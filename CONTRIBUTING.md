@@ -135,9 +135,8 @@ as `QScopedPointer`, or, less preferably, `QSharedPointer`.
 
 ### Translations (for developers) ###
 
-All the user-interface strings inside cockatrice's source code must be written in
-english language. Translations to other languages are managed using Transifex:
-http://www.transifex.com
+All the user-interface strings inside Cockatrice's source code must be written in
+english language. Translations to other languages are managed using [Transifex](https://www.transifex.com/projects/p/cockatrice/).
 
 If you're about to propose a change that adds or modifies any translatable string
 in the code, you'll need to update the basic translation files so that translators
@@ -173,18 +172,17 @@ strings.
 ### Translations (for mantainers) ###
 
 Before rushing out a new release, it would be nice to fetch the most up to date
-translations from Transifer and commit them in the cockatrice source code.
-This can be done manually from the Transifex we interface, but it's quite time
-expensive.
+translations from Transifex and commit them into the Cockatrice source code.
+This can be done manually from the Transifex web interface, but it's quite time
+consuming.
 
 As an alternative, you can install the Transifex CLI: 
     
     http://docs.transifex.com/developer/client/
 
 You'll then be able to use a git-like cli command to push and pull translations
-from Transifex to the source code and viceversa.
+from Transifex to the source code and vice versa.
 
 ### Translations (for translators) ###
 
-Please have a look at the specific FAQ:
-https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ
+Please have a look at the specific [FAQ for translators](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).

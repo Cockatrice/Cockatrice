@@ -21,12 +21,22 @@ SettingsCache::SettingsCache()
     playerBgPath = settings->value("zonebg/playerarea").toString();
     cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
 
-    picDownload = settings->value("personal/picturedownload", true).toBool();
-    picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
-    pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
+    // we only want to reset the cache once, then its up to the user
+    bool updateCache = settings->value("revert/pixmapCacheSize", false).toBool();
+    if (!updateCache) {
+        pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
+        settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
+        settings->setValue("personal/picturedownloadhq", false);
+        settings->setValue("revert/pixmapCacheSize", true);
+    }
+    else
+        pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
     //sanity check
     if(pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
+
+    picDownload = settings->value("personal/picturedownload", true).toBool();
+    picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
 
     picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
     picUrlHq = settings->value("personal/picUrlHq", PIC_URL_HQ_DEFAULT).toString();
@@ -62,7 +72,14 @@ SettingsCache::SettingsCache()
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
     ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
 
-    attemptAutoConnect = settings->value("server/auto_connect", 0).toBool(); 
+    attemptAutoConnect = settings->value("server/auto_connect", 0).toBool();
+
+    scaleCards = settings->value("cards/scaleCards", true).toBool();
+}
+
+void SettingsCache::setCardScaling(const int _scaleCards) {
+    scaleCards = _scaleCards;
+    settings->setValue("cards/scaleCards", scaleCards);
 }
 
 void SettingsCache::setLang(const QString &_lang)

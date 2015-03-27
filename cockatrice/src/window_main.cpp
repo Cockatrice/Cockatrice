@@ -287,7 +287,7 @@ void MainWindow::setClientStatusTitle()
         case StatusConnecting: setWindowTitle(appName + " - " + tr("Connecting to %1...").arg(client->peerName())); break;
         case StatusDisconnected: setWindowTitle(appName + " - " + tr("Disconnected")); break;
         case StatusLoggingIn: setWindowTitle(appName + " - " + tr("Connected, logging in at %1").arg(client->peerName())); break;
-        case StatusLoggedIn: setWindowTitle(appName + " - " + tr("Logged in at %1").arg(client->peerName())); break;
+        case StatusLoggedIn: setWindowTitle(appName + " - " + tr("Logged in as %1 at %2").arg(client->getUserName()).arg(client->peerName())); break;
         default: setWindowTitle(appName);
     }
 }
@@ -423,12 +423,19 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (tabSupervisor->getGameCount()) {
-        if (QMessageBox::question(this, tr("Are you sure?"), tr("There are still open games. Are you sure you want to quit?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
-            event->ignore();
-            return;
-        }
+    // workaround Qt bug where closeEvent gets called twice
+    static bool bClosingDown=false;
+    if(bClosingDown)
+        return;
+    bClosingDown=true;
+
+    if (!tabSupervisor->closeRequest())
+    {
+        event->ignore();
+        bClosingDown=false;
+        return;
     }
+
     event->accept();
     settingsCache->setMainWindowGeometry(saveGeometry());
     tabSupervisor->deleteLater();

@@ -175,6 +175,45 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     return authState;
 }
 
+RegistrationResult Server::registerUserAccount(const QString &ipAddress, const Command_Register &cmd, QString &banReason, int &banSecondsRemaining)
+{
+    // TODO
+
+    if (!registrationEnabled)
+        return RegistrationDisabled;
+
+    QString emailAddress = QString::fromStdString(cmd.email());
+    if (requireEmailForRegistration && emailAddress.isEmpty())
+        return EmailRequired;
+
+    Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
+
+    // TODO: Move this method outside of the db interface
+    QString userName = QString::fromStdString(cmd.user_name());
+    if (!databaseInterface->usernameIsValid(userName))
+        return InvalidUsername;
+
+    if (databaseInterface->checkUserIsBanned(ipAddress, userName, banReason, banSecondsRemaining))
+        return ClientIsBanned;
+
+    if (tooManyRegistrationAttempts(ipAddress))
+        return TooManyRequests;
+
+    QString realName = QString::fromStdString(cmd.real_name());
+    ServerInfo_User_Gender gender = cmd.gender();
+    QString country = QString::fromStdString(cmd.country());
+    QString passwordSha512 = QString::fromStdString(cmd.password());
+    bool regSucceeded = databaseInterface->registerUser(userName, realName, gender, passwordSha512, emailAddress, country, false);
+
+    return regSucceeded ? Accepted : Failed;
+}
+
+bool Server::tooManyRegistrationAttempts(const QString &ipAddress)
+{
+    // TODO: implement
+    return false;
+}
+
 void Server::addPersistentPlayer(const QString &userName, int roomId, int gameId, int playerId)
 {
     QWriteLocker locker(&persistentPlayersLock);

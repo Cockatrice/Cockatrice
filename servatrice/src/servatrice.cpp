@@ -160,6 +160,13 @@ bool Servatrice::initServer()
         authenticationMethod = AuthenticationNone;
     }
 
+    registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
+    requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
+
+    qDebug() << "Registration enabled: " << registrationEnabled;
+    if (registrationEnabled)
+        qDebug() << "Require email address to register: " << requireEmailForRegistration;
+
     QString dbTypeStr = settingsCache->value("database/type").toString();
     if (dbTypeStr == "mysql")
         databaseType = DatabaseMySql;
@@ -172,12 +179,17 @@ bool Servatrice::initServer()
     if (databaseType != DatabaseNone) {
         settingsCache->beginGroup("database");
         dbPrefix = settingsCache->value("prefix").toString();
-        servatriceDatabaseInterface->initDatabase("QMYSQL",
-                              settingsCache->value("hostname").toString(),
-                              settingsCache->value("database").toString(),
-                              settingsCache->value("user").toString(),
-                              settingsCache->value("password").toString());
+        bool dbOpened =
+            servatriceDatabaseInterface->initDatabase("QMYSQL",
+                 settingsCache->value("hostname").toString(),
+                 settingsCache->value("database").toString(),
+                 settingsCache->value("user").toString(),
+                 settingsCache->value("password").toString());
         settingsCache->endGroup();
+        if (!dbOpened) {
+            qDebug() << "Failed to open database";
+            return false;
+        }
 
         updateServerList();
 
@@ -340,7 +352,7 @@ bool Servatrice::initServer()
 	if (gameServer->listen(QHostAddress::Any, gamePort))
 		qDebug() << "Server listening.";
 	else {
-		qDebug() << "gameServer->listen(): Error.";
+		qDebug() << "gameServer->listen(): Error:" << gameServer->errorString();
 		return false;
 	}
 	return true;

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="en_US">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="it" version="2.1">
 <context>
     <name>ChooseSetsPage</name>
     <message>
@@ -38,7 +36,7 @@ Tutti i set base e le espansioni sono selezionate di default.</translation>
     </message>
     <message>
         <source>English</source>
-        <translation>Italiano</translation>
+        <translation>Italiano (Italian)</translation>
     </message>
     <message>
         <source>Language:</source>

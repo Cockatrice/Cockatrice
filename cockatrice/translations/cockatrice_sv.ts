@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="sv_SE">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="sv" version="2.1">
 <context>
     <name>AbstractCounter</name>
     <message>
@@ -11,17 +9,17 @@
     <message>
         <location filename="../src/abstractcounter.cpp" line="68"/>
         <source>Ctrl+L</source>
-        <translation></translation>
+        <translation>Ctrl+L</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="69"/>
         <source>F11</source>
-        <translation></translation>
+        <translation>F11</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="70"/>
         <source>F12</source>
-        <translation></translation>
+        <translation>F12</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="142"/>
@@ -42,49 +40,29 @@
         <translation>Zonbakgrundsbilder</translation>
     </message>
     <message>
-        <source>Path to hand background:</source>
-        <translation type="obsolete">Sökväg till handbakgrund:</translation>
-    </message>
-    <message>
-        <source>Path to stack background:</source>
-        <translation type="obsolete">Sökväg till stapelbakgrund:</translation>
-    </message>
-    <message>
-        <source>Path to table background:</source>
-        <translation type="obsolete">Sökväg till bordbakgrund:</translation>
-    </message>
-    <message>
-        <source>Path to player info background:</source>
-        <translation type="obsolete">Sökväg till spelarinfobakgrund:</translation>
-    </message>
-    <message>
-        <source>Path to picture of card back:</source>
-        <translation type="obsolete">Sökväg till kortbaksidans bild:</translation>
-    </message>
-    <message>
         <location filename="../src/dlg_settings.cpp" line="346"/>
         <source>Hand background:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="347"/>
         <source>Stack background:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="348"/>
         <source>Table background:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="349"/>
         <source>Player info background:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="350"/>
         <source>Card back:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="352"/>
@@ -120,18 +98,6 @@
         <location filename="../src/dlg_settings.cpp" line="360"/>
         <source>Minimum player count for multi-column layout:</source>
         <translation>Minst antal spelare för multi-kolumnlayout:</translation>
-    </message>
-    <message>
-        <source>Zone view layout</source>
-        <translation type="vanished">Zonvylayout</translation>
-    </message>
-    <message>
-        <source>Sort by name</source>
-        <translation type="vanished">Sortera efter namn</translation>
-    </message>
-    <message>
-        <source>Sort by type</source>
-        <translation type="vanished">Sortera efter typ</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="371"/>
@@ -261,27 +227,27 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/cardinfotext.cpp" line="62"/>
         <source>Name:</source>
-        <translation type="unfinished">Namn:</translation>
+        <translation>Namn:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="63"/>
         <source>Mana cost:</source>
-        <translation type="unfinished">Manakostnad:</translation>
+        <translation>Manakostnad:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="64"/>
         <source>Card type:</source>
-        <translation type="unfinished">Korttyp:</translation>
+        <translation>Korttyp:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="65"/>
         <source>P / T:</source>
-        <translation type="unfinished">P / T:</translation>
+        <translation>P / T:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="66"/>
         <source>Loyalty:</source>
-        <translation type="unfinished">Lojalitet:</translation>
+        <translation>Lojalitet:</translation>
     </message>
 </context>
 <context>
@@ -330,121 +296,9 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
 <context>
     <name>CardItem</name>
     <message>
-        <source>&amp;Play</source>
-        <translation type="obsolete">&amp;Spela</translation>
-    </message>
-    <message>
-        <source>&amp;Hide</source>
-        <translation type="obsolete">&amp;Göm</translation>
-    </message>
-    <message>
-        <source>&amp;Tap</source>
-        <translation type="obsolete">&amp;Tappa</translation>
-    </message>
-    <message>
-        <source>&amp;Untap</source>
-        <translation type="obsolete">Tappa &amp;upp</translation>
-    </message>
-    <message>
-        <source>Toggle &amp;normal untapping</source>
-        <translation type="obsolete">Växla &amp;normal upptappning</translation>
-    </message>
-    <message>
-        <source>&amp;Flip</source>
-        <translation type="obsolete">&amp;Vänd</translation>
-    </message>
-    <message>
-        <source>&amp;Clone</source>
-        <translation type="obsolete">&amp;Klona</translation>
-    </message>
-    <message>
-        <source>&amp;Attach to card...</source>
-        <translation type="obsolete">&amp;Fäst på kort...</translation>
-    </message>
-    <message>
-        <source>Unattac&amp;h</source>
-        <translation type="obsolete">Se&amp;parera</translation>
-    </message>
-    <message>
-        <source>&amp;Draw arrow...</source>
-        <translation type="obsolete">&amp;Rita pil...</translation>
-    </message>
-    <message>
         <location filename="../src/carditem.cpp" line="84"/>
         <source>&amp;Power / toughness</source>
         <translation>Po&amp;wer / toughness</translation>
-    </message>
-    <message>
-        <source>&amp;Increase power</source>
-        <translation type="obsolete">&amp;Öka power</translation>
-    </message>
-    <message>
-        <source>&amp;Decrease power</source>
-        <translation type="obsolete">&amp;Minska power</translation>
-    </message>
-    <message>
-        <source>I&amp;ncrease toughness</source>
-        <translation type="obsolete">Öka toug&amp;hness</translation>
-    </message>
-    <message>
-        <source>D&amp;ecrease toughness</source>
-        <translation type="obsolete">Minska t&amp;oughness</translation>
-    </message>
-    <message>
-        <source>In&amp;crease power and toughness</source>
-        <translation type="obsolete">Öka power o&amp;ch toughness</translation>
-    </message>
-    <message>
-        <source>Dec&amp;rease power and toughness</source>
-        <translation type="obsolete">M&amp;inska power och toughness</translation>
-    </message>
-    <message>
-        <source>Set &amp;power and toughness...</source>
-        <translation type="obsolete">An&amp;ge power och toughness...</translation>
-    </message>
-    <message>
-        <source>&amp;Set annotation...</source>
-        <translation type="obsolete">Ang&amp;e annotering...</translation>
-    </message>
-    <message>
-        <source>red</source>
-        <translation type="obsolete">röd</translation>
-    </message>
-    <message>
-        <source>yellow</source>
-        <translation type="obsolete">gul</translation>
-    </message>
-    <message>
-        <source>green</source>
-        <translation type="obsolete">grön</translation>
-    </message>
-    <message>
-        <source>&amp;Add counter (%1)</source>
-        <translation type="obsolete">P&amp;lacera polett (%1)</translation>
-    </message>
-    <message>
-        <source>&amp;Remove counter (%1)</source>
-        <translation type="obsolete">Ta &amp;bort polett (%1)</translation>
-    </message>
-    <message>
-        <source>&amp;Set counters (%1)...</source>
-        <translation type="obsolete">Pl&amp;acera poletter (%1)...</translation>
-    </message>
-    <message>
-        <source>&amp;top of library</source>
-        <translation type="obsolete">&amp;överst i leken</translation>
-    </message>
-    <message>
-        <source>&amp;bottom of library</source>
-        <translation type="obsolete">&amp;underst i leken</translation>
-    </message>
-    <message>
-        <source>&amp;graveyard</source>
-        <translation type="obsolete">kyrkog&amp;ård</translation>
-    </message>
-    <message>
-        <source>&amp;exile</source>
-        <translation type="obsolete">e&amp;xil</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="83"/>
@@ -599,46 +453,6 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <translation>%1&apos;s sidbräda</translation>
     </message>
     <message>
-        <source>of her hand</source>
-        <comment>genitive, female owner</comment>
-        <translation type="obsolete">av sin hand</translation>
-    </message>
-    <message>
-        <source>of %1&apos;s hand</source>
-        <comment>genitive, female owner</comment>
-        <translation type="obsolete">av %1&apos;s hand</translation>
-    </message>
-    <message>
-        <source>of his hand</source>
-        <comment>genitive, male owner</comment>
-        <translation type="obsolete">av sin hand</translation>
-    </message>
-    <message>
-        <source>of %1&apos;s hand</source>
-        <comment>genitive, male owner</comment>
-        <translation type="obsolete">av %1&apos;s hand</translation>
-    </message>
-    <message>
-        <source>her hand</source>
-        <comment>accusative, female owner</comment>
-        <translation type="obsolete">sin hand</translation>
-    </message>
-    <message>
-        <source>%1&apos;s hand</source>
-        <comment>accusative, female owner</comment>
-        <translation type="obsolete">%1&apos;s hand</translation>
-    </message>
-    <message>
-        <source>his hand</source>
-        <comment>accusative, male owner</comment>
-        <translation type="obsolete">sin hand</translation>
-    </message>
-    <message>
-        <source>%1&apos;s hand</source>
-        <comment>accusative, male owner</comment>
-        <translation type="obsolete">%1&apos;s hand</translation>
-    </message>
-    <message>
         <location filename="../src/cardzone.cpp" line="101"/>
         <source>her library</source>
         <comment>nominative, female owner</comment>
@@ -661,46 +475,6 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <source>%1&apos;s library</source>
         <comment>nominative, male owner</comment>
         <translation>%1&apos;s lek</translation>
-    </message>
-    <message>
-        <source>of her library</source>
-        <comment>genitive, female owner</comment>
-        <translation type="obsolete">av sin lek</translation>
-    </message>
-    <message>
-        <source>of %1&apos;s library</source>
-        <comment>genitive, female owner</comment>
-        <translation type="obsolete">av %1&apos;s lek</translation>
-    </message>
-    <message>
-        <source>of his library</source>
-        <comment>genitive, male owner</comment>
-        <translation type="obsolete">av sin lek</translation>
-    </message>
-    <message>
-        <source>of %1&apos;s library</source>
-        <comment>genitive, male owner</comment>
-        <translation type="obsolete">av %1&apos;s lek</translation>
-    </message>
-    <message>
-        <source>her library</source>
-        <comment>accusative, female owner</comment>
-        <translation type="obsolete">hennes lek</translation>
-    </message>
-    <message>
-        <source>%1&apos;s library</source>
-        <comment>accusative, female owner</comment>
-        <translation type="obsolete">%1&apos;s lek</translation>
-    </message>
-    <message>
-        <source>his library</source>
-        <comment>accusative, male owner</comment>
-        <translation type="obsolete">hans lek</translation>
-    </message>
-    <message>
-        <source>%1&apos;s library</source>
-        <comment>accusative, male owner</comment>
-        <translation type="obsolete">%1&apos;s lek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="111"/>
@@ -727,46 +501,6 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <translation>%1&apos;s kyrkogård</translation>
     </message>
     <message>
-        <source>of her graveyard</source>
-        <comment>genitive, female owner</comment>
-        <translation type="obsolete">av sin kyrkogård</translation>
-    </message>
-    <message>
-        <source>of %1&apos;s graveyard</source>
-        <comment>genitive, female owner</comment>
-        <translation type="obsolete">av %1&apos;s kyrkogård</translation>
-    </message>
-    <message>
-        <source>of his graveyard</source>
-        <comment>genitive, male owner</comment>
-        <translation type="obsolete">av sin kyrkogård</translation>
-    </message>
-    <message>
-        <source>of %1&apos;s graveyard</source>
-        <comment>genitive, male owner</comment>
-        <translation type="obsolete">av %1&apos;s kyrkogård</translation>
-    </message>
-    <message>
-        <source>her graveyard</source>
-        <comment>accusative, female owner</comment>
-        <translation type="obsolete">hennes kyrkogård</translation>
-    </message>
-    <message>
-        <source>%1&apos;s graveyard</source>
-        <comment>accusative, female owner</comment>
-        <translation type="obsolete">%1&apos;s kyrkogård</translation>
-    </message>
-    <message>
-        <source>his graveyard</source>
-        <comment>accusative, male owner</comment>
-        <translation type="obsolete">hans kyrkogård</translation>
-    </message>
-    <message>
-        <source>%1&apos;s graveyard</source>
-        <comment>accusative, male owner</comment>
-        <translation type="obsolete">%1&apos;s kyrkogård</translation>
-    </message>
-    <message>
         <location filename="../src/cardzone.cpp" line="120"/>
         <source>her exile</source>
         <comment>nominative, female owner</comment>
@@ -789,46 +523,6 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <source>%1&apos;s exile</source>
         <comment>nominative, male owner</comment>
         <translation>%1&apos;s exil</translation>
-    </message>
-    <message>
-        <source>of her exile</source>
-        <comment>genitive, female owner</comment>
-        <translation type="obsolete">sin exil</translation>
-    </message>
-    <message>
-        <source>of %1&apos;s exile</source>
-        <comment>genitive, female owner</comment>
-        <translation type="obsolete">%1&apos;s exil</translation>
-    </message>
-    <message>
-        <source>of his exile</source>
-        <comment>genitive, male owner</comment>
-        <translation type="obsolete">sin exil</translation>
-    </message>
-    <message>
-        <source>of %1&apos;s exile</source>
-        <comment>genitive, male owner</comment>
-        <translation type="obsolete">%1&apos;s exil</translation>
-    </message>
-    <message>
-        <source>her exile</source>
-        <comment>accusative, female owner</comment>
-        <translation type="obsolete">hennes exil</translation>
-    </message>
-    <message>
-        <source>%1&apos;s exile</source>
-        <comment>accusative, female owner</comment>
-        <translation type="obsolete">%1&apos;s exil</translation>
-    </message>
-    <message>
-        <source>his exile</source>
-        <comment>accusative, male owner</comment>
-        <translation type="obsolete">hans exil</translation>
-    </message>
-    <message>
-        <source>%1&apos;s exile</source>
-        <comment>accusative, male owner</comment>
-        <translation type="obsolete">%1&apos;s exil</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="140"/>
@@ -854,46 +548,6 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <comment>nominative, male owner</comment>
         <translation>%1&apos;s sidbräda</translation>
     </message>
-    <message>
-        <source>of her sideboard</source>
-        <comment>genitive, female owner</comment>
-        <translation type="obsolete">av sin sidbräda</translation>
-    </message>
-    <message>
-        <source>of %1&apos;s sideboard</source>
-        <comment>genitive, female owner</comment>
-        <translation type="obsolete">av %1&apos;s sidbräda</translation>
-    </message>
-    <message>
-        <source>of his sideboard</source>
-        <comment>genitive, male owner</comment>
-        <translation type="obsolete">av sin sidbräda</translation>
-    </message>
-    <message>
-        <source>of %1&apos;s sideboard</source>
-        <comment>genitive, male owner</comment>
-        <translation type="obsolete">av %1&apos;s sidbräda</translation>
-    </message>
-    <message>
-        <source>her sideboard</source>
-        <comment>accusative, female owner</comment>
-        <translation type="obsolete">hennes sidbräda</translation>
-    </message>
-    <message>
-        <source>%1&apos;s sideboard</source>
-        <comment>accusative, female owner</comment>
-        <translation type="obsolete">%1&apos;s sidbräda</translation>
-    </message>
-    <message>
-        <source>his sideboard</source>
-        <comment>accusative, male owner</comment>
-        <translation type="obsolete">hans sidbräda</translation>
-    </message>
-    <message>
-        <source>%1&apos;s sideboard</source>
-        <comment>accusative, male owner</comment>
-        <translation type="obsolete">%1&apos;s sidbräda</translation>
-    </message>
 </context>
 <context>
     <name>DBPriceUpdater</name>
@@ -902,33 +556,29 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/priceupdater.cpp" line="128"/>
         <location filename="../src/priceupdater.cpp" line="149"/>
         <source>Error</source>
-        <translation type="unfinished">Fel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/priceupdater.cpp" line="115"/>
         <location filename="../src/priceupdater.cpp" line="149"/>
         <source>A problem has occured while fetching card prices.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/priceupdater.cpp" line="128"/>
         <source>A problem has occured while fetching card prices:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>DeckEditorSettingsPage</name>
     <message>
-        <source>Enable &amp;price tag feature (using data from blacklotusproject.com)</source>
-        <translation type="obsolete">Aktivera &amp;prislappsfunktionen (använder data från blacklotusproject.com)</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="554"/>
+        <location filename="../src/dlg_settings.cpp" line="565"/>
         <source>Enable &amp;price tag feature from deckbrew.com</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="555"/>
+        <location filename="../src/dlg_settings.cpp" line="566"/>
         <source>General</source>
         <translation>Allmänt</translation>
     </message>
@@ -1076,15 +726,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_connect.cpp" line="37"/>
         <source>A&amp;uto connect at start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Avbryt</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="71"/>
@@ -1100,6 +742,11 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <translation>&amp;Beskrivning:</translation>
     </message>
     <message>
+        <location filename="../src/dlg_creategame.cpp" line="52"/>
+        <source>&amp;Password:</source>
+        <translation>&amp;Lösenord:</translation>
+    </message>
+    <message>
         <location filename="../src/dlg_creategame.cpp" line="28"/>
         <source>P&amp;layers:</source>
         <translation>&amp;Spelare:</translation>
@@ -1108,11 +755,6 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/dlg_creategame.cpp" line="49"/>
         <source>Game type</source>
         <translation>Speltyp</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_creategame.cpp" line="52"/>
-        <source>&amp;Password:</source>
-        <translation>&amp;Lösenord:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="56"/>
@@ -1131,13 +773,18 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="75"/>
-        <source>&amp;Spectators allowed</source>
-        <translation>&amp;Åskådare tillåtna</translation>
+        <source>&amp;Spectators can watch</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="78"/>
-        <source>Spectators &amp;need a password to join</source>
-        <translation>Åskådare &amp;behöver ett lösenord för att ansluta</translation>
+        <source>Spectators &amp;need a password to watch</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_creategame.cpp" line="80"/>
+        <source>Spectators can see &amp;hands</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="79"/>
@@ -1145,22 +792,9 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <translation>Åskådare kan &amp;chatta</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="80"/>
-        <source>Spectators see &amp;everything</source>
-        <translation>Åskådare kan s&amp;e allt</translation>
-    </message>
-    <message>
         <location filename="../src/dlg_creategame.cpp" line="86"/>
         <source>Spectators</source>
         <translation>Åskådare</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Avbryt</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="115"/>
@@ -1269,14 +903,6 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/dlg_create_token.cpp" line="103"/>
         <source>Choose token from list</source>
         <translation>Välj jetong från lista</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Avbryt</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="123"/>
@@ -1388,7 +1014,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="26"/>
         <source>Hide &amp;password protected games</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="31"/>
@@ -1434,14 +1060,6 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <translation>&amp;Uppdatera</translation>
     </message>
     <message>
-        <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Avbryt</translation>
-    </message>
-    <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="34"/>
         <source>Load deck from clipboard</source>
         <translation>Ladda lek från urklipp</translation>
@@ -1460,14 +1078,6 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
 <context>
     <name>DlgLoadRemoteDeck</name>
     <message>
-        <source>O&amp;K</source>
-        <translation type="obsolete">&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Avbryt</translation>
-    </message>
-    <message>
         <location filename="../src/dlg_load_remote_deck.cpp" line="25"/>
         <source>Load deck</source>
         <translation>Ladda lek</translation>
@@ -1476,23 +1086,19 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="837"/>
-        <location filename="../src/dlg_settings.cpp" line="843"/>
-        <location filename="../src/dlg_settings.cpp" line="849"/>
+        <location filename="../src/dlg_settings.cpp" line="848"/>
+        <location filename="../src/dlg_settings.cpp" line="854"/>
+        <location filename="../src/dlg_settings.cpp" line="860"/>
         <source>Error</source>
         <translation>Fel</translation>
     </message>
     <message>
-        <source>Your card database is invalid. Would you like to go back and set the correct path?</source>
-        <translation type="obsolete">Din kortdatabas är ogiltig. Vill du gå tillbaka och ange den korrekta sökvägen?</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="791"/>
+        <location filename="../src/dlg_settings.cpp" line="802"/>
         <source>Unknown Error loading card database</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="800"/>
+        <location filename="../src/dlg_settings.cpp" line="811"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1500,10 +1106,10 @@ Cockatrice may not function correctly with an invalid database
 You may need to rerun oracle to update your card database.
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="807"/>
+        <location filename="../src/dlg_settings.cpp" line="818"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1511,190 +1117,178 @@ This can cause problems loading card information or images
 Usually this can be fixed by rerunning oracle to to update your card database.
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="814"/>
+        <location filename="../src/dlg_settings.cpp" line="825"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues with your cards.xml attached
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="820"/>
+        <location filename="../src/dlg_settings.cpp" line="831"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="825"/>
+        <location filename="../src/dlg_settings.cpp" line="836"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="830"/>
+        <location filename="../src/dlg_settings.cpp" line="841"/>
         <source>Unknown card database load status
 
 Please file a ticket at http://github.com/Daenyth/Cockatrice/issues
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="843"/>
+        <location filename="../src/dlg_settings.cpp" line="854"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Sökvägen till din lekkatalog är ogiltig. Vill du gå tillbaka och ange den korrekta sökvägen?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="849"/>
+        <location filename="../src/dlg_settings.cpp" line="860"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Sökvägen till din kortbildsdatabas är ogiltig. Vill du gå tillbaka och ange den korrekta sökvägen?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="858"/>
+        <location filename="../src/dlg_settings.cpp" line="869"/>
         <source>Settings</source>
         <translation>Inställningar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="860"/>
+        <location filename="../src/dlg_settings.cpp" line="871"/>
         <source>General</source>
         <translation>Allmänt</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="861"/>
+        <location filename="../src/dlg_settings.cpp" line="872"/>
         <source>Appearance</source>
         <translation>Utseende</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="862"/>
+        <location filename="../src/dlg_settings.cpp" line="873"/>
         <source>User interface</source>
         <translation>Användargränssnitt</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="863"/>
+        <location filename="../src/dlg_settings.cpp" line="874"/>
         <source>Deck editor</source>
         <translation>Lekredigeraren</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="864"/>
+        <location filename="../src/dlg_settings.cpp" line="875"/>
         <source>Chat Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Messages</source>
-        <translation type="vanished">Meddelanden</translation>
-    </message>
-    <message>
-        <source>&amp;Close</source>
-        <translation type="obsolete">&amp;Stäng</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="128"/>
-        <location filename="../src/gameselector.cpp" line="129"/>
-        <location filename="../src/gameselector.cpp" line="130"/>
-        <location filename="../src/gameselector.cpp" line="131"/>
-        <location filename="../src/gameselector.cpp" line="132"/>
-        <location filename="../src/gameselector.cpp" line="133"/>
-        <location filename="../src/gameselector.cpp" line="134"/>
-        <location filename="../src/gameselector.cpp" line="135"/>
-        <location filename="../src/gameselector.cpp" line="165"/>
-        <source>Error</source>
-        <translation>Fel</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="128"/>
-        <source>Please join the appropriate room first.</source>
-        <translation>Vänligen anslut till det lämpliga rummet först.</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="129"/>
-        <source>Wrong password.</source>
-        <translation>Fel lösenord.</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="130"/>
-        <source>Spectators are not allowed in this game.</source>
-        <translation>Åskådare är ej tillåtna i detta spelet.</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="131"/>
-        <source>The game is already full.</source>
-        <translation>Spelet är redan fullt.</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="132"/>
-        <source>The game does not exist any more.</source>
-        <translation>Det här spelet finns inte längre.</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="133"/>
-        <source>This game is only open to registered users.</source>
-        <translation>Det här spelet är bara öppet för registrerade användare.</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="134"/>
-        <source>This game is only open to its creator&apos;s buddies.</source>
-        <translation>Det här spelet är bara öppet för skaparens vänner.</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="135"/>
-        <source>You are being ignored by the creator of this game.</source>
-        <translation>Spelets skapare ignorerar dig.</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="152"/>
-        <source>Join game</source>
-        <translation>Anslut till spel</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="152"/>
-        <source>Password:</source>
-        <translation>Lösenord:</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="165"/>
-        <source>Please join the respective room first.</source>
-        <translation>Vänligen anslut till respektive rum först.</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="181"/>
-        <source>Games</source>
-        <translation>Spel</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="182"/>
-        <source>&amp;Filter games</source>
-        <translation>&amp;Filtrera spel</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="183"/>
-        <source>C&amp;lear filter</source>
-        <translation>&amp;Rensa filter</translation>
-    </message>
-    <message>
-        <source>Show u&amp;navailable games</source>
-        <translation type="obsolete">Visa &amp;otillgängliga spel</translation>
-    </message>
-    <message>
-        <location filename="../src/gameselector.cpp" line="185"/>
+        <location filename="../src/gameselector.cpp" line="193"/>
         <source>C&amp;reate</source>
         <translation>&amp;Skapa</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="186"/>
+        <location filename="../src/gameselector.cpp" line="194"/>
         <source>&amp;Join</source>
         <translation>&amp;Anslut</translation>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="187"/>
+        <location filename="../src/gameselector.cpp" line="136"/>
+        <location filename="../src/gameselector.cpp" line="137"/>
+        <location filename="../src/gameselector.cpp" line="138"/>
+        <location filename="../src/gameselector.cpp" line="139"/>
+        <location filename="../src/gameselector.cpp" line="140"/>
+        <location filename="../src/gameselector.cpp" line="141"/>
+        <location filename="../src/gameselector.cpp" line="142"/>
+        <location filename="../src/gameselector.cpp" line="143"/>
+        <location filename="../src/gameselector.cpp" line="173"/>
+        <source>Error</source>
+        <translation>Fel</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="136"/>
+        <source>Please join the appropriate room first.</source>
+        <translation>Vänligen anslut till det lämpliga rummet först.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="137"/>
+        <source>Wrong password.</source>
+        <translation>Fel lösenord.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="138"/>
+        <source>Spectators are not allowed in this game.</source>
+        <translation>Åskådare är ej tillåtna i detta spelet.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="139"/>
+        <source>The game is already full.</source>
+        <translation>Spelet är redan fullt.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="140"/>
+        <source>The game does not exist any more.</source>
+        <translation>Det här spelet finns inte längre.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="141"/>
+        <source>This game is only open to registered users.</source>
+        <translation>Det här spelet är bara öppet för registrerade användare.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="142"/>
+        <source>This game is only open to its creator&apos;s buddies.</source>
+        <translation>Det här spelet är bara öppet för skaparens vänner.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="143"/>
+        <source>You are being ignored by the creator of this game.</source>
+        <translation>Spelets skapare ignorerar dig.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="160"/>
+        <source>Join game</source>
+        <translation>Anslut till spel</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="160"/>
+        <source>Password:</source>
+        <translation>Lösenord:</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="173"/>
+        <source>Please join the respective room first.</source>
+        <translation>Vänligen anslut till respektive rum först.</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="189"/>
+        <source>Games</source>
+        <translation>Spel</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="190"/>
+        <source>&amp;Filter games</source>
+        <translation>&amp;Filtrera spel</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="191"/>
+        <source>C&amp;lear filter</source>
+        <translation>&amp;Rensa filter</translation>
+    </message>
+    <message>
+        <location filename="../src/gameselector.cpp" line="195"/>
         <source>J&amp;oin as spectator</source>
         <translation>Anslut som &amp;åskådare</translation>
     </message>
@@ -1704,22 +1298,30 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/gameview.cpp" line="22"/>
         <source>Esc</source>
-        <translation></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>GamesModel</name>
     <message>
-        <source>yes</source>
-        <translation type="vanished">ja</translation>
+        <location filename="../src/gamesmodel.cpp" line="212"/>
+        <source>Game Created</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>yes, free for spectators</source>
-        <translation type="vanished">ja, fritt för åskådare</translation>
+        <location filename="../src/gamesmodel.cpp" line="214"/>
+        <source>Creator</source>
+        <translation>Skapare</translation>
     </message>
     <message>
-        <source>no</source>
-        <translation type="vanished">nej</translation>
+        <location filename="../src/gamesmodel.cpp" line="213"/>
+        <source>Description</source>
+        <translation>Beskrivning</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="146"/>
+        <source>password</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="148"/>
@@ -1732,60 +1334,48 @@ Would you like to change your database location setting?</source>
         <translation>endast reg. användare</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="176"/>
+        <location filename="../src/gamesmodel.cpp" line="182"/>
+        <location filename="../src/gamesmodel.cpp" line="186"/>
+        <source>can chat</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="182"/>
+        <source>see hands</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="190"/>
+        <source>can see hands</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="195"/>
         <source>not allowed</source>
         <translation>ej tillåtna</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="192"/>
-        <source>Game Created</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="193"/>
-        <source>Description</source>
-        <translation>Beskrivning</translation>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="195"/>
-        <source>Game Type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="191"/>
+        <location filename="../src/gamesmodel.cpp" line="211"/>
         <source>Room</source>
         <translation>Rum</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="146"/>
-        <source>password</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/gamesmodel.cpp" line="215"/>
+        <source>Game Type</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="194"/>
-        <source>Creator</source>
-        <translation>Skapare</translation>
-    </message>
-    <message>
-        <source>Game type</source>
-        <translation type="vanished">Speltyp</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation type="vanished">Lösenord</translation>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="196"/>
+        <location filename="../src/gamesmodel.cpp" line="216"/>
         <source>Restrictions</source>
         <translation>Begränsningar</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="197"/>
+        <location filename="../src/gamesmodel.cpp" line="217"/>
         <source>Players</source>
         <translation>Spelare</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="198"/>
+        <location filename="../src/gamesmodel.cpp" line="218"/>
         <source>Spectators</source>
         <translation>Åskådare</translation>
     </message>
@@ -1793,20 +1383,9 @@ Would you like to change your database location setting?</source>
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="37"/>
-        <location filename="../src/dlg_settings.cpp" line="138"/>
-        <source>English</source>
-        <translation>Svenska</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="232"/>
-        <source>Picture cache size:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/dlg_settings.cpp" line="233"/>
         <source>Reset/Clear Downloaded Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="143"/>
@@ -1820,22 +1399,22 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="190"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="190"/>
         <source>Downloaded card pictures have been reset.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="192"/>
         <source>Error</source>
-        <translation type="unfinished">Fel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="192"/>
         <source>One or more downloaded card pictures could not be cleared.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="222"/>
@@ -1855,7 +1434,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="225"/>
         <source>Download high-quality card pictures</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="226"/>
@@ -1880,20 +1459,23 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="230"/>
         <source>Card database:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="231"/>
         <source>Token database:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Path to card database:</source>
-        <translation type="obsolete">Sökväg till kortdatabas:</translation>
+        <location filename="../src/dlg_settings.cpp" line="232"/>
+        <source>Picture cache size:</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Path to token database:</source>
-        <translation type="obsolete">Sökväg till jetongdatabas:</translation>
+        <location filename="../src/dlg_settings.cpp" line="37"/>
+        <location filename="../src/dlg_settings.cpp" line="138"/>
+        <source>English</source>
+        <translation>Svenska (Swedish)</translation>
     </message>
 </context>
 <context>
@@ -1904,17 +1486,9 @@ Would you like to change your database location setting?</source>
         <translation>Din adress har för många uppkopplingar samtidigt.</translation>
     </message>
     <message>
-        <source>Banned by moderator.</source>
-        <translation type="obsolete">Bannlyst av moderator.</translation>
-    </message>
-    <message>
         <location filename="../src/window_main.cpp" line="78"/>
         <source>Scheduled server shutdown.</source>
         <translation>Schemalagd serverstängning.</translation>
-    </message>
-    <message>
-        <source>Unknown reason.</source>
-        <translation type="obsolete">Okänd anledning.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="69"/>
@@ -1935,7 +1509,7 @@ Would you like to change your database location setting?</source>
         <location filename="../src/window_main.cpp" line="79"/>
         <location filename="../src/window_main.cpp" line="261"/>
         <source>Invalid username.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="82"/>
@@ -1959,14 +1533,11 @@ Anledning: %1</translation>
         <source>The server is going to be restarted in %n minute(s).
 All running games will be lost.
 Reason for shutdown: %1</source>
-        <translation>
-            <numerusform>Servern kommer att starts om om %n minut.
+        <translation><numerusform>Servern kommer att starts om om %n minut.
 Alla pågående spel kommer att gå förlorade.
-Anledning till nedstängning: %1</numerusform>
-            <numerusform>Servern kommer att starts om om %n minuter.
+Anledning till nedstängning: %1</numerusform><numerusform>Servern kommer att starts om om %n minuter.
 Alla pågående spel kommer att gå förlorade.
-Anledning till nedstängning: %1</numerusform>
-        </translation>
+Anledning till nedstängning: %1</numerusform></translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="136"/>
@@ -2037,16 +1608,12 @@ Anledning till nedstängning: %1</numerusform>
     <message>
         <location filename="../src/window_main.cpp" line="227"/>
         <source>Korean:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="228"/>
         <source>Russian:</source>
         <translation>Ryska:</translation>
-    </message>
-    <message>
-        <source>Czech:</source>
-        <translation type="obsolete">Tjeckiska:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="229"/>
@@ -2078,13 +1645,9 @@ Anledning till nedstängning: %1</numerusform>
         <translation>Server timeout</translation>
     </message>
     <message>
-        <source>Invalid login data.</source>
-        <translation type="obsolete">Ogiltig inloggningsdata.</translation>
-    </message>
-    <message>
         <location filename="../src/window_main.cpp" line="243"/>
         <source>Incorrect username or password. Please check your authentication information and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="246"/>
@@ -2106,7 +1669,7 @@ Vänligen stäng den sessionen först och försök igen.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="264"/>
         <source>This server requires user registration.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="267"/>
@@ -2149,8 +1712,8 @@ Lokal version är %1, avlägsen version är %2.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="290"/>
-        <source>Logged in at %1</source>
-        <translation>Inloggad hos %1</translation>
+        <source>Logged in as %1 at %2</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="299"/>
@@ -2185,7 +1748,7 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="305"/>
         <source>Ctrl+F</source>
-        <translation></translation>
+        <translation>Ctrl+F</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="306"/>
@@ -2198,33 +1761,60 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>A&amp;vsluta</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="309"/>
+        <location filename="../src/window_main.cpp" line="310"/>
+        <source>A&amp;ctions</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="312"/>
         <source>&amp;Cockatrice</source>
         <translation>&amp;Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="311"/>
+        <location filename="../src/window_main.cpp" line="314"/>
         <source>&amp;About Cockatrice</source>
         <translation>&amp;Om Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="312"/>
+        <location filename="../src/window_main.cpp" line="315"/>
         <source>&amp;Help</source>
         <translation>&amp;Hjälp</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="430"/>
+        <location filename="../src/window_main.cpp" line="427"/>
         <source>Are you sure?</source>
         <translation>Är du säker?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="430"/>
+        <location filename="../src/window_main.cpp" line="427"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>Du har fortfarande öppna spel. Är du säker på att du vill avsluta?</translation>
     </message>
 </context>
 <context>
     <name>MessageLogWidget</name>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="72"/>
+        <source>The game has been closed.</source>
+        <translation>Spelet har stängts.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="82"/>
+        <source>%1 is now watching the game.</source>
+        <translation>%1 kollar nu på spelet.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="87"/>
+        <source>%1 is not watching the game any more.</source>
+        <translation>%1 kollar inte längre på spelet.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 draws %n card(s).</source>
+        <translation type="obsolete">
+            <numerusform>%1 draws a card.</numerusform>
+            <numerusform>%1 draws %n cards.</numerusform>
+        </translation>
+    </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="40"/>
         <source>You have joined game #%1.</source>
@@ -2274,44 +1864,19 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>%1 har lämnat spelet.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="72"/>
-        <source>The game has been closed.</source>
-        <translation>Spelet har stängts.</translation>
-    </message>
-    <message>
         <location filename="../src/messagelogwidget.cpp" line="77"/>
         <source>You have been kicked out of the game.</source>
         <translation>Du har blivit utsparkad från spelet.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="82"/>
-        <source>%1 is now watching the game.</source>
-        <translation>%1 kollar nu på spelet.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="87"/>
-        <source>%1 is not watching the game any more.</source>
-        <translation>%1 kollar inte längre på spelet.</translation>
-    </message>
-    <message>
-        <source>%1 has loaded a deck (%2).</source>
-        <comment>female</comment>
-        <translation type="obsolete">%1 har laddat en lek (%2).</translation>
-    </message>
-    <message>
-        <source>%1 has loaded a deck (%2).</source>
-        <comment>male</comment>
-        <translation type="obsolete">%1 har laddat en lek (%2).</translation>
-    </message>
-    <message>
         <location filename="../src/messagelogwidget.cpp" line="94"/>
         <source>%1 has loaded a deck (%2).</source>
-        <translation type="unfinished">%1 har laddat en lek (%2).</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="96"/>
         <source>%1 has loaded a deck with %2 sideboard cards (%3).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="105"/>
@@ -2374,11 +1939,6 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>%1 har gett upp spelet.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="143"/>
-        <source>The game has started.</source>
-        <translation>Spelet har börjat.</translation>
-    </message>
-    <message>
         <location filename="../src/messagelogwidget.cpp" line="150"/>
         <source>%1 has restored connection to the game.</source>
         <comment>female</comment>
@@ -2430,24 +1990,13 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <location filename="../src/messagelogwidget.cpp" line="198"/>
         <source>%1 draws %n card(s).</source>
         <comment>female</comment>
-        <translation>
-            <numerusform>%1 drar %n kort.</numerusform>
-            <numerusform>%1 drar %n kort.</numerusform>
-        </translation>
+        <translation><numerusform>%1 drar %n kort.</numerusform><numerusform>%1 drar %n kort.</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="200"/>
         <source>%1 draws %n card(s).</source>
         <comment>male</comment>
-        <translation>
-            <numerusform>%1 drar %n kort.</numerusform>
-            <numerusform>%1 drar %n kort.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="207"/>
-        <source>%1 undoes her last draw.</source>
-        <translation>%1 ångrar sitt senaste drag.</translation>
+        <translation><numerusform>%1 drar %n kort.</numerusform><numerusform>%1 drar %n kort.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="207"/>
@@ -2455,13 +2004,18 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>%1 ångrar sitt senaste drag.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="209"/>
-        <source>%1 undoes her last draw (%2).</source>
-        <translation>%1 ångrar sitt senaste drag (%2).</translation>
+        <location filename="../src/messagelogwidget.cpp" line="207"/>
+        <source>%1 undoes her last draw.</source>
+        <translation>%1 ångrar sitt senaste drag.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="209"/>
         <source>%1 undoes his last draw (%2).</source>
+        <translation>%1 ångrar sitt senaste drag (%2).</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="209"/>
+        <source>%1 undoes her last draw (%2).</source>
         <translation>%1 ångrar sitt senaste drag (%2).</translation>
     </message>
     <message>
@@ -2491,12 +2045,12 @@ Lokal version är %1, avlägsen version är %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="232"/>
-        <source>the bottom card of her library</source>
+        <source>the bottom card of his library</source>
         <translation>det sista kortet i sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="232"/>
-        <source>the bottom card of his library</source>
+        <source>the bottom card of her library</source>
         <translation>det sista kortet i sin lek</translation>
     </message>
     <message>
@@ -2506,12 +2060,12 @@ Lokal version är %1, avlägsen version är %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="238"/>
-        <source> from the bottom of her library</source>
+        <source> from the bottom of his library</source>
         <translation> från botten av sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="238"/>
-        <source> from the bottom of his library</source>
+        <source> from the bottom of her library</source>
         <translation> från botten av sin lek</translation>
     </message>
     <message>
@@ -2521,13 +2075,13 @@ Lokal version är %1, avlägsen version är %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="245"/>
-        <source>the top card of her library</source>
-        <translation>det översta kortet av sin lek</translation>
+        <source>the top card of his library</source>
+        <translation>det översta kortet avsin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="245"/>
-        <source>the top card of his library</source>
-        <translation>det översta kortet avsin lek</translation>
+        <source>the top card of her library</source>
+        <translation>det översta kortet av sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="249"/>
@@ -2536,13 +2090,13 @@ Lokal version är %1, avlägsen version är %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="251"/>
-        <source> from the top of her library</source>
-        <translation> från toppen av sin lek</translation>
+        <source> from the top of his library</source>
+        <translation> från botten av sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="251"/>
-        <source> from the top of his library</source>
-        <translation> från botten av sin lek</translation>
+        <source> from the top of her library</source>
+        <translation> från toppen av sin lek</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="255"/>
@@ -2563,12 +2117,6 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <location filename="../src/messagelogwidget.cpp" line="262"/>
         <source> from the stack</source>
         <translation> från stapeln</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="288"/>
-        <location filename="../src/messagelogwidget.cpp" line="699"/>
-        <source>a card</source>
-        <translation>ett kort</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="293"/>
@@ -2602,18 +2150,13 @@ Lokal version är %1, avlägsen version är %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="312"/>
-        <source>%1 puts %2%3 into her library.</source>
-        <translation>%1 placerar %2%3 i sin lek.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="312"/>
         <source>%1 puts %2%3 into his library.</source>
         <translation>%1 placerar %2%3 i sin lek.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="314"/>
-        <source>%1 puts %2%3 on bottom of her library.</source>
-        <translation>%1 placerar %2%3 underst i sin lek.</translation>
+        <location filename="../src/messagelogwidget.cpp" line="312"/>
+        <source>%1 puts %2%3 into her library.</source>
+        <translation>%1 placerar %2%3 i sin lek.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="314"/>
@@ -2621,9 +2164,9 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>%1 placerar %2%3 underst i sin lek.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="316"/>
-        <source>%1 puts %2%3 on top of her library.</source>
-        <translation>%1 placerar %2%3 överst i sin lek.</translation>
+        <location filename="../src/messagelogwidget.cpp" line="314"/>
+        <source>%1 puts %2%3 on bottom of her library.</source>
+        <translation>%1 placerar %2%3 underst i sin lek.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="316"/>
@@ -2631,13 +2174,18 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>%1 placerar %2%3 överst i sin lek.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="318"/>
-        <source>%1 puts %2%3 into her library at position %4.</source>
-        <translation>%1 placerar %2%3 på plats %4 i sin lek.</translation>
+        <location filename="../src/messagelogwidget.cpp" line="316"/>
+        <source>%1 puts %2%3 on top of her library.</source>
+        <translation>%1 placerar %2%3 överst i sin lek.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="318"/>
         <source>%1 puts %2%3 into his library at position %4.</source>
+        <translation>%1 placerar %2%3 på plats %4 i sin lek.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="318"/>
+        <source>%1 puts %2%3 into her library at position %4.</source>
         <translation>%1 placerar %2%3 på plats %4 i sin lek.</translation>
     </message>
     <message>
@@ -2654,29 +2202,13 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <location filename="../src/messagelogwidget.cpp" line="347"/>
         <source>%1 takes a mulligan to %n.</source>
         <comment>female</comment>
-        <translation>
-            <numerusform>%1 tar en mulligan till %n.</numerusform>
-            <numerusform>%1 tar en mulligan till %n.</numerusform>
-        </translation>
+        <translation><numerusform>%1 tar en mulligan till %n.</numerusform><numerusform>%1 tar en mulligan till %n.</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="349"/>
         <source>%1 takes a mulligan to %n.</source>
         <comment>male</comment>
-        <translation>
-            <numerusform>%1 tar en mulligan till %n.</numerusform>
-            <numerusform>%1 tar en mulligan till %n.</numerusform>
-        </translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="351"/>
-        <source>%1 draws her initial hand.</source>
-        <translation>%1 drar sin första hand.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="351"/>
-        <source>%1 draws his initial hand.</source>
-        <translation>%1 drar sin första hand.</translation>
+        <translation><numerusform>%1 tar en mulligan till %n.</numerusform><numerusform>%1 tar en mulligan till %n.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="358"/>
@@ -2713,30 +2245,6 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <source>%1 destroys %2.</source>
         <comment>male</comment>
         <translation>%1 förstör %2.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="382"/>
-        <source>%1 attaches %2 to %3&apos;s %4.</source>
-        <comment>p1 female, p2 female</comment>
-        <translation>%1 fäster %2 på %3&apos;s %4.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="384"/>
-        <source>%1 attaches %2 to %3&apos;s %4.</source>
-        <comment>p1 female, p2 male</comment>
-        <translation>%1 fäster %2 på %3&apos;s %4.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="387"/>
-        <source>%1 attaches %2 to %3&apos;s %4.</source>
-        <comment>p1 male, p2 female</comment>
-        <translation>%1 fäster %2 på %3&apos;s %4.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="389"/>
-        <source>%1 attaches %2 to %3&apos;s %4.</source>
-        <comment>p1 male, p2 male</comment>
-        <translation>%1 fäster %2 på %3&apos;s %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="398"/>
@@ -2982,61 +2490,25 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <location filename="../src/messagelogwidget.cpp" line="548"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
         <comment>female</comment>
-        <translation>
-            <numerusform>%1 placerar %n %2 polett på %3 (%4 totalt).</numerusform>
-            <numerusform>%1 placerar %n %2 poletter på %3 (%4 totalt).</numerusform>
-        </translation>
+        <translation><numerusform>%1 placerar %n %2 polett på %3 (%4 totalt).</numerusform><numerusform>%1 placerar %n %2 poletter på %3 (%4 totalt).</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="550"/>
         <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
         <comment>male</comment>
-        <translation>
-            <numerusform>%1 placerar %n %2 polett på %3 (%4 totalt).</numerusform>
-            <numerusform>%1 placerar %n %2 poletter på %3 (%4 totalt).</numerusform>
-        </translation>
+        <translation><numerusform>%1 placerar %n %2 polett på %3 (%4 totalt).</numerusform><numerusform>%1 placerar %n %2 poletter på %3 (%4 totalt).</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="553"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
         <comment>female</comment>
-        <translation>
-            <numerusform>%1 tar bort %n %2 polett från %3 (%4 totalt).</numerusform>
-            <numerusform>%1 tar bort %n %2 poletter från %3 (%4 totalt).</numerusform>
-        </translation>
+        <translation><numerusform>%1 tar bort %n %2 polett från %3 (%4 totalt).</numerusform><numerusform>%1 tar bort %n %2 poletter från %3 (%4 totalt).</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="555"/>
         <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
         <comment>male</comment>
-        <translation>
-            <numerusform>%1 tar bort %n %2 polett från %3 (%4 totalt).</numerusform>
-            <numerusform>%1 tar bort %n %2 poletter från %3 (%4 totalt).</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="559"/>
-        <source>red</source>
-        <translation>
-            <numerusform>röd</numerusform>
-            <numerusform>röda</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="560"/>
-        <source>yellow</source>
-        <translation>
-            <numerusform>gul</numerusform>
-            <numerusform>gula</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="561"/>
-        <source>green</source>
-        <translation>
-            <numerusform>grön</numerusform>
-            <numerusform>gröna</numerusform>
-        </translation>
+        <translation><numerusform>%1 tar bort %n %2 polett från %3 (%4 totalt).</numerusform><numerusform>%1 tar bort %n %2 poletter från %3 (%4 totalt).</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="582"/>
@@ -3147,16 +2619,6 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>%1 ställer %2&apos;s annotering till %3.</translation>
     </message>
     <message>
-        <source>%1 is looking at the top %2 cards %3.</source>
-        <comment>female</comment>
-        <translation type="obsolete">%1 tittar på de %2 översta korten %3.</translation>
-    </message>
-    <message>
-        <source>%1 is looking at the top %2 cards %3.</source>
-        <comment>male</comment>
-        <translation type="obsolete">%1 tittar på de %2 översta korten %3.</translation>
-    </message>
-    <message>
         <location filename="../src/messagelogwidget.cpp" line="664"/>
         <source>%1 is looking at %2.</source>
         <comment>female</comment>
@@ -3172,19 +2634,13 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <location filename="../src/messagelogwidget.cpp" line="670"/>
         <source>%1 is looking at the top %n card(s) %2.</source>
         <comment>female</comment>
-        <translation>
-            <numerusform>%1 tittar på det översta kortet %2.</numerusform>
-            <numerusform>%1 tittar på de översta %n korten %2.</numerusform>
-        </translation>
+        <translation><numerusform>%1 tittar på det översta kortet %2.</numerusform><numerusform>%1 tittar på de översta %n korten %2.</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="671"/>
         <source>%1 is looking at the top %n card(s) %2.</source>
         <comment>male</comment>
-        <translation>
-            <numerusform>%1 tittar på det översta kortet %2.</numerusform>
-            <numerusform>%1 tittar på de översta %n korten %2.</numerusform>
-        </translation>
+        <translation><numerusform>%1 tittar på det översta kortet %2.</numerusform><numerusform>%1 tittar på de översta %n korten %2.</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="679"/>
@@ -3353,9 +2809,102 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>Det är nu %1&apos;s tur.</translation>
     </message>
     <message>
+        <location filename="../src/messagelogwidget.cpp" line="288"/>
+        <location filename="../src/messagelogwidget.cpp" line="699"/>
+        <source>a card</source>
+        <translation>ett kort</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 places %n counter(s) (%2) on %3 (now %4).</source>
+        <translation type="obsolete">
+            <numerusform>%1 places a counter (%2) on %3 (now %4).</numerusform>
+            <numerusform>%1 places %n counters (%2) on %3 (now %4).</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 removes %n counter(s) (%2) from %3 (now %4).</source>
+        <translation type="obsolete">
+            <numerusform>%1 removes a counter (%2) from %3 (now %4).</numerusform>
+            <numerusform>%1 removes %n counters (%2) from %3 (now %4).</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="559"/>
+        <source>red</source>
+        <translation><numerusform>röd</numerusform><numerusform>röda</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="560"/>
+        <source>yellow</source>
+        <translation><numerusform>gul</numerusform><numerusform>gula</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="561"/>
+        <source>green</source>
+        <translation><numerusform>grön</numerusform><numerusform>gröna</numerusform></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="143"/>
+        <source>The game has started.</source>
+        <translation>Spelet har börjat.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="351"/>
+        <source>%1 draws his initial hand.</source>
+        <translation>%1 drar sin första hand.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="351"/>
+        <source>%1 draws her initial hand.</source>
+        <translation>%1 drar sin första hand.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 places %n %2 counter(s) on %3 (now %4).</source>
+        <translation type="obsolete">
+            <numerusform>%1 places a %2 counter on %3 (now %4).</numerusform>
+            <numerusform>%1 places %n %2 counters on %3 (now %4).</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 removes %n %2 counter(s) from %3 (now %4).</source>
+        <translation type="obsolete">
+            <numerusform>%1 removes a %2 counter from %3 (now %4).</numerusform>
+            <numerusform>%1 removes %n %2 counters from %3 (now %4).</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="819"/>
+        <source>ending phase</source>
+        <translation>slutfasen</translation>
+    </message>
+    <message>
         <location filename="../src/messagelogwidget.cpp" line="809"/>
         <source>untap step</source>
         <translation>upptappningssteget</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="382"/>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <comment>p1 female, p2 female</comment>
+        <translation>%1 fäster %2 på %3&apos;s %4.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="384"/>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <comment>p1 female, p2 male</comment>
+        <translation>%1 fäster %2 på %3&apos;s %4.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="387"/>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <comment>p1 male, p2 female</comment>
+        <translation>%1 fäster %2 på %3&apos;s %4.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="389"/>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <comment>p1 male, p2 male</comment>
+        <translation>%1 fäster %2 på %3&apos;s %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="810"/>
@@ -3403,11 +2952,6 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>andra huvudfasen</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="819"/>
-        <source>ending phase</source>
-        <translation>slutfasen</translation>
-    </message>
-    <message>
         <location filename="../src/messagelogwidget.cpp" line="821"/>
         <source>It is now the %1.</source>
         <translation>Det är nu %1.</translation>
@@ -3416,64 +2960,64 @@ Lokal version är %1, avlägsen version är %2.</translation>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="660"/>
-        <source>Add message</source>
-        <translation>Lägg till meddelande</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="660"/>
-        <source>Message:</source>
-        <translation>Meddelande:</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="677"/>
+        <location filename="../src/dlg_settings.cpp" line="688"/>
         <source>&amp;Add</source>
         <translation>&amp;Lägg till</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="678"/>
+        <location filename="../src/dlg_settings.cpp" line="689"/>
         <source>&amp;Remove</source>
         <translation>&amp;Ta bort</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="679"/>
+        <location filename="../src/dlg_settings.cpp" line="690"/>
         <source>Chat settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="680"/>
+        <location filename="../src/dlg_settings.cpp" line="691"/>
         <source>Enable chat mentions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="681"/>
+        <location filename="../src/dlg_settings.cpp" line="692"/>
         <source>In-game message macros</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="682"/>
+        <location filename="../src/dlg_settings.cpp" line="693"/>
         <source>Ignore unregistered users in main chat</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="683"/>
+        <location filename="../src/dlg_settings.cpp" line="694"/>
         <source>Ignore chat room messages sent by unregistered users.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="684"/>
+        <location filename="../src/dlg_settings.cpp" line="695"/>
         <source>Ignore private messages sent by unregistered users.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="685"/>
+        <location filename="../src/dlg_settings.cpp" line="696"/>
         <source>Invert text color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="686"/>
+        <location filename="../src/dlg_settings.cpp" line="697"/>
         <source>(Color is hexadecimal)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="671"/>
+        <source>Add message</source>
+        <translation>Lägg till meddelande</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="671"/>
+        <source>Message:</source>
+        <translation>Meddelande:</translation>
     </message>
 </context>
 <context>
@@ -3537,671 +3081,598 @@ Lokal version är %1, avlägsen version är %2.</translation>
 <context>
     <name>Player</name>
     <message>
-        <location filename="../src/player.cpp" line="586"/>
-        <source>&amp;View graveyard</source>
-        <translation>&amp;Titta på kyrkogård</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="587"/>
-        <source>&amp;View exile</source>
-        <translation>&amp;Titta på exil</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="588"/>
-        <source>Player &quot;%1&quot;</source>
-        <translation>Spelare &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="589"/>
-        <location filename="../src/player.cpp" line="596"/>
-        <location filename="../src/player.cpp" line="609"/>
-        <source>&amp;Graveyard</source>
-        <translation>&amp;Kyrkogård</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="590"/>
-        <location filename="../src/player.cpp" line="597"/>
-        <location filename="../src/player.cpp" line="603"/>
-        <source>&amp;Exile</source>
-        <translation>&amp;Exil</translation>
-    </message>
-    <message>
-        <source>Move to &amp;top of library</source>
-        <translation type="vanished">Placera &amp;överst i leken</translation>
-    </message>
-    <message>
-        <source>Move to &amp;bottom of library</source>
-        <translation type="vanished">Placera &amp;underst i leken</translation>
-    </message>
-    <message>
-        <source>Move to &amp;graveyard</source>
-        <translation type="vanished">Flytta till &amp;kyrkogården</translation>
-    </message>
-    <message>
-        <source>Move to &amp;exile</source>
-        <translation type="vanished">Placera i &amp;exil</translation>
-    </message>
-    <message>
-        <source>Move to &amp;hand</source>
-        <translation type="vanished">Placera i &amp;hand</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="611"/>
+        <location filename="../src/player.cpp" line="613"/>
         <source>&amp;View library</source>
         <translation>&amp;Titta på leken</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="612"/>
-        <source>View &amp;top cards of library...</source>
-        <translation>Titta på de &amp;översta korten i leken...</translation>
-    </message>
-    <message>
-        <source>Reveal &amp;library to</source>
-        <translation type="vanished">Visa &amp;leken för</translation>
-    </message>
-    <message>
-        <source>Reveal t&amp;op card to</source>
-        <translation type="vanished">&amp;Visa översta kortet för</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="615"/>
-        <source>&amp;Always reveal top card</source>
-        <translation>&amp;Avslöja alltid det översta kortet</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="616"/>
-        <source>O&amp;pen deck in deck editor</source>
-        <translation>&amp;Öppna lek i lekredigeraren</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="617"/>
-        <source>&amp;View sideboard</source>
-        <translation>&amp;Titta på sidbrädan</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="618"/>
-        <source>&amp;Draw card</source>
-        <translation>&amp;Dra kort</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="619"/>
-        <source>D&amp;raw cards...</source>
-        <translation>D&amp;ra kort...</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="620"/>
-        <source>&amp;Undo last draw</source>
-        <translation>&amp;Ångra senaste drag</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="621"/>
-        <source>Take &amp;mulligan</source>
-        <translation>&amp;Mulligan</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="622"/>
-        <source>&amp;Shuffle</source>
-        <translation>&amp;Blanda</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="623"/>
+        <location filename="../src/player.cpp" line="625"/>
         <source>Move top cards to &amp;graveyard...</source>
         <translation>Flytta översta korten till &amp;kyrkogården...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="624"/>
-        <source>Move top cards to &amp;exile...</source>
-        <translation>Flytta översta korten till &amp;exil...</translation>
+        <location filename="../src/player.cpp" line="664"/>
+        <source>Ctrl+J</source>
+        <translation>Ctrl+J</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="625"/>
-        <source>Put top card on &amp;bottom</source>
-        <translation>Placera översta kortet &amp;underst</translation>
+        <location filename="../src/player.cpp" line="710"/>
+        <source>F3</source>
+        <translation>F3</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="626"/>
-        <source>Put bottom card &amp;in graveyard</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/player.cpp" line="614"/>
+        <source>View &amp;top cards of library...</source>
+        <translation>Titta på de &amp;översta korten i leken...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="602"/>
-        <location filename="../src/player.cpp" line="608"/>
-        <location filename="../src/player.cpp" line="628"/>
+        <location filename="../src/player.cpp" line="588"/>
+        <source>&amp;View graveyard</source>
+        <translation>&amp;Titta på kyrkogård</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="712"/>
+        <source>F4</source>
+        <translation>F4</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="619"/>
+        <source>&amp;View sideboard</source>
+        <translation>&amp;Titta på sidbrädan</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="590"/>
+        <source>Player &quot;%1&quot;</source>
+        <translation>Spelare &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="604"/>
+        <location filename="../src/player.cpp" line="610"/>
+        <location filename="../src/player.cpp" line="630"/>
         <source>&amp;Hand</source>
         <translation>&amp;Hand</translation>
     </message>
     <message>
-        <source>&amp;Reveal to</source>
-        <translation type="vanished">&amp;Visa för</translation>
-    </message>
-    <message>
-        <source>Reveal r&amp;andom card to</source>
-        <translation type="vanished">Visa slumpm&amp;ässigt kort för</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="593"/>
-        <source>&amp;Move hand to...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="594"/>
-        <location filename="../src/player.cpp" line="600"/>
-        <location filename="../src/player.cpp" line="606"/>
-        <source>&amp;Top of library</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="595"/>
-        <location filename="../src/player.cpp" line="601"/>
-        <location filename="../src/player.cpp" line="607"/>
-        <source>&amp;Bottom of library</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="599"/>
-        <source>&amp;Move graveyard to...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="605"/>
-        <source>&amp;Move exile to...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="613"/>
-        <source>Reveal &amp;library to...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="614"/>
-        <source>Reveal t&amp;op card to...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="629"/>
-        <source>&amp;Reveal hand to...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="630"/>
-        <source>Reveal r&amp;andom card to...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/player.cpp" line="631"/>
-        <source>&amp;Sideboard</source>
-        <translation>S&amp;idbräda</translation>
+        <source>&amp;Reveal hand to...</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="632"/>
+        <source>Reveal r&amp;andom card to...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="634"/>
         <source>&amp;Library</source>
         <translation>&amp;Lek</translation>
     </message>
     <message>
+        <location filename="../src/player.cpp" line="591"/>
+        <location filename="../src/player.cpp" line="598"/>
+        <location filename="../src/player.cpp" line="611"/>
+        <source>&amp;Graveyard</source>
+        <translation>&amp;Kyrkogård</translation>
+    </message>
+    <message>
         <location filename="../src/player.cpp" line="633"/>
-        <source>&amp;Counters</source>
-        <translation>&amp;Poletter</translation>
+        <source>&amp;Sideboard</source>
+        <translation>S&amp;idbräda</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="635"/>
-        <source>&amp;Untap all permanents</source>
-        <translation>Tappa upp alla perma&amp;nenta kort</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="636"/>
-        <source>R&amp;oll die...</source>
-        <translation>Rulla t&amp;ärning...</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="637"/>
-        <source>&amp;Create token...</source>
-        <translation>&amp;Skapa jetong...</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="638"/>
-        <source>C&amp;reate another token</source>
-        <translation>S&amp;kapa en till jetong</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="639"/>
-        <source>Cr&amp;eate predefined token</source>
-        <translation>Skapa fördefinierad &amp;jetong</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="640"/>
-        <source>S&amp;ay</source>
-        <translation>S&amp;äg</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="646"/>
-        <source>C&amp;ard</source>
-        <translation>K&amp;ort</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="649"/>
-        <source>&amp;All players</source>
-        <translation>A&amp;lla spelare</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="652"/>
-        <source>&amp;Play</source>
-        <translation>&amp;Spela</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="653"/>
-        <source>&amp;Hide</source>
-        <translation>&amp;Göm</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="655"/>
-        <source>&amp;Tap</source>
-        <translation>&amp;Tappa</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="656"/>
-        <source>&amp;Untap</source>
-        <translation>Tappa &amp;upp</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="657"/>
-        <source>Toggle &amp;normal untapping</source>
-        <translation>Växla &amp;normal upptappning</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="658"/>
-        <source>&amp;Flip</source>
-        <translation>&amp;Vänd</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="659"/>
-        <source>&amp;Peek at card face</source>
-        <translation>Kika på kort&amp;framsida</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="660"/>
-        <source>&amp;Clone</source>
-        <translation>&amp;Klona</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="661"/>
-        <source>Ctrl+J</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="662"/>
-        <source>Attac&amp;h to card...</source>
-        <translation>&amp;Fäst på kort...</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="663"/>
-        <source>Ctrl+A</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="664"/>
-        <source>Unattac&amp;h</source>
-        <translation>Se&amp;parera</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="665"/>
-        <source>&amp;Draw arrow...</source>
-        <translation>&amp;Rita pil...</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="666"/>
-        <source>&amp;Increase power</source>
-        <translation>&amp;Öka power</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="667"/>
-        <source>Ctrl++</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="668"/>
-        <source>&amp;Decrease power</source>
-        <translation>&amp;Minska power</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="669"/>
-        <source>Ctrl+-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="670"/>
-        <source>I&amp;ncrease toughness</source>
-        <translation>Öka toug&amp;hness</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="671"/>
-        <source>Alt++</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="672"/>
-        <source>D&amp;ecrease toughness</source>
-        <translation>Minska t&amp;oughness</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="673"/>
-        <source>Alt+-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="674"/>
-        <source>In&amp;crease power and toughness</source>
-        <translation>Öka power o&amp;ch toughness</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="675"/>
-        <source>Ctrl+Alt++</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="676"/>
-        <source>Dec&amp;rease power and toughness</source>
-        <translation>M&amp;inska power och toughness</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="677"/>
-        <source>Ctrl+Alt+-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="678"/>
-        <source>Set &amp;power and toughness...</source>
-        <translation>An&amp;ge power och toughness...</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="679"/>
-        <source>Ctrl+P</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="680"/>
-        <source>&amp;Set annotation...</source>
-        <translation>Ang&amp;e annotering...</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="682"/>
-        <source>red</source>
-        <translation>röd</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="683"/>
-        <source>yellow</source>
-        <translation>gul</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="684"/>
-        <source>green</source>
-        <translation>grön</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="686"/>
-        <source>&amp;Add counter (%1)</source>
-        <translation>P&amp;lacera polett (%1)</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="688"/>
-        <source>&amp;Remove counter (%1)</source>
-        <translation>Ta &amp;bort polett (%1)</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="690"/>
-        <source>&amp;Set counters (%1)...</source>
-        <translation>Pl&amp;acera poletter (%1)...</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="691"/>
-        <source>&amp;top of library</source>
-        <translation>&amp;överst i leken</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="692"/>
-        <source>&amp;bottom of library</source>
-        <translation>&amp;underst i leken</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="693"/>
-        <source>&amp;graveyard</source>
-        <translation>kyrkog&amp;ård</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="694"/>
-        <source>Ctrl+Del</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="695"/>
-        <source>&amp;exile</source>
-        <translation>e&amp;xil</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="706"/>
-        <source>Ctrl+F3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="707"/>
-        <source>F3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="708"/>
-        <source>Ctrl+W</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="709"/>
-        <source>F4</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="710"/>
-        <source>Ctrl+D</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="711"/>
-        <source>Ctrl+E</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="712"/>
-        <source>Ctrl+Shift+D</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="713"/>
-        <source>Ctrl+M</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="714"/>
-        <source>Ctrl+S</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="715"/>
-        <source>Ctrl+U</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="716"/>
-        <source>Ctrl+I</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="717"/>
-        <source>Ctrl+T</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="718"/>
-        <source>Ctrl+G</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="797"/>
+        <location filename="../src/player.cpp" line="800"/>
         <source>View top cards of library</source>
         <translation>Titta på de översta korten i leken</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="797"/>
+        <location filename="../src/player.cpp" line="800"/>
         <source>Number of cards:</source>
         <translation>Antal kort:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="858"/>
+        <location filename="../src/player.cpp" line="620"/>
+        <source>&amp;Draw card</source>
+        <translation>&amp;Dra kort</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="589"/>
+        <source>&amp;View exile</source>
+        <translation>&amp;Titta på exil</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="592"/>
+        <location filename="../src/player.cpp" line="599"/>
+        <location filename="../src/player.cpp" line="605"/>
+        <source>&amp;Exile</source>
+        <translation>&amp;Exil</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="711"/>
+        <source>Ctrl+W</source>
+        <translation>Ctrl+W</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="713"/>
+        <source>Ctrl+D</source>
+        <translation>Ctrl+D</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="621"/>
+        <source>D&amp;raw cards...</source>
+        <translation>D&amp;ra kort...</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="714"/>
+        <source>Ctrl+E</source>
+        <translation>Ctrl+E</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="623"/>
+        <source>Take &amp;mulligan</source>
+        <translation>&amp;Mulligan</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="716"/>
+        <source>Ctrl+M</source>
+        <translation>Ctrl+M</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="624"/>
+        <source>&amp;Shuffle</source>
+        <translation>&amp;Blanda</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="717"/>
+        <source>Ctrl+S</source>
+        <translation>Ctrl+S</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="635"/>
+        <source>&amp;Counters</source>
+        <translation>&amp;Poletter</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="637"/>
+        <source>&amp;Untap all permanents</source>
+        <translation>Tappa upp alla perma&amp;nenta kort</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="718"/>
+        <source>Ctrl+U</source>
+        <translation>Ctrl+U</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="638"/>
+        <source>R&amp;oll die...</source>
+        <translation>Rulla t&amp;ärning...</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="719"/>
+        <source>Ctrl+I</source>
+        <translation>Ctrl+I</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="639"/>
+        <source>&amp;Create token...</source>
+        <translation>&amp;Skapa jetong...</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="720"/>
+        <source>Ctrl+T</source>
+        <translation>Ctrl+T</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="640"/>
+        <source>C&amp;reate another token</source>
+        <translation>S&amp;kapa en till jetong</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="721"/>
+        <source>Ctrl+G</source>
+        <translation>Ctrl+G</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="642"/>
+        <source>S&amp;ay</source>
+        <translation>S&amp;äg</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="595"/>
+        <source>&amp;Move hand to...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="596"/>
+        <location filename="../src/player.cpp" line="602"/>
+        <location filename="../src/player.cpp" line="608"/>
+        <source>&amp;Top of library</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="597"/>
+        <location filename="../src/player.cpp" line="603"/>
+        <location filename="../src/player.cpp" line="609"/>
+        <source>&amp;Bottom of library</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="601"/>
+        <source>&amp;Move graveyard to...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="607"/>
+        <source>&amp;Move exile to...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="615"/>
+        <source>Reveal &amp;library to...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="616"/>
+        <source>Reveal t&amp;op card to...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="617"/>
+        <source>&amp;Always reveal top card</source>
+        <translation>&amp;Avslöja alltid det översta kortet</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="618"/>
+        <source>O&amp;pen deck in deck editor</source>
+        <translation>&amp;Öppna lek i lekredigeraren</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="622"/>
+        <source>&amp;Undo last draw</source>
+        <translation>&amp;Ångra senaste drag</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="626"/>
+        <source>Move top cards to &amp;exile...</source>
+        <translation>Flytta översta korten till &amp;exil...</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="627"/>
+        <source>Put top card on &amp;bottom</source>
+        <translation>Placera översta kortet &amp;underst</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="628"/>
+        <source>Put bottom card &amp;in graveyard</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="641"/>
+        <source>Cr&amp;eate predefined token</source>
+        <translation>Skapa fördefinierad &amp;jetong</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="648"/>
+        <source>C&amp;ard</source>
+        <translation>K&amp;ort</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="651"/>
+        <source>&amp;All players</source>
+        <translation>A&amp;lla spelare</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="654"/>
+        <source>&amp;Play</source>
+        <translation>&amp;Spela</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="655"/>
+        <source>&amp;Hide</source>
+        <translation>&amp;Göm</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="656"/>
+        <source>Play &amp;Face Down</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="658"/>
+        <source>&amp;Tap</source>
+        <translation>&amp;Tappa</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="659"/>
+        <source>&amp;Untap</source>
+        <translation>Tappa &amp;upp</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="660"/>
+        <source>Toggle &amp;normal untapping</source>
+        <translation>Växla &amp;normal upptappning</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="661"/>
+        <source>&amp;Flip</source>
+        <translation>&amp;Vänd</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="662"/>
+        <source>&amp;Peek at card face</source>
+        <translation>Kika på kort&amp;framsida</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="663"/>
+        <source>&amp;Clone</source>
+        <translation>&amp;Klona</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="665"/>
+        <source>Attac&amp;h to card...</source>
+        <translation>&amp;Fäst på kort...</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="666"/>
+        <source>Ctrl+A</source>
+        <translation>Ctrl+A</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="667"/>
+        <source>Unattac&amp;h</source>
+        <translation>Se&amp;parera</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="668"/>
+        <source>&amp;Draw arrow...</source>
+        <translation>&amp;Rita pil...</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="669"/>
+        <source>&amp;Increase power</source>
+        <translation>&amp;Öka power</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="670"/>
+        <source>Ctrl++</source>
+        <translation>Ctrl++</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="671"/>
+        <source>&amp;Decrease power</source>
+        <translation>&amp;Minska power</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="672"/>
+        <source>Ctrl+-</source>
+        <translation>Ctrl+-</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="673"/>
+        <source>I&amp;ncrease toughness</source>
+        <translation>Öka toug&amp;hness</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="674"/>
+        <source>Alt++</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="675"/>
+        <source>D&amp;ecrease toughness</source>
+        <translation>Minska t&amp;oughness</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="676"/>
+        <source>Alt+-</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="677"/>
+        <source>In&amp;crease power and toughness</source>
+        <translation>Öka power o&amp;ch toughness</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="678"/>
+        <source>Ctrl+Alt++</source>
+        <translation>Ctrl+Alt++</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="679"/>
+        <source>Dec&amp;rease power and toughness</source>
+        <translation>M&amp;inska power och toughness</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="680"/>
+        <source>Ctrl+Alt+-</source>
+        <translation>Ctrl+Alt+-</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="681"/>
+        <source>Set &amp;power and toughness...</source>
+        <translation>An&amp;ge power och toughness...</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="682"/>
+        <source>Ctrl+P</source>
+        <translation>Ctrl+P</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="683"/>
+        <source>&amp;Set annotation...</source>
+        <translation>Ang&amp;e annotering...</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="685"/>
+        <source>red</source>
+        <translation>röd</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="686"/>
+        <source>yellow</source>
+        <translation>gul</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="687"/>
+        <source>green</source>
+        <translation>grön</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="689"/>
+        <source>&amp;Add counter (%1)</source>
+        <translation>P&amp;lacera polett (%1)</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="691"/>
+        <source>&amp;Remove counter (%1)</source>
+        <translation>Ta &amp;bort polett (%1)</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="693"/>
+        <source>&amp;Set counters (%1)...</source>
+        <translation>Pl&amp;acera poletter (%1)...</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="694"/>
+        <source>&amp;top of library</source>
+        <translation>&amp;överst i leken</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="695"/>
+        <source>&amp;bottom of library</source>
+        <translation>&amp;underst i leken</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="696"/>
+        <source>&amp;graveyard</source>
+        <translation>kyrkog&amp;ård</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="697"/>
+        <source>Ctrl+Del</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="698"/>
+        <source>&amp;exile</source>
+        <translation>e&amp;xil</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="709"/>
+        <source>Ctrl+F3</source>
+        <translation>Ctrl+F3</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="715"/>
+        <source>Ctrl+Shift+D</source>
+        <translation>Ctrl+Shift+D</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="861"/>
         <source>Draw cards</source>
         <translation>Dra kort</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="858"/>
-        <location filename="../src/player.cpp" line="879"/>
-        <location filename="../src/player.cpp" line="908"/>
-        <location filename="../src/player.cpp" line="2110"/>
+        <location filename="../src/player.cpp" line="861"/>
+        <location filename="../src/player.cpp" line="882"/>
+        <location filename="../src/player.cpp" line="911"/>
+        <location filename="../src/player.cpp" line="2113"/>
         <source>Number:</source>
         <translation>Antal:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="879"/>
+        <location filename="../src/player.cpp" line="882"/>
         <source>Move top cards to grave</source>
         <translation>Flytta översta korten till kyrkogården</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="908"/>
+        <location filename="../src/player.cpp" line="911"/>
         <source>Move top cards to exile</source>
         <translation>Flytta översta korten till exil</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="974"/>
+        <location filename="../src/player.cpp" line="977"/>
         <source>Roll die</source>
         <translation>Rulla tärning</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="974"/>
+        <location filename="../src/player.cpp" line="977"/>
         <source>Number of sides:</source>
         <translation>Antal sidor:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1956"/>
+        <location filename="../src/player.cpp" line="1959"/>
         <source>Set power/toughness</source>
         <translation>Ange power/toughness</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1956"/>
+        <location filename="../src/player.cpp" line="1959"/>
         <source>Please enter the new PT:</source>
         <translation>Vänligen ange ny PT:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2028"/>
+        <location filename="../src/player.cpp" line="2031"/>
         <source>Set annotation</source>
         <translation>Ange annotering</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2028"/>
+        <location filename="../src/player.cpp" line="2031"/>
         <source>Please enter the new annotation:</source>
         <translation>Vänligen ange den nya annoteringen:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2110"/>
+        <location filename="../src/player.cpp" line="2113"/>
         <source>Set counters</source>
         <translation>Placera poletter</translation>
     </message>
 </context>
 <context>
-    <name>PlayerListWidget</name>
-    <message>
-        <source>User &amp;details</source>
-        <translation type="obsolete">&amp;Användardetaljer</translation>
-    </message>
-    <message>
-        <source>Direct &amp;chat</source>
-        <translation type="obsolete">Direkt &amp;chatt</translation>
-    </message>
-    <message>
-        <source>Add to &amp;buddy list</source>
-        <translation type="obsolete">Lägg till som &amp;vän</translation>
-    </message>
-    <message>
-        <source>Remove from &amp;buddy list</source>
-        <translation type="obsolete">Ta bort som &amp;vän</translation>
-    </message>
-    <message>
-        <source>Add to &amp;ignore list</source>
-        <translation type="obsolete">&amp;Ignorera</translation>
-    </message>
-    <message>
-        <source>Remove from &amp;ignore list</source>
-        <translation type="obsolete">Sluta &amp;ignorera</translation>
-    </message>
-    <message>
-        <source>Kick from &amp;game</source>
-        <translation type="obsolete">&amp;Sparka från spelet</translation>
-    </message>
-</context>
-<context>
     <name>QMenuBar</name>
     <message>
-        <location filename="../src/window_main.cpp" line="353"/>
+        <location filename="../src/window_main.cpp" line="350"/>
         <source>Services</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="351"/>
+        <source>Hide %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="352"/>
+        <source>Hide Others</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="353"/>
+        <source>Show All</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="354"/>
-        <source>Hide %1</source>
-        <translation type="unfinished"></translation>
+        <source>Preferences...</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="355"/>
-        <source>Hide Others</source>
-        <translation type="unfinished"></translation>
+        <source>Quit %1</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="356"/>
-        <source>Show All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/window_main.cpp" line="357"/>
-        <source>Preferences...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/window_main.cpp" line="358"/>
-        <source>Quit %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/window_main.cpp" line="359"/>
         <source>About %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <source>Maindeck</source>
-        <translation type="obsolete">Huvudlek</translation>
-    </message>
-    <message>
-        <source>Sideboard</source>
-        <translation type="obsolete">Sidbräda</translation>
-    </message>
-    <message>
-        <source>Cockatrice decks (*.cod)</source>
-        <translation type="obsolete">Cockatricelekar (*.cod)</translation>
-    </message>
-    <message>
-        <source>Plain text decks (*.dec *.mwDeck)</source>
-        <translation type="obsolete">Klartextlekar (*.dec *.mwDeck)</translation>
+        <location filename="../src/window_main.cpp" line="165"/>
+        <source>Cockatrice replays (*.cor)</source>
+        <translation>Cockatricerepriser (*.cor)</translation>
     </message>
     <message>
         <location filename="../src/deck_loader.cpp" line="8"/>
         <source>Common deck formats (*.cod *.dec *.mwDeck)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/deck_loader.cpp" line="9"/>
@@ -4209,42 +3680,37 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>Alla filer (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="165"/>
-        <source>Cockatrice replays (*.cor)</source>
-        <translation>Cockatricerepriser (*.cor)</translation>
-    </message>
-    <message>
         <location filename="../src/gamesmodel.cpp" line="31"/>
         <source>&lt;1m ago</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="34"/>
         <source>&lt;5m ago</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="41"/>
         <location filename="../src/gamesmodel.cpp" line="58"/>
         <source>m ago</source>
         <extracomment>This will have a number prepended, like &quot;10m ago&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="55"/>
         <source>1hr </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="65"/>
         <source>hr ago</source>
         <extracomment>This will have a number prepended, like &quot;2h ago&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="67"/>
         <source>5+ hrs ago</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4334,23 +3800,19 @@ Lokal version är %1, avlägsen version är %2.</translation>
 <context>
     <name>SetsModel</name>
     <message>
-        <source>Short name</source>
-        <translation type="vanished">Kort namn</translation>
-    </message>
-    <message>
         <location filename="../src/setsmodel.cpp" line="42"/>
         <source>Key</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/setsmodel.cpp" line="43"/>
         <source>Set type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/setsmodel.cpp" line="44"/>
         <source>Set code</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/setsmodel.cpp" line="45"/>
@@ -4360,7 +3822,7 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/setsmodel.cpp" line="46"/>
         <source>Release date</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4374,14 +3836,6 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <location filename="../src/tab_admin.cpp" line="22"/>
         <source>&amp;Time until shutdown (minutes):</source>
         <translation>&amp;Tid till nedstängning (minuter):</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="obsolete">&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">&amp;Avbryt</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="40"/>
@@ -4429,28 +3883,35 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/tab_admin.h" line="45"/>
         <source>Administration</source>
-        <translation type="unfinished">Administration</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>TabDeckEditor</name>
     <message>
-        <source>&amp;Search...</source>
-        <translation type="obsolete">&amp;Sök...</translation>
+        <location filename="../src/tab_deck_editor.cpp" line="311"/>
+        <source>&amp;Print deck...</source>
+        <translation>Skri&amp;v ut lek...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="295"/>
-        <source>Show card text only</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/tab_deck_editor.cpp" line="313"/>
+        <source>&amp;Close</source>
+        <translation>S&amp;täng</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="314"/>
+        <source>Ctrl+Q</source>
+        <translation>Ctrl+Q</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="329"/>
+        <source>&amp;Edit sets...</source>
+        <translation>Redigera utg&amp;åvor...</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="296"/>
         <source>&amp;Clear search</source>
         <translation>&amp;Rensa sökning</translation>
-    </message>
-    <message>
-        <source>&amp;Search for:</source>
-        <translation type="vanished">S&amp;ök efter:</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="298"/>
@@ -4475,7 +3936,7 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="303"/>
         <source>Ctrl+U</source>
-        <translation></translation>
+        <translation>Ctrl+U</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="305"/>
@@ -4508,24 +3969,9 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>Spara lek som u&amp;tklipp</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="311"/>
-        <source>&amp;Print deck...</source>
-        <translation>Skri&amp;v ut lek...</translation>
-    </message>
-    <message>
         <location filename="../src/tab_deck_editor.cpp" line="312"/>
         <source>&amp;Analyze deck on deckstats.net</source>
         <translation>&amp;Anslysera lek på deckstats.net</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="313"/>
-        <source>&amp;Close</source>
-        <translation>S&amp;täng</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="314"/>
-        <source>Ctrl+Q</source>
-        <translation></translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="316"/>
@@ -4538,6 +3984,11 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <translation>Lägg till kort i sidbr&amp;äda</translation>
     </message>
     <message>
+        <location filename="../src/tab_deck_editor.cpp" line="295"/>
+        <source>Show card text only</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
         <location filename="../src/tab_deck_editor.cpp" line="319"/>
         <source>&amp;Remove row</source>
         <translation>Ta bort ra&amp;d</translation>
@@ -4545,7 +3996,7 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="320"/>
         <source>Del</source>
-        <translation></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="321"/>
@@ -4555,7 +4006,7 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="322"/>
         <source>+</source>
-        <translation></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="323"/>
@@ -4565,7 +4016,7 @@ Lokal version är %1, avlägsen version är %2.</translation>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="324"/>
         <source>-</source>
-        <translation></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="326"/>
@@ -4576,11 +4027,6 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <location filename="../src/tab_deck_editor.cpp" line="327"/>
         <source>C&amp;ard database</source>
         <translation>&amp;Kortdatabas</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="329"/>
-        <source>&amp;Edit sets...</source>
-        <translation>Redigera utg&amp;åvor...</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="330"/>
@@ -4710,7 +4156,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="313"/>
         <source>Delete remote folder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="321"/>
@@ -4720,162 +4166,159 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_deck_storage.h" line="52"/>
         <source>Deck storage</source>
-        <translation type="unfinished">Leklagring</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="477"/>
-        <source>F5</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/tab_game.cpp" line="478"/>
-        <source>F6</source>
-        <translation></translation>
+        <source>F5</source>
+        <translation>F5</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="479"/>
-        <source>F7</source>
-        <translation></translation>
+        <source>F6</source>
+        <translation>F6</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="480"/>
-        <source>F8</source>
-        <translation></translation>
+        <source>F7</source>
+        <translation>F7</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="481"/>
-        <source>F9</source>
-        <translation></translation>
+        <source>F8</source>
+        <translation>F8</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="482"/>
-        <source>F10</source>
-        <translation></translation>
+        <source>F9</source>
+        <translation>F9</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="536"/>
+        <location filename="../src/tab_game.cpp" line="483"/>
+        <source>F10</source>
+        <translation>F10</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="542"/>
         <source>&amp;Phases</source>
         <translation>&amp;Faser</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="539"/>
+        <location filename="../src/tab_game.cpp" line="545"/>
         <source>&amp;Game</source>
         <translation>&amp;Spel</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="541"/>
+        <location filename="../src/tab_game.cpp" line="547"/>
         <source>Next &amp;phase</source>
         <translation>Nästa &amp;fas</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="542"/>
+        <location filename="../src/tab_game.cpp" line="548"/>
         <source>Ctrl+Space</source>
-        <translation></translation>
+        <translation>Ctrl+Space</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="542"/>
+        <location filename="../src/tab_game.cpp" line="548"/>
         <source>Tab</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="545"/>
+        <location filename="../src/tab_game.cpp" line="551"/>
         <source>Next &amp;turn</source>
         <translation>Nästa &amp;tur</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="546"/>
+        <location filename="../src/tab_game.cpp" line="552"/>
         <source>Ctrl+Return</source>
-        <translation></translation>
+        <translation>Ctrl+Return</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="546"/>
+        <location filename="../src/tab_game.cpp" line="552"/>
         <source>Ctrl+Enter</source>
-        <translation></translation>
+        <translation>Ctrl+Enter</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="549"/>
+        <location filename="../src/tab_game.cpp" line="555"/>
         <source>&amp;Remove all local arrows</source>
         <translation>Ta &amp;bort alla lokala pilar</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="550"/>
+        <location filename="../src/tab_game.cpp" line="556"/>
         <source>Ctrl+R</source>
-        <translation></translation>
+        <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="553"/>
+        <location filename="../src/tab_game.cpp" line="559"/>
         <source>Game &amp;information</source>
         <translation>Spel&amp;information</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="555"/>
+        <location filename="../src/tab_game.cpp" line="561"/>
         <source>&amp;Concede</source>
         <translation>&amp;Ge upp</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="556"/>
+        <location filename="../src/tab_game.cpp" line="562"/>
         <source>F2</source>
-        <translation></translation>
+        <translation>F2</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="559"/>
+        <location filename="../src/tab_game.cpp" line="565"/>
         <source>&amp;Leave game</source>
         <translation>&amp;Lämna spel</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="560"/>
-        <location filename="../src/tab_game.cpp" line="564"/>
+        <location filename="../src/tab_game.cpp" line="566"/>
+        <location filename="../src/tab_game.cpp" line="570"/>
         <source>Ctrl+Q</source>
-        <translation></translation>
+        <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="563"/>
+        <location filename="../src/tab_game.cpp" line="569"/>
         <source>C&amp;lose replay</source>
         <translation>S&amp;täng repris</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="568"/>
+        <location filename="../src/tab_game.cpp" line="574"/>
         <source>&amp;Say:</source>
         <translation>S&amp;äg:</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="670"/>
+        <location filename="../src/tab_game.cpp" line="676"/>
         <source>Concede</source>
         <translation>Ge upp</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="670"/>
+        <location filename="../src/tab_game.cpp" line="676"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>Är du säker på att du vill ge upp detta spel?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="680"/>
+        <location filename="../src/tab_game.cpp" line="686"/>
         <source>Leave game</source>
         <translation>Lämna spel</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="680"/>
+        <location filename="../src/tab_game.cpp" line="686"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>Är du säker på att du vill lämna detta spel?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1175"/>
+        <location filename="../src/tab_game.cpp" line="1096"/>
+        <source>You have been kicked out of the game.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="1190"/>
         <source>Replay %1: %2</source>
         <translation>Repris %1: %2</translation>
     </message>
     <message>
-        <source>Kicked</source>
-        <translation type="obsolete">Utsparkad</translation>
-    </message>
-    <message>
-        <source>You have been kicked out of the game.</source>
-        <translation type="obsolete">Du har blivit utsparkad från spelet.</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="1177"/>
+        <location filename="../src/tab_game.cpp" line="1192"/>
         <source>Game %1: %2</source>
         <translation>Spel %1: %2</translation>
     </message>
@@ -4970,7 +4413,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_replays.h" line="51"/>
         <source>Game replays</source>
-        <translation type="unfinished">Spelrepriser</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4998,16 +4441,12 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_room.cpp" line="123"/>
         <source>&amp;Clear chat</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="124"/>
         <source>Chat Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Ignore unregistered users in chat</source>
-        <translation type="vanished">&amp;Ignorera oregistrerade användare i chatten</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="163"/>
@@ -5020,25 +4459,25 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_server.h" line="53"/>
         <source>Server</source>
-        <translation type="unfinished">Server</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>TabUserLists</name>
     <message>
-        <location filename="../src/tab_userlists.h" line="48"/>
-        <source>User lists</source>
-        <translation type="unfinished">Användarlistor</translation>
-    </message>
-    <message>
         <location filename="../src/tab_userlists.cpp" line="48"/>
         <source>Add to Buddy List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="57"/>
         <source>Add to Ignore List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_userlists.h" line="48"/>
+        <source>User lists</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5124,7 +4563,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userinfobox.cpp" line="53"/>
         <source>Account Age:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="85"/>
@@ -5150,83 +4589,88 @@ Please enter a name:</source>
     <message>
         <location filename="../src/userinfobox.cpp" line="97"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="110"/>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="110"/>
         <source>Years</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="116"/>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="116"/>
         <source>Days</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="505"/>
+        <location filename="../src/dlg_settings.cpp" line="515"/>
         <source>General interface settings</source>
         <translation>Allmänna gränssnittsinställningar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="506"/>
+        <location filename="../src/dlg_settings.cpp" line="516"/>
         <source>Enable notifications in taskbar</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="507"/>
+        <location filename="../src/dlg_settings.cpp" line="517"/>
+        <source>Notify in the taskbar for game events while you are spectating</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="518"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>&amp;Dubbelklicka på kort för att spela dem (istället för enkelklick)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="508"/>
+        <location filename="../src/dlg_settings.cpp" line="519"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="509"/>
+        <location filename="../src/dlg_settings.cpp" line="520"/>
         <source>Animation settings</source>
         <translation>Animationsinställningar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="510"/>
+        <location filename="../src/dlg_settings.cpp" line="521"/>
         <source>&amp;Tap/untap animation</source>
         <translation>&amp;Tappnings/Upptappningsanimation</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="511"/>
+        <location filename="../src/dlg_settings.cpp" line="522"/>
         <source>Enable &amp;sounds</source>
         <translation>Aktivera &amp;ljud</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="512"/>
+        <location filename="../src/dlg_settings.cpp" line="523"/>
         <source>Path to sounds directory:</source>
         <translation>Sökväg till ljudkatalog:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="513"/>
+        <location filename="../src/dlg_settings.cpp" line="524"/>
         <source>Test system sound engine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="514"/>
-        <source>Sound settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="525"/>
+        <source>Sound settings</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="536"/>
         <source>Choose path</source>
         <translation>Välj sökväg</translation>
     </message>
@@ -5253,204 +4697,38 @@ Please enter a name:</source>
         <source>Ignored users online: %1 / %2</source>
         <translation>Ignorerade användare online: %1 / %2</translation>
     </message>
-    <message>
-        <source>%1&apos;s games</source>
-        <translation type="obsolete">%1&apos;s spel</translation>
-    </message>
-    <message>
-        <source>User &amp;details</source>
-        <translation type="obsolete">Användar&amp;detaljer</translation>
-    </message>
-    <message>
-        <source>Direct &amp;chat</source>
-        <translation type="obsolete">Direct&amp;chatt</translation>
-    </message>
-    <message>
-        <source>Show this user&apos;s &amp;games</source>
-        <translation type="obsolete">Visa denna användarens &amp;spel</translation>
-    </message>
-    <message>
-        <source>Add to &amp;buddy list</source>
-        <translation type="obsolete">Lägg till som &amp;vän</translation>
-    </message>
-    <message>
-        <source>Remove from &amp;buddy list</source>
-        <translation type="obsolete">Ta bort som &amp;vän</translation>
-    </message>
-    <message>
-        <source>Add to &amp;ignore list</source>
-        <translation type="obsolete">&amp;Ignorera</translation>
-    </message>
-    <message>
-        <source>Remove from &amp;ignore list</source>
-        <translation type="obsolete">Sluta &amp;ignorera</translation>
-    </message>
-    <message>
-        <source>Ban from &amp;server</source>
-        <translation type="obsolete">&amp;Bannlys från servern</translation>
-    </message>
-</context>
-<context>
-    <name>WndDeckEditor</name>
-    <message>
-        <source>&amp;Search...</source>
-        <translation type="obsolete">&amp;Sök...</translation>
-    </message>
-    <message>
-        <source>&amp;Clear search</source>
-        <translation type="obsolete">&amp;Rensa sökning</translation>
-    </message>
-    <message>
-        <source>&amp;Search for:</source>
-        <translation type="obsolete">S&amp;ök efter:</translation>
-    </message>
-    <message>
-        <source>Deck &amp;name:</source>
-        <translation type="obsolete">&amp;Leknamn:</translation>
-    </message>
-    <message>
-        <source>&amp;Comments:</source>
-        <translation type="obsolete">&amp;Kommentarer:</translation>
-    </message>
-    <message>
-        <source>Hash:</source>
-        <translation type="obsolete">Hash:</translation>
-    </message>
-    <message>
-        <source>&amp;Update prices</source>
-        <translation type="obsolete">&amp;Uppdatera priser</translation>
-    </message>
-    <message>
-        <source>Deck editor [*]</source>
-        <translation type="obsolete">Lekredigerare [*]</translation>
-    </message>
-    <message>
-        <source>&amp;New deck</source>
-        <translation type="obsolete">&amp;Ny lek</translation>
-    </message>
-    <message>
-        <source>&amp;Load deck...</source>
-        <translation type="obsolete">&amp;Ladda lek...</translation>
-    </message>
-    <message>
-        <source>&amp;Save deck</source>
-        <translation type="obsolete">S&amp;para lek</translation>
-    </message>
-    <message>
-        <source>Save deck &amp;as...</source>
-        <translation type="obsolete">Spa&amp;ra lek som...</translation>
-    </message>
-    <message>
-        <source>Load deck from cl&amp;ipboard...</source>
-        <translation type="obsolete">Ladda lek &amp;från urklipp...</translation>
-    </message>
-    <message>
-        <source>Save deck to clip&amp;board</source>
-        <translation type="obsolete">Spara lek som u&amp;tklipp</translation>
-    </message>
-    <message>
-        <source>&amp;Print deck...</source>
-        <translation type="obsolete">Skri&amp;v ut lek...</translation>
-    </message>
-    <message>
-        <source>&amp;Close</source>
-        <translation type="obsolete">Stän&amp;g</translation>
-    </message>
-    <message>
-        <source>&amp;Edit sets...</source>
-        <translation type="obsolete">Redigera utg&amp;åvor...</translation>
-    </message>
-    <message>
-        <source>&amp;Deck</source>
-        <translation type="obsolete">L&amp;ek</translation>
-    </message>
-    <message>
-        <source>&amp;Card database</source>
-        <translation type="obsolete">K&amp;ortdatabas</translation>
-    </message>
-    <message>
-        <source>Add card to &amp;maindeck</source>
-        <translation type="obsolete">Lägg till kort till &amp;huvudlek</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation type="obsolete">Retur</translation>
-    </message>
-    <message>
-        <source>Add card to &amp;sideboard</source>
-        <translation type="obsolete">Lägg till kort i sidbr&amp;äda</translation>
-    </message>
-    <message>
-        <source>&amp;Remove row</source>
-        <translation type="obsolete">Ta bort ra&amp;d</translation>
-    </message>
-    <message>
-        <source>&amp;Increment number</source>
-        <translation type="obsolete">&amp;Öka antal</translation>
-    </message>
-    <message>
-        <source>&amp;Decrement number</source>
-        <translation type="obsolete">&amp;Minska antal</translation>
-    </message>
-    <message>
-        <source>Are you sure?</source>
-        <translation type="obsolete">Är du säker?</translation>
-    </message>
-    <message>
-        <source>The decklist has been modified.
-Do you want to save the changes?</source>
-        <translation type="obsolete">Denna leklista har modifierats. Vill du spara ändringarna?</translation>
-    </message>
-    <message>
-        <source>Load deck</source>
-        <translation type="obsolete">Ladda lek</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation type="obsolete">Fel</translation>
-    </message>
-    <message>
-        <source>The deck could not be saved.
-Please check that the directory is writable and try again.</source>
-        <translation type="obsolete">Leken kunde inte sparas.
-Vänligen se till att katalogen är skrivbar och försök igen.</translation>
-    </message>
-    <message>
-        <source>Save deck</source>
-        <translation type="obsolete">Spara lek</translation>
-    </message>
 </context>
 <context>
     <name>WndSets</name>
     <message>
         <location filename="../src/window_sets.cpp" line="42"/>
         <source>Save set ordering</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="44"/>
         <source>Restore saved set ordering</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="46"/>
         <source>Move selected set up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="48"/>
         <source>Move selected set down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="50"/>
         <source>Move selected set to top</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="52"/>
         <source>Move selected set to bottom</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="79"/>
@@ -5460,12 +4738,12 @@ Vänligen se till att katalogen är skrivbar och försök igen.</translation>
     <message>
         <location filename="../src/window_sets.cpp" line="90"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="90"/>
         <source>The sets database has been saved successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5488,7 +4766,7 @@ Vänligen se till att katalogen är skrivbar och försök igen.</translation>
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="177"/>
         <source>pile view</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

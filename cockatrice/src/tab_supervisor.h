@@ -58,6 +58,8 @@ private:
     QList<TabDeckEditor *> deckEditorTabs;
     int myAddTab(Tab *tab);
     void addCloseButtonToTab(Tab *tab, int tabIndex);
+    QString sanitizeTabName(QString dirty) const;
+    QString sanitizeHtml(QString dirty) const;
 public:
     TabSupervisor(AbstractClient *_client, QWidget *parent = 0);
     ~TabSupervisor();
@@ -71,6 +73,7 @@ public:
     AbstractClient *getClient() const;
     const QMap<int, TabRoom *> &getRoomTabs() const { return roomTabs; }
     bool getAdminLocked() const;
+    bool closeRequest();
 signals:
     void setMenu(const QList<QMenu *> &newMenuList = QList<QMenu *>());
     void localGameEnded();

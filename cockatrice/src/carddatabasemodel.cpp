@@ -117,34 +117,40 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
     setSortCaseSensitivity(Qt::CaseInsensitive);
 }
 
+
+bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
+
+    QString leftString = sourceModel()->data(left).toString();
+    QString rightString = sourceModel()->data(right).toString();
+
+    if (leftString.compare(cardName, Qt::CaseInsensitive) == 0) {// exact match should be at top
+        return true;
+    }
+
+    if (rightString.compare(cardName, Qt::CaseInsensitive) == 0) {// exact match should be at top
+        return false;
+    }
+
+    bool isLeftType2 = leftString.startsWith(cardName, Qt::CaseInsensitive);
+    bool isRightType2 = rightString.startsWith(cardName, Qt::CaseInsensitive);
+    if (isLeftType2 && !isRightType2)
+        return true;
+    if (isRightType2 && !isLeftType2)
+        return false;
+
+    return QString::localeAwareCompare(leftString, rightString) < 0;
+
+}
+
 bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
     CardInfo const *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
+    
     if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
         return false;
-    
-    if (!cardNameBeginning.isEmpty())
-        if (!info->getName().startsWith(cardNameBeginning, Qt::CaseInsensitive))
-            return false;
-    
+
     if (!cardName.isEmpty())
         if (!info->getName().contains(cardName, Qt::CaseInsensitive))
-            return false;
-    
-    if (!cardNameSet.isEmpty())
-        if (!cardNameSet.contains(info->getName()))
-            return false;
-    
-    if (!cardText.isEmpty())
-        if (!info->getText().contains(cardText, Qt::CaseInsensitive))
-            return false;
-    
-    if (!cardColors.isEmpty())
-        if (QSet<QString>::fromList(info->getColors()).intersect(cardColors).isEmpty() && !(info->getColors().isEmpty() && cardColors.contains("X")))
-            return false;
-    
-    if (!cardTypes.isEmpty())
-        if (!cardTypes.contains(info->getMainCardType()))
             return false;
 
     if (filterTree != NULL)

@@ -75,7 +75,6 @@ private:
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(QString zoneName);
     void recursiveExpand(const QModelIndex &index);
-    bool confirmClose();
 
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
@@ -110,6 +109,7 @@ public:
     QString getTabText() const;
     void setDeck(DeckLoader *_deckLoader);
     void setModified(bool _windowModified);
+    bool confirmClose();
 public slots:
     void closeRequest();
 signals:

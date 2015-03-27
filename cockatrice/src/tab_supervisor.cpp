@@ -15,6 +15,7 @@
 #include "settingscache.h"
 #include <QDebug>
 #include <QPainter>
+#include <QMessageBox>
 
 #include "pb/room_commands.pb.h"
 #include "pb/room_event.pb.h"
@@ -125,9 +126,29 @@ void TabSupervisor::retranslateUi()
     
     for (int i = 0; i < tabs.size(); ++i)
         if (tabs[i]) {
-            setTabText(indexOf(tabs[i]), tabs[i]->getTabText());
+            int idx = indexOf(tabs[i]);
+            QString tabText = tabs[i]->getTabText();
+            setTabText(idx, sanitizeTabName(tabText));
+            setTabToolTip(idx, sanitizeHtml(tabText));
             tabs[i]->retranslateUi();
         }
+}
+
+bool TabSupervisor::closeRequest()
+{
+    if (getGameCount()) {
+        if (QMessageBox::question(this, tr("Are you sure?"), tr("There are still open games. Are you sure you want to quit?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+            return false;
+        }
+    }
+
+    foreach(TabDeckEditor *tab,  deckEditorTabs)
+    {
+        if(!tab->confirmClose())
+            return false;
+    }
+
+    return true;
 }
 
 AbstractClient *TabSupervisor::getClient() const
@@ -135,11 +156,30 @@ AbstractClient *TabSupervisor::getClient() const
     return localClients.isEmpty() ? client : localClients.first();
 }
 
+QString TabSupervisor::sanitizeTabName(QString dirty) const
+{
+    return dirty.replace("&", "&&");
+}
+
+QString TabSupervisor::sanitizeHtml(QString dirty) const
+{
+    return dirty
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;");
+}
+
 int TabSupervisor::myAddTab(Tab *tab)
 {
     connect(tab, SIGNAL(userEvent(bool)), this, SLOT(tabUserEvent(bool)));
     connect(tab, SIGNAL(tabTextChanged(Tab *, QString)), this, SLOT(updateTabText(Tab *, QString)));
-    return addTab(tab, tab->getTabText());
+
+    QString tabText = tab->getTabText();
+    int idx = addTab(tab, sanitizeTabName(tabText));
+    setTabToolTip(idx, sanitizeHtml(tabText));
+
+    return idx;
 }
 
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
@@ -434,7 +474,9 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
 
 void TabSupervisor::updateTabText(Tab *tab, const QString &newTabText)
 {
-    setTabText(indexOf(tab), newTabText);
+    int idx = indexOf(tab);
+    setTabText(idx, sanitizeTabName(newTabText));
+    setTabToolTip(idx, sanitizeHtml(newTabText));
 }
 
 void TabSupervisor::processRoomEvent(const RoomEvent &event)
