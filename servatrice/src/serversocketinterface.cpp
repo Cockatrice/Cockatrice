@@ -375,10 +375,15 @@ bool ServerSocketInterface::deckListHelper(int folderId, ServerInfo_DeckStorage_
     if (!sqlInterface->execSqlQuery(query))
         return false;
 
-    while (query->next()) {
+    QMap<int, QString> results;
+    while(query->next())
+        results[query->value(0).toInt()] = query->value(1).toString();
+
+    foreach(int key, results.keys())
+    {
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(query->value(0).toInt());
-        newItem->set_name(query->value(1).toString().toStdString());
+        newItem->set_id(key);
+        newItem->set_name(results.value(key).toStdString());
 
         if (!deckListHelper(newItem->id(), newItem->mutable_folder()))
             return false;
