@@ -40,7 +40,10 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
             QStringList setList;
             const QList<CardSet *> &sets = card->getSets();
             for (int i = 0; i < sets.size(); i++)
-                setList << sets[i]->getShortName();
+            {
+                if(sets[i]->getEnabled())
+                    setList << sets[i]->getShortName();
+            }
             return setList.join(", ");
         }
         case 2: return card->getManaCost();
@@ -73,9 +76,26 @@ void CardDatabaseModel::updateCardList()
     for (int i = 0; i < cardList.size(); ++i)
         disconnect(cardList[i], 0, this, 0);
     
-    cardList = db->getCardList();
-    for (int i = 0; i < cardList.size(); ++i)
-        connect(cardList[i], SIGNAL(cardInfoChanged(CardInfo *)), this, SLOT(cardInfoChanged(CardInfo *)));
+    cardList.clear();
+
+    foreach(CardInfo * card, db->getCardList())
+    {
+        bool hasSet = false;
+        foreach(CardSet * set, card->getSets())
+        {
+            if(set->getEnabled())
+            {
+                hasSet = true;
+                break;
+            }
+        }
+
+        if(hasSet)
+        {
+            cardList.append(card);
+            connect(card, SIGNAL(cardInfoChanged(CardInfo *)), this, SLOT(cardInfoChanged(CardInfo *)));
+        }
+    }
     
     endResetModel();
 }

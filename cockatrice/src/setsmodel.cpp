@@ -1,4 +1,5 @@
 #include "setsmodel.h"
+#include "main.h"
 
 SetsModel::SetsModel(CardDatabase *_db, QObject *parent)
     : QAbstractTableModel(parent), sets(_db->getSetList())
@@ -50,7 +51,11 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
 bool SetsModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
     if (role == Qt::CheckStateRole && index.column () == EnabledCol)
-            toggleRow(index.row(), value == Qt::Checked);
+    {
+        toggleRow(index.row(), value == Qt::Checked);
+        return true;
+    }
+    return false;
 }
 
 QVariant SetsModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -177,6 +182,8 @@ void SetsModel::save()
         set->setEnabled(enabledSets.contains(set));
 
     sets.sortByKey();
+
+    emit db->cardListChanged();
 }
 
 void SetsModel::restore(CardDatabase *db)
