@@ -32,7 +32,7 @@ private:
     QVariantMap setsMap;
     QString dataDir;
     
-    CardInfo *addCard(const QString &setName, QString cardName, bool isToken, int cardId, QString &cardCost, QString &cmc, const QString &cardType, const QString &cardPT, int cardLoyalty, const QString &cardText);
+    CardInfo *addCard(const QString &setName, QString cardName, bool isToken, int cardId, QString &cardCost, QString &cmc, const QString &cardType, const QString &cardPT, int cardLoyalty, const QString &cardText, const QStringList & colors);
 signals:
     void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
     void dataReadProgress(int bytesRead, int totalBytes);
@@ -43,6 +43,8 @@ public:
     int importTextSpoiler(CardSet *set, const QVariant &data);
     QList<SetToDownload> &getSets() { return allSets; }
     const QString &getDataDir() const { return dataDir; }
+protected:
+    void extractColors(const QStringList & in, QStringList & out);
 };
 
 #endif

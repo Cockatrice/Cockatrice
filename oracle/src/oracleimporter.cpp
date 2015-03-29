@@ -69,7 +69,8 @@ CardInfo *OracleImporter::addCard(const QString &setName,
                                   const QString &cardType,
                                   const QString &cardPT,
                                   int cardLoyalty,
-                                  const QString &cardText)
+                                  const QString &cardText,
+                                  const QStringList & colors)
 {
     QStringList cardTextRows = cardText.split("\n");
     bool splitCard = false;
@@ -99,23 +100,6 @@ CardInfo *OracleImporter::addCard(const QString &setName,
                 if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
                     mArtifact = true;
                     
-        QStringList colors;
-        QStringList allColors = QStringList() << "W" << "U" << "B" << "R" << "G";
-        for (int i = 0; i < allColors.size(); i++)
-            if (cardCost.contains(allColors[i]))
-                colors << allColors[i];
-        
-        if (cardTextRows.contains(cardName + " is white."))
-            colors << "W";
-        if (cardTextRows.contains(cardName + " is blue."))
-            colors << "U";
-        if (cardTextRows.contains(cardName + " is black."))
-            colors << "B";
-        if (cardTextRows.contains(cardName + " is red."))
-            colors << "R";
-        if (cardTextRows.contains(cardName + " is green."))
-            colors << "G";
-        
         bool cipt = cardText.contains(cardName + " enters the battlefield tapped") &&
             !cardText.contains(cardName + " enters the battlefield tapped unless");
         
@@ -137,6 +121,25 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     return card;
 }
 
+void OracleImporter::extractColors(const QStringList & in, QStringList & out)
+{
+    foreach(QString c, in)
+    {
+        if (c == "White")
+            out << "W";
+        else if (c == "Blue")
+            out << "U";
+        else if (c == "Black")
+            out << "B";
+        else if (c == "Red")
+            out << "R";
+        else if (c == "Green")
+            out << "G";
+        else
+            qDebug() << "error: unknown color:" << c;
+    }
+}
+
 int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
 {
     int cards = 0;
@@ -149,6 +152,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
     QString cardType;
     QString cardPT;
     QString cardText;
+    QStringList colors;
     int cardId;
     int cardLoyalty;
     bool cardIsToken = false;
@@ -200,6 +204,12 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
                 cardType += card2->contains("type") ? QString(" // ") + card2->value("type").toString() : QString("");
                 cardPT += card2->contains("power") || card2->contains("toughness") ? QString(" // ") + card2->value("power").toString() + QString('/') + card2->value("toughness").toString() : QString("");
                 cardText += card2->contains("text") ? QString("\n\n---\n\n") + card2->value("text").toString() : QString("");
+
+                colors.clear();
+                extractColors(card1->value("colors").toStringList(), colors);
+                extractColors(card2->value("colors").toStringList(), colors);
+                colors.removeDuplicates();
+
             } else {
                 // first card of a pair; enqueue for later merging
                 // Conditional on cardId because promo prints have no muid - see #640
@@ -219,6 +229,9 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
             cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toInt() : 0;
             cardIsToken = map.value("layout") == "token";
 
+            colors.clear();
+            extractColors(map.value("colors").toStringList(), colors);
+
             // Distinguish Vanguard cards from regular cards of the same name.
             if (map.value("layout") == "vanguard") {
                 cardName += " Avatar";
@@ -226,7 +239,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
         }
 
         if (!cardIsToken) {
-            CardInfo *card = addCard(set->getShortName(), cardName, cardIsToken, cardId, cardCost, cmc, cardType, cardPT, cardLoyalty, cardText);
+            CardInfo *card = addCard(set->getShortName(), cardName, cardIsToken, cardId, cardCost, cmc, cardType, cardPT, cardLoyalty, cardText, colors);
 
             if (!set->contains(card)) {
                 card->addToSet(set);
