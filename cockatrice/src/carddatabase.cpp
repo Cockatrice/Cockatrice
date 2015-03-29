@@ -534,7 +534,7 @@ void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
 
 void CardInfo::clearPixmapCache()
 {
-    qDebug() << "Deleting pixmap for" << name;
+    //qDebug() << "Deleting pixmap for" << name;
     QPixmapCache::remove(pixmapCacheKey);
 }
 
