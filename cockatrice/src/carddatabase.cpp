@@ -33,7 +33,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
 CardSet::CardSet(const QString &_shortName, const QString &_longName, const QString &_setType, const QDate &_releaseDate)
     : shortName(_shortName), longName(_longName), releaseDate(_releaseDate), setType(_setType)
 {
-    updateSortKey();
+    loadSetOptions();
 }
 
 QString CardSet::getCorrectedShortName() const
@@ -58,12 +58,35 @@ void CardSet::setSortKey(unsigned int _sortKey)
     settings.setValue("sortkey", sortKey);
 }
 
-void CardSet::updateSortKey()
+void CardSet::loadSetOptions()
 {
     QSettings settings;
     settings.beginGroup("sets");
     settings.beginGroup(shortName);
+
     sortKey = settings.value("sortkey", 0).toInt();
+    enabled = settings.value("enabled", false).toBool();
+    isknown = settings.value("isknown", false).toBool();
+}
+
+void CardSet::setEnabled(bool _enabled)
+{
+    enabled = _enabled;
+
+    QSettings settings;
+    settings.beginGroup("sets");
+    settings.beginGroup(shortName);
+    settings.setValue("enabled", enabled);
+}
+
+void CardSet::setIsKnown(bool _isknown)
+{
+    isknown = _isknown;
+
+    QSettings settings;
+    settings.beginGroup("sets");
+    settings.beginGroup(shortName);
+    settings.setValue("isknown", isknown);
 }
 
 class SetList::CompareFunctor {

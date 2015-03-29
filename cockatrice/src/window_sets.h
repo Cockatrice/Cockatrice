@@ -15,13 +15,15 @@ class WndSets : public QMainWindow {
 private:
     SetsModel *model;
     QTreeView *view;
-    QPushButton *saveButton, *restoreButton, *upButton, *downButton, *bottomButton, *topButton;
+    QPushButton *enableButton, *disableButton, *saveButton, *restoreButton, *upButton, *downButton, *bottomButton, *topButton;
 public:
     WndSets(QWidget *parent = 0);
     ~WndSets();
 protected:
     void selectRow(int row);
 private slots:
+    void actEnable();
+    void actDisable();
     void actSave();
     void actRestore();
     void actUp();

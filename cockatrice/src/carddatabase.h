@@ -31,6 +31,7 @@ private:
     unsigned int sortKey;
     QDate releaseDate;
     QString setType;
+    bool enabled, isknown;
 public:
     CardSet(const QString &_shortName = QString(), const QString &_longName = QString(), const QString &_setType = QString(), const QDate &_releaseDate = QDate());
     QString getCorrectedShortName() const;
@@ -38,9 +39,13 @@ public:
     QString getLongName() const { return longName; }
     QString getSetType() const { return setType; }
     QDate getReleaseDate() const { return releaseDate; }
+    void loadSetOptions();
     int getSortKey() const { return sortKey; }
     void setSortKey(unsigned int _sortKey);
-    void updateSortKey();
+    bool getEnabled() const { return enabled; }
+    void setEnabled(bool _enabled);
+    bool getIsKnown() const { return isknown; }
+    void setIsKnown(bool _isknown);
 };
 
 class SetList : public QList<CardSet *> {
