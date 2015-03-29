@@ -1,5 +1,4 @@
 #include "setsmodel.h"
-#include "main.h"
 
 SetsModel::SetsModel(CardDatabase *_db, QObject *parent)
     : QAbstractTableModel(parent), sets(_db->getSetList())
@@ -171,7 +170,7 @@ void SetsModel::sort(int column, Qt::SortOrder order)
     emit dataChanged(index(0, 0), index(numRows - 1, columnCount() - 1));
 }
 
-void SetsModel::save()
+void SetsModel::save(CardDatabase *db)
 {
     // order
     for (int i = 0; i < sets.size(); i++)

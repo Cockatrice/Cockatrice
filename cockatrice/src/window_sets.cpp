@@ -96,7 +96,7 @@ WndSets::~WndSets()
 
 void WndSets::actSave()
 {
-    model->save();
+    model->save(db);
     QMessageBox::information(this, tr("Success"), tr("The sets database has been saved successfully."));
 }
 

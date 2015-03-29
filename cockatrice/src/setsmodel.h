@@ -44,7 +44,7 @@ public:
     void swapRows(int oldRow, int newRow);
     void toggleRow(int row, bool enable);
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
-    void save();
+    void save(CardDatabase *db);
     void restore(CardDatabase *db);
 };
 

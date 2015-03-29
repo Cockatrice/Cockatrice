@@ -112,6 +112,7 @@ public:
     bool confirmClose();
 public slots:
     void closeRequest();
+    void checkUnknownSets();
 signals:
     void deckEditorClosing(TabDeckEditor *tab);
 };

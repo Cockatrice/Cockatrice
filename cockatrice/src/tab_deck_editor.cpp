@@ -16,6 +16,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QTextStream>
+#include <QTimer>
 #include "tab_deck_editor.h"
 #include "window_sets.h"
 #include "carddatabase.h"
@@ -280,10 +281,12 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     deckEditToolBar->addAction(aDecrement);
     deckEditToolBar->addAction(aIncrement);
     deckEditToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    
+
     retranslateUi();
     
     resize(950, 700);
+
+    QTimer::singleShot(0, this, SLOT(checkUnknownSets()));
 }
 
 TabDeckEditor::~TabDeckEditor()
@@ -750,4 +753,47 @@ void TabDeckEditor::filterRemove(QAction *action) {
         return;
 
     filterModel->removeRow(idx.row(), idx.parent());
+}
+
+void TabDeckEditor::checkUnknownSets()
+{
+    int numUnknownSets = 0;
+    SetList sets = db->getSetList();
+    foreach(CardSet* set, sets)
+    {
+        if(!set->getIsKnown())
+        {
+            numUnknownSets++;
+        }
+    }
+
+    if(!numUnknownSets)
+        return;
+
+    int ret = QMessageBox::question(this, tr("New sets found"), tr("%1 new set(s) have been found in the card database. Do you want to enable them?").arg(numUnknownSets), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+
+    switch(ret)
+    {
+        case QMessageBox::No:
+            foreach(CardSet * set, sets)
+            {
+                if(!set->getIsKnown())
+                    set->setIsKnown(true);
+            }
+            break;
+        case QMessageBox::Yes:    
+            foreach(CardSet * set, sets)
+            {
+                if(!set->getIsKnown())
+                {
+                    set->setIsKnown(true);
+                    set->setEnabled(true);
+                }
+            }
+
+            emit db->cardListChanged();
+            break;
+        default:
+            break;
+    }
 }
