@@ -69,9 +69,9 @@ CardInfo *OracleImporter::addCard(const QString &setName,
                                   const QString &cardType,
                                   const QString &cardPT,
                                   int cardLoyalty,
-                                  const QStringList &cardText)
+                                  const QString &cardText)
 {
-    QString fullCardText = cardText.join("\n");
+    QStringList cardTextRows = cardText.split("\n");
     bool splitCard = false;
     if (cardName.contains('(')) {
         cardName.remove(QRegExp(" \\(.*\\)"));
@@ -90,13 +90,13 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     CardInfo *card;
     if (cards.contains(cardName)) {
         card = cards.value(cardName);
-        if (splitCard && !card->getText().contains(fullCardText))
-            card->setText(card->getText() + "\n---\n" + fullCardText);
+        if (splitCard && !card->getText().contains(cardText))
+            card->setText(card->getText() + "\n---\n" + cardText);
     } else {
         bool mArtifact = false;
         if (cardType.endsWith("Artifact"))
-            for (int i = 0; i < cardText.size(); ++i)
-                if (cardText[i].contains("{T}") && cardText[i].contains("to your mana pool"))
+            for (int i = 0; i < cardTextRows.size(); ++i)
+                if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
                     mArtifact = true;
                     
         QStringList colors;
@@ -105,20 +105,21 @@ CardInfo *OracleImporter::addCard(const QString &setName,
             if (cardCost.contains(allColors[i]))
                 colors << allColors[i];
         
-        if (cardText.contains(cardName + " is white."))
+        if (cardTextRows.contains(cardName + " is white."))
             colors << "W";
-        if (cardText.contains(cardName + " is blue."))
+        if (cardTextRows.contains(cardName + " is blue."))
             colors << "U";
-        if (cardText.contains(cardName + " is black."))
+        if (cardTextRows.contains(cardName + " is black."))
             colors << "B";
-        if (cardText.contains(cardName + " is red."))
+        if (cardTextRows.contains(cardName + " is red."))
             colors << "R";
-        if (cardText.contains(cardName + " is green."))
+        if (cardTextRows.contains(cardName + " is green."))
             colors << "G";
         
-        bool cipt = (cardText.contains(cardName + " enters the battlefield tapped."));
+        bool cipt = cardText.contains(cardName + " enters the battlefield tapped") &&
+            !cardText.contains(cardName + " enters the battlefield tapped unless");
         
-        card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, fullCardText, colors, cardLoyalty, cipt);
+        card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, cardLoyalty, cipt);
         int tableRow = 1;
         QString mainCardType = card->getMainCardType();
         if ((mainCardType == "Land") || mArtifact)
@@ -225,7 +226,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
         }
 
         if (!cardIsToken) {
-            CardInfo *card = addCard(set->getShortName(), cardName, cardIsToken, cardId, cardCost, cmc, cardType, cardPT, cardLoyalty, cardText.split("\n"));
+            CardInfo *card = addCard(set->getShortName(), cardName, cardIsToken, cardId, cardCost, cmc, cardType, cardPT, cardLoyalty, cardText);
 
             if (!set->contains(card)) {
                 card->addToSet(set);
