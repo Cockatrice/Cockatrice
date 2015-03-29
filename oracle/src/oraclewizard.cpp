@@ -56,7 +56,6 @@ OracleWizard::OracleWizard(QWidget *parent)
 
     addPage(new IntroPage);
     addPage(new LoadSetsPage);
-    addPage(new ChooseSetsPage);
     addPage(new SaveSetsPage);
 
     retranslateUi();
@@ -425,94 +424,6 @@ void LoadSetsPage::importFinished()
     } else {
         QMessageBox::critical(this, tr("Error"), tr("The file was retrieved successfully, but it does not contain any sets data."));
     }
-}
-
-ChooseSetsPage::ChooseSetsPage(QWidget *parent)
-    : OracleWizardPage(parent)
-{
-    checkBoxLayout = new QVBoxLayout;
-    
-    QWidget *checkboxFrame = new QWidget(this);
-    checkboxFrame->setLayout(checkBoxLayout);
-    
-    QScrollArea *checkboxArea = new QScrollArea(this);
-    checkboxArea->setWidget(checkboxFrame);
-    checkboxArea->setWidgetResizable(true);
-    
-    checkAllButton = new QPushButton(this);
-    connect(checkAllButton, SIGNAL(clicked()), this, SLOT(actCheckAll()));
-    uncheckAllButton = new QPushButton(this);
-    connect(uncheckAllButton, SIGNAL(clicked()), this, SLOT(actUncheckAll()));
-
-    QGridLayout *layout = new QGridLayout(this);
-    layout->addWidget(checkboxArea, 0, 0, 1, 2);
-    layout->addWidget(checkAllButton, 1, 0);
-    layout->addWidget(uncheckAllButton, 1, 1);
-
-    setLayout(layout);
-}
-
-void ChooseSetsPage::initializePage()
-{
-    // populate checkbox list
-    for (int i = 0; i < checkBoxList.size(); ++i)
-        delete checkBoxList[i];
-    checkBoxList.clear();
-    
-    QList<SetToDownload> &sets = wizard()->importer->getSets();
-    for (int i = 0; i < sets.size(); ++i) {
-        QCheckBox *checkBox = new QCheckBox(sets[i].getLongName());
-        checkBox->setChecked(sets[i].getImport());
-        connect(checkBox, SIGNAL(stateChanged(int)), this, SLOT(checkBoxChanged(int)));
-        checkBoxLayout->addWidget(checkBox);
-        checkBoxList << checkBox;
-    }
-}
-
-void ChooseSetsPage::retranslateUi()
-{
-    setTitle(tr("Sets selection"));
-    setSubTitle(tr("The following sets has been found in the source file. "
-                   "Please mark the sets that will be imported.\n"
-                   "All core and expansion sets are selected by default."));
-
-    checkAllButton->setText(tr("&Check all"));
-    uncheckAllButton->setText(tr("&Uncheck all"));
-}
-
-void ChooseSetsPage::checkBoxChanged(int state)
-{
-    QCheckBox *checkBox = qobject_cast<QCheckBox *>(sender());
-    QList<SetToDownload> &sets = wizard()->importer->getSets();
-    for (int i = 0; i < sets.size(); ++i)
-        if (sets[i].getLongName() == checkBox->text()) {
-            sets[i].setImport(state);
-            break;
-        }
-}
-
-void ChooseSetsPage::actCheckAll()
-{
-    for (int i = 0; i < checkBoxList.size(); ++i)
-        checkBoxList[i]->setChecked(true);
-}
-
-void ChooseSetsPage::actUncheckAll()
-{
-    for (int i = 0; i < checkBoxList.size(); ++i)
-        checkBoxList[i]->setChecked(false);
-}
-
-bool ChooseSetsPage::validatePage()
-{
-    for (int i = 0; i < checkBoxList.size(); ++i)
-    {
-        if(checkBoxList[i]->isChecked())
-            return true;
-    }
-
-    QMessageBox::critical(this, tr("Error"), tr("Please mark at least one set."));
-    return false;        
 }
 
 SaveSetsPage::SaveSetsPage(QWidget *parent)
