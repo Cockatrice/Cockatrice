@@ -123,21 +123,23 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
     QString leftString = sourceModel()->data(left).toString();
     QString rightString = sourceModel()->data(right).toString();
 
-    if (leftString.compare(cardName, Qt::CaseInsensitive) == 0) {// exact match should be at top
-        return true;
+    if (!cardName.isEmpty())
+    {
+        if (leftString.compare(cardName, Qt::CaseInsensitive) == 0) {// exact match should be at top
+            return true;
+        }
+
+        if (rightString.compare(cardName, Qt::CaseInsensitive) == 0) {// exact match should be at top
+            return false;
+        }
+
+        bool isLeftType2 = leftString.startsWith(cardName, Qt::CaseInsensitive);
+        bool isRightType2 = rightString.startsWith(cardName, Qt::CaseInsensitive);
+        if (isLeftType2 && !isRightType2)
+            return true;
+        if (isRightType2 && !isLeftType2)
+            return false;
     }
-
-    if (rightString.compare(cardName, Qt::CaseInsensitive) == 0) {// exact match should be at top
-        return false;
-    }
-
-    bool isLeftType2 = leftString.startsWith(cardName, Qt::CaseInsensitive);
-    bool isRightType2 = rightString.startsWith(cardName, Qt::CaseInsensitive);
-    if (isLeftType2 && !isRightType2)
-        return true;
-    if (isRightType2 && !isLeftType2)
-        return false;
-
     return QString::localeAwareCompare(leftString, rightString) < 0;
 
 }
