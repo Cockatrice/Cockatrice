@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
     const QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
     if (!db->getLoadSuccess())
-        if (db->loadCardDatabase(dataDir + "/cards.xml"))
+        if (!db->loadCardDatabase(dataDir + "/cards.xml"))
             settingsCache->setCardDatabasePath(dataDir + "/cards.xml");
     if (settingsCache->getTokenDatabasePath().isEmpty())
         settingsCache->setTokenDatabasePath(dataDir + "/tokens.xml");

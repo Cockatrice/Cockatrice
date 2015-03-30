@@ -926,7 +926,7 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
 
     if (!tokens) {
         loadStatus = tempLoadStatus;
-        qDebug() << "loadCardDatabase(): Status = " << loadStatus;
+        qDebug() << "loadCardDatabase(): Path = " << path << " Status = " << loadStatus;
     }
 
 
