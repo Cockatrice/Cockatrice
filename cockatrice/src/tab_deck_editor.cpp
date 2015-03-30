@@ -286,6 +286,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     
     resize(950, 700);
 
+    connect(this, SIGNAL(setListChanged()), db, SIGNAL(cardListChanged()));
     QTimer::singleShot(0, this, SLOT(checkUnknownSets()));
 }
 
@@ -791,7 +792,7 @@ void TabDeckEditor::checkUnknownSets()
                 }
             }
 
-            emit db->cardListChanged();
+            emit setListChanged();
             break;
         default:
             break;

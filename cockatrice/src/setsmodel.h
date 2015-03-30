@@ -46,6 +46,8 @@ public:
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
     void save(CardDatabase *db);
     void restore(CardDatabase *db);
+signals:
+    void setListChanged();
 };
 
 #endif

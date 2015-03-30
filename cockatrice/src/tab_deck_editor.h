@@ -115,6 +115,7 @@ public slots:
     void checkUnknownSets();
 signals:
     void deckEditorClosing(TabDeckEditor *tab);
+    void setListChanged();
 };
 
 #endif
