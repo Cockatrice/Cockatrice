@@ -39,9 +39,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     }
 
     picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
-    
-    connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
-
     picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
 
     pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
