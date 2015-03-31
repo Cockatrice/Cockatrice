@@ -133,6 +133,18 @@ void SetsModel::toggleRow(int row, bool enable)
     emit dataChanged(index(row, EnabledCol), index(row, EnabledCol));
 }
 
+void SetsModel::toggleAll(bool enable)
+{
+    enabledSets.clear();
+    if(enable)
+    {
+        foreach(CardSet *set, sets)
+            enabledSets.insert(set);
+    }
+
+    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
+}
+
 void SetsModel::swapRows(int oldRow, int newRow)
 {
     beginRemoveRows(QModelIndex(), oldRow, oldRow);

@@ -15,7 +15,9 @@ class WndSets : public QMainWindow {
 private:
     SetsModel *model;
     QTreeView *view;
-    QPushButton *enableButton, *disableButton, *saveButton, *restoreButton, *upButton, *downButton, *bottomButton, *topButton;
+    QPushButton *enableButton, *disableButton, *enableAllButton, *disableAllButton,
+                *saveButton, *restoreButton,
+                *upButton, *downButton, *bottomButton, *topButton;
 public:
     WndSets(QWidget *parent = 0);
     ~WndSets();
@@ -24,6 +26,8 @@ protected:
 private slots:
     void actEnable();
     void actDisable();
+    void actEnableAll();
+    void actDisableAll();
     void actSave();
     void actRestore();
     void actUp();

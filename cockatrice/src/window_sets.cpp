@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QItemSelection>
 #include <QMessageBox>
+#include <QGroupBox>
 
 WndSets::WndSets(QWidget *parent)
     : QMainWindow(parent)
@@ -44,10 +45,16 @@ WndSets::WndSets(QWidget *parent)
     connect(enableButton, SIGNAL(clicked()), this, SLOT(actEnable()));
     disableButton = new QPushButton(tr("Disable set"));
     connect(disableButton, SIGNAL(clicked()), this, SLOT(actDisable()));
+    enableAllButton = new QPushButton(tr("Enable all sets"));
+    connect(enableAllButton, SIGNAL(clicked()), this, SLOT(actEnableAll()));
+    disableAllButton = new QPushButton(tr("Disable all sets"));
+    connect(disableAllButton, SIGNAL(clicked()), this, SLOT(actDisableAll()));
+
     saveButton = new QPushButton(tr("Save changes"));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(actSave()));
     restoreButton = new QPushButton(tr("Restore old settings"));
     connect(restoreButton, SIGNAL(clicked()), this, SLOT(actRestore()));
+
     upButton = new QPushButton(tr("Move selected set up"));
     connect(upButton, SIGNAL(clicked()), this, SLOT(actUp()));
     downButton = new QPushButton(tr("Move selected set down"));
@@ -67,20 +74,28 @@ WndSets::WndSets(QWidget *parent)
     connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
         this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
 
+    QGroupBox *toggleFrame = new QGroupBox(tr("Enable sets"));
+    QVBoxLayout *toggleVBox = new QVBoxLayout;
+    toggleVBox->addWidget(enableButton);
+    toggleVBox->addWidget(disableButton);
+    toggleVBox->addWidget(enableAllButton);
+    toggleVBox->addWidget(disableAllButton);
+    toggleFrame->setLayout(toggleVBox);
+
+    QGroupBox *sortFrame = new QGroupBox(tr("Sort sets"));
+    QVBoxLayout *sortVBox = new QVBoxLayout;
+    sortVBox->addWidget(upButton);
+    sortVBox->addWidget(downButton);
+    sortVBox->addWidget(topButton);
+    sortVBox->addWidget(bottomButton);
+    sortFrame->setLayout(sortVBox);
+
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(view, 0, 0, 1, 2);
-
-    mainLayout->addWidget(enableButton, 1, 0, 1, 1);
-    mainLayout->addWidget(disableButton, 1, 1, 1, 1);
-
-    mainLayout->addWidget(upButton, 2, 0, 1, 1);
-    mainLayout->addWidget(downButton, 2, 1, 1, 1);
-
-    mainLayout->addWidget(topButton, 3, 0, 1, 1);
-    mainLayout->addWidget(bottomButton, 3, 1, 1, 1);
-
-    mainLayout->addWidget(saveButton, 4, 0, 1, 1);
-    mainLayout->addWidget(restoreButton, 4, 1, 1, 1);
+    mainLayout->addWidget(toggleFrame, 2, 0, 1, 1);
+    mainLayout->addWidget(sortFrame, 2, 1, 1, 1);
+    mainLayout->addWidget(saveButton, 3, 0, 1, 1);
+    mainLayout->addWidget(restoreButton, 3, 1, 1, 1);
 
     QWidget *centralWidget = new QWidget;
     centralWidget->setLayout(mainLayout);
@@ -139,6 +154,16 @@ void WndSets::actDisable()
         return;
 
     model->toggleRow(rows.first().row(), false);
+}
+
+void WndSets::actEnableAll()
+{
+    model->toggleAll(true);
+}
+
+void WndSets::actDisableAll()
+{
+    model->toggleAll(false);
 }
 
 void WndSets::actUp()
