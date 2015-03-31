@@ -88,23 +88,25 @@ void AbstractCounter::setValue(int _value)
 
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
-        Command_IncCounter cmd;
-        cmd.set_counter_id(id);
-        cmd.set_delta(1);
-        player->sendGameCommand(cmd);
-        event->accept();
-    } else if (event->button() == Qt::RightButton) {
-        Command_IncCounter cmd;
-        cmd.set_counter_id(id);
-        cmd.set_delta(-1);
-        player->sendGameCommand(cmd);
-        event->accept();
-    } else if (event->button() == Qt::MidButton) {
-        if (menu)
-            menu->exec(event->screenPos());
-        event->accept();
-    } else
+    if (isUnderMouse()) {
+        if (event->button() == Qt::LeftButton && isUnderMouse()) {
+            Command_IncCounter cmd;
+            cmd.set_counter_id(id);
+            cmd.set_delta(1);
+            player->sendGameCommand(cmd);
+            event->accept();
+        } else if (event->button() == Qt::RightButton && isUnderMouse()) {
+            Command_IncCounter cmd;
+            cmd.set_counter_id(id);
+            cmd.set_delta(-1);
+            player->sendGameCommand(cmd);
+            event->accept();
+        } else if (event->button() == Qt::MidButton && isUnderMouse()) {
+            if (menu)
+                menu->exec(event->screenPos());
+            event->accept();
+        } 
+    }else
         event->ignore();
 }
 
