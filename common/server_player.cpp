@@ -439,7 +439,6 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
             
             card->deleteLater();
         } else {
-            card->setFaceDown(faceDown);
             if (!targetzone->hasCoords()) {
                 y = 0;
                 card->resetState();
@@ -465,6 +464,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
             int oldCardId = card->getId();
             if ((faceDown && (startzone != targetzone)) || (targetzone->getPlayer() != startzone->getPlayer()))
                 card->setId(targetzone->getPlayer()->newCardId());
+            card->setFaceDown(faceDown);
         
             // The player does not get to see which card he moved if it moves between two parts of hidden zones which
             // are not being looked at.
