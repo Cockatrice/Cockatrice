@@ -73,11 +73,12 @@ void ToggleButton::paintEvent(QPaintEvent *event)
     QPushButton::paintEvent(event);
     
     QPainter painter(this);
-    if (state)
-        painter.setPen(QPen(Qt::green, 3));
-    else
-        painter.setPen(QPen(Qt::red, 3));
-    painter.drawRect(1, 1, width() - 3, height() - 3);
+    QPen pen;
+    pen.setWidth(3);
+    pen.setJoinStyle(Qt::MiterJoin);
+    pen.setColor(state ? Qt::green : Qt::red);
+    painter.setPen(pen);
+    painter.drawRect(QRect(1, 1, width() - 3, height() - 3));
 }
 
 void ToggleButton::setState(bool _state)
