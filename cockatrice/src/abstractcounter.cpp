@@ -89,19 +89,19 @@ void AbstractCounter::setValue(int _value)
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (isUnderMouse()) {
-        if (event->button() == Qt::LeftButton && isUnderMouse()) {
+        if (event->button() == Qt::LeftButton) {
             Command_IncCounter cmd;
             cmd.set_counter_id(id);
             cmd.set_delta(1);
             player->sendGameCommand(cmd);
             event->accept();
-        } else if (event->button() == Qt::RightButton && isUnderMouse()) {
+        } else if (event->button() == Qt::RightButton) {
             Command_IncCounter cmd;
             cmd.set_counter_id(id);
             cmd.set_delta(-1);
             player->sendGameCommand(cmd);
             event->accept();
-        } else if (event->button() == Qt::MidButton && isUnderMouse()) {
+        } else if (event->button() == Qt::MidButton) {
             if (menu)
                 menu->exec(event->screenPos());
             event->accept();
