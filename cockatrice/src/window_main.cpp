@@ -425,6 +425,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    trayIcon->hide();
+    trayIcon->deleteLater();
     client->deleteLater();
     clientThread->wait();
 }
