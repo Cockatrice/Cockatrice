@@ -194,7 +194,9 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
         // set card attributes (eg: tapping 10 cards at once)
         << GameCommand::SET_CARD_ATTR
         // increment / decrement counter (eg: -10 lifepoints one by one)
-        << GameCommand::INC_COUNTER;
+        << GameCommand::INC_COUNTER
+        // mulling lots of hands in a row
+        << GameCommand::MULLIGAN;
 
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
