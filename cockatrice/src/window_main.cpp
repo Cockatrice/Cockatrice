@@ -135,7 +135,7 @@ void MainWindow::actDisconnect()
 void MainWindow::actSinglePlayer()
 {
     bool ok;
-    int numberPlayers = QInputDialog::getInt(this, tr("Number of players"), tr("Please enter the number of players."), 2, 1, 8, 1, &ok);
+    int numberPlayers = QInputDialog::getInt(this, tr("Number of players"), tr("Please enter the number of players."), 1, 1, 8, 1, &ok);
     if (!ok)
         return;
     
