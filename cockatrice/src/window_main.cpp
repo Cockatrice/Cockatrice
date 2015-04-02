@@ -274,6 +274,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
 void MainWindow::socketError(const QString &errorStr)
 {
     QMessageBox::critical(this, tr("Error"), tr("Socket error: %1").arg(errorStr));
+    actConnect();
 }
 
 void MainWindow::protocolVersionMismatch(int localVersion, int remoteVersion)
