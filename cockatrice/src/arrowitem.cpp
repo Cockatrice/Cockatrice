@@ -4,6 +4,7 @@
 #include "arrowitem.h"
 #include "playertarget.h"
 #include "carditem.h"
+#include "carddatabase.h"
 #include "cardzone.h"
 #include "player.h"
 #include "settingscache.h"
@@ -227,7 +228,13 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         }
         if (startZone->getName().compare("hand") == 0)  {
             startCard->playCard(false);
-            cmd.set_start_zone(settingsCache->getPlayToStack() ? "stack" :"table");
+            CardInfo *ci = startCard->getInfo();
+            if (((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) ||
+                ((settingsCache->getPlayToStack() && ci->getTableRow() != 0) &&
+                startCard->getZone()->getName().toStdString() != "stack")))
+                cmd.set_start_zone("stack");
+            else
+                cmd.set_start_zone(settingsCache->getPlayToStack() ? "stack" :"table");
         }
         player->sendGameCommand(cmd);
     }
