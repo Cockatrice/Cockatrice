@@ -100,6 +100,7 @@ private:
     QCheckBox displayCardNamesCheckBox;
     QCheckBox cardScalingCheckBox;
     QCheckBox horizontalHandCheckBox;
+    QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
     QGroupBox *zoneBgGroupBox;
     QGroupBox *cardsGroupBox;

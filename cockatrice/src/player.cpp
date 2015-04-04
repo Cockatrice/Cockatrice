@@ -115,6 +115,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     userInfo->CopyFrom(info);
     
     connect(settingsCache, SIGNAL(horizontalHandChanged()), this, SLOT(rearrangeZones()));
+    connect(settingsCache, SIGNAL(handJustificationChanged()), this, SLOT(rearrangeZones()));
     
     playerArea = new PlayerArea(this);
     

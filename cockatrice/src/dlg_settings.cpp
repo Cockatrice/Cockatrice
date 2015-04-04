@@ -309,9 +309,13 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     
     horizontalHandCheckBox.setChecked(settingsCache->getHorizontalHand());
     connect(&horizontalHandCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setHorizontalHand(int)));
+
+    leftJustifiedHandCheckBox.setChecked(settingsCache->getLeftJustified());
+    connect(&leftJustifiedHandCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setLeftJustified(int)));
     
     QGridLayout *handGrid = new QGridLayout;
     handGrid->addWidget(&horizontalHandCheckBox, 0, 0, 1, 2);
+    handGrid->addWidget(&leftJustifiedHandCheckBox, 1, 0, 1, 2);
     
     handGroupBox = new QGroupBox;
     handGroupBox->setLayout(handGrid);
@@ -356,6 +360,7 @@ void AppearanceSettingsPage::retranslateUi()
     
     handGroupBox->setTitle(tr("Hand layout"));
     horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
+    leftJustifiedHandCheckBox.setText(tr("Enable left justification"));
     
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
