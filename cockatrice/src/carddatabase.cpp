@@ -970,7 +970,9 @@ QStringList CardDatabase::getAllMainCardTypes() const
 void CardDatabase::cacheCardPixmaps(const QStringList &cardNames)
 {
     QPixmap tmp;
-    for (int i = 0; i < cardNames.size(); ++i)
+    // never cache more than 300 cards at once for a single deck
+    int max = qMin(cardNames.size(), 300);
+    for (int i = 0; i < max; ++i)
         getCard(cardNames[i])->loadPixmap(tmp);
 }
 

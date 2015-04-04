@@ -91,7 +91,10 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     
     CardInfo *imageSource = facedown ? db->getCard() : info;
     QPixmap translatedPixmap;
-    imageSource->getPixmap(translatedSize.toSize(), translatedPixmap);
+    // don't even spend time trying to load the picture if our size is too small
+    if(translatedSize.width() > 10)
+        imageSource->getPixmap(translatedSize.toSize(), translatedPixmap);        
+
     painter->save();
     QColor bgColor = Qt::transparent;
     if (translatedPixmap.isNull()) {
