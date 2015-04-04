@@ -311,9 +311,9 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
         const int fromRow = sortResult[i].first;
         const int toRow = sortResult[i].second;
         AbstractDecklistNode *temp = node->at(toRow);
-        for (int j = columnCount(); j; --j) {
-            from << createIndex(fromRow, 0, temp);
-            to << createIndex(toRow, 0, temp);
+        for (int j = 0; j < columnCount(); ++j) {
+            from << createIndex(fromRow, j, temp);
+            to << createIndex(toRow, j, temp);
         }
     }
     changePersistentIndexList(from, to);
