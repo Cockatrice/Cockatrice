@@ -65,6 +65,7 @@ signals:
     void deleteCardInfoPopup(QString cardName);
     void addMentionTag(QString mentionTag);
     void messageClickedSignal();
+    void showMentionPopup(QString &sender);
 };
 
 #endif

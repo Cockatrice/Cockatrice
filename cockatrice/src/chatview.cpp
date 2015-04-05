@@ -5,13 +5,11 @@
 #include <QDesktopServices>
 #include <QApplication>
 #include <QDebug>
-#include <QSystemTrayIcon>
 #include "chatview.h"
 #include "user_level.h"
 #include "user_context_menu.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
-#include "main.h"
 #include "tab_userlists.h"
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
@@ -282,9 +280,7 @@ bool ChatView::shouldShowSystemPopup() {
 }
 
 void ChatView::showSystemPopup(QString &sender) {
-    disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
-    trayIcon->showMessage(sender + tr(" mentioned you."), tr("Click to view"));
-    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(actMessageClicked()));
+    emit showMentionPopup(sender);
 }
 
 
