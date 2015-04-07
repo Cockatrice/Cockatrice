@@ -133,6 +133,7 @@ void TabRoom::retranslateUi()
 void TabRoom::focusTab() {
     QApplication::setActiveWindow(this);
     tabSupervisor->setCurrentIndex(tabSupervisor->indexOf(this));
+    emit maximizeClient();
 }
 
 void TabRoom::actShowMentionPopup(QString &sender) {

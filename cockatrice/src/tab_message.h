@@ -25,6 +25,7 @@ private:
     QAction *aLeave;
 signals:
     void talkClosing(TabMessage *tab);
+    void maximizeClient();
 private slots:
     void sendMessage();
     void actLeave();

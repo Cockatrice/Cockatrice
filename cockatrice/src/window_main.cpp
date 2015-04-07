@@ -408,6 +408,7 @@ MainWindow::MainWindow(QWidget *parent)
     tabSupervisor = new TabSupervisor(client);
     connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
     connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
+    connect(tabSupervisor, SIGNAL(maximize()), this, SLOT(maximize()));
     tabSupervisor->addDeckEditorTab(0);    
     
     setCentralWidget(tabSupervisor);
@@ -506,4 +507,8 @@ void MainWindow::pixmapCacheSizeChanged(int newSizeInMBs)
     //qDebug() << "Setting pixmap cache size to " << value << " MBs";
     // translate MBs to KBs
     QPixmapCache::setCacheLimit(newSizeInMBs * 1024);
+}
+
+void MainWindow::maximize() {
+    showNormal();
 }
