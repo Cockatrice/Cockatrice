@@ -1100,6 +1100,7 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
 void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/, const GameEventContext & /*context*/)
 {
     closeGame();
+    tabSupervisor->setCurrentIndex(tabSupervisor->indexOf(this));
     messageLog->logKicked();
 
     QMessageBox msgBox(this);
