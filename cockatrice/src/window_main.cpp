@@ -308,6 +308,7 @@ void MainWindow::retranslateUi()
     aFullScreen->setText(tr("&Full screen"));
     aFullScreen->setShortcut(tr("Ctrl+F"));
     aSettings->setText(tr("&Settings..."));
+    aSettings->setShortcut(tr("Ctrl+Alt+H"));
     aExit->setText(tr("&Exit"));
     
 #if defined(__APPLE__)  /* For OSX */
