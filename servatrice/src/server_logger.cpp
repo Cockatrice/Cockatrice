@@ -122,7 +122,7 @@ void ServerLogger::flushBuffer()
 void ServerLogger::hupSignalHandler(int /*unused*/)
 {
 #ifdef Q_OS_UNIX
-    ssize_t writeValue = NULL;
+    ssize_t writeValue = 0;
 
     if (!logFile)
         return;
@@ -135,7 +135,7 @@ void ServerLogger::hupSignalHandler(int /*unused*/)
 void ServerLogger::handleSigHup()
 {
 #ifdef Q_OS_UNIX
-    ssize_t readValue = NULL;
+    ssize_t readValue = 0;
 
     if (!logFile)
         return;
