@@ -236,6 +236,7 @@ void MainWindow::actAbout()
 void MainWindow::serverTimeout()
 {
     QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
+    actConnect();
 }
 
 void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
