@@ -799,8 +799,7 @@ void MessageLogWidget::logSetActivePlayer(Player *player)
         str = tr("It is now %1's turn.", "female");
     else
         str = tr("It is now %1's turn.", "male");
-    QString fontColor = (player->getName().compare(QString(tabSupervisor->getUserInfo()->name().c_str())) == 0) ? "#" + settingsCache->getChatMentionColor(): "#0041FF";
-    appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + str.arg("<font color=" + fontColor + ">" + player->getName() + "</font>") + "</b></font><br>");
+    appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + str.arg(player->getName()) + "</b></font><br>");
 }
 
 void MessageLogWidget::logSetActivePhase(int phase)
