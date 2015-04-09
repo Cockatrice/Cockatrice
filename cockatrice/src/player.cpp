@@ -2177,6 +2177,7 @@ void Player::updateCardMenu(CardItem *card)
         if (moveMenu->isEmpty()) {
             moveMenu->addAction(aMoveToTopLibrary);
             moveMenu->addAction(aMoveToBottomLibrary);
+            moveMenu->addSeparator();
             moveMenu->addAction(aMoveToGraveyard);
             moveMenu->addAction(aMoveToExile);
         }
