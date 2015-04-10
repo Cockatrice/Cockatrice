@@ -720,6 +720,7 @@ void Player::setShortcutsActive()
     aRollDie->setShortcut(tr("Ctrl+I"));
     aCreateToken->setShortcut(tr("Ctrl+T"));
     aCreateAnotherToken->setShortcut(tr("Ctrl+G"));
+    aAlwaysRevealTopCard->setShortcut(tr("Ctrl+N"));
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
     while (counterIterator.hasNext())
@@ -743,6 +744,7 @@ void Player::setShortcutsInactive()
     aRollDie->setShortcut(QKeySequence());
     aCreateToken->setShortcut(QKeySequence());
     aCreateAnotherToken->setShortcut(QKeySequence());
+    aAlwaysRevealTopCard->setShortcut(QKeySequence());
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
     while (counterIterator.hasNext())
