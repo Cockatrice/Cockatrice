@@ -37,7 +37,7 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     switch (index.column()) {
-        case SortKeyCol: return QString("%1").arg(set->getSortKey(), 4, 10, QChar('0'));
+        case SortKeyCol: return QString("%1").arg(set->getSortKey(), 8, 10, QChar('0'));
         case IsKnownCol: return set->getIsKnown();
         case SetTypeCol: return set->getSetType();
         case ShortNameCol: return set->getShortName();
@@ -186,7 +186,7 @@ void SetsModel::save(CardDatabase *db)
 {
     // order
     for (int i = 0; i < sets.size(); i++)
-        sets[i]->setSortKey(i);
+        sets[i]->setSortKey(i+1);
 
     // enabled sets
     foreach(CardSet *set, sets)

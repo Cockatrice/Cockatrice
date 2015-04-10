@@ -67,6 +67,7 @@ void CardSet::loadSetOptions()
     sortKey = settings.value("sortkey", 0).toInt();
     enabled = settings.value("enabled", false).toBool();
     isknown = settings.value("isknown", false).toBool();
+    // qDebug() << "load set" << shortName << "key" << sortKey;
 }
 
 void CardSet::setEnabled(bool _enabled)
@@ -1022,7 +1023,7 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
             allSets.append(setsIterator.next().value());
         allSets.sortByKey();
         for (int i = 0; i < allSets.size(); ++i)
-            allSets[i]->setSortKey(i);
+            allSets[i]->setSortKey(i+1);
 
         emit cardListChanged();
     }
