@@ -87,8 +87,6 @@ void Server_Card::setPT(const QString &_pt)
         if (p1.isEmpty() || p2.isEmpty())
             return;
         if ((p1[0] == '+') || (p2[0] == '+')) {
-            if (power < 0)
-                power = 0;
             if (toughness < 0)
                 toughness = 0;
         }
