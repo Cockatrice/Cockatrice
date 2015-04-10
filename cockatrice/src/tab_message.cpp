@@ -119,7 +119,7 @@ void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 
 bool TabMessage::shouldShowSystemPopup(const Event_UserMessage &event) {
     return (QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0 ||
-        event.sender_name() == otherUserInfo->name() && tabSupervisor->currentIndex() != tabSupervisor->indexOf(this));
+        (event.sender_name() == otherUserInfo->name() && tabSupervisor->currentIndex() != tabSupervisor->indexOf(this)));
 }
 
 void TabMessage::showSystemPopup(const Event_UserMessage &event) {
