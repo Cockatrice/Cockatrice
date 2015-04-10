@@ -39,6 +39,10 @@ public:
     QString getLongName() const { return longName; }
     QString getSetType() const { return setType; }
     QDate getReleaseDate() const { return releaseDate; }
+    void setLongName(QString & _longName) { longName = _longName; }
+    void setSetType(QString & _setType) { setType = _setType; }
+    void setReleaseDate(QDate & _releaseDate) { releaseDate = _releaseDate; }
+
     void loadSetOptions();
     int getSortKey() const { return sortKey; }
     void setSortKey(unsigned int _sortKey);

@@ -834,7 +834,11 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
                 else if (xml.name() == "releasedate")
                     releaseDate = QDate::fromString(xml.readElementText(), Qt::ISODate);
             }
-            sets.insert(shortName, new CardSet(shortName, longName, setType, releaseDate));
+
+            CardSet * newSet = getSet(shortName);
+            newSet->setLongName(longName);
+            newSet->setSetType(setType);
+            newSet->setReleaseDate(releaseDate);
         }
     }
 }
@@ -1022,8 +1026,6 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
         while (setsIterator.hasNext())
             allSets.append(setsIterator.next().value());
         allSets.sortByKey();
-        for (int i = 0; i < allSets.size(); ++i)
-            allSets[i]->setSortKey(i+1);
 
         emit cardListChanged();
     }
