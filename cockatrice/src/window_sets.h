@@ -16,7 +16,6 @@ private:
     SetsModel *model;
     QTreeView *view;
     QPushButton *enableButton, *disableButton, *enableAllButton, *disableAllButton,
-                *saveButton, *restoreButton,
                 *upButton, *downButton, *bottomButton, *topButton;
 public:
     WndSets(QWidget *parent = 0);

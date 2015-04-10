@@ -102,6 +102,81 @@ void SetList::sortByKey()
     qSort(begin(), end(), CompareFunctor());
 }
 
+int SetList::getEnabledSetsNum()
+{
+    int num=0;
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        if(set->getEnabled())
+            ++num;
+    }
+    return num;
+}
+
+int SetList::getUnknownSetsNum()
+{
+    int num=0;
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        if(!set->getIsKnown())
+            ++num;
+    }
+    return num;
+}
+
+void SetList::enableAllUnknown()
+{
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        if(!set->getIsKnown())
+        {
+            set->setIsKnown(true);
+            set->setEnabled(true);
+        }
+    }
+}
+
+void SetList::enableAll()
+{
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        set->setIsKnown(true);
+        set->setEnabled(true);
+    }
+}
+
+void SetList::markAllAsKnown()
+{
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        if(!set->getIsKnown())
+        {
+            set->setIsKnown(true);
+        }
+    }
+}
+
+void SetList::guessSortKeys()
+{
+    // sort by release date DESC; invalid dates to the bottom.
+    QDate distantFuture(2050, 1, 1);
+    int aHundredYears = 36500;
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        QDate date = set->getReleaseDate();
+        if(date.isNull())
+            set->setSortKey(aHundredYears);
+        else
+            set->setSortKey(date.daysTo(distantFuture));
+    }
+}
+
 PictureToLoad::PictureToLoad(CardInfo *_card, bool _hq)
     : card(_card), setIndex(0), hq(_hq)
 {
@@ -927,6 +1002,11 @@ void CardDatabase::picDownloadHqChanged()
         while (cardIterator.hasNext())
             cardIterator.next().value()->clearPixmapCacheMiss();
     }
+}
+
+void CardDatabase::emitCardListChanged()
+{
+    emit cardListChanged();
 }
 
 LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)

@@ -758,16 +758,22 @@ void TabDeckEditor::filterRemove(QAction *action) {
 
 void TabDeckEditor::checkUnknownSets()
 {
-    int numUnknownSets = 0;
     SetList sets = db->getSetList();
-    foreach(CardSet* set, sets)
+
+    // no set is enabled. Probably this is the first time running trice
+    if(!sets.getEnabledSetsNum())
     {
-        if(!set->getIsKnown())
-        {
-            numUnknownSets++;
-        }
+        sets.guessSortKeys();
+        sets.sortByKey();
+        sets.enableAll();
+        db->emitCardListChanged();
+
+        actEditSets();
+        return;
     }
 
+    int numUnknownSets = sets.getUnknownSetsNum();
+    // no unkown sets. 
     if(!numUnknownSets)
         return;
 
@@ -776,23 +782,11 @@ void TabDeckEditor::checkUnknownSets()
     switch(ret)
     {
         case QMessageBox::No:
-            foreach(CardSet * set, sets)
-            {
-                if(!set->getIsKnown())
-                    set->setIsKnown(true);
-            }
+            sets.markAllAsKnown();
             break;
-        case QMessageBox::Yes:    
-            foreach(CardSet * set, sets)
-            {
-                if(!set->getIsKnown())
-                {
-                    set->setIsKnown(true);
-                    set->setEnabled(true);
-                }
-            }
-
-            emit setListChanged();
+        case QMessageBox::Yes:
+            sets.enableAllUnknown();
+            db->emitCardListChanged();
             break;
         default:
             break;

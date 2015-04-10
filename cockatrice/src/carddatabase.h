@@ -53,6 +53,12 @@ private:
     class CompareFunctor;
 public:
     void sortByKey();
+    void guessSortKeys();
+    void enableAllUnknown();
+    void enableAll();
+    void markAllAsKnown();
+    int getEnabledSetsNum();
+    int getUnknownSetsNum();
 };
 
 class PictureToLoad {
@@ -257,6 +263,7 @@ public:
 public slots:
     void clearPixmapCache();
     LoadStatus loadCardDatabase(const QString &path, bool tokens = false);
+    void emitCardListChanged();
 private slots:
     void imageLoaded(CardInfo *card, QImage image);
     void picDownloadChanged();

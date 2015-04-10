@@ -3,7 +3,6 @@
 SetsModel::SetsModel(CardDatabase *_db, QObject *parent)
     : QAbstractTableModel(parent), sets(_db->getSetList())
 {
-    connect(this, SIGNAL(setListChanged()), _db, SIGNAL(cardListChanged()));
     sets.sortByKey();
     foreach(CardSet *set, sets)
     {
@@ -195,7 +194,7 @@ void SetsModel::save(CardDatabase *db)
 
     sets.sortByKey();
 
-    emit setListChanged();
+    db->emitCardListChanged();
 }
 
 void SetsModel::restore(CardDatabase *db)

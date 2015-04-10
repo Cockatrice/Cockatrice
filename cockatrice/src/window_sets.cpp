@@ -8,6 +8,8 @@
 #include <QItemSelection>
 #include <QMessageBox>
 #include <QGroupBox>
+#include <QDialogButtonBox>
+#include <QVBoxLayout>
 
 WndSets::WndSets(QWidget *parent)
     : QMainWindow(parent)
@@ -50,11 +52,6 @@ WndSets::WndSets(QWidget *parent)
     disableAllButton = new QPushButton(tr("Disable all sets"));
     connect(disableAllButton, SIGNAL(clicked()), this, SLOT(actDisableAll()));
 
-    saveButton = new QPushButton(tr("Save changes"));
-    connect(saveButton, SIGNAL(clicked()), this, SLOT(actSave()));
-    restoreButton = new QPushButton(tr("Restore old settings"));
-    connect(restoreButton, SIGNAL(clicked()), this, SLOT(actRestore()));
-
     upButton = new QPushButton(tr("Move selected set up"));
     connect(upButton, SIGNAL(clicked()), this, SLOT(actUp()));
     downButton = new QPushButton(tr("Move selected set down"));
@@ -90,12 +87,15 @@ WndSets::WndSets(QWidget *parent)
     sortVBox->addWidget(bottomButton);
     sortFrame->setLayout(sortVBox);
 
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actRestore()));
+
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(view, 0, 0, 1, 2);
-    mainLayout->addWidget(toggleFrame, 2, 0, 1, 1);
-    mainLayout->addWidget(sortFrame, 2, 1, 1, 1);
-    mainLayout->addWidget(saveButton, 3, 0, 1, 1);
-    mainLayout->addWidget(restoreButton, 3, 1, 1, 1);
+    mainLayout->addWidget(toggleFrame, 1, 0, 1, 1);
+    mainLayout->addWidget(sortFrame, 1, 1, 1, 1);
+    mainLayout->addWidget(buttonBox, 2, 0, 1, 2);
 
     QWidget *centralWidget = new QWidget;
     centralWidget->setLayout(mainLayout);
@@ -113,11 +113,13 @@ void WndSets::actSave()
 {
     model->save(db);
     QMessageBox::information(this, tr("Success"), tr("The sets database has been saved successfully."));
+    close();
 }
 
 void WndSets::actRestore()
 {
     model->restore(db);
+    close();
 }
 
 void WndSets::actToggleButtons(const QItemSelection & selected, const QItemSelection &)
