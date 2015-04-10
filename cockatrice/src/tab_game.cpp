@@ -283,8 +283,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     playerListWidget = new PlayerListWidget(0, 0, this);
     playerListWidget->setFocusPolicy(Qt::NoFocus);
     
-    timeElapsedLabel = new QLabel;
-    timeElapsedLabel->setAlignment(Qt::AlignCenter);
     messageLog = new MessageLogWidget(tabSupervisor, this);
     connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
     connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
@@ -294,7 +292,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     deckViewContainerLayout = new QVBoxLayout;
 
     QVBoxLayout *messageLogLayout = new QVBoxLayout;
-    messageLogLayout->addWidget(timeElapsedLabel);
     messageLogLayout->addWidget(messageLog);
     
     QWidget *messageLogLayoutWidget = new QWidget;
@@ -305,10 +302,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     connect(timelineWidget, SIGNAL(processNextEvent()), this, SLOT(replayNextEvent()));
     connect(timelineWidget, SIGNAL(replayFinished()), this, SLOT(replayFinished()));
     
-    replayToStartButton = new QToolButton;
-    replayToStartButton->setIconSize(QSize(32, 32));
-    replayToStartButton->setIcon(QIcon(":/resources/replay_tostart.svg"));
-    connect(replayToStartButton, SIGNAL(clicked()), this, SLOT(replayToStartButtonClicked()));
     replayStartButton = new QToolButton;
     replayStartButton->setIconSize(QSize(32, 32));
     replayStartButton->setIcon(QIcon(":/resources/replay_start.svg"));
@@ -318,21 +311,12 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     replayPauseButton->setEnabled(false);
     replayPauseButton->setIcon(QIcon(":/resources/replay_pause.svg"));
     connect(replayPauseButton, SIGNAL(clicked()), this, SLOT(replayPauseButtonClicked()));
-    replayStopButton = new QToolButton;
-    replayStopButton->setIconSize(QSize(32, 32));
-    replayStopButton->setEnabled(false);
-    replayStopButton->setIcon(QIcon(":/resources/replay_stop.svg"));
-    connect(replayStopButton, SIGNAL(clicked()), this, SLOT(replayStopButtonClicked()));
     replayFastForwardButton = new QToolButton;
     replayFastForwardButton->setIconSize(QSize(32, 32));
     replayFastForwardButton->setEnabled(false);
     replayFastForwardButton->setIcon(QIcon(":/resources/replay_fastforward.svg"));
     replayFastForwardButton->setCheckable(true);
     connect(replayFastForwardButton, SIGNAL(toggled(bool)), this, SLOT(replayFastForwardButtonToggled(bool)));
-    replayToEndButton = new QToolButton;
-    replayToEndButton->setIconSize(QSize(32, 32));
-    replayToEndButton->setIcon(QIcon(":/resources/replay_toend.svg"));
-    connect(replayStopButton, SIGNAL(clicked()), this, SLOT(replayToEndButtonClicked()));
     
     splitter = new QSplitter(Qt::Vertical);
     splitter->addWidget(cardInfo);
@@ -346,12 +330,9 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     
     QHBoxLayout *replayControlLayout = new QHBoxLayout;
     replayControlLayout->addWidget(timelineWidget, 10);
-    replayControlLayout->addWidget(replayToStartButton);
     replayControlLayout->addWidget(replayStartButton);
     replayControlLayout->addWidget(replayPauseButton);
-    replayControlLayout->addWidget(replayStopButton);
     replayControlLayout->addWidget(replayFastForwardButton);
-    replayControlLayout->addWidget(replayToEndButton);
     
     QVBoxLayout *superMainLayout = new QVBoxLayout;
     superMainLayout->addLayout(mainLayout);
@@ -599,20 +580,14 @@ void TabGame::replayFinished()
 {
     replayStartButton->setEnabled(true);
     replayPauseButton->setEnabled(false);
-    replayStopButton->setEnabled(false);
     replayFastForwardButton->setEnabled(false);
 }
 
-void TabGame::replayToStartButtonClicked()
-{
-    // XXX
-}
 
 void TabGame::replayStartButtonClicked()
 {
     replayStartButton->setEnabled(false);
     replayPauseButton->setEnabled(true);
-    replayStopButton->setEnabled(true);
     replayFastForwardButton->setEnabled(true);
     
     timelineWidget->startReplay();
@@ -627,25 +602,9 @@ void TabGame::replayPauseButtonClicked()
     timelineWidget->stopReplay();
 }
 
-void TabGame::replayStopButtonClicked()
-{
-    replayStartButton->setEnabled(true);
-    replayPauseButton->setEnabled(false);
-    replayStopButton->setEnabled(false);
-    replayFastForwardButton->setEnabled(false);
-    
-    timelineWidget->stopReplay();
-    // XXX to start
-}
-
 void TabGame::replayFastForwardButtonToggled(bool checked)
 {
     timelineWidget->setTimeScaleFactor(checked ? 10.0 : 1.0);
-}
-
-void TabGame::replayToEndButtonClicked()
-{
-    // XXX
 }
 
 void TabGame::incrementGameTime()
