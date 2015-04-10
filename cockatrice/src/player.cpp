@@ -990,14 +990,14 @@ void Player::actCreateToken()
     DlgCreateToken dlg(predefinedTokens);
     if (!dlg.exec())
         return;
-    
+
     lastTokenName = dlg.getName();
+    lastTokenPT = dlg.getPT();
     if (CardInfo *correctedCard = db->getCardBySimpleName(lastTokenName, false)) {
         lastTokenName = correctedCard->getName();
+        lastTokenPT = correctedCard->getPowTough();
     }
-
     lastTokenColor = dlg.getColor();
-    lastTokenPT = dlg.getPT();
     lastTokenAnnotation = dlg.getAnnotation();
     lastTokenDestroy = dlg.getDestroy();
     aCreateAnotherToken->setEnabled(true);
