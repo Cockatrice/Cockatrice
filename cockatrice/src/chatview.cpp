@@ -275,8 +275,7 @@ void ChatView::actMessageClicked() {
 }
 
 bool ChatView::shouldShowSystemPopup() {
-    return tabSupervisor->currentIndex() != tabSupervisor->indexOf(this) ||
-        QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0;
+    return QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0 ||tabSupervisor->currentIndex() != tabSupervisor->indexOf(this);
 }
 
 void ChatView::showSystemPopup(QString &sender) {

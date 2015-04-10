@@ -59,6 +59,8 @@ private slots:
     void actAbout();
 
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
+
+    void maximize();
 private:
     static const QString appName;
     void setClientStatusTitle();

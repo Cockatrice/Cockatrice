@@ -49,6 +49,7 @@ private:
 signals:
     void roomClosing(TabRoom *tab);
     void openMessageDialog(const QString &userName, bool focus);
+    void maximizeClient();
 private slots:
     void sendMessage();
     void sayFinished(const Response &response);

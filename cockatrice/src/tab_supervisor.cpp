@@ -364,6 +364,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 {
     TabRoom *tab = new TabRoom(this, client, userInfo, info);
+    connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));   
     connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
     connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
     int tabIndex = myAddTab(tab);
@@ -422,12 +423,17 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
 
     tab = new TabMessage(this, client, *userInfo, otherUser);
     connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
+    connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     messageTabs.insert(receiverName, tab);
     if (focus)
         setCurrentWidget(tab);
     return tab;
+}
+
+void TabSupervisor::maximizeMainWindow() {
+    emit maximize();
 }
 
 void TabSupervisor::talkLeft(TabMessage *tab)
