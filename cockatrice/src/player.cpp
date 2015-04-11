@@ -2293,7 +2293,7 @@ void Player::processSceneSizeChange(int newPlayerWidth)
     qreal tableWidth = newPlayerWidth - CARD_HEIGHT - 15 - counterAreaWidth - stack->boundingRect().width();
     if (!settingsCache->getHorizontalHand())
         tableWidth -= hand->boundingRect().width();
-    
+	else
+		hand->setWidth(tableWidth + stack->boundingRect().width());
     table->setWidth(tableWidth);
-    hand->setWidth(tableWidth + stack->boundingRect().width());
 }
