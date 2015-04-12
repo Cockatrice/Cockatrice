@@ -13,6 +13,7 @@ class CardDatabaseModel : public QAbstractListModel {
     Q_OBJECT
 public:
     enum Columns { NameColumn, SetListColumn, ManaCostColumn, CardTypeColumn, PTColumn, CMCColumn };
+    enum Role { SortRole=Qt::UserRole };
     CardDatabaseModel(CardDatabase *_db, QObject *parent = 0);
     ~CardDatabaseModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const;

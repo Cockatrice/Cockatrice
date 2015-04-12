@@ -32,7 +32,7 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
         return QVariant();
     if ((index.row() >= cardList.size()) || (index.column() >= CARDDBMODEL_COLUMNS))
         return QVariant();
-    if (role != Qt::DisplayRole)
+    if (role != Qt::DisplayRole && role != SortRole)
         return QVariant();
 
     CardInfo *card = cardList.at(index.row());
@@ -45,7 +45,9 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
                 setList << sets[i]->getShortName();
             return setList.join(", ");
         }
-        case ManaCostColumn: return card->getManaCost();
+        case ManaCostColumn: return role == SortRole ?
+            QString("%1%2").arg(card->getCmc(), 4, QChar('0')).arg(card->getManaCost()) :
+            card->getManaCost();
         case CardTypeColumn: return card->getCardType();
         case PTColumn: return card->getPowTough();
         default: return QVariant();
@@ -122,8 +124,8 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
 
 bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
 
-    QString leftString = sourceModel()->data(left).toString();
-    QString rightString = sourceModel()->data(right).toString();
+    QString leftString = sourceModel()->data(left, CardDatabaseModel::SortRole).toString();
+    QString rightString = sourceModel()->data(right, CardDatabaseModel::SortRole).toString();
 
     if (!cardName.isEmpty() && left.column() == CardDatabaseModel::NameColumn)
     {
