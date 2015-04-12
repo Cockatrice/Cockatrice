@@ -12,6 +12,7 @@ class FilterTree;
 class CardDatabaseModel : public QAbstractListModel {
     Q_OBJECT
 public:
+    enum Columns { NameColumn, SetListColumn, ManaCostColumn, CardTypeColumn, PTColumn, CMCColumn };
     CardDatabaseModel(CardDatabase *_db, QObject *parent = 0);
     ~CardDatabaseModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
