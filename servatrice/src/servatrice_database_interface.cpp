@@ -102,9 +102,13 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
     result.reserve(user.size());
     foreach (const QChar& c, user) {
         switch (c.category()) {
-        // TODO: Figure out exactly which categories are OK and not
-        case QChar::Other_Control: break;
-        default: result += c;
+        case QChar::Letter_Uppercase:       //[A-Z]
+        case QChar::Letter_Lowercase:       //[a-z]
+        case QChar::Number_DecimalDigit:    //[0-9]
+        case QChar::Punctuation_Connector:  //[-_]
+            result += c;
+        default: 
+            break;
         }
     }
     result = result.trimmed();
