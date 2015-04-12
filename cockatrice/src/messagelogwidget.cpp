@@ -217,13 +217,13 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
     QString startName = zone->getName();
     
     if (startName == "table")
-        fromStr = tr(" from battlefield");
+        fromStr = tr(" from play");
     else if (startName == "grave")
-        fromStr = tr(" from graveyard");
+        fromStr = isFemale(zone->getPlayer()) ? tr(" from her graveyard") : tr(" from his graveyard");
     else if (startName == "rfg")
         fromStr = tr(" from exile");
     else if (startName == "hand")
-        fromStr = tr(" from hand");
+        fromStr = isFemale(zone->getPlayer()) ? tr(" from her hand") : tr(" from his hand");
     else if (startName == "deck") {
         if (position >= zone->getCards().size() - 1) {
             if (cardName.isEmpty()) {
