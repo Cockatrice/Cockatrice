@@ -324,8 +324,8 @@ void TabDeckEditor::retranslateUi()
     aDecrement->setText(tr("&Decrement number"));
     aDecrement->setShortcut(tr("-"));
     
-    deckMenu->setTitle(tr("&Deck editor"));
-    dbMenu->setTitle(tr("C&ard database"));
+    deckMenu->setTitle(tr("&Deck Editor"));
+    dbMenu->setTitle(tr("C&ard Database"));
     
     aEditSets->setText(tr("&Edit sets..."));
     aEditTokens->setText(tr("Edit &tokens..."));
