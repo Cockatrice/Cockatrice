@@ -254,7 +254,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         moveHandMenu = handMenu->addMenu(QString());
         moveHandMenu->addAction(aMoveHandToTopLibrary);
         moveHandMenu->addAction(aMoveHandToBottomLibrary);
+        moveHandMenu->addSeparator();
         moveHandMenu->addAction(aMoveHandToGrave);
+        moveHandMenu->addSeparator();
         moveHandMenu->addAction(aMoveHandToRfg);
         hand->setMenu(handMenu);
 
@@ -272,10 +274,12 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         playerLists.append(mRevealTopCard = libraryMenu->addMenu(QString()));
         libraryMenu->addAction(aAlwaysRevealTopCard);
         libraryMenu->addSeparator();
-        libraryMenu->addAction(aMoveTopCardsToGrave);
-        libraryMenu->addAction(aMoveTopCardsToExile);
         libraryMenu->addAction(aMoveTopCardToBottom);
         libraryMenu->addAction(aMoveBottomCardToGrave);
+        libraryMenu->addSeparator();
+        libraryMenu->addAction(aMoveTopCardsToGrave);
+        libraryMenu->addSeparator();
+        libraryMenu->addAction(aMoveTopCardsToExile);
         libraryMenu->addSeparator();
         libraryMenu->addAction(aOpenDeckInDeckEditor);
         deck->setMenu(libraryMenu, aDrawCard);
@@ -297,14 +301,18 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         moveGraveMenu = graveMenu->addMenu(QString());
         moveGraveMenu->addAction(aMoveGraveToTopLibrary);
         moveGraveMenu->addAction(aMoveGraveToBottomLibrary);
+        moveGraveMenu->addSeparator();
         moveGraveMenu->addAction(aMoveGraveToHand);
+        moveGraveMenu->addSeparator();
         moveGraveMenu->addAction(aMoveGraveToRfg);
 
         rfgMenu->addSeparator();
         moveRfgMenu = rfgMenu->addMenu(QString());
         moveRfgMenu->addAction(aMoveRfgToTopLibrary);
         moveRfgMenu->addAction(aMoveRfgToBottomLibrary);
+        moveRfgMenu->addSeparator();
         moveRfgMenu->addAction(aMoveRfgToHand);
+        moveRfgMenu->addSeparator();
         moveRfgMenu->addAction(aMoveRfgToGrave);
 
         sbMenu = playerMenu->addMenu(QString());
@@ -683,20 +691,20 @@ void Player::retranslateUi()
     aSetPT->setShortcut(tr("Ctrl+P"));
     aSetAnnotation->setText(tr("&Set annotation..."));
     QStringList counterColors;
-    counterColors.append(tr("red"));
-    counterColors.append(tr("yellow"));
-    counterColors.append(tr("green"));
+    counterColors.append(tr("Red"));
+    counterColors.append(tr("Yellow"));
+    counterColors.append(tr("Green"));
     for (int i = 0; i < aAddCounter.size(); ++i)
         aAddCounter[i]->setText(tr("&Add counter (%1)").arg(counterColors[i]));
     for (int i = 0; i < aRemoveCounter.size(); ++i)
         aRemoveCounter[i]->setText(tr("&Remove counter (%1)").arg(counterColors[i]));
     for (int i = 0; i < aSetCounter.size(); ++i)
         aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(counterColors[i]));
-    aMoveToTopLibrary->setText(tr("&top of library"));
-    aMoveToBottomLibrary->setText(tr("&bottom of library"));
-    aMoveToGraveyard->setText(tr("&graveyard"));
+    aMoveToTopLibrary->setText(tr("&Top of library"));
+    aMoveToBottomLibrary->setText(tr("&Bottom of library"));
+    aMoveToGraveyard->setText(tr("&Graveyard"));
     aMoveToGraveyard->setShortcut(tr("Ctrl+Del"));
-    aMoveToExile->setText(tr("&exile"));
+    aMoveToExile->setText(tr("&Exile"));
     
     QMapIterator<QString, CardZone *> zoneIterator(zones);
     while (zoneIterator.hasNext())
@@ -2181,6 +2189,7 @@ void Player::updateCardMenu(CardItem *card)
             moveMenu->addAction(aMoveToBottomLibrary);
             moveMenu->addSeparator();
             moveMenu->addAction(aMoveToGraveyard);
+            moveMenu->addSeparator();
             moveMenu->addAction(aMoveToExile);
         }
         
