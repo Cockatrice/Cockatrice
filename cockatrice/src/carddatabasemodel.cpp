@@ -125,7 +125,7 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
     QString leftString = sourceModel()->data(left).toString();
     QString rightString = sourceModel()->data(right).toString();
 
-    if (!cardName.isEmpty())
+    if (!cardName.isEmpty() && left.column() == CardDatabaseModel::NameColumn)
     {
         if (leftString.compare(cardName, Qt::CaseInsensitive) == 0) {// exact match should be at top
             return true;
