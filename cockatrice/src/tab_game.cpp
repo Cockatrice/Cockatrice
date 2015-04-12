@@ -649,6 +649,7 @@ void TabGame::actLeaveGame()
         if (!replay)
             sendGameCommand(Command_LeaveGame());
     }
+    scene->clearViews();
     deleteLater();
 }
 
