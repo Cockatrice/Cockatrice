@@ -256,7 +256,7 @@ bool Servatrice::initServer()
 
     maxUsersPerAddress = settingsCache->value("security/max_users_per_address", 4).toInt();
     messageCountingInterval = settingsCache->value("security/message_counting_interval", 10).toInt();
-    maxMessageCountPerInterval = settingsCache->value("security/max_message_count_per_interval", 10).toInt();
+    maxMessageCountPerInterval = settingsCache->value("security/max_message_count_per_interval", 15).toInt();
     maxMessageSizePerInterval = settingsCache->value("security/max_message_size_per_interval", 1000).toInt();
     maxGamesPerUser = settingsCache->value("security/max_games_per_user", 5).toInt();
     commandCountingInterval = settingsCache->value("game/command_counting_interval", 10).toInt();
