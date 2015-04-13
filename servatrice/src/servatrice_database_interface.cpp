@@ -105,7 +105,8 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
         case QChar::Letter_Uppercase:       //[A-Z]
         case QChar::Letter_Lowercase:       //[a-z]
         case QChar::Number_DecimalDigit:    //[0-9]
-        case QChar::Punctuation_Connector:  //[-_]
+        case QChar::Punctuation_Connector:  //[_]
+        case QChar::Punctuation_Dash:       //[-]
             result += c;
         default: 
             break;
