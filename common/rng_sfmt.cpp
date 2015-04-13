@@ -13,9 +13,11 @@
 RNG_SFMT::RNG_SFMT(QObject *parent)
     : RNG_Abstract(parent)
 {
-  // seed the random number generator using <random>, C++11
-  sfmt_init_gen_rand(&sfmt, rd()); 
-
+    // initialize the random number generator with a 32bit integer seed (timestamp)
+    sfmt_init_gen_rand(&sfmt, QDateTime::currentDateTime().toTime_t());
+    // TODO: when c++11 support will be enabled, use <random> instead 
+    // seed the random number generator using <random>, C++11
+    // sfmt_init_gen_rand(&sfmt, rd()); 
 }
 
 /**
