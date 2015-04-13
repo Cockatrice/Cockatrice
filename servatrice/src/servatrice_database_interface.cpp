@@ -113,7 +113,7 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
         }
     }
     result = result.trimmed();
-    return (result.size() > 0);
+    return (result.size() == user.size());
 }
 
 bool Servatrice_DatabaseInterface::getRequireRegistration()
