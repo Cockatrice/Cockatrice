@@ -152,9 +152,8 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
         return false;
 
     if (!cardName.isEmpty())
-        if (!info->getName().contains(cardName, Qt::CaseInsensitive)) 
-            if (!CardInfo::simplifyName(info->getName()).contains(cardName, Qt::CaseInsensitive))
-                return false;
+        if (!CardInfo::simplifyName(info->getName()).contains(cardName, Qt::CaseInsensitive))
+            return false;
 
     if (!cardNameSet.isEmpty())
             if (!cardNameSet.contains(info->getName()))
