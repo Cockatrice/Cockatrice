@@ -457,12 +457,12 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
         QAction *temp = new QAction(QString(), this);
         connect(temp, SIGNAL(triggered()), this, SLOT(actPhaseAction()));
         switch (i) {
-            case 0: temp->setShortcut(tr("F5")); break;
-            case 2: temp->setShortcut(tr("F6")); break;
-            case 3: temp->setShortcut(tr("F7")); break;
-            case 4: temp->setShortcut(tr("F8")); break;
-            case 9: temp->setShortcut(tr("F9")); break;
-            case 10: temp->setShortcut(tr("F10")); break;
+            case 0: temp->setShortcut(QKeySequence("F5")); break;
+            case 2: temp->setShortcut(QKeySequence("F6")); break;
+            case 3: temp->setShortcut(QKeySequence("F7")); break;
+            case 4: temp->setShortcut(QKeySequence("F8")); break;
+            case 9: temp->setShortcut(QKeySequence("F9")); break;
+            case 10: temp->setShortcut(QKeySequence("F10")); break;
             default: ;
         }
         phasesMenu->addAction(temp);
@@ -527,29 +527,29 @@ void TabGame::retranslateUi()
     gameMenu->setTitle(tr("&Game"));
     if (aNextPhase) {
         aNextPhase->setText(tr("Next &phase"));
-        aNextPhase->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Space")) << QKeySequence(tr("Tab")));
+        aNextPhase->setShortcuts(QList<QKeySequence>() << QKeySequence("Ctrl+Space") << QKeySequence("Tab"));
     }
     if (aNextTurn) {
         aNextTurn->setText(tr("Next &turn"));
-        aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
+        aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence("Ctrl+Return") << QKeySequence("Ctrl+Enter"));
     }
     if (aRemoveLocalArrows) {
         aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
-        aRemoveLocalArrows->setShortcut(tr("Ctrl+R"));
+        aRemoveLocalArrows->setShortcut(QKeySequence("Ctrl+R"));
     }
     if (aGameInfo)
         aGameInfo->setText(tr("Game &information"));
     if (aConcede) {
         aConcede->setText(tr("&Concede"));
-        aConcede->setShortcut(tr("F2"));
+        aConcede->setShortcut(QKeySequence("F2"));
     }
     if (aLeaveGame) {
         aLeaveGame->setText(tr("&Leave game"));
-        aLeaveGame->setShortcut(tr("Ctrl+Q"));
+        aLeaveGame->setShortcut(QKeySequence("Ctrl+Q"));
     }
     if (aCloseReplay) {
         aCloseReplay->setText(tr("C&lose replay"));
-        aCloseReplay->setShortcut(tr("Ctrl+Q"));
+        aCloseReplay->setShortcut(QKeySequence("Ctrl+Q"));
     }
     
     if (sayLabel)

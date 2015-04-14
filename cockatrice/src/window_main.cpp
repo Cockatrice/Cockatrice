@@ -307,7 +307,7 @@ void MainWindow::retranslateUi()
     aWatchReplay->setText(tr("&Watch replay..."));
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
-    aFullScreen->setShortcut(tr("Ctrl+F"));
+    aFullScreen->setShortcut(QKeySequence("Ctrl+F"));
     aSettings->setText(tr("&Settings..."));
     aExit->setText(tr("&Exit"));
     
