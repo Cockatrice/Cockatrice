@@ -217,13 +217,13 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
     QString startName = zone->getName();
     
     if (startName == "table")
-        fromStr = tr(" from table");
+        fromStr = tr(" from play");
     else if (startName == "grave")
-        fromStr = tr(" from graveyard");
+        fromStr = isFemale(zone->getPlayer()) ? tr(" from her graveyard") : tr(" from his graveyard");
     else if (startName == "rfg")
         fromStr = tr(" from exile");
     else if (startName == "hand")
-        fromStr = tr(" from hand");
+        fromStr = isFemale(zone->getPlayer()) ? tr(" from her hand") : tr(" from his hand");
     else if (startName == "deck") {
         if (position >= zone->getCards().size() - 1) {
             if (cardName.isEmpty()) {
@@ -303,11 +303,11 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
         else
             finalStr = tr("%1 puts %2 into play%3.");
     } else if (targetName == "grave")
-        finalStr = tr("%1 puts %2%3 into graveyard.");
+        finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 into her graveyard.") : tr("%1 puts %2%3 into his graveyard.");
     else if (targetName == "rfg")
         finalStr = tr("%1 exiles %2%3.");
     else if (targetName == "hand")
-        finalStr = tr("%1 moves %2%3 to hand.");
+        finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 moves %2%3 to her hand.") : tr("%1 moves %2%3 to his hand.");
     else if (targetName == "deck") {
         if (attributes.newX == -1)
             finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 into her library.") : tr("%1 puts %2%3 into his library.");
