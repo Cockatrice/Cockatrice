@@ -125,19 +125,16 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
 
     if (!cardName.isEmpty())
     {
-        // exact match should be at top
-        if (leftString.compare(cardName, Qt::CaseInsensitive) == 0)
+        bool isLeftType = leftString.startsWith(cardName, Qt::CaseInsensitive);
+        bool isRightType = rightString.startsWith(cardName, Qt::CaseInsensitive);
+
+        // test for an exact match: isLeftType && leftString.size() == cardName.size()
+        // or an exclusive start match: isLeftType && !isRightType
+        if (isLeftType && (!isRightType || leftString.size() == cardName.size()))
             return true;
 
-        // exact match should be at top
-        if (rightString.compare(cardName, Qt::CaseInsensitive) == 0)
-            return false;
-
-        bool isLeftType2 = leftString.startsWith(cardName, Qt::CaseInsensitive);
-        bool isRightType2 = rightString.startsWith(cardName, Qt::CaseInsensitive);
-        if (isLeftType2 && !isRightType2)
-            return true;
-        if (isRightType2 && !isLeftType2)
+        // same checks for the right string
+        if (isRightType && (!isLeftType || rightString.size() == cardName.size()))
             return false;
     }
     return QString::localeAwareCompare(leftString, rightString) < 0;
@@ -150,12 +147,11 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
     if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
         return false;
 
-    if (!CardInfo::simplifyName(info->getName()).contains(cardName, Qt::CaseInsensitive))
+    if (!cardName.isEmpty() && !info->getSimpleName().contains(cardName, Qt::CaseInsensitive))
         return false;
 
-    if (!cardNameSet.isEmpty())
-        if (!cardNameSet.contains(info->getName()))
-            return false;
+    if (!cardNameSet.isEmpty() && !cardNameSet.contains(info->getName()))
+        return false;
 
     if (filterTree != NULL)
         return filterTree->acceptsCard(info);
