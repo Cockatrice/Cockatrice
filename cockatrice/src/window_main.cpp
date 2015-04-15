@@ -261,7 +261,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
         }
         case Response::RespUsernameInvalid:
-            QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nAvailable chars: [a-z][A-Z][0-9][-_]"));
+            QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, and - in your username."));
             break;
         case Response::RespRegistrationRequired:
             QMessageBox::critical(this, tr("Error"), tr("This server requires user registration."));
