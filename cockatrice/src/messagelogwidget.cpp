@@ -614,7 +614,9 @@ void MessageLogWidget::logSetCounter(Player *player, QString counterName, int va
         str = tr("%1 sets counter %2 to %3 (%4%5).", "female");
     else
         str = tr("%1 sets counter %2 to %3 (%4%5).", "male");
-    appendHtmlServerMessage(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(counterName))).arg(QString("<font color=\"blue\">%1</font>").arg(value)).arg(value > oldValue ? "+" : "").arg(value - oldValue));
+    QByteArray ba = counterName.toLatin1();
+    const char* c_str = ba.data();
+    appendHtmlServerMessage(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(tr(c_str)))).arg(QString("<font color=\"blue\">%1</font>").arg(value)).arg(value > oldValue ? "+" : "").arg(value - oldValue));
 }
 
 void MessageLogWidget::logSetDoesntUntap(Player *player, CardItem *card, bool doesntUntap)
