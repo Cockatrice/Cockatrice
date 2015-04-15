@@ -125,13 +125,13 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
 
     if (!cardName.isEmpty())
     {
-        if (leftString.compare(cardName, Qt::CaseInsensitive) == 0) {// exact match should be at top
+        // exact match should be at top
+        if (leftString.compare(cardName, Qt::CaseInsensitive) == 0)
             return true;
-        }
 
-        if (rightString.compare(cardName, Qt::CaseInsensitive) == 0) {// exact match should be at top
+        // exact match should be at top
+        if (rightString.compare(cardName, Qt::CaseInsensitive) == 0)
             return false;
-        }
 
         bool isLeftType2 = leftString.startsWith(cardName, Qt::CaseInsensitive);
         bool isRightType2 = rightString.startsWith(cardName, Qt::CaseInsensitive);
@@ -141,7 +141,6 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
             return false;
     }
     return QString::localeAwareCompare(leftString, rightString) < 0;
-
 }
 
 bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
@@ -151,13 +150,12 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
     if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
         return false;
 
-    if (!cardName.isEmpty())
-        if (!CardInfo::simplifyName(info->getName()).contains(cardName, Qt::CaseInsensitive))
-            return false;
+    if (!CardInfo::simplifyName(info->getName()).contains(cardName, Qt::CaseInsensitive))
+        return false;
 
     if (!cardNameSet.isEmpty())
-            if (!cardNameSet.contains(info->getName()))
-                return false;
+        if (!cardNameSet.contains(info->getName()))
+            return false;
 
     if (filterTree != NULL)
         return filterTree->acceptsCard(info);
