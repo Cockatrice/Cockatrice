@@ -150,7 +150,7 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
     if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
         return false;
 
-    if (!CardInfo::simplifyName(info->getName()).contains(cardName, Qt::CaseInsensitive))
+    if (!info->getName().contains(cardName, Qt::CaseInsensitive))
         return false;
 
     if (!cardNameSet.isEmpty())
