@@ -49,6 +49,7 @@ private:
 signals:
     void roomClosing(TabRoom *tab);
     void openMessageDialog(const QString &userName, bool focus);
+    void maximizeClient();
 private slots:
     void sendMessage();
     void sayFinished(const Response &response);
@@ -57,6 +58,7 @@ private slots:
     void actOpenChatSettings();
     void addMentionTag(QString mentionTag);
     void focusTab();
+    void actShowMentionPopup(QString &sender);
     
     void processListGamesEvent(const Event_ListGames &event);
     void processJoinRoomEvent(const Event_JoinRoom &event);

@@ -229,6 +229,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     connect(aAnalyzeDeck, SIGNAL(triggered()), this, SLOT(actAnalyzeDeck()));
     aClose = new QAction(QString(), this);
     connect(aClose, SIGNAL(triggered()), this, SLOT(closeRequest()));
+    aOpenCustomFolder = new QAction(QString(), this);
+    connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
 
     aEditSets = new QAction(QString(), this);
     connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
@@ -257,6 +259,10 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     dbMenu->addSeparator();
     dbMenu->addAction(aClearSearch);
     dbMenu->addAction(aCardTextOnly);
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
+    dbMenu->addSeparator();
+    dbMenu->addAction(aOpenCustomFolder);
+#endif
     addTabMenu(dbMenu);
 
     aAddCard = new QAction(QString(), this);
@@ -305,7 +311,7 @@ void TabDeckEditor::retranslateUi()
     hashLabel1->setText(tr("Hash:"));
     
     //aUpdatePrices->setText(tr("&Update prices"));
-    //aUpdatePrices->setShortcut(tr("Ctrl+U"));
+    //aUpdatePrices->setShortcut(QKeySequence("Ctrl+U"));
 
     aNewDeck->setText(tr("&New deck"));
     aLoadDeck->setText(tr("&Load deck..."));
@@ -315,21 +321,22 @@ void TabDeckEditor::retranslateUi()
     aSaveDeckToClipboard->setText(tr("Save deck to clip&board"));
     aPrintDeck->setText(tr("&Print deck..."));
     aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
+    aOpenCustomFolder->setText(tr("Open custom image folder"));
     aClose->setText(tr("&Close"));
-    aClose->setShortcut(tr("Ctrl+Q"));
+    aClose->setShortcut(QKeySequence("Ctrl+Q"));
     
     aAddCard->setText(tr("Add card to &maindeck"));
     aAddCardToSideboard->setText(tr("Add card to &sideboard"));
 
     aRemoveCard->setText(tr("&Remove row"));
-    aRemoveCard->setShortcut(tr("Del"));
+    aRemoveCard->setShortcut(QKeySequence("Del"));
     aIncrement->setText(tr("&Increment number"));
-    aIncrement->setShortcut(tr("+"));
+    aIncrement->setShortcut(QKeySequence("+"));
     aDecrement->setText(tr("&Decrement number"));
-    aDecrement->setShortcut(tr("-"));
+    aDecrement->setShortcut(QKeySequence("-"));
     
-    deckMenu->setTitle(tr("&Deck editor"));
-    dbMenu->setTitle(tr("C&ard database"));
+    deckMenu->setTitle(tr("&Deck Editor"));
+    dbMenu->setTitle(tr("C&ard Database"));
     
     aEditSets->setText(tr("&Edit sets..."));
     aEditTokens->setText(tr("Edit &tokens..."));
@@ -525,6 +532,28 @@ void TabDeckEditor::actAnalyzeDeck()
         this
     ); // it deletes itself when done
     interface->analyzeDeck(deckModel->getDeckList());
+}
+
+
+void TabDeckEditor::actOpenCustomFolder() {
+
+#if defined(Q_OS_MAC)
+
+    QStringList scriptArgs;
+    scriptArgs << QLatin1String("-e");
+    scriptArgs << QString::fromLatin1("tell application \"Finder\" to open POSIX file \"%1\"").arg(settingsCache->getPicsPath() + "/custom/");
+    scriptArgs << QLatin1String("-e");
+    scriptArgs << QLatin1String("tell application \"Finder\" to activate");
+
+    QProcess::execute("/usr/bin/osascript", scriptArgs);
+#endif
+#if defined(Q_OS_WIN)
+    QStringList args;
+    QString pathToFolder = settingsCache->getPicsPath().append("/custom");
+    args << QDir::toNativeSeparators(pathToFolder);
+    QProcess::startDetached("explorer", args);
+#endif
+
 }
 
 void TabDeckEditor::actEditSets()

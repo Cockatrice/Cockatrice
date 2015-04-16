@@ -22,6 +22,8 @@ void SoundEngine::cacheData()
         << "notification" << "draw" << "playcard" << "shuffle" << "tap" << "untap" << "cuckoo";
     for (int i = 0; i < fileNames.size(); ++i) {
         QFile file(settingsCache->getSoundPath() + "/" + fileNames[i] + ".raw");
+        if(!file.exists())
+            continue;
         file.open(QIODevice::ReadOnly);
         audioData.insert(fileNames[i], file.readAll());
         file.close();

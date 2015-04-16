@@ -78,7 +78,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
             break;
         }
         case Event_ConnectionClosed::SERVER_SHUTDOWN: reasonStr = tr("Scheduled server shutdown."); break;
-        case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username."); break;
+        case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, and - in your username."); break;
         default: reasonStr = QString::fromStdString(event.reason_str());
     }
     QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
@@ -135,7 +135,7 @@ void MainWindow::actDisconnect()
 void MainWindow::actSinglePlayer()
 {
     bool ok;
-    int numberPlayers = QInputDialog::getInt(this, tr("Number of players"), tr("Please enter the number of players."), 2, 1, 8, 1, &ok);
+    int numberPlayers = QInputDialog::getInt(this, tr("Number of players"), tr("Please enter the number of players."), 1, 1, 8, 1, &ok);
     if (!ok)
         return;
     
@@ -236,6 +236,7 @@ void MainWindow::actAbout()
 void MainWindow::serverTimeout()
 {
     QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
+    actConnect();
 }
 
 void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
@@ -260,7 +261,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
         }
         case Response::RespUsernameInvalid:
-            QMessageBox::critical(this, tr("Error"), tr("Invalid username."));
+            QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, and - in your username."));
             break;
         case Response::RespRegistrationRequired:
             QMessageBox::critical(this, tr("Error"), tr("This server requires user registration."));
@@ -274,6 +275,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
 void MainWindow::socketError(const QString &errorStr)
 {
     QMessageBox::critical(this, tr("Error"), tr("Socket error: %1").arg(errorStr));
+    actConnect();
 }
 
 void MainWindow::protocolVersionMismatch(int localVersion, int remoteVersion)
@@ -305,7 +307,7 @@ void MainWindow::retranslateUi()
     aWatchReplay->setText(tr("&Watch replay..."));
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
-    aFullScreen->setShortcut(tr("Ctrl+F"));
+    aFullScreen->setShortcut(QKeySequence("Ctrl+F"));
     aSettings->setText(tr("&Settings..."));
     aExit->setText(tr("&Exit"));
     
@@ -407,6 +409,7 @@ MainWindow::MainWindow(QWidget *parent)
     tabSupervisor = new TabSupervisor(client);
     connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
     connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
+    connect(tabSupervisor, SIGNAL(maximize()), this, SLOT(maximize()));
     tabSupervisor->addDeckEditorTab(0);    
     
     setCentralWidget(tabSupervisor);
@@ -425,6 +428,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    trayIcon->hide();
+    trayIcon->deleteLater();
     client->deleteLater();
     clientThread->wait();
 }
@@ -444,7 +449,7 @@ void MainWindow::createTrayIcon() {
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
     if (reason == QSystemTrayIcon::DoubleClick) {
-        if (windowState() != Qt::WindowMinimized)
+        if (windowState() != Qt::WindowMinimized && windowState() != Qt::WindowMinimized + Qt::WindowMaximized)
             showMinimized();
         else {
             showNormal();
@@ -503,4 +508,8 @@ void MainWindow::pixmapCacheSizeChanged(int newSizeInMBs)
     //qDebug() << "Setting pixmap cache size to " << value << " MBs";
     // translate MBs to KBs
     QPixmapCache::setCacheLimit(newSizeInMBs * 1024);
+}
+
+void MainWindow::maximize() {
+    showNormal();
 }

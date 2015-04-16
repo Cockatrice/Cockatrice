@@ -45,7 +45,7 @@ private:
 public:
     TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo, QWidget *parent = 0);
     void retranslateUi();
-    QString getTabText() const { return tr("User lists"); }
+    QString getTabText() const { return tr("Account"); }
     const UserList *getAllUsersList() const { return allUsersList; }
     const UserList *getBuddyList() const { return buddyList; }
     const UserList *getIgnoreList() const { return ignoreList; }

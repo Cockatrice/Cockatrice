@@ -185,16 +185,20 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
 Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
 {
     static QList<GameCommand::GameCommandType> antifloodCommandsWhiteList = QList<GameCommand::GameCommandType>()
-        // draw, undraw cards (eg: drawing 10 cards one by one from the deck)
+        // draw/undo card draw (example: drawing 10 cards one by one from the deck)
         << GameCommand::DRAW_CARDS
         << GameCommand::UNDO_DRAW
-        // create, delete arrows (eg: targeting with 10 cards during an attack)
+        // create, delete arrows (example: targeting with 10 cards during an attack)
         << GameCommand::CREATE_ARROW
         << GameCommand::DELETE_ARROW
-        // set card attributes (eg: tapping 10 cards at once)
+        // set card attributes (example: tapping 10 cards at once)
         << GameCommand::SET_CARD_ATTR
-        // increment / decrement counter (eg: -10 lifepoints one by one)
-        << GameCommand::INC_COUNTER;
+        // increment / decrement counter (example: -10 life points one by one)
+        << GameCommand::INC_COUNTER
+        // mulling lots of hands in a row
+        << GameCommand::MULLIGAN
+        // allows a user to sideboard without receiving flooding message
+        << GameCommand::MOVE_CARD;
 
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
@@ -230,7 +234,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
         return Response::RespNotInRoom;
     
     int commandCountingInterval = server->getCommandCountingInterval();
-    int maxMessageCountPerInterval = server->getMaxMessageCountPerInterval();
+    int maxCommandCountPerInterval = server->getMaxCommandCountPerInterval();
     GameEventStorage ges;
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.game_command_size() - 1; i >= 0; --i) {
@@ -248,7 +252,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
             for (int i = 0; i < commandCountOverTime.size(); ++i)
                 totalCount += commandCountOverTime[i];
             
-            if (totalCount > maxMessageCountPerInterval)
+            if (totalCount > maxCommandCountPerInterval)
                 return Response::RespChatFlood;
         }
 

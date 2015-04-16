@@ -77,6 +77,14 @@ SettingsCache::SettingsCache()
     scaleCards = settings->value("cards/scaleCards", true).toBool();
     showMessagePopups = settings->value("chat/showmessagepopups", true).toBool();
     showMentionPopups = settings->value("chat/showmentionpopups", true).toBool();
+
+    leftJustified = settings->value("interface/leftjustified", false).toBool();
+}
+
+void SettingsCache::setLeftJustified(const int _leftJustified) {
+    leftJustified = _leftJustified;
+    settings->setValue("interface/leftjustified", leftJustified);
+    emit handJustificationChanged();
 }
 
 void SettingsCache::setCardScaling(const int _scaleCards) {

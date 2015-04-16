@@ -147,8 +147,8 @@ max_games_per_user=5
 ; This setting defines the length in seconds of the considered interval; default is 10
 command_counting_interval=10
 
-; Maximum number of game commands in an interval before new commands gets dropped; default is 10
-max_command_count_per_interval=10
+; Maximum number of game commands in an interval before new commands gets dropped; default is 20
+max_command_count_per_interval=20
 
 [logging]
 

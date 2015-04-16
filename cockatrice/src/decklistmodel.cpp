@@ -307,13 +307,14 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
     QVector<QPair<int, int> > sortResult = node->sort(order);
     
     QModelIndexList from, to;
+    int columns = columnCount();
     for (int i = sortResult.size() - 1; i >= 0; --i) {
         const int fromRow = sortResult[i].first;
         const int toRow = sortResult[i].second;
         AbstractDecklistNode *temp = node->at(toRow);
-        for (int j = columnCount(); j; --j) {
-            from << createIndex(fromRow, 0, temp);
-            to << createIndex(toRow, 0, temp);
+        for (int j = 0; j < columns; ++j) {
+            from << createIndex(fromRow, j, temp);
+            to << createIndex(toRow, j, temp);
         }
     }
     changePersistentIndexList(from, to);

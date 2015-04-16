@@ -23,7 +23,7 @@ AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name,
         connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
         menu->addAction(aSet);
         menu->addSeparator();
-        for (int i = -10; i <= 10; ++i)
+        for (int i = 10; i >= -10; --i)
             if (i == 0)
                 menu->addSeparator();
             else {
@@ -65,9 +65,9 @@ void AbstractCounter::retranslateUi()
 void AbstractCounter::setShortcutsActive()
 {
     if (name == "life") {
-        aSet->setShortcut(tr("Ctrl+L"));
-        aDec->setShortcut(tr("F11"));
-        aInc->setShortcut(tr("F12"));
+        aSet->setShortcut(QKeySequence("Ctrl+L"));
+        aDec->setShortcut(QKeySequence("F11"));
+        aInc->setShortcut(QKeySequence("F12"));
     }
 }
 
@@ -88,23 +88,25 @@ void AbstractCounter::setValue(int _value)
 
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
-        Command_IncCounter cmd;
-        cmd.set_counter_id(id);
-        cmd.set_delta(1);
-        player->sendGameCommand(cmd);
-        event->accept();
-    } else if (event->button() == Qt::RightButton) {
-        Command_IncCounter cmd;
-        cmd.set_counter_id(id);
-        cmd.set_delta(-1);
-        player->sendGameCommand(cmd);
-        event->accept();
-    } else if (event->button() == Qt::MidButton) {
-        if (menu)
-            menu->exec(event->screenPos());
-        event->accept();
-    } else
+    if (isUnderMouse()) {
+        if (event->button() == Qt::LeftButton) {
+            Command_IncCounter cmd;
+            cmd.set_counter_id(id);
+            cmd.set_delta(1);
+            player->sendGameCommand(cmd);
+            event->accept();
+        } else if (event->button() == Qt::RightButton) {
+            Command_IncCounter cmd;
+            cmd.set_counter_id(id);
+            cmd.set_delta(-1);
+            player->sendGameCommand(cmd);
+            event->accept();
+        } else if (event->button() == Qt::MidButton) {
+            if (menu)
+                menu->exec(event->screenPos());
+            event->accept();
+        } 
+    }else
         event->ignore();
 }
 

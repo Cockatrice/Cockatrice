@@ -1,6 +1,8 @@
 #include "carddatabasemodel.h"
 #include "filtertree.h"
 
+#define CARDDBMODEL_COLUMNS 5
+
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, QObject *parent)
     : QAbstractListModel(parent), db(_db)
 {
@@ -21,22 +23,22 @@ int CardDatabaseModel::rowCount(const QModelIndex &/*parent*/) const
 
 int CardDatabaseModel::columnCount(const QModelIndex &/*parent*/) const
 {
-    return 5;
+    return CARDDBMODEL_COLUMNS;
 }
 
 QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
-    if ((index.row() >= cardList.size()) || (index.column() >= 5))
+    if ((index.row() >= cardList.size()) || (index.column() >= CARDDBMODEL_COLUMNS))
         return QVariant();
-    if (role != Qt::DisplayRole)
+    if (role != Qt::DisplayRole && role != SortRole)
         return QVariant();
 
     CardInfo *card = cardList.at(index.row());
     switch (index.column()){
-        case 0: return card->getName();
-        case 1: {
+        case NameColumn: return card->getName();
+        case SetListColumn: {
             QStringList setList;
             const QList<CardSet *> &sets = card->getSets();
             for (int i = 0; i < sets.size(); i++)
@@ -46,9 +48,11 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
             }
             return setList.join(", ");
         }
-        case 2: return card->getManaCost();
-        case 3: return card->getCardType();
-        case 4: return card->getPowTough();
+        case ManaCostColumn: return role == SortRole ?
+            QString("%1%2").arg(card->getCmc(), 4, QChar('0')).arg(card->getManaCost()) :
+            card->getManaCost();
+        case CardTypeColumn: return card->getCardType();
+        case PTColumn: return card->getPowTough();
         default: return QVariant();
     }
 }
@@ -60,11 +64,11 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
     if (orientation != Qt::Horizontal)
         return QVariant();
     switch (section) {
-        case 0: return QString(tr("Name"));
-        case 1: return QString(tr("Sets"));
-        case 2: return QString(tr("Mana cost"));
-        case 3: return QString(tr("Card type"));
-        case 4: return QString(tr("P/T"));
+        case NameColumn: return QString(tr("Name"));
+        case SetListColumn: return QString(tr("Sets"));
+        case ManaCostColumn: return QString(tr("Mana cost"));
+        case CardTypeColumn: return QString(tr("Card type"));
+        case PTColumn: return QString(tr("P/T"));
         default: return QVariant();
     }
 }
@@ -106,7 +110,7 @@ void CardDatabaseModel::cardInfoChanged(CardInfo *card)
     if (row == -1)
         return;
     
-    emit dataChanged(index(row, 0), index(row, 4));
+    emit dataChanged(index(row, 0), index(row, CARDDBMODEL_COLUMNS - 1));
 }
 
 void CardDatabaseModel::cardAdded(CardInfo *card)
@@ -140,26 +144,24 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
 
 bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
 
-    QString leftString = sourceModel()->data(left).toString();
-    QString rightString = sourceModel()->data(right).toString();
+    QString leftString = sourceModel()->data(left, CardDatabaseModel::SortRole).toString();
+    QString rightString = sourceModel()->data(right, CardDatabaseModel::SortRole).toString();
 
-    if (leftString.compare(cardName, Qt::CaseInsensitive) == 0) {// exact match should be at top
-        return true;
+    if (!cardName.isEmpty() && left.column() == CardDatabaseModel::NameColumn)
+    {
+        bool isLeftType = leftString.startsWith(cardName, Qt::CaseInsensitive);
+        bool isRightType = rightString.startsWith(cardName, Qt::CaseInsensitive);
+
+        // test for an exact match: isLeftType && leftString.size() == cardName.size()
+        // or an exclusive start match: isLeftType && !isRightType
+        if (isLeftType && (!isRightType || leftString.size() == cardName.size()))
+            return true;
+
+        // same checks for the right string
+        if (isRightType && (!isLeftType || rightString.size() == cardName.size()))
+            return false;
     }
-
-    if (rightString.compare(cardName, Qt::CaseInsensitive) == 0) {// exact match should be at top
-        return false;
-    }
-
-    bool isLeftType2 = leftString.startsWith(cardName, Qt::CaseInsensitive);
-    bool isRightType2 = rightString.startsWith(cardName, Qt::CaseInsensitive);
-    if (isLeftType2 && !isRightType2)
-        return true;
-    if (isRightType2 && !isLeftType2)
-        return false;
-
     return QString::localeAwareCompare(leftString, rightString) < 0;
-
 }
 
 bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
@@ -169,9 +171,11 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
     if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
         return false;
 
-    if (!cardName.isEmpty())
-        if (!info->getName().contains(cardName, Qt::CaseInsensitive))
-            return false;
+    if (!cardName.isEmpty() && !info->getSimpleName().contains(cardName, Qt::CaseInsensitive))
+        return false;
+
+    if (!cardNameSet.isEmpty() && !cardNameSet.contains(info->getName()))
+        return false;
 
     if (filterTree != NULL)
         return filterTree->acceptsCard(info);

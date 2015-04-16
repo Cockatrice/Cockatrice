@@ -10,62 +10,33 @@
 
 enum GameListColumn {ROOM, CREATED, DESCRIPTION, CREATOR, GAME_TYPE, RESTRICTIONS, PLAYERS, SPECTATORS};
 
-namespace {
-    const int SECS_PER_MIN  = 60;
-    const int SECS_PER_HOUR = 60 * 60;
+const QString GamesModel::getGameCreatedString(const int secs) const {
 
-    /**
-    * Pretty print an integer number of seconds ago. Accurate to only one unit,
-    * rounded; <5 minutes and >5 hours are displayed as such. As a special case,
-    * time between 60 and 90 minutes will display both the hours and minutes.
-    *
-    * For example...
-    *   0-300 seconds will return "<5m ago"
-    *   5-59 minutes will return "Xm ago"
-    *   60-90 minutes will return "Xhr Ym ago"
-    *   91-300 minutes will return "Xhr ago"
-    *   300+ minutes will return "5+ hr ago"
+    QString ret;
+    if (secs < SECS_PER_MIN)
+        ret = tr("<1m ago");
+    else if (secs < SECS_PER_MIN * 5)
+        ret = tr("<5m ago");
+    else if (secs < SECS_PER_HOUR)
+        ret =  QString::number(secs / SECS_PER_MIN).append(tr("m ago"));
+    else if (secs < SECS_PER_MIN * 90) {
+        ret = tr("1hr ").append(QString::number((secs / SECS_PER_MIN) - 60)).append(tr("m ago"));
+    } else if (secs < SECS_PER_HOUR * 4) {
+        unsigned int hours = secs / SECS_PER_HOUR;
+        if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30)
+            hours++;
+        ret = QString::number(hours).append(tr("hr ago"));
+    } else
+        ret = tr("5+ hrs ago");
+
+    return ret;
+
+    /*
+    todo
+    . would like less if()
+    . would like less code repition 
     */
-    QString prettyPrintSecsAgo(int secs) {
-        if (secs < SECS_PER_MIN) {
-            return QObject::tr("<1m ago");
-        }
-        if (secs < SECS_PER_MIN * 5) {
-            return QObject::tr("<5m ago");
-        }
-        if (secs < SECS_PER_HOUR) {
-            unsigned int mins = secs / SECS_PER_MIN;
-            if (secs % SECS_PER_MIN >= 30)
-                mins++;
-            //: This will have a number prepended, like "10m ago"
-            return QString::number(mins).append(QObject::tr("m ago"));
-        }
-        // Here, we want to display both the hours and minutes.
-        //
-        // There are two small "corner" cases which could be rectified with
-        // some more knotty iffy-elsey code:
-        //   Between 1:00:00 and 1:00:29 will display "1hr 0m ago"
-        //   Between 1:29:30 and 1:29:59 will display "1hr 31m ago"
-        //
-        // Personally, I prefer to keep the code cleaner, and allow these.
-        if (secs < SECS_PER_MIN * 90) {
-            unsigned int mins = secs / SECS_PER_MIN - 60;
-            if (secs % SECS_PER_MIN >= 30)
-                mins++;
-            return QObject::tr("1hr ")
-                .append(QString::number(mins))
-                //: This will have a number prepended, like "5m ago"
-                .append(QObject::tr("m ago"));
-        }
-        if (secs < SECS_PER_HOUR * 5) {
-            unsigned int hours = secs / SECS_PER_HOUR;
-            if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30)
-                hours++;
-            //: This will have a number prepended, like "2h ago"
-            return QString::number(hours).append(QObject::tr("hr ago"));
-        }
-        return QObject::tr("5+ hrs ago");
-    }
+
 }
 
 GamesModel::GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent)
@@ -94,7 +65,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             int secs = then.secsTo(QDateTime::currentDateTime());
 
             switch (role) {
-                case Qt::DisplayRole: return prettyPrintSecsAgo(secs);
+                case Qt::DisplayRole: return getGameCreatedString(secs);
                 case SORT_ROLE: return QVariant(secs);
                 default: return QVariant();
             }
@@ -151,7 +122,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                 return result.join(", ");
             }
             case Qt::DecorationRole:{
-                return g.with_password() ? QIcon(":/resources/lock.svg") : QVariant();
+                return g.with_password() ? QIcon(LockPixmapGenerator::generatePixmap(13)) : QVariant();
             case Qt::TextAlignmentRole:
                 return Qt::AlignLeft;
             default:

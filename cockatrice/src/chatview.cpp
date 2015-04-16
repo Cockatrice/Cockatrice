@@ -5,13 +5,11 @@
 #include <QDesktopServices>
 #include <QApplication>
 #include <QDebug>
-#include <QSystemTrayIcon>
 #include "chatview.h"
 #include "user_level.h"
 #include "user_context_menu.h"
 #include "pixmapgenerator.h"
 #include "settingscache.h"
-#include "main.h"
 #include "tab_userlists.h"
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
@@ -28,7 +26,7 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _sh
     if(tabSupervisor->getUserInfo())
     {
         userName = QString::fromStdString(tabSupervisor->getUserInfo()->name());
-        mention = "@" + userName.toLower();
+        mention = "@" + userName;
     }
 
     mentionFormat.setFontWeight(QFont::Bold);
@@ -163,65 +161,85 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     }
     cursor.setCharFormat(messageFormat);
     
-    int from = 0, index = 0, bracket = 0, at = 0;
+    int index = -1, bracket = -1, at = -1;
     bool mentionEnabled = settingsCache->getChatMention();
-    while (((message.indexOf('[', from)) != -1) || (mentionEnabled && (message.indexOf('@', from)) != -1)) {
-        bracket = message.indexOf('[', from);
-        if (!mentionEnabled) {
-            index = bracket;
-        } else {
-            at = message.indexOf('@', from);
-            if (bracket == -1)
+    while (message.size())
+    {
+        // search for the first [ or @
+        bracket = message.indexOf('[');
+        at = mentionEnabled ? message.indexOf('@') : -1;
+        if(bracket == -1)
+        {
+            if(at == -1)
+            {
+                // quick way out
+                cursor.insertText(message);
+                break;
+            } else {
+                // mention
                 index = at;
-            else if (at == -1)
+            }
+        } else {
+            if(at == -1)
+            {
+                // bracket
                 index = bracket;
-            else
+            } else {
+                // both, pick up the first one
                 index = std::min(bracket, at);
+            }
         }
 
+        // insert the message text up to the [ / @
+        if(index > 0)
+        {
+            cursor.insertText(message.left(index), defaultFormat);
+            message = message.mid(index);            
+        }
 
-
-        cursor.insertText(message.left(index), defaultFormat);
-        message = message.mid(index);
-        if (message.isEmpty())
-            break;
-
-        if (message.startsWith("[card]")) {
-            message = message.mid(6);
-            int closeTagIndex = message.indexOf("[/card]");
-            QString cardName = message.left(closeTagIndex);
-            if (closeTagIndex == -1)
-                message.clear();
-            else
-                message = message.mid(closeTagIndex + 7);
-            
-            appendCardTag(cursor, cardName);
-        } else if (message.startsWith("[[")) {
-            message = message.mid(2);
-            int closeTagIndex = message.indexOf("]]");
-            QString cardName = message.left(closeTagIndex);
-            if (closeTagIndex == -1)
-                message.clear();
-            else
-                message = message.mid(closeTagIndex + 2);
-            
-            appendCardTag(cursor, cardName);
-        } else if (message.startsWith("[url]")) {
-            message = message.mid(5);
-            int closeTagIndex = message.indexOf("[/url]");
-            QString url = message.left(closeTagIndex);
-            if (closeTagIndex == -1)
-                message.clear();
-            else
-                message = message.mid(closeTagIndex + 6);
-            
-            appendUrlTag(cursor, url);
-        } else if (mentionEnabled) {
-            if (message.toLower().startsWith(mention)) {
+        if(index == bracket)
+        {
+            if (message.startsWith("[card]")) {
+                message = message.mid(6);
+                int closeTagIndex = message.indexOf("[/card]");
+                QString cardName = message.left(closeTagIndex);
+                if (closeTagIndex == -1)
+                    message.clear();
+                else
+                    message = message.mid(closeTagIndex + 7);
+                
+                appendCardTag(cursor, cardName);
+            } else if (message.startsWith("[[")) {
+                message = message.mid(2);
+                int closeTagIndex = message.indexOf("]]");
+                QString cardName = message.left(closeTagIndex);
+                if (closeTagIndex == -1)
+                    message.clear();
+                else
+                    message = message.mid(closeTagIndex + 2);
+                
+                appendCardTag(cursor, cardName);
+            } else if (message.startsWith("[url]")) {
+                message = message.mid(5);
+                int closeTagIndex = message.indexOf("[/url]");
+                QString url = message.left(closeTagIndex);
+                if (closeTagIndex == -1)
+                    message.clear();
+                else
+                    message = message.mid(closeTagIndex + 6);
+                
+                appendUrlTag(cursor, url);
+            } else {
+                // not a recognized [tag]
+                cursor.insertText("[", defaultFormat);
+                message = message.mid(1);
+            }
+        } else {
+            if (message.startsWith(mention, Qt::CaseInsensitive)) {
                 // you have been mentioned
                 mentionFormat.setBackground(QBrush(getCustomMentionColor()));
                 mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white):QBrush(Qt::black));
-                cursor.insertText("@" + userName, mentionFormat);
+                cursor.insertText(mention, mentionFormat);
                 message = message.mid(mention.size());
                 QApplication::alert(this);
                 if (shouldShowSystemPopup()) {
@@ -245,12 +263,8 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 message = message.mid(userName.size() + 1);
             }
             cursor.setCharFormat(defaultFormat); // reset format after each iteration
-        } else
-            from = 1;
+        }
     }
-
-    if (!message.isEmpty())
-        cursor.insertText(message);
 
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
@@ -261,14 +275,11 @@ void ChatView::actMessageClicked() {
 }
 
 bool ChatView::shouldShowSystemPopup() {
-    return tabSupervisor->currentIndex() != tabSupervisor->indexOf(this) ||
-        QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0;
+    return QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0 ||tabSupervisor->currentIndex() != tabSupervisor->indexOf(this);
 }
 
 void ChatView::showSystemPopup(QString &sender) {
-    disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
-    trayIcon->showMessage(sender + tr(" mentioned you."), tr("Click to view"));
-    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(actMessageClicked()));
+    emit showMentionPopup(sender);
 }
 
 

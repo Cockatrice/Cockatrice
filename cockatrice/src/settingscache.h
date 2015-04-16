@@ -30,6 +30,7 @@ signals:
     void picDownloadHqChanged();
     void displayCardNamesChanged();
     void horizontalHandChanged();
+    void handJustificationChanged();
     void invertVerticalCoordinateChanged();
     void minPlayersForMultiColumnLayoutChanged();
     void soundEnabledChanged();
@@ -77,6 +78,7 @@ private:
     bool scaleCards;
     bool showMessagePopups;
     bool showMentionPopups;
+    bool leftJustified;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -131,6 +133,7 @@ public:
     bool getScaleCards() const {  return scaleCards; }
     bool getShowMessagePopup() const { return showMessagePopups; }
     bool getShowMentionPopup() const { return showMentionPopups; }
+    bool getLeftJustified() const { return leftJustified; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -178,6 +181,7 @@ public slots:
     void setCardScaling(const int _scaleCards);
     void setShowMessagePopups(const int _showMessagePopups);
     void setShowMentionPopups(const int _showMentionPopups);
+    void setLeftJustified( const int _leftJustified);
 };
 
 extern SettingsCache *settingsCache;

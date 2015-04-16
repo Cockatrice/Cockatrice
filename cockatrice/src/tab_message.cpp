@@ -118,9 +118,8 @@ void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 }
 
 bool TabMessage::shouldShowSystemPopup(const Event_UserMessage &event) {
-    return (event.sender_name() == otherUserInfo->name() && 
-        tabSupervisor->currentIndex() != tabSupervisor->indexOf(this)) ||
-        QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0;
+    return (QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0 ||
+        (event.sender_name() == otherUserInfo->name() && tabSupervisor->currentIndex() != tabSupervisor->indexOf(this)));
 }
 
 void TabMessage::showSystemPopup(const Event_UserMessage &event) {
@@ -132,6 +131,7 @@ void TabMessage::showSystemPopup(const Event_UserMessage &event) {
 void TabMessage::messageClicked() {
     tabSupervisor->setCurrentIndex(tabSupervisor->indexOf(this));
     QApplication::setActiveWindow(this);
+    emit maximizeClient();
 }
 
 void TabMessage::processUserLeft()

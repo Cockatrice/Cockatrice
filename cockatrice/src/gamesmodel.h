@@ -18,6 +18,8 @@ private:
     QMap<int, GameTypeMap> gameTypes;
 
     static const int NUM_COLS = 8;
+    static const int SECS_PER_MIN  = 60;
+    static const int SECS_PER_HOUR = 3600;
 public:
     static const int SORT_ROLE = Qt::UserRole+1;
 
@@ -26,7 +28,7 @@ public:
     int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return NUM_COLS; }
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-
+    const QString getGameCreatedString(const int secs) const;
     const ServerInfo_Game &getGame(int row);
 
     /**

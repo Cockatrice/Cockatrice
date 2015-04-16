@@ -10,6 +10,7 @@
 #include <QToolButton>
 #include <QSplitter>
 #include <QApplication>
+#include <QSystemTrayIcon>
 #include "tab_supervisor.h"
 #include "tab_room.h"
 #include "tab_userlists.h"
@@ -18,6 +19,7 @@
 #include "chatview.h"
 #include "gameselector.h"
 #include "settingscache.h"
+#include "main.h"
 
 #include "get_pb_extension.h"
 #include "pb/room_commands.pb.h"
@@ -43,6 +45,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 
     chatView = new ChatView(tabSupervisor, 0, true);
+    connect(chatView, SIGNAL(showMentionPopup(QString&)), this, SLOT(actShowMentionPopup(QString&)));
     connect(chatView, SIGNAL(messageClickedSignal()), this, SLOT(focusTab()));
     connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
@@ -56,7 +59,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     QMenu *chatSettingsMenu = new QMenu(this);
 
     aClearChat = chatSettingsMenu->addAction(QString());
-    aClearChat->setShortcut(tr("F12"));
+    aClearChat->setShortcut(QKeySequence("F12"));
     connect(aClearChat, SIGNAL(triggered()), this, SLOT(actClearChat()));
 
     chatSettingsMenu->addSeparator();
@@ -130,6 +133,16 @@ void TabRoom::retranslateUi()
 void TabRoom::focusTab() {
     QApplication::setActiveWindow(this);
     tabSupervisor->setCurrentIndex(tabSupervisor->indexOf(this));
+    emit maximizeClient();
+}
+
+void TabRoom::actShowMentionPopup(QString &sender) {
+    if (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this) 
+        || QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0) {
+        disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
+        trayIcon->showMessage(sender + tr(" mentioned you."), tr("Click to view"));
+        connect(trayIcon, SIGNAL(messageClicked()), chatView, SLOT(actMessageClicked()));
+    }
 }
 
 void TabRoom::closeRequest()

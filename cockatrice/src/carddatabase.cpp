@@ -506,6 +506,7 @@ CardInfo::CardInfo(CardDatabase *_db,
       tableRow(_tableRow)
 {
     pixmapCacheKey = QLatin1String("card_") + name;
+    simpleName = CardInfo::simplifyName(name);
 
     for (int i = 0; i < sets.size(); i++)
         sets[i]->append(this);
@@ -759,14 +760,14 @@ void CardDatabase::clear()
 void CardDatabase::addCard(CardInfo *card)
 {
     cards.insert(card->getName(), card);
-    simpleNameCards.insert(CardInfo::simplifyName(card->getName()), card);
+    simpleNameCards.insert(card->getSimpleName(), card);
     emit cardAdded(card);
 }
 
 void CardDatabase::removeCard(CardInfo *card)
 {
     cards.remove(card->getName());
-    simpleNameCards.remove(CardInfo::simplifyName(card->getName()));
+    simpleNameCards.remove(card->getSimpleName());
     emit cardRemoved(card);
 }
 
@@ -1032,7 +1033,7 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
 
     if (!tokens) {
         loadStatus = tempLoadStatus;
-        qDebug() << "loadCardDatabase(): Status = " << loadStatus;
+        qDebug() << "loadCardDatabase(): Path = " << path << " Status = " << loadStatus;
     }
 
 
@@ -1076,7 +1077,9 @@ QStringList CardDatabase::getAllMainCardTypes() const
 void CardDatabase::cacheCardPixmaps(const QStringList &cardNames)
 {
     QPixmap tmp;
-    for (int i = 0; i < cardNames.size(); ++i)
+    // never cache more than 300 cards at once for a single deck
+    int max = qMin(cardNames.size(), 300);
+    for (int i = 0; i < max; ++i)
         getCard(cardNames[i])->loadPixmap(tmp);
 }
 
