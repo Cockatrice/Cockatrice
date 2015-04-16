@@ -98,7 +98,7 @@ bool Servatrice_DatabaseInterface::execSqlQuery(QSqlQuery *query)
 
 bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
 {
-    static QRegExp re = QRegExp("^[a-zA-Z0-9_\-\.]+$");
+    static QRegExp re = QRegExp("[a-zA-Z0-9_\.-]+");
     return re.exactMatch(user);
 }
 
