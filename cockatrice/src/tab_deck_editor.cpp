@@ -16,6 +16,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QTextStream>
+#include <QProcessEnvironment>
 #include <QTimer>
 #include "tab_deck_editor.h"
 #include "window_sets.h"
