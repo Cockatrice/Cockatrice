@@ -131,15 +131,18 @@ bool FilterItemList::testTypeAndNot(const CardInfo *info, CardFilter::Attr attr)
 bool FilterItemList::testTypeOr(const CardInfo *info, CardFilter::Attr attr) const
 {
     QList<FilterItem *>::const_iterator i;
+    bool enabledChilds = false;
 
     for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
         if (!(*i)->isEnabled())
             continue;
+        if(!enabledChilds)
+            enabledChilds=true;
         if ((*i)->acceptCardAttr(info, attr))
             return true;
     }
 
-    return false;
+    return enabledChilds ? false : true;
 }
 
 bool FilterItemList::testTypeOrNot(const CardInfo *info, CardFilter::Attr attr) const
