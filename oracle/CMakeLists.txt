@@ -45,7 +45,6 @@ set(ORACLE_LIBS)
 # Qt4 stuff
 if(Qt4_FOUND)
     SET(QT_USE_QTNETWORK TRUE)
-    SET(QT_USE_QTXML TRUE)
     SET(QT_USE_QTSVG TRUE)
 
     # Include directories
@@ -82,13 +81,6 @@ if(Qt5Widgets_FOUND)
     if(Qt5Network_FOUND)
         include_directories(${Qt5Network_INCLUDE_DIRS})
         list(APPEND ORACLE_LIBS Network)
-    endif()
-
-    # QtXml
-    find_package(Qt5Xml)
-    if(Qt5Xml_FOUND)
-        include_directories(${Qt5Xml_INCLUDE_DIRS})
-        list(APPEND ORACLE_LIBS Xml)
     endif()
 
     # QtSvg
