@@ -670,25 +670,25 @@ void Player::retranslateUi()
     aFlip->setText(tr("&Flip"));
     aPeek->setText(tr("&Peek at card face"));
     aClone->setText(tr("&Clone"));
-    aClone->setShortcut(tr("Ctrl+J"));
+    aClone->setShortcut(QKeySequence("Ctrl+J"));
     aAttach->setText(tr("Attac&h to card..."));
-    aAttach->setShortcut(tr("Ctrl+A"));
+    aAttach->setShortcut(QKeySequence("Ctrl+A"));
     aUnattach->setText(tr("Unattac&h"));
     aDrawArrow->setText(tr("&Draw arrow..."));
     aIncP->setText(tr("&Increase power"));
-    aIncP->setShortcut(tr("Ctrl++"));
+    aIncP->setShortcut(QKeySequence("Ctrl++"));
     aDecP->setText(tr("&Decrease power"));
-    aDecP->setShortcut(tr("Ctrl+-"));
+    aDecP->setShortcut(QKeySequence("Ctrl+-"));
     aIncT->setText(tr("I&ncrease toughness"));
-    aIncT->setShortcut(tr("Alt++"));
+    aIncT->setShortcut(QKeySequence("Alt++"));
     aDecT->setText(tr("D&ecrease toughness"));
-    aDecT->setShortcut(tr("Alt+-"));
+    aDecT->setShortcut(QKeySequence("Alt+-"));
     aIncPT->setText(tr("In&crease power and toughness"));
-    aIncPT->setShortcut(tr("Ctrl+Alt++"));
+    aIncPT->setShortcut(QKeySequence("Ctrl+Alt++"));
     aDecPT->setText(tr("Dec&rease power and toughness"));
-    aDecPT->setShortcut(tr("Ctrl+Alt+-"));
+    aDecPT->setShortcut(QKeySequence("Ctrl+Alt+-"));
     aSetPT->setText(tr("Set &power and toughness..."));
-    aSetPT->setShortcut(tr("Ctrl+P"));
+    aSetPT->setShortcut(QKeySequence("Ctrl+P"));
     aSetAnnotation->setText(tr("&Set annotation..."));
     QStringList counterColors;
     counterColors.append(tr("Red"));
@@ -703,7 +703,7 @@ void Player::retranslateUi()
     aMoveToTopLibrary->setText(tr("&Top of library"));
     aMoveToBottomLibrary->setText(tr("&Bottom of library"));
     aMoveToGraveyard->setText(tr("&Graveyard"));
-    aMoveToGraveyard->setShortcut(tr("Ctrl+Del"));
+    aMoveToGraveyard->setShortcut(QKeySequence("Ctrl+Del"));
     aMoveToExile->setText(tr("&Exile"));
     
     QMapIterator<QString, CardZone *> zoneIterator(zones);
@@ -715,20 +715,20 @@ void Player::setShortcutsActive()
 {
     shortcutsActive = true;
     
-    aViewSideboard->setShortcut(tr("Ctrl+F3"));
-    aViewLibrary->setShortcut(tr("F3"));
-    aViewTopCards->setShortcut(tr("Ctrl+W"));
-    aViewGraveyard->setShortcut(tr("F4"));
-    aDrawCard->setShortcut(tr("Ctrl+D"));
-    aDrawCards->setShortcut(tr("Ctrl+E"));
-    aUndoDraw->setShortcut(tr("Ctrl+Shift+D"));
-    aMulligan->setShortcut(tr("Ctrl+M"));
-    aShuffle->setShortcut(tr("Ctrl+S"));
-    aUntapAll->setShortcut(tr("Ctrl+U"));
-    aRollDie->setShortcut(tr("Ctrl+I"));
-    aCreateToken->setShortcut(tr("Ctrl+T"));
-    aCreateAnotherToken->setShortcut(tr("Ctrl+G"));
-    aAlwaysRevealTopCard->setShortcut(tr("Ctrl+N"));
+    aViewSideboard->setShortcut(QKeySequence("Ctrl+F3"));
+    aViewLibrary->setShortcut(QKeySequence("F3"));
+    aViewTopCards->setShortcut(QKeySequence("Ctrl+W"));
+    aViewGraveyard->setShortcut(QKeySequence("F4"));
+    aDrawCard->setShortcut(QKeySequence("Ctrl+D"));
+    aDrawCards->setShortcut(QKeySequence("Ctrl+E"));
+    aUndoDraw->setShortcut(QKeySequence("Ctrl+Shift+D"));
+    aMulligan->setShortcut(QKeySequence("Ctrl+M"));
+    aShuffle->setShortcut(QKeySequence("Ctrl+S"));
+    aUntapAll->setShortcut(QKeySequence("Ctrl+U"));
+    aRollDie->setShortcut(QKeySequence("Ctrl+I"));
+    aCreateToken->setShortcut(QKeySequence("Ctrl+T"));
+    aCreateAnotherToken->setShortcut(QKeySequence("Ctrl+G"));
+    aAlwaysRevealTopCard->setShortcut(QKeySequence("Ctrl+N"));
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
     while (counterIterator.hasNext())
@@ -769,7 +769,7 @@ void Player::initSayMenu()
     for (int i = 0; i < count; i++) {
         QAction *newAction = new QAction(settings.value(QString("msg%1").arg(i)).toString(), this);
         if (i <= 10)
-            newAction->setShortcut(QString("Ctrl+%1").arg((i + 1) % 10));
+            newAction->setShortcut(QKeySequence(QString("Ctrl+%1").arg((i + 1) % 10)));
         connect(newAction, SIGNAL(triggered()), this, SLOT(actSayMessage()));
         sayMenu->addAction(newAction);
     }
@@ -789,7 +789,7 @@ void Player::setDeck(const DeckLoader &_deck)
             predefinedTokens.append(tokenName);
             QAction *a = createPredefinedTokenMenu->addAction(tokenName);
             if (i < 10)
-                a->setShortcut("Alt+" + QString::number((i + 1) % 10));
+                a->setShortcut(QKeySequence("Alt+" + QString::number((i + 1) % 10)));
             connect(a, SIGNAL(triggered()), this, SLOT(actCreatePredefinedToken()));
         }
 }

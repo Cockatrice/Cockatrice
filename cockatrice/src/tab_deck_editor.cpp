@@ -308,7 +308,7 @@ void TabDeckEditor::retranslateUi()
     hashLabel1->setText(tr("Hash:"));
     
     //aUpdatePrices->setText(tr("&Update prices"));
-    //aUpdatePrices->setShortcut(tr("Ctrl+U"));
+    //aUpdatePrices->setShortcut(QKeySequence("Ctrl+U"));
 
     aNewDeck->setText(tr("&New deck"));
     aLoadDeck->setText(tr("&Load deck..."));
@@ -320,17 +320,17 @@ void TabDeckEditor::retranslateUi()
     aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
     aOpenCustomFolder->setText(tr("Open custom image folder"));
     aClose->setText(tr("&Close"));
-    aClose->setShortcut(tr("Ctrl+Q"));
+    aClose->setShortcut(QKeySequence("Ctrl+Q"));
     
     aAddCard->setText(tr("Add card to &maindeck"));
     aAddCardToSideboard->setText(tr("Add card to &sideboard"));
 
     aRemoveCard->setText(tr("&Remove row"));
-    aRemoveCard->setShortcut(tr("Del"));
+    aRemoveCard->setShortcut(QKeySequence("Del"));
     aIncrement->setText(tr("&Increment number"));
-    aIncrement->setShortcut(tr("+"));
+    aIncrement->setShortcut(QKeySequence("+"));
     aDecrement->setText(tr("&Decrement number"));
-    aDecrement->setShortcut(tr("-"));
+    aDecrement->setShortcut(QKeySequence("-"));
     
     deckMenu->setTitle(tr("&Deck Editor"));
     dbMenu->setTitle(tr("C&ard Database"));

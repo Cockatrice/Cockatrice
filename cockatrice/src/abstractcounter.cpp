@@ -65,9 +65,9 @@ void AbstractCounter::retranslateUi()
 void AbstractCounter::setShortcutsActive()
 {
     if (name == "life") {
-        aSet->setShortcut(tr("Ctrl+L"));
-        aDec->setShortcut(tr("F11"));
-        aInc->setShortcut(tr("F12"));
+        aSet->setShortcut(QKeySequence("Ctrl+L"));
+        aDec->setShortcut(QKeySequence("F11"));
+        aInc->setShortcut(QKeySequence("F12"));
     }
 }
 
