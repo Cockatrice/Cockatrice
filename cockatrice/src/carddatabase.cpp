@@ -407,6 +407,7 @@ CardInfo::CardInfo(CardDatabase *_db,
       tableRow(_tableRow)
 {
     pixmapCacheKey = QLatin1String("card_") + name;
+    simpleName = CardInfo::simplifyName(name);
 
     for (int i = 0; i < sets.size(); i++)
         sets[i]->append(this);
@@ -660,14 +661,14 @@ void CardDatabase::clear()
 void CardDatabase::addCard(CardInfo *card)
 {
     cards.insert(card->getName(), card);
-    simpleNameCards.insert(CardInfo::simplifyName(card->getName()), card);
+    simpleNameCards.insert(card->getSimpleName(), card);
     emit cardAdded(card);
 }
 
 void CardDatabase::removeCard(CardInfo *card)
 {
     cards.remove(card->getName());
-    simpleNameCards.remove(CardInfo::simplifyName(card->getName()));
+    simpleNameCards.remove(card->getSimpleName());
     emit cardRemoved(card);
 }
 

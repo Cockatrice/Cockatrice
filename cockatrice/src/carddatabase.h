@@ -142,6 +142,7 @@ public:
         MuidMap muids = MuidMap());
     ~CardInfo();
     const QString &getName() const { return name; }
+    const QString &getSimpleName() const { return simpleName; }
     bool getIsToken() const { return isToken; }
     const SetList &getSets() const { return sets; }
     const QString &getManaCost() const { return manacost; }
