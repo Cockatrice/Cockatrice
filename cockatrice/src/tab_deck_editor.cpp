@@ -698,7 +698,7 @@ void TabDeckEditor::actDecrement()
     offsetCountAtIndex(currentIndex, -1);
 }
 
-void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
+void TabDeckEditor::setPriceTagFeatureEnabled(int /* enabled */)
 {
     //aUpdatePrices->setVisible(enabled);
     deckModel->pricesUpdated();

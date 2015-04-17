@@ -57,7 +57,7 @@ void TitleLabel::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 }
 
 ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, bool _revealZone, bool _writeableRevealZone, const QList<const ServerInfo_Card *> &cardList)
-    : QGraphicsWidget(0, Qt::Tool | Qt::FramelessWindowHint), player(_player), canBeShuffled(_origZone->getIsShufflable())
+    : QGraphicsWidget(0, Qt::Tool | Qt::FramelessWindowHint), canBeShuffled(_origZone->getIsShufflable()), player(_player)
 {
     setAcceptHoverEvents(true);
     setAttribute(Qt::WA_DeleteOnClose);
