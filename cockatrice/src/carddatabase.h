@@ -31,6 +31,7 @@ private:
     unsigned int sortKey;
     QDate releaseDate;
     QString setType;
+    bool enabled, isknown;
 public:
     CardSet(const QString &_shortName = QString(), const QString &_longName = QString(), const QString &_setType = QString(), const QDate &_releaseDate = QDate());
     QString getCorrectedShortName() const;
@@ -38,9 +39,17 @@ public:
     QString getLongName() const { return longName; }
     QString getSetType() const { return setType; }
     QDate getReleaseDate() const { return releaseDate; }
+    void setLongName(QString & _longName) { longName = _longName; }
+    void setSetType(QString & _setType) { setType = _setType; }
+    void setReleaseDate(QDate & _releaseDate) { releaseDate = _releaseDate; }
+
+    void loadSetOptions();
     int getSortKey() const { return sortKey; }
     void setSortKey(unsigned int _sortKey);
-    void updateSortKey();
+    bool getEnabled() const { return enabled; }
+    void setEnabled(bool _enabled);
+    bool getIsKnown() const { return isknown; }
+    void setIsKnown(bool _isknown);
 };
 
 class SetList : public QList<CardSet *> {
@@ -48,6 +57,12 @@ private:
     class CompareFunctor;
 public:
     void sortByKey();
+    void guessSortKeys();
+    void enableAllUnknown();
+    void enableAll();
+    void markAllAsKnown();
+    int getEnabledSetsNum();
+    int getUnknownSetsNum();
 };
 
 class PictureToLoad {
@@ -253,6 +268,7 @@ public:
 public slots:
     void clearPixmapCache();
     LoadStatus loadCardDatabase(const QString &path, bool tokens = false);
+    void emitCardListChanged();
 private slots:
     void imageLoaded(CardInfo *card, QImage image);
     void picDownloadChanged();

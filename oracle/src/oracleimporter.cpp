@@ -32,7 +32,6 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     QVariant editionCards;
     QString setType;
     QDate releaseDate;
-    bool import;
 
     while (it.hasNext()) {
         map = it.next().toMap();
@@ -45,11 +44,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
             setType[0] = setType[0].toUpper();
         releaseDate = map.value("releaseDate").toDate();
 
-        // core and expansion sets are marked to be imported by default
-        import = (0 == QString::compare(setType, QString("core"), Qt::CaseInsensitive) ||
-            0 == QString::compare(setType, QString("expansion"), Qt::CaseInsensitive));
-
-        newSetList.append(SetToDownload(edition, editionLong, editionCards, import, setType, releaseDate));
+        newSetList.append(SetToDownload(edition, editionLong, editionCards, setType, releaseDate));
     }
 
     qSort(newSetList);
@@ -265,10 +260,7 @@ int OracleImporter::startImport()
 
     while (it.hasNext())
     {
-        curSet = & it.next();
-        if(!curSet->getImport())
-            continue;
-            
+        curSet = & it.next();            
         CardSet *set = new CardSet(curSet->getShortName(), curSet->getLongName(), curSet->getSetType(), curSet->getReleaseDate());
         if (!sets.contains(set->getShortName()))
             sets.insert(set->getShortName(), set);
