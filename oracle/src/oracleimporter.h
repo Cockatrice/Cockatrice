@@ -8,7 +8,6 @@
 class SetToDownload {
 private:
     QString shortName, longName;
-    bool import;
     QVariant cards;
     QDate releaseDate;
     QString setType;
@@ -18,10 +17,8 @@ public:
     const QVariant &getCards() const { return cards; }
     const QString &getSetType() const { return setType; }
     const QDate &getReleaseDate() const { return releaseDate; }
-    bool getImport() const { return import; }
-    void setImport(bool _import) { import = _import; }
-    SetToDownload(const QString &_shortName, const QString &_longName, const QVariant &_cards, bool _import, const QString &_setType = QString(), const QDate &_releaseDate = QDate())
-        : shortName(_shortName), longName(_longName), import(_import), cards(_cards), releaseDate(_releaseDate), setType(_setType)  { }
+    SetToDownload(const QString &_shortName, const QString &_longName, const QVariant &_cards, const QString &_setType = QString(), const QDate &_releaseDate = QDate())
+        : shortName(_shortName), longName(_longName), cards(_cards), releaseDate(_releaseDate), setType(_setType)  { }
     bool operator<(const SetToDownload &set) const { return longName.compare(set.longName, Qt::CaseInsensitive) < 0; }
 };
 

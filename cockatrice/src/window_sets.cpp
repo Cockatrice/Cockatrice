@@ -7,6 +7,9 @@
 #include <QPushButton>
 #include <QItemSelection>
 #include <QMessageBox>
+#include <QGroupBox>
+#include <QDialogButtonBox>
+#include <QVBoxLayout>
 
 WndSets::WndSets(QWidget *parent)
     : QMainWindow(parent)
@@ -37,12 +40,18 @@ WndSets::WndSets(QWidget *parent)
 
     view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
     view->setColumnHidden(SetsModel::SortKeyCol, true);
+    view->setColumnHidden(SetsModel::IsKnownCol, true);
     view->setRootIsDecorated(false);
 
-    saveButton = new QPushButton(tr("Save set ordering"));
-    connect(saveButton, SIGNAL(clicked()), this, SLOT(actSave()));
-    restoreButton = new QPushButton(tr("Restore saved set ordering"));
-    connect(restoreButton, SIGNAL(clicked()), this, SLOT(actRestore()));
+    enableButton = new QPushButton(tr("Enable set"));
+    connect(enableButton, SIGNAL(clicked()), this, SLOT(actEnable()));
+    disableButton = new QPushButton(tr("Disable set"));
+    connect(disableButton, SIGNAL(clicked()), this, SLOT(actDisable()));
+    enableAllButton = new QPushButton(tr("Enable all sets"));
+    connect(enableAllButton, SIGNAL(clicked()), this, SLOT(actEnableAll()));
+    disableAllButton = new QPushButton(tr("Disable all sets"));
+    connect(disableAllButton, SIGNAL(clicked()), this, SLOT(actDisableAll()));
+
     upButton = new QPushButton(tr("Move selected set up"));
     connect(upButton, SIGNAL(clicked()), this, SLOT(actUp()));
     downButton = new QPushButton(tr("Move selected set down"));
@@ -52,6 +61,8 @@ WndSets::WndSets(QWidget *parent)
     bottomButton = new QPushButton(tr("Move selected set to bottom"));
     connect(bottomButton, SIGNAL(clicked()), this, SLOT(actBottom()));
 
+    enableButton->setDisabled(true);
+    disableButton->setDisabled(true);
     upButton->setDisabled(true);
     downButton->setDisabled(true);
     topButton->setDisabled(true);
@@ -60,17 +71,31 @@ WndSets::WndSets(QWidget *parent)
     connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
         this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
 
+    QGroupBox *toggleFrame = new QGroupBox(tr("Enable sets"));
+    QVBoxLayout *toggleVBox = new QVBoxLayout;
+    toggleVBox->addWidget(enableButton);
+    toggleVBox->addWidget(disableButton);
+    toggleVBox->addWidget(enableAllButton);
+    toggleVBox->addWidget(disableAllButton);
+    toggleFrame->setLayout(toggleVBox);
+
+    QGroupBox *sortFrame = new QGroupBox(tr("Sort sets"));
+    QVBoxLayout *sortVBox = new QVBoxLayout;
+    sortVBox->addWidget(upButton);
+    sortVBox->addWidget(downButton);
+    sortVBox->addWidget(topButton);
+    sortVBox->addWidget(bottomButton);
+    sortFrame->setLayout(sortVBox);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actRestore()));
+
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(view, 0, 0, 1, 2);
-
-    mainLayout->addWidget(upButton, 1, 0, 1, 1);
-    mainLayout->addWidget(downButton, 2, 0, 1, 1);
-
-    mainLayout->addWidget(topButton, 1, 1, 1, 1);
-    mainLayout->addWidget(bottomButton, 2, 1, 1, 1);
-
-    mainLayout->addWidget(saveButton, 3, 0, 1, 1);
-    mainLayout->addWidget(restoreButton, 3, 1, 1, 1);
+    mainLayout->addWidget(toggleFrame, 1, 0, 1, 1);
+    mainLayout->addWidget(sortFrame, 1, 1, 1, 1);
+    mainLayout->addWidget(buttonBox, 2, 0, 1, 2);
 
     QWidget *centralWidget = new QWidget;
     centralWidget->setLayout(mainLayout);
@@ -86,13 +111,15 @@ WndSets::~WndSets()
 
 void WndSets::actSave()
 {
-    model->save();
+    model->save(db);
     QMessageBox::information(this, tr("Success"), tr("The sets database has been saved successfully."));
+    close();
 }
 
 void WndSets::actRestore()
 {
     model->restore(db);
+    close();
 }
 
 void WndSets::actToggleButtons(const QItemSelection & selected, const QItemSelection &)
@@ -102,6 +129,8 @@ void WndSets::actToggleButtons(const QItemSelection & selected, const QItemSelec
     downButton->setDisabled(disabled);
     topButton->setDisabled(disabled);
     bottomButton->setDisabled(disabled);
+    enableButton->setDisabled(disabled);
+    disableButton->setDisabled(disabled);
 }
 
 void WndSets::selectRow(int row)
@@ -109,6 +138,34 @@ void WndSets::selectRow(int row)
     QModelIndex idx = model->index(row, 0);
     view->selectionModel()->select(idx, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     view->scrollTo(idx, QAbstractItemView::EnsureVisible);
+}
+
+void WndSets::actEnable()
+{
+    QModelIndexList rows = view->selectionModel()->selectedRows();
+    if(rows.empty())
+        return;
+
+    model->toggleRow(rows.first().row(), true);
+}
+
+void WndSets::actDisable()
+{
+    QModelIndexList rows = view->selectionModel()->selectedRows();
+    if(rows.empty())
+        return;
+
+    model->toggleRow(rows.first().row(), false);
+}
+
+void WndSets::actEnableAll()
+{
+    model->toggleAll(true);
+}
+
+void WndSets::actDisableAll()
+{
+    model->toggleAll(false);
 }
 
 void WndSets::actUp()

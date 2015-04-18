@@ -17,6 +17,7 @@
 #include <QClipboard>
 #include <QTextStream>
 #include <QProcessEnvironment>
+#include <QTimer>
 #include "tab_deck_editor.h"
 #include "window_sets.h"
 #include "carddatabase.h"
@@ -287,10 +288,13 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     deckEditToolBar->addAction(aDecrement);
     deckEditToolBar->addAction(aIncrement);
     deckEditToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    
+
     retranslateUi();
     
     resize(950, 700);
+
+    connect(this, SIGNAL(setListChanged()), db, SIGNAL(cardListChanged()));
+    QTimer::singleShot(0, this, SLOT(checkUnknownSets()));
 }
 
 TabDeckEditor::~TabDeckEditor()
@@ -780,4 +784,41 @@ void TabDeckEditor::filterRemove(QAction *action) {
         return;
 
     filterModel->removeRow(idx.row(), idx.parent());
+}
+
+void TabDeckEditor::checkUnknownSets()
+{
+    SetList sets = db->getSetList();
+
+    // no set is enabled. Probably this is the first time running trice
+    if(!sets.getEnabledSetsNum())
+    {
+        sets.guessSortKeys();
+        sets.sortByKey();
+        sets.enableAll();
+        db->emitCardListChanged();
+
+        actEditSets();
+        return;
+    }
+
+    int numUnknownSets = sets.getUnknownSetsNum();
+    // no unkown sets. 
+    if(!numUnknownSets)
+        return;
+
+    int ret = QMessageBox::question(this, tr("New sets found"), tr("%1 new set(s) have been found in the card database. Do you want to enable them?").arg(numUnknownSets), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+
+    switch(ret)
+    {
+        case QMessageBox::No:
+            sets.markAllAsKnown();
+            break;
+        case QMessageBox::Yes:
+            sets.enableAllUnknown();
+            db->emitCardListChanged();
+            break;
+        default:
+            break;
+    }
 }

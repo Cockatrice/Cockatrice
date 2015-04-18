@@ -98,25 +98,6 @@ private slots:
      void zipDownloadFailed(const QString &message);
 };
 
-class ChooseSetsPage : public OracleWizardPage
-{
-     Q_OBJECT
-public:
-     ChooseSetsPage(QWidget *parent = 0);
-    void retranslateUi();
-protected:
-     void initializePage();
-     bool validatePage();
-private:
-     QPushButton *checkAllButton, *uncheckAllButton;
-     QVBoxLayout *checkBoxLayout;
-     QList<QCheckBox *> checkBoxList;
-private slots:
-     void actCheckAll();
-     void actUncheckAll();
-     void checkBoxChanged(int state);
-};
-
 class SaveSetsPage : public OracleWizardPage
 {
      Q_OBJECT

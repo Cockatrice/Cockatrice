@@ -3,6 +3,7 @@
 
 #include <QAbstractTableModel>
 #include <QMimeData>
+#include <QSet>
 #include "carddatabase.h"
 
 class SetsProxyModel;
@@ -21,16 +22,18 @@ class SetsModel : public QAbstractTableModel {
     Q_OBJECT
     friend class SetsProxyModel;
 private:
-    static const int NUM_COLS = 5;
+    static const int NUM_COLS = 7;
     SetList sets;
+    QSet<CardSet *> enabledSets;
 public:
-    enum SetsColumns { SortKeyCol, LongNameCol, ShortNameCol, SetTypeCol, ReleaseDateCol };
+    enum SetsColumns { SortKeyCol, IsKnownCol, EnabledCol, LongNameCol, ShortNameCol, SetTypeCol, ReleaseDateCol };
 
     SetsModel(CardDatabase *_db, QObject *parent = 0);
     ~SetsModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const { Q_UNUSED(parent); return NUM_COLS; }
     QVariant data(const QModelIndex &index, int role) const;
+    bool setData(const QModelIndex & index, const QVariant & value, int role);
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     Qt::DropActions supportedDropActions() const;
@@ -39,8 +42,10 @@ public:
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
     QStringList mimeTypes() const;
     void swapRows(int oldRow, int newRow);
+    void toggleRow(int row, bool enable);
+    void toggleAll(bool enable);
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
-    void save();
+    void save(CardDatabase *db);
     void restore(CardDatabase *db);
 };
 
