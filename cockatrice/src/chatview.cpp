@@ -247,7 +247,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                     showSystemPopup(ref);
                 }
             } else {
-                int mentionEndIndex = message.indexOf(QRegExp("\\W"), 1);// from 1 as @ is non-char
+                int mentionEndIndex = message.indexOf(QRegExp("\\s"), 1);// from 1 as @ is non-char
                 if (mentionEndIndex == -1)
                     mentionEndIndex = message.size(); // there is no text after the mention
                 QString userMention = message.left(mentionEndIndex);
