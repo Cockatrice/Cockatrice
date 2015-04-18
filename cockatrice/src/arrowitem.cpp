@@ -216,8 +216,6 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         cmd.set_start_card_id(startCard->getId());
 
         if (targetCard) {
-            CardZone *startZone = startCard->getZone();
-            
             CardZone *targetZone = targetCard->getZone();
             cmd.set_target_player_id(targetZone->getPlayer()->getId());
             cmd.set_target_zone(targetZone->getName().toStdString());
