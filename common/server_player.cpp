@@ -158,7 +158,7 @@ void Server_Player::setupZones()
     addCounter(new Server_Counter(4, "r", makeColor(250, 150, 150), 20, 0));
     addCounter(new Server_Counter(5, "g", makeColor(150, 255, 150), 20, 0));
     addCounter(new Server_Counter(6, "x", makeColor(255, 255, 255), 20, 0));
-    addCounter(new Server_Counter(7, "storm", makeColor(255, 255, 255), 20, 0));
+    addCounter(new Server_Counter(7, "storm", makeColor(255, 150, 30), 20, 0));
 
     initialCards = 7;
 
