@@ -305,6 +305,7 @@ QString ChatView::getNameFromUserList(QMap<QString, UserListTWI *> &userList, QS
 
 void ChatView::clearChat() {
     document()->clear();
+    lastSender = "";
 }
 
 void ChatView::enterEvent(QEvent * /*event*/)
