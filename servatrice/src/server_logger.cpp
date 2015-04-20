@@ -122,27 +122,23 @@ void ServerLogger::flushBuffer()
 void ServerLogger::hupSignalHandler(int /*unused*/)
 {
 #ifdef Q_OS_UNIX
-    ssize_t writeValue = 0;
-
     if (!logFile)
         return;
     
     char a = 1;
-    writeValue = ::write(sigHupFD[0], &a, sizeof(a));
+    ssize_t writeValue = ::write(sigHupFD[0], &a, sizeof(a));
 #endif
 }
 
 void ServerLogger::handleSigHup()
 {
 #ifdef Q_OS_UNIX
-    ssize_t readValue = 0;
-
     if (!logFile)
         return;
     
     snHup->setEnabled(false);
     char tmp;
-    readValue = ::read(sigHupFD[1], &tmp, sizeof(tmp));
+    ssize_t readValue = ::read(sigHupFD[1], &tmp, sizeof(tmp));
     
     logFile->close();
     logFile->open(QIODevice::Append);

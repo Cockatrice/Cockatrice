@@ -16,7 +16,7 @@ class ServerLogger : public QObject {
 public:
 	ServerLogger(bool _logToConsole, QObject *parent = 0);
 	~ServerLogger();
-	static void hupSignalHandler(int unused);
+	static void hupSignalHandler(int);
 public slots:
 	void startLog(const QString &logFileName);
 	void logMessage(QString message, void *caller = 0);
