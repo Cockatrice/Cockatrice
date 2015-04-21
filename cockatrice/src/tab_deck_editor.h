@@ -111,10 +111,12 @@ public:
     void setDeck(DeckLoader *_deckLoader);
     void setModified(bool _windowModified);
     bool confirmClose();
-    public slots:
-        void closeRequest();
+public slots:
+    void closeRequest();
+    void checkUnknownSets();
 signals:
-        void deckEditorClosing(TabDeckEditor *tab);
+    void deckEditorClosing(TabDeckEditor *tab);
+    void setListChanged();
 };
 
 #endif
