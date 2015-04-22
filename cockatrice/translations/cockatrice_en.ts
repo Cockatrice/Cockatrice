@@ -1297,18 +1297,17 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="21"/>
-        <location filename="../src/gamesmodel.cpp" line="23"/>
         <source>m ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="23"/>
-        <source>1hr </source>
+        <source>1hr %1m ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="28"/>
-        <source>hr ago</source>
+        <source>%1hr ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
