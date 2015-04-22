@@ -126,7 +126,7 @@ void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 }
 
 Servatrice::Servatrice(QObject *parent)
-    : Server(true, parent), uptime(0), shutdownTimer(0)
+    : Server(true, parent), uptime(0), shutdownTimer(0), isFirstShutdownMessage(true)
 {
     qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
@@ -462,7 +462,12 @@ void Servatrice::scheduleShutdown(const QString &reason, int minutes)
     if (minutes > 0) {
         shutdownTimer = new QTimer;
         connect(shutdownTimer, SIGNAL(timeout()), this, SLOT(shutdownTimeout()));
-        shutdownTimer->start(60000);
+        if (minutes <= 5 || isFirstShutdownMessage) {
+            shutdownTimer->start(60000);
+            isFirstShutdownMessage = false;
+        }
+        else
+            shutdownTimer->start((shutdownMinutes / 2) * 60 * 1000);
     }
     shutdownTimeout();
 }
