@@ -18,7 +18,7 @@ const QString GamesModel::getGameCreatedString(const int secs) const {
     else if (secs < SECS_PER_MIN * 5)
         ret = tr("<5m ago");
     else if (secs < SECS_PER_HOUR)
-        ret =  QString::number(secs / SECS_PER_MIN).append(tr("m ago"));
+        ret = tr("%1m ago").arg(QString::number(secs / SECS_PER_MIN));
     else if (secs < SECS_PER_MIN * 90) {
         ret = tr("1hr %1m ago").arg(QString::number((secs / SECS_PER_MIN) - 60));
     } else if (secs < SECS_PER_HOUR * 4) {
