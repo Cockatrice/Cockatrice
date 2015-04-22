@@ -485,7 +485,7 @@ void Servatrice::shutdownTimeout()
 {
     --shutdownMinutes;
 
-    if (shutdownMinutes <= 5 || isFirstShutdownMessage || shutdownMinutes % 20 == 0) {
+    if (shutdownMinutes <= 5 || isFirstShutdownMessage || shutdownMinutes % 10 == 0) {
         isFirstShutdownMessage = false;
         SessionEvent *se;
         if (shutdownMinutes) {
