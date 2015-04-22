@@ -1297,7 +1297,7 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="21"/>
-        <source>m ago</source>
+        <source>%1m ago</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
