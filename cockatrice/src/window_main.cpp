@@ -86,7 +86,13 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
 
 void MainWindow::processServerShutdownEvent(const Event_ServerShutdown &event)
 {
-    QMessageBox::information(this, tr("Scheduled server shutdown"), tr("The server is going to be restarted in %n minute(s).\nAll running games will be lost.\nReason for shutdown: %1", "", event.minutes()).arg(QString::fromStdString(event.reason())));
+    if (serverShutdownMessageBox)
+        serverShutdownMessageBox->close();
+    serverShutdownMessageBox = new QMessageBox(this);
+    serverShutdownMessageBox->setAttribute(Qt::WA_DeleteOnClose);
+    serverShutdownMessageBox->setInformativeText(tr("The server is going to be restarted in %n minute(s).\nAll running games will be lost.\nReason for shutdown: %1", "", event.minutes()).arg(QString::fromStdString(event.reason())));
+    serverShutdownMessageBox->setText(tr("Scheduled server shutdown"));
+    serverShutdownMessageBox->exec();
 }
 
 void MainWindow::statusChanged(ClientStatus _status)
