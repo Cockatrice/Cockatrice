@@ -23,7 +23,7 @@
 #include "pb/serverinfo_card.pb.h"
 
 Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)
-    : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false), facedown(false), color(QString()), power(-1), toughness(-1), annotation(QString()), destroyOnZoneChange(false), doesntUntap(false), parentCard(0)
+    : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false), facedown(false), color(QString()), power(0), toughness(0), annotation(QString()), destroyOnZoneChange(false), doesntUntap(false), parentCard(0)
 {
 }
 
@@ -42,8 +42,8 @@ void Server_Card::resetState()
     counters.clear();
     setTapped(false);
     setAttacking(false);
-    power = -1;
-    toughness = -1;
+    power = 0;
+    toughness = 0;
     setAnnotation(QString());
     setDoesntUntap(false);
 }
@@ -86,14 +86,16 @@ void Server_Card::setPT(const QString &_pt)
         QString p2 = _pt.mid(sep + 1);
         if (p1.isEmpty() || p2.isEmpty())
             return;
-        if ((p1[0] == '+') || (p2[0] == '+')) {
+
+        if ((p1[0] == '+') || (p2[0] == '+'))
             if (toughness < 0)
                 toughness = 0;
-        }
+
         if (p1[0] == '+')
             power += p1.mid(1).toInt();
         else
             power = p1.toInt();
+
         if (p2[0] == '+')
             toughness += p2.mid(1).toInt();
         else
