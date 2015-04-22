@@ -105,13 +105,19 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     
     if (!pt.isEmpty()) {
         painter->save();
-        
         transformPainter(painter, translatedSize, tapAngle);
+
+        QStringList ptDbSplit = db->getCard(name)->getPowTough().split("/");
+        QStringList ptSplit = pt.split("/");
+        
+        if (ptDbSplit.at(0) != ptSplit.at(0) || ptDbSplit.at(1) != ptSplit.at(1))
+            painter->setPen(QColor(0, 195, 255));
+        else
+            painter->setPen(Qt::white);
         painter->setBackground(Qt::black);
         painter->setBackgroundMode(Qt::OpaqueMode);
-        painter->setPen(Qt::white);
         
-        painter->drawText(QRectF(4 * scaleFactor, 4 * scaleFactor, translatedSize.width() - 8 * scaleFactor, translatedSize.height() - 8 * scaleFactor), Qt::AlignRight | Qt::AlignBottom, pt);
+        painter->drawText(QRectF(4 * scaleFactor, 4 * scaleFactor, translatedSize.width() - 10 * scaleFactor, translatedSize.height() - 8 * scaleFactor), Qt::AlignRight | Qt::AlignBottom, pt);
         painter->restore();
     }
     if (!annotation.isEmpty()) {
