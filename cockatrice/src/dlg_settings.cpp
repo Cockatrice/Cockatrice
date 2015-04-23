@@ -20,6 +20,7 @@
 #include <QDialogButtonBox>
 #include <QRadioButton>
 #include <QDebug>
+#include <QFont>
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "main.h"
@@ -640,8 +641,8 @@ MessagesSettingsPage::MessagesSettingsPage()
     messageToolBar->addAction(aRemove);
 
     QHBoxLayout *messageListLayout = new QHBoxLayout;
-    messageListLayout->addWidget(messageList);
     messageListLayout->addWidget(messageToolBar);
+    messageListLayout->addWidget(messageList);
 
     messageShortcuts = new QGroupBox;
     messageShortcuts->setLayout(messageListLayout);
@@ -704,8 +705,10 @@ void MessagesSettingsPage::actRemove()
 
 void MessagesSettingsPage::retranslateUi()
 {
-    aAdd->setText(tr("&Add"));
-    aRemove->setText(tr("&Remove"));
+    aAdd->setText(tr("+"));
+    aAdd->setFont(QFont("Times", 20));
+    aRemove->setText(tr("-"));
+    aRemove->setFont(QFont("Times", 20));
     chatGroupBox->setTitle(tr("Chat settings"));
     chatMentionCheckBox.setText(tr("Enable chat mentions"));
     messageShortcuts->setTitle(tr("In-game message macros"));
