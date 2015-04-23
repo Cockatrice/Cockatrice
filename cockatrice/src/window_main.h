@@ -31,6 +31,7 @@ class LocalClient;
 class LocalServer;
 class ServerInfo_User;
 class QThread;
+class QMessageBox;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -86,6 +87,8 @@ private:
     
     LocalServer *localServer;
     bool bHasActivated;
+
+    QMessageBox *serverShutdownMessageBox;
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();

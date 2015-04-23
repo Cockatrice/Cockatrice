@@ -120,6 +120,7 @@ private:
 	QString shutdownReason;
 	int shutdownMinutes;
 	QTimer *shutdownTimer;
+    bool isFirstShutdownMessage;
 	
 	mutable QMutex serverListMutex;
 	QList<ServerProperties> serverList;

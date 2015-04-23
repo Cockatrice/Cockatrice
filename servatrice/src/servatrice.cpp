@@ -126,7 +126,7 @@ void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 }
 
 Servatrice::Servatrice(QObject *parent)
-    : Server(true, parent), uptime(0), shutdownTimer(0)
+    : Server(true, parent), uptime(0), shutdownTimer(0), isFirstShutdownMessage(true)
 {
     qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
@@ -485,26 +485,29 @@ void Servatrice::shutdownTimeout()
 {
     --shutdownMinutes;
 
-    SessionEvent *se;
-    if (shutdownMinutes) {
-        Event_ServerShutdown event;
-        event.set_reason(shutdownReason.toStdString());
-        event.set_minutes(shutdownMinutes);
-        se = Server_ProtocolHandler::prepareSessionEvent(event);
-    } else {
-        Event_ConnectionClosed event;
-        event.set_reason(Event_ConnectionClosed::SERVER_SHUTDOWN);
-        se = Server_ProtocolHandler::prepareSessionEvent(event);
+    if (shutdownMinutes <= 5 || isFirstShutdownMessage || shutdownMinutes % 10 == 0) {
+        isFirstShutdownMessage = false;
+        SessionEvent *se;
+        if (shutdownMinutes) {
+            Event_ServerShutdown event;
+            event.set_reason(shutdownReason.toStdString());
+            event.set_minutes(shutdownMinutes);
+            se = Server_ProtocolHandler::prepareSessionEvent(event);
+        } else {
+            Event_ConnectionClosed event;
+            event.set_reason(Event_ConnectionClosed::SERVER_SHUTDOWN);
+            se = Server_ProtocolHandler::prepareSessionEvent(event);
+        }
+
+        clientsLock.lockForRead();
+        for (int i = 0; i < clients.size(); ++i)
+            clients[i]->sendProtocolItem(*se);
+        clientsLock.unlock();
+        delete se;
+    
+        if (!shutdownMinutes)
+            deleteLater();
     }
-
-    clientsLock.lockForRead();
-    for (int i = 0; i < clients.size(); ++i)
-        clients[i]->sendProtocolItem(*se);
-    clientsLock.unlock();
-    delete se;
-
-    if (!shutdownMinutes)
-        deleteLater();
 }
 
 bool Servatrice::islConnectionExists(int serverId) const
