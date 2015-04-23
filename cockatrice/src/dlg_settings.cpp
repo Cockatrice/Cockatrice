@@ -20,7 +20,6 @@
 #include <QDialogButtonBox>
 #include <QRadioButton>
 #include <QDebug>
-#include <QFont>
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "main.h"
