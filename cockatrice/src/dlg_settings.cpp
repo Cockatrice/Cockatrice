@@ -631,8 +631,10 @@ MessagesSettingsPage::MessagesSettingsPage()
         messageList->addItem(settings.value(QString("msg%1").arg(i)).toString());
     
     aAdd = new QAction(this);
+    aAdd->setIcon(QIcon(":/resources/increment.svg"));
     connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
     aRemove = new QAction(this);
+    aRemove->setIcon(QIcon(":/resources/decrement.svg"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
 
     QToolBar *messageToolBar = new QToolBar;
@@ -705,10 +707,6 @@ void MessagesSettingsPage::actRemove()
 
 void MessagesSettingsPage::retranslateUi()
 {
-    aAdd->setText(tr("+"));
-    aAdd->setFont(QFont("Times", 20));
-    aRemove->setText(tr("-"));
-    aRemove->setFont(QFont("Times", 20));
     chatGroupBox->setTitle(tr("Chat settings"));
     chatMentionCheckBox.setText(tr("Enable chat mentions"));
     messageShortcuts->setTitle(tr("In-game message macros"));
