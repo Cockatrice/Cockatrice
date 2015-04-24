@@ -1,35 +1,5 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="ko" version="2.1">
 <context>
-    <name>ChooseSetsPage</name>
-    <message>
-        <source>Sets selection</source>
-        <translation>판본 선택</translation>
-    </message>
-    <message>
-        <source>The following sets has been found in the source file. Please mark the sets that will be imported.
-All core and expansion sets are selected by default.</source>
-        <translation>아래는 불러올 수 있는 판본의 목록입니다.
-코카트리스에서 사용 할 판본들을 선택해 주세요.
-모든 기본판과 확장판은 기본으로 선택되어 있습니다. </translation>
-    </message>
-    <message>
-        <source>&amp;Check all</source>
-        <translation>모두 선택</translation>
-    </message>
-    <message>
-        <source>&amp;Uncheck all</source>
-        <translation>모두 선택 해제</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>오류</translation>
-    </message>
-    <message>
-        <source>Please mark at least one set.</source>
-        <translation>최소 한개 이상의 판본을 선택해 주세요.</translation>
-    </message>
-</context>
-<context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>

@@ -1,34 +1,5 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="nl" version="2.1">
 <context>
-    <name>ChooseSetsPage</name>
-    <message>
-        <source>Sets selection</source>
-        <translation>Selecteer sets</translation>
-    </message>
-    <message>
-        <source>The following sets has been found in the source file. Please mark the sets that will be imported.
-All core and expansion sets are selected by default.</source>
-        <translation>De volgende sets zijn gevonden in het bronbestand. Selecteer welke sets geïmporteerd moeten worden.
-Standaard zijn de core en expansion sets al geselecteerd.</translation>
-    </message>
-    <message>
-        <source>&amp;Check all</source>
-        <translation>&amp;Alles selecteren</translation>
-    </message>
-    <message>
-        <source>&amp;Uncheck all</source>
-        <translation>&amp;Alles deselecteren</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Fout</translation>
-    </message>
-    <message>
-        <source>Please mark at least one set.</source>
-        <translation>Markeer ten minste één set.</translation>
-    </message>
-</context>
-<context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>

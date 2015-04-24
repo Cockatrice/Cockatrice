@@ -1,34 +1,5 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="ja" version="2.1">
 <context>
-    <name>ChooseSetsPage</name>
-    <message>
-        <source>Sets selection</source>
-        <translation>カードセット選択</translation>
-    </message>
-    <message>
-        <source>The following sets has been found in the source file. Please mark the sets that will be imported.
-All core and expansion sets are selected by default.</source>
-        <translation>ソースファイルから以下のカードセットが見つかりました。インポートするセットにチェックしてください。
- すべての基本セットと拡張セットはデフォルトで選択されています。</translation>
-    </message>
-    <message>
-        <source>&amp;Check all</source>
-        <translation>すべてチェック</translation>
-    </message>
-    <message>
-        <source>&amp;Uncheck all</source>
-        <translation>すべてチェックを外す</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>エラー</translation>
-    </message>
-    <message>
-        <source>Please mark at least one set.</source>
-        <translation>少なくとも一つは選択してください。</translation>
-    </message>
-</context>
-<context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>

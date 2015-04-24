@@ -1,34 +1,5 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" version="2.1">
 <context>
-    <name>ChooseSetsPage</name>
-    <message>
-        <source>Sets selection</source>
-        <translation>Wybór dodatków</translation>
-    </message>
-    <message>
-        <source>The following sets has been found in the source file. Please mark the sets that will be imported.
-All core and expansion sets are selected by default.</source>
-        <translation>W pliku źródłowym znaleziono następujące dodatki. Zaznacz te, które mają zostać zaimportowane.
-Domyślnie, wszystkie dodatki podstawowe oraz rozszerzenia są zaznaczone.</translation>
-    </message>
-    <message>
-        <source>&amp;Check all</source>
-        <translation>&amp;Zaznacz wszystkie</translation>
-    </message>
-    <message>
-        <source>&amp;Uncheck all</source>
-        <translation>&amp;Odznacz wszystkie</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Błąd</translation>
-    </message>
-    <message>
-        <source>Please mark at least one set.</source>
-        <translation>Proszę zaznaczyć co najmniej jeden dodatek.</translation>
-    </message>
-</context>
-<context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>
