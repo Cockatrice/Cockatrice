@@ -7,21 +7,6 @@
         <translation>Imposta &amp;segnalini...</translation>
     </message>
     <message>
-        <location filename="../src/abstractcounter.cpp" line="68"/>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <location filename="../src/abstractcounter.cpp" line="69"/>
-        <source>F11</source>
-        <translation>F11</translation>
-    </message>
-    <message>
-        <location filename="../src/abstractcounter.cpp" line="70"/>
-        <source>F12</source>
-        <translation>F12</translation>
-    </message>
-    <message>
         <location filename="../src/abstractcounter.cpp" line="144"/>
         <source>Set counter</source>
         <translation>Imposta segnalini</translation>
@@ -92,7 +77,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="363"/>
         <source>Enable left justification</source>
-        <translation type="unfinished"/>
+        <translation>Allinea a sinistra</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="365"/>
@@ -207,27 +192,27 @@ Questo è solo visibile ai moderatori e non alla persona bannata.</translation>
 <context>
     <name>CardDatabaseModel</name>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="60"/>
+        <location filename="../src/carddatabasemodel.cpp" line="67"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="61"/>
+        <location filename="../src/carddatabasemodel.cpp" line="68"/>
         <source>Sets</source>
         <translation>Set</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="62"/>
+        <location filename="../src/carddatabasemodel.cpp" line="69"/>
         <source>Mana cost</source>
         <translation>Costo</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="63"/>
+        <location filename="../src/carddatabasemodel.cpp" line="70"/>
         <source>Card type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="64"/>
+        <location filename="../src/carddatabasemodel.cpp" line="71"/>
         <source>P/T</source>
         <translation>F/C</translation>
     </message>
@@ -889,12 +874,12 @@ Questo è solo visibile ai moderatori e non alla persona bannata.</translation>
         <translation>Mostra pedine di questo &amp;mazzo</translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="103"/>
+        <location filename="../src/dlg_create_token.cpp" line="104"/>
         <source>Choose token from list</source>
         <translation>Scegli pedina dalla lista</translation>
     </message>
     <message>
-        <location filename="../src/dlg_create_token.cpp" line="123"/>
+        <location filename="../src/dlg_create_token.cpp" line="125"/>
         <source>Create token</source>
         <translation>Crea pedina</translation>
     </message>
@@ -1002,8 +987,8 @@ Questo è solo visibile ai moderatori e non alla persona bannata.</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="26"/>
-        <source>Hide &amp;password protected games</source>
-        <translation>Nascondi partite protette da &amp;password</translation>
+        <source>Show &amp;password protected games</source>
+        <translation>Mostra partite protette da &amp;password</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="31"/>
@@ -1307,88 +1292,110 @@ Vuoi modificare le impostazioni della posizione del database della carte?</trans
     </message>
 </context>
 <context>
-    <name>GameView</name>
-    <message>
-        <location filename="../src/gameview.cpp" line="22"/>
-        <source>Esc</source>
-        <translation>Esc</translation>
-    </message>
-</context>
-<context>
     <name>GamesModel</name>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="212"/>
+        <location filename="../src/gamesmodel.cpp" line="183"/>
         <source>Game Created</source>
         <translation>Creazione Partita</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="214"/>
+        <location filename="../src/gamesmodel.cpp" line="185"/>
         <source>Creator</source>
         <translation>Creatore</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="213"/>
+        <location filename="../src/gamesmodel.cpp" line="184"/>
         <source>Description</source>
         <translation>Descrizione</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="146"/>
+        <location filename="../src/gamesmodel.cpp" line="17"/>
+        <source>&lt;1m ago</source>
+        <translation>&lt;1m fa</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="19"/>
+        <source>&lt;5m ago</source>
+        <translation>&lt;5m fa</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="21"/>
+        <source>%1m ago</source>
+        <translation>%1m fa</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="23"/>
+        <source>1hr %1m ago</source>
+        <translation>1 ora %1m fa</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="28"/>
+        <source>%1hr ago</source>
+        <translation>%1ore fa</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="30"/>
+        <source>5+ hrs ago</source>
+        <translation>+ di 5 ore fa</translation>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="117"/>
         <source>password</source>
         <translation>password</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="148"/>
+        <location filename="../src/gamesmodel.cpp" line="119"/>
         <source>buddies only</source>
         <translation>solo amici</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="150"/>
+        <location filename="../src/gamesmodel.cpp" line="121"/>
         <source>reg. users only</source>
         <translation>solo utenti registrati</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="182"/>
-        <location filename="../src/gamesmodel.cpp" line="186"/>
+        <location filename="../src/gamesmodel.cpp" line="153"/>
+        <location filename="../src/gamesmodel.cpp" line="157"/>
         <source>can chat</source>
         <translation>può chattare</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="182"/>
+        <location filename="../src/gamesmodel.cpp" line="153"/>
         <source>see hands</source>
         <translation>vede mani</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="190"/>
+        <location filename="../src/gamesmodel.cpp" line="161"/>
         <source>can see hands</source>
         <translation>può vedere mani</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="195"/>
+        <location filename="../src/gamesmodel.cpp" line="166"/>
         <source>not allowed</source>
         <translation>non ammessi</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="211"/>
+        <location filename="../src/gamesmodel.cpp" line="182"/>
         <source>Room</source>
         <translation>Stanza</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="215"/>
+        <location filename="../src/gamesmodel.cpp" line="186"/>
         <source>Game Type</source>
         <translation>Tipo Partita</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="216"/>
+        <location filename="../src/gamesmodel.cpp" line="187"/>
         <source>Restrictions</source>
         <translation>Restrizioni</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="217"/>
+        <location filename="../src/gamesmodel.cpp" line="188"/>
         <source>Players</source>
         <translation>Giocatori</translation>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="218"/>
+        <location filename="../src/gamesmodel.cpp" line="189"/>
         <source>Spectators</source>
         <translation>Spettatori</translation>
     </message>
@@ -1521,8 +1528,10 @@ Vuoi modificare le impostazioni della posizione del database della carte?</trans
     <message>
         <location filename="../src/window_main.cpp" line="81"/>
         <location filename="../src/window_main.cpp" line="264"/>
-        <source>Invalid username.</source>
-        <translation>Nome utente non valido.</translation>
+        <source>Invalid username.
+You may only use A-Z, a-z, 0-9, _, ., and - in your username.</source>
+        <translation>Nome utente non valido.
+Puoi usare solo i caratteri A-Z, a-z, 0-9, _, ., e - nel tuo nome utente.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="84"/>
@@ -1757,11 +1766,6 @@ La tua versione è la %1, la versione online è la %2.</translation>
         <location filename="../src/window_main.cpp" line="309"/>
         <source>&amp;Full screen</source>
         <translation>&amp;Schermo intero</translation>
-    </message>
-    <message>
-        <location filename="../src/window_main.cpp" line="310"/>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="311"/>
@@ -2027,24 +2031,9 @@ La tua versione è la %1, la versione online è la %2.</translation>
         <translation>%1 annulla la sua ultima pescata (%2).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="220"/>
-        <source> from table</source>
-        <translation> dal tavolo</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="222"/>
-        <source> from graveyard</source>
-        <translation> dal cimitero</translation>
-    </message>
-    <message>
         <location filename="../src/messagelogwidget.cpp" line="224"/>
         <source> from exile</source>
         <translation> dall&apos;esilio</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="226"/>
-        <source> from hand</source>
-        <translation> dalla mano</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="231"/>
@@ -2142,19 +2131,9 @@ La tua versione è la %1, la versione online è la %2.</translation>
         <translation>%1 mette %2 in gioco%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="306"/>
-        <source>%1 puts %2%3 into graveyard.</source>
-        <translation>%1 mette %2%3 nel cimitero.</translation>
-    </message>
-    <message>
         <location filename="../src/messagelogwidget.cpp" line="308"/>
         <source>%1 exiles %2%3.</source>
         <translation>%1 esilia %2%3.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="310"/>
-        <source>%1 moves %2%3 to hand.</source>
-        <translation>%1 prende %2%3 in mano.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="313"/>
@@ -2897,6 +2876,51 @@ La tua versione è la %1, la versione online è la %2.</translation>
         <translation>%1 pesca %2 carta(e).</translation>
     </message>
     <message>
+        <location filename="../src/messagelogwidget.cpp" line="220"/>
+        <source> from play</source>
+        <translation>dal gioco</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="222"/>
+        <source> from her graveyard</source>
+        <translation>dal suo cimitero</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="222"/>
+        <source> from his graveyard</source>
+        <translation>dal suo cimitero</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="226"/>
+        <source> from her hand</source>
+        <translation>dalla sua mano</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="226"/>
+        <source> from his hand</source>
+        <translation>dalla sua mano</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="306"/>
+        <source>%1 puts %2%3 into her graveyard.</source>
+        <translation>%1 mette %2%3 nel suo cimitero.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="306"/>
+        <source>%1 puts %2%3 into his graveyard.</source>
+        <translation>%1 mette %2%3 nel suo cimitero.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="310"/>
+        <source>%1 moves %2%3 to her hand.</source>
+        <translation>%1 prende %2%3 in mano.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="310"/>
+        <source>%1 moves %2%3 to his hand.</source>
+        <translation>%1 prende %2%3 in mano.</translation>
+    </message>
+    <message>
         <location filename="../src/messagelogwidget.cpp" line="383"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 female</comment>
@@ -3141,550 +3165,414 @@ La tua versione è la %1, la versione online è la %2.</translation>
 <context>
     <name>Player</name>
     <message>
-        <location filename="../src/player.cpp" line="614"/>
+        <location filename="../src/player.cpp" line="622"/>
         <source>&amp;View library</source>
         <translation>&amp;Guarda mazzo</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="626"/>
+        <location filename="../src/player.cpp" line="634"/>
         <source>Move top cards to &amp;graveyard...</source>
         <translation>Metti le prime carte nel &amp;cimitero...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="665"/>
-        <source>Ctrl+J</source>
-        <translation>Ctrl+J</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="711"/>
-        <source>F3</source>
-        <translation>F3</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="615"/>
+        <location filename="../src/player.cpp" line="623"/>
         <source>View &amp;top cards of library...</source>
         <translation>Guarda &amp;le prime carte del mazzo...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="589"/>
+        <location filename="../src/player.cpp" line="597"/>
         <source>&amp;View graveyard</source>
         <translation>&amp;Guarda cimitero</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="713"/>
-        <source>F4</source>
-        <translation>F4</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="620"/>
+        <location filename="../src/player.cpp" line="628"/>
         <source>&amp;View sideboard</source>
         <translation>&amp;Guarda la sideboard</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="591"/>
+        <location filename="../src/player.cpp" line="599"/>
         <source>Player &quot;%1&quot;</source>
         <translation>Giocatore &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="605"/>
-        <location filename="../src/player.cpp" line="611"/>
-        <location filename="../src/player.cpp" line="631"/>
+        <location filename="../src/player.cpp" line="613"/>
+        <location filename="../src/player.cpp" line="619"/>
+        <location filename="../src/player.cpp" line="639"/>
         <source>&amp;Hand</source>
         <translation>&amp;Mano</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="632"/>
+        <location filename="../src/player.cpp" line="640"/>
         <source>&amp;Reveal hand to...</source>
         <translation>&amp;Rivela mano a...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="633"/>
+        <location filename="../src/player.cpp" line="641"/>
         <source>Reveal r&amp;andom card to...</source>
         <translation>Rivela carta c&amp;asuale a...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="635"/>
+        <location filename="../src/player.cpp" line="643"/>
         <source>&amp;Library</source>
         <translation>&amp;Mazzo</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="592"/>
-        <location filename="../src/player.cpp" line="599"/>
-        <location filename="../src/player.cpp" line="612"/>
+        <location filename="../src/player.cpp" line="600"/>
+        <location filename="../src/player.cpp" line="607"/>
+        <location filename="../src/player.cpp" line="620"/>
+        <location filename="../src/player.cpp" line="705"/>
         <source>&amp;Graveyard</source>
         <translation>&amp;Cimitero</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="634"/>
+        <location filename="../src/player.cpp" line="642"/>
         <source>&amp;Sideboard</source>
         <translation>&amp;Sideboard</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="803"/>
+        <location filename="../src/player.cpp" line="694"/>
+        <source>Red</source>
+        <translation>Rosso</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="695"/>
+        <source>Yellow</source>
+        <translation>Giallo</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="696"/>
+        <source>Green</source>
+        <translation>Verde</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="811"/>
         <source>View top cards of library</source>
         <translation>Guarda le prima carte del grimorio</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="803"/>
+        <location filename="../src/player.cpp" line="811"/>
         <source>Number of cards:</source>
         <translation>Numero di carte:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="621"/>
+        <location filename="../src/player.cpp" line="629"/>
         <source>&amp;Draw card</source>
         <translation>&amp;Pesca una carta</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="590"/>
+        <location filename="../src/player.cpp" line="598"/>
         <source>&amp;View exile</source>
         <translation>&amp;Guarda zona di esilio</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="593"/>
-        <location filename="../src/player.cpp" line="600"/>
-        <location filename="../src/player.cpp" line="606"/>
+        <location filename="../src/player.cpp" line="601"/>
+        <location filename="../src/player.cpp" line="608"/>
+        <location filename="../src/player.cpp" line="614"/>
+        <location filename="../src/player.cpp" line="707"/>
         <source>&amp;Exile</source>
         <translation>&amp;Esilio</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="712"/>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="714"/>
-        <source>Ctrl+D</source>
-        <translation>Ctrl+D</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="622"/>
+        <location filename="../src/player.cpp" line="630"/>
         <source>D&amp;raw cards...</source>
         <translation>P&amp;esca carte...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="715"/>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="624"/>
+        <location filename="../src/player.cpp" line="632"/>
         <source>Take &amp;mulligan</source>
         <translation>Mu&amp;lliga</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="717"/>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="625"/>
+        <location filename="../src/player.cpp" line="633"/>
         <source>&amp;Shuffle</source>
         <translation>&amp;Mischia</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="718"/>
-        <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="636"/>
+        <location filename="../src/player.cpp" line="644"/>
         <source>&amp;Counters</source>
         <translation>&amp;Segnalini</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="638"/>
+        <location filename="../src/player.cpp" line="646"/>
         <source>&amp;Untap all permanents</source>
         <translation>&amp;Stappa tutti i permanenti</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="719"/>
-        <source>Ctrl+U</source>
-        <translation>Ctrl+U</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="639"/>
+        <location filename="../src/player.cpp" line="647"/>
         <source>R&amp;oll die...</source>
         <translation>L&amp;ancia un dado...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="720"/>
-        <source>Ctrl+I</source>
-        <translation>Ctrl+I</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="640"/>
+        <location filename="../src/player.cpp" line="648"/>
         <source>&amp;Create token...</source>
         <translation>&amp;Crea una pedina...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="721"/>
-        <source>Ctrl+T</source>
-        <translation>Ctrl+T</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="641"/>
+        <location filename="../src/player.cpp" line="649"/>
         <source>C&amp;reate another token</source>
         <translation>C&amp;rea un&apos;altra pedina</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="722"/>
-        <source>Ctrl+G</source>
-        <translation>Ctrl+G</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="643"/>
+        <location filename="../src/player.cpp" line="651"/>
         <source>S&amp;ay</source>
         <translation>P&amp;arla</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="596"/>
+        <location filename="../src/player.cpp" line="604"/>
         <source>&amp;Move hand to...</source>
         <translation>&amp;Sposta mano in...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="597"/>
-        <location filename="../src/player.cpp" line="603"/>
-        <location filename="../src/player.cpp" line="609"/>
+        <location filename="../src/player.cpp" line="605"/>
+        <location filename="../src/player.cpp" line="611"/>
+        <location filename="../src/player.cpp" line="617"/>
+        <location filename="../src/player.cpp" line="703"/>
         <source>&amp;Top of library</source>
         <translation>Cima al grimorio</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="598"/>
-        <location filename="../src/player.cpp" line="604"/>
-        <location filename="../src/player.cpp" line="610"/>
+        <location filename="../src/player.cpp" line="606"/>
+        <location filename="../src/player.cpp" line="612"/>
+        <location filename="../src/player.cpp" line="618"/>
+        <location filename="../src/player.cpp" line="704"/>
         <source>&amp;Bottom of library</source>
         <translation>Fondo al grimorio</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="602"/>
+        <location filename="../src/player.cpp" line="610"/>
         <source>&amp;Move graveyard to...</source>
         <translation>&amp;Muovi cimitero in...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="608"/>
+        <location filename="../src/player.cpp" line="616"/>
         <source>&amp;Move exile to...</source>
         <translation>&amp;Muovi esilio in...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="616"/>
+        <location filename="../src/player.cpp" line="624"/>
         <source>Reveal &amp;library to...</source>
         <translation>Rive&amp;la  grimorio a...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="617"/>
+        <location filename="../src/player.cpp" line="625"/>
         <source>Reveal t&amp;op card to...</source>
         <translation>Rivela prima carta a...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="618"/>
+        <location filename="../src/player.cpp" line="626"/>
         <source>&amp;Always reveal top card</source>
         <translation>Rivela &amp;sempre la prima carta</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="619"/>
+        <location filename="../src/player.cpp" line="627"/>
         <source>O&amp;pen deck in deck editor</source>
         <translation>A&amp;pri mazzo nell&apos;editore di mazzi</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="623"/>
+        <location filename="../src/player.cpp" line="631"/>
         <source>&amp;Undo last draw</source>
         <translation>&amp;Annulla l&apos;ultima pescata</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="627"/>
+        <location filename="../src/player.cpp" line="635"/>
         <source>Move top cards to &amp;exile...</source>
         <translation>Metti le prime carte in &amp;esilio...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="628"/>
+        <location filename="../src/player.cpp" line="636"/>
         <source>Put top card on &amp;bottom</source>
         <translation>Metti la prima carta in &amp;fondo</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="629"/>
+        <location filename="../src/player.cpp" line="637"/>
         <source>Put bottom card &amp;in graveyard</source>
         <translation>Metti l&apos;ultima carta nel c&amp;imitero</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="642"/>
+        <location filename="../src/player.cpp" line="650"/>
         <source>Cr&amp;eate predefined token</source>
         <translation>Cr&amp;a pedina predefinita</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="649"/>
+        <location filename="../src/player.cpp" line="657"/>
         <source>C&amp;ard</source>
         <translation>C&amp;arta</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="652"/>
+        <location filename="../src/player.cpp" line="660"/>
         <source>&amp;All players</source>
         <translation>&amp;Tutti i giocatori</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="655"/>
+        <location filename="../src/player.cpp" line="663"/>
         <source>&amp;Play</source>
         <translation>&amp;Gioca</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="656"/>
+        <location filename="../src/player.cpp" line="664"/>
         <source>&amp;Hide</source>
         <translation>&amp;Nascondi</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="657"/>
+        <location filename="../src/player.cpp" line="665"/>
         <source>Play &amp;Face Down</source>
         <translation>Gioca a &amp;Faccia in giù</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="659"/>
+        <location filename="../src/player.cpp" line="667"/>
         <source>&amp;Tap</source>
         <translation>&amp;Tappa</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="660"/>
+        <location filename="../src/player.cpp" line="668"/>
         <source>&amp;Untap</source>
         <translation>&amp;Stappa</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="661"/>
+        <location filename="../src/player.cpp" line="669"/>
         <source>Toggle &amp;normal untapping</source>
         <translation>Non &amp;stappa normalmente</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="662"/>
+        <location filename="../src/player.cpp" line="670"/>
         <source>&amp;Flip</source>
         <translation>&amp;Gira</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="663"/>
+        <location filename="../src/player.cpp" line="671"/>
         <source>&amp;Peek at card face</source>
         <translation>&amp;Sbircia la faccia della carta</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="664"/>
+        <location filename="../src/player.cpp" line="672"/>
         <source>&amp;Clone</source>
         <translation>&amp;Copia</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="666"/>
+        <location filename="../src/player.cpp" line="674"/>
         <source>Attac&amp;h to card...</source>
         <translation>Attacc&amp;a alla carta...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="667"/>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="668"/>
+        <location filename="../src/player.cpp" line="676"/>
         <source>Unattac&amp;h</source>
         <translation>Stacc&amp;a</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="669"/>
+        <location filename="../src/player.cpp" line="677"/>
         <source>&amp;Draw arrow...</source>
         <translation>&amp;Disegna una freccia...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="670"/>
+        <location filename="../src/player.cpp" line="678"/>
         <source>&amp;Increase power</source>
         <translation>&amp;Aumenta forza</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="671"/>
-        <source>Ctrl++</source>
-        <translation>Ctrl++</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="672"/>
+        <location filename="../src/player.cpp" line="680"/>
         <source>&amp;Decrease power</source>
         <translation>&amp;Diminuisci forza</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="673"/>
-        <source>Ctrl+-</source>
-        <translation>Ctrl+-</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="674"/>
+        <location filename="../src/player.cpp" line="682"/>
         <source>I&amp;ncrease toughness</source>
         <translation>A&amp;umenta costituzione</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="675"/>
-        <source>Alt++</source>
-        <translation>Alt++</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="676"/>
+        <location filename="../src/player.cpp" line="684"/>
         <source>D&amp;ecrease toughness</source>
         <translation>D&amp;iminuisci costituzione</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="677"/>
-        <source>Alt+-</source>
-        <translation>Alt+-</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="678"/>
+        <location filename="../src/player.cpp" line="686"/>
         <source>In&amp;crease power and toughness</source>
         <translation>Au&amp;menta forza e costituzione</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="679"/>
-        <source>Ctrl+Alt++</source>
-        <translation>Ctrl+Alt++</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="680"/>
+        <location filename="../src/player.cpp" line="688"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation>Dim&amp;inuisci forza e costituzione</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="681"/>
-        <source>Ctrl+Alt+-</source>
-        <translation>Ctrl-Alt+-</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="682"/>
+        <location filename="../src/player.cpp" line="690"/>
         <source>Set &amp;power and toughness...</source>
         <translation>Imposta &amp;forza e costituzione...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="683"/>
-        <source>Ctrl+P</source>
-        <translation>Ctrl+P</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="684"/>
+        <location filename="../src/player.cpp" line="692"/>
         <source>&amp;Set annotation...</source>
         <translation>&amp;Imposta annotazioni...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="686"/>
-        <source>red</source>
-        <translation>rosso</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="687"/>
-        <source>yellow</source>
-        <translation>giallo</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="688"/>
-        <source>green</source>
-        <translation>verde</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="690"/>
+        <location filename="../src/player.cpp" line="698"/>
         <source>&amp;Add counter (%1)</source>
         <translation>&amp;Aggiungi contatore (%1)</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="692"/>
+        <location filename="../src/player.cpp" line="700"/>
         <source>&amp;Remove counter (%1)</source>
         <translation>&amp;Rimuovi contatore (%1)</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="694"/>
+        <location filename="../src/player.cpp" line="702"/>
         <source>&amp;Set counters (%1)...</source>
         <translation>&amp;Imposta contatori (%1)...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="695"/>
-        <source>&amp;top of library</source>
-        <translation>&amp;cima al grimorio</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="696"/>
-        <source>&amp;bottom of library</source>
-        <translation>&amp;fondo del grimorio</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="697"/>
-        <source>&amp;graveyard</source>
-        <translation>&amp;cimitero</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="698"/>
-        <source>Ctrl+Del</source>
-        <translation>Ctrl+Del</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="699"/>
-        <source>&amp;exile</source>
-        <translation>&amp;esilio</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="710"/>
-        <source>Ctrl+F3</source>
-        <translation>Ctrl+F3</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="716"/>
-        <source>Ctrl+Shift+D</source>
-        <translation>Ctrl+Shift+D</translation>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="723"/>
-        <source>Ctrl+N</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="864"/>
+        <location filename="../src/player.cpp" line="872"/>
         <source>Draw cards</source>
         <translation>Pesca carte</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="864"/>
-        <location filename="../src/player.cpp" line="885"/>
-        <location filename="../src/player.cpp" line="914"/>
-        <location filename="../src/player.cpp" line="2117"/>
+        <location filename="../src/player.cpp" line="872"/>
+        <location filename="../src/player.cpp" line="893"/>
+        <location filename="../src/player.cpp" line="922"/>
+        <location filename="../src/player.cpp" line="2125"/>
         <source>Number:</source>
         <translation>Numero:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="885"/>
+        <location filename="../src/player.cpp" line="893"/>
         <source>Move top cards to grave</source>
         <translation>Metti le prima carte nel cimitero</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="914"/>
+        <location filename="../src/player.cpp" line="922"/>
         <source>Move top cards to exile</source>
         <translation>Metti le prime carte in esilio</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="980"/>
+        <location filename="../src/player.cpp" line="988"/>
         <source>Roll die</source>
         <translation>Lancia un dado</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="980"/>
+        <location filename="../src/player.cpp" line="988"/>
         <source>Number of sides:</source>
         <translation>Numero di facce:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1963"/>
+        <location filename="../src/player.cpp" line="1971"/>
         <source>Set power/toughness</source>
         <translation>Imposta forza/costituzione</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1963"/>
+        <location filename="../src/player.cpp" line="1971"/>
         <source>Please enter the new PT:</source>
         <translation>Inserisci la nuova FC:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2035"/>
+        <location filename="../src/player.cpp" line="2043"/>
         <source>Set annotation</source>
         <translation>Imposta annotazione</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2035"/>
+        <location filename="../src/player.cpp" line="2043"/>
         <source>Please enter the new annotation:</source>
         <translation>Inserisci le nuove annotazioni:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2117"/>
+        <location filename="../src/player.cpp" line="2125"/>
         <source>Set counters</source>
         <translation>Imposta i segnalini</translation>
     </message>
@@ -3743,39 +3631,6 @@ La tua versione è la %1, la versione online è la %2.</translation>
         <location filename="../src/deck_loader.cpp" line="9"/>
         <source>All files (*.*)</source>
         <translation>Tutti i files (*.*)</translation>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="31"/>
-        <source>&lt;1m ago</source>
-        <translation>&lt;1m fa</translation>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="34"/>
-        <source>&lt;5m ago</source>
-        <translation>&lt;5m fa</translation>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="41"/>
-        <location filename="../src/gamesmodel.cpp" line="58"/>
-        <source>m ago</source>
-        <extracomment>This will have a number prepended, like &quot;10m ago&quot;</extracomment>
-        <translation>m fa</translation>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="55"/>
-        <source>1hr </source>
-        <translation>1ora</translation>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="65"/>
-        <source>hr ago</source>
-        <extracomment>This will have a number prepended, like &quot;2h ago&quot;</extracomment>
-        <translation>ore fa</translation>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="67"/>
-        <source>5+ hrs ago</source>
-        <translation>+ di 5 ore fa</translation>
     </message>
 </context>
 <context>
@@ -3865,27 +3720,37 @@ La tua versione è la %1, la versione online è la %2.</translation>
 <context>
     <name>SetsModel</name>
     <message>
-        <location filename="../src/setsmodel.cpp" line="42"/>
+        <location filename="../src/setsmodel.cpp" line="65"/>
         <source>Key</source>
         <translation>Chiave</translation>
     </message>
     <message>
-        <location filename="../src/setsmodel.cpp" line="43"/>
+        <location filename="../src/setsmodel.cpp" line="66"/>
+        <source>Is known</source>
+        <translation>Conosciuto</translation>
+    </message>
+    <message>
+        <location filename="../src/setsmodel.cpp" line="67"/>
+        <source>Enabled</source>
+        <translation>Attivo</translation>
+    </message>
+    <message>
+        <location filename="../src/setsmodel.cpp" line="68"/>
         <source>Set type</source>
         <translation>Tipo set</translation>
     </message>
     <message>
-        <location filename="../src/setsmodel.cpp" line="44"/>
+        <location filename="../src/setsmodel.cpp" line="69"/>
         <source>Set code</source>
         <translation>Codice set</translation>
     </message>
     <message>
-        <location filename="../src/setsmodel.cpp" line="45"/>
+        <location filename="../src/setsmodel.cpp" line="70"/>
         <source>Long name</source>
         <translation>Nome lungo</translation>
     </message>
     <message>
-        <location filename="../src/setsmodel.cpp" line="46"/>
+        <location filename="../src/setsmodel.cpp" line="71"/>
         <source>Release date</source>
         <translation>Data di rilascio</translation>
     </message>
@@ -3954,184 +3819,179 @@ La tua versione è la %1, la versione online è la %2.</translation>
 <context>
     <name>TabDeckEditor</name>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="312"/>
+        <location filename="../src/tab_deck_editor.cpp" line="323"/>
         <source>&amp;Print deck...</source>
         <translation>&amp;Stampa mazzo...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="314"/>
+        <location filename="../src/tab_deck_editor.cpp" line="326"/>
         <source>&amp;Close</source>
         <translation>&amp;Chiudi</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="315"/>
-        <source>Ctrl+Q</source>
-        <translation>Ctrl+Q</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="330"/>
+        <location filename="../src/tab_deck_editor.cpp" line="342"/>
         <source>&amp;Edit sets...</source>
         <translation>&amp;Modifica set...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="297"/>
+        <location filename="../src/tab_deck_editor.cpp" line="308"/>
         <source>&amp;Clear search</source>
         <translation>&amp;Annulla ricerca</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="299"/>
+        <location filename="../src/tab_deck_editor.cpp" line="310"/>
         <source>Deck &amp;name:</source>
         <translation>&amp;Nome mazzo:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="300"/>
+        <location filename="../src/tab_deck_editor.cpp" line="311"/>
         <source>&amp;Comments:</source>
         <translation>&amp;Commenti:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="301"/>
+        <location filename="../src/tab_deck_editor.cpp" line="312"/>
         <source>Hash:</source>
         <translation>Hash:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="306"/>
+        <location filename="../src/tab_deck_editor.cpp" line="317"/>
         <source>&amp;New deck</source>
         <translation>&amp;Nuovo mazzo</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="307"/>
+        <location filename="../src/tab_deck_editor.cpp" line="318"/>
         <source>&amp;Load deck...</source>
         <translation>&amp;Carica mazzo...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="308"/>
+        <location filename="../src/tab_deck_editor.cpp" line="319"/>
         <source>&amp;Save deck</source>
         <translation>&amp;Salva mazzo</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="309"/>
+        <location filename="../src/tab_deck_editor.cpp" line="320"/>
         <source>Save deck &amp;as...</source>
         <translation>Salva mazzo &amp;con nome...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="310"/>
+        <location filename="../src/tab_deck_editor.cpp" line="321"/>
         <source>Load deck from cl&amp;ipboard...</source>
         <translation>Carica mazzo dagli app&amp;unti...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="311"/>
+        <location filename="../src/tab_deck_editor.cpp" line="322"/>
         <source>Save deck to clip&amp;board</source>
         <translation>Salva mazzo nei app&amp;unti</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="313"/>
+        <location filename="../src/tab_deck_editor.cpp" line="324"/>
         <source>&amp;Analyze deck on deckstats.net</source>
         <translation>&amp;Analizza il mazzo con deckstats.net</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="317"/>
+        <location filename="../src/tab_deck_editor.cpp" line="325"/>
+        <source>Open custom image folder</source>
+        <translation>Apri cartella immagini personalizzate</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="329"/>
         <source>Add card to &amp;maindeck</source>
         <translation>Aggiungi carta al &amp;grimorio</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="318"/>
+        <location filename="../src/tab_deck_editor.cpp" line="330"/>
         <source>Add card to &amp;sideboard</source>
         <translation>Aggiungi carta al &amp;sideboard</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="296"/>
+        <location filename="../src/tab_deck_editor.cpp" line="339"/>
+        <source>&amp;Deck Editor</source>
+        <translation>Editor di mazzi</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="340"/>
+        <source>C&amp;ard Database</source>
+        <translation>Database delle C&amp;arte</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="810"/>
+        <source>New sets found</source>
+        <translation>Nuovi set trovati</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="810"/>
+        <source>%1 new set(s) have been found in the card database. Do you want to enable them?</source>
+        <translation>%1 nuovi set sono stati trovati nel database delle carte. Desideri attivarli?</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="307"/>
         <source>Show card text only</source>
         <translation>Mostra solo testo carta</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="320"/>
+        <location filename="../src/tab_deck_editor.cpp" line="332"/>
         <source>&amp;Remove row</source>
         <translation>&amp;Rimuovi carta</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="321"/>
-        <source>Del</source>
-        <translation>Elimina</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="322"/>
+        <location filename="../src/tab_deck_editor.cpp" line="334"/>
         <source>&amp;Increment number</source>
         <translation>&amp;Aumenta il numero</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="323"/>
-        <source>+</source>
-        <translation>+</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="324"/>
+        <location filename="../src/tab_deck_editor.cpp" line="336"/>
         <source>&amp;Decrement number</source>
         <translation>&amp;Diminuisci il numero</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="325"/>
-        <source>-</source>
-        <translation>-</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="327"/>
-        <source>&amp;Deck editor</source>
-        <translation>&amp;Editore di mazzi</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="328"/>
-        <source>C&amp;ard database</source>
-        <translation>Database delle C&amp;arte</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="331"/>
+        <location filename="../src/tab_deck_editor.cpp" line="343"/>
         <source>Edit &amp;tokens...</source>
         <translation>Modifica &amp;pedine...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="336"/>
+        <location filename="../src/tab_deck_editor.cpp" line="348"/>
         <source>Deck: %1</source>
         <translation>Mazzo: %1</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="384"/>
+        <location filename="../src/tab_deck_editor.cpp" line="396"/>
         <source>Are you sure?</source>
         <translation>Sei sicuro?</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="385"/>
+        <location filename="../src/tab_deck_editor.cpp" line="397"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation>La lista del mazzo è stata modificata.
 Vuoi salvare i cambiamenti?</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="418"/>
+        <location filename="../src/tab_deck_editor.cpp" line="430"/>
         <source>Load deck</source>
         <translation>Carica mazzo</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="437"/>
-        <location filename="../src/tab_deck_editor.cpp" line="461"/>
-        <location filename="../src/tab_deck_editor.cpp" line="481"/>
+        <location filename="../src/tab_deck_editor.cpp" line="449"/>
+        <location filename="../src/tab_deck_editor.cpp" line="473"/>
+        <location filename="../src/tab_deck_editor.cpp" line="493"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="437"/>
+        <location filename="../src/tab_deck_editor.cpp" line="449"/>
         <source>The deck could not be saved.</source>
         <translation>Il mazzo non può essere salvato.</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="461"/>
-        <location filename="../src/tab_deck_editor.cpp" line="481"/>
+        <location filename="../src/tab_deck_editor.cpp" line="473"/>
+        <location filename="../src/tab_deck_editor.cpp" line="493"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation>Il mazzo non può essere salvato.
 Controlla se la cartella è valida e prova ancora.</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="467"/>
+        <location filename="../src/tab_deck_editor.cpp" line="479"/>
         <source>Save deck</source>
         <translation>Salva mazzo</translation>
     </message>
@@ -4228,36 +4088,6 @@ Please enter a name:</source>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="460"/>
-        <source>F5</source>
-        <translation>F5</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="461"/>
-        <source>F6</source>
-        <translation>F6</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="462"/>
-        <source>F7</source>
-        <translation>F7</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="463"/>
-        <source>F8</source>
-        <translation>F8</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="464"/>
-        <source>F9</source>
-        <translation>F9</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="465"/>
-        <source>F10</source>
-        <translation>F10</translation>
-    </message>
-    <message>
         <location filename="../src/tab_game.cpp" line="524"/>
         <source>&amp;Phases</source>
         <translation>&amp;Fasi</translation>
@@ -4273,39 +4103,14 @@ Please enter a name:</source>
         <translation>Prossima &amp;fase</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="530"/>
-        <source>Ctrl+Space</source>
-        <translation>Ctrl+Space</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="530"/>
-        <source>Tab</source>
-        <translation>Tab</translation>
-    </message>
-    <message>
         <location filename="../src/tab_game.cpp" line="533"/>
         <source>Next &amp;turn</source>
         <translation>Prossimo &amp;turno</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="534"/>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="534"/>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl+Enter</translation>
-    </message>
-    <message>
         <location filename="../src/tab_game.cpp" line="537"/>
         <source>&amp;Remove all local arrows</source>
         <translation>&amp;Rimuovi tutte le frecce</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="538"/>
-        <source>Ctrl+R</source>
-        <translation>Ctrl+R</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="541"/>
@@ -4318,20 +4123,9 @@ Please enter a name:</source>
         <translation>&amp;Concedi</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="544"/>
-        <source>F2</source>
-        <translation>F2</translation>
-    </message>
-    <message>
         <location filename="../src/tab_game.cpp" line="547"/>
         <source>&amp;Leave game</source>
         <translation>&amp;Lascia partita</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="548"/>
-        <location filename="../src/tab_game.cpp" line="552"/>
-        <source>Ctrl+Q</source>
-        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="551"/>
@@ -4364,22 +4158,22 @@ Please enter a name:</source>
         <translation>Sei sicuro di voler lasciare la partita?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="819"/>
+        <location filename="../src/tab_game.cpp" line="820"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
         <translation>Stai spammando la partita. Attendi un paio di secondi.</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1067"/>
+        <location filename="../src/tab_game.cpp" line="1068"/>
         <source>You have been kicked out of the game.</source>
         <translation>Sei stato kickato fuori dalla partita.</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1161"/>
+        <location filename="../src/tab_game.cpp" line="1162"/>
         <source>Replay %1: %2</source>
         <translation>Replay %1: %2</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1163"/>
+        <location filename="../src/tab_game.cpp" line="1164"/>
         <source>Game %1: %2</source>
         <translation>Partita %1: %2</translation>
     </message>
@@ -4485,11 +4279,6 @@ Please enter a name:</source>
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="62"/>
-        <source>F12</source>
-        <translation>F12</translation>
-    </message>
-    <message>
         <location filename="../src/tab_room.cpp" line="125"/>
         <source>&amp;Say:</source>
         <translation>&amp;Parla:</translation>
@@ -4522,12 +4311,12 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_room.cpp" line="143"/>
         <source> mentioned you.</source>
-        <translation type="unfinished"/>
+        <translation>ti ha menzionato.</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="143"/>
         <source>Click to view</source>
-        <translation type="unfinished"/>
+        <translation>Clicca per visualizzare</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="184"/>
@@ -4571,7 +4360,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_userlists.h" line="48"/>
         <source>Account</source>
-        <translation type="unfinished"/>
+        <translation>Account</translation>
     </message>
 </context>
 <context>
@@ -4773,8 +4562,8 @@ Please enter a name:</source>
     <name>UserList</name>
     <message>
         <location filename="../src/userlist.cpp" line="243"/>
-        <source>Users online: %1</source>
-        <translation>Utenti online: %1</translation>
+        <source>Users connected to server: %1</source>
+        <translation>Utenti connessi al server: %1</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="244"/>
@@ -4795,47 +4584,67 @@ Please enter a name:</source>
 <context>
     <name>WndSets</name>
     <message>
-        <location filename="../src/window_sets.cpp" line="42"/>
-        <source>Save set ordering</source>
-        <translation>Salva ordinamento dei set</translation>
-    </message>
-    <message>
-        <location filename="../src/window_sets.cpp" line="44"/>
-        <source>Restore saved set ordering</source>
-        <translation>Ripristina ordinamento salvato</translation>
-    </message>
-    <message>
         <location filename="../src/window_sets.cpp" line="46"/>
+        <source>Enable set</source>
+        <translation>Attiva set</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="48"/>
+        <source>Disable set</source>
+        <translation>Disattiva set</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="50"/>
+        <source>Enable all sets</source>
+        <translation>Attiva tutti i set</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="52"/>
+        <source>Disable all sets</source>
+        <translation>Disattiva tutti i set</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="55"/>
         <source>Move selected set up</source>
         <translation>Muovi set selezionato su</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="48"/>
+        <location filename="../src/window_sets.cpp" line="57"/>
         <source>Move selected set down</source>
         <translation>Muovi set selezionato giù</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="50"/>
+        <location filename="../src/window_sets.cpp" line="59"/>
         <source>Move selected set to top</source>
         <translation>Muovi set selezionato in cima</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="52"/>
+        <location filename="../src/window_sets.cpp" line="61"/>
         <source>Move selected set to bottom</source>
         <translation>Muovi set selezionato in fondo</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="79"/>
+        <location filename="../src/window_sets.cpp" line="74"/>
+        <source>Enable sets</source>
+        <translation>Attiva i set</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="82"/>
+        <source>Sort sets</source>
+        <translation>Ordina i set</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="104"/>
         <source>Edit sets</source>
         <translation>Modifica impostazioni</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="90"/>
+        <location filename="../src/window_sets.cpp" line="115"/>
         <source>Success</source>
         <translation>Successo</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="90"/>
+        <location filename="../src/window_sets.cpp" line="115"/>
         <source>The sets database has been saved successfully.</source>
         <translation>Il database dei set è stato salvato correttamente.</translation>
     </message>

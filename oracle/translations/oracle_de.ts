@@ -1,34 +1,5 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">
 <context>
-    <name>ChooseSetsPage</name>
-    <message>
-        <source>Sets selection</source>
-        <translation>Editionsauswahl</translation>
-    </message>
-    <message>
-        <source>The following sets has been found in the source file. Please mark the sets that will be imported.
-All core and expansion sets are selected by default.</source>
-        <translation>Die folgenden Editionen wurden in der Quelldatei gefunden. Bitte markieren Sie alle Editionen die importiert werden sollen.
-Alle Haupt- und Erweiterungssets sind standardmäßig ausgewählt.</translation>
-    </message>
-    <message>
-        <source>&amp;Check all</source>
-        <translation>Alle auswählen</translation>
-    </message>
-    <message>
-        <source>&amp;Uncheck all</source>
-        <translation>Alle abwählen</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Fehler</translation>
-    </message>
-    <message>
-        <source>Please mark at least one set.</source>
-        <translation>Bitte wähle mindestens eine Edition aus.</translation>
-    </message>
-</context>
-<context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>
@@ -154,7 +125,7 @@ Sie müssen dazu eine URL oder einen Dateinamen die/der als Quelle genutzt werde
     <name>OracleWizard</name>
     <message>
         <source>Oracle Importer</source>
-        <translation>Oracle Datenbankaktualisierer</translation>
+        <translation>Oracle Importer</translation>
     </message>
     <message>
         <source>Save</source>

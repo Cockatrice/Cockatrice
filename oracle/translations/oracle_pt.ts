@@ -1,33 +1,5 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="pt" version="2.1">
 <context>
-    <name>ChooseSetsPage</name>
-    <message>
-        <source>Sets selection</source>
-        <translation>Seleção das edições</translation>
-    </message>
-    <message>
-        <source>The following sets has been found in the source file. Please mark the sets that will be imported.
-All core and expansion sets are selected by default.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>&amp;Check all</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>&amp;Uncheck all</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Erro</translation>
-    </message>
-    <message>
-        <source>Please mark at least one set.</source>
-        <translation>Por favor, marque pelo menos uma edição.</translation>
-    </message>
-</context>
-<context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>

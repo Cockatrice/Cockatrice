@@ -1,33 +1,5 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="et" version="2.1">
 <context>
-    <name>ChooseSetsPage</name>
-    <message>
-        <source>Sets selection</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>The following sets has been found in the source file. Please mark the sets that will be imported.
-All core and expansion sets are selected by default.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>&amp;Check all</source>
-        <translation>&amp;Märgi kõik</translation>
-    </message>
-    <message>
-        <source>&amp;Uncheck all</source>
-        <translation>&amp;Ära märgi kõiki</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Viga</translation>
-    </message>
-    <message>
-        <source>Please mark at least one set.</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>
@@ -50,7 +22,7 @@ All core and expansion sets are selected by default.</source>
     <name>LoadSetsPage</name>
     <message>
         <source>Source selection</source>
-        <translation type="unfinished"/>
+        <translation>Allika valik</translation>
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
@@ -102,43 +74,43 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Cannot open file &apos;%1&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>Ei suudeta avada &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>Allalaadimine (%1MB)</translation>
     </message>
     <message>
         <source>Network error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Võrgu viga: %1.</translation>
     </message>
     <message>
         <source>Parsing file</source>
-        <translation type="unfinished"/>
+        <translation>Faili hankimine</translation>
     </message>
     <message>
         <source>Failed to open Zip archive: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Zip-arhiivi avamine ebaõnnestus: %1.</translation>
     </message>
     <message>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
-        <translation type="unfinished"/>
+        <translation>Zip-i lahtipakkimine ebaõnnestus: Zip-arhiiv sisaldab rohkem faile kui üks.</translation>
     </message>
     <message>
         <source>Zip extraction failed: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Zipi lahtipakkimine ebaõnnestus: %1.</translation>
     </message>
     <message>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
-        <translation type="unfinished"/>
+        <translation>Vabandame, aga antud Oracle versioon ei toeta kokkupakitud faile.</translation>
     </message>
     <message>
         <source>Do you want to try to download a fresh copy of the uncompressed file instead?</source>
-        <translation type="unfinished"/>
+        <translation>Soovite hoopis alla laadida pakkimata faili värske koopia?</translation>
     </message>
     <message>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
-        <translation type="unfinished"/>
+        <translation>Fail on edukalt alla laetud, ent ei sisalda andmeid.</translation>
     </message>
 </context>
 <context>
@@ -152,11 +124,11 @@ All core and expansion sets are selected by default.</source>
     <name>OracleWizard</name>
     <message>
         <source>Oracle Importer</source>
-        <translation type="unfinished"/>
+        <translation>Oracle importija</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"/>
+        <translation>Salvesta</translation>
     </message>
 </context>
 <context>
@@ -171,11 +143,11 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Save to the default path (recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Salvesta tavalisse asukohta (soovitatud)</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Viga</translation>
     </message>
     <message>
         <source>No set has been imported.</source>
@@ -183,79 +155,80 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Import finished: %1 cards.</source>
-        <translation type="unfinished"/>
+        <translation>%1 kaarti imporditi edukalt.</translation>
     </message>
     <message>
         <source>%1: %2 cards imported</source>
-        <translation type="unfinished"/>
+        <translation>%1: imporditi %2 kaarti</translation>
     </message>
     <message>
         <source>Save card database</source>
-        <translation type="unfinished"/>
+        <translation>Salvesta kaardi andmebaas</translation>
     </message>
     <message>
         <source>XML; card database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; kaardi andmebaas (*.xml)</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Valmis</translation>
     </message>
     <message>
         <source>The card database has been saved successfully to
 %1</source>
-        <translation type="unfinished"/>
+        <translation>Kaardi andmebaas salvestati edukalt asukohta
+%1</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>
-        <translation type="unfinished"/>
+        <translation>Faili salvestamine asukohta %1 ebaõnnestus</translation>
     </message>
 </context>
 <context>
     <name>UnZip</name>
     <message>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Zip-i tegevus oli edukas.</translation>
     </message>
     <message>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Zlibi kogu ei suudetud ette valmistada või laadida.</translation>
     </message>
     <message>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>zlibi kogu viga.</translation>
     </message>
     <message>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Faili ei suudetud luua või avada.</translation>
     </message>
     <message>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation type="unfinished"/>
+        <translation>Osaliselt vigane arhiiv. Ainult osa faile võidakse lahti pakkida.</translation>
     </message>
     <message>
         <source>Corrupted archive.</source>
-        <translation type="unfinished"/>
+        <translation>Kahjustunud arhiiv.</translation>
     </message>
     <message>
         <source>Wrong password.</source>
-        <translation type="unfinished"/>
+        <translation>Vale parool.</translation>
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>Loodud arhiivid puuduvad.</translation>
     </message>
     <message>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>Faili või asukohta pole olemas.</translation>
     </message>
     <message>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Faili lugemise viga.</translation>
     </message>
     <message>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Faili kirjutamise viga.</translation>
     </message>
     <message>
         <source>File seek error.</source>
@@ -263,15 +236,15 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Unable to create a directory.</source>
-        <translation type="unfinished"/>
+        <translation>Asukoha loomine ebaõnnestus.</translation>
     </message>
     <message>
         <source>Invalid device.</source>
-        <translation type="unfinished"/>
+        <translation>Vigane seade.</translation>
     </message>
     <message>
         <source>Invalid or incompatible zip archive.</source>
-        <translation type="unfinished"/>
+        <translation>Vigane või mittetoetatav zip-arhiiv.</translation>
     </message>
     <message>
         <source>Inconsistent headers. Archive might be corrupted.</source>
@@ -279,42 +252,42 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Tundmatu viga.</translation>
     </message>
 </context>
 <context>
     <name>Zip</name>
     <message>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Zip-tegevus on valmis.</translation>
     </message>
     <message>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Zlib kogu ei suudetud ette valmistada või laadida.</translation>
     </message>
     <message>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>zlibi kogu viga.</translation>
     </message>
     <message>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Faili loomine või avamine ebaõnnestus.</translation>
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>Loodud arhiivid puuduvad.</translation>
     </message>
     <message>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>Faili või asukohta pole olemas.</translation>
     </message>
     <message>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Faili lugemise viga.</translation>
     </message>
     <message>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Faili kirjutamise viga.</translation>
     </message>
     <message>
         <source>File seek error.</source>
@@ -322,7 +295,7 @@ All core and expansion sets are selected by default.</source>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Tundmatu viga.</translation>
     </message>
 </context>
 </TS>
