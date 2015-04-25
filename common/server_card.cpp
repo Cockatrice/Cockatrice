@@ -23,7 +23,7 @@
 #include "pb/serverinfo_card.pb.h"
 
 Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)
-    : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false), facedown(false), color(QString()), power(0), toughness(0), annotation(QString()), destroyOnZoneChange(false), doesntUntap(false), parentCard(0)
+    : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false), facedown(false), color(QString()), power(-1), toughness(-1), annotation(QString()), destroyOnZoneChange(false), doesntUntap(false), parentCard(0)
 {
 }
 
@@ -42,8 +42,8 @@ void Server_Card::resetState()
     counters.clear();
     setTapped(false);
     setAttacking(false);
-    power = 0;
-    toughness = 0;
+    power = -1;
+    toughness = -1;
     setAnnotation(QString());
     setDoesntUntap(false);
 }
@@ -90,7 +90,6 @@ void Server_Card::setPT(const QString &_pt)
         if ((p1[0] == '+') || (p2[0] == '+'))
             if (toughness < 0)
                 toughness = 0;
-
         if (p1[0] == '+')
             power += p1.mid(1).toInt();
         else
