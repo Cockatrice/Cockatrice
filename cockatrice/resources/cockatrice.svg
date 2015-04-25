@@ -28,12 +28,12 @@
      id="namedview132"
      showgrid="false"
      inkscape:zoom="2.2250293"
-     inkscape:cx="154.75154"
+     inkscape:cx="56.550586"
      inkscape:cy="144.68557"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer9" />
+     inkscape:current-layer="layer6" />
   <defs
      id="defs4">
     <linearGradient
@@ -590,14 +590,14 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
      inkscape:groupmode="layer"
      id="layer6"
-     inkscape:label="background"
+     inkscape:label="rounded corners"
      style="display:inline">
     <g
        style="display:inline"
@@ -710,90 +710,4 @@
      style="display:inline"
      id="layer2"
      transform="matrix(0.99103064,0,0,0.98943856,1.2668213,1.9022887)" />
-  <g
-     inkscape:groupmode="layer"
-     id="layer7"
-     inkscape:label="picture"
-     style="display:inline">
-    <g
-       style="display:inline"
-       id="layer10">
-      <g
-         id="g3026">
-        <g
-           clip-path="none"
-           style="display:inline"
-           id="layer4"
-           transform="matrix(0.99103064,0,0,0.98943856,1.2668213,1.9022887)" />
-        <g
-           clip-path="none"
-           style="display:inline;fill:#ffffff;fill-opacity:1"
-           id="layer5"
-           transform="matrix(0.99103064,0,0,0.98943856,1.2668213,1.9022887)">
-          <g
-             style="fill:#ffffff;fill-opacity:1"
-             transform="matrix(1.0090505,0,0,1.0106742,411.46737,-30.548174)"
-             id="g3342">
-            <g
-               id="layer1-27"
-               style="display:none;fill:#ffffff;fill-opacity:1">
-              <circle
-                 r="149.64285"
-                 cy="149.64285"
-                 cx="150.35715"
-                 style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0;filter:url(#filter4089-5)"
-                 id="path3221-6"
-                 transform="matrix(1.0015936,0,0,1.0000039,-0.00173336,0.71369073)" />
-              <ellipse
-                 ry="37.142857"
-                 rx="63.57143"
-                 cy="63.57143"
-                 cx="149.28572"
-                 style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-opacity:0"
-                 id="path4007-1"
-                 transform="matrix(1.7575395,0,0,2.3083681,-112.20297,-59.060263)" />
-            </g>
-            <g
-               transform="translate(-706.77969,-20.338983)"
-               id="layer2-2"
-               style="display:inline;fill:#ffffff;fill-opacity:1">
-              <g
-                 style="fill:#ffffff"
-                 transform="translate(-6.9915273,131.5678)"
-                 id="g3350">
-                <g
-                   id="layer1-1"
-                   style="display:none;fill:#ffffff">
-                  <circle
-                     r="149.64285"
-                     cy="149.64285"
-                     cx="150.35715"
-                     style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0;filter:url(#filter4089-4)"
-                     id="path3221-9"
-                     transform="matrix(1.0015936,0,0,1.0000039,-0.00173336,0.71369073)" />
-                  <ellipse
-                     ry="37.142857"
-                     rx="63.57143"
-                     cy="63.57143"
-                     cx="149.28572"
-                     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-opacity:0"
-                     id="path4007-8"
-                     transform="matrix(1.7575395,0,0,2.3083681,-112.20297,-59.060263)" />
-                </g>
-                <g
-                   transform="translate(-3.8135597,-59.110169)"
-                   id="layer2-5"
-                   style="display:inline;fill:#ffffff" />
-              </g>
-            </g>
-          </g>
-        </g>
-      </g>
-    </g>
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer8"
-     inkscape:label="shape"
-     style="display:inline" />
 </svg>
