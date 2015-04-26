@@ -430,6 +430,8 @@ MainWindow::MainWindow(QWidget *parent)
         createTrayActions();
         createTrayIcon();
     }
+
+    serverShutdownMessageBox = 0;
 }
 
 MainWindow::~MainWindow()
