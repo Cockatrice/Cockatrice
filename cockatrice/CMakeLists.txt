@@ -242,6 +242,7 @@ if(UNIX)
         set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
         set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
         set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+        set_target_properties(cockatrice PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
         INSTALL(TARGETS cockatrice BUNDLE DESTINATION ./)
         INSTALL(FILES ${cockatrice_QM} DESTINATION ./cockatrice.app/Contents/Resources/translations)
