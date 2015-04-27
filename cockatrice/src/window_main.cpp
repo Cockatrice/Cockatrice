@@ -225,17 +225,18 @@ void MainWindow::actAbout()
     QMessageBox::about(this, tr("About Cockatrice"), QString(
         "<font size=\"8\"><b>Cockatrice</b></font><br>"
         + tr("Version %1").arg(VERSION_STRING)
-        + "<br><br><br><b>" + tr("Authors:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
+        + "<br><br><b>" + tr("Project Manager:") + "</b><br>Gavin Bisesi<br><br>"
+        + "<b>" + tr("Past Project Managers:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
+        + "<b>" + tr("Developers:") + "</b><br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c'>" + tr("Our Developers") + "</a><br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice#cockatrice'>" + tr("Help Develop!") + "</a><br><br>"
         + "<b>" + tr("Translators:") + "</b><br>"
-        + tr("Spanish:") + " Víctor Martínez<br>"
-        + tr("Portugese (Portugal):") + " Milton Gonçalves<br>"
-        + tr("Portugese (Brazil):") + " Thiago Queiroz<br>"
-        + tr("French:") + " Yannick Hammer, Arnaud Faes<br>"
-        + tr("Japanese:") + " Nagase Task<br>"
-        + tr("Korean:") + " Jaeic Lee<br>"
-        + tr("Russian:") + " Alexander Davidov<br>"
-        + tr("Italian:") + " Luigi Sciolla<br>"
-        + tr("Swedish:") + " Jessica Dahl<br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Translators'>" + tr("Recognition Page") + "</a><br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ'>" + tr("Help Translate!") + "</a><br><br>"
+        + "<b>" + tr("Support:") + "</b><br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice/issues'>" + tr("Report an Issue") + "</a><br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice/issues'>" + tr("Suggest an Improvement") + "</a><br>"
+        
     ));
 }
 
