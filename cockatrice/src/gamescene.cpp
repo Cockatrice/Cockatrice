@@ -198,8 +198,14 @@ void GameScene::processViewSizeChange(const QSize &newSize)
 
     qreal extraWidthPerColumn = (newWidth - minWidth) / playersByColumn.size();
     for (int col = 0; col < playersByColumn.size(); ++col)
-        for (int row = 0; row < playersByColumn[col].size(); ++row)
-            playersByColumn[col][row]->processSceneSizeChange(minWidthByColumn[col] + extraWidthPerColumn);
+		for (int row = 0; row < playersByColumn[col].size(); ++row){
+			playersByColumn[col][row]->processSceneSizeChange(minWidthByColumn[col] + extraWidthPerColumn);
+			if (col == 0)
+				playersByColumn[col][row]->setPos(phasesToolbar->getWidth(), playersByColumn[col][row]->y());
+			else
+				playersByColumn[col][row]->setPos(phasesToolbar->getWidth() + (newWidth - phasesToolbar->getWidth()) / 2, playersByColumn[col][row]->y());
+		}
+
 }
 
 void GameScene::updateHover(const QPointF &scenePos)
