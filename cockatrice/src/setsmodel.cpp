@@ -62,8 +62,8 @@ QVariant SetsModel::headerData(int section, Qt::Orientation orientation, int rol
     if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
         return QVariant();
     switch (section) {
-        case SortKeyCol: return tr("Key");
-        case IsKnownCol: return tr("Is known");
+        case SortKeyCol: return QString("Key"); /* no tr() for translations needed, column just used for sorting --> hidden */
+        case IsKnownCol: return QString("Is known"); /* no tr() for translations needed, column is just used for sorting --> hidden */
         case EnabledCol: return tr("Enabled");
         case SetTypeCol: return tr("Set type");
         case ShortNameCol: return tr("Set code");
