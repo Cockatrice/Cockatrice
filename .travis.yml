@@ -20,3 +20,7 @@ notifications:
     on_start: false
 matrix:
   fast_finish: true
+  allow_failures:
+    - compiler: gcc
+      os: osx
+      env: QT4=0
