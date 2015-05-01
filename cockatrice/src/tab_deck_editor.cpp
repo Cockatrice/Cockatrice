@@ -293,8 +293,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     
     resize(950, 700);
 
-    connect(this, SIGNAL(setListChanged()), db, SIGNAL(cardListChanged()));
-    QTimer::singleShot(0, this, SLOT(checkUnknownSets()));
+    QTimer::singleShot(0, this, SLOT(checkFirstRunDetected()));
 }
 
 TabDeckEditor::~TabDeckEditor()
@@ -786,39 +785,11 @@ void TabDeckEditor::filterRemove(QAction *action) {
     filterModel->removeRow(idx.row(), idx.parent());
 }
 
-void TabDeckEditor::checkUnknownSets()
+void TabDeckEditor::checkFirstRunDetected()
 {
-    SetList sets = db->getSetList();
-
-    // no set is enabled. Probably this is the first time running trice
-    if(!sets.getEnabledSetsNum())
+    if(db->hasDetectedFirstRun())
     {
-        sets.guessSortKeys();
-        sets.sortByKey();
-        sets.enableAll();
-        db->emitCardListChanged();
-
+        QMessageBox::information(this, tr("Welcome"), tr("Hi! Its seems like it's the first time you run this version of Cockatrice.<br/>All the sets in the card database have been enabled; if you want to hide a set from the deck editor, disable it in the \"Edit Sets\" window."));
         actEditSets();
-        return;
-    }
-
-    int numUnknownSets = sets.getUnknownSetsNum();
-    // no unkown sets. 
-    if(!numUnknownSets)
-        return;
-
-    int ret = QMessageBox::question(this, tr("New sets found"), tr("%1 new set(s) have been found in the card database. Do you want to enable them?").arg(numUnknownSets), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
-
-    switch(ret)
-    {
-        case QMessageBox::No:
-            sets.markAllAsKnown();
-            break;
-        case QMessageBox::Yes:
-            sets.enableAllUnknown();
-            db->emitCardListChanged();
-            break;
-        default:
-            break;
     }
 }
