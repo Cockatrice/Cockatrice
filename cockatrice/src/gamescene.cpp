@@ -127,7 +127,12 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
         zoneViews.append(item);
         connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
     addItem(item);
-    item->setPos(50, 50);
+    if (zoneName=="grave")
+        item->setPos(360, 100);
+    else if (zoneName=="rfg")
+        item->setPos(380, 120);
+    else
+        item->setPos(340, 80);
 }
 
 void GameScene::addRevealedZoneView(Player *player, CardZone *zone, const QList<const ServerInfo_Card *> &cardList, bool withWritePermission)
@@ -136,7 +141,7 @@ void GameScene::addRevealedZoneView(Player *player, CardZone *zone, const QList<
     zoneViews.append(item);
         connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
     addItem(item);
-    item->setPos(50, 50);
+    item->setPos(600, 80);
 }
 
 void GameScene::removeZoneView(ZoneViewWidget *item)
