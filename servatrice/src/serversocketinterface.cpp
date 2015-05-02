@@ -160,7 +160,21 @@ void ServerSocketInterface::readClient()
             return;
 
         CommandContainer newCommandContainer;
-        newCommandContainer.ParseFromArray(inputBuffer.data(), messageLength);
+        try {
+            newCommandContainer.ParseFromArray(inputBuffer.data(), messageLength);
+        }
+        catch(std::exception &e) {
+            qDebug() << "Caught std::exception in" << __FILE__ << __LINE__ << __PRETTY_FUNCTION__;
+            qDebug() << "Exception:" << e.what();
+            qDebug() << "Message coming from:" << getAddress();
+            qDebug() << "Message length:" << messageLength;
+            qDebug() << "Message content:" << inputBuffer.toHex();
+        }
+        catch(...) {
+            qDebug() << "Unhandled exception in" << __FILE__ << __LINE__ << __PRETTY_FUNCTION__;
+            qDebug() << "Message coming from:" << getAddress();
+        }
+
         inputBuffer.remove(0, messageLength);
         messageInProgress = false;
 
