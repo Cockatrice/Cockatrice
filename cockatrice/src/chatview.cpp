@@ -242,7 +242,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 cursor.insertText(mention, mentionFormat);
                 message = message.mid(mention.size());
                 QApplication::alert(this);
-                if (shouldShowSystemPopup()) {
+                if (settingsCache->getShowMentionPopup() && shouldShowSystemPopup()) {
                     QString ref = sender.left(sender.length() - 2);
                     showSystemPopup(ref);
                 }
