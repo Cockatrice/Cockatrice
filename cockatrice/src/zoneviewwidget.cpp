@@ -79,14 +79,21 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 
     vbox->addItem(hbox);
 
+    QGraphicsLinearLayout *hPilebox = 0;
+
     if (numberCards < 0) {
+        hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
+        QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
+
         QGraphicsProxyWidget *sortByNameProxy = new QGraphicsProxyWidget;
         sortByNameProxy->setWidget(&sortByNameCheckBox);
-        vbox->addItem(sortByNameProxy);
+        hFilterbox->addItem(sortByNameProxy);
 
         QGraphicsProxyWidget *sortByTypeProxy = new QGraphicsProxyWidget;
         sortByTypeProxy->setWidget(&sortByTypeCheckBox);
-        vbox->addItem(sortByTypeProxy);
+        hFilterbox->addItem(sortByTypeProxy);
+
+        vbox->addItem(hFilterbox);
 
         QGraphicsProxyWidget *lineProxy = new QGraphicsProxyWidget;
         QFrame *line = new QFrame;
@@ -97,15 +104,17 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 
         QGraphicsProxyWidget *pileViewProxy = new QGraphicsProxyWidget;
         pileViewProxy->setWidget(&pileViewCheckBox);
-        vbox->addItem(pileViewProxy);
+        hPilebox->addItem(pileViewProxy);
     }
 
     if (_origZone->getIsShufflable() && (numberCards == -1)) {
         shuffleCheckBox.setChecked(true);
         QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
         shuffleProxy->setWidget(&shuffleCheckBox);
-        vbox->addItem(shuffleProxy);
+        hPilebox->addItem(shuffleProxy);
     }
+
+    vbox->addItem(hPilebox);
 
     extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
     resize(150, 150);
