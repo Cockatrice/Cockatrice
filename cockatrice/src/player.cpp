@@ -515,8 +515,19 @@ void Player::playerListActionTriggered()
     if (menu == mRevealLibrary) {
         cmd.set_zone_name("deck");
     } else if (menu == mRevealTopCard) {
-        cmd.set_zone_name("deck");
-        cmd.set_card_id(0);
+        bool ok;
+        int number = 
+#if QT_VERSION < 0x050000
+            QInputDialog::getInteger(
+#else
+            QInputDialog::getInt(
+#endif
+            0, tr("Reveal top cards of library"), tr("Number of cards:"), defaultNumberTopCards, 1, 2000000000, 1, &ok);
+        if (ok) {
+            cmd.set_zone_name("deck");
+            cmd.set_top_cards(number);
+        }
+        
     } else if (menu == mRevealHand)
         cmd.set_zone_name("hand");
     else if (menu == mRevealRandomHandCard) {
@@ -624,7 +635,7 @@ void Player::retranslateUi()
         aViewLibrary->setText(tr("&View library"));
         aViewTopCards->setText(tr("View &top cards of library..."));
         mRevealLibrary->setTitle(tr("Reveal &library to..."));
-        mRevealTopCard->setTitle(tr("Reveal t&op card to..."));
+        mRevealTopCard->setTitle(tr("Reveal t&op cards to..."));
         aAlwaysRevealTopCard->setText(tr("&Always reveal top card"));
         aOpenDeckInDeckEditor->setText(tr("O&pen deck in deck editor"));
         aViewSideboard->setText(tr("&View sideboard"));
