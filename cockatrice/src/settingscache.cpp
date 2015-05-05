@@ -79,6 +79,14 @@ SettingsCache::SettingsCache()
     showMentionPopups = settings->value("chat/showmentionpopups", true).toBool();
 
     leftJustified = settings->value("interface/leftjustified", false).toBool();
+
+    masterVolume = settings->value("sound/mastervolume", 100).toInt();
+}
+
+void SettingsCache::setMasterVolume(int _masterVolume) {
+    masterVolume = _masterVolume;
+    settings->setValue("sound/mastervolume", masterVolume);
+    emit masterVolumeChanged(masterVolume);
 }
 
 void SettingsCache::setLeftJustified(const int _leftJustified) {

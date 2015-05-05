@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QDateTime>
 
 class QAudioOutput;
 class QBuffer;
@@ -14,19 +15,17 @@ private:
     QMap<QString, QByteArray> audioData;
     QBuffer *inputBuffer;
     QAudioOutput *audio;
+    QDateTime lastTapPlayed;
+    QDateTime lastEndStepPlayed;
 private slots:
     void cacheData();
     void soundEnabledChanged();
 public:
     SoundEngine(QObject *parent = 0);
 public slots:
-    void notification();
-    void draw();
-    void playCard();
-    void shuffle();
+    void endStep();
     void tap();
-    void untap();
-    void cuckoo();
+    void playerJoined();
 };
 
 extern SoundEngine *soundEngine;

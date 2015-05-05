@@ -9,6 +9,7 @@
     <file>resources/icon_config_interface.svg</file>
     <file>resources/icon_config_messages.svg</file>
     <file>resources/icon_config_deckeditor.svg</file>
+    <file>resources/icon_config_sound.svg</file>
     <file>resources/phases/icon_phase_untap.svg</file>
     <file>resources/phases/icon_phase_upkeep.svg</file>
     <file>resources/phases/icon_phase_draw.svg</file>

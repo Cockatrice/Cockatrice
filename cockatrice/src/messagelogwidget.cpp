@@ -37,6 +37,7 @@ bool MessageLogWidget::userIsFemale() const
 
 void MessageLogWidget::logGameJoined(int gameId)
 {
+    soundEngine->playerJoined();
     if (userIsFemale())
         appendHtmlServerMessage(tr("You have joined game #%1.", "female").arg("<font color=\"blue\">"+ QString::number(gameId) + "</font>"));
     else
@@ -53,7 +54,7 @@ void MessageLogWidget::logReplayStarted(int gameId)
 
 void MessageLogWidget::logJoin(Player *player)
 {
-    soundEngine->cuckoo();
+    soundEngine->playerJoined();
     if (isFemale(player))
         appendHtmlServerMessage(tr("%1 has joined the game.", "female").arg(sanitizeHtml(player->getName())));
     else
@@ -171,7 +172,6 @@ void MessageLogWidget::logSpectatorSay(QString spectatorName, UserLevelFlags spe
 
 void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
 {
-    soundEngine->shuffle();
     if (currentContext != MessageContext_Mulligan) {
         appendHtmlServerMessage((isFemale(player)
             ? tr("%1 shuffles %2.", "female")
@@ -194,7 +194,6 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
     if (currentContext == MessageContext_Mulligan)
         mulliganPlayer = player;
     else {
-        soundEngine->draw();
         if (isFemale(player))
             appendHtmlServerMessage(tr("%1 draws %2 card(s).", "female").arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + QString::number(number) + "</font>"));
         else
@@ -297,7 +296,6 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
     
     QString finalStr;
     if (targetName == "table") {
-        soundEngine->playCard();
         if (moveCardTapped.value(attributes.card))
             finalStr = tr("%1 puts %2 into play tapped%3.");
         else
@@ -320,7 +318,6 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
     } else if (targetName == "sb")
         finalStr = tr("%1 moves %2%3 to sideboard.");
     else if (targetName == "stack") {
-        soundEngine->playCard();
         finalStr = tr("%1 plays %2%3.");
     }
     
@@ -570,8 +567,6 @@ void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 {
     if (tapped)
         soundEngine->tap();
-    else
-        soundEngine->untap();
     
     if (currentContext == MessageContext_MoveCard)
         moveCardTapped.insert(card, tapped);
@@ -792,7 +787,6 @@ void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZone *zone, bo
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
 {
-    soundEngine->notification();
     
     QString str;
     if (isFemale(player))
@@ -804,7 +798,6 @@ void MessageLogWidget::logSetActivePlayer(Player *player)
 
 void MessageLogWidget::logSetActivePhase(int phase)
 {
-    soundEngine->notification();
     QString phaseName;
     switch (phase) {
         case 0: phaseName = tr("untap step"); break;
@@ -817,7 +810,7 @@ void MessageLogWidget::logSetActivePhase(int phase)
         case 7: phaseName = tr("combat damage step"); break;
         case 8: phaseName = tr("end of combat step"); break;
         case 9: phaseName = tr("second main phase"); break;
-        case 10: phaseName = tr("ending phase"); break;
+        case 10: phaseName = tr("ending phase"); soundEngine->endStep(); break;
     }
     appendHtml("<font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + tr("It is now the %1.").arg(phaseName) + "</b></font>");
 }
