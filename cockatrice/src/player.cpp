@@ -523,7 +523,7 @@ void Player::playerListActionTriggered()
 #else
             QInputDialog::getInt(
 #endif
-            0, tr("Reveal top cards of library"), tr("Number of cards: (max %1)").arg(decksize), defaultNumberTopCards, 1, decksize, 1, &ok);
+            0, tr("Reveal top cards of library"), tr("Number of cards: (max. %1)").arg(decksize), defaultNumberTopCards, 1, decksize, 1, &ok);
         if (ok) {
             cmd.set_zone_name("deck");
             cmd.set_top_cards(number);
