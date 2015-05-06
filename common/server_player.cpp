@@ -369,12 +369,15 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
     if (cardsToMove.isEmpty())
         return Response::RespContextError;
     
-    MoveCardCompareFunctor cmp(startzone == targetzone ? -1 : x);
+    // 0 performs no sorting
+    // 1 reverses the sorting 
+    MoveCardCompareFunctor cmp(0);
     qSort(cardsToMove.begin(), cardsToMove.end(), cmp);
     
     bool secondHalf = false;
     int xIndex = -1;
-    for (int cardIndex = 0; cardIndex < cardsToMove.size(); ++cardIndex) {
+
+    for (int cardIndex = cardsToMove.size() - 1; cardIndex > -1; --cardIndex) {
         Server_Card *card = cardsToMove[cardIndex].first;
         const CardToMove *thisCardProperties = cardProperties.value(card);
         bool faceDown = thisCardProperties->has_face_down() ? thisCardProperties->face_down() : card->getFaceDown();
