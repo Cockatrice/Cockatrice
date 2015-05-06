@@ -147,8 +147,8 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
     if (bgPixmap.isNull()) {
         QLinearGradient grad1(0, 0, 1, 0);
         grad1.setCoordinateMode(QGradient::ObjectBoundingMode);
-        grad1.setColorAt(0, QColor(48, 34, 69));
-        grad1.setColorAt(1, QColor(110, 90, 140));
+        grad1.setColorAt(0, QColor(30, 30, 30));
+        grad1.setColorAt(1, QColor(80, 80, 80));
         painter->fillRect(QRectF(0, 0, width, height), QBrush(grad1));
 
         painter->fillRect(boundingRect(), QColor(0, 0, 0, 80));
