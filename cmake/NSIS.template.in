@@ -3,6 +3,7 @@
 !include "FileFunc.nsh"
 
 Name "@CPACK_PACKAGE_NAME@"
+BrandingText "@CPACK_PACKAGE_NAME@-@CPACK_PACKAGE_VERSION_MAJOR@"
 OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 SetCompressor /SOLID lzma
 InstallDir "$PROGRAMFILES\Cockatrice"
@@ -87,6 +88,7 @@ Section Uninstall
 	Delete "$INSTDIR\qdebug.txt"
 	Delete "$INSTDIR\servatrice.sql"
 	Delete "$INSTDIR\servatrice.ini.example"
+	Delete "$INSTDIR\zlib1.dll"
 	RMDir "$INSTDIR"
 
 	RMDir "$SMPROGRAMS\Cockatrice"
@@ -106,3 +108,18 @@ LangString DESC_SecStartMenu ${LANG_ENGLISH} "Create start menu items for Cockat
 	!insertmacro MUI_DESCRIPTION_TEXT ${SecStartMenu} $(DESC_SecStartMenu)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
+Function .onInit
+    SetShellVarContext all
+    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
+    StrCmp $R0 "" done
+
+    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst
+    Abort
+
+uninst:
+    ClearErrors
+    ExecWait "$R0"
+
+done:
+
+FunctionEnd
