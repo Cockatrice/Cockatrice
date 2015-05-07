@@ -16,6 +16,7 @@ class GameScene;
 class ServerInfo_Card;
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
+class QStyleOption;
 
 class TitleLabel : public QGraphicsWidget {
     Q_OBJECT
@@ -68,7 +69,7 @@ public:
     void retranslateUi();
 protected:
     void closeEvent(QCloseEvent *event);
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void initStyleOption(QStyleOption *option) const;
 };
 
 #endif

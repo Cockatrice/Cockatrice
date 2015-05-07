@@ -1,6 +1,8 @@
 #include <math.h>
 #include <QDebug>
 #include <QGraphicsSceneWheelEvent>
+#include <QBrush>
+#include <QPainter>
 #include "zoneviewzone.h"
 #include "player.h"
 #include "carddragitem.h"
@@ -32,8 +34,11 @@ QRectF ZoneViewZone::boundingRect() const
     return bRect;
 }
 
-void ZoneViewZone::paint(QPainter * /*painter*/, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
+void ZoneViewZone::paint(QPainter * painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
+    QBrush windowBrush(QColor(240,240,240));
+    windowBrush.setColor(windowBrush.color().darker(150));
+    painter->fillRect(boundingRect(), windowBrush);
 }
 
 void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardList)
@@ -123,7 +128,7 @@ void ZoneViewZone::reorganizeCards()
             }
 
             lastCardType = cardType;
-            qreal x = typeColumn * CARD_WIDTH;
+            qreal x = 7 + (typeColumn * CARD_WIDTH);
             qreal y = typeRow * CARD_HEIGHT / 3;
             c->setPos(x + 5, y + 5);
             c->setRealZValue(i);
@@ -132,7 +137,7 @@ void ZoneViewZone::reorganizeCards()
     } else {
         for (int i = 0; i < cardCount; i++) {
             CardItem *c = cardsToDisplay.at(i);
-            qreal x = (i / rows) * CARD_WIDTH;
+            qreal x = 7 + ((i / rows) * CARD_WIDTH);
             qreal y = (i % rows) * CARD_HEIGHT / 3;
             c->setPos(x + 5, y + 5);
             c->setRealZValue(i);
