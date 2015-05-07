@@ -20,6 +20,8 @@
 #include <QDialogButtonBox>
 #include <QRadioButton>
 #include <QDebug>
+#include <QSlider>
+#include <QSpinBox>
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "main.h"
@@ -449,8 +451,6 @@ void AppearanceSettingsPage::cardBackPicturePathButtonClicked()
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
-    QIcon deleteIcon(":/resources/icon_delete.svg");
-
     notificationsEnabledCheckBox.setChecked(settingsCache->getNotificationsEnabled());
     connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotificationsEnabled(int)));
     connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setSpecNotificationEnabled(int)));
@@ -477,28 +477,6 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     tapAnimationCheckBox.setChecked(settingsCache->getTapAnimation());
     connect(&tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
     
-    soundEnabledCheckBox.setChecked(settingsCache->getSoundEnabled());
-    connect(&soundEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSoundEnabled(int)));
-    
-    soundPathEdit = new QLineEdit(settingsCache->getSoundPath());
-    soundPathEdit->setReadOnly(true);
-    QPushButton *soundPathClearButton = new QPushButton(deleteIcon, QString());
-    connect(soundPathClearButton, SIGNAL(clicked()), this, SLOT(soundPathClearButtonClicked()));
-    QPushButton *soundPathButton = new QPushButton("...");
-    connect(soundPathButton, SIGNAL(clicked()), this, SLOT(soundPathButtonClicked()));
-    connect(&soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(cuckoo()));
-    
-    QGridLayout *soundGrid = new QGridLayout;
-    soundGrid->addWidget(&soundEnabledCheckBox, 0, 0, 1, 4);
-    soundGrid->addWidget(&soundPathLabel, 1, 0);
-    soundGrid->addWidget(soundPathEdit, 1, 1);
-    soundGrid->addWidget(soundPathClearButton, 1, 2);
-    soundGrid->addWidget(soundPathButton, 1, 3);
-    soundGrid->addWidget(&soundTestButton, 2, 1);
-    
-    soundGroupBox = new QGroupBox;
-    soundGroupBox->setLayout(soundGrid);
-    
     QGridLayout *animationGrid = new QGridLayout;
     animationGrid->addWidget(&tapAnimationCheckBox, 0, 0);
     
@@ -508,7 +486,6 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(generalGroupBox);
     mainLayout->addWidget(animationGroupBox);
-    mainLayout->addWidget(soundGroupBox);
     
     setLayout(mainLayout);
 }
@@ -526,27 +503,8 @@ void UserInterfaceSettingsPage::retranslateUi()
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
-    soundEnabledCheckBox.setText(tr("Enable &sounds"));
-    soundPathLabel.setText(tr("Path to sounds directory:"));
-    soundTestButton.setText(tr("Test system sound engine"));
-    soundGroupBox->setTitle(tr("Sound settings"));
 }
 
-void UserInterfaceSettingsPage::soundPathClearButtonClicked()
-{
-    soundPathEdit->setText(QString());
-    settingsCache->setSoundPath(QString());
-}
-
-void UserInterfaceSettingsPage::soundPathButtonClicked()
-{
-    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
-    if (path.isEmpty())
-        return;
-    
-    soundPathEdit->setText(path);
-    settingsCache->setSoundPath(path);
-}
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
@@ -718,6 +676,102 @@ void MessagesSettingsPage::retranslateUi()
     hexLabel.setText(tr("(Color is hexadecimal)"));
 }
 
+
+SoundSettingsPage::SoundSettingsPage()
+{
+    QIcon deleteIcon(":/resources/icon_delete.svg");
+
+    soundEnabledCheckBox.setChecked(settingsCache->getSoundEnabled());
+    connect(&soundEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSoundEnabled(int)));
+
+    soundPathEdit = new QLineEdit(settingsCache->getSoundPath());
+    soundPathEdit->setReadOnly(true);
+    QPushButton *soundPathClearButton = new QPushButton(deleteIcon, QString());
+    connect(soundPathClearButton, SIGNAL(clicked()), this, SLOT(soundPathClearButtonClicked()));
+    QPushButton *soundPathButton = new QPushButton("...");
+    connect(soundPathButton, SIGNAL(clicked()), this, SLOT(soundPathButtonClicked()));
+    connect(&soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(cuckoo()));
+
+    masterVolumeSlider = new QSlider(Qt::Horizontal);
+    masterVolumeSlider->setMinimum(0);
+    masterVolumeSlider->setMaximum(100);
+    masterVolumeSlider->setValue(settingsCache->getMasterVolume());
+    masterVolumeSlider->setToolTip(QString::number(settingsCache->getMasterVolume()));
+    connect(settingsCache, SIGNAL(masterVolumeChanged(int)), this, SLOT(masterVolumeChanged(int)));
+    connect(masterVolumeSlider, SIGNAL(sliderReleased()), soundEngine, SLOT(endStep()));
+    connect(masterVolumeSlider, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMasterVolume(int)));
+
+    
+
+    masterVolumeSpinBox = new QSpinBox();
+    masterVolumeSpinBox->setMinimum(0);
+    masterVolumeSpinBox->setMaximum(100);
+    masterVolumeSpinBox->setValue(settingsCache->getMasterVolume());
+    connect(masterVolumeSlider, SIGNAL(valueChanged(int)), masterVolumeSpinBox, SLOT(setValue(int)));
+    connect(masterVolumeSpinBox, SIGNAL(valueChanged(int)), masterVolumeSlider, SLOT(setValue(int)));
+
+#if QT_VERSION < 0x050000
+    masterVolumeSlider->setEnabled(false);
+    masterVolumeSpinBox->setEnabled(false);
+#endif
+
+    QGridLayout *soundGrid = new QGridLayout;
+    soundGrid->addWidget(&soundEnabledCheckBox, 0, 0, 1, 4);
+    soundGrid->addWidget(&masterVolumeLabel, 1, 0);
+    soundGrid->addWidget(masterVolumeSlider, 1, 1);
+    soundGrid->addWidget(masterVolumeSpinBox, 1, 2);
+    soundGrid->addWidget(&soundPathLabel, 2, 0);
+    soundGrid->addWidget(soundPathEdit, 2, 1);
+    soundGrid->addWidget(soundPathClearButton, 2, 2);
+    soundGrid->addWidget(soundPathButton, 2, 3);
+    soundGrid->addWidget(&soundTestButton, 3, 1);
+
+    soundGroupBox = new QGroupBox;
+    soundGroupBox->setLayout(soundGrid);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(soundGroupBox);
+
+    setLayout(mainLayout);
+}
+
+void SoundSettingsPage::masterVolumeChanged(int value) {
+    masterVolumeSlider->setToolTip(QString::number(value));
+    //QToolTip::showText(masterVolumeSlider->mapToGlobal(QPoint(0, 0)), QString::number(value));
+    // to do
+    // need to set the edit bar to be the same
+    // also need to update the slider to be the same
+}
+
+void SoundSettingsPage::soundPathClearButtonClicked()
+{
+    soundPathEdit->setText(QString());
+    settingsCache->setSoundPath(QString());
+}
+
+void SoundSettingsPage::soundPathButtonClicked()
+{
+    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
+    if (path.isEmpty())
+        return;
+
+    soundPathEdit->setText(path);
+    settingsCache->setSoundPath(path);
+}
+
+void SoundSettingsPage::retranslateUi() {
+    soundEnabledCheckBox.setText(tr("Enable &sounds"));
+    soundPathLabel.setText(tr("Path to sounds directory:"));
+    soundTestButton.setText(tr("Test system sound engine"));
+    soundGroupBox->setTitle(tr("Sound settings"));
+    #if QT_VERSION < 0x050000
+    masterVolumeLabel.setText(tr("Master volume requires QT5"));
+#else
+    masterVolumeLabel.setText(tr("Master volume"));
+#endif
+    
+}
+
 DlgSettings::DlgSettings(QWidget *parent)
     : QDialog(parent)
 {
@@ -737,6 +791,7 @@ DlgSettings::DlgSettings(QWidget *parent)
     pagesWidget->addWidget(new UserInterfaceSettingsPage);
     pagesWidget->addWidget(new DeckEditorSettingsPage);
     pagesWidget->addWidget(new MessagesSettingsPage);
+    pagesWidget->addWidget(new SoundSettingsPage);
     
     createIcons();
     contentsWidget->setCurrentRow(0);
@@ -785,6 +840,11 @@ void DlgSettings::createIcons()
     messagesButton->setTextAlignment(Qt::AlignHCenter);
     messagesButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     messagesButton->setIcon(QIcon(":/resources/icon_config_messages.svg"));
+
+    soundButton = new QListWidgetItem(contentsWidget);
+    soundButton->setTextAlignment(Qt::AlignHCenter);
+    soundButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    soundButton->setIcon(QIcon(":/resources/icon_config_sound.svg"));
     
     connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(changePage(QListWidgetItem *, QListWidgetItem *)));
 }
@@ -894,6 +954,7 @@ void DlgSettings::retranslateUi()
     userInterfaceButton->setText(tr("User Interface"));
     deckEditorButton->setText(tr("Deck Editor"));
     messagesButton->setText(tr("Chat"));
+    soundButton->setText(tr("Sound"));
     
     for (int i = 0; i < pagesWidget->count(); i++)
         dynamic_cast<AbstractSettingsPage *>(pagesWidget->widget(i))->retranslateUi();

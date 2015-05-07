@@ -39,6 +39,7 @@ signals:
     void ignoreUnregisteredUsersChanged();
     void ignoreUnregisteredUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
+    void masterVolumeChanged(int value);
 private:
     QSettings *settings;
 
@@ -79,6 +80,7 @@ private:
     bool showMessagePopups;
     bool showMentionPopups;
     bool leftJustified;
+    int masterVolume;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -134,6 +136,7 @@ public:
     bool getShowMessagePopup() const { return showMessagePopups; }
     bool getShowMentionPopup() const { return showMentionPopups; }
     bool getLeftJustified() const { return leftJustified; }
+    int getMasterVolume() const { return masterVolume; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -182,6 +185,7 @@ public slots:
     void setShowMessagePopups(const int _showMessagePopups);
     void setShowMentionPopups(const int _showMentionPopups);
     void setLeftJustified( const int _leftJustified);
+    void setMasterVolume(const int _masterVolume); 
 };
 
 extern SettingsCache *settingsCache;

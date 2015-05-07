@@ -14,12 +14,15 @@ SoundEngine::SoundEngine(QObject *parent)
     connect(settingsCache, SIGNAL(soundEnabledChanged()), this, SLOT(soundEnabledChanged()));
     cacheData();
     soundEnabledChanged();
+
+    lastTapPlayed = QDateTime::currentDateTime();
+    lastEndStepPlayed = QDateTime::currentDateTime();
 }
 
 void SoundEngine::cacheData()
 {
     static const QStringList fileNames = QStringList()
-        << "notification" << "draw" << "playcard" << "shuffle" << "tap" << "untap" << "cuckoo";
+        << "end_step" << "tap" << "player_joined";
     for (int i = 0; i < fileNames.size(); ++i) {
         QFile file(settingsCache->getSoundPath() + "/" + fileNames[i] + ".raw");
         if(!file.exists())
@@ -64,40 +67,28 @@ void SoundEngine::playSound(const QString &fileName)
     inputBuffer->close();
     inputBuffer->setData(audioData[fileName]);
     inputBuffer->open(QIODevice::ReadOnly);
+#if QT_VERSION >= 0x050000
+    audio->setVolume(settingsCache->getMasterVolume() / 100.0);
+#endif
     audio->start(inputBuffer);
+    
 }
 
-void SoundEngine::notification()
+void SoundEngine::endStep()
 {
-    playSound("notification");
-}
-
-void SoundEngine::draw()
-{
-    playSound("draw");
-}
-
-void SoundEngine::playCard()
-{
-    playSound("playcard");
-}
-
-void SoundEngine::shuffle()
-{
-    playSound("shuffle");
+    if (lastEndStepPlayed.secsTo(QDateTime::currentDateTime()) >= 1)
+        playSound("end_step");
+    lastEndStepPlayed = QDateTime::currentDateTime();
 }
 
 void SoundEngine::tap()
 {
-    playSound("tap");
+    if (lastTapPlayed.secsTo(QDateTime::currentDateTime()) >= 1)
+        playSound("tap");
+    lastTapPlayed = QDateTime::currentDateTime();
 }
 
-void SoundEngine::untap()
+void SoundEngine::playerJoined()
 {
-    playSound("untap");
-}
-
-void SoundEngine::cuckoo()
-{
-    playSound("cuckoo");
+    playSound("player_joined");
 }

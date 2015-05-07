@@ -23,6 +23,8 @@ class QCloseEvent;
 class QSpinBox;
 class QRadioButton;
 class QSpinBox;
+class QSlider;
+class QSpinBox;
 
 class AbstractSettingsPage : public QWidget {
 public:
@@ -115,24 +117,16 @@ public:
 class UserInterfaceSettingsPage : public AbstractSettingsPage {
     Q_OBJECT
 private slots:
-    void soundPathClearButtonClicked();
-    void soundPathButtonClicked();
     void setSpecNotificationEnabled(int);
-signals:
-    void soundPathChanged();
 private:
     QCheckBox notificationsEnabledCheckBox;
     QCheckBox specNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox playToStackCheckBox;
     QCheckBox tapAnimationCheckBox;
-    QCheckBox soundEnabledCheckBox;
-    QLabel soundPathLabel;
-    QLineEdit *soundPathEdit;
     QGroupBox *generalGroupBox;
     QGroupBox *animationGroupBox;
-    QGroupBox *soundGroupBox;
-    QPushButton soundTestButton;
+    
 public:
     UserInterfaceSettingsPage();
     void retranslateUi();
@@ -181,6 +175,28 @@ private:
     void updateMentionPreview();
 };
 
+class SoundSettingsPage : public AbstractSettingsPage {
+    Q_OBJECT
+public:
+    SoundSettingsPage();
+    void retranslateUi();
+private:
+    QGroupBox *soundGroupBox;
+    QPushButton soundTestButton;
+    QCheckBox soundEnabledCheckBox;
+    QLabel soundPathLabel;
+    QLineEdit *soundPathEdit;
+    QLabel masterVolumeLabel;
+    QSlider *masterVolumeSlider;
+    QSpinBox *masterVolumeSpinBox;
+signals:
+    void soundPathChanged();
+private slots:
+    void masterVolumeChanged(int value);
+    void soundPathClearButtonClicked();
+    void soundPathButtonClicked();
+};
+
 class DlgSettings : public QDialog {
     Q_OBJECT
 public:
@@ -192,7 +208,7 @@ private slots:
 private:
     QListWidget *contentsWidget;
     QStackedWidget *pagesWidget;
-    QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton;
+    QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton, *soundButton;
     void createIcons();
     void retranslateUi();
 protected:
