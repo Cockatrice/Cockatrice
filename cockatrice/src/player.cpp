@@ -1003,7 +1003,7 @@ void Player::actRollDie()
 #else
     QInputDialog::getInt(
 #endif
-    0, tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
+    static_cast<QWidget *>(parent()), tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
     if (ok) {
         Command_RollDie cmd;
         cmd.set_sides(sides);
