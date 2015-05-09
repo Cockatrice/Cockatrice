@@ -136,7 +136,7 @@ void DlgEditTokens::actAddToken()
     do {
         name = QInputDialog::getText(this, tr("Add token"), tr("Please enter the name of the token:"));
         if (!name.isEmpty() && cardDatabaseModel->getDatabase()->getCard(name, false)) {
-            QMessageBox::critical(this, tr("Error"), tr("The chosen name conflicts with an existing card or token."));
+            QMessageBox::critical(this, tr("Error"), tr("The chosen name conflicts with an existing card or token.\n Make sure to enable the 'token set' in 'Edit sets...' dialog to display them correctly."));
             askAgain = true;
         } else
             askAgain = false;
