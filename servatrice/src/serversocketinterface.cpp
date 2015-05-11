@@ -164,14 +164,24 @@ void ServerSocketInterface::readClient()
             newCommandContainer.ParseFromArray(inputBuffer.data(), messageLength);
         }
         catch(std::exception &e) {
-            qDebug() << "Caught std::exception in" << __FILE__ << __LINE__ << __PRETTY_FUNCTION__;
+            qDebug() << "Caught std::exception in" << __FILE__ << __LINE__ << 
+#ifdef _MSC_VER // Visual Studio
+                __FUNCTION__;
+#else
+                __PRETTY_FUNCTION__;
+#endif
             qDebug() << "Exception:" << e.what();
             qDebug() << "Message coming from:" << getAddress();
             qDebug() << "Message length:" << messageLength;
             qDebug() << "Message content:" << inputBuffer.toHex();
         }
         catch(...) {
-            qDebug() << "Unhandled exception in" << __FILE__ << __LINE__ << __PRETTY_FUNCTION__;
+            qDebug() << "Unhandled exception in" << __FILE__ << __LINE__ <<
+#ifdef _MSC_VER // Visual Studio
+                __FUNCTION__;
+#else
+                __PRETTY_FUNCTION__;
+#endif
             qDebug() << "Message coming from:" << getAddress();
         }
 
