@@ -690,7 +690,7 @@ SoundSettingsPage::SoundSettingsPage()
     connect(soundPathClearButton, SIGNAL(clicked()), this, SLOT(soundPathClearButtonClicked()));
     QPushButton *soundPathButton = new QPushButton("...");
     connect(soundPathButton, SIGNAL(clicked()), this, SLOT(soundPathButtonClicked()));
-    connect(&soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(cuckoo()));
+    connect(&soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(playerJoined()));
 
     masterVolumeSlider = new QSlider(Qt::Horizontal);
     masterVolumeSlider->setMinimum(0);
@@ -698,7 +698,7 @@ SoundSettingsPage::SoundSettingsPage()
     masterVolumeSlider->setValue(settingsCache->getMasterVolume());
     masterVolumeSlider->setToolTip(QString::number(settingsCache->getMasterVolume()));
     connect(settingsCache, SIGNAL(masterVolumeChanged(int)), this, SLOT(masterVolumeChanged(int)));
-    connect(masterVolumeSlider, SIGNAL(sliderReleased()), soundEngine, SLOT(endStep()));
+    connect(masterVolumeSlider, SIGNAL(sliderReleased()), soundEngine, SLOT(playerJoined()));
     connect(masterVolumeSlider, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMasterVolume(int)));
 
     
@@ -737,10 +737,6 @@ SoundSettingsPage::SoundSettingsPage()
 
 void SoundSettingsPage::masterVolumeChanged(int value) {
     masterVolumeSlider->setToolTip(QString::number(value));
-    //QToolTip::showText(masterVolumeSlider->mapToGlobal(QPoint(0, 0)), QString::number(value));
-    // to do
-    // need to set the edit bar to be the same
-    // also need to update the slider to be the same
 }
 
 void SoundSettingsPage::soundPathClearButtonClicked()
