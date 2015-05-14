@@ -789,7 +789,7 @@ void TabDeckEditor::checkFirstRunDetected()
 {
     if(db->hasDetectedFirstRun())
     {
-        QMessageBox::information(this, tr("Welcome"), tr("Hi! Its seems like it's the first time you run this version of Cockatrice.<br/>All the sets in the card database have been enabled; if you want to hide a set from the deck editor, disable it in the \"Edit Sets\" window."));
+        QMessageBox::information(this, tr("Welcome"), tr("Hi! Its seems like it's the first time you run this version of Cockatrice.\nAll the sets in the card database have been enabled.\nRead more about changing the set order or disabling specific sets in the the \"Edit Sets\" window."));
         actEditSets();
     }
 }
