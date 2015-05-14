@@ -165,6 +165,20 @@ int main(int argc, char *argv[])
     if (!QDir().mkpath(settingsCache->getPicsPath() + "/CUSTOM"))
         qDebug() << "Could not create " + settingsCache->getPicsPath().toUtf8() + "/CUSTOM. Will fall back on default card images.";
 
+    if(settingsCache->getSoundPath().isEmpty() || !QDir(settingsCache->getSoundPath()).exists())
+    {
+        QDir tmpDir;
+        
+#ifdef Q_OS_MAC
+        tmpDir = app.applicationDirPath() + "/../Resources/sounds";
+#elif defined(Q_OS_WIN)
+         tmpDir = app.applicationDirPath() + "/sounds";
+#else // linux
+        tmpDir = app.applicationDirPath() + "/../share/cockatrice/sounds/";
+#endif
+        settingsCache->setSoundPath(tmpDir.canonicalPath());
+    }
+
     if (!settingsValid() || db->getLoadStatus() != Ok) {
         qDebug("main(): invalid settings or load status");
         DlgSettings dlgSettings;
