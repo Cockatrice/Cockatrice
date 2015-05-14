@@ -234,6 +234,34 @@ void GeneralSettingsPage::retranslateUi()
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
+
+    handZoneColor = new QLineEdit;
+    handZoneColor->setText(settingsCache->getHandZoneColor());
+    updateZonePreview(handZoneColor);
+    connect(handZoneColor, SIGNAL(textChanged(QString)), this, SLOT(updateZoneColor(QString)));
+
+    tableZoneColor = new QLineEdit;
+    tableZoneColor->setText(settingsCache->getTableZoneColor());
+    updateZonePreview(tableZoneColor);
+    connect(tableZoneColor, SIGNAL(textChanged(QString)), this, SLOT(updateZoneColor(QString)));
+
+    stackZoneColor = new QLineEdit;
+    stackZoneColor->setText(settingsCache->getStackZoneColor());
+    updateZonePreview(stackZoneColor);
+    connect(stackZoneColor, SIGNAL(textChanged(QString)), this, SLOT(updateZoneColor(QString)));
+
+
+    QGridLayout *zoneDefaultColorGrid = new QGridLayout;
+    zoneDefaultColorGrid->addWidget(&handZoneLabel, 0, 0);
+    zoneDefaultColorGrid->addWidget(handZoneColor, 0, 1);
+    zoneDefaultColorGrid->addWidget(&tableZoneLabel, 1, 0);
+    zoneDefaultColorGrid->addWidget(tableZoneColor, 1, 1);
+    zoneDefaultColorGrid->addWidget(&stackZoneLabel, 2, 0);
+    zoneDefaultColorGrid->addWidget(stackZoneColor, 2, 1);
+
+    zoneDefaultColorGroupBox = new QGroupBox;
+    zoneDefaultColorGroupBox->setLayout(zoneDefaultColorGrid);
+
     QIcon deleteIcon(":/resources/icon_delete.svg");
     
     handBgEdit = new QLineEdit(settingsCache->getHandBgPath());
@@ -339,6 +367,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     tableGroupBox->setLayout(tableGrid);
     
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(zoneDefaultColorGroupBox);
     mainLayout->addWidget(zoneBgGroupBox);
     mainLayout->addWidget(cardsGroupBox);
     mainLayout->addWidget(handGroupBox);
@@ -349,6 +378,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
 void AppearanceSettingsPage::retranslateUi()
 {
+    zoneDefaultColorGroupBox->setTitle(tr("Default Game-play Colors"));
+    handZoneLabel.setText(tr("Hand Zone"));
+    tableZoneLabel.setText(tr("Table Zone"));
+    stackZoneLabel.setText(tr("Stack Zone"));
     zoneBgGroupBox->setTitle(tr("Zone background pictures"));
     handBgLabel.setText(tr("Hand background:"));
     stackBgLabel.setText(tr("Stack background:"));
@@ -367,6 +400,36 @@ void AppearanceSettingsPage::retranslateUi()
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
+}
+
+void AppearanceSettingsPage::updateZonePreview(QLineEdit* zone) {
+    QString colorString;
+    if (zone == handZoneColor)
+        colorString = settingsCache->getHandZoneColor();
+    else if (zone == tableZoneColor)
+        colorString = settingsCache->getTableZoneColor();
+    else if (zone == stackZoneColor)
+        colorString = settingsCache->getStackZoneColor();
+    QColor colorToSet;
+    colorToSet.setNamedColor("#" + colorString);
+    if (colorToSet.isValid())
+        zone->setStyleSheet("QLineEdit{background:#" + colorString + ";color: " +  (colorToSet.black() > 100 ? "white" : "black") + "}");
+}
+
+void AppearanceSettingsPage::updateZoneColor(QString value) {
+    QColor colorToSet;
+    colorToSet.setNamedColor("#" + value);
+    if (colorToSet.isValid()) {
+        QLineEdit* zone = qobject_cast<QLineEdit*>(sender());
+        if (zone == handZoneColor)
+            settingsCache->setHandZoneColor(value);
+        else if (zone == tableZoneColor)
+            settingsCache->setTableZoneColor(value);
+        else if (zone == stackZoneColor)
+            settingsCache->setStackZoneColor(value);
+        
+        updateZonePreview(zone);
+    }
 }
 
 void AppearanceSettingsPage::handBgClearButtonClicked()

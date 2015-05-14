@@ -68,8 +68,14 @@ bool TableZone::isInverted() const
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     // if no custom background is provided then use the default color
-    if (backgroundPixelMap.isNull())
-        painter->fillRect(boundingRect(), BACKGROUND_COLOR);
+    if (backgroundPixelMap.isNull()) {
+        QColor colorToSet;
+        colorToSet.setNamedColor("#" + settingsCache->getTableZoneColor());
+            if (colorToSet.isValid())
+                painter->fillRect(boundingRect(), colorToSet);
+            else
+                painter->fillRect(boundingRect(), BACKGROUND_COLOR);
+    }
     else
         painter->fillRect(boundingRect(), QBrush(backgroundPixelMap));
 

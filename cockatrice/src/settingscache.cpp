@@ -81,6 +81,25 @@ SettingsCache::SettingsCache()
     leftJustified = settings->value("interface/leftjustified", false).toBool();
 
     masterVolume = settings->value("sound/mastervolume", 100).toInt();
+
+    handZoneColor = settings->value("personal/handzonecolor", "1E1E1E").toString();
+    tableZoneColor = settings->value("personal/tablezonecolor", "646464").toString();
+    stackZoneColor = settings->value("personal/stackzonecolor", "712B2B").toString();
+}
+
+void SettingsCache::setHandZoneColor(const QString &_color) {
+    handZoneColor = _color;
+    settings->setValue("personal/handzonecolor", handZoneColor);
+}
+
+void SettingsCache::setTableZoneColor(const QString &_color) {
+    tableZoneColor = _color;
+    settings->setValue("personal/tablezonecolor", tableZoneColor);
+}
+
+void SettingsCache::setStackZoneColor(const QString &_color) {
+    stackZoneColor = _color;
+    settings->setValue("personal/stackzonecolor", stackZoneColor);
 }
 
 void SettingsCache::setMasterVolume(int _masterVolume) {

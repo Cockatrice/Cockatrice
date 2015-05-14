@@ -81,6 +81,9 @@ private:
     bool showMentionPopups;
     bool leftJustified;
     int masterVolume;
+    QString handZoneColor;
+    QString tableZoneColor;
+    QString stackZoneColor;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -96,6 +99,9 @@ public:
     QString getPlayerBgPath() const { return playerBgPath; }
     QString getCardBackPicturePath() const { return cardBackPicturePath; }
     QString getChatMentionColor() const { return chatMentionColor; }
+    QString getHandZoneColor() const { return handZoneColor; }
+    QString getTableZoneColor() const { return tableZoneColor; }
+    QString getStackZoneColor() const { return stackZoneColor; }
     bool getPicDownload() const { return picDownload; }
     bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
@@ -186,6 +192,9 @@ public slots:
     void setShowMentionPopups(const int _showMentionPopups);
     void setLeftJustified( const int _leftJustified);
     void setMasterVolume(const int _masterVolume); 
+    void setHandZoneColor(const QString& _color);
+    void setTableZoneColor(const QString& _color);
+    void setStackZoneColor(const QString& _color);
 };
 
 extern SettingsCache *settingsCache;

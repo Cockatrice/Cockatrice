@@ -81,6 +81,7 @@ private slots:
     void playerAreaBgButtonClicked();
     void cardBackPicturePathClearButtonClicked();
     void cardBackPicturePathButtonClicked();
+    void updateZoneColor(QString);
 signals:
     void handBgChanged(const QString &path);
     void stackBgChanged(const QString &path);
@@ -105,13 +106,22 @@ private:
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
     QGroupBox *zoneBgGroupBox;
+    QGroupBox *zoneDefaultColorGroupBox;
     QGroupBox *cardsGroupBox;
     QGroupBox *handGroupBox;
     QGroupBox *tableGroupBox;
     QSpinBox minPlayersForMultiColumnLayoutEdit;
+    QLineEdit *handZoneColor;
+    QLineEdit *tableZoneColor;
+    QLineEdit *stackZoneColor;
+    QLabel handZoneLabel;
+    QLabel tableZoneLabel;
+    QLabel stackZoneLabel;
 public:
     AppearanceSettingsPage();
     void retranslateUi();
+private:
+    void updateZonePreview(QLineEdit* zone);
 };
 
 class UserInterfaceSettingsPage : public AbstractSettingsPage {
