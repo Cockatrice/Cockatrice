@@ -378,10 +378,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
 void AppearanceSettingsPage::retranslateUi()
 {
-    zoneDefaultColorGroupBox->setTitle(tr("Default Game-play Colors"));
-    handZoneLabel.setText(tr("Hand Zone"));
-    tableZoneLabel.setText(tr("Table Zone"));
-    stackZoneLabel.setText(tr("Stack Zone"));
+    zoneDefaultColorGroupBox->setTitle(tr("Default Game-play Colors (Hexadecimal)"));
+    handZoneLabel.setText(tr("Hand Zone:"));
+    tableZoneLabel.setText(tr("Table Zone:"));
+    stackZoneLabel.setText(tr("Stack Zone:"));
     zoneBgGroupBox->setTitle(tr("Zone background pictures"));
     handBgLabel.setText(tr("Hand background:"));
     stackBgLabel.setText(tr("Stack background:"));
