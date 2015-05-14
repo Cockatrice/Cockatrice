@@ -164,42 +164,6 @@ int main(int argc, char *argv[])
     }
     if (!QDir().mkpath(settingsCache->getPicsPath() + "/CUSTOM"))
         qDebug() << "Could not create " + settingsCache->getPicsPath().toUtf8() + "/CUSTOM. Will fall back on default card images.";
-        
-#ifdef Q_OS_MAC
-    if(settingsCache->getHandBgPath().isEmpty() &&
-        settingsCache->getStackBgPath().isEmpty() &&
-        settingsCache->getTableBgPath().isEmpty() &&
-        settingsCache->getPlayerBgPath().isEmpty())
-    {
-        QString srcDir = QLibraryInfo::location(QLibraryInfo::DataPath);
-        QString destDir = dataDir + "/zonebg";
-        QDir tmpDir(destDir);
-        if(!tmpDir.exists())
-        {
-            // try to install the default images for the current user and set the settigs value
-            settingsCache->copyPath(srcDir + "/zonebg", destDir);
-
-            settingsCache->setHandBgPath(destDir + "/fabric_green.png");
-            settingsCache->setStackBgPath(destDir + "/fabric_red.png");
-            settingsCache->setTableBgPath(destDir + "/fabric_blue.png");
-            settingsCache->setPlayerBgPath(destDir + "/fabric_gray.png");
-        }
-    }
-
-    if(settingsCache->getSoundPath().isEmpty())
-    {
-        QString srcDir = QLibraryInfo::location(QLibraryInfo::DataPath);
-        QString destDir = dataDir + "/sounds";
-        QDir tmpDir(destDir);
-        if(!tmpDir.exists())
-        {
-            // try to install the default sounds for the current user and set the settigs value
-            settingsCache->copyPath(srcDir + "/sounds", destDir);
-
-            settingsCache->setSoundPath(destDir);
-        }
-    }
-#endif
 
     if (!settingsValid() || db->getLoadStatus() != Ok) {
         qDebug("main(): invalid settings or load status");
