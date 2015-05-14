@@ -56,7 +56,7 @@ Section "Update configuration" SecUpdateConfig
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "carddatabase" "$LOCALAPPDATA\Cockatrice\cards.xml"
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "decks" "$LOCALAPPDATA\Cockatrice\decks"
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "pics" "$LOCALAPPDATA\Cockatrice\pics"
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$LOCALAPPDATA\Cockatrice\sounds"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$INSTDIR\sounds"
 SectionEnd
 
 Section "Start menu item" SecStartMenu
