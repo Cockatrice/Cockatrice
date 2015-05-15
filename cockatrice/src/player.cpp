@@ -527,6 +527,8 @@ void Player::playerListActionTriggered()
         if (ok) {
             cmd.set_zone_name("deck");
             cmd.set_top_cards(number);
+            // backward compatibility: servers before #1051 only permits to reveal the first card
+            cmd.set_card_id(0);
         }
         
     } else if (menu == mRevealHand)
