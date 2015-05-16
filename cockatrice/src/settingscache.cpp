@@ -1,7 +1,5 @@
 #include "settingscache.h"
 #include <QSettings>
-#include <QDebug>
-#include <QDir>
 
 SettingsCache::SettingsCache()
 {
@@ -380,32 +378,4 @@ void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
     pixmapCacheSize = _pixmapCacheSize;
     settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
     emit pixmapCacheSizeChanged(pixmapCacheSize);
-}
-
-void SettingsCache::copyPath(const QString &src, const QString &dst)
-{
-    // test source && return if inexistent
-    QDir dir(src);
-    if (! dir.exists())
-        return;
-    // test destination && create if inexistent
-    QDir tmpDir(dst);
-    if (!tmpDir.exists())
-    {
-        tmpDir.setPath(QDir::rootPath());
-        if (!tmpDir.mkdir(dst) && !tmpDir.exists()) {
-            // TODO: this is probably not good.
-            qDebug() << "copyPath(): Failed to create dir: " << dst;
-        }
-    }
-
-    foreach (QString d, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-        QString dst_path = dst + QDir::separator() + d;
-        dir.mkpath(dst_path);
-        copyPath(src+ QDir::separator() + d, dst_path);
-    }
-
-    foreach (QString f, dir.entryList(QDir::Files)) {
-        QFile::copy(src + QDir::separator() + f, dst + QDir::separator() + f);
-    }
 }

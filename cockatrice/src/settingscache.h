@@ -129,7 +129,6 @@ public:
     QString getPicUrlHq() const { return picUrlHq; }
     QString getPicUrlFallback() const { return picUrlFallback; }
     QString getPicUrlHqFallback() const { return picUrlHqFallback; }
-    void copyPath(const QString &src, const QString &dst);
     bool getAutoConnect() const { return attemptAutoConnect; }
     int getPixmapCacheSize() const { return pixmapCacheSize; }
     bool getScaleCards() const {  return scaleCards; }
