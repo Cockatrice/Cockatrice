@@ -1525,7 +1525,14 @@ Response::ResponseCode Server_Player::cmdRevealCards(const Command_RevealCards &
         return Response::RespNameNotFound;
     
     QList<Server_Card *> cardsToReveal;
-    if (!cmd.has_card_id())
+    if (cmd.top_cards() != -1) {
+        for (int i = 0; i < cmd.top_cards(); i++) {
+            Server_Card *card = zone->getCard(i);
+            if (!card)
+                return Response::RespNameNotFound;
+            cardsToReveal.append(card);
+        }
+    } else if (!cmd.has_card_id())
         cardsToReveal = zone->getCards();
     else if (cmd.card_id() == -2) {
         if (zone->getCards().isEmpty())
