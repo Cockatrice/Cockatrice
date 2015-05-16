@@ -161,43 +161,53 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     }
     cursor.setCharFormat(messageFormat);
     
-    int index = -1, bracket = -1, at = -1;
+    int index = -1, bracketFirstIndex = -1, mentionFirstIndex = -1, urlFirstIndex = -1;
     bool mentionEnabled = settingsCache->getChatMention();
     while (message.size())
     {
         // search for the first [ or @
-        bracket = message.indexOf('[');
-        at = mentionEnabled ? message.indexOf('@') : -1;
-        if(bracket == -1)
-        {
-            if(at == -1)
-            {
-                // quick way out
-                cursor.insertText(message);
-                break;
+        bracketFirstIndex = message.indexOf('[');
+        mentionFirstIndex = mentionEnabled ? message.indexOf('@') : -1;
+        urlFirstIndex = message.indexOf("https://");
+        if(bracketFirstIndex == -1) {
+            if(mentionFirstIndex == -1) {
+                if (urlFirstIndex == -1) {
+                    // quick way out
+                    cursor.insertText(message);
+                    break;
+                } else {
+                    // url
+                    index = urlFirstIndex;
+                }
             } else {
-                // mention
-                index = at;
+                if (urlFirstIndex == -1) {
+                    // mention
+                    index = mentionFirstIndex;
+                } else {
+                    index = std::min(urlFirstIndex, mentionFirstIndex);
+                }
             }
         } else {
-            if(at == -1)
-            {
+            if(mentionFirstIndex == -1) {
                 // bracket
-                index = bracket;
+                index = bracketFirstIndex;
             } else {
                 // both, pick up the first one
-                index = std::min(bracket, at);
+                index = std::min(bracketFirstIndex, mentionFirstIndex);
+            }
+            if(urlFirstIndex != -1) {
+                index = std::min(index, urlFirstIndex);
             }
         }
 
-        // insert the message text up to the [ / @
+        // insert the message text up to the [ / @ / https://
         if(index > 0)
         {
             cursor.insertText(message.left(index), defaultFormat);
             message = message.mid(index);            
         }
 
-        if(index == bracket)
+        if(index == bracketFirstIndex)
         {
             if (message.startsWith("[card]")) {
                 message = message.mid(6);
@@ -234,6 +244,20 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 cursor.insertText("[", defaultFormat);
                 message = message.mid(1);
             }
+        } else if (index == urlFirstIndex) {
+            int urlEndIndex = message.indexOf(QRegExp("\\s"), 0);
+            if (urlEndIndex == -1)
+                urlEndIndex = message.size();
+            QString urlText = message.left(urlEndIndex);
+            QUrl qUrl(urlText);
+            if (qUrl.isValid())
+                appendUrlTag(cursor, urlText);
+            else
+                cursor.insertText(urlText);
+            if (urlEndIndex == -1)
+                message.clear();
+            else
+                message = message.mid(urlEndIndex);
         } else {
             if (message.startsWith(mention, Qt::CaseInsensitive)) {
                 // you have been mentioned
