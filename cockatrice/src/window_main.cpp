@@ -325,6 +325,7 @@ void MainWindow::retranslateUi()
 #endif
     aAbout->setText(tr("&About Cockatrice"));
     helpMenu->setTitle(tr("&Help"));
+    aCheckCardUpdates->setText(tr("Check card updates..."));
     
     tabSupervisor->retranslateUi();
 }
@@ -352,6 +353,9 @@ void MainWindow::createActions()
     
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
+
+    aCheckCardUpdates = new QAction(this);
+    connect(aCheckCardUpdates, SIGNAL(triggered()), this, SLOT(actCheckCardUpdates()));
 
 #if defined(__APPLE__)  /* For OSX */
     aSettings->setMenuRole(QAction::PreferencesRole);
@@ -383,6 +387,7 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aFullScreen);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSettings);
+    cockatriceMenu->addAction(aCheckCardUpdates);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aExit);
     
@@ -391,7 +396,7 @@ void MainWindow::createMenus()
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), localServer(0), bHasActivated(false)
+    : QMainWindow(parent), localServer(0), bHasActivated(false), cardUpdateProcess(0)
 {
     connect(settingsCache, SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
     pixmapCacheSizeChanged(settingsCache->getPixmapCacheSize());
@@ -521,4 +526,94 @@ void MainWindow::pixmapCacheSizeChanged(int newSizeInMBs)
 
 void MainWindow::maximize() {
     showNormal();
+}
+
+/* CARD UPDATER */
+
+void MainWindow::actCheckCardUpdates()
+{
+    if(cardUpdateProcess)
+    {
+        QMessageBox::information(this, tr("Information"), tr("A card update is already ongoing."));
+        return;
+    }
+
+    cardUpdateProcess = new QProcess(this);
+    connect(cardUpdateProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(cardUpdateError(QProcess::ProcessError)));
+    connect(cardUpdateProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(cardUpdateFinished(int, QProcess::ExitStatus)));
+
+    // full "run the update" command; leave empty if not present
+    QString updaterCmd;
+    QString binaryName;
+    QDir dir = QDir(QApplication::applicationDirPath());
+
+#if defined(Q_OS_MAC)
+    binaryName = getCardUpdaterBinaryName();
+
+    // exit from the application bundle
+    dir.cdUp();
+    dir.cdUp();
+    dir.cdUp();
+    dir.cd(binaryName + ".app");
+    dir.cd("Contents");
+    dir.cd("MacOS");
+#elif defined(Q_OS_WIN)
+    binaryName = getCardUpdaterBinaryName() + ".exe";
+#else
+    binaryName = getCardUpdaterBinaryName();
+#endif    
+
+    if(dir.exists(binaryName))
+        updaterCmd = dir.absoluteFilePath(binaryName);
+
+    if(updaterCmd.isEmpty())
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Unable to run the card updater: ") + dir.absoluteFilePath(binaryName));
+        return;
+    }
+
+    cardUpdateProcess->start(updaterCmd);
+}
+
+void MainWindow::cardUpdateError(QProcess::ProcessError err)
+{
+    QString error;
+    switch(err)
+    {
+        case QProcess::FailedToStart:
+            error = tr("failed to start.");
+            break;
+        case QProcess::Crashed:
+            error = tr("crashed.");
+            break;
+        case QProcess::Timedout:
+            error = tr("timed out.");
+            break;
+        case QProcess::WriteError:
+            error = tr("write error.");
+            break;
+        case QProcess::ReadError:
+            error = tr("read error.");
+            break;
+        case QProcess::UnknownError:
+        default:
+            error = tr("unknown error.");
+            break;
+    }
+
+    cardUpdateProcess->deleteLater();
+    cardUpdateProcess = 0;
+
+    QMessageBox::warning(this, tr("Error"), tr("The card updater exited with an error: %1").arg(error));
+}
+
+void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
+{
+    cardUpdateProcess->deleteLater();
+    cardUpdateProcess = 0;
+
+    QMessageBox::information(this, tr("Information"), tr("Card update completed successfully. Will now reload card database."));
+
+    // this will force a database reload
+    settingsCache->setCardDatabasePath(settingsCache->getCardDatabasePath());
 }

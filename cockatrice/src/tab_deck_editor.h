@@ -113,10 +113,9 @@ public:
     bool confirmClose();
 public slots:
     void closeRequest();
-    void checkUnknownSets();
+    void checkFirstRunDetected();
 signals:
     void deckEditorClosing(TabDeckEditor *tab);
-    void setListChanged();
 };
 
 #endif

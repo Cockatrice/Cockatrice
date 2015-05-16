@@ -14,6 +14,7 @@
 #include <QNetworkRequest>
 #include <QDebug>
 #include <QImageReader>
+#include <QMessageBox>
 
 const int CardDatabase::versionNeeded = 3;
 const char* CardDatabase::TOKENS_SETNAME = "TK";
@@ -1028,6 +1029,8 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
             allSets.append(setsIterator.next().value());
         allSets.sortByKey();
 
+        if(!tokens)
+            checkUnknownSets();
         emit cardListChanged();
     }
 
@@ -1097,4 +1100,52 @@ void CardDatabase::picsPathChanged()
 {
     pictureLoader->setPicsPath(settingsCache->getPicsPath());
     clearPixmapCache();
+}
+
+void CardDatabase::checkUnknownSets()
+{
+    SetList sets = getSetList();
+
+    // no set is enabled. Probably this is the first time running trice
+    if(!sets.getEnabledSetsNum())
+    {
+        sets.guessSortKeys();
+        sets.sortByKey();
+        sets.enableAll();
+
+        detectedFirstRun = true;
+        return;
+    }
+
+    int numUnknownSets = sets.getUnknownSetsNum();
+    // no unkown sets. 
+    if(!numUnknownSets)
+        return;
+
+    QMessageBox msgbox(QMessageBox::Question, tr("New sets found"), tr("%1 new set(s) have been found in the card database. Do you want to enable them?").arg(numUnknownSets), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+
+    switch(msgbox.exec())
+    {
+        case QMessageBox::No:
+            sets.markAllAsKnown();
+            break;
+        case QMessageBox::Yes:
+            sets.enableAllUnknown();
+            break;
+        default:
+            break;
+    }
+
+    return;
+}
+
+bool CardDatabase::hasDetectedFirstRun()
+{
+    if(detectedFirstRun)
+    {
+        detectedFirstRun=false;
+        return true;
+    }
+
+    return false;
 }

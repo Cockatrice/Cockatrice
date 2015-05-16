@@ -232,12 +232,14 @@ protected:
     QThread *pictureLoaderThread;
     PictureLoader *pictureLoader;
     LoadStatus loadStatus;
+    bool detectedFirstRun;
 private:
     static const int versionNeeded;
     void loadCardsFromXml(QXmlStreamReader &xml, bool tokens);
     void loadSetsFromXml(QXmlStreamReader &xml);
 
     CardInfo *getCardFromMap(CardNameMap &cardMap, const QString &cardName, bool createIfNotFound);
+    void checkUnknownSets();
 public:
     static const char* TOKENS_SETNAME;
 
@@ -265,6 +267,7 @@ public:
     bool getLoadSuccess() const { return loadStatus == Ok; }
     void cacheCardPixmaps(const QStringList &cardNames);
     void loadImage(CardInfo *card);
+    bool hasDetectedFirstRun();
 public slots:
     void clearPixmapCache();
     LoadStatus loadCardDatabase(const QString &path, bool tokens = false);

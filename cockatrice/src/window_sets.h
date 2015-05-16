@@ -15,8 +15,8 @@ class WndSets : public QMainWindow {
 private:
     SetsModel *model;
     QTreeView *view;
-    QPushButton *enableButton, *disableButton, *enableAllButton, *disableAllButton,
-                *upButton, *downButton, *bottomButton, *topButton;
+    QPushButton *enableAllButton, *disableAllButton;
+    QAction *aUp, *aDown, *aBottom, *aTop;
 public:
     WndSets(QWidget *parent = 0);
     ~WndSets();

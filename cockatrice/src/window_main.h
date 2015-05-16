@@ -22,6 +22,7 @@
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
+#include <QProcess>
 #include "abstractclient.h"
 #include "pb/response.pb.h"
 
@@ -62,6 +63,10 @@ private slots:
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
 
     void maximize();
+
+    void actCheckCardUpdates();
+    void cardUpdateError(QProcess::ProcessError err);
+    void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
 private:
     static const QString appName;
     void setClientStatusTitle();
@@ -71,11 +76,13 @@ private:
 
     void createTrayIcon();
     void createTrayActions();
+    // TODO: add a preference item to choose updater name for other games
+    inline QString getCardUpdaterBinaryName() { return "oracle"; };
 
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *helpMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout;
+        *aAbout, *aCheckCardUpdates;
     TabSupervisor *tabSupervisor;
 
     QMenu *trayIconMenu;
@@ -89,6 +96,7 @@ private:
     bool bHasActivated;
 
     QMessageBox *serverShutdownMessageBox;
+    QProcess * cardUpdateProcess;
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();

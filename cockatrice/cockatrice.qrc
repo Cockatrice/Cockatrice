@@ -38,6 +38,11 @@
     <file>resources/remove_row.svg</file>
     <file>resources/arrow_left_green.svg</file>
     <file>resources/arrow_right_green.svg</file>
+
+    <file>resources/arrow_top_green.svg</file>
+    <file>resources/arrow_up_green.svg</file>
+    <file>resources/arrow_down_green.svg</file>
+    <file>resources/arrow_bottom_green.svg</file>
     
     <file>resources/icon_ready_start.svg</file>
     <file>resources/icon_not_ready_start.svg</file>
