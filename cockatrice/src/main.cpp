@@ -38,6 +38,7 @@
 #include "dlg_settings.h"
 #include "carddatabase.h"
 #include "settingscache.h"
+#include "thememanager.h"
 #include "pixmapgenerator.h"
 #include "rng_sfmt.h"
 #include "soundengine.h"
@@ -50,7 +51,7 @@ SettingsCache *settingsCache;
 RNG_Abstract *rng;
 SoundEngine *soundEngine;
 QSystemTrayIcon *trayIcon;
-
+ThemeManager *themeManager;
 
 const QString translationPrefix = "cockatrice";
 #ifdef TRANSLATION_PATH
@@ -132,6 +133,7 @@ int main(int argc, char *argv[])
 
     rng = new RNG_SFMT;
     settingsCache = new SettingsCache;
+    themeManager = new ThemeManager;
     db = new CardDatabase;
 
     qtTranslator = new QTranslator;
@@ -195,13 +197,14 @@ int main(int argc, char *argv[])
 
     if (settingsValid()) {
         qDebug("main(): starting main program");
+
         soundEngine = new SoundEngine;
         qDebug("main(): SoundEngine constructor finished");
 
         MainWindow ui;
         qDebug("main(): MainWindow constructor finished");
 
-        QIcon icon(":/resources/appicon.svg");
+        QIcon icon("theme:appicon.svg");
         ui.setWindowIcon(icon);
 
         ui.show();

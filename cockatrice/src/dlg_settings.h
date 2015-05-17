@@ -71,40 +71,17 @@ private:
 class AppearanceSettingsPage : public AbstractSettingsPage {
     Q_OBJECT
 private slots:
-    void handBgClearButtonClicked();
-    void handBgButtonClicked();
-    void stackBgClearButtonClicked();
-    void stackBgButtonClicked();
-    void tableBgClearButtonClicked();
-    void tableBgButtonClicked();
-    void playerAreaBgClearButtonClicked();
-    void playerAreaBgButtonClicked();
-    void cardBackPicturePathClearButtonClicked();
-    void cardBackPicturePathButtonClicked();
-signals:
-    void handBgChanged(const QString &path);
-    void stackBgChanged(const QString &path);
-    void tableBgChanged(const QString &path);
-    void playerAreaBgChanged(const QString &path);
-    void cardBackPicturePathChanged(const QString &path);
+    void themeBoxChanged(int index);
 private:
-    QLabel handBgLabel;
-    QLabel stackBgLabel;
-    QLabel tableBgLabel;
-    QLabel playerAreaBgLabel;
-    QLabel cardBackPicturePathLabel;
+    QLabel themeLabel;
+    QComboBox themeBox;
     QLabel minPlayersForMultiColumnLayoutLabel;
-    QLineEdit *handBgEdit;
-    QLineEdit *stackBgEdit;
-    QLineEdit *tableBgEdit;
-    QLineEdit *playerAreaBgEdit;
-    QLineEdit *cardBackPicturePathEdit;
     QCheckBox displayCardNamesCheckBox;
     QCheckBox cardScalingCheckBox;
     QCheckBox horizontalHandCheckBox;
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
-    QGroupBox *zoneBgGroupBox;
+    QGroupBox *themeGroupBox;
     QGroupBox *cardsGroupBox;
     QGroupBox *handGroupBox;
     QGroupBox *tableGroupBox;

@@ -561,7 +561,7 @@ void MainWindow::createTrayIcon() {
     
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
-    trayIcon->setIcon(QIcon(":/resources/appicon.svg"));
+    trayIcon->setIcon(QIcon("theme:appicon.svg"));
     trayIcon->show();
 
     connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,

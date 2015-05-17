@@ -84,6 +84,7 @@ SET(cockatrice_SOURCES
     src/playerlistwidget.cpp 
     src/pixmapgenerator.cpp 
     src/settingscache.cpp 
+    src/thememanager.cpp 
     src/localserver.cpp 
     src/localserverinterface.cpp 
     src/localclient.cpp 
