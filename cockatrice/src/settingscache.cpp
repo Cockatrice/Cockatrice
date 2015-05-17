@@ -13,11 +13,7 @@ SettingsCache::SettingsCache()
     cardDatabasePath = settings->value("paths/carddatabase").toString();
     tokenDatabasePath = settings->value("paths/tokendatabase").toString();
 
-    handBgPath = settings->value("zonebg/hand").toString();
-    stackBgPath = settings->value("zonebg/stack").toString();
-    tableBgPath = settings->value("zonebg/table").toString();
-    playerBgPath = settings->value("zonebg/playerarea").toString();
-    cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
+    themeName = settings->value("theme/name").toString();
 
     // we only want to reset the cache once, then its up to the user
     bool updateCache = settings->value("revert/pixmapCacheSize", false).toBool();
@@ -148,39 +144,11 @@ void SettingsCache::setTokenDatabasePath(const QString &_tokenDatabasePath)
     emit tokenDatabasePathChanged();
 }
 
-void SettingsCache::setHandBgPath(const QString &_handBgPath)
+void SettingsCache::setThemeName(const QString &_themeName)
 {
-    handBgPath = _handBgPath;
-    settings->setValue("zonebg/hand", handBgPath);
-    emit handBgPathChanged();
-}
-
-void SettingsCache::setStackBgPath(const QString &_stackBgPath)
-{
-    stackBgPath = _stackBgPath;
-    settings->setValue("zonebg/stack", stackBgPath);
-    emit stackBgPathChanged();
-}
-
-void SettingsCache::setTableBgPath(const QString &_tableBgPath)
-{
-    tableBgPath = _tableBgPath;
-    settings->setValue("zonebg/table", tableBgPath);
-    emit tableBgPathChanged();
-}
-
-void SettingsCache::setPlayerBgPath(const QString &_playerBgPath)
-{
-    playerBgPath = _playerBgPath;
-    settings->setValue("zonebg/playerarea", playerBgPath);
-    emit playerBgPathChanged();
-}
-
-void SettingsCache::setCardBackPicturePath(const QString &_cardBackPicturePath)
-{
-    cardBackPicturePath = _cardBackPicturePath;
-    settings->setValue("paths/cardbackpicture", cardBackPicturePath);
-    emit cardBackPicturePathChanged();
+    themeName = _themeName;
+    settings->setValue("theme/name", themeName);
+    emit themeChanged();
 }
 
 void SettingsCache::setPicDownload(int _picDownload)

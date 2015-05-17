@@ -27,7 +27,7 @@ private:
     static const int MIN_WIDTH = 15 * CARD_WIDTH / 2;
     
     /*
-    Default background color, inactive mask and boarder gradient 
+    Default inactive mask and border gradient
     */
     static const QColor BACKGROUND_COLOR;
     static const QColor FADE_MASK;
@@ -43,11 +43,6 @@ private:
     int currentMinimumWidth;
 
     /*
-       Holds any custom background image for the TableZone
-     */
-    QPixmap backgroundPixelMap;
-
-    /*
        If this TableZone is currently active
      */
     bool active;
@@ -58,7 +53,7 @@ private slots:
     /**
        Loads in any found custom background and updates
      */
-    void updateBgPixmap();
+    void updateBg();
 
 public slots:
     /**

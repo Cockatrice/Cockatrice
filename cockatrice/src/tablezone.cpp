@@ -8,6 +8,7 @@
 #include "tablezone.h"
 #include "player.h"
 #include "settingscache.h"
+#include "thememanager.h"
 #include "arrowitem.h"
 #include "carddragitem.h"
 #include "carddatabase.h"
@@ -16,20 +17,18 @@
 #include "pb/command_move_card.pb.h"
 #include "pb/command_set_card_attr.pb.h"
 
-
 const QColor TableZone::BACKGROUND_COLOR    = QColor(100, 100, 100);
 const QColor TableZone::FADE_MASK           = QColor(0, 0, 0, 80);
 const QColor TableZone::GRADIENT_COLOR      = QColor(255, 255, 255, 150);
 const QColor TableZone::GRADIENT_COLORLESS  = QColor(255, 255, 255, 0);
 
-
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
     : SelectZone(_p, "table", true, false, true, parent), active(false)
 {
-    connect(settingsCache, SIGNAL(tableBgPathChanged()), this, SLOT(updateBgPixmap()));
+    connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
     connect(settingsCache, SIGNAL(invertVerticalCoordinateChanged()), this, SLOT(reorganizeCards()));
 
-    updateBgPixmap();
+    updateBg();
 
     height = 2 * BOX_LINE_WIDTH + 3 * (CARD_HEIGHT + 20) + 2 * PADDING_Y;
     width = MIN_WIDTH + 2 * MARGIN_X + 2 * BOX_LINE_WIDTH;
@@ -44,11 +43,8 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 }
 
 
-void TableZone::updateBgPixmap()
+void TableZone::updateBg()
 {
-    QString bgPath = settingsCache->getTableBgPath();
-    if (!bgPath.isEmpty())
-        backgroundPixelMap.load(bgPath);
     update();
 }
 
@@ -67,11 +63,7 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    // if no custom background is provided then use the default color
-    if (backgroundPixelMap.isNull())
-        painter->fillRect(boundingRect(), BACKGROUND_COLOR);
-    else
-        painter->fillRect(boundingRect(), QBrush(backgroundPixelMap));
+    painter->fillRect(boundingRect(), themeManager->getTableBgBrush());
 
     if (active) {
         paintZoneOutline(painter);

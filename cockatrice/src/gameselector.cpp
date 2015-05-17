@@ -60,10 +60,10 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 #endif
     filterButton = new QPushButton;
-    filterButton->setIcon(QIcon(":/resources/icon_search_black.svg"));
+    filterButton->setIcon(QIcon("theme:icon_search_black.svg"));
     connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));
     clearFilterButton = new QPushButton;
-    clearFilterButton->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
+    clearFilterButton->setIcon(QIcon("theme:icon_clearsearch.svg"));
     clearFilterButton->setEnabled(true);
     connect(clearFilterButton, SIGNAL(clicked()), this, SLOT(actClearFilter()));
 

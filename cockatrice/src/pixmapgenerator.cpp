@@ -16,7 +16,7 @@ QPixmap PhasePixmapGenerator::generatePixmap(int height, QString name)
     if (pmCache.contains(key))
         return pmCache.value(key);
     
-    QSvgRenderer svg(QString(":/resources/phases/icon_phase_" + name + ".svg"));
+    QSvgRenderer svg(QString("theme:phases/icon_phase_" + name + ".svg"));
     
     QPixmap pixmap(height, height);
     pixmap.fill(Qt::transparent);
@@ -36,13 +36,13 @@ QPixmap CounterPixmapGenerator::generatePixmap(int height, QString name, bool hi
     if (pmCache.contains(key))
         return pmCache.value(key);
     
-    QSvgRenderer svg(QString(":/resources/counters/" + name + ".svg"));
+    QSvgRenderer svg(QString("theme:counters/" + name + ".svg"));
     
     if (!svg.isValid()) {
         name = "general";
         if (highlight)
             name.append("_highlight");
-        svg.load(QString(":/resources/counters/" + name + ".svg"));
+        svg.load(QString("theme:counters/" + name + ".svg"));
     }
     
     int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
@@ -98,7 +98,7 @@ QPixmap GenderPixmapGenerator::generatePixmap(int height, int _gender)
         default: genderStr = "unknown";
     };
     
-    QSvgRenderer svg(QString(":/resources/genders/" + genderStr + ".svg"));
+    QSvgRenderer svg(QString("theme:genders/" + genderStr + ".svg"));
     int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
     QPixmap pixmap(width, height);
     pixmap.fill(Qt::transparent);
@@ -119,7 +119,7 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
     if (pmCache.contains(key))
         return pmCache.value(key);
     
-    QSvgRenderer svg(QString(":/resources/countries/" + countryCode + ".svg"));
+    QSvgRenderer svg(QString("theme:countries/" + countryCode + ".svg"));
     int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
     QPixmap pixmap(width, height);
     pixmap.fill(Qt::transparent);
@@ -154,7 +154,7 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
     if (isBuddy)
         levelString.append("_buddy");
 
-    QSvgRenderer svg(QString(":/resources/userlevels/" + levelString + ".svg"));
+    QSvgRenderer svg(QString("theme:userlevels/" + levelString + ".svg"));
     int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
     QPixmap pixmap(width, height);
     pixmap.fill(Qt::transparent);
@@ -175,7 +175,7 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QSvgRenderer svg(QString(":/resources/lock.svg"));
+    QSvgRenderer svg(QString("theme:lock.svg"));
     int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
     QPixmap pixmap(width, height);
     pixmap.fill(Qt::transparent);
