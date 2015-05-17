@@ -4,8 +4,11 @@
 #include <QObject>
 #include <QBrush>
 #include <QPixmap>
-#include <QStringList>
+#include <QMap>
 #include <QDir>
+#include <QString>
+
+typedef QMap<QString, QString> QStringMap;
 
 class QApplication;
 
@@ -16,9 +19,9 @@ public:
 private:
     QBrush handBgBrush, stackBgBrush, tableBgBrush, playerBgBrush;
     QPixmap cardBackPixmap;
-    QStringList availableThemes;
+    QStringMap availableThemes;
 protected:
-    void ensureUserThemeDirectoryExists();
+    void ensureThemeDirectoryExists();
     QBrush loadBrush(QDir dir, QString fileName, QColor fallbackColor);
     QPixmap loadPixmap(QDir dir, QString fileName);
 public:
@@ -27,7 +30,7 @@ public:
     QBrush &getTableBgBrush() { return tableBgBrush; }
     QBrush &getPlayerBgBrush() { return playerBgBrush; }
     QPixmap &getCardBackPixmap() { return cardBackPixmap; }
-    QStringList &getAvailableThemes();
+    QStringMap &getAvailableThemes();
 protected slots:
     void themeChangedSlot();
 signals:

@@ -58,6 +58,8 @@ private:
     QList<TabDeckEditor *> deckEditorTabs;
     int myAddTab(Tab *tab);
     void addCloseButtonToTab(Tab *tab, int tabIndex);
+    QString sanitizeTabName(QString dirty) const;
+    QString sanitizeHtml(QString dirty) const;
 public:
     TabSupervisor(AbstractClient *_client, QWidget *parent = 0);
     ~TabSupervisor();
@@ -76,9 +78,11 @@ signals:
     void setMenu(const QList<QMenu *> &newMenuList = QList<QMenu *>());
     void localGameEnded();
     void adminLockChanged(bool lock);
+    void maximize();
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
     void openReplay(GameReplay *replay);
+    void maximizeMainWindow();
 private slots:
     void closeButtonPressed();
     void updateCurrent(int index);

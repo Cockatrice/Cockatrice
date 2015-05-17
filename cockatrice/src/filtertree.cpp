@@ -131,15 +131,18 @@ bool FilterItemList::testTypeAndNot(const CardInfo *info, CardFilter::Attr attr)
 bool FilterItemList::testTypeOr(const CardInfo *info, CardFilter::Attr attr) const
 {
     QList<FilterItem *>::const_iterator i;
+    bool noChildEnabledChild = true;
 
     for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
         if (!(*i)->isEnabled())
             continue;
+        if(noChildEnabledChild)
+            noChildEnabledChild=false;
         if ((*i)->acceptCardAttr(info, attr))
             return true;
     }
 
-    return false;
+    return noChildEnabledChild;
 }
 
 bool FilterItemList::testTypeOrNot(const CardInfo *info, CardFilter::Attr attr) const
@@ -202,8 +205,8 @@ bool FilterItem::acceptSet(const CardInfo *info) const
 
     status = false;
     for (i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++)
-        if ((*i)->getShortName() == term
-                || (*i)->getLongName().contains(term, Qt::CaseInsensitive)) {
+        if ((*i)->getShortName().compare(term, Qt::CaseInsensitive) == 0 
+            || (*i)->getLongName().compare(term, Qt::CaseInsensitive) == 0) {
             status = true;
             break;
         }

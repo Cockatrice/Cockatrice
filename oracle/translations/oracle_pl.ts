@@ -1,34 +1,5 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" version="2.1">
 <context>
-    <name>ChooseSetsPage</name>
-    <message>
-        <source>Sets selection</source>
-        <translation>Wybór dodatków</translation>
-    </message>
-    <message>
-        <source>The following sets has been found in the source file. Please mark the sets that will be imported.
-All core and expansion sets are selected by default.</source>
-        <translation>W pliku źródłowym znaleziono następujące dodatki. Zaznacz te, które mają zostać zaimportowane.
-Domyślnie, wszystkie dodatki podstawowe oraz rozszerzenia są zaznaczone.</translation>
-    </message>
-    <message>
-        <source>&amp;Check all</source>
-        <translation>&amp;Zaznacz wszystkie</translation>
-    </message>
-    <message>
-        <source>&amp;Uncheck all</source>
-        <translation>&amp;Odznacz wszystkie</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Błąd</translation>
-    </message>
-    <message>
-        <source>Please mark at least one set.</source>
-        <translation>Proszę zaznaczyć co najmniej jeden dodatek.</translation>
-    </message>
-</context>
-<context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>
@@ -75,15 +46,15 @@ Domyślnie, wszystkie dodatki podstawowe oraz rozszerzenia są zaznaczone.</tran
     </message>
     <message>
         <source>Load sets file</source>
-        <translation type="unfinished"/>
+        <translation>Wczytaj listę dodatków</translation>
     </message>
     <message>
         <source>Sets JSON file (*.json *.zip)</source>
-        <translation type="unfinished"/>
+        <translation>Plik listy dodatków JSON (*.json, *.zip)</translation>
     </message>
     <message>
         <source>Sets JSON file (*.json)</source>
-        <translation type="unfinished"/>
+        <translation>Plik listy dodatków JSON (*.json)</translation>
     </message>
     <message>
         <source>Error</source>
@@ -123,7 +94,7 @@ Domyślnie, wszystkie dodatki podstawowe oraz rozszerzenia są zaznaczone.</tran
     </message>
     <message>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
-        <translation>Rozpakowanie Zip nieudane: archiwum Zip nie zawiera dokładnie jednego pliku.</translation>
+        <translation>Rozpakowanie pliku Zip nieudane: archiwum nie zawiera dokładnie jednego pliku.</translation>
     </message>
     <message>
         <source>Zip extraction failed: %1.</source>
@@ -205,7 +176,7 @@ Domyślnie, wszystkie dodatki podstawowe oraz rozszerzenia są zaznaczone.</tran
     <message>
         <source>The card database has been saved successfully to
 %1</source>
-        <translation>Zakończono powodzeniem zapis bazy kart do
+        <translation>Z powodzeniem zapisano bazę kart do
 %1</translation>
     </message>
     <message>
@@ -261,7 +232,7 @@ Domyślnie, wszystkie dodatki podstawowe oraz rozszerzenia są zaznaczone.</tran
     </message>
     <message>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Błąd przemieszczenia w czasie odczytu pliku.</translation>
     </message>
     <message>
         <source>Unable to create a directory.</source>
@@ -269,7 +240,7 @@ Domyślnie, wszystkie dodatki podstawowe oraz rozszerzenia są zaznaczone.</tran
     </message>
     <message>
         <source>Invalid device.</source>
-        <translation type="unfinished"/>
+        <translation>Nieprawidłowe urządzenie.</translation>
     </message>
     <message>
         <source>Invalid or incompatible zip archive.</source>
@@ -320,7 +291,7 @@ Domyślnie, wszystkie dodatki podstawowe oraz rozszerzenia są zaznaczone.</tran
     </message>
     <message>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Błąd przemieszczenia w czasie odczytu pliku.</translation>
     </message>
     <message>
         <source>Unknown error.</source>

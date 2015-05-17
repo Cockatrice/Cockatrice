@@ -114,20 +114,25 @@ void GameScene::rearrange()
 
 void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards)
 {
-        for (int i = 0; i < zoneViews.size(); i++) {
-                ZoneViewZone *temp = zoneViews[i]->getZone();
-                if ((temp->getName() == zoneName) && (temp->getPlayer() == player)) { // view is already open
-                        zoneViews[i]->close();
-                        if (temp->getNumberCards() == numberCards)
-                                return;
-                }
+    for (int i = 0; i < zoneViews.size(); i++) {
+        ZoneViewZone *temp = zoneViews[i]->getZone();
+        if ((temp->getName() == zoneName) && (temp->getPlayer() == player)) { // view is already open
+            zoneViews[i]->close();
+            if (temp->getNumberCards() == numberCards)
+                return;
         }
+    }
 
     ZoneViewWidget *item = new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false);
         zoneViews.append(item);
         connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
     addItem(item);
-    item->setPos(50, 50);
+    if (zoneName=="grave")
+        item->setPos(360, 100);
+    else if (zoneName=="rfg")
+        item->setPos(380, 120);
+    else
+        item->setPos(340, 80);
 }
 
 void GameScene::addRevealedZoneView(Player *player, CardZone *zone, const QList<const ServerInfo_Card *> &cardList, bool withWritePermission)
@@ -136,7 +141,7 @@ void GameScene::addRevealedZoneView(Player *player, CardZone *zone, const QList<
     zoneViews.append(item);
         connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
     addItem(item);
-    item->setPos(50, 50);
+    item->setPos(600, 80);
 }
 
 void GameScene::removeZoneView(ZoneViewWidget *item)
@@ -198,8 +203,13 @@ void GameScene::processViewSizeChange(const QSize &newSize)
 
     qreal extraWidthPerColumn = (newWidth - minWidth) / playersByColumn.size();
     for (int col = 0; col < playersByColumn.size(); ++col)
-        for (int row = 0; row < playersByColumn[col].size(); ++row)
+        for (int row = 0; row < playersByColumn[col].size(); ++row){
             playersByColumn[col][row]->processSceneSizeChange(minWidthByColumn[col] + extraWidthPerColumn);
+            if (col == 0)
+                playersByColumn[col][row]->setPos(phasesToolbar->getWidth(), playersByColumn[col][row]->y());
+            else
+                playersByColumn[col][row]->setPos(phasesToolbar->getWidth() + (newWidth - phasesToolbar->getWidth()) / 2, playersByColumn[col][row]->y());
+        }
 }
 
 void GameScene::updateHover(const QPointF &scenePos)

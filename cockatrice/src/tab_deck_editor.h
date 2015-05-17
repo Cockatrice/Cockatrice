@@ -20,55 +20,56 @@ class FilterTreeModel;
 class CardInfo;
 
 class SearchLineEdit : public QLineEdit {
-    private:
-        QTreeView *treeView;
-    protected:
-        void keyPressEvent(QKeyEvent *event);
-    public:
-        SearchLineEdit() : QLineEdit(), treeView(0) { }
-        void setTreeView(QTreeView *_treeView) { treeView = _treeView; }
+private:
+    QTreeView *treeView;
+protected:
+    void keyPressEvent(QKeyEvent *event);
+public:
+    SearchLineEdit() : QLineEdit(), treeView(0) { }
+    void setTreeView(QTreeView *_treeView) { treeView = _treeView; }
 };
 
 class TabDeckEditor : public Tab {
     Q_OBJECT
-private slots:
-    void updateName(const QString &name);
-    void updateComments();
-    void updateHash();
-    void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
-    void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);
-    void updateSearch(const QString &search);
+        private slots:
+            void updateName(const QString &name);
+            void updateComments();
+            void updateHash();
+            void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
+            void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);
+            void updateSearch(const QString &search);
 
-    void actNewDeck();
-    void actLoadDeck();
-    bool actSaveDeck();
-    bool actSaveDeckAs();
-    void actLoadDeckFromClipboard();
-    void actSaveDeckToClipboard();
-    void actPrintDeck();
-    void actAnalyzeDeck();
+            void actNewDeck();
+            void actLoadDeck();
+            bool actSaveDeck();
+            bool actSaveDeckAs();
+            void actLoadDeckFromClipboard();
+            void actSaveDeckToClipboard();
+            void actPrintDeck();
+            void actAnalyzeDeck();
+            void actOpenCustomFolder();
 
-    void actEditSets();
-    void actEditTokens();
+            void actEditSets();
+            void actEditTokens();
 
-    void actClearSearch();
+            void actClearSearch();
 
-    void actSwapCard();
-    void actAddCard();
-    void actAddCardToSideboard();
-    void actRemoveCard();
-    void actIncrement();
-    void actDecrement();
-    void actDecrementCard();
-    void actDecrementCardFromSideboard();
+            void actSwapCard();
+            void actAddCard();
+            void actAddCardToSideboard();
+            void actRemoveCard();
+            void actIncrement();
+            void actDecrement();
+            void actDecrementCard();
+            void actDecrementCardFromSideboard();
 
-    void actUpdatePrices();
+            //void actUpdatePrices();
 
-    void finishedUpdatingPrices();
-    void saveDeckRemoteFinished(const Response &r);
-    void filterViewCustomContextMenu(const QPoint &point);
-    void filterRemove(QAction *action);
-    void setPriceTagFeatureEnabled(int enabled);
+            void finishedUpdatingPrices();
+            void saveDeckRemoteFinished(const Response &r);
+            void filterViewCustomContextMenu(const QPoint &point);
+            void filterRemove(QAction *action);
+            void setPriceTagFeatureEnabled(int enabled);
 private:
     CardInfo *currentCardInfo() const;
     void addCardHelper(QString zoneName);
@@ -97,10 +98,10 @@ private:
     QTreeView *filterView;
 
     QMenu *deckMenu, *dbMenu;
-    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose;
+    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose, *aOpenCustomFolder;
     QAction *aEditSets, *aEditTokens, *aClearSearch, *aCardTextOnly;
-    QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement, *aUpdatePrices;
-    
+    QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;// *aUpdatePrices;
+
     bool modified;
 public:
     TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent = 0);
@@ -112,6 +113,7 @@ public:
     bool confirmClose();
 public slots:
     void closeRequest();
+    void checkFirstRunDetected();
 signals:
     void deckEditorClosing(TabDeckEditor *tab);
 };

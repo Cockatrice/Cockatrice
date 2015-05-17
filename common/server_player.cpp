@@ -158,7 +158,7 @@ void Server_Player::setupZones()
     addCounter(new Server_Counter(4, "r", makeColor(250, 150, 150), 20, 0));
     addCounter(new Server_Counter(5, "g", makeColor(150, 255, 150), 20, 0));
     addCounter(new Server_Counter(6, "x", makeColor(255, 255, 255), 20, 0));
-    addCounter(new Server_Counter(7, "storm", makeColor(255, 255, 255), 20, 0));
+    addCounter(new Server_Counter(7, "storm", makeColor(255, 150, 30), 20, 0));
 
     initialCards = 7;
 
@@ -369,12 +369,15 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
     if (cardsToMove.isEmpty())
         return Response::RespContextError;
     
-    MoveCardCompareFunctor cmp(startzone == targetzone ? -1 : x);
+    // 0 performs no sorting
+    // 1 reverses the sorting 
+    MoveCardCompareFunctor cmp(0);
     qSort(cardsToMove.begin(), cardsToMove.end(), cmp);
     
     bool secondHalf = false;
     int xIndex = -1;
-    for (int cardIndex = 0; cardIndex < cardsToMove.size(); ++cardIndex) {
+
+    for (int cardIndex = cardsToMove.size() - 1; cardIndex > -1; --cardIndex) {
         Server_Card *card = cardsToMove[cardIndex].first;
         const CardToMove *thisCardProperties = cardProperties.value(card);
         bool faceDown = thisCardProperties->has_face_down() ? thisCardProperties->face_down() : card->getFaceDown();
@@ -443,7 +446,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
                 y = 0;
                 card->resetState();
             } else
-                newX = targetzone->getFreeGridColumn(newX, y, card->getName());
+                newX = targetzone->getFreeGridColumn(newX, y, card->getName(), faceDown);
         
             targetzone->insertCard(card, newX, y);
         
@@ -1043,7 +1046,7 @@ Response::ResponseCode Server_Player::cmdAttachCard(const Command_AttachCard &cm
         if (targetzone->isColumnStacked(targetCard->getX(), targetCard->getY())) {
             CardToMove *cardToMove = new CardToMove;
             cardToMove->set_card_id(targetCard->getId());
-            targetPlayer->moveCard(ges, targetzone, QList<const CardToMove *>() << cardToMove, targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName()), targetCard->getY(), targetCard->getFaceDown());
+            targetPlayer->moveCard(ges, targetzone, QList<const CardToMove *>() << cardToMove, targetzone, targetzone->getFreeGridColumn(-2, targetCard->getY(), targetCard->getName(), false), targetCard->getY(), targetCard->getFaceDown());
             delete cardToMove;
         }
         
@@ -1080,7 +1083,7 @@ Response::ResponseCode Server_Player::cmdCreateToken(const Command_CreateToken &
     int x = cmd.x();
     int y = cmd.y();
     if (zone->hasCoords())
-        x = zone->getFreeGridColumn(x, y, cardName);
+        x = zone->getFreeGridColumn(x, y, cardName, false);
     if (x < 0)
         x = 0;
     if (y < 0)
@@ -1522,7 +1525,14 @@ Response::ResponseCode Server_Player::cmdRevealCards(const Command_RevealCards &
         return Response::RespNameNotFound;
     
     QList<Server_Card *> cardsToReveal;
-    if (!cmd.has_card_id())
+    if (cmd.top_cards() != -1) {
+        for (int i = 0; i < cmd.top_cards(); i++) {
+            Server_Card *card = zone->getCard(i);
+            if (!card)
+                return Response::RespNameNotFound;
+            cardsToReveal.append(card);
+        }
+    } else if (!cmd.has_card_id())
         cardsToReveal = zone->getCards();
     else if (cmd.card_id() == -2) {
         if (zone->getCards().isEmpty())

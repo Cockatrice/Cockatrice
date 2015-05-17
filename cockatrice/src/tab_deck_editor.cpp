@@ -16,6 +16,8 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QTextStream>
+#include <QProcessEnvironment>
+#include <QTimer>
 #include "tab_deck_editor.h"
 #include "window_sets.h"
 #include "carddatabase.h"
@@ -173,19 +175,20 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     grid->addWidget(hashLabel1, 2, 0);
     grid->addWidget(hashLabel, 2, 1);
 
-    // Update price
+    /* Update price
     aUpdatePrices = new QAction(QString(), this);
     aUpdatePrices->setIcon(QIcon("theme:icon_update.png"));
     connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
     if (!settingsCache->getPriceTagFeature())
         aUpdatePrices->setVisible(false);
     connect(settingsCache, SIGNAL(priceTagFeatureChanged(int)), this, SLOT(setPriceTagFeatureEnabled(int)));
+    */
 
     QToolBar *deckToolBar = new QToolBar;
     deckToolBar->setOrientation(Qt::Vertical);
     deckToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     deckToolBar->setIconSize(QSize(24, 24));
-    deckToolBar->addAction(aUpdatePrices);
+    //deckToolBar->addAction(aUpdatePrices);
     QHBoxLayout *deckToolbarLayout = new QHBoxLayout;
     deckToolbarLayout->addStretch();
     deckToolbarLayout->addWidget(deckToolBar);
@@ -227,6 +230,8 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     connect(aAnalyzeDeck, SIGNAL(triggered()), this, SLOT(actAnalyzeDeck()));
     aClose = new QAction(QString(), this);
     connect(aClose, SIGNAL(triggered()), this, SLOT(closeRequest()));
+    aOpenCustomFolder = new QAction(QString(), this);
+    connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
 
     aEditSets = new QAction(QString(), this);
     connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
@@ -255,6 +260,10 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     dbMenu->addSeparator();
     dbMenu->addAction(aClearSearch);
     dbMenu->addAction(aCardTextOnly);
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
+    dbMenu->addSeparator();
+    dbMenu->addAction(aOpenCustomFolder);
+#endif
     addTabMenu(dbMenu);
 
     aAddCard = new QAction(QString(), this);
@@ -279,10 +288,12 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     deckEditToolBar->addAction(aDecrement);
     deckEditToolBar->addAction(aIncrement);
     deckEditToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    
+
     retranslateUi();
     
     resize(950, 700);
+
+    QTimer::singleShot(0, this, SLOT(checkFirstRunDetected()));
 }
 
 TabDeckEditor::~TabDeckEditor()
@@ -299,8 +310,8 @@ void TabDeckEditor::retranslateUi()
     commentsLabel->setText(tr("&Comments:"));
     hashLabel1->setText(tr("Hash:"));
     
-    aUpdatePrices->setText(tr("&Update prices"));
-    aUpdatePrices->setShortcut(tr("Ctrl+U"));
+    //aUpdatePrices->setText(tr("&Update prices"));
+    //aUpdatePrices->setShortcut(QKeySequence("Ctrl+U"));
 
     aNewDeck->setText(tr("&New deck"));
     aLoadDeck->setText(tr("&Load deck..."));
@@ -310,21 +321,22 @@ void TabDeckEditor::retranslateUi()
     aSaveDeckToClipboard->setText(tr("Save deck to clip&board"));
     aPrintDeck->setText(tr("&Print deck..."));
     aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
+    aOpenCustomFolder->setText(tr("Open custom image folder"));
     aClose->setText(tr("&Close"));
-    aClose->setShortcut(tr("Ctrl+Q"));
+    aClose->setShortcut(QKeySequence("Ctrl+Q"));
     
     aAddCard->setText(tr("Add card to &maindeck"));
     aAddCardToSideboard->setText(tr("Add card to &sideboard"));
 
     aRemoveCard->setText(tr("&Remove row"));
-    aRemoveCard->setShortcut(tr("Del"));
+    aRemoveCard->setShortcut(QKeySequence("Del"));
     aIncrement->setText(tr("&Increment number"));
-    aIncrement->setShortcut(tr("+"));
+    aIncrement->setShortcut(QKeySequence("+"));
     aDecrement->setText(tr("&Decrement number"));
-    aDecrement->setShortcut(tr("-"));
+    aDecrement->setShortcut(QKeySequence("-"));
     
-    deckMenu->setTitle(tr("&Deck editor"));
-    dbMenu->setTitle(tr("C&ard database"));
+    deckMenu->setTitle(tr("&Deck Editor"));
+    dbMenu->setTitle(tr("C&ard Database"));
     
     aEditSets->setText(tr("&Edit sets..."));
     aEditTokens->setText(tr("Edit &tokens..."));
@@ -522,6 +534,28 @@ void TabDeckEditor::actAnalyzeDeck()
     interface->analyzeDeck(deckModel->getDeckList());
 }
 
+
+void TabDeckEditor::actOpenCustomFolder() {
+
+#if defined(Q_OS_MAC)
+
+    QStringList scriptArgs;
+    scriptArgs << QLatin1String("-e");
+    scriptArgs << QString::fromLatin1("tell application \"Finder\" to open POSIX file \"%1\"").arg(settingsCache->getPicsPath() + "/custom/");
+    scriptArgs << QLatin1String("-e");
+    scriptArgs << QLatin1String("tell application \"Finder\" to activate");
+
+    QProcess::execute("/usr/bin/osascript", scriptArgs);
+#endif
+#if defined(Q_OS_WIN)
+    QStringList args;
+    QString pathToFolder = settingsCache->getPicsPath().append("/custom");
+    args << QDir::toNativeSeparators(pathToFolder);
+    QProcess::startDetached("explorer", args);
+#endif
+
+}
+
 void TabDeckEditor::actEditSets()
 {
     WndSets *w = new WndSets;
@@ -667,12 +701,14 @@ void TabDeckEditor::actDecrement()
     offsetCountAtIndex(currentIndex, -1);
 }
 
-void TabDeckEditor::setPriceTagFeatureEnabled(int enabled)
+void TabDeckEditor::setPriceTagFeatureEnabled(int /* enabled */)
 {
-    aUpdatePrices->setVisible(enabled);
+    //aUpdatePrices->setVisible(enabled);
     deckModel->pricesUpdated();
 }
 
+
+/*
 void TabDeckEditor::actUpdatePrices()
 {
     aUpdatePrices->setDisabled(true);
@@ -689,12 +725,14 @@ void TabDeckEditor::actUpdatePrices()
     connect(up, SIGNAL(finishedUpdate()), this, SLOT(finishedUpdatingPrices()));
     up->updatePrices();
 }
+*/
+
 
 void TabDeckEditor::finishedUpdatingPrices()
 {
-    deckModel->pricesUpdated();
-    setModified(true);
-    aUpdatePrices->setDisabled(false);
+    //deckModel->pricesUpdated();
+    //setModified(true);
+    //aUpdatePrices->setDisabled(false);
 }
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)
@@ -745,4 +783,13 @@ void TabDeckEditor::filterRemove(QAction *action) {
         return;
 
     filterModel->removeRow(idx.row(), idx.parent());
+}
+
+void TabDeckEditor::checkFirstRunDetected()
+{
+    if(db->hasDetectedFirstRun())
+    {
+        QMessageBox::information(this, tr("Welcome"), tr("Hi! Its seems like it's the first time you run this version of Cockatrice.\nAll the sets in the card database have been enabled.\nRead more about changing the set order or disabling specific sets in the the \"Edit Sets\" window."));
+        actEditSets();
+    }
 }

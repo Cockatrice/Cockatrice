@@ -121,7 +121,7 @@ private:
     int currentReplayStep;
     QList<int> replayTimeline;
     ReplayTimelineWidget *timelineWidget;
-    QToolButton *replayToStartButton, *replayStartButton, *replayPauseButton, *replayStopButton, *replayFastForwardButton, *replayToEndButton;
+    QToolButton *replayStartButton, *replayPauseButton, *replayFastForwardButton;
     
     QSplitter *splitter;
     CardInfoWidget *cardInfo;
@@ -176,12 +176,9 @@ signals:
 private slots:
     void replayNextEvent();
     void replayFinished();
-    void replayToStartButtonClicked();
     void replayStartButtonClicked();
     void replayPauseButtonClicked();
-    void replayStopButtonClicked();
     void replayFastForwardButtonToggled(bool checked);
-    void replayToEndButtonClicked();
     
     void incrementGameTime();
     void adminLockChanged(bool lock);
@@ -198,6 +195,7 @@ private slots:
     void actNextTurn();
 
     void addMentionTag(QString value);
+    void commandFinished(const Response &response);
 public:
     TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);

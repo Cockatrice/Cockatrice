@@ -126,7 +126,10 @@ void TabSupervisor::retranslateUi()
     
     for (int i = 0; i < tabs.size(); ++i)
         if (tabs[i]) {
-            setTabText(indexOf(tabs[i]), tabs[i]->getTabText());
+            int idx = indexOf(tabs[i]);
+            QString tabText = tabs[i]->getTabText();
+            setTabText(idx, sanitizeTabName(tabText));
+            setTabToolTip(idx, sanitizeHtml(tabText));
             tabs[i]->retranslateUi();
         }
 }
@@ -153,11 +156,30 @@ AbstractClient *TabSupervisor::getClient() const
     return localClients.isEmpty() ? client : localClients.first();
 }
 
+QString TabSupervisor::sanitizeTabName(QString dirty) const
+{
+    return dirty.replace("&", "&&");
+}
+
+QString TabSupervisor::sanitizeHtml(QString dirty) const
+{
+    return dirty
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;");
+}
+
 int TabSupervisor::myAddTab(Tab *tab)
 {
     connect(tab, SIGNAL(userEvent(bool)), this, SLOT(tabUserEvent(bool)));
     connect(tab, SIGNAL(tabTextChanged(Tab *, QString)), this, SLOT(updateTabText(Tab *, QString)));
-    return addTab(tab, tab->getTabText());
+
+    QString tabText = tab->getTabText();
+    int idx = addTab(tab, sanitizeTabName(tabText));
+    setTabToolTip(idx, sanitizeHtml(tabText));
+
+    return idx;
 }
 
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
@@ -342,6 +364,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 {
     TabRoom *tab = new TabRoom(this, client, userInfo, info);
+    connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));   
     connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
     connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
     int tabIndex = myAddTab(tab);
@@ -400,12 +423,17 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
 
     tab = new TabMessage(this, client, *userInfo, otherUser);
     connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
+    connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     messageTabs.insert(receiverName, tab);
     if (focus)
         setCurrentWidget(tab);
     return tab;
+}
+
+void TabSupervisor::maximizeMainWindow() {
+    emit maximize();
 }
 
 void TabSupervisor::talkLeft(TabMessage *tab)
@@ -452,7 +480,9 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
 
 void TabSupervisor::updateTabText(Tab *tab, const QString &newTabText)
 {
-    setTabText(indexOf(tab), newTabText);
+    int idx = indexOf(tab);
+    setTabText(idx, sanitizeTabName(newTabText));
+    setTabToolTip(idx, sanitizeHtml(newTabText));
 }
 
 void TabSupervisor::processRoomEvent(const RoomEvent &event)

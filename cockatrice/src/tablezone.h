@@ -29,6 +29,7 @@ private:
     /*
     Default inactive mask and border gradient 
     */
+    static const QColor BACKGROUND_COLOR;
     static const QColor FADE_MASK;
     static const QColor GRADIENT_COLOR;
     static const QColor GRADIENT_COLORLESS;

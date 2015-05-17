@@ -18,6 +18,8 @@ private:
     QMap<int, GameTypeMap> gameTypes;
 
     static const int NUM_COLS = 8;
+    static const int SECS_PER_MIN  = 60;
+    static const int SECS_PER_HOUR = 3600;
 public:
     static const int SORT_ROLE = Qt::UserRole+1;
 
@@ -26,7 +28,7 @@ public:
     int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return NUM_COLS; }
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-
+    const QString getGameCreatedString(const int secs) const;
     const ServerInfo_Game &getGame(int row);
 
     /**
@@ -45,7 +47,7 @@ class GamesProxyModel : public QSortFilterProxyModel {
 private:
     ServerInfo_User *ownUser;
     bool unavailableGamesVisible;
-    bool passwordProtectedGamesHidden;
+    bool showPasswordProtectedGames;
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
     int maxPlayersFilterMin, maxPlayersFilterMax;
@@ -62,8 +64,8 @@ public:
 
     bool getUnavailableGamesVisible() const { return unavailableGamesVisible; }
     void setUnavailableGamesVisible(bool _unavailableGamesVisible);
-    bool getPasswordProtectedGamesHidden() const { return passwordProtectedGamesHidden; }
-    void setPasswordProtectedGamesHidden(bool _passwordProtectedGamesHidden);
+    bool getShowPasswordProtectedGames() const { return showPasswordProtectedGames; }
+    void setShowPasswordProtectedGames(bool _showPasswordProtectedGames);
     QString getGameNameFilter() const { return gameNameFilter; }
     void setGameNameFilter(const QString &_gameNameFilter);
     QString getCreatorNameFilter() const { return creatorNameFilter; }

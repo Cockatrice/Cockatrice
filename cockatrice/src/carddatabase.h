@@ -31,6 +31,7 @@ private:
     unsigned int sortKey;
     QDate releaseDate;
     QString setType;
+    bool enabled, isknown;
 public:
     CardSet(const QString &_shortName = QString(), const QString &_longName = QString(), const QString &_setType = QString(), const QDate &_releaseDate = QDate());
     QString getCorrectedShortName() const;
@@ -38,9 +39,17 @@ public:
     QString getLongName() const { return longName; }
     QString getSetType() const { return setType; }
     QDate getReleaseDate() const { return releaseDate; }
+    void setLongName(QString & _longName) { longName = _longName; }
+    void setSetType(QString & _setType) { setType = _setType; }
+    void setReleaseDate(QDate & _releaseDate) { releaseDate = _releaseDate; }
+
+    void loadSetOptions();
     int getSortKey() const { return sortKey; }
     void setSortKey(unsigned int _sortKey);
-    void updateSortKey();
+    bool getEnabled() const { return enabled; }
+    void setEnabled(bool _enabled);
+    bool getIsKnown() const { return isknown; }
+    void setIsKnown(bool _isknown);
 };
 
 class SetList : public QList<CardSet *> {
@@ -48,6 +57,12 @@ private:
     class CompareFunctor;
 public:
     void sortByKey();
+    void guessSortKeys();
+    void enableAllUnknown();
+    void enableAll();
+    void markAllAsKnown();
+    int getEnabledSetsNum();
+    int getUnknownSetsNum();
 };
 
 class PictureToLoad {
@@ -142,6 +157,7 @@ public:
         MuidMap muids = MuidMap());
     ~CardInfo();
     const QString &getName() const { return name; }
+    const QString &getSimpleName() const { return simpleName; }
     bool getIsToken() const { return isToken; }
     const SetList &getSets() const { return sets; }
     const QString &getManaCost() const { return manacost; }
@@ -216,12 +232,14 @@ protected:
     QThread *pictureLoaderThread;
     PictureLoader *pictureLoader;
     LoadStatus loadStatus;
+    bool detectedFirstRun;
 private:
     static const int versionNeeded;
     void loadCardsFromXml(QXmlStreamReader &xml, bool tokens);
     void loadSetsFromXml(QXmlStreamReader &xml);
 
     CardInfo *getCardFromMap(CardNameMap &cardMap, const QString &cardName, bool createIfNotFound);
+    void checkUnknownSets();
 public:
     static const char* TOKENS_SETNAME;
 
@@ -249,9 +267,11 @@ public:
     bool getLoadSuccess() const { return loadStatus == Ok; }
     void cacheCardPixmaps(const QStringList &cardNames);
     void loadImage(CardInfo *card);
+    bool hasDetectedFirstRun();
 public slots:
     void clearPixmapCache();
     LoadStatus loadCardDatabase(const QString &path, bool tokens = false);
+    void emitCardListChanged();
 private slots:
     void imageLoaded(CardInfo *card, QImage image);
     void picDownloadChanged();

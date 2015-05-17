@@ -1,7 +1,7 @@
 find_package(Git)
 if(GIT_FOUND)
 	execute_process(
-		COMMAND ${GIT_EXECUTABLE} describe --long --always
+		COMMAND ${GIT_EXECUTABLE} log -1 --date=short "--pretty=%h (%cd)"
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		RESULT_VARIABLE res_var
 		OUTPUT_VARIABLE GIT_COM_ID

@@ -160,7 +160,31 @@ void ServerSocketInterface::readClient()
             return;
 
         CommandContainer newCommandContainer;
-        newCommandContainer.ParseFromArray(inputBuffer.data(), messageLength);
+        try {
+            newCommandContainer.ParseFromArray(inputBuffer.data(), messageLength);
+        }
+        catch(std::exception &e) {
+            qDebug() << "Caught std::exception in" << __FILE__ << __LINE__ << 
+#ifdef _MSC_VER // Visual Studio
+                __FUNCTION__;
+#else
+                __PRETTY_FUNCTION__;
+#endif
+            qDebug() << "Exception:" << e.what();
+            qDebug() << "Message coming from:" << getAddress();
+            qDebug() << "Message length:" << messageLength;
+            qDebug() << "Message content:" << inputBuffer.toHex();
+        }
+        catch(...) {
+            qDebug() << "Unhandled exception in" << __FILE__ << __LINE__ <<
+#ifdef _MSC_VER // Visual Studio
+                __FUNCTION__;
+#else
+                __PRETTY_FUNCTION__;
+#endif
+            qDebug() << "Message coming from:" << getAddress();
+        }
+
         inputBuffer.remove(0, messageLength);
         messageInProgress = false;
 
@@ -375,10 +399,15 @@ bool ServerSocketInterface::deckListHelper(int folderId, ServerInfo_DeckStorage_
     if (!sqlInterface->execSqlQuery(query))
         return false;
 
-    while (query->next()) {
+    QMap<int, QString> results;
+    while(query->next())
+        results[query->value(0).toInt()] = query->value(1).toString();
+
+    foreach(int key, results.keys())
+    {
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(query->value(0).toInt());
-        newItem->set_name(query->value(1).toString().toStdString());
+        newItem->set_id(key);
+        newItem->set_name(results.value(key).toStdString());
 
         if (!deckListHelper(newItem->id(), newItem->mutable_folder()))
             return false;

@@ -32,7 +32,6 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     QVariant editionCards;
     QString setType;
     QDate releaseDate;
-    bool import;
 
     while (it.hasNext()) {
         map = it.next().toMap();
@@ -45,11 +44,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
             setType[0] = setType[0].toUpper();
         releaseDate = map.value("releaseDate").toDate();
 
-        // core and expansion sets are marked to be imported by default
-        import = (0 == QString::compare(setType, QString("core"), Qt::CaseInsensitive) ||
-            0 == QString::compare(setType, QString("expansion"), Qt::CaseInsensitive));
-
-        newSetList.append(SetToDownload(edition, editionLong, editionCards, import, setType, releaseDate));
+        newSetList.append(SetToDownload(edition, editionLong, editionCards, setType, releaseDate));
     }
 
     qSort(newSetList);
@@ -69,9 +64,10 @@ CardInfo *OracleImporter::addCard(const QString &setName,
                                   const QString &cardType,
                                   const QString &cardPT,
                                   int cardLoyalty,
-                                  const QStringList &cardText)
+                                  const QString &cardText,
+                                  const QStringList & colors)
 {
-    QString fullCardText = cardText.join("\n");
+    QStringList cardTextRows = cardText.split("\n");
     bool splitCard = false;
     if (cardName.contains('(')) {
         cardName.remove(QRegExp(" \\(.*\\)"));
@@ -90,35 +86,19 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     CardInfo *card;
     if (cards.contains(cardName)) {
         card = cards.value(cardName);
-        if (splitCard && !card->getText().contains(fullCardText))
-            card->setText(card->getText() + "\n---\n" + fullCardText);
+        if (splitCard && !card->getText().contains(cardText))
+            card->setText(card->getText() + "\n---\n" + cardText);
     } else {
         bool mArtifact = false;
         if (cardType.endsWith("Artifact"))
-            for (int i = 0; i < cardText.size(); ++i)
-                if (cardText[i].contains("{T}") && cardText[i].contains("to your mana pool"))
+            for (int i = 0; i < cardTextRows.size(); ++i)
+                if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
                     mArtifact = true;
                     
-        QStringList colors;
-        QStringList allColors = QStringList() << "W" << "U" << "B" << "R" << "G";
-        for (int i = 0; i < allColors.size(); i++)
-            if (cardCost.contains(allColors[i]))
-                colors << allColors[i];
+        bool cipt = cardText.contains(cardName + " enters the battlefield tapped") &&
+            !cardText.contains(cardName + " enters the battlefield tapped unless");
         
-        if (cardText.contains(cardName + " is white."))
-            colors << "W";
-        if (cardText.contains(cardName + " is blue."))
-            colors << "U";
-        if (cardText.contains(cardName + " is black."))
-            colors << "B";
-        if (cardText.contains(cardName + " is red."))
-            colors << "R";
-        if (cardText.contains(cardName + " is green."))
-            colors << "G";
-        
-        bool cipt = (cardText.contains(cardName + " enters the battlefield tapped."));
-        
-        card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, fullCardText, colors, cardLoyalty, cipt);
+        card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, cardLoyalty, cipt);
         int tableRow = 1;
         QString mainCardType = card->getMainCardType();
         if ((mainCardType == "Land") || mArtifact)
@@ -136,6 +116,25 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     return card;
 }
 
+void OracleImporter::extractColors(const QStringList & in, QStringList & out)
+{
+    foreach(QString c, in)
+    {
+        if (c == "White")
+            out << "W";
+        else if (c == "Blue")
+            out << "U";
+        else if (c == "Black")
+            out << "B";
+        else if (c == "Red")
+            out << "R";
+        else if (c == "Green")
+            out << "G";
+        else
+            qDebug() << "error: unknown color:" << c;
+    }
+}
+
 int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
 {
     int cards = 0;
@@ -148,6 +147,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
     QString cardType;
     QString cardPT;
     QString cardText;
+    QStringList colors;
     int cardId;
     int cardLoyalty;
     bool cardIsToken = false;
@@ -187,7 +187,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
                 // add first card's data
                 cardName = card1->contains("name") ? card1->value("name").toString() : QString("");
                 cardCost = card1->contains("manaCost") ? card1->value("manaCost").toString() : QString("");
-                cmc = card1->contains("cmc") ? card1->value("cmc").toString() : QString("");
+                cmc = card1->contains("cmc") ? card1->value("cmc").toString() : QString("0");
                 cardType = card1->contains("type") ? card1->value("type").toString() : QString("");
                 cardPT = card1->contains("power") || card1->contains("toughness") ? card1->value("power").toString() + QString('/') + card1->value("toughness").toString() : QString("");
                 cardText = card1->contains("text") ? card1->value("text").toString() : QString("");
@@ -195,10 +195,16 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
                 // add second card's data
                 cardName += card2->contains("name") ? QString(" // ") + card2->value("name").toString() : QString("");
                 cardCost += card2->contains("manaCost") ? QString(" // ") + card2->value("manaCost").toString() : QString("");
-                cmc += card2->contains("cmc") ? QString(" // ") + card2->value("cmc").toString() : QString("");
+                cmc += card2->contains("cmc") ? QString(" // ") + card2->value("cmc").toString() : QString("0");
                 cardType += card2->contains("type") ? QString(" // ") + card2->value("type").toString() : QString("");
                 cardPT += card2->contains("power") || card2->contains("toughness") ? QString(" // ") + card2->value("power").toString() + QString('/') + card2->value("toughness").toString() : QString("");
                 cardText += card2->contains("text") ? QString("\n\n---\n\n") + card2->value("text").toString() : QString("");
+
+                colors.clear();
+                extractColors(card1->value("colors").toStringList(), colors);
+                extractColors(card2->value("colors").toStringList(), colors);
+                colors.removeDuplicates();
+
             } else {
                 // first card of a pair; enqueue for later merging
                 // Conditional on cardId because promo prints have no muid - see #640
@@ -210,13 +216,16 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
             // normal cards handling
             cardName = map.contains("name") ? map.value("name").toString() : QString("");
             cardCost = map.contains("manaCost") ? map.value("manaCost").toString() : QString("");
-            cmc = map.contains("cmc") ? map.value("cmc").toString() : QString("");
+            cmc = map.contains("cmc") ? map.value("cmc").toString() : QString("0");
             cardType = map.contains("type") ? map.value("type").toString() : QString("");
             cardPT = map.contains("power") || map.contains("toughness") ? map.value("power").toString() + QString('/') + map.value("toughness").toString() : QString("");
             cardText = map.contains("text") ? map.value("text").toString() : QString("");
             cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
             cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toInt() : 0;
             cardIsToken = map.value("layout") == "token";
+
+            colors.clear();
+            extractColors(map.value("colors").toStringList(), colors);
 
             // Distinguish Vanguard cards from regular cards of the same name.
             if (map.value("layout") == "vanguard") {
@@ -225,7 +234,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
         }
 
         if (!cardIsToken) {
-            CardInfo *card = addCard(set->getShortName(), cardName, cardIsToken, cardId, cardCost, cmc, cardType, cardPT, cardLoyalty, cardText.split("\n"));
+            CardInfo *card = addCard(set->getShortName(), cardName, cardIsToken, cardId, cardCost, cmc, cardType, cardPT, cardLoyalty, cardText, colors);
 
             if (!set->contains(card)) {
                 card->addToSet(set);
@@ -251,10 +260,7 @@ int OracleImporter::startImport()
 
     while (it.hasNext())
     {
-        curSet = & it.next();
-        if(!curSet->getImport())
-            continue;
-            
+        curSet = & it.next();            
         CardSet *set = new CardSet(curSet->getShortName(), curSet->getLongName(), curSet->getSetType(), curSet->getReleaseDate());
         if (!sets.contains(set->getShortName()))
             sets.insert(set->getShortName(), set);

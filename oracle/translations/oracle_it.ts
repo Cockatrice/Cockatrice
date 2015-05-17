@@ -1,34 +1,5 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="it" version="2.1">
 <context>
-    <name>ChooseSetsPage</name>
-    <message>
-        <source>Sets selection</source>
-        <translation>Selezione dei set</translation>
-    </message>
-    <message>
-        <source>The following sets has been found in the source file. Please mark the sets that will be imported.
-All core and expansion sets are selected by default.</source>
-        <translation>I seguenti set sono stati trovati nel file. Seleziona i set che verranno importati.
-Tutti i set base e le espansioni sono selezionate di default.</translation>
-    </message>
-    <message>
-        <source>&amp;Check all</source>
-        <translation>Seleziona tutti</translation>
-    </message>
-    <message>
-        <source>&amp;Uncheck all</source>
-        <translation>Deseleziona tutti</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Errore</translation>
-    </message>
-    <message>
-        <source>Please mark at least one set.</source>
-        <translation>Seleziona perlomeno un set.</translation>
-    </message>
-</context>
-<context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>

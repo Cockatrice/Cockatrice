@@ -60,8 +60,11 @@ public:
     virtual int getMaxMessageCountPerInterval() const { return 0; }
     virtual int getMaxMessageSizePerInterval() const { return 0; }
     virtual int getMaxGamesPerUser() const { return 0; }
+    virtual int getCommandCountingInterval() const { return 0; }
+    virtual int getMaxCommandCountPerInterval() const { return 0; }
+
     virtual bool getThreaded() const { return false; }
-    
+
     Server_DatabaseInterface *getDatabaseInterface() const;
     int getNextLocalGameId() { QMutexLocker locker(&nextLocalGameIdMutex); return ++nextLocalGameId; }
     

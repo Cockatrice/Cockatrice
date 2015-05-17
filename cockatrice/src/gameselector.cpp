@@ -35,6 +35,16 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     gameListView->sortByColumn(gameListModel->startTimeColIndex(), Qt::AscendingOrder);
     gameListView->setAlternatingRowColors(true);
     gameListView->setRootIsDecorated(true);
+    // game created width
+    gameListView->resizeColumnToContents(1);
+    // players width
+    gameListView->resizeColumnToContents(6);
+    // description width
+    gameListView->setColumnWidth(2, gameListView->columnWidth(2) * 1.7);
+    // creator width
+    gameListView->setColumnWidth(3, gameListView->columnWidth(3) * 1.2);
+    // game type width
+    gameListView->setColumnWidth(4, gameListView->columnWidth(4) * 1.4);
     if (_room)
         gameListView->header()->hideSection(gameListModel->roomColIndex());
 
@@ -50,7 +60,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 #endif
     filterButton = new QPushButton;
-    filterButton->setIcon(QIcon("theme:icon_search.svg"));
+    filterButton->setIcon(QIcon("theme:icon_search_black.svg"));
     connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));
     clearFilterButton = new QPushButton;
     clearFilterButton->setIcon(QIcon("theme:icon_clearsearch.svg"));
@@ -103,7 +113,7 @@ void GameSelector::actSetFilter()
     clearFilterButton->setEnabled(true);
 
     gameListProxyModel->setUnavailableGamesVisible(dlg.getUnavailableGamesVisible());
-    gameListProxyModel->setPasswordProtectedGamesHidden(dlg.getPasswordProtectedGamesHidden());
+    gameListProxyModel->setShowPasswordProtectedGames(dlg.getShowPasswordProtectedGames());
     gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());
     gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());

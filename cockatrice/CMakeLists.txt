@@ -129,7 +129,6 @@ if(Qt4_FOUND)
 
     SET(QT_USE_QTNETWORK TRUE)
     SET(QT_USE_QTMULTIMEDIA TRUE)
-    SET(QT_USE_QTXML TRUE)
     SET(QT_USE_QTSVG TRUE)
 
     # Include directories
@@ -176,13 +175,6 @@ if(Qt5Widgets_FOUND)
     if(Qt5PrintSupport_FOUND)
         include_directories(${Qt5PrintSupport_INCLUDE_DIRS})
         list(APPEND COCKATRICE_LIBS PrintSupport)
-    endif()
-
-    # QtXml
-    find_package(Qt5Xml)
-    if(Qt5Xml_FOUND)
-        include_directories(${Qt5Xml_INCLUDE_DIRS})
-        list(APPEND COCKATRICE_LIBS Xml)
     endif()
 
     # QtSvg
@@ -251,6 +243,7 @@ if(UNIX)
         set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
         set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
         set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+        set_target_properties(cockatrice PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
         INSTALL(TARGETS cockatrice BUNDLE DESTINATION ./)
         INSTALL(FILES ${cockatrice_QM} DESTINATION ./cockatrice.app/Contents/Resources/translations)

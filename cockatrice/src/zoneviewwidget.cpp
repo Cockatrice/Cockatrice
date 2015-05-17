@@ -7,6 +7,8 @@
 #include <QPainter>
 #include <QPalette>
 #include <QScrollBar>
+#include <QStyleOption>
+#include <QStyleOptionTitleBar>
 #include "zoneviewwidget.h"
 #include "carditem.h"
 #include "zoneviewzone.h"
@@ -57,36 +59,29 @@ void TitleLabel::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 }
 
 ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, bool _revealZone, bool _writeableRevealZone, const QList<const ServerInfo_Card *> &cardList)
-    : QGraphicsWidget(0, Qt::Tool | Qt::FramelessWindowHint), player(_player), canBeShuffled(_origZone->getIsShufflable())
+    : QGraphicsWidget(0, Qt::Window), canBeShuffled(_origZone->getIsShufflable()), player(_player)
 {
     setAcceptHoverEvents(true);
     setAttribute(Qt::WA_DeleteOnClose);
     setZValue(2000000006);
     setFlag(ItemIgnoresTransformations);
 
-    QGraphicsLinearLayout *hbox = new QGraphicsLinearLayout(Qt::Horizontal);
-    titleLabel = new TitleLabel;
-    connect(titleLabel, SIGNAL(mouseMoved(QPointF)), this, SLOT(moveWidget(QPointF)));
-    closeButton = new QPushButton("X");
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
-    closeButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    QGraphicsProxyWidget *closeButtonProxy = new QGraphicsProxyWidget;
-    closeButtonProxy->setWidget(closeButton);
-
-    hbox->addItem(titleLabel);
-    hbox->addItem(closeButtonProxy);
     QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
-
-    vbox->addItem(hbox);
+    QGraphicsLinearLayout *hPilebox = 0;
 
     if (numberCards < 0) {
+        hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
+        QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
+
         QGraphicsProxyWidget *sortByNameProxy = new QGraphicsProxyWidget;
         sortByNameProxy->setWidget(&sortByNameCheckBox);
-        vbox->addItem(sortByNameProxy);
+        hFilterbox->addItem(sortByNameProxy);
 
         QGraphicsProxyWidget *sortByTypeProxy = new QGraphicsProxyWidget;
         sortByTypeProxy->setWidget(&sortByTypeCheckBox);
-        vbox->addItem(sortByTypeProxy);
+        hFilterbox->addItem(sortByTypeProxy);
+
+        vbox->addItem(hFilterbox);
 
         QGraphicsProxyWidget *lineProxy = new QGraphicsProxyWidget;
         QFrame *line = new QFrame;
@@ -97,15 +92,17 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 
         QGraphicsProxyWidget *pileViewProxy = new QGraphicsProxyWidget;
         pileViewProxy->setWidget(&pileViewCheckBox);
-        vbox->addItem(pileViewProxy);
+        hPilebox->addItem(pileViewProxy);
     }
 
     if (_origZone->getIsShufflable() && (numberCards == -1)) {
         shuffleCheckBox.setChecked(true);
         QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
         shuffleProxy->setWidget(&shuffleCheckBox);
-        vbox->addItem(shuffleProxy);
+        hPilebox->addItem(shuffleProxy);
     }
+
+    vbox->addItem(hPilebox);
 
     extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
     resize(150, 150);
@@ -170,17 +167,11 @@ void ZoneViewWidget::processSetPileView(int value) {
 
 void ZoneViewWidget::retranslateUi()
 {
-    titleLabel->setText(zone->getTranslatedName(false, CaseNominative));
+    setWindowTitle(zone->getTranslatedName(false, CaseNominative));
     sortByNameCheckBox.setText(tr("sort by name"));
     sortByTypeCheckBox.setText(tr("sort by type"));
     shuffleCheckBox.setText(tr("shuffle when closing"));
     pileViewCheckBox.setText(tr("pile view"));
-}
-
-void ZoneViewWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    painter->fillRect(boundingRect(), palette().color(QPalette::Window));
-    QGraphicsWidget::paint(painter, option, widget);
 }
 
 void ZoneViewWidget::moveWidget(QPointF scenePos)
@@ -254,4 +245,10 @@ void ZoneViewWidget::zoneDeleted()
 {
     emit closePressed(this);
     deleteLater();
+}
+
+void ZoneViewWidget::initStyleOption(QStyleOption *option) const {
+    QStyleOptionTitleBar *titleBar = qstyleoption_cast<QStyleOptionTitleBar *>(option);
+    if (titleBar)
+        titleBar->icon = QIcon("theme:appicon.svg");
 }

@@ -184,6 +184,22 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
 
 Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
 {
+    static QList<GameCommand::GameCommandType> antifloodCommandsWhiteList = QList<GameCommand::GameCommandType>()
+        // draw/undo card draw (example: drawing 10 cards one by one from the deck)
+        << GameCommand::DRAW_CARDS
+        << GameCommand::UNDO_DRAW
+        // create, delete arrows (example: targeting with 10 cards during an attack)
+        << GameCommand::CREATE_ARROW
+        << GameCommand::DELETE_ARROW
+        // set card attributes (example: tapping 10 cards at once)
+        << GameCommand::SET_CARD_ATTR
+        // increment / decrement counter (example: -10 life points one by one)
+        << GameCommand::INC_COUNTER
+        // mulling lots of hands in a row
+        << GameCommand::MULLIGAN
+        // allows a user to sideboard without receiving flooding message
+        << GameCommand::MOVE_CARD;
+
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
     
@@ -217,12 +233,29 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     if (!player)
         return Response::RespNotInRoom;
     
+    int commandCountingInterval = server->getCommandCountingInterval();
+    int maxCommandCountPerInterval = server->getMaxCommandCountPerInterval();
     GameEventStorage ges;
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.game_command_size() - 1; i >= 0; --i) {
         const GameCommand &sc = cont.game_command(i);
         logDebugMessage(QString("game %1 player %2: ").arg(cont.game_id()).arg(roomIdAndPlayerId.second) + QString::fromStdString(sc.ShortDebugString()));
-        
+
+        if (commandCountingInterval > 0) {
+            int totalCount = 0;
+            if (commandCountOverTime.isEmpty())
+                commandCountOverTime.prepend(0);
+
+            if(!antifloodCommandsWhiteList.contains((GameCommand::GameCommandType) getPbExtension(sc)))
+                ++commandCountOverTime[0];
+
+            for (int i = 0; i < commandCountOverTime.size(); ++i)
+                totalCount += commandCountOverTime[i];
+            
+            if (totalCount > maxCommandCountPerInterval)
+                return Response::RespChatFlood;
+        }
+
         Response::ResponseCode resp = player->processGameCommand(sc, rc, ges);
 
         if (resp != Response::RespOk)
@@ -314,7 +347,14 @@ void Server_ProtocolHandler::pingClockTimeout()
         if (messageCountOverTime.size() > server->getMessageCountingInterval())
             messageCountOverTime.removeLast();
     }
-    
+
+    interval = server->getCommandCountingInterval();
+    if (interval > 0) {
+        commandCountOverTime.prepend(0);
+        if (commandCountOverTime.size() > server->getCommandCountingInterval())
+            commandCountOverTime.removeLast();
+    }
+
     if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
         prepareDestroy();
     ++timeRunning;

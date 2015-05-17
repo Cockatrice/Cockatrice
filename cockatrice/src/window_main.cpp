@@ -28,6 +28,8 @@
 #include <QFileDialog>
 #include <QThread>
 #include <QDateTime>
+#include <QSystemTrayIcon>
+#include <QApplication>
 
 #include "main.h"
 #include "window_main.h"
@@ -76,7 +78,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
             break;
         }
         case Event_ConnectionClosed::SERVER_SHUTDOWN: reasonStr = tr("Scheduled server shutdown."); break;
-        case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username."); break;
+        case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."); break;
         default: reasonStr = QString::fromStdString(event.reason_str());
     }
     QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
@@ -84,7 +86,13 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
 
 void MainWindow::processServerShutdownEvent(const Event_ServerShutdown &event)
 {
-    QMessageBox::information(this, tr("Scheduled server shutdown"), tr("The server is going to be restarted in %n minute(s).\nAll running games will be lost.\nReason for shutdown: %1", "", event.minutes()).arg(QString::fromStdString(event.reason())));
+    if (serverShutdownMessageBox)
+        serverShutdownMessageBox->close();
+    serverShutdownMessageBox = new QMessageBox(this);
+    serverShutdownMessageBox->setAttribute(Qt::WA_DeleteOnClose);
+    serverShutdownMessageBox->setInformativeText(tr("The server is going to be restarted in %n minute(s).\nAll running games will be lost.\nReason for shutdown: %1", "", event.minutes()).arg(QString::fromStdString(event.reason())));
+    serverShutdownMessageBox->setText(tr("Scheduled server shutdown"));
+    serverShutdownMessageBox->exec();
 }
 
 void MainWindow::statusChanged(ClientStatus _status)
@@ -133,7 +141,7 @@ void MainWindow::actDisconnect()
 void MainWindow::actSinglePlayer()
 {
     bool ok;
-    int numberPlayers = QInputDialog::getInt(this, tr("Number of players"), tr("Please enter the number of players."), 2, 1, 8, 1, &ok);
+    int numberPlayers = QInputDialog::getInt(this, tr("Number of players"), tr("Please enter the number of players."), 1, 1, 8, 1, &ok);
     if (!ok)
         return;
     
@@ -217,23 +225,25 @@ void MainWindow::actAbout()
     QMessageBox::about(this, tr("About Cockatrice"), QString(
         "<font size=\"8\"><b>Cockatrice</b></font><br>"
         + tr("Version %1").arg(VERSION_STRING)
-        + "<br><br><br><b>" + tr("Authors:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
+        + "<br><br><b>" + tr("Project Manager:") + "</b><br>Gavin Bisesi<br><br>"
+        + "<b>" + tr("Past Project Managers:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
+        + "<b>" + tr("Developers:") + "</b><br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c'>" + tr("Our Developers") + "</a><br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice#cockatrice'>" + tr("Help Develop!") + "</a><br><br>"
         + "<b>" + tr("Translators:") + "</b><br>"
-        + tr("Spanish:") + " Víctor Martínez<br>"
-        + tr("Portugese (Portugal):") + " Milton Gonçalves<br>"
-        + tr("Portugese (Brazil):") + " Thiago Queiroz<br>"
-        + tr("French:") + " Yannick Hammer, Arnaud Faes<br>"
-        + tr("Japanese:") + " Nagase Task<br>"
-        + tr("Korean:") + " Jaeic Lee<br>"
-        + tr("Russian:") + " Alexander Davidov<br>"
-        + tr("Italian:") + " Luigi Sciolla<br>"
-        + tr("Swedish:") + " Jessica Dahl<br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Translators'>" + tr("Recognition Page") + "</a><br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ'>" + tr("Help Translate!") + "</a><br><br>"
+        + "<b>" + tr("Support:") + "</b><br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice/issues'>" + tr("Report an Issue") + "</a><br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice/issues'>" + tr("Suggest an Improvement") + "</a><br>"
+        
     ));
 }
 
 void MainWindow::serverTimeout()
 {
     QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
+    actConnect();
 }
 
 void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
@@ -258,7 +268,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
         }
         case Response::RespUsernameInvalid:
-            QMessageBox::critical(this, tr("Error"), tr("Invalid username."));
+            QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."));
             break;
         case Response::RespRegistrationRequired:
             QMessageBox::critical(this, tr("Error"), tr("This server requires user registration."));
@@ -266,11 +276,13 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
         default:
             QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
     }
+    actConnect();
 }
 
 void MainWindow::socketError(const QString &errorStr)
 {
     QMessageBox::critical(this, tr("Error"), tr("Socket error: %1").arg(errorStr));
+    actConnect();
 }
 
 void MainWindow::protocolVersionMismatch(int localVersion, int remoteVersion)
@@ -287,7 +299,7 @@ void MainWindow::setClientStatusTitle()
         case StatusConnecting: setWindowTitle(appName + " - " + tr("Connecting to %1...").arg(client->peerName())); break;
         case StatusDisconnected: setWindowTitle(appName + " - " + tr("Disconnected")); break;
         case StatusLoggingIn: setWindowTitle(appName + " - " + tr("Connected, logging in at %1").arg(client->peerName())); break;
-        case StatusLoggedIn: setWindowTitle(appName + " - " + tr("Logged in at %1").arg(client->peerName())); break;
+        case StatusLoggedIn: setWindowTitle(appName + " - " + tr("Logged in as %1 at %2").arg(client->getUserName()).arg(client->peerName())); break;
         default: setWindowTitle(appName);
     }
 }
@@ -302,7 +314,7 @@ void MainWindow::retranslateUi()
     aWatchReplay->setText(tr("&Watch replay..."));
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
-    aFullScreen->setShortcut(tr("Ctrl+F"));
+    aFullScreen->setShortcut(QKeySequence("Ctrl+F"));
     aSettings->setText(tr("&Settings..."));
     aExit->setText(tr("&Exit"));
     
@@ -313,6 +325,7 @@ void MainWindow::retranslateUi()
 #endif
     aAbout->setText(tr("&About Cockatrice"));
     helpMenu->setTitle(tr("&Help"));
+    aCheckCardUpdates->setText(tr("Check card updates..."));
     
     tabSupervisor->retranslateUi();
 }
@@ -340,6 +353,9 @@ void MainWindow::createActions()
     
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
+
+    aCheckCardUpdates = new QAction(this);
+    connect(aCheckCardUpdates, SIGNAL(triggered()), this, SLOT(actCheckCardUpdates()));
 
 #if defined(__APPLE__)  /* For OSX */
     aSettings->setMenuRole(QAction::PreferencesRole);
@@ -371,6 +387,7 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aFullScreen);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSettings);
+    cockatriceMenu->addAction(aCheckCardUpdates);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aExit);
     
@@ -379,7 +396,7 @@ void MainWindow::createMenus()
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), localServer(0), bHasActivated(false)
+    : QMainWindow(parent), localServer(0), bHasActivated(false), cardUpdateProcess(0)
 {
     connect(settingsCache, SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
     pixmapCacheSizeChanged(settingsCache->getPixmapCacheSize());
@@ -404,6 +421,7 @@ MainWindow::MainWindow(QWidget *parent)
     tabSupervisor = new TabSupervisor(client);
     connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
     connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
+    connect(tabSupervisor, SIGNAL(maximize()), this, SLOT(maximize()));
     tabSupervisor->addDeckEditorTab(0);    
     
     setCentralWidget(tabSupervisor);
@@ -413,13 +431,53 @@ MainWindow::MainWindow(QWidget *parent)
     resize(900, 700);
     restoreGeometry(settingsCache->getMainWindowGeometry());
     aFullScreen->setChecked(windowState() & Qt::WindowFullScreen);
+
+    if (QSystemTrayIcon::isSystemTrayAvailable()) {
+        createTrayActions();
+        createTrayIcon();
+    }
+
+    serverShutdownMessageBox = 0;
 }
 
 MainWindow::~MainWindow()
 {
+    trayIcon->hide();
+    trayIcon->deleteLater();
     client->deleteLater();
     clientThread->wait();
 }
+
+void MainWindow::createTrayIcon() {
+    QMenu *trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(closeAction);
+    
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(trayIconMenu);
+    trayIcon->setIcon(QIcon("theme:appicon.svg"));
+    trayIcon->show();
+
+    connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,
+        SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+}
+
+void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
+    if (reason == QSystemTrayIcon::DoubleClick) {
+        if (windowState() != Qt::WindowMinimized && windowState() != Qt::WindowMinimized + Qt::WindowMaximized)
+            showMinimized();
+        else {
+            showNormal();
+            QApplication::setActiveWindow(this);
+        }
+    }
+}
+
+
+void MainWindow::createTrayActions() {
+    closeAction = new QAction(tr("&Exit"), this);
+    connect(closeAction, SIGNAL(triggered()), this, SLOT(close()));
+}
+
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -464,4 +522,98 @@ void MainWindow::pixmapCacheSizeChanged(int newSizeInMBs)
     //qDebug() << "Setting pixmap cache size to " << value << " MBs";
     // translate MBs to KBs
     QPixmapCache::setCacheLimit(newSizeInMBs * 1024);
+}
+
+void MainWindow::maximize() {
+    showNormal();
+}
+
+/* CARD UPDATER */
+
+void MainWindow::actCheckCardUpdates()
+{
+    if(cardUpdateProcess)
+    {
+        QMessageBox::information(this, tr("Information"), tr("A card update is already ongoing."));
+        return;
+    }
+
+    cardUpdateProcess = new QProcess(this);
+    connect(cardUpdateProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(cardUpdateError(QProcess::ProcessError)));
+    connect(cardUpdateProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(cardUpdateFinished(int, QProcess::ExitStatus)));
+
+    // full "run the update" command; leave empty if not present
+    QString updaterCmd;
+    QString binaryName;
+    QDir dir = QDir(QApplication::applicationDirPath());
+
+#if defined(Q_OS_MAC)
+    binaryName = getCardUpdaterBinaryName();
+
+    // exit from the application bundle
+    dir.cdUp();
+    dir.cdUp();
+    dir.cdUp();
+    dir.cd(binaryName + ".app");
+    dir.cd("Contents");
+    dir.cd("MacOS");
+#elif defined(Q_OS_WIN)
+    binaryName = getCardUpdaterBinaryName() + ".exe";
+#else
+    binaryName = getCardUpdaterBinaryName();
+#endif    
+
+    if(dir.exists(binaryName))
+        updaterCmd = dir.absoluteFilePath(binaryName);
+
+    if(updaterCmd.isEmpty())
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Unable to run the card updater: ") + dir.absoluteFilePath(binaryName));
+        return;
+    }
+
+    cardUpdateProcess->start(updaterCmd);
+}
+
+void MainWindow::cardUpdateError(QProcess::ProcessError err)
+{
+    QString error;
+    switch(err)
+    {
+        case QProcess::FailedToStart:
+            error = tr("failed to start.");
+            break;
+        case QProcess::Crashed:
+            error = tr("crashed.");
+            break;
+        case QProcess::Timedout:
+            error = tr("timed out.");
+            break;
+        case QProcess::WriteError:
+            error = tr("write error.");
+            break;
+        case QProcess::ReadError:
+            error = tr("read error.");
+            break;
+        case QProcess::UnknownError:
+        default:
+            error = tr("unknown error.");
+            break;
+    }
+
+    cardUpdateProcess->deleteLater();
+    cardUpdateProcess = 0;
+
+    QMessageBox::warning(this, tr("Error"), tr("The card updater exited with an error: %1").arg(error));
+}
+
+void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
+{
+    cardUpdateProcess->deleteLater();
+    cardUpdateProcess = 0;
+
+    QMessageBox::information(this, tr("Information"), tr("Card update completed successfully. Will now reload card database."));
+
+    // this will force a database reload
+    settingsCache->setCardDatabasePath(settingsCache->getCardDatabasePath());
 }

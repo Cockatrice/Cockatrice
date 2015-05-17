@@ -166,3 +166,24 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
 }
 
 QMap<int, QPixmap> UserLevelPixmapGenerator::pmCache;
+
+
+QPixmap LockPixmapGenerator::generatePixmap(int height)
+{
+
+    int key = height;
+    if (pmCache.contains(key))
+        return pmCache.value(key);
+
+    QSvgRenderer svg(QString("theme:lock.svg"));
+    int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
+    QPixmap pixmap(width, height);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    svg.render(&painter, QRectF(0, 0, width, height));
+
+    pmCache.insert(key, pixmap);
+    return pixmap;
+}
+
+QMap<int, QPixmap> LockPixmapGenerator::pmCache;

@@ -98,17 +98,8 @@ bool Servatrice_DatabaseInterface::execSqlQuery(QSqlQuery *query)
 
 bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
 {
-    QString result;
-    result.reserve(user.size());
-    foreach (const QChar& c, user) {
-        switch (c.category()) {
-        // TODO: Figure out exactly which categories are OK and not
-        case QChar::Other_Control: break;
-        default: result += c;
-        }
-    }
-    result = result.trimmed();
-    return (result.size() > 0);
+    static QRegExp re = QRegExp("[a-zA-Z0-9_\\.-]+");
+    return re.exactMatch(user);
 }
 
 bool Servatrice_DatabaseInterface::getRequireRegistration()

@@ -31,6 +31,7 @@
 #include <QDir>
 #include <QDesktopServices>
 #include <QDebug>
+#include <QSystemTrayIcon>
 
 #include "main.h"
 #include "window_main.h"
@@ -49,6 +50,7 @@ QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;
 RNG_Abstract *rng;
 SoundEngine *soundEngine;
+QSystemTrayIcon *trayIcon;
 ThemeManager *themeManager;
 
 const QString translationPrefix = "cockatrice";
@@ -146,7 +148,7 @@ int main(int argc, char *argv[])
     const QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
     if (!db->getLoadSuccess())
-        if (db->loadCardDatabase(dataDir + "/cards.xml"))
+        if (!db->loadCardDatabase(dataDir + "/cards.xml"))
             settingsCache->setCardDatabasePath(dataDir + "/cards.xml");
     if (settingsCache->getTokenDatabasePath().isEmpty())
         settingsCache->setTokenDatabasePath(dataDir + "/tokens.xml");
@@ -165,18 +167,18 @@ int main(int argc, char *argv[])
     if (!QDir().mkpath(settingsCache->getPicsPath() + "/CUSTOM"))
         qDebug() << "Could not create " + settingsCache->getPicsPath().toUtf8() + "/CUSTOM. Will fall back on default card images.";
 
-    if(settingsCache->getSoundPath().isEmpty())
+    if(settingsCache->getSoundPath().isEmpty() || !QDir(settingsCache->getSoundPath()).exists())
     {
-        QString srcDir = QLibraryInfo::location(QLibraryInfo::DataPath);
-        QString destDir = dataDir + "/sounds";
-        QDir tmpDir(destDir);
-        if(!tmpDir.exists())
-        {
-            // try to install the default sounds for the current user and set the settigs value
-            settingsCache->copyPath(srcDir + "/sounds", destDir);
-
-            settingsCache->setSoundPath(destDir);
-        }
+        QDir tmpDir;
+        
+#ifdef Q_OS_MAC
+        tmpDir = app.applicationDirPath() + "/../Resources/sounds";
+#elif defined(Q_OS_WIN)
+         tmpDir = app.applicationDirPath() + "/sounds";
+#else // linux
+        tmpDir = app.applicationDirPath() + "/../share/cockatrice/sounds/";
+#endif
+        settingsCache->setSoundPath(tmpDir.canonicalPath());
     }
 
     if (!settingsValid() || db->getLoadStatus() != Ok) {

@@ -3,6 +3,7 @@
 !include "FileFunc.nsh"
 
 Name "@CPACK_PACKAGE_NAME@"
+BrandingText "@CPACK_PACKAGE_NAME@-@CPACK_PACKAGE_VERSION_MAJOR@"
 OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 SetCompressor /SOLID lzma
 InstallDir "$PROGRAMFILES\Cockatrice"
@@ -55,13 +56,13 @@ Section "Update configuration" SecUpdateConfig
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "carddatabase" "$LOCALAPPDATA\Cockatrice\cards.xml"
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "decks" "$LOCALAPPDATA\Cockatrice\decks"
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "pics" "$LOCALAPPDATA\Cockatrice\pics"
-	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$LOCALAPPDATA\Cockatrice\sounds"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$INSTDIR\sounds"
 SectionEnd
 
 Section "Start menu item" SecStartMenu
 	SetShellVarContext all
 	createDirectory "$SMPROGRAMS\Cockatrice"
-	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe" '--debug-output'
+	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Servatrice.lnk" "$INSTDIR\servatrice.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Usermanual.lnk" "$INSTDIR\Usermanual.pdf"
@@ -87,6 +88,7 @@ Section Uninstall
 	Delete "$INSTDIR\qdebug.txt"
 	Delete "$INSTDIR\servatrice.sql"
 	Delete "$INSTDIR\servatrice.ini.example"
+	Delete "$INSTDIR\zlib1.dll"
 	RMDir "$INSTDIR"
 
 	RMDir "$SMPROGRAMS\Cockatrice"
@@ -106,3 +108,18 @@ LangString DESC_SecStartMenu ${LANG_ENGLISH} "Create start menu items for Cockat
 	!insertmacro MUI_DESCRIPTION_TEXT ${SecStartMenu} $(DESC_SecStartMenu)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
+Function .onInit
+    SetShellVarContext all
+    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
+    StrCmp $R0 "" done
+
+    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst
+    Abort
+
+uninst:
+    ClearErrors
+    ExecWait "$R0"
+
+done:
+
+FunctionEnd

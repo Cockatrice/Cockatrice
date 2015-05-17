@@ -23,8 +23,8 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const Ga
     unavailableGamesVisibleCheckBox = new QCheckBox(tr("Show &unavailable games"));
     unavailableGamesVisibleCheckBox->setChecked(gamesProxyModel->getUnavailableGamesVisible());
 
-    passwordProtectedGamesHiddenCheckBox = new QCheckBox(tr("Hide &password protected games"));
-    passwordProtectedGamesHiddenCheckBox->setChecked(gamesProxyModel->getPasswordProtectedGamesHidden());
+    showPasswordProtectedGames = new QCheckBox(tr("Show &password protected games"));
+    showPasswordProtectedGames->setChecked(gamesProxyModel->getShowPasswordProtectedGames());
 
     gameNameFilterEdit = new QLineEdit;
     gameNameFilterEdit->setText(gamesProxyModel->getGameNameFilter());
@@ -84,7 +84,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const Ga
     leftGrid->addWidget(creatorNameFilterEdit, 1, 1);
     leftGrid->addWidget(maxPlayersGroupBox, 2, 0, 1, 2);
     leftGrid->addWidget(unavailableGamesVisibleCheckBox, 3, 0, 1, 2);
-    leftGrid->addWidget(passwordProtectedGamesHiddenCheckBox, 4, 0, 1, 2);
+    leftGrid->addWidget(showPasswordProtectedGames, 4, 0, 1, 2);
 
     QVBoxLayout *leftColumn = new QVBoxLayout;
     leftColumn->addLayout(leftGrid);
@@ -123,14 +123,14 @@ void DlgFilterGames::setUnavailableGamesVisible(bool _unavailableGamesVisible)
     unavailableGamesVisibleCheckBox->setChecked(_unavailableGamesVisible);
 }
 
-bool DlgFilterGames::getPasswordProtectedGamesHidden() const
+bool DlgFilterGames::getShowPasswordProtectedGames() const
 {
-    return passwordProtectedGamesHiddenCheckBox->isChecked();
+    return showPasswordProtectedGames->isChecked();
 }
 
-void DlgFilterGames::setPasswordProtectedGamesHidden(bool _passwordProtectedGamesHidden)
+void DlgFilterGames::setShowPasswordProtectedGames(bool _passwordProtectedGamesHidden)
 {
-    passwordProtectedGamesHiddenCheckBox->setChecked(_passwordProtectedGamesHidden);
+    showPasswordProtectedGames->setChecked(_passwordProtectedGamesHidden);
 }
 
 QString DlgFilterGames::getGameNameFilter() const

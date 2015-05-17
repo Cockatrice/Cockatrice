@@ -15,6 +15,7 @@
 #include <QNetworkRequest>
 #include <QDebug>
 #include <QImageReader>
+#include <QMessageBox>
 
 const int CardDatabase::versionNeeded = 3;
 const char* CardDatabase::TOKENS_SETNAME = "TK";
@@ -34,7 +35,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
 CardSet::CardSet(const QString &_shortName, const QString &_longName, const QString &_setType, const QDate &_releaseDate)
     : shortName(_shortName), longName(_longName), releaseDate(_releaseDate), setType(_setType)
 {
-    updateSortKey();
+    loadSetOptions();
 }
 
 QString CardSet::getCorrectedShortName() const
@@ -59,12 +60,36 @@ void CardSet::setSortKey(unsigned int _sortKey)
     settings.setValue("sortkey", sortKey);
 }
 
-void CardSet::updateSortKey()
+void CardSet::loadSetOptions()
 {
     QSettings settings;
     settings.beginGroup("sets");
     settings.beginGroup(shortName);
+
     sortKey = settings.value("sortkey", 0).toInt();
+    enabled = settings.value("enabled", false).toBool();
+    isknown = settings.value("isknown", false).toBool();
+    // qDebug() << "load set" << shortName << "key" << sortKey;
+}
+
+void CardSet::setEnabled(bool _enabled)
+{
+    enabled = _enabled;
+
+    QSettings settings;
+    settings.beginGroup("sets");
+    settings.beginGroup(shortName);
+    settings.setValue("enabled", enabled);
+}
+
+void CardSet::setIsKnown(bool _isknown)
+{
+    isknown = _isknown;
+
+    QSettings settings;
+    settings.beginGroup("sets");
+    settings.beginGroup(shortName);
+    settings.setValue("isknown", isknown);
 }
 
 class SetList::CompareFunctor {
@@ -78,6 +103,81 @@ public:
 void SetList::sortByKey()
 {
     qSort(begin(), end(), CompareFunctor());
+}
+
+int SetList::getEnabledSetsNum()
+{
+    int num=0;
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        if(set->getEnabled())
+            ++num;
+    }
+    return num;
+}
+
+int SetList::getUnknownSetsNum()
+{
+    int num=0;
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        if(!set->getIsKnown())
+            ++num;
+    }
+    return num;
+}
+
+void SetList::enableAllUnknown()
+{
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        if(!set->getIsKnown())
+        {
+            set->setIsKnown(true);
+            set->setEnabled(true);
+        }
+    }
+}
+
+void SetList::enableAll()
+{
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        set->setIsKnown(true);
+        set->setEnabled(true);
+    }
+}
+
+void SetList::markAllAsKnown()
+{
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        if(!set->getIsKnown())
+        {
+            set->setIsKnown(true);
+        }
+    }
+}
+
+void SetList::guessSortKeys()
+{
+    // sort by release date DESC; invalid dates to the bottom.
+    QDate distantFuture(2050, 1, 1);
+    int aHundredYears = 36500;
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        QDate date = set->getReleaseDate();
+        if(date.isNull())
+            set->setSortKey(aHundredYears);
+        else
+            set->setSortKey(date.daysTo(distantFuture));
+    }
 }
 
 PictureToLoad::PictureToLoad(CardInfo *_card, bool _hq)
@@ -408,6 +508,7 @@ CardInfo::CardInfo(CardDatabase *_db,
       tableRow(_tableRow)
 {
     pixmapCacheKey = QLatin1String("card_") + name;
+    simpleName = CardInfo::simplifyName(name);
 
     for (int i = 0; i < sets.size(); i++)
         sets[i]->append(this);
@@ -512,7 +613,7 @@ void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
 
 void CardInfo::clearPixmapCache()
 {
-    qDebug() << "Deleting pixmap for" << name;
+    //qDebug() << "Deleting pixmap for" << name;
     QPixmapCache::remove(pixmapCacheKey);
 }
 
@@ -661,14 +762,14 @@ void CardDatabase::clear()
 void CardDatabase::addCard(CardInfo *card)
 {
     cards.insert(card->getName(), card);
-    simpleNameCards.insert(CardInfo::simplifyName(card->getName()), card);
+    simpleNameCards.insert(card->getSimpleName(), card);
     emit cardAdded(card);
 }
 
 void CardDatabase::removeCard(CardInfo *card)
 {
     cards.remove(card->getName());
-    simpleNameCards.remove(CardInfo::simplifyName(card->getName()));
+    simpleNameCards.remove(card->getSimpleName());
     emit cardRemoved(card);
 }
 
@@ -736,7 +837,11 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
                 else if (xml.name() == "releasedate")
                     releaseDate = QDate::fromString(xml.readElementText(), Qt::ISODate);
             }
-            sets.insert(shortName, new CardSet(shortName, longName, setType, releaseDate));
+
+            CardSet * newSet = getSet(shortName);
+            newSet->setLongName(longName);
+            newSet->setSetType(setType);
+            newSet->setReleaseDate(releaseDate);
         }
     }
 }
@@ -907,6 +1012,11 @@ void CardDatabase::picDownloadHqChanged()
     }
 }
 
+void CardDatabase::emitCardListChanged()
+{
+    emit cardListChanged();
+}
+
 LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
 {
     LoadStatus tempLoadStatus = NotLoaded;
@@ -919,15 +1029,15 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
         while (setsIterator.hasNext())
             allSets.append(setsIterator.next().value());
         allSets.sortByKey();
-        for (int i = 0; i < allSets.size(); ++i)
-            allSets[i]->setSortKey(i);
 
+        if(!tokens)
+            checkUnknownSets();
         emit cardListChanged();
     }
 
     if (!tokens) {
         loadStatus = tempLoadStatus;
-        qDebug() << "loadCardDatabase(): Status = " << loadStatus;
+        qDebug() << "loadCardDatabase(): Path = " << path << " Status = " << loadStatus;
     }
 
 
@@ -971,7 +1081,9 @@ QStringList CardDatabase::getAllMainCardTypes() const
 void CardDatabase::cacheCardPixmaps(const QStringList &cardNames)
 {
     QPixmap tmp;
-    for (int i = 0; i < cardNames.size(); ++i)
+    // never cache more than 300 cards at once for a single deck
+    int max = qMin(cardNames.size(), 300);
+    for (int i = 0; i < max; ++i)
         getCard(cardNames[i])->loadPixmap(tmp);
 }
 
@@ -989,4 +1101,52 @@ void CardDatabase::picsPathChanged()
 {
     pictureLoader->setPicsPath(settingsCache->getPicsPath());
     clearPixmapCache();
+}
+
+void CardDatabase::checkUnknownSets()
+{
+    SetList sets = getSetList();
+
+    // no set is enabled. Probably this is the first time running trice
+    if(!sets.getEnabledSetsNum())
+    {
+        sets.guessSortKeys();
+        sets.sortByKey();
+        sets.enableAll();
+
+        detectedFirstRun = true;
+        return;
+    }
+
+    int numUnknownSets = sets.getUnknownSetsNum();
+    // no unkown sets. 
+    if(!numUnknownSets)
+        return;
+
+    QMessageBox msgbox(QMessageBox::Question, tr("New sets found"), tr("%1 new set(s) have been found in the card database. Do you want to enable them?").arg(numUnknownSets), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+
+    switch(msgbox.exec())
+    {
+        case QMessageBox::No:
+            sets.markAllAsKnown();
+            break;
+        case QMessageBox::Yes:
+            sets.enableAllUnknown();
+            break;
+        default:
+            break;
+    }
+
+    return;
+}
+
+bool CardDatabase::hasDetectedFirstRun()
+{
+    if(detectedFirstRun)
+    {
+        detectedFirstRun=false;
+        return true;
+    }
+
+    return false;
 }

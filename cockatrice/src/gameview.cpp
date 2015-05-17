@@ -19,7 +19,7 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
     connect(scene, SIGNAL(sigStopRubberBand()), this, SLOT(stopRubberBand()));
 
     aCloseMostRecentZoneView = new QAction(this);
-    aCloseMostRecentZoneView->setShortcut(tr("Esc"));
+    aCloseMostRecentZoneView->setShortcut(QKeySequence("Esc"));
     connect(aCloseMostRecentZoneView, SIGNAL(triggered()), scene, SLOT(closeMostRecentZoneView()));
     addAction(aCloseMostRecentZoneView);
 

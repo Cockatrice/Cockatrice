@@ -115,11 +115,12 @@ private:
 	QMutex txBytesMutex, rxBytesMutex;
 	quint64 txBytes, rxBytes;
 	int maxGameInactivityTime, maxPlayerInactivityTime;
-	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser;
-	
+	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser, commandCountingInterval, maxCommandCountPerInterval;
+
 	QString shutdownReason;
 	int shutdownMinutes;
 	QTimer *shutdownTimer;
+    bool isFirstShutdownMessage;
 	
 	mutable QMutex serverListMutex;
 	QList<ServerProperties> serverList;
@@ -143,6 +144,8 @@ public:
 	int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
 	int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
 	int getMaxGamesPerUser() const { return maxGamesPerUser; }
+    int getCommandCountingInterval() const { return commandCountingInterval; }
+    int getMaxCommandCountPerInterval() const { return maxCommandCountPerInterval; }
 	AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
 	QString getDbPrefix() const { return dbPrefix; }
 	int getServerId() const { return serverId; }

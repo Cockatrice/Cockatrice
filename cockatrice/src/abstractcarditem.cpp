@@ -91,7 +91,10 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     
     CardInfo *imageSource = facedown ? db->getCard() : info;
     QPixmap translatedPixmap;
-    imageSource->getPixmap(translatedSize.toSize(), translatedPixmap);
+    // don't even spend time trying to load the picture if our size is too small
+    if(translatedSize.width() > 10)
+        imageSource->getPixmap(translatedSize.toSize(), translatedPixmap);        
+
     painter->save();
     QColor bgColor = Qt::transparent;
     if (translatedPixmap.isNull()) {
@@ -120,14 +123,21 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     } else {
         painter->save();
         transformPainter(painter, translatedSize, angle);
-        painter->drawPixmap(QPointF(0, 0), translatedPixmap);
+        painter->drawPixmap(QPointF(0, angle ? -1 : 0), translatedPixmap);
         painter->restore();
     }
     painter->setBrush(bgColor);
+
     QPen pen(Qt::black);
-    pen.setWidth(2);
+    pen.setJoinStyle(Qt::MiterJoin);
+    const int penWidth = 2;
+    pen.setWidth(penWidth);
     painter->setPen(pen);
-    painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2));
+
+    if (!angle)
+        painter->drawRect(QRectF(0, 0, CARD_WIDTH - 1, CARD_HEIGHT - penWidth));
+    else
+        painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 1.5));
     
     if (translatedPixmap.isNull() || settingsCache->getDisplayCardNames() || facedown) {
         painter->save();
@@ -157,13 +167,19 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, false);
     transformPainter(painter, translatedSize, tapAngle);
-    if (isSelected()) {
-        painter->setPen(Qt::red);
-        painter->drawRect(QRectF(0.5, 0.5, translatedSize.width() - 1, translatedSize.height() - 1));
-    } else if (isHovered) {
-        painter->setPen(Qt::yellow);
-        painter->drawRect(QRectF(0.5, 0.5, translatedSize.width() - 1, translatedSize.height() - 1));
+
+    if (isSelected() || isHovered) {
+        QPen pen;
+        if (isHovered)
+            pen.setColor(Qt::yellow);
+        if (isSelected())
+            pen.setColor(Qt::red);
+        const int penWidth = 1;
+        pen.setWidth(penWidth);
+        painter->setPen(pen);
+        painter->drawRect(QRectF(0, 0, translatedSize.width() + penWidth, translatedSize.height() - penWidth));
     }
+
     painter->restore();
 
     painter->restore();
@@ -191,7 +207,7 @@ void AbstractCardItem::setHovered(bool _hovered)
         processHoverEvent();
     isHovered = _hovered;
     setZValue(_hovered ? 2000000004 : realZValue);
-    setScale(_hovered ? 1.1 : 1);
+    setScale(_hovered && settingsCache->getScaleCards() ? 1.1 : 1);
     setTransformOriginPoint(_hovered ? CARD_WIDTH / 2 : 0, _hovered ? CARD_HEIGHT / 2 : 0);
     update();
 }

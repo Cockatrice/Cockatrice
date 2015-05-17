@@ -12,7 +12,6 @@
 
 #define DEFAULT_THEME_NAME "Default"
 #define STYLE_CSS_NAME "style.css"
-#define VERSION_TXT_NAME "version.txt"
 #define HANDZONE_BG_NAME "handzone"
 #define PLAYERZONE_BG_NAME "playerzone"
 #define STACKZONE_BG_NAME "stackzone"
@@ -22,91 +21,55 @@
 ThemeManager::ThemeManager(QObject *parent)
     : QObject(parent)
 {
-    ensureUserThemeDirectoryExists();
+    ensureThemeDirectoryExists();
     connect(settingsCache, SIGNAL(themeChanged()), this, SLOT(themeChangedSlot()));
     themeChangedSlot();
 }
 
-void ThemeManager::ensureUserThemeDirectoryExists()
+void ThemeManager::ensureThemeDirectoryExists()
 {
-    QString destDir =
-#if QT_VERSION < 0x050000
-    QDesktopServices::storageLocation(QDesktopServices::DataLocation) +
-#else
-    QStandardPaths::standardLocations(QStandardPaths::DataLocation).first() +
-#endif
-    QDir::separator() + "themes";
-
-    QString srcDir = QLibraryInfo::location(QLibraryInfo::DataPath) + QDir::separator() + "themes";
-    QDir tmpDstDir(destDir);
-    if(!tmpDstDir.exists())
-    {
-        qDebug() << "Themes directory not found, copying bundled themes";
-        settingsCache->copyPath(srcDir, destDir);
-    } else {
-        QDir tmpSrcDir(srcDir);
-        QStringList bundledThemes = tmpSrcDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-        // check if any bundled theme needs an update
-        foreach(QString themeName, bundledThemes)
-        {
-            bool needCopy = false;
-            QFile srcVersionFile(srcDir + QDir::separator() + themeName + QDir::separator() + VERSION_TXT_NAME);
-            QFile dstVersionFile(destDir + QDir::separator() + themeName + QDir::separator() + VERSION_TXT_NAME);
-
-            if(!srcVersionFile.exists())
-            {
-                qDebug() << "Corrupted installation: version.txt doesn't exists in bundled theme" << themeName;
-                continue;
-            }
-
-            if(dstVersionFile.exists())
-            {
-                // compare version files
-                srcVersionFile.open(QIODevice::ReadOnly);
-                dstVersionFile.open(QIODevice::ReadOnly);
-                int oldver = dstVersionFile.readAll().simplified().toUInt();
-                int newver = srcVersionFile.readAll().simplified().toUInt();
-                srcVersionFile.close();
-                dstVersionFile.close();
-
-                if(newver > oldver)
-                {
-                    needCopy = true;
-                    qDebug() << "Updating bundled theme" << themeName << "from version" << oldver << "to version" << newver;
-                }
-
-            } else {
-                // no version file in dest
-                needCopy = true;
-                qDebug() << "Installing new bundled theme" << themeName;
-            }
-
-            // copy if needed
-            if(needCopy)
-            {
-                settingsCache->copyPath(srcDir + QDir::separator() + themeName, destDir + QDir::separator() + themeName);
-            }
-        }
-    }
-
-    if(settingsCache->getThemeName().isEmpty())
+    if(settingsCache->getThemeName().isEmpty() ||
+        !getAvailableThemes().contains(settingsCache->getThemeName()))
     {
         qDebug() << "Theme name not set, setting default value";
         settingsCache->setThemeName(DEFAULT_THEME_NAME);
     }
 }
 
-QStringList & ThemeManager::getAvailableThemes()
+QStringMap & ThemeManager::getAvailableThemes()
 {
-    QDir dir =
+    QDir dir;
+    availableThemes.clear();
+
+    // load themes from user profile dir
+    dir =
 #if QT_VERSION < 0x050000
         QDesktopServices::storageLocation(QDesktopServices::DataLocation) +
 #else
         QStandardPaths::standardLocations(QStandardPaths::DataLocation).first() +
 #endif
-        QDir::separator() + "themes";
+        "/themes";
 
-    availableThemes = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name);
+    foreach(QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
+    {
+        if(!availableThemes.contains(themeName))
+            availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
+    }
+
+    // load themes from cockatrice system dir
+#ifdef Q_OS_MAC
+    dir = qApp->applicationDirPath() + "/../Resources/themes";
+#elif defined(Q_OS_WIN)
+    dir = qApp->applicationDirPath() + "/themes";
+#else // linux
+    dir = qApp->applicationDirPath() + "/../share/cockatrice/themes";
+#endif
+    foreach(QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
+    {
+        if(!availableThemes.contains(themeName))
+            availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
+    }
+
     return availableThemes;
 }
 
@@ -153,13 +116,7 @@ void ThemeManager::themeChangedSlot()
     QString themeName = settingsCache->getThemeName();
     qDebug() << "Theme changed:" << themeName;
 
-    QDir dir =
-#if QT_VERSION < 0x050000
-        QDesktopServices::storageLocation(QDesktopServices::DataLocation) +
-#else
-        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first() +
-#endif
-        QDir::separator() + "themes" + QDir::separator() + themeName + QDir::separator();
+    QDir dir = getAvailableThemes().value(themeName);
 
     // css
     if(dir.exists(STYLE_CSS_NAME))

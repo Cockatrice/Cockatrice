@@ -73,11 +73,12 @@ void ToggleButton::paintEvent(QPaintEvent *event)
     QPushButton::paintEvent(event);
     
     QPainter painter(this);
-    if (state)
-        painter.setPen(QPen(Qt::green, 3));
-    else
-        painter.setPen(QPen(Qt::red, 3));
-    painter.drawRect(1, 1, width() - 3, height() - 3);
+    QPen pen;
+    pen.setWidth(3);
+    pen.setJoinStyle(Qt::MiterJoin);
+    pen.setColor(state ? Qt::green : Qt::red);
+    painter.setPen(pen);
+    painter.drawRect(QRect(1, 1, width() - 3, height() - 3));
 }
 
 void ToggleButton::setState(bool _state)
@@ -282,8 +283,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     playerListWidget = new PlayerListWidget(0, 0, this);
     playerListWidget->setFocusPolicy(Qt::NoFocus);
     
-    timeElapsedLabel = new QLabel;
-    timeElapsedLabel->setAlignment(Qt::AlignCenter);
     messageLog = new MessageLogWidget(tabSupervisor, this);
     connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
     connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
@@ -293,7 +292,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     deckViewContainerLayout = new QVBoxLayout;
 
     QVBoxLayout *messageLogLayout = new QVBoxLayout;
-    messageLogLayout->addWidget(timeElapsedLabel);
     messageLogLayout->addWidget(messageLog);
     
     QWidget *messageLogLayoutWidget = new QWidget;
@@ -304,10 +302,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     connect(timelineWidget, SIGNAL(processNextEvent()), this, SLOT(replayNextEvent()));
     connect(timelineWidget, SIGNAL(replayFinished()), this, SLOT(replayFinished()));
     
-    replayToStartButton = new QToolButton;
-    replayToStartButton->setIconSize(QSize(32, 32));
-    replayToStartButton->setIcon(QIcon("theme:replay_tostart.svg"));
-    connect(replayToStartButton, SIGNAL(clicked()), this, SLOT(replayToStartButtonClicked()));
     replayStartButton = new QToolButton;
     replayStartButton->setIconSize(QSize(32, 32));
     replayStartButton->setIcon(QIcon("theme:replay_start.svg"));
@@ -317,21 +311,12 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     replayPauseButton->setEnabled(false);
     replayPauseButton->setIcon(QIcon("theme:replay_pause.svg"));
     connect(replayPauseButton, SIGNAL(clicked()), this, SLOT(replayPauseButtonClicked()));
-    replayStopButton = new QToolButton;
-    replayStopButton->setIconSize(QSize(32, 32));
-    replayStopButton->setEnabled(false);
-    replayStopButton->setIcon(QIcon("theme:replay_stop.svg"));
-    connect(replayStopButton, SIGNAL(clicked()), this, SLOT(replayStopButtonClicked()));
     replayFastForwardButton = new QToolButton;
     replayFastForwardButton->setIconSize(QSize(32, 32));
     replayFastForwardButton->setEnabled(false);
     replayFastForwardButton->setIcon(QIcon("theme:replay_fastforward.svg"));
     replayFastForwardButton->setCheckable(true);
     connect(replayFastForwardButton, SIGNAL(toggled(bool)), this, SLOT(replayFastForwardButtonToggled(bool)));
-    replayToEndButton = new QToolButton;
-    replayToEndButton->setIconSize(QSize(32, 32));
-    replayToEndButton->setIcon(QIcon("theme:replay_toend.svg"));
-    connect(replayStopButton, SIGNAL(clicked()), this, SLOT(replayToEndButtonClicked()));
     
     splitter = new QSplitter(Qt::Vertical);
     splitter->addWidget(cardInfo);
@@ -345,12 +330,9 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     
     QHBoxLayout *replayControlLayout = new QHBoxLayout;
     replayControlLayout->addWidget(timelineWidget, 10);
-    replayControlLayout->addWidget(replayToStartButton);
     replayControlLayout->addWidget(replayStartButton);
     replayControlLayout->addWidget(replayPauseButton);
-    replayControlLayout->addWidget(replayStopButton);
     replayControlLayout->addWidget(replayFastForwardButton);
-    replayControlLayout->addWidget(replayToEndButton);
     
     QVBoxLayout *superMainLayout = new QVBoxLayout;
     superMainLayout->addLayout(mainLayout);
@@ -475,12 +457,12 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
         QAction *temp = new QAction(QString(), this);
         connect(temp, SIGNAL(triggered()), this, SLOT(actPhaseAction()));
         switch (i) {
-            case 0: temp->setShortcut(tr("F5")); break;
-            case 2: temp->setShortcut(tr("F6")); break;
-            case 3: temp->setShortcut(tr("F7")); break;
-            case 4: temp->setShortcut(tr("F8")); break;
-            case 9: temp->setShortcut(tr("F9")); break;
-            case 10: temp->setShortcut(tr("F10")); break;
+            case 0: temp->setShortcut(QKeySequence("F5")); break;
+            case 2: temp->setShortcut(QKeySequence("F6")); break;
+            case 3: temp->setShortcut(QKeySequence("F7")); break;
+            case 4: temp->setShortcut(QKeySequence("F8")); break;
+            case 9: temp->setShortcut(QKeySequence("F9")); break;
+            case 10: temp->setShortcut(QKeySequence("F10")); break;
             default: ;
         }
         phasesMenu->addAction(temp);
@@ -545,29 +527,29 @@ void TabGame::retranslateUi()
     gameMenu->setTitle(tr("&Game"));
     if (aNextPhase) {
         aNextPhase->setText(tr("Next &phase"));
-        aNextPhase->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Space")) << QKeySequence(tr("Tab")));
+        aNextPhase->setShortcuts(QList<QKeySequence>() << QKeySequence("Ctrl+Space") << QKeySequence("Tab"));
     }
     if (aNextTurn) {
         aNextTurn->setText(tr("Next &turn"));
-        aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence(tr("Ctrl+Return")) << QKeySequence(tr("Ctrl+Enter")));
+        aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence("Ctrl+Return") << QKeySequence("Ctrl+Enter"));
     }
     if (aRemoveLocalArrows) {
         aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
-        aRemoveLocalArrows->setShortcut(tr("Ctrl+R"));
+        aRemoveLocalArrows->setShortcut(QKeySequence("Ctrl+R"));
     }
     if (aGameInfo)
         aGameInfo->setText(tr("Game &information"));
     if (aConcede) {
         aConcede->setText(tr("&Concede"));
-        aConcede->setShortcut(tr("F2"));
+        aConcede->setShortcut(QKeySequence("F2"));
     }
     if (aLeaveGame) {
         aLeaveGame->setText(tr("&Leave game"));
-        aLeaveGame->setShortcut(tr("Ctrl+Q"));
+        aLeaveGame->setShortcut(QKeySequence("Ctrl+Q"));
     }
     if (aCloseReplay) {
         aCloseReplay->setText(tr("C&lose replay"));
-        aCloseReplay->setShortcut(tr("Ctrl+Q"));
+        aCloseReplay->setShortcut(QKeySequence("Ctrl+Q"));
     }
     
     if (sayLabel)
@@ -598,20 +580,14 @@ void TabGame::replayFinished()
 {
     replayStartButton->setEnabled(true);
     replayPauseButton->setEnabled(false);
-    replayStopButton->setEnabled(false);
     replayFastForwardButton->setEnabled(false);
 }
 
-void TabGame::replayToStartButtonClicked()
-{
-    // XXX
-}
 
 void TabGame::replayStartButtonClicked()
 {
     replayStartButton->setEnabled(false);
     replayPauseButton->setEnabled(true);
-    replayStopButton->setEnabled(true);
     replayFastForwardButton->setEnabled(true);
     
     timelineWidget->startReplay();
@@ -626,25 +602,9 @@ void TabGame::replayPauseButtonClicked()
     timelineWidget->stopReplay();
 }
 
-void TabGame::replayStopButtonClicked()
-{
-    replayStartButton->setEnabled(true);
-    replayPauseButton->setEnabled(false);
-    replayStopButton->setEnabled(false);
-    replayFastForwardButton->setEnabled(false);
-    
-    timelineWidget->stopReplay();
-    // XXX to start
-}
-
 void TabGame::replayFastForwardButtonToggled(bool checked)
 {
     timelineWidget->setTimeScaleFactor(checked ? 10.0 : 1.0);
-}
-
-void TabGame::replayToEndButtonClicked()
-{
-    // XXX
 }
 
 void TabGame::incrementGameTime()
@@ -689,6 +649,7 @@ void TabGame::actLeaveGame()
         if (!replay)
             sendGameCommand(Command_LeaveGame());
     }
+    scene->clearViews();
     deleteLater();
 }
 
@@ -837,6 +798,8 @@ void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
     AbstractClient *client = getClientForPlayer(playerId);
     if (!client)
         return;
+
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(commandFinished(const Response &)));
     client->sendCommand(pend);
 }
 
@@ -845,7 +808,16 @@ void TabGame::sendGameCommand(const google::protobuf::Message &command, int play
     AbstractClient *client = getClientForPlayer(playerId);
     if (!client)
         return;
-    client->sendCommand(prepareGameCommand(command));
+
+    PendingCommand *pend = prepareGameCommand(command);
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(commandFinished(const Response &)));
+    client->sendCommand(pend);
+}
+
+void TabGame::commandFinished(const Response &response)
+{   
+    if (response.response_code() == Response::RespChatFlood)
+       messageLog->appendMessage(tr("You are flooding the game. Please wait a couple of seconds."));
 }
 
 PendingCommand *TabGame::prepareGameCommand(const ::google::protobuf::Message &cmd)

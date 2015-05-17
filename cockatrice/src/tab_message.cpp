@@ -6,6 +6,10 @@
 #include "tab_message.h"
 #include "abstractclient.h"
 #include "chatview.h"
+#include "main.h"
+#include "settingscache.h"
+#include <QSystemTrayIcon>
+#include <QApplication>
 
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
@@ -51,7 +55,7 @@ void TabMessage::addMentionTag(QString mentionTag) {
 
 void TabMessage::retranslateUi()
 {
-    messageMenu->setTitle(tr("Personal &talk"));
+    messageMenu->setTitle(tr("Private &chat"));
     aLeave->setText(tr("&Leave"));
 }
 
@@ -68,7 +72,7 @@ QString TabMessage::getUserName() const
 
 QString TabMessage::getTabText() const
 {
-    return tr("Talking to %1").arg(QString::fromStdString(otherUserInfo->name()));
+    return tr("%1 - Private chat").arg(QString::fromStdString(otherUserInfo->name()));
 }
 
 void TabMessage::closeRequest()
@@ -106,8 +110,28 @@ void TabMessage::actLeave()
 void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 {
     const UserLevelFlags userLevel(event.sender_name() == otherUserInfo->name() ? otherUserInfo->user_level() : ownUserInfo->user_level());
-    chatView->appendMessage(QString::fromStdString(event.message()), QString::fromStdString(event.sender_name()), userLevel);
+    chatView->appendMessage(QString::fromStdString(event.message()), QString::fromStdString(event.sender_name()), userLevel, true);
+    if (settingsCache->getShowMessagePopup() && shouldShowSystemPopup(event))
+        showSystemPopup(event);
+
     emit userEvent();
+}
+
+bool TabMessage::shouldShowSystemPopup(const Event_UserMessage &event) {
+    return (QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0 ||
+        (event.sender_name() == otherUserInfo->name() && tabSupervisor->currentIndex() != tabSupervisor->indexOf(this)));
+}
+
+void TabMessage::showSystemPopup(const Event_UserMessage &event) {
+    disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
+    trayIcon->showMessage(tr("Private message from ") + otherUserInfo->name().c_str(), event.message().c_str());
+    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
+}
+
+void TabMessage::messageClicked() {
+    tabSupervisor->setCurrentIndex(tabSupervisor->indexOf(this));
+    QApplication::setActiveWindow(this);
+    emit maximizeClient();
 }
 
 void TabMessage::processUserLeft()

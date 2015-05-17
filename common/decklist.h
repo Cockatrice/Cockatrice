@@ -110,7 +110,6 @@ private:
         float price;
 public:
         DecklistCardNode(const QString &_name = QString(), int _number = 1, float _price = 0, InnerDecklistNode *_parent = 0) : AbstractDecklistCardNode(_parent), name(_name), number(_number), price(_price) { }
-        DecklistCardNode(const QString &_name = QString(), int _number = 1, InnerDecklistNode *_parent = 0) : AbstractDecklistCardNode(_parent), name(_name), number(_number), price(0) { }
     DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
     int getNumber() const { return number; }
     void setNumber(int _number) { number = _number; }

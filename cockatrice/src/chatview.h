@@ -5,6 +5,7 @@
 #include <QTextFragment>
 #include <QTextCursor>
 #include <QColor>
+#include <QAction>
 #include "userlist.h"
 #include "user_level.h"
 #include "tab_supervisor.h"
@@ -32,18 +33,23 @@ private:
     bool showTimestamps;
     HoveredItemType hoveredItemType;
     QString hoveredContent;
+    QAction *messageClicked;
     QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
     QTextCursor prepareBlock(bool same = false);
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
     QString getNameFromUserList(QMap<QString, UserListTWI *> &userList, QString &userName);
     QColor getCustomMentionColor();
+    bool shouldShowSystemPopup();
+    void showSystemPopup(QString &sender);
 private slots:
     void openLink(const QUrl &link);
+    void actMessageClicked();
 public:
     ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent = 0);
     void retranslateUi();
     void appendHtml(const QString &html);
+    void appendHtmlServerMessage(const QString &html);
     void appendMessage(QString message, QString sender = QString(), UserLevelFlags userLevel = UserLevelFlags(), bool playerBold = false);
     void clearChat();
 protected:
@@ -58,6 +64,8 @@ signals:
     void showCardInfoPopup(QPoint pos, QString cardName);
     void deleteCardInfoPopup(QString cardName);
     void addMentionTag(QString mentionTag);
+    void messageClickedSignal();
+    void showMentionPopup(QString &sender);
 };
 
 #endif

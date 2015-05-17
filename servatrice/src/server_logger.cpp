@@ -126,7 +126,8 @@ void ServerLogger::hupSignalHandler(int /*unused*/)
         return;
     
     char a = 1;
-    ::write(sigHupFD[0], &a, sizeof(a));
+    ssize_t writeValue = ::write(sigHupFD[0], &a, sizeof(a));
+    Q_UNUSED(writeValue);
 #endif
 }
 
@@ -138,7 +139,8 @@ void ServerLogger::handleSigHup()
     
     snHup->setEnabled(false);
     char tmp;
-    ::read(sigHupFD[1], &tmp, sizeof(tmp));
+    ssize_t readValue = ::read(sigHupFD[1], &tmp, sizeof(tmp));
+    Q_UNUSED(readValue);
     
     logFile->close();
     logFile->open(QIODevice::Append);

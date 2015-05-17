@@ -23,6 +23,8 @@ class QCloseEvent;
 class QSpinBox;
 class QRadioButton;
 class QSpinBox;
+class QSlider;
+class QSpinBox;
 
 class AbstractSettingsPage : public QWidget {
 public:
@@ -75,7 +77,9 @@ private:
     QComboBox themeBox;
     QLabel minPlayersForMultiColumnLayoutLabel;
     QCheckBox displayCardNamesCheckBox;
+    QCheckBox cardScalingCheckBox;
     QCheckBox horizontalHandCheckBox;
+    QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
     QGroupBox *themeGroupBox;
     QGroupBox *cardsGroupBox;
@@ -90,24 +94,16 @@ public:
 class UserInterfaceSettingsPage : public AbstractSettingsPage {
     Q_OBJECT
 private slots:
-    void soundPathClearButtonClicked();
-    void soundPathButtonClicked();
     void setSpecNotificationEnabled(int);
-signals:
-    void soundPathChanged();
 private:
     QCheckBox notificationsEnabledCheckBox;
     QCheckBox specNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox playToStackCheckBox;
     QCheckBox tapAnimationCheckBox;
-    QCheckBox soundEnabledCheckBox;
-    QLabel soundPathLabel;
-    QLineEdit *soundPathEdit;
     QGroupBox *generalGroupBox;
     QGroupBox *animationGroupBox;
-    QGroupBox *soundGroupBox;
-    QPushButton soundTestButton;
+    
 public:
     UserInterfaceSettingsPage();
     void retranslateUi();
@@ -119,11 +115,11 @@ public:
     DeckEditorSettingsPage();
     void retranslateUi();
 private slots:
-    void radioPriceTagSourceClicked(bool checked);
+    //void radioPriceTagSourceClicked(bool checked);
 signals:
-    void priceTagSourceChanged(int _priceTagSource);
+    //void priceTagSourceChanged(int _priceTagSource);
 private:
-    QCheckBox priceTagsCheckBox;
+    //QCheckBox priceTagsCheckBox;
     QGroupBox *generalGroupBox;
 };
 
@@ -145,6 +141,8 @@ private:
     QCheckBox invertMentionForeground;
     QCheckBox ignoreUnregUsersMainChat;
     QCheckBox ignoreUnregUserMessages;
+    QCheckBox messagePopups;
+    QCheckBox mentionPopups;
     QGroupBox *chatGroupBox;
     QGroupBox *messageShortcuts;
     QLineEdit *mentionColor;
@@ -152,6 +150,28 @@ private:
 
     void storeSettings();
     void updateMentionPreview();
+};
+
+class SoundSettingsPage : public AbstractSettingsPage {
+    Q_OBJECT
+public:
+    SoundSettingsPage();
+    void retranslateUi();
+private:
+    QGroupBox *soundGroupBox;
+    QPushButton soundTestButton;
+    QCheckBox soundEnabledCheckBox;
+    QLabel soundPathLabel;
+    QLineEdit *soundPathEdit;
+    QLabel masterVolumeLabel;
+    QSlider *masterVolumeSlider;
+    QSpinBox *masterVolumeSpinBox;
+signals:
+    void soundPathChanged();
+private slots:
+    void masterVolumeChanged(int value);
+    void soundPathClearButtonClicked();
+    void soundPathButtonClicked();
 };
 
 class DlgSettings : public QDialog {
@@ -165,7 +185,7 @@ private slots:
 private:
     QListWidget *contentsWidget;
     QStackedWidget *pagesWidget;
-    QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton;
+    QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton, *soundButton;
     void createIcons();
     void retranslateUi();
 protected:

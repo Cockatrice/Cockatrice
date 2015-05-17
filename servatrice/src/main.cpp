@@ -33,7 +33,11 @@
 #include <google/protobuf/stubs/common.h>
 #ifdef Q_OS_UNIX
 #include <signal.h>
+#include <execinfo.h>
+#include <unistd.h>
 #endif
+
+#define SIGSEGV_TRACE_LINES 40
 
 RNG_Abstract *rng;
 ServerLogger *logger;
@@ -129,6 +133,16 @@ void myMessageOutput2(QtMsgType /*type*/, const QMessageLogContext &, const QStr
 #ifdef Q_OS_UNIX
 void sigSegvHandler(int sig)
 {
+    void *array[SIGSEGV_TRACE_LINES];
+    size_t size;
+
+    // get void*'s for all entries on the stack
+    size = backtrace(array, SIGSEGV_TRACE_LINES);
+
+    // print out all the frames to stderr
+    fprintf(stderr, "Error: signal %d:\n", sig);
+    backtrace_symbols_fd(array, size, STDERR_FILENO);
+
 	if (sig == SIGSEGV)
 		logger->logMessage("CRASH: SIGSEGV");
 	else if (sig == SIGABRT)

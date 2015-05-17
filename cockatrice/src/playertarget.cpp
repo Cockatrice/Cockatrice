@@ -38,9 +38,8 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     
     painter->drawPath(path);
 
-    QRectF translatedRect = painter->combinedTransform().mapRect(boundingRect());
+    QRectF translatedRect = path.controlPointRect();
     QSize translatedSize = translatedRect.size().toSize();
-    painter->resetTransform();
     QFont font("Serif");
     font.setWeight(QFont::Bold);
     font.setPixelSize(qMax((int) round(translatedSize.height() / 1.3), 9));

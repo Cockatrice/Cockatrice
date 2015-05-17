@@ -21,6 +21,8 @@
 #define WINDOW_H
 
 #include <QMainWindow>
+#include <QSystemTrayIcon>
+#include <QProcess>
 #include "abstractclient.h"
 #include "pb/response.pb.h"
 
@@ -30,6 +32,7 @@ class LocalClient;
 class LocalServer;
 class ServerInfo_User;
 class QThread;
+class QMessageBox;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -56,23 +59,44 @@ private slots:
     void actExit();
     
     void actAbout();
+
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
+
+    void maximize();
+
+    void actCheckCardUpdates();
+    void cardUpdateError(QProcess::ProcessError err);
+    void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
 private:
     static const QString appName;
     void setClientStatusTitle();
     void retranslateUi();
     void createActions();
     void createMenus();
+
+    void createTrayIcon();
+    void createTrayActions();
+    // TODO: add a preference item to choose updater name for other games
+    inline QString getCardUpdaterBinaryName() { return "oracle"; };
+
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *helpMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout;
+        *aAbout, *aCheckCardUpdates;
     TabSupervisor *tabSupervisor;
+
+    QMenu *trayIconMenu;
+
+    QAction *closeAction;
 
     RemoteClient *client;
     QThread *clientThread;
     
     LocalServer *localServer;
     bool bHasActivated;
+
+    QMessageBox *serverShutdownMessageBox;
+    QProcess * cardUpdateProcess;
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();

@@ -126,7 +126,7 @@ void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 }
 
 Servatrice::Servatrice(QObject *parent)
-    : Server(true, parent), uptime(0), shutdownTimer(0)
+    : Server(true, parent), uptime(0), shutdownTimer(0), isFirstShutdownMessage(true)
 {
     qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
@@ -256,9 +256,11 @@ bool Servatrice::initServer()
 
     maxUsersPerAddress = settingsCache->value("security/max_users_per_address", 4).toInt();
     messageCountingInterval = settingsCache->value("security/message_counting_interval", 10).toInt();
-    maxMessageCountPerInterval = settingsCache->value("security/max_message_count_per_interval", 10).toInt();
+    maxMessageCountPerInterval = settingsCache->value("security/max_message_count_per_interval", 15).toInt();
     maxMessageSizePerInterval = settingsCache->value("security/max_message_size_per_interval", 1000).toInt();
     maxGamesPerUser = settingsCache->value("security/max_games_per_user", 5).toInt();
+    commandCountingInterval = settingsCache->value("game/command_counting_interval", 10).toInt();
+    maxCommandCountPerInterval = settingsCache->value("game/max_command_count_per_interval", 20).toInt();
 
 	try { if (settingsCache->value("servernetwork/active", 0).toInt()) {
 		qDebug() << "Connecting to ISL network.";
@@ -483,26 +485,29 @@ void Servatrice::shutdownTimeout()
 {
     --shutdownMinutes;
 
-    SessionEvent *se;
-    if (shutdownMinutes) {
-        Event_ServerShutdown event;
-        event.set_reason(shutdownReason.toStdString());
-        event.set_minutes(shutdownMinutes);
-        se = Server_ProtocolHandler::prepareSessionEvent(event);
-    } else {
-        Event_ConnectionClosed event;
-        event.set_reason(Event_ConnectionClosed::SERVER_SHUTDOWN);
-        se = Server_ProtocolHandler::prepareSessionEvent(event);
+    if (shutdownMinutes <= 5 || isFirstShutdownMessage || shutdownMinutes % 10 == 0) {
+        isFirstShutdownMessage = false;
+        SessionEvent *se;
+        if (shutdownMinutes) {
+            Event_ServerShutdown event;
+            event.set_reason(shutdownReason.toStdString());
+            event.set_minutes(shutdownMinutes);
+            se = Server_ProtocolHandler::prepareSessionEvent(event);
+        } else {
+            Event_ConnectionClosed event;
+            event.set_reason(Event_ConnectionClosed::SERVER_SHUTDOWN);
+            se = Server_ProtocolHandler::prepareSessionEvent(event);
+        }
+
+        clientsLock.lockForRead();
+        for (int i = 0; i < clients.size(); ++i)
+            clients[i]->sendProtocolItem(*se);
+        clientsLock.unlock();
+        delete se;
+    
+        if (!shutdownMinutes)
+            deleteLater();
     }
-
-    clientsLock.lockForRead();
-    for (int i = 0; i < clients.size(); ++i)
-        clients[i]->sendProtocolItem(*se);
-    clientsLock.unlock();
-    delete se;
-
-    if (!shutdownMinutes)
-        deleteLater();
 }
 
 bool Servatrice::islConnectionExists(int serverId) const

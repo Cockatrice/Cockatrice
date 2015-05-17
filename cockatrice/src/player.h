@@ -115,7 +115,8 @@ public slots:
     void actDrawCard();
     void actDrawCards();
     void actUndoDraw();
-        void actMulligan();
+    void actMulligan();
+    void actMoveTopCardToPlayFaceDown();
     void actMoveTopCardsToGrave();
     void actMoveTopCardsToExile();
     void actMoveTopCardToBottom();
@@ -168,7 +169,7 @@ private:
         *aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
         *aViewLibrary, *aViewTopCards, *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardsToGrave, *aMoveTopCardsToExile, *aMoveTopCardToBottom,
         *aViewGraveyard, *aViewRfg, *aViewSideboard,
-                *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle,
+                *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlayFaceDown,
         *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
         *aCardMenu, *aMoveBottomCardToGrave;
     

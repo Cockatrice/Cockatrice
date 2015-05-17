@@ -83,19 +83,22 @@ void HandZone::reorganizeCards()
     if (!cards.isEmpty()) {
         const int cardCount = cards.size();
         if (settingsCache->getHorizontalHand()) {
-            const int xPadding = 5;
-            qreal totalWidth = boundingRect().width() - 2 * xPadding;
+            bool leftJustified = settingsCache->getLeftJustified();
             qreal cardWidth = cards.at(0)->boundingRect().width();
+            const int xPadding = leftJustified ? cardWidth * 1.4 : 5;
+            qreal totalWidth = leftJustified? boundingRect().width() - (1 * xPadding) - 5 : boundingRect().width() - 2 * xPadding;
             
             for (int i = 0; i < cardCount; i++) {
                 CardItem *c = cards.at(i);
-    
                 // If the total width of the cards is smaller than the available width,
                 // the cards do not need to overlap and are displayed in the center of the area.
                 if (cardWidth * cardCount > totalWidth)
                     c->setPos(xPadding + ((qreal) i) * (totalWidth - cardWidth) / (cardCount - 1), 5);
-                else
-                    c->setPos(xPadding + ((qreal) i) * cardWidth + (totalWidth - cardCount * cardWidth) / 2, 5);
+                else {
+                    qreal xPosition = leftJustified ? xPadding + ((qreal) i) * cardWidth : 
+                        xPadding + ((qreal) i) * cardWidth + (totalWidth - cardCount * cardWidth) / 2;
+                    c->setPos(xPosition, 5);
+                }
                 c->setRealZValue(i);
             }
         } else {

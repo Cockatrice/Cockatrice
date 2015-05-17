@@ -79,11 +79,12 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     chooseTokenView->header()->setStretchLastSection(false);
     chooseTokenView->header()->hideSection(1);
     chooseTokenView->header()->hideSection(2);
+    chooseTokenView->setWordWrap(true);
+    chooseTokenView->setColumnWidth(0, 130);
+    chooseTokenView->setColumnWidth(3, 178);
 #if QT_VERSION < 0x050000
-    chooseTokenView->header()->setResizeMode(3, QHeaderView::ResizeToContents);
     chooseTokenView->header()->setResizeMode(4, QHeaderView::ResizeToContents);
 #else
-    chooseTokenView->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
     chooseTokenView->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
 #endif
     connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
@@ -106,11 +107,12 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     QVBoxLayout *leftVBox = new QVBoxLayout;
     leftVBox->addWidget(tokenDataGroupBox);
     leftVBox->addStretch();
-    
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addLayout(leftVBox);
-    hbox->addWidget(tokenChooseGroupBox);
-    
+
+    QGridLayout *hbox = new QGridLayout;
+    hbox->addLayout(leftVBox, 0, 0);
+    hbox->addWidget(tokenChooseGroupBox, 0, 1);
+    hbox->setColumnStretch(1, 1);
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -122,7 +124,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 
     setWindowTitle(tr("Create token"));
     setFixedHeight(sizeHint().height());
-    setMinimumWidth(300);
+    setFixedWidth(width());
 }
 
 void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)

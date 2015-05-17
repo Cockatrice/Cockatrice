@@ -17,6 +17,7 @@
 #include "pb/command_move_card.pb.h"
 #include "pb/command_set_card_attr.pb.h"
 
+const QColor TableZone::BACKGROUND_COLOR    = QColor(100, 100, 100);
 const QColor TableZone::FADE_MASK           = QColor(0, 0, 0, 80);
 const QColor TableZone::GRADIENT_COLOR      = QColor(255, 255, 255, 150);
 const QColor TableZone::GRADIENT_COLORLESS  = QColor(255, 255, 255, 0);

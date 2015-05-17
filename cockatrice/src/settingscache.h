@@ -26,6 +26,7 @@ signals:
     void picDownloadHqChanged();
     void displayCardNamesChanged();
     void horizontalHandChanged();
+    void handJustificationChanged();
     void invertVerticalCoordinateChanged();
     void minPlayersForMultiColumnLayoutChanged();
     void soundEnabledChanged();
@@ -34,6 +35,7 @@ signals:
     void ignoreUnregisteredUsersChanged();
     void ignoreUnregisteredUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
+    void masterVolumeChanged(int value);
 private:
     QSettings *settings;
 
@@ -69,6 +71,11 @@ private:
     QString picUrlHqFallback;
     bool attemptAutoConnect;
     int pixmapCacheSize;
+    bool scaleCards;
+    bool showMessagePopups;
+    bool showMentionPopups;
+    bool leftJustified;
+    int masterVolume;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -105,7 +112,7 @@ public:
     bool getZoneViewPileView() const { return zoneViewPileView; }
     bool getSoundEnabled() const { return soundEnabled; }
     QString getSoundPath() const { return soundPath; }
-    bool getPriceTagFeature() const { return priceTagFeature; }
+    bool getPriceTagFeature() const { return false; /* #859; priceTagFeature;*/ }
     int getPriceTagSource() const { return priceTagSource; }
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
     bool getIgnoreUnregisteredUserMessages() const { return ignoreUnregisteredUserMessages; }
@@ -113,9 +120,13 @@ public:
     QString getPicUrlHq() const { return picUrlHq; }
     QString getPicUrlFallback() const { return picUrlFallback; }
     QString getPicUrlHqFallback() const { return picUrlHqFallback; }
-    void copyPath(const QString &src, const QString &dst);
     bool getAutoConnect() const { return attemptAutoConnect; }
     int getPixmapCacheSize() const { return pixmapCacheSize; }
+    bool getScaleCards() const {  return scaleCards; }
+    bool getShowMessagePopup() const { return showMessagePopups; }
+    bool getShowMentionPopup() const { return showMentionPopups; }
+    bool getLeftJustified() const { return leftJustified; }
+    int getMasterVolume() const { return masterVolume; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -156,6 +167,11 @@ public slots:
     void setPicUrlHqFallback(const QString &_picUrlHqFallback);
     void setAutoConnect(const bool &_autoConnect);
     void setPixmapCacheSize(const int _pixmapCacheSize);
+    void setCardScaling(const int _scaleCards);
+    void setShowMessagePopups(const int _showMessagePopups);
+    void setShowMentionPopups(const int _showMentionPopups);
+    void setLeftJustified( const int _leftJustified);
+    void setMasterVolume(const int _masterVolume); 
 };
 
 extern SettingsCache *settingsCache;

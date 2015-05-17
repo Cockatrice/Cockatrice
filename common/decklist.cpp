@@ -586,7 +586,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         }
 
         ++okRows;
-        new DecklistCardNode(cardName, number, zone);
+        new DecklistCardNode(cardName, number, 0, zone);
     }
     updateDeckHash();
     return (okRows > 0);
@@ -687,7 +687,7 @@ DecklistCardNode *DeckList::addCard(const QString &cardName, const QString &zone
     if (!zoneNode)
         zoneNode = new InnerDecklistNode(zoneName, root);
 
-    DecklistCardNode *node = new DecklistCardNode(cardName, 1, zoneNode);
+    DecklistCardNode *node = new DecklistCardNode(cardName, 1, 0, zoneNode);
     updateDeckHash();
     return node;
 }

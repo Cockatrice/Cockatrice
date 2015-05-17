@@ -9,6 +9,7 @@
     <file>resources/icon_config_interface.svg</file>
     <file>resources/icon_config_messages.svg</file>
     <file>resources/icon_config_deckeditor.svg</file>
+    <file>resources/icon_config_sound.svg</file>
     <file>resources/phases/icon_phase_untap.svg</file>
     <file>resources/phases/icon_phase_upkeep.svg</file>
     <file>resources/phases/icon_phase_draw.svg</file>
@@ -24,7 +25,6 @@
     <file>resources/icon_settings.svg</file>
     <file>resources/hand.svg</file>
     <file>resources/pencil.svg</file>
-    <file>resources/icon_search.svg</file>
     <file>resources/icon_search_black.svg</file>
     <file>resources/icon_clearsearch.svg</file>
     <file>resources/icon_update.png</file>
@@ -38,6 +38,11 @@
     <file>resources/remove_row.svg</file>
     <file>resources/arrow_left_green.svg</file>
     <file>resources/arrow_right_green.svg</file>
+
+    <file>resources/arrow_top_green.svg</file>
+    <file>resources/arrow_up_green.svg</file>
+    <file>resources/arrow_down_green.svg</file>
+    <file>resources/arrow_bottom_green.svg</file>
     
     <file>resources/icon_ready_start.svg</file>
     <file>resources/icon_not_ready_start.svg</file>
@@ -46,11 +51,7 @@
     <file>resources/icon_spectator.svg</file>
 
     <file>resources/replay_start.svg</file>
-    <file>resources/replay_stop.svg</file>
     <file>resources/replay_fastforward.svg</file>
-    <file>resources/replay_rewind.svg</file>
-    <file>resources/replay_toend.svg</file>
-    <file>resources/replay_tostart.svg</file>
     <file>resources/replay_pause.svg</file>
 
     <file>resources/genders/male.svg</file>
@@ -317,6 +318,8 @@
     <file>resources/counters/r_highlight.svg</file>
     <file>resources/counters/g.svg</file>
     <file>resources/counters/g_highlight.svg</file>
+    <file>resources/counters/storm.svg</file>
+    <file>resources/counters/storm_highlight.svg</file>
     <file>resources/counters/general.svg</file>
     <file>resources/counters/general_highlight.svg</file>
 

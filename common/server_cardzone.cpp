@@ -85,7 +85,7 @@ void Server_CardZone::insertCardIntoCoordMap(Server_Card *card, int x, int y)
     
     coordinateMap[y].insert(x, card);
     if (!(x % 3)) {
-        if (!freePilesMap[y].contains(card->getName(), x) && card->getAttachedCards().isEmpty())
+        if (!card->getFaceDown() && !freePilesMap[y].contains(card->getName(), x) && card->getAttachedCards().isEmpty())
             freePilesMap[y].insert(card->getName(), x);
         if (freeSpaceMap[y] == x) {
             int nextFreeX = x;
@@ -141,11 +141,11 @@ Server_Card *Server_CardZone::getCard(int id, int *position, bool remove)
     }
 }
 
-int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName) const
+int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName, bool dontStackSameName) const
 {
     const QMap<int, Server_Card *> &coordMap = coordinateMap.value(y);
     if (x == -1) {
-        if (freePilesMap[y].contains(cardName)) {
+        if (!dontStackSameName && freePilesMap[y].contains(cardName)) {
             x = (freePilesMap[y].value(cardName) / 3) * 3;
             if (!coordMap.contains(x))
                 return x;

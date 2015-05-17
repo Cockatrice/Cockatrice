@@ -1,7 +1,5 @@
 #include "settingscache.h"
 #include <QSettings>
-#include <QDebug>
-#include <QDir>
 
 SettingsCache::SettingsCache()
 {
@@ -17,12 +15,22 @@ SettingsCache::SettingsCache()
 
     themeName = settings->value("theme/name").toString();
 
-    picDownload = settings->value("personal/picturedownload", true).toBool();
-    picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
-    pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
+    // we only want to reset the cache once, then its up to the user
+    bool updateCache = settings->value("revert/pixmapCacheSize", false).toBool();
+    if (!updateCache) {
+        pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
+        settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
+        settings->setValue("personal/picturedownloadhq", false);
+        settings->setValue("revert/pixmapCacheSize", true);
+    }
+    else
+        pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
     //sanity check
     if(pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
+
+    picDownload = settings->value("personal/picturedownload", true).toBool();
+    picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
 
     picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
     picUrlHq = settings->value("personal/picUrlHq", PIC_URL_HQ_DEFAULT).toString();
@@ -58,7 +66,42 @@ SettingsCache::SettingsCache()
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
     ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
 
-    attemptAutoConnect = settings->value("server/auto_connect", 0).toBool(); 
+    attemptAutoConnect = settings->value("server/auto_connect", 0).toBool();
+
+    scaleCards = settings->value("cards/scaleCards", true).toBool();
+    showMessagePopups = settings->value("chat/showmessagepopups", true).toBool();
+    showMentionPopups = settings->value("chat/showmentionpopups", true).toBool();
+
+    leftJustified = settings->value("interface/leftjustified", false).toBool();
+
+    masterVolume = settings->value("sound/mastervolume", 100).toInt();
+}
+
+void SettingsCache::setMasterVolume(int _masterVolume) {
+    masterVolume = _masterVolume;
+    settings->setValue("sound/mastervolume", masterVolume);
+    emit masterVolumeChanged(masterVolume);
+}
+
+void SettingsCache::setLeftJustified(const int _leftJustified) {
+    leftJustified = _leftJustified;
+    settings->setValue("interface/leftjustified", leftJustified);
+    emit handJustificationChanged();
+}
+
+void SettingsCache::setCardScaling(const int _scaleCards) {
+    scaleCards = _scaleCards;
+    settings->setValue("cards/scaleCards", scaleCards);
+}
+
+void SettingsCache::setShowMessagePopups(const int _showMessagePopups) {
+    showMessagePopups = _showMessagePopups;
+    settings->setValue("chat/showmessagepopups", showMessagePopups);
+}
+
+void SettingsCache::setShowMentionPopups(const int _showMentionPopus) {
+    showMentionPopups = _showMentionPopus;
+    settings->setValue("chat/showmentionpopups", showMentionPopups);
 }
 
 void SettingsCache::setLang(const QString &_lang)
@@ -303,34 +346,4 @@ void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
     pixmapCacheSize = _pixmapCacheSize;
     settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
     emit pixmapCacheSizeChanged(pixmapCacheSize);
-}
-
-void SettingsCache::copyPath(const QString &src, const QString &dst)
-{
-    // test source && return if inexistent
-    QDir dir(src);
-    if (! dir.exists())
-        return;
-    // test destination && create if inexistent
-    QDir tmpDir(dst);
-    if (!tmpDir.exists())
-    {
-        tmpDir.setPath(QDir::rootPath());
-        if (!tmpDir.mkdir(dst) && !tmpDir.exists()) {
-            // TODO: this is probably not good.
-            qDebug() << "copyPath(): Failed to create dir: " << dst;
-        }
-    }
-
-    foreach (QString d, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-        QString dst_path = dst + QDir::separator() + d;
-        dir.mkpath(dst_path);
-        copyPath(src+ QDir::separator() + d, dst_path);
-    }
-
-    foreach (QString f, dir.entryList(QDir::Files)) {
-        if(tmpDir.exists(f)) 
-            tmpDir.remove(f);
-        QFile::copy(src + QDir::separator() + f, dst + QDir::separator() + f);
-    }
 }
