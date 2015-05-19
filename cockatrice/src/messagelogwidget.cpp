@@ -565,8 +565,7 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 
 void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 {
-    if (tapped)
-        soundEngine->tap();
+    soundEngine->tap();
     
     if (currentContext == MessageContext_MoveCard)
         moveCardTapped.insert(card, tapped);
@@ -805,7 +804,7 @@ void MessageLogWidget::logSetActivePhase(int phase)
         case 2: phaseName = tr("draw step"); break;
         case 3: phaseName = tr("first main phase"); break;
         case 4: phaseName = tr("beginning of combat step"); break;
-        case 5: phaseName = tr("declare attackers step"); break;
+        case 5: phaseName = tr("declare attackers step"); soundEngine->attack(); break;
         case 6: phaseName = tr("declare blockers step"); break;
         case 7: phaseName = tr("combat damage step"); break;
         case 8: phaseName = tr("end of combat step"); break;
