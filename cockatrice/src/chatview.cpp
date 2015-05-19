@@ -168,7 +168,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         // search for the first [ or @
         bracketFirstIndex = message.indexOf('[');
         mentionFirstIndex = mentionEnabled ? message.indexOf('@') : -1;
-        urlFirstIndex = message.indexOf("https://");
+        urlFirstIndex = message.indexOf(QRegExp("https?://|www."));
         if(bracketFirstIndex == -1) {
             if(mentionFirstIndex == -1) {
                 if (urlFirstIndex == -1) {
