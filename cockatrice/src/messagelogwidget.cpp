@@ -565,8 +565,7 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 
 void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 {
-    if (tapped)
-        soundEngine->tap();
+    soundEngine->tap();
     
     if (currentContext == MessageContext_MoveCard)
         moveCardTapped.insert(card, tapped);
