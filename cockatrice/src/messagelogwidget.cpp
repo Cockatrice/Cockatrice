@@ -803,7 +803,7 @@ void MessageLogWidget::logSetActivePhase(int phase)
         case 1: phaseName = tr("upkeep step"); break;
         case 2: phaseName = tr("draw step"); break;
         case 3: phaseName = tr("first main phase"); break;
-        case 4: phaseName = tr("beginning of combat step"); break;
+        case 4: phaseName = tr("beginning of combat step"); soundEngine->startCombat(); break;
         case 5: phaseName = tr("declare attackers step"); break;
         case 6: phaseName = tr("declare blockers step"); break;
         case 7: phaseName = tr("combat damage step"); break;

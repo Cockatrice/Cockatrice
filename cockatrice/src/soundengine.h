@@ -17,6 +17,7 @@ private:
     QAudioOutput *audio;
     QDateTime lastTapPlayed;
     QDateTime lastEndStepPlayed;
+    QDateTime lastStartCombatPlayed;
 private slots:
     void cacheData();
     void soundEnabledChanged();
@@ -26,6 +27,7 @@ public slots:
     void endStep();
     void tap();
     void playerJoined();
+    void startCombat();
 };
 
 extern SoundEngine *soundEngine;
