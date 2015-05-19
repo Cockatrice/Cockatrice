@@ -359,6 +359,9 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
     
     messageLog->logReplayStarted(gameInfo.game_id());
+
+    for (int i = gameInfo.game_types_size() - 1; i >= 0; i--)
+        gameTypes.append(roomGameTypes.find(gameInfo.game_types(i)).value());
 }
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes)
@@ -490,6 +493,9 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
     
     messageLog->logGameJoined(gameInfo.game_id());
+
+    for (int i = gameInfo.game_types_size() - 1; i >= 0; i--)
+        gameTypes.append(roomGameTypes.find(gameInfo.game_types(i)).value());
 }
 
 void TabGame::addMentionTag(QString value) {
@@ -1159,10 +1165,32 @@ CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) co
 
 QString TabGame::getTabText() const
 {
+    QString gameTypeInfo;
+    if (gameTypes.size() != 0) {
+        gameTypeInfo = gameTypes.at(0);
+        if (gameTypes.size() > 1) 
+            gameTypeInfo.append("...");
+    }
+
+    QString gameDesc(gameInfo.description().c_str());
+    QString gameId(QString::number(gameInfo.game_id()));
+
+    QString tabText;
     if (replay)
-        return tr("Replay %1: %2").arg(gameInfo.game_id()).arg(QString::fromStdString(gameInfo.description()));
-    else
-        return tr("Game %1: %2").arg(gameInfo.game_id()).arg(QString::fromStdString(gameInfo.description()));
+        tabText.append(tr("REPLAY "));
+    if (!gameTypeInfo.isEmpty())
+        tabText.append(gameTypeInfo + " ");
+    if (!gameDesc.isEmpty()) {
+        if (gameDesc.length() >= 15)
+            tabText.append("| " + gameDesc.left(15) + "... ");
+        else
+            tabText.append("| " + gameDesc + " ");
+    }
+    if (!tabText.isEmpty())
+        tabText.append("| ");
+    tabText.append("#" + gameId);
+
+    return tabText;
 }
 
 Player *TabGame::getActiveLocalPlayer() const
