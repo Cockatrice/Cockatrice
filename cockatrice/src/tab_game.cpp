@@ -217,6 +217,7 @@ void DeckViewContainer::setReadyStart(bool ready)
 {
     readyStartButton->setState(ready);
     deckView->setLocked(ready || !sideboardLockButton->getState());
+    sideboardLockButton->setEnabled(!readyStartButton->getState());
 }
 
 void DeckViewContainer::setSideboardLocked(bool locked)
