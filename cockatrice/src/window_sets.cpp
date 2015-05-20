@@ -24,28 +24,28 @@ WndSets::WndSets(QWidget *parent)
     setsEditToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     aTop = new QAction(QString(), this);
-    aTop->setIcon(QIcon("theme:arrow_top_green.svg"));
+    aTop->setIcon(QIcon("theme:icons/arrow_top_green.svg"));
     aTop->setToolTip(tr("Move selected set to top"));
     aTop->setEnabled(false);
     connect(aTop, SIGNAL(triggered()), this, SLOT(actTop()));
     setsEditToolBar->addAction(aTop);
 
     aUp = new QAction(QString(), this);
-    aUp->setIcon(QIcon("theme:arrow_up_green.svg"));
+    aUp->setIcon(QIcon("theme:icons/arrow_up_green.svg"));
     aUp->setToolTip(tr("Move selected set up"));
     aUp->setEnabled(false);
     connect(aUp, SIGNAL(triggered()), this, SLOT(actUp()));
     setsEditToolBar->addAction(aUp);
 
     aDown = new QAction(QString(), this);
-    aDown->setIcon(QIcon("theme:arrow_down_green.svg"));
+    aDown->setIcon(QIcon("theme:icons/arrow_down_green.svg"));
     aDown->setToolTip(tr("Move selected set down"));
     aDown->setEnabled(false);
     connect(aDown, SIGNAL(triggered()), this, SLOT(actDown()));
     setsEditToolBar->addAction(aDown);
 
     aBottom = new QAction(QString(), this);
-    aBottom->setIcon(QIcon("theme:arrow_bottom_green.svg"));
+    aBottom->setIcon(QIcon("theme:icons/arrow_bottom_green.svg"));
     aBottom->setToolTip(tr("Move selected set to bottom"));
     aBottom->setEnabled(false);
     connect(aBottom, SIGNAL(triggered()), this, SLOT(actBottom()));
