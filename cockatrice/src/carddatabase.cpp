@@ -1053,6 +1053,18 @@ void CardDatabase::loadTokenDatabase()
     loadCardDatabase(settingsCache->getTokenDatabasePath(), true);
 }
 
+void CardDatabase::loadCustomCardDatabases(const QString &path)
+{
+    QDir dir(path);
+    if(!dir.exists())
+        return;
+
+    foreach(QString fileName, dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name))
+    {
+        loadCardDatabase(dir.absoluteFilePath(fileName), false);
+    }
+}
+
 QStringList CardDatabase::getAllColors() const
 {
     QSet<QString> colors;

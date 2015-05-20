@@ -271,6 +271,7 @@ public:
 public slots:
     void clearPixmapCache();
     LoadStatus loadCardDatabase(const QString &path, bool tokens = false);
+    void loadCustomCardDatabases(const QString &path);
     void emitCardListChanged();
 private slots:
     void imageLoaded(CardInfo *card, QImage image);
