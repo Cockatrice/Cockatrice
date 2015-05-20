@@ -68,7 +68,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     connect(aOpenChatSettings, SIGNAL(triggered()), this, SLOT(actOpenChatSettings()));
 
     QToolButton *chatSettingsButton = new QToolButton;
-    chatSettingsButton->setIcon(QIcon("theme:icon_settings.svg"));
+    chatSettingsButton->setIcon(QIcon("theme:icons/settings.svg"));
     chatSettingsButton->setMenu(chatSettingsMenu);
     chatSettingsButton->setPopupMode(QToolButton::InstantPopup);
 

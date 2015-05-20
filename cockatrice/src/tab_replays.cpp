@@ -78,22 +78,22 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
     hbox->addWidget(rightGroupBox);
     
     aOpenLocalReplay = new QAction(this);
-    aOpenLocalReplay->setIcon(QIcon("theme:icon_view.svg"));
+    aOpenLocalReplay->setIcon(QIcon("theme:icons/view.svg"));
     connect(aOpenLocalReplay, SIGNAL(triggered()), this, SLOT(actOpenLocalReplay()));
     aDeleteLocalReplay = new QAction(this);
-    aDeleteLocalReplay->setIcon(QIcon("theme:remove_row.svg"));
+    aDeleteLocalReplay->setIcon(QIcon("theme:icons/remove_row.svg"));
     connect(aDeleteLocalReplay, SIGNAL(triggered()), this, SLOT(actDeleteLocalReplay()));
     aOpenRemoteReplay = new QAction(this);
-    aOpenRemoteReplay->setIcon(QIcon("theme:icon_view.svg"));
+    aOpenRemoteReplay->setIcon(QIcon("theme:icons/view.svg"));
     connect(aOpenRemoteReplay, SIGNAL(triggered()), this, SLOT(actOpenRemoteReplay()));
     aDownload = new QAction(this);
-    aDownload->setIcon(QIcon("theme:arrow_left_green.svg"));
+    aDownload->setIcon(QIcon("theme:icons/arrow_left_green.svg"));
     connect(aDownload, SIGNAL(triggered()), this, SLOT(actDownload()));
     aKeep = new QAction(this);
-    aKeep->setIcon(QIcon("theme:lock.svg"));
+    aKeep->setIcon(QIcon("theme:icons/lock.svg"));
     connect(aKeep, SIGNAL(triggered()), this, SLOT(actKeepRemoteReplay()));
     aDeleteRemoteReplay = new QAction(this);
-    aDeleteRemoteReplay->setIcon(QIcon("theme:remove_row.svg"));
+    aDeleteRemoteReplay->setIcon(QIcon("theme:icons/remove_row.svg"));
     connect(aDeleteRemoteReplay, SIGNAL(triggered()), this, SLOT(actDeleteRemoteReplay()));
     
     leftToolBar->addAction(aOpenLocalReplay);

@@ -16,7 +16,7 @@ QPixmap PhasePixmapGenerator::generatePixmap(int height, QString name)
     if (pmCache.contains(key))
         return pmCache.value(key);
     
-    QSvgRenderer svg(QString("theme:phases/icon_phase_" + name + ".svg"));
+    QSvgRenderer svg(QString("theme:phases/" + name + ".svg"));
     
     QPixmap pixmap(height, height);
     pixmap.fill(Qt::transparent);
@@ -175,7 +175,7 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QSvgRenderer svg(QString("theme:lock.svg"));
+    QSvgRenderer svg(QString("theme:icons/lock.svg"));
     int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
     QPixmap pixmap(width, height);
     pixmap.fill(Qt::transparent);

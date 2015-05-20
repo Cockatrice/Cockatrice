@@ -35,7 +35,7 @@ RemoteReplayList_TreeModel::RemoteReplayList_TreeModel(AbstractClient *_client, 
     QFileIconProvider fip;
     dirIcon = fip.icon(QFileIconProvider::Folder);
     fileIcon = fip.icon(QFileIconProvider::File);
-    lockIcon = QIcon("theme:lock.svg");
+    lockIcon = QIcon("theme:icons/lock.svg");
 
     refreshTree();
 }

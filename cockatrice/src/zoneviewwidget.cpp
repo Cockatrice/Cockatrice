@@ -250,5 +250,5 @@ void ZoneViewWidget::zoneDeleted()
 void ZoneViewWidget::initStyleOption(QStyleOption *option) const {
     QStyleOptionTitleBar *titleBar = qstyleoption_cast<QStyleOptionTitleBar *>(option);
     if (titleBar)
-        titleBar->icon = QIcon("theme:appicon.svg");
+        titleBar->icon = QIcon("theme:cockatrice.svg");
 }
