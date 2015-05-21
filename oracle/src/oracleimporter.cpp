@@ -95,8 +95,7 @@ CardInfo *OracleImporter::addCard(const QString &setName,
                 if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
                     mArtifact = true;
                     
-        bool cipt = cardText.contains(cardName + " enters the battlefield tapped") &&
-            !cardText.contains(cardName + " enters the battlefield tapped unless");
+        bool cipt = cardText.contains("Hideaway") || (cardText.contains(cardName + " enters the battlefield tapped") && !cardText.contains(cardName + " enters the battlefield tapped unless"));
         
         card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, cardLoyalty, cipt);
         int tableRow = 1;
