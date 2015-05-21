@@ -25,7 +25,7 @@ WndSets::WndSets(QWidget *parent)
 
     aTop = new QAction(QString(), this);
     aTop->setIcon(QIcon(":/resources/arrow_top_green.svg"));
-    aTop->setToolTip(tr("Move selected set to top"));
+    aTop->setToolTip(tr("Move selected set to the top"));
     aTop->setEnabled(false);
     connect(aTop, SIGNAL(triggered()), this, SLOT(actTop()));
     setsEditToolBar->addAction(aTop);
@@ -46,7 +46,7 @@ WndSets::WndSets(QWidget *parent)
 
     aBottom = new QAction(QString(), this);
     aBottom->setIcon(QIcon(":/resources/arrow_bottom_green.svg"));
-    aBottom->setToolTip(tr("Move selected set to bottom"));
+    aBottom->setToolTip(tr("Move selected set to the bottom"));
     aBottom->setEnabled(false);
     connect(aBottom, SIGNAL(triggered()), this, SLOT(actBottom()));
     setsEditToolBar->addAction(aBottom);
