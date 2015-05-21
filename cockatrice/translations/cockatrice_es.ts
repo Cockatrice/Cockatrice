@@ -988,7 +988,7 @@ Se almacenará unicamente para moderadores y no podrá ser visto por la persona 
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="139"/>
         <source>The chosen name conflicts with an existing card or token.
- Make sure to enable the &apos;token set&apos; in &apos;Edit sets...&apos; dialog to display them correctly.</source>
+Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; dialog to display them correctly.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -4679,6 +4679,14 @@ Por favor, introduzca un nombre:</translation>
     <message>
         <location filename="../src/window_sets.cpp" line="49"/>
         <source>Move selected set to bottom</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="95"/>
+        <source>Enable the sets that you want to have available in the deck editor.
+Move sets around to change their order, or click on a column header to sort sets on that field.
+Sets order decides the source that will be used when loading images for a specific card.
+Disabled sets will still be used for loading images.</source>
         <translation type="unfinished"/>
     </message>
     <message>

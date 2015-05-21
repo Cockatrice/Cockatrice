@@ -988,9 +988,9 @@ Questo è solo visibile ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="139"/>
         <source>The chosen name conflicts with an existing card or token.
- Make sure to enable the &apos;token set&apos; in &apos;Edit sets...&apos; dialog to display them correctly.</source>
-        <translation>Il nome scelto combacia con quello di una carta o token già esistente.
-Assicurati di aver abilitato il set &quot;Tokens&quot; nella finestra &quot;Modifica set...&quot; per visualizzarli correttamente.</translation>
+Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; dialog to display them correctly.</source>
+        <translation>Il nome scelto coincide con il nome di una carta o token già esistente.
+Assicurati di aver abilitato il set &quot;Tokens&quot; nella finestra &quot;Modifica set&quot; per visualizzarli correttamente.</translation>
     </message>
 </context>
 <context>
@@ -4707,6 +4707,17 @@ Please enter a name:</source>
         <location filename="../src/window_sets.cpp" line="49"/>
         <source>Move selected set to bottom</source>
         <translation>Muovi set selezionato in fondo</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="95"/>
+        <source>Enable the sets that you want to have available in the deck editor.
+Move sets around to change their order, or click on a column header to sort sets on that field.
+Sets order decides the source that will be used when loading images for a specific card.
+Disabled sets will still be used for loading images.</source>
+        <translation>Abilita i set che buoi avere a disposizione nell&apos;editor di mazzi.
+Sposta i set usando il mouse o i pulsanti a sinistra per modificarne l&apos;ordine, o clicca sull&apos;intestazione di una colonna per ordinare i set su quel campo.
+L&apos;ordine dei set decide quali set verranno utilizzati per cariare le immagini delle carte.
+I set disabilitati saranno comunque usati per caricare le immagini.</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="115"/>
