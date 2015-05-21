@@ -572,7 +572,7 @@ void MainWindow::actCheckCardUpdates()
         return;
     }
 
-    cardUpdateProcess->start(updaterCmd);
+    cardUpdateProcess->start("\"" + updaterCmd + "\"");
 }
 
 void MainWindow::cardUpdateError(QProcess::ProcessError err)
