@@ -1059,7 +1059,7 @@ void CardDatabase::loadCustomCardDatabases(const QString &path)
     if(!dir.exists())
         return;
 
-    foreach(QString fileName, dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name))
+    foreach(QString fileName, dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase))
     {
         loadCardDatabase(dir.absoluteFilePath(fileName), false);
     }
