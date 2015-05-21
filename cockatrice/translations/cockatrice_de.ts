@@ -194,12 +194,12 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="../src/carddatabase.cpp" line="1125"/>
         <source>New sets found</source>
-        <translation type="unfinished"/>
+        <translation>Neue Editionen gefunden</translation>
     </message>
     <message>
         <location filename="../src/carddatabase.cpp" line="1125"/>
         <source>%1 new set(s) have been found in the card database. Do you want to enable them?</source>
-        <translation type="unfinished"/>
+        <translation>%1 neue Edition(en) wurden in der Kartendatenbank gefunden. Sollen diese aktiviert werden?</translation>
     </message>
 </context>
 <context>
@@ -988,7 +988,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="139"/>
         <source>The chosen name conflicts with an existing card or token.
- Make sure to enable the &apos;token set&apos; in &apos;Edit sets...&apos; dialog to display them correctly.</source>
+Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; dialog to display them correctly.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -1206,7 +1206,7 @@ Möchten Sie Ihren Speicherort der Datenbank aktualisieren?</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="953"/>
         <source>Sound</source>
-        <translation type="unfinished"/>
+        <translation>Töne</translation>
     </message>
 </context>
 <context>
@@ -1828,7 +1828,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
         <location filename="../src/window_main.cpp" line="537"/>
         <location filename="../src/window_main.cpp" line="615"/>
         <source>Information</source>
-        <translation type="unfinished"/>
+        <translation>Information</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="537"/>
@@ -3334,12 +3334,12 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
     <message>
         <location filename="../src/player.cpp" line="526"/>
         <source>Reveal top cards of library</source>
-        <translation type="unfinished"/>
+        <translation>Zeige die obersten Karten der Bibliothek</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="526"/>
         <source>Number of cards: (max. %1)</source>
-        <translation type="unfinished"/>
+        <translation>Anzahl an Karten: (max. %1)</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="614"/>
@@ -3357,7 +3357,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
     <message>
         <location filename="../src/player.cpp" line="641"/>
         <source>Reveal t&amp;op cards to...</source>
-        <translation type="unfinished"/>
+        <translation>Zeige die obersten Karten...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="646"/>
@@ -3829,7 +3829,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
     <message>
         <location filename="../src/setsmodel.cpp" line="71"/>
         <source>Release date</source>
-        <translation>Veröffentlichungsdatum</translation>
+        <translation>Veröffentlichung</translation>
     </message>
 </context>
 <context>
@@ -3855,17 +3855,17 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="750"/>
         <source>Choose path</source>
-        <translation type="unfinished"/>
+        <translation>Dateipfad auswählen</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="759"/>
         <source>Enable &amp;sounds</source>
-        <translation type="unfinished"/>
+        <translation>Töne aktivieren</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="760"/>
         <source>Path to sounds directory:</source>
-        <translation type="unfinished"/>
+        <translation>Pfad zum Verzeichnis mit den Tondateien:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="761"/>
@@ -3875,7 +3875,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="762"/>
         <source>Sound settings</source>
-        <translation type="unfinished"/>
+        <translation>Toneinstellungen</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="764"/>
@@ -4031,7 +4031,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="792"/>
         <source>Welcome</source>
-        <translation type="unfinished"/>
+        <translation>Willkommen</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="792"/>
@@ -4705,6 +4705,14 @@ Bitte geben Sie einen Namen ein:</translation>
         <location filename="../src/window_sets.cpp" line="49"/>
         <source>Move selected set to bottom</source>
         <translation>ans Ende verschieben</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="95"/>
+        <source>Enable the sets that you want to have available in the deck editor.
+Move sets around to change their order, or click on a column header to sort sets on that field.
+Sets order decides the source that will be used when loading images for a specific card.
+Disabled sets will still be used for loading images.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="115"/>

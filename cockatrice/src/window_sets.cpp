@@ -92,7 +92,7 @@ WndSets::WndSets(QWidget *parent)
 
 
     QLabel *labNotes = new QLabel;
-    labNotes->setText("Enable the sets that you want to have available in the deck editor.\nMove sets around to change their order, or click on a column header to sort sets on that field.\nSets order decides the source that will be used when loading images for a specific card.\nDisabled sets will still be used for loading images.");
+    labNotes->setText(tr("Enable the sets that you want to have available in the deck editor.\nMove sets around to change their order, or click on a column header to sort sets on that field.\nSets order decides the source that will be used when loading images for a specific card.\nDisabled sets will still be used for loading images."));
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
