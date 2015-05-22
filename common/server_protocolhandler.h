@@ -28,6 +28,7 @@ class AdminCommand;
 
 class Command_Ping;
 class Command_Login;
+class Command_Register;
 class Command_Message;
 class Command_ListUsers;
 class Command_GetGamesOfUser;
@@ -59,6 +60,7 @@ private:
     
     Response::ResponseCode cmdPing(const Command_Ping &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdLogin(const Command_Login &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdMessage(const Command_Message &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetUserInfo(const Command_GetUserInfo &cmd, ResponseContainer &rc);
