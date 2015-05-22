@@ -115,6 +115,7 @@ private:
     int activePlayer;
     CardItem *activeCard;
     bool gameClosed;
+    QStringList gameTypes;
     
     // Replay related members
     GameReplay *replay;
