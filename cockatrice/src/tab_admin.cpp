@@ -24,6 +24,7 @@ ShutdownDialog::ShutdownDialog(QWidget *parent)
     minutesLabel->setBuddy(minutesEdit);
     minutesEdit->setMinimum(0);
     minutesEdit->setValue(5);
+    minutesEdit->setMaximum(999);
     
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
