@@ -17,13 +17,13 @@ SoundEngine::SoundEngine(QObject *parent)
 
     lastTapPlayed = QDateTime::currentDateTime();
     lastEndStepPlayed = QDateTime::currentDateTime();
-    lastStartCombatPlayed = QDateTime::currentDateTime();
+    lastAttackStepPlayed = QDateTime::currentDateTime();
 }
 
 void SoundEngine::cacheData()
 {
     static const QStringList fileNames = QStringList()
-        << "end_step" << "tap" << "player_joined" << "start_combat";
+        << "end_step" << "tap" << "player_joined" << "attack";
     for (int i = 0; i < fileNames.size(); ++i) {
         QFile file(settingsCache->getSoundPath() + "/" + fileNames[i] + ".raw");
         if(!file.exists())
@@ -95,8 +95,8 @@ void SoundEngine::playerJoined()
 }
 
 
-void SoundEngine::startCombat() {
-    if (lastStartCombatPlayed.secsTo(QDateTime::currentDateTime()) >= 1)
-        playSound("start_combat");
-    lastStartCombatPlayed = QDateTime::currentDateTime();
+void SoundEngine::attack() {
+    if (lastAttackStepPlayed.secsTo(QDateTime::currentDateTime()) >= 1)
+        playSound("attack");
+    lastAttackStepPlayed = QDateTime::currentDateTime();
 }
