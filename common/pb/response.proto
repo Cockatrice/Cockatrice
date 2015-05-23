@@ -32,6 +32,9 @@ message Response {
 		RespAccountNotActivated = 28; // Client attempted to log into a registered username but the account hasn't been activated
 		RespRegistrationDisabled = 29; // Server does not allow clients to register
 		RespRegistrationFailed = 30; // Server accepted a reg request but failed to perform the registration
+		RespActivationAccepted = 31; // Server accepted a reg user activation token
+		RespActivationFailed = 32; // Server didn't accept a reg user activation token
+		RespRegistrationAcceptedNeedsActivation = 33; // Server accepted cient registration, but it will need token activation
 	}
 	enum ResponseType {
 		JOIN_ROOM = 1000;
@@ -44,6 +47,7 @@ message Response {
 		DECK_DOWNLOAD = 1007;
 		DECK_UPLOAD = 1008;
 		REGISTER = 1009;
+		ACTIVATE = 1010;
 		REPLAY_LIST = 1100;
 		REPLAY_DOWNLOAD = 1101;
 	}

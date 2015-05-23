@@ -126,8 +126,17 @@ void MainWindow::userInfoReceived(const ServerInfo_User &info)
 
 void MainWindow::registerAccepted()
 {
-    QMessageBox::information(this, tr("Success"), tr("Registration accepted.\nNow check your email for instructions on how to activate your account."));
-    actConnect();
+    QMessageBox::information(this, tr("Success"), tr("Registration accepted.\nWill now login."));
+}
+
+void MainWindow::registerAcceptedNeedsActivate()
+{
+    // nothing
+}
+
+void MainWindow::activateAccepted()
+{
+    QMessageBox::information(this, tr("Success"), tr("Account activation accepted.\nWill now login."));
 }
 
 // Actions
@@ -299,11 +308,20 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
                 actRegister();
             }
             break;
-        case Response::RespAccountNotActivated:
-            QMessageBox::critical(this, tr("Error"), tr("Your account has not been activated yet."));
+        case Response::RespAccountNotActivated: {
+            bool ok = false;
+            QString token = QInputDialog::getText(this, tr("Account activation"), tr("Your account has not been activated yet.\n You need to provide the activation token received in the activation email"), QLineEdit::Normal, QString(), &ok);
+            if(ok && !token.isEmpty())
+            {
+                client->activateToServer(token);
+                return;
+            }
+            client->disconnectFromServer();
             break;
+        }
         default:
             QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
+            break;
     }
     actConnect();
 }
@@ -348,6 +366,13 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
     }
     actRegister();
+}
+
+void MainWindow::activateError()
+{
+    QMessageBox::critical(this, tr("Error"), tr("Account activation failed"));
+    client->disconnectFromServer();
+    actConnect();
 }
 
 void MainWindow::socketError(const QString &errorStr)
@@ -488,7 +513,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(userInfoChanged(const ServerInfo_User &)), this, SLOT(userInfoReceived(const ServerInfo_User &)), Qt::BlockingQueuedConnection);
 
     connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
+    connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
     connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
+    connect(client, SIGNAL(activateAccepted()), this, SLOT(activateAccepted()));
+    connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
 
     clientThread = new QThread(this);
     client->moveToThread(clientThread);

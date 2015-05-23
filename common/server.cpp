@@ -208,9 +208,22 @@ RegistrationResult Server::registerUserAccount(const QString &ipAddress, const C
     if(password.length() < 6)
         return PasswordTooShort;
 
-    bool regSucceeded = databaseInterface->registerUser(userName, realName, gender, password, emailAddress, country, false);
+    bool regSucceeded = databaseInterface->registerUser(userName, realName, gender, password, emailAddress, country, !requireEmailForRegistration);
 
-    return regSucceeded ? Accepted : Failed;
+    if(regSucceeded)
+        return requireEmailForRegistration ? AcceptedNeedsActivation : Accepted;
+    else
+        return Failed;
+}
+
+bool Server::activateUserAccount(const Command_Activate &cmd)
+{
+    QString userName = QString::fromStdString(cmd.user_name());
+    QString token = QString::fromStdString(cmd.token());
+
+    Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
+
+    return databaseInterface->activateUser(userName, token);
 }
 
 bool Server::tooManyRegistrationAttempts(const QString &ipAddress)

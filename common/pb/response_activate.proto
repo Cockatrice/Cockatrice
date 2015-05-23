@@ -1,0 +1,7 @@
+import "response.proto";
+
+message Response_Activate {
+	extend Response {
+		optional Response_Activate ext = 1010;
+	}
+}

@@ -7,6 +7,7 @@
 #include "pb/session_commands.pb.h"
 #include "pb/response_login.pb.h"
 #include "pb/response_register.pb.h"
+#include "pb/response_activate.pb.h"
 #include "pb/server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
 
@@ -30,6 +31,7 @@ RemoteClient::RemoteClient(QObject *parent)
     connect(this, SIGNAL(sigConnectToServer(QString, unsigned int, QString, QString)), this, SLOT(doConnectToServer(QString, unsigned int, QString, QString)));
     connect(this, SIGNAL(sigDisconnectFromServer()), this, SLOT(doDisconnectFromServer()));
     connect(this, SIGNAL(sigRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)), this, SLOT(doRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)));
+    connect(this, SIGNAL(sigActivateToServer(QString)), this, SLOT(doActivateToServer(QString)));
 }
 
 RemoteClient::~RemoteClient()
@@ -81,6 +83,24 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
 
+    if(getStatus() == StatusActivating)
+    {
+        Command_Activate cmdActivate;
+        cmdActivate.set_user_name(userName.toStdString());
+        cmdActivate.set_token(token.toStdString());
+
+        PendingCommand *pend = prepareSessionCommand(cmdActivate);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(activateResponse(Response)));
+        sendCommand(pend);
+
+        return;
+    }
+
+    doLogin();
+}
+
+void RemoteClient::doLogin()
+{
     setStatus(StatusLoggingIn);
     
     Command_Login cmdLogin;
@@ -122,13 +142,34 @@ void RemoteClient::loginResponse(const Response &response)
 void RemoteClient::registerResponse(const Response &response)
 {
     const Response_Register &resp = response.GetExtension(Response_Register::ext);
-    if (response.response_code() == Response::RespRegistrationAccepted) {
-        emit registerAccepted();
-    } else {
-        emit registerError(response.response_code(), QString::fromStdString(resp.denied_reason_str()), resp.denied_end_time());
+    switch(response.response_code())
+    {
+        case Response::RespRegistrationAccepted:
+            emit registerAccepted();
+            doLogin();
+            break;
+        case Response::RespRegistrationAcceptedNeedsActivation:
+            emit registerAcceptedNeedsActivate();
+            doLogin();
+            break;
+        default:
+            emit registerError(response.response_code(), QString::fromStdString(resp.denied_reason_str()), resp.denied_end_time());
+            setStatus(StatusDisconnecting);
+            doDisconnectFromServer();
+            break;
     }
-    setStatus(StatusDisconnecting);
-    doDisconnectFromServer();
+}
+
+void RemoteClient::activateResponse(const Response &response)
+{
+    const Response_Activate &resp = response.GetExtension(Response_Activate::ext);
+    if (response.response_code() == Response::RespActivationAccepted) {
+        emit activateAccepted();
+
+        doLogin();
+    } else {
+        emit activateError();
+    }
 }
 
 void RemoteClient::readData()
@@ -201,6 +242,9 @@ void RemoteClient::doConnectToServer(const QString &hostname, unsigned int port,
     
     userName = _userName;
     password = _password;
+    lastHostname = hostname;
+    lastPort = port;
+
     socket->connectToHost(hostname, port);
     setStatus(StatusConnecting);
 }
@@ -215,9 +259,21 @@ void RemoteClient::doRegisterToServer(const QString &hostname, unsigned int port
     gender = _gender;
     country = _country;
     realName = _realname;
+    lastHostname = hostname;
+    lastPort = port;
 
     socket->connectToHost(hostname, port);
     setStatus(StatusRegistering);
+}
+
+void RemoteClient::doActivateToServer(const QString &_token)
+{
+    doDisconnectFromServer();
+    
+    token = _token;
+
+    socket->connectToHost(lastHostname, lastPort);
+    setStatus(StatusActivating);
 }
 
 void RemoteClient::doDisconnectFromServer()
@@ -273,6 +329,11 @@ void RemoteClient::connectToServer(const QString &hostname, unsigned int port, c
 void RemoteClient::registerToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname)
 {
     emit sigRegisterToServer(hostname, port, _userName, _password, _email, _gender, _country, _realname);
+}
+
+void RemoteClient::activateToServer(const QString &_token)
+{
+    emit sigActivateToServer(_token);
 }
 
 void RemoteClient::disconnectFromServer()

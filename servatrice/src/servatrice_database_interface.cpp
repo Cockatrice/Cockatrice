@@ -117,11 +117,12 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const Q
         return false;
 
     QString passwordSha512 = PasswordHasher::computeHash(password, PasswordHasher::generateRandomSalt());
+    QString token = PasswordHasher::generateActivationToken();
 
     QSqlQuery *query = prepareQuery("insert into {prefix}_users "
-            "(name, realname, gender, password_sha512, email, country, registrationDate, active) "
+            "(name, realname, gender, password_sha512, email, country, registrationDate, active, token) "
             "values "
-            "(:userName, :realName, :gender, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active)");
+            "(:userName, :realName, :gender, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active, :token)");
     query->bindValue(":userName", userName);
     query->bindValue(":realName", realName);
     query->bindValue(":gender", getGenderChar(gender));
@@ -129,6 +130,7 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const Q
     query->bindValue(":email", emailAddress);
     query->bindValue(":country", country);
     query->bindValue(":active", active ? 1 : 0);
+    query->bindValue(":token", token);
 
     if (!execSqlQuery(query)) {
         qDebug() << "Failed to insert user: " << query->lastError() << " sql: " << query->lastQuery();
@@ -136,6 +138,40 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const Q
     }
 
     return true;
+}
+
+bool Servatrice_DatabaseInterface::activateUser(const QString &userName, const QString &token)
+{
+    if (!checkSql())
+        return false;
+
+    QSqlQuery *activateQuery = prepareQuery("select name from {prefix}_users where active=0 and name=:username and token=:token");
+
+    activateQuery->bindValue(":username", userName);
+    activateQuery->bindValue(":token", token);
+    if (!execSqlQuery(activateQuery)) {
+        qDebug() << "Account activation failed: SQL error." << activateQuery->lastError()<< " sql: " << activateQuery->lastQuery();
+        return false;
+    }
+
+    if (activateQuery->next()) {
+        const QString name = activateQuery->value(0).toString();
+        // redundant check
+        if(name == userName)
+        {
+
+            QSqlQuery *query = prepareQuery("update {prefix}_users set active=1 where name = :userName");
+            query->bindValue(":userName", userName);
+
+            if (!execSqlQuery(query)) {
+                qDebug() << "Failed to activate user: " << query->lastError() << " sql: " << query->lastQuery();
+                return false;
+            }
+
+            return true;
+        }
+    }
+    return false;
 }
 
 QChar Servatrice_DatabaseInterface::getGenderChar(ServerInfo_User_Gender const &gender)

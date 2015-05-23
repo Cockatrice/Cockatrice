@@ -65,6 +65,7 @@ public:
 
 	bool getRequireRegistration();
 	bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, bool active = false);
+	bool activateUser(const QString &userName, const QString &token);
 
     void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName);
 };

@@ -60,7 +60,9 @@ regonly=0
 ; Enable this feature? Default false.
 ;enabled=false
 
-; Require users to provide an email address in order to register. Default true.
+; Require users to provide an email address in order to register. Newly registered users will receive an 
+; activation token by email, and will be required to input back this token on cockatrice at the first login 
+; to get their account activated. Default true.
 ;requireemail=true
 
 

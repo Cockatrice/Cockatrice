@@ -29,7 +29,7 @@ class CommandContainer;
 class Command_JoinGame;
 
 enum AuthenticationResult { NotLoggedIn, PasswordRight, UnknownUser, WouldOverwriteOldSession, UserIsBanned, UsernameInvalid, RegistrationRequired, UserIsInactive };
-enum RegistrationResult { Accepted, UserAlreadyExists, EmailRequired, TooManyRequests, InvalidUsername, ClientIsBanned, RegistrationDisabled, Failed, PasswordTooShort };
+enum RegistrationResult { Accepted, UserAlreadyExists, EmailRequired, TooManyRequests, InvalidUsername, ClientIsBanned, RegistrationDisabled, Failed, PasswordTooShort, AcceptedNeedsActivation };
 
 class Server : public QObject
 {
@@ -57,6 +57,7 @@ public:
     * @return RegistrationResult member indicating whether it succeeded or failed.
     */
     RegistrationResult registerUserAccount(const QString &ipAddress, const Command_Register &cmd, QString &banReason, int &banSecondsRemaining);
+    bool activateUserAccount(const Command_Activate &cmd);
 
     bool tooManyRegistrationAttempts(const QString &ipAddress);
     const QMap<int, Server_Room *> &getRooms() { return rooms; }

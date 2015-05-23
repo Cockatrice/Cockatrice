@@ -114,6 +114,7 @@ SET(PROTO_FILES
     isl_message.proto
     moderator_commands.proto
     move_card_to_zone.proto
+    response_activate.proto
     response_deck_download.proto
     response_deck_list.proto
     response_deck_upload.proto

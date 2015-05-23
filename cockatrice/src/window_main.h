@@ -44,10 +44,13 @@ private slots:
     void serverTimeout();
     void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
     void registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
+    void activateError();
     void socketError(const QString &errorStr);
     void protocolVersionMismatch(int localVersion, int remoteVersion);
     void userInfoReceived(const ServerInfo_User &userInfo);
     void registerAccepted();
+    void registerAcceptedNeedsActivate();
+    void activateAccepted();
     void localGameEnded();
     void pixmapCacheSizeChanged(int newSizeInMBs);
 

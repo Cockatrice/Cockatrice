@@ -30,6 +30,7 @@ enum ClientStatus {
     StatusDisconnecting,
     StatusConnecting,
     StatusRegistering,
+    StatusActivating,
     StatusLoggingIn,
     StatusLoggedIn,
 };
@@ -60,6 +61,8 @@ signals:
     void ignoreListReceived(const QList<ServerInfo_User> &ignoreList);
     void replayAddedEventReceived(const Event_ReplayAdded &event);
     void registerAccepted();
+    void registerAcceptedNeedsActivate();
+    void activateAccepted();
     
     void sigQueuePendingCommand(PendingCommand *pend);
 private:
@@ -72,7 +75,7 @@ protected slots:
     void processProtocolItem(const ServerMessage &item);
 protected:
     QMap<int, PendingCommand *> pendingCommands;
-    QString userName, password, email, country, realName;
+    QString userName, password, email, country, realName, token;
     int gender;
     void setStatus(ClientStatus _status);
     int getNewCmdId() { return nextCmdId++; }

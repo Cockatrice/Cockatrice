@@ -146,6 +146,7 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
             case SessionCommand::PING: resp = cmdPing(sc.GetExtension(Command_Ping::ext), rc); break;
             case SessionCommand::LOGIN: resp = cmdLogin(sc.GetExtension(Command_Login::ext), rc); break;
             case SessionCommand::REGISTER: resp = cmdRegisterAccount(sc.GetExtension(Command_Register::ext), rc); break;
+            case SessionCommand::ACTIVATE: resp = cmdActivateAccount(sc.GetExtension(Command_Activate::ext), rc); break;
             case SessionCommand::MESSAGE: resp = cmdMessage(sc.GetExtension(Command_Message::ext), rc); break;
             case SessionCommand::GET_GAMES_OF_USER: resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), rc); break;
             case SessionCommand::GET_USER_INFO: resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), rc); break;
@@ -437,8 +438,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdRegisterAccount(const Command_
     switch (result) {
         case RegistrationDisabled:
             return Response::RespRegistrationDisabled;
-        case Accepted:
+        case Accepted:            
             return Response::RespRegistrationAccepted;
+        case AcceptedNeedsActivation:
+            // TODO SEND EMAIL WITH TOKEN TO THE USER
+            return Response::RespRegistrationAcceptedNeedsActivation;
         case UserAlreadyExists:
             return Response::RespUserAlreadyExists;
         case EmailRequired:
@@ -461,6 +465,18 @@ Response::ResponseCode Server_ProtocolHandler::cmdRegisterAccount(const Command_
     }
 
     return Response::RespInvalidCommand;
+}
+
+Response::ResponseCode Server_ProtocolHandler::cmdActivateAccount(const Command_Activate &cmd, ResponseContainer &rc)
+{
+    if(server->activateUserAccount(cmd))
+    {
+        qDebug() << "Accepted activation for user" << QString::fromStdString(cmd.user_name());
+        return Response::RespActivationAccepted;
+    } else {
+        qDebug() << "Failed activation for user" << QString::fromStdString(cmd.user_name());
+        return Response::RespActivationFailed;
+    }
 }
 
 Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message &cmd, ResponseContainer &rc)

@@ -70,3 +70,8 @@ QString PasswordHasher::generateRandomSalt(const int len)
 
     return ret;
 }
+
+QString PasswordHasher::generateActivationToken()
+{
+    return QCryptographicHash::hash(generateRandomSalt().toUtf8(), QCryptographicHash::Md5).toBase64().left(16);
+}

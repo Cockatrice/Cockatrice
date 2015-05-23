@@ -13,11 +13,13 @@ signals:
     void serverTimeout();
     void loginError(Response::ResponseCode resp, QString reasonStr, quint32 endTime);
     void registerError(Response::ResponseCode resp, QString reasonStr, quint32 endTime);
+    void activateError();
     void socketError(const QString &errorString);
     void protocolVersionMismatch(int clientVersion, int serverVersion);
     void protocolError();
     void sigConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
     void sigRegisterToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname);
+    void sigActivateToServer(const QString &_token);
     void sigDisconnectFromServer();
 private slots:
     void slotConnected();
@@ -28,9 +30,13 @@ private slots:
     void processConnectionClosedEvent(const Event_ConnectionClosed &event);
     void loginResponse(const Response &response);
     void registerResponse(const Response &response);
+    void activateResponse(const Response &response);
     void doConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
     void doRegisterToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname);
+    void doLogin();
     void doDisconnectFromServer();
+    void doActivateToServer(const QString &_token);
+
 private:
     static const int maxTimeout = 10;
     int timeRunning, lastDataReceived;
@@ -42,6 +48,8 @@ private:
     
     QTimer *timer;
     QTcpSocket *socket;
+    QString lastHostname;
+    int lastPort;
 protected slots:    
     void sendCommandContainer(const CommandContainer &cont);
 public:
@@ -50,7 +58,7 @@ public:
     QString peerName() const { return socket->peerName(); }
     void connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
     void registerToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname);
-
+    void activateToServer(const QString &_token);
     void disconnectFromServer();
 };
 
