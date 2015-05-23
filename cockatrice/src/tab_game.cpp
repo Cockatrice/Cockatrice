@@ -359,9 +359,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
     
     messageLog->logReplayStarted(gameInfo.game_id());
-
-    for (int i = gameInfo.game_types_size() - 1; i >= 0; i--)
-        gameTypes.append(roomGameTypes.find(gameInfo.game_types(i)).value());
 }
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes)
