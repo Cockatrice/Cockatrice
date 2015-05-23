@@ -106,7 +106,7 @@ void MainWindow::statusChanged(ClientStatus _status)
             aDisconnect->setEnabled(false);
             break;
         case StatusLoggingIn:
-            aSinglePlayer->setEnabled(false);
+            //aSinglePlayer->setEnabled(false);
             aConnect->setEnabled(false);
             aDisconnect->setEnabled(true);
             break;
@@ -143,7 +143,7 @@ void MainWindow::actSinglePlayer()
     if (!ok)
         return;
     
-    aConnect->setEnabled(false);
+    //aConnect->setEnabled(false);
     aSinglePlayer->setEnabled(false);
     
     localServer = new LocalServer(this);
@@ -190,7 +190,7 @@ void MainWindow::localGameEnded()
     delete localServer;
     localServer = 0;
     
-    aConnect->setEnabled(true);
+    //aConnect->setEnabled(true);
     aSinglePlayer->setEnabled(true);
 }
 

@@ -223,10 +223,10 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
 
 void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
 {
-    tabUserLists = 0;
-    tabDeckStorage = 0;
-    tabReplays = 0;
-    tabAdmin = 0;
+    //tabUserLists = 0;
+    //tabDeckStorage = 0;
+    //tabReplays = 0;
+    //tabAdmin = 0;
     userInfo = new ServerInfo_User;
     localClients = _clients;
     for (int i = 0; i < localClients.size(); ++i)
@@ -358,7 +358,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
     removeTab(indexOf(tab));
     
     if (!localClients.isEmpty())
-        stop();
+        emit localGameEnded();
 }
 
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
