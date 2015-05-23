@@ -4,10 +4,9 @@
     #include <stdio.h>
     #include <string.h>
     #include <gcrypt.h>
-#else
-    #include <QCryptographicHash>
 #endif
 
+#include <QCryptographicHash>
 #include "rng_sfmt.h"
 
 void PasswordHasher::initialize()
