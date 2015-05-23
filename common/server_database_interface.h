@@ -13,7 +13,7 @@ public:
         : QObject(parent) { }
     
     virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft) = 0;
-    virtual bool checkUserIsBanned(const QString &ipAddress, const QString &userName, QString &banReason, int &banSecondsRemaining) { return false; }
+    virtual bool checkUserIsBanned(const QString & /* ipAddress */, const QString & /* userName */, QString & /* banReason */, int & /* banSecondsRemaining */) { return false; }
     virtual bool activeUserExists(const QString & /* user */) { return false; }
     virtual bool userExists(const QString & /* user */) { return false; }
     virtual QMap<QString, ServerInfo_User> getBuddyList(const QString & /* name */) { return QMap<QString, ServerInfo_User>(); }

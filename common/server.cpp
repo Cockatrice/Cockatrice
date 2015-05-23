@@ -216,6 +216,7 @@ RegistrationResult Server::registerUserAccount(const QString &ipAddress, const C
 bool Server::tooManyRegistrationAttempts(const QString &ipAddress)
 {
     // TODO: implement
+        Q_UNUSED(ipAddress);
     return false;
 }
 
