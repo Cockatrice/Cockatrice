@@ -7,6 +7,7 @@ class PasswordHasher {
 public:
 	static void initialize();
 	static QString computeHash(const QString &password, const QString &salt);
+	static QString generateRandomSalt(const int len = 16);
 };
 
 #endif

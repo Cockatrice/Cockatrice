@@ -29,9 +29,9 @@ enum ClientStatus {
     StatusDisconnected,
     StatusDisconnecting,
     StatusConnecting,
-    StatusAwaitingWelcome,
+    StatusRegistering,
     StatusLoggingIn,
-    StatusLoggedIn
+    StatusLoggedIn,
 };
 
 class AbstractClient : public QObject {
@@ -59,6 +59,7 @@ signals:
     void buddyListReceived(const QList<ServerInfo_User> &buddyList);
     void ignoreListReceived(const QList<ServerInfo_User> &ignoreList);
     void replayAddedEventReceived(const Event_ReplayAdded &event);
+    void registerAccepted();
     
     void sigQueuePendingCommand(PendingCommand *pend);
 private:
@@ -71,7 +72,8 @@ protected slots:
     void processProtocolItem(const ServerMessage &item);
 protected:
     QMap<int, PendingCommand *> pendingCommands;
-    QString userName, password;
+    QString userName, password, email, country, realName;
+    int gender;
     void setStatus(ClientStatus _status);
     int getNewCmdId() { return nextCmdId++; }
     virtual void sendCommandContainer(const CommandContainer &cont) = 0;

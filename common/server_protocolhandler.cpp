@@ -392,6 +392,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         case WouldOverwriteOldSession: return Response::RespWouldOverwriteOldSession;
         case UsernameInvalid: return Response::RespUsernameInvalid;
         case RegistrationRequired: return Response::RespRegistrationRequired;
+        case UserIsInactive: return Response::RespAccountNotActivated;
         default: authState = res;
     }
     
@@ -442,10 +443,10 @@ Response::ResponseCode Server_ProtocolHandler::cmdRegisterAccount(const Command_
             return Response::RespUserAlreadyExists;
         case EmailRequired:
             return Response::RespEmailRequiredToRegister;
-        case UnauthenticatedServer:
-            return Response::RespServerDoesNotUseAuth;
         case TooManyRequests:
             return Response::RespTooManyRequests;
+        case PasswordTooShort:
+            return Response::RespPasswordTooShort;
         case InvalidUsername:
             return Response::RespUsernameInvalid;
         case Failed:

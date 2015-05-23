@@ -113,7 +113,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     QWriteLocker locker(&clientsLock);
     
     AuthenticationResult authState = databaseInterface->checkUserPassword(session, name, password, reasonStr, secondsLeft);
-    if ((authState == NotLoggedIn) || (authState == UserIsBanned || authState == UsernameInvalid))
+    if (authState == NotLoggedIn || authState == UserIsBanned || authState == UsernameInvalid || authState == UserIsInactive)
         return authState;
     
     ServerInfo_User data = databaseInterface->getUserData(name, true);
@@ -140,7 +140,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
         QString tempName = name;
         int i = 0;
-        while (users.contains(tempName) || databaseInterface->userExists(tempName) || databaseInterface->userSessionExists(tempName))
+        while (users.contains(tempName) || databaseInterface->activeUserExists(tempName) || databaseInterface->userSessionExists(tempName))
             tempName = name + "_" + QString::number(++i);
         name = tempName;
         data.set_name(name.toStdString());
@@ -177,8 +177,6 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
 RegistrationResult Server::registerUserAccount(const QString &ipAddress, const Command_Register &cmd, QString &banReason, int &banSecondsRemaining)
 {
-    // TODO
-
     if (!registrationEnabled)
         return RegistrationDisabled;
 
@@ -193,6 +191,9 @@ RegistrationResult Server::registerUserAccount(const QString &ipAddress, const C
     if (!databaseInterface->usernameIsValid(userName))
         return InvalidUsername;
 
+    if(databaseInterface->userExists(userName))
+        return UserAlreadyExists;
+
     if (databaseInterface->checkUserIsBanned(ipAddress, userName, banReason, banSecondsRemaining))
         return ClientIsBanned;
 
@@ -202,8 +203,12 @@ RegistrationResult Server::registerUserAccount(const QString &ipAddress, const C
     QString realName = QString::fromStdString(cmd.real_name());
     ServerInfo_User_Gender gender = cmd.gender();
     QString country = QString::fromStdString(cmd.country());
-    QString passwordSha512 = QString::fromStdString(cmd.password());
-    bool regSucceeded = databaseInterface->registerUser(userName, realName, gender, passwordSha512, emailAddress, country, false);
+    QString password = QString::fromStdString(cmd.password());
+
+    if(password.length() < 6)
+        return PasswordTooShort;
+
+    bool regSucceeded = databaseInterface->registerUser(userName, realName, gender, password, emailAddress, country, false);
 
     return regSucceeded ? Accepted : Failed;
 }

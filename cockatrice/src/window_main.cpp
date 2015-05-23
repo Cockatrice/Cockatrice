@@ -34,6 +34,7 @@
 #include "main.h"
 #include "window_main.h"
 #include "dlg_connect.h"
+#include "dlg_register.h"
 #include "dlg_settings.h"
 #include "tab_supervisor.h"
 #include "remoteclient.h"
@@ -99,8 +100,6 @@ void MainWindow::statusChanged(ClientStatus _status)
 {
     setClientStatusTitle();
     switch (_status) {
-        case StatusConnecting:
-            break;
         case StatusDisconnected:
             tabSupervisor->stop();
             aSinglePlayer->setEnabled(true);
@@ -112,8 +111,9 @@ void MainWindow::statusChanged(ClientStatus _status)
             aConnect->setEnabled(false);
             aDisconnect->setEnabled(true);
             break;
+        case StatusConnecting:
+        case StatusRegistering:
         case StatusLoggedIn:
-            break;
         default:
             break;
     }
@@ -124,6 +124,12 @@ void MainWindow::userInfoReceived(const ServerInfo_User &info)
     tabSupervisor->start(info);
 }
 
+void MainWindow::registerAccepted()
+{
+    QMessageBox::information(this, tr("Success"), tr("Registration accepted.\nNow check your email for instructions on how to activate your account."));
+    actConnect();
+}
+
 // Actions
 
 void MainWindow::actConnect()
@@ -131,6 +137,24 @@ void MainWindow::actConnect()
     DlgConnect dlg(this);
     if (dlg.exec())
         client->connectToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getPassword());
+}
+
+void MainWindow::actRegister()
+{
+    DlgRegister dlg(this);
+    if (dlg.exec())
+    {
+        client->registerToServer(
+            dlg.getHost(),
+            dlg.getPort(),
+            dlg.getPlayerName(),
+            dlg.getPassword(),
+            dlg.getEmail(),
+            dlg.getGender(),
+            dlg.getCountry(),
+            dlg.getRealName()
+        );
+    }
 }
 
 void MainWindow::actDisconnect()
@@ -271,12 +295,59 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."));
             break;
         case Response::RespRegistrationRequired:
-            QMessageBox::critical(this, tr("Error"), tr("This server requires user registration."));
+            if (QMessageBox::question(this, tr("Error"), tr("This server requires user registration. Do you want to register now?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+                actRegister();
+            }
+            break;
+        case Response::RespAccountNotActivated:
+            QMessageBox::critical(this, tr("Error"), tr("Your account has not been activated yet."));
             break;
         default:
             QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
     }
     actConnect();
+}
+
+void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
+{
+    switch (r) {
+        case Response::RespRegistrationDisabled:
+            QMessageBox::critical(this, tr("Registration denied"), tr("Registration is currently disabled on this server"));
+            break;
+        case Response::RespUserAlreadyExists:
+            QMessageBox::critical(this, tr("Registration denied"), tr("There is already an existing account with the same user name."));
+            break;
+        case Response::RespEmailRequiredToRegister:
+            QMessageBox::critical(this, tr("Registration denied"), tr("It's mandatory to specify an email when registering."));
+            break;
+        case Response::RespTooManyRequests:
+            QMessageBox::critical(this, tr("Registration denied"), tr("Too many registration attempts from your IP address."));
+            break;
+        case Response::RespPasswordTooShort:
+            QMessageBox::critical(this, tr("Registration denied"), tr("Password too short."));
+            break;
+        case Response::RespUserIsBanned: {
+            QString bannedStr;
+            if (endTime)
+                bannedStr = tr("You are banned until %1.").arg(QDateTime::fromTime_t(endTime).toString());
+            else
+                bannedStr = tr("You are banned indefinitely.");
+            if (!reasonStr.isEmpty())
+                bannedStr.append("\n\n" + reasonStr);
+        
+            QMessageBox::critical(this, tr("Error"), bannedStr);
+            break;
+        }
+        case Response::RespUsernameInvalid:
+            QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."));
+            break;
+        case Response::RespRegistrationFailed:
+            QMessageBox::critical(this, tr("Error"), tr("Registration failed for a technical problem on the server."));
+            break;
+        default:
+            QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
+    }
+    actRegister();
 }
 
 void MainWindow::socketError(const QString &errorStr)
@@ -297,6 +368,7 @@ void MainWindow::setClientStatusTitle()
 {
     switch (client->getStatus()) {
         case StatusConnecting: setWindowTitle(appName + " - " + tr("Connecting to %1...").arg(client->peerName())); break;
+        case StatusRegistering: setWindowTitle(appName + " - " + tr("Registering to %1 as %2...").arg(client->peerName()).arg(client->getUserName())); break;
         case StatusDisconnected: setWindowTitle(appName + " - " + tr("Disconnected")); break;
         case StatusLoggingIn: setWindowTitle(appName + " - " + tr("Connected, logging in at %1").arg(client->peerName())); break;
         case StatusLoggedIn: setWindowTitle(appName + " - " + tr("Logged in as %1 at %2").arg(client->getUserName()).arg(client->peerName())); break;
@@ -315,6 +387,7 @@ void MainWindow::retranslateUi()
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
     aFullScreen->setShortcut(QKeySequence("Ctrl+F"));
+    aRegister->setText(tr("&Register to server..."));
     aSettings->setText(tr("&Settings..."));
     aExit->setText(tr("&Exit"));
     
@@ -346,6 +419,8 @@ void MainWindow::createActions()
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
+    aRegister = new QAction(this);
+    connect(aRegister, SIGNAL(triggered()), this, SLOT(actRegister()));
     aSettings = new QAction(this);
     connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
     aExit = new QAction(this);
@@ -378,6 +453,7 @@ void MainWindow::createMenus()
     cockatriceMenu = menuBar()->addMenu(QString());
     cockatriceMenu->addAction(aConnect);
     cockatriceMenu->addAction(aDisconnect);
+    cockatriceMenu->addAction(aRegister);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
@@ -410,7 +486,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
     connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
     connect(client, SIGNAL(userInfoChanged(const ServerInfo_User &)), this, SLOT(userInfoReceived(const ServerInfo_User &)), Qt::BlockingQueuedConnection);
-    
+
+    connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
+    connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
+
     clientThread = new QThread(this);
     client->moveToThread(clientThread);
     clientThread->start();

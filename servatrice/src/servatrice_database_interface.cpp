@@ -130,7 +130,6 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const Q
 
     if (!execSqlQuery(query)) {
         qDebug() << "Failed to insert user: " << query->lastError() << " sql: " << query->lastQuery();
-        // TODO handle duplicate insert error
         return false;
     }
 
@@ -172,7 +171,6 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
         if (checkUserIsBanned(handler->getAddress(), user, reasonStr, banSecondsLeft))
             return UserIsBanned;
         
-        QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name and active = 1");
         passwordQuery->bindValue(":name", user);
         if (!execSqlQuery(passwordQuery)) {
             qDebug("Login denied: SQL error");
@@ -270,7 +268,6 @@ bool Servatrice_DatabaseInterface::checkUserIsIpBanned(const QString &ipAddress,
     return false;
 }
 
-bool Servatrice_DatabaseInterface::userExists(const QString &user)
 {
     if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         checkSql();

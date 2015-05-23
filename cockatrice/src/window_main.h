@@ -43,9 +43,11 @@ private slots:
     void processServerShutdownEvent(const Event_ServerShutdown &event);
     void serverTimeout();
     void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
+    void registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
     void socketError(const QString &errorStr);
     void protocolVersionMismatch(int localVersion, int remoteVersion);
     void userInfoReceived(const ServerInfo_User &userInfo);
+    void registerAccepted();
     void localGameEnded();
     void pixmapCacheSizeChanged(int newSizeInMBs);
 
@@ -55,6 +57,7 @@ private slots:
     void actWatchReplay();
     void actDeckEditor();
     void actFullScreen(bool checked);
+    void actRegister();
     void actSettings();
     void actExit();
     
@@ -82,7 +85,7 @@ private:
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *helpMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aCheckCardUpdates;
+        *aAbout, *aCheckCardUpdates, *aRegister;
     TabSupervisor *tabSupervisor;
 
     QMenu *trayIconMenu;

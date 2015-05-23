@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QHash>
-#include <qchar.h>
+#include <QChar>
 
 #include "server.h"
 #include "server_database_interface.h"
@@ -41,6 +41,7 @@ public:
 	bool execSqlQuery(QSqlQuery *query);
 	const QSqlDatabase &getDatabase() { return sqlDatabase; }
 
+	bool activeUserExists(const QString &user);
 	bool userExists(const QString &user);
 	int getUserIdInDB(const QString &name);
 	QMap<QString, ServerInfo_User> getBuddyList(const QString &name);
@@ -63,7 +64,7 @@ public:
 	bool userSessionExists(const QString &userName);
 
 	bool getRequireRegistration();
-	bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &passwordSha512, const QString &emailAddress, const QString &country, bool active = false);
+	bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, bool active = false);
 
     void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName);
 };

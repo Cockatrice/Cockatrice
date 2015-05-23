@@ -12,6 +12,7 @@ SET(cockatrice_SOURCES
     src/dlg_connect.cpp 
     src/dlg_create_token.cpp 
     src/dlg_edit_tokens.cpp
+    src/dlg_register.cpp 
     src/abstractclient.cpp 
     src/remoteclient.cpp 
     src/main.cpp 
