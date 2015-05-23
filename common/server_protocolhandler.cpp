@@ -467,7 +467,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdRegisterAccount(const Command_
     return Response::RespInvalidCommand;
 }
 
-Response::ResponseCode Server_ProtocolHandler::cmdActivateAccount(const Command_Activate &cmd, ResponseContainer &rc)
+Response::ResponseCode Server_ProtocolHandler::cmdActivateAccount(const Command_Activate &cmd, ResponseContainer & /*rc*/)
 {
     if(server->activateUserAccount(cmd))
     {
