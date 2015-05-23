@@ -23,6 +23,7 @@
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 #include <QProcess>
+#include <QMessageBox>
 #include "abstractclient.h"
 #include "pb/response.pb.h"
 
@@ -32,7 +33,6 @@ class LocalClient;
 class LocalServer;
 class ServerInfo_User;
 class QThread;
-class QMessageBox;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -95,7 +95,7 @@ private:
     LocalServer *localServer;
     bool bHasActivated;
 
-    QMessageBox *serverShutdownMessageBox;
+    QMessageBox serverShutdownMessageBox;
     QProcess * cardUpdateProcess;
 public:
     MainWindow(QWidget *parent = 0);
