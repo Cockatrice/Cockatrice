@@ -162,7 +162,6 @@ void RemoteClient::registerResponse(const Response &response)
 
 void RemoteClient::activateResponse(const Response &response)
 {
-    const Response_Activate &resp = response.GetExtension(Response_Activate::ext);
     if (response.response_code() == Response::RespActivationAccepted) {
         emit activateAccepted();
 
