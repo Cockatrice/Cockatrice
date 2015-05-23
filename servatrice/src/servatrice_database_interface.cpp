@@ -111,10 +111,12 @@ bool Servatrice_DatabaseInterface::getRequireRegistration()
     return settingsCache->value("authentication/regonly", 0).toBool();
 }
 
-bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &passwordSha512, const QString &emailAddress, const QString &country, bool active)
+bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, bool active)
 {
     if (!checkSql())
         return false;
+
+    QString passwordSha512 = PasswordHasher::computeHash(password, PasswordHasher::generateRandomSalt());
 
     QSqlQuery *query = prepareQuery("insert into {prefix}_users "
             "(name, realname, gender, password_sha512, email, country, registrationDate, active) "
@@ -171,6 +173,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
         if (checkUserIsBanned(handler->getAddress(), user, reasonStr, banSecondsLeft))
             return UserIsBanned;
         
+        QSqlQuery *passwordQuery = prepareQuery("select password_sha512, active from {prefix}_users where name = :name");
         passwordQuery->bindValue(":name", user);
         if (!execSqlQuery(passwordQuery)) {
             qDebug("Login denied: SQL error");
@@ -179,6 +182,11 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
         
         if (passwordQuery->next()) {
             const QString correctPassword = passwordQuery->value(0).toString();
+            const bool userIsActive = passwordQuery->value(1).toBool();
+            if(!userIsActive) {
+                qDebug("Login denied: user not active");
+                return UserIsInactive;                
+            }
             if (correctPassword == PasswordHasher::computeHash(password, correctPassword.left(16))) {
                 qDebug("Login accepted: password right");
                 return PasswordRight;
@@ -268,11 +276,26 @@ bool Servatrice_DatabaseInterface::checkUserIsIpBanned(const QString &ipAddress,
     return false;
 }
 
+bool Servatrice_DatabaseInterface::activeUserExists(const QString &user)
 {
     if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         checkSql();
     
         QSqlQuery *query = prepareQuery("select 1 from {prefix}_users where name = :name and active = 1");
+        query->bindValue(":name", user);
+        if (!execSqlQuery(query))
+            return false;
+        return query->next();
+    }
+    return false;
+}
+
+bool Servatrice_DatabaseInterface::userExists(const QString &user)
+{
+    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
+        checkSql();
+    
+        QSqlQuery *query = prepareQuery("select 1 from {prefix}_users where name = :name");
         query->bindValue(":name", user);
         if (!execSqlQuery(query))
             return false;
