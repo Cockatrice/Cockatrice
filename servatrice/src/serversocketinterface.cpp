@@ -51,11 +51,14 @@
 #include "pb/response_deck_list.pb.h"
 #include "pb/response_deck_download.pb.h"
 #include "pb/response_deck_upload.pb.h"
+#include "pb/response_register.pb.h"
 #include "pb/response_replay_list.pb.h"
 #include "pb/response_replay_download.pb.h"
 #include "pb/serverinfo_replay.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
+
+#include "smtp/SmtpMime"
 
 #include "version_string.h"
 #include <string>
@@ -267,6 +270,8 @@ Response::ResponseCode ServerSocketInterface::processExtendedSessionCommand(int 
         case SessionCommand::REPLAY_DOWNLOAD: return cmdReplayDownload(cmd.GetExtension(Command_ReplayDownload::ext), rc);
         case SessionCommand::REPLAY_MODIFY_MATCH: return cmdReplayModifyMatch(cmd.GetExtension(Command_ReplayModifyMatch::ext), rc);
         case SessionCommand::REPLAY_DELETE_MATCH: return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
+        case SessionCommand::REGISTER: return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc); break;
+        case SessionCommand::ACTIVATE: return cmdActivateAccount(cmd.GetExtension(Command_Activate::ext), rc); break;
         default: return Response::RespFunctionNotAllowed;
     }
 }
@@ -763,6 +768,179 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 
     return Response::RespOk;
 }
+
+Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc)
+{
+    QString userName = QString::fromStdString(cmd.user_name());
+    qDebug() << "Got register command: " << userName;
+
+    bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
+    if (!registrationEnabled)
+        return Response::RespRegistrationDisabled;
+
+    QString emailAddress = QString::fromStdString(cmd.email());
+    bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
+    if (requireEmailForRegistration)
+    {
+        QRegExp rx("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}\\b");
+        if(emailAddress.isEmpty() || !rx.exactMatch(emailAddress))
+            return Response::RespEmailRequiredToRegister;
+    }
+
+    // TODO: Move this method outside of the db interface
+    if (!sqlInterface->usernameIsValid(userName))
+        return Response::RespUsernameInvalid;
+
+    if(sqlInterface->userExists(userName))
+        return Response::RespUserAlreadyExists;
+
+    QString banReason;
+    int banSecondsRemaining;
+    if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, banReason, banSecondsRemaining))
+    {
+        Response_Register *re = new Response_Register;
+        re->set_denied_reason_str(banReason.toStdString());
+        if (banSecondsRemaining != 0)
+            re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsRemaining).toTime_t());
+        rc.setResponseExtension(re);
+        return Response::RespUserIsBanned;
+    }
+
+    if (tooManyRegistrationAttempts(this->getAddress()))
+        return Response::RespTooManyRequests;
+
+    QString realName = QString::fromStdString(cmd.real_name());
+    ServerInfo_User_Gender gender = cmd.gender();
+    QString country = QString::fromStdString(cmd.country());
+    QString password = QString::fromStdString(cmd.password());
+
+    // TODO make this configurable?
+    if(password.length() < 6)
+        return Response::RespPasswordTooShort;
+
+    QString token;
+    bool regSucceeded = sqlInterface->registerUser(userName, realName, gender, password, emailAddress, country, token, !requireEmailForRegistration);
+
+    if(regSucceeded)
+    {
+        qDebug() << "Accepted register command for user: " << userName;
+        if(requireEmailForRegistration)
+        {
+            // TODO call a slot on another thread to send email
+            sendActivationTokenMail(userName, emailAddress, token);
+            return Response::RespRegistrationAcceptedNeedsActivation;
+        } else {
+            return Response::RespRegistrationAccepted;
+        }
+    } else {
+        return Response::RespRegistrationFailed;
+    }
+}
+
+bool ServerSocketInterface::sendActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token)
+{
+    QString tmp = settingsCache->value("smtp/connection", "tcp").toString();
+    SmtpClient::ConnectionType connection = SmtpClient::TcpConnection;
+    if(tmp == "ssl")
+        connection = SmtpClient::SslConnection;
+    else if(tmp == "tls")
+        connection = SmtpClient::TlsConnection;
+
+    tmp = settingsCache->value("smtp/auth", "plain").toString();
+    SmtpClient::AuthMethod auth = SmtpClient::AuthPlain;
+    if(tmp == "login")
+        auth = SmtpClient::AuthLogin;
+
+    QString host = settingsCache->value("smtp/host", "localhost").toString();
+    int port = settingsCache->value("smtp/port", 25).toInt();
+    QString username = settingsCache->value("smtp/username", "").toString();
+    QString password = settingsCache->value("smtp/password", "").toString();
+    QString email = settingsCache->value("smtp/email", "").toString();
+    QString name = settingsCache->value("smtp/name", "").toString();
+    QString subject = settingsCache->value("smtp/subject", "").toString();
+    QString body = settingsCache->value("smtp/body", "").toString();
+
+    if(email.isEmpty())
+    {
+        qDebug() << "[MAIL] Missing email field" << endl;
+        return false;
+    }
+    if(body.isEmpty())
+    {
+        qDebug() << "[MAIL] Missing body field" << endl;
+        return false;
+    }
+    if(recipient.isEmpty())
+    {
+        qDebug() << "[MAIL] Missing recipient field" << endl;
+        return false;
+    }
+    if(token.isEmpty())
+    {
+        qDebug() << "[MAIL] Missing token field" << endl;
+        return false;
+    }
+
+    SmtpClient smtp(host, port, connection);
+    smtp.setUser(username);
+    smtp.setPassword(password);
+    smtp.setAuthMethod(auth);
+
+    MimeMessage message;
+    EmailAddress sender(email, name);
+    message.setSender(&sender);
+    EmailAddress to(recipient, nickname);
+    message.addRecipient(&to);
+    message.setSubject(subject);
+
+    MimeText text;
+    text.setText(body.replace("%username", nickname).replace("%token", token));
+    message.addPart(&text);
+
+    // Now we can send the mail
+
+    if (!smtp.connectToHost()) {
+        qDebug() << "[MAIL] Failed to connect to host" << host << "on port" << port;
+        return false;
+    }
+
+    if (!smtp.login()) {
+        qDebug() << "[MAIL] Failed to login as " << username;
+        return false;
+    }
+
+    if (!smtp.sendMail(message)) {
+        qDebug() << "[MAIL] Failed to send mail to " << recipient;
+        return false;
+    }
+
+    smtp.quit();
+    qDebug() << "[MAIL] Sent activation email to " << recipient << " for nickname " << nickname;
+    return true;
+}
+
+bool ServerSocketInterface::tooManyRegistrationAttempts(const QString &ipAddress)
+{
+    // TODO: implement
+        Q_UNUSED(ipAddress);
+    return false;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdActivateAccount(const Command_Activate &cmd, ResponseContainer & /*rc*/)
+{
+    QString userName = QString::fromStdString(cmd.user_name());
+    QString token = QString::fromStdString(cmd.token());
+
+    if(sqlInterface->activateUser(userName, token))
+    {
+        qDebug() << "Accepted activation for user" << QString::fromStdString(cmd.user_name());
+        return Response::RespActivationAccepted;
+    } else {
+        qDebug() << "Failed activation for user" << QString::fromStdString(cmd.user_name());
+        return Response::RespActivationFailed;
+    }
+}
+
 
 // ADMIN FUNCTIONS.
 // Permission is checked by the calling function.

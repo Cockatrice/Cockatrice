@@ -60,8 +60,6 @@ private:
     
     Response::ResponseCode cmdPing(const Command_Ping &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdLogin(const Command_Login &cmd, ResponseContainer &rc);
-    Response::ResponseCode cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc);
-    Response::ResponseCode cmdActivateAccount(const Command_Activate &cmd, ResponseContainer & /* rc */);
     Response::ResponseCode cmdMessage(const Command_Message &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetUserInfo(const Command_GetUserInfo &cmd, ResponseContainer &rc);
@@ -101,6 +99,7 @@ public:
     void sendProtocolItem(const SessionEvent &item);
     void sendProtocolItem(const GameEventContainer &item);
     void sendProtocolItem(const RoomEvent &item);
+
 };
 
 #endif

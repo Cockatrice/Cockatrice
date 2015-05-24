@@ -111,13 +111,13 @@ bool Servatrice_DatabaseInterface::getRequireRegistration()
     return settingsCache->value("authentication/regonly", 0).toBool();
 }
 
-bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, bool active)
+bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active)
 {
     if (!checkSql())
         return false;
 
     QString passwordSha512 = PasswordHasher::computeHash(password, PasswordHasher::generateRandomSalt());
-    QString token = PasswordHasher::generateActivationToken();
+    token = active ? QString() : PasswordHasher::generateActivationToken();
 
     QSqlQuery *query = prepareQuery("insert into {prefix}_users "
             "(name, realname, gender, password_sha512, email, country, registrationDate, active, token) "

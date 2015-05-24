@@ -59,6 +59,7 @@ signals:
 	void outputQueueChanged();
 protected:
 	void logDebugMessage(const QString &message);
+	bool tooManyRegistrationAttempts(const QString &ipAddress);
 private:
 	QMutex outputQueueMutex;
 	Servatrice *servatrice;
@@ -91,10 +92,14 @@ private:
 	Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdActivateAccount(const Command_Activate &cmd, ResponseContainer & /* rc */);
 	
 	Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
 	Response::ResponseCode processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
 	Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc);
+
+	bool sendActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token);
 public:
 	ServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent = 0);
 	~ServerSocketInterface();

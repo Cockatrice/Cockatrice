@@ -104,11 +104,13 @@ void MainWindow::statusChanged(ClientStatus _status)
             tabSupervisor->stop();
             aSinglePlayer->setEnabled(true);
             aConnect->setEnabled(true);
+            aRegister->setEnabled(true);
             aDisconnect->setEnabled(false);
             break;
         case StatusLoggingIn:
             aSinglePlayer->setEnabled(false);
             aConnect->setEnabled(false);
+            aRegister->setEnabled(false);
             aDisconnect->setEnabled(true);
             break;
         case StatusConnecting:
@@ -179,6 +181,7 @@ void MainWindow::actSinglePlayer()
         return;
     
     aConnect->setEnabled(false);
+    aRegister->setEnabled(false);
     aSinglePlayer->setEnabled(false);
     
     localServer = new LocalServer(this);
@@ -226,6 +229,7 @@ void MainWindow::localGameEnded()
     localServer = 0;
     
     aConnect->setEnabled(true);
+    aRegister->setEnabled(true);
     aSinglePlayer->setEnabled(true);
 }
 
@@ -336,7 +340,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             QMessageBox::critical(this, tr("Registration denied"), tr("There is already an existing account with the same user name."));
             break;
         case Response::RespEmailRequiredToRegister:
-            QMessageBox::critical(this, tr("Registration denied"), tr("It's mandatory to specify an email when registering."));
+            QMessageBox::critical(this, tr("Registration denied"), tr("It's mandatory to specify a valid email address when registering."));
             break;
         case Response::RespTooManyRequests:
             QMessageBox::critical(this, tr("Registration denied"), tr("Too many registration attempts from your IP address."));

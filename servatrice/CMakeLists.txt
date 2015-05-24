@@ -15,6 +15,18 @@ SET(servatrice_SOURCES
     src/settingscache.cpp
     src/isl_interface.cpp
     ${VERSION_STRING_CPP}
+    src/smtp/emailaddress.cpp
+    src/smtp/mimeattachment.cpp
+    src/smtp/mimecontentformatter.cpp
+    src/smtp/mimefile.cpp
+    src/smtp/mimehtml.cpp
+    src/smtp/mimeinlinefile.cpp
+    src/smtp/mimemessage.cpp
+    src/smtp/mimemultipart.cpp
+    src/smtp/mimepart.cpp
+    src/smtp/mimetext.cpp
+    src/smtp/quotedprintable.cpp
+    src/smtp/smtpclient.cpp
 )
 
 set(servatrice_RESOURCES servatrice.qrc)

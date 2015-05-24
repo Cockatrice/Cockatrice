@@ -29,7 +29,6 @@ class CommandContainer;
 class Command_JoinGame;
 
 enum AuthenticationResult { NotLoggedIn, PasswordRight, UnknownUser, WouldOverwriteOldSession, UserIsBanned, UsernameInvalid, RegistrationRequired, UserIsInactive };
-enum RegistrationResult { Accepted, UserAlreadyExists, EmailRequired, TooManyRequests, InvalidUsername, ClientIsBanned, RegistrationDisabled, Failed, PasswordTooShort, AcceptedNeedsActivation };
 
 class Server : public QObject
 {
@@ -47,19 +46,6 @@ public:
     void setThreaded(bool _threaded) { threaded = _threaded; }
     AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft);
 
-    /**
-    * Registers a user account.
-    * @param ipAddress The address of the connection from the user
-    * @param userName The username to attempt to register
-    * @param emailAddress The email address to associate with the new account (and to use for activation)
-    * @param banReason If the client is banned, the reason for the ban will be included in this string.
-    * @param banSecondsRemaining If the client is banned, the time left will be included in this. 0 if the ban is permanent.
-    * @return RegistrationResult member indicating whether it succeeded or failed.
-    */
-    RegistrationResult registerUserAccount(const QString &ipAddress, const Command_Register &cmd, QString &banReason, int &banSecondsRemaining);
-    bool activateUserAccount(const Command_Activate &cmd);
-
-    bool tooManyRegistrationAttempts(const QString &ipAddress);
     const QMap<int, Server_Room *> &getRooms() { return rooms; }
     
     Server_AbstractUserInterface *findUser(const QString &userName) const;
@@ -131,9 +117,6 @@ protected:
     int getUsersCount() const;
     int getGamesCount() const;
     void addRoom(Server_Room *newRoom);
-
-    bool registrationEnabled;
-    bool requireEmailForRegistration;
 };
 
 #endif

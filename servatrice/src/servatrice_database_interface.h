@@ -25,9 +25,7 @@ private:
 	bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
 	QChar getGenderChar(ServerInfo_User_Gender const &gender);
 protected:
-	bool usernameIsValid(const QString &user);
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft);
-	bool checkUserIsBanned(const QString &ipAddress, const QString &userName, QString &banReason, int &banSecondsRemaining);
 public slots:
 	void initDatabase(const QSqlDatabase &_sqlDatabase);
 public:
@@ -62,9 +60,11 @@ public:
 	void lockSessionTables();
 	void unlockSessionTables();
 	bool userSessionExists(const QString &userName);
+	bool usernameIsValid(const QString &user);
+	bool checkUserIsBanned(const QString &ipAddress, const QString &userName, QString &banReason, int &banSecondsRemaining);
 
 	bool getRequireRegistration();
-	bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, bool active = false);
+	bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active = false);
 	bool activateUser(const QString &userName, const QString &token);
 
     void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName);

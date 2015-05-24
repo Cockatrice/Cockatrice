@@ -9,7 +9,6 @@
 #include "pb/commands.pb.h"
 #include "pb/response.pb.h"
 #include "pb/response_login.pb.h"
-#include "pb/response_register.pb.h"
 #include "pb/response_list_users.pb.h"
 #include "pb/response_get_games_of_user.pb.h"
 #include "pb/response_get_user_info.pb.h"
@@ -145,8 +144,6 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
         switch ((SessionCommand::SessionCommandType) num) {
             case SessionCommand::PING: resp = cmdPing(sc.GetExtension(Command_Ping::ext), rc); break;
             case SessionCommand::LOGIN: resp = cmdLogin(sc.GetExtension(Command_Login::ext), rc); break;
-            case SessionCommand::REGISTER: resp = cmdRegisterAccount(sc.GetExtension(Command_Register::ext), rc); break;
-            case SessionCommand::ACTIVATE: resp = cmdActivateAccount(sc.GetExtension(Command_Activate::ext), rc); break;
             case SessionCommand::MESSAGE: resp = cmdMessage(sc.GetExtension(Command_Message::ext), rc); break;
             case SessionCommand::GET_GAMES_OF_USER: resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), rc); break;
             case SessionCommand::GET_USER_INFO: resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), rc); break;
@@ -419,64 +416,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     
     rc.setResponseExtension(re);
     return Response::RespOk;
-}
-
-Response::ResponseCode Server_ProtocolHandler::cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc)
-{
-    qDebug() << "Got register command: " << QString::fromStdString(cmd.user_name());
-
-    QString banReason;
-    int banSecondsRemaining;
-    RegistrationResult result =
-            server->registerUserAccount(
-                    this->getAddress(),
-                    cmd,
-                    banReason,
-                    banSecondsRemaining);
-    qDebug() << "Register command result:" << result;
-
-    switch (result) {
-        case RegistrationDisabled:
-            return Response::RespRegistrationDisabled;
-        case Accepted:            
-            return Response::RespRegistrationAccepted;
-        case AcceptedNeedsActivation:
-            // TODO SEND EMAIL WITH TOKEN TO THE USER
-            return Response::RespRegistrationAcceptedNeedsActivation;
-        case UserAlreadyExists:
-            return Response::RespUserAlreadyExists;
-        case EmailRequired:
-            return Response::RespEmailRequiredToRegister;
-        case TooManyRequests:
-            return Response::RespTooManyRequests;
-        case PasswordTooShort:
-            return Response::RespPasswordTooShort;
-        case InvalidUsername:
-            return Response::RespUsernameInvalid;
-        case Failed:
-            return Response::RespRegistrationFailed;
-        case ClientIsBanned:
-            Response_Register *re = new Response_Register;
-            re->set_denied_reason_str(banReason.toStdString());
-            if (banSecondsRemaining != 0)
-                re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsRemaining).toTime_t());
-            rc.setResponseExtension(re);
-            return Response::RespUserIsBanned;
-    }
-
-    return Response::RespInvalidCommand;
-}
-
-Response::ResponseCode Server_ProtocolHandler::cmdActivateAccount(const Command_Activate &cmd, ResponseContainer & /*rc*/)
-{
-    if(server->activateUserAccount(cmd))
-    {
-        qDebug() << "Accepted activation for user" << QString::fromStdString(cmd.user_name());
-        return Response::RespActivationAccepted;
-    } else {
-        qDebug() << "Failed activation for user" << QString::fromStdString(cmd.user_name());
-        return Response::RespActivationFailed;
-    }
 }
 
 Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message &cmd, ResponseContainer &rc)
