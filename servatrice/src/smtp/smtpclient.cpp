@@ -463,11 +463,11 @@ void SmtpClient::sendMessage(const QString &text) throw (SendMessageTimeoutExcep
 
 /* [5] Slots for the socket's signals */
 
-void SmtpClient::socketStateChanged(QAbstractSocket::SocketState state)
+void SmtpClient::socketStateChanged(QAbstractSocket::SocketState /* state */)
 {
 }
 
-void SmtpClient::socketError(QAbstractSocket::SocketError socketError)
+void SmtpClient::socketError(QAbstractSocket::SocketError /* socketError */)
 {
 }
 
