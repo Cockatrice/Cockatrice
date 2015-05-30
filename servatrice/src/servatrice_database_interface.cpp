@@ -9,6 +9,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDateTime>
+#include <QChar>
 
 Servatrice_DatabaseInterface::Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server)
     : instanceId(_instanceId),
@@ -34,7 +35,9 @@ void Servatrice_DatabaseInterface::initDatabase(const QSqlDatabase &_sqlDatabase
     }
 }
 
-void Servatrice_DatabaseInterface::initDatabase(const QString &type, const QString &hostName, const QString &databaseName, const QString &userName, const QString &password)
+bool Servatrice_DatabaseInterface::initDatabase(const QString &type, const QString &hostName,
+                                                const QString &databaseName, const QString &userName,
+                                                const QString &password)
 {
     sqlDatabase = QSqlDatabase::addDatabase(type, "main");
     sqlDatabase.setHostName(hostName);
@@ -42,7 +45,7 @@ void Servatrice_DatabaseInterface::initDatabase(const QString &type, const QStri
     sqlDatabase.setUserName(userName);
     sqlDatabase.setPassword(password);
     
-    openDatabase();
+    return openDatabase();
 }
 
 bool Servatrice_DatabaseInterface::openDatabase()
@@ -102,9 +105,87 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
     return re.exactMatch(user);
 }
 
+// TODO move this to Server
 bool Servatrice_DatabaseInterface::getRequireRegistration()
 {
     return settingsCache->value("authentication/regonly", 0).toBool();
+}
+
+bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active)
+{
+    if (!checkSql())
+        return false;
+
+    QString passwordSha512 = PasswordHasher::computeHash(password, PasswordHasher::generateRandomSalt());
+    token = active ? QString() : PasswordHasher::generateActivationToken();
+
+    QSqlQuery *query = prepareQuery("insert into {prefix}_users "
+            "(name, realname, gender, password_sha512, email, country, registrationDate, active, token) "
+            "values "
+            "(:userName, :realName, :gender, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active, :token)");
+    query->bindValue(":userName", userName);
+    query->bindValue(":realName", realName);
+    query->bindValue(":gender", getGenderChar(gender));
+    query->bindValue(":password_sha512", passwordSha512);
+    query->bindValue(":email", emailAddress);
+    query->bindValue(":country", country);
+    query->bindValue(":active", active ? 1 : 0);
+    query->bindValue(":token", token);
+
+    if (!execSqlQuery(query)) {
+        qDebug() << "Failed to insert user: " << query->lastError() << " sql: " << query->lastQuery();
+        return false;
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::activateUser(const QString &userName, const QString &token)
+{
+    if (!checkSql())
+        return false;
+
+    QSqlQuery *activateQuery = prepareQuery("select name from {prefix}_users where active=0 and name=:username and token=:token");
+
+    activateQuery->bindValue(":username", userName);
+    activateQuery->bindValue(":token", token);
+    if (!execSqlQuery(activateQuery)) {
+        qDebug() << "Account activation failed: SQL error." << activateQuery->lastError()<< " sql: " << activateQuery->lastQuery();
+        return false;
+    }
+
+    if (activateQuery->next()) {
+        const QString name = activateQuery->value(0).toString();
+        // redundant check
+        if(name == userName)
+        {
+
+            QSqlQuery *query = prepareQuery("update {prefix}_users set active=1 where name = :userName");
+            query->bindValue(":userName", userName);
+
+            if (!execSqlQuery(query)) {
+                qDebug() << "Failed to activate user: " << query->lastError() << " sql: " << query->lastQuery();
+                return false;
+            }
+
+            return true;
+        }
+    }
+    return false;
+}
+
+QChar Servatrice_DatabaseInterface::getGenderChar(ServerInfo_User_Gender const &gender)
+{
+    switch (gender) {
+        case ServerInfo_User_Gender_GenderUnknown:
+            return QChar('u');
+        case ServerInfo_User_Gender_Male:
+            return QChar('m');
+        case ServerInfo_User_Gender_Female:
+            return QChar('f');
+        default:
+            return QChar('u');
+    }
 }
 
 AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &banSecondsLeft)
@@ -125,45 +206,10 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
         if (!usernameIsValid(user))
             return UsernameInvalid;
         
-        QSqlQuery *ipBanQuery = prepareQuery("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))), b.minutes <=> 0, b.visible_reason from {prefix}_bans b where b.time_from = (select max(c.time_from) from {prefix}_bans c where c.ip_address = :address) and b.ip_address = :address2");
-        ipBanQuery->bindValue(":address", static_cast<ServerSocketInterface *>(handler)->getPeerAddress().toString());
-        ipBanQuery->bindValue(":address2", static_cast<ServerSocketInterface *>(handler)->getPeerAddress().toString());
-        if (!execSqlQuery(ipBanQuery)) {
-            qDebug("Login denied: SQL error");
-            return NotLoggedIn;
-        }
+        if (checkUserIsBanned(handler->getAddress(), user, reasonStr, banSecondsLeft))
+            return UserIsBanned;
         
-        if (ipBanQuery->next()) {
-            const int secondsLeft = -ipBanQuery->value(0).toInt();
-            const bool permanentBan = ipBanQuery->value(1).toInt();
-            if ((secondsLeft > 0) || permanentBan) {
-                reasonStr = ipBanQuery->value(2).toString();
-                banSecondsLeft = permanentBan ? 0 : secondsLeft;
-                qDebug("Login denied: banned by address");
-                return UserIsBanned;
-            }
-        }
-        
-        QSqlQuery *nameBanQuery = prepareQuery("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))), b.minutes <=> 0, b.visible_reason from {prefix}_bans b where b.time_from = (select max(c.time_from) from {prefix}_bans c where c.user_name = :name2) and b.user_name = :name1");
-        nameBanQuery->bindValue(":name1", user);
-        nameBanQuery->bindValue(":name2", user);
-        if (!execSqlQuery(nameBanQuery)) {
-            qDebug("Login denied: SQL error");
-            return NotLoggedIn;
-        }
-        
-        if (nameBanQuery->next()) {
-            const int secondsLeft = -nameBanQuery->value(0).toInt();
-            const bool permanentBan = nameBanQuery->value(1).toInt();
-            if ((secondsLeft > 0) || permanentBan) {
-                reasonStr = nameBanQuery->value(2).toString();
-                banSecondsLeft = permanentBan ? 0 : secondsLeft;
-                qDebug("Login denied: banned by name");
-                return UserIsBanned;
-            }
-        }
-        
-        QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name and active = 1");
+        QSqlQuery *passwordQuery = prepareQuery("select password_sha512, active from {prefix}_users where name = :name");
         passwordQuery->bindValue(":name", user);
         if (!execSqlQuery(passwordQuery)) {
             qDebug("Login denied: SQL error");
@@ -172,6 +218,11 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
         
         if (passwordQuery->next()) {
             const QString correctPassword = passwordQuery->value(0).toString();
+            const bool userIsActive = passwordQuery->value(1).toBool();
+            if(!userIsActive) {
+                qDebug("Login denied: user not active");
+                return UserIsInactive;                
+            }
             if (correctPassword == PasswordHasher::computeHash(password, correctPassword.left(16))) {
                 qDebug("Login accepted: password right");
                 return PasswordRight;
@@ -188,12 +239,99 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
     return UnknownUser;
 }
 
-bool Servatrice_DatabaseInterface::userExists(const QString &user)
+bool Servatrice_DatabaseInterface::checkUserIsBanned(const QString &ipAddress, const QString &userName, QString &banReason, int &banSecondsRemaining)
+{
+    if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql)
+        return false;
+
+    if (!checkSql()) {
+        qDebug("Failed to check if user is banned. Database invalid.");
+        return false;
+    }
+
+    return
+        checkUserIsIpBanned(ipAddress, banReason, banSecondsRemaining)
+        || checkUserIsNameBanned(userName, banReason, banSecondsRemaining);
+
+}
+
+bool Servatrice_DatabaseInterface::checkUserIsNameBanned(const QString &userName, QString &banReason, int &banSecondsRemaining)
+{
+    QSqlQuery *nameBanQuery = prepareQuery("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))), b.minutes <=> 0, b.visible_reason from {prefix}_bans b where b.time_from = (select max(c.time_from) from {prefix}_bans c where c.user_name = :name2) and b.user_name = :name1");
+    nameBanQuery->bindValue(":name1", userName);
+    nameBanQuery->bindValue(":name2", userName);
+    if (!execSqlQuery(nameBanQuery)) {
+        qDebug() << "Name ban check failed: SQL error" << nameBanQuery->lastError();
+        return false;
+    }
+
+    if (nameBanQuery->next()) {
+        const int secondsLeft = -nameBanQuery->value(0).toInt();
+        const bool permanentBan = nameBanQuery->value(1).toInt();
+        if ((secondsLeft > 0) || permanentBan) {
+            banReason = nameBanQuery->value(2).toString();
+            banSecondsRemaining = permanentBan ? 0 : secondsLeft;
+            qDebug() << "Username" << userName << "is banned by name";
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Servatrice_DatabaseInterface::checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining)
+{
+    QSqlQuery *ipBanQuery = prepareQuery(
+            "select"
+                    " time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))),"
+                    " b.minutes <=> 0,"
+                    " b.visible_reason"
+                    " from {prefix}_bans b"
+                    " where"
+                    " b.time_from = (select max(c.time_from)"
+                    " from {prefix}_bans c"
+                    " where c.ip_address = :address)"
+                    " and b.ip_address = :address2");
+
+    ipBanQuery->bindValue(":address", ipAddress);
+    ipBanQuery->bindValue(":address2", ipAddress);
+    if (!execSqlQuery(ipBanQuery)) {
+        qDebug() << "IP ban check failed: SQL error." << ipBanQuery->lastError();
+        return false;
+    }
+
+    if (ipBanQuery->next()) {
+        const int secondsLeft = -ipBanQuery->value(0).toInt();
+        const bool permanentBan = ipBanQuery->value(1).toInt();
+        if ((secondsLeft > 0) || permanentBan) {
+            banReason = ipBanQuery->value(2).toString();
+            banSecondsRemaining = permanentBan ? 0 : secondsLeft;
+            qDebug() << "User is banned by address" << ipAddress;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Servatrice_DatabaseInterface::activeUserExists(const QString &user)
 {
     if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         checkSql();
     
         QSqlQuery *query = prepareQuery("select 1 from {prefix}_users where name = :name and active = 1");
+        query->bindValue(":name", user);
+        if (!execSqlQuery(query))
+            return false;
+        return query->next();
+    }
+    return false;
+}
+
+bool Servatrice_DatabaseInterface::userExists(const QString &user)
+{
+    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
+        checkSql();
+    
+        QSqlQuery *query = prepareQuery("select 1 from {prefix}_users where name = :name");
         query->bindValue(":name", user);
         if (!execSqlQuery(query))
             return false;

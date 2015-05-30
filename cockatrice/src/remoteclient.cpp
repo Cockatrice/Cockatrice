@@ -6,6 +6,8 @@
 #include "pb/commands.pb.h"
 #include "pb/session_commands.pb.h"
 #include "pb/response_login.pb.h"
+#include "pb/response_register.pb.h"
+#include "pb/response_activate.pb.h"
 #include "pb/server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
 
@@ -28,6 +30,8 @@ RemoteClient::RemoteClient(QObject *parent)
     connect(this, SIGNAL(connectionClosedEventReceived(Event_ConnectionClosed)), this, SLOT(processConnectionClosedEvent(Event_ConnectionClosed)));
     connect(this, SIGNAL(sigConnectToServer(QString, unsigned int, QString, QString)), this, SLOT(doConnectToServer(QString, unsigned int, QString, QString)));
     connect(this, SIGNAL(sigDisconnectFromServer()), this, SLOT(doDisconnectFromServer()));
+    connect(this, SIGNAL(sigRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)), this, SLOT(doRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)));
+    connect(this, SIGNAL(sigActivateToServer(QString)), this, SLOT(doActivateToServer(QString)));
 }
 
 RemoteClient::~RemoteClient()
@@ -52,8 +56,6 @@ void RemoteClient::slotConnected()
     sendCommandContainer(CommandContainer());
     getNewCmdId();
     // end of hack
-
-    setStatus(StatusAwaitingWelcome);
 }
 
 void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentification &event)
@@ -63,6 +65,42 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         setStatus(StatusDisconnecting);
         return;
     }
+
+    if(getStatus() == StatusRegistering)
+    {
+        Command_Register cmdRegister;
+        cmdRegister.set_user_name(userName.toStdString());
+        cmdRegister.set_password(password.toStdString());
+        cmdRegister.set_email(email.toStdString());
+        cmdRegister.set_gender((ServerInfo_User_Gender) gender);
+        cmdRegister.set_country(country.toStdString());
+        cmdRegister.set_real_name(realName.toStdString());
+
+        PendingCommand *pend = prepareSessionCommand(cmdRegister);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(registerResponse(Response)));
+        sendCommand(pend);
+
+        return;
+    }
+
+    if(getStatus() == StatusActivating)
+    {
+        Command_Activate cmdActivate;
+        cmdActivate.set_user_name(userName.toStdString());
+        cmdActivate.set_token(token.toStdString());
+
+        PendingCommand *pend = prepareSessionCommand(cmdActivate);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(activateResponse(Response)));
+        sendCommand(pend);
+
+        return;
+    }
+
+    doLogin();
+}
+
+void RemoteClient::doLogin()
+{
     setStatus(StatusLoggingIn);
     
     Command_Login cmdLogin;
@@ -98,6 +136,38 @@ void RemoteClient::loginResponse(const Response &response)
     } else {
         emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()), resp.denied_end_time());
         setStatus(StatusDisconnecting);
+    }
+}
+
+void RemoteClient::registerResponse(const Response &response)
+{
+    const Response_Register &resp = response.GetExtension(Response_Register::ext);
+    switch(response.response_code())
+    {
+        case Response::RespRegistrationAccepted:
+            emit registerAccepted();
+            doLogin();
+            break;
+        case Response::RespRegistrationAcceptedNeedsActivation:
+            emit registerAcceptedNeedsActivate();
+            doLogin();
+            break;
+        default:
+            emit registerError(response.response_code(), QString::fromStdString(resp.denied_reason_str()), resp.denied_end_time());
+            setStatus(StatusDisconnecting);
+            doDisconnectFromServer();
+            break;
+    }
+}
+
+void RemoteClient::activateResponse(const Response &response)
+{
+    if (response.response_code() == Response::RespActivationAccepted) {
+        emit activateAccepted();
+
+        doLogin();
+    } else {
+        emit activateError();
     }
 }
 
@@ -171,8 +241,38 @@ void RemoteClient::doConnectToServer(const QString &hostname, unsigned int port,
     
     userName = _userName;
     password = _password;
+    lastHostname = hostname;
+    lastPort = port;
+
     socket->connectToHost(hostname, port);
     setStatus(StatusConnecting);
+}
+
+void RemoteClient::doRegisterToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname)
+{
+    doDisconnectFromServer();
+    
+    userName = _userName;
+    password = _password;
+    email = _email;
+    gender = _gender;
+    country = _country;
+    realName = _realname;
+    lastHostname = hostname;
+    lastPort = port;
+
+    socket->connectToHost(hostname, port);
+    setStatus(StatusRegistering);
+}
+
+void RemoteClient::doActivateToServer(const QString &_token)
+{
+    doDisconnectFromServer();
+    
+    token = _token;
+
+    socket->connectToHost(lastHostname, lastPort);
+    setStatus(StatusActivating);
 }
 
 void RemoteClient::doDisconnectFromServer()
@@ -223,6 +323,16 @@ void RemoteClient::ping()
 void RemoteClient::connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password)
 {
     emit sigConnectToServer(hostname, port, _userName, _password);
+}
+
+void RemoteClient::registerToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname)
+{
+    emit sigRegisterToServer(hostname, port, _userName, _password, _email, _gender, _country, _realname);
+}
+
+void RemoteClient::activateToServer(const QString &_token)
+{
+    emit sigActivateToServer(_token);
 }
 
 void RemoteClient::disconnectFromServer()

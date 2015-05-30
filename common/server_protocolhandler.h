@@ -28,6 +28,7 @@ class AdminCommand;
 
 class Command_Ping;
 class Command_Login;
+class Command_Register;
 class Command_Message;
 class Command_ListUsers;
 class Command_GetGamesOfUser;
@@ -98,6 +99,7 @@ public:
     void sendProtocolItem(const SessionEvent &item);
     void sendProtocolItem(const GameEventContainer &item);
     void sendProtocolItem(const RoomEvent &item);
+
 };
 
 #endif

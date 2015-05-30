@@ -113,7 +113,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     QWriteLocker locker(&clientsLock);
     
     AuthenticationResult authState = databaseInterface->checkUserPassword(session, name, password, reasonStr, secondsLeft);
-    if ((authState == NotLoggedIn) || (authState == UserIsBanned || authState == UsernameInvalid))
+    if (authState == NotLoggedIn || authState == UserIsBanned || authState == UsernameInvalid || authState == UserIsInactive)
         return authState;
     
     ServerInfo_User data = databaseInterface->getUserData(name, true);
@@ -140,7 +140,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
         QString tempName = name;
         int i = 0;
-        while (users.contains(tempName) || databaseInterface->userExists(tempName) || databaseInterface->userSessionExists(tempName))
+        while (users.contains(tempName) || databaseInterface->activeUserExists(tempName) || databaseInterface->userSessionExists(tempName))
             tempName = name + "_" + QString::number(++i);
         name = tempName;
         data.set_name(name.toStdString());

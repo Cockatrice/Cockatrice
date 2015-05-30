@@ -1,3 +1,5 @@
+import "serverinfo_user.proto";
+
 message SessionCommand {
 	enum SessionCommandType {
 		PING = 1000;
@@ -16,6 +18,8 @@ message SessionCommand {
 		DECK_UPLOAD = 1013;
 		LIST_ROOMS = 1014;
 		JOIN_ROOM = 1015;
+		REGISTER = 1016;
+		ACTIVATE = 1017;
 		REPLAY_LIST = 1100;
 		REPLAY_DOWNLOAD = 1101;
 		REPLAY_MODIFY_MATCH = 1102;
@@ -93,4 +97,33 @@ message Command_JoinRoom {
 		optional Command_JoinRoom ext = 1015;
 	}
 	optional uint32 room_id = 1;
+}
+
+// User wants to register a new account
+message Command_Register {
+	extend SessionCommand {
+		optional Command_Register ext = 1016;
+	}
+	// User name client wants to register
+	required string user_name = 1;
+	// Hashed password to be inserted into database
+	required string password = 2;
+	// Email address of the client for user validation
+	optional string email = 3;
+  // Gender of the user
+  optional ServerInfo_User.Gender gender = 4;
+  // Country code of the user. 2 letter ISO format
+  optional string country = 5;
+  optional string real_name = 6;
+}
+
+// User wants to activate an account
+message Command_Activate {
+	extend SessionCommand {
+		optional Command_Activate ext = 1017;
+	}
+	// User name client wants to activate
+	required string user_name = 1;
+	// Activation token
+	required string token = 2;
 }

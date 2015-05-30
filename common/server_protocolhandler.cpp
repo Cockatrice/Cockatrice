@@ -134,6 +134,10 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
                 SessionCommand debugSc(sc);
                 debugSc.MutableExtension(Command_Login::ext)->clear_password();
                 logDebugMessage(QString::fromStdString(debugSc.ShortDebugString()));
+            } else if (num == SessionCommand::REGISTER) {
+                SessionCommand logSc(sc);
+                logSc.MutableExtension(Command_Register::ext)->clear_password();
+                logDebugMessage(QString::fromStdString(logSc.ShortDebugString()));
             } else
                 logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
         }
@@ -386,6 +390,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         case WouldOverwriteOldSession: return Response::RespWouldOverwriteOldSession;
         case UsernameInvalid: return Response::RespUsernameInvalid;
         case RegistrationRequired: return Response::RespRegistrationRequired;
+        case UserIsInactive: return Response::RespAccountNotActivated;
         default: authState = res;
     }
     

@@ -4,9 +4,10 @@
     #include <stdio.h>
     #include <string.h>
     #include <gcrypt.h>
-#else
-    #include <QCryptographicHash>
 #endif
+
+#include <QCryptographicHash>
+#include "rng_sfmt.h"
 
 void PasswordHasher::initialize()
 {
@@ -51,3 +52,25 @@ QString PasswordHasher::computeHash(const QString &password, const QString &salt
     return hashedPass;
 }
 #endif
+
+QString PasswordHasher::generateRandomSalt(const int len)
+{
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+
+    QString ret;
+    int size = sizeof(alphanum) - 1;
+
+    for (int i = 0; i < len; ++i) {
+        ret.append(alphanum[rng->rand(0, size)]);
+    }
+
+    return ret;
+}
+
+QString PasswordHasher::generateActivationToken()
+{
+    return QCryptographicHash::hash(generateRandomSalt().toUtf8(), QCryptographicHash::Md5).toBase64().left(16);
+}
