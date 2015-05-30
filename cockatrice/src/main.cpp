@@ -164,6 +164,13 @@ int main(int argc, char *argv[])
     }
     if (!QDir().mkpath(settingsCache->getPicsPath() + "/CUSTOM"))
         qDebug() << "Could not create " + settingsCache->getPicsPath().toUtf8() + "/CUSTOM. Will fall back on default card images.";
+    if (QDir().mkpath(dataDir + "/customsets"))
+    {
+        // if the dir exists (or has just been created)
+        db->loadCustomCardDatabases(dataDir + "/customsets");
+    } else {
+        qDebug() << "Could not create " + dataDir + "/customsets folder.";
+    }
 
     if(settingsCache->getSoundPath().isEmpty() || !QDir(settingsCache->getSoundPath()).exists())
     {
