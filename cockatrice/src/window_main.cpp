@@ -323,7 +323,7 @@ void MainWindow::retranslateUi()
 #endif
     aAbout->setText(tr("&About Cockatrice"));
     helpMenu->setTitle(tr("&Help"));
-    aCheckCardUpdates->setText(tr("Check card updates..."));
+    aCheckCardUpdates->setText(tr("Check for card updates..."));
     
     tabSupervisor->retranslateUi();
 }
@@ -530,7 +530,7 @@ void MainWindow::actCheckCardUpdates()
 {
     if(cardUpdateProcess)
     {
-        QMessageBox::information(this, tr("Information"), tr("A card update is already ongoing."));
+        QMessageBox::information(this, tr("Information"), tr("A card database update is already running."));
         return;
     }
 
@@ -564,7 +564,7 @@ void MainWindow::actCheckCardUpdates()
 
     if(updaterCmd.isEmpty())
     {
-        QMessageBox::warning(this, tr("Error"), tr("Unable to run the card updater: ") + dir.absoluteFilePath(binaryName));
+        QMessageBox::warning(this, tr("Error"), tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
         return;
     }
 
@@ -600,7 +600,7 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = 0;
 
-    QMessageBox::warning(this, tr("Error"), tr("The card updater exited with an error: %1").arg(error));
+    QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error: %1").arg(error));
 }
 
 void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
@@ -608,7 +608,7 @@ void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = 0;
 
-    QMessageBox::information(this, tr("Information"), tr("Card update completed successfully. Will now reload card database."));
+    QMessageBox::information(this, tr("Information"), tr("Update completed successfully. Cockatrice will now reload the card database."));
 
     // this will force a database reload
     settingsCache->setCardDatabasePath(settingsCache->getCardDatabasePath());

@@ -25,7 +25,7 @@ WndSets::WndSets(QWidget *parent)
 
     aTop = new QAction(QString(), this);
     aTop->setIcon(QIcon(":/resources/arrow_top_green.svg"));
-    aTop->setToolTip(tr("Move selected set to top"));
+    aTop->setToolTip(tr("Move selected set to the top"));
     aTop->setEnabled(false);
     connect(aTop, SIGNAL(triggered()), this, SLOT(actTop()));
     setsEditToolBar->addAction(aTop);
@@ -46,7 +46,7 @@ WndSets::WndSets(QWidget *parent)
 
     aBottom = new QAction(QString(), this);
     aBottom->setIcon(QIcon(":/resources/arrow_bottom_green.svg"));
-    aBottom->setToolTip(tr("Move selected set to bottom"));
+    aBottom->setToolTip(tr("Move selected set to the bottom"));
     aBottom->setEnabled(false);
     connect(aBottom, SIGNAL(triggered()), this, SLOT(actBottom()));
     setsEditToolBar->addAction(aBottom);
@@ -92,7 +92,7 @@ WndSets::WndSets(QWidget *parent)
 
 
     QLabel *labNotes = new QLabel;
-    labNotes->setText(tr("Enable the sets that you want to have available in the deck editor.\nMove sets around to change their order, or click on a column header to sort sets on that field.\nSets order decides the source that will be used when loading images for a specific card.\nDisabled sets will still be used for loading images."));
+    labNotes->setText("<b>" + tr("hints:") + "</b>" + "<ul><li>" + tr("Enable the sets that you want to have available in the deck editor") + "</li><li>" + tr("Move sets around to change their order, or click on a column header to sort sets on that field") + "</li><li>" + tr("Sets order decides the source that will be used when loading images for a specific card") + "</li><li>" + tr("Disabled sets will still be used for loading images") + "</li></ul>");
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
