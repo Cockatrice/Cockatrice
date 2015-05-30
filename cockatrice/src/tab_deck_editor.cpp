@@ -606,6 +606,7 @@ void TabDeckEditor::addCardHelper(QString zoneName)
     recursiveExpand(newCardIndex);
     deckView->setCurrentIndex(newCardIndex);
     setModified(true);
+    searchEdit->setSelection(0, searchEdit->text().length());
 }
 
 void TabDeckEditor::actSwapCard()
