@@ -11,6 +11,17 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
+-- Every time the database schema changes, the schema version number
+-- must be incremented. Also remember to update the corresponding
+-- number in servatrice/src/servatrice_database_interface.h
+
+CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
+  `version` int(7) unsigned NOT NULL,
+  PRIMARY KEY  (`version`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+INSERT INTO cockatrice_schema_version VALUES(1);
+
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `id_folder` int(7) unsigned zerofill NOT NULL,

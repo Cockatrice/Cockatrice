@@ -9,6 +9,8 @@
 #include "server.h"
 #include "server_database_interface.h"
 
+#define DATABASE_SCHEMA_VERSION 1
+
 class Servatrice;
 
 class Servatrice_DatabaseInterface : public Server_DatabaseInterface {
