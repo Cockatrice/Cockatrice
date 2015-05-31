@@ -1,11 +1,7 @@
-﻿-- phpMyAdmin SQL Dump
--- version 2.11.8.1deb1ubuntu0.2
--- http://www.phpmyadmin.net
---
--- Host: localhost
--- Erstellungszeit: 11. Oktober 2010 um 23:57
--- Server Version: 5.0.67
--- PHP-Version: 5.2.6-2ubuntu4.6
+﻿-- Schema file for servatrice database.
+
+-- This schema file is using the default table prefix "cockatrice",
+-- to match the "prefix=cockatrice" default setting in servatrice.ini
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
@@ -14,16 +10,6 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
-
---
--- Datenbank: `servatrice`
---
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `decklist_files`
---
 
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
@@ -36,12 +22,6 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   KEY `FolderPlusUser` (`id_folder`,`id_user`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `decklist_folders`
---
-
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_folders` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `id_parent` int(7) unsigned zerofill NOT NULL,
@@ -50,12 +30,6 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_folders` (
   PRIMARY KEY  (`id`),
   KEY `ParentPlusUser` (`id_parent`,`id_user`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `games`
---
 
 CREATE TABLE IF NOT EXISTS `cockatrice_games` (
   `room_name` varchar(255) NOT NULL,
@@ -70,23 +44,11 @@ CREATE TABLE IF NOT EXISTS `cockatrice_games` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `games_players`
---
-
 CREATE TABLE IF NOT EXISTS `cockatrice_games_players` (
   `id_game` int(7) unsigned zerofill NOT NULL,
   `player_name` varchar(255) NOT NULL,
   KEY `id_game` (`id_game`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `news`
---
 
 CREATE TABLE IF NOT EXISTS `cockatrice_news` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
@@ -96,12 +58,6 @@ CREATE TABLE IF NOT EXISTS `cockatrice_news` (
   `content` text NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `users`
---
 
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
@@ -209,29 +165,29 @@ CREATE TABLE `cockatrice_replays_access` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
-`id` int(7) unsigned NOT NULL auto_increment,
-`name` varchar(50) NOT NULL,
-`descr` varchar(255) NOT NULL,
-`auto_join` tinyint(1) default 0,
-`join_message` varchar(255) NOT NULL,
-PRIMARY KEY (`id`)
+  `id` int(7) unsigned NOT NULL auto_increment,
+  `name` varchar(50) NOT NULL,
+  `descr` varchar(255) NOT NULL,
+  `auto_join` tinyint(1) default 0,
+  `join_message` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_rooms_gametypes` (
-`id_room` int(7) unsigned NOT NULL,
-`name` varchar(50) NOT NULL,
-PRIMARY KEY (`name`)
+  `id_room` int(7) unsigned NOT NULL,
+  `name` varchar(50) NOT NULL,
+  KEY (`id_room`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_log` (
- `log_time` datetime NOT NULL,
- `sender_id` int(7) unsigned NULL,
- `sender_name` varchar(35) NOT NULL,
- `sender_ip` varchar(255) NOT NULL,
- `log_message` text NOT NULL,
- `target_type` ENUM('room', 'game', 'chat'),
- `target_id` int(7) NULL,
- `target_name` varchar(50) NOT NULL,
+  `log_time` datetime NOT NULL,
+  `sender_id` int(7) unsigned NULL,
+  `sender_name` varchar(35) NOT NULL,
+  `sender_ip` varchar(255) NOT NULL,
+  `log_message` text NOT NULL,
+  `target_type` ENUM('room', 'game', 'chat'),
+  `target_id` int(7) NULL,
+  `target_name` varchar(50) NOT NULL,
   KEY `sender_name` (`sender_name`),
   KEY `sender_ip` (`sender_ip`),
   KEY `target_type` (`target_type`),
