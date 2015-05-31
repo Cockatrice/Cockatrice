@@ -1129,6 +1129,8 @@ void CardDatabase::checkUnknownSets()
         return;
     }
 
+    detectedFirstRun = false;
+
     int numUnknownSets = sets.getUnknownSetsNum();
     // no unkown sets. 
     if(!numUnknownSets)
