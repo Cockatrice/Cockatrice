@@ -49,6 +49,12 @@ GeneralSettingsPage::GeneralSettingsPage()
     pixmapCacheEdit.setSingleStep(64);
     pixmapCacheEdit.setValue(settingsCache->getPixmapCacheSize());
     pixmapCacheEdit.setSuffix(" MB");
+    
+    highQualityURLEdit = new QLineEdit(settingsCache->getHighQualityURL());
+    highQualityURLFallbackEdit = new QLineEdit(settingsCache->getHighQualityURLFallback());
+    lowQualityURLEdit = new QLineEdit(settingsCache->getLowQualityURL());
+    lowQualityURLFallbackEdit = new QLineEdit(settingsCache->getLowQualityURLFallback());
+    
     picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
     picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
 
@@ -57,6 +63,11 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
     connect(&picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
+    
+    connect(highQualityURLEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighQualityURL(QString)));
+    connect(highQualityURLFallbackEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighQualityURLFallback(QString)));
+    connect(lowQualityURLEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setLowQualityURL(QString)));
+    connect(lowQualityURLFallbackEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setLowQualityURLFallback(QString)));
 
     QGridLayout *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
@@ -66,6 +77,17 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&picDownloadCheckBox, 2, 0, 1, 2);
     personalGrid->addWidget(&picDownloadHqCheckBox, 3, 0, 1, 2);
     personalGrid->addWidget(&clearDownloadedPicsButton, 4, 0, 1, 1);
+    
+    personalGrid->addWidget(&highQualityURLLabel, 5, 0, 1, 1);
+    personalGrid->addWidget(highQualityURLEdit, 5, 1, 1, 1);
+    personalGrid->addWidget(&highQualityURLFallbackLabel, 6, 0, 1, 1);
+    personalGrid->addWidget(highQualityURLFallbackEdit, 6, 1, 1, 1);
+    personalGrid->addWidget(&lowQualityURLLabel, 7, 0, 1, 1);
+    personalGrid->addWidget(lowQualityURLEdit, 7, 1, 1, 1);
+    personalGrid->addWidget(&lowQualityURLFallbackLabel, 8, 0, 1, 1);
+    personalGrid->addWidget(lowQualityURLFallbackEdit, 8, 1, 1, 1);
+    
+    
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -229,6 +251,12 @@ void GeneralSettingsPage::retranslateUi()
     cardDatabasePathLabel.setText(tr("Card database:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
+    
+    highQualityURLLabel.setText(tr("High Quality Source URL:"));
+    highQualityURLFallbackLabel.setText(tr("High Quality Backup URL:"));
+    lowQualityURLLabel.setText(tr("Low Quality Source URL:"));
+    lowQualityURLFallbackLabel.setText(tr("Low Quality Backup URL:"));
+    
     clearDownloadedPicsButton.setText(tr("Reset/Clear Downloaded Pictures"));
 }
 

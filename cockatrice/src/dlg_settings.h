@@ -52,6 +52,13 @@ private:
     QLineEdit *picsPathEdit;
     QLineEdit *cardDatabasePathEdit;
     QLineEdit *tokenDatabasePathEdit;
+    
+    QLineEdit *highQualityURLEdit;
+    QLineEdit *highQualityURLFallbackEdit;
+    QLineEdit *lowQualityURLEdit;
+    QLineEdit *lowQualityURLFallbackEdit;
+    
+    
     QSpinBox pixmapCacheEdit;
     QGroupBox *personalGroupBox; 
     QGroupBox *pathsGroupBox;
@@ -65,6 +72,12 @@ private:
     QLabel picsPathLabel;
     QLabel cardDatabasePathLabel;
     QLabel tokenDatabasePathLabel;
+    
+    QLabel highQualityURLLabel;
+    QLabel lowQualityURLLabel;
+    QLabel highQualityURLFallbackLabel;
+    QLabel lowQualityURLFallbackLabel;
+    
     QPushButton clearDownloadedPicsButton;
 };
 

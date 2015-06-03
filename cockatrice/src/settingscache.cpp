@@ -36,10 +36,10 @@ SettingsCache::SettingsCache()
     picDownload = settings->value("personal/picturedownload", true).toBool();
     picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
 
-    picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
-    picUrlHq = settings->value("personal/picUrlHq", PIC_URL_HQ_DEFAULT).toString();
-    picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
-    picUrlHqFallback = settings->value("personal/picUrlHqFallback", PIC_URL_HQ_FALLBACK).toString();
+    picUrl = settings->value("personal/lowQualityURL", PIC_URL_DEFAULT).toString();
+    picUrlHq = settings->value("personal/highQualityURL", PIC_URL_HQ_DEFAULT).toString();
+    picUrlFallback = settings->value("personal/lowQualityURLFallback", PIC_URL_FALLBACK).toString();
+    picUrlHqFallback = settings->value("personal/highQualityURLFallback", PIC_URL_HQ_FALLBACK).toString();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
@@ -378,4 +378,28 @@ void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
     pixmapCacheSize = _pixmapCacheSize;
     settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
     emit pixmapCacheSizeChanged(pixmapCacheSize);
+}
+
+void SettingsCache::setHighQualityURL(const QString _picsHq)
+{
+    picsHq = _picsHq;
+    settings->setValue("personal/highQualityURL", picsHq);
+}
+
+void SettingsCache::setHighQualityURLFallback(const QString _picsHqFallback)
+{
+    picsHqFallback = _picsHqFallback;
+    settings->setValue("personal/highQualityURLFallback", _picsHqFallback);
+}
+
+void SettingsCache::setLowQualityURL(const QString _picsLq)
+{
+    picsLq = _picsLq;
+    settings->setValue("personal/lowQualityURL", picsLq);
+}
+
+void SettingsCache::setLowQualityURLFallback(const QString _picsLqFallback)
+{
+    picsLqFallback = _picsLqFallback;
+    settings->setValue("personal/lowQualityURLFallback", _picsLqFallback);
 }
