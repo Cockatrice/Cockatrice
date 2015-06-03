@@ -71,7 +71,7 @@ bool Servatrice_DatabaseInterface::openDatabase()
         const int expectedversion = DATABASE_SCHEMA_VERSION;
         if(dbversion != expectedversion)
         {
-            qCritical() << QString("[%1] Error opening database: the database schema version is too old, yum need to run the migrations to update it from version %2 to version %3").arg(poolStr).arg(dbversion).arg(expectedversion);
+            qCritical() << QString("[%1] Error opening database: the database schema version is too old, you need to run the migrations to update it from version %2 to version %3").arg(poolStr).arg(dbversion).arg(expectedversion);
             return false;
         }
     } else {
