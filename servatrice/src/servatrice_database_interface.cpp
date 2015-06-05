@@ -60,6 +60,25 @@ bool Servatrice_DatabaseInterface::openDatabase()
         return false;
     }
 
+    QSqlQuery *versionQuery = prepareQuery("select version from {prefix}_schema_version limit 1");
+    if (!execSqlQuery(versionQuery)) {
+        qCritical() << QString("[%1] Error opening database: unable to load database schema version (hint: ensure the cockatrice_schema_version exists)").arg(poolStr);
+        return false;
+    }
+
+    if (versionQuery->next()) {
+        const int dbversion = versionQuery->value(0).toInt();
+        const int expectedversion = DATABASE_SCHEMA_VERSION;
+        if(dbversion != expectedversion)
+        {
+            qCritical() << QString("[%1] Error opening database: the database schema version is too old, you need to run the migrations to update it from version %2 to version %3").arg(poolStr).arg(dbversion).arg(expectedversion);
+            return false;
+        }
+    } else {
+        qCritical() << QString("[%1] Error opening database: unable to load database schema version (hint: ensure the cockatrice_schema_version contains a single record)").arg(poolStr);
+        return false;
+    }
+
     // reset all prepared statements
     qDeleteAll(preparedStatements);
     preparedStatements.clear();

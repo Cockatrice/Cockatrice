@@ -11,6 +11,17 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
+-- Every time the database schema changes, the schema version number
+-- must be incremented. Also remember to update the corresponding
+-- number in servatrice/src/servatrice_database_interface.h
+
+CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
+  `version` int(7) unsigned NOT NULL,
+  PRIMARY KEY  (`version`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+INSERT INTO cockatrice_schema_version VALUES(1);
+
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `id_folder` int(7) unsigned zerofill NOT NULL,
@@ -78,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   KEY `email` (`email`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-CREATE TABLE `cockatrice_uptime` (
+CREATE TABLE IF NOT EXISTS `cockatrice_uptime` (
   `id_server` tinyint(3) NOT NULL,
   `timest` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `uptime` int(11) NOT NULL,
@@ -89,14 +100,14 @@ CREATE TABLE `cockatrice_uptime` (
   PRIMARY KEY (`timest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-CREATE TABLE `cockatrice_servermessages` (
+CREATE TABLE IF NOT EXISTS `cockatrice_servermessages` (
   `id_server` tinyint(3) not null default 0,
   `timest` datetime NOT NULL default '0000-00-00 00:00:00',
   `message` text,
   PRIMARY KEY  (`timest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-CREATE TABLE `cockatrice_ignorelist` (
+CREATE TABLE IF NOT EXISTS `cockatrice_ignorelist` (
   `id_user1` int(7) unsigned NOT NULL,
   `id_user2` int(7) unsigned NOT NULL,
   UNIQUE KEY `key` (`id_user1`, `id_user2`),
@@ -104,7 +115,7 @@ CREATE TABLE `cockatrice_ignorelist` (
   KEY `id_user2` (`id_user2`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-CREATE TABLE `cockatrice_buddylist` (
+CREATE TABLE IF NOT EXISTS `cockatrice_buddylist` (
   `id_user1` int(7) unsigned NOT NULL,
   `id_user2` int(7) unsigned NOT NULL,
   UNIQUE KEY `key` (`id_user1`, `id_user2`),
@@ -112,7 +123,7 @@ CREATE TABLE `cockatrice_buddylist` (
   KEY `id_user2` (`id_user2`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-CREATE TABLE `cockatrice_bans` (
+CREATE TABLE IF NOT EXISTS `cockatrice_bans` (
  `user_name` varchar(255) NOT NULL,
  `ip_address` varchar(255) NOT NULL,
  `id_admin` int(7) unsigned zerofill NOT NULL,
@@ -125,7 +136,7 @@ CREATE TABLE `cockatrice_bans` (
   KEY `ip_address` (`ip_address`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-CREATE TABLE `cockatrice_sessions` (
+CREATE TABLE IF NOT EXISTS `cockatrice_sessions` (
   `id` int(9) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `id_server` tinyint(3) NOT NULL,
@@ -136,7 +147,7 @@ CREATE TABLE `cockatrice_sessions` (
   KEY `username` (`user_name`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-CREATE TABLE `cockatrice_servers` (
+CREATE TABLE IF NOT EXISTS `cockatrice_servers` (
   `id` mediumint(8) unsigned NOT NULL,
   `ssl_cert` text COLLATE utf8_unicode_ci NOT NULL,
   `hostname` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -146,7 +157,7 @@ CREATE TABLE `cockatrice_servers` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-CREATE TABLE `cockatrice_replays` (
+CREATE TABLE IF NOT EXISTS `cockatrice_replays` (
   `id` int(7) NOT NULL AUTO_INCREMENT,
   `id_game` int(7) NOT NULL,
   `duration` int(7) NOT NULL,
@@ -155,7 +166,7 @@ CREATE TABLE `cockatrice_replays` (
   KEY `id_game` (`id_game`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-CREATE TABLE `cockatrice_replays_access` (
+CREATE TABLE IF NOT EXISTS `cockatrice_replays_access` (
   `id_game` int(7) NOT NULL,
   `id_player` int(7) NOT NULL,
   `replay_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
