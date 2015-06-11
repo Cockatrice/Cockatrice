@@ -132,13 +132,13 @@ private:
     QString powtough;
     QString text;
     QStringList colors;
+    QStringList relatedCards;
     int loyalty;
     QStringMap customPicURLs, customPicURLsHq;
     MuidMap muIds;
     bool cipt;
     int tableRow;
     QString pixmapCacheKey;
-    QStringList relatedCards;
 public:
     CardInfo(CardDatabase *_db,
         const QString &_name = QString(),
