@@ -141,6 +141,7 @@ private slots:
     
     void actOpenDeckInDeckEditor();
     void actCreatePredefinedToken();
+    void actCreateRelatedCard();
     void cardMenuAction();
     void actCardCounterTrigger();
     void actAttach();
