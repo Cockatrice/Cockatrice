@@ -482,13 +482,15 @@ CardInfo::CardInfo(CardDatabase *_db,
                    const QString &_powtough,
                    const QString &_text,
                    const QStringList &_colors,
+                   const QStringList &_relatedCards,
                    int _loyalty,
                    bool _cipt,
                    int _tableRow,
                    const SetList &_sets,
                    const QStringMap &_customPicURLs,
                    const QStringMap &_customPicURLsHq,
-                   MuidMap _muIds)
+                   MuidMap _muIds
+                   )
     : db(_db),
       name(_name),
       isToken(_isToken),
@@ -499,6 +501,7 @@ CardInfo::CardInfo(CardDatabase *_db,
       powtough(_powtough),
       text(_text),
       colors(_colors),
+      relatedCards(_relatedCards),
       loyalty(_loyalty),
       customPicURLs(_customPicURLs),
       customPicURLsHq(_customPicURLsHq),
@@ -685,6 +688,10 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
     for (int i = 0; i < colors.size(); i++)
         xml.writeTextElement("color", colors[i]);
 
+    const QStringList &related = info->getRelatedCards();
+    for (int i = 0; i < related.size(); i++)
+        xml.writeTextElement("related", related[i]);
+
     xml.writeTextElement("manacost", info->getManaCost());
     xml.writeTextElement("cmc", info->getCmc());
     xml.writeTextElement("type", info->getCardType());
@@ -852,7 +859,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             break;
         if (xml.name() == "card") {
             QString name, manacost, cmc, type, pt, text;
-            QStringList colors;
+            QStringList colors, relatedCards;
             QStringMap customPicURLs, customPicURLsHq;
             MuidMap muids;
             SetList sets;
@@ -890,6 +897,8 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
                     }
                 } else if (xml.name() == "color")
                     colors << xml.readElementText();
+                else if (xml.name() == "related")
+                    relatedCards << xml.readElementText();
                 else if (xml.name() == "tablerow")
                     tableRow = xml.readElementText().toInt();
                 else if (xml.name() == "cipt")
@@ -901,7 +910,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             }
 
             if (isToken == tokens) {
-                addCard(new CardInfo(this, name, isToken, manacost, cmc, type, pt, text, colors, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
+                addCard(new CardInfo(this, name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
             }
         }
     }

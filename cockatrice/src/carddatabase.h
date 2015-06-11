@@ -138,6 +138,7 @@ private:
     bool cipt;
     int tableRow;
     QString pixmapCacheKey;
+    QStringList relatedCards;
 public:
     CardInfo(CardDatabase *_db,
         const QString &_name = QString(),
@@ -148,13 +149,15 @@ public:
         const QString &_powtough = QString(),
         const QString &_text = QString(),
         const QStringList &_colors = QStringList(),
+        const QStringList &_relatedCards = QStringList(),
         int _loyalty = 0,
         bool _cipt = false,
         int _tableRow = 0,
         const SetList &_sets = SetList(),
         const QStringMap &_customPicURLs = QStringMap(),
         const QStringMap &_customPicURLsHq = QStringMap(),
-        MuidMap muids = MuidMap());
+        MuidMap muids = MuidMap()
+        );
     ~CardInfo();
     const QString &getName() const { return name; }
     const QString &getSimpleName() const { return simpleName; }
@@ -174,6 +177,7 @@ public:
     void setText(const QString &_text) { text = _text; emit cardInfoChanged(this); }
     void setColors(const QStringList &_colors) { colors = _colors; emit cardInfoChanged(this); }
     const QStringList &getColors() const { return colors; }
+    const QStringList &getRelatedCards() const { return relatedCards; }
     QString getCustomPicURL(const QString &set) const { return customPicURLs.value(set); }
     QString getCustomPicURLHq(const QString &set) const { return customPicURLsHq.value(set); }
     int getMuId(const QString &set) const { return muIds.value(set); }
