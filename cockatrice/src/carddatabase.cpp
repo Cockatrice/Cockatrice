@@ -587,7 +587,7 @@ void CardInfo::imageLoaded(const QImage &image)
 
 void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
 {
-    QString key = QLatin1String("card_") + name + QLatin1Char('_') + QString::number(size.width());
+    QString key = QLatin1String("card_") + name + QLatin1Char('_') + QString::number(size.width()) + QString::number(size.height());
     if(QPixmapCache::find(key, &pixmap))
         return;
 
@@ -598,15 +598,15 @@ void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
             pixmap = QPixmap(); // null
             return;
         } else {
-            pixmap = QPixmap(size);
-            pixmap.fill(Qt::transparent);
             QSvgRenderer svg(QString(":/back.svg"));
-            QPainter painter(&pixmap);
-            svg.render(&painter, QRectF(0, 0, size.width(), size.height()));
+            bigPixmap = QPixmap(svg.defaultSize());
+            bigPixmap.fill(Qt::transparent);
+            QPainter painter(&bigPixmap);
+            svg.render(&painter);
         }
-    } else {
-        pixmap = bigPixmap.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
+
+    pixmap = bigPixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     QPixmapCache::insert(key, pixmap);
 }
 

@@ -53,7 +53,7 @@ public:
     void setCardText(const QString &_cardText) { cardText = _cardText; invalidate(); }
     void setCardTypes(const QSet<QString> &_cardTypes) { cardTypes = _cardTypes; invalidate(); }
     void setCardColors(const QSet<QString> &_cardColors) { cardColors = _cardColors; invalidate(); }
-    void clearSearch();
+    void clearFilterAll();
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;

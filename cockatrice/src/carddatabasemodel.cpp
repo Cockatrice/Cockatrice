@@ -183,7 +183,7 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
     return true;
 }
 
-void CardDatabaseDisplayModel::clearSearch()
+void CardDatabaseDisplayModel::clearFilterAll()
 {
     cardName.clear();
     cardText.clear();
