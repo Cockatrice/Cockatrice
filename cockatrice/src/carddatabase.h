@@ -133,6 +133,7 @@ private:
     QString text;
     QStringList colors;
     QStringList relatedCards;
+    bool upsideDownArt;
     int loyalty;
     QStringMap customPicURLs, customPicURLsHq;
     MuidMap muIds;
@@ -150,6 +151,7 @@ public:
         const QString &_text = QString(),
         const QStringList &_colors = QStringList(),
         const QStringList &_relatedCards = QStringList(),
+        bool _upsideDownArt = false,
         int _loyalty = 0,
         bool _cipt = false,
         int _tableRow = 0,
@@ -178,6 +180,7 @@ public:
     void setColors(const QStringList &_colors) { colors = _colors; emit cardInfoChanged(this); }
     const QStringList &getColors() const { return colors; }
     const QStringList &getRelatedCards() const { return relatedCards; }
+    bool getUpsideDownArt() const { return upsideDownArt; }
     QString getCustomPicURL(const QString &set) const { return customPicURLs.value(set); }
     QString getCustomPicURLHq(const QString &set) const { return customPicURLsHq.value(set); }
     int getMuId(const QString &set) const { return muIds.value(set); }

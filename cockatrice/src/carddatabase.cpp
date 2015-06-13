@@ -483,6 +483,7 @@ CardInfo::CardInfo(CardDatabase *_db,
                    const QString &_text,
                    const QStringList &_colors,
                    const QStringList &_relatedCards,
+                   bool _upsideDownArt,
                    int _loyalty,
                    bool _cipt,
                    int _tableRow,
@@ -502,6 +503,7 @@ CardInfo::CardInfo(CardDatabase *_db,
       text(_text),
       colors(_colors),
       relatedCards(_relatedCards),
+      upsideDownArt(_upsideDownArt),
       loyalty(_loyalty),
       customPicURLs(_customPicURLs),
       customPicURLsHq(_customPicURLsHq),
@@ -583,7 +585,13 @@ void CardInfo::loadPixmap(QPixmap &pixmap)
 void CardInfo::imageLoaded(const QImage &image)
 {
     if (!image.isNull()) {
-        QPixmapCache::insert(pixmapCacheKey, QPixmap::fromImage(image));
+        if(upsideDownArt)
+        {
+            QImage mirrorImage = image.mirrored(true, true);
+            QPixmapCache::insert(pixmapCacheKey, QPixmap::fromImage(mirrorImage));
+        } else {
+            QPixmapCache::insert(pixmapCacheKey, QPixmap::fromImage(image));
+        }
         emit pixmapUpdated();
     }
 }
@@ -705,6 +713,8 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
         xml.writeTextElement("cipt", "1");
     if (info->getIsToken())
         xml.writeTextElement("token", "1");
+    if (info->getUpsideDownArt())
+        xml.writeTextElement("upsidedown", "1");
     xml.writeEndElement(); // card
 
     return xml;
@@ -867,6 +877,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             int loyalty = 0;
             bool cipt = false;
             bool isToken = false;
+            bool upsideDown = false;
             while (!xml.atEnd()) {
                 if (xml.readNext() == QXmlStreamReader::EndElement)
                     break;
@@ -903,6 +914,8 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
                     tableRow = xml.readElementText().toInt();
                 else if (xml.name() == "cipt")
                     cipt = (xml.readElementText() == "1");
+                else if (xml.name() == "upsidedown")
+                    upsideDown = (xml.readElementText() == "1");
                 else if (xml.name() == "loyalty")
                     loyalty = xml.readElementText().toInt();
                 else if (xml.name() == "token")
@@ -910,7 +923,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             }
 
             if (isToken == tokens) {
-                addCard(new CardInfo(this, name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
+                addCard(new CardInfo(this, name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
             }
         }
     }
