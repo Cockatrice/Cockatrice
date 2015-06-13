@@ -1065,7 +1065,7 @@ Response::ResponseCode Server_Player::cmdAttachCard(const Command_AttachCard &cm
     return Response::RespOk;
 }
 
-Response::ResponseCode Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Response::ResponseCode Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer & rc, GameEventStorage &ges)
 {
     if (spectator)
         return Response::RespFunctionNotAllowed;
@@ -1109,8 +1109,20 @@ Response::ResponseCode Server_Player::cmdCreateToken(const Command_CreateToken &
     event.set_x(x);
     event.set_y(y);
     ges.enqueueGameEvent(event, playerId);
-    
-    return Response::RespOk;
+   
+    // chck if the token is a replacement for an existing card
+    if(cmd.target_card_id() < 0)
+        return Response::RespOk;
+
+    Command_AttachCard cmd2;
+    cmd2.set_start_zone(cmd.target_zone());
+    cmd2.set_card_id(cmd.target_card_id());
+
+    cmd2.set_target_player_id(zone->getPlayer()->getPlayerId());
+    cmd2.set_target_zone(cmd.zone());
+    cmd2.set_target_card_id(card->getId());
+
+    return cmdAttachCard(cmd2, rc, ges);
 }
 
 Response::ResponseCode Server_Player::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)

@@ -1078,7 +1078,12 @@ void Player::actCreatePredefinedToken()
 
 void Player::actCreateRelatedCard()
 {
-    // get he target card name
+    // get the clicked card
+    CardItem * sourceCard = game->getActiveCard();
+    if(!sourceCard)
+        return;
+
+    // get the target card name
     QAction *action = static_cast<QAction *>(sender());
     CardInfo *cardInfo = db->getCard(action->text());
 
@@ -1089,8 +1094,8 @@ void Player::actCreateRelatedCard()
     cmd.set_color(cardInfo->getColors().isEmpty() ? QString().toStdString() : cardInfo->getColors().first().toLower().toStdString());
     cmd.set_pt(cardInfo->getPowTough().toStdString());
     cmd.set_destroy_on_zone_change(true);
-    cmd.set_x(-1);
-    cmd.set_y(0);
+    cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
+    cmd.set_target_card_id(sourceCard->getId());
 
     sendGameCommand(cmd);
 }
