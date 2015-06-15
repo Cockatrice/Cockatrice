@@ -24,7 +24,7 @@ FilterBuilder::FilterBuilder(QWidget *parent)
             QVariant(i)
         );
 
-    QPushButton *ok = new QPushButton(QIcon(":/resources/increment.svg"), QString());
+    QPushButton *ok = new QPushButton(QIcon("theme:icons/increment.svg"), QString());
     ok->setMaximumSize(20, 20);
 
     edit = new QLineEdit;
