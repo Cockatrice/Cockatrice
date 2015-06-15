@@ -232,7 +232,7 @@ void GeneralSettingsPage::retranslateUi()
     personalGroupBox->setTitle(tr("Personal settings"));
     languageLabel.setText(tr("Language:"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
-    picDownloadHqCheckBox.setText(tr("Download high-quality card pictures"));
+    picDownloadHqCheckBox.setText(tr("Download card pictures from a custom URL"));
     pathsGroupBox->setTitle(tr("Paths"));
     deckPathLabel.setText(tr("Decks directory:"));
     replaysPathLabel.setText(tr("Replays directory:"));
@@ -240,7 +240,7 @@ void GeneralSettingsPage::retranslateUi()
     cardDatabasePathLabel.setText(tr("Card database:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
-    highQualityURLLabel.setText(tr("High Quality Source URL:"));
+    highQualityURLLabel.setText(tr("Custom Card Download URL:"));
     highQualityURLLinkLabel.setText(QString("<a href='https://github.com/Cockatrice/Cockatrice/wiki/Custom-Download-HQ-URLs'>" + tr("Linking FAQ") + "</a>"));
     clearDownloadedPicsButton.setText(tr("Reset/Clear Downloaded Pictures"));
 }
