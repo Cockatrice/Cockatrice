@@ -44,6 +44,7 @@ private slots:
     void cardDatabasePathButtonClicked();
     void tokenDatabasePathButtonClicked();
     void languageBoxChanged(int index);
+	void setEnabledStatus(bool);
 private:
     QStringList findQmFiles();
     QString languageName(const QString &qmFile);
@@ -57,7 +58,6 @@ private:
     QLineEdit *highQualityURLFallbackEdit;
     QLineEdit *lowQualityURLEdit;
     QLineEdit *lowQualityURLFallbackEdit;
-    
     
     QSpinBox pixmapCacheEdit;
     QGroupBox *personalGroupBox; 

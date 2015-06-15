@@ -49,14 +49,12 @@ GeneralSettingsPage::GeneralSettingsPage()
     pixmapCacheEdit.setSingleStep(64);
     pixmapCacheEdit.setValue(settingsCache->getPixmapCacheSize());
     pixmapCacheEdit.setSuffix(" MB");
-    
+
+	picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
+    picDownloadCheckBox.setChecked(settingsCache->getPicDownload());	
+	
     highQualityURLEdit = new QLineEdit(settingsCache->getHighQualityURL());
-    highQualityURLFallbackEdit = new QLineEdit(settingsCache->getHighQualityURLFallback());
-    lowQualityURLEdit = new QLineEdit(settingsCache->getLowQualityURL());
-    lowQualityURLFallbackEdit = new QLineEdit(settingsCache->getLowQualityURLFallback());
-    
-    picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
-    picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
+	highQualityURLEdit->setEnabled(settingsCache->getPicDownloadHq());
 
     connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
@@ -64,10 +62,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
     
+    connect(&picDownloadHqCheckBox, SIGNAL(clicked(bool)), this, SLOT(setEnabledStatus(bool)));
     connect(highQualityURLEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighQualityURL(QString)));
-    connect(highQualityURLFallbackEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighQualityURLFallback(QString)));
-    connect(lowQualityURLEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setLowQualityURL(QString)));
-    connect(lowQualityURLFallbackEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setLowQualityURLFallback(QString)));
 
     QGridLayout *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
@@ -80,14 +76,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     
     personalGrid->addWidget(&highQualityURLLabel, 5, 0, 1, 1);
     personalGrid->addWidget(highQualityURLEdit, 5, 1, 1, 1);
-    personalGrid->addWidget(&highQualityURLFallbackLabel, 6, 0, 1, 1);
-    personalGrid->addWidget(highQualityURLFallbackEdit, 6, 1, 1, 1);
-    personalGrid->addWidget(&lowQualityURLLabel, 7, 0, 1, 1);
-    personalGrid->addWidget(lowQualityURLEdit, 7, 1, 1, 1);
-    personalGrid->addWidget(&lowQualityURLFallbackLabel, 8, 0, 1, 1);
-    personalGrid->addWidget(lowQualityURLFallbackEdit, 8, 1, 1, 1);
-    
-    
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -149,6 +137,11 @@ QStringList GeneralSettingsPage::findQmFiles()
     QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
     fileNames.replaceInStrings(QRegExp(translationPrefix + "_(.*)\\.qm"), "\\1");
     return fileNames;
+}
+
+void GeneralSettingsPage::setEnabledStatus(bool status)
+{
+	highQualityURLEdit->setEnabled(status);
 }
 
 QString GeneralSettingsPage::languageName(const QString &qmFile)
@@ -539,7 +532,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     //priceTagsCheckBox.setChecked(settingsCache->getPriceTagFeature());
     //connect(&priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
 
-    connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
+    //connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
 
     QGridLayout *generalGrid = new QGridLayout;
     //generalGrid->addWidget(&priceTagsCheckBox, 0, 0);

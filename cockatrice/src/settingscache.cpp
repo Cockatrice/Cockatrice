@@ -18,7 +18,7 @@ SettingsCache::SettingsCache()
     tableBgPath = settings->value("zonebg/table").toString();
     playerBgPath = settings->value("zonebg/playerarea").toString();
     cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
-
+  
     // we only want to reset the cache once, then its up to the user
     bool updateCache = settings->value("revert/pixmapCacheSize", false).toBool();
     if (!updateCache) {
@@ -37,9 +37,10 @@ SettingsCache::SettingsCache()
     picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
 
     picUrl = settings->value("personal/lowQualityURL", PIC_URL_DEFAULT).toString();
-    picUrlHq = settings->value("personal/highQualityURL", PIC_URL_HQ_DEFAULT).toString();
-    picUrlFallback = settings->value("personal/lowQualityURLFallback", PIC_URL_FALLBACK).toString();
-    picUrlHqFallback = settings->value("personal/highQualityURLFallback", PIC_URL_HQ_FALLBACK).toString();
+	picUrlHq = settings->value("personal/highQualityURL", PIC_URL_HQ_DEFAULT).toString();
+	picsHq = settings->value("personal/highQualityURL", PIC_URL_HQ_DEFAULT).toString();
+	picUrlFallback = settings->value("personal/lowQualityURLFallback", PIC_URL_FALLBACK).toString();
+    //picUrlHqFallback = settings->value("personal/highQualityURLFallback", PIC_URL_HQ_FALLBACK).toString();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
@@ -206,7 +207,13 @@ void SettingsCache::setPicUrl(const QString &_picUrl)
 void SettingsCache::setPicUrlHq(const QString &_picUrlHq)
 {
     picUrlHq = _picUrlHq;
-    settings->setValue("personal/picUrlHq", picUrlHq);
+    settings->setValue("personal/highQualityURL", picUrlHq);
+}
+
+void SettingsCache::setHighQualityURL(const QString _picsHq)
+{
+    picsHq = _picsHq;
+    settings->setValue("personal/highQualityURL", _picsHq);
 }
 
 void SettingsCache::setPicUrlFallback(const QString &_picUrlFallback)
@@ -380,26 +387,8 @@ void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
     emit pixmapCacheSizeChanged(pixmapCacheSize);
 }
 
-void SettingsCache::setHighQualityURL(const QString _picsHq)
-{
-    picsHq = _picsHq;
-    settings->setValue("personal/highQualityURL", picsHq);
-}
-
 void SettingsCache::setHighQualityURLFallback(const QString _picsHqFallback)
 {
     picsHqFallback = _picsHqFallback;
     settings->setValue("personal/highQualityURLFallback", _picsHqFallback);
-}
-
-void SettingsCache::setLowQualityURL(const QString _picsLq)
-{
-    picsLq = _picsLq;
-    settings->setValue("personal/lowQualityURL", picsLq);
-}
-
-void SettingsCache::setLowQualityURLFallback(const QString _picsLqFallback)
-{
-    picsLqFallback = _picsLqFallback;
-    settings->setValue("personal/lowQualityURLFallback", _picsLqFallback);
 }

@@ -132,16 +132,16 @@ public:
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
     bool getIgnoreUnregisteredUserMessages() const { return ignoreUnregisteredUserMessages; }
     QString getPicUrl() const { return picUrl; }
-    QString getPicUrlHq() const { return picUrlHq; }
+    //QString getPicUrlHq() const { return picUrlHq; }
     QString getPicUrlFallback() const { return picUrlFallback; }
-    QString getPicUrlHqFallback() const { return picUrlHqFallback; }
+    //QString getPicUrlHqFallback() const { return picUrlHqFallback; }
     bool getAutoConnect() const { return attemptAutoConnect; }
     int getPixmapCacheSize() const { return pixmapCacheSize; }
     
     QString getHighQualityURL() const { return picsHq; }
     QString getHighQualityURLFallback() const { return picsHqFallback; }
-    QString getLowQualityURL() const { return picsLq; }
-    QString getLowQualityURLFallback() const { return picsLqFallback; }
+    //QString getLowQualityURL() const { return picsLq; }
+    //QString getLowQualityURLFallback() const { return picsLqFallback; }
     
     bool getScaleCards() const {  return scaleCards; }
     bool getShowMessagePopup() const { return showMessagePopups; }
@@ -195,8 +195,8 @@ public slots:
     
     void setHighQualityURL(const QString _picsHq);
     void setHighQualityURLFallback(const QString _picsHqFallback);
-    void setLowQualityURL(const QString _picsLq);
-    void setLowQualityURLFallback(const QString _picsLqFallback);
+    //void setLowQualityURL(const QString _picsLq);
+    //void setLowQualityURLFallback(const QString _picsLqFallback);
     
     void setCardScaling(const int _scaleCards);
     void setShowMessagePopups(const int _showMessagePopups);
