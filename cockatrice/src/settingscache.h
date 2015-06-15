@@ -4,9 +4,9 @@
 #include <QObject>
 
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
-#define PIC_URL_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
-#define PIC_URL_HQ_DEFAULT "http://mtgimage.com/multiverseid/!cardid!.jpg"
-#define PIC_URL_HQ_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
+#define PIC_URL_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
+#define PIC_URL_HQ_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
+#define PIC_URL_HQ_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
 // size should be a multiple of 64
 #define PIXMAPCACHE_SIZE_DEFAULT 2047
 #define PIXMAPCACHE_SIZE_MIN 64
@@ -76,6 +76,12 @@ private:
     QString picUrlHqFallback;
     bool attemptAutoConnect;
     int pixmapCacheSize;
+    
+    QString picsHq;
+    QString picsHqFallback;
+    QString picsLq;
+    QString picsLqFallback;
+
     bool scaleCards;
     bool showMessagePopups;
     bool showMentionPopups;
@@ -126,11 +132,17 @@ public:
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
     bool getIgnoreUnregisteredUserMessages() const { return ignoreUnregisteredUserMessages; }
     QString getPicUrl() const { return picUrl; }
-    QString getPicUrlHq() const { return picUrlHq; }
+    //QString getPicUrlHq() const { return picUrlHq; }
     QString getPicUrlFallback() const { return picUrlFallback; }
-    QString getPicUrlHqFallback() const { return picUrlHqFallback; }
+    //QString getPicUrlHqFallback() const { return picUrlHqFallback; }
     bool getAutoConnect() const { return attemptAutoConnect; }
     int getPixmapCacheSize() const { return pixmapCacheSize; }
+    
+    QString getHighQualityURL() const { return picsHq; }
+    QString getHighQualityURLFallback() const { return picsHqFallback; }
+    //QString getLowQualityURL() const { return picsLq; }
+    //QString getLowQualityURLFallback() const { return picsLqFallback; }
+    
     bool getScaleCards() const {  return scaleCards; }
     bool getShowMessagePopup() const { return showMessagePopups; }
     bool getShowMentionPopup() const { return showMentionPopups; }
@@ -180,6 +192,12 @@ public slots:
     void setPicUrlHqFallback(const QString &_picUrlHqFallback);
     void setAutoConnect(const bool &_autoConnect);
     void setPixmapCacheSize(const int _pixmapCacheSize);
+    
+    void setHighQualityURL(const QString _picsHq);
+    void setHighQualityURLFallback(const QString _picsHqFallback);
+    //void setLowQualityURL(const QString _picsLq);
+    //void setLowQualityURLFallback(const QString _picsLqFallback);
+    
     void setCardScaling(const int _scaleCards);
     void setShowMessagePopups(const int _showMessagePopups);
     void setShowMentionPopups(const int _showMentionPopups);

@@ -49,14 +49,21 @@ GeneralSettingsPage::GeneralSettingsPage()
     pixmapCacheEdit.setSingleStep(64);
     pixmapCacheEdit.setValue(settingsCache->getPixmapCacheSize());
     pixmapCacheEdit.setSuffix(" MB");
-    picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
-    picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
+
+	picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
+    picDownloadCheckBox.setChecked(settingsCache->getPicDownload());	
+	
+    highQualityURLEdit = new QLineEdit(settingsCache->getHighQualityURL());
+	highQualityURLEdit->setEnabled(settingsCache->getPicDownloadHq());
 
     connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
     connect(&picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
+    
+    connect(&picDownloadHqCheckBox, SIGNAL(clicked(bool)), this, SLOT(setEnabledStatus(bool)));
+    connect(highQualityURLEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighQualityURL(QString)));
 
     QGridLayout *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
@@ -66,6 +73,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&picDownloadCheckBox, 2, 0, 1, 2);
     personalGrid->addWidget(&picDownloadHqCheckBox, 3, 0, 1, 2);
     personalGrid->addWidget(&clearDownloadedPicsButton, 4, 0, 1, 1);
+    
+    personalGrid->addWidget(&highQualityURLLabel, 5, 0, 1, 1);
+    personalGrid->addWidget(highQualityURLEdit, 5, 1, 1, 1);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -127,6 +137,11 @@ QStringList GeneralSettingsPage::findQmFiles()
     QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
     fileNames.replaceInStrings(QRegExp(translationPrefix + "_(.*)\\.qm"), "\\1");
     return fileNames;
+}
+
+void GeneralSettingsPage::setEnabledStatus(bool status)
+{
+	highQualityURLEdit->setEnabled(status);
 }
 
 QString GeneralSettingsPage::languageName(const QString &qmFile)
@@ -229,6 +244,12 @@ void GeneralSettingsPage::retranslateUi()
     cardDatabasePathLabel.setText(tr("Card database:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
+    
+    highQualityURLLabel.setText(tr("High Quality Source URL:"));
+    highQualityURLFallbackLabel.setText(tr("High Quality Backup URL:"));
+    lowQualityURLLabel.setText(tr("Low Quality Source URL:"));
+    lowQualityURLFallbackLabel.setText(tr("Low Quality Backup URL:"));
+    
     clearDownloadedPicsButton.setText(tr("Reset/Clear Downloaded Pictures"));
 }
 
@@ -511,7 +532,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     //priceTagsCheckBox.setChecked(settingsCache->getPriceTagFeature());
     //connect(&priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
 
-    connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
+    //connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
 
     QGridLayout *generalGrid = new QGridLayout;
     //generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
