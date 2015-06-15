@@ -8,15 +8,13 @@
 #include "settingscache.h"
 
 #include <QVBoxLayout>
-#include <QTabBar>
 
 CardFrame::CardFrame(int width, int height,
                         const QString &cardName, QWidget *parent)
-    : QFrame(parent)
+    : QTabWidget(parent)
     , info(0)
     , cardTextOnly(false)
 {
-    setFrameStyle(QFrame::Panel | QFrame::Raised);
     setMaximumWidth(width);
     setMinimumWidth(width);
     setMinimumHeight(height);
@@ -24,20 +22,28 @@ CardFrame::CardFrame(int width, int height,
     pic = new CardInfoPicture(width);
     text = new CardInfoText();
 
-    tabBar = new QTabBar(this);
-    tabBar->setDrawBase(false);
-    tabBar->insertTab(ImageOnlyView, QString());
-    tabBar->insertTab(TextOnlyView, QString());
-    tabBar->insertTab(ImageAndTextView, QString());
-    connect(tabBar, SIGNAL(currentChanged(int)), this, SLOT(setViewMode(int)));
+    tab1 = new QWidget(this);
+    tab2 = new QWidget(this);
+    tab3 = new QWidget(this);
+    insertTab(ImageOnlyView, tab1, QString());
+    insertTab(TextOnlyView, tab2, QString());
+    insertTab(ImageAndTextView, tab3, QString());
+    connect(this, SIGNAL(currentChanged(int)), this, SLOT(setViewMode(int)));
 
-    QVBoxLayout * layout = new QVBoxLayout();
-    layout->addWidget(tabBar);
-    layout->addWidget(pic);
-    layout->addWidget(text);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    setLayout(layout);
+    tab1Layout = new QVBoxLayout();
+    tab1Layout->setContentsMargins(0, 0, 0, 0);
+    tab1Layout->setSpacing(0);
+    tab1->setLayout(tab1Layout);
+
+    tab2Layout = new QVBoxLayout();
+    tab2Layout->setContentsMargins(0, 0, 0, 0);
+    tab2Layout->setSpacing(0);
+    tab2->setLayout(tab2Layout);
+
+    tab3Layout = new QVBoxLayout();
+    tab3Layout->setContentsMargins(0, 0, 0, 0);
+    tab3Layout->setSpacing(0);
+    tab3->setLayout(tab3Layout);
 
     setViewMode(settingsCache->getCardInfoViewMode());
 
@@ -46,29 +52,26 @@ CardFrame::CardFrame(int width, int height,
 
 void CardFrame::retranslateUi()
 {
-    tabBar->setTabText(ImageOnlyView, tr("Image"));
-    tabBar->setTabText(TextOnlyView, tr("Description"));
-    tabBar->setTabText(ImageAndTextView, tr("Both"));
+    setTabText(ImageOnlyView, tr("Image"));
+    setTabText(TextOnlyView, tr("Description"));
+    setTabText(ImageAndTextView, tr("Both"));
 }
 
 void CardFrame::setViewMode(int mode)
 {
-    if(tabBar->currentIndex() != mode)
-        tabBar->setCurrentIndex(mode);
+    if(currentIndex() != mode)
+        setCurrentIndex(mode);
 
     switch(mode)
     {
         case ImageOnlyView:
-            pic->setVisible(true);
-            text->setVisible(false);
-            break;
         case TextOnlyView:
-            pic->setVisible(false);
-            text->setVisible(true);
+            tab1Layout->addWidget(pic);
+            tab2Layout->addWidget(text);
             break;
         case ImageAndTextView:
-            pic->setVisible(true);
-            text->setVisible(true);
+            tab3Layout->addWidget(pic);
+            tab3Layout->addWidget(text);
             break;
     }
 
