@@ -79,6 +79,13 @@ SettingsCache::SettingsCache()
     leftJustified = settings->value("interface/leftjustified", false).toBool();
 
     masterVolume = settings->value("sound/mastervolume", 100).toInt();
+
+    cardInfoViewMode = settings->value("cards/cardinfoviewmode", 0).toInt();
+}
+
+void SettingsCache::setCardInfoViewMode(const int _viewMode) {
+    cardInfoViewMode = _viewMode;
+    settings->setValue("cards/cardinfoviewmode", cardInfoViewMode);
 }
 
 void SettingsCache::setMasterVolume(int _masterVolume) {

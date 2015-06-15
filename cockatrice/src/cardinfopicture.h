@@ -19,16 +19,14 @@ private:
 public:
     CardInfoPicture(int maximumWidth, QWidget *parent = 0);
     bool hasPicture() const { return !noPicture; }
-
 private:
     void setNoPicture(bool status);
+protected:
+    void resizeEvent(QResizeEvent *event);
 
 public slots:
     void setCard(CardInfo *card);
-
-private slots:
     void updatePixmap();
-
 };
 
 #endif

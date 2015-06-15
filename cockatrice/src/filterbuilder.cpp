@@ -1,6 +1,6 @@
 #include "filterbuilder.h"
 
-#include <QHBoxLayout>
+#include <QGridLayout>
 #include <QComboBox>
 #include <QPushButton>
 #include <QLineEdit>
@@ -8,41 +8,36 @@
 #include "cardfilter.h"
 
 FilterBuilder::FilterBuilder(QWidget *parent)
-    : QFrame(parent)
+    : QWidget(parent)
 {
-    int i;
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    QHBoxLayout *addFilter = new QHBoxLayout;
-
     filterCombo = new QComboBox;
-    for (i = 0; i < CardFilter::AttrEnd; i++)
+    for (int i = 0; i < CardFilter::AttrEnd; i++)
         filterCombo->addItem(
             tr(CardFilter::attrName(static_cast<CardFilter::Attr>(i))),
             QVariant(i)
         );
 
     typeCombo = new QComboBox;
-    for (i = 0; i < CardFilter::TypeEnd; i++)
+    for (int i = 0; i < CardFilter::TypeEnd; i++)
         typeCombo->addItem(
             tr(CardFilter::typeName(static_cast<CardFilter::Type>(i))),
             QVariant(i)
         );
 
-    QPushButton *ok = new QPushButton("+");
+    QPushButton *ok = new QPushButton(QIcon(":/resources/increment.svg"), QString());
     ok->setMaximumSize(20, 20);
-
-    addFilter->addWidget(ok);
-    addFilter->addWidget(typeCombo);
-    addFilter->addWidget(filterCombo, Qt::AlignLeft);
 
     edit = new QLineEdit;
     edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    layout->addLayout(addFilter);
-    layout->addWidget(edit);
 
-    setFrameStyle(QFrame::Panel | QFrame::Raised);
-    layout->setAlignment(Qt::AlignTop);
+    QGridLayout *layout = new QGridLayout;
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    layout->addWidget(typeCombo, 0, 0, 1, 2);
+    layout->addWidget(filterCombo, 0, 2, 1, 2);
+    layout->addWidget(edit, 1, 0, 1, 3);
+    layout->addWidget(ok, 1, 3);
+
     setLayout(layout);
 
     connect(edit, SIGNAL(returnPressed()), this, SLOT(emit_add()));

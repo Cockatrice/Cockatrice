@@ -10,6 +10,7 @@ CardInfoPicture::CardInfoPicture(int maximumWidth, QWidget *parent)
     , info(0)
     , noPicture(true)
 {
+    setAlignment(Qt::AlignCenter);
     setMaximumWidth(maximumWidth);
 }
 
@@ -31,22 +32,24 @@ void CardInfoPicture::setCard(CardInfo *card)
     updatePixmap();
 }
 
+void CardInfoPicture::resizeEvent(QResizeEvent * /* e */)
+{
+    updatePixmap();
+}
+
 void CardInfoPicture::updatePixmap()
 {
-    qreal aspectRatio = (qreal) CARD_HEIGHT / (qreal) CARD_WIDTH;
-    qreal pixmapWidth = this->width();
-
-    if (pixmapWidth == 0) {
+    if (info == 0 || width() == 0 || height() == 0) {
         setNoPicture(true);
         return;
     }
 
     QPixmap resizedPixmap;
-    info->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio), resizedPixmap);
+    info->getPixmap(size(), resizedPixmap);
 
     if (resizedPixmap.isNull()) {
         setNoPicture(true);
-        db->getCard()->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio), resizedPixmap);
+        db->getCard()->getPixmap(size(), resizedPixmap);
     } else {
         setNoPicture(false);
     }
