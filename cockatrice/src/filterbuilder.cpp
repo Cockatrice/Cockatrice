@@ -47,7 +47,6 @@ FilterBuilder::FilterBuilder(QWidget *parent)
 
     connect(edit, SIGNAL(returnPressed()), this, SLOT(emit_add()));
     connect(ok, SIGNAL(released()), this, SLOT(emit_add()));
-    connect(filterCombo, SIGNAL(currentIndexChanged(int)), edit, SLOT(clear()));
     fltr = NULL;
 }
 
