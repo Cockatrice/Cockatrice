@@ -4,9 +4,9 @@
 #include <QObject>
 
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
-#define PIC_URL_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
-#define PIC_URL_HQ_DEFAULT "http://mtgimage.com/multiverseid/!cardid!.jpg"
-#define PIC_URL_HQ_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
+#define PIC_URL_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
+#define PIC_URL_HQ_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
+#define PIC_URL_HQ_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
 // size should be a multiple of 64
 #define PIXMAPCACHE_SIZE_DEFAULT 2047
 #define PIXMAPCACHE_SIZE_MIN 64
