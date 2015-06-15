@@ -48,9 +48,14 @@ QRectF StackZone::boundingRect() const
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    if (bgPixmap.isNull())
-        painter->fillRect(boundingRect(), QColor(113, 43, 43));
-    else
+    if (bgPixmap.isNull()) {
+        QColor colorToSet;
+        colorToSet.setNamedColor("#" + settingsCache->getStackZoneColor());
+            if (colorToSet.isValid())
+                painter->fillRect(boundingRect(), colorToSet);
+            else
+                painter->fillRect(boundingRect(), QColor(113, 43, 43));
+    }
         painter->fillRect(boundingRect(), QBrush(bgPixmap));
 }
 
