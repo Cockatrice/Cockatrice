@@ -337,16 +337,26 @@ QString PictureLoader::getPicUrl()
         picUrl = picDownloadHq ? settingsCache->getPicUrlHqFallback() : settingsCache->getPicUrlFallback();
 
     picUrl.replace("!name!", QUrl::toPercentEncoding(card->getCorrectedName()));
+    picUrl.replace("!name_lower!", QUrl::toPercentEncoding(card->getCorrectedName().toLower()));
     picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
-    if (set) {
+    if (set)
+    {
         picUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
+        picUrl.replace("!setcode_lower!", QUrl::toPercentEncoding(set->getShortName().toLower()));
         picUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
+        picUrl.replace("!setname_lower!", QUrl::toPercentEncoding(set->getLongName().toLower()));
     }
 
-    if (picUrl.contains("!name!") ||
-            picUrl.contains("!setcode!") ||
-            picUrl.contains("!setname!") ||
-            picUrl.contains("!cardid!")) {
+    if (
+        picUrl.contains("!name!") ||
+        picUrl.contains("!name_lower!") ||
+        picUrl.contains("!setcode!") ||
+        picUrl.contains("!setcode_lower!") ||
+        picUrl.contains("!setname!") ||
+        picUrl.contains("!setname_lower!") ||
+        picUrl.contains("!cardid!")
+        )
+    {
         qDebug() << "Insufficient card data to download" << card->getName() << "Url:" << picUrl;
         return QString("");
     }
