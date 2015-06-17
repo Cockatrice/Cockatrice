@@ -305,7 +305,10 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
     else if (targetName == "rfg")
         finalStr = tr("%1 exiles %2%3.");
     else if (targetName == "hand")
-        finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 moves %2%3 to her hand.") : tr("%1 moves %2%3 to his hand.");
+        if (attributes.player->topCardRevealed())
+            finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 moves %2%3 to her hand from her library.") : tr("%1 moves %2%3 to his hand from his library.");
+        else
+            finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 moves a card to her hand from her library.") : tr("%1 moves a card to his hand from his library.");
     else if (targetName == "deck") {
         if (attributes.newX == -1)
             finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 into her library.") : tr("%1 puts %2%3 into his library.");
