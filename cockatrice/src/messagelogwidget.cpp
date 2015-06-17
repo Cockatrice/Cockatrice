@@ -224,20 +224,7 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
     else if (startName == "hand")
         fromStr = isFemale(zone->getPlayer()) ? tr(" from her hand") : tr(" from his hand");
     else if (startName == "deck") {
-        if (position >= zone->getCards().size() - 1) {
-            if (cardName.isEmpty()) {
-                if (ownerChange)
-                    cardName = tr("the bottom card of %1's library").arg(zone->getPlayer()->getName());
-                else
-                    cardName = isFemale(zone->getPlayer()) ? tr("the bottom card of her library") : tr("the bottom card of his library");
-                cardNameContainsStartZone = true;
-            } else {
-                if (ownerChange)
-                    fromStr = tr(" from the bottom of %1's library").arg(zone->getPlayer()->getName());
-                else
-                    fromStr = isFemale(zone->getPlayer()) ? tr(" from the bottom of her library") : tr(" from the bottom of his library");
-            }
-        } else if (position == 0) {
+        if (position == 0) {
             if (cardName.isEmpty()) {
                 if (ownerChange)
                     cardName = tr("the top card of %1's library").arg(zone->getPlayer()->getName());
@@ -249,6 +236,19 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
                     fromStr = tr(" from the top of %1's library").arg(zone->getPlayer()->getName());
                 else
                     fromStr = isFemale(zone->getPlayer()) ? tr(" from the top of her library") : tr(" from the top of his library");
+            }
+        } else if (position >= zone->getCards().size() - 1) {
+            if (cardName.isEmpty()) {
+                if (ownerChange)
+                    cardName = tr("the bottom card of %1's library").arg(zone->getPlayer()->getName());
+                else
+                    cardName = isFemale(zone->getPlayer()) ? tr("the bottom card of her library") : tr("the bottom card of his library");
+                cardNameContainsStartZone = true;
+            } else {
+                if (ownerChange)
+                    fromStr = tr(" from the bottom of %1's library").arg(zone->getPlayer()->getName());
+                else
+                    fromStr = isFemale(zone->getPlayer()) ? tr(" from the bottom of her library") : tr(" from the bottom of his library");
             }
         } else {
             if (ownerChange)
