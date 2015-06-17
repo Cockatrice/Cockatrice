@@ -9,16 +9,11 @@ class CardInfo;
 class CardInfoPicture : public QLabel {
     Q_OBJECT
 
-signals:
-    void hasPictureChanged();
-
 private:
     CardInfo *info;
-    bool noPicture;
 
 public:
-    CardInfoPicture(int maximumWidth, QWidget *parent = 0);
-    bool hasPicture() const { return !noPicture; }
+    CardInfoPicture(int width, QWidget *parent = 0);
 private:
     void setNoPicture(bool status);
 protected:

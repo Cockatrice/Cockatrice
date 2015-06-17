@@ -143,7 +143,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     filterBox->setLayout(filterLayout);
 
     QVBoxLayout *middleFrame = new QVBoxLayout;
-    middleFrame->addWidget(cardInfo, 0, Qt::AlignTop);
+    middleFrame->addWidget(cardInfo, 1, Qt::AlignTop);
     middleFrame->addWidget(filterBox, 0);
 
     deckModel = new DeckListModel(this);

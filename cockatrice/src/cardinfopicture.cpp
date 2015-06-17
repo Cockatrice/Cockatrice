@@ -5,21 +5,12 @@
 #include "carddatabase.h"
 #include "main.h"
 
-CardInfoPicture::CardInfoPicture(int maximumWidth, QWidget *parent)
+CardInfoPicture::CardInfoPicture(int width, QWidget *parent)
     : QLabel(parent)
     , info(0)
-    , noPicture(true)
 {
     setAlignment(Qt::AlignCenter);
-    setMaximumWidth(maximumWidth);
-}
-
-void CardInfoPicture::setNoPicture(bool status)
-{
-    if (noPicture != status) {
-        noPicture = status;
-        emit hasPictureChanged();
-    }
+    setFixedWidth(width);
 }
 
 void CardInfoPicture::setCard(CardInfo *card)
@@ -40,7 +31,6 @@ void CardInfoPicture::resizeEvent(QResizeEvent * /* e */)
 void CardInfoPicture::updatePixmap()
 {
     if (info == 0 || width() == 0 || height() == 0) {
-        setNoPicture(true);
         return;
     }
 
@@ -48,10 +38,8 @@ void CardInfoPicture::updatePixmap()
     info->getPixmap(size(), resizedPixmap);
 
     if (resizedPixmap.isNull()) {
-        setNoPicture(true);
         db->getCard()->getPixmap(size(), resizedPixmap);
-    } else {
-        setNoPicture(false);
     }
+
     this->setPixmap(resizedPixmap);
 }
