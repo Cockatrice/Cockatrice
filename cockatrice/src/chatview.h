@@ -39,6 +39,7 @@ private:
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
     QString getNameFromUserList(QMap<QString, UserListTWI *> &userList, QString &userName);
+    bool isFullMentionAValidUser(QMap<QString, UserListTWI *> &userList, QString userNameToMatch);
     QColor getCustomMentionColor();
     bool shouldShowSystemPopup();
     void showSystemPopup(QString &sender);
