@@ -5,12 +5,11 @@
 #include "carddatabase.h"
 #include "main.h"
 
-CardInfoPicture::CardInfoPicture(int width, QWidget *parent)
+CardInfoPicture::CardInfoPicture(QWidget *parent)
     : QLabel(parent)
     , info(0)
 {
     setAlignment(Qt::AlignCenter);
-    setFixedWidth(width);
 }
 
 void CardInfoPicture::setCard(CardInfo *card)
@@ -41,5 +40,5 @@ void CardInfoPicture::updatePixmap()
         db->getCard()->getPixmap(size(), resizedPixmap);
     }
 
-    this->setPixmap(resizedPixmap);
+    setPixmap(resizedPixmap);
 }

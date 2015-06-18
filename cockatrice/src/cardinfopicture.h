@@ -13,7 +13,7 @@ private:
     CardInfo *info;
 
 public:
-    CardInfoPicture(int width, QWidget *parent = 0);
+    CardInfoPicture(QWidget *parent = 0);
 private:
     void setNoPicture(bool status);
 protected:

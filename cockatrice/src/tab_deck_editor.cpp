@@ -108,7 +108,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     leftFrame->addLayout(searchLayout);
     leftFrame->addWidget(databaseView);
 
-    cardInfo = new CardFrame(250, 356);
+    cardInfo = new CardFrame(250, 372);
 
     filterModel = new FilterTreeModel();
     databaseDisplayModel->setFilterTree(filterModel->filterTree());
