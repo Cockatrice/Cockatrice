@@ -18,7 +18,8 @@ CardFrame::CardFrame(int width, int height,
     setFixedWidth(width);
     setMinimumHeight(height);
 
-    pic = new CardInfoPicture();
+    setContentsMargins(3, 3, 3, 3);
+    pic = new CardInfoPicture(width - 6);
     text = new CardInfoText();
 
     tab1 = new QWidget(this);
