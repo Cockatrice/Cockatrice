@@ -106,7 +106,7 @@ void ArrowItem::updatePath(const QPointF &endPoint)
         path.quadTo(c, arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
         path.lineTo(-arrowWidth / 2 * QPointF(cos((phi - 90) * M_PI / 180), sin((phi - 90) * M_PI / 180)));
     }
-
+    // adda comment
     setPos(startPoint);
     setTransform(QTransform().rotate(-line.angle()));
 }
