@@ -9,6 +9,7 @@
 #include <QAction>
 #include <QCloseEvent>
 #include <QFileDialog>
+#include <QGroupBox>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPrintPreviewDialog>
@@ -49,9 +50,14 @@ void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     : Tab(_tabSupervisor, parent), modified(false)
 {
-    aClearSearch = new QAction(QString(), this);
-    aClearSearch->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
-    connect(aClearSearch, SIGNAL(triggered()), this, SLOT(actClearSearch()));
+    aClearFilterAll = new QAction(QString(), this);
+    aClearFilterAll->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
+    connect(aClearFilterAll, SIGNAL(triggered()), this, SLOT(actClearFilterAll()));
+
+    aClearFilterOne = new QAction(QString(), this);
+    aClearFilterOne->setIcon(QIcon(":/resources/decrement.svg"));
+    connect(aClearFilterOne, SIGNAL(triggered()), this, SLOT(actClearFilterOne()));
+
     searchEdit = new SearchLineEdit;
 #if QT_VERSION >= 0x050300
     searchEdit->addAction(QIcon(":/resources/icon_search_black.svg"), QLineEdit::LeadingPosition);
@@ -102,10 +108,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     leftFrame->addLayout(searchLayout);
     leftFrame->addWidget(databaseView);
 
-    cardInfo = new CardFrame(250, 356);
-    aCardTextOnly = new QAction(QString(), this);
-    aCardTextOnly->setCheckable(true);
-    connect(aCardTextOnly, SIGNAL(triggered()), cardInfo, SLOT(toggleCardTextOnly()));
+    cardInfo = new CardFrame(250, 372);
 
     filterModel = new FilterTreeModel();
     databaseDisplayModel->setFilterTree(filterModel->filterTree());
@@ -119,16 +122,29 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     connect(filterView, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(filterViewCustomContextMenu(const QPoint &)));
     FilterBuilder *filterBuilder = new FilterBuilder;
-    filterBuilder->setMaximumWidth(250);
     connect(filterBuilder, SIGNAL(add(const CardFilter *)), filterModel, SLOT(addFilter(const CardFilter *)));
 
-    QVBoxLayout *filter = new QVBoxLayout;
-    filter->addWidget(filterBuilder, 0, Qt::AlignTop);
-    filter->addWidget(filterView, 10);
+    QToolButton *filterDelOne = new QToolButton();
+    filterDelOne->setDefaultAction(aClearFilterOne);
+    filterDelOne->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QToolButton *filterDelAll = new QToolButton();
+    filterDelAll->setDefaultAction(aClearFilterAll);
+    filterDelAll->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    QGridLayout *filterLayout = new QGridLayout;
+    filterLayout->addWidget(filterBuilder, 0, 0, 1, 2);
+    filterLayout->addWidget(filterView, 1, 0, 1, 2);
+    filterLayout->addWidget(filterDelOne, 2, 0);
+    filterLayout->addWidget(filterDelAll, 2, 1);
+
+    filterBox = new QGroupBox();
+    filterBox->setMaximumWidth(250);
+    filterBox->setLayout(filterLayout);
 
     QVBoxLayout *middleFrame = new QVBoxLayout;
-    middleFrame->addWidget(cardInfo, 0, Qt::AlignTop);
-    middleFrame->addLayout(filter, 10);
+    middleFrame->addWidget(cardInfo, 1, Qt::AlignTop);
+    middleFrame->addWidget(filterBox, 0);
 
     deckModel = new DeckListModel(this);
     connect(deckModel, SIGNAL(deckHashChanged()), this, SLOT(updateHash()));
@@ -258,8 +274,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     dbMenu->addAction(aEditSets);
     dbMenu->addAction(aEditTokens);
     dbMenu->addSeparator();
-    dbMenu->addAction(aClearSearch);
-    dbMenu->addAction(aCardTextOnly);
+    dbMenu->addAction(aClearFilterAll);
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     dbMenu->addSeparator();
     dbMenu->addAction(aOpenCustomFolder);
@@ -303,8 +318,11 @@ TabDeckEditor::~TabDeckEditor()
 
 void TabDeckEditor::retranslateUi()
 {
-    aCardTextOnly->setText(tr("Show card text only"));
-    aClearSearch->setText(tr("&Clear search"));
+    cardInfo->retranslateUi();
+
+    filterBox->setTitle(tr("Filters"));
+    aClearFilterAll->setText(tr("&Clear all filters"));
+    aClearFilterOne->setText(tr("Delete selected"));
     
     nameLabel->setText(tr("Deck &name:"));
     commentsLabel->setText(tr("&Comments:"));
@@ -570,9 +588,16 @@ void TabDeckEditor::actEditTokens()
     db->saveToFile(settingsCache->getTokenDatabasePath(), true);
 }
 
-void TabDeckEditor::actClearSearch()
+void TabDeckEditor::actClearFilterAll()
 {
-    databaseDisplayModel->clearSearch();
+    databaseDisplayModel->clearFilterAll();
+}
+
+void TabDeckEditor::actClearFilterOne()
+{
+    QModelIndexList selIndexes = filterView->selectionModel()->selectedIndexes();
+    foreach(QModelIndex idx, selIndexes)
+        filterModel->removeRow(idx.row(), idx.parent());
 }
 
 void TabDeckEditor::recursiveExpand(const QModelIndex &index)

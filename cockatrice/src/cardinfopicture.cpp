@@ -1,24 +1,21 @@
 #include "cardinfopicture.h"
 
-#include <QLabel>
+#include <QWidget>
+#include <QPainter>
+#include <QStyle>
+
 #include "carditem.h"
 #include "carddatabase.h"
 #include "main.h"
 
-CardInfoPicture::CardInfoPicture(int maximumWidth, QWidget *parent)
-    : QLabel(parent)
-    , info(0)
-    , noPicture(true)
+CardInfoPicture::CardInfoPicture(int width, QWidget *parent)
+    : QWidget(parent),
+    info(0),
+    pixmapDirty(true)
 {
-    setMaximumWidth(maximumWidth);
-}
-
-void CardInfoPicture::setNoPicture(bool status)
-{
-    if (noPicture != status) {
-        noPicture = status;
-        emit hasPictureChanged();
-    }
+    setFixedWidth(width);
+    setMinimumHeight(100);
+    setMaximumHeight(width / (qreal) CARD_WIDTH * (qreal) CARD_HEIGHT);
 }
 
 void CardInfoPicture::setCard(CardInfo *card)
@@ -31,24 +28,37 @@ void CardInfoPicture::setCard(CardInfo *card)
     updatePixmap();
 }
 
+void CardInfoPicture::resizeEvent(QResizeEvent *)
+{
+    updatePixmap();
+}
+
 void CardInfoPicture::updatePixmap()
 {
-    qreal aspectRatio = (qreal) CARD_HEIGHT / (qreal) CARD_WIDTH;
-    qreal pixmapWidth = this->width();
+    pixmapDirty = true;
+    update();
+}
 
-    if (pixmapWidth == 0) {
-        setNoPicture(true);
+void CardInfoPicture::loadPixmap()
+{
+    if(info)
+        info->getPixmap(size(), resizedPixmap);
+    else
+        resizedPixmap = QPixmap();
+
+
+    if (resizedPixmap.isNull())
+        db->getCard()->getPixmap(size(), resizedPixmap);
+}
+
+void CardInfoPicture::paintEvent(QPaintEvent *)
+{
+    if (width() == 0 || height() == 0)
         return;
-    }
 
-    QPixmap resizedPixmap;
-    info->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio), resizedPixmap);
+    if(pixmapDirty)
+        loadPixmap();
 
-    if (resizedPixmap.isNull()) {
-        setNoPicture(true);
-        db->getCard()->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio), resizedPixmap);
-    } else {
-        setNoPicture(false);
-    }
-    this->setPixmap(resizedPixmap);
+    QPainter painter(this);
+    style()->drawItemPixmap(&painter, rect(), Qt::AlignHCenter, resizedPixmap);
 }

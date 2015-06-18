@@ -1,14 +1,14 @@
 #ifndef FILTERBUILDER_H
 #define FILTERBUILDER_H
 
-#include <QFrame>
+#include <QWidget>
 
 class QCheckBox;
 class QComboBox;
 class QLineEdit;
 class CardFilter;
 
-class FilterBuilder : public QFrame {
+class FilterBuilder : public QWidget {
     Q_OBJECT
 
 private:

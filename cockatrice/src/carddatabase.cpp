@@ -337,16 +337,26 @@ QString PictureLoader::getPicUrl()
         picUrl = picDownloadHq ? settingsCache->getPicUrlHqFallback() : settingsCache->getPicUrlFallback();
 
     picUrl.replace("!name!", QUrl::toPercentEncoding(card->getCorrectedName()));
+    picUrl.replace("!name_lower!", QUrl::toPercentEncoding(card->getCorrectedName().toLower()));
     picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
-    if (set) {
+    if (set)
+    {
         picUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
+        picUrl.replace("!setcode_lower!", QUrl::toPercentEncoding(set->getShortName().toLower()));
         picUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
+        picUrl.replace("!setname_lower!", QUrl::toPercentEncoding(set->getLongName().toLower()));
     }
 
-    if (picUrl.contains("!name!") ||
-            picUrl.contains("!setcode!") ||
-            picUrl.contains("!setname!") ||
-            picUrl.contains("!cardid!")) {
+    if (
+        picUrl.contains("!name!") ||
+        picUrl.contains("!name_lower!") ||
+        picUrl.contains("!setcode!") ||
+        picUrl.contains("!setcode_lower!") ||
+        picUrl.contains("!setname!") ||
+        picUrl.contains("!setname_lower!") ||
+        picUrl.contains("!cardid!")
+        )
+    {
         qDebug() << "Insufficient card data to download" << card->getName() << "Url:" << picUrl;
         return QString("");
     }
@@ -587,7 +597,7 @@ void CardInfo::imageLoaded(const QImage &image)
 
 void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
 {
-    QString key = QLatin1String("card_") + name + QLatin1Char('_') + QString::number(size.width());
+    QString key = QLatin1String("card_") + name + QLatin1Char('_') + QString::number(size.width()) + QString::number(size.height());
     if(QPixmapCache::find(key, &pixmap))
         return;
 
@@ -598,15 +608,15 @@ void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
             pixmap = QPixmap(); // null
             return;
         } else {
-            pixmap = QPixmap(size);
-            pixmap.fill(Qt::transparent);
             QSvgRenderer svg(QString(":/back.svg"));
-            QPainter painter(&pixmap);
-            svg.render(&painter, QRectF(0, 0, size.width(), size.height()));
+            bigPixmap = QPixmap(svg.defaultSize());
+            bigPixmap.fill(Qt::transparent);
+            QPainter painter(&bigPixmap);
+            svg.render(&painter);
         }
-    } else {
-        pixmap = bigPixmap.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
+
+    pixmap = bigPixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     QPixmapCache::insert(key, pixmap);
 }
 

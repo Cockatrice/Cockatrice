@@ -4,9 +4,9 @@
 #include <QObject>
 
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
-#define PIC_URL_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
-#define PIC_URL_HQ_DEFAULT "http://mtgimage.com/multiverseid/!cardid!.jpg"
-#define PIC_URL_HQ_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
+#define PIC_URL_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
+#define PIC_URL_HQ_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
+#define PIC_URL_HQ_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
 // size should be a multiple of 64
 #define PIXMAPCACHE_SIZE_DEFAULT 2047
 #define PIXMAPCACHE_SIZE_MIN 64
@@ -81,6 +81,7 @@ private:
     bool showMentionPopups;
     bool leftJustified;
     int masterVolume;
+    int cardInfoViewMode;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -136,6 +137,7 @@ public:
     bool getShowMentionPopup() const { return showMentionPopups; }
     bool getLeftJustified() const { return leftJustified; }
     int getMasterVolume() const { return masterVolume; }
+    int getCardInfoViewMode() const { return cardInfoViewMode; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -184,7 +186,8 @@ public slots:
     void setShowMessagePopups(const int _showMessagePopups);
     void setShowMentionPopups(const int _showMentionPopups);
     void setLeftJustified( const int _leftJustified);
-    void setMasterVolume(const int _masterVolume); 
+    void setMasterVolume(const int _masterVolume);
+    void setCardInfoViewMode(const int _viewMode);
 };
 
 extern SettingsCache *settingsCache;

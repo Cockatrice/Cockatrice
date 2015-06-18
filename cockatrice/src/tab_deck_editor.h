@@ -17,7 +17,9 @@ class QLabel;
 class DeckLoader;
 class Response;
 class FilterTreeModel;
+class FilterBuilder;
 class CardInfo;
+class QGroupBox;
 
 class SearchLineEdit : public QLineEdit {
 private:
@@ -52,7 +54,8 @@ class TabDeckEditor : public Tab {
             void actEditSets();
             void actEditTokens();
 
-            void actClearSearch();
+            void actClearFilterAll();
+            void actClearFilterOne();
 
             void actSwapCard();
             void actAddCard();
@@ -96,10 +99,11 @@ private:
     QLabel *hashLabel;
     FilterTreeModel *filterModel;
     QTreeView *filterView;
+    QGroupBox *filterBox;
 
     QMenu *deckMenu, *dbMenu;
     QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose, *aOpenCustomFolder;
-    QAction *aEditSets, *aEditTokens, *aClearSearch, *aCardTextOnly;
+    QAction *aEditSets, *aEditTokens, *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;// *aUpdatePrices;
 
     bool modified;

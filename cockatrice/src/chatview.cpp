@@ -163,12 +163,15 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     
     int index = -1, bracketFirstIndex = -1, mentionFirstIndex = -1, urlFirstIndex = -1;
     bool mentionEnabled = settingsCache->getChatMention();
+    const QRegExp urlStarter = QRegExp("https?://|\\bwww\\.");
+    const QRegExp phraseEnder = QRegExp("\\s");
+    
     while (message.size())
     {
         // search for the first [ or @
         bracketFirstIndex = message.indexOf('[');
         mentionFirstIndex = mentionEnabled ? message.indexOf('@') : -1;
-        urlFirstIndex = message.indexOf(QRegExp("https?://|www."));
+        urlFirstIndex = message.indexOf(urlStarter);
         if(bracketFirstIndex == -1) {
             if(mentionFirstIndex == -1) {
                 if (urlFirstIndex == -1) {
@@ -245,7 +248,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 message = message.mid(1);
             }
         } else if (index == urlFirstIndex) {
-            int urlEndIndex = message.indexOf(QRegExp("\\s"), 0);
+            int urlEndIndex = message.indexOf(phraseEnder, 0);
             if (urlEndIndex == -1)
                 urlEndIndex = message.size();
             QString urlText = message.left(urlEndIndex);
@@ -271,7 +274,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                     showSystemPopup(ref);
                 }
             } else {
-                int mentionEndIndex = message.indexOf(QRegExp("\\s"), 1);// from 1 as @ is non-char
+                int mentionEndIndex = message.indexOf(phraseEnder, 1);// from 1 as @ is non-char
                 if (mentionEndIndex == -1)
                     mentionEndIndex = message.size(); // there is no text after the mention
                 QString userMention = message.left(mentionEndIndex);
