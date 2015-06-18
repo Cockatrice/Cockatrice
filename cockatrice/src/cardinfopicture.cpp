@@ -1,16 +1,21 @@
 #include "cardinfopicture.h"
 
-#include <QLabel>
+#include <QWidget>
+#include <QPainter>
+#include <QStyle>
+
 #include "carditem.h"
 #include "carddatabase.h"
 #include "main.h"
 
 CardInfoPicture::CardInfoPicture(int width, QWidget *parent)
-    : QLabel(parent)
-    , info(0)
+    : QWidget(parent),
+    info(0),
+    pixmapDirty(true)
 {
     setFixedWidth(width);
-    setAlignment(Qt::AlignCenter);
+    setMinimumHeight(100);
+    setMaximumHeight(width / (qreal) CARD_WIDTH * (qreal) CARD_HEIGHT);
 }
 
 void CardInfoPicture::setCard(CardInfo *card)
@@ -23,23 +28,37 @@ void CardInfoPicture::setCard(CardInfo *card)
     updatePixmap();
 }
 
-void CardInfoPicture::resizeEvent(QResizeEvent * /* e */)
+void CardInfoPicture::resizeEvent(QResizeEvent *)
 {
     updatePixmap();
 }
 
 void CardInfoPicture::updatePixmap()
 {
-    if (info == 0 || width() == 0 || height() == 0) {
-        return;
-    }
+    pixmapDirty = true;
+    update();
+}
 
-    QPixmap resizedPixmap;
-    info->getPixmap(size(), resizedPixmap);
+void CardInfoPicture::loadPixmap()
+{
+    if(info)
+        info->getPixmap(size(), resizedPixmap);
+    else
+        resizedPixmap = QPixmap();
 
-    if (resizedPixmap.isNull()) {
+
+    if (resizedPixmap.isNull())
         db->getCard()->getPixmap(size(), resizedPixmap);
-    }
+}
 
-    setPixmap(resizedPixmap);
+void CardInfoPicture::paintEvent(QPaintEvent *)
+{
+    if (width() == 0 || height() == 0)
+        return;
+
+    if(pixmapDirty)
+        loadPixmap();
+
+    QPainter painter(this);
+    style()->drawItemPixmap(&painter, rect(), Qt::AlignHCenter, resizedPixmap);
 }
