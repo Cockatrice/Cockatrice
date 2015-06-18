@@ -108,7 +108,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     leftFrame->addLayout(searchLayout);
     leftFrame->addWidget(databaseView);
 
-    cardInfo = new CardFrame(250, 356);
+    cardInfo = new CardFrame(250, 372);
 
     filterModel = new FilterTreeModel();
     databaseDisplayModel->setFilterTree(filterModel->filterTree());
@@ -143,7 +143,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     filterBox->setLayout(filterLayout);
 
     QVBoxLayout *middleFrame = new QVBoxLayout;
-    middleFrame->addWidget(cardInfo, 0, Qt::AlignTop);
+    middleFrame->addWidget(cardInfo, 1, Qt::AlignTop);
     middleFrame->addWidget(filterBox, 0);
 
     deckModel = new DeckListModel(this);

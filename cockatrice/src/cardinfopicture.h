@@ -1,29 +1,25 @@
 #ifndef CARDINFOPICTURE_H
 #define CARDINFOPICTURE_H
 
-#include <QLabel>
+#include <QWidget>
 
 class AbstractCardItem;
 class CardInfo;
 
-class CardInfoPicture : public QLabel {
+class CardInfoPicture : public QWidget {
     Q_OBJECT
-
-signals:
-    void hasPictureChanged();
 
 private:
     CardInfo *info;
-    bool noPicture;
+    QPixmap resizedPixmap;
+    bool pixmapDirty;
 
 public:
-    CardInfoPicture(int maximumWidth, QWidget *parent = 0);
-    bool hasPicture() const { return !noPicture; }
-private:
-    void setNoPicture(bool status);
+    CardInfoPicture(int width, QWidget *parent = 0);
 protected:
     void resizeEvent(QResizeEvent *event);
-
+	void paintEvent(QPaintEvent *);
+	void loadPixmap();
 public slots:
     void setCard(CardInfo *card);
     void updatePixmap();
