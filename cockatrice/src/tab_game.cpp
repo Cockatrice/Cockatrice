@@ -293,6 +293,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     deckViewContainerLayout = new QVBoxLayout;
 
     QVBoxLayout *messageLogLayout = new QVBoxLayout;
+    messageLogLayout->setContentsMargins(0, 0, 0, 0);
     messageLogLayout->addWidget(messageLog);
     
     QWidget *messageLogLayoutWidget = new QWidget;
@@ -414,6 +415,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     deckViewContainerLayout = new QVBoxLayout;
 
     QVBoxLayout *messageLogLayout = new QVBoxLayout;
+    messageLogLayout->setContentsMargins(0, 0, 0, 0);
     messageLogLayout->addWidget(timeElapsedLabel);
     messageLogLayout->addWidget(messageLog);
     messageLogLayout->addLayout(hLayout);
