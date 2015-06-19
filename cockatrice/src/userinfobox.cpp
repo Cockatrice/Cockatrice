@@ -21,6 +21,9 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _fullInfo, QWidget *paren
     nameFont.setBold(true);
     nameFont.setPointSize(nameFont.pointSize() * 1.5);
     nameLabel.setFont(nameFont);
+
+    avatarLabel.setMaximumWidth(400);
+    avatarLabel.setMaximumHeight(200);
     
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(&avatarLabel, 0, 0, 1, 3, Qt::AlignCenter);
@@ -61,7 +64,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     const std::string bmp = user.avatar_bmp();
     if (!avatarPixmap.loadFromData((const uchar *) bmp.data(), bmp.size()))
         avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel, false);
-    avatarLabel.setPixmap(avatarPixmap);
+    avatarLabel.setPixmap(avatarPixmap.scaled(avatarLabel.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     
     nameLabel.setText(QString::fromStdString(user.name()));
     realNameLabel2.setText(QString::fromStdString(user.real_name()));
