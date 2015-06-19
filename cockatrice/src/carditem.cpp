@@ -110,7 +110,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         QStringList ptDbSplit = db->getCard(name)->getPowTough().split("/");
         QStringList ptSplit = pt.split("/");
         
-        if (ptDbSplit.at(0) != ptSplit.at(0) || ptDbSplit.at(1) != ptSplit.at(1))
+        if ((ptDbSplit.at(0) != ptSplit.at(0) || ptDbSplit.at(1) != ptSplit.at(1)) && !getFaceDown())
             painter->setPen(QColor(255, 150, 0));
         else
             painter->setPen(Qt::white);
