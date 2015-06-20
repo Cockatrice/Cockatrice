@@ -54,6 +54,29 @@ password=123456
 ; Accept only registered users? default is 0 (accept unregistered users)
 regonly=0
 
+[users]
+
+; The minimum length a username can be
+minnamelength=6
+
+; The maximum length a username can be
+maxnamelength=12
+
+; If a username should be allowed to contain lowercase chars [a-z]
+allowlowercase=true
+
+; If a username should be allowed to conatain uppercase chars [A-Z]
+allowuppercase=true
+
+; If a username should be allowed to contain numbers [0-9]
+allownumerics=true
+
+; Define punctuation allowed in usernames
+allowedpunctuation=_.-
+
+; If a username can begin with punctuation defined in allowedpunctuation
+allowpunctuationprefix=false
+
 [registration]
 
 ; Servatrice can process registration requests to add new users on the fly.

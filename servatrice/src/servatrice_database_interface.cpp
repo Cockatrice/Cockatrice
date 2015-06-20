@@ -120,7 +120,27 @@ bool Servatrice_DatabaseInterface::execSqlQuery(QSqlQuery *query)
 
 bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
 {
-    static QRegExp re = QRegExp("[a-zA-Z0-9_\\.-]+");
+    int maxNameLength = settingsCache->value("users/maxnamelength").toInt();
+    int minNameLength = settingsCache->value("users/minnamelength").toInt();
+    if (user.length() < minNameLength || user.length() > maxNameLength)
+        return false;
+
+    bool allowPunctuationPrefix = settingsCache->value("users/allowpunctuationprefix").toBool();
+    QString allowedPunctuation = settingsCache->value("users/allowedpunctuation").toString();
+    if (!allowPunctuationPrefix && allowedPunctuation.contains(user.at(0)))
+        return false;
+
+    QString regEx("[");
+    if (settingsCache->value("users/allowlowercase").toBool())
+        regEx.append("a-z");
+    if (settingsCache->value("users/allowuppercase").toBool())
+        regEx.append("A-Z");
+    if(settingsCache->value("users/allownumerics").toBool())
+        regEx.append("0-9");
+    regEx.append(allowedPunctuation);
+    regEx.append("]+");
+
+    static QRegExp re = QRegExp(regEx);
     return re.exactMatch(user);
 }
 
