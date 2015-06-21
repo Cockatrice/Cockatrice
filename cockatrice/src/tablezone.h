@@ -24,7 +24,7 @@ private:
     static const int PADDING_X  = 35;
     static const int PADDING_Y = 10;
     static const int MARGIN_X = 20;
-    static const int MIN_WIDTH = 15 * CARD_WIDTH / 2;
+    static const int MIN_WIDTH = 10 * CARD_WIDTH / 2;
     
     /*
     Default background color, inactive mask and boarder gradient 
