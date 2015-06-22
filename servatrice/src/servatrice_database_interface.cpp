@@ -120,22 +120,22 @@ bool Servatrice_DatabaseInterface::execSqlQuery(QSqlQuery *query)
 
 bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
 {
-    int maxNameLength = settingsCache->value("users/maxnamelength").toInt();
-    int minNameLength = settingsCache->value("users/minnamelength").toInt();
+    int maxNameLength = settingsCache->value("users/maxnamelength", 12).toInt();
+    int minNameLength = settingsCache->value("users/minnamelength", 6).toInt();
     if (user.length() < minNameLength || user.length() > maxNameLength)
         return false;
 
-    bool allowPunctuationPrefix = settingsCache->value("users/allowpunctuationprefix").toBool();
-    QString allowedPunctuation = settingsCache->value("users/allowedpunctuation").toString();
+    bool allowPunctuationPrefix = settingsCache->value("users/allowpunctuationprefix", false).toBool();
+    QString allowedPunctuation = settingsCache->value("users/allowedpunctuation", "_").toString();
     if (!allowPunctuationPrefix && allowedPunctuation.contains(user.at(0)))
         return false;
 
     QString regEx("[");
-    if (settingsCache->value("users/allowlowercase").toBool())
+    if (settingsCache->value("users/allowlowercase", true).toBool())
         regEx.append("a-z");
-    if (settingsCache->value("users/allowuppercase").toBool())
+    if (settingsCache->value("users/allowuppercase", true).toBool())
         regEx.append("A-Z");
-    if(settingsCache->value("users/allownumerics").toBool())
+    if(settingsCache->value("users/allownumerics", true).toBool())
         regEx.append("0-9");
     regEx.append(allowedPunctuation);
     regEx.append("]+");
