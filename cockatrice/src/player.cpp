@@ -676,7 +676,7 @@ void Player::retranslateUi()
         for (int i = 0; i < allPlayersActions.size(); ++i)
             allPlayersActions[i]->setText(tr("&All players"));
     }
-    
+
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
@@ -1074,6 +1074,30 @@ void Player::actCreatePredefinedToken()
     aCreateAnotherToken->setEnabled(true);
     
     actCreateAnotherToken();
+}
+
+void Player::actCreateRelatedCard()
+{
+    // get the clicked card
+    CardItem * sourceCard = game->getActiveCard();
+    if(!sourceCard)
+        return;
+
+    // get the target card name
+    QAction *action = static_cast<QAction *>(sender());
+    CardInfo *cardInfo = db->getCard(action->text());
+
+    // create the token for the related card
+    Command_CreateToken cmd;
+    cmd.set_zone("table");
+    cmd.set_card_name(cardInfo->getName().toStdString());
+    cmd.set_color(cardInfo->getColors().isEmpty() ? QString().toStdString() : cardInfo->getColors().first().toLower().toStdString());
+    cmd.set_pt(cardInfo->getPowTough().toStdString());
+    cmd.set_destroy_on_zone_change(true);
+    cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
+    cmd.set_target_card_id(sourceCard->getId());
+
+    sendGameCommand(cmd);
 }
 
 void Player::actSayMessage()
@@ -2247,6 +2271,17 @@ void Player::updateCardMenu(CardItem *card)
                 cardMenu->addAction(aFlip);
                 if (card->getFaceDown())
                     cardMenu->addAction(aPeek);
+
+                QStringList relatedCards = card->getInfo()->getRelatedCards();
+                if(relatedCards.size())
+                {
+                    QMenu * createRelatedCardMenu = cardMenu->addMenu(tr("Cr&eate related card"));
+
+                    for (int i = 0; i < relatedCards.size(); ++i) {
+                        QAction *a = createRelatedCardMenu->addAction(relatedCards.at(i));
+                        connect(a, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
+                    }
+                }
                 cardMenu->addSeparator();
                 cardMenu->addAction(aAttach);
                 if (card->getAttachedTo())
