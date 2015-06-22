@@ -182,6 +182,7 @@ private:
         *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
 
     bool shortcutsActive;
+    bool isTopCardRevealed;
     int defaultNumberTopCards;
     QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
     bool lastTokenDestroy;
@@ -305,6 +306,8 @@ public:
     PendingCommand *prepareGameCommand(const QList< const ::google::protobuf::Message * > &cmdList);
     void sendGameCommand(PendingCommand *pend);
     void sendGameCommand(const google::protobuf::Message &command);
+    
+    bool topCardRevealed() const { return isTopCardRevealed; }
 };
 
 #endif

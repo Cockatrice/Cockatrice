@@ -837,7 +837,8 @@ void Player::actAlwaysRevealTopCard()
     Command_ChangeZoneProperties cmd;
     cmd.set_zone_name("deck");
     cmd.set_always_reveal_top_card(aAlwaysRevealTopCard->isChecked());
-    
+    isTopCardRevealed = aAlwaysRevealTopCard->isChecked();
+
     sendGameCommand(cmd);
 }
 
