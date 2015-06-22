@@ -358,7 +358,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     setLayout(superMainLayout);
 
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
-    
+    splitter->setChildrenCollapsible(false);
+
     messageLog->logReplayStarted(gameInfo.game_id());
 }
 
@@ -490,6 +491,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     setLayout(mainLayout);
 
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
+    splitter->setChildrenCollapsible(false);
     
     messageLog->logGameJoined(gameInfo.game_id());
 
