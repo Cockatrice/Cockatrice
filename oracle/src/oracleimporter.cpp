@@ -71,11 +71,7 @@ CardInfo *OracleImporter::addCard(const QString &setName,
                                   )
 {
     QStringList cardTextRows = cardText.split("\n");
-    bool splitCard = false;
-    if (cardName.contains('(')) {
-        cardName.remove(QRegExp(" \\(.*\\)"));
-        splitCard = true;
-    }
+
     // Workaround for card name weirdness
     if (cardName.contains("XX"))
         cardName.remove("XX");
@@ -87,32 +83,26 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     cardCost.remove(QChar('}'));
 
     CardInfo *card;
-    if (cards.contains(cardName)) {
-        card = cards.value(cardName);
-        if (splitCard && !card->getText().contains(cardText))
-            card->setText(card->getText() + "\n---\n" + cardText);
-    } else {
-        bool mArtifact = false;
-        if (cardType.endsWith("Artifact"))
-            for (int i = 0; i < cardTextRows.size(); ++i)
-                if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
-                    mArtifact = true;
-                    
-        bool cipt = cardText.contains("Hideaway") || (cardText.contains(cardName + " enters the battlefield tapped") && !cardText.contains(cardName + " enters the battlefield tapped unless"));
-        
-        card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards, upsideDown, cardLoyalty, cipt);
-        int tableRow = 1;
-        QString mainCardType = card->getMainCardType();
-        if ((mainCardType == "Land") || mArtifact)
-            tableRow = 0;
-        else if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
-            tableRow = 3;
-        else if (mainCardType == "Creature")
-            tableRow = 2;
-        card->setTableRow(tableRow);
-        
-        cards.insert(cardName, card);
-    }
+    bool mArtifact = false;
+    if (cardType.endsWith("Artifact"))
+        for (int i = 0; i < cardTextRows.size(); ++i)
+            if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
+                mArtifact = true;
+                
+    bool cipt = cardText.contains("Hideaway") || (cardText.contains(cardName + " enters the battlefield tapped") && !cardText.contains(cardName + " enters the battlefield tapped unless"));
+    
+    card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards, upsideDown, cardLoyalty, cipt);
+    int tableRow = 1;
+    QString mainCardType = card->getMainCardType();
+    if ((mainCardType == "Land") || mArtifact)
+        tableRow = 0;
+    else if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
+        tableRow = 3;
+    else if (mainCardType == "Creature")
+        tableRow = 2;
+    card->setTableRow(tableRow);
+    
+    cards.insert(cardName, card);
     card->setMuId(setName, cardId);
 
     return card;
