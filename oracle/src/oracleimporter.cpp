@@ -73,8 +73,6 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     QStringList cardTextRows = cardText.split("\n");
 
     // Workaround for card name weirdness
-    if (cardName.contains("XX"))
-        cardName.remove("XX");
     cardName = cardName.replace("Æ", "AE");
     cardName = cardName.replace("’", "'");
 
@@ -82,16 +80,18 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     cardCost.remove(QChar('{'));
     cardCost.remove(QChar('}'));
 
-    CardInfo *card;
+    // detect mana generator artifacts
     bool mArtifact = false;
     if (cardType.endsWith("Artifact"))
         for (int i = 0; i < cardTextRows.size(); ++i)
             if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
                 mArtifact = true;
-                
+
+    // detect cards that enter the field tapped
     bool cipt = cardText.contains("Hideaway") || (cardText.contains(cardName + " enters the battlefield tapped") && !cardText.contains(cardName + " enters the battlefield tapped unless"));
     
-    card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards, upsideDown, cardLoyalty, cipt);
+    // insert the card and its properties
+    CardInfo *card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards, upsideDown, cardLoyalty, cipt);
     int tableRow = 1;
     QString mainCardType = card->getMainCardType();
     if ((mainCardType == "Land") || mArtifact)
