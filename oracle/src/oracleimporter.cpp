@@ -187,11 +187,6 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
         colors.clear();
         extractColors(map.value("colors").toStringList(), colors);
 
-        // Distinguish Vanguard cards from regular cards of the same name.
-        if (map.value("layout") == "vanguard") {
-            cardName += " Avatar";
-        }
-
         CardInfo *card = addCard(set->getShortName(), cardName, false, cardId, cardCost, cmc, cardType, cardPT, cardLoyalty, cardText, colors, relatedCards, upsideDown);
 
         if (!set->contains(card)) {
@@ -206,7 +201,6 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
     {
         // get all cards for this specific muid
         QList<QVariantMap> maps = splitCards.values(muid);
-        // get all the card names in the correct order
         QStringList names;
         // now, reorder the cards using the ordered list of names
         QMap<int, QVariantMap> orderedMaps;
