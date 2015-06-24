@@ -1,5 +1,6 @@
 #include "carddatabase.h"
 #include "settingscache.h"
+#include <QCryptographicHash>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
@@ -212,6 +213,9 @@ CardSet *PictureToLoad::getCurrentSet() const
         return 0;
 }
 
+QStringList PictureLoader::md5Blacklist = QStringList()
+    << "db0c48db407a907c16ade38de048a441"; // card back returned by gatherer when card is not found
+
 PictureLoader::PictureLoader(const QString &__picsPath, bool _picDownload, bool _picDownloadHq, QObject *parent)
     : QObject(parent),
       _picsPath(__picsPath), picDownload(_picDownload), picDownloadHq(_picDownloadHq),
@@ -413,6 +417,18 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
     }
 
     const QByteArray &picData = reply->peek(reply->size()); //peek is used to keep the data in the buffer for use by QImageReader
+
+    // check if the image is blacklisted
+    QString md5sum = QCryptographicHash::hash(picData, QCryptographicHash::Md5).toHex();
+    if(md5Blacklist.contains(md5sum))
+    {
+        qDebug() << "Picture downloaded, but blacklisted (" << md5sum << "), will consider it as not found";
+        picDownloadFailed();
+        reply->deleteLater();
+        startNextPicDownload();
+        return;
+    }
+
     QImage testImage;
     
     QImageReader imgReader;
