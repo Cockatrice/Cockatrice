@@ -165,6 +165,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     bool mentionEnabled = settingsCache->getChatMention();
     const QRegExp urlStarter = QRegExp("https?://|\\bwww\\.");
     const QRegExp phraseEnder = QRegExp("\\s");
+    const QRegExp notALetterOrNumber = QRegExp("[^a-zA-Z0-9]");
     
     while (message.size())
     {
@@ -172,47 +173,72 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         bracketFirstIndex = message.indexOf('[');
         mentionFirstIndex = mentionEnabled ? message.indexOf('@') : -1;
         urlFirstIndex = message.indexOf(urlStarter);
-        if(bracketFirstIndex == -1) {
-            if(mentionFirstIndex == -1) {
-                if (urlFirstIndex == -1) {
-                    // quick way out
+
+        bool startsWithBracket = (bracketFirstIndex != -1);
+        bool startsWithAtSymbol = (mentionFirstIndex != -1);
+        bool startsWithUrl = (urlFirstIndex != -1);     
+        
+        if (!startsWithBracket)
+        {
+            if (!startsWithAtSymbol)
+            {
+                if (!startsWithUrl)
+                {
+                    // No brackets, mentions, or urls. Send message as normal
                     cursor.insertText(message);
                     break;
-                } else {
-                    // url
+                }
+                else
+                {
+                    // There's a URL, lets begin!
                     index = urlFirstIndex;
                 }
-            } else {
-                if (urlFirstIndex == -1) {
-                    // mention
+            }
+            else
+            {
+                if (!startsWithUrl)
+                {
+                    // There's an @ symbol, lets begin!
                     index = mentionFirstIndex;
-                } else {
+                }
+                else
+                {
+                    // There's both an @ symbol and URL, pick the first one... lets begin!
                     index = std::min(urlFirstIndex, mentionFirstIndex);
                 }
             }
-        } else {
-            if(mentionFirstIndex == -1) {
-                // bracket
+        }
+        else
+        {
+            if (!startsWithAtSymbol) 
+            {
+                // There's a [, look down!
                 index = bracketFirstIndex;
-            } else {
-                // both, pick up the first one
+            }
+            else
+            {
+                // There's both a [ and @, pick the first one... look down!
                 index = std::min(bracketFirstIndex, mentionFirstIndex);
             }
-            if(urlFirstIndex != -1) {
+            
+            if (startsWithUrl)
+            {
+                // If there's a URL, pick the first one... then lets begin!
+                // Otherwise, just "lets begin!"
                 index = std::min(index, urlFirstIndex);
             }
         }
 
-        // insert the message text up to the [ / @ / https://
-        if(index > 0)
+        if (index > 0)
         {
             cursor.insertText(message.left(index), defaultFormat);
-            message = message.mid(index);            
+            message = message.mid(index);
         }
 
-        if(index == bracketFirstIndex)
+        if (index == bracketFirstIndex) // The message now starts with a bracket ->>  [  <<- that symbol
         {
-            if (message.startsWith("[card]")) {
+            if (message.startsWith("[card]"))
+            {
                 message = message.mid(6);
                 int closeTagIndex = message.indexOf("[/card]");
                 QString cardName = message.left(closeTagIndex);
@@ -222,7 +248,9 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                     message = message.mid(closeTagIndex + 7);
                 
                 appendCardTag(cursor, cardName);
-            } else if (message.startsWith("[[")) {
+            }
+            else if (message.startsWith("[["))
+            {
                 message = message.mid(2);
                 int closeTagIndex = message.indexOf("]]");
                 QString cardName = message.left(closeTagIndex);
@@ -232,7 +260,9 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                     message = message.mid(closeTagIndex + 2);
                 
                 appendCardTag(cursor, cardName);
-            } else if (message.startsWith("[url]")) {
+            }
+            else if (message.startsWith("[url]"))
+            {
                 message = message.mid(5);
                 int closeTagIndex = message.indexOf("[/url]");
                 QString url = message.left(closeTagIndex);
@@ -242,12 +272,16 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                     message = message.mid(closeTagIndex + 6);
                 
                 appendUrlTag(cursor, url);
-            } else {
-                // not a recognized [tag]
+            }
+            else
+            {
+                // Not a valid tag
                 cursor.insertText("[", defaultFormat);
                 message = message.mid(1);
             }
-        } else if (index == urlFirstIndex) {
+        }
+        else if (index == urlFirstIndex) // The message now starts with either: www. , http:// , or https://
+        {
             int urlEndIndex = message.indexOf(phraseEnder, 0);
             if (urlEndIndex == -1)
                 urlEndIndex = message.size();
@@ -261,35 +295,62 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 message.clear();
             else
                 message = message.mid(urlEndIndex);
-        } else {
-            if (message.startsWith(mention, Qt::CaseInsensitive)) {
-                // you have been mentioned
-                mentionFormat.setBackground(QBrush(getCustomMentionColor()));
-                mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white):QBrush(Qt::black));
-                cursor.insertText(mention, mentionFormat);
-                message = message.mid(mention.size());
-                QApplication::alert(this);
-                if (settingsCache->getShowMentionPopup() && shouldShowSystemPopup()) {
-                    QString ref = sender.left(sender.length() - 2);
-                    showSystemPopup(ref);
+        }
+        else if (index == mentionFirstIndex)
+        {
+            QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
+
+            int firstSpace = message.indexOf(" ");
+            QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
+            QString mentionIntact = fullMentionUpToSpaceOrEnd;
+
+            while (fullMentionUpToSpaceOrEnd.size())
+            {
+                if (isFullMentionAValidUser(userList, fullMentionUpToSpaceOrEnd)) // Is there a user online named this?
+                {
+                    if (userName.toLower() == fullMentionUpToSpaceOrEnd.toLower()) // Is this user you?
+                    {
+                        // You have received a valid mention!!
+                        mentionFormat.setBackground(QBrush(getCustomMentionColor()));
+                        mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
+                        cursor.insertText(mention, mentionFormat);
+                        message = message.mid(mention.size());
+                        QApplication::alert(this);
+                        if (settingsCache->getShowMentionPopup() && shouldShowSystemPopup())
+                        {
+                            QString ref = sender.left(sender.length() - 2);
+                            showSystemPopup(ref);
+                        }
+                    }
+                    else
+                    {
+                        QString correctUserName = getNameFromUserList(userList, fullMentionUpToSpaceOrEnd);
+                        UserListTWI *vlu = userList.value(correctUserName);
+                        mentionFormatOtherUser.setAnchorHref("user://" + QString::number(vlu->getUserInfo().user_level()) + "_" + correctUserName);
+                        cursor.insertText("@" + correctUserName, mentionFormatOtherUser);
+
+                        message = message.mid(correctUserName.size() + 1);
+                    }
+
+                    cursor.setCharFormat(defaultFormat);
+                    break;
                 }
-            } else {
-                int mentionEndIndex = message.indexOf(phraseEnder, 1);// from 1 as @ is non-char
-                if (mentionEndIndex == -1)
-                    mentionEndIndex = message.size(); // there is no text after the mention
-                QString userMention = message.left(mentionEndIndex);
-                QString userName = userMention.right(userMention.size()-1).normalized(QString::NormalizationForm_D);
-                QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
-                QString correctUserName = getNameFromUserList(userList, userName);
-                if (!correctUserName.isEmpty()) {
-                    UserListTWI *vlu = userList.value(correctUserName);
-                    mentionFormatOtherUser.setAnchorHref("user://" + QString::number(vlu->getUserInfo().user_level()) + "_" + correctUserName);
-                    cursor.insertText("@" + correctUserName, mentionFormatOtherUser);
-                } else
-                    cursor.insertText("@" + userName, defaultFormat);
-                message = message.mid(userName.size() + 1);
+                else if (fullMentionUpToSpaceOrEnd.right(1).indexOf(notALetterOrNumber) == -1)
+                {               
+                    cursor.insertText("@" + mentionIntact, defaultFormat);
+                    message = message.mid(mentionIntact.size() + 1);
+                    cursor.setCharFormat(defaultFormat);
+                    break;
+                }
+                else
+                {
+                    fullMentionUpToSpaceOrEnd = fullMentionUpToSpaceOrEnd.left(fullMentionUpToSpaceOrEnd.size() - 1);
+                }
             }
-            cursor.setCharFormat(defaultFormat); // reset format after each iteration
+        }
+        else
+        {
+            message = message.mid(1); // Not certain when this would ever be reached, but just incase
         }
     }
 
@@ -328,6 +389,18 @@ QString ChatView::getNameFromUserList(QMap<QString, UserListTWI *> &userList, QS
             return i.key();
     }
     return QString();
+}
+
+bool ChatView::isFullMentionAValidUser(QMap<QString, UserListTWI *> &userList, QString userNameToMatch)
+{
+    QString userNameToMatchLower = userNameToMatch.toLower();
+    QMap<QString, UserListTWI *>::iterator i;
+    
+    for (i = userList.begin(); i != userList.end(); ++i)
+        if (i.key().toLower() == userNameToMatchLower)
+            return true;
+
+    return false;
 }
 
 void ChatView::clearChat() {
