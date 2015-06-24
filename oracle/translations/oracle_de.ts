@@ -16,7 +16,7 @@
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
         <translation>Dieser Assistent wird eine Liste aller Editionen und Karten, die von Cockatrice genutzt werden, importieren.
-Sie müssen dazu eine URL oder einen Dateinamen die/der als Quelle genutzt werden soll angeben, dann können aus einer Liste aller verfügbaren Editionen die Gewünschten ausgwählt werden.</translation>
+Sie müssen dazu eine URL oder einen Dateinamen als Quelle angeben. Danach können Sie aus einer Liste aller verfügbaren Editionen die Gewünschten ausgewählen.</translation>
     </message>
 </context>
 <context>
@@ -39,7 +39,7 @@ Sie müssen dazu eine URL oder einen Dateinamen die/der als Quelle genutzt werde
     </message>
     <message>
         <source>Restore default url</source>
-        <translation>URL wiederherstellen</translation>
+        <translation>Standard-URL wiederherstellen</translation>
     </message>
     <message>
         <source>Choose file...</source>
