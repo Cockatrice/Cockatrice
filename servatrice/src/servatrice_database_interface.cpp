@@ -137,7 +137,7 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
         regEx.append("A-Z");
     if(settingsCache->value("users/allownumerics", true).toBool())
         regEx.append("0-9");
-    regEx.append(allowedPunctuation);
+    regEx.append(QRegExp::escape(allowedPunctuation));
     regEx.append("]+");
 
     static QRegExp re = QRegExp(regEx);
