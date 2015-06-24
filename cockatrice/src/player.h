@@ -185,6 +185,7 @@ private:
     int defaultNumberTopCards;
     QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
     bool lastTokenDestroy;
+    int lastTokenTableRow;
     ServerInfo_User *userInfo;
     int id;
     bool active;
