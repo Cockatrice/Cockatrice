@@ -1036,7 +1036,7 @@ void Player::actCreateToken()
     lastTokenPT = dlg.getPT();
     if (CardInfo *correctedCard = db->getCardBySimpleName(lastTokenName, false)) {
         lastTokenName = correctedCard->getName();
-        lastTokenTableRow = 2 - correctedCard->getTableRow();
+        lastTokenTableRow = table->clampValidTableRow(2 - correctedCard->getTableRow());
         if (lastTokenPT.isEmpty())
             lastTokenPT = correctedCard->getPowTough();
     }
@@ -1072,7 +1072,7 @@ void Player::actCreatePredefinedToken()
     lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first().toLower();
     lastTokenPT = cardInfo->getPowTough();
     lastTokenAnnotation = cardInfo->getText();
-    lastTokenTableRow = 2 - cardInfo->getTableRow();
+    lastTokenTableRow = table->clampValidTableRow(2 - cardInfo->getTableRow());
     lastTokenDestroy = true;
     aCreateAnotherToken->setEnabled(true);
     
@@ -1660,7 +1660,7 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
         cmd.set_y(0);
     } else {
         int tableRow = faceDown ? 2 : ci->getTableRow();
-        QPoint gridPoint = QPoint(-1, 2 - tableRow);
+        QPoint gridPoint = QPoint(-1, table->clampValidTableRow(2 - tableRow));
         cardToMove->set_face_down(faceDown);
         cardToMove->set_pt(ci->getPowTough().toStdString());
         cardToMove->set_tapped(faceDown ? false : tapped);
