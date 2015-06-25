@@ -28,6 +28,7 @@ InstallDir "$PROGRAMFILES\Cockatrice"
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_COMPONENTS
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
 
@@ -54,8 +55,10 @@ SectionEnd
 Section "Update configuration" SecUpdateConfig
 	SetShellVarContext current
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "carddatabase" "$LOCALAPPDATA\Cockatrice\cards.xml"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "tokendatabase" "$LOCALAPPDATA\Cockatrice\tokens.xml"
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "decks" "$LOCALAPPDATA\Cockatrice\decks"
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "pics" "$LOCALAPPDATA\Cockatrice\pics"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\replays" "pics" "$LOCALAPPDATA\Cockatrice\replays"
 	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$INSTDIR\sounds"
 SectionEnd
 
@@ -68,7 +71,7 @@ Section "Start menu item" SecStartMenu
 	createShortCut "$SMPROGRAMS\Cockatrice\Usermanual.lnk" "$INSTDIR\Usermanual.pdf"
 SectionEnd
 
-Section Uninstall
+Section "un.Application" UnSecApplication
 	SetShellVarContext all
 	RMDir /r "$INSTDIR\zonebg"
 	RMDir /r "$INSTDIR\plugins"
@@ -94,9 +97,14 @@ Section Uninstall
 	RMDir "$SMPROGRAMS\Cockatrice"
 
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
+SectionEnd
 
+; unselected because it is /o
+Section /o "un.Configurations, decks, cards, pics" UnSecConfiguration
 	SetShellVarContext current
 	DeleteRegKey HKCU "Software\Cockatrice"
+
+	RMDir /r "$LOCALAPPDATA\Cockatrice"
 SectionEnd
 
 LangString DESC_SecApplication ${LANG_ENGLISH} "Cockatrice program files"
@@ -107,6 +115,14 @@ LangString DESC_SecStartMenu ${LANG_ENGLISH} "Create start menu items for Cockat
 	!insertmacro MUI_DESCRIPTION_TEXT ${SecUpdateConfig} $(DESC_SecUpdateConfig)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SecStartMenu} $(DESC_SecStartMenu)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+LangString DESC_UnSecApplication ${LANG_ENGLISH} "Cockatrice program files and start menu items"
+LangString DESC_UnSecConfiguration ${LANG_ENGLISH} "Configurations, decks, card database, pictures"
+!insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
+	!insertmacro MUI_DESCRIPTION_TEXT ${UnSecApplication} $(DESC_UnSecApplication)
+	!insertmacro MUI_DESCRIPTION_TEXT ${UnSecConfiguration} $(DESC_UnSecConfiguration)
+!insertmacro MUI_UNFUNCTION_DESCRIPTION_END
+
 
 Function .onInit
     SetShellVarContext all
