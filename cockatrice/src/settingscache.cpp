@@ -51,6 +51,7 @@ SettingsCache::SettingsCache()
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
+    playerPositionRotation = settings->value("interface/player_position_rotation", 0).toInt();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 5).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
@@ -282,6 +283,13 @@ void SettingsCache::setInvertVerticalCoordinate(int _invertVerticalCoordinate)
     invertVerticalCoordinate = _invertVerticalCoordinate;
     settings->setValue("table/invert_vertical", invertVerticalCoordinate);
     emit invertVerticalCoordinateChanged();
+}
+
+void SettingsCache::setPlayerPositionRotation(int _playerPositionRotation)
+{
+    playerPositionRotation = _playerPositionRotation;
+    settings->setValue("interface/player_position_rotation", playerPositionRotation);
+    emit playerPositionRotationChanged();
 }
 
 void SettingsCache::setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout)

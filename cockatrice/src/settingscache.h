@@ -33,6 +33,7 @@ signals:
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
+    void playerPositionRotationChanged();
     void minPlayersForMultiColumnLayoutChanged();
     void soundEnabledChanged();
     void soundPathChanged();
@@ -59,6 +60,7 @@ private:
     bool displayCardNames;
     bool horizontalHand;
     bool invertVerticalCoordinate;
+    int playerPositionRotation;
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
     bool chatMention;
@@ -110,6 +112,7 @@ public:
     bool getDisplayCardNames() const { return displayCardNames; }
     bool getHorizontalHand() const { return horizontalHand; }
     bool getInvertVerticalCoordinate() const { return invertVerticalCoordinate; }
+    int getPlayerPositionRotation() const { return playerPositionRotation; }
     int getMinPlayersForMultiColumnLayout() const { return minPlayersForMultiColumnLayout; }
     bool getTapAnimation() const { return tapAnimation; }
     bool getChatMention()  const { return chatMention; }
@@ -164,6 +167,7 @@ public slots:
     void setDisplayCardNames(int _displayCardNames);
     void setHorizontalHand(int _horizontalHand);
     void setInvertVerticalCoordinate(int _invertVerticalCoordinate);
+    void setPlayerPositionRotation(int _playerPositionRotation);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setTapAnimation(int _tapAnimation);
     void setChatMention(int _chatMention);
