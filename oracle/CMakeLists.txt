@@ -151,6 +151,7 @@ if(UNIX)
         set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
         set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
         set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+        set_target_properties(oracle PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
         INSTALL(TARGETS oracle BUNDLE DESTINATION ./)
         INSTALL(FILES ${oracle_QM} DESTINATION ./oracle.app/Contents/Resources/translations)

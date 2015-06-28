@@ -25,6 +25,7 @@ private:
     static const int PADDING_Y = 10;
     static const int MARGIN_X = 20;
     static const int MIN_WIDTH = 10 * CARD_WIDTH / 2;
+    static const int TABLEROWS = 3;
     
     /*
     Default background color, inactive mask and boarder gradient 
@@ -116,6 +117,8 @@ public:
     QPointF mapFromGrid(QPoint gridPoint) const;
     QPoint mapToGrid(const QPointF &mapPoint) const;
     QPointF closestGridPoint(const QPointF &point);
+
+    int clampValidTableRow(const int row);
 
     /**
        Removes a card from view.

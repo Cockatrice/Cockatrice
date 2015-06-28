@@ -12,7 +12,7 @@
 #include "dlg_creategame.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
-#include "cardinfowidget.h"
+#include "cardframe.h"
 #include "playerlistwidget.h"
 #include "messagelogwidget.h"
 #include "phasestoolbar.h"
@@ -280,7 +280,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     gameView = new GameView(scene);
     gameView->hide();
     
-    cardInfo = new CardInfoWidget(CardInfoWidget::ModeGameTab);
+    cardInfo = new CardFrame(250, 372);
     playerListWidget = new PlayerListWidget(0, 0, this);
     playerListWidget->setFocusPolicy(Qt::NoFocus);
     
@@ -293,6 +293,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     deckViewContainerLayout = new QVBoxLayout;
 
     QVBoxLayout *messageLogLayout = new QVBoxLayout;
+    messageLogLayout->setContentsMargins(0, 0, 0, 0);
     messageLogLayout->addWidget(messageLog);
     
     QWidget *messageLogLayoutWidget = new QWidget;
@@ -357,7 +358,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     setLayout(superMainLayout);
 
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
-    
+    splitter->setChildrenCollapsible(false);
+
     messageLog->logReplayStarted(gameInfo.game_id());
 }
 
@@ -390,7 +392,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     gameView = new GameView(scene);
     gameView->hide();
     
-    cardInfo = new CardInfoWidget(CardInfoWidget::ModeGameTab);
+    cardInfo = new CardFrame(250, 372);
     playerListWidget = new PlayerListWidget(tabSupervisor, clients.first(), this);
     playerListWidget->setFocusPolicy(Qt::NoFocus);
     connect(playerListWidget, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
@@ -414,6 +416,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     deckViewContainerLayout = new QVBoxLayout;
 
     QVBoxLayout *messageLogLayout = new QVBoxLayout;
+    messageLogLayout->setContentsMargins(0, 0, 0, 0);
     messageLogLayout->addWidget(timeElapsedLabel);
     messageLogLayout->addWidget(messageLog);
     messageLogLayout->addLayout(hLayout);
@@ -488,6 +491,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     setLayout(mainLayout);
 
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
+    splitter->setChildrenCollapsible(false);
     
     messageLog->logGameJoined(gameInfo.game_id());
 

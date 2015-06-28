@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>English</source>
-        <translation type="unfinished"/>
+        <translation>(Norwegian Bokmål)</translation>
     </message>
     <message>
         <source>Language:</source>

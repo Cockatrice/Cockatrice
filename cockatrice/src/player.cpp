@@ -102,6 +102,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
       shortcutsActive(false),
       defaultNumberTopCards(1),
       lastTokenDestroy(true),
+      lastTokenTableRow(0),
       id(_id),
       active(false),
       local(_local),
@@ -1035,6 +1036,7 @@ void Player::actCreateToken()
     lastTokenPT = dlg.getPT();
     if (CardInfo *correctedCard = db->getCardBySimpleName(lastTokenName, false)) {
         lastTokenName = correctedCard->getName();
+        lastTokenTableRow = table->clampValidTableRow(2 - correctedCard->getTableRow());
         if (lastTokenPT.isEmpty())
             lastTokenPT = correctedCard->getPowTough();
     }
@@ -1056,7 +1058,7 @@ void Player::actCreateAnotherToken()
     cmd.set_annotation(lastTokenAnnotation.toStdString());
     cmd.set_destroy_on_zone_change(lastTokenDestroy);
     cmd.set_x(-1);
-    cmd.set_y(0);
+    cmd.set_y(lastTokenTableRow);
     
     sendGameCommand(cmd);
 }
@@ -1070,6 +1072,7 @@ void Player::actCreatePredefinedToken()
     lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first().toLower();
     lastTokenPT = cardInfo->getPowTough();
     lastTokenAnnotation = cardInfo->getText();
+    lastTokenTableRow = table->clampValidTableRow(2 - cardInfo->getTableRow());
     lastTokenDestroy = true;
     aCreateAnotherToken->setEnabled(true);
     
@@ -1657,7 +1660,7 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
         cmd.set_y(0);
     } else {
         int tableRow = faceDown ? 2 : ci->getTableRow();
-        QPoint gridPoint = QPoint(-1, 2 - tableRow);
+        QPoint gridPoint = QPoint(-1, table->clampValidTableRow(2 - tableRow));
         cardToMove->set_face_down(faceDown);
         cardToMove->set_pt(ci->getPowTough().toStdString());
         cardToMove->set_tapped(faceDown ? false : tapped);
