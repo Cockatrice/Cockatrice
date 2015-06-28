@@ -15,7 +15,7 @@
     </message>
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation>Cet assistant va importer la liste des éditions et des cartes qui seront utilisées par Cockatrice.&lt;br/&gt;Vous devrez spécifier une url ou un fichier local avec la liste d&apos;édition comme fichier source, Puis choisir quelles éditions seront importées parmis la liste proposée.</translation>
+        <translation>Cet assistant va importer la liste des éditions et des cartes qui seront utilisées par Cockatrice.&lt;br/&gt;Vous devrez spécifier une url ou un fichier local avec la liste d&apos;édition comme fichier source, puis choisir quelles éditions seront importées parmi la liste proposée.</translation>
     </message>
 </context>
 <context>

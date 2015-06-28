@@ -3396,184 +3396,176 @@ Lokal version är %1, avlägsen version är %2.</translation>
 <context>
     <name>Player</name>
     <message>
-        <location filename="../src/player.cpp" line="638"/>
+        <location filename="../src/player.cpp" line="639"/>
         <source>&amp;View library</source>
         <translation>&amp;Titta på leken</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="651"/>
+        <location filename="../src/player.cpp" line="652"/>
         <source>Move top cards to &amp;graveyard...</source>
         <translation>Flytta översta korten till &amp;kyrkogården...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="639"/>
+        <location filename="../src/player.cpp" line="640"/>
         <source>View &amp;top cards of library...</source>
         <translation>Titta på de &amp;översta korten i leken...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="613"/>
+        <location filename="../src/player.cpp" line="614"/>
         <source>&amp;View graveyard</source>
         <translation>&amp;Titta på kyrkogård</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="644"/>
+        <location filename="../src/player.cpp" line="645"/>
         <source>&amp;View sideboard</source>
         <translation>&amp;Titta på sidbrädan</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="615"/>
+        <location filename="../src/player.cpp" line="616"/>
         <source>Player &quot;%1&quot;</source>
         <translation>Spelare &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="629"/>
-        <location filename="../src/player.cpp" line="635"/>
-        <location filename="../src/player.cpp" line="656"/>
+        <location filename="../src/player.cpp" line="630"/>
+        <location filename="../src/player.cpp" line="636"/>
+        <location filename="../src/player.cpp" line="657"/>
         <source>&amp;Hand</source>
         <translation>&amp;Hand</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="657"/>
+        <location filename="../src/player.cpp" line="658"/>
         <source>&amp;Reveal hand to...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="658"/>
+        <location filename="../src/player.cpp" line="659"/>
         <source>Reveal r&amp;andom card to...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="660"/>
+        <location filename="../src/player.cpp" line="661"/>
         <source>&amp;Library</source>
         <translation>&amp;Lek</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="616"/>
-        <location filename="../src/player.cpp" line="623"/>
-        <location filename="../src/player.cpp" line="636"/>
-        <location filename="../src/player.cpp" line="722"/>
+        <location filename="../src/player.cpp" line="617"/>
+        <location filename="../src/player.cpp" line="624"/>
+        <location filename="../src/player.cpp" line="637"/>
+        <location filename="../src/player.cpp" line="723"/>
         <source>&amp;Graveyard</source>
         <translation>&amp;Kyrkogård</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="659"/>
+        <location filename="../src/player.cpp" line="660"/>
         <source>&amp;Sideboard</source>
         <translation>S&amp;idbräda</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="711"/>
+        <location filename="../src/player.cpp" line="712"/>
         <source>Red</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="712"/>
+        <location filename="../src/player.cpp" line="713"/>
         <source>Yellow</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="713"/>
+        <location filename="../src/player.cpp" line="714"/>
         <source>Green</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="828"/>
+        <location filename="../src/player.cpp" line="829"/>
         <source>View top cards of library</source>
         <translation>Titta på de översta korten i leken</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="828"/>
+        <location filename="../src/player.cpp" line="829"/>
         <source>Number of cards:</source>
         <translation>Antal kort:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="645"/>
+        <location filename="../src/player.cpp" line="646"/>
         <source>&amp;Draw card</source>
         <translation>&amp;Dra kort</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="526"/>
+        <location filename="../src/player.cpp" line="527"/>
         <source>Reveal top cards of library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="526"/>
+        <location filename="../src/player.cpp" line="527"/>
         <source>Number of cards: (max. %1)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="614"/>
+        <location filename="../src/player.cpp" line="615"/>
         <source>&amp;View exile</source>
         <translation>&amp;Titta på exil</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="617"/>
-        <location filename="../src/player.cpp" line="624"/>
-        <location filename="../src/player.cpp" line="630"/>
-        <location filename="../src/player.cpp" line="724"/>
+        <location filename="../src/player.cpp" line="618"/>
+        <location filename="../src/player.cpp" line="625"/>
+        <location filename="../src/player.cpp" line="631"/>
+        <location filename="../src/player.cpp" line="725"/>
         <source>&amp;Exile</source>
         <translation>&amp;Exil</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="641"/>
+        <location filename="../src/player.cpp" line="642"/>
         <source>Reveal t&amp;op cards to...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="646"/>
+        <location filename="../src/player.cpp" line="647"/>
         <source>D&amp;raw cards...</source>
         <translation>D&amp;ra kort...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="648"/>
+        <location filename="../src/player.cpp" line="649"/>
         <source>Take &amp;mulligan</source>
         <translation>&amp;Mulligan</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="649"/>
+        <location filename="../src/player.cpp" line="650"/>
         <source>&amp;Shuffle</source>
         <translation>&amp;Blanda</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="661"/>
+        <location filename="../src/player.cpp" line="662"/>
         <source>&amp;Counters</source>
         <translation>&amp;Poletter</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="663"/>
+        <location filename="../src/player.cpp" line="664"/>
         <source>&amp;Untap all permanents</source>
         <translation>Tappa upp alla perma&amp;nenta kort</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="664"/>
+        <location filename="../src/player.cpp" line="665"/>
         <source>R&amp;oll die...</source>
         <translation>Rulla t&amp;ärning...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="665"/>
+        <location filename="../src/player.cpp" line="666"/>
         <source>&amp;Create token...</source>
         <translation>&amp;Skapa jetong...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="666"/>
+        <location filename="../src/player.cpp" line="667"/>
         <source>C&amp;reate another token</source>
         <translation>S&amp;kapa en till jetong</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="668"/>
+        <location filename="../src/player.cpp" line="669"/>
         <source>S&amp;ay</source>
         <translation>S&amp;äg</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="620"/>
-        <source>&amp;Move hand to...</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location filename="../src/player.cpp" line="621"/>
-        <location filename="../src/player.cpp" line="627"/>
-        <location filename="../src/player.cpp" line="633"/>
-        <location filename="../src/player.cpp" line="720"/>
-        <source>&amp;Top of library</source>
+        <source>&amp;Move hand to...</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3581,249 +3573,257 @@ Lokal version är %1, avlägsen version är %2.</translation>
         <location filename="../src/player.cpp" line="628"/>
         <location filename="../src/player.cpp" line="634"/>
         <location filename="../src/player.cpp" line="721"/>
+        <source>&amp;Top of library</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="623"/>
+        <location filename="../src/player.cpp" line="629"/>
+        <location filename="../src/player.cpp" line="635"/>
+        <location filename="../src/player.cpp" line="722"/>
         <source>&amp;Bottom of library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="626"/>
+        <location filename="../src/player.cpp" line="627"/>
         <source>&amp;Move graveyard to...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="632"/>
+        <location filename="../src/player.cpp" line="633"/>
         <source>&amp;Move exile to...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="640"/>
+        <location filename="../src/player.cpp" line="641"/>
         <source>Reveal &amp;library to...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="642"/>
+        <location filename="../src/player.cpp" line="643"/>
         <source>&amp;Always reveal top card</source>
         <translation>&amp;Avslöja alltid det översta kortet</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="643"/>
+        <location filename="../src/player.cpp" line="644"/>
         <source>O&amp;pen deck in deck editor</source>
         <translation>&amp;Öppna lek i lekredigeraren</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="647"/>
+        <location filename="../src/player.cpp" line="648"/>
         <source>&amp;Undo last draw</source>
         <translation>&amp;Ångra senaste drag</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="650"/>
+        <location filename="../src/player.cpp" line="651"/>
         <source>Play top card &amp;face down</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="652"/>
+        <location filename="../src/player.cpp" line="653"/>
         <source>Move top cards to &amp;exile...</source>
         <translation>Flytta översta korten till &amp;exil...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="653"/>
+        <location filename="../src/player.cpp" line="654"/>
         <source>Put top card on &amp;bottom</source>
         <translation>Placera översta kortet &amp;underst</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="654"/>
+        <location filename="../src/player.cpp" line="655"/>
         <source>Put bottom card &amp;in graveyard</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="667"/>
+        <location filename="../src/player.cpp" line="668"/>
         <source>Cr&amp;eate predefined token</source>
         <translation>Skapa fördefinierad &amp;jetong</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="674"/>
+        <location filename="../src/player.cpp" line="675"/>
         <source>C&amp;ard</source>
         <translation>K&amp;ort</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="677"/>
+        <location filename="../src/player.cpp" line="678"/>
         <source>&amp;All players</source>
         <translation>A&amp;lla spelare</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="680"/>
+        <location filename="../src/player.cpp" line="681"/>
         <source>&amp;Play</source>
         <translation>&amp;Spela</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="681"/>
+        <location filename="../src/player.cpp" line="682"/>
         <source>&amp;Hide</source>
         <translation>&amp;Göm</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="682"/>
+        <location filename="../src/player.cpp" line="683"/>
         <source>Play &amp;Face Down</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="684"/>
+        <location filename="../src/player.cpp" line="685"/>
         <source>&amp;Tap</source>
         <translation>&amp;Tappa</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="685"/>
+        <location filename="../src/player.cpp" line="686"/>
         <source>&amp;Untap</source>
         <translation>Tappa &amp;upp</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="686"/>
+        <location filename="../src/player.cpp" line="687"/>
         <source>Toggle &amp;normal untapping</source>
         <translation>Växla &amp;normal upptappning</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="687"/>
+        <location filename="../src/player.cpp" line="688"/>
         <source>&amp;Flip</source>
         <translation>&amp;Vänd</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="688"/>
+        <location filename="../src/player.cpp" line="689"/>
         <source>&amp;Peek at card face</source>
         <translation>Kika på kort&amp;framsida</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="689"/>
+        <location filename="../src/player.cpp" line="690"/>
         <source>&amp;Clone</source>
         <translation>&amp;Klona</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="691"/>
+        <location filename="../src/player.cpp" line="692"/>
         <source>Attac&amp;h to card...</source>
         <translation>&amp;Fäst på kort...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="693"/>
+        <location filename="../src/player.cpp" line="694"/>
         <source>Unattac&amp;h</source>
         <translation>Se&amp;parera</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="694"/>
+        <location filename="../src/player.cpp" line="695"/>
         <source>&amp;Draw arrow...</source>
         <translation>&amp;Rita pil...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="695"/>
+        <location filename="../src/player.cpp" line="696"/>
         <source>&amp;Increase power</source>
         <translation>&amp;Öka power</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="697"/>
+        <location filename="../src/player.cpp" line="698"/>
         <source>&amp;Decrease power</source>
         <translation>&amp;Minska power</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="699"/>
+        <location filename="../src/player.cpp" line="700"/>
         <source>I&amp;ncrease toughness</source>
         <translation>Öka toug&amp;hness</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="701"/>
+        <location filename="../src/player.cpp" line="702"/>
         <source>D&amp;ecrease toughness</source>
         <translation>Minska t&amp;oughness</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="703"/>
+        <location filename="../src/player.cpp" line="704"/>
         <source>In&amp;crease power and toughness</source>
         <translation>Öka power o&amp;ch toughness</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="705"/>
+        <location filename="../src/player.cpp" line="706"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation>M&amp;inska power och toughness</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="707"/>
+        <location filename="../src/player.cpp" line="708"/>
         <source>Set &amp;power and toughness...</source>
         <translation>An&amp;ge power och toughness...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="709"/>
+        <location filename="../src/player.cpp" line="710"/>
         <source>&amp;Set annotation...</source>
         <translation>Ang&amp;e annotering...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="715"/>
+        <location filename="../src/player.cpp" line="716"/>
         <source>&amp;Add counter (%1)</source>
         <translation>P&amp;lacera polett (%1)</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="717"/>
+        <location filename="../src/player.cpp" line="718"/>
         <source>&amp;Remove counter (%1)</source>
         <translation>Ta &amp;bort polett (%1)</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="719"/>
+        <location filename="../src/player.cpp" line="720"/>
         <source>&amp;Set counters (%1)...</source>
         <translation>Pl&amp;acera poletter (%1)...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="889"/>
+        <location filename="../src/player.cpp" line="890"/>
         <source>Draw cards</source>
         <translation>Dra kort</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="889"/>
-        <location filename="../src/player.cpp" line="910"/>
-        <location filename="../src/player.cpp" line="939"/>
-        <location filename="../src/player.cpp" line="2182"/>
+        <location filename="../src/player.cpp" line="890"/>
+        <location filename="../src/player.cpp" line="911"/>
+        <location filename="../src/player.cpp" line="940"/>
+        <location filename="../src/player.cpp" line="2185"/>
         <source>Number:</source>
         <translation>Antal:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="910"/>
+        <location filename="../src/player.cpp" line="911"/>
         <source>Move top cards to grave</source>
         <translation>Flytta översta korten till kyrkogården</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="939"/>
+        <location filename="../src/player.cpp" line="940"/>
         <source>Move top cards to exile</source>
         <translation>Flytta översta korten till exil</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1020"/>
+        <location filename="../src/player.cpp" line="1021"/>
         <source>Roll die</source>
         <translation>Rulla tärning</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1020"/>
+        <location filename="../src/player.cpp" line="1021"/>
         <source>Number of sides:</source>
         <translation>Antal sidor:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2028"/>
+        <location filename="../src/player.cpp" line="2031"/>
         <source>Set power/toughness</source>
         <translation>Ange power/toughness</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2028"/>
+        <location filename="../src/player.cpp" line="2031"/>
         <source>Please enter the new PT:</source>
         <translation>Vänligen ange ny PT:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2100"/>
+        <location filename="../src/player.cpp" line="2103"/>
         <source>Set annotation</source>
         <translation>Ange annotering</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2100"/>
+        <location filename="../src/player.cpp" line="2103"/>
         <source>Please enter the new annotation:</source>
         <translation>Vänligen ange den nya annoteringen:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2182"/>
+        <location filename="../src/player.cpp" line="2185"/>
         <source>Set counters</source>
         <translation>Placera poletter</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2278"/>
+        <location filename="../src/player.cpp" line="2281"/>
         <source>Cr&amp;eate related card</source>
         <translation type="unfinished"/>
     </message>
@@ -4373,87 +4373,87 @@ Please enter a name:</source>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="528"/>
+        <location filename="../src/tab_game.cpp" line="532"/>
         <source>&amp;Phases</source>
         <translation>&amp;Faser</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="531"/>
+        <location filename="../src/tab_game.cpp" line="535"/>
         <source>&amp;Game</source>
         <translation>&amp;Spel</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="533"/>
+        <location filename="../src/tab_game.cpp" line="537"/>
         <source>Next &amp;phase</source>
         <translation>Nästa &amp;fas</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="537"/>
+        <location filename="../src/tab_game.cpp" line="541"/>
         <source>Next &amp;turn</source>
         <translation>Nästa &amp;tur</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="541"/>
+        <location filename="../src/tab_game.cpp" line="545"/>
         <source>&amp;Remove all local arrows</source>
         <translation>Ta &amp;bort alla lokala pilar</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="545"/>
+        <location filename="../src/tab_game.cpp" line="549"/>
         <source>Game &amp;information</source>
         <translation>Spel&amp;information</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="547"/>
+        <location filename="../src/tab_game.cpp" line="551"/>
         <source>&amp;Concede</source>
         <translation>&amp;Ge upp</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="551"/>
+        <location filename="../src/tab_game.cpp" line="555"/>
         <source>&amp;Leave game</source>
         <translation>&amp;Lämna spel</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="555"/>
+        <location filename="../src/tab_game.cpp" line="559"/>
         <source>C&amp;lose replay</source>
         <translation>S&amp;täng repris</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="560"/>
+        <location filename="../src/tab_game.cpp" line="564"/>
         <source>&amp;Say:</source>
         <translation>S&amp;äg:</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="640"/>
+        <location filename="../src/tab_game.cpp" line="644"/>
         <source>Concede</source>
         <translation>Ge upp</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="640"/>
+        <location filename="../src/tab_game.cpp" line="644"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>Är du säker på att du vill ge upp detta spel?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="650"/>
+        <location filename="../src/tab_game.cpp" line="654"/>
         <source>Leave game</source>
         <translation>Lämna spel</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="650"/>
+        <location filename="../src/tab_game.cpp" line="654"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>Är du säker på att du vill lämna detta spel?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="824"/>
+        <location filename="../src/tab_game.cpp" line="828"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1072"/>
+        <location filename="../src/tab_game.cpp" line="1076"/>
         <source>You have been kicked out of the game.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1177"/>
+        <location filename="../src/tab_game.cpp" line="1181"/>
         <source>REPLAY </source>
         <translation type="unfinished"/>
     </message>
@@ -4699,78 +4699,78 @@ Please enter a name:</source>
 <context>
     <name>UserInfoBox</name>
     <message>
-        <location filename="../src/userinfobox.cpp" line="42"/>
+        <location filename="../src/userinfobox.cpp" line="45"/>
         <source>User information</source>
         <translation>Användarinformation</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="49"/>
+        <location filename="../src/userinfobox.cpp" line="52"/>
         <source>Real name:</source>
         <translation>Riktiga namn:</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="50"/>
+        <location filename="../src/userinfobox.cpp" line="53"/>
         <source>Gender:</source>
         <translation>Kön:</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="51"/>
+        <location filename="../src/userinfobox.cpp" line="54"/>
         <source>Location:</source>
         <translation>Plats:</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="52"/>
+        <location filename="../src/userinfobox.cpp" line="55"/>
         <source>User level:</source>
         <translation>Användarnivå:</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="53"/>
+        <location filename="../src/userinfobox.cpp" line="56"/>
         <source>Account Age:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="85"/>
+        <location filename="../src/userinfobox.cpp" line="88"/>
         <source>Administrator</source>
         <translation>Administratör</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="87"/>
+        <location filename="../src/userinfobox.cpp" line="90"/>
         <source>Moderator</source>
         <translation>Moderator</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="89"/>
+        <location filename="../src/userinfobox.cpp" line="92"/>
         <source>Registered user</source>
         <translation>Registrerad användare</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="91"/>
         <location filename="../src/userinfobox.cpp" line="94"/>
+        <location filename="../src/userinfobox.cpp" line="97"/>
         <source>Unregistered user</source>
         <translation>Oregistrerad användare</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="97"/>
+        <location filename="../src/userinfobox.cpp" line="100"/>
         <source>Unknown</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="110"/>
+        <location filename="../src/userinfobox.cpp" line="113"/>
         <source>Year</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="110"/>
+        <location filename="../src/userinfobox.cpp" line="113"/>
         <source>Years</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="116"/>
+        <location filename="../src/userinfobox.cpp" line="119"/>
         <source>Day</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="116"/>
+        <location filename="../src/userinfobox.cpp" line="119"/>
         <source>Days</source>
         <translation type="unfinished"/>
     </message>
