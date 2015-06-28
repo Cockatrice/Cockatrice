@@ -31,7 +31,7 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 
     updateBgPixmap();
 
-    height = 2 * BOX_LINE_WIDTH + 3 * (CARD_HEIGHT + 20) + 2 * PADDING_Y;
+    height = 2 * BOX_LINE_WIDTH + TABLEROWS * (CARD_HEIGHT + 20) + 2 * PADDING_Y;
     width = MIN_WIDTH + 2 * MARGIN_X + 2 * BOX_LINE_WIDTH;
     currentMinimumWidth = MIN_WIDTH;
 
@@ -311,7 +311,7 @@ QPointF TableZone::mapFromGrid(QPoint gridPoint) const
     if (isInverted())
         gridPoint.setY(2 - gridPoint.y());
     
-    y = BOX_LINE_WIDTH + gridPoint.y() * (CARD_HEIGHT + PADDING_Y + 20) + (gridPoint.x() % 3) * 10;
+    y = BOX_LINE_WIDTH + gridPoint.y() * (CARD_HEIGHT + PADDING_Y + 20) + (gridPoint.x() % TABLEROWS) * 10;
 /*    
     if (isInverted())
         y = height - CARD_HEIGHT - y;
@@ -339,7 +339,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     
     int resultY = round(y / (CARD_HEIGHT + PADDING_Y + 20));
     if (isInverted())
-        resultY = 2 - resultY;
+        resultY = TABLEROWS - 1 - resultY;
 
     int baseX = -1;
     qreal oldTempX = 0, tempX = 0;
@@ -364,4 +364,13 @@ QPointF TableZone::closestGridPoint(const QPointF &point)
     if (getCardFromGrid(gridPoint))
         gridPoint.setX(gridPoint.x() + 1);
     return mapFromGrid(gridPoint);
+}
+
+int TableZone::clampValidTableRow(const int row)
+{
+    if(row < 0)
+        return 0;
+    if(row >= TABLEROWS)
+        return TABLEROWS - 1;
+    return row;
 }
