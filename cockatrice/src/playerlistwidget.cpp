@@ -67,7 +67,7 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient
     } else
         userContextMenu = 0;
     
-    setMinimumHeight(60);
+    setMinimumHeight(40);
     setIconSize(QSize(20, 15));
     setColumnCount(6);
     setColumnWidth(0, 20);
