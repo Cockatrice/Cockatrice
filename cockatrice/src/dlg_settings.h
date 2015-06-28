@@ -97,6 +97,7 @@ private:
     QLabel tableBgLabel;
     QLabel playerAreaBgLabel;
     QLabel cardBackPicturePathLabel;
+    QLabel playerPositionRotationLabel;
     QLabel minPlayersForMultiColumnLayoutLabel;
     QLineEdit *handBgEdit;
     QLineEdit *stackBgEdit;
@@ -112,6 +113,7 @@ private:
     QGroupBox *cardsGroupBox;
     QGroupBox *handGroupBox;
     QGroupBox *tableGroupBox;
+    QSpinBox playerPositionRotationSpinBox;
     QSpinBox minPlayersForMultiColumnLayoutEdit;
 public:
     AppearanceSettingsPage();

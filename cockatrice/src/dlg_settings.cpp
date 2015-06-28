@@ -343,6 +343,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     invertVerticalCoordinateCheckBox.setChecked(settingsCache->getInvertVerticalCoordinate());
     connect(&invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setInvertVerticalCoordinate(int)));
     
+    playerPositionRotationSpinBox.setValue(settingsCache->getPlayerPositionRotation());
+    connect(&playerPositionRotationSpinBox, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPlayerPositionRotation(int)));
+    playerPositionRotationLabel.setBuddy(&playerPositionRotationSpinBox);
+    
     minPlayersForMultiColumnLayoutEdit.setMinimum(2);
     minPlayersForMultiColumnLayoutEdit.setValue(settingsCache->getMinPlayersForMultiColumnLayout());
     connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMinPlayersForMultiColumnLayout(int)));
@@ -350,8 +354,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     
     QGridLayout *tableGrid = new QGridLayout;
     tableGrid->addWidget(&invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
-    tableGrid->addWidget(&minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
-    tableGrid->addWidget(&minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
+    tableGrid->addWidget(&playerPositionRotationLabel, 1, 0, 1, 1);
+    tableGrid->addWidget(&playerPositionRotationSpinBox, 1, 1, 1, 1);
+    tableGrid->addWidget(&minPlayersForMultiColumnLayoutLabel, 2, 0, 1, 1);
+    tableGrid->addWidget(&minPlayersForMultiColumnLayoutEdit, 2, 1, 1, 1);
     
     tableGroupBox = new QGroupBox;
     tableGroupBox->setLayout(tableGrid);
@@ -384,6 +390,7 @@ void AppearanceSettingsPage::retranslateUi()
     
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
+    playerPositionRotationLabel.setText(tr("Player position rotation amount:"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
 }
 
