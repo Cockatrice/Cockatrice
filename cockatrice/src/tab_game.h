@@ -141,7 +141,7 @@ private:
     QAction *playersSeparator;
     QMenu *gameMenu;
     QMenu *phasesMenu;
-    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
+    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW;
     QList<QAction *> phaseActions;
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
@@ -190,6 +190,8 @@ private slots:
     void actConcede();
     void actLeaveGame();
     void actRemoveLocalArrows();
+    void actRotateViewCW();
+    void actRotateViewCCW();
     void actSay();
     void actPhaseAction();
     void actNextPhase();

@@ -345,6 +345,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     aNextPhase = 0;
     aNextTurn = 0;
     aRemoveLocalArrows = 0;
+    aRotateViewCW = 0;
+    aRotateViewCCW = 0;
     aGameInfo = 0;
     aConcede = 0;
     aLeaveGame = 0;
@@ -450,6 +452,10 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
     aRemoveLocalArrows = new QAction(this);
     connect(aRemoveLocalArrows, SIGNAL(triggered()), this, SLOT(actRemoveLocalArrows()));
+    aRotateViewCW = new QAction(this);
+    connect(aRotateViewCW, SIGNAL(triggered()), this, SLOT(actRotateViewCW()));
+    aRotateViewCCW = new QAction(this);
+    connect(aRotateViewCCW, SIGNAL(triggered()), this, SLOT(actRotateViewCCW()));
     aGameInfo = new QAction(this);
     connect(aGameInfo, SIGNAL(triggered()), this, SLOT(actGameInfo()));
     aConcede = new QAction(this);
@@ -483,6 +489,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     gameMenu->addAction(aNextTurn);
     gameMenu->addSeparator();
     gameMenu->addAction(aRemoveLocalArrows);
+    gameMenu->addAction(aRotateViewCW);
+    gameMenu->addAction(aRotateViewCCW);
     gameMenu->addSeparator();
     gameMenu->addAction(aGameInfo);
     gameMenu->addAction(aConcede);
@@ -546,6 +554,14 @@ void TabGame::retranslateUi()
     if (aRemoveLocalArrows) {
         aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
         aRemoveLocalArrows->setShortcut(QKeySequence("Ctrl+R"));
+    }
+    if (aRotateViewCW) {
+        aRotateViewCW->setText(tr("Rotate View Cl&ockwise"));
+        aRotateViewCW->setShortcut(QKeySequence("Ctrl+]"));
+    }
+    if (aRotateViewCCW) {
+        aRotateViewCCW->setText(tr("Rotate View Co&unterclockwise"));
+        aRotateViewCCW->setShortcut(QKeySequence("Ctrl+["));
     }
     if (aGameInfo)
         aGameInfo->setText(tr("Game &information"));
@@ -711,6 +727,16 @@ void TabGame::actRemoveLocalArrows()
             sendGameCommand(cmd);
         }
     }
+}
+
+void TabGame::actRotateViewCW()
+{
+    scene->adjustPlayerRotation(-1);
+}
+
+void TabGame::actRotateViewCCW()
+{
+    scene->adjustPlayerRotation(1);
 }
 
 Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
