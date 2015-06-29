@@ -30,6 +30,10 @@
 #include <QDateTime>
 #include <QSystemTrayIcon>
 #include <QApplication>
+#if QT_VERSION < 0x050000
+    // for Qt::escape() 
+    #include <QtGui/qtextdocument.h>
+#endif
 
 #include "main.h"
 #include "window_main.h"
@@ -359,8 +363,37 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             break;
         }
         case Response::RespUsernameInvalid:
-            QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."));
+        {
+            QString error = tr("Invalid username.") + "<br/>";
+            QStringList rules = reasonStr.split(QChar('|'));
+            if (rules.size() == 7)
+            {
+                error += tr("The username must respect these rules:") + "<br/><ul>"
+                    + "<li>" + tr("length between %1 and %2 characters").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
+                if(rules.at(2).toInt() > 0)
+                    error += "<li>" + tr("it can contain lowercase characters") + "</li>";
+                if(rules.at(3).toInt() > 0)
+                    error += "<li>" + tr("it can contain uppercase characters") + "</li>";
+                if(rules.at(4).toInt() > 0)
+                    error += "<li>" + tr("it can contain numeric characters") + "</li>";
+                if(rules.at(6).size() > 0)
+                    error += "<li>" + tr("it can contain the following punctuation: %1").arg(
+#if QT_VERSION < 0x050000
+            Qt::escape(rules.at(6))
+#else
+            rules.at(6).toHtmlEscaped()
+#endif
+                ) + "</li>";
+                if(rules.at(5).toInt() > 0)
+                    error += "<li>" + tr("the first character can't be a punctuation") + "</li>";
+                error += "</ul>";
+            } else {
+                error += tr("You may only use A-Z, a-z, 0-9, _, ., and - in your username.");
+            }
+
+            QMessageBox::critical(this, tr("Error"), error);
             break;
+        }
         case Response::RespRegistrationFailed:
             QMessageBox::critical(this, tr("Error"), tr("Registration failed for a technical problem on the server."));
             break;
