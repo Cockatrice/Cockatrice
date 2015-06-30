@@ -14,6 +14,7 @@ SET(servatrice_SOURCES
     src/serversocketinterface.cpp
     src/settingscache.cpp
     src/isl_interface.cpp
+    src/signalhandler.cpp
     ${VERSION_STRING_CPP}
     src/smtp/emailaddress.cpp
     src/smtp/mimeattachment.cpp
