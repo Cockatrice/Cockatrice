@@ -247,8 +247,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
         if (!checkSql())
             return UnknownUser;
 
-        QString error;
-        if (!usernameIsValid(user, error))
+        if (!usernameIsValid(user, reasonStr))
             return UsernameInvalid;
         
         if (checkUserIsBanned(handler->getAddress(), user, reasonStr, banSecondsLeft))

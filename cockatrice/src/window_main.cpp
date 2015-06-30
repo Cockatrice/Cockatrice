@@ -83,7 +83,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
             break;
         }
         case Event_ConnectionClosed::SERVER_SHUTDOWN: reasonStr = tr("Scheduled server shutdown."); break;
-        case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."); break;
+        case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username."); break;
         default: reasonStr = QString::fromStdString(event.reason_str());
     }
     QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
@@ -306,9 +306,12 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             QMessageBox::critical(this, tr("Error"), bannedStr);
             break;
         }
-        case Response::RespUsernameInvalid:
-            QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."));
+        case Response::RespUsernameInvalid: {
+            QString errorStr;
+            extractInvalidUsernameMessage(reasonStr, errorStr);
+            QMessageBox::critical(this, tr("Error"), errorStr);
             break;
+        }
         case Response::RespRegistrationRequired:
             if (QMessageBox::question(this, tr("Error"), tr("This server requires user registration. Do you want to register now?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
                 actRegister();
@@ -330,6 +333,36 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
     }
     actConnect();
+}
+
+void MainWindow::extractInvalidUsernameMessage(QString & in, QString & out)
+{
+    out = tr("Invalid username.") + "<br/>";
+    QStringList rules = in.split(QChar('|'));
+    if (rules.size() == 7)
+    {
+        out += tr("The username must respect these rules:") + "<br/><ul>"
+            + "<li>" + tr("length between %1 and %2 characters").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
+        if(rules.at(2).toInt() > 0)
+            out += "<li>" + tr("it can contain lowercase characters") + "</li>";
+        if(rules.at(3).toInt() > 0)
+            out += "<li>" + tr("it can contain uppercase characters") + "</li>";
+        if(rules.at(4).toInt() > 0)
+            out += "<li>" + tr("it can contain numeric characters") + "</li>";
+        if(rules.at(6).size() > 0)
+            out += "<li>" + tr("it can contain the following punctuation: %1").arg(
+#if QT_VERSION < 0x050000
+    Qt::escape(rules.at(6))
+#else
+    rules.at(6).toHtmlEscaped()
+#endif
+        ) + "</li>";
+        if(rules.at(5).toInt() > 0)
+            out += "<li>" + tr("the first character can't be a punctuation") + "</li>";
+        out += "</ul>";
+    } else {
+        out += tr("You may only use A-Z, a-z, 0-9, _, ., and - in your username.");
+    }
 }
 
 void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
@@ -362,36 +395,10 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             QMessageBox::critical(this, tr("Error"), bannedStr);
             break;
         }
-        case Response::RespUsernameInvalid:
-        {
-            QString error = tr("Invalid username.") + "<br/>";
-            QStringList rules = reasonStr.split(QChar('|'));
-            if (rules.size() == 7)
-            {
-                error += tr("The username must respect these rules:") + "<br/><ul>"
-                    + "<li>" + tr("length between %1 and %2 characters").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
-                if(rules.at(2).toInt() > 0)
-                    error += "<li>" + tr("it can contain lowercase characters") + "</li>";
-                if(rules.at(3).toInt() > 0)
-                    error += "<li>" + tr("it can contain uppercase characters") + "</li>";
-                if(rules.at(4).toInt() > 0)
-                    error += "<li>" + tr("it can contain numeric characters") + "</li>";
-                if(rules.at(6).size() > 0)
-                    error += "<li>" + tr("it can contain the following punctuation: %1").arg(
-#if QT_VERSION < 0x050000
-            Qt::escape(rules.at(6))
-#else
-            rules.at(6).toHtmlEscaped()
-#endif
-                ) + "</li>";
-                if(rules.at(5).toInt() > 0)
-                    error += "<li>" + tr("the first character can't be a punctuation") + "</li>";
-                error += "</ul>";
-            } else {
-                error += tr("You may only use A-Z, a-z, 0-9, _, ., and - in your username.");
-            }
-
-            QMessageBox::critical(this, tr("Error"), error);
+        case Response::RespUsernameInvalid: {
+            QString errorStr;
+            extractInvalidUsernameMessage(reasonStr, errorStr);
+            QMessageBox::critical(this, tr("Error"), errorStr);
             break;
         }
         case Response::RespRegistrationFailed:
