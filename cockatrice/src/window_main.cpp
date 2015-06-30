@@ -307,9 +307,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
         }
         case Response::RespUsernameInvalid: {
-            QString errorStr;
-            extractInvalidUsernameMessage(reasonStr, errorStr);
-            QMessageBox::critical(this, tr("Error"), errorStr);
+            QMessageBox::critical(this, tr("Error"), extractInvalidUsernameMessage(reasonStr));
             break;
         }
         case Response::RespRegistrationRequired:
@@ -335,9 +333,9 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
     actConnect();
 }
 
-void MainWindow::extractInvalidUsernameMessage(QString & in, QString & out)
+QString MainWindow::extractInvalidUsernameMessage(QString & in)
 {
-    out = tr("Invalid username.") + "<br/>";
+    QString out = tr("Invalid username.") + "<br/>";
     QStringList rules = in.split(QChar('|'));
     if (rules.size() == 7)
     {
@@ -357,12 +355,14 @@ void MainWindow::extractInvalidUsernameMessage(QString & in, QString & out)
     rules.at(6).toHtmlEscaped()
 #endif
         ) + "</li>";
-        if(rules.at(5).toInt() > 0)
+        if(rules.at(5).toInt() == 0)
             out += "<li>" + tr("the first character can't be a punctuation") + "</li>";
         out += "</ul>";
     } else {
         out += tr("You may only use A-Z, a-z, 0-9, _, ., and - in your username.");
     }
+
+    return out;
 }
 
 void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
@@ -396,9 +396,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             break;
         }
         case Response::RespUsernameInvalid: {
-            QString errorStr;
-            extractInvalidUsernameMessage(reasonStr, errorStr);
-            QMessageBox::critical(this, tr("Error"), errorStr);
+            QMessageBox::critical(this, tr("Error"), extractInvalidUsernameMessage(reasonStr));
             break;
         }
         case Response::RespRegistrationFailed:
