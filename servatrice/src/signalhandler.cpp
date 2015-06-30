@@ -48,19 +48,21 @@ SignalHandler::SignalHandler(QObject *parent)
 
 void SignalHandler::sigHupHandler(int /* sig */)
 {
+#ifdef Q_OS_UNIX
     char a = 1;
     ssize_t writeValue = ::write(sigHupFD[0], &a, sizeof(a));
     Q_UNUSED(writeValue);
+#endif
 }
 
 void SignalHandler::internalSigHupHandler()
 {
     snHup->setEnabled(false);
+#ifdef Q_OS_UNIX
     char tmp;
     ssize_t readValue = ::read(sigHupFD[1], &tmp, sizeof(tmp));
     Q_UNUSED(readValue);
 
-#ifdef Q_OS_UNIX
     std::cerr << "Received SIGHUP" << std::endl;
 #endif
     logger->logMessage("Received SIGHUP");
@@ -83,7 +85,7 @@ void SignalHandler::sigSegvHandler(int sig)
     // print out all the frames to stderr
     fprintf(stderr, "Error: signal %d:\n", sig);
     backtrace_symbols_fd(array, size, STDERR_FILENO);
-#endif
+
     if (sig == SIGSEGV)
         logger->logMessage("CRASH: SIGSEGV");
     else if (sig == SIGABRT)
@@ -94,5 +96,6 @@ void SignalHandler::sigSegvHandler(int sig)
     delete loggerThread;
     
     raise(sig);
+#endif
 }
 
