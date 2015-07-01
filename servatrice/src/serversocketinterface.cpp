@@ -958,7 +958,7 @@ Response::ResponseCode ServerSocketInterface::cmdShutdownServer(const Command_Sh
     return Response::RespOk;
 }
 
-Response::ResponseCode ServerSocketInterface::cmdReloadConfig(const Command_ReloadConfig &cmd, ResponseContainer & /*rc*/)
+Response::ResponseCode ServerSocketInterface::cmdReloadConfig(const Command_ReloadConfig & /* cmd */, ResponseContainer & /*rc*/)
 {
     settingsCache->sync();
     return Response::RespOk;

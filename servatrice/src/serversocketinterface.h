@@ -95,7 +95,7 @@ private:
 	Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdActivateAccount(const Command_Activate &cmd, ResponseContainer & /* rc */);
-    Response::ResponseCode cmdReloadConfig(const Command_ReloadConfig &cmd, ResponseContainer & /*rc*/);
+    Response::ResponseCode cmdReloadConfig(const Command_ReloadConfig &/* cmd */, ResponseContainer & /*rc*/);
 	
 	Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
 	Response::ResponseCode processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
