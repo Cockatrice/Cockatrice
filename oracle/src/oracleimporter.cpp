@@ -195,12 +195,6 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
         CardInfo *card = addCard(set->getShortName(), cardName, false, cardId, cardCost, cmc, cardType, cardPT, cardLoyalty, cardText, colors, relatedCards, upsideDown);
 
         if (!set->contains(card)) {
-
-        if(cardName=="Mountain")
-        {
-            qDebug() << cardName << " " << set->getShortName();
-        }
-
             card->addToSet(set);
             cards++;
         }
