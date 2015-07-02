@@ -76,33 +76,38 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     cardName = cardName.replace("Æ", "AE");
     cardName = cardName.replace("’", "'");
 
-    // Remove {} around mana costs
-    cardCost.remove(QChar('{'));
-    cardCost.remove(QChar('}'));
+    CardInfo * card;
+    if (cards.contains(cardName)) {
+        card = cards.value(cardName);
+    } else {
+        // Remove {} around mana costs
+        cardCost.remove(QChar('{'));
+        cardCost.remove(QChar('}'));
 
-    // detect mana generator artifacts
-    bool mArtifact = false;
-    if (cardType.endsWith("Artifact"))
-        for (int i = 0; i < cardTextRows.size(); ++i)
-            if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
-                mArtifact = true;
+        // detect mana generator artifacts
+        bool mArtifact = false;
+        if (cardType.endsWith("Artifact"))
+            for (int i = 0; i < cardTextRows.size(); ++i)
+                if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
+                    mArtifact = true;
 
-    // detect cards that enter the field tapped
-    bool cipt = cardText.contains("Hideaway") || (cardText.contains(cardName + " enters the battlefield tapped") && !cardText.contains(cardName + " enters the battlefield tapped unless"));
-    
-    // insert the card and its properties
-    CardInfo *card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards, upsideDown, cardLoyalty, cipt);
-    int tableRow = 1;
-    QString mainCardType = card->getMainCardType();
-    if ((mainCardType == "Land") || mArtifact)
-        tableRow = 0;
-    else if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
-        tableRow = 3;
-    else if (mainCardType == "Creature")
-        tableRow = 2;
-    card->setTableRow(tableRow);
-    
-    cards.insert(cardName, card);
+        // detect cards that enter the field tapped
+        bool cipt = cardText.contains("Hideaway") || (cardText.contains(cardName + " enters the battlefield tapped") && !cardText.contains(cardName + " enters the battlefield tapped unless"));
+        
+        // insert the card and its properties
+        card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards, upsideDown, cardLoyalty, cipt);
+        int tableRow = 1;
+        QString mainCardType = card->getMainCardType();
+        if ((mainCardType == "Land") || mArtifact)
+            tableRow = 0;
+        else if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
+            tableRow = 3;
+        else if (mainCardType == "Creature")
+            tableRow = 2;
+        card->setTableRow(tableRow);
+        
+        cards.insert(cardName, card);
+    }
     card->setMuId(setName, cardId);
 
     return card;
