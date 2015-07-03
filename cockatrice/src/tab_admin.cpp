@@ -58,10 +58,13 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
     connect(updateServerMessageButton, SIGNAL(clicked()), this, SLOT(actUpdateServerMessage()));
     shutdownServerButton = new QPushButton;
     connect(shutdownServerButton, SIGNAL(clicked()), this, SLOT(actShutdownServer()));
+    reloadConfigButton = new QPushButton;
+    connect(reloadConfigButton, SIGNAL(clicked()), this, SLOT(actReloadConfig()));
     
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(updateServerMessageButton);
     vbox->addWidget(shutdownServerButton);
+    vbox->addWidget(reloadConfigButton);
     vbox->addStretch();
     
     adminGroupBox = new QGroupBox;
@@ -87,6 +90,7 @@ void TabAdmin::retranslateUi()
 {
     updateServerMessageButton->setText(tr("Update server &message"));
     shutdownServerButton->setText(tr("&Shut down server"));
+    reloadConfigButton->setText(tr("&Reload configuration"));
     adminGroupBox->setTitle(tr("Server administration functions"));
     
     unlockButton->setText(tr("&Unlock functions"));
@@ -108,6 +112,12 @@ void TabAdmin::actShutdownServer()
         
         client->sendCommand(client->prepareAdminCommand(cmd));
     }
+}
+
+void TabAdmin::actReloadConfig()
+{
+    Command_ReloadConfig cmd;
+    client->sendCommand(client->prepareAdminCommand(cmd));
 }
 
 void TabAdmin::actUnlock()

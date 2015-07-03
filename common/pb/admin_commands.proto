@@ -2,6 +2,7 @@ message AdminCommand {
 	enum AdminCommandType {
 		UPDATE_SERVER_MESSAGE = 1000;
 		SHUTDOWN_SERVER = 1001;
+		RELOAD_CONFIG = 1002;
 	}
 	extensions 100 to max;
 }
@@ -18,4 +19,10 @@ message Command_ShutdownServer {
 	}
 	optional string reason = 1;
 	optional uint32 minutes = 2;
+}
+
+message Command_ReloadConfig {
+	extend AdminCommand {
+		optional Command_ReloadConfig ext = 1002;
+	}
 }

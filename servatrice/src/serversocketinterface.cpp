@@ -289,6 +289,7 @@ Response::ResponseCode ServerSocketInterface::processExtendedAdminCommand(int cm
     switch ((AdminCommand::AdminCommandType) cmdType) {
         case AdminCommand::SHUTDOWN_SERVER: return cmdShutdownServer(cmd.GetExtension(Command_ShutdownServer::ext), rc);
         case AdminCommand::UPDATE_SERVER_MESSAGE: return cmdUpdateServerMessage(cmd.GetExtension(Command_UpdateServerMessage::ext), rc);
+        case AdminCommand::RELOAD_CONFIG: return cmdReloadConfig(cmd.GetExtension(Command_ReloadConfig::ext), rc);
         default: return Response::RespFunctionNotAllowed;
     }
 }
@@ -954,5 +955,12 @@ Response::ResponseCode ServerSocketInterface::cmdUpdateServerMessage(const Comma
 Response::ResponseCode ServerSocketInterface::cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer & /*rc*/)
 {
     QMetaObject::invokeMethod(server, "scheduleShutdown", Q_ARG(QString, QString::fromStdString(cmd.reason())), Q_ARG(int, cmd.minutes()));
+    return Response::RespOk;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdReloadConfig(const Command_ReloadConfig & /* cmd */, ResponseContainer & /*rc*/)
+{
+    logDebugMessage("Received admin command: reloading configuration");
+    settingsCache->sync();
     return Response::RespOk;
 }

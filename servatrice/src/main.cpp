@@ -28,21 +28,16 @@
 #include "servatrice.h"
 #include "server_logger.h"
 #include "settingscache.h"
+#include "signalhandler.h"
 #include "rng_sfmt.h"
 #include "version_string.h"
 #include <google/protobuf/stubs/common.h>
-#ifdef Q_OS_UNIX
-#include <signal.h>
-#include <execinfo.h>
-#include <unistd.h>
-#endif
-
-#define SIGSEGV_TRACE_LINES 40
 
 RNG_Abstract *rng;
 ServerLogger *logger;
 QThread *loggerThread;
 SettingsCache *settingsCache;
+SignalHandler *signalhandler;
 
 /* Prototypes */
 
@@ -54,9 +49,6 @@ void myMessageOutput2(QtMsgType type, const char *msg);
 #else
 void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &msg);
 void myMessageOutput2(QtMsgType type, const QMessageLogContext &, const QString &msg);
-#endif
-#ifdef Q_OS_UNIX
-void sigSegvHandler(int sig);
 #endif
 
 /* Implementations */
@@ -130,32 +122,6 @@ void myMessageOutput2(QtMsgType /*type*/, const QMessageLogContext &, const QStr
 }
 #endif
 
-#ifdef Q_OS_UNIX
-void sigSegvHandler(int sig)
-{
-    void *array[SIGSEGV_TRACE_LINES];
-    size_t size;
-
-    // get void*'s for all entries on the stack
-    size = backtrace(array, SIGSEGV_TRACE_LINES);
-
-    // print out all the frames to stderr
-    fprintf(stderr, "Error: signal %d:\n", sig);
-    backtrace_symbols_fd(array, size, STDERR_FILENO);
-
-	if (sig == SIGSEGV)
-		logger->logMessage("CRASH: SIGSEGV");
-	else if (sig == SIGABRT)
-		logger->logMessage("CRASH: SIGABRT");
-	
-	logger->deleteLater();
-	loggerThread->wait();
-	delete loggerThread;
-	
-	raise(sig);
-}
-#endif
-
 int main(int argc, char *argv[])
 {
 	QCoreApplication app(argc, argv);
@@ -202,23 +168,8 @@ int main(int argc, char *argv[])
 		qInstallMessageHandler(myMessageOutput2);
 #endif
 
-#ifdef Q_OS_UNIX	
-	struct sigaction hup;
-	hup.sa_handler = ServerLogger::hupSignalHandler;
-	sigemptyset(&hup.sa_mask);
-	hup.sa_flags = 0;
-	hup.sa_flags |= SA_RESTART;
-	sigaction(SIGHUP, &hup, 0);
-	
-	struct sigaction segv;
-	segv.sa_handler = sigSegvHandler;
-	segv.sa_flags = SA_RESETHAND;
-	sigemptyset(&segv.sa_mask);
-	sigaction(SIGSEGV, &segv, 0);
-	sigaction(SIGABRT, &segv, 0);
-	
-	signal(SIGPIPE, SIG_IGN);
-#endif
+	signalhandler = new SignalHandler();
+
 	rng = new RNG_SFMT;
 	
 	std::cerr << "Servatrice " << VERSION_STRING << " starting." << std::endl;
@@ -250,6 +201,7 @@ int main(int argc, char *argv[])
 	}
 	
 	delete rng;
+	delete signalhandler;
 	delete settingsCache;
 	
 	logger->deleteLater();
