@@ -219,6 +219,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 # Build cockatrice binary and link it
 ADD_EXECUTABLE(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS})
+set_property(TARGET cockatrice PROPERTY CXX_STANDARD 11)
+set_property(TARGET cockatrice PROPERTY CXX_STANDARD_REQUIRED ON)
 
 if(Qt4_FOUND)
     if(MSVC) 
