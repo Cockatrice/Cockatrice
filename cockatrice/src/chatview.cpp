@@ -298,7 +298,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         }
         else if (index == mentionFirstIndex)
         {
-            if (tabSupervisor->isALocalGame())
+            if (tabSupervisor->getIsLocalGame())
             {
                 cursor.insertText("@");
                 message = message.mid(1);

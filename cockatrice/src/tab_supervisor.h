@@ -68,7 +68,7 @@ public:
     void start(const ServerInfo_User &userInfo);
     void startLocal(const QList<AbstractClient *> &_clients);
     void stop();
-    bool isALocalGame() const { return isLocalGame; }
+    bool getIsLocalGame() const { return isLocalGame; }
     int getGameCount() const { return gameTabs.size(); }
     TabUserLists *getUserListsTab() const { return tabUserLists; }
     ServerInfo_User *getUserInfo() const { return userInfo; }
