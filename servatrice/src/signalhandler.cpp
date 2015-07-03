@@ -65,7 +65,7 @@ void SignalHandler::internalSigHupHandler()
 
     std::cerr << "Received SIGHUP" << std::endl;
 #endif
-    logger->logMessage("Received SIGHUP");
+    logger->logMessage("Received SIGHUP, rotating logs and reloading configuration", this);
     logger->rotateLogs();
 
     settingsCache->sync();

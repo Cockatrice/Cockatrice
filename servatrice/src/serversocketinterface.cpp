@@ -960,6 +960,7 @@ Response::ResponseCode ServerSocketInterface::cmdShutdownServer(const Command_Sh
 
 Response::ResponseCode ServerSocketInterface::cmdReloadConfig(const Command_ReloadConfig & /* cmd */, ResponseContainer & /*rc*/)
 {
+    logDebugMessage("Received admin command: reloading configuration");
     settingsCache->sync();
     return Response::RespOk;
 }

@@ -110,6 +110,8 @@ void ServerLogger::rotateLogs()
 {
     if (!logFile)
         return;
+
+    flushBuffer();
     
     logFile->close();
     logFile->open(QIODevice::Append);
