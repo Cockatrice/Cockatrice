@@ -1,0 +1,12 @@
+.git/
+CONTRIBUTING.md
+Dockerfile
+TODO.md
+build/
+cockatrice/
+doc/
+oracle/
+sounds/
+travis-compile.sh
+travis-dependencies.sh
+zonebg/

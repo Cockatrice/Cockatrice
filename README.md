@@ -60,6 +60,9 @@ The following flags can be passed to `cmake`:
 - `-DCMAKE_BUILD_TYPE=Debug` Compile in debug mode. Enables extra logging output, debug symbols, and much more verbose compiler warnings.
 - `-DUPDATE_TRANSLATIONS=1` Configure `make` to update the translation .ts files for new strings in the source code. Note: Running `make clean` will remove the .ts files.
 
+# Building servatrice Docker container
+`docker build -t servatrice .`
+
 # Running
 
 `oracle` fetches card data  
