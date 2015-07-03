@@ -60,6 +60,7 @@ private:
     void addCloseButtonToTab(Tab *tab, int tabIndex);
     QString sanitizeTabName(QString dirty) const;
     QString sanitizeHtml(QString dirty) const;
+    bool isLocalGame;
 public:
     TabSupervisor(AbstractClient *_client, QWidget *parent = 0);
     ~TabSupervisor();
@@ -67,6 +68,7 @@ public:
     void start(const ServerInfo_User &userInfo);
     void startLocal(const QList<AbstractClient *> &_clients);
     void stop();
+    bool isALocalGame() const { return isLocalGame; }
     int getGameCount() const { return gameTabs.size(); }
     TabUserLists *getUserListsTab() const { return tabUserLists; }
     ServerInfo_User *getUserInfo() const { return userInfo; }
