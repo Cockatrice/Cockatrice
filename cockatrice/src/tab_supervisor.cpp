@@ -184,6 +184,7 @@ int TabSupervisor::myAddTab(Tab *tab)
 
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
 {
+    isLocalGame = false;
     userInfo = new ServerInfo_User(_userInfo);
     
     tabServer = new TabServer(this, client);
@@ -227,6 +228,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     tabDeckStorage = 0;
     tabReplays = 0;
     tabAdmin = 0;
+    isLocalGame = true;
     userInfo = new ServerInfo_User;
     localClients = _clients;
     for (int i = 0; i < localClients.size(); ++i)

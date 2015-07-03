@@ -298,59 +298,68 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         }
         else if (index == mentionFirstIndex)
         {
-            QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
-
-            int firstSpace = message.indexOf(" ");
-            QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
-            QString mentionIntact = fullMentionUpToSpaceOrEnd;
-
-            while (fullMentionUpToSpaceOrEnd.size())
+            if (tabSupervisor->getIsLocalGame())
             {
-                if (isFullMentionAValidUser(userList, fullMentionUpToSpaceOrEnd)) // Is there a user online named this?
+                cursor.insertText("@");
+                message = message.mid(1);
+            }
+            else
+            {
+
+                QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
+
+                int firstSpace = message.indexOf(" ");
+                QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
+                QString mentionIntact = fullMentionUpToSpaceOrEnd;
+
+                while (fullMentionUpToSpaceOrEnd.size())
                 {
-                    if (userName.toLower() == fullMentionUpToSpaceOrEnd.toLower()) // Is this user you?
+                    if (isFullMentionAValidUser(userList, fullMentionUpToSpaceOrEnd)) // Is there a user online named this?
                     {
-                        // You have received a valid mention!!
-                        mentionFormat.setBackground(QBrush(getCustomMentionColor()));
-                        mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
-                        cursor.insertText(mention, mentionFormat);
-                        message = message.mid(mention.size());
-                        QApplication::alert(this);
-                        if (settingsCache->getShowMentionPopup() && shouldShowSystemPopup())
+                        if (userName.toLower() == fullMentionUpToSpaceOrEnd.toLower()) // Is this user you?
                         {
-                            QString ref = sender.left(sender.length() - 2);
-                            showSystemPopup(ref);
+                            // You have received a valid mention!!
+                            mentionFormat.setBackground(QBrush(getCustomMentionColor()));
+                            mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
+                            cursor.insertText(mention, mentionFormat);
+                            message = message.mid(mention.size());
+                            QApplication::alert(this);
+                            if (settingsCache->getShowMentionPopup() && shouldShowSystemPopup())
+                            {
+                                QString ref = sender.left(sender.length() - 2);
+                                showSystemPopup(ref);
+                            }
                         }
+                        else
+                        {
+                            QString correctUserName = getNameFromUserList(userList, fullMentionUpToSpaceOrEnd);
+                            UserListTWI *vlu = userList.value(correctUserName);
+                            mentionFormatOtherUser.setAnchorHref("user://" + QString::number(vlu->getUserInfo().user_level()) + "_" + correctUserName);
+                            cursor.insertText("@" + correctUserName, mentionFormatOtherUser);
+
+                            message = message.mid(correctUserName.size() + 1);
+                        }
+
+                        cursor.setCharFormat(defaultFormat);
+                        break;
+                    }
+                    else if (fullMentionUpToSpaceOrEnd.right(1).indexOf(notALetterOrNumber) == -1)
+                    {               
+                        cursor.insertText("@" + mentionIntact, defaultFormat);
+                        message = message.mid(mentionIntact.size() + 1);
+                        cursor.setCharFormat(defaultFormat);
+                        break;
                     }
                     else
                     {
-                        QString correctUserName = getNameFromUserList(userList, fullMentionUpToSpaceOrEnd);
-                        UserListTWI *vlu = userList.value(correctUserName);
-                        mentionFormatOtherUser.setAnchorHref("user://" + QString::number(vlu->getUserInfo().user_level()) + "_" + correctUserName);
-                        cursor.insertText("@" + correctUserName, mentionFormatOtherUser);
-
-                        message = message.mid(correctUserName.size() + 1);
+                        fullMentionUpToSpaceOrEnd = fullMentionUpToSpaceOrEnd.left(fullMentionUpToSpaceOrEnd.size() - 1);
                     }
-
-                    cursor.setCharFormat(defaultFormat);
-                    break;
-                }
-                else if (fullMentionUpToSpaceOrEnd.right(1).indexOf(notALetterOrNumber) == -1)
-                {               
-                    cursor.insertText("@" + mentionIntact, defaultFormat);
-                    message = message.mid(mentionIntact.size() + 1);
-                    cursor.setCharFormat(defaultFormat);
-                    break;
-                }
-                else
-                {
-                    fullMentionUpToSpaceOrEnd = fullMentionUpToSpaceOrEnd.left(fullMentionUpToSpaceOrEnd.size() - 1);
                 }
             }
         }
         else
         {
-            message = message.mid(1); // Not certain when this would ever be reached, but just incase
+            message = message.mid(1); // Not certain when this would ever be reached, but just incase lets skip the character
         }
     }
 
