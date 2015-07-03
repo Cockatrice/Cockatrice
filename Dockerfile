@@ -32,3 +32,9 @@ WORKDIR build
 RUN cmake .. -DWITH_QT4=0 -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0 &&\
   make &&\
   make install
+
+WORKIR /home/servatrice
+
+EXPOSE 4747
+
+RUN servatrice
