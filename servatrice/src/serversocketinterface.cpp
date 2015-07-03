@@ -789,8 +789,14 @@ Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_R
     }
 
     // TODO: Move this method outside of the db interface
-    if (!sqlInterface->usernameIsValid(userName))
+    QString errorString;
+    if (!sqlInterface->usernameIsValid(userName, errorString))
+    {
+        Response_Register *re = new Response_Register;
+        re->set_denied_reason_str(errorString.toStdString());
+        rc.setResponseExtension(re);
         return Response::RespUsernameInvalid;
+    }
 
     if(sqlInterface->userExists(userName))
         return Response::RespUserAlreadyExists;

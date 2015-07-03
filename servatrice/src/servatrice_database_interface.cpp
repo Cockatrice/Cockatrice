@@ -118,24 +118,29 @@ bool Servatrice_DatabaseInterface::execSqlQuery(QSqlQuery *query)
     return false;
 }
 
-bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user)
+bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString & error)
 {
-    int maxNameLength = settingsCache->value("users/maxnamelength", 12).toInt();
     int minNameLength = settingsCache->value("users/minnamelength", 6).toInt();
+    int maxNameLength = settingsCache->value("users/maxnamelength", 12).toInt();
+    bool allowLowercase = settingsCache->value("users/allowlowercase", true).toBool();
+    bool allowUppercase = settingsCache->value("users/allowuppercase", true).toBool();
+    bool allowNumerics = settingsCache->value("users/allownumerics", true).toBool();
+    bool allowPunctuationPrefix = settingsCache->value("users/allowpunctuationprefix", false).toBool();
+    QString allowedPunctuation = settingsCache->value("users/allowedpunctuation", "_").toString();
+    error = QString("%1|%2|%3|%4|%5|%6|%7").arg(minNameLength).arg(maxNameLength).arg(allowLowercase).arg(allowUppercase).arg(allowNumerics).arg(allowPunctuationPrefix).arg(allowedPunctuation);
+
     if (user.length() < minNameLength || user.length() > maxNameLength)
         return false;
 
-    bool allowPunctuationPrefix = settingsCache->value("users/allowpunctuationprefix", false).toBool();
-    QString allowedPunctuation = settingsCache->value("users/allowedpunctuation", "_").toString();
     if (!allowPunctuationPrefix && allowedPunctuation.contains(user.at(0)))
         return false;
 
     QString regEx("[");
-    if (settingsCache->value("users/allowlowercase", true).toBool())
+    if (allowLowercase)
         regEx.append("a-z");
-    if (settingsCache->value("users/allowuppercase", true).toBool())
+    if (allowUppercase)
         regEx.append("A-Z");
-    if(settingsCache->value("users/allownumerics", true).toBool())
+    if(allowNumerics)
         regEx.append("0-9");
     regEx.append(QRegExp::escape(allowedPunctuation));
     regEx.append("]+");
@@ -242,7 +247,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
         if (!checkSql())
             return UnknownUser;
 
-        if (!usernameIsValid(user))
+        if (!usernameIsValid(user, reasonStr))
             return UsernameInvalid;
         
         if (checkUserIsBanned(handler->getAddress(), user, reasonStr, banSecondsLeft))

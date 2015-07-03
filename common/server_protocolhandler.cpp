@@ -388,7 +388,12 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         }
         case NotLoggedIn: return Response::RespWrongPassword;
         case WouldOverwriteOldSession: return Response::RespWouldOverwriteOldSession;
-        case UsernameInvalid: return Response::RespUsernameInvalid;
+        case UsernameInvalid: {
+            Response_Login *re = new Response_Login;
+            re->set_denied_reason_str(reasonStr.toStdString());
+            rc.setResponseExtension(re);
+            return Response::RespUsernameInvalid;
+        }
         case RegistrationRequired: return Response::RespRegistrationRequired;
         case UserIsInactive: return Response::RespAccountNotActivated;
         default: authState = res;

@@ -109,6 +109,7 @@ public:
 protected:
     void closeEvent(QCloseEvent *event);
     void changeEvent(QEvent *event);
+    QString extractInvalidUsernameMessage(QString & in);
 };
 
 #endif

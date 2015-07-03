@@ -62,7 +62,7 @@ public:
 	void lockSessionTables();
 	void unlockSessionTables();
 	bool userSessionExists(const QString &userName);
-	bool usernameIsValid(const QString &user);
+	bool usernameIsValid(const QString &user, QString & error);
 	bool checkUserIsBanned(const QString &ipAddress, const QString &userName, QString &banReason, int &banSecondsRemaining);
 
 	bool getRequireRegistration();
