@@ -37,4 +37,4 @@ WORKDIR /home/servatrice
 
 EXPOSE 4747
 
-RUN servatrice
+CMD servatrice
