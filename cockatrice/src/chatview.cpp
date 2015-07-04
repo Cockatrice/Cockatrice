@@ -312,7 +312,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
                 QString mentionIntact = fullMentionUpToSpaceOrEnd;
 
-                while (fullMentionUpToSpaceOrEnd.size())
+                do
                 {
                     if (isFullMentionAValidUser(userList, fullMentionUpToSpaceOrEnd)) // Is there a user online named this?
                     {
@@ -343,8 +343,8 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                         cursor.setCharFormat(defaultFormat);
                         break;
                     }
-                    else if (fullMentionUpToSpaceOrEnd.right(1).indexOf(notALetterOrNumber) == -1)
-                    {               
+                    else if (fullMentionUpToSpaceOrEnd.right(1).indexOf(notALetterOrNumber) == -1 || fullMentionUpToSpaceOrEnd.size() < 2)
+                    {
                         cursor.insertText("@" + mentionIntact, defaultFormat);
                         message = message.mid(mentionIntact.size() + 1);
                         cursor.setCharFormat(defaultFormat);
@@ -352,9 +352,10 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                     }
                     else
                     {
-                        fullMentionUpToSpaceOrEnd = fullMentionUpToSpaceOrEnd.left(fullMentionUpToSpaceOrEnd.size() - 1);
+                        fullMentionUpToSpaceOrEnd.chop(1);
                     }
                 }
+                while (fullMentionUpToSpaceOrEnd.size());
             }
         }
         else
