@@ -25,7 +25,7 @@ public:
     virtual DeckList *getDeckFromDatabase(int /* deckId */, int /* userId */) { return 0; }
     
     virtual qint64 startSession(const QString & /* userName */, const QString & /* address */) { return 0; }
-    virtual bool usernameIsValid(const QString & /*userName */) { return true; };
+    virtual bool usernameIsValid(const QString & /*userName */, QString & /* error */) { return true; };
 public slots:
     virtual void endSession(qint64 /* sessionId */ ) { }
 public:

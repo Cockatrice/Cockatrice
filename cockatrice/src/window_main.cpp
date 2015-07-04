@@ -30,6 +30,10 @@
 #include <QDateTime>
 #include <QSystemTrayIcon>
 #include <QApplication>
+#if QT_VERSION < 0x050000
+    // for Qt::escape() 
+    #include <QtGui/qtextdocument.h>
+#endif
 
 #include "main.h"
 #include "window_main.h"
@@ -79,7 +83,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
             break;
         }
         case Event_ConnectionClosed::SERVER_SHUTDOWN: reasonStr = tr("Scheduled server shutdown."); break;
-        case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."); break;
+        case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username."); break;
         default: reasonStr = QString::fromStdString(event.reason_str());
     }
     QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
@@ -302,9 +306,10 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             QMessageBox::critical(this, tr("Error"), bannedStr);
             break;
         }
-        case Response::RespUsernameInvalid:
-            QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."));
+        case Response::RespUsernameInvalid: {
+            QMessageBox::critical(this, tr("Error"), extractInvalidUsernameMessage(reasonStr));
             break;
+        }
         case Response::RespRegistrationRequired:
             if (QMessageBox::question(this, tr("Error"), tr("This server requires user registration. Do you want to register now?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
                 actRegister();
@@ -326,6 +331,41 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
     }
     actConnect();
+}
+
+QString MainWindow::extractInvalidUsernameMessage(QString & in)
+{
+    QString out = tr("Invalid username.") + "<br/>";
+    QStringList rules = in.split(QChar('|'));
+    if (rules.size() == 7)
+    {
+        out += tr("Your username must respect these rules:") + "<br><ul>";
+
+        out += "<li>" + tr("is %1 - %2 characters long").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
+        out += "<li>" + tr("can %1 contain lowercase characters").arg((rules.at(2).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+        out += "<li>" + tr("can %1 contain uppercase characters").arg((rules.at(3).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+        out += "<li>" + tr("can %1 contain numeric characters").arg((rules.at(4).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+
+        if (rules.at(6).size() > 0)
+        {   
+            out += "<li>" + tr("can contain the following punctuation: %1").arg(
+                #if QT_VERSION < 0x050000
+                    Qt::escape(rules.at(6))
+                #else
+                    rules.at(6).toHtmlEscaped()
+                #endif
+            ) + "</li>";
+        }
+        
+        out += "<li>" + tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+        out += "</ul>";
+    }
+    else
+    {
+        out += tr("You may only use A-Z, a-z, 0-9, _, ., and - in your username.");
+    }
+
+    return out;
 }
 
 void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
@@ -358,9 +398,10 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             QMessageBox::critical(this, tr("Error"), bannedStr);
             break;
         }
-        case Response::RespUsernameInvalid:
-            QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."));
+        case Response::RespUsernameInvalid: {
+            QMessageBox::critical(this, tr("Error"), extractInvalidUsernameMessage(reasonStr));
             break;
+        }
         case Response::RespRegistrationFailed:
             QMessageBox::critical(this, tr("Error"), tr("Registration failed for a technical problem on the server."));
             break;
