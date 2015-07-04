@@ -357,7 +357,7 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
             ) + "</li>";
         }
         
-        out += "<li>" + tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() == 0) ? "" : tr("NOT")) + "</li>";
+        out += "<li>" + tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) + "</li>";
         out += "</ul>";
     }
     else
