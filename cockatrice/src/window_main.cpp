@@ -339,26 +339,29 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
     QStringList rules = in.split(QChar('|'));
     if (rules.size() == 7)
     {
-        out += tr("The username must respect these rules:") + "<br/><ul>"
-            + "<li>" + tr("length between %1 and %2 characters").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
-        if(rules.at(2).toInt() > 0)
-            out += "<li>" + tr("it can contain lowercase characters") + "</li>";
-        if(rules.at(3).toInt() > 0)
-            out += "<li>" + tr("it can contain uppercase characters") + "</li>";
-        if(rules.at(4).toInt() > 0)
-            out += "<li>" + tr("it can contain numeric characters") + "</li>";
-        if(rules.at(6).size() > 0)
-            out += "<li>" + tr("it can contain the following punctuation: %1").arg(
-#if QT_VERSION < 0x050000
-    Qt::escape(rules.at(6))
-#else
-    rules.at(6).toHtmlEscaped()
-#endif
-        ) + "</li>";
-        if(rules.at(5).toInt() == 0)
-            out += "<li>" + tr("the first character can't be a punctuation") + "</li>";
+        out += tr("Your username must respect these rules:") + "<br><ul>";
+
+        out += "<li>" + tr("is %1 - %2 characters long").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
+        out += "<li>" + tr("can %1 contain lowercase characters").arg((rules.at(2).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+        out += "<li>" + tr("can %1 contain uppercase characters").arg((rules.at(3).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+        out += "<li>" + tr("can %1 contain numeric characters").arg((rules.at(4).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+
+        if (rules.at(6).size() > 0)
+        {   
+            out += "<li>" + tr("can contain the following punctuation: %1").arg(
+                #if QT_VERSION < 0x050000
+                    Qt::escape(rules.at(6))
+                #else
+                    rules.at(6).toHtmlEscaped()
+                #endif
+            ) + "</li>";
+        }
+        
+        out += "<li>" + tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() == 0) ? "" : tr("NOT")) + "</li>";
         out += "</ul>";
-    } else {
+    }
+    else
+    {
         out += tr("You may only use A-Z, a-z, 0-9, _, ., and - in your username.");
     }
 
