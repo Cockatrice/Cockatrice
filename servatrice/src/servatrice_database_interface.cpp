@@ -775,7 +775,8 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const
     if (!checkSql())
         return true;
 
-    if (!usernameIsValid(user))
+    QString error;
+    if (!usernameIsValid(user, error))
         return true;
 
     QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name");
