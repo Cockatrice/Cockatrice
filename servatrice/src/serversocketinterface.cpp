@@ -272,6 +272,10 @@ Response::ResponseCode ServerSocketInterface::processExtendedSessionCommand(int 
         case SessionCommand::REPLAY_DELETE_MATCH: return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
         case SessionCommand::REGISTER: return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc); break;
         case SessionCommand::ACTIVATE: return cmdActivateAccount(cmd.GetExtension(Command_Activate::ext), rc); break;
+
+        case SessionCommand::ACCOUNT_EDIT: return cmdAccountEdit(cmd.GetExtension(Command_AccountEdit::ext), rc);
+        case SessionCommand::ACCOUNT_IMAGE: return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
+        case SessionCommand::ACCOUNT_PASSWORD: return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
         default: return Response::RespFunctionNotAllowed;
     }
 }
@@ -948,6 +952,75 @@ Response::ResponseCode ServerSocketInterface::cmdActivateAccount(const Command_A
     }
 }
 
+Response::ResponseCode ServerSocketInterface::cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer &rc)
+{
+    if (authState != PasswordRight)
+        return Response::RespFunctionNotAllowed;
+
+    QString realName = QString::fromStdString(cmd.real_name());
+    QString emailAddress = QString::fromStdString(cmd.email());
+    ServerInfo_User_Gender gender = cmd.gender();
+    QString country = QString::fromStdString(cmd.country());
+
+    QString userName = QString::fromStdString(userInfo->name());
+
+
+    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set realname=:realName, email=:email, gender=:gender, country=:country where name=:userName");
+    query->bindValue(":realName", realName);
+    query->bindValue(":email", emailAddress);
+    query->bindValue(":gender", sqlInterface->getGenderChar(gender));
+    query->bindValue(":country", country);
+    query->bindValue(":userName", userName);
+    if (!sqlInterface->execSqlQuery(query))
+        return Response::RespInternalError;
+
+    userInfo->set_real_name(cmd.real_name());
+    userInfo->set_email(cmd.email());
+    userInfo->set_gender(cmd.gender());
+    userInfo->set_country(cmd.country());
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc)
+{
+    if (authState != PasswordRight)
+        return Response::RespFunctionNotAllowed;
+
+    QByteArray image(cmd.image().c_str(), cmd.image().length());
+    int id = userInfo->id();
+
+    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set avatar_bmp=:image where id=:id");
+    query->bindValue(":image", image);
+    query->bindValue(":id", id);
+    if (!sqlInterface->execSqlQuery(query))
+        return Response::RespInternalError;
+
+    userInfo->set_avatar_bmp(cmd.image().c_str(), cmd.image().length());
+    return Response::RespOk;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdAccountPassword(const Command_AccountPassword &cmd, ResponseContainer &rc)
+{
+    if (authState != PasswordRight)
+        return Response::RespFunctionNotAllowed;
+
+    QString oldPassword = QString::fromStdString(cmd.old_password());
+    QString newPassword = QString::fromStdString(cmd.new_password());
+
+    // TODO make this configurable?
+    if(newPassword.length() < 6)
+        return Response::RespPasswordTooShort;
+
+    QString userName = QString::fromStdString(userInfo->name());
+
+    bool changeFailed = databaseInterface->changeUserPassword(userName, oldPassword, newPassword);
+
+    if(changeFailed)
+        return Response::RespWrongPassword;
+    
+    return Response::RespOk;
+}
 
 // ADMIN FUNCTIONS.
 // Permission is checked by the calling function.

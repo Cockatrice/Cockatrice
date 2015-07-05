@@ -12,7 +12,6 @@
 #include "tab_server.h"
 #include "abstractclient.h"
 #include "userlist.h"
-#include "userinfobox.h"
 #include <QDebug>
 
 #include "pending_command.h"

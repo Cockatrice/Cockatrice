@@ -3,7 +3,6 @@
 #include "tab_supervisor.h"
 #include "abstractclient.h"
 #include "pixmapgenerator.h"
-#include "userinfobox.h"
 #include "user_context_menu.h"
 #include "gameselector.h"
 #include <QHeaderView>

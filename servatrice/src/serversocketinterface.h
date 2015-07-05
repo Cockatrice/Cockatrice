@@ -49,6 +49,10 @@ class Command_UpdateServerMessage;
 class Command_ShutdownServer;
 class Command_ReloadConfig;
 
+class Command_AccountEdit;
+class Command_AccountImage;
+class Command_AccountPassword;
+
 class ServerSocketInterface : public Server_ProtocolHandler
 {
 	Q_OBJECT
@@ -100,6 +104,10 @@ private:
 	Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
 	Response::ResponseCode processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
 	Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc);
+
+	Response::ResponseCode cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdAccountPassword(const Command_AccountPassword &cmd, ResponseContainer &rc);
 
 	bool sendActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token);
 public:

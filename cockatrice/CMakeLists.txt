@@ -11,7 +11,10 @@ SET(cockatrice_SOURCES
     src/dlg_filter_games.cpp
     src/dlg_connect.cpp 
     src/dlg_create_token.cpp 
+    src/dlg_edit_avatar.cpp
+    src/dlg_edit_password.cpp
     src/dlg_edit_tokens.cpp
+    src/dlg_edit_user.cpp
     src/dlg_register.cpp 
     src/abstractclient.cpp 
     src/remoteclient.cpp 

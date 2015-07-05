@@ -145,7 +145,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
 
     QAction *actionClicked = menu->exec(pos);
     if (actionClicked == aDetails) {
-        UserInfoBox *infoWidget = new UserInfoBox(client, true, static_cast<QWidget *>(parent()), Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
+        UserInfoBox *infoWidget = new UserInfoBox(client, false, static_cast<QWidget *>(parent()), Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
         infoWidget->setAttribute(Qt::WA_DeleteOnClose);
         infoWidget->updateInfo(userName);
     } else if (actionClicked == aChat)

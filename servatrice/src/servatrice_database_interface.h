@@ -25,7 +25,6 @@ private:
 	bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
 	/** Must be called after checkSql and server is known to be in auth mode. */
 	bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
-	QChar getGenderChar(ServerInfo_User_Gender const &gender);
 protected:
 	AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft);
 public slots:
@@ -70,6 +69,8 @@ public:
 	bool activateUser(const QString &userName, const QString &token);
 
     void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName);
+	bool changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword);
+	QChar getGenderChar(ServerInfo_User_Gender const &gender);
 };
 
 #endif

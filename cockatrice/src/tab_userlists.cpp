@@ -21,7 +21,7 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     allUsersList = new UserList(_tabSupervisor, client, UserList::AllUsersList);
     buddyList = new UserList(_tabSupervisor, client, UserList::BuddyList);
     ignoreList = new UserList(_tabSupervisor, client, UserList::IgnoreList);
-    userInfoBox = new UserInfoBox(client, false);
+    userInfoBox = new UserInfoBox(client, true);
     userInfoBox->updateInfo(userInfo);
 
     connect(allUsersList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
