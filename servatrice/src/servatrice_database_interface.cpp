@@ -471,6 +471,10 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
             qint64 accountAgeInSeconds = regDate.secsTo(QDateTime::currentDateTime());
             result.set_accountage_secs(accountAgeInSeconds);
         }
+
+        const QString email = query->value(8).toString();
+        if (!email.isEmpty())
+            result.set_email(email.toStdString());
     }
     return result;
 }
@@ -485,7 +489,7 @@ ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, b
         if (!checkSql())
             return result;
         
-        QSqlQuery *query = prepareQuery("select id, name, admin, country, gender, realname, avatar_bmp, registrationDate from {prefix}_users where name = :name and active = 1");
+        QSqlQuery *query = prepareQuery("select id, name, admin, country, gender, realname, avatar_bmp, registrationDate, email from {prefix}_users where name = :name and active = 1");
         query->bindValue(":name", name);
         if (!execSqlQuery(query))
             return result;
@@ -756,4 +760,41 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId, const QString 
     query->bindValue(":target_id", (targetType == MessageTargetChat && targetId < 1) ? QVariant() : targetId);
     query->bindValue(":target_name", targetName);
     execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword)
+{
+    if(server->getAuthenticationMethod() != Servatrice::AuthenticationSql)
+        return true;
+
+    if (!checkSql())
+        return true;
+
+    if (!usernameIsValid(user))
+        return true;
+
+    QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name");
+    passwordQuery->bindValue(":name", user);
+    if (!execSqlQuery(passwordQuery)) {
+        qDebug("Change password denied: SQL error");
+        return true;
+    }
+        
+    if (!passwordQuery->next())
+        return true;
+
+    const QString correctPassword = passwordQuery->value(0).toString();
+    if (correctPassword != PasswordHasher::computeHash(oldPassword, correctPassword.left(16)))
+        return true;
+
+    QString passwordSha512 = PasswordHasher::computeHash(newPassword, PasswordHasher::generateRandomSalt());
+
+    passwordQuery = prepareQuery("update {prefix}_users set password_sha512=:password where name = :name");
+    passwordQuery->bindValue(":password", passwordSha512);
+    passwordQuery->bindValue(":name", user);
+    if (!execSqlQuery(passwordQuery)) {
+        qDebug("Change password denied: SQL error");
+        return true;
+    }
+    return false;
 }
