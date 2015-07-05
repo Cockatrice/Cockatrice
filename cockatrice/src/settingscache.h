@@ -2,6 +2,7 @@
 #define SETTINGSCACHE_H
 
 #include <QObject>
+#include <QStringList>
 
 // the falbacks are used for cards without a muid
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
@@ -139,6 +140,7 @@ public:
     bool getLeftJustified() const { return leftJustified; }
     int getMasterVolume() const { return masterVolume; }
     int getCardInfoViewMode() const { return cardInfoViewMode; }
+    QStringList getCountries() const;
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);

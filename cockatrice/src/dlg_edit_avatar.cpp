@@ -1,4 +1,5 @@
 #include <QBuffer>
+#include <QDebug>
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFileDialog>
@@ -17,7 +18,7 @@ DlgEditAvatar::DlgEditAvatar(QWidget *parent)
     imageLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     imageLabel->setStyleSheet("border: 1px solid #000");
 
-    textLabel = new QLabel(tr("To change your avatar, choose a new image.\nTo remove your current avatar, just confirm without choosing a new image."));
+    textLabel = new QLabel(tr("To change your avatar, choose a new image.\nTo remove your current avatar, confirm without choosing a new image."));
     browseButton = new QPushButton(tr("Browse..."));
     connect(browseButton, SIGNAL(clicked()), this, SLOT(actBrowse()));
     
@@ -65,6 +66,7 @@ void DlgEditAvatar::actBrowse()
     imgReader.setFileName(fileName);
     if(!imgReader.read(&image))
     {
+        qDebug() << "Avatar image loading failed for file:" << fileName;
         imageLabel->setText(tr("Invalid image chosen."));
         return;
     }

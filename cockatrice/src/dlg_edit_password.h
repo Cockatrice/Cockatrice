@@ -19,8 +19,8 @@ private slots:
     void actOk();
     void actCancel();
 private:
-    QLabel *oldPasswordLabel, *newPasswordLabel;
-    QLineEdit *oldPasswordEdit, *newPasswordEdit;
+    QLabel *oldPasswordLabel, *newPasswordLabel, *newPasswordLabel2;
+    QLineEdit *oldPasswordEdit, *newPasswordEdit, *newPasswordEdit2;
 };
 
 #endif
