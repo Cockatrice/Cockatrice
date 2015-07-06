@@ -274,8 +274,8 @@ void MainWindow::actAbout()
         + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ'>" + tr("Help Translate!") + "</a><br><br>"
         + "<b>" + tr("Support:") + "</b><br>"
         + "<a href='https://github.com/Cockatrice/Cockatrice/issues'>" + tr("Report an Issue") + "</a><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/issues'>" + tr("Suggest an Improvement") + "</a><br>"
-        
+        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting'>" + tr("Troubleshooting") + "</a><br>"
+        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions'>" + tr("F.A.Q.") + "</a><br>"
     ));
 }
 
