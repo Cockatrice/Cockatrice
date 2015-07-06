@@ -126,14 +126,17 @@ void Server_Card::getInfo(ServerInfo_Card *info)
     info->set_name(displayedName.toStdString());
     info->set_x(coord_x);
     info->set_y(coord_y);
+    QString ptStr = getPT();
     if (facedown)
+    {
         info->set_face_down(true);
+        ptStr = getPT();
+    }
     info->set_tapped(tapped);
     if (attacking)
         info->set_attacking(true);
     if (!color.isEmpty())
         info->set_color(color.toStdString());
-    const QString ptStr = getPT();
     if (!ptStr.isEmpty())
         info->set_pt(ptStr.toStdString());
     if (!annotation.isEmpty())
