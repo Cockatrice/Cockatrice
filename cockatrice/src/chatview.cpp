@@ -343,6 +343,23 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                         cursor.setCharFormat(defaultFormat);
                         break;
                     }
+                    else if (isModeratorSendingGlobal(userLevel, fullMentionUpToSpaceOrEnd))
+                    {
+                        // Moderator Sending Global Message
+                        mentionFormat.setBackground(QBrush(getCustomMentionColor()));
+                        mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
+                        cursor.insertText("@" + fullMentionUpToSpaceOrEnd, mentionFormat);
+                        message = message.mid(fullMentionUpToSpaceOrEnd.size() + 1);
+                        QApplication::alert(this);
+                        if (settingsCache->getShowMentionPopup() && shouldShowSystemPopup())
+                        {
+                            QString ref = sender.left(sender.length() - 2);
+                            showSystemPopup(ref);
+                        }
+
+                        cursor.setCharFormat(defaultFormat);
+                        break;
+                    }
                     else if (fullMentionUpToSpaceOrEnd.right(1).indexOf(notALetterOrNumber) == -1 || fullMentionUpToSpaceOrEnd.size() < 2)
                     {
                         cursor.insertText("@" + mentionIntact, defaultFormat);
@@ -366,6 +383,19 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+bool ChatView::isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message)
+{
+    int userLevel = QString::number(userLevelFlag).toInt();
+
+    QStringList getAttentionList;
+    getAttentionList << "/all"; // Send a message to all users
+
+    if (getAttentionList.contains(message) && (userLevel & ServerInfo_User::IsModerator || userLevel & ServerInfo_User::IsAdmin))
+        return true;
+
+    return false;
 }
 
 void ChatView::actMessageClicked() {
