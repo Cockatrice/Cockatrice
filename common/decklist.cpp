@@ -727,7 +727,7 @@ void DeckList::updateDeckHash()
 {
     QStringList cardList;
     bool isValidDeckList = true;
-    static QSet<QString> hashZones, optionalZones;
+    QSet<QString> hashZones, optionalZones;
 
     hashZones << "main" << "side"; // Zones in deck to be included in hashing process
     optionalZones << "tokens"; // Optional zones in deck not included in hashing process
@@ -737,17 +737,15 @@ void DeckList::updateDeckHash()
         InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
         for (int j = 0; j < node->size(); j++)
         {
-            DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
-            for (int k = 0; k < card->getNumber(); ++k)
+            if (hashZones.contains(node->getName())) // Mainboard or Sideboard
             {
-                if (hashZones.contains(node->getName())) // Mainboard or Sideboard
-                {
+                DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+                for (int k = 0; k < card->getNumber(); ++k)
                     cardList.append((node->getName() == "side" ? "SB:" : "") + card->getName().toLower());
-                }
-                else if (!optionalZones.contains(node->getName())) // Not a valid zone -> cheater?
-                {
-                    isValidDeckList = false; // Deck is invalid
-                }
+            }
+            else if (!optionalZones.contains(node->getName())) // Not a valid zone -> cheater?
+            {
+                isValidDeckList = false; // Deck is invalid
             }
         }
     }
