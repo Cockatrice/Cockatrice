@@ -741,8 +741,7 @@ void DeckList::updateDeckHash()
                 }
                 else if (node->getName() != "tokens") // Neither Mainboard, Sideboard, or Tokens... cheater?
                 {
-                    isValidDeckList = false;
-                    break; break; break; // Deck is invalid, end the entire check
+                    isValidDeckList = false; // Deck is invalid
                 }
             }
         }
