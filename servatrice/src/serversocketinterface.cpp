@@ -952,7 +952,7 @@ Response::ResponseCode ServerSocketInterface::cmdActivateAccount(const Command_A
     }
 }
 
-Response::ResponseCode ServerSocketInterface::cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer &rc)
+Response::ResponseCode ServerSocketInterface::cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer & /* rc */)
 {
     if (authState != PasswordRight)
         return Response::RespFunctionNotAllowed;
@@ -982,7 +982,7 @@ Response::ResponseCode ServerSocketInterface::cmdAccountEdit(const Command_Accou
     return Response::RespOk;
 }
 
-Response::ResponseCode ServerSocketInterface::cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc)
+Response::ResponseCode ServerSocketInterface::cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer & /* rc */)
 {
     if (authState != PasswordRight)
         return Response::RespFunctionNotAllowed;
@@ -1000,7 +1000,7 @@ Response::ResponseCode ServerSocketInterface::cmdAccountImage(const Command_Acco
     return Response::RespOk;
 }
 
-Response::ResponseCode ServerSocketInterface::cmdAccountPassword(const Command_AccountPassword &cmd, ResponseContainer &rc)
+Response::ResponseCode ServerSocketInterface::cmdAccountPassword(const Command_AccountPassword &cmd, ResponseContainer & /* rc */)
 {
     if (authState != PasswordRight)
         return Response::RespFunctionNotAllowed;
