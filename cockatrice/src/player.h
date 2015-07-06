@@ -241,7 +241,7 @@ private:
     void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
 public:
     static const int counterAreaWidth = 55;
-    enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToGraveyard, cmMoveToExile, cmMoveToHand };
+    enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToHand, cmMoveToGraveyard, cmMoveToExile };
     
     enum { Type = typeOther };
     int type() const { return Type; }
