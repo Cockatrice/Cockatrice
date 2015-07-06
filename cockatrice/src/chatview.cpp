@@ -171,7 +171,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     {
         // search for the first [ or @
         bracketFirstIndex = message.indexOf('[');
-        mentionFirstIndex = mentionEnabled ? message.indexOf('@') : -1;
+        mentionFirstIndex = message.indexOf('@');
         urlFirstIndex = message.indexOf(urlStarter);
 
         bool startsWithBracket = (bracketFirstIndex != -1);
@@ -298,19 +298,18 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         }
         else if (index == mentionFirstIndex)
         {
-            if (tabSupervisor->getIsLocalGame())
+            int firstSpace = message.indexOf(" ");
+            QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
+            QString mentionIntact = fullMentionUpToSpaceOrEnd;
+
+            if ((!mentionEnabled && !isModeratorSendingGlobal(userLevel, fullMentionUpToSpaceOrEnd)) || tabSupervisor->getIsLocalGame())
             {
                 cursor.insertText("@");
                 message = message.mid(1);
             }
             else
             {
-
                 QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
-
-                int firstSpace = message.indexOf(" ");
-                QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
-                QString mentionIntact = fullMentionUpToSpaceOrEnd;
 
                 do
                 {
