@@ -726,12 +726,25 @@ bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNod
 void DeckList::updateDeckHash()
 {
     QStringList cardList;
-    for (int i = 0; i < root->size(); i++) {
+    bool isValidDeckList = true;
+    for (int i = 0; i < root->size(); i++)
+    {
         InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
-        for (int j = 0; j < node->size(); j++) {
+        for (int j = 0; j < node->size(); j++)
+        {
             DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
             for (int k = 0; k < card->getNumber(); ++k)
-                cardList.append((node->getName() == "side" ? "SB:" : "") + card->getName().toLower());
+            {
+                if (node->getName() == "main" || node->getName() == "side") // Mainboard or Sideboard
+                {
+                    cardList.append((node->getName() == "side" ? "SB:" : "") + card->getName().toLower());
+                }
+                else if (node->getName() != "tokens") // Neither Mainboard, Sideboard, or Tokens... cheater?
+                {
+                    isValidDeckList = false;
+                    break; break; break; // Deck is invalid, end the entire check
+                }
+            }
         }
     }
     cardList.sort();
@@ -741,7 +754,7 @@ void DeckList::updateDeckHash()
                     + (((quint64) (unsigned char) deckHashArray[2] << 16))
                     + (((quint64) (unsigned char) deckHashArray[3]) << 8)
                     + (quint64) (unsigned char) deckHashArray[4];
-    deckHash = QString::number(number, 32).rightJustified(8, '0');
+    deckHash = (isValidDeckList) ? QString::number(number, 32).rightJustified(8, '0') : "INVALID";
     
     emit deckHashChanged();
 }
