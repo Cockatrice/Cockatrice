@@ -415,11 +415,14 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     aMoveToBottomLibrary = new QAction(this);
     aMoveToBottomLibrary->setData(cmMoveToBottomLibrary);
     aMoveToGraveyard = new QAction(this);
+    aMoveToHand = new QAction(this);
+    aMoveToHand->setData(cmMoveToHand);
     aMoveToGraveyard->setData(cmMoveToGraveyard);
     aMoveToExile = new QAction(this);
     aMoveToExile->setData(cmMoveToExile);
     connect(aMoveToTopLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     connect(aMoveToBottomLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    connect(aMoveToHand, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     connect(aMoveToGraveyard, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     connect(aMoveToExile, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     
@@ -720,6 +723,7 @@ void Player::retranslateUi()
         aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(counterColors[i]));
     aMoveToTopLibrary->setText(tr("&Top of library"));
     aMoveToBottomLibrary->setText(tr("&Bottom of library"));
+    aMoveToHand->setText(tr("&Hand"));
     aMoveToGraveyard->setText(tr("&Graveyard"));
     aMoveToGraveyard->setShortcut(QKeySequence("Ctrl+Del"));
     aMoveToExile->setText(tr("&Exile"));
@@ -1959,6 +1963,18 @@ void Player::cardMenuAction()
                 commandList.append(cmd);
                 break;
             }
+            case cmMoveToHand: {
+                Command_MoveCard *cmd = new Command_MoveCard;
+                cmd->set_start_player_id(startPlayerId);
+                cmd->set_start_zone(startZone.toStdString());
+                cmd->mutable_cards_to_move()->CopyFrom(idList);
+                cmd->set_target_player_id(getId());
+                cmd->set_target_zone("hand");
+                cmd->set_x(0);
+                cmd->set_y(0);
+                commandList.append(cmd);
+                break;
+            }
             case cmMoveToGraveyard: {
                 Command_MoveCard *cmd = new Command_MoveCard;
                 cmd->set_start_player_id(startPlayerId);
@@ -2247,6 +2263,8 @@ void Player::updateCardMenu(CardItem *card)
         if (moveMenu->isEmpty()) {
             moveMenu->addAction(aMoveToTopLibrary);
             moveMenu->addAction(aMoveToBottomLibrary);
+            moveMenu->addSeparator();
+            moveMenu->addAction(aMoveToHand);
             moveMenu->addSeparator();
             moveMenu->addAction(aMoveToGraveyard);
             moveMenu->addSeparator();
