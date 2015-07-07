@@ -46,6 +46,7 @@ SettingsCache::SettingsCache()
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     playToStack = settings->value("interface/playtostack", false).toBool();
+    annotateTokens = settings->value("interface/annotatetokens", false).toBool();
     cardInfoMinimized = settings->value("interface/cardinfominimized", 0).toInt();
     tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
@@ -249,6 +250,12 @@ void SettingsCache::setPlayToStack(int _playToStack)
 {
     playToStack = _playToStack;
     settings->setValue("interface/playtostack", playToStack);
+}
+
+void SettingsCache::setAnnotateTokens(int _annotateTokens)
+{
+    annotateTokens = _annotateTokens;
+    settings->setValue("interface/annotatetokens", annotateTokens);
 }
 
 void SettingsCache::setCardInfoMinimized(int _cardInfoMinimized)

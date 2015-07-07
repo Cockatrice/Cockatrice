@@ -482,12 +482,16 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     
     playToStackCheckBox.setChecked(settingsCache->getPlayToStack());
     connect(&playToStackCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPlayToStack(int)));
-    
+
+    annotateTokensCheckBox.setChecked(settingsCache->getAnnotateTokens());
+    connect(&annotateTokensCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setAnnotateTokens(int)));
+
     QGridLayout *generalGrid = new QGridLayout;
     generalGrid->addWidget(&notificationsEnabledCheckBox, 0, 0);
     generalGrid->addWidget(&specNotificationsEnabledCheckBox, 1, 0);
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 2, 0);
     generalGrid->addWidget(&playToStackCheckBox, 3, 0);
+    generalGrid->addWidget(&annotateTokensCheckBox, 4, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -519,6 +523,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
+    annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
 }

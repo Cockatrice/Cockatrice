@@ -55,6 +55,7 @@ private:
     bool spectatorNotificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
+    bool annotateTokens;
     int cardInfoMinimized;
     QByteArray tabGameSplitterSizes;
     bool displayCardNames;
@@ -106,6 +107,7 @@ public:
 
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
+    bool getAnnotateTokens() const { return annotateTokens; }
     int  getCardInfoMinimized() const { return cardInfoMinimized; }
     QByteArray getTabGameSplitterSizes() const { return tabGameSplitterSizes; }
     bool getDisplayCardNames() const { return displayCardNames; }
@@ -161,6 +163,7 @@ public slots:
     void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
+    void setAnnotateTokens(int _annotateTokens);
     void setCardInfoMinimized(int _cardInfoMinimized);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setDisplayCardNames(int _displayCardNames);

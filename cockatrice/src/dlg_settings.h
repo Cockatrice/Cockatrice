@@ -127,6 +127,7 @@ private:
     QCheckBox specNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox playToStackCheckBox;
+    QCheckBox annotateTokensCheckBox;
     QCheckBox tapAnimationCheckBox;
     QGroupBox *generalGroupBox;
     QGroupBox *animationGroupBox;
