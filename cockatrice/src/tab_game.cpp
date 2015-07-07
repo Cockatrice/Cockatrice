@@ -124,8 +124,10 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 
 void DeckViewContainer::retranslateUi()
 {
-    loadLocalButton->setText(tr("Load &local deck"));
-    loadRemoteButton->setText(tr("Load d&eck from server"));
+    loadLocalButton->setText(tr("Load local deck"));
+    loadLocalButton->setShortcut(QKeySequence("Ctrl+O"));
+    loadRemoteButton->setText(tr("Load deck from server"));
+    loadRemoteButton->setShortcut(QKeySequence("Ctrl+Alt+O"));
     readyStartButton->setText(tr("Ready to s&tart"));
     updateSideboardLockButtonText();
 }
