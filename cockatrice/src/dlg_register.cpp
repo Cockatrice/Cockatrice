@@ -37,7 +37,7 @@ DlgRegister::DlgRegister(QWidget *parent)
     emailEdit = new QLineEdit();
     emailLabel->setBuddy(emailEdit);
 
-    genderLabel = new QLabel(tr("Gender:"));
+    genderLabel = new QLabel(tr("Pronouns:"));
     genderEdit = new QComboBox();
     genderLabel->setBuddy(genderEdit);
     genderEdit->insertItem(0, QIcon(":/resources/genders/unknown.svg"), tr("Neutral"));
