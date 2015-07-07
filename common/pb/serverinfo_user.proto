@@ -22,4 +22,5 @@ message ServerInfo_User {
     optional sint32 server_id = 9 [default = -1];
     optional uint64 session_id = 10;
     optional uint64 accountage_secs = 11;
+    optional string email = 12;
 }
