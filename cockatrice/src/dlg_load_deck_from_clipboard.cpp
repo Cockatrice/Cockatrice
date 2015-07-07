@@ -48,7 +48,20 @@ void DlgLoadDeckFromClipboard::actOK()
     QTextStream stream(&buffer);
     
     DeckLoader *l = new DeckLoader;
-    if (l->loadFromStream_Plain(stream)) {
+    if (buffer.contains("<cockatrice_deck version=\"1\">"))
+    {
+        if (l->loadFromString_Native(buffer))
+        {
+            deckList = l;
+            accept();
+        }
+        else
+        {
+            QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
+            delete l;
+        }
+    }
+    else if (l->loadFromStream_Plain(stream)) {
         deckList = l;
         accept();
     } else {
