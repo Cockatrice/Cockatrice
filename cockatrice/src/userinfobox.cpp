@@ -68,7 +68,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
 void UserInfoBox::retranslateUi()
 {
     realNameLabel1.setText(tr("Real name:"));
-    genderLabel1.setText(tr("Gender:"));
+    genderLabel1.setText(tr("Pronouns:"));
     countryLabel1.setText(tr("Location:"));
     userLevelLabel1.setText(tr("User level:"));
     accountAgeLebel1.setText(tr("Account Age:"));
