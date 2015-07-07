@@ -43,6 +43,7 @@ private:
     QColor getCustomMentionColor();
     bool shouldShowSystemPopup();
     void showSystemPopup(QString &sender);
+    bool isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message);
 private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();

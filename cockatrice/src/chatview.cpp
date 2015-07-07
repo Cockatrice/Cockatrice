@@ -171,7 +171,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     {
         // search for the first [ or @
         bracketFirstIndex = message.indexOf('[');
-        mentionFirstIndex = mentionEnabled ? message.indexOf('@') : -1;
+        mentionFirstIndex = message.indexOf('@');
         urlFirstIndex = message.indexOf(urlStarter);
 
         bool startsWithBracket = (bracketFirstIndex != -1);
@@ -298,19 +298,18 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         }
         else if (index == mentionFirstIndex)
         {
-            if (tabSupervisor->getIsLocalGame())
+            int firstSpace = message.indexOf(" ");
+            QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
+            QString mentionIntact = fullMentionUpToSpaceOrEnd;
+
+            if ((!mentionEnabled && !isModeratorSendingGlobal(userLevel, fullMentionUpToSpaceOrEnd)) || tabSupervisor->getIsLocalGame())
             {
                 cursor.insertText("@");
                 message = message.mid(1);
             }
             else
             {
-
                 QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
-
-                int firstSpace = message.indexOf(" ");
-                QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
-                QString mentionIntact = fullMentionUpToSpaceOrEnd;
 
                 do
                 {
@@ -343,6 +342,23 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                         cursor.setCharFormat(defaultFormat);
                         break;
                     }
+                    else if (isModeratorSendingGlobal(userLevel, fullMentionUpToSpaceOrEnd))
+                    {
+                        // Moderator Sending Global Message
+                        mentionFormat.setBackground(QBrush(getCustomMentionColor()));
+                        mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
+                        cursor.insertText("@" + fullMentionUpToSpaceOrEnd, mentionFormat);
+                        message = message.mid(fullMentionUpToSpaceOrEnd.size() + 1);
+                        QApplication::alert(this);
+                        if (settingsCache->getShowMentionPopup() && shouldShowSystemPopup())
+                        {
+                            QString ref = sender.left(sender.length() - 2);
+                            showSystemPopup(ref);
+                        }
+
+                        cursor.setCharFormat(defaultFormat);
+                        break;
+                    }
                     else if (fullMentionUpToSpaceOrEnd.right(1).indexOf(notALetterOrNumber) == -1 || fullMentionUpToSpaceOrEnd.size() < 2)
                     {
                         cursor.insertText("@" + mentionIntact, defaultFormat);
@@ -366,6 +382,19 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
 
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+bool ChatView::isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message)
+{
+    int userLevel = QString::number(userLevelFlag).toInt();
+
+    QStringList getAttentionList;
+    getAttentionList << "/all"; // Send a message to all users
+
+    if (getAttentionList.contains(message) && (userLevel & ServerInfo_User::IsModerator || userLevel & ServerInfo_User::IsAdmin))
+        return true;
+
+    return false;
 }
 
 void ChatView::actMessageClicked() {
