@@ -9,11 +9,8 @@
 
 #include <QVBoxLayout>
 
-CardFrame::CardFrame(int width, int height,
-                        const QString &cardName, QWidget *parent)
-    : QTabWidget(parent)
-    , info(0)
-    , cardTextOnly(false)
+CardFrame::CardFrame(int width, int height, const QString &cardName, QWidget *parent)
+    : QTabWidget(parent), info(0), cardTextOnly(false)
 {
     setFixedWidth(width);
     setMinimumHeight(height);
