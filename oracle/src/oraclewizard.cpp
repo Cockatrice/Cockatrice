@@ -39,7 +39,7 @@
     #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json"
 #endif
 
-#define TOKENS_URL "https://raw.githubusercontent.com/Psithief/Cockatrice-tokens/master/tokens.xml"
+#define TOKENS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml"
 
 
 OracleWizard::OracleWizard(QWidget *parent)
@@ -323,7 +323,7 @@ void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
         progressBar->setMaximum(total);
         progressBar->setValue(received);
     }
-    progressLabel->setText(tr("Downloading (%1MB)").arg((int) received / 1048576));
+    progressLabel->setText(tr("Downloading (%1MB)").arg((int) received / (1024 * 1024)));
 }
 
 void LoadSetsPage::actDownloadFinishedSetsFile()
@@ -638,7 +638,7 @@ void LoadTokensPage::actDownloadProgressTokensFile(qint64 received, qint64 total
         progressBar->setMaximum(total);
         progressBar->setValue(received);
     }
-    progressLabel->setText(tr("Downloading (%1MB)").arg((int) received / 1048576));
+    progressLabel->setText(tr("Downloading (%1MB)").arg((int) received / (1024 * 1024)));
 }
 
 void LoadTokensPage::actDownloadFinishedTokensFile()
