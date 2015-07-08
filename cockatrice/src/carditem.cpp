@@ -358,7 +358,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (settingsCache->getDoubleClickToPlay()) {
+    if (settingsCache->getDoubleClickToPlay() && event->buttons() == Qt::LeftButton) {
         if (revealedCard)
             zone->removeCard(this);
         else
