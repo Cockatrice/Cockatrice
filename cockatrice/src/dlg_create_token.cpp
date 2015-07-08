@@ -10,10 +10,12 @@
 #include <QTreeView>
 #include <QRadioButton>
 #include <QHeaderView>
+
 #include "decklist.h"
 #include "dlg_create_token.h"
 #include "carddatabasemodel.h"
 #include "main.h"
+#include "settingscache.h"
 
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     : QDialog(parent), predefinedTokens(_predefinedTokens)
@@ -136,7 +138,8 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
     const QString cardColor = cardInfo->getColors().isEmpty() ? QString() : (cardInfo->getColors().size() > 1 ? QString("m") : cardInfo->getColors().first());
     colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
     ptEdit->setText(cardInfo->getPowTough());
-    annotationEdit->setText(cardInfo->getText());
+    if(settingsCache->getAnnotateTokens())
+        annotationEdit->setText(cardInfo->getText());
 }
 
 void DlgCreateToken::actChooseTokenFromAll(bool checked)

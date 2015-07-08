@@ -1075,7 +1075,7 @@ void Player::actCreatePredefinedToken()
     lastTokenName = cardInfo->getName();
     lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first().toLower();
     lastTokenPT = cardInfo->getPowTough();
-    lastTokenAnnotation = cardInfo->getText();
+    lastTokenAnnotation = settingsCache->getAnnotateTokens() ? cardInfo->getText() : "";
     lastTokenTableRow = table->clampValidTableRow(2 - cardInfo->getTableRow());
     lastTokenDestroy = true;
     aCreateAnotherToken->setEnabled(true);
@@ -1100,6 +1100,7 @@ void Player::actCreateRelatedCard()
     cmd.set_card_name(cardInfo->getName().toStdString());
     cmd.set_color(cardInfo->getColors().isEmpty() ? QString().toStdString() : cardInfo->getColors().first().toLower().toStdString());
     cmd.set_pt(cardInfo->getPowTough().toStdString());
+    cmd.set_annotation(settingsCache->getAnnotateTokens() ? cardInfo->getText().toStdString() : QString().toStdString());
     cmd.set_destroy_on_zone_change(true);
     cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
     cmd.set_target_card_id(sourceCard->getId());
