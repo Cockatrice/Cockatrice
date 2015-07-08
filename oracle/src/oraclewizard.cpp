@@ -108,9 +108,15 @@ bool OracleWizard::saveTokensToFile(const QString & fileName)
 {
     QFile file(fileName);
     if(!file.open(QIODevice::WriteOnly))
+    {
+        qDebug() << "File open (w) failed for" << fileName;
         return false;
+    }
     if(file.write(tokensData) == -1)
+    {
+        qDebug() << "File write (w) failed for" << fileName;
         return false;
+    }
     file.close();
     return true;
 }
@@ -653,7 +659,7 @@ void LoadTokensPage::actDownloadFinishedTokensFile()
         return;
     }
 
-    // save allsets.json url, but only if the user customized it and download was successfull
+    // save tokens.xml url, but only if the user customized it and download was successfull
     if(urlLineEdit->text() != QString(TOKENS_URL))
         wizard()->settings->setValue("tokensurl", urlLineEdit->text());
     else
