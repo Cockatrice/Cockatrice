@@ -323,6 +323,7 @@ void TabDeckEditor::retranslateUi()
     filterBox->setTitle(tr("Filters"));
     aClearFilterAll->setText(tr("&Clear all filters"));
     aClearFilterOne->setText(tr("Delete selected"));
+    aClearFilterOne->setShortcut(QKeySequence("Backspace"));
     
     nameLabel->setText(tr("Deck &name:"));
     commentsLabel->setText(tr("&Comments:"));
