@@ -358,13 +358,15 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (settingsCache->getDoubleClickToPlay()) {
-        if (revealedCard)
-            zone->removeCard(this);
-        else
-            playCard(event->modifiers().testFlag(Qt::ShiftModifier));
+    if (event->buttons() == Qt::LeftButton){
+        if (settingsCache->getDoubleClickToPlay()) {
+            if (revealedCard)
+                zone->removeCard(this);
+            else
+                playCard(event->modifiers().testFlag(Qt::ShiftModifier));
+        }
+        event->accept();
     }
-    event->accept();
 }
 
 
