@@ -28,6 +28,7 @@ private:
     QPointer<CardItem> hoveredCard;
     QBasicTimer *animationTimer;
     QSet<CardItem *> cardsToAnimate;
+    int playerRotation;
     void updateHover(const QPointF &scenePos);
 public:
     GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = 0);
@@ -51,6 +52,7 @@ public slots:
     void removePlayer(Player *player);
     void clearViews();
     void closeMostRecentZoneView();
+    void adjustPlayerRotation(int rotationAdjustment);
     void rearrange();
 protected:
     bool event(QEvent *event);
