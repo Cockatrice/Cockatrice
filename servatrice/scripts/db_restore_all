@@ -1,5 +1,6 @@
 #!/bin/bash
 set -u
+set -e
 SLEEPTIME=5
 SQLCONFFILE="./mysql.cnf"	#set this to the path that contains the mysql.cnf file
 LOGAPPENDDATE=`date +%m%d%Y`
@@ -30,8 +31,7 @@ TABLES=(
 	)
 
 PROCESSNAME="mysqldump"
-COMMANDRESULTS=`ps -e |grep $PROCESSNAME |grep -v grep`
-if [ -z "$COMMANDRESULTS" ];
+if [ "$(pgrep $PROCESSNAME)" == "" ];
 then
 	[ ! -d $BACKUPDIR ] && mkdir -p $BACKUPDIR/
 	for TABLENAME in "${TABLES[@]}"
