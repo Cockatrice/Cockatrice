@@ -1,0 +1,50 @@
+#!/bin/bash
+SLEEPTIME=5
+SQLCONFFILE="./mysql.cnf"	#set this to the path that contains the mysql.cnf file
+LOGAPPENDDATE=`date +%m%d%Y`
+EXPIRATION=`date +%m%d%Y -d "-3 days"`
+DBNAME="servatrice"
+APPNAME="servatrice"
+ROOTFOLDER="./backups"	#set this to the root path that contains the backup files
+BACKUPDIR="$ROOTFOLDER/$LOGAPPENDDATE/db/$APPNAME"
+TABLES=(
+	"cockatrice_users"
+	"cockatrice_decklist_files"
+	"cockatrice_replays"
+	"cockatrice_buddylist"
+	"cockatrice_ignorelist"
+	"cockatrice_bans"
+	"cockatrice_sessions"
+	"cockatrice_decklist_folders"
+	"cockatrice_replays_access"
+	"cockatrice_games"
+	"cockatrice_games_players"
+	"cockatrice_uptime"
+	"cockatrice_schema_version"
+	"cockatrice_servermessages"
+	"cockatrice_servers"
+	"cockatrice_news"
+	"cockatrice_rooms"
+        "cockatrice_rooms_gametypes"
+	)
+/home/wwadmin/scripts/db_maint_logs
+PROCESSNAME="mysqldump"
+#COMMANDRESULTS=`ps -e |grep $PROCESSNAME |grep -v grep`
+if [ -z "$COMMANDRESULTS" ];
+then
+	[ ! -d $BACKUPDIR ] && mkdir -p $BACKUPDIR/
+	for TABLENAME in "${TABLES[@]}"
+	do
+		BACKUPFILE="$BACKUPDIR/$APPNAME.$TABLENAME.sql.$LOGAPPENDDATE"
+		if [ -f "$BACKUPFILE" ]
+		then
+			echo "Restoring up DB Table [$TABLENAME]"
+			ionice -c3 nice -n19 mysql --defaults-file=$SQLCONFFILE $DBNAME < $BACKUPFILE
+			sleep $SLEEPTIME
+		else
+			echo "Missing backup file [$$TABLENAME]"
+			sleep $SLEEPTIME
+		fi
+	done
+	rm -rf "$ROOTFOLDER/$EXPIRATION/"
+fi
