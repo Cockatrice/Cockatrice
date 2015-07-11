@@ -1,4 +1,5 @@
 #!/bin/bash
+set -u
 SLEEPTIME=5
 SQLCONFFILE="./mysql.cnf"	#set this to the path that contains the mysql.cnf file
 LOGAPPENDDATE=`date +%m%d%Y`
@@ -25,11 +26,11 @@ TABLES=(
 	"cockatrice_servers"
 	"cockatrice_news"
 	"cockatrice_rooms"
-        "cockatrice_rooms_gametypes"
+    "cockatrice_rooms_gametypes"
 	)
-/home/wwadmin/scripts/db_maint_logs
+
 PROCESSNAME="mysqldump"
-#COMMANDRESULTS=`ps -e |grep $PROCESSNAME |grep -v grep`
+COMMANDRESULTS=`ps -e |grep $PROCESSNAME |grep -v grep`
 if [ -z "$COMMANDRESULTS" ];
 then
 	[ ! -d $BACKUPDIR ] && mkdir -p $BACKUPDIR/
@@ -47,4 +48,6 @@ then
 		fi
 	done
 	rm -rf "$ROOTFOLDER/$EXPIRATION/"
+else
+        echo "Restore in progress, aborting"
 fi
