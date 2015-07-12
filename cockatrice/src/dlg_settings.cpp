@@ -710,7 +710,7 @@ void MessagesSettingsPage::retranslateUi()
     messagePopups.setText(tr("Enable desktop notifications for private messages."));
     mentionPopups.setText(tr("Enable desktop notification for mentions."));
     hexLabel.setText(tr("(Color is hexadecimal)"));
-    customAlertStringLabel.setText(tr("(Seperate each word with a comma; Words are case insensitive)"));
+    customAlertStringLabel.setText(tr("(Seperate each word with a comma, words are case insensitive)"));
 }
 
 

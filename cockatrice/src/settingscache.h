@@ -196,7 +196,7 @@ public slots:
     void setLeftJustified( const int _leftJustified);
     void setMasterVolume(const int _masterVolume);
     void setCardInfoViewMode(const int _viewMode);
-    void setHighlightWords(const QString _highlightWords);
+    void setHighlightWords(const QString &_highlightWords);
 };
 
 extern SettingsCache *settingsCache;

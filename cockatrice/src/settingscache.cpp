@@ -91,7 +91,7 @@ void SettingsCache::setCardInfoViewMode(const int _viewMode) {
     settings->setValue("cards/cardinfoviewmode", cardInfoViewMode);
 }
 
-void SettingsCache::setHighlightWords(const QString _highlightWords) {
+void SettingsCache::setHighlightWords(const QString &_highlightWords) {
     // Words are seperated by a comma and you can not use spaces in words
     highlightWords = _highlightWords.simplified().replace(" ", "").split(",");
     settings->setValue("personal/highlightWords", highlightWords);

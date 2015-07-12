@@ -427,11 +427,6 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
             cursor.setCharFormat(defaultFormat);
             message = message.mid(firstSpace);
             QApplication::alert(this);
-            if (settingsCache->getShowMentionPopup() && shouldShowSystemPopup())
-            {
-                QString ref = sender.left(sender.length() - 2);
-                showSystemPopup(ref);
-            }
         }
         else
         {
