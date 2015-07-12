@@ -532,7 +532,8 @@ bool Servatrice_DatabaseInterface::userSessionExists(const QString &userName)
 {
     // Call only after lockSessionTables().
     
-    QSqlQuery *query = prepareQuery("select 1 from {prefix}_sessions where user_name = :user_name and end_time is null");
+    QSqlQuery *query = prepareQuery("select 1 from {prefix}_sessions where user_name = :user_name and id_server = :id_server and end_time is null");
+    query->bindValue(":id_server", server->getServerId());
     query->bindValue(":user_name", userName);
     execSqlQuery(query);
     return query->next();
