@@ -82,11 +82,19 @@ SettingsCache::SettingsCache()
     masterVolume = settings->value("sound/mastervolume", 100).toInt();
 
     cardInfoViewMode = settings->value("cards/cardinfoviewmode", 0).toInt();
+
+    highlightWords = settings->value("personal/highlightWords", QStringList()).toStringList();
 }
 
 void SettingsCache::setCardInfoViewMode(const int _viewMode) {
     cardInfoViewMode = _viewMode;
     settings->setValue("cards/cardinfoviewmode", cardInfoViewMode);
+}
+
+void SettingsCache::setHighlightWords(const QString _highlightWords) {
+    // Words are seperated by a comma and you can not use spaces in words
+    highlightWords = _highlightWords.simplified().replace(" ", "").split(",");
+    settings->setValue("personal/highlightWords", highlightWords);
 }
 
 void SettingsCache::setMasterVolume(int _masterVolume) {

@@ -85,6 +85,7 @@ private:
     bool leftJustified;
     int masterVolume;
     int cardInfoViewMode;
+    QStringList highlightWords;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -143,6 +144,7 @@ public:
     int getMasterVolume() const { return masterVolume; }
     int getCardInfoViewMode() const { return cardInfoViewMode; }
     QStringList getCountries() const;
+    QStringList getHighlightWords() const { return highlightWords; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -194,6 +196,7 @@ public slots:
     void setLeftJustified( const int _leftJustified);
     void setMasterVolume(const int _masterVolume);
     void setCardInfoViewMode(const int _viewMode);
+    void setHighlightWords(const QString _highlightWords);
 };
 
 extern SettingsCache *settingsCache;

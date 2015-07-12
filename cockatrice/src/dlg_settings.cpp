@@ -591,6 +591,11 @@ MessagesSettingsPage::MessagesSettingsPage()
     mentionPopups.setChecked(settingsCache->getShowMentionPopup());
     connect(&mentionPopups, SIGNAL(stateChanged(int)), settingsCache, SLOT(setShowMentionPopups(int)));
 
+    customAlertString = new QLineEdit();
+    customAlertString->setPlaceholderText("Word1, Word2, Word3");
+    customAlertString->setText(settingsCache->getHighlightWords().join(", "));
+    connect(customAlertString, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighlightWords(QString)));
+
     QGridLayout *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
     chatGrid->addWidget(&invertMentionForeground, 0, 1);
@@ -602,6 +607,12 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&mentionPopups, 4, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
+    
+    QGridLayout *highlightNotice = new QGridLayout;
+    highlightNotice->addWidget(customAlertString, 0, 0);
+	highlightNotice->addWidget(&customAlertStringLabel, 1, 0);
+    highlightGroupBox = new QGroupBox;
+    highlightGroupBox->setLayout(highlightNotice);
 
     QSettings settings;
     messageList = new QListWidget;
@@ -628,11 +639,12 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     messageShortcuts = new QGroupBox;
     messageShortcuts->setLayout(messageListLayout);
-    
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
-     
+
     mainLayout->addWidget(messageShortcuts);
     mainLayout->addWidget(chatGroupBox);
+    mainLayout->addWidget(highlightGroupBox);
 
     setLayout(mainLayout);
     
@@ -688,6 +700,7 @@ void MessagesSettingsPage::actRemove()
 void MessagesSettingsPage::retranslateUi()
 {
     chatGroupBox->setTitle(tr("Chat settings"));
+    highlightGroupBox->setTitle(tr("Custom alert words"));
     chatMentionCheckBox.setText(tr("Enable chat mentions"));
     messageShortcuts->setTitle(tr("In-game message macros"));
     ignoreUnregUsersMainChat.setText(tr("Ignore unregistered users in main chat"));
@@ -697,6 +710,7 @@ void MessagesSettingsPage::retranslateUi()
     messagePopups.setText(tr("Enable desktop notifications for private messages."));
     mentionPopups.setText(tr("Enable desktop notification for mentions."));
     hexLabel.setText(tr("(Color is hexadecimal)"));
+    customAlertStringLabel.setText(tr("(Seperate each word with a comma; Words are case insensitive)"));
 }
 
 

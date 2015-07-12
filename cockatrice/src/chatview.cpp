@@ -161,72 +161,115 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     }
     cursor.setCharFormat(messageFormat);
     
-    int index = -1, bracketFirstIndex = -1, mentionFirstIndex = -1, urlFirstIndex = -1;
+    int index = -1, bracketFirstIndex = -1, mentionFirstIndex = -1, urlFirstIndex = -1, highlightWordFirstIndex = -1;
     bool mentionEnabled = settingsCache->getChatMention();
     const QRegExp urlStarter = QRegExp("https?://|\\bwww\\.");
     const QRegExp phraseEnder = QRegExp("\\s");
     const QRegExp notALetterOrNumber = QRegExp("[^a-zA-Z0-9]");
+    const QStringList highlightedWords = settingsCache->getHighlightWords();
     
     while (message.size())
     {
-        // search for the first [ or @
         bracketFirstIndex = message.indexOf('[');
         mentionFirstIndex = message.indexOf('@');
         urlFirstIndex = message.indexOf(urlStarter);
+        highlightWordFirstIndex = -1;
+
+        foreach (QString word, message.simplified().split(" "))
+        {
+            if (highlightedWords.contains(word, Qt::CaseInsensitive))
+            {
+                highlightWordFirstIndex = message.indexOf(word);
+                break;
+            }
+        }
 
         bool startsWithBracket = (bracketFirstIndex != -1);
         bool startsWithAtSymbol = (mentionFirstIndex != -1);
-        bool startsWithUrl = (urlFirstIndex != -1);     
+        bool startsWithUrl = (urlFirstIndex != -1);
+        bool startsWithHighlightWord = (highlightWordFirstIndex != -1);
+
         
-        if (!startsWithBracket)
+        if (!startsWithBracket && !startsWithAtSymbol && !startsWithUrl && !startsWithHighlightWord)
         {
-            if (!startsWithAtSymbol)
-            {
-                if (!startsWithUrl)
-                {
-                    // No brackets, mentions, or urls. Send message as normal
-                    cursor.insertText(message);
-                    break;
-                }
-                else
-                {
-                    // There's a URL, lets begin!
-                    index = urlFirstIndex;
-                }
-            }
-            else
-            {
-                if (!startsWithUrl)
-                {
-                    // There's an @ symbol, lets begin!
-                    index = mentionFirstIndex;
-                }
-                else
-                {
-                    // There's both an @ symbol and URL, pick the first one... lets begin!
-                    index = std::min(urlFirstIndex, mentionFirstIndex);
-                }
-            }
+            // No functions need to be run. Send message as normal
+            cursor.insertText(message);
+            break;
         }
-        else
+        else if (startsWithBracket && !startsWithAtSymbol && !startsWithUrl && !startsWithHighlightWord)
         {
-            if (!startsWithAtSymbol) 
-            {
-                // There's a [, look down!
-                index = bracketFirstIndex;
-            }
-            else
-            {
-                // There's both a [ and @, pick the first one... look down!
-                index = std::min(bracketFirstIndex, mentionFirstIndex);
-            }
-            
-            if (startsWithUrl)
-            {
-                // If there's a URL, pick the first one... then lets begin!
-                // Otherwise, just "lets begin!"
-                index = std::min(index, urlFirstIndex);
-            }
+            // Contains a bracket
+            index = bracketFirstIndex;
+        }
+        else if (!startsWithBracket && startsWithAtSymbol && !startsWithUrl && !startsWithHighlightWord)
+        {
+            // Contains an @ symbol
+            index = mentionFirstIndex;
+        }
+        else if (!startsWithBracket && !startsWithAtSymbol && startsWithUrl && !startsWithHighlightWord)
+        {
+            // Contains URL stuff (http or www.)
+            index = urlFirstIndex;
+        }
+        else if (!startsWithBracket && !startsWithAtSymbol && !startsWithUrl && startsWithHighlightWord)
+        {
+            // Contains a word the user wants highlighted
+            index = highlightWordFirstIndex;
+        }
+        else if (startsWithBracket && startsWithAtSymbol && !startsWithUrl && !startsWithHighlightWord)
+        {
+            // Contains both a bracket and an @ symbol
+            index = std::min(bracketFirstIndex, mentionFirstIndex);
+        }
+        else if (startsWithBracket && !startsWithAtSymbol && startsWithUrl && !startsWithHighlightWord)
+        {
+            // Contains both a bracket and URL stuff
+            index = std::min(bracketFirstIndex, urlFirstIndex);
+        }
+        else if (startsWithBracket && !startsWithAtSymbol && !startsWithUrl && startsWithHighlightWord)
+        {
+            // Contains both a bracket and a word the user wants highlighted
+            index = std::min(bracketFirstIndex, highlightWordFirstIndex);
+        }
+        else if (!startsWithBracket && startsWithAtSymbol && startsWithUrl && !startsWithHighlightWord)
+        {
+            // Contains both an @ symbol and URL stuff
+            index = std::min(mentionFirstIndex, urlFirstIndex);
+        }
+        else if (!startsWithBracket && startsWithAtSymbol && !startsWithUrl && startsWithHighlightWord)
+        {
+            // Contains both an @ symbol and a word the user wants highlighted
+            index = std::min(mentionFirstIndex, highlightWordFirstIndex);
+        }
+        else if (!startsWithBracket && !startsWithAtSymbol && startsWithUrl && startsWithHighlightWord)
+        {
+            // Contains both URL stuff and a word the user wants highlighted
+            index = std::min(urlFirstIndex, highlightWordFirstIndex);
+        }
+        else if (!startsWithBracket && startsWithAtSymbol && startsWithUrl && startsWithHighlightWord)
+        {
+            // Contains an @ symbol, URL stuff, and a word the user wants highlighted
+            index = std::min(mentionFirstIndex, std::min(urlFirstIndex, highlightWordFirstIndex));
+        }
+        else if (startsWithBracket && !startsWithAtSymbol && startsWithUrl && startsWithHighlightWord)
+        {
+            // Contains a bracket, URL stuff, and a word the user wants highlighted
+            index = std::min(bracketFirstIndex, std::min(urlFirstIndex, highlightWordFirstIndex));
+        }
+        else if (startsWithBracket && startsWithAtSymbol && !startsWithUrl && startsWithHighlightWord)
+        {
+            // Contains a bracket, an @ symbol, and a word the user wants highlighted
+            index = std::min(bracketFirstIndex, std::min(mentionFirstIndex, highlightWordFirstIndex));
+        }
+        else if (startsWithBracket && startsWithAtSymbol && startsWithUrl && !startsWithHighlightWord)
+        {
+            // Contains a bracket, an @ symbol, and URL stuff
+            index = std::min(bracketFirstIndex, std::min(mentionFirstIndex, urlFirstIndex));
+        }
+        else if (startsWithBracket && startsWithAtSymbol && startsWithUrl && startsWithHighlightWord)
+        {
+            // Contains a bracket, an @ symbol, URL stuff, and a word the user wants highlighted
+            index = std::min(highlightWordFirstIndex, std::min(bracketFirstIndex, std::min(mentionFirstIndex, urlFirstIndex)));
         }
 
         if (index > 0)
@@ -374,9 +417,27 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 while (fullMentionUpToSpaceOrEnd.size());
             }
         }
+        else if (index == highlightWordFirstIndex)
+        {
+            // You have received a valid mention of custom word!!
+            int firstSpace = (message.indexOf(" ") == -1 ? message.size() : message.indexOf(" "));
+            mentionFormat.setBackground(QBrush(getCustomMentionColor()));
+            mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
+            cursor.insertText(message.mid(0, firstSpace), mentionFormat);
+            cursor.setCharFormat(defaultFormat);
+            message = message.mid(firstSpace);
+            QApplication::alert(this);
+            if (settingsCache->getShowMentionPopup() && shouldShowSystemPopup())
+            {
+                QString ref = sender.left(sender.length() - 2);
+                showSystemPopup(ref);
+            }
+        }
         else
         {
-            message = message.mid(1); // Not certain when this would ever be reached, but just incase lets skip the character
+            // Not certain when this would ever be reached, but just incase lets skip the character
+            cursor.insertText(message.mid(0), defaultFormat);
+            message = message.mid(1);
         }
     }
 

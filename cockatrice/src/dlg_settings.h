@@ -172,9 +172,12 @@ private:
     QCheckBox messagePopups;
     QCheckBox mentionPopups;
     QGroupBox *chatGroupBox;
+    QGroupBox *highlightGroupBox;
     QGroupBox *messageShortcuts;
     QLineEdit *mentionColor;
+    QLineEdit *customAlertString;
     QLabel hexLabel;
+    QLabel customAlertStringLabel;
 
     void storeSettings();
     void updateMentionPreview();
