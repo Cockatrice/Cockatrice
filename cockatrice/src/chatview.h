@@ -44,6 +44,9 @@ private:
     bool shouldShowSystemPopup();
     void showSystemPopup(QString &sender);
     bool isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message);
+    void checkTag(QTextCursor &cursor, QString &message);
+    void checkMention(QTextCursor &cursor, QString &message, QString &sender, UserLevelFlags userLevel);
+    void checkWord(QTextCursor &cursor, QString &message);
 private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();
