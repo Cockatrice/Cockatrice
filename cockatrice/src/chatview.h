@@ -27,6 +27,7 @@ private:
     QString userName;
     QString mention;
     QTextCharFormat mentionFormat;
+    QTextCharFormat highlightFormat;
     QTextCharFormat mentionFormatOtherUser;
     QTextCharFormat defaultFormat;
     bool evenNumber;
@@ -41,9 +42,11 @@ private:
     QString getNameFromUserList(QMap<QString, UserListTWI *> &userList, QString &userName);
     bool isFullMentionAValidUser(QMap<QString, UserListTWI *> &userList, QString userNameToMatch);
     QColor getCustomMentionColor();
+    QColor getCustomHighlightColor();
     bool shouldShowSystemPopup();
     void showSystemPopup(QString &sender);
     bool isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message);
+    QString removePunctuation(QString wordToParse);
 private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();

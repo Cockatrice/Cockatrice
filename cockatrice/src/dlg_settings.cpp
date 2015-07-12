@@ -580,6 +580,9 @@ MessagesSettingsPage::MessagesSettingsPage()
     invertMentionForeground.setChecked(settingsCache->getChatMentionForeground());
     connect(&invertMentionForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextColor(int)));
 
+    invertHighlightForeground.setChecked(settingsCache->getChatHighlightForeground());
+    connect(&invertHighlightForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextHighlightColor(int)));
+
     mentionColor = new QLineEdit();
     mentionColor->setText(settingsCache->getChatMentionColor());
     updateMentionPreview();
@@ -590,6 +593,11 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     mentionPopups.setChecked(settingsCache->getShowMentionPopup());
     connect(&mentionPopups, SIGNAL(stateChanged(int)), settingsCache, SLOT(setShowMentionPopups(int)));
+
+    customAlertString = new QLineEdit();
+    customAlertString->setPlaceholderText("Word1 Word2 Word3");
+    customAlertString->setText(settingsCache->getHighlightWords());
+    connect(customAlertString, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighlightWords(QString)));
 
     QGridLayout *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
@@ -602,6 +610,20 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&mentionPopups, 4, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
+    
+    highlightColor = new QLineEdit();
+    highlightColor->setText(settingsCache->getChatHighlightColor());
+    updateHighlightPreview();
+    connect(highlightColor, SIGNAL(textChanged(QString)), this, SLOT(updateHighlightColor(QString)));
+
+    QGridLayout *highlightNotice = new QGridLayout;
+    highlightNotice->addWidget(highlightColor, 0, 2);
+    highlightNotice->addWidget(&invertHighlightForeground, 0, 1);
+    highlightNotice->addWidget(&hexHighlightLabel, 1, 2);
+    highlightNotice->addWidget(customAlertString, 0, 0);
+    highlightNotice->addWidget(&customAlertStringLabel, 1, 0);
+    highlightGroupBox = new QGroupBox;
+    highlightGroupBox->setLayout(highlightNotice);
 
     QSettings settings;
     messageList = new QListWidget;
@@ -628,11 +650,12 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     messageShortcuts = new QGroupBox;
     messageShortcuts->setLayout(messageListLayout);
-    
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
-     
+
     mainLayout->addWidget(messageShortcuts);
     mainLayout->addWidget(chatGroupBox);
+    mainLayout->addWidget(highlightGroupBox);
 
     setLayout(mainLayout);
     
@@ -648,14 +671,33 @@ void MessagesSettingsPage::updateColor(const QString &value) {
     }
 }
 
+void MessagesSettingsPage::updateHighlightColor(const QString &value) {
+    QColor colorToSet;
+    colorToSet.setNamedColor("#" + value);
+    if (colorToSet.isValid()) {
+        settingsCache->setChatHighlightColor(value);
+        updateHighlightPreview();
+    }
+}
+
 void MessagesSettingsPage::updateTextColor(int value) {
     settingsCache->setChatMentionForeground(value);
     updateMentionPreview();
 }
 
+void MessagesSettingsPage::updateTextHighlightColor(int value) {
+    settingsCache->setChatHighlightForeground(value);
+    updateHighlightPreview();
+}
+
 void MessagesSettingsPage::updateMentionPreview() {
-    mentionColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatMentionColor() + 
+    mentionColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatMentionColor() +
         ";color: " + (settingsCache->getChatMentionForeground() ? "white" : "black") + ";}");
+}
+
+void MessagesSettingsPage::updateHighlightPreview() {
+    highlightColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatHighlightColor() +
+        ";color: " + (settingsCache->getChatHighlightForeground() ? "white" : "black") + ";}");
 }
 
 void MessagesSettingsPage::storeSettings()
@@ -688,15 +730,19 @@ void MessagesSettingsPage::actRemove()
 void MessagesSettingsPage::retranslateUi()
 {
     chatGroupBox->setTitle(tr("Chat settings"));
+    highlightGroupBox->setTitle(tr("Custom alert words"));
     chatMentionCheckBox.setText(tr("Enable chat mentions"));
     messageShortcuts->setTitle(tr("In-game message macros"));
     ignoreUnregUsersMainChat.setText(tr("Ignore unregistered users in main chat"));
-    ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users."));
-    ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users."));
+    ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users"));
+    ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users"));
     invertMentionForeground.setText(tr("Invert text color"));
-    messagePopups.setText(tr("Enable desktop notifications for private messages."));
-    mentionPopups.setText(tr("Enable desktop notification for mentions."));
+    invertHighlightForeground.setText(tr("Invert text color"));
+    messagePopups.setText(tr("Enable desktop notifications for private messages"));
+    mentionPopups.setText(tr("Enable desktop notification for mentions"));
     hexLabel.setText(tr("(Color is hexadecimal)"));
+    hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
+    customAlertStringLabel.setText(tr("(Separate each word with a space, words are case insensitive)"));
 }
 
 

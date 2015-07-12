@@ -65,7 +65,9 @@ private:
     bool tapAnimation;
     bool chatMention;
     QString chatMentionColor;
+    QString chatHighlightColor;
     bool chatMentionForeground;
+    bool chatHighlightForeground;
     bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
     bool soundEnabled;
     QString soundPath;
@@ -85,6 +87,7 @@ private:
     bool leftJustified;
     int masterVolume;
     int cardInfoViewMode;
+    QString highlightWords;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -100,6 +103,7 @@ public:
     QString getPlayerBgPath() const { return playerBgPath; }
     QString getCardBackPicturePath() const { return cardBackPicturePath; }
     QString getChatMentionColor() const { return chatMentionColor; }
+    QString getChatHighlightColor() const { return chatHighlightColor; }
     bool getPicDownload() const { return picDownload; }
     bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
@@ -117,6 +121,7 @@ public:
     bool getTapAnimation() const { return tapAnimation; }
     bool getChatMention()  const { return chatMention; }
     bool getChatMentionForeground() const { return chatMentionForeground; }
+    bool getChatHighlightForeground() const { return chatHighlightForeground; }
     bool getZoneViewSortByName() const { return zoneViewSortByName; }
     bool getZoneViewSortByType() const { return zoneViewSortByType; }
     /**
@@ -143,6 +148,7 @@ public:
     int getMasterVolume() const { return masterVolume; }
     int getCardInfoViewMode() const { return cardInfoViewMode; }
     QStringList getCountries() const;
+    QString getHighlightWords() const { return highlightWords; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -157,6 +163,7 @@ public slots:
     void setPlayerBgPath(const QString &_playerBgPath);
     void setCardBackPicturePath(const QString &_cardBackPicturePath);
     void setChatMentionColor(const QString &_chatMentionColor);
+    void setChatHighlightColor(const QString &_chatHighlightColor);
     void setPicDownload(int _picDownload);
     void setPicDownloadHq(int _picDownloadHq);
     void setNotificationsEnabled(int _notificationsEnabled);
@@ -173,6 +180,7 @@ public slots:
     void setTapAnimation(int _tapAnimation);
     void setChatMention(int _chatMention);
     void setChatMentionForeground(int _chatMentionForeground);
+    void setChatHighlightForeground(int _chatHighlightForeground);
     void setZoneViewSortByName(int _zoneViewSortByName);
     void setZoneViewSortByType(int _zoneViewSortByType);
     void setZoneViewPileView(int _zoneViewPileView);
@@ -194,6 +202,7 @@ public slots:
     void setLeftJustified( const int _leftJustified);
     void setMasterVolume(const int _masterVolume);
     void setCardInfoViewMode(const int _viewMode);
+    void setHighlightWords(const QString &_highlightWords);
 };
 
 extern SettingsCache *settingsCache;
