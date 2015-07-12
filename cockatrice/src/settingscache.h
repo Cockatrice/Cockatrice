@@ -2,6 +2,7 @@
 #define SETTINGSCACHE_H
 
 #include <QObject>
+#include <QStringList>
 
 // the falbacks are used for cards without a muid
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
@@ -54,6 +55,7 @@ private:
     bool spectatorNotificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
+    bool annotateTokens;
     int cardInfoMinimized;
     QByteArray tabGameSplitterSizes;
     bool displayCardNames;
@@ -83,6 +85,16 @@ private:
     bool leftJustified;
     int masterVolume;
     int cardInfoViewMode;
+    QString gameDescription;
+    int maxPlayers;
+    QString gameTypes;
+    QString gamePassword;
+    bool onlyBuddies;
+    bool onlyRegistered;
+    bool spectatorsAllowed;
+    bool spectatorsNeedPassword;
+    bool spectatorsCanTalk;
+    bool spectatorsCanSeeEverything;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -105,6 +117,7 @@ public:
 
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
+    bool getAnnotateTokens() const { return annotateTokens; }
     int  getCardInfoMinimized() const { return cardInfoMinimized; }
     QByteArray getTabGameSplitterSizes() const { return tabGameSplitterSizes; }
     bool getDisplayCardNames() const { return displayCardNames; }
@@ -139,6 +152,17 @@ public:
     bool getLeftJustified() const { return leftJustified; }
     int getMasterVolume() const { return masterVolume; }
     int getCardInfoViewMode() const { return cardInfoViewMode; }
+    QStringList getCountries() const;
+    QString getGameDescription() const { return gameDescription; }
+    int getMaxPlayers() const { return maxPlayers; }
+    QString getGameTypes() const { return gameTypes; }
+    QString getGamePassword() const { return gamePassword; }
+    bool getOnlyBuddies() const { return onlyBuddies; }
+    bool getOnlyRegistered() const { return onlyRegistered; }
+    bool getSpectatorsAllowed() const { return spectatorsAllowed; }
+    bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
+    bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
+    bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -159,6 +183,7 @@ public slots:
     void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
+    void setAnnotateTokens(int _annotateTokens);
     void setCardInfoMinimized(int _cardInfoMinimized);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setDisplayCardNames(int _displayCardNames);
@@ -189,6 +214,16 @@ public slots:
     void setLeftJustified( const int _leftJustified);
     void setMasterVolume(const int _masterVolume);
     void setCardInfoViewMode(const int _viewMode);
+    void setGameDescription(const QString _gameDescription);
+    void setMaxPlayers(const int _maxPlayers);
+    void setGameTypes(const QString _gameTypes);
+    void setGamePassword(const QString _gamePassword);
+    void setOnlyBuddies(const bool _onlyBuddies);
+    void setOnlyRegistered(const bool _onlyRegistered);
+    void setSpectatorsAllowed(const bool _spectatorsAllowed);
+    void setSpectatorsNeedPassword(const bool _spectatorsNeedPassword);
+    void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
+    void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
 };
 
 extern SettingsCache *settingsCache;
