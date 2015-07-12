@@ -47,8 +47,8 @@ void DlgCreateGame::sharedCtor()
         QCheckBox *gameTypeCheckBox = new QCheckBox(gameTypeIterator.value());
         gameTypeLayout->addWidget(gameTypeCheckBox);
         gameTypeCheckBoxes.insert(gameTypeIterator.key(), gameTypeCheckBox);
-        keyText = gameTypeIterator.key();
-        if (settingsCache->getGameTypes().contains(keyText + ",1"))
+        keyText = gameTypeIterator.value();
+        if (settingsCache->getGameTypes().contains(keyText + ",1~"))
             gameTypeCheckBoxes[gameTypeIterator.key()]->setChecked(true);
     }
     QGroupBox *gameTypeGroupBox = new QGroupBox(tr("Game type"));
@@ -110,7 +110,7 @@ void DlgCreateGame::sharedCtor()
 }
 
 DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent)
-: QDialog(parent), room(_room), gameTypes(_gameTypes)
+    : QDialog(parent), room(_room), gameTypes(_gameTypes)
 {
     sharedCtor();
 
@@ -197,17 +197,15 @@ void DlgCreateGame::actOK()
     cmd.set_spectators_can_talk(spectatorsCanTalkCheckBox->isChecked());
     cmd.set_spectators_see_everything(spectatorsSeeEverythingCheckBox->isChecked());
 
-    static QString gameTypes = QString();
-    QString keyText;
-
+    static QString gameTypes;
+    settingsCache->setGameTypes(gameTypes);
     QMapIterator<int, QCheckBox *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
     while (gameTypeCheckBoxIterator.hasNext()) {
         gameTypeCheckBoxIterator.next();
         if (gameTypeCheckBoxIterator.value()->isChecked())
         {
             cmd.add_game_type_ids(gameTypeCheckBoxIterator.key());
-            keyText = gameTypeCheckBoxIterator.key();
-            gameTypes += keyText + ",1;";
+            gameTypes += gameTypeCheckBoxIterator.value()->text() + ",1~";
         }
     }
     
