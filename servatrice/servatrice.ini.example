@@ -55,6 +55,8 @@ password=123456
 regonly=0
 
 [users]
+; Require clients to provide clientids to log in (default false)
+requireclientids=false
 
 ; The minimum length a username can be
 minnamelength=6

@@ -14,6 +14,7 @@ extern const QString translationPrefix;
 extern QString translationPath;
 
 void installNewTranslator();
+void generateClientID();
 
 bool settingsValid();
 

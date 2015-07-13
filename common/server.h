@@ -44,7 +44,7 @@ public:
     Server(bool _threaded, QObject *parent = 0);
     ~Server();
     void setThreaded(bool _threaded) { threaded = _threaded; }
-    AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft);
+    AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft, QString &clientid);
 
     const QMap<int, Server_Room *> &getRooms() { return rooms; }
     

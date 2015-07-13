@@ -84,7 +84,6 @@ SettingsCache::SettingsCache()
     masterVolume = settings->value("sound/mastervolume", 100).toInt();
 
     cardInfoViewMode = settings->value("cards/cardinfoviewmode", 0).toInt();
-
     highlightWords = settings->value("personal/highlightWords", QString()).toString();
 
     gameDescription = settings->value("game/gamedescription","").toString();
@@ -96,6 +95,8 @@ SettingsCache::SettingsCache()
     spectatorsNeedPassword = settings->value("game/spectatorsneedpassword", false).toBool();
     spectatorsCanTalk = settings->value("game/spectatorscantalk", false).toBool();
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
+    clientID = settings->value("personal/clientid", "notset").toString();
+
 }
 
 void SettingsCache::setCardInfoViewMode(const int _viewMode) {
@@ -421,6 +422,12 @@ void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
     pixmapCacheSize = _pixmapCacheSize;
     settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
     emit pixmapCacheSizeChanged(pixmapCacheSize);
+}
+
+void SettingsCache::setClientID(QString _clientID)
+{
+    clientID = _clientID;
+	settings->setValue("personal/clientid", clientID);
 }
 
 QStringList SettingsCache::getCountries() const
