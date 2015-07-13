@@ -188,6 +188,11 @@ max_game_inactivity_time=120
 
 
 [security]
+; You may want to restrict the number of users that can connect to your server at any given time.
+enable_max_user_limit=false
+
+; Maximum number of users that can connect to the server, default is 500.
+max_users_total=500
 
 ; Maximum number of users that can connect from the same IP address; useful to avoid bots, default is 4
 max_users_per_address=4

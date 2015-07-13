@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
 #include <QSqlQuery>
 #include <QHostAddress>
 #include <QDebug>
@@ -120,14 +121,33 @@ bool ServerSocketInterface::initSession()
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);
     delete identSe;
-    
-    int maxUsers = servatrice->getMaxUsersPerAddress();
+
+	//limit the number of total users based on configuration settings
+	bool enforceUserLimit = settingsCache->value("security/enable_max_user_limit", false).toBool();
+	if (enforceUserLimit){
+		int userLimit = settingsCache->value("security/max_users_total", 500).toInt();
+		int playerCount = (databaseInterface->getActiveUserCount() + 1);
+		if (playerCount > userLimit){
+			std::cerr << "Max Users Total Limit Reached, please increase the max_users_total setting." << std::endl;
+			logger->logMessage(QString("Max Users Total Limit Reached, please increase the max_users_total setting."), this);
+			Event_ConnectionClosed event;
+			event.set_reason(Event_ConnectionClosed::USER_LIMIT_REACHED);
+			SessionEvent *se = prepareSessionEvent(event);
+			sendProtocolItem(*se);
+			delete se;
+			return false;
+		}
+		else {
+			std::cerr << "Player Count: " << playerCount << " / " << userLimit << std::endl;
+		}
+	}
 
     //allow unlimited number of connections from the trusted sources
-    QString trustedSources = settingsCache->value("server/trusted_sources","127.0.0.1,::1").toString();
+    QString trustedSources = settingsCache->value("security/trusted_sources","127.0.0.1,::1").toString();
     if (trustedSources.contains(socket->peerAddress().toString(),Qt::CaseInsensitive))
         return true;
     
+	int maxUsers = servatrice->getMaxUsersPerAddress();
     if ((maxUsers > 0) && (servatrice->getUsersWithAddress(socket->peerAddress()) >= maxUsers)) {
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::TOO_MANY_CONNECTIONS);

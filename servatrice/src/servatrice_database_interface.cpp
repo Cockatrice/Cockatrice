@@ -805,3 +805,23 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const
     }
     return false;
 }
+
+int Servatrice_DatabaseInterface::getActiveUserCount()
+{
+	int userCount = 0;
+
+	if (!checkSql())
+		return userCount;
+
+	QSqlQuery *query = prepareQuery("select count(*) from {prefix}_sessions where id_server = :serverid AND end_time is NULL");
+	query->bindValue(":serverid", server->getServerId());
+	if (!execSqlQuery(query)){
+		return userCount;
+	}
+
+	if (query->next()){
+		userCount = query->value(0).toInt();
+	}
+
+	return userCount;
+}

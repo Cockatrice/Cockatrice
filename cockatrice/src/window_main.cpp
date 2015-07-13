@@ -71,6 +71,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
     client->disconnectFromServer();
     QString reasonStr;
     switch (event.reason()) {
+	case Event_ConnectionClosed::USER_LIMIT_REACHED: reasonStr = tr("The server has reached its maximum user capacity, please check back later."); break;
         case Event_ConnectionClosed::TOO_MANY_CONNECTIONS: reasonStr = tr("There are too many concurrent connections from your address."); break;
         case Event_ConnectionClosed::BANNED: {
             reasonStr = tr("Banned by moderator");

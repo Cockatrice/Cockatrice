@@ -160,6 +160,14 @@ bool Servatrice::initServer()
         authenticationMethod = AuthenticationNone;
     }
 
+	bool maxUserLimitEnabled = settingsCache->value("security/enable_max_user_limit", false).toBool();
+	qDebug() << "Maximum user limit enabled: " << maxUserLimitEnabled;
+
+	if (maxUserLimitEnabled){
+		int maxUserLimit = settingsCache->value("security/max_users_total", 500).toInt();
+		qDebug() << "Maximum user limit: " << maxUserLimit;
+	}
+
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
     bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
 
