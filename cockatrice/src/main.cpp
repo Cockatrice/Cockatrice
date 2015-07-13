@@ -32,6 +32,8 @@
 #include <QDesktopServices>
 #include <QDebug>
 #include <QSystemTrayIcon>
+#include "QtNetwork/QNetworkInterface"
+#include "QString"
 
 #include "main.h"
 #include "window_main.h"
@@ -95,6 +97,24 @@ bool settingsValid()
         !settingsCache->getDeckPath().isEmpty() &&
         QDir(settingsCache->getPicsPath()).exists() &&
         !settingsCache->getPicsPath().isEmpty();
+}
+
+QString getMacAddress()
+{
+	QString text;
+	foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
+	{
+		if (interface.hardwareAddress() != ""){
+			// do nothing as this is an invalid mac
+		} else {
+			if (interface.hardwareAddress() != "00:00:00:00:00:00:00:E0"){
+				// do nothing as this is an invalid mac
+			} else {
+				return interface.hardwareAddress();
+			}
+		}
+	}
+	return text;
 }
 
 int main(int argc, char *argv[])
@@ -203,6 +223,10 @@ int main(int argc, char *argv[])
 
         QIcon icon(":/resources/appicon.svg");
         ui.setWindowIcon(icon);
+
+		settingsCache->setClientID("Test");
+		qDebug() << "MacAddress: " << getMacAddress().constData();
+		qDebug() << "ClientID: " << settingsCache->getClientID();
 
         ui.show();
         qDebug("main(): ui.show() finished");

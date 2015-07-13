@@ -16,5 +16,6 @@ extern QString translationPath;
 void installNewTranslator();
 
 bool settingsValid();
+QString getMacAddress();
 
 #endif
