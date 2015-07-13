@@ -224,7 +224,9 @@ int main(int argc, char *argv[])
         QIcon icon(":/resources/appicon.svg");
         ui.setWindowIcon(icon);
 
+		settingsCache->setClientID("Test");
 		qDebug() << "MacAddress: " << getMacAddress().constData();
+		qDebug() << "ClientID: " << settingsCache->getClientID();
 
         ui.show();
         qDebug("main(): ui.show() finished");

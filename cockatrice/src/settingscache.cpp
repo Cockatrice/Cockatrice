@@ -86,6 +86,8 @@ SettingsCache::SettingsCache()
     cardInfoViewMode = settings->value("cards/cardinfoviewmode", 0).toInt();
 
     highlightWords = settings->value("personal/highlightWords", QString()).toString();
+    clientID = settings->value("personal/clientid", "notset").toString();
+
 }
 
 void SettingsCache::setCardInfoViewMode(const int _viewMode) {
@@ -411,6 +413,11 @@ void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
     pixmapCacheSize = _pixmapCacheSize;
     settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
     emit pixmapCacheSizeChanged(pixmapCacheSize);
+}
+
+void SettingsCache::setClientID(QString _clientID)
+{
+	settings->setValue("personal/clientid", _clientID);
 }
 
 QStringList SettingsCache::getCountries() const
