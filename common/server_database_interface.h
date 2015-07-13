@@ -31,6 +31,7 @@ public slots:
 public:
     virtual int getNextGameId() = 0;
     virtual int getNextReplayId() = 0;
+    virtual int getActiveUserCount() = 0;
     
     virtual void clearSessionTables() { }
     virtual void lockSessionTables() { }

@@ -10,6 +10,7 @@ message Event_ConnectionClosed {
 		TOO_MANY_CONNECTIONS = 3;
 		BANNED = 4;
 		USERNAMEINVALID = 5;
+		USER_LIMIT_REACHED = 6;
 	}
 	optional CloseReason reason = 1;
 	optional string reason_str = 2;

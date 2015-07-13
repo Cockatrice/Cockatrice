@@ -58,6 +58,7 @@ public:
 
     int getNextGameId();
     int getNextReplayId();
+    int getActiveUserCount();
     qint64 startSession(const QString &userName, const QString &address);
     void endSession(qint64 sessionId);
     void clearSessionTables();
