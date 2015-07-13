@@ -218,7 +218,7 @@ void DlgCreateGame::actOK()
     cmd.set_spectators_need_password(spectatorsNeedPasswordCheckBox->isChecked());
     cmd.set_spectators_can_talk(spectatorsCanTalkCheckBox->isChecked());
     cmd.set_spectators_see_everything(spectatorsSeeEverythingCheckBox->isChecked());
-
+    //Comment
     QString gameTypes = QString();
     QMapIterator<int, QCheckBox *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
     while (gameTypeCheckBoxIterator.hasNext()) {
