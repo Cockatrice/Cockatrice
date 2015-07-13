@@ -84,7 +84,6 @@ SettingsCache::SettingsCache()
     masterVolume = settings->value("sound/mastervolume", 100).toInt();
 
     cardInfoViewMode = settings->value("cards/cardinfoviewmode", 0).toInt();
-
     highlightWords = settings->value("personal/highlightWords", QString()).toString();
     clientID = settings->value("personal/clientid", "notset").toString();
 

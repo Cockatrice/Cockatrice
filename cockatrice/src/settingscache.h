@@ -153,7 +153,7 @@ public:
     void setClientID(QString clientID);
     QString getClientID() { return clientID; }
 
-public slots:
+	public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
     void setDeckPath(const QString &_deckPath);
