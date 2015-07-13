@@ -43,6 +43,7 @@ message Command_Login {
 	}
 	optional string user_name = 1;
 	optional string password = 2;
+	optional string clientid = 3;
 }
 
 message Command_Message {
