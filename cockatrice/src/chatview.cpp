@@ -73,10 +73,16 @@ void ChatView::appendHtml(const QString &html)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
 
-void ChatView::appendHtmlServerMessage(const QString &html)
+void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold, QString optionalFontColor)
 {
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
-    prepareBlock().insertHtml("<font color=" + SERVER_MESSAGE_COLOR + ">" + html + "</font>");
+
+    QString htmlText = "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : SERVER_MESSAGE_COLOR) + ">" + html + "</font>";
+
+    if (optionalIsBold)
+        htmlText = "<b>" + htmlText + "</b>";
+
+    prepareBlock().insertHtml(htmlText);
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }

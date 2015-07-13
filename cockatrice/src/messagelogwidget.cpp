@@ -76,7 +76,7 @@ void MessageLogWidget::logGameClosed()
 
 void MessageLogWidget::logKicked()
 {
-    appendHtmlServerMessage(tr("You have been kicked out of the game."));
+    appendHtmlServerMessage(tr("You have been kicked out of the game."), true);
 }
 
 void MessageLogWidget::logJoinSpectator(QString name)
