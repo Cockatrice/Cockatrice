@@ -23,6 +23,7 @@ public:
     DlgCreateGame(const ServerInfo_Game &game, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
 private slots:
     void actOK();
+    void actReset();
     void checkResponse(const Response &response);
     void spectatorsAllowedChanged(int state);
 private:
@@ -37,7 +38,8 @@ private:
     QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
     QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox, *spectatorsSeeEverythingCheckBox;
     QDialogButtonBox *buttonBox;
-    
+    QPushButton *clearButton;
+
     void sharedCtor();
 };
 
