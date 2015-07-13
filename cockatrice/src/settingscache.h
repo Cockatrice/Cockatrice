@@ -77,6 +77,7 @@ private:
     QString picUrlHq;
     QString picUrlFallback;
     QString picUrlHqFallback;
+    QString clientID;
     bool attemptAutoConnect;
     int pixmapCacheSize;
     bool scaleCards;
@@ -143,6 +144,8 @@ public:
     int getMasterVolume() const { return masterVolume; }
     int getCardInfoViewMode() const { return cardInfoViewMode; }
     QStringList getCountries() const;
+    void setClientID(QString clientID);
+    QString getClientID() { return clientID; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
