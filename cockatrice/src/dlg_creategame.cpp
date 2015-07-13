@@ -115,7 +115,6 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
     descriptionEdit->setText(settingsCache->getGameDescription());
     maxPlayersEdit->setValue(settingsCache->getMaxPlayers());
 
-    passwordEdit->setText(settingsCache->getGamePassword());
     onlyBuddiesCheckBox->setChecked(settingsCache->getOnlyBuddies());
     onlyRegisteredCheckBox->setChecked(settingsCache->getOnlyRegistered());
 
@@ -124,12 +123,12 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
     spectatorsCanTalkCheckBox->setChecked(settingsCache->getSpectatorsCanTalk());
     spectatorsSeeEverythingCheckBox->setChecked(settingsCache->getSpectatorsCanSeeEverything());
 
-    resetButton = new QPushButton(tr("&Reset"));
+    clearButton = new QPushButton(tr("&Clear"));
     buttonBox->addButton(QDialogButtonBox::Cancel);
-    buttonBox->addButton(resetButton, QDialogButtonBox::ActionRole);
+    buttonBox->addButton(clearButton, QDialogButtonBox::ActionRole);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOK()));
-    connect(resetButton, SIGNAL(clicked()), this, SLOT(actReset()));
+    connect(clearButton, SIGNAL(clicked()), this, SLOT(actReset()));
 
     setWindowTitle(tr("Create game"));
 }
@@ -165,7 +164,6 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
     QMapIterator<int, QString> gameTypeIterator(gameTypes);
     while (gameTypeIterator.hasNext()) {
         gameTypeIterator.next();
-
         QCheckBox *gameTypeCheckBox = gameTypeCheckBoxes.value(gameTypeIterator.key());
         gameTypeCheckBox->setEnabled(false);
         gameTypeCheckBox->setChecked(types.contains(gameTypeIterator.key()));
@@ -203,7 +201,6 @@ void DlgCreateGame::actOK()
 {
     settingsCache->setGameDescription(descriptionEdit->text());
     settingsCache->setMaxPlayers(maxPlayersEdit->value());
-    settingsCache->setGamePassword(passwordEdit->text());
     settingsCache->setOnlyBuddies(onlyBuddiesCheckBox->isChecked());
     settingsCache->setOnlyRegistered(onlyRegisteredCheckBox->isChecked());
     settingsCache->setSpectatorsAllowed(spectatorsAllowedCheckBox->isChecked());

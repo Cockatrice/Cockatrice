@@ -88,7 +88,6 @@ private:
     QString gameDescription;
     int maxPlayers;
     QString gameTypes;
-    QString gamePassword;
     bool onlyBuddies;
     bool onlyRegistered;
     bool spectatorsAllowed;
@@ -156,7 +155,6 @@ public:
     QString getGameDescription() const { return gameDescription; }
     int getMaxPlayers() const { return maxPlayers; }
     QString getGameTypes() const { return gameTypes; }
-    QString getGamePassword() const { return gamePassword; }
     bool getOnlyBuddies() const { return onlyBuddies; }
     bool getOnlyRegistered() const { return onlyRegistered; }
     bool getSpectatorsAllowed() const { return spectatorsAllowed; }
@@ -217,7 +215,6 @@ public slots:
     void setGameDescription(const QString _gameDescription);
     void setMaxPlayers(const int _maxPlayers);
     void setGameTypes(const QString _gameTypes);
-    void setGamePassword(const QString _gamePassword);
     void setOnlyBuddies(const bool _onlyBuddies);
     void setOnlyRegistered(const bool _onlyRegistered);
     void setSpectatorsAllowed(const bool _spectatorsAllowed);

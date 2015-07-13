@@ -38,7 +38,7 @@ private:
     QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
     QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox, *spectatorsSeeEverythingCheckBox;
     QDialogButtonBox *buttonBox;
-    QPushButton *resetButton;
+    QPushButton *clearButton;
 
     void sharedCtor();
 };

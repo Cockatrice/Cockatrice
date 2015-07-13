@@ -86,7 +86,6 @@ SettingsCache::SettingsCache()
     gameDescription = settings->value("game/gamedescription","").toString();
     maxPlayers = settings->value("game/maxplayers", 2).toInt();
     gameTypes = settings->value("game/gametypes","").toString();
-    gamePassword = settings->value("game/gamepassword", "").toString();
     onlyBuddies = settings->value("game/onlybuddies", false).toBool();
     onlyRegistered = settings->value("game/onlyregistered", true).toBool();
     spectatorsAllowed = settings->value("game/spectatorsallowed", true).toBool();
@@ -453,12 +452,6 @@ void SettingsCache::setGameTypes(const QString _gameTypes)
 {
     gameTypes = _gameTypes;
     settings->setValue("game/gametypes", gameTypes);
-}
-
-void SettingsCache::setGamePassword(const QString _gamePassword)
-{
-    gamePassword = _gamePassword;
-    settings->setValue("game/gamepassword", gamePassword);
 }
 
 void SettingsCache::setOnlyBuddies(const bool _onlyBuddies)
