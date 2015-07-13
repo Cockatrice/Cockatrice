@@ -102,6 +102,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 # Build servatrice binary and link it
 ADD_EXECUTABLE(servatrice MACOSX_BUNDLE ${servatrice_SOURCES} ${servatrice_RESOURCES_RCC} ${servatrice_MOC_SRCS})
+set_property(TARGET servatrice PROPERTY CXX_STANDARD 11)
+set_property(TARGET servatrice PROPERTY CXX_STANDARD_REQUIRED ON)
 
 if(Qt4_FOUND)
     if(MSVC) 
