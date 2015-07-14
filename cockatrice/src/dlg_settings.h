@@ -160,13 +160,16 @@ private slots:
     void actAdd();
     void actRemove();
     void updateColor(const QString &value);
+    void updateHighlightColor(const QString &value);
     void updateTextColor(int value);
+    void updateTextHighlightColor(int value);
 private:
     QListWidget *messageList;
     QAction *aAdd;
     QAction *aRemove;
     QCheckBox chatMentionCheckBox;
     QCheckBox invertMentionForeground;
+    QCheckBox invertHighlightForeground;
     QCheckBox ignoreUnregUsersMainChat;
     QCheckBox ignoreUnregUserMessages;
     QCheckBox messagePopups;
@@ -175,12 +178,15 @@ private:
     QGroupBox *highlightGroupBox;
     QGroupBox *messageShortcuts;
     QLineEdit *mentionColor;
+    QLineEdit *highlightColor;
     QLineEdit *customAlertString;
     QLabel hexLabel;
+    QLabel hexHighlightLabel;
     QLabel customAlertStringLabel;
 
     void storeSettings();
     void updateMentionPreview();
+    void updateHighlightPreview();
 };
 
 class SoundSettingsPage : public AbstractSettingsPage {

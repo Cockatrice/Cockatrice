@@ -56,7 +56,9 @@ SettingsCache::SettingsCache()
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
+    chatHighlightForeground = settings->value("chat/highlightforeground", true).toBool();
     chatMentionColor = settings->value("chat/mentioncolor", "A6120D").toString();
+    chatHighlightColor = settings->value("chat/highlightcolor", "A6120D").toString();
 
     zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
     zoneViewSortByType = settings->value("zoneview/sortbytype", true).toBool();
@@ -83,7 +85,7 @@ SettingsCache::SettingsCache()
 
     cardInfoViewMode = settings->value("cards/cardinfoviewmode", 0).toInt();
 
-    highlightWords = settings->value("personal/highlightWords", QStringList()).toStringList();
+    highlightWords = settings->value("personal/highlightWords", QString()).toString();
 }
 
 void SettingsCache::setCardInfoViewMode(const int _viewMode) {
@@ -92,8 +94,7 @@ void SettingsCache::setCardInfoViewMode(const int _viewMode) {
 }
 
 void SettingsCache::setHighlightWords(const QString &_highlightWords) {
-    // Words are seperated by a comma and you can not use spaces in words
-    highlightWords = _highlightWords.simplified().replace(" ", "").split(",");
+    highlightWords = _highlightWords;
     settings->setValue("personal/highlightWords", highlightWords);
 }
 
@@ -322,9 +323,19 @@ void SettingsCache::setChatMentionForeground(int _chatMentionForeground) {
     settings->setValue("chat/mentionforeground", chatMentionForeground);
 }
 
+void SettingsCache::setChatHighlightForeground(int _chatHighlightForeground) {
+    chatHighlightForeground = _chatHighlightForeground;
+    settings->setValue("chat/highlightforeground", chatHighlightForeground);
+}
+
 void SettingsCache::setChatMentionColor(const QString &_chatMentionColor) {
     chatMentionColor = _chatMentionColor;
     settings->setValue("chat/mentioncolor", chatMentionColor);
+}
+
+void SettingsCache::setChatHighlightColor(const QString &_chatHighlightColor) {
+    chatHighlightColor = _chatHighlightColor;
+    settings->setValue("chat/highlightcolor", chatHighlightColor);
 }
 
 void SettingsCache::setZoneViewSortByName(int _zoneViewSortByName)

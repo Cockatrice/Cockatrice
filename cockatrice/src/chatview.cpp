@@ -166,6 +166,8 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     cursor.setCharFormat(messageFormat);
 
     bool mentionEnabled = settingsCache->getChatMention();
+    highlightedWords = settingsCache->getHighlightWords().split(' ', QString::SkipEmptyParts);
+
     // parse the message
     while (message.size())
     {
@@ -318,16 +320,8 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, QString &send
 void ChatView::checkWord(QTextCursor &cursor, QString &message)
 {
     // extract the first word
-    int firstSpace = message.indexOf(' ');
-    QString fullWordUpToSpaceOrEnd;
-    if(firstSpace == -1)
-    {
-        fullWordUpToSpaceOrEnd = message;
-        message.clear();
-    } else {
-        fullWordUpToSpaceOrEnd = message.mid(0, firstSpace);
-        message = message.mid(firstSpace);
-    }
+    QString rest;
+    QString fullWordUpToSpaceOrEnd = extractNextWord(message, rest);
 
     // check urls
     if (fullWordUpToSpaceOrEnd.startsWith("http://", Qt::CaseInsensitive) ||
@@ -338,29 +332,59 @@ void ChatView::checkWord(QTextCursor &cursor, QString &message)
         if (qUrl.isValid())
         {
             appendUrlTag(cursor, fullWordUpToSpaceOrEnd);
+            cursor.insertText(rest, defaultFormat);
             return;
         }
     }
 
     // check word mentions
-    const QStringList highlightedWords = settingsCache->getHighlightWords();
     foreach (QString word, highlightedWords)
     {
         if (fullWordUpToSpaceOrEnd.compare(word, Qt::CaseInsensitive) == 0)
         {
             // You have received a valid mention of custom word!!
-            mentionFormat.setBackground(QBrush(getCustomMentionColor()));
-            mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
-            cursor.insertText(fullWordUpToSpaceOrEnd, mentionFormat);
+            highlightFormat.setBackground(QBrush(getCustomHighlightColor()));
+            highlightFormat.setForeground(settingsCache->getChatHighlightForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
+            cursor.insertText(fullWordUpToSpaceOrEnd, highlightFormat);
             cursor.setCharFormat(defaultFormat);
+            cursor.insertText(rest, defaultFormat);
             QApplication::alert(this);
             return;
         }
     }
 
     // not a special word; just print it
-    cursor.insertText(fullWordUpToSpaceOrEnd, defaultFormat);
+    cursor.insertText(fullWordUpToSpaceOrEnd + rest, defaultFormat);
 }
+
+QString ChatView::extractNextWord(QString &message, QString &rest)
+{
+    // get the first next space and extract the word
+    QString word;
+    int firstSpace = message.indexOf(' ');
+    if(firstSpace == -1)
+    {
+        word = message;
+        message.clear();
+    } else {
+        word = message.mid(0, firstSpace);
+        message = message.mid(firstSpace);
+    }
+
+    // remove any punctution from the end and pass it separately
+    for (int len = word.size() - 1; len >= 0; --len)
+    {
+        if(word.at(len).isLetterOrNumber())
+        {
+            rest = word.mid(len + 1);
+            return word.mid(0, len + 1);
+        }
+    }
+
+    rest = word;
+    return QString();
+}
+
 
 bool ChatView::isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message)
 {
@@ -387,10 +411,15 @@ void ChatView::showSystemPopup(QString &sender) {
     emit showMentionPopup(sender);
 }
 
-
 QColor ChatView::getCustomMentionColor() {
     QColor customColor;
     customColor.setNamedColor("#" + settingsCache->getChatMentionColor());
+    return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
+}
+
+QColor ChatView::getCustomHighlightColor() {
+    QColor customColor;
+    customColor.setNamedColor("#" + settingsCache->getChatHighlightColor());
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
 
