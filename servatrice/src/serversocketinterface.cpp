@@ -137,9 +137,6 @@ bool ServerSocketInterface::initSession()
 			delete se;
 			return false;
 		}
-		else {
-			std::cerr << "Player Count: " << playerCount << " / " << userLimit << std::endl;
-		}
 	}
 
     //allow unlimited number of connections from the trusted sources
