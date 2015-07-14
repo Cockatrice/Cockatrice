@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#SCHEDULE WITH CRONTAB AND ADJUST THE INTERVALS FOR THE NUMBER OF DAYS OF LOGS TO KEEP IN THE DATABASE
+
+DBNAME="servatrice"					#set this to the database name used
+TABLEPREFIX="cockatrice"			#set this to the prefix used for the table names in the database (do not inclue the _)
+SQLCONFFILE="./mysql.cnf" 			#set this to the path that contains the mysql.cnf file
+NUMBEROFDAYS=10						#set this to the number of days desired
+mysql --defaults-file=$SQLCONFFILE -h localhost -e 'delete from ""$DBNAME"".""$TABLEPREFIX""_log where log_time < DATE_SUB(now(), INTERVAL ""$NUMBEROFDAYS"" DAY)'

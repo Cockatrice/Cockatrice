@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# SCHEDULE WITH CRONTAB ON A REGULAR BASIS. NUMBER OF DAYS IS THE AMOUNT OF DAYS TO KEEP INACTIVE ACCOUNTS (EX: 1 DAY REMOVES ALL INACTIVE ACCOUNTS OLDER THAN A SINGLE DAY).
+
+DBNAME="servatrice"             #set this to the database name used
+TABLEPREFIX="cockatrice"        #set this to the prefix used for the table names with in the database
+SQLCONFFILE="./mysql.cnf" 		#set this to the path that contains the mysql.cnf file
+NUMBEROFDAYS=5					#set this to the number of days to search for
+mysql --defaults-file=$SQLCONFFILE -h localhost -e "delete from ""$DBNAME"".""$TABLEPREFIX""_users where active = 0 AND registrationDate < DATE_SUB(now(), INTERVAL ""$NUMBEROFDAYS"" DAY);"
