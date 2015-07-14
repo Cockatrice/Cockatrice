@@ -25,8 +25,8 @@ private slots:
     void actOk();
     void actCancel();
 private:
-    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *emailLabel, *genderLabel, *countryLabel, *realnameLabel;
-    QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *emailEdit, *realnameEdit;
+    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *passwordConfirmationLabel, *emailLabel, *emailConfirmationLabel, *genderLabel, *countryLabel, *realnameLabel;
+    QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *passwordConfirmationEdit, *emailEdit, *emailConfirmationEdit, *realnameEdit;
     QComboBox *genderEdit, *countryEdit;
 };
 
