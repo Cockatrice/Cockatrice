@@ -1,4 +1,0 @@
-#!/bin/bash
-# SCHEDULE WITH CRONTAB TO RUN ONCE A MONTH
-SQLCONFFILE="./mysql.cnf" #set this to the path that contains the mysql.cnf file
-mysql --defaults-file=$SQLCONFFILE -h localhost -e "delete from servatrice.cockatrice_sessions where start_time < DATE_SUB(now(), INTERVAL 1 MONTH)"
