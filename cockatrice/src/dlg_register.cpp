@@ -4,6 +4,7 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QDialogButtonBox>
+#include <QMessageBox>
 #include <QDebug>
 
 #include "dlg_register.h"
@@ -33,9 +34,18 @@ DlgRegister::DlgRegister(QWidget *parent)
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
 
+    passwordConfirmationLabel = new QLabel(tr("Password (again):"));
+    passwordConfirmationEdit = new QLineEdit();
+    passwordConfirmationLabel->setBuddy(passwordConfirmationEdit);
+    passwordConfirmationEdit->setEchoMode(QLineEdit::Password);
+
     emailLabel = new QLabel(tr("Email:"));
     emailEdit = new QLineEdit();
     emailLabel->setBuddy(emailEdit);
+
+    emailConfirmationLabel = new QLabel(tr("Email (again):"));
+    emailConfirmationEdit = new QLineEdit();
+    emailConfirmationLabel->setBuddy(emailConfirmationEdit);
 
     genderLabel = new QLabel(tr("Pronouns:"));
     genderEdit = new QComboBox();
@@ -69,14 +79,18 @@ DlgRegister::DlgRegister(QWidget *parent)
     grid->addWidget(playernameEdit, 2, 1);
     grid->addWidget(passwordLabel, 3, 0);
     grid->addWidget(passwordEdit, 3, 1);
-    grid->addWidget(emailLabel, 4, 0);
-    grid->addWidget(emailEdit, 4, 1);
-    grid->addWidget(genderLabel, 5, 0);
-    grid->addWidget(genderEdit, 5, 1);
-    grid->addWidget(countryLabel, 6, 0);
-    grid->addWidget(countryEdit, 6, 1);
-    grid->addWidget(realnameLabel, 7, 0);
-    grid->addWidget(realnameEdit, 7, 1);
+    grid->addWidget(passwordConfirmationLabel, 4, 0);
+    grid->addWidget(passwordConfirmationEdit, 4, 1);
+    grid->addWidget(emailLabel, 5, 0);
+    grid->addWidget(emailEdit, 5, 1);
+    grid->addWidget(emailConfirmationLabel, 6, 0);
+    grid->addWidget(emailConfirmationEdit, 6, 1);
+    grid->addWidget(genderLabel, 7, 0);
+    grid->addWidget(genderEdit, 7, 1);
+    grid->addWidget(countryLabel, 8, 0);
+    grid->addWidget(countryEdit, 8, 1);
+    grid->addWidget(realnameLabel, 9, 0);
+    grid->addWidget(realnameEdit, 9, 1);
     
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
@@ -94,6 +108,17 @@ DlgRegister::DlgRegister(QWidget *parent)
 
 void DlgRegister::actOk()
 {
+    if (passwordEdit->text() != passwordConfirmationEdit->text())
+    {
+         QMessageBox::critical(this, tr("Registration Warning"), tr("Your passwords do not match, please try again."));
+         return;
+    }
+    else if (emailConfirmationEdit->text() != emailEdit->text())
+    {
+        QMessageBox::critical(this, tr("Registration Warning"), tr("Your email addresses do not match, please try again."));
+        return;
+    }
+
     QSettings settings;
     settings.beginGroup("server");
     settings.setValue("hostname", hostEdit->text());
