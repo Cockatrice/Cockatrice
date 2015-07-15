@@ -741,7 +741,7 @@ void MessagesSettingsPage::retranslateUi()
     mentionPopups.setText(tr("Enable desktop notification for mentions."));
     hexLabel.setText(tr("(Color is hexadecimal)"));
     hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
-    customAlertStringLabel.setText(tr("(Seperate each word with a space, words are case insensitive)"));
+    customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));
 }
 
 
