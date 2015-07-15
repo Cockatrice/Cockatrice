@@ -169,6 +169,7 @@ private:
     QCheckBox invertMentionForeground;
     QCheckBox ignoreUnregUsersMainChat;
     QCheckBox ignoreUnregUserMessages;
+    QCheckBox ignoreAllUserMessages;
     QCheckBox messagePopups;
     QCheckBox mentionPopups;
     QGroupBox *chatGroupBox;

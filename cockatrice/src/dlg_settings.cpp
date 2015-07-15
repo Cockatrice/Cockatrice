@@ -576,7 +576,10 @@ MessagesSettingsPage::MessagesSettingsPage()
     ignoreUnregUserMessages.setChecked(settingsCache->getIgnoreUnregisteredUserMessages());
     connect(&ignoreUnregUsersMainChat, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreUnregisteredUsers(int)));
     connect(&ignoreUnregUserMessages, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreUnregisteredUserMessages(int)));
-    
+
+    ignoreAllUserMessages.setChecked(settingsCache->getIgnoreAllUserMessages());
+    connect(&ignoreAllUserMessages, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreAllUserMessages(int)));
+
     invertMentionForeground.setChecked(settingsCache->getChatMentionForeground());
     connect(&invertMentionForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextColor(int)));
 
@@ -597,9 +600,10 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(mentionColor, 0, 2);
     chatGrid->addWidget(&ignoreUnregUsersMainChat, 1, 0);
     chatGrid->addWidget(&hexLabel, 1, 2);
-    chatGrid->addWidget(&ignoreUnregUserMessages, 2, 0);
-    chatGrid->addWidget(&messagePopups, 3, 0);
-    chatGrid->addWidget(&mentionPopups, 4, 0);
+    chatGrid->addWidget(&ignoreAllUserMessages, 2, 0);
+    chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0);
+    chatGrid->addWidget(&messagePopups, 4, 0);
+    chatGrid->addWidget(&mentionPopups, 5, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -693,6 +697,7 @@ void MessagesSettingsPage::retranslateUi()
     ignoreUnregUsersMainChat.setText(tr("Ignore unregistered users in main chat"));
     ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users."));
     ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users."));
+    ignoreAllUserMessages.setText(tr("Ignore all private messages"));
     invertMentionForeground.setText(tr("Invert text color"));
     messagePopups.setText(tr("Enable desktop notifications for private messages."));
     mentionPopups.setText(tr("Enable desktop notification for mentions."));

@@ -509,17 +509,30 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
     TabMessage *tab = messageTabs.value(senderName);
     if (!tab)
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
-    if (!tab) {
+
+    if (!tab)
+    {
         UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(senderName);
-        if (twi) {
+        if (twi)
+        {
             UserLevelFlags userLevel = UserLevelFlags(twi->getUserInfo().user_level());
-            if (settingsCache->getIgnoreUnregisteredUserMessages() &&
-                !userLevel.testFlag(ServerInfo_User::IsRegistered))
+
+            if (settingsCache->getIgnoreUnregisteredUserMessages() && !userLevel.testFlag(ServerInfo_User::IsRegistered))
+            {
                 // Flags are additive, so reg/mod/admin are all IsRegistered
                 return;
+            }
+
+            bool isStaff = userLevel.testFlag(ServerInfo_User::IsModerator) || userLevel.testFlag(ServerInfo_User::IsAdmin);
+            if (settingsCache->getIgnoreAllUserMessages() && !isStaff)
+            {
+                // User is ignoring all PMs (Staff can override, provided they aren't ignored by user already)
+                return;
+            }
         }
         tab = addMessageTab(QString::fromStdString(event.sender_name()), false);
     }
+
     if (!tab)
         return;
     tab->processUserMessageEvent(event);
