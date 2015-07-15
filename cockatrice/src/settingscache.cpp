@@ -70,6 +70,7 @@ SettingsCache::SettingsCache()
 
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
     ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
+    ignoreAllUserMessages = settings->value("chat/ignore_all_messages", false).toBool();
 
     attemptAutoConnect = settings->value("server/auto_connect", 0).toBool();
 
@@ -373,6 +374,12 @@ void SettingsCache::setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUse
 {
     ignoreUnregisteredUserMessages = _ignoreUnregisteredUserMessages;
     settings->setValue("chat/ignore_unregistered_messages", ignoreUnregisteredUserMessages);
+}
+
+void SettingsCache::setIgnoreAllUserMessages(int _ignoreAllUserMessages)
+{
+    ignoreAllUserMessages = _ignoreAllUserMessages;
+    settings->setValue("chat/ignore_all_messages", ignoreAllUserMessages);
 }
 
 void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)
