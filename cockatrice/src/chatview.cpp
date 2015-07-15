@@ -158,12 +158,13 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
         cursor.insertText(sender);
     }
 
-    QTextCharFormat messageFormat;
+    // use different color for server messages 
+    defaultFormat = QTextCharFormat();
     if (sender.isEmpty()) {
-        messageFormat.setForeground(Qt::darkGreen);
-        messageFormat.setFontWeight(QFont::Bold);
+        defaultFormat.setForeground(Qt::darkGreen);
+        defaultFormat.setFontWeight(QFont::Bold);
     }
-    cursor.setCharFormat(messageFormat);
+    cursor.setCharFormat(defaultFormat);
 
     bool mentionEnabled = settingsCache->getChatMention();
     highlightedWords = settingsCache->getHighlightWords().split(' ', QString::SkipEmptyParts);
@@ -178,17 +179,24 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
                 checkTag(cursor, message);
                 break;
             case '@':
-                if(mentionEnabled)
+                if(mentionEnabled) {
                     checkMention(cursor, message, sender, userLevel);
-                else
-                    checkWord(cursor, message);
+                } else {
+                    cursor.insertText(c, defaultFormat);
+                    message = message.mid(1);
+                }
                 break;
             case ' ':
-                cursor.insertText(" ", defaultFormat);
+                cursor.insertText(c, defaultFormat);
                 message = message.mid(1);
                 break;
             default:
-                checkWord(cursor, message);
+                if(c.isLetterOrNumber()) {
+                    checkWord(cursor, message);
+                } else {
+                    cursor.insertText(c, defaultFormat);
+                    message = message.mid(1);
+                }
                 break;
         }
     }
@@ -346,7 +354,6 @@ void ChatView::checkWord(QTextCursor &cursor, QString &message)
             highlightFormat.setBackground(QBrush(getCustomHighlightColor()));
             highlightFormat.setForeground(settingsCache->getChatHighlightForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
             cursor.insertText(fullWordUpToSpaceOrEnd, highlightFormat);
-            cursor.setCharFormat(defaultFormat);
             cursor.insertText(rest, defaultFormat);
             QApplication::alert(this);
             return;
