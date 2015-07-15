@@ -136,17 +136,20 @@ void TabSupervisor::retranslateUi()
 
 bool TabSupervisor::closeRequest()
 {
-    if (getGameCount()) {
-        if (QMessageBox::question(this, tr("Are you sure?"), tr("There are still open games. Are you sure you want to quit?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+    if (getGameCount())
+    {
+        if (QMessageBox::question(this, tr("Are you sure?"), tr("There are still open games. Are you sure you want to quit?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No)
             return false;
-        }
+    }
+    else
+    {
+        if (QMessageBox::question(this, tr("Close Cockatrice"), tr("Are you sure you want to close Cockatrice?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No)
+            return false;
     }
 
     foreach(TabDeckEditor *tab,  deckEditorTabs)
-    {
-        if(!tab->confirmClose())
+        if (!tab->confirmClose())
             return false;
-    }
 
     return true;
 }
