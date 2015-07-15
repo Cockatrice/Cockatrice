@@ -29,7 +29,8 @@ SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connection
     authMethod(AuthPlain),
     connectionTimeout(5000),
     responseTimeout(5000),
-    sendMessageTimeout(60000)
+    sendMessageTimeout(60000),
+    socket(NULL)
 {
     setConnectionType(connectionType);
 
@@ -44,7 +45,10 @@ SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connection
             this, SLOT(socketReadyRead()));
 }
 
-SmtpClient::~SmtpClient() {}
+SmtpClient::~SmtpClient() {
+    if (socket)
+        delete socket;
+}
 
 /* [1] --- */
 
@@ -79,6 +83,9 @@ void SmtpClient::setPort(int port)
 void SmtpClient::setConnectionType(ConnectionType ct)
 {
     this->connectionType = ct;
+
+    if (socket)
+        delete socket;
 
     switch (connectionType)
     {
