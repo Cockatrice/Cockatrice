@@ -85,6 +85,15 @@ private:
     bool leftJustified;
     int masterVolume;
     int cardInfoViewMode;
+    QString gameDescription;
+    int maxPlayers;
+    QString gameTypes;
+    bool onlyBuddies;
+    bool onlyRegistered;
+    bool spectatorsAllowed;
+    bool spectatorsNeedPassword;
+    bool spectatorsCanTalk;
+    bool spectatorsCanSeeEverything;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -143,6 +152,15 @@ public:
     int getMasterVolume() const { return masterVolume; }
     int getCardInfoViewMode() const { return cardInfoViewMode; }
     QStringList getCountries() const;
+    QString getGameDescription() const { return gameDescription; }
+    int getMaxPlayers() const { return maxPlayers; }
+    QString getGameTypes() const { return gameTypes; }
+    bool getOnlyBuddies() const { return onlyBuddies; }
+    bool getOnlyRegistered() const { return onlyRegistered; }
+    bool getSpectatorsAllowed() const { return spectatorsAllowed; }
+    bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
+    bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
+    bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -194,6 +212,15 @@ public slots:
     void setLeftJustified( const int _leftJustified);
     void setMasterVolume(const int _masterVolume);
     void setCardInfoViewMode(const int _viewMode);
+    void setGameDescription(const QString _gameDescription);
+    void setMaxPlayers(const int _maxPlayers);
+    void setGameTypes(const QString _gameTypes);
+    void setOnlyBuddies(const bool _onlyBuddies);
+    void setOnlyRegistered(const bool _onlyRegistered);
+    void setSpectatorsAllowed(const bool _spectatorsAllowed);
+    void setSpectatorsNeedPassword(const bool _spectatorsNeedPassword);
+    void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
+    void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
 };
 
 extern SettingsCache *settingsCache;
