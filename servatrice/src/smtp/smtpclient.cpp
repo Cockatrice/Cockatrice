@@ -25,12 +25,12 @@
 /* [1] Constructors and destructors */
 
 SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connectionType) :
+    socket(NULL),
     name("localhost"),
     authMethod(AuthPlain),
     connectionTimeout(5000),
     responseTimeout(5000),
-    sendMessageTimeout(60000),
-    socket(NULL)
+    sendMessageTimeout(60000)
 {
     setConnectionType(connectionType);
 
