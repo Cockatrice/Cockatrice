@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
  *   Copyright (C) 2008 by Max-Wilhelm Bruker   *
  *   brukie@gmx.net   *
  *                                                                         *
@@ -33,6 +33,7 @@
 #include <QDebug>
 #include <QSystemTrayIcon>
 #include "QtNetwork/QNetworkInterface"
+#include <QCryptographicHash>
 #include "QString"
 
 #include "main.h"
@@ -101,20 +102,14 @@ bool settingsValid()
 
 QString getMacAddress()
 {
-	QString text;
+	QString macList;
 	foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
 	{
-		if (interface.hardwareAddress() != ""){
-			// do nothing as this is an invalid mac
-		} else {
-			if (interface.hardwareAddress() != "00:00:00:00:00:00:00:E0"){
-				// do nothing as this is an invalid mac
-			} else {
-				return interface.hardwareAddress();
-			}
-		}
+		if (interface.hardwareAddress() != "")
+			if (interface.hardwareAddress() != "00:00:00:00:00:00:00:E0")
+				macList += interface.hardwareAddress() + ".";
 	}
-	return text;
+	return macList;
 }
 
 int main(int argc, char *argv[])
@@ -224,9 +219,12 @@ int main(int argc, char *argv[])
         QIcon icon(":/resources/appicon.svg");
         ui.setWindowIcon(icon);
 
-		settingsCache->setClientID("Test");
-		qDebug() << "MacAddress: " << getMacAddress().constData();
-		qDebug() << "ClientID: " << settingsCache->getClientID();
+		
+		QString strMac = getMacAddress();
+		QCryptographicHash md5_generator(QCryptographicHash::Md5);
+		md5_generator.addData(strMac.toStdString());
+		qDebug() << "MacAddress: " << strMac;
+		qDebug() << "ClientID: " << md5_generator.result().toHex();
 
         ui.show();
         qDebug("main(): ui.show() finished");
