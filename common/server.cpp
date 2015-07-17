@@ -103,7 +103,7 @@ Server_DatabaseInterface *Server::getDatabaseInterface() const
     return databaseInterfaces.value(QThread::currentThread());
 }
 
-AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft)
+AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft, QString &clientid)
 {
     if (name.size() > 35)
         name = name.left(35);
@@ -123,6 +123,18 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     databaseInterface->lockSessionTables();
     
     if (authState == PasswordRight) {
+
+        // check if client id exists (older client compatibility
+        
+        if (clientid.isEmpty()){
+            // client id is empty, either out dated client or client has been modified
+            qDebug() << "Warning: Outdated client detected";
+        } else {
+            // update users database table with client id
+            qDebug() << "ClientID: " << clientid;
+        }
+        
+        // verify that new session would not cause problems with older existing session
         if (users.contains(name) || databaseInterface->userSessionExists(name)) {
             qDebug("Login denied: would overwrite old session");
             databaseInterface->unlockSessionTables();
