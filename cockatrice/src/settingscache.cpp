@@ -397,7 +397,8 @@ void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
 
 void SettingsCache::setClientID(QString _clientID)
 {
-	settings->setValue("personal/clientid", _clientID);
+    clientID = _clientID;
+	settings->setValue("personal/clientid", clientID);
 }
 
 QStringList SettingsCache::getCountries() const
