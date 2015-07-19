@@ -828,15 +828,14 @@ int Servatrice_DatabaseInterface::getActiveUserCount()
 
 void Servatrice_DatabaseInterface::updateUsersClientID(const QString &userName, const QString &userClientID)
 {
-    qDebug() << "Inserting client id [ " << userClientID << " ] for [ " << userName << " ]";
-
+    
     if (!checkSql())
         return;
-        
+
+	qDebug() << "Inserting client id [ " << userClientID << " ] for [ " << userName << " ]";
     QSqlQuery *query = prepareQuery("update {prefix}_users set clientid = ':clientid' where name = ':username'");
-    query->bindValue(":clientid", userName);
-    query->bindValue(":username", userClientID);
-    if (!execSqlQuery(query)){
-        return;
-    }
+	query->bindValue(":clientid", userClientID);
+	query->bindValue(":username", userName);
+	execSqlQuery(query);
+	
 }

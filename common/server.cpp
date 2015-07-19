@@ -124,18 +124,6 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     
     if (authState == PasswordRight) {
 
-        // check if client id exists (older client compatibility
-        
-        if (clientid.isEmpty()){
-            // client id is empty, either out dated client or client has been modified
-            qDebug() << "Warning: Outdated client detected";
-        }
-        else {
-            // update users database table with client id
-            qDebug() << "ClientID: " << clientid;
-            databaseInterface->updateUsersClientID(name, clientid);
-        }
-        
         // verify that new session would not cause problems with older existing session
         if (users.contains(name) || databaseInterface->userSessionExists(name)) {
             qDebug("Login denied: would overwrite old session");
@@ -182,6 +170,17 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     event.mutable_user_info()->CopyFrom(session->copyUserInfo(true, true, true));
     locker.unlock();
     
+	// check if client id exists (older client compatibility)
+	if (clientid.isEmpty()){
+		// client id is empty, either out dated client or client has been modified
+		qDebug() << "Warning: Outdated client detected";
+	}
+	else {
+		// update users database table with client id
+		qDebug() << "ClientID: " << clientid;
+		databaseInterface->updateUsersClientID(name, clientid);
+	}
+
     se = Server_ProtocolHandler::prepareSessionEvent(event);
     sendIsl_SessionEvent(*se);
     delete se;
