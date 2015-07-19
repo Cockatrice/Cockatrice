@@ -129,9 +129,11 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
         if (clientid.isEmpty()){
             // client id is empty, either out dated client or client has been modified
             qDebug() << "Warning: Outdated client detected";
-        } else {
+        }
+        else {
             // update users database table with client id
             qDebug() << "ClientID: " << clientid;
+            databaseInterface->updateUsersClientID(name, clientid);
         }
         
         // verify that new session would not cause problems with older existing session
