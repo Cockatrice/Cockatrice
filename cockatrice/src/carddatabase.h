@@ -54,8 +54,10 @@ public:
 
 class SetList : public QList<CardSet *> {
 private:
-    class CompareFunctor;
+    class KeyCompareFunctor;
+    class EnabledAndKeyCompareFunctor;
 public:
+    void sortByEnabledAndKey();
     void sortByKey();
     void guessSortKeys();
     void enableAllUnknown();
