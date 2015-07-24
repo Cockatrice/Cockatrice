@@ -2389,6 +2389,7 @@ void Player::setMirrored(bool _mirrored)
 
 void Player::processSceneSizeChange(int newPlayerWidth)
 {
+    // Extend table (and hand, if horizontal) to accomodate the new player width.
     qreal tableWidth = newPlayerWidth - CARD_HEIGHT - 15 - counterAreaWidth - stack->boundingRect().width();
     if (!settingsCache->getHorizontalHand())
         tableWidth -= hand->boundingRect().width();

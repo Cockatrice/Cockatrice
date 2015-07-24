@@ -31,9 +31,9 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
 
     updateBgPixmap();
 
-    height = 2 * BOX_LINE_WIDTH + TABLEROWS * (CARD_HEIGHT + 20) + 2 * PADDING_Y;
-    width = MIN_WIDTH + 2 * MARGIN_X + 2 * BOX_LINE_WIDTH;
-    currentMinimumWidth = MIN_WIDTH;
+    height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CARD_HEIGHT + (TABLEROWS-1) * PADDING_Y;
+    width = MIN_WIDTH;
+    currentMinimumWidth = width;
 
     setCacheMode(DeviceCoordinateCache);
 #if QT_VERSION < 0x050000
@@ -115,10 +115,12 @@ void TableZone::paintZoneOutline(QPainter *painter) {
    @painter QPainter object
  */
 void TableZone::paintLandDivider(QPainter *painter){
-    painter->setPen(QColor(255, 255, 255, 40));
-    qreal separatorY = 2 * (CARD_HEIGHT + 20 + PADDING_Y) + BOX_LINE_WIDTH - PADDING_Y / 2;
+    // Place the line 2 grid heights down then back it off just enough to allow
+    // some space between a 3-card stack and the land area.
+    qreal separatorY = MARGIN_TOP + 2 * (CARD_HEIGHT + PADDING_Y) - STACKED_CARD_OFFSET_Y / 2;
     if (isInverted())
         separatorY = height - separatorY;
+    painter->setPen(QColor(255, 255, 255, 40));
     painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
 }
 
@@ -165,30 +167,9 @@ void TableZone::reorganizeCards()
 {
     QList<ArrowItem *> arrowsToUpdate;
     
-    // Calculate table grid distortion so that the mapping functions work properly
-    QMap<int, int> gridPointStackCount;
-    for (int i = 0; i < cards.size(); ++i) {
-        const QPoint &gridPoint = cards[i]->getGridPos();
-        if (gridPoint.x() == -1)
-            continue;
-        
-        const int key = gridPoint.x() / 3 + gridPoint.y() * 1000;
-        gridPointStackCount.insert(key, gridPointStackCount.value(key, 0) + 1);
-    }
-    gridPointWidth.clear();
-    for (int i = 0; i < cards.size(); ++i) {
-        const QPoint &gridPoint = cards[i]->getGridPos();
-        if (gridPoint.x() == -1)
-            continue;
-        
-        const int key = gridPoint.x() / 3 + gridPoint.y() * 1000;
-        const int stackCount = gridPointStackCount.value(key, 0);
-        if (stackCount == 1)
-            gridPointWidth.insert(key, CARD_WIDTH * (1 + cards[i]->getAttachedCards().size() / 3.0));
-        else
-            gridPointWidth.insert(key, CARD_WIDTH * (1 + (stackCount - 1) / 3.0));
-    }
-    
+    // Calculate card stack widths so mapping functions work properly
+    computeCardStackWidths();
+
     for (int i = 0; i < cards.size(); ++i) {
         QPoint gridPoint = cards[i]->getGridPos();
         if (gridPoint.x() == -1)
@@ -199,7 +180,7 @@ void TableZone::reorganizeCards()
         qreal y = mapPoint.y();
         
         int numberAttachedCards = cards[i]->getAttachedCards().size();
-        qreal actualX = x + numberAttachedCards * CARD_WIDTH / 3.0;
+        qreal actualX = x + numberAttachedCards * STACKED_CARD_OFFSET_X;
         qreal actualY = y;
         if (numberAttachedCards)
             actualY += 15;
@@ -212,7 +193,7 @@ void TableZone::reorganizeCards()
         while (attachedCardIterator.hasNext()) {
             ++j;
             CardItem *attachedCard = attachedCardIterator.next();
-            qreal childX = actualX - j * CARD_WIDTH / 3.0;
+            qreal childX = actualX - j * STACKED_CARD_OFFSET_X;
             qreal childY = y + 5;
             attachedCard->setPos(childX, childY);
             attachedCard->setRealZValue((childY + CARD_HEIGHT) * 100000 + (childX + 1) * 100);
@@ -271,13 +252,19 @@ CardItem *TableZone::takeCard(int position, int cardId, bool canResize)
 void TableZone::resizeToContents()
 {
     int xMax = 0;
+
+    // Find rightmost card position, which includes the left margin amount.
     for (int i = 0; i < cards.size(); ++i)
         if (cards[i]->pos().x() > xMax)
             xMax = (int) cards[i]->pos().x();
-    xMax += 2 * CARD_WIDTH;
-    if (xMax < MIN_WIDTH)
-        xMax = MIN_WIDTH;
-    currentMinimumWidth = xMax + 2 * MARGIN_X + 2 * BOX_LINE_WIDTH;
+
+    // Minimum width is the rightmost card position plus enough room for
+    // another card with padding, then margin.
+    currentMinimumWidth = xMax + (2 * CARD_WIDTH) + PADDING_X + MARGIN_RIGHT;
+
+    if (currentMinimumWidth < MIN_WIDTH)
+        currentMinimumWidth = MIN_WIDTH;
+
     if (currentMinimumWidth != width) {
         prepareGeometryChange();
         width = currentMinimumWidth;
@@ -294,6 +281,7 @@ CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
     return 0;
 }
 
+
 CardItem *TableZone::getCardFromCoords(const QPointF &point) const
 {
     QPoint gridPoint = mapToGrid(point);
@@ -301,57 +289,110 @@ CardItem *TableZone::getCardFromCoords(const QPointF &point) const
 }
 
 
+void TableZone::computeCardStackWidths()
+{
+    // Each card stack is three grid points worth of card locations.
+    // First pass: compute the number of cards at each card stack.
+    QMap<int, int> cardStackCount;
+    for (int i = 0; i < cards.size(); ++i) {
+        const QPoint &gridPoint = cards[i]->getGridPos();
+        if (gridPoint.x() == -1)
+            continue;
+        
+        const int key = getCardStackMapKey(gridPoint.x() / 3, gridPoint.y());
+        cardStackCount.insert(key, cardStackCount.value(key, 0) + 1);
+    }
+
+    // Second pass: compute the width at each card stack.
+    cardStackWidth.clear();
+    for (int i = 0; i < cards.size(); ++i) {
+        const QPoint &gridPoint = cards[i]->getGridPos();
+        if (gridPoint.x() == -1)
+            continue;
+        
+        const int key = getCardStackMapKey(gridPoint.x() / 3, gridPoint.y());
+        const int stackCount = cardStackCount.value(key, 0);
+        if (stackCount == 1)
+            cardStackWidth.insert(key, CARD_WIDTH + cards[i]->getAttachedCards().size() * STACKED_CARD_OFFSET_X);
+        else
+            cardStackWidth.insert(key, CARD_WIDTH + (stackCount - 1) * STACKED_CARD_OFFSET_X);
+    }
+}
+
+
 QPointF TableZone::mapFromGrid(QPoint gridPoint) const
 {
     qreal x, y;
-    x = MARGIN_X + (gridPoint.x() % 3) * CARD_WIDTH / 3.0;
+
+    // Start with margin plus stacked card offset
+    x = MARGIN_LEFT + (gridPoint.x() % 3) * STACKED_CARD_OFFSET_X;
+
+    // Add in width of card stack plus padding for each column
     for (int i = 0; i < gridPoint.x() / 3; ++i)
-        x += gridPointWidth.value(gridPoint.y() * 1000 + i, CARD_WIDTH) + PADDING_X;
+    {
+        const int key = getCardStackMapKey(i, gridPoint.y());
+        x += cardStackWidth.value(key, CARD_WIDTH) + PADDING_X;
+    }
     
     if (isInverted())
-        gridPoint.setY(2 - gridPoint.y());
+        gridPoint.setY(TABLEROWS - 1 - gridPoint.y());
     
-    y = BOX_LINE_WIDTH + gridPoint.y() * (CARD_HEIGHT + PADDING_Y + 20) + (gridPoint.x() % TABLEROWS) * 10;
-/*    
-    if (isInverted())
-        y = height - CARD_HEIGHT - y;
-*/    
+    // Start with margin plus stacked card offset
+    y = MARGIN_TOP + (gridPoint.x() % 3) * STACKED_CARD_OFFSET_Y;
+
+    // Add in card size and padding for each row
+    for (int i = 0; i < gridPoint.y(); ++i)
+        y += CARD_HEIGHT + PADDING_Y;
+
     return QPointF(x, y);
 }
 
 
 QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 {
-    qreal x = mapPoint.x() - MARGIN_X;
-    qreal y = mapPoint.y();
-/*    if (isInverted())
-        y = height - y;
-*/    y -= BOX_LINE_WIDTH;
-    
-    if (x < 0)
-        x = 0;
-    else if (x > width - CARD_WIDTH - MARGIN_X)
-        x = width - CARD_WIDTH - MARGIN_X;
-    if (y < 0)
-        y = 0;
-    else if (y > height - CARD_HEIGHT)
-        y = height - CARD_HEIGHT;
-    
-    int resultY = round(y / (CARD_HEIGHT + PADDING_Y + 20));
-    if (isInverted())
-        resultY = TABLEROWS - 1 - resultY;
+    // Begin by calculating the y-coordinate of the grid space, which will be
+    // used for the x-coordinate.
 
-    int baseX = -1;
-    qreal oldTempX = 0, tempX = 0;
-    do {
-        ++baseX;
-        oldTempX = tempX;
-        tempX += gridPointWidth.value(resultY * 1000 + baseX, CARD_WIDTH) + PADDING_X;
-    } while (tempX < x + 1);
-    
-    qreal xdiff = x - oldTempX;
-    int resultX = baseX * 3 + qMin((int) floor(xdiff * 3 / CARD_WIDTH), 2);
-    return QPoint(resultX, resultY);
+    // Offset point by the margin amount to reference point within grid area.
+    int y = mapPoint.y() - MARGIN_TOP;
+
+    // Below calculation effectively rounds to the nearest grid point.
+    const int gridPointHeight = CARD_HEIGHT + PADDING_Y;
+    int gridPointY = (y + gridPointHeight / 2) / gridPointHeight;
+
+    gridPointY = clampValidTableRow(gridPointY);
+
+    if (isInverted())
+        gridPointY = TABLEROWS - 1 - gridPointY;
+
+    // Calculating the x-coordinate of the grid space requires adding up the
+    // widths of each card stack along the row.
+
+    // Offset point by the margin amount to reference point within grid area.
+    int x = mapPoint.x() - MARGIN_LEFT;
+
+    // Maximum value is a card width from the right margin, referenced to the
+    // grid area.
+    const int xMax = width - MARGIN_LEFT - MARGIN_RIGHT - CARD_WIDTH;
+
+    int xStack = 0;
+    int xNextStack = 0;
+    int nextStackCol = 0;
+    while ((xNextStack <= x) && (xNextStack <= xMax)) { 
+        xStack = xNextStack;
+        const int key = getCardStackMapKey(nextStackCol, gridPointY);
+        xNextStack += cardStackWidth.value(key, CARD_WIDTH) + PADDING_X;
+        nextStackCol++;
+    }
+    int stackCol = qMax(nextStackCol - 1, 0);
+
+    // Have the stack column, need to refine to the grid column.  Take the
+    // difference between the point and the stack point and divide by stacked
+    // card offsets.
+    int xDiff = x - xStack;
+    int gridPointX = stackCol * 3 + qMin(xDiff / STACKED_CARD_OFFSET_X, 2);
+
+    return QPoint(gridPointX, gridPointY);
 }
 
 
