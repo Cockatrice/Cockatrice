@@ -108,6 +108,9 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                 int color = 90 + 60 * node->depth();
                 return QBrush(QColor(color, 255, color));
             }
+            case Qt::ForegroundRole: {
+                return QBrush(QColor(0 ,0 ,0));
+            }
             default: return QVariant();
         }
     } else {
@@ -124,6 +127,9 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
             case Qt::BackgroundRole: {
                 int color = 255 - (index.row() % 2) * 30;
                 return QBrush(QColor(color, color, color));
+            }
+            case Qt::ForegroundRole: {
+                return QBrush(QColor(0 ,0 ,0));
             }
             default: return QVariant();
         }
