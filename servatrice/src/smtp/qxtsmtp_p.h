@@ -78,11 +78,7 @@ public:
     int nextID, rcptNumber, rcptAck;
     bool mailAck;
 
-#ifndef QT_NO_OPENSSL
     QSslSocket* socket;
-#else
-    QTcpSocket* socket;
-#endif
 
     void parseEhlo(const QByteArray& code, bool cont, const QString& line);
     void startTLS();

@@ -33,9 +33,7 @@
 #include "qxtmailmessage.h"
 
 class QTcpSocket;
-#ifndef QT_NO_OPENSSL
 class QSslSocket;
-#endif
 
 class QxtSmtpPrivate;
 class QXT_NETWORK_EXPORT QxtSmtp : public QObject
@@ -77,11 +75,9 @@ public:
     bool startTlsDisabled() const;
     void setStartTlsDisabled(bool disable);
 
-#ifndef QT_NO_OPENSSL
     QSslSocket* sslSocket() const;
     void connectToSecureHost(const QString& hostName, quint16 port = 465);
     void connectToSecureHost(const QHostAddress& address, quint16 port = 465);
-#endif
 
     bool hasExtension(const QString& extension);
     QString extensionData(const QString& extension);
