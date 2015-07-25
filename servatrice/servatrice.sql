@@ -205,3 +205,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_log` (
   KEY `target_id` (`target_id`),
   KEY `target_name` (`target_name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_activation_emails` (
+  `name` varchar(35) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
