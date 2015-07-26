@@ -336,8 +336,7 @@ void TabDeckEditor::retranslateUi()
     aLoadDeck->setText(tr("&Load deck..."));
     aSaveDeck->setText(tr("&Save deck"));
     aSaveDeckAs->setText(tr("Save deck &as..."));
-    aLoadDeckFromClipboard->setText(tr("Load deck from clipboard..."));
-    aLoadDeckFromClipboard->setShortcut(QKeySequence("Ctrl+L"));
+    aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
     aSaveDeckToClipboard->setText(tr("Save deck to clip&board"));
     aPrintDeck->setText(tr("&Print deck..."));
     aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
