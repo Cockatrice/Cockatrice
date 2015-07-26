@@ -92,7 +92,7 @@ void CardSet::setIsKnown(bool _isknown)
     settings.setValue("isknown", isknown);
 }
 
-class SetList::CompareFunctor {
+class SetList::KeyCompareFunctor {
 public:
     inline bool operator()(CardSet *a, CardSet *b) const
     {
@@ -102,7 +102,39 @@ public:
 
 void SetList::sortByKey()
 {
-    qSort(begin(), end(), CompareFunctor());
+    qSort(begin(), end(), KeyCompareFunctor());
+}
+
+class SetList::EnabledAndKeyCompareFunctor {
+public:
+    inline bool operator()(CardSet *a, CardSet *b) const
+    {
+        if(a->getEnabled())
+        {
+            if(b->getEnabled())
+            {
+                // both enabled: sort by key
+                return a->getSortKey() < b->getSortKey();
+            } else {
+                // only a enabled
+                return true;
+            }
+        } else {
+            if(b->getEnabled())
+            {
+                // only b enabled
+                return false;
+            } else {
+                // both disabled: sort by key
+                return a->getSortKey() < b->getSortKey();
+            }
+        }
+    }
+};
+
+void SetList::sortByEnabledAndKey()
+{
+    qSort(begin(), end(), EnabledAndKeyCompareFunctor());
 }
 
 int SetList::getEnabledSetsNum()
@@ -185,7 +217,7 @@ PictureToLoad::PictureToLoad(CardInfo *_card, bool _hq)
 {
     if (card) {
         sortedSets = card->getSets();
-        sortedSets.sortByKey();
+        sortedSets.sortByEnabledAndKey();
     }
 }
 
@@ -857,6 +889,8 @@ void CardDatabase::clearPixmapCache()
     }
     if (noCard)
         noCard->clearPixmapCache();
+
+    QPixmapCache::clear();
 }
 
 void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
