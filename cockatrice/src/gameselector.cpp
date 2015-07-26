@@ -157,12 +157,11 @@ void GameSelector::checkResponse(const Response &response)
 
 void GameSelector::actJoin()
 {
-    bool spectator = sender() == spectateButton;
-
     QModelIndex ind = gameListView->currentIndex();
     if (!ind.isValid())
         return;
     const ServerInfo_Game &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
+    bool spectator = sender() == spectateButton || game.player_count() == game.max_players();
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
     QString password;
     if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
