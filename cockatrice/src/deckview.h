@@ -46,6 +46,7 @@ class DeckViewCardContainer : public QGraphicsItem {
 private:
     static const int separatorY = 20;
     static const int paddingY = 10;
+    static bool sortCardsByName(DeckViewCard * c1, DeckViewCard * c2);
     
     QString name;
     QList<DeckViewCard *> cards;
