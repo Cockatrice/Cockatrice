@@ -889,6 +889,8 @@ void CardDatabase::clearPixmapCache()
     }
     if (noCard)
         noCard->clearPixmapCache();
+
+    QPixmapCache::clear();
 }
 
 void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)

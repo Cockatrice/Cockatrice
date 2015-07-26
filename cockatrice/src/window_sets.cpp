@@ -123,6 +123,7 @@ WndSets::~WndSets()
 void WndSets::actSave()
 {
     model->save(db);
+    db->clearPixmapCache();
     QMessageBox::information(this, tr("Success"), tr("The sets database has been saved successfully."));
     close();
 }
