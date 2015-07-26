@@ -301,7 +301,7 @@ bool Servatrice_DatabaseInterface::checkUserIsBanned(const QString &ipAddress, c
 
 bool Servatrice_DatabaseInterface::checkUserIsNameBanned(const QString &userName, QString &banReason, int &banSecondsRemaining)
 {
-    QSqlQuery *nameBanQuery = prepareQuery("select time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))), b.minutes <=> 0, b.visible_reason from {prefix}_bans b where b.time_from = (select max(c.time_from) from {prefix}_bans c where c.user_name = :name2) and b.user_name = :name1");
+    QSqlQuery *nameBanQuery = prepareQuery("select timestampdiff(second, now(), date_add(b.time_from, interval b.minutes minute)), b.minutes <=> 0, b.visible_reason from {prefix}_bans b where b.time_from = (select max(c.time_from) from {prefix}_bans c where c.user_name = :name2) and b.user_name = :name1");
     nameBanQuery->bindValue(":name1", userName);
     nameBanQuery->bindValue(":name2", userName);
     if (!execSqlQuery(nameBanQuery)) {
@@ -310,7 +310,7 @@ bool Servatrice_DatabaseInterface::checkUserIsNameBanned(const QString &userName
     }
 
     if (nameBanQuery->next()) {
-        const int secondsLeft = -nameBanQuery->value(0).toInt();
+        const int secondsLeft = nameBanQuery->value(0).toInt();
         const bool permanentBan = nameBanQuery->value(1).toInt();
         if ((secondsLeft > 0) || permanentBan) {
             banReason = nameBanQuery->value(2).toString();
@@ -326,7 +326,7 @@ bool Servatrice_DatabaseInterface::checkUserIsIpBanned(const QString &ipAddress,
 {
     QSqlQuery *ipBanQuery = prepareQuery(
             "select"
-                    " time_to_sec(timediff(now(), date_add(b.time_from, interval b.minutes minute))),"
+                    " timestampdiff(second, now(), date_add(b.time_from, interval b.minutes minute)),"
                     " b.minutes <=> 0,"
                     " b.visible_reason"
                     " from {prefix}_bans b"
@@ -344,7 +344,7 @@ bool Servatrice_DatabaseInterface::checkUserIsIpBanned(const QString &ipAddress,
     }
 
     if (ipBanQuery->next()) {
-        const int secondsLeft = -ipBanQuery->value(0).toInt();
+        const int secondsLeft = ipBanQuery->value(0).toInt();
         const bool permanentBan = ipBanQuery->value(1).toInt();
         if ((secondsLeft > 0) || permanentBan) {
             banReason = ipBanQuery->value(2).toString();
