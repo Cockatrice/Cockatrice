@@ -440,7 +440,7 @@ void MainWindow::setClientStatusTitle()
         case StatusRegistering: setWindowTitle(appName + " - " + tr("Registering to %1 as %2...").arg(client->peerName()).arg(client->getUserName())); break;
         case StatusDisconnected: setWindowTitle(appName + " - " + tr("Disconnected")); break;
         case StatusLoggingIn: setWindowTitle(appName + " - " + tr("Connected, logging in at %1").arg(client->peerName())); break;
-        case StatusLoggedIn: setWindowTitle(appName + " - " + tr("Logged in as %1 at %2").arg(client->getUserName()).arg(client->peerName())); break;
+        case StatusLoggedIn: setWindowTitle(client->getUserName() + "@" + client->peerName()); break;
         default: setWindowTitle(appName);
     }
 }
