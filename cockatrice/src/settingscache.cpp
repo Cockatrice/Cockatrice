@@ -82,6 +82,16 @@ SettingsCache::SettingsCache()
     masterVolume = settings->value("sound/mastervolume", 100).toInt();
 
     cardInfoViewMode = settings->value("cards/cardinfoviewmode", 0).toInt();
+	
+    gameDescription = settings->value("game/gamedescription","").toString();
+    maxPlayers = settings->value("game/maxplayers", 2).toInt();
+    gameTypes = settings->value("game/gametypes","").toString();
+    onlyBuddies = settings->value("game/onlybuddies", false).toBool();
+    onlyRegistered = settings->value("game/onlyregistered", true).toBool();
+    spectatorsAllowed = settings->value("game/spectatorsallowed", true).toBool();
+    spectatorsNeedPassword = settings->value("game/spectatorsneedpassword", false).toBool();
+    spectatorsCanTalk = settings->value("game/spectatorscantalk", false).toBool();
+    spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
 }
 
 void SettingsCache::setCardInfoViewMode(const int _viewMode) {
@@ -424,4 +434,58 @@ QStringList SettingsCache::getCountries() const
     << "vn" << "vu" << "wf" << "ws" << "ye" << "yt" << "za" << "zm" << "zw";
 
     return countries;
+}
+
+void SettingsCache::setGameDescription(const QString _gameDescription)
+{
+    gameDescription = _gameDescription;
+    settings->setValue("game/gamedescription", gameDescription);
+}
+
+void SettingsCache::setMaxPlayers(const int _maxPlayers)
+{
+    maxPlayers = _maxPlayers;
+    settings->setValue("game/maxplayers", maxPlayers);
+}
+
+void SettingsCache::setGameTypes(const QString _gameTypes)
+{
+    gameTypes = _gameTypes;
+    settings->setValue("game/gametypes", gameTypes);
+}
+
+void SettingsCache::setOnlyBuddies(const bool _onlyBuddies)
+{
+    onlyBuddies = _onlyBuddies;
+    settings->setValue("game/onlybuddies", onlyBuddies);
+}
+
+void SettingsCache::setOnlyRegistered(const bool _onlyRegistered)
+{
+    onlyRegistered = _onlyRegistered;
+    settings->setValue("game/onlyregistered", onlyRegistered);
+}
+
+void SettingsCache::setSpectatorsAllowed(const bool _spectatorsAllowed)
+{
+    spectatorsAllowed = _spectatorsAllowed;
+    settings->setValue("game/spectatorsallowed", spectatorsAllowed);
+}
+
+void SettingsCache::setSpectatorsNeedPassword(const bool _spectatorsNeedPassword)
+{
+    spectatorsNeedPassword = _spectatorsNeedPassword;
+    settings->setValue("game/spectatorsneedpassword", spectatorsNeedPassword);
+}
+
+void SettingsCache::setSpectatorsCanTalk(const bool _spectatorsCanTalk)
+{
+    spectatorsCanTalk = _spectatorsCanTalk;
+    settings->setValue("game/spectatorscantalk", spectatorsCanTalk);
+}
+
+void SettingsCache::setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything)
+{
+    spectatorsCanSeeEverything = _spectatorsCanSeeEverything;
+    settings->setValue("game/spectatorscanseeeverything", spectatorsCanSeeEverything);
 }
