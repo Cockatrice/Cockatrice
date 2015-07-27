@@ -29,6 +29,7 @@
 #include "server_logger.h"
 #include "settingscache.h"
 #include "signalhandler.h"
+#include "smtpclient.h"
 #include "rng_sfmt.h"
 #include "version_string.h"
 #include <google/protobuf/stubs/common.h>
@@ -38,6 +39,7 @@ ServerLogger *logger;
 QThread *loggerThread;
 SettingsCache *settingsCache;
 SignalHandler *signalhandler;
+SmtpClient *smtpClient;
 
 /* Prototypes */
 
@@ -181,6 +183,8 @@ int main(int argc, char *argv[])
 		testRNG();
 	if (testHashFunction)
 		testHash();
+
+	smtpClient = new SmtpClient();
 	
 	Servatrice *server = new Servatrice();
 	QObject::connect(server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
@@ -200,6 +204,7 @@ int main(int argc, char *argv[])
 		std::cerr << "-------------------------" << std::endl;
 	}
 	
+	delete smtpClient;
 	delete rng;
 	delete signalhandler;
 	delete settingsCache;

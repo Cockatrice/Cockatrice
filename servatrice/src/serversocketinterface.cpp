@@ -59,8 +59,6 @@
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
 
-#include "smtp/SmtpMime"
-
 #include "version_string.h"
 #include <string>
 #include <iostream>
@@ -854,8 +852,11 @@ Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_R
         qDebug() << "Accepted register command for user: " << userName;
         if(requireEmailForRegistration)
         {
-            // TODO call a slot on another thread to send email
-            sendActivationTokenMail(userName, emailAddress, token);
+            QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
+            query->bindValue(":name", userName);
+            if (!sqlInterface->execSqlQuery(query))
+                return Response::RespRegistrationFailed;
+
             return Response::RespRegistrationAcceptedNeedsActivation;
         } else {
             return Response::RespRegistrationAccepted;
@@ -863,88 +864,6 @@ Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_R
     } else {
         return Response::RespRegistrationFailed;
     }
-}
-
-bool ServerSocketInterface::sendActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token)
-{
-    QString tmp = settingsCache->value("smtp/connection", "tcp").toString();
-    SmtpClient::ConnectionType connection = SmtpClient::TcpConnection;
-    if(tmp == "ssl")
-        connection = SmtpClient::SslConnection;
-    else if(tmp == "tls")
-        connection = SmtpClient::TlsConnection;
-
-    tmp = settingsCache->value("smtp/auth", "plain").toString();
-    SmtpClient::AuthMethod auth = SmtpClient::AuthPlain;
-    if(tmp == "login")
-        auth = SmtpClient::AuthLogin;
-
-    QString host = settingsCache->value("smtp/host", "localhost").toString();
-    int port = settingsCache->value("smtp/port", 25).toInt();
-    QString username = settingsCache->value("smtp/username", "").toString();
-    QString password = settingsCache->value("smtp/password", "").toString();
-    QString email = settingsCache->value("smtp/email", "").toString();
-    QString name = settingsCache->value("smtp/name", "").toString();
-    QString subject = settingsCache->value("smtp/subject", "").toString();
-    QString body = settingsCache->value("smtp/body", "").toString();
-
-    if(email.isEmpty())
-    {
-        qDebug() << "[MAIL] Missing email field" << endl;
-        return false;
-    }
-    if(body.isEmpty())
-    {
-        qDebug() << "[MAIL] Missing body field" << endl;
-        return false;
-    }
-    if(recipient.isEmpty())
-    {
-        qDebug() << "[MAIL] Missing recipient field" << endl;
-        return false;
-    }
-    if(token.isEmpty())
-    {
-        qDebug() << "[MAIL] Missing token field" << endl;
-        return false;
-    }
-
-    SmtpClient smtp(host, port, connection);
-    smtp.setUser(username);
-    smtp.setPassword(password);
-    smtp.setAuthMethod(auth);
-
-    MimeMessage message;
-    EmailAddress sender(email, name);
-    message.setSender(&sender);
-    EmailAddress to(recipient, nickname);
-    message.addRecipient(&to);
-    message.setSubject(subject);
-
-    MimeText text;
-    text.setText(body.replace("%username", nickname).replace("%token", token));
-    message.addPart(&text);
-
-    // Now we can send the mail
-
-    if (!smtp.connectToHost()) {
-        qDebug() << "[MAIL] Failed to connect to host" << host << "on port" << port;
-        return false;
-    }
-
-    if (!smtp.login()) {
-        qDebug() << "[MAIL] Failed to login as " << username;
-        return false;
-    }
-
-    if (!smtp.sendMail(message)) {
-        qDebug() << "[MAIL] Failed to send mail to " << recipient;
-        return false;
-    }
-
-    smtp.quit();
-    qDebug() << "[MAIL] Sent activation email to " << recipient << " for nickname " << nickname;
-    return true;
 }
 
 bool ServerSocketInterface::tooManyRegistrationAttempts(const QString &ipAddress)

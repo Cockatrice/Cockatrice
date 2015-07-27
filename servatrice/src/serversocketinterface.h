@@ -108,8 +108,6 @@ private:
 	Response::ResponseCode cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdAccountPassword(const Command_AccountPassword &cmd, ResponseContainer &rc);
-
-	bool sendActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token);
 public:
 	ServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent = 0);
 	~ServerSocketInterface();

@@ -90,11 +90,11 @@ allowpunctuationprefix=false
 
 [smtp]
 
-; Connectin type: currently supported method are "tcp", "ssl" and "tls"
+; Connectin type: currently supported method are "tcp" and "ssl"; tls is autodetected if available
 connection=tcp
 
-; Auth type: currently supported method are "plain" and "login"
-auth=plain
+; Accept all certificates: in ssl mode, enable this if your server is using an invalid/self signed certificate
+acceptallcerts=false;
 
 ; Hostname or IP addres of the smtp server
 host=localhost

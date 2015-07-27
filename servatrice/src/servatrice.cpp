@@ -34,6 +34,7 @@
 #include "server_logger.h"
 #include "main.h"
 #include "decklist.h"
+#include "smtpclient.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/event_connection_closed.pb.h"
@@ -473,6 +474,32 @@ void Servatrice::statusUpdate()
     query->bindValue(":tx", tx);
     query->bindValue(":rx", rx);
     servatriceDatabaseInterface->execSqlQuery(query);
+
+    // send activation emails
+    bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
+    bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
+    if (registrationEnabled && requireEmailForRegistration)
+    {
+        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
+        if (!servatriceDatabaseInterface->execSqlQuery(query))
+            return;
+  
+        QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
+  
+        while (query->next()) {
+            const QString userName = query->value(0).toString();
+            const QString emailAddress = query->value(1).toString();
+            const QString token = query->value(2).toString();
+
+            if(smtpClient->enqueueActivationTokenMail(userName, emailAddress, token))
+            {
+                queryDelete->bindValue(":name", userName);
+                servatriceDatabaseInterface->execSqlQuery(queryDelete);
+            }
+        }
+
+        smtpClient->sendAllEmails();
+    }
 }
 
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)
