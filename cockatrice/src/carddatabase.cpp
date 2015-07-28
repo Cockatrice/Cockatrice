@@ -448,6 +448,15 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
         qDebug() << "Download failed:" << reply->errorString();
     }
 
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (statusCode == 301 || statusCode == 302) {
+        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        QNetworkRequest req(redirectUrl);
+        qDebug() << "following redirect:" << cardBeingDownloaded.getCard()->getName() << "Url:" << req.url();
+        networkManager->get(req);
+        return;
+    }
+
     const QByteArray &picData = reply->peek(reply->size()); //peek is used to keep the data in the buffer for use by QImageReader
 
     // check if the image is blacklisted
