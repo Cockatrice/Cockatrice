@@ -222,7 +222,6 @@ int main(int argc, char *argv[])
         
         generateClientID();    //generate the users client id
         qDebug() << "ClientID In Cache: " << settingsCache->getClientID();
-<<<<<<< HEAD
 
 		settingsCache->setClientID("Test");
 		qDebug() << "MacAddress: " << getMacAddress().constData();
@@ -234,8 +233,6 @@ int main(int argc, char *argv[])
 		md5_generator.addData(strMac.toStdString());
 		qDebug() << "MacAddress: " << strMac;
 		qDebug() << "ClientID: " << md5_generator.result().toHex();
-=======
->>>>>>> 812a337... Successfully pass client id to server
 
         ui.show();
         qDebug("main(): ui.show() finished");

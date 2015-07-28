@@ -839,5 +839,4 @@ void Servatrice_DatabaseInterface::updateUsersClientID(const QString &userName, 
 	query->bindValue(":clientid", userClientID);
 	query->bindValue(":username", userName);
 	execSqlQuery(query);
-	
-}
+}	

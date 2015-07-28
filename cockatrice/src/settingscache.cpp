@@ -461,6 +461,7 @@ QStringList SettingsCache::getCountries() const
 
     return countries;
 }
+<<<<<<< HEAD
 
 void SettingsCache::setGameDescription(const QString _gameDescription)
 {
