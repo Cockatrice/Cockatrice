@@ -26,6 +26,7 @@
 #include "server_remoteuserinterface.h"
 #include "server_metatypes.h"
 #include "server_database_interface.h"
+#include "server_settings_interface.h"
 #include "pb/event_user_joined.pb.h"
 #include "pb/event_user_left.pb.h"
 #include "pb/event_list_rooms.pb.h"
