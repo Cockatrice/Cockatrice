@@ -30,7 +30,7 @@ public:
     int getActiveUserCount() { return 0; }
 };
 
-class Servatrice_SettingsInterface : public Server_SettingsInterface {
+class LocalServer_SettingsInterface : public Server_SettingsInterface {
     Q_OBJECT
 public:
     LocalServer_SettingsInterface(LocalServer *_localServer);
