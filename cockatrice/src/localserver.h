@@ -3,6 +3,7 @@
 
 #include "server.h"
 #include "server_database_interface.h"
+#include "server_settings_interface.h"
 
 class LocalServerInterface;
 
