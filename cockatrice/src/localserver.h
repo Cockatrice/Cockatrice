@@ -33,6 +33,8 @@ public:
 
 class LocalServer_SettingsInterface : public Server_SettingsInterface {
     Q_OBJECT
+private:
+    LocalServer *localServer;
 public:
     LocalServer_SettingsInterface(LocalServer *_localServer);
     bool getRequireRegistration() { return false; }
