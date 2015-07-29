@@ -190,6 +190,7 @@ bool Servatrice::initServer()
 
     servatriceDatabaseInterface = new Servatrice_DatabaseInterface(-1, this);
     setDatabaseInterface(servatriceDatabaseInterface);
+    setSettingsInterface(servatriceSettingsInterface);
 
     if (databaseType != DatabaseNone) {
         settingsCache->beginGroup("database");

@@ -3,6 +3,8 @@
 #include <QDebug>
 
 Servatrice_SettingsInterface::Servatrice_SettingsInterface(int _instanceId, Servatrice *_server)
+    : instanceId(_instanceId),
+      server(_server)
 {
 
 }

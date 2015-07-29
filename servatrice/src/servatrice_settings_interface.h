@@ -10,6 +10,10 @@ class Servatrice;
 class Servatrice_SettingsInterface : public Server_SettingsInterface {
     Q_OBJECT
 
+private:
+    int instanceId;
+    Servatrice *server;
+
 public:
     Servatrice_SettingsInterface(int _instanceId, Servatrice *_server);
     ~Servatrice_SettingsInterface();

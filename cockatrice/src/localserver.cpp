@@ -6,6 +6,7 @@ LocalServer::LocalServer(QObject *parent)
     : Server(false, parent)
 {
     setDatabaseInterface(new LocalServer_DatabaseInterface(this));
+    setSettingsInterface(new LocalServer_SettingsInterface(this));
     addRoom(new Server_Room(0, QString(), QString(), false, QString(), QStringList(), this));
 }
 
@@ -27,6 +28,7 @@ LocalServer_DatabaseInterface::LocalServer_DatabaseInterface(LocalServer *_local
 }
 
 LocalServer_SettingsInterface::LocalServer_SettingsInterface(LocalServer *_localServer)
+    : Server_SettingsInterface(_localServer), localServer(_localServer)
 {
 }
 

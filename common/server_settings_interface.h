@@ -7,6 +7,9 @@
 class Server_SettingsInterface : public QObject {
     Q_OBJECT
 public:
+    Server_SettingsInterface(QObject *parent = 0)
+        : QObject(parent) { }
+
 	virtual bool getRequireRegistration() { return false; }
 };
 

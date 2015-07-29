@@ -33,6 +33,7 @@ public:
 class Servatrice_SettingsInterface : public Server_SettingsInterface {
     Q_OBJECT
 public:
+    LocalServer_SettingsInterface(LocalServer *_localServer);
     bool getRequireRegistration() { return false; }
 };
 
