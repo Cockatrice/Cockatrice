@@ -12,7 +12,7 @@ class LocalServer : public Server
 public:
     LocalServer(QObject *parent = 0);
     ~LocalServer();
-    
+
     LocalServerInterface *newConnection();
 };
 
@@ -28,6 +28,12 @@ public:
     int getNextGameId() { return localServer->getNextLocalGameId(); }
     int getNextReplayId() { return -1; }
     int getActiveUserCount() { return 0; }
+};
+
+class Servatrice_SettingsInterface : public Server_SettingsInterface {
+    Q_OBJECT
+public:
+    bool getRequireRegistration() { return false; }
 };
 
 #endif

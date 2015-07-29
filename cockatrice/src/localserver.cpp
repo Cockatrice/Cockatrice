@@ -26,6 +26,10 @@ LocalServer_DatabaseInterface::LocalServer_DatabaseInterface(LocalServer *_local
 {
 }
 
+LocalServer_SettingsInterface::LocalServer_SettingsInterface(LocalServer *_localServer)
+{
+}
+
 ServerInfo_User LocalServer_DatabaseInterface::getUserData(const QString &name, bool /*withId*/)
 {
     ServerInfo_User result;

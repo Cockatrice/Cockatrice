@@ -11,6 +11,8 @@ class Servatrice_SettingsInterface : public Server_SettingsInterface {
     Q_OBJECT
 
 public:
+    Servatrice_SettingsInterface(int _instanceId, Servatrice *_server);
+    ~Servatrice_SettingsInterface();
 	bool getRequireRegistration();
 };
 

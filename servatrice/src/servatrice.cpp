@@ -26,6 +26,7 @@
 #include <iostream>
 #include "servatrice.h"
 #include "servatrice_database_interface.h"
+#include "servatrice_settings_interface.h"
 #include "servatrice_connection_pool.h"
 #include "server_room.h"
 #include "settingscache.h"
@@ -46,22 +47,27 @@ Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server, int _numberPoo
     if (_numberPools == 0) {
         server->setThreaded(false);
         Servatrice_DatabaseInterface *newDatabaseInterface = new Servatrice_DatabaseInterface(0, server);
+        Servatrice_SettingsInterface *newSettingsInterface = new Servatrice_SettingsInterface(0, server);
         Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
 
         server->addDatabaseInterface(thread(), newDatabaseInterface);
+        server->addSettingsInterface(thread(), newSettingsInterface);
         newDatabaseInterface->initDatabase(_sqlDatabase);
 
         connectionPools.append(newPool);
     } else
     for (int i = 0; i < _numberPools; ++i) {
         Servatrice_DatabaseInterface *newDatabaseInterface = new Servatrice_DatabaseInterface(i, server);
+        Servatrice_SettingsInterface *newSettingsInterface = new Servatrice_SettingsInterface(i, server);
         Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
 
         QThread *newThread = new QThread;
         newThread->setObjectName("pool_" + QString::number(i));
         newPool->moveToThread(newThread);
         newDatabaseInterface->moveToThread(newThread);
+        newSettingsInterface->moveToThread(newThread);
         server->addDatabaseInterface(newThread, newDatabaseInterface);
+        server->addSettingsInterface(newThread, newSettingsInterface);
 
         newThread->start();
         QMetaObject::invokeMethod(newDatabaseInterface, "initDatabase", Qt::BlockingQueuedConnection, Q_ARG(QSqlDatabase, _sqlDatabase));
@@ -408,7 +414,7 @@ int Servatrice::getUsersWithAddress(const QHostAddress &address) const
     for (int i = 0; i < clients.size(); ++i)
     if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
         ++result;
-    
+
     return result;
 }
 
@@ -483,9 +489,9 @@ void Servatrice::statusUpdate()
         QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
         if (!servatriceDatabaseInterface->execSqlQuery(query))
             return;
-  
+
         QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
-  
+
         while (query->next()) {
             const QString userName = query->value(0).toString();
             const QString emailAddress = query->value(1).toString();
@@ -551,7 +557,7 @@ void Servatrice::shutdownTimeout()
             clients[i]->sendProtocolItem(*se);
         clientsLock.unlock();
         delete se;
-    
+
         if (!shutdownMinutes)
             deleteLater();
     }

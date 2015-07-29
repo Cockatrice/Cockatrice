@@ -39,6 +39,7 @@ class GameReplay;
 class Servatrice;
 class Servatrice_ConnectionPool;
 class Servatrice_DatabaseInterface;
+class Servatrice_SettingsInterface;
 class ServerSocketInterface;
 class IslInterface;
 
@@ -83,7 +84,7 @@ public:
 	QHostAddress address;
 	int gamePort;
 	int controlPort;
-	
+
 	ServerProperties(int _id, const QSslCertificate &_cert, const QString &_hostname, const QHostAddress &_address, int _gamePort, int _controlPort)
 		: id(_id), cert(_cert), hostname(_hostname), address(_address), gamePort(_gamePort), controlPort(_controlPort) { }
 };
@@ -110,6 +111,7 @@ private:
 	QString loginMessage;
 	QString dbPrefix;
 	Servatrice_DatabaseInterface *servatriceDatabaseInterface;
+	Servatrice_SettingsInterface *servatriceSettingsInterface;
 	int serverId;
 	int uptime;
 	QMutex txBytesMutex, rxBytesMutex;
@@ -121,11 +123,11 @@ private:
 	int shutdownMinutes;
 	QTimer *shutdownTimer;
     bool isFirstShutdownMessage;
-	
+
 	mutable QMutex serverListMutex;
 	QList<ServerProperties> serverList;
 	void updateServerList();
-	
+
 	QMap<int, IslInterface *> islInterfaces;
 public slots:
 	void scheduleShutdown(const QString &reason, int minutes);
@@ -154,7 +156,8 @@ public:
 	void incTxBytes(quint64 num);
 	void incRxBytes(quint64 num);
 	void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);
-	
+	void addSettingsInterface(QThread *thread, Servatrice_SettingsInterface *settingsInterface);
+
 	bool islConnectionExists(int serverId) const;
 	void addIslInterface(int serverId, IslInterface *interface);
 	void removeIslInterface(int serverId);
