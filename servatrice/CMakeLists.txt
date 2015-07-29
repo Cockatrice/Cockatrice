@@ -10,6 +10,7 @@ SET(servatrice_SOURCES
     src/servatrice.cpp
     src/servatrice_connection_pool.cpp
     src/servatrice_database_interface.cpp
+    src/servatrice_settings_interface.cpp
     src/server_logger.cpp
     src/serversocketinterface.cpp
     src/settingscache.cpp
