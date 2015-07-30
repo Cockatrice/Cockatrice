@@ -38,6 +38,14 @@ logfile=server.log
 ; it won't be logged. Default is empty; example: "kittens,ponies,faires"
 logfilters=""
 
+; Set the time interval in seconds that servatrice will use to communicate with each connected client
+; to verify the client has not timed out. Defaults is 5 seconds
+clientkeepalive=5
+
+; Maximum time in seconds a player can stay inactive with there client not even responding to pings, before is
+; considered disconnected; default is 15
+max_player_inactivity_time=15
+
 
 [authentication]
 
@@ -83,8 +91,8 @@ allowpunctuationprefix=false
 ; Enable this feature? Default false.
 ;enabled=false
 
-; Require users to provide an email address in order to register. Newly registered users will receive an 
-; activation token by email, and will be required to input back this token on cockatrice at the first login 
+; Require users to provide an email address in order to register. Newly registered users will receive an
+; activation token by email, and will be required to input back this token on cockatrice at the first login
 ; to get their account activated. Default true.
 ;requireemail=true
 
@@ -119,7 +127,7 @@ subject="Cockatrice server account activation token"
 
 ; Email body. You can use these tags here: %username %token
 ; They will be substituted with the actual values in the email
-; 
+;
 body="Hi %username, thank our for registering on our Cockatrice server\r\nHere's the activation token you need to supply for activating your account:\r\n\r\n%token\r\n\r\nHappy gaming!"
 
 [database]
@@ -177,10 +185,6 @@ roomlist\1\game_types\3\name="GameType3"
 
 
 [game]
-
-; Maximum time in seconds a player can stay inactive, with his client hot even responding to pings, before is
-; considered disconnected; default is 15
-max_player_inactivity_time=15
 
 ; Maximum time in seconds all players in a game can stay inactive before the game is automatically closed;
 ; default is 120

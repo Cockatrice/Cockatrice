@@ -161,13 +161,13 @@ bool Servatrice::initServer()
         authenticationMethod = AuthenticationNone;
     }
 
-	bool maxUserLimitEnabled = settingsCache->value("security/enable_max_user_limit", false).toBool();
-	qDebug() << "Maximum user limit enabled: " << maxUserLimitEnabled;
+    bool maxUserLimitEnabled = settingsCache->value("security/enable_max_user_limit", false).toBool();
+    qDebug() << "Maximum user limit enabled: " << maxUserLimitEnabled;
 
-	if (maxUserLimitEnabled){
-		int maxUserLimit = settingsCache->value("security/max_users_total", 500).toInt();
-		qDebug() << "Maximum user limit: " << maxUserLimit;
-	}
+    if (maxUserLimitEnabled){
+        int maxUserLimit = settingsCache->value("security/max_users_total", 500).toInt();
+        qDebug() << "Maximum user limit: " << maxUserLimit;
+    }
 
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
     bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
@@ -273,7 +273,7 @@ bool Servatrice::initServer()
     updateLoginMessage();
 
     maxGameInactivityTime = settingsCache->value("game/max_game_inactivity_time", 120).toInt();
-    maxPlayerInactivityTime = settingsCache->value("game/max_player_inactivity_time", 15).toInt();
+    maxPlayerInactivityTime = settingsCache->value("server/max_player_inactivity_time", 15).toInt();
 
     maxUsersPerAddress = settingsCache->value("security/max_users_per_address", 4).toInt();
     messageCountingInterval = settingsCache->value("security/message_counting_interval", 10).toInt();
@@ -283,90 +283,91 @@ bool Servatrice::initServer()
     commandCountingInterval = settingsCache->value("game/command_counting_interval", 10).toInt();
     maxCommandCountPerInterval = settingsCache->value("game/max_command_count_per_interval", 20).toInt();
 
-	try { if (settingsCache->value("servernetwork/active", 0).toInt()) {
-		qDebug() << "Connecting to ISL network.";
-		const QString certFileName = settingsCache->value("servernetwork/ssl_cert").toString();
-		const QString keyFileName = settingsCache->value("servernetwork/ssl_key").toString();
-		qDebug() << "Loading certificate...";
-		QFile certFile(certFileName);
-		if (!certFile.open(QIODevice::ReadOnly))
-			throw QString("Error opening certificate file: %1").arg(certFileName);
-		QSslCertificate cert(&certFile);
+    try { if (settingsCache->value("servernetwork/active", 0).toInt()) {
+        qDebug() << "Connecting to ISL network.";
+        const QString certFileName = settingsCache->value("servernetwork/ssl_cert").toString();
+        const QString keyFileName = settingsCache->value("servernetwork/ssl_key").toString();
+        qDebug() << "Loading certificate...";
+        QFile certFile(certFileName);
+        if (!certFile.open(QIODevice::ReadOnly))
+            throw QString("Error opening certificate file: %1").arg(certFileName);
+        QSslCertificate cert(&certFile);
 #if QT_VERSION < 0x050000
-		if (!cert.isValid())
-			throw(QString("Invalid certificate."));
+        if (!cert.isValid())
+            throw(QString("Invalid certificate."));
 #else
-		const QDateTime currentTime = QDateTime::currentDateTime();
-		if(currentTime < cert.effectiveDate() ||
-			currentTime > cert.expiryDate() ||
-			cert.isBlacklisted())
-			throw(QString("Invalid certificate."));
+        const QDateTime currentTime = QDateTime::currentDateTime();
+        if(currentTime < cert.effectiveDate() ||
+            currentTime > cert.expiryDate() ||
+            cert.isBlacklisted())
+            throw(QString("Invalid certificate."));
 #endif
-		qDebug() << "Loading private key...";
-		QFile keyFile(keyFileName);
-		if (!keyFile.open(QIODevice::ReadOnly))
-			throw QString("Error opening private key file: %1").arg(keyFileName);
-		QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
-		if (key.isNull())
-			throw QString("Invalid private key.");
+        qDebug() << "Loading private key...";
+        QFile keyFile(keyFileName);
+        if (!keyFile.open(QIODevice::ReadOnly))
+            throw QString("Error opening private key file: %1").arg(keyFileName);
+        QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+        if (key.isNull())
+            throw QString("Invalid private key.");
 
-		QMutableListIterator<ServerProperties> serverIterator(serverList);
-		while (serverIterator.hasNext()) {
-			const ServerProperties &prop = serverIterator.next();
-			if (prop.cert == cert) {
-				serverIterator.remove();
-				continue;
-			}
+        QMutableListIterator<ServerProperties> serverIterator(serverList);
+        while (serverIterator.hasNext()) {
+            const ServerProperties &prop = serverIterator.next();
+            if (prop.cert == cert) {
+                serverIterator.remove();
+                continue;
+            }
 
-			QThread *thread = new QThread;
-			thread->setObjectName("isl_" + QString::number(prop.id));
-			connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+            QThread *thread = new QThread;
+            thread->setObjectName("isl_" + QString::number(prop.id));
+            connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 
-			IslInterface *interface = new IslInterface(prop.id, prop.hostname, prop.address.toString(), prop.controlPort, prop.cert, cert, key, this);
-			interface->moveToThread(thread);
-			connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
+            IslInterface *interface = new IslInterface(prop.id, prop.hostname, prop.address.toString(), prop.controlPort, prop.cert, cert, key, this);
+            interface->moveToThread(thread);
+            connect(interface, SIGNAL(destroyed()), thread, SLOT(quit()));
 
-			thread->start();
-			QMetaObject::invokeMethod(interface, "initClient", Qt::BlockingQueuedConnection);
-		}
+            thread->start();
+            QMetaObject::invokeMethod(interface, "initClient", Qt::BlockingQueuedConnection);
+        }
 
-		const int networkPort = settingsCache->value("servernetwork/port", 14747).toInt();
-		qDebug() << "Starting ISL server on port" << networkPort;
+        const int networkPort = settingsCache->value("servernetwork/port", 14747).toInt();
+        qDebug() << "Starting ISL server on port" << networkPort;
 
-		islServer = new Servatrice_IslServer(this, cert, key, this);
-		if (islServer->listen(QHostAddress::Any, networkPort))
-			qDebug() << "ISL server listening.";
-		else
-			throw QString("islServer->listen()");
-	} } catch (QString error) {
-		qDebug() << "ERROR --" << error;
-		return false;
-	}
+        islServer = new Servatrice_IslServer(this, cert, key, this);
+        if (islServer->listen(QHostAddress::Any, networkPort))
+            qDebug() << "ISL server listening.";
+        else
+            throw QString("islServer->listen()");
+    } } catch (QString error) {
+        qDebug() << "ERROR --" << error;
+        return false;
+    }
 
-	pingClock = new QTimer(this);
-	connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
-	pingClock->start(1000);
+    int clientkeepalive = settingsCache->value("server/clientkeepalive", 1).toInt();
+    pingClock = new QTimer(this);
+    connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
+    pingClock->start(clientkeepalive * 1000);
 
-	int statusUpdateTime = settingsCache->value("server/statusupdate", 15000).toInt();
-	statusUpdateClock = new QTimer(this);
-	connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
-	if (statusUpdateTime != 0) {
-		qDebug() << "Starting status update clock, interval " << statusUpdateTime << " ms";
-		statusUpdateClock->start(statusUpdateTime);
-	}
+    int statusUpdateTime = settingsCache->value("server/statusupdate", 15000).toInt();
+    statusUpdateClock = new QTimer(this);
+    connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
+    if (statusUpdateTime != 0) {
+        qDebug() << "Starting status update clock, interval " << statusUpdateTime << " ms";
+        statusUpdateClock->start(statusUpdateTime);
+    }
 
-	const int numberPools = settingsCache->value("server/number_pools", 1).toInt();
-	gameServer = new Servatrice_GameServer(this, numberPools, servatriceDatabaseInterface->getDatabase(), this);
-	gameServer->setMaxPendingConnections(1000);
-	const int gamePort = settingsCache->value("server/port", 4747).toInt();
-	qDebug() << "Starting server on port" << gamePort;
-	if (gameServer->listen(QHostAddress::Any, gamePort))
-		qDebug() << "Server listening.";
-	else {
-		qDebug() << "gameServer->listen(): Error:" << gameServer->errorString();
-		return false;
-	}
-	return true;
+    const int numberPools = settingsCache->value("server/number_pools", 1).toInt();
+    gameServer = new Servatrice_GameServer(this, numberPools, servatriceDatabaseInterface->getDatabase(), this);
+    gameServer->setMaxPendingConnections(1000);
+    const int gamePort = settingsCache->value("server/port", 4747).toInt();
+    qDebug() << "Starting server on port" << gamePort;
+    if (gameServer->listen(QHostAddress::Any, gamePort))
+        qDebug() << "Server listening.";
+    else {
+        qDebug() << "gameServer->listen(): Error:" << gameServer->errorString();
+        return false;
+    }
+    return true;
 }
 
 void Servatrice::addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface)
@@ -376,20 +377,20 @@ void Servatrice::addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterf
 
 void Servatrice::updateServerList()
 {
-	qDebug() << "Updating server list...";
+    qDebug() << "Updating server list...";
 
-	serverListMutex.lock();
-	serverList.clear();
+    serverListMutex.lock();
+    serverList.clear();
 
-	QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, ssl_cert, hostname, address, game_port, control_port from {prefix}_servers order by id asc");
-	servatriceDatabaseInterface->execSqlQuery(query);
-	while (query->next()) {
-		ServerProperties prop(query->value(0).toInt(), QSslCertificate(query->value(1).toString().toUtf8()), query->value(2).toString(), QHostAddress(query->value(3).toString()), query->value(4).toInt(), query->value(5).toInt());
-		serverList.append(prop);
-		qDebug() << QString("#%1 CERT=%2 NAME=%3 IP=%4:%5 CPORT=%6").arg(prop.id).arg(QString(prop.cert.digest().toHex())).arg(prop.hostname).arg(prop.address.toString()).arg(prop.gamePort).arg(prop.controlPort);
-	}
+    QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, ssl_cert, hostname, address, game_port, control_port from {prefix}_servers order by id asc");
+    servatriceDatabaseInterface->execSqlQuery(query);
+    while (query->next()) {
+        ServerProperties prop(query->value(0).toInt(), QSslCertificate(query->value(1).toString().toUtf8()), query->value(2).toString(), QHostAddress(query->value(3).toString()), query->value(4).toInt(), query->value(5).toInt());
+        serverList.append(prop);
+        qDebug() << QString("#%1 CERT=%2 NAME=%3 IP=%4:%5 CPORT=%6").arg(prop.id).arg(QString(prop.cert.digest().toHex())).arg(prop.hostname).arg(prop.address.toString()).arg(prop.gamePort).arg(prop.controlPort);
+    }
 
-	serverListMutex.unlock();
+    serverListMutex.unlock();
 }
 
 QList<ServerProperties> Servatrice::getServerList() const
@@ -408,7 +409,7 @@ int Servatrice::getUsersWithAddress(const QHostAddress &address) const
     for (int i = 0; i < clients.size(); ++i)
     if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
         ++result;
-    
+
     return result;
 }
 
@@ -483,9 +484,9 @@ void Servatrice::statusUpdate()
         QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
         if (!servatriceDatabaseInterface->execSqlQuery(query))
             return;
-  
+
         QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
-  
+
         while (query->next()) {
             const QString userName = query->value(0).toString();
             const QString emailAddress = query->value(1).toString();
@@ -551,7 +552,7 @@ void Servatrice::shutdownTimeout()
             clients[i]->sendProtocolItem(*se);
         clientsLock.unlock();
         delete se;
-    
+
         if (!shutdownMinutes)
             deleteLater();
     }

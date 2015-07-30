@@ -1,7 +1,7 @@
 #include <QTimer>
 #include <QThread>
 #include "remoteclient.h"
-
+#include "settingscache.h"
 #include "pending_command.h"
 #include "pb/commands.pb.h"
 #include "pb/session_commands.pb.h"
@@ -16,8 +16,10 @@ static const unsigned int protocolVersion = 14;
 RemoteClient::RemoteClient(QObject *parent)
     : AbstractClient(parent), timeRunning(0), lastDataReceived(0), messageInProgress(false), handshakeStarted(false), messageLength(0)
 {
+
+    int keepalive = settingsCache->getKeepAlive();
     timer = new QTimer(this);
-    timer->setInterval(1000);
+    timer->setInterval(keepalive * 1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(ping()));
 
     socket = new QTcpSocket(this);
@@ -102,11 +104,11 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
 void RemoteClient::doLogin()
 {
     setStatus(StatusLoggingIn);
-    
+
     Command_Login cmdLogin;
     cmdLogin.set_user_name(userName.toStdString());
     cmdLogin.set_password(password.toStdString());
-    
+
     PendingCommand *pend = prepareSessionCommand(cmdLogin);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
     sendCommand(pend);
@@ -123,12 +125,12 @@ void RemoteClient::loginResponse(const Response &response)
     if (response.response_code() == Response::RespOk) {
         setStatus(StatusLoggedIn);
         emit userInfoChanged(resp.user_info());
-        
+
         QList<ServerInfo_User> buddyList;
         for (int i = resp.buddy_list_size() - 1; i >= 0; --i)
             buddyList.append(resp.buddy_list(i));
         emit buddyListReceived(buddyList);
-        
+
         QList<ServerInfo_User> ignoreList;
         for (int i = resp.ignore_list_size() - 1; i >= 0; --i)
             ignoreList.append(resp.ignore_list(i));
@@ -177,7 +179,7 @@ void RemoteClient::readData()
     QByteArray data = socket->readAll();
 
     inputBuffer.append(data);
-    
+
     do {
         if (!messageInProgress) {
             if (inputBuffer.size() >= 4) {
@@ -202,7 +204,7 @@ void RemoteClient::readData()
         }
         if (inputBuffer.size() < messageLength)
             return;
-        
+
         ServerMessage newServerMessage;
         newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
 #ifdef QT_DEBUG
@@ -210,9 +212,9 @@ void RemoteClient::readData()
 #endif
         inputBuffer.remove(0, messageLength);
         messageInProgress = false;
-        
+
         processProtocolItem(newServerMessage);
-    
+
         if (getStatus() == StatusDisconnecting) // use thread-safe getter
             doDisconnectFromServer();
     } while (!inputBuffer.isEmpty());
@@ -231,14 +233,14 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
     buf.data()[2] = (unsigned char) (size >> 8);
     buf.data()[1] = (unsigned char) (size >> 16);
     buf.data()[0] = (unsigned char) (size >> 24);
-    
+
     socket->write(buf);
 }
 
 void RemoteClient::doConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password)
 {
     doDisconnectFromServer();
-    
+
     userName = _userName;
     password = _password;
     lastHostname = hostname;
@@ -251,7 +253,7 @@ void RemoteClient::doConnectToServer(const QString &hostname, unsigned int port,
 void RemoteClient::doRegisterToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname)
 {
     doDisconnectFromServer();
-    
+
     userName = _userName;
     password = _password;
     email = _email;
@@ -268,7 +270,7 @@ void RemoteClient::doRegisterToServer(const QString &hostname, unsigned int port
 void RemoteClient::doActivateToServer(const QString &_token)
 {
     doDisconnectFromServer();
-    
+
     token = _token;
 
     socket->connectToHost(lastHostname, lastPort);
@@ -278,7 +280,7 @@ void RemoteClient::doActivateToServer(const QString &_token)
 void RemoteClient::doDisconnectFromServer()
 {
     timer->stop();
-    
+
     messageInProgress = false;
     handshakeStarted = false;
     messageLength = 0;
@@ -289,7 +291,7 @@ void RemoteClient::doDisconnectFromServer()
         response.set_response_code(Response::RespNotConnected);
         response.set_cmd_id(pc[i]->getCommandContainer().cmd_id());
         pc[i]->processResponse(response);
-        
+
         delete pc[i];
     }
     pendingCommands.clear();
@@ -309,9 +311,10 @@ void RemoteClient::ping()
         }
     }
 
+    int keepalive = settingsCache->getKeepAlive();
     int maxTime = timeRunning - lastDataReceived;
     emit maxPingTime(maxTime, maxTimeout);
-    if (maxTime >= maxTimeout) {
+    if (maxTime >= (keepalive * maxTimeout)) {
         disconnectFromServer();
         emit serverTimeout();
     } else {
