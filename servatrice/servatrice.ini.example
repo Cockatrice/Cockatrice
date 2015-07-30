@@ -39,8 +39,8 @@ logfile=server.log
 logfilters=""
 
 ; Set the time interval in seconds that servatrice will use to communicate with each connected client
-; to verify the client has not timed out. Defaults is 5 seconds
-clientkeepalive=5
+; to verify the client has not timed out. Defaults is 1 seconds
+clientkeepalive=1
 
 ; Maximum time in seconds a player can stay inactive with there client not even responding to pings, before is
 ; considered disconnected; default is 15

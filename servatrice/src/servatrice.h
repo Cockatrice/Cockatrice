@@ -83,7 +83,7 @@ public:
 	QHostAddress address;
 	int gamePort;
 	int controlPort;
-	
+
 	ServerProperties(int _id, const QSslCertificate &_cert, const QString &_hostname, const QHostAddress &_address, int _gamePort, int _controlPort)
 		: id(_id), cert(_cert), hostname(_hostname), address(_address), gamePort(_gamePort), controlPort(_controlPort) { }
 };
@@ -115,17 +115,17 @@ private:
 	QMutex txBytesMutex, rxBytesMutex;
 	quint64 txBytes, rxBytes;
 	int maxGameInactivityTime, maxPlayerInactivityTime;
-	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser, commandCountingInterval, maxCommandCountPerInterval;
+	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser, commandCountingInterval, maxCommandCountPerInterval, pingClockInterval;
 
 	QString shutdownReason;
 	int shutdownMinutes;
 	QTimer *shutdownTimer;
     bool isFirstShutdownMessage;
-	
+
 	mutable QMutex serverListMutex;
 	QList<ServerProperties> serverList;
 	void updateServerList();
-	
+
 	QMap<int, IslInterface *> islInterfaces;
 public slots:
 	void scheduleShutdown(const QString &reason, int minutes);
@@ -137,6 +137,7 @@ public:
 	QString getServerName() const { return serverName; }
 	QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
 	bool getGameShouldPing() const { return true; }
+	int getPingClockInterval() const { return pingClockInterval; }
 	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
 	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
 	int getMaxUsersPerAddress() const { return maxUsersPerAddress; }
@@ -154,7 +155,7 @@ public:
 	void incTxBytes(quint64 num);
 	void incRxBytes(quint64 num);
 	void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);
-	
+
 	bool islConnectionExists(int serverId) const;
 	void addIslInterface(int serverId, IslInterface *interface);
 	void removeIslInterface(int serverId);

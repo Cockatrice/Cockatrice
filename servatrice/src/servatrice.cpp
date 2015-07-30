@@ -274,7 +274,7 @@ bool Servatrice::initServer()
 
     maxGameInactivityTime = settingsCache->value("game/max_game_inactivity_time", 120).toInt();
     maxPlayerInactivityTime = settingsCache->value("server/max_player_inactivity_time", 15).toInt();
-
+    pingClockInterval = settingsCache->value("server/clientkeepalive", 1).toInt();
     maxUsersPerAddress = settingsCache->value("security/max_users_per_address", 4).toInt();
     messageCountingInterval = settingsCache->value("security/message_counting_interval", 10).toInt();
     maxMessageCountPerInterval = settingsCache->value("security/max_message_count_per_interval", 15).toInt();
@@ -343,10 +343,9 @@ bool Servatrice::initServer()
         return false;
     }
 
-    int clientkeepalive = settingsCache->value("server/clientkeepalive", 1).toInt();
     pingClock = new QTimer(this);
     connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
-    pingClock->start(clientkeepalive * 1000);
+    pingClock->start(pingClockInterval * 1000);
 
     int statusUpdateTime = settingsCache->value("server/statusupdate", 15000).toInt();
     statusUpdateClock = new QTimer(this);
