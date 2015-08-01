@@ -19,6 +19,7 @@ SET(common_SOURCES
     server_counter.cpp
     server_game.cpp
     server_database_interface.cpp
+    server_settings_interface.cpp
     server_player.cpp
     server_protocolhandler.cpp
     server_remoteuserinterface.cpp

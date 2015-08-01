@@ -3,6 +3,7 @@
 
 #include "server.h"
 #include "server_database_interface.h"
+#include "server_settings_interface.h"
 
 class LocalServerInterface;
 
@@ -12,7 +13,7 @@ class LocalServer : public Server
 public:
     LocalServer(QObject *parent = 0);
     ~LocalServer();
-    
+
     LocalServerInterface *newConnection();
 };
 
@@ -28,6 +29,15 @@ public:
     int getNextGameId() { return localServer->getNextLocalGameId(); }
     int getNextReplayId() { return -1; }
     int getActiveUserCount() { return 0; }
+};
+
+class LocalServer_SettingsInterface : public Server_SettingsInterface {
+    Q_OBJECT
+private:
+    LocalServer *localServer;
+public:
+    LocalServer_SettingsInterface(LocalServer *_localServer);
+    bool getRequireRegistration() { return false; }
 };
 
 #endif
