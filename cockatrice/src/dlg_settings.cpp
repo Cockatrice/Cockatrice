@@ -29,6 +29,8 @@
 #include "priceupdater.h"
 #include "soundengine.h"
 
+#define LINKING_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Download-URLs"
+
 GeneralSettingsPage::GeneralSettingsPage()
 {
     QString setLanguage = settingsCache->getLang();
@@ -241,7 +243,7 @@ void GeneralSettingsPage::retranslateUi()
     tokenDatabasePathLabel.setText(tr("Token database:"));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
     highQualityURLLabel.setText(tr("Custom Card Download URL:"));
-    highQualityURLLinkLabel.setText(QString("<a href='https://github.com/Cockatrice/Cockatrice/wiki/Custom-Download-HQ-URLs'>" + tr("Linking FAQ") + "</a>"));
+    highQualityURLLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(LINKING_FAQ_URL).arg(tr("Linking FAQ")));
     clearDownloadedPicsButton.setText(tr("Reset/Clear Downloaded Pictures"));
 }
 
