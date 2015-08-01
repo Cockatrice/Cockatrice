@@ -1,17 +1,17 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="et" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" version="2.1">
 <context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>
-        <translation>Sissejuhatus</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>English</source>
-        <translation>Eesti Keel (Estonian)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Language:</source>
-        <translation>Keel:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
@@ -22,7 +22,7 @@
     <name>LoadSetsPage</name>
     <message>
         <source>Source selection</source>
-        <translation>Allika valik</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
@@ -30,19 +30,19 @@
     </message>
     <message>
         <source>Download url:</source>
-        <translation>Allalaadimise url:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Local file:</source>
-        <translation>Fail arvutis:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Restore default url</source>
-        <translation>Taasta tavaurl</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Choose file...</source>
-        <translation>Valige fail....</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Load sets file</source>
@@ -58,59 +58,59 @@
     </message>
     <message>
         <source>Error</source>
-        <translation>Viga</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The provided url is not valid.</source>
-        <translation>See url pole kehtiv.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Downloading (0MB)</source>
-        <translation>Allalaadimine (0MB)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Please choose a file.</source>
-        <translation>Palun valige fail.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Cannot open file &apos;%1&apos;.</source>
-        <translation>Ei suudeta avada &apos;%1&apos;.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Downloading (%1MB)</source>
-        <translation>Allalaadimine (%1MB)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Network error: %1.</source>
-        <translation>Võrgu viga: %1.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Parsing file</source>
-        <translation>Faili hankimine</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Failed to open Zip archive: %1.</source>
-        <translation>Zip-arhiivi avamine ebaõnnestus: %1.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
-        <translation>Zip-i lahtipakkimine ebaõnnestus: Zip-arhiiv sisaldab rohkem faile kui üks.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Zip extraction failed: %1.</source>
-        <translation>Zipi lahtipakkimine ebaõnnestus: %1.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
-        <translation>Vabandame, aga antud Oracle versioon ei toeta kokkupakitud faile.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Do you want to try to download a fresh copy of the uncompressed file instead?</source>
-        <translation>Soovite hoopis alla laadida pakkimata faili värske koopia?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
-        <translation>Fail on edukalt alla laetud, ent ei sisalda andmeid.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -163,11 +163,11 @@
     <name>OracleWizard</name>
     <message>
         <source>Oracle Importer</source>
-        <translation>Oracle importija</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save</source>
-        <translation>Salvesta</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -182,11 +182,11 @@
     </message>
     <message>
         <source>Save to the default path (recommended)</source>
-        <translation>Salvesta tavalisse asukohta (soovitatud)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Error</source>
-        <translation>Viga</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>No set has been imported.</source>
@@ -194,33 +194,32 @@
     </message>
     <message>
         <source>Import finished: %1 cards.</source>
-        <translation>%1 kaarti imporditi edukalt.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>%1: %2 cards imported</source>
-        <translation>%1: imporditi %2 kaarti</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save card database</source>
-        <translation>Salvesta kaardi andmebaas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>XML; card database (*.xml)</source>
-        <translation>XML; kaardi andmebaas (*.xml)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Success</source>
-        <translation>Valmis</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The card database has been saved successfully to
 %1</source>
-        <translation>Kaardi andmebaas salvestati edukalt asukohta
-%1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The file could not be saved to %1</source>
-        <translation>Faili salvestamine asukohta %1 ebaõnnestus</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -267,47 +266,47 @@
     <name>UnZip</name>
     <message>
         <source>ZIP operation completed successfully.</source>
-        <translation>Zip-i tegevus oli edukas.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Failed to initialize or load zlib library.</source>
-        <translation>Zlibi kogu ei suudetud ette valmistada või laadida.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>zlib library error.</source>
-        <translation>zlibi kogu viga.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unable to create or open file.</source>
-        <translation>Faili ei suudetud luua või avada.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation>Osaliselt vigane arhiiv. Ainult osa faile võidakse lahti pakkida.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Corrupted archive.</source>
-        <translation>Kahjustunud arhiiv.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wrong password.</source>
-        <translation>Vale parool.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation>Loodud arhiivid puuduvad.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File or directory does not exist.</source>
-        <translation>Faili või asukohta pole olemas.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File read error.</source>
-        <translation>Faili lugemise viga.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File write error.</source>
-        <translation>Faili kirjutamise viga.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File seek error.</source>
@@ -315,15 +314,15 @@
     </message>
     <message>
         <source>Unable to create a directory.</source>
-        <translation>Asukoha loomine ebaõnnestus.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invalid device.</source>
-        <translation>Vigane seade.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invalid or incompatible zip archive.</source>
-        <translation>Vigane või mittetoetatav zip-arhiiv.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Inconsistent headers. Archive might be corrupted.</source>
@@ -331,42 +330,42 @@
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation>Tundmatu viga.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>Zip</name>
     <message>
         <source>ZIP operation completed successfully.</source>
-        <translation>Zip-tegevus on valmis.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Failed to initialize or load zlib library.</source>
-        <translation>Zlib kogu ei suudetud ette valmistada või laadida.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>zlib library error.</source>
-        <translation>zlibi kogu viga.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unable to create or open file.</source>
-        <translation>Faili loomine või avamine ebaõnnestus.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation>Loodud arhiivid puuduvad.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File or directory does not exist.</source>
-        <translation>Faili või asukohta pole olemas.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File read error.</source>
-        <translation>Faili lugemise viga.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File write error.</source>
-        <translation>Faili kirjutamise viga.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File seek error.</source>
@@ -374,7 +373,7 @@
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation>Tundmatu viga.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

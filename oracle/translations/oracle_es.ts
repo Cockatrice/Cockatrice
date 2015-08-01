@@ -114,6 +114,45 @@
     </message>
 </context>
 <context>
+    <name>LoadTokensPage</name>
+    <message>
+        <source>Tokens source selection</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download url:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default url</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided url is not valid.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Downloading (0MB)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Downloading (%1MB)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Network error: %1.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>OracleImporter</name>
     <message>
         <source>Dummy set containing tokens</source>
@@ -182,6 +221,46 @@
     <message>
         <source>The file could not be saved to %1</source>
         <translation>El archivo no ha podido ser guardado en %1</translation>
+    </message>
+</context>
+<context>
+    <name>SaveTokensPage</name>
+    <message>
+        <source>Tokens imported</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Save to the default path (recommended)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Save token database</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>XML; token database (*.xml)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The token database has been saved successfully to
+%1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The file could not be saved to %1</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
