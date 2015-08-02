@@ -18,6 +18,7 @@
 #include "pb/event_user_message.pb.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_room_say.pb.h"
+#include "pb/event_room_clear.pb.h"
 #include <google/protobuf/descriptor.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent)
@@ -179,6 +180,7 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
             case RoomCommand::ROOM_SAY: resp = cmdRoomSay(sc.GetExtension(Command_RoomSay::ext), room, rc); break;
             case RoomCommand::CREATE_GAME: resp = cmdCreateGame(sc.GetExtension(Command_CreateGame::ext), room, rc); break;
             case RoomCommand::JOIN_GAME: resp = cmdJoinGame(sc.GetExtension(Command_JoinGame::ext), room, rc); break;
+            case RoomCommand::ROOM_CLEAR: resp = cmdRoomClear(sc.GetExtension(Command_RoomClear::ext), room, rc); break;
         }
         if (resp != Response::RespOk)
             finalResponseCode = resp;
@@ -597,6 +599,14 @@ Response::ResponseCode Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay 
     room->say(QString::fromStdString(userInfo->name()), msg);
 
     databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()), msg, Server_DatabaseInterface::MessageTargetRoom, room->getId(), room->getName());
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode Server_ProtocolHandler::cmdRoomClear(const Command_RoomClear &cmd, Server_Room *room, ResponseContainer & /*rc*/)
+{
+    room->clear();
+    room->say("", "Room Cleared by Moderator");
 
     return Response::RespOk;
 }

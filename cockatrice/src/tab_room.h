@@ -20,6 +20,7 @@ class Event_ListGames;
 class Event_JoinRoom;
 class Event_LeaveRoom;
 class Event_RoomSay;
+class Event_RoomClear;
 class GameSelector;
 class Response;
 class PendingCommand;
@@ -45,6 +46,7 @@ private:
     QAction *aLeaveRoom;
     QAction *aOpenChatSettings;
     QAction * aClearChat;
+    QAction * aClearChatMod;
     QString sanitizeHtml(QString dirty) const;
 signals:
     void roomClosing(TabRoom *tab);
@@ -55,6 +57,7 @@ private slots:
     void sayFinished(const Response &response);
     void actLeaveRoom();
     void actClearChat();
+    void actClearChatMod();
     void actOpenChatSettings();
     void addMentionTag(QString mentionTag);
     void focusTab();
@@ -64,6 +67,7 @@ private slots:
     void processJoinRoomEvent(const Event_JoinRoom &event);
     void processLeaveRoomEvent(const Event_LeaveRoom &event);
     void processRoomSayEvent(const Event_RoomSay &event);
+    void processRoomClearEvent(const Event_RoomClear &event);
 public:
     TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *_ownUser, const ServerInfo_Room &info);
     ~TabRoom();

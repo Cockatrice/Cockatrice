@@ -92,6 +92,7 @@ SET(PROTO_FILES
     event_reveal_cards.proto
     event_roll_die.proto
     event_room_say.proto
+    event_room_clear.proto
     event_server_complete_list.proto
     event_server_identification.proto
     event_server_message.proto
