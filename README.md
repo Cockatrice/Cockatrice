@@ -42,7 +42,7 @@ Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Tra
 
 # Building [![Build Status](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice)
 
-**Detailed installation instructions are on the Cockatrice wiki under [Installing Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Installing-Cockatrice)**
+**Detailed complication instructions are on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 
 Dependencies:
 
