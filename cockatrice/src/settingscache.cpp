@@ -6,6 +6,7 @@ SettingsCache::SettingsCache()
     settings = new QSettings(this);
 
     lang = settings->value("personal/lang").toString();
+    keepalive = settings->value("personal/keepalive", 5).toInt();
 
     deckPath = settings->value("paths/decks").toString();
     replaysPath = settings->value("paths/replays").toString();
@@ -429,7 +430,7 @@ QStringList SettingsCache::getCountries() const
     << "ad" << "ae" << "af" << "ag" << "ai" << "al" << "am" << "ao" << "aq" << "ar"
     << "as" << "at" << "au" << "aw" << "ax" << "az" << "ba" << "bb" << "bd" << "be"
     << "bf" << "bg" << "bh" << "bi" << "bj" << "bl" << "bm" << "bn" << "bo" << "bq"
-    << "br" << "bs" << "bt" << "bv" << "bw" << "by" << "bz" << "ca" << "cc" << "cd" 
+    << "br" << "bs" << "bt" << "bv" << "bw" << "by" << "bz" << "ca" << "cc" << "cd"
     << "cf" << "cg" << "ch" << "ci" << "ck" << "cl" << "cm" << "cn" << "co" << "cr"
     << "cu" << "cv" << "cw" << "cx" << "cy" << "cz" << "de" << "dj" << "dk" << "dm"
     << "do" << "dz" << "ec" << "ee" << "eg" << "eh" << "er" << "es" << "et" << "fi"
@@ -440,10 +441,10 @@ QStringList SettingsCache::getCountries() const
     << "je" << "jm" << "jo" << "jp" << "ke" << "kg" << "kh" << "ki" << "km" << "kn"
     << "kp" << "kr" << "kw" << "ky" << "kz" << "la" << "lb" << "lc" << "li" << "lk"
     << "lr" << "ls" << "lt" << "lu" << "lv" << "ly" << "ma" << "mc" << "md" << "me"
-    << "mf" << "mg" << "mh" << "mk" << "ml" << "mm" << "mn" << "mo" << "mp" << "mq" 
+    << "mf" << "mg" << "mh" << "mk" << "ml" << "mm" << "mn" << "mo" << "mp" << "mq"
     << "mr" << "ms" << "mt" << "mu" << "mv" << "mw" << "mx" << "my" << "mz" << "na"
     << "nc" << "ne" << "nf" << "ng" << "ni" << "nl" << "no" << "np" << "nr" << "nu"
-    << "nz" << "om" << "pa" << "pe" << "pf" << "pg" << "ph" << "pk" << "pl" << "pm" 
+    << "nz" << "om" << "pa" << "pe" << "pf" << "pg" << "ph" << "pk" << "pl" << "pm"
     << "pn" << "pr" << "ps" << "pt" << "pw" << "py" << "qa" << "re" << "ro" << "rs"
     << "ru" << "rw" << "sa" << "sb" << "sc" << "sd" << "se" << "sg" << "sh" << "si"
     << "sj" << "sk" << "sl" << "sm" << "sn" << "so" << "sr" << "ss" << "st" << "sv"

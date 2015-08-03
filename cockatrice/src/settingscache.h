@@ -97,6 +97,7 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
+    int keepalive;
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -167,6 +168,7 @@ public:
     bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
     bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
     bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
+    int getKeepAlive() const { return keepalive; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
