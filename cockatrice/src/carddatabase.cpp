@@ -17,6 +17,7 @@
 #include <QImageReader>
 #include <QMessageBox>
 #include <QEventLoop>
+
 const int CardDatabase::versionNeeded = 3;
 const char* CardDatabase::TOKENS_SETNAME = "TK";
 
@@ -348,7 +349,6 @@ int PictureLoader::getIdFromHtml(QString html, QString lang)
         const QString langHtml = langs.at(i);
         if(langHtml.contains(lang,Qt::CaseInsensitive))
         {
-            //qDebug() << langHtml;
             int posStart = langHtml.indexOf("multiverseid=") + 13;
             int posEnd = langHtml.indexOf("\">",posStart);
             QString sId = langHtml.mid(posStart, posEnd-posStart);
@@ -364,16 +364,16 @@ int PictureLoader::getTranslatedId(int currentId)
 {
     if(langDict.isEmpty())
     {
-        langDict["cs"] =  "繁體中文";
-        langDict["de"] =  "Deutsch";
-        langDict["es"] =   "Español";
-        langDict["fr"] =   "Français";
-        langDict["it"] =   "Italiano";
-        langDict["ja"] =   "日本語";
-        langDict["ko"] =   "한국어";
-        langDict["pt_BR"] =  "Português";
-        langDict["pt"] =     "Português";
-        langDict["ru"] =     "русский язык";
+        langDict["cs"] = "繁體中文";
+        langDict["de"] = "Deutsch";
+        langDict["es"] = "Español";
+        langDict["fr"] = "Français";
+        langDict["it"] = "Italiano";
+        langDict["ja"] = "日本語";
+        langDict["ko"] = "한국어";
+        langDict["pt_BR"] = "Português";
+        langDict["pt"] = "Português";
+        langDict["ru"] = "русский язык";
         langDict["zh-Hans"] = "简体中文";
     }
 
@@ -383,23 +383,22 @@ int PictureLoader::getTranslatedId(int currentId)
 
     QEventLoop eventLoop;
 
-       QNetworkAccessManager mgr;
-       QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
+    QNetworkAccessManager mgr;
+    QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
 
-       QNetworkRequest req( QUrl( "http://gatherer.wizards.com/Pages/Card/Languages.aspx?multiverseid="+QString::number(currentId,'f',0)) );
-       QNetworkReply *reply = mgr.get(req);
-       eventLoop.exec();
+    QNetworkRequest req( QUrl( "http://gatherer.wizards.com/Pages/Card/Languages.aspx?multiverseid="+QString::number(currentId,'f',0)) );
+    QNetworkReply *reply = mgr.get(req);
+    eventLoop.exec();
 
-       if (reply->error() == QNetworkReply::NoError) {
-           QString replyHtml = reply->readAll();
-           delete reply;
-           return getIdFromHtml(replyHtml, lang);
-       }
-       else {
-           //TODO error
-           delete reply;
-           return 0;
-       }
+    if (reply->error() == QNetworkReply::NoError) {
+        QString replyHtml = reply->readAll();
+        delete reply;
+        return getIdFromHtml(replyHtml, lang);
+    }
+    else {
+        delete reply;
+        return 0;
+    }
 }
 
 QMap<int,int> translatedMuids;
