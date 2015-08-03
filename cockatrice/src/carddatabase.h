@@ -97,6 +97,8 @@ private:
     void startNextPicDownload();
     QString getPicUrl();
     static QStringList md5Blacklist;
+    int getIdFromHtml(QString html, QString lang);
+    int getTranslatedId(int currentId);
 public:
     PictureLoader(const QString &__picsPath, bool _picDownload, bool _picDownloadHq, QObject *parent = 0);
     ~PictureLoader();
@@ -187,6 +189,7 @@ public:
     QString getCustomPicURL(const QString &set) const { return customPicURLs.value(set); }
     QString getCustomPicURLHq(const QString &set) const { return customPicURLsHq.value(set); }
     int getMuId(const QString &set) const { return muIds.value(set); }
+    MuidMap getMuiIDs() const { return muIds; }
     QString getMainCardType() const;
     QString getCorrectedName() const;
     int getTableRow() const { return tableRow; }

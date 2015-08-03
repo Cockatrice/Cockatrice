@@ -340,6 +340,71 @@ void PictureLoader::processLoadQueue()
     }
 }
 
+int PictureLoader::getIdFromHtml(QString html, QString lang)
+{
+    QStringList langs = html.split("class=\"cardItem");
+    for(int i = 1; i < langs.size(); ++i)
+    {
+        const QString langHtml = langs.at(i);
+        if(langHtml.contains(lang,Qt::CaseInsensitive))
+        {
+            //qDebug() << langHtml;
+            int posStart = langHtml.indexOf("multiverseid=") + 13;
+            int posEnd = langHtml.indexOf("\">",posStart);
+            QString sId = langHtml.mid(posStart, posEnd-posStart);
+            return sId.toDouble();
+        }
+    }
+    return 0;
+}
+
+QMap<QString,QString> langDict;
+
+int PictureLoader::getTranslatedId(int currentId)
+{
+    if(langDict.isEmpty())
+    {
+        langDict["cs"] =  "繁體中文";
+        langDict["de"] =  "Deutsch";
+        langDict["es"] =   "Español";
+        langDict["fr"] =   "Français";
+        langDict["it"] =   "Italiano";
+        langDict["ja"] =   "日本語";
+        langDict["ko"] =   "한국어";
+        langDict["pt_BR"] =  "Português";
+        langDict["pt"] =     "Português";
+        langDict["ru"] =     "русский язык";
+        langDict["zh-Hans"] = "简体中文";
+    }
+
+    QString lang = langDict.value(settingsCache->getLang(), QStringLiteral("English"));
+    if(lang == QStringLiteral("English"))
+        return 0;
+
+    QEventLoop eventLoop;
+
+       QNetworkAccessManager mgr;
+       QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
+
+       QNetworkRequest req( QUrl( "http://gatherer.wizards.com/Pages/Card/Languages.aspx?multiverseid="+QString::number(currentId,'f',0)) );
+       QNetworkReply *reply = mgr.get(req);
+       eventLoop.exec();
+
+       if (reply->error() == QNetworkReply::NoError) {
+           QString replyHtml = reply->readAll();
+           delete reply;
+           return getIdFromHtml(replyHtml, lang);
+       }
+       else {
+           //TODO error
+           delete reply;
+           return 0;
+       }
+}
+
+QMap<int,int> translatedMuids;
+QMap<int,bool> translatedTried;
+
 QString PictureLoader::getPicUrl()
 {
     if (!picDownload) return QString("");
@@ -365,12 +430,33 @@ QString PictureLoader::getPicUrl()
             return picUrl;
     }
 
+
+
     // if a card has a muid, use the default url; if not, use the fallback
     int muid = set ? card->getMuId(set->getShortName()) : 0;
     if(muid)
         picUrl = picDownloadHq ? settingsCache->getPicUrlHq() : settingsCache->getPicUrl();
     else
         picUrl = picDownloadHq ? settingsCache->getPicUrlHqFallback() : settingsCache->getPicUrlFallback();
+
+    //Get muid translations
+    QList<int> muiIDs = card->getMuiIDs().values();
+    for (int i = 0; i < muiIDs.length(); ++i) {
+        if(!translatedMuids.contains(muiIDs.at(i)))
+        {
+            int newId = getTranslatedId(muiIDs.at(i));
+            translatedMuids[muiIDs.at(i)] = newId;
+            if(newId != 0)
+            {
+                if(!translatedTried.contains(newId))
+                {
+                    muid = newId;
+                    translatedTried[newId] = true;
+                    break;
+                }
+            }
+        }
+    }
 
     picUrl.replace("!name!", QUrl::toPercentEncoding(card->getCorrectedName()));
     picUrl.replace("!name_lower!", QUrl::toPercentEncoding(card->getCorrectedName().toLower()));
