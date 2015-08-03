@@ -658,7 +658,10 @@ void TabDeckEditor::actSwapCard()
 
 void TabDeckEditor::actAddCard()
 {
-    addCardHelper("main");
+    if(QApplication::keyboardModifiers() & Qt::ControlModifier)
+        actAddCardToSideboard();
+    else
+        addCardHelper("main");
 }
 
 void TabDeckEditor::actAddCardToSideboard()
