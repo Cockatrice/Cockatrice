@@ -1,0 +1,8 @@
+import "room_event.proto";
+
+message Event_RoomClear {
+    extend RoomEvent {
+        optional Event_RoomClear ext = 1004;
+    }
+    optional string message = 1;
+}

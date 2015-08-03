@@ -37,6 +37,7 @@ class Command_ListRooms;
 class Command_JoinRoom;
 class Command_LeaveRoom;
 class Command_RoomSay;
+class Command_RoomClear;
 class Command_CreateGame;
 class Command_JoinGame;
 
@@ -68,6 +69,7 @@ private:
     Response::ResponseCode cmdListUsers(const Command_ListUsers &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdLeaveRoom(const Command_LeaveRoom &cmd, Server_Room *room, ResponseContainer &rc);
     Response::ResponseCode cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room, ResponseContainer &rc);
+    Response::ResponseCode cmdRoomClear(const Command_RoomClear &cmd, Server_Room *room, ResponseContainer &rc);
     Response::ResponseCode cmdCreateGame(const Command_CreateGame &cmd, Server_Room *room, ResponseContainer &rc);
     Response::ResponseCode cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room, ResponseContainer &rc);
     

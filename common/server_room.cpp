@@ -9,6 +9,7 @@
 #include "pb/event_leave_room.pb.h"
 #include "pb/event_list_games.pb.h"
 #include "pb/event_room_say.pb.h"
+#include "pb/event_room_clear.pb.h"
 #include "pb/serverinfo_room.pb.h"
 #include <google/protobuf/descriptor.h>
 
@@ -224,12 +225,17 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
     return result;
 }
 
-
 void Server_Room::say(const QString &userName, const QString &s, bool sendToIsl)
 {
     Event_RoomSay event;
     event.set_name(userName.toStdString());
     event.set_message(s.toStdString());
+    sendRoomEvent(prepareRoomEvent(event), sendToIsl);
+}
+
+void Server_Room::clear(bool sendToIsl)
+{
+    Event_RoomClear event;
     sendRoomEvent(prepareRoomEvent(event), sendToIsl);
 }
 

@@ -28,6 +28,7 @@
 #include "pb/event_join_room.pb.h"
 #include "pb/event_leave_room.pb.h"
 #include "pb/event_room_say.pb.h"
+#include "pb/event_room_clear.pb.h"
 #include "pending_command.h"
 #include "dlg_settings.h"
 
@@ -61,6 +62,11 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     aClearChat = chatSettingsMenu->addAction(QString());
     aClearChat->setShortcut(QKeySequence("F12"));
     connect(aClearChat, SIGNAL(triggered()), this, SLOT(actClearChat()));
+
+    aClearChatMod = chatSettingsMenu->addAction(QString());
+    if (!(ownUser->user_level() & ServerInfo_User::IsModerator) && !(ownUser->user_level() & ServerInfo_User::IsAdmin))
+        chatSettingsMenu->removeAction(aClearChatMod);
+    connect(aClearChatMod, SIGNAL(triggered()), this, SLOT(actClearChatMod()));
 
     chatSettingsMenu->addSeparator();
 
@@ -119,7 +125,7 @@ TabRoom::~TabRoom()
 
 void TabRoom::retranslateUi()
 {
-        gameSelector->retranslateUi();
+    gameSelector->retranslateUi();
     chatView->retranslateUi();
     userList->retranslateUi();
     sayLabel->setText(tr("&Say:"));
@@ -127,6 +133,7 @@ void TabRoom::retranslateUi()
     roomMenu->setTitle(tr("&Room"));
     aLeaveRoom->setText(tr("&Leave room"));
     aClearChat->setText(tr("&Clear chat"));
+    aClearChatMod->setText(tr("MOD: Clear chat"));
     aOpenChatSettings->setText(tr("Chat Settings..."));
 }
 
@@ -194,6 +201,10 @@ void TabRoom::actClearChat() {
     chatView->clearChat();
 }
 
+void TabRoom::actClearChatMod() {
+    sendRoomCommand(prepareRoomCommand(Command_RoomClear()));
+}
+
 void TabRoom::actOpenChatSettings() {
     DlgSettings settings(this);
     settings.setTab(4);
@@ -207,6 +218,7 @@ void TabRoom::processRoomEvent(const RoomEvent &event)
         case RoomEvent::JOIN_ROOM: processJoinRoomEvent(event.GetExtension(Event_JoinRoom::ext)); break;
         case RoomEvent::LEAVE_ROOM: processLeaveRoomEvent(event.GetExtension(Event_LeaveRoom::ext)); break;
         case RoomEvent::ROOM_SAY: processRoomSayEvent(event.GetExtension(Event_RoomSay::ext)); break;
+        case RoomEvent::ROOM_CLEAR: processRoomClearEvent(event.GetExtension(Event_RoomClear::ext)); break;
         default: ;
     }
 }
@@ -243,6 +255,10 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     }
     chatView->appendMessage(QString::fromStdString(event.message()), senderName, userLevel, true);
     emit userEvent(false);
+}
+
+void TabRoom::processRoomClearEvent(const Event_RoomClear &event) {
+    chatView->clearChat();
 }
 
 void TabRoom::addMentionTag(QString mentionTag) {

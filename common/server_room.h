@@ -70,6 +70,7 @@ public:
     Response::ResponseCode processJoinGameCommand(const Command_JoinGame &cmd, ResponseContainer &rc, Server_AbstractUserInterface *userInterface);
     
     void say(const QString &userName, const QString &s, bool sendToIsl = true);
+    void clear(bool sendToIsl = true);
     
     void addGame(Server_Game *game);
     void removeGame(Server_Game *game);
