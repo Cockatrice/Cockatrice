@@ -377,8 +377,8 @@ int PictureLoader::getTranslatedId(int currentId)
         langDict["zh-Hans"] = "简体中文";
     }
 
-    QString lang = langDict.value(settingsCache->getLang(), QStringLiteral("English"));
-    if(lang == QStringLiteral("English"))
+    QString lang = langDict.value(settingsCache->getLang(), "English");
+    if(lang == "English")
         return 0;
 
     QEventLoop eventLoop;
