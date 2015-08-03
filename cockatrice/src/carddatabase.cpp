@@ -16,7 +16,7 @@
 #include <QDebug>
 #include <QImageReader>
 #include <QMessageBox>
-
+#include <QEventLoop>
 const int CardDatabase::versionNeeded = 3;
 const char* CardDatabase::TOKENS_SETNAME = "TK";
 
