@@ -223,8 +223,8 @@ int main(int argc, char *argv[])
         generateClientID();    //generate the users client id
         qDebug() << "ClientID In Cache: " << settingsCache->getClientID();
 
-        ui.show();
-        qDebug("main(): ui.show() finished");
+        ui.showMaximized();
+        qDebug("main(): ui.showMaximized() finished");
 
         app.exec();
     }

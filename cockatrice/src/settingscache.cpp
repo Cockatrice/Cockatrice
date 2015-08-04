@@ -1,5 +1,26 @@
 #include "settingscache.h"
 #include <QSettings>
+#if QT_VERSION >= 0x050000
+    #include <QStandardPaths>
+#else
+    #include <QDesktopServices>
+#endif
+
+QString SettingsCache::getLayoutsSettingsPath()
+{
+    QString file = "";
+
+#ifndef PORTABLE_BUILD
+    #if QT_VERSION >= 0x050000
+        file = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    #else
+        file = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    #endif
+        file.append("/settings/layouts/");
+#endif
+
+    return file;
+}
 
 SettingsCache::SettingsCache()
 {
@@ -97,6 +118,16 @@ SettingsCache::SettingsCache()
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     clientID = settings->value("personal/clientid", "notset").toString();
 
+    QString file = getLayoutsSettingsPath();
+    file.append("deckLayout.ini");
+
+    QSettings layout_settings(file , QSettings::IniFormat);
+    deckEditorLayoutState = layout_settings.value("layouts/deckEditor_state").toByteArray();
+    deckEditorGeometry = layout_settings.value("layouts/deckEditor_geometry").toByteArray();
+
+    deckEditorCardSize = layout_settings.value("layouts/deckEditor_CardSize", QSize(250,500)).toSize();
+    deckEditorFilterSize = layout_settings.value("layouts/deckEditor_FilterSize", QSize(250,250)).toSize();
+    deckEditorDeckSize = layout_settings.value("layouts/deckEditor_DeckSize", QSize(250,360)).toSize();
 }
 
 void SettingsCache::setCardInfoViewMode(const int _viewMode) {
@@ -460,6 +491,56 @@ QStringList SettingsCache::getCountries() const
     << "vn" << "vu" << "wf" << "ws" << "ye" << "yt" << "za" << "zm" << "zw";
 
     return countries;
+}
+
+void SettingsCache::setDeckEditorLayoutState(const QByteArray &value)
+{
+    deckEditorLayoutState = value;
+
+    QString file = getLayoutsSettingsPath();
+    file.append("deckLayout.ini");
+    QSettings layout_settings(file , QSettings::IniFormat);
+    layout_settings.setValue("layouts/deckEditor_state",value);
+}
+
+void SettingsCache::setDeckEditorGeometry(const QByteArray &value)
+{
+    deckEditorGeometry = value;
+
+    QString file = getLayoutsSettingsPath();
+    file.append("deckLayout.ini");
+    QSettings layout_settings(file , QSettings::IniFormat);
+    layout_settings.setValue("layouts/deckEditor_geometry",value);
+}
+
+void SettingsCache::setDeckEditorCardSize(const QSize &value)
+{
+    deckEditorCardSize = value;
+
+    QString file = getLayoutsSettingsPath();
+    file.append("deckLayout.ini");
+    QSettings layout_settings(file , QSettings::IniFormat);
+    layout_settings.setValue("layouts/deckEditor_CardSize",value);
+}
+
+void SettingsCache::setDeckEditorDeckSize(const QSize &value)
+{
+    deckEditorDeckSize = value;
+
+    QString file = getLayoutsSettingsPath();
+    file.append("deckLayout.ini");
+    QSettings layout_settings(file , QSettings::IniFormat);
+    layout_settings.setValue("layouts/deckEditor_DeckSize",value);
+}
+
+void SettingsCache::setDeckEditorFilterSize(const QSize &value)
+{
+    deckEditorFilterSize = value;
+
+    QString file = getLayoutsSettingsPath();
+    file.append("deckLayout.ini");
+    QSettings layout_settings(file , QSettings::IniFormat);
+    layout_settings.setValue("layouts/deckEditor_FilterSize",value);
 }
 
 void SettingsCache::setGameDescription(const QString _gameDescription)
