@@ -238,7 +238,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     aLoadDeckFromClipboard->setShortcuts(QKeySequence::Paste);
     aSaveDeckToClipboard = new QAction(QString(), this);
     connect(aSaveDeckToClipboard, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboard()));
-    aSaveDeckToClipboard->setShortcuts(QKeySequence::Copy);
+    aSaveDeckToClipboard->setShortcuts(QKeySequence::Cut);
     aPrintDeck = new QAction(QString(), this);
     aPrintDeck->setShortcuts(QKeySequence::Print);
     connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
