@@ -172,10 +172,7 @@ public:
     int getKeepAlive() const { return keepalive; }
     void setClientID(QString clientID);
     QString getClientID() { return clientID; }
-
 public slots:
-    void setClientID(QString clientID);
-    QString getClientID() { return clientID; }
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
     void setDeckPath(const QString &_deckPath);

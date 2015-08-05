@@ -173,11 +173,9 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 	// check if client id exists (older client compatibility)
 	if (clientid.isEmpty()){
 		// client id is empty, either out dated client or client has been modified
-		qDebug() << "Warning: Outdated client detected";
 	}
 	else {
 		// update users database table with client id
-		qDebug() << "ClientID: " << clientid;
 		databaseInterface->updateUsersClientID(name, clientid);
 	}
 
