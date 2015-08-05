@@ -811,20 +811,33 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const
 
 int Servatrice_DatabaseInterface::getActiveUserCount()
 {
-	int userCount = 0;
+    int userCount = 0;
 
-	if (!checkSql())
-		return userCount;
+    if (!checkSql())
+        return userCount;
 
-	QSqlQuery *query = prepareQuery("select count(*) from {prefix}_sessions where id_server = :serverid AND end_time is NULL");
-	query->bindValue(":serverid", server->getServerId());
-	if (!execSqlQuery(query)){
-		return userCount;
-	}
+    QSqlQuery *query = prepareQuery("select count(*) from {prefix}_sessions where id_server = :serverid AND end_time is NULL");
+    query->bindValue(":serverid", server->getServerId());
+    if (!execSqlQuery(query)){
+        return userCount;
+    }
 
-	if (query->next()){
-		userCount = query->value(0).toInt();
-	}
+    if (query->next()){
+        userCount = query->value(0).toInt();
+    }
 
-	return userCount;
+    return userCount;
+}
+
+void Servatrice_DatabaseInterface::updateUsersClientID(const QString &userName, const QString &userClientID)
+{
+    
+    if (!checkSql())
+        return;
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set clientid = :clientid where name = :username");
+    query->bindValue(":clientid", userClientID);
+    query->bindValue(":username", userName);
+    execSqlQuery(query);
+    
 }

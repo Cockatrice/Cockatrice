@@ -79,6 +79,7 @@ private:
     QString picUrlHq;
     QString picUrlFallback;
     QString picUrlHqFallback;
+    QString clientID;
     bool attemptAutoConnect;
     int pixmapCacheSize;
     bool scaleCards;
@@ -169,6 +170,8 @@ public:
     bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
     bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
     int getKeepAlive() const { return keepalive; }
+    void setClientID(QString clientID);
+    QString getClientID() { return clientID; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);

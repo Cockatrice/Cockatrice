@@ -10,6 +10,7 @@
 #include "pb/response_activate.pb.h"
 #include "pb/server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
+#include "settingscache.h"
 
 static const unsigned int protocolVersion = 14;
 
@@ -108,7 +109,7 @@ void RemoteClient::doLogin()
     Command_Login cmdLogin;
     cmdLogin.set_user_name(userName.toStdString());
     cmdLogin.set_password(password.toStdString());
-
+    cmdLogin.set_clientid(settingsCache->getClientID().toStdString());
     PendingCommand *pend = prepareSessionCommand(cmdLogin);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
     sendCommand(pend);
@@ -243,6 +244,7 @@ void RemoteClient::doConnectToServer(const QString &hostname, unsigned int port,
 
     userName = _userName;
     password = _password;
+    QString clientid = settingsCache->getClientID();
     lastHostname = hostname;
     lastPort = port;
 
