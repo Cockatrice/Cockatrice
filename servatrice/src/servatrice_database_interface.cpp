@@ -828,3 +828,16 @@ int Servatrice_DatabaseInterface::getActiveUserCount()
 
 	return userCount;
 }
+
+void Servatrice_DatabaseInterface::updateUsersClientID(const QString &userName, const QString &userClientID)
+{
+    
+    if (!checkSql())
+        return;
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set clientid = :clientid where name = :username");
+    query->bindValue(":clientid", userClientID);
+    query->bindValue(":username", userName);
+    execSqlQuery(query);
+	
+}

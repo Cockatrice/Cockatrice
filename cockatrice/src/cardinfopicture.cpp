@@ -13,7 +13,7 @@ CardInfoPicture::CardInfoPicture(int width, QWidget *parent)
     info(0),
     pixmapDirty(true)
 {
-    setFixedWidth(width);
+	setMaximumWidth(width);
     setMinimumHeight(100);
     setMaximumHeight(width / (qreal) CARD_WIDTH * (qreal) CARD_HEIGHT);
 }

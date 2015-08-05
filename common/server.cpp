@@ -103,12 +103,12 @@ Server_DatabaseInterface *Server::getDatabaseInterface() const
     return databaseInterfaces.value(QThread::currentThread());
 }
 
-AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft)
+AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft, QString &clientid)
 {
     if (name.size() > 35)
         name = name.left(35);
     
-    Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
+	Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
     
     QWriteLocker locker(&clientsLock);
     
@@ -123,6 +123,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     databaseInterface->lockSessionTables();
     
     if (authState == PasswordRight) {
+
+        // verify that new session would not cause problems with older existing session
         if (users.contains(name) || databaseInterface->userSessionExists(name)) {
             qDebug("Login denied: would overwrite old session");
             databaseInterface->unlockSessionTables();
@@ -168,6 +170,15 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     event.mutable_user_info()->CopyFrom(session->copyUserInfo(true, true, true));
     locker.unlock();
     
+	// check if client id exists (older client compatibility)
+	if (clientid.isEmpty()){
+		// client id is empty, either out dated client or client has been modified
+	}
+	else {
+		// update users database table with client id
+		databaseInterface->updateUsersClientID(name, clientid);
+	}
+
     se = Server_ProtocolHandler::prepareSessionEvent(event);
     sendIsl_SessionEvent(*se);
     delete se;
