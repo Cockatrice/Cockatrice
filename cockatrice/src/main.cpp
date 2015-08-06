@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
  *   Copyright (C) 2008 by Max-Wilhelm Bruker   *
  *   brukie@gmx.net   *
  *                                                                         *
@@ -32,6 +32,9 @@
 #include <QDesktopServices>
 #include <QDebug>
 #include <QSystemTrayIcon>
+#include "QtNetwork/QNetworkInterface"
+#include <QCryptographicHash>
+
 
 #include "main.h"
 #include "window_main.h"
@@ -95,6 +98,19 @@ bool settingsValid()
         !settingsCache->getDeckPath().isEmpty() &&
         QDir(settingsCache->getPicsPath()).exists() &&
         !settingsCache->getPicsPath().isEmpty();
+}
+
+void generateClientID()
+{
+    QString macList;
+    foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
+    {
+        if (interface.hardwareAddress() != "")
+            if (interface.hardwareAddress() != "00:00:00:00:00:00:00:E0")
+                macList += interface.hardwareAddress() + ".";
+    }
+    QString strClientID = QCryptographicHash::hash(macList.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
+    settingsCache->setClientID(strClientID);
 }
 
 int main(int argc, char *argv[])
@@ -203,6 +219,9 @@ int main(int argc, char *argv[])
 
         QIcon icon(":/resources/appicon.svg");
         ui.setWindowIcon(icon);
+        
+        generateClientID();    //generate the users client id
+        qDebug() << "ClientID In Cache: " << settingsCache->getClientID();
 
         ui.show();
         qDebug("main(): ui.show() finished");
