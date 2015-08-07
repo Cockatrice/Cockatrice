@@ -172,6 +172,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     
     if (clientid.isEmpty()){
         // client id is empty, either out dated client or client has been modified
+        if (getClientIdRequired())
+            return ClientIdRequired;
     }
     else {
         // update users database table with client id
