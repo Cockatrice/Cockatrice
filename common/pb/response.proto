@@ -35,7 +35,7 @@ message Response {
         RespActivationAccepted = 31; // Server accepted a reg user activation token
         RespActivationFailed = 32; // Server didn't accept a reg user activation token
         RespRegistrationAcceptedNeedsActivation = 33; // Server accepted cient registration, but it will need token activation
-        RespClientIDRequired = 34; // Server require's client to generate and send its client id before allowing access
+        RespClientIDRequired = 34; // Server requires client to generate and send its client id before allowing access
     }
     enum ResponseType {
         JOIN_ROOM = 1000;

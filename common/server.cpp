@@ -170,7 +170,6 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     event.mutable_user_info()->CopyFrom(session->copyUserInfo(true, true, true));
     locker.unlock();
     
-    // check if client id exists (older client compatibility)
     if (clientid.isEmpty()){
         // client id is empty, either out dated client or client has been modified
     }
