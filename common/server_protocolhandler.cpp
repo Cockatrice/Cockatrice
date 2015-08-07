@@ -409,6 +409,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             return Response::RespUsernameInvalid;
         }
         case RegistrationRequired: return Response::RespRegistrationRequired;
+        case ClientIdRequired: return Response::RespClientIdRequired;
         case UserIsInactive: return Response::RespAccountNotActivated;
         default: authState = res;
     }

@@ -120,7 +120,7 @@ private:
 	QString shutdownReason;
 	int shutdownMinutes;
 	QTimer *shutdownTimer;
-    bool isFirstShutdownMessage;
+    bool isFirstShutdownMessage, clientIdRequired;
 
 	mutable QMutex serverListMutex;
 	QList<ServerProperties> serverList;
@@ -137,6 +137,7 @@ public:
 	QString getServerName() const { return serverName; }
 	QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
 	bool getGameShouldPing() const { return true; }
+    bool getClientIdRequired() const { return clientIdRequired; }
 	int getPingClockInterval() const { return pingClockInterval; }
 	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
 	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
