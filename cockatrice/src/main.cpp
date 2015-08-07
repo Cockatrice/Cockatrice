@@ -35,7 +35,6 @@
 #include "QtNetwork/QNetworkInterface"
 #include <QCryptographicHash>
 
-
 #include "main.h"
 #include "window_main.h"
 #include "dlg_settings.h"
@@ -100,7 +99,7 @@ bool settingsValid()
         !settingsCache->getPicsPath().isEmpty();
 }
 
-void generateClientID()
+QString const generateClientID()
 {
     QString macList;
     foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
@@ -110,7 +109,7 @@ void generateClientID()
                 macList += interface.hardwareAddress() + ".";
     }
     QString strClientID = QCryptographicHash::hash(macList.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
-    settingsCache->setClientID(strClientID);
+    return strClientID;
 }
 
 int main(int argc, char *argv[])
@@ -220,7 +219,7 @@ int main(int argc, char *argv[])
         QIcon icon(":/resources/appicon.svg");
         ui.setWindowIcon(icon);
         
-        generateClientID();    //generate the users client id
+        settingsCache->setClientID(generateClientID());
         qDebug() << "ClientID In Cache: " << settingsCache->getClientID();
 
         ui.show();

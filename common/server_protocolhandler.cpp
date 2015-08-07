@@ -381,12 +381,16 @@ Response::ResponseCode Server_ProtocolHandler::cmdPing(const Command_Ping & /*cm
 Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd, ResponseContainer &rc)
 {
     QString userName = QString::fromStdString(cmd.user_name()).simplified();
-    QString clientid = QString::fromStdString(cmd.clientid()).simplified();
+    QString clientId = QString::fromStdString(cmd.clientid()).simplified();
+    
     if (userName.isEmpty() || (userInfo != 0))
         return Response::RespContextError;
+    if (clientId.isEmpty())
+        return Response::RespContextError;
+
     QString reasonStr;
     int banSecondsLeft = 0;
-    AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft, clientid);
+    AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft, clientId);
     switch (res) {
         case UserIsBanned: {
             Response_Login *re = new Response_Login;
