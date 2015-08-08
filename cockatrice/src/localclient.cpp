@@ -10,6 +10,7 @@ LocalClient::LocalClient(LocalServerInterface *_lsi, const QString &_playerName,
     
     Command_Login loginCmd;
     loginCmd.set_user_name(_playerName.toStdString());
+    loginCmd.set_clientid("notneeded");
     sendCommand(prepareSessionCommand(loginCmd));
     
     Command_JoinRoom joinCmd;
