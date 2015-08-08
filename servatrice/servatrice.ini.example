@@ -62,8 +62,8 @@ method=none
 ; if the chosen authentication method is password, here you can define the password your users will use to log in
 password=123456
 
-; Accept only registered users? default is 0 (accept unregistered users)
-regonly=0
+; Accept only registered users? default is false (accept unregistered users)
+regonly=false
 
 [users]
 
