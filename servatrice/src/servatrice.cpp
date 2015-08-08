@@ -144,7 +144,7 @@ bool Servatrice::initServer()
     serverId = settingsCache->value("server/id", 0).toInt();
     clientIdRequired = settingsCache->value("server/requireclientid",0).toBool();
     bool regServerOnly = settingsCache->value("authentication/regonly", 0).toBool();
-    
+
     const QString authenticationMethodStr = settingsCache->value("authentication/method").toString();
     if (authenticationMethodStr == "sql") {
         qDebug() << "Authenticating method: sql";
