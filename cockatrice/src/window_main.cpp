@@ -331,7 +331,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
         }
         default:
-            QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
+            QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1".).arg(static_cast<int>(r)) + tr("\nThis usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
             break;
     }
     actConnect();
