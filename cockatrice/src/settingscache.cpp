@@ -6,17 +6,17 @@
     #include <QDesktopServices>
 #endif
 
-QString SettingsCache::getLayoutsSettingsPath()
+QString SettingsCache::getSettingsPath()
 {
     QString file = "";
 
 #ifndef PORTABLE_BUILD
-    #if QT_VERSION >= 0x050000
+#if QT_VERSION >= 0x050000
         file = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     #else
         file = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     #endif
-        file.append("/settings/layouts/");
+        file.append("/settings/");
 #endif
 
     return file;
@@ -25,6 +25,7 @@ QString SettingsCache::getLayoutsSettingsPath()
 SettingsCache::SettingsCache()
 {
     settings = new QSettings(this);
+    shortcutsSettings = new ShortcutsSettings(getSettingsPath(),this);
 
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
@@ -118,8 +119,8 @@ SettingsCache::SettingsCache()
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     clientID = settings->value("personal/clientid", "notset").toString();
 
-    QString file = getLayoutsSettingsPath();
-    file.append("deckLayout.ini");
+    QString file = getSettingsPath();
+    file.append("layouts/deckLayout.ini");
 
     QSettings layout_settings(file , QSettings::IniFormat);
     deckEditorLayoutState = layout_settings.value("layouts/deckEditor_state").toByteArray();
@@ -497,8 +498,8 @@ void SettingsCache::setDeckEditorLayoutState(const QByteArray &value)
 {
     deckEditorLayoutState = value;
 
-    QString file = getLayoutsSettingsPath();
-    file.append("deckLayout.ini");
+    QString file = getSettingsPath();
+    file.append("layouts/deckLayout.ini");
     QSettings layout_settings(file , QSettings::IniFormat);
     layout_settings.setValue("layouts/deckEditor_state",value);
 }
@@ -507,8 +508,8 @@ void SettingsCache::setDeckEditorGeometry(const QByteArray &value)
 {
     deckEditorGeometry = value;
 
-    QString file = getLayoutsSettingsPath();
-    file.append("deckLayout.ini");
+    QString file = getSettingsPath();
+    file.append("layouts/deckLayout.ini");
     QSettings layout_settings(file , QSettings::IniFormat);
     layout_settings.setValue("layouts/deckEditor_geometry",value);
 }
@@ -517,8 +518,8 @@ void SettingsCache::setDeckEditorCardSize(const QSize &value)
 {
     deckEditorCardSize = value;
 
-    QString file = getLayoutsSettingsPath();
-    file.append("deckLayout.ini");
+    QString file = getSettingsPath();
+    file.append("layouts/deckLayout.ini");
     QSettings layout_settings(file , QSettings::IniFormat);
     layout_settings.setValue("layouts/deckEditor_CardSize",value);
 }
@@ -527,8 +528,8 @@ void SettingsCache::setDeckEditorDeckSize(const QSize &value)
 {
     deckEditorDeckSize = value;
 
-    QString file = getLayoutsSettingsPath();
-    file.append("deckLayout.ini");
+    QString file = getSettingsPath();
+    file.append("layouts/deckLayout.ini");
     QSettings layout_settings(file , QSettings::IniFormat);
     layout_settings.setValue("layouts/deckEditor_DeckSize",value);
 }
@@ -537,8 +538,8 @@ void SettingsCache::setDeckEditorFilterSize(const QSize &value)
 {
     deckEditorFilterSize = value;
 
-    QString file = getLayoutsSettingsPath();
-    file.append("deckLayout.ini");
+    QString file = getSettingsPath();
+    file.append("layouts/deckLayout.ini");
     QSettings layout_settings(file , QSettings::IniFormat);
     layout_settings.setValue("layouts/deckEditor_FilterSize",value);
 }

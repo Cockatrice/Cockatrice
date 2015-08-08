@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSize>
 #include <QStringList>
+#include "shortcutssettings.h"
 
 // the falbacks are used for cards without a muid
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
@@ -45,7 +46,7 @@ signals:
     void masterVolumeChanged(int value);
 private:
     QSettings *settings;
-
+    ShortcutsSettings *shortcutsSettings;
     QByteArray mainWindowGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath;
@@ -102,7 +103,7 @@ private:
     int keepalive;
     QByteArray deckEditorLayoutState, deckEditorGeometry;
     QSize deckEditorFilterSize, deckEditorDeckSize, deckEditorCardSize;
-    QString getLayoutsSettingsPath();
+    QString getSettingsPath();
 
 public:
     SettingsCache();
@@ -187,6 +188,7 @@ public:
     void setDeckEditorDeckSize(const QSize &value);
     QSize getDeckEditorFilterSize() const { return deckEditorFilterSize; }
     void setDeckEditorFilterSize(const QSize &value);
+    ShortcutsSettings& shortcuts() const { return *shortcutsSettings; }
 
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);

@@ -125,9 +125,13 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 void DeckViewContainer::retranslateUi()
 {
     loadLocalButton->setText(tr("Load local deck"));
-    loadLocalButton->setShortcut(QKeySequence("Ctrl+O"));
+    loadLocalButton->setShortcut(settingsCache->shortcuts().getSingleShortcut(
+                                     "DeckViewContainer/loadLocalButton",
+                                     QKeySequence("Ctrl+O")));
     loadRemoteButton->setText(tr("Load deck from server"));
-    loadRemoteButton->setShortcut(QKeySequence("Ctrl+Alt+O"));
+    loadRemoteButton->setShortcut(settingsCache->shortcuts().getSingleShortcut(
+                                      "DeckViewContainer/loadRemoteButton",
+                                      QKeySequence("Ctrl+Alt+O")));
     readyStartButton->setText(tr("Ready to s&tart"));
     updateSideboardLockButtonText();
 }
@@ -469,12 +473,12 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
         QAction *temp = new QAction(QString(), this);
         connect(temp, SIGNAL(triggered()), this, SLOT(actPhaseAction()));
         switch (i) {
-            case 0: temp->setShortcut(QKeySequence("F5")); break;
-            case 2: temp->setShortcut(QKeySequence("F6")); break;
-            case 3: temp->setShortcut(QKeySequence("F7")); break;
-            case 4: temp->setShortcut(QKeySequence("F8")); break;
-            case 9: temp->setShortcut(QKeySequence("F9")); break;
-            case 10: temp->setShortcut(QKeySequence("F10")); break;
+            case 0: temp->setShortcuts(settingsCache->shortcuts().getShortcut("TabGame/phase0" ,QKeySequence("F5"))); break;
+            case 2: temp->setShortcuts(settingsCache->shortcuts().getShortcut("TabGame/phase2" ,QKeySequence("F6"))); break;
+            case 3: temp->setShortcuts(settingsCache->shortcuts().getShortcut("TabGame/phase3" ,QKeySequence("F7"))); break;
+            case 4: temp->setShortcuts(settingsCache->shortcuts().getShortcut("TabGame/phase4" ,QKeySequence("F8"))); break;
+            case 9: temp->setShortcuts(settingsCache->shortcuts().getShortcut("TabGame/phase9" ,QKeySequence("F9"))); break;
+            case 10:temp->setShortcuts(settingsCache->shortcuts().getShortcut("TabGame/phase10" ,QKeySequence("F10"))); break;
             default: ;
         }
         phasesMenu->addAction(temp);
@@ -545,37 +549,57 @@ void TabGame::retranslateUi()
     gameMenu->setTitle(tr("&Game"));
     if (aNextPhase) {
         aNextPhase->setText(tr("Next &phase"));
-        aNextPhase->setShortcuts(QList<QKeySequence>() << QKeySequence("Ctrl+Space") << QKeySequence("Tab"));
+        aNextPhase->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                     "TabGame/aNextPhase",
+                                     QList<QKeySequence>()
+                                     << QKeySequence("Ctrl+Space")
+                                     << QKeySequence("Tab")));
     }
     if (aNextTurn) {
         aNextTurn->setText(tr("Next &turn"));
-        aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence("Ctrl+Return") << QKeySequence("Ctrl+Enter"));
+        aNextTurn->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                    "TabGame/aNextTurn",
+                                    QList<QKeySequence>()
+                                    << QKeySequence("Ctrl+Return")
+                                    << QKeySequence("Ctrl+Enter")));
     }
     if (aRemoveLocalArrows) {
         aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
-        aRemoveLocalArrows->setShortcut(QKeySequence("Ctrl+R"));
+        aRemoveLocalArrows->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                             "TabGame/aRemoveLocalArrows",
+                                             QKeySequence("Ctrl+R")));
     }
     if (aRotateViewCW) {
         aRotateViewCW->setText(tr("Rotate View Cl&ockwise"));
-        aRotateViewCW->setShortcut(QKeySequence("Ctrl+]"));
+        aRotateViewCW->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                        "TabGame/aRotateViewCW",
+                                        QKeySequence("Ctrl+]")));
     }
     if (aRotateViewCCW) {
         aRotateViewCCW->setText(tr("Rotate View Co&unterclockwise"));
-        aRotateViewCCW->setShortcut(QKeySequence("Ctrl+["));
+        aRotateViewCCW->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                         "TabGame/aRotateViewCCW",
+                                         QKeySequence("Ctrl+[")));
     }
     if (aGameInfo)
         aGameInfo->setText(tr("Game &information"));
     if (aConcede) {
         aConcede->setText(tr("&Concede"));
-        aConcede->setShortcut(QKeySequence("F2"));
+        aConcede->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                   "TabGame/aRotateViewCCW",
+                                   QKeySequence("F2")));
     }
     if (aLeaveGame) {
         aLeaveGame->setText(tr("&Leave game"));
-        aLeaveGame->setShortcut(QKeySequence("Ctrl+Q"));
+        aLeaveGame->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                     "TabGame/aLeaveGame",
+                                     QKeySequence("Ctrl+Q")));
     }
     if (aCloseReplay) {
         aCloseReplay->setText(tr("C&lose replay"));
-        aCloseReplay->setShortcut(QKeySequence("Ctrl+Q"));
+        aCloseReplay->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                       "TabGame/aCloseReplay",
+                                       QKeySequence("Ctrl+Q")));
     }
     
     if (sayLabel)

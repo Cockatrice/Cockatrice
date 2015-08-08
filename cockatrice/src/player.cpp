@@ -691,25 +691,44 @@ void Player::retranslateUi()
     aFlip->setText(tr("&Flip"));
     aPeek->setText(tr("&Peek at card face"));
     aClone->setText(tr("&Clone"));
-    aClone->setShortcut(QKeySequence("Ctrl+J"));
+    aClone->setShortcuts(settingsCache->shortcuts().getShortcut(
+                             "Player/aClone", QKeySequence("Ctrl+J")));
+
     aAttach->setText(tr("Attac&h to card..."));
-    aAttach->setShortcut(QKeySequence("Ctrl+A"));
+    aAttach->setShortcuts(settingsCache->shortcuts().getShortcut(
+                              "Player/aAttach", QKeySequence("Ctrl+A")));
+
     aUnattach->setText(tr("Unattac&h"));
     aDrawArrow->setText(tr("&Draw arrow..."));
+
     aIncP->setText(tr("&Increase power"));
-    aIncP->setShortcut(QKeySequence("Ctrl++"));
+    aIncP->setShortcuts(settingsCache->shortcuts().getShortcut(
+                            "Player/IncP", QKeySequence("Ctrl++")));
+
     aDecP->setText(tr("&Decrease power"));
-    aDecP->setShortcut(QKeySequence("Ctrl+-"));
+    aDecP->setShortcuts(settingsCache->shortcuts().getShortcut(
+                            "Player/aDecP", QKeySequence("Ctrl+-")));
+
     aIncT->setText(tr("I&ncrease toughness"));
-    aIncT->setShortcut(QKeySequence("Alt++"));
+    aIncT->setShortcuts(settingsCache->shortcuts().getShortcut(
+                            "Player/aIncT", QKeySequence("Alt++")));
+
     aDecT->setText(tr("D&ecrease toughness"));
-    aDecT->setShortcut(QKeySequence("Alt+-"));
+    aDecT->setShortcuts(settingsCache->shortcuts().getShortcut(
+                            "Player/aDecT", QKeySequence("Alt+-")));
+
     aIncPT->setText(tr("In&crease power and toughness"));
-    aIncPT->setShortcut(QKeySequence("Ctrl+Alt++"));
+    aIncPT->setShortcuts(settingsCache->shortcuts().getShortcut(
+                             "Player/aIncPT", QKeySequence("Ctrl+Alt++")));
+
     aDecPT->setText(tr("Dec&rease power and toughness"));
-    aDecPT->setShortcut(QKeySequence("Ctrl+Alt+-"));
+    aDecPT->setShortcuts(settingsCache->shortcuts().getShortcut(
+                             "Player/aDecPT", QKeySequence("Ctrl+Alt+-")));
+
     aSetPT->setText(tr("Set &power and toughness..."));
-    aSetPT->setShortcut(QKeySequence("Ctrl+P"));
+    aSetPT->setShortcuts(settingsCache->shortcuts().getShortcut(
+                             "Player/aSetPT", QKeySequence("Ctrl+P")));
+
     aSetAnnotation->setText(tr("&Set annotation..."));
     QStringList counterColors;
     counterColors.append(tr("Red"));
@@ -725,7 +744,8 @@ void Player::retranslateUi()
     aMoveToBottomLibrary->setText(tr("&Bottom of library"));
     aMoveToHand->setText(tr("&Hand"));
     aMoveToGraveyard->setText(tr("&Graveyard"));
-    aMoveToGraveyard->setShortcut(QKeySequence("Ctrl+Del"));
+    aMoveToGraveyard->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                      "Player/aMoveToGraveyard", QKeySequence("Ctrl+Del")));
     aMoveToExile->setText(tr("&Exile"));
     
     QMapIterator<QString, CardZone *> zoneIterator(zones);
@@ -737,20 +757,50 @@ void Player::setShortcutsActive()
 {
     shortcutsActive = true;
     
-    aViewSideboard->setShortcut(QKeySequence("Ctrl+F3"));
-    aViewLibrary->setShortcut(QKeySequence("F3"));
-    aViewTopCards->setShortcut(QKeySequence("Ctrl+W"));
-    aViewGraveyard->setShortcut(QKeySequence("F4"));
-    aDrawCard->setShortcut(QKeySequence("Ctrl+D"));
-    aDrawCards->setShortcut(QKeySequence("Ctrl+E"));
-    aUndoDraw->setShortcut(QKeySequence("Ctrl+Shift+D"));
-    aMulligan->setShortcut(QKeySequence("Ctrl+M"));
-    aShuffle->setShortcut(QKeySequence("Ctrl+S"));
-    aUntapAll->setShortcut(QKeySequence("Ctrl+U"));
-    aRollDie->setShortcut(QKeySequence("Ctrl+I"));
-    aCreateToken->setShortcut(QKeySequence("Ctrl+T"));
-    aCreateAnotherToken->setShortcut(QKeySequence("Ctrl+G"));
-    aAlwaysRevealTopCard->setShortcut(QKeySequence("Ctrl+N"));
+    aViewSideboard->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                     "Player/aViewSideboard", QKeySequence("Ctrl+F3")));
+
+    aViewLibrary->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                   "Player/aViewLibrary", QKeySequence("F3")));
+
+    aViewTopCards->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                    "Player/aViewTopCards", QKeySequence("Ctrl+W")));
+
+    aViewGraveyard->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                     "Player/aViewGraveyard", QKeySequence("F4")));
+
+    aDrawCard->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                "Player/aDrawCard", QKeySequence("Ctrl+D")));
+
+    aDrawCards->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                 "Player/aDrawCards", QKeySequence("Ctrl+E")));
+
+    aUndoDraw->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                "Player/aUndoDraw", QKeySequence("Ctrl+Shift+D")));
+
+    aMulligan->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                "Player/aMulligan", QKeySequence("Ctrl+M")));
+
+    aShuffle->setShortcuts(settingsCache->shortcuts().getShortcut(
+                               "Player/aShuffle", QKeySequence("Ctrl+S")));
+
+    aUntapAll->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                "Player/aUntapAll", QKeySequence("Ctrl+U")));
+
+    aRollDie->setShortcuts(settingsCache->shortcuts().getShortcut(
+                               "Player/aRollDie", QKeySequence("Ctrl+I")));
+
+    aCreateToken->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                   "Player/aCreateToken",
+                                   QKeySequence("Ctrl+T")));
+
+    aCreateAnotherToken->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                          "Player/aCreateAnotherToken",
+                                          QKeySequence("Ctrl+G")));
+
+    aAlwaysRevealTopCard->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                           "Player/aAlwaysRevealTopCard",
+                                           QKeySequence("Ctrl+N")));
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
     while (counterIterator.hasNext())
@@ -788,10 +838,15 @@ void Player::initSayMenu()
     QSettings settings;
     settings.beginGroup("messages");
     int count = settings.value("count", 0).toInt();
+    QString base = settingsCache->shortcuts().getSingleShortcut(
+                "Player/say", QKeySequence("Ctrl")).toString();
+    base = base.append("+");
+
     for (int i = 0; i < count; i++) {
         QAction *newAction = new QAction(settings.value(QString("msg%1").arg(i)).toString(), this);
-        if (i <= 10)
-            newAction->setShortcut(QKeySequence(QString("Ctrl+%1").arg((i + 1) % 10)));
+        if (i <= 10){
+            newAction->setShortcut(QKeySequence(base + QString::number((i + 1) % 10)));
+        }
         connect(newAction, SIGNAL(triggered()), this, SLOT(actSayMessage()));
         sayMenu->addAction(newAction);
     }
@@ -805,13 +860,20 @@ void Player::setDeck(const DeckLoader &_deck)
     createPredefinedTokenMenu->clear();
     predefinedTokens.clear();
     InnerDecklistNode *tokenZone = dynamic_cast<InnerDecklistNode *>(deck->getRoot()->findChild("tokens"));
+
+    QString base = settingsCache->shortcuts().getSingleShortcut(
+                "Player/token", QKeySequence("Alt")).toString();
+    base = base.append("+");
+
     if (tokenZone)
         for (int i = 0; i < tokenZone->size(); ++i) {
             const QString tokenName = tokenZone->at(i)->getName();
             predefinedTokens.append(tokenName);
             QAction *a = createPredefinedTokenMenu->addAction(tokenName);
             if (i < 10)
-                a->setShortcut(QKeySequence("Alt+" + QString::number((i + 1) % 10)));
+            {
+                a->setShortcut(QKeySequence(base + QString::number((i + 1) % 10)));
+            }
             connect(a, SIGNAL(triggered()), this, SLOT(actCreatePredefinedToken()));
         }
 }

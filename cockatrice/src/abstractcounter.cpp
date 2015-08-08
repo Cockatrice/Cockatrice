@@ -1,5 +1,6 @@
 #include "abstractcounter.h"
 #include "player.h"
+#include "settingscache.h"
 #include <QPainter>
 #include <QMenu>
 #include <QAction>
@@ -65,9 +66,17 @@ void AbstractCounter::retranslateUi()
 void AbstractCounter::setShortcutsActive()
 {
     if (name == "life") {
-        aSet->setShortcut(QKeySequence("Ctrl+L"));
-        aDec->setShortcut(QKeySequence("F11"));
-        aInc->setShortcut(QKeySequence("F12"));
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut(
+                               "AbstractCounter/aSet",
+                               QKeySequence("Ctrl+L")));
+
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut(
+                               "AbstractCounter/aDec",
+                               QKeySequence("F11")));
+
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut(
+                               "AbstractCounter/aInc",
+                               QKeySequence("F12")));
     }
 }
 
