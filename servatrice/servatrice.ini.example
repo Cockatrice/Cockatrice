@@ -46,6 +46,9 @@ clientkeepalive=1
 ; considered disconnected; default is 15
 max_player_inactivity_time=15
 
+; More modern clients generate client IDs based on specific client side information.  Enable this option to
+' require that clients report the client ID in order to log into the server.  Default is false
+requireclientid=false
 
 [authentication]
 
