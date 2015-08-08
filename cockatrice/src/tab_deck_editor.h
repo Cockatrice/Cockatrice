@@ -20,6 +20,10 @@ class FilterTreeModel;
 class FilterBuilder;
 class CardInfo;
 class QGroupBox;
+class QHBoxLayout;
+class QPushButton;
+class QMainWindow;
+class QDockWidget;
 
 class SearchLineEdit : public QLineEdit {
 private:
@@ -73,6 +77,12 @@ class TabDeckEditor : public Tab {
             void filterViewCustomContextMenu(const QPoint &point);
             void filterRemove(QAction *action);
             void setPriceTagFeatureEnabled(int enabled);
+
+            bool eventFilter(QObject *o, QEvent *e);
+            void loadLayout();
+            void restartLayout();
+            void freeDocksSize();
+
 private:
     CardInfo *currentCardInfo() const;
     void addCardHelper(QString zoneName);
@@ -99,14 +109,25 @@ private:
     QLabel *hashLabel;
     FilterTreeModel *filterModel;
     QTreeView *filterView;
-    QGroupBox *filterBox;
+    QWidget *filterBox;
 
     QMenu *deckMenu, *dbMenu;
     QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose, *aOpenCustomFolder;
     QAction *aEditSets, *aEditTokens, *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;// *aUpdatePrices;
+    QAction *aResetLayout;
 
     bool modified;
+    QMainWindow *MainWindow;
+    QVBoxLayout *centralFrame;
+    QHBoxLayout *searchLayout;
+    QPushButton *btnFilter;
+    QPushButton *btnDeck;
+    QPushButton *btnCard;
+    QDockWidget *cardInfoDock;
+    QDockWidget *deckDock;
+    QDockWidget *filterDock;
+    QWidget *centralWidget;
 public:
     TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent = 0);
     ~TabDeckEditor();
@@ -115,6 +136,13 @@ public:
     void setDeck(DeckLoader *_deckLoader);
     void setModified(bool _windowModified);
     bool confirmClose();
+    void createShowHideDocksButtons();
+    void createDeckDock();
+    void createCardInfoDock();
+    void createFiltersDock();
+    void createMenus();
+    void createCentralFrame();
+
 public slots:
     void closeRequest();
     void checkFirstRunDetected();

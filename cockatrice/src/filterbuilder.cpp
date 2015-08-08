@@ -11,6 +11,7 @@ FilterBuilder::FilterBuilder(QWidget *parent)
     : QWidget(parent)
 {
     filterCombo = new QComboBox;
+    filterCombo->setObjectName("filterCombo");
     for (int i = 0; i < CardFilter::AttrEnd; i++)
         filterCombo->addItem(
             tr(CardFilter::attrName(static_cast<CardFilter::Attr>(i))),
@@ -18,6 +19,7 @@ FilterBuilder::FilterBuilder(QWidget *parent)
         );
 
     typeCombo = new QComboBox;
+    typeCombo->setObjectName("typeCombo");
     for (int i = 0; i < CardFilter::TypeEnd; i++)
         typeCombo->addItem(
             tr(CardFilter::typeName(static_cast<CardFilter::Type>(i))),
@@ -25,12 +27,15 @@ FilterBuilder::FilterBuilder(QWidget *parent)
         );
 
     QPushButton *ok = new QPushButton(QIcon(":/resources/increment.svg"), QString());
+    ok->setObjectName("ok");
     ok->setMaximumSize(20, 20);
 
     edit = new QLineEdit;
+    edit->setObjectName("edit");
     edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     QGridLayout *layout = new QGridLayout;
+    layout->setObjectName("layout");
     layout->setContentsMargins(0, 0, 0, 0);
 
     layout->addWidget(typeCombo, 0, 0, 1, 2);

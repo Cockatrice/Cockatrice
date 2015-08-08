@@ -15,7 +15,7 @@ private:
     bool pixmapDirty;
 
 public:
-    CardInfoPicture(int width, QWidget *parent = 0);
+    CardInfoPicture(QWidget *parent = 0);
 protected:
     void resizeEvent(QResizeEvent *event);
 	void paintEvent(QPaintEvent *);

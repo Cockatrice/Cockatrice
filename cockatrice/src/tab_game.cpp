@@ -282,7 +282,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     gameView = new GameView(scene);
     gameView->hide();
     
-    cardInfo = new CardFrame(250, 372);
+    cardInfo = new CardFrame();
     playerListWidget = new PlayerListWidget(0, 0, this);
     playerListWidget->setFocusPolicy(Qt::NoFocus);
     
@@ -396,7 +396,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     gameView = new GameView(scene);
     gameView->hide();
     
-    cardInfo = new CardFrame(250, 372);
+    cardInfo = new CardFrame();
     playerListWidget = new PlayerListWidget(tabSupervisor, clients.first(), this);
     playerListWidget->setFocusPolicy(Qt::NoFocus);
     connect(playerListWidget, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));

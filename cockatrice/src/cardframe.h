@@ -8,6 +8,7 @@ class CardInfo;
 class CardInfoPicture;
 class CardInfoText;
 class QVBoxLayout;
+class QSplitter;
 
 class CardFrame : public QTabWidget {
     Q_OBJECT
@@ -19,11 +20,11 @@ private:
     bool cardTextOnly;
     QWidget *tab1, *tab2, *tab3;
     QVBoxLayout *tab1Layout, *tab2Layout, *tab3Layout;
-
+    QSplitter *splitter;
 public:
     enum ViewMode { ImageOnlyView, TextOnlyView, ImageAndTextView };
 
-    CardFrame(int width, int height, const QString &cardName = QString(),
+    CardFrame(const QString &cardName = QString(),
                 QWidget *parent = 0);
     void retranslateUi();
 public slots:

@@ -8,14 +8,12 @@
 #include "carddatabase.h"
 #include "main.h"
 
-CardInfoPicture::CardInfoPicture(int width, QWidget *parent)
+CardInfoPicture::CardInfoPicture(QWidget *parent)
     : QWidget(parent),
     info(0),
     pixmapDirty(true)
 {
-    setFixedWidth(width);
     setMinimumHeight(100);
-    setMaximumHeight(width / (qreal) CARD_WIDTH * (qreal) CARD_HEIGHT);
 }
 
 void CardInfoPicture::setCard(CardInfo *card)

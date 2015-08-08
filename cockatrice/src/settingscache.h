@@ -2,6 +2,7 @@
 #define SETTINGSCACHE_H
 
 #include <QObject>
+#include <QSize>
 #include <QStringList>
 
 // the falbacks are used for cards without a muid
@@ -99,6 +100,10 @@ private:
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
     int keepalive;
+    QByteArray deckEditorLayoutState, deckEditorGeometry;
+    QSize deckEditorFilterSize, deckEditorDeckSize, deckEditorCardSize;
+    QString getLayoutsSettingsPath();
+
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -172,6 +177,17 @@ public:
     int getKeepAlive() const { return keepalive; }
     void setClientID(QString clientID);
     QString getClientID() { return clientID; }
+    QByteArray getDeckEditorLayoutState() const { return deckEditorLayoutState; }
+    void setDeckEditorLayoutState(const QByteArray &value);
+    QByteArray getDeckEditorGeometry() const { return deckEditorGeometry; }
+    void setDeckEditorGeometry(const QByteArray &value);
+    QSize getDeckEditorCardSize() const { return deckEditorCardSize; }
+    void setDeckEditorCardSize(const QSize &value);
+    QSize getDeckEditorDeckSize() const { return deckEditorDeckSize; }
+    void setDeckEditorDeckSize(const QSize &value);
+    QSize getDeckEditorFilterSize() const { return deckEditorFilterSize; }
+    void setDeckEditorFilterSize(const QSize &value);
+
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
