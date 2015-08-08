@@ -31,7 +31,7 @@
 #include <QSystemTrayIcon>
 #include <QApplication>
 #if QT_VERSION < 0x050000
-    // for Qt::escape() 
+    // for Qt::escape()
     #include <QtGui/qtextdocument.h>
 #endif
 
@@ -182,24 +182,24 @@ void MainWindow::actSinglePlayer()
     int numberPlayers = QInputDialog::getInt(this, tr("Number of players"), tr("Please enter the number of players."), 1, 1, 8, 1, &ok);
     if (!ok)
         return;
-    
+
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
     aSinglePlayer->setEnabled(false);
-    
+
     localServer = new LocalServer(this);
     LocalServerInterface *mainLsi = localServer->newConnection();
-    LocalClient *mainClient = new LocalClient(mainLsi, tr("Player %1").arg(1), this);
+    LocalClient *mainClient = new LocalClient(mainLsi, tr("Player %1").arg(1), settingsCache->getClientID(), this);
     QList<AbstractClient *> localClients;
     localClients.append(mainClient);
-    
+
     for (int i = 0; i < numberPlayers - 1; ++i) {
         LocalServerInterface *slaveLsi = localServer->newConnection();
-        LocalClient *slaveClient = new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), this);
+        LocalClient *slaveClient = new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), settingsCache->getClientID(), this);
         localClients.append(slaveClient);
     }
     tabSupervisor->startLocal(localClients);
-    
+
     Command_CreateGame createCommand;
     createCommand.set_max_players(numberPlayers);
     mainClient->sendCommand(mainClient->prepareRoomCommand(createCommand, 0));
@@ -212,17 +212,17 @@ void MainWindow::actWatchReplay()
     dlg.setNameFilters(QStringList() << QObject::tr("Cockatrice replays (*.cor)"));
     if (!dlg.exec())
         return;
-    
+
     QString fileName = dlg.selectedFiles().at(0);
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
         return;
     QByteArray buf = file.readAll();
     file.close();
-    
+
     GameReplay *replay = new GameReplay;
     replay->ParseFromArray(buf.data(), buf.size());
-    
+
     tabSupervisor->openReplay(replay);
 }
 
@@ -230,7 +230,7 @@ void MainWindow::localGameEnded()
 {
     delete localServer;
     localServer = 0;
-    
+
     aConnect->setEnabled(true);
     aRegister->setEnabled(true);
     aSinglePlayer->setEnabled(true);
@@ -303,7 +303,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
                 bannedStr = tr("You are banned indefinitely.");
             if (!reasonStr.isEmpty())
                 bannedStr.append("\n\n" + reasonStr);
-        
+
             QMessageBox::critical(this, tr("Error"), bannedStr);
             break;
         }
@@ -351,7 +351,7 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
         out += "<li>" + tr("can %1 contain numeric characters").arg((rules.at(4).toInt() > 0) ? "" : tr("NOT")) + "</li>";
 
         if (rules.at(6).size() > 0)
-        {   
+        {
             out += "<li>" + tr("can contain the following punctuation: %1").arg(
                 #if QT_VERSION < 0x050000
                     Qt::escape(rules.at(6))
@@ -360,7 +360,7 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
                 #endif
             ) + "</li>";
         }
-        
+
         out += "<li>" + tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) + "</li>";
         out += "</ul>";
     }
@@ -398,7 +398,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
                 bannedStr = tr("You are banned indefinitely.");
             if (!reasonStr.isEmpty())
                 bannedStr.append("\n\n" + reasonStr);
-        
+
             QMessageBox::critical(this, tr("Error"), bannedStr);
             break;
         }
@@ -451,7 +451,7 @@ void MainWindow::setClientStatusTitle()
 void MainWindow::retranslateUi()
 {
     setClientStatusTitle();
-    
+
     aConnect->setText(tr("&Connect..."));
     aDisconnect->setText(tr("&Disconnect"));
     aSinglePlayer->setText(tr("Start &local game..."));
@@ -462,7 +462,7 @@ void MainWindow::retranslateUi()
     aRegister->setText(tr("&Register to server..."));
     aSettings->setText(tr("&Settings..."));
     aExit->setText(tr("&Exit"));
-    
+
 #if defined(__APPLE__)  /* For OSX */
     cockatriceMenu->setTitle(tr("A&ctions"));
 #else
@@ -471,7 +471,7 @@ void MainWindow::retranslateUi()
     aAbout->setText(tr("&About Cockatrice"));
     helpMenu->setTitle(tr("&Help"));
     aCheckCardUpdates->setText(tr("Check for card updates..."));
-    
+
     tabSupervisor->retranslateUi();
 }
 
@@ -497,7 +497,7 @@ void MainWindow::createActions()
     connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
     aExit = new QAction(this);
     connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
-    
+
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
 
@@ -538,7 +538,7 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aCheckCardUpdates);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aExit);
-    
+
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
 }
@@ -571,17 +571,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     createActions();
     createMenus();
-    
+
     tabSupervisor = new TabSupervisor(client);
     connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
     connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
     connect(tabSupervisor, SIGNAL(maximize()), this, SLOT(maximize()));
-    tabSupervisor->addDeckEditorTab(0);    
-    
+    tabSupervisor->addDeckEditorTab(0);
+
     setCentralWidget(tabSupervisor);
 
     retranslateUi();
-    
+
     resize(900, 700);
     restoreGeometry(settingsCache->getMainWindowGeometry());
     aFullScreen->setChecked(windowState() & Qt::WindowFullScreen);
@@ -603,7 +603,7 @@ MainWindow::~MainWindow()
 void MainWindow::createTrayIcon() {
     QMenu *trayIconMenu = new QMenu(this);
     trayIconMenu->addAction(closeAction);
-    
+
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(QIcon(":/resources/appicon.svg"));
@@ -713,7 +713,7 @@ void MainWindow::actCheckCardUpdates()
     binaryName = getCardUpdaterBinaryName() + ".exe";
 #else
     binaryName = getCardUpdaterBinaryName();
-#endif    
+#endif
 
     if(dir.exists(binaryName))
         updaterCmd = dir.absoluteFilePath(binaryName);

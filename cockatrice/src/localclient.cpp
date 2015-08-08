@@ -3,13 +3,14 @@
 
 #include "pb/session_commands.pb.h"
 
-LocalClient::LocalClient(LocalServerInterface *_lsi, const QString &_playerName, QObject *parent)
+LocalClient::LocalClient(LocalServerInterface *_lsi, const QString &_playerName, const QString &_clientId, QObject *parent)
     : AbstractClient(parent), lsi(_lsi)
 {
     connect(lsi, SIGNAL(itemToClient(const ServerMessage &)), this, SLOT(itemFromServer(const ServerMessage &)));
     
     Command_Login loginCmd;
     loginCmd.set_user_name(_playerName.toStdString());
+    loginCmd.set_clientid(_clientId.toStdString());
     sendCommand(prepareSessionCommand(loginCmd));
     
     Command_JoinRoom joinCmd;
