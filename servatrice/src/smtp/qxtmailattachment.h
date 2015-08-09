@@ -34,7 +34,7 @@
 #include <QSharedDataPointer>
 #include <QIODevice>
 
-class QxtMailAttachmentPrivate;
+struct QxtMailAttachmentPrivate;
 class QXT_NETWORK_EXPORT QxtMailAttachment
 {
 public:
