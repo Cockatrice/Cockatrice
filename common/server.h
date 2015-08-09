@@ -55,6 +55,7 @@ public:
     void removeClient(Server_ProtocolHandler *player);
     virtual QString getLoginMessage() const { return QString(); }
 
+    virtual bool permitUnregisteredUsers() const { return true; }
     virtual bool getGameShouldPing() const { return false; }
     virtual bool getClientIdRequired() const { return false; }
     virtual bool getRegOnlyServer() const { return false; }

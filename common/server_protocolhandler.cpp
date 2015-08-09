@@ -636,7 +636,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
     if (description.size() > 60)
         description = description.left(60);
 
-    Server_Game *game = new Server_Game(copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes, cmd.only_buddies(), cmd.only_registered(), cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
+    // When server doesn't permit registered users to exist, do not honor only-reg setting
+    bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
+    Server_Game *game = new Server_Game(copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes, cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
     game->addPlayer(this, rc, false, false);
     room->addGame(game);
 
