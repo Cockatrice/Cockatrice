@@ -67,15 +67,15 @@ void AbstractCounter::setShortcutsActive()
 {
     if (name == "life") {
         aSet->setShortcuts(settingsCache->shortcuts().getShortcut(
-                               "AbstractCounter/aSet",
+                               "Player/aSet",
                                QKeySequence("Ctrl+L")));
 
         aDec->setShortcuts(settingsCache->shortcuts().getShortcut(
-                               "AbstractCounter/aDec",
+                               "Player/aDec",
                                QKeySequence("F11")));
 
         aInc->setShortcuts(settingsCache->shortcuts().getShortcut(
-                               "AbstractCounter/aInc",
+                               "Player/aInc",
                                QKeySequence("F12")));
     }
 }

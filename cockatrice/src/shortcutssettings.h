@@ -16,19 +16,20 @@ public:
     QList<QKeySequence> getShortcut(QString name, QList<QKeySequence> defaultShortCut);
     QList<QKeySequence> getShortcut(QString name, QKeySequence defaultShortCut);
     QKeySequence getSingleShortcut(QString name, QKeySequence defaultShortCut);
-    QList<QKeySequence> getDefaultShortCut(QString name);
+
+    QString getDefaultShortcutString(QString name);
+    QString getShortcutString(QString name);
 
     void setShortcuts(QString name, QList<QKeySequence> secuence);
     void setShortcuts(QString name, QKeySequence secuence);
+    void setShortcuts(QString name, QString secuences);
 
-signals:
-
-public slots:
-
+    bool isValid(QString name, QString secuences);
 private:
     QString settingsFilePath;
     QMap<QString,QList<QKeySequence> > shortCuts;
     QMap<QString,QList<QKeySequence> > defaultShortCuts;
+    void fillDefaultShorcuts();
 
     QString stringifySecuence(QList<QKeySequence> secuence) const;
     QList<QKeySequence> parseSecuenceString(QString stringSecuence);

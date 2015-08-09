@@ -223,6 +223,7 @@ private:
     QListWidget *contentsWidget;
     QStackedWidget *pagesWidget;
     QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton, *soundButton;
+    QListWidgetItem *shortcutsButton;
     void createIcons();
     void retranslateUi();
 protected:

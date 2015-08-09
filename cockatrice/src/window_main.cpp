@@ -453,24 +453,54 @@ void MainWindow::retranslateUi()
     setClientStatusTitle();
 
     aConnect->setText(tr("&Connect..."));
+    aConnect->setShortcuts(settingsCache->shortcuts().getShortcut(
+                               "MainWindow/aConnect", QKeySequence()));
+
     aDisconnect->setText(tr("&Disconnect"));
+    aDisconnect->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                  "MainWindow/aDisconnect", QKeySequence()));
+
     aSinglePlayer->setText(tr("Start &local game..."));
+    aSinglePlayer->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                    "MainWindow/aSinglePlayer", QKeySequence()));
+
     aWatchReplay->setText(tr("&Watch replay..."));
+    aWatchReplay->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                   "MainWindow/aWatchReplay", QKeySequence()));
+
     aDeckEditor->setText(tr("&Deck editor"));
+    aDeckEditor->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                  "MainWindow/aDeckEditor", QKeySequence()));
+
     aFullScreen->setText(tr("&Full screen"));
-    aFullScreen->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aFullScreen", QKeySequence("Ctrl+F")));
+    aFullScreen->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                  "MainWindow/aFullScreen", QKeySequence("Ctrl+F")));
+
     aRegister->setText(tr("&Register to server..."));
+    aRegister->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                "MainWindow/aRegister", QKeySequence()));
+
     aSettings->setText(tr("&Settings..."));
+    aSettings->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                "MainWindow/aSettings", QKeySequence()));
+
     aExit->setText(tr("&Exit"));
+    aExit->setShortcuts(settingsCache->shortcuts().getShortcut(
+                            "MainWindow/aExit", QKeySequence()));
 
 #if defined(__APPLE__)  /* For OSX */
     cockatriceMenu->setTitle(tr("A&ctions"));
 #else
     cockatriceMenu->setTitle(tr("&Cockatrice"));
 #endif
+
     aAbout->setText(tr("&About Cockatrice"));
     helpMenu->setTitle(tr("&Help"));
+
     aCheckCardUpdates->setText(tr("Check for card updates..."));
+    aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                        "MainWindow/aCheckCardUpdates",
+                                        QKeySequence()));
 
     tabSupervisor->retranslateUi();
 }

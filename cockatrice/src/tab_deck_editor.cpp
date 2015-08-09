@@ -254,26 +254,28 @@ void TabDeckEditor::createFiltersDock()
 void TabDeckEditor::createMenus()
 {
     aNewDeck = new QAction(QString(), this);
+    connect(aNewDeck, SIGNAL(triggered()), this, SLOT(actNewDeck()));
     aNewDeck->setShortcuts(settingsCache->shortcuts().getShortcut(
                                "TabDeckEditor/aNewDeck",
                                QKeySequence::New));
-    connect(aNewDeck, SIGNAL(triggered()), this, SLOT(actNewDeck()));
 
     aLoadDeck = new QAction(QString(), this);
+    connect(aLoadDeck, SIGNAL(triggered()), this, SLOT(actLoadDeck()));
     aLoadDeck->setShortcuts(settingsCache->shortcuts().getShortcut(
                                 "TabDeckEditor/aLoadDeck",
                                 QKeySequence::Open));
-    connect(aLoadDeck, SIGNAL(triggered()), this, SLOT(actLoadDeck()));
 
     aSaveDeck = new QAction(QString(), this);
+    connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
     aSaveDeck->setShortcuts(settingsCache->shortcuts().getShortcut(
                                 "TabDeckEditor/aSaveDeck",
                                 QKeySequence::Save));
 
-    connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
     aSaveDeckAs = new QAction(QString(), this);
-//  aSaveDeckAs->setShortcuts(QKeySequence::SaveAs);
     connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
+    aSaveDeckAs->setShortcuts(QKeySequence::SaveAs);
+    aSaveDeckAs->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                "TabDeckEditor/aSaveDeckAs", QKeySequence()));
 
     aLoadDeckFromClipboard = new QAction(QString(), this);
     connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
@@ -288,24 +290,39 @@ void TabDeckEditor::createMenus()
                                            QKeySequence::Copy));
 
     aPrintDeck = new QAction(QString(), this);
+    connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
     aPrintDeck->setShortcuts(settingsCache->shortcuts().getShortcut(
                                  "TabDeckEditor/aPrintDeck",QKeySequence::Print));
-    connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
 
     aAnalyzeDeck = new QAction(QString(), this);
     connect(aAnalyzeDeck, SIGNAL(triggered()), this, SLOT(actAnalyzeDeck()));
+    aAnalyzeDeck->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                   "TabDeckEditor/aAnalyzeDeck", QKeySequence()));
+
     aClose = new QAction(QString(), this);
     connect(aClose, SIGNAL(triggered()), this, SLOT(closeRequest()));
+    aClose->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                       "TabDeckEditor/aClose", QKeySequence()));
+
     aOpenCustomFolder = new QAction(QString(), this);
     connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
+    aOpenCustomFolder->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                        "TabDeckEditor/aOpenCustomFolder", QKeySequence()));
 
     aEditSets = new QAction(QString(), this);
     connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
+    aEditSets->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                            "TabDeckEditor/aEditSets", QKeySequence()));
+
     aEditTokens = new QAction(QString(), this);
     connect(aEditTokens, SIGNAL(triggered()), this, SLOT(actEditTokens()));
+    aEditTokens->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                            "TabDeckEditor/aEditTokens", QKeySequence()));
 
     aResetLayout = new QAction(QString(), this);
     connect(aResetLayout,SIGNAL(triggered()),this,SLOT(restartLayout()));
+    aResetLayout->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                            "TabDeckEditor/aResetLayout", QKeySequence()));
 
     deckMenu = new QMenu(this);
     deckMenu->addAction(aNewDeck);
@@ -328,10 +345,14 @@ void TabDeckEditor::createMenus()
     aClearFilterAll = new QAction(QString(), this);
     aClearFilterAll->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
     connect(aClearFilterAll, SIGNAL(triggered()), this, SLOT(actClearFilterAll()));
+    aClearFilterAll->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                                "TabDeckEditor/aClearFilterAll", QKeySequence()));
 
     aClearFilterOne = new QAction(QString(), this);
     aClearFilterOne->setIcon(QIcon(":/resources/decrement.svg"));
     connect(aClearFilterOne, SIGNAL(triggered()), this, SLOT(actClearFilterOne()));
+    aClearFilterOne->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                                "TabDeckEditor/aClearFilterOne", QKeySequence()));
 
     dbMenu = new QMenu(this);
     dbMenu->addAction(aEditSets);

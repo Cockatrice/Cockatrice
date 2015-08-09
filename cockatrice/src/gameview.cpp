@@ -21,7 +21,7 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
 
     aCloseMostRecentZoneView = new QAction(this);
     aCloseMostRecentZoneView->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                               "GameView/aCloseMostRecentZoneView",
+                                               "Player/aCloseMostRecentZoneView",
                                                QKeySequence("Esc")));
     connect(aCloseMostRecentZoneView, SIGNAL(triggered()), scene, SLOT(closeMostRecentZoneView()));
     addAction(aCloseMostRecentZoneView);

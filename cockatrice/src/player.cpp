@@ -616,6 +616,7 @@ void Player::retranslateUi()
 {
     aViewGraveyard->setText(tr("&View graveyard"));
     aViewRfg->setText(tr("&View exile"));
+
     playerMenu->setTitle(tr("Player \"%1\"").arg(QString::fromStdString(userInfo->name())));
     graveMenu->setTitle(tr("&Graveyard"));
     rfgMenu->setTitle(tr("&Exile"));
@@ -682,14 +683,32 @@ void Player::retranslateUi()
     }
 
     aPlay->setText(tr("&Play"));
+    aPlay->setShortcuts(settingsCache->shortcuts().getShortcut(
+                            "Player/aPlay", QKeySequence()));
+
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
 
     aTap->setText(tr("&Tap"));
+    aTap->setShortcuts(settingsCache->shortcuts().getShortcut(
+                           "Player/aTap", QKeySequence()));
+
     aUntap->setText(tr("&Untap"));
+    aUntap->setShortcuts(settingsCache->shortcuts().getShortcut(
+                             "Player/aUntap", QKeySequence()));
+
     aDoesntUntap->setText(tr("Toggle &normal untapping"));
+    aDoesntUntap->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                   "Player/aDoesntUntap", QKeySequence()));
+
     aFlip->setText(tr("&Flip"));
+    aFlip->setShortcuts(settingsCache->shortcuts().getShortcut(
+                            "Player/aFlip", QKeySequence()));
+
     aPeek->setText(tr("&Peek at card face"));
+    aPeek->setShortcuts(settingsCache->shortcuts().getShortcut(
+                            "Player/aPeek", QKeySequence()));
+
     aClone->setText(tr("&Clone"));
     aClone->setShortcuts(settingsCache->shortcuts().getShortcut(
                              "Player/aClone", QKeySequence("Ctrl+J")));
@@ -699,7 +718,12 @@ void Player::retranslateUi()
                               "Player/aAttach", QKeySequence("Ctrl+A")));
 
     aUnattach->setText(tr("Unattac&h"));
+    aUnattach->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                "Player/aUnattach", QKeySequence()));
+
     aDrawArrow->setText(tr("&Draw arrow..."));
+    aDrawArrow->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                 "Player/aDrawArrow", QKeySequence()));
 
     aIncP->setText(tr("&Increase power"));
     aIncP->setShortcuts(settingsCache->shortcuts().getShortcut(
@@ -730,24 +754,71 @@ void Player::retranslateUi()
                              "Player/aSetPT", QKeySequence("Ctrl+P")));
 
     aSetAnnotation->setText(tr("&Set annotation..."));
+    aSetAnnotation->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                     "Player/aSetAnnotation", QKeySequence()));
+
     QStringList counterColors;
     counterColors.append(tr("Red"));
     counterColors.append(tr("Yellow"));
     counterColors.append(tr("Green"));
-    for (int i = 0; i < aAddCounter.size(); ++i)
+
+    QList<QKeySequence> addCCShortCuts;
+    addCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut(
+                                     "Player/aCCRed", QKeySequence()));
+    addCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut(
+                                     "Player/aCCYellow", QKeySequence()));
+    addCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut(
+                                     "Player/aCCGreen", QKeySequence()));
+
+    QList<QKeySequence> removeCCShortCuts;
+    removeCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut(
+                                     "Player/aRCRed", QKeySequence()));
+    removeCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut(
+                                     "Player/aRCYellow", QKeySequence()));
+    removeCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut(
+                                     "Player/aRCGreen", QKeySequence()));
+
+    QList<QKeySequence> setCCShortCuts;
+    setCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut(
+                                     "Player/aSCRed", QKeySequence()));
+    setCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut(
+                                     "Player/aSCYellow", QKeySequence()));
+    setCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut(
+                                     "Player/aSCGreen", QKeySequence()));
+
+    for (int i = 0; i < aAddCounter.size(); ++i){
         aAddCounter[i]->setText(tr("&Add counter (%1)").arg(counterColors[i]));
-    for (int i = 0; i < aRemoveCounter.size(); ++i)
+        aAddCounter[i]->setShortcut(addCCShortCuts[i]);
+    }
+    for (int i = 0; i < aRemoveCounter.size(); ++i){
         aRemoveCounter[i]->setText(tr("&Remove counter (%1)").arg(counterColors[i]));
-    for (int i = 0; i < aSetCounter.size(); ++i)
+        aRemoveCounter[i]->setShortcut(removeCCShortCuts[i]);
+    }
+    for (int i = 0; i < aSetCounter.size(); ++i){
         aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(counterColors[i]));
+        aSetCounter[i]->setShortcut(setCCShortCuts[i]);
+    }
+
     aMoveToTopLibrary->setText(tr("&Top of library"));
+    aMoveToTopLibrary->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                        "Player/aMoveToTopLibrary", QKeySequence()));
+
     aMoveToBottomLibrary->setText(tr("&Bottom of library"));
+    aMoveToBottomLibrary->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                            "Player/aMoveToBottomLibrary", QKeySequence()));
+
     aMoveToHand->setText(tr("&Hand"));
+    aMoveToHand->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                                "Player/aMoveToHand", QKeySequence()));
+
     aMoveToGraveyard->setText(tr("&Graveyard"));
     aMoveToGraveyard->setShortcuts(settingsCache->shortcuts().getShortcut(
                                       "Player/aMoveToGraveyard", QKeySequence("Ctrl+Del")));
+
     aMoveToExile->setText(tr("&Exile"));
-    
+    aMoveToExile->setShortcuts(settingsCache->shortcuts().getShortcut(
+                                                    "Player/aMoveToExile", QKeySequence()));
+
     QMapIterator<QString, CardZone *> zoneIterator(zones);
     while (zoneIterator.hasNext())
         zoneIterator.next().value()->retranslateUi();
@@ -768,6 +839,9 @@ void Player::setShortcutsActive()
 
     aViewGraveyard->setShortcuts(settingsCache->shortcuts().getShortcut(
                                      "Player/aViewGraveyard", QKeySequence("F4")));
+
+    aViewRfg->setShortcuts(settingsCache->shortcuts().getShortcut(
+                               "Player/aViewRfg", QKeySequence()));
 
     aDrawCard->setShortcuts(settingsCache->shortcuts().getShortcut(
                                 "Player/aDrawCard", QKeySequence("Ctrl+D")));
@@ -838,14 +912,11 @@ void Player::initSayMenu()
     QSettings settings;
     settings.beginGroup("messages");
     int count = settings.value("count", 0).toInt();
-    QString base = settingsCache->shortcuts().getSingleShortcut(
-                "Player/say", QKeySequence("Ctrl")).toString();
-    base = base.append("+");
 
     for (int i = 0; i < count; i++) {
         QAction *newAction = new QAction(settings.value(QString("msg%1").arg(i)).toString(), this);
         if (i <= 10){
-            newAction->setShortcut(QKeySequence(base + QString::number((i + 1) % 10)));
+            newAction->setShortcut(QKeySequence("Ctrl+" + QString::number((i + 1) % 10)));
         }
         connect(newAction, SIGNAL(triggered()), this, SLOT(actSayMessage()));
         sayMenu->addAction(newAction);
@@ -861,10 +932,6 @@ void Player::setDeck(const DeckLoader &_deck)
     predefinedTokens.clear();
     InnerDecklistNode *tokenZone = dynamic_cast<InnerDecklistNode *>(deck->getRoot()->findChild("tokens"));
 
-    QString base = settingsCache->shortcuts().getSingleShortcut(
-                "Player/token", QKeySequence("Alt")).toString();
-    base = base.append("+");
-
     if (tokenZone)
         for (int i = 0; i < tokenZone->size(); ++i) {
             const QString tokenName = tokenZone->at(i)->getName();
@@ -872,7 +939,7 @@ void Player::setDeck(const DeckLoader &_deck)
             QAction *a = createPredefinedTokenMenu->addAction(tokenName);
             if (i < 10)
             {
-                a->setShortcut(QKeySequence(base + QString::number((i + 1) % 10)));
+                a->setShortcut(QKeySequence("Alt+" + QString::number((i + 1) % 10)));
             }
             connect(a, SIGNAL(triggered()), this, SLOT(actCreatePredefinedToken()));
         }
