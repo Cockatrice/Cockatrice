@@ -111,7 +111,7 @@ SettingsCache::SettingsCache()
     maxPlayers = settings->value("game/maxplayers", 2).toInt();
     gameTypes = settings->value("game/gametypes","").toString();
     onlyBuddies = settings->value("game/onlybuddies", false).toBool();
-    onlyRegistered = settings->value("game/onlyregistered", false).toBool();
+    onlyRegistered = settings->value("game/onlyregistered", true).toBool();
     spectatorsAllowed = settings->value("game/spectatorsallowed", true).toBool();
     spectatorsNeedPassword = settings->value("game/spectatorsneedpassword", false).toBool();
     spectatorsCanTalk = settings->value("game/spectatorscantalk", false).toBool();
