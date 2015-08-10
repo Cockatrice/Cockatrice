@@ -4,6 +4,9 @@
 #include "tab.h"
 #include <QGroupBox>
 #include <QMap>
+#include <QLineEdit>
+#include <QKeyEvent>
+#include <QFocusEvent>
 
 namespace google { namespace protobuf { class Message; } }
 class AbstractClient;
@@ -13,6 +16,7 @@ class ChatView;
 class QLineEdit;
 class QPushButton;
 class QTextTable;
+class QCompleter;
 class RoomEvent;
 class ServerInfo_Room;
 class ServerInfo_Game;
@@ -24,6 +28,7 @@ class GameSelector;
 class Response;
 class PendingCommand;
 class ServerInfo_User;
+class CustomLineEdit;
 
 class TabRoom : public Tab {
     Q_OBJECT
@@ -38,14 +43,17 @@ private:
     UserList *userList;
     ChatView *chatView;
     QLabel *sayLabel;
-    QLineEdit *sayEdit;
+    CustomLineEdit *sayEdit;
     QGroupBox *chatGroupBox;
     
     QMenu *roomMenu;
     QAction *aLeaveRoom;
     QAction *aOpenChatSettings;
-    QAction * aClearChat;
+    QAction *aClearChat;
     QString sanitizeHtml(QString dirty) const;
+
+    QStringList autocompleteUserList;
+    QCompleter *completer;
 signals:
     void roomClosing(TabRoom *tab);
     void openMessageDialog(const QString &userName, bool focus);
@@ -59,7 +67,8 @@ private slots:
     void addMentionTag(QString mentionTag);
     void focusTab();
     void actShowMentionPopup(QString &sender);
-    
+    void actCompleterChanged();
+
     void processListGamesEvent(const Event_ListGames &event);
     void processJoinRoomEvent(const Event_JoinRoom &event);
     void processLeaveRoomEvent(const Event_LeaveRoom &event);
@@ -79,6 +88,23 @@ public:
 
     PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd);
     void sendRoomCommand(PendingCommand *pend);
+};
+
+class CustomLineEdit : public QLineEdit
+{
+    Q_OBJECT
+private:
+    QString cursorWord(const QString& line) const;
+    QCompleter* c;
+private slots:
+    void insertCompletion(QString);
+protected:
+    void keyPressEvent(QKeyEvent * event);
+    void focusOutEvent(QFocusEvent * e);
+public:
+    explicit CustomLineEdit(QWidget *parent = 0);
+    void setCompleter(QCompleter*);
+    void updateCompleterModel(QStringList);
 };
 
 #endif
