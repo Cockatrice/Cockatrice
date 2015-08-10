@@ -385,8 +385,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     
     if (userName.isEmpty() || (userInfo != 0))
         return Response::RespContextError;
-    if (clientId.isEmpty())
-        return Response::RespContextError;
 
     QString reasonStr;
     int banSecondsLeft = 0;
