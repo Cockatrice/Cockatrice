@@ -162,6 +162,7 @@ bool Servatrice::initServer()
         authenticationMethod = AuthenticationNone;
     }
 
+    qDebug() << "Store Replays: " << settingsCache->value("game/store_replays", true).toBool();
     qDebug() << "Client ID Required: " << clientIdRequired;
     bool maxUserLimitEnabled = settingsCache->value("security/enable_max_user_limit", false).toBool();
     qDebug() << "Maximum user limit enabled: " << maxUserLimitEnabled;

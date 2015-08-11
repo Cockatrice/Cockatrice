@@ -642,6 +642,9 @@ void Servatrice_DatabaseInterface::storeGameInformation(const QString &roomName,
     if (!checkSql())
         return;
 
+    if (!settingsCache->value("game/store_replays", 1).toBool() )
+        return;
+
     QVariantList gameIds1, playerNames, gameIds2, userIds, replayNames;
     QSetIterator<QString> playerIterator(allPlayersEver);
     while (playerIterator.hasNext()) {
