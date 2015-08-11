@@ -144,6 +144,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_sessions` (
   `ip_address` char(15) COLLATE utf8_unicode_ci NOT NULL,
   `start_time` datetime NOT NULL,
   `end_time` datetime DEFAULT NULL,
+  `clientid` varchar(15) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `username` (`user_name`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
