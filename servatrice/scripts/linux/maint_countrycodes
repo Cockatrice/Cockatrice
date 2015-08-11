@@ -27,5 +27,10 @@ do
         fi 
     fi
 done
+
+if [ "$MODE" == "correct" ]; then
+    mysql --defaults-file=$SQLCONFFILE -h localhost -e "update ""$DBNAME"".""$TABLEPREFIX""_users set country = lower(country);"
+fi
+
 echo "INVALID: $INVALIDCOUNT"
 echo "VALID: $VALIDCOUNT"
