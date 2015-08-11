@@ -536,7 +536,7 @@ bool Servatrice_DatabaseInterface::userSessionExists(const QString &userName)
     return query->next();
 }
 
-qint64 Servatrice_DatabaseInterface::startSession(const QString &userName, const QString &address)
+qint64 Servatrice_DatabaseInterface::startSession(const QString &userName, const QString &address, const QString &clientId)
 {
     if (server->getAuthenticationMethod() == Servatrice::AuthenticationNone)
         return -1;
@@ -544,10 +544,11 @@ qint64 Servatrice_DatabaseInterface::startSession(const QString &userName, const
     if (!checkSql())
         return -1;
 
-    QSqlQuery *query = prepareQuery("insert into {prefix}_sessions (user_name, id_server, ip_address, start_time) values(:user_name, :id_server, :ip_address, NOW())");
+    QSqlQuery *query = prepareQuery("insert into {prefix}_sessions (user_name, id_server, ip_address, start_time, clientid) values(:user_name, :id_server, :ip_address, NOW(), :client_id)");
     query->bindValue(":user_name", userName);
     query->bindValue(":id_server", server->getServerId());
     query->bindValue(":ip_address", address);
+    query->bindValue(":client_id", clientId);
     if (execSqlQuery(query))
         return query->lastInsertId().toInt();
     return -1;
