@@ -150,7 +150,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     users.insert(name, session);
     qDebug() << "Server::loginUser:" << session << "name=" << name;
 
-    data.set_session_id(databaseInterface->startSession(name, session->getAddress()));
+    data.set_session_id(databaseInterface->startSession(name, session->getAddress(), clientid));
     databaseInterface->unlockSessionTables();
 
     usersBySessionId.insert(data.session_id(), session);
