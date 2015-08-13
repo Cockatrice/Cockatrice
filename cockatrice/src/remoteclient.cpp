@@ -11,6 +11,7 @@
 #include "pb/server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
 #include "settingscache.h"
+#include "main.h"
 
 static const unsigned int protocolVersion = 14;
 
@@ -78,6 +79,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdRegister.set_gender((ServerInfo_User_Gender) gender);
         cmdRegister.set_country(country.toStdString());
         cmdRegister.set_real_name(realName.toStdString());
+        cmdRegister.set_clientid(settingsCache->getClientID().toStdString());
 
         PendingCommand *pend = prepareSessionCommand(cmdRegister);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(registerResponse(Response)));

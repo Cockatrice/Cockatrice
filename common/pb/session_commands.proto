@@ -119,6 +119,7 @@ message Command_Register {
     // Country code of the user. 2 letter ISO format
     optional string country = 5;
     optional string real_name = 6;
+    optional string clientid = 7;
 }
 
 // User wants to activate an account
