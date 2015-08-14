@@ -112,7 +112,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
     QWriteLocker locker(&clientsLock);
 
-    AuthenticationResult authState = databaseInterface->checkUserPassword(session, name, password, reasonStr, secondsLeft);
+    AuthenticationResult authState = databaseInterface->checkUserPassword(session, name, password, clientid, reasonStr, secondsLeft);
     if (authState == NotLoggedIn || authState == UserIsBanned || authState == UsernameInvalid || authState == UserIsInactive)
         return authState;
 

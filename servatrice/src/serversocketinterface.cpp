@@ -756,20 +756,40 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
     if (trustedSources.contains(address,Qt::CaseInsensitive))
         address = "";
 
-    QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason)");
+    QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason, clientid) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason, :client_id)");
     query->bindValue(":user_name", userName);
     query->bindValue(":ip_address", address);
     query->bindValue(":id_admin", userInfo->id());
     query->bindValue(":minutes", minutes);
     query->bindValue(":reason", QString::fromStdString(cmd.reason()));
     query->bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()));
+    query->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
     sqlInterface->execSqlQuery(query);
 
     servatrice->clientsLock.lockForRead();
     QList<ServerSocketInterface *> userList = servatrice->getUsersWithAddressAsList(QHostAddress(address));
-    ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
-    if (user && !userList.contains(user))
+
+    if (!userName.isEmpty()) {
+        ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
         userList.append(user);
+    }
+
+    if (userName.isEmpty() && address.isEmpty()) {
+        QSqlQuery *query = sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
+        query->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
+        sqlInterface->execSqlQuery(query);
+        if (!sqlInterface->execSqlQuery(query)){
+            qDebug("ClientID username ban lookup failed: SQL Error");
+        } else {
+            while (query->next()) {
+                userName = query->value(0).toString();
+                ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
+                if (user && !userList.contains(user))
+                   userList.append(user);
+            }
+        }
+    }
+
     if (!userList.isEmpty()) {
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::BANNED);
@@ -792,6 +812,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc)
 {
     QString userName = QString::fromStdString(cmd.user_name());
+    QString clientId = QString::fromStdString(cmd.clientid());
     qDebug() << "Got register command: " << userName;
 
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
@@ -822,7 +843,7 @@ Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_R
 
     QString banReason;
     int banSecondsRemaining;
-    if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, banReason, banSecondsRemaining))
+    if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining))
     {
         Response_Register *re = new Response_Register;
         re->set_denied_reason_str(banReason.toStdString());

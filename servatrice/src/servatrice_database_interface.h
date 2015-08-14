@@ -9,7 +9,7 @@
 #include "server.h"
 #include "server_database_interface.h"
 
-#define DATABASE_SCHEMA_VERSION 4
+#define DATABASE_SCHEMA_VERSION 5
 
 class Servatrice;
 
@@ -22,13 +22,14 @@ private:
     Servatrice *server;
     ServerInfo_User evalUserQueryResult(const QSqlQuery *query, bool complete, bool withId = false);
     /** Must be called after checkSql and server is known to be in auth mode. */
+    bool checkUserIsIdBanned(const QString &clientId, QString &banReason, int &banSecondsRemaining);
+    /** Must be called after checkSql and server is known to be in auth mode. */
     bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
     /** Must be called after checkSql and server is known to be in auth mode. */
     bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
 
 protected:
-    AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user,
-        const QString &password, QString &reasonStr, int &secondsLeft);
+    AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, const QString &clientId, QString &reasonStr, int &secondsLeft);
 
 public slots:
     void initDatabase(const QSqlDatabase &_sqlDatabase);
@@ -66,7 +67,7 @@ public:
     void unlockSessionTables();
     bool userSessionExists(const QString &userName);
     bool usernameIsValid(const QString &user, QString & error);
-    bool checkUserIsBanned(const QString &ipAddress, const QString &userName, QString &banReason, int &banSecondsRemaining);
+    bool checkUserIsBanned(const QString &ipAddress, const QString &userName, const QString &clientId, QString &banReason, int &banSecondsRemaining);
 
     bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender,
         const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active = false);

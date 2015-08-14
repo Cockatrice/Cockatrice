@@ -229,7 +229,7 @@ QChar Servatrice_DatabaseInterface::getGenderChar(ServerInfo_User_Gender const &
     }
 }
 
-AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &banSecondsLeft)
+AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, const QString &clientId, QString &reasonStr, int &banSecondsLeft)
 {
     switch (server->getAuthenticationMethod()) {
     case Servatrice::AuthenticationNone: return UnknownUser;
@@ -247,7 +247,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
         if (!usernameIsValid(user, reasonStr))
             return UsernameInvalid;
 
-        if (checkUserIsBanned(handler->getAddress(), user, reasonStr, banSecondsLeft))
+        if (checkUserIsBanned(handler->getAddress(), user, clientId, reasonStr, banSecondsLeft))
             return UserIsBanned;
 
         QSqlQuery *passwordQuery = prepareQuery("select password_sha512, active from {prefix}_users where name = :name");
@@ -280,7 +280,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
     return UnknownUser;
 }
 
-bool Servatrice_DatabaseInterface::checkUserIsBanned(const QString &ipAddress, const QString &userName, QString &banReason, int &banSecondsRemaining)
+bool Servatrice_DatabaseInterface::checkUserIsBanned(const QString &ipAddress, const QString &userName, const QString &clientId, QString &banReason, int &banSecondsRemaining)
 {
     if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql)
         return false;
@@ -291,10 +291,47 @@ bool Servatrice_DatabaseInterface::checkUserIsBanned(const QString &ipAddress, c
     }
 
     return
-        checkUserIsIpBanned(ipAddress, banReason, banSecondsRemaining)
-        || checkUserIsNameBanned(userName, banReason, banSecondsRemaining);
+        checkUserIsIpBanned(ipAddress, banReason, banSecondsRemaining) || checkUserIsNameBanned(userName, banReason, banSecondsRemaining) || checkUserIsIdBanned(clientId, banReason, banSecondsRemaining);
 
 }
+
+bool Servatrice_DatabaseInterface::checkUserIsIdBanned(const QString &clientId, QString &banReason, int &banSecondsRemaining)
+{
+    if (clientId.isEmpty())
+        return false;
+
+    QSqlQuery *idBanQuery = prepareQuery(
+            "select"
+                    " timestampdiff(second, now(), date_add(b.time_from, interval b.minutes minute)),"
+                    " b.minutes <=> 0,"
+                    " b.visible_reason"
+                    " from {prefix}_bans b"
+                    " where"
+                    " b.time_from = (select max(c.time_from)"
+                    " from {prefix}_bans c"
+                    " where c.clientid = :id)"
+                    " and b.clientid = :id2");
+
+    idBanQuery->bindValue(":id", clientId);
+    idBanQuery->bindValue(":id2", clientId);
+    if (!execSqlQuery(idBanQuery)) {
+        qDebug() << "Id ban check failed: SQL error." << idBanQuery->lastError();
+        return false;
+    }
+
+    if (idBanQuery->next()) {
+        const int secondsLeft = idBanQuery->value(0).toInt();
+        const bool permanentBan = idBanQuery->value(1).toInt();
+        if ((secondsLeft > 0) || permanentBan) {
+            banReason = idBanQuery->value(2).toString();
+            banSecondsRemaining = permanentBan ? 0 : secondsLeft;
+            qDebug() << "User is banned by client id" << clientId;
+            return true;
+        }
+    }
+    return false;
+}
+
 
 bool Servatrice_DatabaseInterface::checkUserIsNameBanned(const QString &userName, QString &banReason, int &banSecondsRemaining)
 {
@@ -477,6 +514,10 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
         const QString email = query->value(8).toString();
         if (!email.isEmpty())
             result.set_email(email.toStdString());
+
+        const QString clientid = query->value(9).toString();
+        if (!clientid.isEmpty())
+            result.set_clientid(clientid.toStdString());
     }
     return result;
 }
@@ -491,7 +532,7 @@ ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, b
         if (!checkSql())
             return result;
 
-        QSqlQuery *query = prepareQuery("select id, name, admin, country, gender, realname, avatar_bmp, registrationDate, email from {prefix}_users where name = :name and active = 1");
+        QSqlQuery *query = prepareQuery("select id, name, admin, country, gender, realname, avatar_bmp, registrationDate, email, clientid from {prefix}_users where name = :name and active = 1");
         query->bindValue(":name", name);
         if (!execSqlQuery(query))
             return result;
