@@ -880,3 +880,14 @@ void Servatrice_DatabaseInterface::updateUsersClientID(const QString &userName, 
     execSqlQuery(query);
 
 }
+
+void Servatrice_DatabaseInterface::updateUsersLastLoginTime(const QString &userName)
+{
+    if (!checkSql())
+        return;
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set last_login = NOW() where name = :user_name");
+    query->bindValue(":user_name", userName);
+    execSqlQuery(query);
+
+}

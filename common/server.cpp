@@ -179,6 +179,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
         databaseInterface->updateUsersClientID(name, clientid);
     }
 
+    databaseInterface->updateUsersLastLoginTime(name);
     se = Server_ProtocolHandler::prepareSessionEvent(event);
     sendIsl_SessionEvent(*se);
     delete se;
