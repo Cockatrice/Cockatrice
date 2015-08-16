@@ -9,7 +9,7 @@
 #include "server.h"
 #include "server_database_interface.h"
 
-#define DATABASE_SCHEMA_VERSION 5
+#define DATABASE_SCHEMA_VERSION 6
 
 class Servatrice;
 
@@ -73,6 +73,7 @@ public:
         const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active = false);
     bool activateUser(const QString &userName, const QString &token);
     void updateUsersClientID(const QString &userName, const QString &userClientID);
+    void updateUsersLastLoginTime(const QString &userName);
     void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage,
         LogMessage_TargetType targetType, const int targetId, const QString &targetName);
     bool changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword);
