@@ -266,6 +266,7 @@ public:
     QLabel *lbl_Player_aAlwaysRevealTopCard;
     SecuenceEdit *Player_aAlwaysRevealTopCard;
     QSpacerItem *verticalSpacer_3;
+    QWidget * tab_4;
 
     void setupUi(QWidget *shortcutsTab)
     {
@@ -725,9 +726,6 @@ public:
 
 
         horizontalLayout->addWidget(groupBox_7);
-
-
-        gridLayout_3->addWidget(groupBox_3, 1, 0, 1, 2);
 
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -1420,6 +1418,13 @@ public:
 
         tabWidget->addTab(tab_3, QString());
 
+        tab_4 = new QWidget(tabWidget);
+        QGridLayout* grid = new QGridLayout(tab_4);
+        grid->addWidget(groupBox_3);
+        grid->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding),1,0);
+
+        tabWidget->addTab(tab_4, QString());
+
         gridLayout_9->addWidget(tabWidget, 0, 0, 1, 1);
 
 
@@ -1481,7 +1486,7 @@ public:
         lbl_Player_aSCYellow->setText(QApplication::translate("shortcutsTab", "Set", 0));
         lbl_Player_aCCYellow->setText(QApplication::translate("shortcutsTab", "Add", 0));
         lbl_Player_aRCYellow->setText(QApplication::translate("shortcutsTab", "Remove", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("shortcutsTab", "Mainwindow / Deck editor / Counters", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("shortcutsTab", "Mainwindow / Deck editor", 0));
         groupBox_9->setTitle(QApplication::translate("shortcutsTab", "Power / toughness", 0));
         groupBox_12->setTitle(QApplication::translate("shortcutsTab", "Power and toughness", 0));
         lbl_Player_aIncPT->setText(QApplication::translate("shortcutsTab", "Add (+1/+1)", 0));
@@ -1554,6 +1559,7 @@ public:
         lbl_Player_aUndoDraw->setText(QApplication::translate("shortcutsTab", "Undo draw", 0));
         lbl_Player_aAlwaysRevealTopCard->setText(QApplication::translate("shortcutsTab", "Always reveal top card", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("shortcutsTab", "Draw / Move / View / Game play", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("shortcutsTab","Counters", 0));
     } // retranslateUi
 
 };
