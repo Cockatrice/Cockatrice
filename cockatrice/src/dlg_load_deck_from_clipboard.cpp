@@ -19,8 +19,7 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
     
     refreshButton = new QPushButton(tr("&Refresh"));
     refreshButton->setShortcut(settingsCache->shortcuts().getSingleShortcut(
-                                   "DlgLoadDeckFromClipboard/refreshButton",
-                                   QKeySequence("F5")));
+                                   "DlgLoadDeckFromClipboard/refreshButton"));
     connect(refreshButton, SIGNAL(clicked()), this, SLOT(actRefresh()));
     
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);

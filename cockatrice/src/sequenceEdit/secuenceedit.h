@@ -12,7 +12,7 @@ class SecuenceEdit : public QWidget
 {
     Q_OBJECT
 public:
-    SecuenceEdit(QString shorcutName, QWidget *parent = 0);
+    SecuenceEdit(QString _shorcutName, QWidget *parent = 0);
     QString getSecuence();
 signals:
 

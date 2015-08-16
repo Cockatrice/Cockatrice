@@ -68,7 +68,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     QMenu *chatSettingsMenu = new QMenu(this);
 
     aClearChat = chatSettingsMenu->addAction(QString());
-    aClearChat->setShortcuts(settingsCache->shortcuts().getShortcut("tab_room/aClearChat", QKeySequence("F12")));
+    aClearChat->setShortcuts(settingsCache->shortcuts().getShortcut("tab_room/aClearChat"));
     connect(aClearChat, SIGNAL(triggered()), this, SLOT(actClearChat()));
 
     chatSettingsMenu->addSeparator();

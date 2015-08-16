@@ -66,17 +66,9 @@ void AbstractCounter::retranslateUi()
 void AbstractCounter::setShortcutsActive()
 {
     if (name == "life") {
-        aSet->setShortcuts(settingsCache->shortcuts().getShortcut(
-                               "Player/aSet",
-                               QKeySequence("Ctrl+L")));
-
-        aDec->setShortcuts(settingsCache->shortcuts().getShortcut(
-                               "Player/aDec",
-                               QKeySequence("F11")));
-
-        aInc->setShortcuts(settingsCache->shortcuts().getShortcut(
-                               "Player/aInc",
-                               QKeySequence("F12")));
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSet"));
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDec"));
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aInc"));
     }
 }
 

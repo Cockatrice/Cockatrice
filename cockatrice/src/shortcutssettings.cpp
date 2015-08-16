@@ -23,43 +23,20 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
             shortCuts.insert(*it, secuenceList);
         }
         shortCutsFile.endGroup();
-
-        shortCutsFile.beginGroup("Defaults");
-        const QStringList defaultKeys = shortCutsFile.allKeys();
-        for(QStringList::const_iterator it = defaultKeys.constBegin(); it != defaultKeys.constEnd(); ++it)
-        {
-            QString stringSecuence = shortCutsFile.value(*it).toString();
-            QList<QKeySequence> secuenceList = parseSecuenceString(stringSecuence);
-            defaultShortCuts.insert(*it, secuenceList);
-        }
-        shortCutsFile.endGroup();
     }
 }
 
-QList<QKeySequence> ShortcutsSettings::getShortcut(QString name, QList<QKeySequence> defaultShortCut)
+QList<QKeySequence> ShortcutsSettings::getShortcut(QString name)
 {
     if(shortCuts.contains(name))
         return shortCuts.value(name);
 
-    setShortcuts(name, defaultShortCut);
-
-    defaultShortCuts[name] = defaultShortCut;
-
-    QSettings shortCutsFile(settingsFilePath, QSettings::IniFormat);
-    shortCutsFile.beginGroup("Defaults");
-    shortCutsFile.setValue(name, stringifySecuence(defaultShortCut));
-    shortCutsFile.endGroup();
-    return defaultShortCut;
+    return defaultShortCuts.value(name, QList<QKeySequence>());
 }
 
-QList<QKeySequence> ShortcutsSettings::getShortcut(QString name, QKeySequence defaultShortCut)
+QKeySequence ShortcutsSettings::getSingleShortcut(QString name)
 {
-    return getShortcut(name, QList<QKeySequence>() << defaultShortCut);
-}
-
-QKeySequence ShortcutsSettings::getSingleShortcut(QString name, QKeySequence defaultShortCut)
-{
-    return getShortcut(name,defaultShortCut).at(0);
+    return getShortcut(name).at(0);
 }
 
 QString ShortcutsSettings::getDefaultShortcutString(QString name)
@@ -244,5 +221,7 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/phase7"] = parseSecuenceString("");
     defaultShortCuts["Player/phase8"] = parseSecuenceString("");
     defaultShortCuts["Player/phase9"] = parseSecuenceString("F9");
+    defaultShortCuts["tab_room/aClearChat"] = parseSecuenceString("F12");
+    defaultShortCuts["DlgLoadDeckFromClipboard/refreshButton"] = parseSecuenceString("F5");
 }
 

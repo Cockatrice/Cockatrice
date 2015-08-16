@@ -13,9 +13,8 @@ public:
     ShortcutsSettings(QString settingsFilePath, QObject *parent = 0);
     ~ShortcutsSettings() { }
 
-    QList<QKeySequence> getShortcut(QString name, QList<QKeySequence> defaultShortCut);
-    QList<QKeySequence> getShortcut(QString name, QKeySequence defaultShortCut);
-    QKeySequence getSingleShortcut(QString name, QKeySequence defaultShortCut);
+    QList<QKeySequence> getShortcut(QString name);
+    QKeySequence getSingleShortcut(QString name);
 
     QString getDefaultShortcutString(QString name);
     QString getShortcutString(QString name);

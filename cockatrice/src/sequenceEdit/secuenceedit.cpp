@@ -7,9 +7,9 @@
 #include <QKeyEvent>
 #include <QToolTip>
 
-SecuenceEdit::SecuenceEdit(QString name, QWidget *parent) : QWidget(parent)
+SecuenceEdit::SecuenceEdit(QString _shorcutName, QWidget *parent) : QWidget(parent)
 {
-    this->shorcutName = name;
+    shorcutName = _shorcutName;
     currentKey = 0;
     maxKeys = 4;
     keys = 0;
@@ -37,7 +37,7 @@ SecuenceEdit::SecuenceEdit(QString name, QWidget *parent) : QWidget(parent)
     connect(defaultButton,SIGNAL(clicked()),this,SLOT(restoreDefault()));
     lineEdit->installEventFilter(this);
 
-    lineEdit->setText(settingsCache->shortcuts().getShortcutString(name));
+    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shorcutName));
 }
 
 QString SecuenceEdit::getSecuence()
