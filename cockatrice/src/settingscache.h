@@ -43,6 +43,7 @@ signals:
     void ignoreUnregisteredUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void masterVolumeChanged(int value);
+    void chatMentionCompleterChanged();
 private:
     QSettings *settings;
 
@@ -65,6 +66,7 @@ private:
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
     bool chatMention;
+    bool chatMentionCompleter;
     QString chatMentionColor;
     QString chatHighlightColor;
     bool chatMentionForeground;
@@ -136,6 +138,7 @@ public:
     int getMinPlayersForMultiColumnLayout() const { return minPlayersForMultiColumnLayout; }
     bool getTapAnimation() const { return tapAnimation; }
     bool getChatMention()  const { return chatMention; }
+    bool getChatMentionCompleter() const { return chatMentionCompleter; }
     bool getChatMentionForeground() const { return chatMentionForeground; }
     bool getChatHighlightForeground() const { return chatHighlightForeground; }
     bool getZoneViewSortByName() const { return zoneViewSortByName; }
@@ -218,6 +221,7 @@ public slots:
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setTapAnimation(int _tapAnimation);
     void setChatMention(int _chatMention);
+    void setChatMentionCompleter(int _chatMentionCompleter);
     void setChatMentionForeground(int _chatMentionForeground);
     void setChatHighlightForeground(int _chatHighlightForeground);
     void setZoneViewSortByName(int _zoneViewSortByName);
