@@ -119,7 +119,7 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
     if (pmCache.contains(key))
         return pmCache.value(key);
     
-    QSvgRenderer svg(QString(":/resources/countries/" + countryCode + ".svg"));
+    QSvgRenderer svg(QString(":/resources/countries/" + countryCode.toLower() + ".svg"));
     int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
     QPixmap pixmap(width, height);
     pixmap.fill(Qt::transparent);
