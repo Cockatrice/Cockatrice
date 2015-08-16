@@ -16,7 +16,7 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
     if(exists){
         shortCutsFile.beginGroup("Custom");
         const QStringList customKeys = shortCutsFile.allKeys();
-        for(QStringList::const_iterator it = customKeys.cbegin(); it != customKeys.cend(); ++it)
+        for(QStringList::const_iterator it = customKeys.constBegin(); it != customKeys.constEnd(); ++it)
         {
             QString stringSecuence = shortCutsFile.value(*it).toString();
             QList<QKeySequence> secuenceList = parseSecuenceString(stringSecuence);
@@ -26,7 +26,7 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
 
         shortCutsFile.beginGroup("Defaults");
         const QStringList defaultKeys = shortCutsFile.allKeys();
-        for(QStringList::const_iterator it = defaultKeys.cbegin(); it != defaultKeys.cend(); ++it)
+        for(QStringList::const_iterator it = defaultKeys.constBegin(); it != defaultKeys.constEnd(); ++it)
         {
             QString stringSecuence = shortCutsFile.value(*it).toString();
             QList<QKeySequence> secuenceList = parseSecuenceString(stringSecuence);
@@ -89,7 +89,7 @@ QList<QKeySequence> ShortcutsSettings::parseSecuenceString(QString stringSecuenc
 {
     QStringList secuences = stringSecuence.split(";");
     QList<QKeySequence> secuenceList;
-    for(QStringList::const_iterator ss = secuences.cbegin(); ss != secuences.cend(); ++ss)
+    for(QStringList::const_iterator ss = secuences.constBegin(); ss != secuences.constEnd(); ++ss)
     {
         secuenceList.append(QKeySequence(*ss, QKeySequence::PortableText));
     }

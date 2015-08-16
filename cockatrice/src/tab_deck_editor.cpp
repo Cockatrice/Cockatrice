@@ -279,6 +279,9 @@ void TabDeckEditor::createMenus()
     aSaveDeckAs->setShortcuts(settingsCache->shortcuts().getShortcut(
                                 "TabDeckEditor/aSaveDeckAs", QKeySequence()));
 
+    aOpenCustomsetsFolder = new QAction(QString(), this);
+        connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
+
     aLoadDeckFromClipboard = new QAction(QString(), this);
     connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
     aLoadDeckFromClipboard->setShortcuts(settingsCache->shortcuts().getShortcut(
@@ -576,7 +579,7 @@ void TabDeckEditor::retranslateUi()
     aPrintDeck->setText(tr("&Print deck..."));
     aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
     aOpenCustomFolder->setText(tr("Open custom image folder"));
-    aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
+    aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));    
     aClose->setText(tr("&Close"));
     aClose->setShortcuts(settingsCache->shortcuts().getShortcut(
                              "TabDeckEditor/aClose",
