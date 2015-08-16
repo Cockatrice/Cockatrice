@@ -49,6 +49,7 @@
 #include "pb/event_server_identification.pb.h"
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_remove_from_list.pb.h"
+#include "pb/event_notify_user.pb.h"
 #include "pb/response_deck_list.pb.h"
 #include "pb/response_deck_download.pb.h"
 #include "pb/response_deck_upload.pb.h"
@@ -309,6 +310,7 @@ Response::ResponseCode ServerSocketInterface::processExtendedAdminCommand(int cm
         case AdminCommand::SHUTDOWN_SERVER: return cmdShutdownServer(cmd.GetExtension(Command_ShutdownServer::ext), rc);
         case AdminCommand::UPDATE_SERVER_MESSAGE: return cmdUpdateServerMessage(cmd.GetExtension(Command_UpdateServerMessage::ext), rc);
         case AdminCommand::RELOAD_CONFIG: return cmdReloadConfig(cmd.GetExtension(Command_ReloadConfig::ext), rc);
+        case AdminCommand::ADJUST_MOD: return cmdAdjustMod(cmd.GetExtension(Command_AdjustMod::ext), rc);
         default: return Response::RespFunctionNotAllowed;
     }
 }
@@ -998,5 +1000,56 @@ Response::ResponseCode ServerSocketInterface::cmdReloadConfig(const Command_Relo
 {
     logDebugMessage("Received admin command: reloading configuration");
     settingsCache->sync();
+    return Response::RespOk;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdAdjustMod(const Command_AdjustMod &cmd, ResponseContainer & /*rc*/) {
+
+    QString userName = QString::fromStdString(cmd.user_name());
+
+    if (cmd.should_be_mod()) {
+        logDebugMessage("Received admin command: promote user");
+        QSqlQuery *query = sqlInterface->prepareQuery(
+                "update {prefix}_users set admin = :adminlevel where name = :username");
+        query->bindValue(":adminlevel", 2);
+        query->bindValue(":username", userName);
+        if (!sqlInterface->execSqlQuery(query))
+            return Response::RespInternalError;
+
+        ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
+        Event_NotifyUser event;
+        event.set_type(Event_NotifyUser::PROMOTED);
+        SessionEvent *se = user->prepareSessionEvent(event);
+        user->sendProtocolItem(*se);
+        delete se;
+
+    } else {
+        logDebugMessage("Received admin command: demote user");
+        QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set admin = :adminlevel where name = :username");
+        query->bindValue(":adminlevel", 0);
+        query->bindValue(":username", userName);
+        if (!sqlInterface->execSqlQuery(query))
+            return Response::RespInternalError;
+
+        QList<ServerSocketInterface *> userList;
+        ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
+        userList.append(user);
+
+        if (!userList.isEmpty()) {
+            Event_ConnectionClosed event;
+            event.set_reason(Event_ConnectionClosed::DEMOTED);
+            event.set_reason_str("Your moderator status has been revoked.");
+            event.set_end_time(QDateTime::currentDateTime().toTime_t());
+            for (int i = 0; i < userList.size(); ++i) {
+                SessionEvent *se = userList[i]->prepareSessionEvent(event);
+                userList[i]->sendProtocolItem(*se);
+                delete se;
+                QMetaObject::invokeMethod(userList[i], "prepareDestroy", Qt::QueuedConnection);
+            }
+            userList.clear();
+        }
+
+    }
+
     return Response::RespOk;
 }

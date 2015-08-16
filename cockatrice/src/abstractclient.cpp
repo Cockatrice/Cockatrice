@@ -8,6 +8,7 @@
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_user_message.pb.h"
+#include "pb/event_notify_user.pb.h"
 #include "pb/event_list_rooms.pb.h"
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_remove_from_list.pb.h"
@@ -40,6 +41,7 @@ AbstractClient::AbstractClient(QObject *parent)
     qRegisterMetaType<Event_ListRooms>("Event_ListRooms");
     qRegisterMetaType<Event_GameJoined>("Event_GameJoined");
     qRegisterMetaType<Event_UserMessage>("Event_UserMessage");
+    qRegisterMetaType<Event_NotifyUser>("Event_NotifyUser");
     qRegisterMetaType<ServerInfo_User>("ServerInfo_User");
     qRegisterMetaType<QList<ServerInfo_User> >("QList<ServerInfo_User>");
     qRegisterMetaType<Event_ReplayAdded>("Event_ReplayAdded");
@@ -75,6 +77,7 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
                 case SessionEvent::SERVER_SHUTDOWN: emit serverShutdownEventReceived(event.GetExtension(Event_ServerShutdown::ext)); break;
                 case SessionEvent::CONNECTION_CLOSED: emit connectionClosedEventReceived(event.GetExtension(Event_ConnectionClosed::ext)); break;
                 case SessionEvent::USER_MESSAGE: emit userMessageEventReceived(event.GetExtension(Event_UserMessage::ext)); break;
+                case SessionEvent::NOTIFY_USER: emit notifyUserEventReceived(event.GetExtension(Event_NotifyUser::ext)); break;
                 case SessionEvent::LIST_ROOMS: emit listRoomsEventReceived(event.GetExtension(Event_ListRooms::ext)); break;
                 case SessionEvent::ADD_TO_LIST: emit addToListEventReceived(event.GetExtension(Event_AddToList::ext)); break;
                 case SessionEvent::REMOVE_FROM_LIST: emit removeFromListEventReceived(event.GetExtension(Event_RemoveFromList::ext)); break;

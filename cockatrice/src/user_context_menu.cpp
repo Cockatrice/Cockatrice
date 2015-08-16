@@ -1,5 +1,6 @@
 #include <QAction>
 #include <QMenu>
+#include <QMessageBox>
 #include "user_context_menu.h"
 #include "tab_supervisor.h"
 #include "tab_userlists.h"
@@ -31,6 +32,8 @@ UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *p
     aRemoveFromIgnoreList = new QAction(QString(), this);
     aKick = new QAction(QString(), this);
     aBan = new QAction(QString(), this);
+    aPromoteToMod = new QAction(QString(), this);
+    aDemoteFromMod = new QAction(QString(), this);
 
     retranslateUi();
 }
@@ -46,6 +49,8 @@ void UserContextMenu::retranslateUi()
     aRemoveFromIgnoreList->setText(tr("Remove from &ignore list"));
     aKick->setText(tr("Kick from &game"));
     aBan->setText(tr("Ban from &server"));
+    aPromoteToMod->setText(tr("&Promote user to moderator"));
+    aDemoteFromMod->setText(tr("Dem&ote user from moderator"));
 }
 
 void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer)
@@ -87,6 +92,27 @@ void UserContextMenu::banUser_processUserInfoResponse(const Response &r)
     BanDialog *dlg = new BanDialog(response.user_info(), static_cast<QWidget *>(parent()));
     connect(dlg, SIGNAL(accepted()), this, SLOT(banUser_dialogFinished()));
     dlg->show();
+}
+
+void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const CommandContainer &commandContainer)
+{
+
+    const Command_AdjustMod &cmd = commandContainer.admin_command(0).GetExtension(Command_AdjustMod::ext);
+
+    if (resp.response_code() == Response::RespOk) {
+        if (cmd.should_be_mod()) {
+            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Success"), tr("Successfully promoted user."));
+        } else {
+            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Success"), tr("Successfully demoted user."));
+        }
+
+    } else {
+        if (cmd.should_be_mod()) {
+            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Failed"), tr("Failed to promote user."));
+        } else {
+            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Failed"), tr("Failed to demote user."));
+        }
+    }
 }
 
 void UserContextMenu::banUser_dialogFinished()
@@ -132,6 +158,14 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     if (!tabSupervisor->getAdminLocked()) {
         menu->addSeparator();
         menu->addAction(aBan);
+
+        menu->addSeparator();
+        if (userLevel.testFlag(ServerInfo_User::IsModerator) && (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+            menu->addAction(aDemoteFromMod);
+
+        } else if (userLevel.testFlag(ServerInfo_User::IsRegistered) && (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+            menu->addAction(aPromoteToMod);
+        }
     }
     bool anotherUser = userName != QString::fromStdString(tabSupervisor->getUserInfo()->name());
     aDetails->setEnabled(online);
@@ -143,6 +177,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     aRemoveFromIgnoreList->setEnabled(anotherUser);
     aKick->setEnabled(anotherUser);
     aBan->setEnabled(anotherUser);
+    aPromoteToMod->setEnabled(anotherUser);
+    aDemoteFromMod->setEnabled(anotherUser);
 
     QAction *actionClicked = menu->exec(pos);
     if (actionClicked == aDetails) {
@@ -186,6 +222,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     } else if (actionClicked == aKick) {
         Command_KickFromGame cmd;
         cmd.set_player_id(playerId);
+
         game->sendGameCommand(cmd);
     } else if (actionClicked == aBan) {
         Command_GetUserInfo cmd;
@@ -193,7 +230,24 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(banUser_processUserInfoResponse(Response)));
+        client->sendCommand(pend);
+    } else if (actionClicked == aPromoteToMod) {
+        Command_AdjustMod cmd;
+        cmd.set_user_name(userName.toStdString());
+        cmd.set_should_be_mod(true);
 
+        // client->sendCommand(client->prepareAdminCommand(cmd));
+        PendingCommand *pend = client->prepareAdminCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(adjustMod_processUserResponse(Response,CommandContainer)));
+        client->sendCommand(pend);
+    } else if (actionClicked == aDemoteFromMod) {
+        Command_AdjustMod cmd;
+        cmd.set_user_name(userName.toStdString());
+        cmd.set_should_be_mod(false);
+
+        // client->sendCommand(client->prepareAdminCommand(cmd));
+        PendingCommand *pend = client->prepareAdminCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(adjustMod_processUserResponse(Response,CommandContainer)));
         client->sendCommand(pend);
     }
 

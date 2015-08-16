@@ -11,6 +11,7 @@ message Event_ConnectionClosed {
 		BANNED = 4;
 		USERNAMEINVALID = 5;
 		USER_LIMIT_REACHED = 6;
+		DEMOTED = 7;
 	}
 	optional CloseReason reason = 1;
 	optional string reason_str = 2;

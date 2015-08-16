@@ -49,6 +49,7 @@ message Response {
         DECK_UPLOAD = 1008;
         REGISTER = 1009;
         ACTIVATE = 1010;
+        ADJUST_MOD = 1011;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
     }
