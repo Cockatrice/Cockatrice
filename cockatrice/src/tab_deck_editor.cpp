@@ -21,6 +21,8 @@
 #include <QTimer>
 #include <QDockWidget>
 #include <QPushButton>
+#include <QDir>
+#include <QDesktopServices>
 #include "tab_deck_editor.h"
 #include "window_sets.h"
 #include "carddatabase.h"
@@ -363,6 +365,7 @@ void TabDeckEditor::createMenus()
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     dbMenu->addSeparator();
     dbMenu->addAction(aOpenCustomFolder);
+    dbMenu->addAction(aOpenCustomsetsFolder);
 #endif
     addTabMenu(dbMenu);
 }
@@ -573,6 +576,7 @@ void TabDeckEditor::retranslateUi()
     aPrintDeck->setText(tr("&Print deck..."));
     aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
     aOpenCustomFolder->setText(tr("Open custom image folder"));
+    aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
     aClose->setText(tr("&Close"));
     aClose->setShortcuts(settingsCache->shortcuts().getShortcut(
                              "TabDeckEditor/aClose",
@@ -820,6 +824,33 @@ void TabDeckEditor::actOpenCustomFolder() {
     QStringList args;
     QString pathToFolder = settingsCache->getPicsPath().append("/custom");
     args << QDir::toNativeSeparators(pathToFolder);
+    QProcess::startDetached("explorer", args);
+#endif
+
+}
+
+void TabDeckEditor::actOpenCustomsetsFolder() {
+#if QT_VERSION < 0x050000
+    QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#else
+    QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+#endif
+
+#if defined(Q_OS_MAC)
+
+    QStringList scriptArgs;
+    scriptArgs << QLatin1String("-e");
+    scriptArgs << QString::fromLatin1("tell application \"Finder\" to open POSIX file \"%1\"").arg(dataDir + "/customsets/");
+    scriptArgs << QLatin1String("-e");
+    scriptArgs << QLatin1String("tell application \"Finder\" to activate");
+
+    QProcess::execute("/usr/bin/osascript", scriptArgs);
+#endif
+#if defined(Q_OS_WIN)
+    QStringList args;
+    dataDir.append("/customsets");
+    args << QDir::toNativeSeparators(dataDir);
+    aOpenCustomsetsFolder->setText(dataDir);
     QProcess::startDetached("explorer", args);
 #endif
 

@@ -57,6 +57,7 @@ public:
 
     virtual bool getGameShouldPing() const { return false; }
     virtual bool getClientIdRequired() const { return false; }
+    virtual bool getRegOnlyServer() const { return false; }
     virtual int getPingClockInterval() const { return 0; }
     virtual int getMaxGameInactivityTime() const { return 9999999; }
     virtual int getMaxPlayerInactivityTime() const { return 9999999; }

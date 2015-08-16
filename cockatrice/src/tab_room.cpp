@@ -11,6 +11,14 @@
 #include <QSplitter>
 #include <QApplication>
 #include <QSystemTrayIcon>
+#include <QCompleter>
+#include <QWidget>
+#include <QTextCursor>
+#include <QAbstractItemView>
+#include <QScrollBar>
+#include <QStringListModel>
+#include <QKeyEvent>
+#include <QFocusEvent>
 #include "tab_supervisor.h"
 #include "tab_room.h"
 #include "tab_userlists.h"
@@ -51,8 +59,9 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
+    connect(settingsCache, SIGNAL(chatMentionCompleterChanged()), this, SLOT(actCompleterChanged()));
     sayLabel = new QLabel;
-    sayEdit = new QLineEdit;
+    sayEdit = new CustomLineEdit;
     sayLabel->setBuddy(sayEdit);
     connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 
@@ -103,13 +112,26 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     setLayout(hbox);
 
     const int userListSize = info.user_list_size();
-    for (int i = 0; i < userListSize; ++i)
+    for (int i = 0; i < userListSize; ++i){
         userList->processUserInfo(info.user_list(i), true);
+        autocompleteUserList.append("@" + QString::fromStdString(info.user_list(i).name()));
+    }
     userList->sortItems();
 
     const int gameListSize = info.game_list_size();
     for (int i = 0; i < gameListSize; ++i)
         gameSelector->processGameInfo(info.game_list(i));
+
+    completer = new QCompleter(autocompleteUserList, sayEdit);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setMaxVisibleItems(5);
+
+    #if QT_VERSION >= 0x050000
+        completer->setFilterMode(Qt::MatchStartsWith);
+    #endif
+
+    sayEdit->setCompleter(completer);
+    actCompleterChanged();
 }
 
 TabRoom::~TabRoom()
@@ -119,7 +141,7 @@ TabRoom::~TabRoom()
 
 void TabRoom::retranslateUi()
 {
-        gameSelector->retranslateUi();
+    gameSelector->retranslateUi();
     chatView->retranslateUi();
     userList->retranslateUi();
     sayLabel->setText(tr("&Say:"));
@@ -166,16 +188,20 @@ QString TabRoom::sanitizeHtml(QString dirty) const
 
 void TabRoom::sendMessage()
 {
-    if (sayEdit->text().isEmpty())
-          return;
+    if (sayEdit->text().isEmpty()){
+        return;
+    }else if (completer->popup()->isVisible()){
+        completer->popup()->hide();
+        return;
+    }else{
+        Command_RoomSay cmd;
+        cmd.set_message(sayEdit->text().toStdString());
 
-    Command_RoomSay cmd;
-    cmd.set_message(sayEdit->text().toStdString());
-
-    PendingCommand *pend = prepareRoomCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(sayFinished(const Response &)));
-    sendRoomCommand(pend);
-    sayEdit->clear();
+        PendingCommand *pend = prepareRoomCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(sayFinished(const Response &)));
+        sendRoomCommand(pend);
+        sayEdit->clear();
+    }
 }
 
 void TabRoom::sayFinished(const Response &response)
@@ -200,6 +226,11 @@ void TabRoom::actOpenChatSettings() {
     settings.exec();
 }
 
+void TabRoom::actCompleterChanged()
+{
+    settingsCache->getChatMentionCompleter() ? completer->setCompletionRole(2) : completer->setCompletionRole(1);
+}
+
 void TabRoom::processRoomEvent(const RoomEvent &event)
 {
     switch (static_cast<RoomEvent::RoomEventType>(getPbExtension(event))) {
@@ -222,11 +253,17 @@ void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)
 {
     userList->processUserInfo(event.user_info(), true);
     userList->sortItems();
+    if (!autocompleteUserList.contains("@" + QString::fromStdString(event.user_info().name()))){
+        autocompleteUserList << "@" + QString::fromStdString(event.user_info().name());
+        sayEdit->updateCompleterModel(autocompleteUserList);
+    }    
 }
 
 void TabRoom::processLeaveRoomEvent(const Event_LeaveRoom &event)
 {
     userList->deleteUser(QString::fromStdString(event.name()));
+    autocompleteUserList.removeOne("@" + QString::fromStdString(event.name()));
+    sayEdit->updateCompleterModel(autocompleteUserList);
 }
 
 void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
@@ -258,4 +295,125 @@ PendingCommand *TabRoom::prepareRoomCommand(const ::google::protobuf::Message &c
 void TabRoom::sendRoomCommand(PendingCommand *pend)
 {
     client->sendCommand(pend);
+}
+
+CustomLineEdit::CustomLineEdit(QWidget *parent)
+    : QLineEdit(parent)
+{
+}
+
+void CustomLineEdit::focusOutEvent(QFocusEvent * e){
+    QLineEdit::focusOutEvent(e);
+    if (c->popup()->isVisible()){
+        //Remove Popup
+        c->popup()->hide();
+        //Truncate the line to last space or whole string
+        QString textValue = text();
+        int lastIndex = textValue.length();
+        int lastWordStartIndex = textValue.lastIndexOf(" ") + 1;
+        int leftShift = qMin(lastIndex, lastWordStartIndex); 
+        setText(textValue.left(leftShift));
+        //Insert highlighted line from popup
+        insert(c->completionModel()->index(c->popup()->currentIndex().row(), 0).data().toString() + " ");
+        //Set focus back to the textbox since tab was pressed
+        setFocus();
+    }
+}
+
+void CustomLineEdit::keyPressEvent(QKeyEvent * event)
+{
+    switch (event->key()){
+        case Qt::Key_Return:
+        case Qt::Key_Enter:
+        case Qt::Key_Escape:
+            if (c->popup()->isVisible()){
+                event->ignore();
+                //Remove Popup
+                c->popup()->hide();
+                //Truncate the line to last space or whole string
+                QString textValue = text();
+                int lastIndexof = textValue.lastIndexOf(" ");
+                QString finalString = textValue.left(lastIndexof);
+                //Add a space if there's a word
+                if (finalString != "")
+                    finalString += " ";
+                setText(finalString);
+                return;
+            }
+            break;
+        case Qt::Key_Space:
+            if (c->popup()->isVisible()){
+                event->ignore();
+                //Remove Popup
+                c->popup()->hide();
+                //Truncate the line to last space or whole string
+                QString textValue = text();
+                int lastIndex = textValue.length();
+                int lastWordStartIndex = textValue.lastIndexOf(" ") + 1;
+                int leftShift = qMin(lastIndex, lastWordStartIndex);
+                setText(textValue.left(leftShift));
+                //Insert highlighted line from popup
+                insert(c->completionModel()->index(c->popup()->currentIndex().row(), 0).data().toString() + " ");
+                return;
+            }
+            break;
+        default:
+            break;
+    }
+
+    QLineEdit::keyPressEvent(event);
+    //Wait until the first character after @
+    if (!c || text().right(1).contains("@"))
+        return;
+
+    //Set new completion prefix
+    c->setCompletionPrefix(cursorWord(text()));
+    if (c->completionPrefix().length() < 1){
+        c->popup()->hide();
+        return;
+    }
+
+    //Draw completion box
+    QRect cr = cursorRect();
+    cr.setWidth(c->popup()->sizeHintForColumn(0) + c->popup()->verticalScrollBar()->sizeHint().width());
+    c->complete(cr);
+
+    //Select first item in the completion popup
+    QItemSelectionModel* sm = new QItemSelectionModel(c->completionModel());
+    c->popup()->setSelectionModel(sm);
+    sm->select(c->completionModel()->index(0, 0), QItemSelectionModel::ClearAndSelect);
+    sm->setCurrentIndex(c->completionModel()->index(0, 0), QItemSelectionModel::NoUpdate);
+}
+
+QString CustomLineEdit::cursorWord(const QString &line) const
+{
+    return line.mid(line.left(cursorPosition()).lastIndexOf(" ") + 1,
+        cursorPosition() - line.left(cursorPosition()).lastIndexOf(" ") - 1);
+}
+
+void CustomLineEdit::insertCompletion(QString arg)
+{
+    QString s_arg = arg + " ";
+    setText(text().replace(text().left(cursorPosition()).lastIndexOf(" ") + 1,
+        cursorPosition() - text().left(cursorPosition()).lastIndexOf(" ") - 1, s_arg));
+}
+
+void CustomLineEdit::setCompleter(QCompleter* completer)
+{
+    c = completer;
+    c->setWidget(this);
+    connect(c, SIGNAL(activated(QString)),this, SLOT(insertCompletion(QString)));
+}
+
+void CustomLineEdit::updateCompleterModel(QStringList completionList)
+{
+    if (!c || c->popup()->isVisible())
+        return;
+
+    QStringListModel *model;
+    model = (QStringListModel*)(c->model());
+    if (model == NULL)
+        model = new QStringListModel();
+    QStringList updatedList = completionList;
+    model->setStringList(updatedList);
 }

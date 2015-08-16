@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# THIS SCRIPT EXPECTS TO BE EXECUTED FROM THE GITHUB SOURCE FOLDER PATH STRUCTURE
+# OTHERWISE, UPDATE THE 'COUNTRYCODEIMAGEPATH' TO POINT TO THE FOLDER CONTAINING THE COUNTRY CODE IMAGES
+# USE THIS SCRIPT TO COMPARE EXISTING USER ACCOUNTS TO VALID COUNTRY CODES AND CLEAR INVALID COUNTRY CODE DATA
+
+MODE="report"                       #set this to correct to fix invalid country codes, otherwise it only reports
+DBNAME="servatrice"                 #set this to the database name used
+TABLEPREFIX="cockatrice"            #set this to the prefix used for the table names in the database (do not inclue the _)
+SQLCONFFILE="./mysql.cnf"           #set this to the path that contains the mysql.cnf file
+COUNTRYCODEIMAGEPATH='../../../cockatrice/resources/countries'
+VALIDCOUNT=0
+INVALIDCOUNT=0
+
+for i in `mysql --defaults-file=$SQLCONFFILE -h localhost -e "select distinct(country) from ""$DBNAME"".""$TABLEPREFIX""_users;"`
+do
+    if [ "$i" != "country" ]; then
+        if [ -f "$COUNTRYCODEIMAGEPATH/$i.svg" ]; then
+            ((VALIDCOUNT++))
+        else
+            ((INVALIDCOUNT++))
+
+            if [ "$MODE" == "correct" ]; then
+                echo "$i COUNTRY CODE INVALID, ATTEMPTING TO CORRECT"
+                mysql --defaults-file=$SQLCONFFILE -h localhost -e "update ""$DBNAME"".""$TABLEPREFIX""_users set country = '' where country = '$i';"
+            fi
+        fi 
+    fi
+done
+
+if [ "$MODE" == "correct" ]; then
+    mysql --defaults-file=$SQLCONFFILE -h localhost -e "update ""$DBNAME"".""$TABLEPREFIX""_users set country = lower(country);"
+fi
+
+echo "INVALID: $INVALIDCOUNT"
+echo "VALID: $VALIDCOUNT"

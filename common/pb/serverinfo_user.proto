@@ -23,4 +23,5 @@ message ServerInfo_User {
     optional uint64 session_id = 10;
     optional uint64 accountage_secs = 11;
     optional string email = 12;
+    optional string clientid = 13;
 }

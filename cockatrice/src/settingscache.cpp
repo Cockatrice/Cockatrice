@@ -78,6 +78,7 @@ SettingsCache::SettingsCache()
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 5).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
+    chatMentionCompleter = settings->value("chat/mentioncompleter", true).toBool();
     chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
     chatHighlightForeground = settings->value("chat/highlightforeground", true).toBool();
     chatMentionColor = settings->value("chat/mentioncolor", "A6120D").toString();
@@ -359,6 +360,13 @@ void SettingsCache::setTapAnimation(int _tapAnimation)
 void SettingsCache::setChatMention(int _chatMention) {
     chatMention = _chatMention;
     settings->setValue("chat/mention", chatMention);
+}
+
+void SettingsCache::setChatMentionCompleter(const int _enableMentionCompleter)
+{
+    chatMentionCompleter = _enableMentionCompleter;
+    settings->setValue("chat/mentioncompleter", chatMentionCompleter);
+    emit chatMentionCompleterChanged();
 }
 
 void SettingsCache::setChatMentionForeground(int _chatMentionForeground) {

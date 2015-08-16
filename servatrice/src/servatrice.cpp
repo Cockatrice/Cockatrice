@@ -143,7 +143,7 @@ bool Servatrice::initServer()
     serverName = settingsCache->value("server/name", "My Cockatrice server").toString();
     serverId = settingsCache->value("server/id", 0).toInt();
     clientIdRequired = settingsCache->value("server/requireclientid",0).toBool();
-    bool regServerOnly = settingsCache->value("authentication/regonly", 0).toBool();
+    regServerOnly = settingsCache->value("authentication/regonly", 0).toBool();
 
     const QString authenticationMethodStr = settingsCache->value("authentication/method").toString();
     if (authenticationMethodStr == "sql") {
@@ -161,7 +161,8 @@ bool Servatrice::initServer()
         qDebug() << "Authenticating method: none";
         authenticationMethod = AuthenticationNone;
     }
-    
+
+    qDebug() << "Store Replays: " << settingsCache->value("game/store_replays", true).toBool();
     qDebug() << "Client ID Required: " << clientIdRequired;
     bool maxUserLimitEnabled = settingsCache->value("security/enable_max_user_limit", false).toBool();
     qDebug() << "Maximum user limit enabled: " << maxUserLimitEnabled;
@@ -174,7 +175,7 @@ bool Servatrice::initServer()
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
     bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
 
-    qDebug() << "Registration enabled: " << registrationEnabled;
+    qDebug() << "Registration enabled: " << regServerOnly;
     if (registrationEnabled)
         qDebug() << "Require email address to register: " << requireEmailForRegistration;
 

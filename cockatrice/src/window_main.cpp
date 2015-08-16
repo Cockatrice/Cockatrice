@@ -319,6 +319,9 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
         case Response::RespClientIdRequired:
             QMessageBox::critical(this, tr("Error"), tr("This server requires client ID's. Your client is either failing to generate an ID or you are running a modified client.\nPlease close and reopen your client to try again."));
             break;
+        case Response::RespContextError:
+            QMessageBox::critical(this, tr("Error"), tr("An internal error has occurred, please try closing and reopening your client and try again. If the error persists try updating your client to the most recent build and if need be contact your software provider."));
+            break;
         case Response::RespAccountNotActivated: {
             bool ok = false;
             QString token = QInputDialog::getText(this, tr("Account activation"), tr("Your account has not been activated yet.\nYou need to provide the activation token received in the activation email"), QLineEdit::Normal, QString(), &ok);

@@ -574,6 +574,9 @@ MessagesSettingsPage::MessagesSettingsPage()
 {
     chatMentionCheckBox.setChecked(settingsCache->getChatMention());
     connect(&chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
+
+    chatMentionCompleterCheckbox.setChecked(settingsCache->getChatMentionCompleter());
+    connect(&chatMentionCompleterCheckbox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMentionCompleter(int)));
     
     ignoreUnregUsersMainChat.setChecked(settingsCache->getIgnoreUnregisteredUsers());
     ignoreUnregUserMessages.setChecked(settingsCache->getIgnoreUnregisteredUserMessages());
@@ -606,11 +609,12 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
     chatGrid->addWidget(&invertMentionForeground, 0, 1);
     chatGrid->addWidget(mentionColor, 0, 2);
-    chatGrid->addWidget(&ignoreUnregUsersMainChat, 1, 0);
+    chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0);
+    chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0);
     chatGrid->addWidget(&hexLabel, 1, 2);
-    chatGrid->addWidget(&ignoreUnregUserMessages, 2, 0);
-    chatGrid->addWidget(&messagePopups, 3, 0);
-    chatGrid->addWidget(&mentionPopups, 4, 0);
+    chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0);
+    chatGrid->addWidget(&messagePopups, 4, 0);
+    chatGrid->addWidget(&mentionPopups, 5, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
     
@@ -735,6 +739,7 @@ void MessagesSettingsPage::retranslateUi()
     chatGroupBox->setTitle(tr("Chat settings"));
     highlightGroupBox->setTitle(tr("Custom alert words"));
     chatMentionCheckBox.setText(tr("Enable chat mentions"));
+    chatMentionCompleterCheckbox.setText(tr("Enable mention completer"));
     messageShortcuts->setTitle(tr("In-game message macros"));
     ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users"));
     ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users"));

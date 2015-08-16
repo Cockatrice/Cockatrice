@@ -9,7 +9,7 @@
 #include "server.h"
 #include "server_database_interface.h"
 
-#define DATABASE_SCHEMA_VERSION 3
+#define DATABASE_SCHEMA_VERSION 6
 
 class Servatrice;
 
@@ -22,13 +22,14 @@ private:
     Servatrice *server;
     ServerInfo_User evalUserQueryResult(const QSqlQuery *query, bool complete, bool withId = false);
     /** Must be called after checkSql and server is known to be in auth mode. */
+    bool checkUserIsIdBanned(const QString &clientId, QString &banReason, int &banSecondsRemaining);
+    /** Must be called after checkSql and server is known to be in auth mode. */
     bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
     /** Must be called after checkSql and server is known to be in auth mode. */
     bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
 
 protected:
-    AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, 
-        const QString &password, QString &reasonStr, int &secondsLeft);
+    AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, const QString &clientId, QString &reasonStr, int &secondsLeft);
 
 public slots:
     void initDatabase(const QSqlDatabase &_sqlDatabase);
@@ -36,7 +37,7 @@ public slots:
 public:
     Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server);
     ~Servatrice_DatabaseInterface();
-    bool initDatabase(const QString &type, const QString &hostName, const QString &databaseName, 
+    bool initDatabase(const QString &type, const QString &hostName, const QString &databaseName,
         const QString &userName, const QString &password);
     bool openDatabase();
     bool checkSql();
@@ -52,28 +53,28 @@ public:
     bool isInBuddyList(const QString &whoseList, const QString &who);
     bool isInIgnoreList(const QString &whoseList, const QString &who);
     ServerInfo_User getUserData(const QString &name, bool withId = false);
-    void storeGameInformation(const QString &roomName, const QStringList &roomGameTypes, const ServerInfo_Game &gameInfo, 
+    void storeGameInformation(const QString &roomName, const QStringList &roomGameTypes, const ServerInfo_Game &gameInfo,
         const QSet<QString> &allPlayersEver, const QSet<QString>&allSpectatorsEver, const QList<GameReplay *> &replayList);
     DeckList *getDeckFromDatabase(int deckId, int userId);
 
     int getNextGameId();
     int getNextReplayId();
     int getActiveUserCount();
-    qint64 startSession(const QString &userName, const QString &address);
+    qint64 startSession(const QString &userName, const QString &address, const QString &clientId);
     void endSession(qint64 sessionId);
     void clearSessionTables();
     void lockSessionTables();
     void unlockSessionTables();
     bool userSessionExists(const QString &userName);
     bool usernameIsValid(const QString &user, QString & error);
-    bool checkUserIsBanned(const QString &ipAddress, const QString &userName, QString &banReason, int &banSecondsRemaining);
+    bool checkUserIsBanned(const QString &ipAddress, const QString &userName, const QString &clientId, QString &banReason, int &banSecondsRemaining);
 
-    bool getRequireRegistration();
-    bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, 
+    bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender,
         const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active = false);
     bool activateUser(const QString &userName, const QString &token);
     void updateUsersClientID(const QString &userName, const QString &userClientID);
-    void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, 
+    void updateUsersLastLoginTime(const QString &userName);
+    void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage,
         LogMessage_TargetType targetType, const int targetId, const QString &targetName);
     bool changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword);
     QChar getGenderChar(ServerInfo_User_Gender const &gender);

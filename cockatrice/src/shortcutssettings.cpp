@@ -1,5 +1,6 @@
 #include "shortcutssettings.h"
 #include <QFile>
+#include <QStringList>
 
 ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QObject(parent)
 {

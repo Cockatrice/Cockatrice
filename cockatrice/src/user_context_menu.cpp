@@ -99,6 +99,7 @@ void UserContextMenu::banUser_dialogFinished()
     cmd.set_minutes(dlg->getMinutes());
     cmd.set_reason(dlg->getReason().toStdString());
     cmd.set_visible_reason(dlg->getVisibleReason().toStdString());
+    cmd.set_clientid(dlg->getBanId().toStdString());
 
     client->sendCommand(client->prepareModeratorCommand(cmd));
 }
