@@ -138,13 +138,12 @@ void RoomSelector::joinClicked()
 
 void RoomSelector::joinFinished(const Response &r, const CommandContainer & /*commandContainer*/, const QVariant &extraData)
 {
-    if (r.response_code() != Response::RespOk) {
-        switch (r.response_code()) {
-            case Response::RespUserLevelTooLow: QMessageBox::critical(this, tr("Error"), tr("You do not have the proper permission to join this room.")); return;
-            default:
-                QMessageBox::critical(this, tr("Error"), tr("Failed to join the room due to an unknown error."));
-                return;
-        }
+    switch (r.response_code()) {
+        case Response::RespOk: break;
+        case Response::RespUserLevelTooLow: QMessageBox::critical(this, tr("Error"), tr("You do not have the proper permission to join this room.")); return;
+        default:
+            QMessageBox::critical(this, tr("Error"), tr("Failed to join the room due to an unknown error."));
+            return;
     }
 
     const Response_JoinRoom &resp = r.GetExtension(Response_JoinRoom::ext);
