@@ -62,8 +62,8 @@ method=none
 ; if the chosen authentication method is password, here you can define the password your users will use to log in
 password=123456
 
-; Accept only registered users? default is 0 (accept unregistered users)
-regonly=0
+; Accept only registered users? default is false (accept unregistered users)
+regonly=false
 
 [users]
 
@@ -193,6 +193,11 @@ roomlist\1\game_types\3\name="GameType3"
 ; default is 120
 max_game_inactivity_time=120
 
+; All actions during a game are recorded and stored in the database as a replay that all participants of
+; the game can go back to and review after the game is closed.  This can require a fairly large amount of
+; storage to save all the information.  Disable this option to prevent the storing of replay data in
+; the database.  Default value is true.
+store_replays=true
 
 [security]
 ; You may want to restrict the number of users that can connect to your server at any given time.

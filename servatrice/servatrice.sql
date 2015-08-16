@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO cockatrice_schema_version VALUES(3);
+INSERT INTO cockatrice_schema_version VALUES(6);
 
 CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `active` tinyint(1) NOT NULL,
   `token` binary(16) NOT NULL,
   `clientid` varchar(15) NOT NULL,
+  `last_login` datetime NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `token` (`token`),
@@ -132,6 +133,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_bans` (
  `minutes` int(6) NOT NULL,
  `reason` text NOT NULL,
  `visible_reason` text NOT NULL,
+ `clientid` varchar(15) NOT NULL,
   PRIMARY KEY (`user_name`,`time_from`),
   KEY `time_from` (`time_from`,`ip_address`),
   KEY `ip_address` (`ip_address`)
@@ -144,6 +146,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_sessions` (
   `ip_address` char(15) COLLATE utf8_unicode_ci NOT NULL,
   `start_time` datetime NOT NULL,
   `end_time` datetime DEFAULT NULL,
+  `clientid` varchar(15) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `username` (`user_name`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
