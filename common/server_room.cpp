@@ -12,8 +12,8 @@
 #include "pb/serverinfo_room.pb.h"
 #include <google/protobuf/descriptor.h>
 
-Server_Room::Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
-    : QObject(parent), id(_id), name(_name), description(_description), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), gamesLock(QReadWriteLock::Recursive)
+Server_Room::Server_Room(int _id, const QString &_name, const QString &_description, const QString &_permissionLevel, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
+    : QObject(parent), id(_id), name(_name), description(_description), permissionLevel(_permissionLevel), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), gamesLock(QReadWriteLock::Recursive)
 {
     connect(this, SIGNAL(gameListChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)), Qt::QueuedConnection);
 }
@@ -46,6 +46,7 @@ const ServerInfo_Room &Server_Room::getInfo(ServerInfo_Room &result, bool comple
     result.set_name(name.toStdString());
     result.set_description(description.toStdString());
     result.set_auto_join(autoJoin);
+    result.set_permissionlevel(permissionLevel.toStdString());
     
     gamesLock.lockForRead();
     result.set_game_count(games.size() + externalGames.size());

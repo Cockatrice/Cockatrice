@@ -172,6 +172,10 @@ roomlist\1\name="General room"
 ; Room description for the room number 1
 roomlist\1\description="Play anything here."
 
+; Rooms can restrict the level of user that can join. Current supported options are none, registered, moderator, administrator.
+; Default is none.
+roomlist\1\permissionlevel=none
+
 ; Wether to make users autojoin this room when connected to the server
 roomlist\1\autojoin=true
 

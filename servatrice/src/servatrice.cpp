@@ -211,7 +211,7 @@ bool Servatrice::initServer()
 
     const QString roomMethod = settingsCache->value("rooms/method").toString();
     if (roomMethod == "sql") {
-        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, auto_join, join_message from {prefix}_rooms order by id asc");
+        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, permissionlevel, auto_join, join_message from {prefix}_rooms order by id asc");
         servatriceDatabaseInterface->execSqlQuery(query);
         while (query->next()) {
             QSqlQuery *query2 = servatriceDatabaseInterface->prepareQuery("select name from {prefix}_rooms_gametypes where id_room = :id_room");
@@ -224,8 +224,9 @@ bool Servatrice::initServer()
             addRoom(new Server_Room(query->value(0).toInt(),
                                     query->value(1).toString(),
                                     query->value(2).toString(),
-                                    query->value(3).toInt(),
-                                    query->value(4).toString(),
+                                    query->value(3).toString().toLower(),
+                                    query->value(4).toInt(),
+                                    query->value(5).toString(),
                                     gameTypes,
                                     this
             ));
@@ -247,6 +248,7 @@ bool Servatrice::initServer()
                 i,
                 settingsCache->value("name").toString(),
                 settingsCache->value("description").toString(),
+                settingsCache->value("permissionlevel").toString().toLower(),
                 settingsCache->value("autojoin").toBool(),
                 settingsCache->value("joinmessage").toString(),
                 gameTypes,
@@ -262,6 +264,7 @@ bool Servatrice::initServer()
                 0,
                 "General room",
                 "Play anything here.",
+                "none",
                 true,
                 "",
                 QStringList("Standard"),

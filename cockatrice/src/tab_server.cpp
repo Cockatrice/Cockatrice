@@ -25,7 +25,7 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
 {
     roomList = new QTreeWidget;
     roomList->setRootIsDecorated(false);
-    roomList->setColumnCount(4);
+    roomList->setColumnCount(5);
     roomList->header()->setStretchLastSection(false);
 #if QT_VERSION < 0x050000
     roomList->header()->setResizeMode(0, QHeaderView::ResizeToContents);
@@ -35,6 +35,7 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
 #else
     roomList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     roomList->header()->setSectionResizeMode(1, QHeaderView::Stretch);
+    roomList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
     roomList->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     roomList->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 #endif    
@@ -63,10 +64,12 @@ void RoomSelector::retranslateUi()
     QTreeWidgetItem *header = roomList->headerItem();
     header->setText(0, tr("Room"));
     header->setText(1, tr("Description"));
-    header->setText(2, tr("Players"));
-    header->setText(3, tr("Games"));
+    header->setText(2, tr("Permissions"));
+    header->setText(3, tr("Players"));
+    header->setText(4, tr("Games"));
     header->setTextAlignment(2, Qt::AlignRight);
     header->setTextAlignment(3, Qt::AlignRight);
+    header->setTextAlignment(4, Qt::AlignRight);
 }
 
 void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
@@ -82,10 +85,12 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
                     twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
                 if (room.has_description())
                     twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
+                if (room.has_permissionlevel())
+                    twi->setData(2, Qt::DisplayRole, QString::fromStdString(room.permissionlevel()).toLower());
                 if (room.has_player_count())
-                    twi->setData(2, Qt::DisplayRole, room.player_count());
+                    twi->setData(3, Qt::DisplayRole, room.player_count());
                 if (room.has_game_count())
-                    twi->setData(3, Qt::DisplayRole, room.game_count());
+                    twi->setData(4, Qt::DisplayRole, room.game_count());
                 return;
             }
         }
@@ -95,10 +100,13 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
             twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
         if (room.has_description())
             twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
-        twi->setData(2, Qt::DisplayRole, room.player_count());
-        twi->setData(3, Qt::DisplayRole, room.game_count());
+        if (room.has_permissionlevel())
+            twi->setData(2, Qt::DisplayRole, QString::fromStdString(room.permissionlevel()).toLower());
+        twi->setData(3, Qt::DisplayRole, room.player_count());
+        twi->setData(4, Qt::DisplayRole, room.game_count());
         twi->setTextAlignment(2, Qt::AlignRight);
         twi->setTextAlignment(3, Qt::AlignRight);
+        twi->setTextAlignment(4, Qt::AlignRight);
         
         roomList->addTopLevelItem(twi);
         if (room.has_auto_join())
@@ -130,10 +138,15 @@ void RoomSelector::joinClicked()
 
 void RoomSelector::joinFinished(const Response &r, const CommandContainer & /*commandContainer*/, const QVariant &extraData)
 {
-    if (r.response_code() != Response::RespOk)
-        return;
+    switch (r.response_code()) {
+        case Response::RespOk: break;
+        case Response::RespUserLevelTooLow: QMessageBox::critical(this, tr("Error"), tr("You do not have the proper permission to join this room.")); return;
+        default:
+            QMessageBox::critical(this, tr("Error"), tr("Failed to join the room due to an unknown error."));
+            return;
+    }
+
     const Response_JoinRoom &resp = r.GetExtension(Response_JoinRoom::ext);
-    
     emit roomJoined(resp.room_info(), extraData.toBool());
 }
 

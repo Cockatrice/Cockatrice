@@ -542,6 +542,24 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     if (!r)
         return Response::RespNameNotFound;
 
+    QString roomPermission = r->getRoomPermission().toLower();
+    if (roomPermission != "none"){
+        if (roomPermission == "registered") {
+            if (!(userInfo->user_level() & ServerInfo_User::IsRegistered))
+                return Response::RespUserLevelTooLow;
+        }
+
+        if (roomPermission == "moderator"){
+            if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
+                return Response::RespUserLevelTooLow;
+        }
+
+        if (roomPermission == "administrator"){
+            if (!(userInfo->user_level() & ServerInfo_User::IsAdmin))
+                return Response::RespUserLevelTooLow;
+        }
+    }
+
     r->addClient(this);
     rooms.insert(r->getId(), r);
 
