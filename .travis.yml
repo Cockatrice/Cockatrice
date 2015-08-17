@@ -26,4 +26,4 @@ matrix:
     - env: QT4=1
       addons: {apt: {packages: [qtmobility-dev,libprotobuf-dev,protobuf-compiler,libqt4-dev]}}
     - env: QT4=0
-      addons: {apt: {packages: [libprotobuf-dev,protobuf-compiler,cmake,libsqlite3-dev,qt52base,qt52webkit,qt52tools qt52svg,qt52multimedia], sources: [ppa:beineri/opt-qt521,ppa:kalakris/cmake]}}
+      addons: {apt: {packages: [libprotobuf-dev,protobuf-compiler,cmake,libsqlite3-dev,qt52base,qt52webkit,qt52tools qt52svg,qt52multimedia], sources: [beineri/opt-qt521,kalakris/cmake]}}
