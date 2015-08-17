@@ -1,14 +1,5 @@
 sudo: false
 language: cpp
-env:
-  - QT4=1
-  - QT4=0
-os:
-  - linux
-  - osx
-compiler:
-  - gcc
-  - clang
 script: ./travis-compile.sh
 install: ./travis-dependencies.sh
 cache: apt
@@ -20,10 +11,39 @@ notifications:
     on_success: change
     on_failure: change
     on_start: false
+addons:
+    apt:
+      packages:
+        - libprotobuf-dev
+        - protobuf-compiler
 matrix:
   fast_finish: true
   include:
-    - env: QT4=1
-      addons: {apt: {packages: [qtmobility-dev,libprotobuf-dev,protobuf-compiler,libqt4-dev]}}
-    - env: QT4=0
-      addons: {apt: {packages: [libprotobuf-dev,protobuf-compiler,cmake,libsqlite3-dev,qt52base,qt52webkit,qt52tools qt52svg,qt52multimedia], sources: [beineri/opt-qt521,kalakris/cmake]}}
+    - os: linux
+      compiler: gcc
+      env: QT4=1
+      addons: {apt: {packages: [qtmobility-dev,libqt4-dev]}}
+    - os: linux
+      compiler: clang
+      env: QT4=1
+      addons: {apt: {packages: [qtmobility-dev,libqt4-dev]}}
+    - os: linux
+      compiler: gcc
+      env: QT4=0
+      addons: {apt: {packages: [cmake,libsqlite3-dev,qt52base,qt52webkit,qt52tools qt52svg,qt52multimedia], sources: [beineri/opt-qt521,kalakris/cmake]}}
+    - os: linux
+      compiler: clang
+      env: QT4=0
+      addons: {apt: {packages: [cmake,libsqlite3-dev,qt52base,qt52webkit,qt52tools qt52svg,qt52multimedia], sources: [beineri/opt-qt521,kalakris/cmake]}}
+    - os: osx
+      compiler: gcc
+      env: QT4=1
+    - os: osx
+      compiler: clang
+      env: QT4=1
+    - os: osx
+      compiler: gcc
+      env: QT4=0
+    - os: osx
+      compiler: clang
+      env: QT4=0
