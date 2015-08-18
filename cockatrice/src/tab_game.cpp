@@ -8,6 +8,8 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QDebug>
+#include <QCompleter>
+#include <QWidget>
 
 #include "dlg_creategame.h"
 #include "tab_game.h"
@@ -31,6 +33,7 @@
 #include "settingscache.h"
 #include "carddatabase.h"
 #include "replay_timeline_widget.h"
+#include "lineeditcompleter.h"
 
 #include <google/protobuf/descriptor.h>
 #include "pending_command.h"
@@ -409,8 +412,9 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(messageLog, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
+    connect(settingsCache, SIGNAL(chatMentionCompleterChanged()), this, SLOT(actCompleterChanged()));
     sayLabel = new QLabel;
-    sayEdit = new QLineEdit;
+    sayEdit = new LineEditCompleter;
     sayLabel->setBuddy(sayEdit);
 
     QHBoxLayout *hLayout = new QHBoxLayout;
@@ -507,6 +511,17 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 
     for (int i = gameInfo.game_types_size() - 1; i >= 0; i--)
         gameTypes.append(roomGameTypes.find(gameInfo.game_types(i)).value());
+
+    completer = new QCompleter(autocompleteUserList, sayEdit);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setMaxVisibleItems(5);
+
+    #if QT_VERSION >= 0x050000
+        completer->setFilterMode(Qt::MatchStartsWith);
+    #endif
+
+    sayEdit->setCompleter(completer);
+    actCompleterChanged();
 }
 
 void TabGame::addMentionTag(QString value) {
@@ -681,6 +696,9 @@ void TabGame::actLeaveGame()
 
 void TabGame::actSay()
 {
+    if (completer->popup()->isVisible())
+        return;
+
     if (!sayEdit->text().isEmpty()) {
         Command_GameSay cmd;
         cmd.set_message(sayEdit->text().toStdString());
@@ -739,11 +757,21 @@ void TabGame::actRotateViewCCW()
     scene->adjustPlayerRotation(1);
 }
 
+void TabGame::actCompleterChanged()
+{
+    settingsCache->getChatMentionCompleter() ? completer->setCompletionRole(2) : completer->setCompletionRole(1);
+}
+
 Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
 {
     bool local = ((clients.size() > 1) || (playerId == localPlayerId));
     Player *newPlayer = new Player(info, playerId, local, this);
     connect(newPlayer, SIGNAL(openDeckEditor(const DeckLoader *)), this, SIGNAL(openDeckEditor(const DeckLoader *)));
+    QString newPlayerName = "@" + newPlayer->getName();
+    if (!autocompleteUserList.contains(newPlayerName)){
+        autocompleteUserList << newPlayerName;
+        sayEdit->setCompletionList(autocompleteUserList);
+    }
     scene->addPlayer(newPlayer);
 
     connect(newPlayer, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
@@ -763,7 +791,6 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
     
     players.insert(playerId, newPlayer);
     emit playerAdded(newPlayer);
-
     return newPlayer;
 }
 
@@ -938,6 +965,9 @@ void TabGame::eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, c
 
 void TabGame::eventSpectatorLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
 {
+    QString playerName = "@" + QString::fromStdString(spectators.value(eventPlayerId).name());
+    if (autocompleteUserList.removeOne(playerName))
+        sayEdit->setCompletionList(autocompleteUserList);
     messageLog->logLeaveSpectator(QString::fromStdString(spectators.value(eventPlayerId).name()));
     playerListWidget->removePlayer(eventPlayerId);
     spectators.remove(eventPlayerId);
@@ -952,6 +982,11 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
         const ServerInfo_Player &playerInfo = event.player_list(i);
         const ServerInfo_PlayerProperties &prop = playerInfo.properties();
         const int playerId = prop.player_id();
+        QString playerName = "@" + QString::fromStdString(prop.user_info().name());
+        if (!autocompleteUserList.contains(playerName)){
+            autocompleteUserList << playerName;
+            sayEdit->setCompletionList(autocompleteUserList);
+        }
         if (prop.spectator()) {
             if (!spectators.contains(playerId)) {
                 spectators.insert(playerId, prop.user_info());
@@ -1059,11 +1094,18 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
 {
     const ServerInfo_PlayerProperties &playerInfo = event.player_properties();
     const int playerId = playerInfo.player_id();
+    QString playerName = QString::fromStdString(playerInfo.user_info().name());
+    if (!autocompleteUserList.contains("@" + playerName)){
+        autocompleteUserList << "@" + playerName;
+        sayEdit->setCompletionList(autocompleteUserList);
+    }
+
     if (players.contains(playerId))
         return;
+    
     if (playerInfo.spectator()) {
         spectators.insert(playerId, playerInfo.user_info());
-        messageLog->logJoinSpectator(QString::fromStdString(playerInfo.user_info().name()));
+        messageLog->logJoinSpectator(playerName);
     } else {
         Player *newPlayer = addPlayer(playerId, playerInfo.user_info());
         messageLog->logJoin(newPlayer);
@@ -1078,6 +1120,10 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     if (!player)
         return;
     
+    QString playerName = "@" + player->getName();
+    if(autocompleteUserList.removeOne(playerName))
+        sayEdit->setCompletionList(autocompleteUserList);
+
     messageLog->logLeave(player);
     playerListWidget->removePlayer(eventPlayerId);
     players.remove(eventPlayerId);

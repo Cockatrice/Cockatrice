@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include <QPushButton>
+#include <QCompleter>
 #include "tab.h"
 #include "pb/serverinfo_game.pb.h"
 
@@ -54,6 +55,7 @@ class QHBoxLayout;
 class GameReplay;
 class ServerInfo_User;
 class PendingCommand;
+class LineEditCompleter;
 
 class ToggleButton : public QPushButton {
     Q_OBJECT
@@ -116,6 +118,8 @@ private:
     CardItem *activeCard;
     bool gameClosed;
     QStringList gameTypes;
+    QCompleter *completer;
+    QStringList autocompleteUserList;
     
     // Replay related members
     GameReplay *replay;
@@ -130,7 +134,7 @@ private:
     QLabel *timeElapsedLabel;
     MessageLogWidget *messageLog;
     QLabel *sayLabel;
-    QLineEdit *sayEdit;
+    LineEditCompleter *sayEdit;
     PhasesToolbar *phasesToolbar;
     GameScene *scene;
     GameView *gameView;
@@ -199,6 +203,8 @@ private slots:
 
     void addMentionTag(QString value);
     void commandFinished(const Response &response);
+
+    void actCompleterChanged();
 public:
     TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
