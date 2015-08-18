@@ -159,6 +159,7 @@ private slots:
     void actPlay();
     void actHide();
     void actPlayFacedown();
+    void refreshShortcuts();
 
 private:
     TabGame *game;

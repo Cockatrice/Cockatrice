@@ -18,8 +18,6 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
     contentsEdit = new QPlainTextEdit;
     
     refreshButton = new QPushButton(tr("&Refresh"));
-    refreshButton->setShortcut(settingsCache->shortcuts().getSingleShortcut(
-                                   "DlgLoadDeckFromClipboard/refreshButton"));
     connect(refreshButton, SIGNAL(clicked()), this, SLOT(actRefresh()));
     
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -37,11 +35,18 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
     resize(500, 500);
     
     actRefresh();
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
 }
 
 void DlgLoadDeckFromClipboard::actRefresh()
 {
     contentsEdit->setPlainText(QApplication::clipboard()->text());
+}
+
+void DlgLoadDeckFromClipboard::refreshShortcuts()
+{
+    refreshButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DlgLoadDeckFromClipboard/refreshButton"));
 }
 
 void DlgLoadDeckFromClipboard::actOK()

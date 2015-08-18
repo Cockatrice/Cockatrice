@@ -83,6 +83,7 @@ void ShortcutsSettings::setShortcuts(QString name, QList<QKeySequence> secuence)
     QString stringSecuence = stringifySecuence(secuence);
     shortCutsFile.setValue(name, stringSecuence);
     shortCutsFile.endGroup();
+    emit shortCutchanged();
 }
 
 void ShortcutsSettings::setShortcuts(QString name, QKeySequence secuence)

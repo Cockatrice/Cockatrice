@@ -456,40 +456,14 @@ void MainWindow::retranslateUi()
     setClientStatusTitle();
 
     aConnect->setText(tr("&Connect..."));
-    aConnect->setShortcuts(settingsCache->shortcuts().getShortcut(
-                               "MainWindow/aConnect"));
-
     aDisconnect->setText(tr("&Disconnect"));
-    aDisconnect->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                  "MainWindow/aDisconnect"));
-
     aSinglePlayer->setText(tr("Start &local game..."));
-    aSinglePlayer->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                    "MainWindow/aSinglePlayer"));
-
     aWatchReplay->setText(tr("&Watch replay..."));
-    aWatchReplay->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                   "MainWindow/aWatchReplay"));
-
     aDeckEditor->setText(tr("&Deck editor"));
-    aDeckEditor->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                  "MainWindow/aDeckEditor"));
-
     aFullScreen->setText(tr("&Full screen"));
-    aFullScreen->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                  "MainWindow/aFullScreen"));
-
     aRegister->setText(tr("&Register to server..."));
-    aRegister->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                "MainWindow/aRegister"));
-
     aSettings->setText(tr("&Settings..."));
-    aSettings->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                "MainWindow/aSettings"));
-
     aExit->setText(tr("&Exit"));
-    aExit->setShortcuts(settingsCache->shortcuts().getShortcut(
-                            "MainWindow/aExit"));
 
 #if defined(__APPLE__)  /* For OSX */
     cockatriceMenu->setTitle(tr("A&ctions"));
@@ -499,11 +473,7 @@ void MainWindow::retranslateUi()
 
     aAbout->setText(tr("&About Cockatrice"));
     helpMenu->setTitle(tr("&Help"));
-
     aCheckCardUpdates->setText(tr("Check for card updates..."));
-    aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                        "MainWindow/aCheckCardUpdates"));
-
     tabSupervisor->retranslateUi();
 }
 
@@ -622,6 +592,9 @@ MainWindow::MainWindow(QWidget *parent)
         createTrayActions();
         createTrayIcon();
     }
+
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
 }
 
 MainWindow::~MainWindow()
@@ -800,4 +773,18 @@ void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
 
     // this will force a database reload
     settingsCache->setCardDatabasePath(settingsCache->getCardDatabasePath());
+}
+
+void MainWindow::refreshShortcuts()
+{
+    aConnect->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aConnect"));
+    aDisconnect->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aDisconnect"));
+    aSinglePlayer->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSinglePlayer"));
+    aWatchReplay->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aWatchReplay"));
+    aDeckEditor->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aDeckEditor"));
+    aFullScreen->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aFullScreen"));
+    aRegister->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aRegister"));
+    aSettings->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSettings"));
+    aExit->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aExit"));
+    aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aCheckCardUpdates"));
 }

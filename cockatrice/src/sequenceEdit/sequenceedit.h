@@ -8,11 +8,11 @@ class QLineEdit;
 class QPushButton;
 class QEvent;
 
-class SecuenceEdit : public QWidget
+class SequenceEdit : public QWidget
 {
     Q_OBJECT
 public:
-    SecuenceEdit(QString _shorcutName, QWidget *parent = 0);
+    SequenceEdit(QString _shorcutName, QWidget *parent = 0);
     QString getSecuence();
 signals:
 

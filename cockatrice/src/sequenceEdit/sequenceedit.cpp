@@ -1,4 +1,4 @@
-#include "secuenceedit.h"
+#include "sequenceedit.h"
 #include "../settingscache.h"
 #include <QLineEdit>
 #include <QPushButton>
@@ -7,7 +7,7 @@
 #include <QKeyEvent>
 #include <QToolTip>
 
-SecuenceEdit::SecuenceEdit(QString _shorcutName, QWidget *parent) : QWidget(parent)
+SequenceEdit::SequenceEdit(QString _shorcutName, QWidget *parent) : QWidget(parent)
 {
     shorcutName = _shorcutName;
     currentKey = 0;
@@ -19,16 +19,21 @@ SecuenceEdit::SecuenceEdit(QString _shorcutName, QWidget *parent) : QWidget(pare
     clearButton = new QPushButton("", this);
     defaultButton = new QPushButton("", this);
 
-    lineEdit->setMinimumWidth(100);
+    lineEdit->setMinimumWidth(70);
     clearButton->setMaximumWidth(lineEdit->height());
     defaultButton->setMaximumWidth(lineEdit->height());
+    clearButton->setMaximumHeight(lineEdit->height());
+    defaultButton->setMaximumHeight(lineEdit->height());
 
     clearButton->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
     defaultButton->setIcon(QIcon(":/resources/icon_update.png"));
 
+    clearButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+    defaultButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
-    layout->setSpacing(0);
+    layout->setSpacing(1);
     layout->addWidget(lineEdit);
     layout->addWidget(clearButton);
     layout->addWidget(defaultButton);
@@ -40,12 +45,12 @@ SecuenceEdit::SecuenceEdit(QString _shorcutName, QWidget *parent) : QWidget(pare
     lineEdit->setText(settingsCache->shortcuts().getShortcutString(shorcutName));
 }
 
-QString SecuenceEdit::getSecuence()
+QString SequenceEdit::getSecuence()
 {
     return lineEdit->text();
 }
 
-void SecuenceEdit::removeLastShortcut()
+void SequenceEdit::removeLastShortcut()
 {
     QString secuences = lineEdit->text();
     if(!secuences.isEmpty())
@@ -60,13 +65,13 @@ void SecuenceEdit::removeLastShortcut()
     }
 }
 
-void SecuenceEdit::restoreDefault()
+void SequenceEdit::restoreDefault()
 {
     lineEdit->setText(settingsCache->shortcuts().getDefaultShortcutString(shorcutName));
     updateSettings();
 }
 
-bool SecuenceEdit::eventFilter(QObject *, QEvent * event)
+bool SequenceEdit::eventFilter(QObject *, QEvent * event)
 {
     if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
     {
@@ -81,7 +86,7 @@ bool SecuenceEdit::eventFilter(QObject *, QEvent * event)
     return false;
 }
 
-void SecuenceEdit::processKey(QKeyEvent* e)
+void SequenceEdit::processKey(QKeyEvent* e)
 {
     int key = e->key();
     if(key != Qt::Key_Control && key != Qt::Key_Shift
@@ -96,7 +101,7 @@ void SecuenceEdit::processKey(QKeyEvent* e)
         finishShortcut();
 }
 
-int SecuenceEdit::translateModifiers(Qt::KeyboardModifiers state, const QString &text)
+int SequenceEdit::translateModifiers(Qt::KeyboardModifiers state, const QString &text)
 {
     int result = 0;
     // The shift modifier only counts when it is not used to type a symbol
@@ -116,7 +121,7 @@ int SecuenceEdit::translateModifiers(Qt::KeyboardModifiers state, const QString 
     return result;
 }
 
-void SecuenceEdit::finishShortcut()
+void SequenceEdit::finishShortcut()
 {
     QKeySequence secuence(keys);
     if(!secuence.isEmpty() && valid)
@@ -143,7 +148,7 @@ void SecuenceEdit::finishShortcut()
     updateSettings();
 }
 
-void SecuenceEdit::updateSettings()
+void SequenceEdit::updateSettings()
 {
     settingsCache->shortcuts().setShortcuts(shorcutName,lineEdit->text());
 }

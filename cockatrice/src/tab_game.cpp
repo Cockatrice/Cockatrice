@@ -120,16 +120,14 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     setLayout(deckViewLayout);
     
     retranslateUi();
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
 }
 
 void DeckViewContainer::retranslateUi()
 {
     loadLocalButton->setText(tr("Load local deck"));
-    loadLocalButton->setShortcut(settingsCache->shortcuts().getSingleShortcut(
-                                     "DeckViewContainer/loadLocalButton"));
     loadRemoteButton->setText(tr("Load deck from server"));
-    loadRemoteButton->setShortcut(settingsCache->shortcuts().getSingleShortcut(
-                                      "DeckViewContainer/loadRemoteButton"));
     readyStartButton->setText(tr("Ready to s&tart"));
     updateSideboardLockButtonText();
 }
@@ -148,6 +146,58 @@ void DeckViewContainer::updateSideboardLockButtonText()
         sideboardLockButton->setText(tr("S&ideboard unlocked"));
     else
         sideboardLockButton->setText(tr("S&ideboard locked"));
+}
+
+void DeckViewContainer::refreshShortcuts()
+{
+    loadLocalButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/loadLocalButton"));
+    loadRemoteButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/loadRemoteButton"));
+}
+
+void TabGame::refreshShortcuts()
+{
+    for (int i = 0; i < phaseActions.size(); ++i) {
+        QAction *temp = phaseActions.at(i);
+        switch (i) {
+            case 0: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase0")); break;
+            case 1: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase1")); break;
+            case 2: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase2")); break;
+            case 3: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase3")); break;
+            case 4: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase4")); break;
+            case 5: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase5")); break;
+            case 6: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase6")); break;
+            case 7: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase7")); break;
+            case 8: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase8")); break;
+            case 9: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase9")); break;
+            case 10:temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase10")); break;
+            default: ;
+        }
+    }
+
+    if (aNextPhase) {
+        aNextPhase->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aNextPhase"));
+    }
+    if (aNextTurn) {
+        aNextTurn->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aNextTurn"));
+    }
+    if (aRemoveLocalArrows) {
+        aRemoveLocalArrows->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aRemoveLocalArrows"));
+    }
+    if (aRotateViewCW) {
+        aRotateViewCW->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aRotateViewCW"));
+    }
+    if (aRotateViewCCW) {
+        aRotateViewCCW->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aRotateViewCCW"));
+    }
+    if (aConcede) {
+        aConcede->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aConcede"));
+    }
+    if (aLeaveGame) {
+        aLeaveGame->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aLeaveGame"));
+    }
+    if (aCloseReplay) {
+        aCloseReplay->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aCloseReplay"));
+    }
 }
 
 void DeckViewContainer::loadLocalDeck()
@@ -361,6 +411,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     addTabMenu(gameMenu);
     
     retranslateUi();
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
     setLayout(superMainLayout);
 
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
@@ -470,23 +522,10 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     for (int i = 0; i < phasesToolbar->phaseCount(); ++i) {
         QAction *temp = new QAction(QString(), this);
         connect(temp, SIGNAL(triggered()), this, SLOT(actPhaseAction()));
-        switch (i) {
-            case 0: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase0")); break;
-            case 1: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase1")); break;
-            case 2: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase2")); break;
-            case 3: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase3")); break;
-            case 4: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase4")); break;
-            case 5: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase5")); break;
-            case 6: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase6")); break;
-            case 7: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase7")); break;
-            case 8: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase8")); break;
-            case 9: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase9")); break;
-            case 10:temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase10")); break;
-            default: ;
-        }
         phasesMenu->addAction(temp);
         phaseActions.append(temp);
     }
+
     phasesMenu->addSeparator();
     phasesMenu->addAction(aNextPhase);
     
@@ -505,6 +544,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     addTabMenu(gameMenu);
     
     retranslateUi();
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
     setLayout(mainLayout);
 
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
@@ -552,45 +593,29 @@ void TabGame::retranslateUi()
     gameMenu->setTitle(tr("&Game"));
     if (aNextPhase) {
         aNextPhase->setText(tr("Next &phase"));
-        aNextPhase->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                     "Player/aNextPhase"));
     }
     if (aNextTurn) {
         aNextTurn->setText(tr("Next &turn"));
-        aNextTurn->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                    "Player/aNextTurn"));
     }
     if (aRemoveLocalArrows) {
         aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
-        aRemoveLocalArrows->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                             "Player/aRemoveLocalArrows"));
     }
     if (aRotateViewCW) {
         aRotateViewCW->setText(tr("Rotate View Cl&ockwise"));
-        aRotateViewCW->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                        "Player/aRotateViewCW"));
     }
     if (aRotateViewCCW) {
         aRotateViewCCW->setText(tr("Rotate View Co&unterclockwise"));
-        aRotateViewCCW->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                         "Player/aRotateViewCCW"));
     }
     if (aGameInfo)
         aGameInfo->setText(tr("Game &information"));
     if (aConcede) {
         aConcede->setText(tr("&Concede"));
-        aConcede->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                   "Player/aConcede"));
     }
     if (aLeaveGame) {
         aLeaveGame->setText(tr("&Leave game"));
-        aLeaveGame->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                     "Player/aLeaveGame"));
     }
     if (aCloseReplay) {
         aCloseReplay->setText(tr("C&lose replay"));
-        aCloseReplay->setShortcuts(settingsCache->shortcuts().getShortcut(
-                                       "Player/aCloseReplay"));
     }
     
     if (sayLabel)

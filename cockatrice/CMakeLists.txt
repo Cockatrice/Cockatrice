@@ -95,7 +95,7 @@ SET(cockatrice_SOURCES
     src/soundengine.cpp
     src/pending_command.cpp
     src/shortcutssettings.cpp
-    src/sequenceEdit/secuenceedit.cpp
+    src/sequenceEdit/sequenceedit.cpp
     src/sequenceEdit/shortcutstab.cpp
     ${VERSION_STRING_CPP}
 )
