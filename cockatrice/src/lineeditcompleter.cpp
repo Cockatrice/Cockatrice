@@ -46,6 +46,7 @@ void LineEditCompleter::keyPressEvent(QKeyEvent * event)
             //Truncate the line to last space or whole string
             QString textValue = text();
             int lastIndexof = textValue.lastIndexOf(" ");
+			lastIndexof = qMax(0, lastIndexof);
             QString finalString = textValue.left(lastIndexof);
             //Add a space if there's a word
             if (finalString != "")
