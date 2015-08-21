@@ -97,6 +97,7 @@ SET(cockatrice_SOURCES
     src/shortcutssettings.cpp
     src/sequenceEdit/sequenceedit.cpp
     src/sequenceEdit/shortcutstab.cpp
+    src/lineeditcompleter.cpp
     ${VERSION_STRING_CPP}
 )
 

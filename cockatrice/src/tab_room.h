@@ -2,6 +2,7 @@
 #define TAB_ROOM_H
 
 #include "tab.h"
+#include "lineeditcompleter.h"
 #include <QGroupBox>
 #include <QMap>
 #include <QLineEdit>
@@ -28,7 +29,7 @@ class GameSelector;
 class Response;
 class PendingCommand;
 class ServerInfo_User;
-class CustomLineEdit;
+class LineEditCompleter;
 
 class TabRoom : public Tab {
     Q_OBJECT
@@ -43,7 +44,7 @@ private:
     UserList *userList;
     ChatView *chatView;
     QLabel *sayLabel;
-    CustomLineEdit *sayEdit;
+    LineEditCompleter *sayEdit;
     QGroupBox *chatGroupBox;
     
     QMenu *roomMenu;
@@ -89,23 +90,6 @@ public:
 
     PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd);
     void sendRoomCommand(PendingCommand *pend);
-};
-
-class CustomLineEdit : public QLineEdit
-{
-    Q_OBJECT
-private:
-    QString cursorWord(const QString& line) const;
-    QCompleter* c;
-private slots:
-    void insertCompletion(QString);
-protected:
-    void keyPressEvent(QKeyEvent * event);
-    void focusOutEvent(QFocusEvent * e);
-public:
-    explicit CustomLineEdit(QWidget *parent = 0);
-    void setCompleter(QCompleter*);
-    void updateCompleterModel(QStringList);
 };
 
 #endif
