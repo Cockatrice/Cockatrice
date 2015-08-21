@@ -1,4 +1,3 @@
-#include <QSettings>
 #include <QLabel>
 #include <QCheckBox>
 #include <QComboBox>
@@ -11,25 +10,23 @@
 #include <QKeyEvent>
 #include <iostream>
 #include "dlg_connect.h"
+#include "settingscache.h"
 
 DlgConnect::DlgConnect(QWidget *parent)
     : QDialog(parent)
 {
-    QSettings settings;
-    settings.beginGroup("server");
-
     previousHostButton = new QRadioButton(tr("Previous Host"), this);
-
     previousHosts = new QComboBox(this);
     previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
-    QStringList previousHostList = settings.value("previoushosts").toStringList();
+
+    QStringList previousHostList = settingsCache->servers().getPreviousHostList();
     if (previousHostList.isEmpty()) {
         previousHostList << "cockatrice.woogerworks.com";
         previousHostList << "vps.poixen.com";
         previousHostList << "chickatrice.net";
     }
     previousHosts->addItems(previousHostList);
-    previousHosts->setCurrentIndex(settings.value("previoushostindex").toInt());
+    previousHosts->setCurrentIndex(settingsCache->servers().getPrevioushostindex());
 
     newHostButton = new QRadioButton(tr("New Host"), this);
     
@@ -39,28 +36,28 @@ DlgConnect::DlgConnect(QWidget *parent)
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
-    portEdit = new QLineEdit(settings.value("port", "4747").toString());
+    portEdit = new QLineEdit(settingsCache->servers().getPort("4747"));
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
-    playernameEdit = new QLineEdit(settings.value("playername", "Player").toString());
+    playernameEdit = new QLineEdit(settingsCache->servers().getPlayerName("Player"));
     playernameLabel->setBuddy(playernameEdit);
 
     passwordLabel = new QLabel(tr("P&assword:"));
-    passwordEdit = new QLineEdit(settings.value("password").toString());
+    passwordEdit = new QLineEdit(settingsCache->servers().getPassword());
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
     
     savePasswordCheckBox = new QCheckBox(tr("&Save password"));
-    savePasswordCheckBox->setChecked(settings.value("save_password", 1).toInt());
+    savePasswordCheckBox->setChecked(settingsCache->servers().getSavePassword());
 
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect at start"));
     if(savePasswordCheckBox->isChecked())
     {
-        autoConnectCheckBox->setChecked(settings.value("auto_connect", 0).toInt());
+        autoConnectCheckBox->setChecked(settingsCache->servers().getAutoConnect());
         autoConnectCheckBox->setEnabled(true);
     } else {
-        settings.setValue("auto_connect", 0);
+        settingsCache->servers().setAutoConnect(0);
         autoConnectCheckBox->setChecked(0);
         autoConnectCheckBox->setEnabled(false);
     }
@@ -98,7 +95,7 @@ DlgConnect::DlgConnect(QWidget *parent)
     connect(previousHostButton, SIGNAL(toggled(bool)), this, SLOT(previousHostSelected(bool)));
     connect(newHostButton, SIGNAL(toggled(bool)), this, SLOT(newHostSelected(bool)));
 
-    if (settings.value("previoushostlogin", 1).toInt())
+    if (settingsCache->servers().getPreviousHostLogin())
         previousHostButton->setChecked(true);
     else
         newHostButton->setChecked(true);
@@ -133,14 +130,12 @@ void DlgConnect::passwordSaved(int state)
 
 void DlgConnect::actOk()
 {
-    QSettings settings;
-    settings.beginGroup("server");
-    settings.setValue("port", portEdit->text());
-    settings.setValue("playername", playernameEdit->text());
-    settings.setValue("password", savePasswordCheckBox->isChecked() ? passwordEdit->text() : QString());
-    settings.setValue("save_password", savePasswordCheckBox->isChecked() ? 1 : 0);
-    settings.setValue("auto_connect", autoConnectCheckBox->isChecked() ? 1 : 0);
-    settings.setValue("previoushostlogin", previousHostButton->isChecked() ? 1 : 0);
+    settingsCache->servers().setPort(portEdit->text());
+    settingsCache->servers().setPlayerName(playernameEdit->text());
+    settingsCache->servers().setPassword(savePasswordCheckBox->isChecked() ? passwordEdit->text() : QString());
+    settingsCache->servers().setSavePassword(savePasswordCheckBox->isChecked() ? 1 : 0);
+    settingsCache->servers().setAutoConnect(autoConnectCheckBox->isChecked() ? 1 : 0);
+    settingsCache->servers().setPreviousHostLogin(previousHostButton->isChecked() ? 1 : 0);
     
     QStringList hostList;
     if (newHostButton->isChecked())
@@ -151,9 +146,8 @@ void DlgConnect::actOk()
         if(!previousHosts->itemText(i).trimmed().isEmpty())
             hostList << previousHosts->itemText(i);
     
-    settings.setValue("previoushosts", hostList);
-    settings.setValue("previoushostindex", previousHosts->currentIndex());
-    settings.endGroup();
+    settingsCache->servers().setPreviousHostList(hostList);
+    settingsCache->servers().setPrevioushostindex(previousHosts->currentIndex());
 
     accept();
 }
@@ -165,12 +159,8 @@ QString DlgConnect::getHost() const {
 
 void DlgConnect::actCancel()
 {
-    QSettings settings;
-    settings.beginGroup("server");
-    settings.setValue("save_password", savePasswordCheckBox->isChecked() ? 1 : 0);
-    settings.setValue("auto_connect", autoConnectCheckBox->isChecked() ? 1 : 0);
-    settings.endGroup();
-    
+    settingsCache->servers().setSavePassword(savePasswordCheckBox->isChecked() ? 1 : 0);
+    settingsCache->servers().setAutoConnect( autoConnectCheckBox->isChecked() ? 1 : 0);
     reject();
 }
 

@@ -13,7 +13,6 @@
 #include <QToolBar>
 #include <QTranslator>
 #include <QAction>
-#include <QSettings>
 #include <QApplication>
 #include <QInputDialog>
 #include <QSpinBox>
@@ -632,12 +631,11 @@ MessagesSettingsPage::MessagesSettingsPage()
     highlightGroupBox = new QGroupBox;
     highlightGroupBox->setLayout(highlightNotice);
 
-    QSettings settings;
     messageList = new QListWidget;
-    settings.beginGroup("messages");
-    int count = settings.value("count", 0).toInt();
+
+    int count = settingsCache->messages().getCount();
     for (int i = 0; i < count; i++)
-        messageList->addItem(settings.value(QString("msg%1").arg(i)).toString());
+        messageList->addItem(settingsCache->messages().getMessageAt(i));
     
     aAdd = new QAction(this);
     aAdd->setIcon(QIcon(":/resources/increment.svg"));
@@ -709,11 +707,9 @@ void MessagesSettingsPage::updateHighlightPreview() {
 
 void MessagesSettingsPage::storeSettings()
 {
-    QSettings settings;
-    settings.beginGroup("messages");
-    settings.setValue("count", messageList->count());
+    settingsCache->messages().setCount(messageList->count());
     for (int i = 0; i < messageList->count(); i++)
-        settings.setValue(QString("msg%1").arg(i), messageList->item(i)->text());
+        settingsCache->messages().setMessageAt(i, messageList->item(i)->text());
 }
 
 void MessagesSettingsPage::actAdd()

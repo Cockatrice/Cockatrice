@@ -26,7 +26,6 @@
 #include <QTranslator>
 #include <QLibraryInfo>
 #include <QDateTime>
-#include <QSettings>
 #include <QIcon>
 #include <QDir>
 #include <QDesktopServices>

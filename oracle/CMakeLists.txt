@@ -14,6 +14,12 @@ SET(oracle_SOURCES
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/settingscache.cpp
     ../cockatrice/src/shortcutssettings.cpp
+    ../cockatrice/src/settings/carddatabasesettings.cpp
+    ../cockatrice/src/settings/serverssettings.cpp
+    ../cockatrice/src/settings/settingsmanager.cpp
+    ../cockatrice/src/settings/messagesettings.cpp
+    ../cockatrice/src/settings/gamefilterssettings.cpp
+    ../cockatrice/src/settings/layoutssettings.cpp
     ../cockatrice/src/qt-json/json.cpp
  )
 

@@ -52,13 +52,7 @@ private:
     QSet<int> gameTypeFilter;
     int maxPlayersFilterMin, maxPlayersFilterMax;
 
-    static const int DEFAULT_MAX_PLAYERS_MAX = 99;
-
-    /*
-     * The game type might contain special characters, so to use it in
-     * QSettings we just hash it.
-     */
-    QString hashGameType(const QString &gameType) const;
+    static const int DEFAULT_MAX_PLAYERS_MAX = 99;   
 public:
     GamesProxyModel(QObject *parent = 0, ServerInfo_User *_ownUser = 0);
 

@@ -5,7 +5,6 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QTextStream>
-#include <QSettings>
 #include <QSvgRenderer>
 #include <QPainter>
 #include <QUrl>
@@ -50,46 +49,29 @@ QString CardSet::getCorrectedShortName() const
     return invalidFileNames.contains(shortName) ? shortName + "_" : shortName;
 }
 
+void CardSet::loadSetOptions()
+{
+    sortKey = settingsCache->cardDatabase().getSortKey(shortName);
+    enabled = settingsCache->cardDatabase().isEnabled(shortName);
+    isknown = settingsCache->cardDatabase().isKnown(shortName);
+}
+
 void CardSet::setSortKey(unsigned int _sortKey)
 {
     sortKey = _sortKey;
-
-    QSettings settings;
-    settings.beginGroup("sets");
-    settings.beginGroup(shortName);
-    settings.setValue("sortkey", sortKey);
-}
-
-void CardSet::loadSetOptions()
-{
-    QSettings settings;
-    settings.beginGroup("sets");
-    settings.beginGroup(shortName);
-
-    sortKey = settings.value("sortkey", 0).toInt();
-    enabled = settings.value("enabled", false).toBool();
-    isknown = settings.value("isknown", false).toBool();
-    // qDebug() << "load set" << shortName << "key" << sortKey;
+    settingsCache->cardDatabase().setSortKey(shortName,_sortKey);
 }
 
 void CardSet::setEnabled(bool _enabled)
 {
     enabled = _enabled;
-
-    QSettings settings;
-    settings.beginGroup("sets");
-    settings.beginGroup(shortName);
-    settings.setValue("enabled", enabled);
+    settingsCache->cardDatabase().setEnabled(shortName,_enabled);
 }
 
 void CardSet::setIsKnown(bool _isknown)
 {
     isknown = _isknown;
-
-    QSettings settings;
-    settings.beginGroup("sets");
-    settings.beginGroup(shortName);
-    settings.setValue("isknown", isknown);
+    settingsCache->cardDatabase().setIsKnown(shortName,_isknown);
 }
 
 class SetList::KeyCompareFunctor {

@@ -494,21 +494,21 @@ void TabDeckEditor::refreshShortcuts()
 
 void TabDeckEditor::loadLayout()
 {
-    MainWindow->restoreState(settingsCache->getDeckEditorLayoutState());
-    MainWindow->restoreGeometry(settingsCache->getDeckEditorGeometry());
+    MainWindow->restoreState(settingsCache->layouts().getDeckEditorLayoutState());
+    MainWindow->restoreGeometry(settingsCache->layouts().getDeckEditorGeometry());
 
     btnCard->setChecked(!cardInfoDock->isHidden());
     btnFilter->setChecked(!filterDock->isHidden());
     btnDeck->setChecked(!deckDock->isHidden());
 
-    cardInfoDock->setMinimumSize(settingsCache->getDeckEditorCardSize());
-    cardInfoDock->setMaximumSize(settingsCache->getDeckEditorCardSize());
+    cardInfoDock->setMinimumSize(settingsCache->layouts().getDeckEditorCardSize());
+    cardInfoDock->setMaximumSize(settingsCache->layouts().getDeckEditorCardSize());
 
-    filterDock->setMinimumSize(settingsCache->getDeckEditorFilterSize());
-    filterDock->setMaximumSize(settingsCache->getDeckEditorFilterSize());
+    filterDock->setMinimumSize(settingsCache->layouts().getDeckEditorFilterSize());
+    filterDock->setMaximumSize(settingsCache->layouts().getDeckEditorFilterSize());
 
-    deckDock->setMinimumSize(settingsCache->getDeckEditorDeckSize());
-    deckDock->setMaximumSize(settingsCache->getDeckEditorDeckSize());
+    deckDock->setMinimumSize(settingsCache->layouts().getDeckEditorDeckSize());
+    deckDock->setMaximumSize(settingsCache->layouts().getDeckEditorDeckSize());
 
     QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
@@ -1009,11 +1009,11 @@ bool TabDeckEditor::eventFilter(QObject * o, QEvent * e)
             btnFilter->setChecked(false);            
     }   
     if( o == this && e->type() == QEvent::Hide){
-        settingsCache->setDeckEditorLayoutState(MainWindow->saveState());
-        settingsCache->setDeckEditorGeometry(MainWindow->saveGeometry());
-        settingsCache->setDeckEditorCardSize(cardInfoDock->size());
-        settingsCache->setDeckEditorFilterSize(filterDock->size());
-        settingsCache->setDeckEditorDeckSize(deckDock->size());
+        settingsCache->layouts().setDeckEditorLayoutState(MainWindow->saveState());
+        settingsCache->layouts().setDeckEditorGeometry(MainWindow->saveGeometry());
+        settingsCache->layouts().setDeckEditorCardSize(cardInfoDock->size());
+        settingsCache->layouts().setDeckEditorFilterSize(filterDock->size());
+        settingsCache->layouts().setDeckEditorDeckSize(deckDock->size());
     }
     return false;
 }

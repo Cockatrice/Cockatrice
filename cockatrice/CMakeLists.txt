@@ -98,6 +98,12 @@ SET(cockatrice_SOURCES
     src/sequenceEdit/sequenceedit.cpp
     src/sequenceEdit/shortcutstab.cpp
     src/lineeditcompleter.cpp
+    src/settings/settingsmanager.cpp
+    src/settings/carddatabasesettings.cpp
+    src/settings/serverssettings.cpp
+    src/settings/messagesettings.cpp
+    src/settings/gamefilterssettings.cpp
+    src/settings/layoutssettings.cpp
     ${VERSION_STRING_CPP}
 )
 
