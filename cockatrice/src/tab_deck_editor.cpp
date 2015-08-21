@@ -256,37 +256,41 @@ void TabDeckEditor::createFiltersDock()
 void TabDeckEditor::createMenus()
 {
     aNewDeck = new QAction(QString(), this);
-    aNewDeck->setShortcuts(QKeySequence::New);
     connect(aNewDeck, SIGNAL(triggered()), this, SLOT(actNewDeck()));
+
     aLoadDeck = new QAction(QString(), this);
-    aLoadDeck->setShortcuts(QKeySequence::Open);
     connect(aLoadDeck, SIGNAL(triggered()), this, SLOT(actLoadDeck()));
+
     aSaveDeck = new QAction(QString(), this);
-    aSaveDeck->setShortcuts(QKeySequence::Save);
     connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
+
     aSaveDeckAs = new QAction(QString(), this);
-//  aSaveDeckAs->setShortcuts(QKeySequence::SaveAs);
     connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
+
+    aOpenCustomsetsFolder = new QAction(QString(), this);
+        connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
+
     aLoadDeckFromClipboard = new QAction(QString(), this);
     connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
-    aLoadDeckFromClipboard->setShortcuts(QKeySequence::Paste);
+
     aSaveDeckToClipboard = new QAction(QString(), this);
     connect(aSaveDeckToClipboard, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboard()));
-    aSaveDeckToClipboard->setShortcuts(QKeySequence::Copy);
+
     aPrintDeck = new QAction(QString(), this);
-    aPrintDeck->setShortcuts(QKeySequence::Print);
     connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
+
     aAnalyzeDeck = new QAction(QString(), this);
     connect(aAnalyzeDeck, SIGNAL(triggered()), this, SLOT(actAnalyzeDeck()));
+
     aClose = new QAction(QString(), this);
     connect(aClose, SIGNAL(triggered()), this, SLOT(closeRequest()));
+
     aOpenCustomFolder = new QAction(QString(), this);
     connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
-    aOpenCustomsetsFolder = new QAction(QString(), this);
-    connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
 
     aEditSets = new QAction(QString(), this);
     connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
+
     aEditTokens = new QAction(QString(), this);
     connect(aEditTokens, SIGNAL(triggered()), this, SLOT(actEditTokens()));
 
@@ -424,7 +428,7 @@ void TabDeckEditor::createCentralFrame()
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->setObjectName("mainLayout");
     mainLayout->addWidget(MainWindow);
-    setLayout(mainLayout);    
+    setLayout(mainLayout);
 }
 
 void TabDeckEditor::restartLayout()
@@ -462,6 +466,30 @@ void TabDeckEditor::freeDocksSize()
 
     filterDock->setMinimumSize(100,100);
     filterDock->setMaximumSize(5000,5000);
+}
+
+void TabDeckEditor::refreshShortcuts()
+{
+    aNewDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aNewDeck"));
+    aLoadDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aLoadDeck"));
+    aSaveDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeck"));
+    aSaveDeckAs->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeckAs"));
+    aLoadDeckFromClipboard->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
+    aPrintDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aPrintDeck"));
+    aAnalyzeDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aAnalyzeDeck"));
+    aClose->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClose"));
+    aOpenCustomFolder->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aOpenCustomFolder"));
+    aEditSets->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aEditSets"));
+    aEditTokens->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aEditTokens"));
+    aResetLayout->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aResetLayout"));
+    aClearFilterAll->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterAll"));
+    aClearFilterOne->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterOne"));
+    aSaveDeckToClipboard->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeckToClipboard"));
+    aClearFilterOne->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterOne"));
+    aClose->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClose"));
+    aRemoveCard->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aRemoveCard"));
+    aIncrement->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aIncrement"));
+    aDecrement->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aDecrement"));
 }
 
 void TabDeckEditor::loadLayout()
@@ -504,6 +532,9 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     this->installEventFilter(this);    
 
     retranslateUi();
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
+
     QTimer::singleShot(0, this, SLOT(checkFirstRunDetected()));
     QTimer::singleShot(0, this, SLOT(loadLayout()));
 }
@@ -519,7 +550,6 @@ void TabDeckEditor::retranslateUi()
 
     aClearFilterAll->setText(tr("&Clear all filters"));
     aClearFilterOne->setText(tr("Delete selected"));
-    aClearFilterOne->setShortcut(QKeySequence("Backspace"));
     
     nameLabel->setText(tr("Deck &name:"));
     commentsLabel->setText(tr("&Comments:"));
@@ -537,19 +567,17 @@ void TabDeckEditor::retranslateUi()
     aPrintDeck->setText(tr("&Print deck..."));
     aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
     aOpenCustomFolder->setText(tr("Open custom image folder"));
-    aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
+    aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));    
     aClose->setText(tr("&Close"));
-    aClose->setShortcut(QKeySequence("Ctrl+Q"));
     
     aAddCard->setText(tr("Add card to &maindeck"));
     aAddCardToSideboard->setText(tr("Add card to &sideboard"));
 
     aRemoveCard->setText(tr("&Remove row"));
-    aRemoveCard->setShortcut(QKeySequence("Del"));
+
     aIncrement->setText(tr("&Increment number"));
-    aIncrement->setShortcut(QKeySequence("+"));
+
     aDecrement->setText(tr("&Decrement number"));
-    aDecrement->setShortcut(QKeySequence("-"));
     
     deckMenu->setTitle(tr("&Deck Editor"));
     dbMenu->setTitle(tr("C&ard Database"));

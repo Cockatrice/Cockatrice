@@ -12,6 +12,7 @@ class DlgLoadDeckFromClipboard : public QDialog {
 private slots:
     void actOK();
     void actRefresh();
+    void refreshShortcuts();
 private:
     DeckLoader *deckList;
 public:

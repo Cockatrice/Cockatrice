@@ -13,6 +13,7 @@ SET(oracle_SOURCES
     src/oracleimporter.cpp
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/settingscache.cpp
+    ../cockatrice/src/shortcutssettings.cpp
     ../cockatrice/src/qt-json/json.cpp
  )
 

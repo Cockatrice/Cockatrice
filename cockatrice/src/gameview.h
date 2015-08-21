@@ -17,6 +17,7 @@ private slots:
     void startRubberBand(const QPointF &selectionOrigin);
     void resizeRubberBand(const QPointF &cursorPoint);
     void stopRubberBand();
+    void refreshShortcuts();
 public slots:
     void updateSceneRect(const QRectF &rect);
 public:

@@ -83,6 +83,7 @@ class TabDeckEditor : public Tab {
             void loadLayout();
             void restartLayout();
             void freeDocksSize();
+            void refreshShortcuts();
 
 private:
     CardInfo *currentCardInfo() const;

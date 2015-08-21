@@ -68,7 +68,6 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     QMenu *chatSettingsMenu = new QMenu(this);
 
     aClearChat = chatSettingsMenu->addAction(QString());
-    aClearChat->setShortcut(QKeySequence("F12"));
     connect(aClearChat, SIGNAL(triggered()), this, SLOT(actClearChat()));
 
     chatSettingsMenu->addSeparator();
@@ -132,6 +131,8 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
 
     sayEdit->setCompleter(completer);
     actCompleterChanged();
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
 }
 
 TabRoom::~TabRoom()
@@ -280,6 +281,11 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     }
     chatView->appendMessage(QString::fromStdString(event.message()), senderName, userLevel, true);
     emit userEvent(false);
+}
+
+void TabRoom::refreshShortcuts()
+{
+    aClearChat->setShortcuts(settingsCache->shortcuts().getShortcut("tab_room/aClearChat"));
 }
 
 void TabRoom::addMentionTag(QString mentionTag) {

@@ -94,6 +94,9 @@ SET(cockatrice_SOURCES
     src/qt-json/json.cpp
     src/soundengine.cpp
     src/pending_command.cpp
+    src/shortcutssettings.cpp
+    src/sequenceEdit/sequenceedit.cpp
+    src/sequenceEdit/shortcutstab.cpp
     ${VERSION_STRING_CPP}
 )
 

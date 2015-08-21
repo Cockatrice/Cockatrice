@@ -1,5 +1,6 @@
 #include "gameview.h"
 #include "gamescene.h"
+#include "settingscache.h"
 #include <QResizeEvent>
 #include <QAction>
 #include <QRubberBand>
@@ -19,10 +20,11 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
     connect(scene, SIGNAL(sigStopRubberBand()), this, SLOT(stopRubberBand()));
 
     aCloseMostRecentZoneView = new QAction(this);
-    aCloseMostRecentZoneView->setShortcut(QKeySequence("Esc"));
+
     connect(aCloseMostRecentZoneView, SIGNAL(triggered()), scene, SLOT(closeMostRecentZoneView()));
     addAction(aCloseMostRecentZoneView);
-
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
     rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 }
 
@@ -58,4 +60,9 @@ void GameView::resizeRubberBand(const QPointF &cursorPoint)
 void GameView::stopRubberBand()
 {
     rubberBand->hide();
+}
+
+void GameView::refreshShortcuts()
+{
+    aCloseMostRecentZoneView->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aCloseMostRecentZoneView"));
 }

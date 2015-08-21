@@ -28,6 +28,7 @@
 #include "settingscache.h"
 #include "priceupdater.h"
 #include "soundengine.h"
+#include "sequenceEdit/shortcutstab.h"
 
 #define LINKING_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Download-URLs"
 
@@ -863,6 +864,7 @@ DlgSettings::DlgSettings(QWidget *parent)
     pagesWidget->addWidget(new DeckEditorSettingsPage);
     pagesWidget->addWidget(new MessagesSettingsPage);
     pagesWidget->addWidget(new SoundSettingsPage);
+    pagesWidget->addWidget(new ShortcutsTab);
     
     createIcons();
     contentsWidget->setCurrentRow(0);
@@ -917,6 +919,11 @@ void DlgSettings::createIcons()
     soundButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     soundButton->setIcon(QIcon(":/resources/icon_config_sound.svg"));
     
+    shortcutsButton = new QListWidgetItem(contentsWidget);
+    shortcutsButton->setTextAlignment(Qt::AlignHCenter);
+    shortcutsButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    shortcutsButton->setIcon(QIcon(":/resources/icon_config_shorcuts.svg"));
+
     connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(changePage(QListWidgetItem *, QListWidgetItem *)));
 }
 
@@ -1026,6 +1033,7 @@ void DlgSettings::retranslateUi()
     deckEditorButton->setText(tr("Deck Editor"));
     messagesButton->setText(tr("Chat"));
     soundButton->setText(tr("Sound"));
+    shortcutsButton->setText(tr("Shortcuts"));
     
     for (int i = 0; i < pagesWidget->count(); i++)
         dynamic_cast<AbstractSettingsPage *>(pagesWidget->widget(i))->retranslateUi();
