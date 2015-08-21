@@ -86,6 +86,7 @@ private slots:
     void sideboardPlanChanged();
     void sideboardLockButtonClicked();
     void updateSideboardLockButtonText();
+    void refreshShortcuts();
 signals:
     void newCardAdded(AbstractCardItem *card);
 public:
@@ -203,8 +204,12 @@ private slots:
 
     void addMentionTag(QString value);
     void commandFinished(const Response &response);
+<<<<<<< HEAD
 
     void actCompleterChanged();
+=======
+    void refreshShortcuts();
+>>>>>>> master
 public:
     TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);

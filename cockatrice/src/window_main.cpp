@@ -461,7 +461,6 @@ void MainWindow::retranslateUi()
     aWatchReplay->setText(tr("&Watch replay..."));
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
-    aFullScreen->setShortcut(QKeySequence("Ctrl+F"));
     aRegister->setText(tr("&Register to server..."));
     aSettings->setText(tr("&Settings..."));
     aExit->setText(tr("&Exit"));
@@ -471,10 +470,10 @@ void MainWindow::retranslateUi()
 #else
     cockatriceMenu->setTitle(tr("&Cockatrice"));
 #endif
+
     aAbout->setText(tr("&About Cockatrice"));
     helpMenu->setTitle(tr("&Help"));
     aCheckCardUpdates->setText(tr("Check for card updates..."));
-
     tabSupervisor->retranslateUi();
 }
 
@@ -593,6 +592,9 @@ MainWindow::MainWindow(QWidget *parent)
         createTrayActions();
         createTrayIcon();
     }
+
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
 }
 
 MainWindow::~MainWindow()
@@ -771,4 +773,18 @@ void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
 
     // this will force a database reload
     settingsCache->setCardDatabasePath(settingsCache->getCardDatabasePath());
+}
+
+void MainWindow::refreshShortcuts()
+{
+    aConnect->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aConnect"));
+    aDisconnect->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aDisconnect"));
+    aSinglePlayer->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSinglePlayer"));
+    aWatchReplay->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aWatchReplay"));
+    aDeckEditor->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aDeckEditor"));
+    aFullScreen->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aFullScreen"));
+    aRegister->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aRegister"));
+    aSettings->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSettings"));
+    aExit->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aExit"));
+    aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aCheckCardUpdates"));
 }

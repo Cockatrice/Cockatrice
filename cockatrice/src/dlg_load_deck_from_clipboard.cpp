@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include "dlg_load_deck_from_clipboard.h"
 #include "deck_loader.h"
+#include "settingscache.h"
 
 DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
     : QDialog(parent), deckList(0)
@@ -17,7 +18,6 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
     contentsEdit = new QPlainTextEdit;
     
     refreshButton = new QPushButton(tr("&Refresh"));
-    refreshButton->setShortcut(QKeySequence("F5"));
     connect(refreshButton, SIGNAL(clicked()), this, SLOT(actRefresh()));
     
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -35,11 +35,18 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
     resize(500, 500);
     
     actRefresh();
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
 }
 
 void DlgLoadDeckFromClipboard::actRefresh()
 {
     contentsEdit->setPlainText(QApplication::clipboard()->text());
+}
+
+void DlgLoadDeckFromClipboard::refreshShortcuts()
+{
+    refreshButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DlgLoadDeckFromClipboard/refreshButton"));
 }
 
 void DlgLoadDeckFromClipboard::actOK()

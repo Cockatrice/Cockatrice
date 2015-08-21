@@ -26,6 +26,7 @@ private:
     bool dialogSemaphore, deleteAfterDialog;
     bool shownInCounterArea;
 private slots:
+    void refreshShortcuts();
     void incrementCounter();
     void setCounter();
 public:
@@ -44,6 +45,7 @@ public:
     
     void setShortcutsActive();
     void setShortcutsInactive();
+    bool shortcutActive;
 };
 
 #endif

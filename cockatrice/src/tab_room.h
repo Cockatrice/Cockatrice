@@ -74,6 +74,7 @@ private slots:
     void processJoinRoomEvent(const Event_JoinRoom &event);
     void processLeaveRoomEvent(const Event_LeaveRoom &event);
     void processRoomSayEvent(const Event_RoomSay &event);
+    void refreshShortcuts();
 public:
     TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *_ownUser, const ServerInfo_Room &info);
     ~TabRoom();
