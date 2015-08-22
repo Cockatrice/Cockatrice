@@ -32,6 +32,7 @@
 #include "main.h"
 #include "settingscache.h"
 #include "carddatabase.h"
+#include "pictureloader.h"
 #include "replay_timeline_widget.h"
 #include "lineeditcompleter.h"
 
@@ -242,7 +243,7 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
 {
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     DeckLoader newDeck(QString::fromStdString(resp.deck()));
-    db->cacheCardPixmaps(newDeck.getCardList());
+    PictureLoader::cacheCardPixmaps(db->getCards(newDeck.getCardList()));
     setDeck(newDeck);
 }
 
@@ -1044,7 +1045,7 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
                 DeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
                 if (playerInfo.has_deck_list()) {
                     DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
-                    db->cacheCardPixmaps(newDeck.getCardList());
+                    PictureLoader::cacheCardPixmaps(db->getCards(newDeck.getCardList()));
                     deckViewContainer->setDeck(newDeck);
                     player->setDeck(newDeck);
                 }
