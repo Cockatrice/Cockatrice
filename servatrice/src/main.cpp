@@ -33,6 +33,9 @@
 #include "rng_sfmt.h"
 #include "version_string.h"
 #include <google/protobuf/stubs/common.h>
+#if QT_VERSION_CHECK(5, 2, 0)
+#include <qcommandlineparser.h>
+#endif
 
 RNG_Abstract *rng;
 ServerLogger *logger;
@@ -129,15 +132,45 @@ int main(int argc, char *argv[])
 	QCoreApplication app(argc, argv);
 	app.setOrganizationName("Cockatrice");
 	app.setApplicationName("Servatrice");
-	
-	QStringList args = app.arguments();
-	bool testRandom = args.contains("--test-random");
-	bool testHashFunction = args.contains("--test-hash");
-	bool logToConsole = args.contains("--log-to-console");
+	app.setApplicationVersion(VERSION_STRING);
+
+	bool testRandom = false;
+	bool testHashFunction = false;
+	bool logToConsole = false;
 	QString configPath;
-	int hasConfigPath=args.indexOf("--config");
-	if(hasConfigPath > -1 && args.count() > hasConfigPath + 1)
-		configPath = args.at(hasConfigPath + 1);
+
+#if QT_VERSION_CHECK(5, 2, 0)
+	QCommandLineParser parser;
+	parser.addHelpOption();
+	parser.addVersionOption();
+
+	QCommandLineOption testRandomOpt("test-random", "Test PRNG (chi^2)");
+	parser.addOption(testRandomOpt);
+
+	QCommandLineOption testHashFunctionOpt("test-hash", "Test password hash function");
+	parser.addOption(testHashFunctionOpt);
+
+	QCommandLineOption logToConsoleOpt("log-to-console", "Write server logs to console");
+	parser.addOption(logToConsoleOpt);
+
+	QCommandLineOption configPathOpt("config", "Read server configuration from <file>", "file", "");
+	parser.addOption(configPathOpt);
+
+	parser.process(app);
+
+	testRandom = parser.isSet(testRandomOpt);
+	testHashFunction = parser.isSet(testHashFunctionOpt);
+	logToConsole = parser.isSet(logToConsoleOpt);
+	configPath = parser.value(configPathOpt);
+#else
+	QStringList args = app.arguments();
+	testRandom = args.contains("--test-random");
+	testHashFunction = args.contains("--test-hash");
+ 	logToConsole = args.contains("--log-to-console");
+ 	int hasConfigPath = args.indexOf("--config");
+ 	if (hasConfigPath > -1 && args.count() > hasConfigPath + 1)
+ 		configPath = args.at(hasConfigPath + 1);
+#endif // QT_VERSION_CHECK
 	
 	qRegisterMetaType<QList<int> >("QList<int>");
 
