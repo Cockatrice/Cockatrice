@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y\
   cmake\
   git\
   libprotobuf-dev\
+  libqt5sql5-mysql\
   libqt5svg5-dev\
   libqt5webkit5-dev\
   libsqlite3-dev\
@@ -37,4 +38,4 @@ WORKDIR /home/servatrice
 
 EXPOSE 4747
 
-CMD servatrice
+ENTRYPOINT [ "servatrice" ]
