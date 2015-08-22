@@ -128,6 +128,7 @@ SET(PROTO_FILES
     response_register.proto
     response_replay_download.proto
     response_replay_list.proto
+    response_update_check.proto
     response_adjust_mod.proto
     response.proto
     room_commands.proto

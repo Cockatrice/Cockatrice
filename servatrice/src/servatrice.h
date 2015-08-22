@@ -29,6 +29,7 @@
 #include <QSqlDatabase>
 #include <QMetaType>
 #include "server.h"
+#include "version_string.h"
 
 Q_DECLARE_METATYPE(QSqlDatabase)
 
@@ -106,6 +107,7 @@ private:
     Servatrice_GameServer *gameServer;
     Servatrice_IslServer *islServer;
     QString serverName;
+    QString serverVersion;
     mutable QMutex loginMessageMutex;
     QString loginMessage;
     QString dbPrefix;
@@ -120,7 +122,7 @@ private:
     QString shutdownReason;
     int shutdownMinutes;
     QTimer *shutdownTimer;
-    bool isFirstShutdownMessage, clientIdRequired, regServerOnly;
+    bool isFirstShutdownMessage, clientIdRequired, regServerOnly, denyClientUpdateResponses;
 
     mutable QMutex serverListMutex;
     QList<ServerProperties> serverList;
@@ -135,11 +137,13 @@ public:
     ~Servatrice();
     bool initServer();
     QString getServerName() const { return serverName; }
+    QString getServerVersion() const { return serverVersion; }
     QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
     bool permitUnregisteredUsers() const { return authenticationMethod != AuthenticationNone; }
     bool getGameShouldPing() const { return true; }
     bool getClientIdRequired() const { return clientIdRequired; }
     bool getRegOnlyServer() const { return regServerOnly; }
+    bool getDenyClientUpdateResponses() const { return denyClientUpdateResponses; }
     int getPingClockInterval() const { return pingClockInterval; }
     int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
     int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }

@@ -103,7 +103,9 @@ private:
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
     bool rememberGameSettings;
+    bool trustedSourceClientUpdateSuccess;
     int keepalive;
+    bool enableClientUpdateCheck;
     QByteArray deckEditorLayoutState, deckEditorGeometry;
     QSize deckEditorFilterSize, deckEditorDeckSize, deckEditorCardSize;
     QString getSettingsPath();
@@ -128,7 +130,7 @@ public:
     bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
-
+    bool getTrustedSourceClientUpdateSuccess() const { return trustedSourceClientUpdateSuccess;}
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
     bool getAnnotateTokens() const { return annotateTokens; }
@@ -180,6 +182,7 @@ public:
     bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
     bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
     bool getRememberGameSettings() const { return rememberGameSettings; }
+    bool getEnableClientUpdateCheck() const { return enableClientUpdateCheck; }
     int getKeepAlive() const { return keepalive; }
     void setClientID(QString clientID);
     QString getClientID() { return clientID; }
@@ -260,6 +263,8 @@ public slots:
     void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setRememberGameSettings(const bool _rememberGameSettings);
+    void setEnableClientUpdateCheck(int _enableClientUpdateCheck);
+    void setTrustedSourceClientUpdateSuccess(const bool _trustedSourceClientUpdateSuccess);
 };
 
 extern SettingsCache *settingsCache;

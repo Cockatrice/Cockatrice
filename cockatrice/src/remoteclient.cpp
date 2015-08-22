@@ -1,16 +1,18 @@
 #include <QTimer>
 #include <QThread>
+#include <QDateTime>
 #include "remoteclient.h"
-#include "settingscache.h"
 #include "pending_command.h"
 #include "pb/commands.pb.h"
 #include "pb/session_commands.pb.h"
 #include "pb/response_login.pb.h"
 #include "pb/response_register.pb.h"
 #include "pb/response_activate.pb.h"
+#include "pb/response_update_check.pb.h"
 #include "pb/server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
 #include "settingscache.h"
+#include "version_string.h"
 #include "main.h"
 #include "version_string.h"
 
@@ -37,6 +39,8 @@ RemoteClient::RemoteClient(QObject *parent)
     connect(this, SIGNAL(sigDisconnectFromServer()), this, SLOT(doDisconnectFromServer()));
     connect(this, SIGNAL(sigRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)), this, SLOT(doRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)));
     connect(this, SIGNAL(sigActivateToServer(QString)), this, SLOT(doActivateToServer(QString)));
+    connect(this, SIGNAL(serverUpdateClientCheckReceived()), this, SLOT(doServerUpdateClientCheck()));
+
 }
 
 RemoteClient::~RemoteClient()
@@ -140,6 +144,11 @@ void RemoteClient::loginResponse(const Response &response)
         for (int i = resp.ignore_list_size() - 1; i >= 0; --i)
             ignoreList.append(resp.ignore_list(i));
         emit ignoreListReceived(ignoreList);
+
+        if (settingsCache->getEnableClientUpdateCheck())
+            if (!settingsCache->getTrustedSourceClientUpdateSuccess())
+                emit serverUpdateClientCheckReceived();
+
     } else {
         emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()), resp.denied_end_time());
         setStatus(StatusDisconnecting);
@@ -249,6 +258,7 @@ void RemoteClient::doConnectToServer(const QString &hostname, unsigned int port,
     userName = _userName;
     password = _password;
     QString clientid = settingsCache->getClientID();
+    QString clientver = (VERSION_STRING);
     lastHostname = hostname;
     lastPort = port;
 
@@ -347,4 +357,81 @@ void RemoteClient::activateToServer(const QString &_token)
 void RemoteClient::disconnectFromServer()
 {
     emit sigDisconnectFromServer();
+}
+
+void RemoteClient::doServerUpdateClientCheck()
+{
+    Command_UpdateCheck cmd;
+    cmd.set_client_version(VERSION_STRING);
+    PendingCommand *pend = prepareSessionCommand(cmd);
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processClientUpdateCheck(Response)));
+    sendCommand(pend);
+}
+
+void RemoteClient::processClientUpdateCheck(const Response &response)
+{
+    const Response_UpdateCheck &resp = response.GetExtension(Response_UpdateCheck::ext);
+
+    if (response.response_code() == Response::RespOk)
+    {
+        switch ((Response_UpdateCheck::ResponseSource) resp.source()) {
+            case Response_UpdateCheck::TRUSTED_SITE: {
+                //TODO: add trusted source site response code logic
+                break;
+            }
+            case Response_UpdateCheck::SERVER: {
+                /*
+                 *  In order for a client to trust a client update available response the server and client
+                 *  run the same type of date/commit calculations and verify the results are the same.  If
+                 *  there is a change in the logic here, make sure you update the logic in the server_protocolhandler.cpp
+                 *  file to match the clientUpdateAvailable results.
+                 */
+
+
+                QString serverVer = QString::fromStdString(resp.server_version()).simplified();
+                QString clientVer = QString::fromStdString(VERSION_STRING);
+                QDate clientDate = QDate::fromString(serverVer.mid(9, 10), "yyyy'-'MM'-'dd");
+                QDate serverDate = QDate::fromString(clientVer.mid(9, 10), "yyyy'-'MM'-'dd");
+                bool clientUpdateAvailable = false;
+
+                if (clientVer.isEmpty()) {
+                    // client version not available OR client does not have code for sending the information
+                    clientUpdateAvailable = true;
+                } else if (serverVer.isEmpty()) {
+                    // server version not available OR server does not have the code for sending the information
+                    clientUpdateAvailable = false;
+                } else if (clientDate.operator==(serverDate)) {
+                    // client date matches server version
+                    QString clientCommitVer = clientVer.mid(1, 6);
+                    QString serverCommitVer = serverVer.mid(1, 6);
+                    if (clientCommitVer != serverCommitVer)
+                        // client is considered custom client, should we recommend a client update?
+                        clientUpdateAvailable = false;
+                } else if (clientDate.operator<(serverDate)) {
+                    // client date is older than server version
+                    clientUpdateAvailable = true;
+
+                } else if (clientDate.operator>(serverDate)) {
+                    // client date is newer than server version
+                    QString clientCommitVer = clientVer.mid(1, 6);
+                    QString serverCommitVer = serverVer.mid(1, 6);
+                    if (clientCommitVer == serverCommitVer)
+                        // client is considered custom client, should we recommend a client update?
+                        clientUpdateAvailable = false;
+                }
+
+                if (clientUpdateAvailable) {
+                    if (clientUpdateAvailable == resp.update_available())
+                            emit notifyOfClientUpdate();
+                } else {
+                    qDebug() << "Client update not available.";
+                }
+
+                break;
+            }
+
+            default:
+                break;
+        }
+    }
 }

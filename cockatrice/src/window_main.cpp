@@ -567,7 +567,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
     connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
     connect(client, SIGNAL(userInfoChanged(const ServerInfo_User &)), this, SLOT(userInfoReceived(const ServerInfo_User &)), Qt::BlockingQueuedConnection);
-
+    connect(client, SIGNAL(notifyOfClientUpdate()), this, SLOT(doNotifyOfClientUpdate()));
     connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
     connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
     connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
@@ -794,4 +794,9 @@ void MainWindow::refreshShortcuts()
     aSettings->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSettings"));
     aExit->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aExit"));
     aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aCheckCardUpdates"));
+}
+
+void MainWindow::doNotifyOfClientUpdate()
+{
+    QMessageBox::information(this, "Client Update Check", "There is a new client available, please update your client.");
 }

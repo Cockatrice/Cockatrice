@@ -1,0 +1,15 @@
+syntax = "proto2";
+import "response.proto";
+
+message Response_UpdateCheck {
+	enum ResponseSource {
+  		TRUSTED_SITE = 1;
+   		SERVER = 2;
+   	}
+	extend Response {
+		optional Response_UpdateCheck ext = 1012;
+	}
+	required ResponseSource source = 1;
+	required string server_version = 2;
+	required bool update_available = 3;
+}

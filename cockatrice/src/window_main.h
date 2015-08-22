@@ -53,6 +53,7 @@ private slots:
     void activateAccepted();
     void localGameEnded();
     void pixmapCacheSizeChanged(int newSizeInMBs);
+    void doNotifyOfClientUpdate();
 
     void actConnect();
     void actDisconnect();

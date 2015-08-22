@@ -47,8 +47,13 @@ clientkeepalive=1
 max_player_inactivity_time=15
 
 ; More modern clients generate client IDs based on specific client side information.  Enable this option to
-' require that clients report the client ID in order to log into the server.  Default is false
+; require that clients report the client ID in order to log into the server.  Default is false
 requireclientid=false
+
+; When clients check for updates and the update server is unreachable you can allow users to check for updates
+; against your server by comparing the client version information to the server information.  To disable responses
+; to client update requests set this setting to true.  Default is false
+denyupdatechecking=false
 
 [authentication]
 
