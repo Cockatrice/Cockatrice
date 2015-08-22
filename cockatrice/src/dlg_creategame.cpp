@@ -114,7 +114,13 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
     descriptionEdit->setText(settingsCache->getGameDescription());
     maxPlayersEdit->setValue(settingsCache->getMaxPlayers());
     onlyBuddiesCheckBox->setChecked(settingsCache->getOnlyBuddies());
-    onlyRegisteredCheckBox->setChecked(settingsCache->getOnlyRegistered());
+    if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered)
+    {
+        onlyRegisteredCheckBox->setChecked(settingsCache->getOnlyRegistered());
+    } else {
+        onlyBuddiesCheckBox->setEnabled(false);
+        onlyRegisteredCheckBox->setEnabled(false);
+    }
     spectatorsAllowedCheckBox->setChecked(settingsCache->getSpectatorsAllowed());
     spectatorsNeedPasswordCheckBox->setChecked(settingsCache->getSpectatorsNeedPassword());
     spectatorsCanTalkCheckBox->setChecked(settingsCache->getSpectatorsCanTalk());

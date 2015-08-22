@@ -136,6 +136,7 @@ public:
     bool initServer();
     QString getServerName() const { return serverName; }
     QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
+    bool permitUnregisteredUsers() const { return authenticationMethod != AuthenticationNone; }
     bool getGameShouldPing() const { return true; }
     bool getClientIdRequired() const { return clientIdRequired; }
     bool getRegOnlyServer() const { return regServerOnly; }
