@@ -231,23 +231,13 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(banUser_processUserInfoResponse(Response)));
         client->sendCommand(pend);
-    } else if (actionClicked == aPromoteToMod) {
+    } else if (actionClicked == aPromoteToMod || actionClicked == aDemoteFromMod) {
         Command_AdjustMod cmd;
         cmd.set_user_name(userName.toStdString());
-        cmd.set_should_be_mod(true);
+        cmd.set_should_be_mod(actionClicked == aPromoteToMod);
 
-        // client->sendCommand(client->prepareAdminCommand(cmd));
         PendingCommand *pend = client->prepareAdminCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(adjustMod_processUserResponse(Response,CommandContainer)));
-        client->sendCommand(pend);
-    } else if (actionClicked == aDemoteFromMod) {
-        Command_AdjustMod cmd;
-        cmd.set_user_name(userName.toStdString());
-        cmd.set_should_be_mod(false);
-
-        // client->sendCommand(client->prepareAdminCommand(cmd));
-        PendingCommand *pend = client->prepareAdminCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(adjustMod_processUserResponse(Response,CommandContainer)));
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(adjustMod_processUserResponse(Response, CommandContainer)));
         client->sendCommand(pend);
     }
 
