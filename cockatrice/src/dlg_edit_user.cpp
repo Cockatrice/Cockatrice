@@ -35,7 +35,7 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, int gender, QString cou
     foreach(QString c, countries)
     {
         countryEdit->addItem(QPixmap(":/resources/countries/" + c + ".svg"), c);
-        if(c == country)
+        if (c == country)
             countryEdit->setCurrentIndex(i);
 
         ++i;
