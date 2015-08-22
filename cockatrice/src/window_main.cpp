@@ -85,6 +85,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
         }
         case Event_ConnectionClosed::SERVER_SHUTDOWN: reasonStr = tr("Scheduled server shutdown."); break;
         case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username."); break;
+        case Event_ConnectionClosed::LOGGEDINELSEWERE: reasonStr = tr("You have been logged out due to logging in at another location."); break;
         default: reasonStr = QString::fromStdString(event.reason_str());
     }
     QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));

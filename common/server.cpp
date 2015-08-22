@@ -30,6 +30,7 @@
 #include "pb/event_user_left.pb.h"
 #include "pb/event_list_rooms.pb.h"
 #include "pb/session_event.pb.h"
+#include "pb/event_connection_closed.pb.h"
 #include "pb/isl_message.pb.h"
 #include <QCoreApplication>
 #include <QThread>
@@ -126,9 +127,17 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
         // verify that new session would not cause problems with older existing session
         if (users.contains(name) || databaseInterface->userSessionExists(name)) {
-            qDebug("Login denied: would overwrite old session");
-            databaseInterface->unlockSessionTables();
-            return WouldOverwriteOldSession;
+            qDebug("Session already logged in, logging old session out");
+
+            Event_ConnectionClosed event;
+            event.set_reason(Event_ConnectionClosed::LOGGEDINELSEWERE);
+            event.set_reason_str("You have been logged out due to logging in at another location.");
+            event.set_end_time(QDateTime::currentDateTime().toTime_t());
+
+            SessionEvent *se = users.value(name)->prepareSessionEvent(event);
+            users.value(name)->sendProtocolItem(*se);
+            delete se;
+
         }
     } else if (authState == UnknownUser) {
         // Change user name so that no two users have the same names,
