@@ -102,6 +102,7 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
+    bool rememberGameSettings;
     int keepalive;
     QByteArray deckEditorLayoutState, deckEditorGeometry;
     QSize deckEditorFilterSize, deckEditorDeckSize, deckEditorCardSize;
@@ -178,6 +179,7 @@ public:
     bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
     bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
     bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
+    bool getRememberGameSettings() const { return rememberGameSettings; }
     int getKeepAlive() const { return keepalive; }
     void setClientID(QString clientID);
     QString getClientID() { return clientID; }
@@ -257,6 +259,7 @@ public slots:
     void setSpectatorsNeedPassword(const bool _spectatorsNeedPassword);
     void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
+    void setRememberGameSettings(const bool _rememberGameSettings);
 };
 
 extern SettingsCache *settingsCache;
