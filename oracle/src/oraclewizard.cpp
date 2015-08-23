@@ -48,13 +48,19 @@ OracleWizard::OracleWizard(QWidget *parent)
     settings = new QSettings(this);
     connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
 
-    importer = new OracleImporter(
-#if QT_VERSION < 0x050000
-        QDesktopServices::storageLocation(QDesktopServices::DataLocation)
+    QString dataDir;
+
+#ifndef PORTABLE_BUILD
+    #if QT_VERSION < 0x050000
+            QDesktopServices::storageLocation(QDesktopServices::DataLocation)
+    #else
+            QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+    #endif
 #else
-        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first()
+    dataDir.append("data/");
 #endif
-    , this);
+
+    importer = new OracleImporter(dataDir, this);
 
     addPage(new IntroPage);
     addPage(new LoadSetsPage);
@@ -485,6 +491,9 @@ void SaveSetsPage::retranslateUi()
                    "Press \"Save\" to save the imported cards to the Cockatrice database."));
 
     defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
+    #ifdef PORTABLE_BUILD
+    defaultPathCheckBox->setEnabled(false);
+    #endif
 }
 
 void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, const QString &setName)
@@ -500,12 +509,17 @@ void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, co
 bool SaveSetsPage::validatePage()
 {
     bool ok = false;
-    const QString dataDir = 
+    QString dataDir;
+    #ifndef PORTABLE_BUILD
 #if QT_VERSION < 0x050000
-        QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+        dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #else
-        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+        dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
+#else
+    dataDir = "data/";
+#endif
+
     QSettings* settings = new QSettings(this);
     QString defaultPath = settings->value("paths/carddatabase").toString();
     QString windowName = tr("Save card database");
@@ -695,16 +709,23 @@ void SaveTokensPage::retranslateUi()
                    "Press \"Save\" to save the imported tokens to the Cockatrice tokens database."));
 
     defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
+    #ifdef PORTABLE_BUILD
+    defaultPathCheckBox->setEnabled(false);
+    #endif
 }
 
 bool SaveTokensPage::validatePage()
 {
     bool ok = false;
-    const QString dataDir = 
+    QString dataDir;
+    #ifndef PORTABLE_BUILD
 #if QT_VERSION < 0x050000
-        QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+        dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #else
-        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+        dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+#endif
+#else
+    dataDir = "data/";
 #endif
     QSettings* settings = new QSettings(this);
     QString defaultPath = settings->value("paths/tokendatabase").toString();

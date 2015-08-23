@@ -17,8 +17,8 @@ QString SettingsCache::getSettingsPath()
     #else
         file = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     #endif
-        file.append("/settings/");
 #endif
+        file.append("/settings/");
 
         return file;
 }
@@ -98,7 +98,7 @@ void SettingsCache::translateLegacySettings()
     QStringList allFilters = legacySetting.allKeys();
     for (int i = 0; i < allFilters.size(); ++i) {
         if(allFilters.at(i).startsWith("game_type")){
-            gameFilters().setGameTypeEnabled(allFilters.at(i), legacySetting.value(allFilters.at(i)).toBool());
+            gameFilters().setGameHashedTypeEnabled(allFilters.at(i), legacySetting.value(allFilters.at(i)).toBool());
         }
     }
     QStringList allKeysfilter_games = legacySetting.allKeys();
