@@ -19,7 +19,7 @@ public:
     QString getPassword() const { return passwordEdit->text(); }
     QString getEmail() const { return emailEdit->text(); }
     int getGender() const { return genderEdit->currentIndex() - 1; }
-    QString getCountry() const { return genderEdit->currentIndex() == 0 ? "" : countryEdit->currentText(); }
+    QString getCountry() const { return countryEdit->currentIndex() == 0 ? "" : countryEdit->currentText(); }
     QString getRealName() const { return realnameEdit->text(); }
 private slots:
     void actOk();
