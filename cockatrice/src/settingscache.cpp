@@ -1,6 +1,7 @@
 #include "settingscache.h"
 #include <QSettings>
 #include <QFile>
+
 #if QT_VERSION >= 0x050000
     #include <QStandardPaths>
 #else
@@ -9,7 +10,7 @@
 
 QString SettingsCache::getSettingsPath()
 {
-    QString file = "";
+    QString file = "settings/";
 
 #ifndef PORTABLE_BUILD
     #if QT_VERSION >= 0x050000
@@ -17,10 +18,10 @@ QString SettingsCache::getSettingsPath()
     #else
         file = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     #endif
-#endif
         file.append("/settings/");
+#endif        
 
-        return file;
+    return file;
 }
 
 void SettingsCache::translateLegacySettings()

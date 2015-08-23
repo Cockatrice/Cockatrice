@@ -45,19 +45,19 @@
 OracleWizard::OracleWizard(QWidget *parent)
     : QWizard(parent)
 {
-    settings = new QSettings(this);
+    settings = new QSettings(settingsCache->getSettingsPath()+"global.ini",QSettings::IniFormat, this);
     connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
 
     QString dataDir;
 
 #ifndef PORTABLE_BUILD
     #if QT_VERSION < 0x050000
-            QDesktopServices::storageLocation(QDesktopServices::DataLocation)
+            QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     #else
             QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
     #endif
 #else
-    dataDir.append("data/");
+    dataDir.append("../cockatrice/data");
 #endif
 
     importer = new OracleImporter(dataDir, this);
@@ -517,11 +517,17 @@ bool SaveSetsPage::validatePage()
         dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
 #else
-    dataDir = "data/";
+    dataDir = "../cockatrice/data";
 #endif
 
-    QSettings* settings = new QSettings(this);
+#ifdef PORTABLE_BUILD
+    QSettings* settings = new QSettings("../cockatrice/settings/global.ini",QSettings::IniFormat,this);
+    QString defaultPath = "../cockatrice/data/cards.xml";
+    settings->setValue("paths/carddatabase", "data/cards.xml");
+#else
+    QSettings* settings = new QSettings(settingsCache->getSettingsPath()+"global.ini",QSettings::IniFormat,this);
     QString defaultPath = settings->value("paths/carddatabase").toString();
+#endif
     QString windowName = tr("Save card database");
     QString fileType = tr("XML; card database (*.xml)");
 
@@ -532,6 +538,7 @@ bool SaveSetsPage::validatePage()
                 fileName = dataDir + "/cards.xml";
             else
                 fileName = QFileDialog::getSaveFileName(this, windowName, dataDir + "/cards.xml", fileType);
+
             settings->setValue("paths/carddatabase", fileName);
         }
         else {
@@ -725,10 +732,18 @@ bool SaveTokensPage::validatePage()
         dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
 #else
-    dataDir = "data/";
+    dataDir = "../cockatrice/data";
 #endif
-    QSettings* settings = new QSettings(this);
+
+#ifdef PORTABLE_BUILD
+    QSettings* settings = new QSettings("../cockatrice/settings/global.ini",QSettings::IniFormat,this);
+    QString defaultPath = "../cockatrice/data/tokens.xml";
+    settings->setValue("paths/tokendatabase", "data/tokens.xml");
+#else
+    QSettings* settings = new QSettings(settingsCache->getSettingsPath()+"global.ini",QSettings::IniFormat,this);
     QString defaultPath = settings->value("paths/tokendatabase").toString();
+#endif
+
     QString windowName = tr("Save token database");
     QString fileType = tr("XML; token database (*.xml)");
 

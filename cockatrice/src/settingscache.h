@@ -113,11 +113,11 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
-    int keepalive;
-    QString getSettingsPath();
+    int keepalive;    
     void translateLegacySettings();
 public:
     SettingsCache();
+    QString getSettingsPath();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
     QString getLang() const { return lang; }
     QString getDeckPath() const { return deckPath; }
