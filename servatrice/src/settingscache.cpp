@@ -1,11 +1,7 @@
 #include "settingscache.h"
 #include <QCoreApplication>
 #include <QFile>
-#if QT_VERSION >= 0x050000
-    #include <QStandardPaths>
-#else
-    #include <QDesktopServices>
-#endif
+#include <QStandardPaths>
 
 SettingsCache::SettingsCache(const QString & fileName, QSettings::Format format, QObject * parent)
 :QSettings(fileName, format, parent)
@@ -34,10 +30,6 @@ QString SettingsCache::guessConfigurationPath(QString & specificPath)
         return guessFileName;
 #endif
 
-#if QT_VERSION >= 0x050000
-    guessFileName =  QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + fileName;
-#else
-    guessFileName =  QDesktopServices::storageLocation(QDesktopServices::DataLocation) + "/" + fileName;
-#endif
+    guessFileName = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/" + fileName;
     return guessFileName;
 }
