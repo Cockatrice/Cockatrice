@@ -315,13 +315,22 @@
         <file>resources/counters/storm_highlight.svg</file>
         <file>resources/counters/general.svg</file>
         <file>resources/counters/general_highlight.svg</file>
-        <file>resources/userlevels/normal.svg</file>
-        <file>resources/userlevels/registered.svg</file>
-        <file>resources/userlevels/registered_buddy.svg</file>
-        <file>resources/userlevels/moderator.svg</file>
-        <file>resources/userlevels/moderator_buddy.svg</file>
-        <file>resources/userlevels/admin.svg</file>
-        <file>resources/userlevels/admin_buddy.svg</file>
+
+        <file>resources/userlevels/normal0.svg</file>
+        <file>resources/userlevels/registered0.svg</file>
+        <file>resources/userlevels/registered_buddy0.svg</file>
+        <file>resources/userlevels/moderator0.svg</file>
+        <file>resources/userlevels/moderator_buddy0.svg</file>
+        <file>resources/userlevels/admin0.svg</file>
+        <file>resources/userlevels/admin_buddy0.svg</file>
+
+        <file>resources/userlevels/registered1.svg</file>
+        <file>resources/userlevels/registered_buddy1.svg</file>
+        <file>resources/userlevels/moderator1.svg</file>
+        <file>resources/userlevels/moderator_buddy1.svg</file>
+        <file>resources/userlevels/admin1.svg</file>
+        <file>resources/userlevels/admin_buddy1.svg</file>
+
         <file>resources/news/exclamation_mark.svg</file>
         <file>resources/news/question_mark.svg</file>
         <file>resources/icon_config_shorcuts.svg</file>

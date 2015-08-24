@@ -134,10 +134,10 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
 
 QMap<QString, QPixmap> CountryPixmapGenerator::pmCache;
 
-QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy)
+QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, int usersLevelRole)
 {
 
-    int key = height * 10000 + (int) userLevel + (int) isBuddy;
+    int key = height * 10000 + (int) userLevel + (int) isBuddy + usersLevelRole;
     if (pmCache.contains(key))
         return pmCache.value(key);
 
@@ -148,13 +148,13 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
         levelString = "moderator";
     else if (userLevel.testFlag(ServerInfo_User::IsRegistered))
         levelString = "registered";
-    else
+    else {
         levelString = "normal";
-
+    }
     if (isBuddy)
         levelString.append("_buddy");
 
-    QSvgRenderer svg(QString(":/resources/userlevels/" + levelString + ".svg"));
+    QSvgRenderer svg(QString(":/resources/userlevels/" + levelString + "%1.svg").arg(usersLevelRole));
     int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
     QPixmap pixmap(width, height);
     pixmap.fill(Qt::transparent);

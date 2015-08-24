@@ -15,7 +15,7 @@ private:
     AbstractClient *client;
     bool editable;
     QLabel avatarLabel, nameLabel, realNameLabel1, realNameLabel2, genderLabel1, genderLabel2, countryLabel1,
-        countryLabel2, countryLabel3, userLevelLabel1, userLevelLabel2, userLevelLabel3, accountAgeLebel1, accountAgeLabel2;
+        countryLabel2, countryLabel3, userLevelLabel1, userLevelLabel2, userLevelLabel3, userLevelLabel4, userLevelLabel5, accountAgeLebel1, accountAgeLabel2;
     QPushButton editButton, passwordButton, avatarButton;
 
 public:
