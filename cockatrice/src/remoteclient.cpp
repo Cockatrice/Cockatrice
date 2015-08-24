@@ -12,6 +12,7 @@
 #include "pb/event_server_identification.pb.h"
 #include "settingscache.h"
 #include "main.h"
+#include "version_string.h"
 
 static const unsigned int protocolVersion = 14;
 
@@ -112,6 +113,7 @@ void RemoteClient::doLogin()
     cmdLogin.set_user_name(userName.toStdString());
     cmdLogin.set_password(password.toStdString());
     cmdLogin.set_clientid(settingsCache->getClientID().toStdString());
+    cmdLogin.set_clientver(VERSION_STRING);
     PendingCommand *pend = prepareSessionCommand(cmdLogin);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
     sendCommand(pend);
