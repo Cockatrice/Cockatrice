@@ -57,7 +57,7 @@ OracleWizard::OracleWizard(QWidget *parent)
             QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
     #endif
 #else
-    dataDir.append("../cockatrice/data");
+    dataDir.append("data");
 #endif
 
     importer = new OracleImporter(dataDir, this);
@@ -517,13 +517,13 @@ bool SaveSetsPage::validatePage()
         dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
 #else
-    dataDir = "../cockatrice/data";
+    dataDir = "data";
 #endif
 
 #ifdef PORTABLE_BUILD
-    QSettings* settings = new QSettings("../cockatrice/settings/global.ini",QSettings::IniFormat,this);
-    QString defaultPath = "../cockatrice/data/cards.xml";
-    settings->setValue("paths/carddatabase", "data/cards.xml");
+    QSettings* settings = new QSettings("settings/global.ini",QSettings::IniFormat,this);
+    QString defaultPath = "data/cards.xml";
+    settings->setValue("paths/carddatabase", defaultPath);
 #else
     QSettings* settings = new QSettings(settingsCache->getSettingsPath()+"global.ini",QSettings::IniFormat,this);
     QString defaultPath = settings->value("paths/carddatabase").toString();
@@ -732,13 +732,13 @@ bool SaveTokensPage::validatePage()
         dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
 #else
-    dataDir = "../cockatrice/data";
+    dataDir = "data";
 #endif
 
 #ifdef PORTABLE_BUILD
-    QSettings* settings = new QSettings("../cockatrice/settings/global.ini",QSettings::IniFormat,this);
-    QString defaultPath = "../cockatrice/data/tokens.xml";
-    settings->setValue("paths/tokendatabase", "data/tokens.xml");
+    QSettings* settings = new QSettings("settings/global.ini",QSettings::IniFormat,this);
+    QString defaultPath = "data/tokens.xml";
+    settings->setValue("paths/tokendatabase", defaultPath);
 #else
     QSettings* settings = new QSettings(settingsCache->getSettingsPath()+"global.ini",QSettings::IniFormat,this);
     QString defaultPath = settings->value("paths/tokendatabase").toString();

@@ -31,8 +31,7 @@
 #include <QSystemTrayIcon>
 #include <QApplication>
 #if QT_VERSION < 0x050000
-    // for Qt::escape()
-    #include <QtGui/qtextdocument.h>
+    #include <QtGui/qtextdocument.h> // for Qt::escape()
 #endif
 
 #include "main.h"
@@ -47,13 +46,20 @@
 #include "localclient.h"
 #include "settingscache.h"
 #include "tab_game.h"
-
 #include "version_string.h"
 
 #include "pb/game_replay.pb.h"
 #include "pb/room_commands.pb.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_shutdown.pb.h"
+
+#define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
+#define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#cockatrice"
+#define GITHUB_TRANSLATOR_RECOGNIZE_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translators"
+#define GITHUB_TRANSLATOR_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ"
+#define GITHUB_ISSUES_URL "https://github.com/Cockatrice/Cockatrice/issues"
+#define GITHUB_TROUBLESHOOTING_URL "https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting"
+#define GITHUB_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions"
 
 const QString MainWindow::appName = "Cockatrice";
 
@@ -71,7 +77,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
     client->disconnectFromServer();
     QString reasonStr;
     switch (event.reason()) {
-	case Event_ConnectionClosed::USER_LIMIT_REACHED: reasonStr = tr("The server has reached its maximum user capacity, please check back later."); break;
+        case Event_ConnectionClosed::USER_LIMIT_REACHED: reasonStr = tr("The server has reached its maximum user capacity, please check back later."); break;
         case Event_ConnectionClosed::TOO_MANY_CONNECTIONS: reasonStr = tr("There are too many concurrent connections from your address."); break;
         case Event_ConnectionClosed::BANNED: {
             reasonStr = tr("Banned by moderator");
@@ -85,6 +91,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
         }
         case Event_ConnectionClosed::SERVER_SHUTDOWN: reasonStr = tr("Scheduled server shutdown."); break;
         case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username."); break;
+        case Event_ConnectionClosed::LOGGEDINELSEWERE: reasonStr = tr("You have been logged out due to logging in at another location."); break;
         default: reasonStr = QString::fromStdString(event.reason_str());
     }
     QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
@@ -268,15 +275,15 @@ void MainWindow::actAbout()
         + "<br><br><b>" + tr("Project Manager:") + "</b><br>Gavin Bisesi<br><br>"
         + "<b>" + tr("Past Project Managers:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
         + "<b>" + tr("Developers:") + "</b><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c'>" + tr("Our Developers") + "</a><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice#cockatrice'>" + tr("Help Develop!") + "</a><br><br>"
+        + "<a href='" + GITHUB_CONTRIBUTORS_URL + "'>" + tr("Our Developers") + "</a><br>"
+        + "<a href='" + GITHUB_CONTRIBUTE_URL + "'>" + tr("Help Develop!") + "</a><br><br>"
         + "<b>" + tr("Translators:") + "</b><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Translators'>" + tr("Recognition Page") + "</a><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ'>" + tr("Help Translate!") + "</a><br><br>"
+        + "<a href='" + GITHUB_TRANSLATOR_RECOGNIZE_URL + "'>" + tr("Recognition Page") + "</a><br>"
+        + "<a href='" + GITHUB_TRANSLATOR_FAQ_URL + "'>" + tr("Help Translate!") + "</a><br><br>"
         + "<b>" + tr("Support:") + "</b><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/issues'>" + tr("Report an Issue") + "</a><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting'>" + tr("Troubleshooting") + "</a><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions'>" + tr("F.A.Q.") + "</a><br>"
+        + "<a href='" + GITHUB_ISSUES_URL + "'>" + tr("Report an Issue") + "</a><br>"
+        + "<a href='" + GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>"
+        + "<a href='" + GITHUB_FAQ_URL + "'>" + tr("F.A.Q.") + "</a><br>"
     ));
 }
 

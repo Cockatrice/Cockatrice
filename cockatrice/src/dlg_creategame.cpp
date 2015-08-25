@@ -21,6 +21,7 @@
 
 void DlgCreateGame::sharedCtor()
 {
+    rememberGameSettings = new QCheckBox(tr("Re&member settings"));
     descriptionLabel = new QLabel(tr("&Description:"));
     descriptionEdit = new QLineEdit;
     descriptionLabel->setBuddy(descriptionEdit);
@@ -38,6 +39,7 @@ void DlgCreateGame::sharedCtor()
     generalGrid->addWidget(descriptionEdit, 0, 1);
     generalGrid->addWidget(maxPlayersLabel, 1, 0);
     generalGrid->addWidget(maxPlayersEdit, 1, 1);
+    generalGrid->addWidget(rememberGameSettings, 2, 0);
 
     QVBoxLayout *gameTypeLayout = new QVBoxLayout;
     QMapIterator<int, QString> gameTypeIterator(gameTypes);
@@ -111,14 +113,25 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
 {
     sharedCtor();
 
+    rememberGameSettings->setChecked(settingsCache->getRememberGameSettings());
     descriptionEdit->setText(settingsCache->getGameDescription());
     maxPlayersEdit->setValue(settingsCache->getMaxPlayers());
     onlyBuddiesCheckBox->setChecked(settingsCache->getOnlyBuddies());
-    onlyRegisteredCheckBox->setChecked(settingsCache->getOnlyRegistered());
+    if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered)
+    {
+        onlyRegisteredCheckBox->setChecked(settingsCache->getOnlyRegistered());
+    } else {
+        onlyBuddiesCheckBox->setEnabled(false);
+        onlyRegisteredCheckBox->setEnabled(false);
+    }
     spectatorsAllowedCheckBox->setChecked(settingsCache->getSpectatorsAllowed());
     spectatorsNeedPasswordCheckBox->setChecked(settingsCache->getSpectatorsNeedPassword());
     spectatorsCanTalkCheckBox->setChecked(settingsCache->getSpectatorsCanTalk());
     spectatorsSeeEverythingCheckBox->setChecked(settingsCache->getSpectatorsCanSeeEverything());
+
+    if (!rememberGameSettings->isChecked()){
+        actReset();
+    }
 
     clearButton = new QPushButton(tr("&Clear"));
     buttonBox->addButton(QDialogButtonBox::Cancel);
@@ -134,6 +147,7 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
 {
     sharedCtor();
 
+    rememberGameSettings->setEnabled(false);
     descriptionEdit->setEnabled(false);
     maxPlayersEdit->setEnabled(false);
     passwordEdit->setEnabled(false);
@@ -197,15 +211,6 @@ descriptionEdit->setFocus();
 
 void DlgCreateGame::actOK()
 {
-    settingsCache->setGameDescription(descriptionEdit->text());
-    settingsCache->setMaxPlayers(maxPlayersEdit->value());
-    settingsCache->setOnlyBuddies(onlyBuddiesCheckBox->isChecked());
-    settingsCache->setOnlyRegistered(onlyRegisteredCheckBox->isChecked());
-    settingsCache->setSpectatorsAllowed(spectatorsAllowedCheckBox->isChecked());
-    settingsCache->setSpectatorsNeedPassword(spectatorsNeedPasswordCheckBox->isChecked());
-    settingsCache->setSpectatorsCanTalk(spectatorsCanTalkCheckBox->isChecked());
-    settingsCache->setSpectatorsCanSeeEverything(spectatorsSeeEverythingCheckBox->isChecked());
-
     Command_CreateGame cmd;
     cmd.set_description(descriptionEdit->text().simplified().toStdString());
     cmd.set_password(passwordEdit->text().toStdString());
@@ -227,7 +232,18 @@ void DlgCreateGame::actOK()
         }
     }
 
-    settingsCache->setGameTypes(gameTypes);
+    settingsCache->setRememberGameSettings(rememberGameSettings->isChecked());
+    if (rememberGameSettings->isChecked()){
+        settingsCache->setGameDescription(descriptionEdit->text());
+        settingsCache->setMaxPlayers(maxPlayersEdit->value());
+        settingsCache->setOnlyBuddies(onlyBuddiesCheckBox->isChecked());
+        settingsCache->setOnlyRegistered(onlyRegisteredCheckBox->isChecked());
+        settingsCache->setSpectatorsAllowed(spectatorsAllowedCheckBox->isChecked());
+        settingsCache->setSpectatorsNeedPassword(spectatorsNeedPasswordCheckBox->isChecked());
+        settingsCache->setSpectatorsCanTalk(spectatorsCanTalkCheckBox->isChecked());
+        settingsCache->setSpectatorsCanSeeEverything(spectatorsSeeEverythingCheckBox->isChecked());
+        settingsCache->setGameTypes(gameTypes);
+    }
     PendingCommand *pend = room->prepareRoomCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
     room->sendRoomCommand(pend);

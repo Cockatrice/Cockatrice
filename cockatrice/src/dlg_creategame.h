@@ -39,6 +39,7 @@ private:
     QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox, *spectatorsSeeEverythingCheckBox;
     QDialogButtonBox *buttonBox;
     QPushButton *clearButton;
+    QCheckBox *rememberGameSettings;
     
     void sharedCtor();
 };

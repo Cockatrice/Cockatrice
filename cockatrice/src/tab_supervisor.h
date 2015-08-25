@@ -22,6 +22,7 @@ class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;
 class Event_UserMessage;
+class Event_NotifyUser;
 class ServerInfo_Room;
 class ServerInfo_User;
 class GameReplay;
@@ -105,6 +106,7 @@ private slots:
     void processRoomEvent(const RoomEvent &event);
     void processGameEventContainer(const GameEventContainer &cont);
     void processUserMessageEvent(const Event_UserMessage &event);
+    void processNotifyUserEvent(const Event_NotifyUser &event);
 };
 
 #endif

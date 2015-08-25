@@ -220,6 +220,7 @@ SettingsCache::SettingsCache()
     spectatorsNeedPassword = settings->value("game/spectatorsneedpassword", false).toBool();
     spectatorsCanTalk = settings->value("game/spectatorscantalk", false).toBool();
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
+    rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", "notset").toString();
 }
 
@@ -645,4 +646,10 @@ void SettingsCache::setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEv
 {
     spectatorsCanSeeEverything = _spectatorsCanSeeEverything;
     settings->setValue("game/spectatorscanseeeverything", spectatorsCanSeeEverything);
+}
+
+void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
+{
+    rememberGameSettings = _rememberGameSettings;
+    settings->setValue("game/remembergamesettings", rememberGameSettings);
 }
