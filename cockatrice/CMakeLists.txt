@@ -333,3 +333,8 @@ Data = Resources\")
         install(FILES ${WIN32SSLRUNTIME_LIBRARIES} DESTINATION ./)
     endif()
 endif()
+#Compile a portable version, default off
+option(PORTABLE "portable build" OFF)
+IF(PORTABLE)
+add_definitions(-DPORTABLE_BUILD)
+endif()
