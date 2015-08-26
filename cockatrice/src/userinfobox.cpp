@@ -116,7 +116,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user) {
         userLevelText = tr("Unregistered user");
     userLevelLabel3.setText(userLevelText);
 
-    switch (user.user_role()) {
+    switch (user.user_role) {
         case (0):
             userLevelLabel5.setText("Regular");
             break;

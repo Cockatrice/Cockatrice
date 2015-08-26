@@ -2412,6 +2412,11 @@ QString Player::getName() const
     return QString::fromStdString(userInfo->name());
 }
 
+int Player::getRole() const
+{
+    return userInfo->user_role();
+}
+
 qreal Player::getMinimumWidth() const
 {
     qreal result = table->getMinimumWidth() + CARD_HEIGHT + 15 + counterAreaWidth + stack->boundingRect().width();
