@@ -1445,7 +1445,7 @@ public:
         lbl_MainWindow_aFullScreen->setText(QApplication::translate("shortcutsTab", "Full screen", 0));
         lbl_MainWindow_aSettings->setText(QApplication::translate("shortcutsTab", "Settings", 0));
         lbl_MainWindow_aCheckCardUpdates->setText(QApplication::translate("shortcutsTab", "Check for card updates", 0));
-        lbl_MainWindow_aDisconnect->setText(QApplication::translate("shortcutsTab", "Diconnect", 0));
+        lbl_MainWindow_aDisconnect->setText(QApplication::translate("shortcutsTab", "Disconnect", 0));
         lbl_MainWindow_aExit->setText(QApplication::translate("shortcutsTab", "Exit", 0));
         groupBox_2->setTitle(QApplication::translate("shortcutsTab", "Deck Editor", 0));
         lbl_TabDeckEditor_aAnalyzeDeck->setText(QApplication::translate("shortcutsTab", "Analyze deck", 0));
@@ -1497,7 +1497,7 @@ public:
         lbl_Player_IncP->setText(QApplication::translate("shortcutsTab", "Add (+1/+0)", 0));
         groupBox_8->setTitle(QApplication::translate("shortcutsTab", "Game Phases", 0));
         lbl_TabGame_phase0->setText(QApplication::translate("shortcutsTab", "Untap", 0));
-        lbl_TabGame_phase1->setText(QApplication::translate("shortcutsTab", "Unkeep", 0));
+        lbl_TabGame_phase1->setText(QApplication::translate("shortcutsTab", "Upkeep", 0));
         lbl_TabGame_phase2->setText(QApplication::translate("shortcutsTab", "Draw", 0));
         lbl_TabGame_phase3->setText(QApplication::translate("shortcutsTab", "Main 1", 0));
         lbl_TabGame_phase4->setText(QApplication::translate("shortcutsTab", "Start combat", 0));
