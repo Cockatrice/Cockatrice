@@ -1,7 +1,8 @@
+syntax = "proto2";
 import "game_event_context.proto";
 
 message Context_MoveCard {
-	extend GameEventContext {
-		optional Context_MoveCard ext = 1004;
-	}
+    extend GameEventContext {
+        optional Context_MoveCard ext = 1004;
+    }
 }

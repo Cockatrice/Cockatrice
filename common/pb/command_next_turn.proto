@@ -1,6 +1,7 @@
+syntax = "proto2";
 import "game_commands.proto";
 message Command_NextTurn {
-	extend GameCommand {
-		optional Command_NextTurn ext = 1022;
-	}
+    extend GameCommand {
+        optional Command_NextTurn ext = 1022;
+    }
 }

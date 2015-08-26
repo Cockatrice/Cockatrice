@@ -1,10 +1,11 @@
+syntax = "proto2";
 import "response.proto";
 import "serverinfo_user.proto";
 
 message Response_ListUsers {
-	extend Response {
-		optional Response_ListUsers ext = 1001;
-	}
-	repeated ServerInfo_User user_list = 1;
+    extend Response {
+        optional Response_ListUsers ext = 1001;
+    }
+    repeated ServerInfo_User user_list = 1;
 }
  

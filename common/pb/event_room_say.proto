@@ -1,9 +1,10 @@
+syntax = "proto2";
 import "room_event.proto";
 
 message Event_RoomSay {
-	extend RoomEvent {
-		optional Event_RoomSay ext = 1002;
-	}
-	optional string name = 1;
-	optional string message = 2;
+    extend RoomEvent {
+        optional Event_RoomSay ext = 1002;
+    }
+    optional string name = 1;
+    optional string message = 2;
 }

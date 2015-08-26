@@ -1,8 +1,9 @@
+syntax = "proto2";
 import "game_commands.proto";
 message Command_DrawCards {
-	extend GameCommand {
-		optional Command_DrawCards ext = 1006;
-	}
-	optional uint32 number = 1;
+    extend GameCommand {
+        optional Command_DrawCards ext = 1006;
+    }
+    optional uint32 number = 1;
 }
 

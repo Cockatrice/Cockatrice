@@ -1,7 +1,8 @@
+syntax = "proto2";
 import "response.proto";
 
 message Response_Activate {
-	extend Response {
-		optional Response_Activate ext = 1010;
-	}
+    extend Response {
+        optional Response_Activate ext = 1010;
+    }
 }

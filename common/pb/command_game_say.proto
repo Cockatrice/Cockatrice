@@ -1,9 +1,10 @@
+syntax = "proto2";
 import "game_commands.proto";
 message Command_GameSay {
-	extend GameCommand {
-		optional Command_GameSay ext = 1002;
-	}
-	optional string message = 1;
+    extend GameCommand {
+        optional Command_GameSay ext = 1002;
+    }
+    optional string message = 1;
 }
 
 

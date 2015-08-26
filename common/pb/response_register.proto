@@ -1,9 +1,10 @@
+syntax = "proto2";
 import "response.proto";
 
 message Response_Register {
-	extend Response {
-		optional Response_Register ext = 1009;
-	}
-	optional string denied_reason_str = 1;
-	optional uint64 denied_end_time = 2;
+    extend Response {
+        optional Response_Register ext = 1009;
+    }
+    optional string denied_reason_str = 1;
+    optional uint64 denied_end_time = 2;
 }

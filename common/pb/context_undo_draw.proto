@@ -1,7 +1,8 @@
+syntax = "proto2";
 import "game_event_context.proto";
 
 message Context_UndoDraw {
-	extend GameEventContext {
-		optional Context_UndoDraw ext = 1003;
-	}
+    extend GameEventContext {
+        optional Context_UndoDraw ext = 1003;
+    }
 }
