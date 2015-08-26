@@ -60,8 +60,6 @@ public:
 class CardInfo : public QObject {
     Q_OBJECT
 private:
-    CardDatabase *db;
-
     QString name;
 
     /*
@@ -84,6 +82,7 @@ private:
     QStringList reverseRelatedCards;
     // the cards thare are reverse-related to me
     QStringList reverseRelatedCardsToMe;
+    QString setsNames;
     bool upsideDownArt;
     int loyalty;
     QStringMap customPicURLs;
@@ -92,9 +91,9 @@ private:
     int tableRow;
     QString pixmapCacheKey;
 
+    void refreshCachedSetNames();
 public:
-    CardInfo(CardDatabase *_db,
-        const QString &_name = QString(),
+    CardInfo(const QString &_name = QString(),
         bool _isToken = false,
         const QString &_manacost = QString(),
         const QString &_cmc = QString(),
@@ -113,14 +112,15 @@ public:
         MuidMap muids = MuidMap()
         );
     ~CardInfo();
-    const QString &getName() const { return name; }
+    inline const QString &getName() const { return name; }
+    inline const QString &getSetsNames() const { return setsNames; }
     const QString &getSimpleName() const { return simpleName; }
     bool getIsToken() const { return isToken; }
     const SetList &getSets() const { return sets; }
-    const QString &getManaCost() const { return manacost; }
-    const QString &getCmc() const { return cmc; }
-    const QString &getCardType() const { return cardtype; }
-    const QString &getPowTough() const { return powtough; }
+    inline const QString &getManaCost() const { return manacost; }
+    inline const QString &getCmc() const { return cmc; }
+    inline const QString &getCardType() const { return cardtype; }
+    inline const QString &getPowTough() const { return powtough; }
     const QString &getText() const { return text; }
     const QString &getPixmapCacheKey() const { return pixmapCacheKey; }
     const int &getLoyalty() const { return loyalty; }
@@ -229,12 +229,12 @@ public:
     bool hasDetectedFirstRun();
     void refreshCachedReverseRelatedCards();
 public slots:
-    LoadStatus loadCardDatabase(const QString &path, bool tokens = false);
+    LoadStatus loadCardDatabase();
+    LoadStatus loadTokenDatabase();
     void loadCustomCardDatabases(const QString &path);
     void emitCardListChanged();
 private slots:
-    void loadCardDatabase();
-    void loadTokenDatabase();
+    LoadStatus loadCardDatabase(const QString &path, bool tokens = false);
 signals:
     void cardListChanged();
     void cardAdded(CardInfo *card);

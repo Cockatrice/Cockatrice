@@ -367,17 +367,16 @@ void TabDeckEditor::createCentralFrame()
     databaseDisplayModel = new CardDatabaseDisplayModel(this);
     databaseDisplayModel->setSourceModel(databaseModel);
     databaseDisplayModel->setFilterKeyColumn(0);
-    databaseDisplayModel->sort(0, Qt::AscendingOrder);
 
     databaseView = new QTreeView();
     databaseView->setObjectName("databaseView");
     databaseView->setFocusProxy(searchEdit);
-    databaseView->setModel(databaseDisplayModel);
     databaseView->setUniformRowHeights(true);
     databaseView->setRootIsDecorated(false);
     databaseView->setAlternatingRowColors(true);
     databaseView->setSortingEnabled(true);
     databaseView->sortByColumn(0, Qt::AscendingOrder);
+    databaseView->setModel(databaseDisplayModel);
     databaseView->resizeColumnToContents(0);
     connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
     connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
