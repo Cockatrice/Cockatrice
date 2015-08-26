@@ -1,7 +1,8 @@
+syntax = "proto2";
 import "game_event.proto";
 
 message Event_GameClosed {
-	extend GameEvent {
-		optional Event_GameClosed ext = 1002;
-	}
+    extend GameEvent {
+        optional Event_GameClosed ext = 1002;
+    }
 }

@@ -1,6 +1,7 @@
+syntax = "proto2";
 import "game_commands.proto";
 message Command_UndoDraw {
-	extend GameCommand {
-		optional Command_UndoDraw ext = 1007;
-	}
+    extend GameCommand {
+        optional Command_UndoDraw ext = 1007;
+    }
 }

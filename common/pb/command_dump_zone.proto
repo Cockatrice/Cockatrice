@@ -1,9 +1,10 @@
+syntax = "proto2";
 import "game_commands.proto";
 message Command_DumpZone {
-	extend GameCommand {
-		optional Command_DumpZone ext = 1024;
-	}
-	optional sint32 player_id = 1 [default = -1];
-	optional string zone_name = 2;
-	optional sint32 number_cards = 3;
+    extend GameCommand {
+        optional Command_DumpZone ext = 1024;
+    }
+    optional sint32 player_id = 1 [default = -1];
+    optional string zone_name = 2;
+    optional sint32 number_cards = 3;
 }

@@ -1,10 +1,11 @@
+syntax = "proto2";
 import "game_commands.proto";
 import "move_card_to_zone.proto";
 
 message Command_SetSideboardPlan {
-	extend GameCommand {
-		optional Command_SetSideboardPlan ext = 1028;
-	}
-	repeated MoveCard_ToZone move_list = 1;
+    extend GameCommand {
+        optional Command_SetSideboardPlan ext = 1028;
+    }
+    repeated MoveCard_ToZone move_list = 1;
 }
 

@@ -1,10 +1,11 @@
+syntax = "proto2";
 import "room_event.proto";
 
 message Event_LeaveRoom {
-	extend RoomEvent {
-		optional Event_LeaveRoom ext = 1000;
-	}
-	optional string name = 1;
+    extend RoomEvent {
+        optional Event_LeaveRoom ext = 1000;
+    }
+    optional string name = 1;
 }
  
  

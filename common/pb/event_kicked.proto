@@ -1,7 +1,8 @@
+syntax = "proto2";
 import "game_event.proto";
 
 message Event_Kicked {
-	extend GameEvent {
-		optional Event_Kicked ext = 1004;
-	}
+    extend GameEvent {
+        optional Event_Kicked ext = 1004;
+    }
 }

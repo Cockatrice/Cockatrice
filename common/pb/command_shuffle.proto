@@ -1,7 +1,8 @@
+syntax = "proto2";
 import "game_commands.proto";
 message Command_Shuffle {
-	extend GameCommand {
-		optional Command_Shuffle ext = 1003;
-	}
+    extend GameCommand {
+        optional Command_Shuffle ext = 1003;
+    }
 }
 
