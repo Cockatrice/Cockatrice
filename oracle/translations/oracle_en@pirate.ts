@@ -1,384 +1,379 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="en@pirate" version="2.1">
 <context>
     <name>IntroPage</name>
     <message>
         <source>Introduction</source>
-        <translation>Einführung</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>English</source>
-        <translation>Deutsch (German)</translation>
+        <translation>English, arr! (Pirate English)</translation>
     </message>
     <message>
         <source>Language:</source>
-        <translation>Sprache:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation>Dieser Assistent wird eine Liste aller Editionen und Karten, die von Cockatrice genutzt werden, importieren.
-Sie müssen dazu eine URL oder einen Dateinamen als Quelle angeben. Danach können Sie aus einer Liste aller verfügbaren Editionen die Gewünschten ausgewählen.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LoadSetsPage</name>
     <message>
         <source>Source selection</source>
-        <translation>Quellenauswahl</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>Bitte geben Sie eine Quelle für die Liste von Editionen und Karten an. Sie können eine URL Adresse zum herunterladen eingeben, oder Sie verwenden eine vorhandene Datei von Ihrem Computer.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Download url:</source>
-        <translation>Download URL:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Local file:</source>
-        <translation>Lokale Datei:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Restore default url</source>
-        <translation>Standard-URL wiederherstellen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Choose file...</source>
-        <translation>Datei auswählen...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Load sets file</source>
-        <translation>Editionsdatei wird geladen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sets JSON file (*.json *.zip)</source>
-        <translation>JSON Editionsdatei (*.json *.zip)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sets JSON file (*.json)</source>
-        <translation>JSON Editionsdatei (*.json)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Error</source>
-        <translation>Fehler</translation>
+        <translation>Cap&apos;n? Thar be a problem</translation>
     </message>
     <message>
         <source>The provided url is not valid.</source>
-        <translation>Die eingegebene URL ist nicht gültig.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Downloading (0MB)</source>
-        <translation>Herunterladen (0MB)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Please choose a file.</source>
-        <translation>Bitte wählen Sie eine Datei.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Cannot open file &apos;%1&apos;.</source>
-        <translation>Datei &apos;%1&apos; kann nicht geöffnet werden.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Downloading (%1MB)</source>
-        <translation>Herunterladen (%1MB)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Network error: %1.</source>
-        <translation>Netzwerkfehler: %1.</translation>
+        <translation>Cap&apos;n? Thar be a problem wi&apos; t&apos; smoke signals: %1.</translation>
     </message>
     <message>
         <source>Parsing file</source>
-        <translation>Datei wird analysiert</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Failed to open Zip archive: %1.</source>
-        <translation>Fehler beim Öffnen des Zip Archivs: %1.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
-        <translation>Fehler beim Extrahieren: Das Zip Archiv enthält mehr als eine Datei.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Zip extraction failed: %1.</source>
-        <translation>Fehler beim Extrahieren: %1.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
-        <translation>Es tut uns Leid, diese Version von Oracle unterstützt keine Zip Archive.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Do you want to try to download a fresh copy of the uncompressed file instead?</source>
-        <translation>Möchtest du stattdessen eine neue Kopie der nicht komprimierten Datei herunerladen?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
-        <translation>Die Datei wurde erfolgreich abgerufen, sie enthält aber keine Editionsdaten.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LoadTokensPage</name>
     <message>
         <source>Tokens source selection</source>
-        <translation>Spielstein-Quellenauswahl</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>Bitte geben Sie eine Quelle für die Liste der Spielsteine an. Sie können eine URL Adresse zum Herunterladen eingeben oder eine vorhandene Datei von Ihrem Computer verwenden.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Download url:</source>
-        <translation>Download URL:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Restore default url</source>
-        <translation>Standard-URL wiederherstellen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Error</source>
-        <translation>Fehler</translation>
+        <translation>Cap&apos;n? Thar be a problem</translation>
     </message>
     <message>
         <source>The provided url is not valid.</source>
-        <translation>Die eingegebene URL ist nicht gültig.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Downloading (0MB)</source>
-        <translation>Herunterladen (0MB)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Downloading (%1MB)</source>
-        <translation>Herunterladen (%1MB)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Network error: %1.</source>
-        <translation>Netzwerkfehler: %1.</translation>
+        <translation>Cap&apos;n? Thar be a problem wi&apos; t&apos; smoke signals: %1.</translation>
     </message>
 </context>
 <context>
     <name>OracleImporter</name>
     <message>
         <source>Dummy set containing tokens</source>
-        <translation>Platzhalter Edition mit Spielsteinen</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>OracleWizard</name>
     <message>
         <source>Oracle Importer</source>
-        <translation>Oracle Importer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save</source>
-        <translation>Speichern</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>SaveSetsPage</name>
     <message>
         <source>Sets imported</source>
-        <translation>Editionen wurden importiert</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The following sets has been imported. Press &quot;Save&quot; to save the imported cards to the Cockatrice database.</source>
-        <translation>Die folgenden Editionen wurden importiert. Drücken Sie &quot;Speichern&quot; um die importierten Karten in der Cockatrice Datenbank abzuspeichern.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save to the default path (recommended)</source>
-        <translation>Im Standardverzeichnis abspeichern (Empfohlen)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Error</source>
-        <translation>Fehler</translation>
+        <translation>Cap&apos;n? Thar be a problem</translation>
     </message>
     <message>
         <source>No set has been imported.</source>
-        <translation>Es wurden keine Editionen importiert.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Import finished: %1 cards.</source>
-        <translation>Importieren abgeschlossen: %1 Karten.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>%1: %2 cards imported</source>
-        <translation>%1: %2 Karten importiert.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save card database</source>
-        <translation>Kartendatenbank speichern</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>XML; card database (*.xml)</source>
-        <translation>XML; Kartendatenbank (*.xml)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Success</source>
-        <translation>Erfolgreich</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The card database has been saved successfully to
 %1</source>
-        <translation>Die Kartendatenbank wurde erfolgreich gespeichert:
-%1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The file could not be saved to %1</source>
-        <translation>Die Datei konnte nicht gespeichert werden:
-%1 </translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>SaveTokensPage</name>
     <message>
         <source>Tokens imported</source>
-        <translation>Spielsteine importiert</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
-        <translation>Spielsteine wurden importiert. Drücken Sie „Speichern“, um die importierten Spielsteine in der Cockatrice Spielsteindatenbank abzuspeichern.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save to the default path (recommended)</source>
-        <translation>Im Standardverzeichnis abspeichern (Empfohlen)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save token database</source>
-        <translation>Spielsteindatenbank speichern</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>XML; token database (*.xml)</source>
-        <translation>XML; Tokendatenbank (*.xml)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Success</source>
-        <translation>Erfolgreich</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The token database has been saved successfully to
 %1</source>
-        <translation>Die Spielsteindatenbank wurde erfolgreich im folgendem Pfad gespeichert:
-%1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Error</source>
-        <translation>Fehler</translation>
+        <translation>Cap&apos;n? Thar be a problem</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>
-        <translation>Die Datei konnte nicht gespeichert werden:
-%1 </translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>UnZip</name>
     <message>
         <source>ZIP operation completed successfully.</source>
-        <translation>ZIP Operation erfolgreich abgeschlossen.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Failed to initialize or load zlib library.</source>
-        <translation>Fehler beim Initialisieren oder Laden der zlib Bibliothek.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>zlib library error.</source>
-        <translation>zlib Bibliothek fehlerhaft</translation>
+        <translation>Cap&apos;n? Thar be a problem wi&apos; t&apos; zlib library.</translation>
     </message>
     <message>
         <source>Unable to create or open file.</source>
-        <translation>Fehler beim Erstellen oder Öffnen der Datei.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation>Teilweise fehlerhaftes Archiv. Manche Dateien wurden möglicherweise extrahiert.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Corrupted archive.</source>
-        <translation>Fehlerhaftes Archiv.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wrong password.</source>
-        <translation>Falsches Passwort.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation>Es wurde noch kein Archiv erstellt.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File or directory does not exist.</source>
-        <translation>Datei oder Verzeichnis existiert nicht.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File read error.</source>
-        <translation>Lesefehler in der Datei.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File write error.</source>
-        <translation>Schreibfehler in der Datei.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File seek error.</source>
-        <translation>Suchfehler in der Datei.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unable to create a directory.</source>
-        <translation>Fehler beim Erstellen des Verzeichnisses.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invalid device.</source>
-        <translation>Ungültiges Gerät.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invalid or incompatible zip archive.</source>
-        <translation>Ungültiges oder inkompatibles Zip Archiv.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation>Unstimmiger Dateikopf. Das Archiv ist möglicherweise fehlerhaft.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation>Unbekannter Fehler.</translation>
+        <translation>Cap&apos;n? Thar be a unknown problem wi&apos; t&apos; ship.</translation>
     </message>
 </context>
 <context>
     <name>Zip</name>
     <message>
         <source>ZIP operation completed successfully.</source>
-        <translation>ZIP Operation erfolgreich abgeschlossen.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Failed to initialize or load zlib library.</source>
-        <translation>Fehler beim Initialisieren oder Laden der zlib Bibliothek.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>zlib library error.</source>
-        <translation>zlib Bibliothek fehlerhaft</translation>
+        <translation>Cap&apos;n? Thar be a problem wi&apos; t&apos; zlib library.</translation>
     </message>
     <message>
         <source>Unable to create or open file.</source>
-        <translation>Fehler beim Erstellen oder Öffnen der Datei.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation>Es wurde noch kein Archiv erstellt.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File or directory does not exist.</source>
-        <translation>Datei oder Verzeichnis existiert nicht.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File read error.</source>
-        <translation>Lesefehler in der Datei.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File write error.</source>
-        <translation>Schreibfehler in der Datei.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File seek error.</source>
-        <translation>Suchfehler in der Datei.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation>Unbekannter Fehler</translation>
+        <translation>Cap&apos;n? Thar be a unknown problem wi&apos; t&apos; ship.</translation>
     </message>
 </context>
 </TS>
