@@ -78,7 +78,7 @@
     </message>
     <message>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>A efectuar download (%1MB)</translation>
     </message>
     <message>
         <source>Network error: %1.</source>
@@ -133,7 +133,7 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <source>The provided url is not valid.</source>
@@ -141,15 +141,15 @@
     </message>
     <message>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>A efectuar download (0MB)</translation>
     </message>
     <message>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>A efectuar download (%1MB)</translation>
     </message>
     <message>
         <source>Network error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Erro da rede: %1.</translation>
     </message>
 </context>
 <context>
@@ -246,7 +246,7 @@
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Sucesso</translation>
     </message>
     <message>
         <source>The token database has been saved successfully to
@@ -255,7 +255,7 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>
@@ -353,7 +353,7 @@
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>Ainda não foi criado nenhum arquivo</translation>
     </message>
     <message>
         <source>File or directory does not exist.</source>
