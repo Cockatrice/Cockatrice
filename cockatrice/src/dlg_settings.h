@@ -60,6 +60,7 @@ private:
     QComboBox languageBox;
     QCheckBox picDownloadCheckBox;
     QCheckBox picDownloadHqCheckBox;
+    QCheckBox updateNotificationCheckBox;
     QLabel languageLabel;
     QLabel pixmapCacheLabel;
     QLabel deckPathLabel;

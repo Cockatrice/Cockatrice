@@ -7,6 +7,7 @@ add_subdirectory(pb)
 
 SET(common_SOURCES
     decklist.cpp
+    featureset.cpp
     get_pb_extension.cpp
     rng_abstract.cpp
     rng_sfmt.cpp

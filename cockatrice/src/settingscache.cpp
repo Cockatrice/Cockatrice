@@ -130,6 +130,7 @@ SettingsCache::SettingsCache()
     if(!QFile(settingsPath+"global.ini").exists())
         translateLegacySettings();
 
+    notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
     deckPath = settings->value("paths/decks").toString();
@@ -620,4 +621,10 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 {
     rememberGameSettings = _rememberGameSettings;
     settings->setValue("game/remembergamesettings", rememberGameSettings);
+}
+
+void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
+{
+    notifyAboutUpdates = _notifyaboutupdate;
+    settings->setValue("personal/updatenotification", notifyAboutUpdates);
 }

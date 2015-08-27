@@ -19,6 +19,8 @@
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_room_say.pb.h"
 #include <google/protobuf/descriptor.h>
+#include "featureset.h"
+
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent)
     : QObject(parent),
@@ -382,9 +384,31 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 {
     QString userName = QString::fromStdString(cmd.user_name()).simplified();
     QString clientId = QString::fromStdString(cmd.clientid()).simplified();
-    
+
     if (userName.isEmpty() || (userInfo != 0))
         return Response::RespContextError;
+
+    // check client feature set against server feature set
+    FeatureSet features;
+    QMap<QString, bool> receivedClientFeatures;
+    QMap<QString, bool> missingClientFeatures;
+
+    for (int i = 0; i < cmd.clientfeatures().size(); ++i)
+        receivedClientFeatures.insert(QString::fromStdString(cmd.clientfeatures(i)).simplified(), false);
+
+    missingClientFeatures = features.identifyMissingFeatures(receivedClientFeatures, server->getServerRequiredFeatureList());
+
+    if (!missingClientFeatures.isEmpty()) {
+        if (features.isRequiredFeaturesMissing(missingClientFeatures, server->getServerRequiredFeatureList())) {
+            Response_Login *re = new Response_Login;
+            re->set_denied_reason_str("Client upgrade required");
+            QMap<QString, bool>::iterator i;
+            for (i = missingClientFeatures.begin(); i != missingClientFeatures.end(); ++i)
+                re->add_missing_features(i.key().toStdString().c_str());
+            rc.setResponseExtension(re);
+            return Response::RespClientUpdateRequired;
+        }
+    }
 
     QString reasonStr;
     int banSecondsLeft = 0;
@@ -428,6 +452,13 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         QMapIterator<QString, ServerInfo_User> ignoreIterator(databaseInterface->getIgnoreList(userName));
         while (ignoreIterator.hasNext())
             re->add_ignore_list()->CopyFrom(ignoreIterator.next().value());
+    }
+
+    // return to client any missing features the server has that the client does not
+    if (!missingClientFeatures.isEmpty()) {
+        QMap<QString, bool>::iterator i;
+        for (i = missingClientFeatures.begin(); i != missingClientFeatures.end(); ++i)
+            re->add_missing_features(i.key().toStdString().c_str());
     }
 
     joinPersistentGames(rc);

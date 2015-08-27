@@ -8,11 +8,13 @@
 #include "pb/response.pb.h"
 #include "pb/server_message.pb.h"
 
+class Features;
 class Server_DatabaseInterface;
 class Server_Player;
 class ServerInfo_User;
 class Server_Room;
 class QTimer;
+class FeatureSet;
 
 class ServerMessage;
 class Response;

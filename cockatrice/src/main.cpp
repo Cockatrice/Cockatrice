@@ -33,7 +33,6 @@
 #include <QSystemTrayIcon>
 #include "QtNetwork/QNetworkInterface"
 #include <QCryptographicHash>
-
 #include "main.h"
 #include "window_main.h"
 #include "dlg_settings.h"
@@ -43,6 +42,7 @@
 #include "pixmapgenerator.h"
 #include "rng_sfmt.h"
 #include "soundengine.h"
+#include "featureset.h"
 
 //Q_IMPORT_PLUGIN(qjpeg)
 

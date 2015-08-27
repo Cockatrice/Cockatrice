@@ -20,6 +20,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include <QList>
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 #include <QProcess>
@@ -42,7 +43,7 @@ private slots:
     void processConnectionClosedEvent(const Event_ConnectionClosed &event);
     void processServerShutdownEvent(const Event_ServerShutdown &event);
     void serverTimeout();
-    void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
+    void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime, QList<QString> missingFeatures);
     void registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
     void activateError();
     void socketError(const QString &errorStr);
@@ -53,7 +54,7 @@ private slots:
     void activateAccepted();
     void localGameEnded();
     void pixmapCacheSizeChanged(int newSizeInMBs);
-
+    void notifyUserAboutUpdate();
     void actConnect();
     void actDisconnect();
     void actSinglePlayer();

@@ -58,6 +58,7 @@ private:
     QByteArray mainWindowGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath, themeName;
+    bool notifyAboutUpdates;
     bool picDownload;
     bool picDownloadHq;
     bool notificationsEnabled;
@@ -129,6 +130,7 @@ public:
     bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
+    bool getNotifyAboutUpdates() const { return notifyAboutUpdates; }
 
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
@@ -251,6 +253,7 @@ public slots:
     void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setRememberGameSettings(const bool _rememberGameSettings);
+    void setNotifyAboutUpdate(int _notifyaboutupdate);
 };
 
 extern SettingsCache *settingsCache;
