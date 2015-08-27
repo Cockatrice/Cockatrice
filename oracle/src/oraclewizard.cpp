@@ -172,9 +172,9 @@ void IntroPage::retranslateUi()
 {
     setTitle(tr("Introduction"));
     label->setText(tr("This wizard will import the list of sets, cards and tokens "
-                          "that will be used by Cockatrice."
-                          "\nYou will need to specify an URL or a filename that "
-                          "will be used as a source."));
+                      "that will be used by Cockatrice."
+                      "\nYou will need to specify an URL or a filename that "
+                      "will be used as a source."));
     languageLabel->setText(tr("Language:"));
 }
 
@@ -481,7 +481,7 @@ void SaveSetsPage::retranslateUi()
 {
     setTitle(tr("Sets imported"));
     setSubTitle(tr("The following sets has been imported. "
-                    "Press \"Save\" to save the imported cards to the Cockatrice database."));
+                   "Press \"Save\" to save the imported cards to the Cockatrice database."));
 
     defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
 }
@@ -584,8 +584,8 @@ void LoadTokensPage::retranslateUi()
 {
     setTitle(tr("Tokens source selection"));
     setSubTitle(tr("Please specify a source for the list of tokens. "
-                    "You can specify an URL address that will be download or "
-                    "use an existing file from your computer."));
+                   "You can specify an URL address that will be download or "
+                   "use an existing file from your computer."));
 
     urlLabel->setText(tr("Download URL:"));
     urlButton->setText(tr("Restore default URL"));
@@ -691,7 +691,7 @@ void SaveTokensPage::retranslateUi()
 {
     setTitle(tr("Tokens imported"));
     setSubTitle(tr("The tokens has been imported. "
-                    "Press \"Save\" to save the imported tokens to the Cockatrice tokens database."));
+                   "Press \"Save\" to save the imported tokens to the Cockatrice tokens database."));
 
     defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
 }
