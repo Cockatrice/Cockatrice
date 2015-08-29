@@ -138,6 +138,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
             users.value(name)->sendProtocolItem(*se);
             delete se;
 
+            QMetaObject::invokeMethod(users.value(name), "prepareDestroy", Qt::QueuedConnection);
         }
     } else if (authState == UnknownUser) {
         // Change user name so that no two users have the same names,
