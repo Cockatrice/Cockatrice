@@ -40,6 +40,7 @@
 Server::Server(bool _threaded, QObject *parent)
     : QObject(parent), threaded(_threaded), nextLocalGameId(0)
 {
+    qRegisterMetaType<ServerInfo_Ban>("ServerInfo_Ban");
     qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
     qRegisterMetaType<ServerInfo_Room>("ServerInfo_Room");
     qRegisterMetaType<ServerInfo_User>("ServerInfo_User");

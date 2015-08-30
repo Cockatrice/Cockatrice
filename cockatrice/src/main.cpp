@@ -225,7 +225,6 @@ int main(int argc, char *argv[])
         ui.setWindowIcon(icon);
         
         settingsCache->setClientID(generateClientID());
-        qDebug() << "ClientID In Cache: " << settingsCache->getClientID();
 
         ui.show();
         qDebug("main(): ui.show() finished");

@@ -78,6 +78,7 @@ public:
         LogMessage_TargetType targetType, const int targetId, const QString &targetName);
     bool changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword);
     QChar getGenderChar(ServerInfo_User_Gender const &gender);
+    QList<ServerInfo_Ban> getUserBanHistory(const QString userName);
 };
 
 #endif

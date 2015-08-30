@@ -116,6 +116,7 @@ SET(PROTO_FILES
     moderator_commands.proto
     move_card_to_zone.proto
     response_activate.proto
+    response_ban_history.proto
     response_deck_download.proto
     response_deck_list.proto
     response_deck_upload.proto
@@ -133,6 +134,7 @@ SET(PROTO_FILES
     room_commands.proto
     room_event.proto
     serverinfo_arrow.proto
+    serverinfo_ban.proto
     serverinfo_cardcounter.proto
     serverinfo_card.proto
     serverinfo_counter.proto

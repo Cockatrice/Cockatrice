@@ -16,6 +16,7 @@ void FeatureSet::initalizeFeatureList(QMap<QString, bool> &featureList){
     featureList.insert("client_id", false);
     featureList.insert("client_ver", false);
     featureList.insert("feature_set", false);
+    featureList.insert("user_ban_history", false);
 }
 
 void FeatureSet::enableRequiredFeature(QMap<QString, bool> &featureList, QString featureName){

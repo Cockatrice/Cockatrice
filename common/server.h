@@ -9,6 +9,7 @@
 #include <QReadWriteLock>
 #include "pb/commands.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "pb/serverinfo_ban.pb.h"
 #include "server_player_reference.h"
 
 class Server_DatabaseInterface;

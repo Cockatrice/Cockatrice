@@ -2,6 +2,7 @@ syntax = "proto2";
 message ModeratorCommand {
     enum ModeratorCommandType {
         BAN_FROM_SERVER = 1000;
+        BAN_HISTORY = 1001;
     }
     extensions 100 to max;
 }
@@ -16,4 +17,11 @@ message Command_BanFromServer {
     optional string reason = 4;
     optional string visible_reason = 5;
     optional string clientid = 6;
+}
+
+message Command_GetBanHistory {
+    extend ModeratorCommand {
+        optional Command_GetBanHistory ext = 1001;
+    }
+    optional string user_name = 1;
 }
