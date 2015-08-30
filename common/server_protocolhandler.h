@@ -39,6 +39,7 @@ class Command_LeaveRoom;
 class Command_RoomSay;
 class Command_CreateGame;
 class Command_JoinGame;
+class Command_UpdateCheck;
 
 class Server_ProtocolHandler : public QObject, public Server_AbstractUserInterface {
     Q_OBJECT
@@ -70,6 +71,7 @@ private:
     Response::ResponseCode cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room, ResponseContainer &rc);
     Response::ResponseCode cmdCreateGame(const Command_CreateGame &cmd, Server_Room *room, ResponseContainer &rc);
     Response::ResponseCode cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room, ResponseContainer &rc);
+    Response::ResponseCode cmdUpdateCheck(const Command_UpdateCheck &cmd, ResponseContainer &rc);
     
     Response::ResponseCode processSessionCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
     virtual Response::ResponseCode processExtendedSessionCommand(int /* cmdType */, const SessionCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }

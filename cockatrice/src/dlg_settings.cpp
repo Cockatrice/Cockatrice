@@ -54,6 +54,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     pixmapCacheEdit.setSuffix(" MB");
     picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
     picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
+    checkForUpdatesCheckBox.setChecked(settingsCache->getEnableClientUpdateCheck());
     
     highQualityURLEdit = new QLineEdit(settingsCache->getPicUrlHq());
     highQualityURLEdit->setEnabled(settingsCache->getPicDownloadHq());
@@ -63,6 +64,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
     connect(&picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
+    connect(&checkForUpdatesCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setEnableClientUpdateCheck(int)));
     connect(&picDownloadHqCheckBox, SIGNAL(clicked(bool)), this, SLOT(setEnabledStatus(bool)));
     connect(highQualityURLEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrlHq(QString)));
 
@@ -73,7 +75,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&pixmapCacheEdit, 1, 1, 1, 1);
     personalGrid->addWidget(&picDownloadCheckBox, 2, 0, 1, 2);
     personalGrid->addWidget(&picDownloadHqCheckBox, 3, 0, 1, 2);
-    personalGrid->addWidget(&clearDownloadedPicsButton, 4, 0, 1, 1);
+    personalGrid->addWidget(&checkForUpdatesCheckBox, 4, 0);
+    personalGrid->addWidget(&clearDownloadedPicsButton,6, 0, 1, 1);
     personalGrid->addWidget(&highQualityURLLabel, 5, 0, 1, 1);
     personalGrid->addWidget(highQualityURLEdit, 5, 1, 1, 1);
     personalGrid->addWidget(&highQualityURLLinkLabel, 6, 1, 1, 1);
@@ -236,6 +239,7 @@ void GeneralSettingsPage::retranslateUi()
     languageLabel.setText(tr("Language:"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
     picDownloadHqCheckBox.setText(tr("Download card pictures from a custom URL"));
+    checkForUpdatesCheckBox.setText(tr("Automatically check for client updates"));
     pathsGroupBox->setTitle(tr("Paths"));
     deckPathLabel.setText(tr("Decks directory:"));
     replaysPathLabel.setText(tr("Replays directory:"));

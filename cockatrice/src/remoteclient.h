@@ -21,6 +21,9 @@ signals:
     void sigRegisterToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname);
     void sigActivateToServer(const QString &_token);
     void sigDisconnectFromServer();
+    void sendServerUpdateClientCheck();
+
+
 private slots:
     void slotConnected();
     void readData();
@@ -36,6 +39,8 @@ private slots:
     void doLogin();
     void doDisconnectFromServer();
     void doActivateToServer(const QString &_token);
+    void doServerUpdateClientCheck();
+    void processClientUpdateCheck(const Response &response);
 
 private:
     static const int maxTimeout = 10;
@@ -50,6 +55,7 @@ private:
     QTcpSocket *socket;
     QString lastHostname;
     int lastPort;
+
 protected slots:    
     void sendCommandContainer(const CommandContainer &cont);
 public:

@@ -140,6 +140,7 @@ Servatrice::~Servatrice()
 
 bool Servatrice::initServer()
 {
+    serverVersion = VERSION_STRING;
     serverName = settingsCache->value("server/name", "My Cockatrice server").toString();
     serverId = settingsCache->value("server/id", 0).toInt();
     clientIdRequired = settingsCache->value("server/requireclientid",0).toBool();
@@ -178,6 +179,9 @@ bool Servatrice::initServer()
     qDebug() << "Registration enabled: " << regServerOnly;
     if (registrationEnabled)
         qDebug() << "Require email address to register: " << requireEmailForRegistration;
+
+    denyClientUpdateResponses = settingsCache->value("server/denyupdatechecking", false).toBool();
+    qDebug() << "Allow client update requests: " << denyClientUpdateResponses;
 
     QString dbTypeStr = settingsCache->value("database/type").toString();
     if (dbTypeStr == "mysql")

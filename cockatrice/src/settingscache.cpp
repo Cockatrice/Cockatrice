@@ -27,6 +27,7 @@ SettingsCache::SettingsCache()
     settings = new QSettings(this);
     shortcutsSettings = new ShortcutsSettings(getSettingsPath(),this);
 
+    trustedSourceClientUpdateSuccess = settings->value("personal/trustedsourceclientchecksuccess",false).toBool();
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
 
@@ -120,6 +121,7 @@ SettingsCache::SettingsCache()
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", "notset").toString();
+    enableClientUpdateCheck = settings->value("personal/checkforupdates", true).toBool();
 
     QString file = getSettingsPath();
     file.append("layouts/deckLayout.ini");
@@ -607,8 +609,17 @@ void SettingsCache::setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEv
     settings->setValue("game/spectatorscanseeeverything", spectatorsCanSeeEverything);
 }
 
-void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
-{
+void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings) {
     rememberGameSettings = _rememberGameSettings;
     settings->setValue("game/remembergamesettings", rememberGameSettings);
+}
+void SettingsCache::setEnableClientUpdateCheck(int _enableClientUpdateCheck){
+    enableClientUpdateCheck = _enableClientUpdateCheck;
+    settings->setValue("personal/checkforupdates", enableClientUpdateCheck);
+}
+void SettingsCache::setTrustedSourceClientUpdateSuccess(const bool _trustedSourceClientUpdateSuccess)
+{
+    //set this value to true to automatically disable the client update check at login, this value will be used when trusted source client update checks come online
+    trustedSourceClientUpdateSuccess = _trustedSourceClientUpdateSuccess;
+    settings->setValue("personal/trustedsourceclientchecksuccess", trustedSourceClientUpdateSuccess);
 }

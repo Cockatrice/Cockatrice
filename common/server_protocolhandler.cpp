@@ -13,11 +13,15 @@
 #include "pb/response_get_games_of_user.pb.h"
 #include "pb/response_get_user_info.pb.h"
 #include "pb/response_join_room.pb.h"
+#include "pb/response_update_check.pb.h"
 #include "pb/event_list_rooms.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_room_say.pb.h"
+#include "pb/event_notify_user.pb.h"
+#include "version_string.h"
+#include "../cockatrice/src/settingscache.h"
 #include <google/protobuf/descriptor.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent)
@@ -150,6 +154,7 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
             case SessionCommand::LIST_ROOMS: resp = cmdListRooms(sc.GetExtension(Command_ListRooms::ext), rc); break;
             case SessionCommand::JOIN_ROOM: resp = cmdJoinRoom(sc.GetExtension(Command_JoinRoom::ext), rc); break;
             case SessionCommand::LIST_USERS: resp = cmdListUsers(sc.GetExtension(Command_ListUsers::ext), rc); break;
+            case SessionCommand::UPDATE_CHECK: resp = cmdUpdateCheck(sc.GetExtension(Command_UpdateCheck::ext), rc); break;
             default: resp = processExtendedSessionCommand(num, sc, rc);
         }
         if (resp != Response::RespOk)
@@ -412,7 +417,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         default: authState = res;
     }
 
-    userName = QString::fromStdString(userInfo->name());
     Event_ServerMessage event;
     event.set_message(server->getLoginMessage().toStdString());
     rc.enqueuePostResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
@@ -667,4 +671,66 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGam
         return Response::RespLoginNeeded;
 
     return room->processJoinGameCommand(cmd, rc, this);
+}
+
+Response::ResponseCode Server_ProtocolHandler::cmdUpdateCheck(const Command_UpdateCheck &cmd, ResponseContainer &rc)
+{
+    /*
+     *  In order for a client to trust a client update available response from a server, the server and client
+     *  run the same type of date/commit calculations and verify the results are the same.  If there is a change
+     *  in the logic here, make sure you update the logic in the remoteclient.cpp file to match the clientUpdateAvailable results.
+    */
+
+    if (authState == NotLoggedIn)
+        return Response::RespLoginNeeded;
+
+    if (server->getDenyClientUpdateResponses()) {
+        // server operator has opted out of responding to client update check requests
+        Response_UpdateCheck *re = new Response_UpdateCheck;
+        re->set_source(Response_UpdateCheck::SERVER);
+        re->set_server_version("DENIED");
+        re->set_update_available(false);
+        rc.setResponseExtension(re);
+        return Response::RespOk;
+    }
+
+    QString clientVer = QString::fromStdString(cmd.client_version()).simplified();
+    QString serverVer = QString::fromStdString(VERSION_STRING);
+    Response_UpdateCheck *re = new Response_UpdateCheck;
+    re->set_source(Response_UpdateCheck::SERVER);
+    re->set_server_version(VERSION_STRING);
+
+    QDate clientDate = QDate::fromString(clientVer.mid(9, 10), "yyyy'-'MM'-'dd");
+    QDate serverDate = QDate::fromString(serverVer.mid(9, 10), "yyyy'-'MM'-'dd");
+
+    if (clientVer.isEmpty()) {
+        // client version not sent to server OR client does not have code for sending the information
+        re->set_update_available(true);
+    } else if (serverVer.isEmpty()) {
+        // server version not available OR server does not have the code for sending the information
+        re->set_update_available(false);
+    } else if (clientDate.operator==(serverDate)) {
+        // client date matches server version
+        QString clientCommitVer = clientVer.mid(1, 6);
+        QString serverCommitVer = server->getServerVersion().mid(1, 6);
+        if (clientCommitVer != serverCommitVer) {
+        // client is considered custom client, should we recommend a client update?
+        }
+        re->set_update_available(false);
+    } else if (clientDate.operator<(serverDate)) {
+        // client date is older than server version
+        re->set_update_available(true);
+
+    } else if (clientDate.operator>(serverDate)) {
+        // client date is newer than server version
+        QString clientCommitVer = clientVer.mid(1, 6);
+        QString serverCommitVer = server->getServerVersion().mid(1, 6);
+        if (clientCommitVer == serverCommitVer) {
+            // client is considered custom client, should we recommend a client update?
+        }
+        re->set_update_available(false);
+    }
+
+    rc.setResponseExtension(re);
+    return Response::RespOk;
 }

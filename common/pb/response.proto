@@ -51,6 +51,7 @@ message Response {
         REGISTER = 1009;
         ACTIVATE = 1010;
         ADJUST_MOD = 1011;
+        UPDATE_CHECK = 1012;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
     }

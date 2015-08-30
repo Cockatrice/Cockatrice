@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
 	signalhandler = new SignalHandler();
 
 	rng = new RNG_SFMT;
-	
+
 	std::cerr << "Servatrice " << VERSION_STRING << " starting." << std::endl;
 	std::cerr << "-------------------------" << std::endl;
 	

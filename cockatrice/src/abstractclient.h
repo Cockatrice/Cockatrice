@@ -65,6 +65,8 @@ signals:
     void registerAccepted();
     void registerAcceptedNeedsActivate();
     void activateAccepted();
+    void serverUpdateClientCheckReceived();
+    void notifyOfClientUpdate();
     
     void sigQueuePendingCommand(PendingCommand *pend);
 private:
