@@ -43,8 +43,10 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     mainLayout->addWidget(&userLevelLabel1, 5, 0, 1, 1);
     mainLayout->addWidget(&userLevelLabel2, 5, 1, 1, 1);
     mainLayout->addWidget(&userLevelLabel3, 5, 2, 1, 1);
-    mainLayout->addWidget(&accountAgeLebel1, 6, 0, 1, 1);
-    mainLayout->addWidget(&accountAgeLabel2, 6, 2, 1, 1);
+    mainLayout->addWidget(&userLevelLabel4, 6, 0, 1, 1);
+    mainLayout->addWidget(&userLevelLabel5, 6, 1, 1, 1);
+    mainLayout->addWidget(&accountAgeLebel1, 7, 0, 1, 1);
+    mainLayout->addWidget(&accountAgeLabel2, 7, 2, 1, 1);
     mainLayout->setColumnStretch(2, 10);
 
     if(editable)
@@ -71,6 +73,7 @@ void UserInfoBox::retranslateUi()
     genderLabel1.setText(tr("Pronouns:"));
     countryLabel1.setText(tr("Location:"));
     userLevelLabel1.setText(tr("User level:"));
+    userLevelLabel4.setText(tr("User Role:"));
     accountAgeLebel1.setText(tr("Account Age:"));
 
     editButton.setText(tr("Edit"));
@@ -78,33 +81,30 @@ void UserInfoBox::retranslateUi()
     avatarButton.setText(tr("Change avatar"));
 }
 
-void UserInfoBox::updateInfo(const ServerInfo_User &user)
-{
+void UserInfoBox::updateInfo(const ServerInfo_User &user) {
     const UserLevelFlags userLevel(user.user_level());
-    
+
     QPixmap avatarPixmap;
     const std::string bmp = user.avatar_bmp();
     if (!avatarPixmap.loadFromData((const uchar *) bmp.data(), bmp.size()))
-        avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel, false);
+        avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel, false, user.user_role());
     avatarLabel.setPixmap(avatarPixmap.scaled(avatarLabel.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    
+
     nameLabel.setText(QString::fromStdString(user.name()));
     realNameLabel2.setText(QString::fromStdString(user.real_name()));
     genderLabel2.setPixmap(GenderPixmapGenerator::generatePixmap(15, user.gender()));
     QString country = QString::fromStdString(user.country());
 
-    if (country.length() != 0)
-    {
+    if (country.length() != 0) {
         countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, country));
         countryLabel3.setText(QString("(%1)").arg(country.toUpper()));
     }
-    else
-    {
+    else {
         countryLabel2.setText("");
         countryLabel3.setText("");
     }
-	
-    userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, false));
+
+    userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, false, user.user_role()));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
         userLevelText = tr("Administrator");
@@ -115,6 +115,19 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     else
         userLevelText = tr("Unregistered user");
     userLevelLabel3.setText(userLevelText);
+
+    switch (user.user_role) {
+        case (0):
+            userLevelLabel5.setText("Regular");
+            break;
+
+        case (1):
+            userLevelLabel5.setText("Lead");
+            break;
+
+        default:
+            userLevelLabel5.setText("Uknown");
+    }
 
     QString accountAgeString = tr("Unregistered user");
     if (userLevel.testFlag(ServerInfo_User::IsAdmin) || userLevel.testFlag(ServerInfo_User::IsModerator) || userLevel.testFlag(ServerInfo_User::IsRegistered)) {

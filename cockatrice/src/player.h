@@ -275,6 +275,7 @@ public:
     QMenu *getPlayerMenu() const { return playerMenu; }
     int getId() const { return id; }
     QString getName() const;
+    int getRole() const;
     ServerInfo_User *getUserInfo() const { return userInfo; }
     bool getLocal() const { return local; }
     bool getMirrored() const { return mirrored; }

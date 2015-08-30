@@ -5,6 +5,7 @@
 #include <QMap>
 
 #include "user_level.h"
+#include "user_role.h"
 
 class PhasePixmapGenerator {
 private:
@@ -50,7 +51,7 @@ class UserLevelPixmapGenerator {
 private:
     static QMap<int, QPixmap> pmCache;
 public:
-    static QPixmap generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy);
+    static QPixmap generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, int usersLevelRole);
     static void clear() { pmCache.clear(); }
 };
 
