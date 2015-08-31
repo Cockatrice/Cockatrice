@@ -133,6 +133,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
                 delete se;
 
                 users.value(name)->prepareDestroy();
+            } else {
+                qDebug() << "Active session and sessions table inconsistent, please validate session table information for user " << name;
             }
         }
 
