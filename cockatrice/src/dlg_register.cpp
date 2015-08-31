@@ -311,7 +311,7 @@ DlgRegister::DlgRegister(QWidget *parent)
     countryEdit->setCurrentIndex(0);
     QStringList countries = settingsCache->getCountries();
     foreach(QString c, countries)
-        countryEdit->addItem(QPixmap(":/resources/countries/" + c + ".svg"), c);
+        countryEdit->addItem(QPixmap("theme:countries/" + c.toLower() + ".svg"), c);
 
     realnameLabel = new QLabel(tr("Real name:"));
     realnameEdit = new QLineEdit();

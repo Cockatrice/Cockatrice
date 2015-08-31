@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 
 	OracleWizard wizard;
 
-    QIcon icon(":/resources/appicon.svg");
+    QIcon icon("theme:appicon.svg");
     wizard.setWindowIcon(icon);
 
 	wizard.show();

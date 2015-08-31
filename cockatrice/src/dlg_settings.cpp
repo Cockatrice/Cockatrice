@@ -802,7 +802,7 @@ void DlgSettings::createIcons()
     shortcutsButton = new QListWidgetItem(contentsWidget);
     shortcutsButton->setTextAlignment(Qt::AlignHCenter);
     shortcutsButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    shortcutsButton->setIcon(QIcon(":/resources/icon_config_shorcuts.svg"));
+    shortcutsButton->setIcon(QIcon("theme:config/shorcuts.svg"));
 
     connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(changePage(QListWidgetItem *, QListWidgetItem *)));
 }

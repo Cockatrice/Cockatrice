@@ -316,11 +316,11 @@ void TabDeckEditor::createMenus()
     addTabMenu(deckMenu);
 
     aClearFilterAll = new QAction(QString(), this);
-    aClearFilterAll->setIcon(QIcon(":/resources/icon_clearsearch.svg"));
+    aClearFilterAll->setIcon(QIcon("theme:icons/clearsearch.svg"));
     connect(aClearFilterAll, SIGNAL(triggered()), this, SLOT(actClearFilterAll()));
 
     aClearFilterOne = new QAction(QString(), this);
-    aClearFilterOne->setIcon(QIcon(":/resources/decrement.svg"));
+    aClearFilterOne->setIcon(QIcon("theme:icons/decrement.svg"));
     connect(aClearFilterOne, SIGNAL(triggered()), this, SLOT(actClearFilterOne()));
 
     dbMenu = new QMenu(this);
@@ -342,7 +342,7 @@ void TabDeckEditor::createCentralFrame()
     searchEdit = new SearchLineEdit;
     searchEdit->setObjectName("searchEdit");
 #if QT_VERSION >= 0x050300
-    searchEdit->addAction(QIcon(":/resources/icon_search_black.svg"), QLineEdit::LeadingPosition);
+    searchEdit->addAction(QIcon("theme:icons/search.svg"), QLineEdit::LeadingPosition);
 #endif
 
     setFocusProxy(searchEdit);
