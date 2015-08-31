@@ -20,12 +20,34 @@ signals:
     void sizeChanged();
 
 private:
-    static const int BOX_LINE_WIDTH = 10;
+    static const int TABLEROWS = 3;
+
+    /*
+    Margins between table edges and cards, paddings between cards
+    */
+    static const int MARGIN_LEFT = 20;
+    static const int MARGIN_RIGHT = 15;
+    static const int MARGIN_TOP = 10;
+    static const int MARGIN_BOTTOM = 30;
     static const int PADDING_X  = 35;
-    static const int PADDING_Y = 10;
-    static const int MARGIN_X = 20;
-    static const int MIN_WIDTH = 15 * CARD_WIDTH / 2;
-    
+    static const int PADDING_Y = 30;
+
+    /*
+    Minimum width of the table zone including margins.
+    */
+    static const int MIN_WIDTH = MARGIN_LEFT + (5 * CARD_WIDTH) + MARGIN_RIGHT;
+
+    /*
+    Offset sizes when cards are stacked on each other in the grid
+    */
+    static const int STACKED_CARD_OFFSET_X = CARD_WIDTH / 3;
+    static const int STACKED_CARD_OFFSET_Y = PADDING_Y / 3;
+
+    /*
+    Width of the box line drawn in the margin around the active player's area
+    */
+    static const int BOX_LINE_WIDTH = 10;
+
     /*
     Default inactive mask and border gradient
     */
@@ -37,10 +59,19 @@ private:
     /*
        Size and shape variables
      */
-    QMap<int, int> gridPointWidth;
     int width;
     int height;
     int currentMinimumWidth;
+
+    /*
+    Internal cache for widths of stacks of cards by row and column.
+    */
+    QMap<int, int> cardStackWidth;
+
+    /*
+       Holds any custom background image for the TableZone
+     */
+    QPixmap backgroundPixelMap;
 
     /*
        If this TableZone is currently active
@@ -108,9 +139,9 @@ public:
      */
     CardItem *getCardFromCoords(const QPointF &point) const;
 
-    QPointF mapFromGrid(QPoint gridPoint) const;
-    QPoint mapToGrid(const QPointF &mapPoint) const;
     QPointF closestGridPoint(const QPointF &point);
+
+    static int clampValidTableRow(const int row);
 
     /**
        Removes a card from view.
@@ -129,7 +160,7 @@ public:
     void resizeToContents();
 
     int getMinimumWidth() const { return currentMinimumWidth; }
-    void setWidth(qreal _width){ prepareGeometryChange(); width = _width;};
+    void setWidth(qreal _width) { prepareGeometryChange(); width = _width; }
     qreal getWidth() const { return width; }
     void setActive(bool _active) { active = _active; update(); }
 
@@ -139,6 +170,22 @@ protected:
 private:
     void paintZoneOutline(QPainter *painter);
     void paintLandDivider(QPainter *painter);
+
+    /*
+    Calculates card stack widths so mapping functions work properly
+    */
+    void computeCardStackWidths();
+
+    /*
+    Mapping functions for points to/from gridpoints.
+    */
+    QPointF mapFromGrid(QPoint gridPoint) const;
+    QPoint mapToGrid(const QPointF &mapPoint) const;
+
+    /*
+    Helper function to create a single key from a card stack location.
+    */
+    int getCardStackMapKey (int x, int y) const { return x + (y * 1000); }
 };
 
 #endif

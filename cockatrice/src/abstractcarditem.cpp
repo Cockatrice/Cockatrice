@@ -123,7 +123,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     } else {
         painter->save();
         transformPainter(painter, translatedSize, angle);
-        painter->drawPixmap(QPointF(0, angle ? -1 : 0), translatedPixmap);
+        painter->drawPixmap(QPointF(1, 1), translatedPixmap);
         painter->restore();
     }
     painter->setBrush(bgColor);

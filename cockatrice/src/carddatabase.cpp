@@ -1,6 +1,8 @@
 #include "carddatabase.h"
 #include "settingscache.h"
 #include "thememanager.h"
+
+#include <QCryptographicHash>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
@@ -92,7 +94,7 @@ void CardSet::setIsKnown(bool _isknown)
     settings.setValue("isknown", isknown);
 }
 
-class SetList::CompareFunctor {
+class SetList::KeyCompareFunctor {
 public:
     inline bool operator()(CardSet *a, CardSet *b) const
     {
@@ -102,7 +104,39 @@ public:
 
 void SetList::sortByKey()
 {
-    qSort(begin(), end(), CompareFunctor());
+    qSort(begin(), end(), KeyCompareFunctor());
+}
+
+class SetList::EnabledAndKeyCompareFunctor {
+public:
+    inline bool operator()(CardSet *a, CardSet *b) const
+    {
+        if(a->getEnabled())
+        {
+            if(b->getEnabled())
+            {
+                // both enabled: sort by key
+                return a->getSortKey() < b->getSortKey();
+            } else {
+                // only a enabled
+                return true;
+            }
+        } else {
+            if(b->getEnabled())
+            {
+                // only b enabled
+                return false;
+            } else {
+                // both disabled: sort by key
+                return a->getSortKey() < b->getSortKey();
+            }
+        }
+    }
+};
+
+void SetList::sortByEnabledAndKey()
+{
+    qSort(begin(), end(), EnabledAndKeyCompareFunctor());
 }
 
 int SetList::getEnabledSetsNum()
@@ -185,7 +219,7 @@ PictureToLoad::PictureToLoad(CardInfo *_card, bool _hq)
 {
     if (card) {
         sortedSets = card->getSets();
-        sortedSets.sortByKey();
+        sortedSets.sortByEnabledAndKey();
     }
 }
 
@@ -212,6 +246,9 @@ CardSet *PictureToLoad::getCurrentSet() const
     else
         return 0;
 }
+
+QStringList PictureLoader::md5Blacklist = QStringList()
+    << "db0c48db407a907c16ade38de048a441"; // card back returned by gatherer when card is not found
 
 PictureLoader::PictureLoader(const QString &__picsPath, bool _picDownload, bool _picDownloadHq, QObject *parent)
     : QObject(parent),
@@ -338,16 +375,26 @@ QString PictureLoader::getPicUrl()
         picUrl = picDownloadHq ? settingsCache->getPicUrlHqFallback() : settingsCache->getPicUrlFallback();
 
     picUrl.replace("!name!", QUrl::toPercentEncoding(card->getCorrectedName()));
+    picUrl.replace("!name_lower!", QUrl::toPercentEncoding(card->getCorrectedName().toLower()));
     picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
-    if (set) {
+    if (set)
+    {
         picUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
+        picUrl.replace("!setcode_lower!", QUrl::toPercentEncoding(set->getShortName().toLower()));
         picUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
+        picUrl.replace("!setname_lower!", QUrl::toPercentEncoding(set->getLongName().toLower()));
     }
 
-    if (picUrl.contains("!name!") ||
-            picUrl.contains("!setcode!") ||
-            picUrl.contains("!setname!") ||
-            picUrl.contains("!cardid!")) {
+    if (
+        picUrl.contains("!name!") ||
+        picUrl.contains("!name_lower!") ||
+        picUrl.contains("!setcode!") ||
+        picUrl.contains("!setcode_lower!") ||
+        picUrl.contains("!setname!") ||
+        picUrl.contains("!setname_lower!") ||
+        picUrl.contains("!cardid!")
+        )
+    {
         qDebug() << "Insufficient card data to download" << card->getName() << "Url:" << picUrl;
         return QString("");
     }
@@ -403,7 +450,28 @@ void PictureLoader::picDownloadFinished(QNetworkReply *reply)
         qDebug() << "Download failed:" << reply->errorString();
     }
 
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (statusCode == 301 || statusCode == 302) {
+        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        QNetworkRequest req(redirectUrl);
+        qDebug() << "following redirect:" << cardBeingDownloaded.getCard()->getName() << "Url:" << req.url();
+        networkManager->get(req);
+        return;
+    }
+
     const QByteArray &picData = reply->peek(reply->size()); //peek is used to keep the data in the buffer for use by QImageReader
+
+    // check if the image is blacklisted
+    QString md5sum = QCryptographicHash::hash(picData, QCryptographicHash::Md5).toHex();
+    if(md5Blacklist.contains(md5sum))
+    {
+        qDebug() << "Picture downloaded, but blacklisted (" << md5sum << "), will consider it as not found";
+        picDownloadFailed();
+        reply->deleteLater();
+        startNextPicDownload();
+        return;
+    }
+
     QImage testImage;
     
     QImageReader imgReader;
@@ -483,13 +551,16 @@ CardInfo::CardInfo(CardDatabase *_db,
                    const QString &_powtough,
                    const QString &_text,
                    const QStringList &_colors,
+                   const QStringList &_relatedCards,
+                   bool _upsideDownArt,
                    int _loyalty,
                    bool _cipt,
                    int _tableRow,
                    const SetList &_sets,
                    const QStringMap &_customPicURLs,
                    const QStringMap &_customPicURLsHq,
-                   MuidMap _muIds)
+                   MuidMap _muIds
+                   )
     : db(_db),
       name(_name),
       isToken(_isToken),
@@ -500,6 +571,8 @@ CardInfo::CardInfo(CardDatabase *_db,
       powtough(_powtough),
       text(_text),
       colors(_colors),
+      relatedCards(_relatedCards),
+      upsideDownArt(_upsideDownArt),
       loyalty(_loyalty),
       customPicURLs(_customPicURLs),
       customPicURLsHq(_customPicURLsHq),
@@ -581,7 +654,13 @@ void CardInfo::loadPixmap(QPixmap &pixmap)
 void CardInfo::imageLoaded(const QImage &image)
 {
     if (!image.isNull()) {
-        QPixmapCache::insert(pixmapCacheKey, QPixmap::fromImage(image));
+        if(upsideDownArt)
+        {
+            QImage mirrorImage = image.mirrored(true, true);
+            QPixmapCache::insert(pixmapCacheKey, QPixmap::fromImage(mirrorImage));
+        } else {
+            QPixmapCache::insert(pixmapCacheKey, QPixmap::fromImage(image));
+        }
         emit pixmapUpdated();
     }
 }
@@ -686,6 +765,10 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
     for (int i = 0; i < colors.size(); i++)
         xml.writeTextElement("color", colors[i]);
 
+    const QStringList &related = info->getRelatedCards();
+    for (int i = 0; i < related.size(); i++)
+        xml.writeTextElement("related", related[i]);
+
     xml.writeTextElement("manacost", info->getManaCost());
     xml.writeTextElement("cmc", info->getCmc());
     xml.writeTextElement("type", info->getCardType());
@@ -699,6 +782,8 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
         xml.writeTextElement("cipt", "1");
     if (info->getIsToken())
         xml.writeTextElement("token", "1");
+    if (info->getUpsideDownArt())
+        xml.writeTextElement("upsidedown", "1");
     xml.writeEndElement(); // card
 
     return xml;
@@ -815,6 +900,8 @@ void CardDatabase::clearPixmapCache()
     }
     if (noCard)
         noCard->clearPixmapCache();
+
+    QPixmapCache::clear();
 }
 
 void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
@@ -853,7 +940,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             break;
         if (xml.name() == "card") {
             QString name, manacost, cmc, type, pt, text;
-            QStringList colors;
+            QStringList colors, relatedCards;
             QStringMap customPicURLs, customPicURLsHq;
             MuidMap muids;
             SetList sets;
@@ -861,6 +948,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             int loyalty = 0;
             bool cipt = false;
             bool isToken = false;
+            bool upsideDown = false;
             while (!xml.atEnd()) {
                 if (xml.readNext() == QXmlStreamReader::EndElement)
                     break;
@@ -891,10 +979,14 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
                     }
                 } else if (xml.name() == "color")
                     colors << xml.readElementText();
+                else if (xml.name() == "related")
+                    relatedCards << xml.readElementText();
                 else if (xml.name() == "tablerow")
                     tableRow = xml.readElementText().toInt();
                 else if (xml.name() == "cipt")
                     cipt = (xml.readElementText() == "1");
+                else if (xml.name() == "upsidedown")
+                    upsideDown = (xml.readElementText() == "1");
                 else if (xml.name() == "loyalty")
                     loyalty = xml.readElementText().toInt();
                 else if (xml.name() == "token")
@@ -902,7 +994,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             }
 
             if (isToken == tokens) {
-                addCard(new CardInfo(this, name, isToken, manacost, cmc, type, pt, text, colors, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
+                addCard(new CardInfo(this, name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, customPicURLsHq, muids));
             }
         }
     }

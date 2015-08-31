@@ -15,7 +15,7 @@
     </message>
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation>Cet assistant va importer la liste des éditions et des cartes qui seront utilisées par Cockatrice.&lt;br/&gt;Vous devrez spécifier une url ou un fichier local avec la liste d&apos;édition comme fichier source, Puis choisir quelles éditions seront importées parmis la liste proposée.</translation>
+        <translation>Cet assistant va importer la liste des éditions et des cartes qui seront utilisées par Cockatrice.&lt;br/&gt;Vous devrez spécifier une url ou un fichier local avec la liste d&apos;édition comme fichier source, puis choisir quelles éditions seront importées parmi la liste proposée.</translation>
     </message>
 </context>
 <context>
@@ -114,6 +114,45 @@
     </message>
 </context>
 <context>
+    <name>LoadTokensPage</name>
+    <message>
+        <source>Tokens source selection</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download url:</source>
+        <translation>URL de téléchargement:</translation>
+    </message>
+    <message>
+        <source>Restore default url</source>
+        <translation>Restaurer l&apos;URL par défaut</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Érreur</translation>
+    </message>
+    <message>
+        <source>The provided url is not valid.</source>
+        <translation>L&apos;URL fournit est non valide.</translation>
+    </message>
+    <message>
+        <source>Downloading (0MB)</source>
+        <translation>Téléchargement (0MB)</translation>
+    </message>
+    <message>
+        <source>Downloading (%1MB)</source>
+        <translation>Téléchargement (%1MB)</translation>
+    </message>
+    <message>
+        <source>Network error: %1.</source>
+        <translation>Erreur réseau : %1.</translation>
+    </message>
+</context>
+<context>
     <name>OracleImporter</name>
     <message>
         <source>Dummy set containing tokens</source>
@@ -182,6 +221,46 @@
     <message>
         <source>The file could not be saved to %1</source>
         <translation>Le fichier n&apos;a pu être sauvegarder au chemin &apos;%1&apos;</translation>
+    </message>
+</context>
+<context>
+    <name>SaveTokensPage</name>
+    <message>
+        <source>Tokens imported</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Save to the default path (recommended)</source>
+        <translation>Sauvergarder au chemin par défaut (recommendé)</translation>
+    </message>
+    <message>
+        <source>Save token database</source>
+        <translation>Sauvegarder la base des jetons</translation>
+    </message>
+    <message>
+        <source>XML; token database (*.xml)</source>
+        <translation>XML; bases de données des jetons (*.xml)</translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation>Réussite</translation>
+    </message>
+    <message>
+        <source>The token database has been saved successfully to
+%1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Érreur</translation>
+    </message>
+    <message>
+        <source>The file could not be saved to %1</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

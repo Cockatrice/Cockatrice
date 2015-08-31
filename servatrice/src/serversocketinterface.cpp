@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
+#include <QSqlError>
 #include <QSqlQuery>
 #include <QHostAddress>
 #include <QDebug>
@@ -48,6 +50,7 @@
 #include "pb/event_server_identification.pb.h"
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_remove_from_list.pb.h"
+#include "pb/event_notify_user.pb.h"
 #include "pb/response_deck_list.pb.h"
 #include "pb/response_deck_download.pb.h"
 #include "pb/response_deck_upload.pb.h"
@@ -57,8 +60,6 @@
 #include "pb/serverinfo_replay.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
-
-#include "smtp/SmtpMime"
 
 #include "version_string.h"
 #include <string>
@@ -120,14 +121,30 @@ bool ServerSocketInterface::initSession()
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);
     delete identSe;
-    
-    int maxUsers = servatrice->getMaxUsersPerAddress();
+
+	//limit the number of total users based on configuration settings
+	bool enforceUserLimit = settingsCache->value("security/enable_max_user_limit", false).toBool();
+	if (enforceUserLimit){
+		int userLimit = settingsCache->value("security/max_users_total", 500).toInt();
+		int playerCount = (databaseInterface->getActiveUserCount() + 1);
+		if (playerCount > userLimit){
+			std::cerr << "Max Users Total Limit Reached, please increase the max_users_total setting." << std::endl;
+			logger->logMessage(QString("Max Users Total Limit Reached, please increase the max_users_total setting."), this);
+			Event_ConnectionClosed event;
+			event.set_reason(Event_ConnectionClosed::USER_LIMIT_REACHED);
+			SessionEvent *se = prepareSessionEvent(event);
+			sendProtocolItem(*se);
+			delete se;
+			return false;
+		}
+	}
 
     //allow unlimited number of connections from the trusted sources
-    QString trustedSources = settingsCache->value("server/trusted_sources","127.0.0.1,::1").toString();
+    QString trustedSources = settingsCache->value("security/trusted_sources","127.0.0.1,::1").toString();
     if (trustedSources.contains(socket->peerAddress().toString(),Qt::CaseInsensitive))
         return true;
     
+	int maxUsers = servatrice->getMaxUsersPerAddress();
     if ((maxUsers > 0) && (servatrice->getUsersWithAddress(socket->peerAddress()) >= maxUsers)) {
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::TOO_MANY_CONNECTIONS);
@@ -272,6 +289,10 @@ Response::ResponseCode ServerSocketInterface::processExtendedSessionCommand(int 
         case SessionCommand::REPLAY_DELETE_MATCH: return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
         case SessionCommand::REGISTER: return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc); break;
         case SessionCommand::ACTIVATE: return cmdActivateAccount(cmd.GetExtension(Command_Activate::ext), rc); break;
+
+        case SessionCommand::ACCOUNT_EDIT: return cmdAccountEdit(cmd.GetExtension(Command_AccountEdit::ext), rc);
+        case SessionCommand::ACCOUNT_IMAGE: return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
+        case SessionCommand::ACCOUNT_PASSWORD: return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
         default: return Response::RespFunctionNotAllowed;
     }
 }
@@ -289,6 +310,8 @@ Response::ResponseCode ServerSocketInterface::processExtendedAdminCommand(int cm
     switch ((AdminCommand::AdminCommandType) cmdType) {
         case AdminCommand::SHUTDOWN_SERVER: return cmdShutdownServer(cmd.GetExtension(Command_ShutdownServer::ext), rc);
         case AdminCommand::UPDATE_SERVER_MESSAGE: return cmdUpdateServerMessage(cmd.GetExtension(Command_UpdateServerMessage::ext), rc);
+        case AdminCommand::RELOAD_CONFIG: return cmdReloadConfig(cmd.GetExtension(Command_ReloadConfig::ext), rc);
+        case AdminCommand::ADJUST_MOD: return cmdAdjustMod(cmd.GetExtension(Command_AdjustMod::ext), rc);
         default: return Response::RespFunctionNotAllowed;
     }
 }
@@ -736,20 +759,40 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
     if (trustedSources.contains(address,Qt::CaseInsensitive))
         address = "";
 
-    QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason)");
+    QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason, clientid) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason, :client_id)");
     query->bindValue(":user_name", userName);
     query->bindValue(":ip_address", address);
     query->bindValue(":id_admin", userInfo->id());
     query->bindValue(":minutes", minutes);
     query->bindValue(":reason", QString::fromStdString(cmd.reason()));
     query->bindValue(":visible_reason", QString::fromStdString(cmd.visible_reason()));
+    query->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
     sqlInterface->execSqlQuery(query);
 
     servatrice->clientsLock.lockForRead();
     QList<ServerSocketInterface *> userList = servatrice->getUsersWithAddressAsList(QHostAddress(address));
-    ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
-    if (user && !userList.contains(user))
+
+    if (!userName.isEmpty()) {
+        ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
         userList.append(user);
+    }
+
+    if (userName.isEmpty() && address.isEmpty() && (!QString::fromStdString(cmd.clientid()).isEmpty())) {
+        QSqlQuery *query = sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
+        query->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
+        sqlInterface->execSqlQuery(query);
+        if (!sqlInterface->execSqlQuery(query)){
+            qDebug("ClientID username ban lookup failed: SQL Error");
+        } else {
+            while (query->next()) {
+                userName = query->value(0).toString();
+                ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
+                if (user && !userList.contains(user))
+                   userList.append(user);
+            }
+        }
+    }
+
     if (!userList.isEmpty()) {
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::BANNED);
@@ -772,6 +815,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc)
 {
     QString userName = QString::fromStdString(cmd.user_name());
+    QString clientId = QString::fromStdString(cmd.clientid());
     qDebug() << "Got register command: " << userName;
 
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
@@ -788,15 +832,21 @@ Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_R
     }
 
     // TODO: Move this method outside of the db interface
-    if (!sqlInterface->usernameIsValid(userName))
+    QString errorString;
+    if (!sqlInterface->usernameIsValid(userName, errorString))
+    {
+        Response_Register *re = new Response_Register;
+        re->set_denied_reason_str(errorString.toStdString());
+        rc.setResponseExtension(re);
         return Response::RespUsernameInvalid;
+    }
 
     if(sqlInterface->userExists(userName))
         return Response::RespUserAlreadyExists;
 
     QString banReason;
     int banSecondsRemaining;
-    if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, banReason, banSecondsRemaining))
+    if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining))
     {
         Response_Register *re = new Response_Register;
         re->set_denied_reason_str(banReason.toStdString());
@@ -826,8 +876,11 @@ Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_R
         qDebug() << "Accepted register command for user: " << userName;
         if(requireEmailForRegistration)
         {
-            // TODO call a slot on another thread to send email
-            sendActivationTokenMail(userName, emailAddress, token);
+            QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
+            query->bindValue(":name", userName);
+            if (!sqlInterface->execSqlQuery(query))
+                return Response::RespRegistrationFailed;
+
             return Response::RespRegistrationAcceptedNeedsActivation;
         } else {
             return Response::RespRegistrationAccepted;
@@ -835,88 +888,6 @@ Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_R
     } else {
         return Response::RespRegistrationFailed;
     }
-}
-
-bool ServerSocketInterface::sendActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token)
-{
-    QString tmp = settingsCache->value("smtp/connection", "tcp").toString();
-    SmtpClient::ConnectionType connection = SmtpClient::TcpConnection;
-    if(tmp == "ssl")
-        connection = SmtpClient::SslConnection;
-    else if(tmp == "tls")
-        connection = SmtpClient::TlsConnection;
-
-    tmp = settingsCache->value("smtp/auth", "plain").toString();
-    SmtpClient::AuthMethod auth = SmtpClient::AuthPlain;
-    if(tmp == "login")
-        auth = SmtpClient::AuthLogin;
-
-    QString host = settingsCache->value("smtp/host", "localhost").toString();
-    int port = settingsCache->value("smtp/port", 25).toInt();
-    QString username = settingsCache->value("smtp/username", "").toString();
-    QString password = settingsCache->value("smtp/password", "").toString();
-    QString email = settingsCache->value("smtp/email", "").toString();
-    QString name = settingsCache->value("smtp/name", "").toString();
-    QString subject = settingsCache->value("smtp/subject", "").toString();
-    QString body = settingsCache->value("smtp/body", "").toString();
-
-    if(email.isEmpty())
-    {
-        qDebug() << "[MAIL] Missing email field" << endl;
-        return false;
-    }
-    if(body.isEmpty())
-    {
-        qDebug() << "[MAIL] Missing body field" << endl;
-        return false;
-    }
-    if(recipient.isEmpty())
-    {
-        qDebug() << "[MAIL] Missing recipient field" << endl;
-        return false;
-    }
-    if(token.isEmpty())
-    {
-        qDebug() << "[MAIL] Missing token field" << endl;
-        return false;
-    }
-
-    SmtpClient smtp(host, port, connection);
-    smtp.setUser(username);
-    smtp.setPassword(password);
-    smtp.setAuthMethod(auth);
-
-    MimeMessage message;
-    EmailAddress sender(email, name);
-    message.setSender(&sender);
-    EmailAddress to(recipient, nickname);
-    message.addRecipient(&to);
-    message.setSubject(subject);
-
-    MimeText text;
-    text.setText(body.replace("%username", nickname).replace("%token", token));
-    message.addPart(&text);
-
-    // Now we can send the mail
-
-    if (!smtp.connectToHost()) {
-        qDebug() << "[MAIL] Failed to connect to host" << host << "on port" << port;
-        return false;
-    }
-
-    if (!smtp.login()) {
-        qDebug() << "[MAIL] Failed to login as " << username;
-        return false;
-    }
-
-    if (!smtp.sendMail(message)) {
-        qDebug() << "[MAIL] Failed to send mail to " << recipient;
-        return false;
-    }
-
-    smtp.quit();
-    qDebug() << "[MAIL] Sent activation email to " << recipient << " for nickname " << nickname;
-    return true;
 }
 
 bool ServerSocketInterface::tooManyRegistrationAttempts(const QString &ipAddress)
@@ -941,6 +912,75 @@ Response::ResponseCode ServerSocketInterface::cmdActivateAccount(const Command_A
     }
 }
 
+Response::ResponseCode ServerSocketInterface::cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer & /* rc */)
+{
+    if (authState != PasswordRight)
+        return Response::RespFunctionNotAllowed;
+
+    QString realName = QString::fromStdString(cmd.real_name());
+    QString emailAddress = QString::fromStdString(cmd.email());
+    ServerInfo_User_Gender gender = cmd.gender();
+    QString country = QString::fromStdString(cmd.country());
+
+    QString userName = QString::fromStdString(userInfo->name());
+
+
+    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set realname=:realName, email=:email, gender=:gender, country=:country where name=:userName");
+    query->bindValue(":realName", realName);
+    query->bindValue(":email", emailAddress);
+    query->bindValue(":gender", sqlInterface->getGenderChar(gender));
+    query->bindValue(":country", country);
+    query->bindValue(":userName", userName);
+    if (!sqlInterface->execSqlQuery(query))
+        return Response::RespInternalError;
+
+    userInfo->set_real_name(cmd.real_name());
+    userInfo->set_email(cmd.email());
+    userInfo->set_gender(cmd.gender());
+    userInfo->set_country(cmd.country());
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer & /* rc */)
+{
+    if (authState != PasswordRight)
+        return Response::RespFunctionNotAllowed;
+
+    QByteArray image(cmd.image().c_str(), cmd.image().length());
+    int id = userInfo->id();
+
+    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set avatar_bmp=:image where id=:id");
+    query->bindValue(":image", image);
+    query->bindValue(":id", id);
+    if (!sqlInterface->execSqlQuery(query))
+        return Response::RespInternalError;
+
+    userInfo->set_avatar_bmp(cmd.image().c_str(), cmd.image().length());
+    return Response::RespOk;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdAccountPassword(const Command_AccountPassword &cmd, ResponseContainer & /* rc */)
+{
+    if (authState != PasswordRight)
+        return Response::RespFunctionNotAllowed;
+
+    QString oldPassword = QString::fromStdString(cmd.old_password());
+    QString newPassword = QString::fromStdString(cmd.new_password());
+
+    // TODO make this configurable?
+    if(newPassword.length() < 6)
+        return Response::RespPasswordTooShort;
+
+    QString userName = QString::fromStdString(userInfo->name());
+
+    bool changeFailed = databaseInterface->changeUserPassword(userName, oldPassword, newPassword);
+
+    if(changeFailed)
+        return Response::RespWrongPassword;
+    
+    return Response::RespOk;
+}
 
 // ADMIN FUNCTIONS.
 // Permission is checked by the calling function.
@@ -954,5 +994,61 @@ Response::ResponseCode ServerSocketInterface::cmdUpdateServerMessage(const Comma
 Response::ResponseCode ServerSocketInterface::cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer & /*rc*/)
 {
     QMetaObject::invokeMethod(server, "scheduleShutdown", Q_ARG(QString, QString::fromStdString(cmd.reason())), Q_ARG(int, cmd.minutes()));
+    return Response::RespOk;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdReloadConfig(const Command_ReloadConfig & /* cmd */, ResponseContainer & /*rc*/)
+{
+    logDebugMessage("Received admin command: reloading configuration");
+    settingsCache->sync();
+    return Response::RespOk;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdAdjustMod(const Command_AdjustMod &cmd, ResponseContainer & /*rc*/) {
+
+    QString userName = QString::fromStdString(cmd.user_name());
+
+    if (cmd.should_be_mod()) {
+        QSqlQuery *query = sqlInterface->prepareQuery(
+                "update {prefix}_users set admin = :adminlevel where name = :username");
+        query->bindValue(":adminlevel", 2);
+        query->bindValue(":username", userName);
+        if (!sqlInterface->execSqlQuery(query)){
+            logger->logMessage(QString::fromStdString("Failed to promote user %1: %2").arg(userName).arg(query->lastError().text()));
+            return Response::RespInternalError;
+        }
+
+        ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
+        if (user) {
+            Event_NotifyUser event;
+            event.set_type(Event_NotifyUser::PROMOTED);
+            SessionEvent *se = user->prepareSessionEvent(event);
+            user->sendProtocolItem(*se);
+            delete se;
+        }
+    } else {
+        QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set admin = :adminlevel where name = :username");
+        query->bindValue(":adminlevel", 0);
+        query->bindValue(":username", userName);
+        if (!sqlInterface->execSqlQuery(query)){
+            logger->logMessage(QString::fromStdString("Failed to demote user %1: %2").arg(userName).arg(query->lastError().text()));
+            return Response::RespInternalError;
+        }
+
+        ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
+        if (user) {
+            Event_ConnectionClosed event;
+            event.set_reason(Event_ConnectionClosed::DEMOTED);
+            event.set_reason_str("Your moderator status has been revoked.");
+            event.set_end_time(QDateTime::currentDateTime().toTime_t());
+
+            SessionEvent *se = user->prepareSessionEvent(event);
+            user->sendProtocolItem(*se);
+            delete se;
+        }
+
+        QMetaObject::invokeMethod(user, "prepareDestroy", Qt::QueuedConnection);
+    }
+
     return Response::RespOk;
 }

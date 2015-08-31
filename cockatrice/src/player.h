@@ -140,6 +140,7 @@ private slots:
     
     void actOpenDeckInDeckEditor();
     void actCreatePredefinedToken();
+    void actCreateRelatedCard();
     void cardMenuAction();
     void actCardCounterTrigger();
     void actAttach();
@@ -157,6 +158,7 @@ private slots:
     void actPlay();
     void actHide();
     void actPlayFacedown();
+    void refreshShortcuts();
 
 private:
     TabGame *game;
@@ -177,12 +179,13 @@ private:
     QAction *aPlay, *aPlayFacedown,
         *aHide,
         *aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
-        *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToGraveyard, *aMoveToExile;
+        *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile;
 
     bool shortcutsActive;
     int defaultNumberTopCards;
     QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
     bool lastTokenDestroy;
+    int lastTokenTableRow;
     ServerInfo_User *userInfo;
     int id;
     bool active;
@@ -238,7 +241,7 @@ private:
     void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
 public:
     static const int counterAreaWidth = 55;
-    enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToGraveyard, cmMoveToExile };
+    enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToHand, cmMoveToGraveyard, cmMoveToExile };
     
     enum { Type = typeOther };
     int type() const { return Type; }

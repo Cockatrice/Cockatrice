@@ -14,19 +14,13 @@ SET(servatrice_SOURCES
     src/serversocketinterface.cpp
     src/settingscache.cpp
     src/isl_interface.cpp
+    src/signalhandler.cpp
     ${VERSION_STRING_CPP}
-    src/smtp/emailaddress.cpp
-    src/smtp/mimeattachment.cpp
-    src/smtp/mimecontentformatter.cpp
-    src/smtp/mimefile.cpp
-    src/smtp/mimehtml.cpp
-    src/smtp/mimeinlinefile.cpp
-    src/smtp/mimemessage.cpp
-    src/smtp/mimemultipart.cpp
-    src/smtp/mimepart.cpp
-    src/smtp/mimetext.cpp
-    src/smtp/quotedprintable.cpp
-    src/smtp/smtpclient.cpp
+    src/smtpclient.cpp
+    src/smtp/qxthmac.cpp
+    src/smtp/qxtmailattachment.cpp
+    src/smtp/qxtmailmessage.cpp
+    src/smtp/qxtsmtp.cpp
 )
 
 set(servatrice_RESOURCES servatrice.qrc)
@@ -101,6 +95,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 # Build servatrice binary and link it
 ADD_EXECUTABLE(servatrice MACOSX_BUNDLE ${servatrice_SOURCES} ${servatrice_RESOURCES_RCC} ${servatrice_MOC_SRCS})
+set_property(TARGET servatrice PROPERTY CXX_STANDARD 11)
+set_property(TARGET servatrice PROPERTY CXX_STANDARD_REQUIRED ON)
 
 if(Qt4_FOUND)
     if(MSVC) 

@@ -24,9 +24,10 @@ protected:
     ServerInfo_User getUserData(const QString &name, bool withId = false);
 public:
     LocalServer_DatabaseInterface(LocalServer *_localServer);
-    AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, QString &reasonStr, int &secondsLeft);
+    AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, const QString &clientId, QString &reasonStr, int &secondsLeft);
     int getNextGameId() { return localServer->getNextLocalGameId(); }
     int getNextReplayId() { return -1; }
+    int getActiveUserCount() { return 0; }
 };
 
 #endif

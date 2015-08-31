@@ -28,7 +28,7 @@ private:
     bool locked;
     AbstractClient *client;
     bool fullAdmin;
-    QPushButton *updateServerMessageButton, *shutdownServerButton;
+    QPushButton *updateServerMessageButton, *shutdownServerButton, *reloadConfigButton;
     QGroupBox *adminGroupBox;
     QPushButton *unlockButton, *lockButton;
 signals:
@@ -36,6 +36,7 @@ signals:
 private slots:
     void actUpdateServerMessage();
     void actShutdownServer();
+    void actReloadConfig();
     
     void actUnlock();
     void actLock();

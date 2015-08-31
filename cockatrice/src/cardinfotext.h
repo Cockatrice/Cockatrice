@@ -13,6 +13,7 @@ class CardInfoText : public QFrame {
 private:
     QLabel *nameLabel1, *nameLabel2;
     QLabel *manacostLabel1, *manacostLabel2;
+    QLabel *colorLabel1, *colorLabel2;
     QLabel *cardtypeLabel1, *cardtypeLabel2;
     QLabel *powtoughLabel1, *powtoughLabel2;
     QLabel *loyaltyLabel1, *loyaltyLabel2;

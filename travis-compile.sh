@@ -6,7 +6,7 @@ mkdir build
 cd build
 prefix=""
 if [[ $TRAVIS_OS_NAME == "osx" && $QT4 == 0 ]]; then
-  prefix="-DCMAKE_PREFIX_PATH=/usr/local/Cellar/qt5/5.4.2/"
+  prefix="-DCMAKE_PREFIX_PATH=`echo /usr/local/Cellar/qt5/5.*/`"
 fi
 if [[ $TRAVIS_OS_NAME == "linux" && $QT4 == 0 ]]; then
   prefix="-DCMAKE_PREFIX_PATH=/opt/qt52/lib/cmake/"

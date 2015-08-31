@@ -65,39 +65,37 @@ CardInfo *OracleImporter::addCard(const QString &setName,
                                   const QString &cardPT,
                                   int cardLoyalty,
                                   const QString &cardText,
-                                  const QStringList & colors)
+                                  const QStringList & colors,
+                                  const QStringList & relatedCards,
+                                  bool upsideDown
+                                  )
 {
     QStringList cardTextRows = cardText.split("\n");
-    bool splitCard = false;
-    if (cardName.contains('(')) {
-        cardName.remove(QRegExp(" \\(.*\\)"));
-        splitCard = true;
-    }
+
     // Workaround for card name weirdness
-    if (cardName.contains("XX"))
-        cardName.remove("XX");
     cardName = cardName.replace("Æ", "AE");
     cardName = cardName.replace("’", "'");
 
-    // Remove {} around mana costs
-    cardCost.remove(QChar('{'));
-    cardCost.remove(QChar('}'));
-
-    CardInfo *card;
+    CardInfo * card;
     if (cards.contains(cardName)) {
         card = cards.value(cardName);
-        if (splitCard && !card->getText().contains(cardText))
-            card->setText(card->getText() + "\n---\n" + cardText);
     } else {
+        // Remove {} around mana costs
+        cardCost.remove(QChar('{'));
+        cardCost.remove(QChar('}'));
+
+        // detect mana generator artifacts
         bool mArtifact = false;
         if (cardType.endsWith("Artifact"))
             for (int i = 0; i < cardTextRows.size(); ++i)
                 if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
                     mArtifact = true;
-                    
+
+        // detect cards that enter the field tapped
         bool cipt = cardText.contains("Hideaway") || (cardText.contains(cardName + " enters the battlefield tapped") && !cardText.contains(cardName + " enters the battlefield tapped unless"));
         
-        card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, cardLoyalty, cipt);
+        // insert the card and its properties
+        card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards, upsideDown, cardLoyalty, cipt);
         int tableRow = 1;
         QString mainCardType = card->getMainCardType();
         if ((mainCardType == "Land") || mArtifact)
@@ -147,101 +145,149 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
     QString cardPT;
     QString cardText;
     QStringList colors;
+    QStringList relatedCards;
     int cardId;
     int cardLoyalty;
-    bool cardIsToken = false;
+    bool upsideDown = false;
     QMap<int, QVariantMap> splitCards;
 
-    while (it.hasNext()) {
+    while (it.hasNext())
+    {
         map = it.next().toMap();
-        if(0 == QString::compare(map.value("layout").toString(), QString("split"), Qt::CaseInsensitive))
+
+        QString layout = map.value("layout").toString();
+
+        if(layout == "token")
+            continue;
+
+        if(layout == "split")
         {
-            // Split card handling
+            // Enqueue split card for later handling
             cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
-            if(splitCards.contains(cardId))
-            {
-                // merge two split cards
-                QVariantMap tmpMap = splitCards.take(cardId);
-                QVariantMap * card1 = 0, * card2 = 0;
-                // same cardid
-                cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
-                // this is currently an integer; can't accept 2 values
-                cardLoyalty = 0;
-
-                // determine which subcard is the first one in the split
-                QStringList names=map.contains("names") ? map.value("names").toStringList() : QStringList("");
-                if(names.count()>0 &&
-                    map.contains("name") &&
-                    0 == QString::compare(map.value("name").toString(), names.at(0)))
-                {
-                    // map is the left part of the split card, tmpMap is right part
-                    card1 = &map;
-                    card2 = &tmpMap;
-                } else {
-                    //tmpMap is the left part of the split card, map is right part
-                    card1 = &tmpMap;
-                    card2 = &map;
-                }
-
-                // add first card's data
-                cardName = card1->contains("name") ? card1->value("name").toString() : QString("");
-                cardCost = card1->contains("manaCost") ? card1->value("manaCost").toString() : QString("");
-                cmc = card1->contains("cmc") ? card1->value("cmc").toString() : QString("0");
-                cardType = card1->contains("type") ? card1->value("type").toString() : QString("");
-                cardPT = card1->contains("power") || card1->contains("toughness") ? card1->value("power").toString() + QString('/') + card1->value("toughness").toString() : QString("");
-                cardText = card1->contains("text") ? card1->value("text").toString() : QString("");
-
-                // add second card's data
-                cardName += card2->contains("name") ? QString(" // ") + card2->value("name").toString() : QString("");
-                cardCost += card2->contains("manaCost") ? QString(" // ") + card2->value("manaCost").toString() : QString("");
-                cmc += card2->contains("cmc") ? QString(" // ") + card2->value("cmc").toString() : QString("0");
-                cardType += card2->contains("type") ? QString(" // ") + card2->value("type").toString() : QString("");
-                cardPT += card2->contains("power") || card2->contains("toughness") ? QString(" // ") + card2->value("power").toString() + QString('/') + card2->value("toughness").toString() : QString("");
-                cardText += card2->contains("text") ? QString("\n\n---\n\n") + card2->value("text").toString() : QString("");
-
-                colors.clear();
-                extractColors(card1->value("colors").toStringList(), colors);
-                extractColors(card2->value("colors").toStringList(), colors);
-                colors.removeDuplicates();
-
-            } else {
-                // first card of a pair; enqueue for later merging
-                // Conditional on cardId because promo prints have no muid - see #640
-                if (cardId)
-                  splitCards.insert(cardId, map);
-                continue;
-            }
-        } else {
-            // normal cards handling
-            cardName = map.contains("name") ? map.value("name").toString() : QString("");
-            cardCost = map.contains("manaCost") ? map.value("manaCost").toString() : QString("");
-            cmc = map.contains("cmc") ? map.value("cmc").toString() : QString("0");
-            cardType = map.contains("type") ? map.value("type").toString() : QString("");
-            cardPT = map.contains("power") || map.contains("toughness") ? map.value("power").toString() + QString('/') + map.value("toughness").toString() : QString("");
-            cardText = map.contains("text") ? map.value("text").toString() : QString("");
-            cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
-            cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toInt() : 0;
-            cardIsToken = map.value("layout") == "token";
-
-            colors.clear();
-            extractColors(map.value("colors").toStringList(), colors);
-
-            // Distinguish Vanguard cards from regular cards of the same name.
-            if (map.value("layout") == "vanguard") {
-                cardName += " Avatar";
-            }
+            if (cardId)
+              splitCards.insertMulti(cardId, map);
+            continue;
         }
 
-        if (!cardIsToken) {
-            CardInfo *card = addCard(set->getShortName(), cardName, cardIsToken, cardId, cardCost, cmc, cardType, cardPT, cardLoyalty, cardText, colors);
+        // normal cards handling
+        cardName = map.contains("name") ? map.value("name").toString() : QString("");
+        cardCost = map.contains("manaCost") ? map.value("manaCost").toString() : QString("");
+        cmc = map.contains("cmc") ? map.value("cmc").toString() : QString("0");
+        cardType = map.contains("type") ? map.value("type").toString() : QString("");
+        cardPT = map.contains("power") || map.contains("toughness") ? map.value("power").toString() + QString('/') + map.value("toughness").toString() : QString("");
+        cardText = map.contains("text") ? map.value("text").toString() : QString("");
+        cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
+        cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toInt() : 0;
+        relatedCards = map.contains("names") ? map.value("names").toStringList() : QStringList();
+        relatedCards.removeAll(cardName);
 
-            if (!set->contains(card)) {
-                card->addToSet(set);
-                cards++;
-            }
+        if(0 == QString::compare(map.value("layout").toString(), QString("flip"), Qt::CaseInsensitive)) 
+        {
+            QStringList cardNames = map.contains("names") ? map.value("names").toStringList() : QStringList();
+            upsideDown = (cardNames.indexOf(cardName) > 0);
+        } else {
+            upsideDown = false;
+        }
+
+        colors.clear();
+        extractColors(map.value("colors").toStringList(), colors);
+
+        CardInfo *card = addCard(set->getShortName(), cardName, false, cardId, cardCost, cmc, cardType, cardPT, cardLoyalty, cardText, colors, relatedCards, upsideDown);
+
+        if (!set->contains(card)) {
+            card->addToSet(set);
+            cards++;
         }
     }
     
+    // split cards handling - get all unique card muids
+    QList<int> muids = splitCards.uniqueKeys();
+    foreach(int muid, muids)
+    {
+        // get all cards for this specific muid
+        QList<QVariantMap> maps = splitCards.values(muid);
+        QStringList names;
+        // now, reorder the cards using the ordered list of names
+        QMap<int, QVariantMap> orderedMaps;
+        foreach(QVariantMap map, maps)
+        {
+            if(names.isEmpty())
+                names = map.contains("names") ? map.value("names").toStringList() : QStringList();
+            QString name = map.value("name").toString();
+            int index = names.indexOf(name);
+            orderedMaps.insertMulti(index, map);
+        }
+
+        // clean variables
+        cardName = "";
+        cardCost = "";
+        cmc = "";
+        cardType = "";
+        cardPT = "";
+        cardText = "";
+        colors.clear();
+        // this is currently an integer; can't accept 2 values
+        cardLoyalty = 0;
+
+        // loop cards and merge their contents
+        QString prefix = QString(" // ");
+        QString prefix2 = QString("\n\n---\n\n");
+        foreach(QVariantMap map, orderedMaps.values())
+        {
+            if(map.contains("name"))
+            {
+                if(!cardName.isEmpty())
+                    cardName += prefix;
+                cardName += map.value("name").toString();
+            }
+            if(map.contains("manaCost"))
+            {
+                if(!cardCost.isEmpty())
+                    cardCost += prefix;
+                cardCost += map.value("manaCost").toString();
+            }
+            if(map.contains("cmc"))
+            {
+                if(!cmc.isEmpty())
+                    cmc += prefix;
+                cmc += map.value("cmc").toString();
+            }
+            if(map.contains("type"))
+            {
+                if(!cardType.isEmpty())
+                    cardType += prefix;
+                cardType += map.value("type").toString();
+            }
+            if(map.contains("power") || map.contains("toughness"))
+            {
+                if(!cardPT.isEmpty())
+                    cardPT += prefix;
+                cardPT += map.value("power").toString() + QString('/') + map.value("toughness").toString();
+            }
+            if(map.contains("text"))
+            {
+                if(!cardText.isEmpty())
+                    cardText += prefix2;
+                cardText += map.value("text").toString();
+            }
+
+            extractColors(map.value("colors").toStringList(), colors);
+        }
+
+        colors.removeDuplicates();
+        relatedCards = QStringList();
+        upsideDown = false;
+
+        // add the card
+        CardInfo *card = addCard(set->getShortName(), cardName, false, muid, cardCost, cmc, cardType, cardPT, cardLoyalty, cardText, colors, relatedCards, upsideDown);
+
+        if (!set->contains(card)) {
+            card->addToSet(set);
+            cards++;
+        }
+
+    }
+
     return cards;
 }
 

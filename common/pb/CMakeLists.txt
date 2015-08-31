@@ -106,6 +106,7 @@ SET(PROTO_FILES
     event_user_joined.proto
     event_user_left.proto
     event_user_message.proto
+    event_notify_user.proto
     game_commands.proto
     game_event_container.proto
     game_event_context.proto
@@ -127,6 +128,7 @@ SET(PROTO_FILES
     response_register.proto
     response_replay_download.proto
     response_replay_list.proto
+    response_adjust_mod.proto
     response.proto
     room_commands.proto
     room_event.proto

@@ -1,8 +1,9 @@
+syntax = "proto2";
 import "game_commands.proto";
 message Command_DeckSelect {
-	extend GameCommand {
-		optional Command_DeckSelect ext = 1029;
-	}
-	optional string deck = 1;
-	optional sint32 deck_id = 2 [default = -1];
+    extend GameCommand {
+        optional Command_DeckSelect ext = 1029;
+    }
+    optional string deck = 1;
+    optional sint32 deck_id = 2 [default = -1];
 }

@@ -43,124 +43,128 @@ class ServerSocketInterface;
 class IslInterface;
 
 class Servatrice_GameServer : public QTcpServer {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	Servatrice *server;
-	QList<Servatrice_ConnectionPool *> connectionPools;
+    Servatrice *server;
+    QList<Servatrice_ConnectionPool *> connectionPools;
 public:
-	Servatrice_GameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
-	~Servatrice_GameServer();
+    Servatrice_GameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
+    ~Servatrice_GameServer();
 protected:
 #if QT_VERSION < 0x050000
-	void incomingConnection(int socketDescriptor);
+    void incomingConnection(int socketDescriptor);
 #else
-	void incomingConnection(qintptr socketDescriptor);
+    void incomingConnection(qintptr socketDescriptor);
 #endif
 };
 
 class Servatrice_IslServer : public QTcpServer {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	Servatrice *server;
-	QSslCertificate cert;
-	QSslKey privateKey;
+    Servatrice *server;
+    QSslCertificate cert;
+    QSslKey privateKey;
 public:
-	Servatrice_IslServer(Servatrice *_server, const QSslCertificate &_cert, const QSslKey &_privateKey, QObject *parent = 0)
-		: QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey) { }
+    Servatrice_IslServer(Servatrice *_server, const QSslCertificate &_cert, const QSslKey &_privateKey, QObject *parent = 0)
+        : QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey) { }
 protected:
 #if QT_VERSION < 0x050000
-	void incomingConnection(int socketDescriptor);
+    void incomingConnection(int socketDescriptor);
 #else
-	void incomingConnection(qintptr socketDescriptor);
+    void incomingConnection(qintptr socketDescriptor);
 #endif
 };
 
 class ServerProperties {
 public:
-	int id;
-	QSslCertificate cert;
-	QString hostname;
-	QHostAddress address;
-	int gamePort;
-	int controlPort;
-	
-	ServerProperties(int _id, const QSslCertificate &_cert, const QString &_hostname, const QHostAddress &_address, int _gamePort, int _controlPort)
-		: id(_id), cert(_cert), hostname(_hostname), address(_address), gamePort(_gamePort), controlPort(_controlPort) { }
+    int id;
+    QSslCertificate cert;
+    QString hostname;
+    QHostAddress address;
+    int gamePort;
+    int controlPort;
+
+    ServerProperties(int _id, const QSslCertificate &_cert, const QString &_hostname, const QHostAddress &_address, int _gamePort, int _controlPort)
+        : id(_id), cert(_cert), hostname(_hostname), address(_address), gamePort(_gamePort), controlPort(_controlPort) { }
 };
 
 class Servatrice : public Server
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	enum AuthenticationMethod { AuthenticationNone, AuthenticationSql, AuthenticationPassword };
+    enum AuthenticationMethod { AuthenticationNone, AuthenticationSql, AuthenticationPassword };
 private slots:
-	void statusUpdate();
-	void shutdownTimeout();
+    void statusUpdate();
+    void shutdownTimeout();
 protected:
-	void doSendIslMessage(const IslMessage &msg, int serverId);
+    void doSendIslMessage(const IslMessage &msg, int serverId);
 private:
-	enum DatabaseType { DatabaseNone, DatabaseMySql };
-	AuthenticationMethod authenticationMethod;
-	DatabaseType databaseType;
-	QTimer *pingClock, *statusUpdateClock;
-	Servatrice_GameServer *gameServer;
-	Servatrice_IslServer *islServer;
-	QString serverName;
-	mutable QMutex loginMessageMutex;
-	QString loginMessage;
-	QString dbPrefix;
-	Servatrice_DatabaseInterface *servatriceDatabaseInterface;
-	int serverId;
-	int uptime;
-	QMutex txBytesMutex, rxBytesMutex;
-	quint64 txBytes, rxBytes;
-	int maxGameInactivityTime, maxPlayerInactivityTime;
-	int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser, commandCountingInterval, maxCommandCountPerInterval;
+    enum DatabaseType { DatabaseNone, DatabaseMySql };
+    AuthenticationMethod authenticationMethod;
+    DatabaseType databaseType;
+    QTimer *pingClock, *statusUpdateClock;
+    Servatrice_GameServer *gameServer;
+    Servatrice_IslServer *islServer;
+    QString serverName;
+    mutable QMutex loginMessageMutex;
+    QString loginMessage;
+    QString dbPrefix;
+    Servatrice_DatabaseInterface *servatriceDatabaseInterface;
+    int serverId;
+    int uptime;
+    QMutex txBytesMutex, rxBytesMutex;
+    quint64 txBytes, rxBytes;
+    int maxGameInactivityTime, maxPlayerInactivityTime;
+    int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser, commandCountingInterval, maxCommandCountPerInterval, pingClockInterval;
 
-	QString shutdownReason;
-	int shutdownMinutes;
-	QTimer *shutdownTimer;
-    bool isFirstShutdownMessage;
-	
-	mutable QMutex serverListMutex;
-	QList<ServerProperties> serverList;
-	void updateServerList();
-	
-	QMap<int, IslInterface *> islInterfaces;
+    QString shutdownReason;
+    int shutdownMinutes;
+    QTimer *shutdownTimer;
+    bool isFirstShutdownMessage, clientIdRequired, regServerOnly;
+
+    mutable QMutex serverListMutex;
+    QList<ServerProperties> serverList;
+    void updateServerList();
+
+    QMap<int, IslInterface *> islInterfaces;
 public slots:
-	void scheduleShutdown(const QString &reason, int minutes);
-	void updateLoginMessage();
+    void scheduleShutdown(const QString &reason, int minutes);
+    void updateLoginMessage();
 public:
-	Servatrice(QObject *parent = 0);
-	~Servatrice();
-	bool initServer();
-	QString getServerName() const { return serverName; }
-	QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
-	bool getGameShouldPing() const { return true; }
-	int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
-	int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
-	int getMaxUsersPerAddress() const { return maxUsersPerAddress; }
-	int getMessageCountingInterval() const { return messageCountingInterval; }
-	int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
-	int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
-	int getMaxGamesPerUser() const { return maxGamesPerUser; }
+    Servatrice(QObject *parent = 0);
+    ~Servatrice();
+    bool initServer();
+    QString getServerName() const { return serverName; }
+    QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
+    bool permitUnregisteredUsers() const { return authenticationMethod != AuthenticationNone; }
+    bool getGameShouldPing() const { return true; }
+    bool getClientIdRequired() const { return clientIdRequired; }
+    bool getRegOnlyServer() const { return regServerOnly; }
+    int getPingClockInterval() const { return pingClockInterval; }
+    int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
+    int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
+    int getMaxUsersPerAddress() const { return maxUsersPerAddress; }
+    int getMessageCountingInterval() const { return messageCountingInterval; }
+    int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
+    int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
+    int getMaxGamesPerUser() const { return maxGamesPerUser; }
     int getCommandCountingInterval() const { return commandCountingInterval; }
     int getMaxCommandCountPerInterval() const { return maxCommandCountPerInterval; }
-	AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
-	QString getDbPrefix() const { return dbPrefix; }
-	int getServerId() const { return serverId; }
-	int getUsersWithAddress(const QHostAddress &address) const;
-	QList<ServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
-	void incTxBytes(quint64 num);
-	void incRxBytes(quint64 num);
-	void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);
-	
-	bool islConnectionExists(int serverId) const;
-	void addIslInterface(int serverId, IslInterface *interface);
-	void removeIslInterface(int serverId);
-	QReadWriteLock islLock;
+    AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
+    QString getDbPrefix() const { return dbPrefix; }
+    int getServerId() const { return serverId; }
+    int getUsersWithAddress(const QHostAddress &address) const;
+    QList<ServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
+    void incTxBytes(quint64 num);
+    void incRxBytes(quint64 num);
+    void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);
 
-	QList<ServerProperties> getServerList() const;
+    bool islConnectionExists(int serverId) const;
+    void addIslInterface(int serverId, IslInterface *interface);
+    void removeIslInterface(int serverId);
+    QReadWriteLock islLock;
+
+    QList<ServerProperties> getServerList() const;
 };
 
 #endif

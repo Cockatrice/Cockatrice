@@ -80,12 +80,14 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
     aOpenLocalReplay = new QAction(this);
     aOpenLocalReplay->setIcon(QIcon("theme:icons/view.svg"));
     connect(aOpenLocalReplay, SIGNAL(triggered()), this, SLOT(actOpenLocalReplay()));
+    connect(localDirView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actOpenLocalReplay()));
     aDeleteLocalReplay = new QAction(this);
     aDeleteLocalReplay->setIcon(QIcon("theme:icons/remove_row.svg"));
     connect(aDeleteLocalReplay, SIGNAL(triggered()), this, SLOT(actDeleteLocalReplay()));
     aOpenRemoteReplay = new QAction(this);
     aOpenRemoteReplay->setIcon(QIcon("theme:icons/view.svg"));
     connect(aOpenRemoteReplay, SIGNAL(triggered()), this, SLOT(actOpenRemoteReplay()));
+    connect(serverDirView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actOpenRemoteReplay()));
     aDownload = new QAction(this);
     aDownload->setIcon(QIcon("theme:icons/arrow_left_green.svg"));
     connect(aDownload, SIGNAL(triggered()), this, SLOT(actDownload()));

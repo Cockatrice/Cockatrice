@@ -27,6 +27,9 @@ public:
      void enableButtons();
      void disableButtons();
      void retranslateUi();
+     void setTokensData(QByteArray _tokensData) { tokensData = _tokensData; }
+     bool hasTokensData() { return !tokensData.isEmpty(); }
+     bool saveTokensToFile(const QString & fileName);
 public: 
      OracleImporter *importer;
      QSettings * settings;
@@ -35,6 +38,7 @@ private slots:
 private:
     QStringList findQmFiles();
     QString languageName(const QString &qmFile);
+    QByteArray tokensData;
 protected:
     void changeEvent(QEvent *event);
 };
@@ -115,4 +119,38 @@ private slots:
      void updateTotalProgress(int cardsImported, int setIndex, const QString &setName);
 };
 
+class LoadTokensPage : public OracleWizardPage
+{
+     Q_OBJECT
+public:
+     LoadTokensPage(QWidget *parent = 0);
+    void retranslateUi();
+protected:
+     void initializePage();
+     bool validatePage();
+private:
+     QLabel *urlLabel;
+     QLineEdit *urlLineEdit;
+     QPushButton *urlButton;
+     QLabel *progressLabel;
+     QProgressBar * progressBar;
+
+     QNetworkAccessManager *nam;
+private slots:
+     void actRestoreDefaultUrl();
+     void actDownloadProgressTokensFile(qint64 received, qint64 total);
+     void actDownloadFinishedTokensFile();
+};
+
+class SaveTokensPage : public OracleWizardPage
+{
+     Q_OBJECT
+public:
+     SaveTokensPage(QWidget *parent = 0);
+    void retranslateUi();
+private:
+     QCheckBox * defaultPathCheckBox;
+protected:
+     bool validatePage();
+};
 #endif

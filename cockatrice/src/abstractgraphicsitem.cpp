@@ -17,15 +17,7 @@ void AbstractGraphicsItem::paintNumberEllipse(int number, int fontSize, const QC
         w = h;
 
     painter->setPen(QColor(255, 255, 255, 0));
-    QRadialGradient grad(QPointF(0.5, 0.5), 0.5);
-    grad.setCoordinateMode(QGradient::ObjectBoundingMode);
-    QColor color1(color), color2(color);
-    color1.setAlpha(255);
-    color2.setAlpha(0);
-    grad.setColorAt(0, color1);
-    grad.setColorAt(0.8, color1);
-    grad.setColorAt(1, color2);
-    painter->setBrush(QBrush(grad));
+    painter->setBrush(QBrush(QColor(color)));
     
     QRectF textRect;
     if (position == -1)

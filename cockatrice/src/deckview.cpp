@@ -228,6 +228,13 @@ QSizeF DeckViewCardContainer::calculateBoundingRect(const QList<QPair<int, int> 
     return QSizeF(getCardTypeTextWidth() + totalWidth, totalHeight + separatorY + paddingY);
 }
 
+bool DeckViewCardContainer::sortCardsByName(DeckViewCard * c1, DeckViewCard * c2)
+{
+    if (c1 && c2)
+       return c1->getName() < c2->getName();
+    return false;
+}
+
 void DeckViewCardContainer::rearrangeItems(const QList<QPair<int, int> > &rowsAndCols)
 {
     currentRowsAndCols = rowsAndCols;
@@ -244,6 +251,7 @@ void DeckViewCardContainer::rearrangeItems(const QList<QPair<int, int> > &rowsAn
         
         QList<QString> cardTypeList = cardsByType.uniqueKeys();
         QList<DeckViewCard *> row = cardsByType.values(cardTypeList[i]);
+        qSort( row.begin(), row.end(), DeckViewCardContainer::sortCardsByName);
         for (int j = 0; j < row.size(); ++j) {
             DeckViewCard *card = row[j];
             card->setPos(x + (j % tempCols) * CARD_WIDTH, yUntilNow + (j / tempCols) * CARD_HEIGHT);

@@ -44,6 +44,7 @@ private slots:
     void cardDatabasePathButtonClicked();
     void tokenDatabasePathButtonClicked();
     void languageBoxChanged(int index);
+    void setEnabledStatus(bool);
 private:
     QStringList findQmFiles();
     QString languageName(const QString &qmFile);
@@ -52,6 +53,7 @@ private:
     QLineEdit *picsPathEdit;
     QLineEdit *cardDatabasePathEdit;
     QLineEdit *tokenDatabasePathEdit;
+    QLineEdit *highQualityURLEdit;
     QSpinBox pixmapCacheEdit;
     QGroupBox *personalGroupBox; 
     QGroupBox *pathsGroupBox;
@@ -65,6 +67,8 @@ private:
     QLabel picsPathLabel;
     QLabel cardDatabasePathLabel;
     QLabel tokenDatabasePathLabel;
+    QLabel highQualityURLLabel;
+    QLabel highQualityURLLinkLabel;
     QPushButton clearDownloadedPicsButton;
 };
 
@@ -100,6 +104,7 @@ private:
     QCheckBox specNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox playToStackCheckBox;
+    QCheckBox annotateTokensCheckBox;
     QCheckBox tapAnimationCheckBox;
     QGroupBox *generalGroupBox;
     QGroupBox *animationGroupBox;
@@ -132,24 +137,34 @@ private slots:
     void actAdd();
     void actRemove();
     void updateColor(const QString &value);
+    void updateHighlightColor(const QString &value);
     void updateTextColor(int value);
+    void updateTextHighlightColor(int value);
 private:
     QListWidget *messageList;
     QAction *aAdd;
     QAction *aRemove;
     QCheckBox chatMentionCheckBox;
+    QCheckBox chatMentionCompleterCheckbox;
     QCheckBox invertMentionForeground;
+    QCheckBox invertHighlightForeground;
     QCheckBox ignoreUnregUsersMainChat;
     QCheckBox ignoreUnregUserMessages;
     QCheckBox messagePopups;
     QCheckBox mentionPopups;
     QGroupBox *chatGroupBox;
+    QGroupBox *highlightGroupBox;
     QGroupBox *messageShortcuts;
     QLineEdit *mentionColor;
+    QLineEdit *highlightColor;
+    QLineEdit *customAlertString;
     QLabel hexLabel;
+    QLabel hexHighlightLabel;
+    QLabel customAlertStringLabel;
 
     void storeSettings();
     void updateMentionPreview();
+    void updateHighlightPreview();
 };
 
 class SoundSettingsPage : public AbstractSettingsPage {
@@ -186,6 +201,7 @@ private:
     QListWidget *contentsWidget;
     QStackedWidget *pagesWidget;
     QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton, *soundButton;
+    QListWidgetItem *shortcutsButton;
     void createIcons();
     void retranslateUi();
 protected:

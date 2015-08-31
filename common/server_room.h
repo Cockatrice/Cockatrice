@@ -32,6 +32,7 @@ private:
     int id;
     QString name;
     QString description;
+    QString permissionLevel;
     bool autoJoin;
     QString joinMessage;
     QStringList gameTypes;
@@ -44,11 +45,12 @@ private slots:
 public:
     mutable QReadWriteLock usersLock;
     mutable QReadWriteLock gamesLock;
-    Server_Room(int _id, const QString &_name, const QString &_description, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent);
+    Server_Room(int _id, const QString &_name, const QString &_description, const QString &_permissionLevel, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent);
     ~Server_Room();
     int getId() const { return id; }
     QString getName() const { return name; }
     QString getDescription() const { return description; }
+    QString getRoomPermission() const { return permissionLevel; }
     bool getAutoJoin() const { return autoJoin; }
     QString getJoinMessage() const { return joinMessage; }
     const QStringList &getGameTypes() const { return gameTypes; }

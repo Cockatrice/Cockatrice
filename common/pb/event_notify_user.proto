@@ -1,0 +1,15 @@
+syntax = "proto2";
+import "session_event.proto";
+
+message Event_NotifyUser {
+
+    enum NotificationType {
+        PROMOTED = 1;
+    }
+
+    extend SessionEvent {
+        optional Event_NotifyUser ext = 1010;
+    }
+    optional NotificationType type = 1;
+
+}

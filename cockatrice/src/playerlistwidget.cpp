@@ -6,7 +6,6 @@
 #include "tab_supervisor.h"
 #include "tab_userlists.h"
 #include "userlist.h"
-#include "userinfobox.h"
 #include "user_context_menu.h"
 #include <QMouseEvent>
 #include <QAction>
@@ -67,7 +66,7 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient
     } else
         userContextMenu = 0;
     
-    setMinimumHeight(60);
+    setMinimumHeight(40);
     setIconSize(QSize(20, 15));
     setColumnCount(6);
     setColumnWidth(0, 20);

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#USE THIS SCRIPT TO IDENTIFY THE SIZE OF YOUR TABLES IN THE DATABASE
+
+DBNAME="servatrice"					#set this to the database name used
+TABLEPREFIX="cockatrice"			#set this to the prefix used for the table names in the database (do not inclue the _)
+SQLCONFFILE="./mysql.cnf" 			#set this to the path that contains the mysql.cnf file
+mysql --defaults-file=$SQLCONFFILE -e 'SELECT table_name AS "Tables", round(((data_length + index_length) / 1024 / 1024), 2) "Size in MB" FROM information_schema.TABLES WHERE table_schema = "'$DBNAME'" ORDER BY (data_length + index_length) DESC;'

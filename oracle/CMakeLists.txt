@@ -13,6 +13,7 @@ SET(oracle_SOURCES
     src/oracleimporter.cpp
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/settingscache.cpp
+    ../cockatrice/src/shortcutssettings.cpp
     ../cockatrice/src/thememanager.cpp 
     ../cockatrice/src/qt-json/json.cpp
  )
@@ -126,6 +127,8 @@ ENDIF()
 
 # Build oracle binary and link it
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
+set_property(TARGET oracle PROPERTY CXX_STANDARD 11)
+set_property(TARGET oracle PROPERTY CXX_STANDARD_REQUIRED ON)
 
 if(Qt4_FOUND)
     if(MSVC) 
@@ -152,6 +155,7 @@ if(UNIX)
         set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
         set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
         set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+        set_target_properties(oracle PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
         INSTALL(TARGETS oracle BUNDLE DESTINATION ./)
         INSTALL(FILES ${oracle_QM} DESTINATION ./oracle.app/Contents/Resources/translations)

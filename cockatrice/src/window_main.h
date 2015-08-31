@@ -73,6 +73,7 @@ private slots:
     void actCheckCardUpdates();
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void refreshShortcuts();
 private:
     static const QString appName;
     void setClientStatusTitle();
@@ -109,6 +110,7 @@ public:
 protected:
     void closeEvent(QCloseEvent *event);
     void changeEvent(QEvent *event);
+    QString extractInvalidUsernameMessage(QString & in);
 };
 
 #endif

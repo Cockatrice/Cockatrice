@@ -36,9 +36,13 @@ ServerInfo_User &ServerInfo_User_Container::copyUserInfo(ServerInfo_User &result
         if (!sessionInfo) {
             result.clear_session_id();
             result.clear_address();
+            result.clear_clientid();
         }
         if (!internalInfo)
+        {
             result.clear_id();
+            result.clear_email();
+        }
         if (!complete)
             result.clear_avatar_bmp();
     }

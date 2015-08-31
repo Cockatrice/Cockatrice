@@ -1,7 +1,8 @@
- import "game_commands.proto";
+syntax = "proto2";
+import "game_commands.proto";
 message Command_SetSideboardLock {
-	extend GameCommand {
-		optional Command_SetSideboardLock ext = 1030;
-	}
-	optional bool locked = 1;
+    extend GameCommand {
+        optional Command_SetSideboardLock ext = 1030;
+    }
+    optional bool locked = 1;
 }

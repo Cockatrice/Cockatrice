@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include <QPushButton>
+#include <QCompleter>
 #include "tab.h"
 #include "pb/serverinfo_game.pb.h"
 
@@ -11,7 +12,7 @@ class CardDatabase;
 class GameView;
 class DeckView;
 class GameScene;
-class CardInfoWidget;
+class CardFrame;
 class MessageLogWidget;
 class QTimer;
 class QSplitter;
@@ -54,6 +55,7 @@ class QHBoxLayout;
 class GameReplay;
 class ServerInfo_User;
 class PendingCommand;
+class LineEditCompleter;
 
 class ToggleButton : public QPushButton {
     Q_OBJECT
@@ -84,6 +86,7 @@ private slots:
     void sideboardPlanChanged();
     void sideboardLockButtonClicked();
     void updateSideboardLockButtonText();
+    void refreshShortcuts();
 signals:
     void newCardAdded(AbstractCardItem *card);
 public:
@@ -116,6 +119,8 @@ private:
     CardItem *activeCard;
     bool gameClosed;
     QStringList gameTypes;
+    QCompleter *completer;
+    QStringList autocompleteUserList;
     
     // Replay related members
     GameReplay *replay;
@@ -125,12 +130,12 @@ private:
     QToolButton *replayStartButton, *replayPauseButton, *replayFastForwardButton;
     
     QSplitter *splitter;
-    CardInfoWidget *cardInfo;
+    CardFrame *cardInfo;
     PlayerListWidget *playerListWidget;
     QLabel *timeElapsedLabel;
     MessageLogWidget *messageLog;
     QLabel *sayLabel;
-    QLineEdit *sayEdit;
+    LineEditCompleter *sayEdit;
     PhasesToolbar *phasesToolbar;
     GameScene *scene;
     GameView *gameView;
@@ -141,7 +146,7 @@ private:
     QAction *playersSeparator;
     QMenu *gameMenu;
     QMenu *phasesMenu;
-    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows;
+    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW;
     QList<QAction *> phaseActions;
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
@@ -190,6 +195,8 @@ private slots:
     void actConcede();
     void actLeaveGame();
     void actRemoveLocalArrows();
+    void actRotateViewCW();
+    void actRotateViewCCW();
     void actSay();
     void actPhaseAction();
     void actNextPhase();
@@ -197,6 +204,10 @@ private slots:
 
     void addMentionTag(QString value);
     void commandFinished(const Response &response);
+	
+    void refreshShortcuts();
+	
+	void actCompleterChanged();
 public:
     TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);

@@ -11,7 +11,10 @@ SET(cockatrice_SOURCES
     src/dlg_filter_games.cpp
     src/dlg_connect.cpp 
     src/dlg_create_token.cpp 
+    src/dlg_edit_avatar.cpp
+    src/dlg_edit_password.cpp
     src/dlg_edit_tokens.cpp
+    src/dlg_edit_user.cpp
     src/dlg_register.cpp 
     src/abstractclient.cpp 
     src/remoteclient.cpp 
@@ -92,6 +95,10 @@ SET(cockatrice_SOURCES
     src/qt-json/json.cpp
     src/soundengine.cpp
     src/pending_command.cpp
+    src/shortcutssettings.cpp
+    src/sequenceEdit/sequenceedit.cpp
+    src/sequenceEdit/shortcutstab.cpp
+    src/lineeditcompleter.cpp
     ${VERSION_STRING_CPP}
 )
 
@@ -220,6 +227,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 # Build cockatrice binary and link it
 ADD_EXECUTABLE(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS})
+set_property(TARGET cockatrice PROPERTY CXX_STANDARD 11)
+set_property(TARGET cockatrice PROPERTY CXX_STANDARD_REQUIRED ON)
 
 if(Qt4_FOUND)
     if(MSVC) 

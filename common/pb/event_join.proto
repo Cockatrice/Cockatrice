@@ -1,9 +1,10 @@
+syntax = "proto2";
 import "game_event.proto";
 import "serverinfo_playerproperties.proto";
 
 message Event_Join {
-	extend GameEvent {
-		optional Event_Join ext = 1000;
-	}
-	optional ServerInfo_PlayerProperties player_properties = 1;
+    extend GameEvent {
+        optional Event_Join ext = 1000;
+    }
+    optional ServerInfo_PlayerProperties player_properties = 1;
 }

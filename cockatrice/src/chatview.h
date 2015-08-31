@@ -27,8 +27,10 @@ private:
     QString userName;
     QString mention;
     QTextCharFormat mentionFormat;
+    QTextCharFormat highlightFormat;
     QTextCharFormat mentionFormatOtherUser;
     QTextCharFormat defaultFormat;
+    QStringList highlightedWords;
     bool evenNumber;
     bool showTimestamps;
     HoveredItemType hoveredItemType;
@@ -39,9 +41,16 @@ private:
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
     QString getNameFromUserList(QMap<QString, UserListTWI *> &userList, QString &userName);
+    bool isFullMentionAValidUser(QMap<QString, UserListTWI *> &userList, QString userNameToMatch);
     QColor getCustomMentionColor();
+    QColor getCustomHighlightColor();
     bool shouldShowSystemPopup();
     void showSystemPopup(QString &sender);
+    bool isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message);
+    void checkTag(QTextCursor &cursor, QString &message);
+    void checkMention(QTextCursor &cursor, QString &message, QString &sender, UserLevelFlags userLevel);
+    void checkWord(QTextCursor &cursor, QString &message);
+    QString extractNextWord(QString &message, QString &rest);
 private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();
@@ -49,7 +58,7 @@ public:
     ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent = 0);
     void retranslateUi();
     void appendHtml(const QString &html);
-    void appendHtmlServerMessage(const QString &html);
+    void appendHtmlServerMessage(const QString &html, bool optionalIsBold = false, QString optionalFontColor = QString());
     void appendMessage(QString message, QString sender = QString(), UserLevelFlags userLevel = UserLevelFlags(), bool playerBold = false);
     void clearChat();
 protected:

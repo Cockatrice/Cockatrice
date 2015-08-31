@@ -1,9 +1,10 @@
+syntax = "proto2";
 import "response.proto";
 
 message Response_ReplayDownload {
-	extend Response {
-		optional Response_ReplayDownload ext = 1101;
-	}
-	optional bytes replay_data = 1;
+    extend Response {
+        optional Response_ReplayDownload ext = 1101;
+    }
+    optional bytes replay_data = 1;
 }
  

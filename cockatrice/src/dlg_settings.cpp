@@ -29,6 +29,9 @@
 #include "thememanager.h"
 #include "priceupdater.h"
 #include "soundengine.h"
+#include "sequenceEdit/shortcutstab.h"
+
+#define LINKING_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Download-URLs"
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
@@ -52,12 +55,17 @@ GeneralSettingsPage::GeneralSettingsPage()
     pixmapCacheEdit.setSuffix(" MB");
     picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
     picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
+    
+    highQualityURLEdit = new QLineEdit(settingsCache->getPicUrlHq());
+    highQualityURLEdit->setEnabled(settingsCache->getPicDownloadHq());
 
     connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
     connect(&picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
+    connect(&picDownloadHqCheckBox, SIGNAL(clicked(bool)), this, SLOT(setEnabledStatus(bool)));
+    connect(highQualityURLEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrlHq(QString)));
 
     QGridLayout *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
@@ -67,6 +75,12 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&picDownloadCheckBox, 2, 0, 1, 2);
     personalGrid->addWidget(&picDownloadHqCheckBox, 3, 0, 1, 2);
     personalGrid->addWidget(&clearDownloadedPicsButton, 4, 0, 1, 1);
+    personalGrid->addWidget(&highQualityURLLabel, 5, 0, 1, 1);
+    personalGrid->addWidget(highQualityURLEdit, 5, 1, 1, 1);
+    personalGrid->addWidget(&highQualityURLLinkLabel, 6, 1, 1, 1);
+    
+    highQualityURLLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    highQualityURLLinkLabel.setOpenExternalLinks(true);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -222,7 +236,7 @@ void GeneralSettingsPage::retranslateUi()
     personalGroupBox->setTitle(tr("Personal settings"));
     languageLabel.setText(tr("Language:"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
-    picDownloadHqCheckBox.setText(tr("Download high-quality card pictures"));
+    picDownloadHqCheckBox.setText(tr("Download card pictures from a custom URL"));
     pathsGroupBox->setTitle(tr("Paths"));
     deckPathLabel.setText(tr("Decks directory:"));
     replaysPathLabel.setText(tr("Replays directory:"));
@@ -230,7 +244,14 @@ void GeneralSettingsPage::retranslateUi()
     cardDatabasePathLabel.setText(tr("Card database:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
+    highQualityURLLabel.setText(tr("Custom Card Download URL:"));
+    highQualityURLLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(LINKING_FAQ_URL).arg(tr("Linking FAQ")));
     clearDownloadedPicsButton.setText(tr("Reset/Clear Downloaded Pictures"));
+}
+
+void GeneralSettingsPage::setEnabledStatus(bool status)
+{
+    highQualityURLEdit->setEnabled(status);
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()
@@ -344,12 +365,16 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     
     playToStackCheckBox.setChecked(settingsCache->getPlayToStack());
     connect(&playToStackCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPlayToStack(int)));
-    
+
+    annotateTokensCheckBox.setChecked(settingsCache->getAnnotateTokens());
+    connect(&annotateTokensCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setAnnotateTokens(int)));
+
     QGridLayout *generalGrid = new QGridLayout;
     generalGrid->addWidget(&notificationsEnabledCheckBox, 0, 0);
     generalGrid->addWidget(&specNotificationsEnabledCheckBox, 1, 0);
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 2, 0);
     generalGrid->addWidget(&playToStackCheckBox, 3, 0);
+    generalGrid->addWidget(&annotateTokensCheckBox, 4, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -381,6 +406,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
+    annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
 }
@@ -391,7 +417,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     //priceTagsCheckBox.setChecked(settingsCache->getPriceTagFeature());
     //connect(&priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
 
-    connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
+    //connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
 
     QGridLayout *generalGrid = new QGridLayout;
     //generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
@@ -428,6 +454,9 @@ MessagesSettingsPage::MessagesSettingsPage()
 {
     chatMentionCheckBox.setChecked(settingsCache->getChatMention());
     connect(&chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
+
+    chatMentionCompleterCheckbox.setChecked(settingsCache->getChatMentionCompleter());
+    connect(&chatMentionCompleterCheckbox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMentionCompleter(int)));
     
     ignoreUnregUsersMainChat.setChecked(settingsCache->getIgnoreUnregisteredUsers());
     ignoreUnregUserMessages.setChecked(settingsCache->getIgnoreUnregisteredUserMessages());
@@ -436,6 +465,9 @@ MessagesSettingsPage::MessagesSettingsPage()
     
     invertMentionForeground.setChecked(settingsCache->getChatMentionForeground());
     connect(&invertMentionForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextColor(int)));
+
+    invertHighlightForeground.setChecked(settingsCache->getChatHighlightForeground());
+    connect(&invertHighlightForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextHighlightColor(int)));
 
     mentionColor = new QLineEdit();
     mentionColor->setText(settingsCache->getChatMentionColor());
@@ -448,17 +480,37 @@ MessagesSettingsPage::MessagesSettingsPage()
     mentionPopups.setChecked(settingsCache->getShowMentionPopup());
     connect(&mentionPopups, SIGNAL(stateChanged(int)), settingsCache, SLOT(setShowMentionPopups(int)));
 
+    customAlertString = new QLineEdit();
+    customAlertString->setPlaceholderText("Word1 Word2 Word3");
+    customAlertString->setText(settingsCache->getHighlightWords());
+    connect(customAlertString, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighlightWords(QString)));
+
     QGridLayout *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
     chatGrid->addWidget(&invertMentionForeground, 0, 1);
     chatGrid->addWidget(mentionColor, 0, 2);
-    chatGrid->addWidget(&ignoreUnregUsersMainChat, 1, 0);
+    chatGrid->addWidget(&chatMentionCompleterCheckbox, 1, 0);
+    chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0);
     chatGrid->addWidget(&hexLabel, 1, 2);
-    chatGrid->addWidget(&ignoreUnregUserMessages, 2, 0);
-    chatGrid->addWidget(&messagePopups, 3, 0);
-    chatGrid->addWidget(&mentionPopups, 4, 0);
+    chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0);
+    chatGrid->addWidget(&messagePopups, 4, 0);
+    chatGrid->addWidget(&mentionPopups, 5, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
+    
+    highlightColor = new QLineEdit();
+    highlightColor->setText(settingsCache->getChatHighlightColor());
+    updateHighlightPreview();
+    connect(highlightColor, SIGNAL(textChanged(QString)), this, SLOT(updateHighlightColor(QString)));
+
+    QGridLayout *highlightNotice = new QGridLayout;
+    highlightNotice->addWidget(highlightColor, 0, 2);
+    highlightNotice->addWidget(&invertHighlightForeground, 0, 1);
+    highlightNotice->addWidget(&hexHighlightLabel, 1, 2);
+    highlightNotice->addWidget(customAlertString, 0, 0);
+    highlightNotice->addWidget(&customAlertStringLabel, 1, 0);
+    highlightGroupBox = new QGroupBox;
+    highlightGroupBox->setLayout(highlightNotice);
 
     QSettings settings;
     messageList = new QListWidget;
@@ -485,11 +537,12 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     messageShortcuts = new QGroupBox;
     messageShortcuts->setLayout(messageListLayout);
-    
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
-     
+
     mainLayout->addWidget(messageShortcuts);
     mainLayout->addWidget(chatGroupBox);
+    mainLayout->addWidget(highlightGroupBox);
 
     setLayout(mainLayout);
     
@@ -505,14 +558,33 @@ void MessagesSettingsPage::updateColor(const QString &value) {
     }
 }
 
+void MessagesSettingsPage::updateHighlightColor(const QString &value) {
+    QColor colorToSet;
+    colorToSet.setNamedColor("#" + value);
+    if (colorToSet.isValid()) {
+        settingsCache->setChatHighlightColor(value);
+        updateHighlightPreview();
+    }
+}
+
 void MessagesSettingsPage::updateTextColor(int value) {
     settingsCache->setChatMentionForeground(value);
     updateMentionPreview();
 }
 
+void MessagesSettingsPage::updateTextHighlightColor(int value) {
+    settingsCache->setChatHighlightForeground(value);
+    updateHighlightPreview();
+}
+
 void MessagesSettingsPage::updateMentionPreview() {
     mentionColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatMentionColor() + 
         ";color: " + (settingsCache->getChatMentionForeground() ? "white" : "black") + ";}");
+}
+
+void MessagesSettingsPage::updateHighlightPreview() {
+    highlightColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatHighlightColor() +
+        ";color: " + (settingsCache->getChatHighlightForeground() ? "white" : "black") + ";}");
 }
 
 void MessagesSettingsPage::storeSettings()
@@ -545,15 +617,19 @@ void MessagesSettingsPage::actRemove()
 void MessagesSettingsPage::retranslateUi()
 {
     chatGroupBox->setTitle(tr("Chat settings"));
+    highlightGroupBox->setTitle(tr("Custom alert words"));
     chatMentionCheckBox.setText(tr("Enable chat mentions"));
+    chatMentionCompleterCheckbox.setText(tr("Enable mention completer"));
     messageShortcuts->setTitle(tr("In-game message macros"));
-    ignoreUnregUsersMainChat.setText(tr("Ignore unregistered users in main chat"));
-    ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users."));
-    ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users."));
+    ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users"));
+    ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users"));
     invertMentionForeground.setText(tr("Invert text color"));
-    messagePopups.setText(tr("Enable desktop notifications for private messages."));
+    invertHighlightForeground.setText(tr("Invert text color"));
+    messagePopups.setText(tr("Enable desktop notifications for private messages"));
     mentionPopups.setText(tr("Enable desktop notification for mentions."));
     hexLabel.setText(tr("(Color is hexadecimal)"));
+    hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
+    customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));
 }
 
 
@@ -668,6 +744,7 @@ DlgSettings::DlgSettings(QWidget *parent)
     pagesWidget->addWidget(new DeckEditorSettingsPage);
     pagesWidget->addWidget(new MessagesSettingsPage);
     pagesWidget->addWidget(new SoundSettingsPage);
+    pagesWidget->addWidget(new ShortcutsTab);
     
     createIcons();
     contentsWidget->setCurrentRow(0);
@@ -722,6 +799,11 @@ void DlgSettings::createIcons()
     soundButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     soundButton->setIcon(QIcon("theme:config/sound.svg"));
     
+    shortcutsButton = new QListWidgetItem(contentsWidget);
+    shortcutsButton->setTextAlignment(Qt::AlignHCenter);
+    shortcutsButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    shortcutsButton->setIcon(QIcon(":/resources/icon_config_shorcuts.svg"));
+
     connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(changePage(QListWidgetItem *, QListWidgetItem *)));
 }
 
@@ -831,6 +913,7 @@ void DlgSettings::retranslateUi()
     deckEditorButton->setText(tr("Deck Editor"));
     messagesButton->setText(tr("Chat"));
     soundButton->setText(tr("Sound"));
+    shortcutsButton->setText(tr("Shortcuts"));
     
     for (int i = 0; i < pagesWidget->count(); i++)
         dynamic_cast<AbstractSettingsPage *>(pagesWidget->widget(i))->retranslateUi();

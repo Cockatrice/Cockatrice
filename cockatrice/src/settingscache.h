@@ -2,11 +2,15 @@
 #define SETTINGSCACHE_H
 
 #include <QObject>
+#include <QSize>
+#include <QStringList>
+#include "shortcutssettings.h"
 
+// the falbacks are used for cards without a muid
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
-#define PIC_URL_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
-#define PIC_URL_HQ_DEFAULT "http://mtgimage.com/multiverseid/!cardid!.jpg"
-#define PIC_URL_HQ_FALLBACK "http://mtgimage.com/set/!setcode!/!name!.jpg"
+#define PIC_URL_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"
+#define PIC_URL_HQ_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
+#define PIC_URL_HQ_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"
 // size should be a multiple of 64
 #define PIXMAPCACHE_SIZE_DEFAULT 2047
 #define PIXMAPCACHE_SIZE_MIN 64
@@ -36,9 +40,10 @@ signals:
     void ignoreUnregisteredUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void masterVolumeChanged(int value);
+    void chatMentionCompleterChanged();
 private:
     QSettings *settings;
-
+    ShortcutsSettings *shortcutsSettings;
     QByteArray mainWindowGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath, themeName;
@@ -48,6 +53,7 @@ private:
     bool spectatorNotificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
+    bool annotateTokens;
     int cardInfoMinimized;
     QByteArray tabGameSplitterSizes;
     bool displayCardNames;
@@ -56,8 +62,11 @@ private:
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
     bool chatMention;
+    bool chatMentionCompleter;
     QString chatMentionColor;
+    QString chatHighlightColor;
     bool chatMentionForeground;
+    bool chatHighlightForeground;
     bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
     bool soundEnabled;
     QString soundPath;
@@ -69,6 +78,7 @@ private:
     QString picUrlHq;
     QString picUrlFallback;
     QString picUrlHqFallback;
+    QString clientID;
     bool attemptAutoConnect;
     int pixmapCacheSize;
     bool scaleCards;
@@ -77,6 +87,22 @@ private:
     bool leftJustified;
     int masterVolume;
     int cardInfoViewMode;
+    QString highlightWords;
+    QString gameDescription;
+    int maxPlayers;
+    QString gameTypes;
+    bool onlyBuddies;
+    bool onlyRegistered;
+    bool spectatorsAllowed;
+    bool spectatorsNeedPassword;
+    bool spectatorsCanTalk;
+    bool spectatorsCanSeeEverything;
+    bool rememberGameSettings;
+    int keepalive;
+    QByteArray deckEditorLayoutState, deckEditorGeometry;
+    QSize deckEditorFilterSize, deckEditorDeckSize, deckEditorCardSize;
+    QString getSettingsPath();
+
 public:
     SettingsCache();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
@@ -88,6 +114,7 @@ public:
     QString getTokenDatabasePath() const { return tokenDatabasePath; }
     QString getThemeName() const { return themeName; }
     QString getChatMentionColor() const { return chatMentionColor; }
+    QString getChatHighlightColor() const { return chatHighlightColor; }
     bool getPicDownload() const { return picDownload; }
     bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
@@ -95,6 +122,7 @@ public:
 
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
+    bool getAnnotateTokens() const { return annotateTokens; }
     int  getCardInfoMinimized() const { return cardInfoMinimized; }
     QByteArray getTabGameSplitterSizes() const { return tabGameSplitterSizes; }
     bool getDisplayCardNames() const { return displayCardNames; }
@@ -103,7 +131,9 @@ public:
     int getMinPlayersForMultiColumnLayout() const { return minPlayersForMultiColumnLayout; }
     bool getTapAnimation() const { return tapAnimation; }
     bool getChatMention()  const { return chatMention; }
+    bool getChatMentionCompleter() const { return chatMentionCompleter; }
     bool getChatMentionForeground() const { return chatMentionForeground; }
+    bool getChatHighlightForeground() const { return chatHighlightForeground; }
     bool getZoneViewSortByName() const { return zoneViewSortByName; }
     bool getZoneViewSortByType() const { return zoneViewSortByType; }
     /**
@@ -129,6 +159,33 @@ public:
     bool getLeftJustified() const { return leftJustified; }
     int getMasterVolume() const { return masterVolume; }
     int getCardInfoViewMode() const { return cardInfoViewMode; }
+    QStringList getCountries() const;
+    QString getHighlightWords() const { return highlightWords; }
+    QString getGameDescription() const { return gameDescription; }
+    int getMaxPlayers() const { return maxPlayers; }
+    QString getGameTypes() const { return gameTypes; }
+    bool getOnlyBuddies() const { return onlyBuddies; }
+    bool getOnlyRegistered() const { return onlyRegistered; }
+    bool getSpectatorsAllowed() const { return spectatorsAllowed; }
+    bool getSpectatorsNeedPassword() const { return spectatorsNeedPassword; }
+    bool getSpectatorsCanTalk() const { return spectatorsCanTalk; }
+    bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
+    bool getRememberGameSettings() const { return rememberGameSettings; }
+    int getKeepAlive() const { return keepalive; }
+    void setClientID(QString clientID);
+    QString getClientID() { return clientID; }
+    QByteArray getDeckEditorLayoutState() const { return deckEditorLayoutState; }
+    void setDeckEditorLayoutState(const QByteArray &value);
+    QByteArray getDeckEditorGeometry() const { return deckEditorGeometry; }
+    void setDeckEditorGeometry(const QByteArray &value);
+    QSize getDeckEditorCardSize() const { return deckEditorCardSize; }
+    void setDeckEditorCardSize(const QSize &value);
+    QSize getDeckEditorDeckSize() const { return deckEditorDeckSize; }
+    void setDeckEditorDeckSize(const QSize &value);
+    QSize getDeckEditorFilterSize() const { return deckEditorFilterSize; }
+    void setDeckEditorFilterSize(const QSize &value);
+    ShortcutsSettings& shortcuts() const { return *shortcutsSettings; }
+
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -139,12 +196,14 @@ public slots:
     void setTokenDatabasePath(const QString &_tokenDatabasePath);
     void setThemeName(const QString &_themeName);
     void setChatMentionColor(const QString &_chatMentionColor);
+    void setChatHighlightColor(const QString &_chatHighlightColor);
     void setPicDownload(int _picDownload);
     void setPicDownloadHq(int _picDownloadHq);
     void setNotificationsEnabled(int _notificationsEnabled);
     void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
+    void setAnnotateTokens(int _annotateTokens);
     void setCardInfoMinimized(int _cardInfoMinimized);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setDisplayCardNames(int _displayCardNames);
@@ -153,7 +212,9 @@ public slots:
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setTapAnimation(int _tapAnimation);
     void setChatMention(int _chatMention);
+    void setChatMentionCompleter(int _chatMentionCompleter);
     void setChatMentionForeground(int _chatMentionForeground);
+    void setChatHighlightForeground(int _chatHighlightForeground);
     void setZoneViewSortByName(int _zoneViewSortByName);
     void setZoneViewSortByType(int _zoneViewSortByType);
     void setZoneViewPileView(int _zoneViewPileView);
@@ -175,6 +236,17 @@ public slots:
     void setLeftJustified( const int _leftJustified);
     void setMasterVolume(const int _masterVolume);
     void setCardInfoViewMode(const int _viewMode);
+    void setHighlightWords(const QString &_highlightWords);
+    void setGameDescription(const QString _gameDescription);
+    void setMaxPlayers(const int _maxPlayers);
+    void setGameTypes(const QString _gameTypes);
+    void setOnlyBuddies(const bool _onlyBuddies);
+    void setOnlyRegistered(const bool _onlyRegistered);
+    void setSpectatorsAllowed(const bool _spectatorsAllowed);
+    void setSpectatorsNeedPassword(const bool _spectatorsNeedPassword);
+    void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
+    void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
+    void setRememberGameSettings(const bool _rememberGameSettings);
 };
 
 extern SettingsCache *settingsCache;

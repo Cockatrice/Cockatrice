@@ -30,6 +30,9 @@
 #include <QDateTime>
 #include <QSystemTrayIcon>
 #include <QApplication>
+#if QT_VERSION < 0x050000
+    #include <QtGui/qtextdocument.h> // for Qt::escape()
+#endif
 
 #include "main.h"
 #include "window_main.h"
@@ -43,13 +46,20 @@
 #include "localclient.h"
 #include "settingscache.h"
 #include "tab_game.h"
-
 #include "version_string.h"
 
 #include "pb/game_replay.pb.h"
 #include "pb/room_commands.pb.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_shutdown.pb.h"
+
+#define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
+#define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#cockatrice"
+#define GITHUB_TRANSLATOR_RECOGNIZE_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translators"
+#define GITHUB_TRANSLATOR_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ"
+#define GITHUB_ISSUES_URL "https://github.com/Cockatrice/Cockatrice/issues"
+#define GITHUB_TROUBLESHOOTING_URL "https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting"
+#define GITHUB_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions"
 
 const QString MainWindow::appName = "Cockatrice";
 
@@ -67,6 +77,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
     client->disconnectFromServer();
     QString reasonStr;
     switch (event.reason()) {
+        case Event_ConnectionClosed::USER_LIMIT_REACHED: reasonStr = tr("The server has reached its maximum user capacity, please check back later."); break;
         case Event_ConnectionClosed::TOO_MANY_CONNECTIONS: reasonStr = tr("There are too many concurrent connections from your address."); break;
         case Event_ConnectionClosed::BANNED: {
             reasonStr = tr("Banned by moderator");
@@ -79,7 +90,8 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
             break;
         }
         case Event_ConnectionClosed::SERVER_SHUTDOWN: reasonStr = tr("Scheduled server shutdown."); break;
-        case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."); break;
+        case Event_ConnectionClosed::USERNAMEINVALID: reasonStr = tr("Invalid username."); break;
+        case Event_ConnectionClosed::LOGGEDINELSEWERE: reasonStr = tr("You have been logged out due to logging in at another location."); break;
         default: reasonStr = QString::fromStdString(event.reason_str());
     }
     QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
@@ -177,24 +189,24 @@ void MainWindow::actSinglePlayer()
     int numberPlayers = QInputDialog::getInt(this, tr("Number of players"), tr("Please enter the number of players."), 1, 1, 8, 1, &ok);
     if (!ok)
         return;
-    
+
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
     aSinglePlayer->setEnabled(false);
-    
+
     localServer = new LocalServer(this);
     LocalServerInterface *mainLsi = localServer->newConnection();
-    LocalClient *mainClient = new LocalClient(mainLsi, tr("Player %1").arg(1), this);
+    LocalClient *mainClient = new LocalClient(mainLsi, tr("Player %1").arg(1), settingsCache->getClientID(), this);
     QList<AbstractClient *> localClients;
     localClients.append(mainClient);
-    
+
     for (int i = 0; i < numberPlayers - 1; ++i) {
         LocalServerInterface *slaveLsi = localServer->newConnection();
-        LocalClient *slaveClient = new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), this);
+        LocalClient *slaveClient = new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), settingsCache->getClientID(), this);
         localClients.append(slaveClient);
     }
     tabSupervisor->startLocal(localClients);
-    
+
     Command_CreateGame createCommand;
     createCommand.set_max_players(numberPlayers);
     mainClient->sendCommand(mainClient->prepareRoomCommand(createCommand, 0));
@@ -207,17 +219,17 @@ void MainWindow::actWatchReplay()
     dlg.setNameFilters(QStringList() << QObject::tr("Cockatrice replays (*.cor)"));
     if (!dlg.exec())
         return;
-    
+
     QString fileName = dlg.selectedFiles().at(0);
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
         return;
     QByteArray buf = file.readAll();
     file.close();
-    
+
     GameReplay *replay = new GameReplay;
     replay->ParseFromArray(buf.data(), buf.size());
-    
+
     tabSupervisor->openReplay(replay);
 }
 
@@ -225,7 +237,7 @@ void MainWindow::localGameEnded()
 {
     delete localServer;
     localServer = 0;
-    
+
     aConnect->setEnabled(true);
     aRegister->setEnabled(true);
     aSinglePlayer->setEnabled(true);
@@ -263,15 +275,15 @@ void MainWindow::actAbout()
         + "<br><br><b>" + tr("Project Manager:") + "</b><br>Gavin Bisesi<br><br>"
         + "<b>" + tr("Past Project Managers:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
         + "<b>" + tr("Developers:") + "</b><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c'>" + tr("Our Developers") + "</a><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice#cockatrice'>" + tr("Help Develop!") + "</a><br><br>"
+        + "<a href='" + GITHUB_CONTRIBUTORS_URL + "'>" + tr("Our Developers") + "</a><br>"
+        + "<a href='" + GITHUB_CONTRIBUTE_URL + "'>" + tr("Help Develop!") + "</a><br><br>"
         + "<b>" + tr("Translators:") + "</b><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Translators'>" + tr("Recognition Page") + "</a><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ'>" + tr("Help Translate!") + "</a><br><br>"
+        + "<a href='" + GITHUB_TRANSLATOR_RECOGNIZE_URL + "'>" + tr("Recognition Page") + "</a><br>"
+        + "<a href='" + GITHUB_TRANSLATOR_FAQ_URL + "'>" + tr("Help Translate!") + "</a><br><br>"
         + "<b>" + tr("Support:") + "</b><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/issues'>" + tr("Report an Issue") + "</a><br>"
-        + "<a href='https://github.com/Cockatrice/Cockatrice/issues'>" + tr("Suggest an Improvement") + "</a><br>"
-        
+        + "<a href='" + GITHUB_ISSUES_URL + "'>" + tr("Report an Issue") + "</a><br>"
+        + "<a href='" + GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>"
+        + "<a href='" + GITHUB_FAQ_URL + "'>" + tr("F.A.Q.") + "</a><br>"
     ));
 }
 
@@ -298,21 +310,28 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
                 bannedStr = tr("You are banned indefinitely.");
             if (!reasonStr.isEmpty())
                 bannedStr.append("\n\n" + reasonStr);
-        
+
             QMessageBox::critical(this, tr("Error"), bannedStr);
             break;
         }
-        case Response::RespUsernameInvalid:
-            QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."));
+        case Response::RespUsernameInvalid: {
+            QMessageBox::critical(this, tr("Error"), extractInvalidUsernameMessage(reasonStr));
             break;
+        }
         case Response::RespRegistrationRequired:
             if (QMessageBox::question(this, tr("Error"), tr("This server requires user registration. Do you want to register now?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
                 actRegister();
             }
             break;
+        case Response::RespClientIdRequired:
+            QMessageBox::critical(this, tr("Error"), tr("This server requires client ID's. Your client is either failing to generate an ID or you are running a modified client.\nPlease close and reopen your client to try again."));
+            break;
+        case Response::RespContextError:
+            QMessageBox::critical(this, tr("Error"), tr("An internal error has occurred, please try closing and reopening your client and try again. If the error persists try updating your client to the most recent build and if need be contact your software provider."));
+            break;
         case Response::RespAccountNotActivated: {
             bool ok = false;
-            QString token = QInputDialog::getText(this, tr("Account activation"), tr("Your account has not been activated yet.\n You need to provide the activation token received in the activation email"), QLineEdit::Normal, QString(), &ok);
+            QString token = QInputDialog::getText(this, tr("Account activation"), tr("Your account has not been activated yet.\nYou need to provide the activation token received in the activation email"), QLineEdit::Normal, QString(), &ok);
             if(ok && !token.isEmpty())
             {
                 client->activateToServer(token);
@@ -322,10 +341,45 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
         }
         default:
-            QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
+            QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)) + tr("\nThis usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
             break;
     }
     actConnect();
+}
+
+QString MainWindow::extractInvalidUsernameMessage(QString & in)
+{
+    QString out = tr("Invalid username.") + "<br/>";
+    QStringList rules = in.split(QChar('|'));
+    if (rules.size() == 7)
+    {
+        out += tr("Your username must respect these rules:") + "<br><ul>";
+
+        out += "<li>" + tr("is %1 - %2 characters long").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
+        out += "<li>" + tr("can %1 contain lowercase characters").arg((rules.at(2).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+        out += "<li>" + tr("can %1 contain uppercase characters").arg((rules.at(3).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+        out += "<li>" + tr("can %1 contain numeric characters").arg((rules.at(4).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+
+        if (rules.at(6).size() > 0)
+        {
+            out += "<li>" + tr("can contain the following punctuation: %1").arg(
+                #if QT_VERSION < 0x050000
+                    Qt::escape(rules.at(6))
+                #else
+                    rules.at(6).toHtmlEscaped()
+                #endif
+            ) + "</li>";
+        }
+
+        out += "<li>" + tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+        out += "</ul>";
+    }
+    else
+    {
+        out += tr("You may only use A-Z, a-z, 0-9, _, ., and - in your username.");
+    }
+
+    return out;
 }
 
 void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
@@ -354,18 +408,19 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
                 bannedStr = tr("You are banned indefinitely.");
             if (!reasonStr.isEmpty())
                 bannedStr.append("\n\n" + reasonStr);
-        
+
             QMessageBox::critical(this, tr("Error"), bannedStr);
             break;
         }
-        case Response::RespUsernameInvalid:
-            QMessageBox::critical(this, tr("Error"), tr("Invalid username.\nYou may only use A-Z, a-z, 0-9, _, ., and - in your username."));
+        case Response::RespUsernameInvalid: {
+            QMessageBox::critical(this, tr("Error"), extractInvalidUsernameMessage(reasonStr));
             break;
+        }
         case Response::RespRegistrationFailed:
             QMessageBox::critical(this, tr("Error"), tr("Registration failed for a technical problem on the server."));
             break;
         default:
-            QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)));
+            QMessageBox::critical(this, tr("Error"), tr("Unknown registration error: %1").arg(static_cast<int>(r)) + tr("\nThis usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
     }
     actRegister();
 }
@@ -398,7 +453,7 @@ void MainWindow::setClientStatusTitle()
         case StatusRegistering: setWindowTitle(appName + " - " + tr("Registering to %1 as %2...").arg(client->peerName()).arg(client->getUserName())); break;
         case StatusDisconnected: setWindowTitle(appName + " - " + tr("Disconnected")); break;
         case StatusLoggingIn: setWindowTitle(appName + " - " + tr("Connected, logging in at %1").arg(client->peerName())); break;
-        case StatusLoggedIn: setWindowTitle(appName + " - " + tr("Logged in as %1 at %2").arg(client->getUserName()).arg(client->peerName())); break;
+        case StatusLoggedIn: setWindowTitle(client->getUserName() + "@" + client->peerName()); break;
         default: setWindowTitle(appName);
     }
 }
@@ -406,27 +461,26 @@ void MainWindow::setClientStatusTitle()
 void MainWindow::retranslateUi()
 {
     setClientStatusTitle();
-    
+
     aConnect->setText(tr("&Connect..."));
     aDisconnect->setText(tr("&Disconnect"));
     aSinglePlayer->setText(tr("Start &local game..."));
     aWatchReplay->setText(tr("&Watch replay..."));
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
-    aFullScreen->setShortcut(QKeySequence("Ctrl+F"));
     aRegister->setText(tr("&Register to server..."));
     aSettings->setText(tr("&Settings..."));
     aExit->setText(tr("&Exit"));
-    
+
 #if defined(__APPLE__)  /* For OSX */
     cockatriceMenu->setTitle(tr("A&ctions"));
 #else
     cockatriceMenu->setTitle(tr("&Cockatrice"));
 #endif
+
     aAbout->setText(tr("&About Cockatrice"));
     helpMenu->setTitle(tr("&Help"));
     aCheckCardUpdates->setText(tr("Check for card updates..."));
-    
     tabSupervisor->retranslateUi();
 }
 
@@ -452,7 +506,7 @@ void MainWindow::createActions()
     connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
     aExit = new QAction(this);
     connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
-    
+
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
 
@@ -493,7 +547,7 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aCheckCardUpdates);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aExit);
-    
+
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
 }
@@ -526,17 +580,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     createActions();
     createMenus();
-    
+
     tabSupervisor = new TabSupervisor(client);
     connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
     connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
     connect(tabSupervisor, SIGNAL(maximize()), this, SLOT(maximize()));
-    tabSupervisor->addDeckEditorTab(0);    
-    
+    tabSupervisor->addDeckEditorTab(0);
+
     setCentralWidget(tabSupervisor);
 
     retranslateUi();
-    
+
     resize(900, 700);
     restoreGeometry(settingsCache->getMainWindowGeometry());
     aFullScreen->setChecked(windowState() & Qt::WindowFullScreen);
@@ -545,6 +599,9 @@ MainWindow::MainWindow(QWidget *parent)
         createTrayActions();
         createTrayIcon();
     }
+
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
 }
 
 MainWindow::~MainWindow()
@@ -558,7 +615,7 @@ MainWindow::~MainWindow()
 void MainWindow::createTrayIcon() {
     QMenu *trayIconMenu = new QMenu(this);
     trayIconMenu->addAction(closeAction);
-    
+
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(QIcon("theme:cockatrice.svg"));
@@ -668,7 +725,7 @@ void MainWindow::actCheckCardUpdates()
     binaryName = getCardUpdaterBinaryName() + ".exe";
 #else
     binaryName = getCardUpdaterBinaryName();
-#endif    
+#endif
 
     if(dir.exists(binaryName))
         updaterCmd = dir.absoluteFilePath(binaryName);
@@ -723,4 +780,18 @@ void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
 
     // this will force a database reload
     settingsCache->setCardDatabasePath(settingsCache->getCardDatabasePath());
+}
+
+void MainWindow::refreshShortcuts()
+{
+    aConnect->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aConnect"));
+    aDisconnect->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aDisconnect"));
+    aSinglePlayer->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSinglePlayer"));
+    aWatchReplay->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aWatchReplay"));
+    aDeckEditor->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aDeckEditor"));
+    aFullScreen->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aFullScreen"));
+    aRegister->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aRegister"));
+    aSettings->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSettings"));
+    aExit->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aExit"));
+    aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aCheckCardUpdates"));
 }

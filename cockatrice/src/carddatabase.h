@@ -54,8 +54,10 @@ public:
 
 class SetList : public QList<CardSet *> {
 private:
-    class CompareFunctor;
+    class KeyCompareFunctor;
+    class EnabledAndKeyCompareFunctor;
 public:
+    void sortByEnabledAndKey();
     void sortByKey();
     void guessSortKeys();
     void enableAllUnknown();
@@ -94,6 +96,7 @@ private:
     bool picDownload, picDownloadHq, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
     QString getPicUrl();
+    static QStringList md5Blacklist;
 public:
     PictureLoader(const QString &__picsPath, bool _picDownload, bool _picDownloadHq, QObject *parent = 0);
     ~PictureLoader();
@@ -132,6 +135,8 @@ private:
     QString powtough;
     QString text;
     QStringList colors;
+    QStringList relatedCards;
+    bool upsideDownArt;
     int loyalty;
     QStringMap customPicURLs, customPicURLsHq;
     MuidMap muIds;
@@ -148,13 +153,16 @@ public:
         const QString &_powtough = QString(),
         const QString &_text = QString(),
         const QStringList &_colors = QStringList(),
+        const QStringList &_relatedCards = QStringList(),
+        bool _upsideDownArt = false,
         int _loyalty = 0,
         bool _cipt = false,
         int _tableRow = 0,
         const SetList &_sets = SetList(),
         const QStringMap &_customPicURLs = QStringMap(),
         const QStringMap &_customPicURLsHq = QStringMap(),
-        MuidMap muids = MuidMap());
+        MuidMap muids = MuidMap()
+        );
     ~CardInfo();
     const QString &getName() const { return name; }
     const QString &getSimpleName() const { return simpleName; }
@@ -174,6 +182,8 @@ public:
     void setText(const QString &_text) { text = _text; emit cardInfoChanged(this); }
     void setColors(const QStringList &_colors) { colors = _colors; emit cardInfoChanged(this); }
     const QStringList &getColors() const { return colors; }
+    const QStringList &getRelatedCards() const { return relatedCards; }
+    bool getUpsideDownArt() const { return upsideDownArt; }
     QString getCustomPicURL(const QString &set) const { return customPicURLs.value(set); }
     QString getCustomPicURLHq(const QString &set) const { return customPicURLsHq.value(set); }
     int getMuId(const QString &set) const { return muIds.value(set); }

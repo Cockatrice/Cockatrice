@@ -39,6 +39,8 @@
     #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json"
 #endif
 
+#define TOKENS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml"
+
 
 OracleWizard::OracleWizard(QWidget *parent)
     : QWizard(parent)
@@ -57,6 +59,8 @@ OracleWizard::OracleWizard(QWidget *parent)
     addPage(new IntroPage);
     addPage(new LoadSetsPage);
     addPage(new SaveSetsPage);
+    addPage(new LoadTokensPage);
+    addPage(new SaveTokensPage);
 
     retranslateUi();
 }
@@ -98,6 +102,23 @@ void OracleWizard::disableButtons()
 {
     button(QWizard::NextButton)->setDisabled(true);
     button(QWizard::BackButton)->setDisabled(true);
+}
+
+bool OracleWizard::saveTokensToFile(const QString & fileName)
+{
+    QFile file(fileName);
+    if(!file.open(QIODevice::WriteOnly))
+    {
+        qDebug() << "File open (w) failed for" << fileName;
+        return false;
+    }
+    if(file.write(tokensData) == -1)
+    {
+        qDebug() << "File write (w) failed for" << fileName;
+        return false;
+    }
+    file.close();
+    return true;
 }
 
 IntroPage::IntroPage(QWidget *parent)
@@ -150,11 +171,10 @@ void IntroPage::languageBoxChanged(int index)
 void IntroPage::retranslateUi()
 {
     setTitle(tr("Introduction"));
-    label->setText(tr("This wizard will import the list of sets and cards "
-                          "that will be used by Cockatrice.<br/>You will need to "
-                          "specify an url or a filename that will be used as a "
-                          "source, and then choose the wanted sets from the list "
-                          "of the available ones."));
+    label->setText(tr("This wizard will import the list of sets, cards, and tokens "
+                      "that will be used by Cockatrice."
+                      "\nYou will need to specify a URL or a filename that "
+                      "will be used as a source."));
     languageLabel->setText(tr("Language:"));
 }
 
@@ -205,12 +225,12 @@ void LoadSetsPage::retranslateUi()
 {
     setTitle(tr("Source selection"));
     setSubTitle(tr("Please specify a source for the list of sets and cards. "
-                   "You can specify an url address that will be download or "
+                   "You can specify a URL address that will be downloaded or "
                    "use an existing file from your computer."));
 
-    urlRadioButton->setText(tr("Download url:"));
+    urlRadioButton->setText(tr("Download URL:"));
     fileRadioButton->setText(tr("Local file:"));
-    urlButton->setText(tr("Restore default url"));
+    urlButton->setText(tr("Restore default URL"));
     fileButton->setText(tr("Choose file..."));
 }
 
@@ -251,7 +271,7 @@ bool LoadSetsPage::validatePage()
         QUrl url = QUrl::fromUserInput(urlLineEdit->text());
         if(!url.isValid())
         {
-            QMessageBox::critical(this, tr("Error"), tr("The provided url is not valid."));
+            QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
             return false;
         }
 
@@ -302,7 +322,7 @@ void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
         progressBar->setMaximum(total);
         progressBar->setValue(received);
     }
-    progressLabel->setText(tr("Downloading (%1MB)").arg((int) received / 1048576));
+    progressLabel->setText(tr("Downloading (%1MB)").arg((int) received / (1024 * 1024)));
 }
 
 void LoadSetsPage::actDownloadFinishedSetsFile()
@@ -520,6 +540,206 @@ bool SaveSetsPage::validatePage()
             QMessageBox::information(this,
               tr("Success"),
               tr("The card database has been saved successfully to\n%1").arg(fileName));
+        } else {
+            QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));;
+            if (defaultPathCheckBox->isChecked())
+                defaultPathCheckBox->setChecked(false);
+        }
+    } while (!ok);
+
+    return true;
+}
+
+LoadTokensPage::LoadTokensPage(QWidget *parent)
+    : OracleWizardPage(parent), nam(0)
+{
+    urlLabel = new QLabel(this);
+    urlLineEdit = new QLineEdit(this);
+
+    progressLabel = new QLabel(this);
+    progressBar = new QProgressBar(this);
+
+    urlButton = new QPushButton(this);
+    connect(urlButton, SIGNAL(clicked()), this, SLOT(actRestoreDefaultUrl()));
+
+    QGridLayout *layout = new QGridLayout(this);
+    layout->addWidget(urlLabel, 0, 0);
+    layout->addWidget(urlLineEdit, 0, 1);
+    layout->addWidget(urlButton, 1, 1, Qt::AlignRight);
+    layout->addWidget(progressLabel, 2, 0);
+    layout->addWidget(progressBar, 2, 1);
+
+    setLayout(layout);
+}
+
+void LoadTokensPage::initializePage()
+{
+    urlLineEdit->setText(wizard()->settings->value("tokensurl", TOKENS_URL).toString());
+
+    progressLabel->hide();
+    progressBar->hide();
+}
+
+void LoadTokensPage::retranslateUi()
+{
+    setTitle(tr("Tokens source selection"));
+    setSubTitle(tr("Please specify a source for the list of tokens. "
+                   "You can specify a URL address that will be downloaded or "
+                   "use an existing file from your computer."));
+
+    urlLabel->setText(tr("Download URL:"));
+    urlButton->setText(tr("Restore default URL"));
+}
+
+void LoadTokensPage::actRestoreDefaultUrl()
+{
+    urlLineEdit->setText(TOKENS_URL);
+}
+
+bool LoadTokensPage::validatePage()
+{
+    // once the import is finished, we call next(); skip validation
+    if(wizard()->hasTokensData())
+        return true;
+
+    QUrl url = QUrl::fromUserInput(urlLineEdit->text());
+    if(!url.isValid())
+    {
+        QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
+        return false;
+    }
+
+    progressLabel->setText(tr("Downloading (0MB)"));
+    // show an infinite progressbar
+    progressBar->setMaximum(0);
+    progressBar->setMinimum(0);
+    progressBar->setValue(0);
+    progressLabel->show();
+    progressBar->show();
+
+    wizard()->disableButtons();
+    setEnabled(false);
+
+    if(!nam)
+        nam = new QNetworkAccessManager(this);
+    QNetworkReply *reply = nam->get(QNetworkRequest(url));
+
+    connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedTokensFile()));
+    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(actDownloadProgressTokensFile(qint64, qint64)));
+
+    return false;
+}
+
+void LoadTokensPage::actDownloadProgressTokensFile(qint64 received, qint64 total)
+{
+    if(total > 0)
+    {
+        progressBar->setMaximum(total);
+        progressBar->setValue(received);
+    }
+    progressLabel->setText(tr("Downloading (%1MB)").arg((int) received / (1024 * 1024)));
+}
+
+void LoadTokensPage::actDownloadFinishedTokensFile()
+{
+    progressLabel->hide();
+    progressBar->hide();
+
+    // check for a reply
+    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
+    QNetworkReply::NetworkError errorCode = reply->error();
+    if (errorCode != QNetworkReply::NoError) {
+        QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
+
+        wizard()->enableButtons();
+        setEnabled(true);
+
+        reply->deleteLater();
+        return;
+    }
+
+    // save tokens.xml url, but only if the user customized it and download was successfull
+    if(urlLineEdit->text() != QString(TOKENS_URL))
+        wizard()->settings->setValue("tokensurl", urlLineEdit->text());
+    else
+        wizard()->settings->remove("tokensurl");
+
+    wizard()->setTokensData(reply->readAll());
+    reply->deleteLater();
+
+    wizard()->enableButtons();
+    setEnabled(true);
+    progressLabel->hide();
+    progressBar->hide();
+
+    wizard()->next();
+}
+
+SaveTokensPage::SaveTokensPage(QWidget *parent)
+    : OracleWizardPage(parent)
+{
+    defaultPathCheckBox = new QCheckBox(this);
+    defaultPathCheckBox->setChecked(true);
+
+    QGridLayout *layout = new QGridLayout(this);
+    layout->addWidget(defaultPathCheckBox, 0, 0);
+
+    setLayout(layout);
+}
+
+void SaveTokensPage::retranslateUi()
+{
+    setTitle(tr("Tokens imported"));
+    setSubTitle(tr("The tokens has been imported. "
+                   "Press \"Save\" to save the imported tokens to the Cockatrice tokens database."));
+
+    defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
+}
+
+bool SaveTokensPage::validatePage()
+{
+    bool ok = false;
+    const QString dataDir = 
+#if QT_VERSION < 0x050000
+        QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#else
+        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+#endif
+    QSettings* settings = new QSettings(this);
+    QString defaultPath = settings->value("paths/tokendatabase").toString();
+    QString windowName = tr("Save token database");
+    QString fileType = tr("XML; token database (*.xml)");
+
+    do {
+        QString fileName;
+        if (defaultPath.isEmpty()) {
+            if (defaultPathCheckBox->isChecked())
+                fileName = dataDir + "/tokens.xml";
+            else
+                fileName = QFileDialog::getSaveFileName(this, windowName, dataDir + "/tokens.xml", fileType);
+            settings->setValue("paths/tokendatabase", fileName);
+        }
+        else {
+            if (defaultPathCheckBox->isChecked())
+                fileName = defaultPath;
+            else
+                fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
+        }
+        if (fileName.isEmpty()) {
+            return false;
+        }
+
+        QFileInfo fi(fileName);
+        QDir fileDir(fi.path());
+        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
+            return false;
+        }
+        if (wizard()->saveTokensToFile(fileName))
+        {
+            ok = true;
+            QMessageBox::information(this,
+              tr("Success"),
+              tr("The token database has been saved successfully to\n%1").arg(fileName));
         } else {
             QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));;
             if (defaultPathCheckBox->isChecked())

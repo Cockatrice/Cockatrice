@@ -115,6 +115,46 @@
     </message>
 </context>
 <context>
+    <name>LoadTokensPage</name>
+    <message>
+        <source>Tokens source selection</source>
+        <translation>토큰 파일 주소 입력</translation>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
+        <translation>토큰 목록 및 정보가 들어있는 파일의 위치를 입력해 주세요. 
+다운로드 할 수 있는 웹 주소나 컴퓨터에 저장되어 있는 파일을 선택 할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Download url:</source>
+        <translation>웹 주소:</translation>
+    </message>
+    <message>
+        <source>Restore default url</source>
+        <translation>기본 주소로 복원</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>오류</translation>
+    </message>
+    <message>
+        <source>The provided url is not valid.</source>
+        <translation>잘못된 주소를 입력하셨습니다.</translation>
+    </message>
+    <message>
+        <source>Downloading (0MB)</source>
+        <translation>다운로드 중 (0MB)</translation>
+    </message>
+    <message>
+        <source>Downloading (%1MB)</source>
+        <translation>다운로드 중 (%1MB)</translation>
+    </message>
+    <message>
+        <source>Network error: %1.</source>
+        <translation>네트워크 오류 : %1.</translation>
+    </message>
+</context>
+<context>
     <name>OracleImporter</name>
     <message>
         <source>Dummy set containing tokens</source>
@@ -180,6 +220,48 @@
 %1</source>
         <translation>카드 데이터베이스를 다음 위치에 저장했습니다:
 %1</translation>
+    </message>
+    <message>
+        <source>The file could not be saved to %1</source>
+        <translation>파일을 %1에 저장 할 수 없습니다.</translation>
+    </message>
+</context>
+<context>
+    <name>SaveTokensPage</name>
+    <message>
+        <source>Tokens imported</source>
+        <translation>토큰 불러오기 완료</translation>
+    </message>
+    <message>
+        <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
+        <translation>토큰 파일을 불러왔습니다.
+&quot;저장&quot; 버튼을 누르면 코카트리스에서 토큰 파일을 불러옵니다.</translation>
+    </message>
+    <message>
+        <source>Save to the default path (recommended)</source>
+        <translation>기본 경로에 저장 (권장)</translation>
+    </message>
+    <message>
+        <source>Save token database</source>
+        <translation>토큰 파일 저장</translation>
+    </message>
+    <message>
+        <source>XML; token database (*.xml)</source>
+        <translation>토큰 정보 XML 파일 (*.xml)</translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation>성공</translation>
+    </message>
+    <message>
+        <source>The token database has been saved successfully to
+%1</source>
+        <translation>토큰 정보 파일을 다음 위치에 저장했습니다:
+%1</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>오류</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>

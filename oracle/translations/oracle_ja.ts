@@ -115,6 +115,45 @@
     </message>
 </context>
 <context>
+    <name>LoadTokensPage</name>
+    <message>
+        <source>Tokens source selection</source>
+        <translation>トークンのソース選択</translation>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
+        <translation>トークンのソースを指定してください。ダウンロード可能なURLか、コンピューターにあるソースファイルを指定することができます。</translation>
+    </message>
+    <message>
+        <source>Download url:</source>
+        <translation>ダウンロードURL:</translation>
+    </message>
+    <message>
+        <source>Restore default url</source>
+        <translation>デフォルトのURLを復元</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>エラー</translation>
+    </message>
+    <message>
+        <source>The provided url is not valid.</source>
+        <translation>指定されたURLは無効です。</translation>
+    </message>
+    <message>
+        <source>Downloading (0MB)</source>
+        <translation>ダウンロード中 (0MB)</translation>
+    </message>
+    <message>
+        <source>Downloading (%1MB)</source>
+        <translation>ダウンロード中 (%1MB)</translation>
+    </message>
+    <message>
+        <source>Network error: %1.</source>
+        <translation>ネットワークエラー: %1。</translation>
+    </message>
+</context>
+<context>
     <name>OracleImporter</name>
     <message>
         <source>Dummy set containing tokens</source>
@@ -179,6 +218,47 @@
 %1</source>
         <translation>カードデータベースは以下に保存されました:
 %1</translation>
+    </message>
+    <message>
+        <source>The file could not be saved to %1</source>
+        <translation>%1に保存できませんでした。</translation>
+    </message>
+</context>
+<context>
+    <name>SaveTokensPage</name>
+    <message>
+        <source>Tokens imported</source>
+        <translation>トークンインポート</translation>
+    </message>
+    <message>
+        <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
+        <translation>トークンがインポートされました。”保存”をクリックするとインポートしたトークンをCockatriceデータベースに保存します。</translation>
+    </message>
+    <message>
+        <source>Save to the default path (recommended)</source>
+        <translation>デフォルトのパスに保存 (推奨)</translation>
+    </message>
+    <message>
+        <source>Save token database</source>
+        <translation>トークンデータベースを保存</translation>
+    </message>
+    <message>
+        <source>XML; token database (*.xml)</source>
+        <translation>XML; token database (*.xml)</translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation>完了</translation>
+    </message>
+    <message>
+        <source>The token database has been saved successfully to
+%1</source>
+        <translation>トークンデータベースは以下に保存されました:
+%1</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>エラー</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>

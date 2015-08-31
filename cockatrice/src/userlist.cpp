@@ -3,7 +3,6 @@
 #include "tab_supervisor.h"
 #include "abstractclient.h"
 #include "pixmapgenerator.h"
-#include "userinfobox.h"
 #include "user_context_menu.h"
 #include "gameselector.h"
 #include <QHeaderView>
@@ -37,11 +36,19 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent)
     ipBanCheckBox = new QCheckBox(tr("ban &IP address"));
     ipBanCheckBox->setChecked(true);
     ipBanEdit = new QLineEdit(QString::fromStdString(info.address()));
+    idBanCheckBox = new QCheckBox(tr("ban client I&D"));
+    idBanCheckBox->setChecked(true);
+    idBanEdit = new QLineEdit(QString::fromStdString(info.clientid()));
+    if (QString::fromStdString(info.clientid()).isEmpty())
+        idBanCheckBox->setChecked(false);
+
     QGridLayout *banTypeGrid = new QGridLayout;
     banTypeGrid->addWidget(nameBanCheckBox, 0, 0);
     banTypeGrid->addWidget(nameBanEdit, 0, 1);
     banTypeGrid->addWidget(ipBanCheckBox, 1, 0);
     banTypeGrid->addWidget(ipBanEdit, 1, 1);
+    banTypeGrid->addWidget(idBanCheckBox, 2, 0);
+    banTypeGrid->addWidget(idBanEdit, 2, 1);
     QGroupBox *banTypeGroupBox = new QGroupBox(tr("Ban type"));
     banTypeGroupBox->setLayout(banTypeGrid);
     
@@ -111,8 +118,8 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent)
 
 void BanDialog::okClicked()
 {
-    if (!nameBanCheckBox->isChecked() && !ipBanCheckBox->isChecked()) {
-        QMessageBox::critical(this, tr("Error"), tr("You have to select a name-based or IP-based ban, or both."));
+    if (!nameBanCheckBox->isChecked() && !ipBanCheckBox->isChecked() && !idBanCheckBox->isChecked()) {
+        QMessageBox::critical(this, tr("Error"), tr("You have to select a name-based, IP-based, clientId based, or some combination of the three to place a ban."));
         return;
     }
     accept();
@@ -126,6 +133,11 @@ void BanDialog::enableTemporaryEdits(bool enabled)
     hoursEdit->setEnabled(enabled);
     minutesLabel->setEnabled(enabled);
     minutesEdit->setEnabled(enabled);
+}
+
+QString BanDialog::getBanId() const
+{
+    return idBanCheckBox->isChecked() ? idBanEdit->text() : QString();
 }
 
 QString BanDialog::getBanName() const

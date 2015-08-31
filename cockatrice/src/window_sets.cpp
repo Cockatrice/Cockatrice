@@ -92,7 +92,7 @@ WndSets::WndSets(QWidget *parent)
 
 
     QLabel *labNotes = new QLabel;
-    labNotes->setText("<b>" + tr("hints:") + "</b>" + "<ul><li>" + tr("Enable the sets that you want to have available in the deck editor") + "</li><li>" + tr("Move sets around to change their order, or click on a column header to sort sets on that field") + "</li><li>" + tr("Sets order decides the source that will be used when loading images for a specific card") + "</li><li>" + tr("Disabled sets will still be used for loading images") + "</li></ul>");
+    labNotes->setText("<b>" + tr("hints:") + "</b>" + "<ul><li>" + tr("Enable the sets that you want to have available in the deck editor") + "</li><li>" + tr("Move sets around to change their order, or click on a column header to sort sets on that field") + "</li><li>" + tr("Sets order decides the source that will be used when loading images for a specific card") + "</li><li>" + tr("Disabled sets will be used for loading images only if all the enabled sets failed") + "</li></ul>");
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
@@ -123,6 +123,7 @@ WndSets::~WndSets()
 void WndSets::actSave()
 {
     model->save(db);
+    db->clearPixmapCache();
     QMessageBox::information(this, tr("Success"), tr("The sets database has been saved successfully."));
     close();
 }

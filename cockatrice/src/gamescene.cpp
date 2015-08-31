@@ -11,9 +11,13 @@
 #include <QSet>
 #include <QBasicTimer>
 #include <QGraphicsView>
+#include <QDebug>
 
 GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
-    : QGraphicsScene(parent), phasesToolbar(_phasesToolbar), viewSize(QSize())
+    : QGraphicsScene(parent),
+      phasesToolbar(_phasesToolbar),
+      viewSize(QSize()),
+      playerRotation(0)
 {
     animationTimer = new QBasicTimer;
     addItem(phasesToolbar);
@@ -35,7 +39,7 @@ void GameScene::retranslateUi()
 
 void GameScene::addPlayer(Player *player)
 {
-    qDebug("GameScene::addPlayer");
+    qDebug() << "GameScene::addPlayer name=" << player->getName();
     players << player;
     addItem(player);
     connect(player, SIGNAL(sizeChanged()), this, SLOT(rearrange()));
@@ -44,9 +48,15 @@ void GameScene::addPlayer(Player *player)
 
 void GameScene::removePlayer(Player *player)
 {
-    qDebug("GameScene::removePlayer");
+    qDebug() << "GameScene::removePlayer name=" << player->getName();
     players.removeAt(players.indexOf(player));
     removeItem(player);
+    rearrange();
+}
+
+void GameScene::adjustPlayerRotation(int rotationAdjustment)
+{
+    playerRotation += rotationAdjustment;
     rearrange();
 }
 
@@ -54,29 +64,47 @@ void GameScene::rearrange()
 {
     playersByColumn.clear();
 
+    // Create the list of players playing, noting the first player's index.
     QList<Player *> playersPlaying;
-    int firstPlayer = -1;
-    for (int i = 0; i < players.size(); ++i)
-        if (!players[i]->getConceded()) {
-            playersPlaying.append(players[i]);
-            if ((firstPlayer == -1) && (players[i]->getLocal()))
-                firstPlayer = playersPlaying.size() - 1;
+    int firstPlayerIndex = 0;
+    bool firstPlayerFound = false;
+    QListIterator<Player *> playersIter(players);
+    while (playersIter.hasNext()) {
+        Player *p = playersIter.next();
+        if (!p->getConceded()) {
+            playersPlaying.append(p);
+            if (!firstPlayerFound && (p->getLocal())) {
+                firstPlayerIndex = playersPlaying.size() - 1;
+                firstPlayerFound = true;
+            }
         }
-    if (firstPlayer == -1)
-        firstPlayer = 0;
+    }
+
+    // Rotate the players playing list so that first player is first, then
+    // adjust by the additional rotation setting.
+    if (!playersPlaying.isEmpty()) {
+        int totalRotation = firstPlayerIndex + playerRotation;
+        while (totalRotation < 0)
+            totalRotation += playersPlaying.size();
+        for (int i = 0; i < totalRotation; ++i) {
+            playersPlaying.append(playersPlaying.takeFirst());
+        }
+    }
+
     const int playersCount = playersPlaying.size();
     const int columns = playersCount < settingsCache->getMinPlayersForMultiColumnLayout() ? 1 : 2;
     const int rows = ceil((qreal) playersCount / columns);
     qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;
     QList<int> columnWidth;
-    int firstPlayerOfColumn = firstPlayer;
+
+    QListIterator<Player *> playersPlayingIter(playersPlaying);
     for (int col = 0; col < columns; ++col) {
         playersByColumn.append(QList<Player *>());
         columnWidth.append(0);
         qreal thisColumnHeight = -playerAreaSpacing;
         const int rowsInColumn = rows - (playersCount % columns) * col; // only correct for max. 2 cols
         for (int j = 0; j < rowsInColumn; ++j) {
-            Player *player = playersPlaying[(firstPlayerOfColumn + j) % playersCount];
+            Player *player = playersPlayingIter.next();
             if (col == 0)
                 playersByColumn[col].prepend(player);
             else
@@ -88,8 +116,6 @@ void GameScene::rearrange()
         if (thisColumnHeight > sceneHeight)
             sceneHeight = thisColumnHeight;
         sceneWidth += columnWidth[col] + playerAreaSpacing;
-
-        firstPlayerOfColumn += rowsInColumn;
     }
 
     phasesToolbar->setHeight(sceneHeight);
@@ -202,14 +228,14 @@ void GameScene::processViewSizeChange(const QSize &newSize)
     setSceneRect(0, 0, newWidth, sceneRect().height());
 
     qreal extraWidthPerColumn = (newWidth - minWidth) / playersByColumn.size();
-    for (int col = 0; col < playersByColumn.size(); ++col)
+    qreal newx = phasesToolbar->getWidth();
+    for (int col = 0; col < playersByColumn.size(); ++col) {
         for (int row = 0; row < playersByColumn[col].size(); ++row){
             playersByColumn[col][row]->processSceneSizeChange(minWidthByColumn[col] + extraWidthPerColumn);
-            if (col == 0)
-                playersByColumn[col][row]->setPos(phasesToolbar->getWidth(), playersByColumn[col][row]->y());
-            else
-                playersByColumn[col][row]->setPos(phasesToolbar->getWidth() + (newWidth - phasesToolbar->getWidth()) / 2, playersByColumn[col][row]->y());
+            playersByColumn[col][row]->setPos(newx, playersByColumn[col][row]->y());
         }
+        newx += minWidthByColumn[col] + extraWidthPerColumn;
+    }
 }
 
 void GameScene::updateHover(const QPointF &scenePos)

@@ -114,6 +114,45 @@
     </message>
 </context>
 <context>
+    <name>LoadTokensPage</name>
+    <message>
+        <source>Tokens source selection</source>
+        <translation>Selezione sorgente pedine</translation>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
+        <translation>Specifica una sorgente per la lista delle pedine. Puoi specificare un indirizzo url da cui scaricare il file o alternativamente usare un file già presente nel tuo computer.</translation>
+    </message>
+    <message>
+        <source>Download url:</source>
+        <translation>Indirizzo download:</translation>
+    </message>
+    <message>
+        <source>Restore default url</source>
+        <translation>Usa l&apos;indirizzo predefinito</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Errore</translation>
+    </message>
+    <message>
+        <source>The provided url is not valid.</source>
+        <translation>L&apos;indirizzo specificato non è valido.</translation>
+    </message>
+    <message>
+        <source>Downloading (0MB)</source>
+        <translation>Scaricamento (0MB)</translation>
+    </message>
+    <message>
+        <source>Downloading (%1MB)</source>
+        <translation>Scaricamento (%1MB)</translation>
+    </message>
+    <message>
+        <source>Network error: %1.</source>
+        <translation>Errore di rete: %1</translation>
+    </message>
+</context>
+<context>
     <name>OracleImporter</name>
     <message>
         <source>Dummy set containing tokens</source>
@@ -178,6 +217,47 @@
 %1</source>
         <translation>L&apos;archivio delle carte è stato salvato correttamente su
 %1</translation>
+    </message>
+    <message>
+        <source>The file could not be saved to %1</source>
+        <translation>Impossibile salvare il file su %1</translation>
+    </message>
+</context>
+<context>
+    <name>SaveTokensPage</name>
+    <message>
+        <source>Tokens imported</source>
+        <translation>Pedine importate</translation>
+    </message>
+    <message>
+        <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
+        <translation>Le pedine sono state importate. Premi &quot;Salva&quot; per salvare le pedine importate nell&apos;archivio delle pedine di Cockatrice.</translation>
+    </message>
+    <message>
+        <source>Save to the default path (recommended)</source>
+        <translation>Salva nel percorso predefinito (raccomandato)</translation>
+    </message>
+    <message>
+        <source>Save token database</source>
+        <translation>Salva archivio pedine</translation>
+    </message>
+    <message>
+        <source>XML; token database (*.xml)</source>
+        <translation>XML; archivio pedine (*.xml)</translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation>Successo</translation>
+    </message>
+    <message>
+        <source>The token database has been saved successfully to
+%1</source>
+        <translation>L&apos;archivio delle pedine è stato salvato correttamente su
+%1</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Errore</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>

@@ -11,6 +11,8 @@
 #include <QSplitter>
 #include <QApplication>
 #include <QSystemTrayIcon>
+#include <QCompleter>
+#include <QWidget>
 #include "tab_supervisor.h"
 #include "tab_room.h"
 #include "tab_userlists.h"
@@ -20,6 +22,7 @@
 #include "gameselector.h"
 #include "settingscache.h"
 #include "main.h"
+#include "lineeditcompleter.h"
 
 #include "get_pb_extension.h"
 #include "pb/room_commands.pb.h"
@@ -51,15 +54,15 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
+    connect(settingsCache, SIGNAL(chatMentionCompleterChanged()), this, SLOT(actCompleterChanged()));
     sayLabel = new QLabel;
-    sayEdit = new QLineEdit;
+    sayEdit = new LineEditCompleter;
     sayLabel->setBuddy(sayEdit);
     connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
 
     QMenu *chatSettingsMenu = new QMenu(this);
 
     aClearChat = chatSettingsMenu->addAction(QString());
-    aClearChat->setShortcut(QKeySequence("F12"));
     connect(aClearChat, SIGNAL(triggered()), this, SLOT(actClearChat()));
 
     chatSettingsMenu->addSeparator();
@@ -103,13 +106,28 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     setLayout(hbox);
 
     const int userListSize = info.user_list_size();
-    for (int i = 0; i < userListSize; ++i)
+    for (int i = 0; i < userListSize; ++i){
         userList->processUserInfo(info.user_list(i), true);
+        autocompleteUserList.append("@" + QString::fromStdString(info.user_list(i).name()));
+    }
     userList->sortItems();
 
     const int gameListSize = info.game_list_size();
     for (int i = 0; i < gameListSize; ++i)
         gameSelector->processGameInfo(info.game_list(i));
+
+    completer = new QCompleter(autocompleteUserList, sayEdit);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setMaxVisibleItems(5);
+
+    #if QT_VERSION >= 0x050000
+        completer->setFilterMode(Qt::MatchStartsWith);
+    #endif
+
+    sayEdit->setCompleter(completer);
+    actCompleterChanged();
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
 }
 
 TabRoom::~TabRoom()
@@ -119,7 +137,7 @@ TabRoom::~TabRoom()
 
 void TabRoom::retranslateUi()
 {
-        gameSelector->retranslateUi();
+    gameSelector->retranslateUi();
     chatView->retranslateUi();
     userList->retranslateUi();
     sayLabel->setText(tr("&Say:"));
@@ -166,16 +184,20 @@ QString TabRoom::sanitizeHtml(QString dirty) const
 
 void TabRoom::sendMessage()
 {
-    if (sayEdit->text().isEmpty())
-          return;
+    if (sayEdit->text().isEmpty()){
+        return;
+    }else if (completer->popup()->isVisible()){
+        completer->popup()->hide();
+        return;
+    }else{
+        Command_RoomSay cmd;
+        cmd.set_message(sayEdit->text().toStdString());
 
-    Command_RoomSay cmd;
-    cmd.set_message(sayEdit->text().toStdString());
-
-    PendingCommand *pend = prepareRoomCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(sayFinished(const Response &)));
-    sendRoomCommand(pend);
-    sayEdit->clear();
+        PendingCommand *pend = prepareRoomCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(sayFinished(const Response &)));
+        sendRoomCommand(pend);
+        sayEdit->clear();
+    }
 }
 
 void TabRoom::sayFinished(const Response &response)
@@ -200,6 +222,11 @@ void TabRoom::actOpenChatSettings() {
     settings.exec();
 }
 
+void TabRoom::actCompleterChanged()
+{
+    settingsCache->getChatMentionCompleter() ? completer->setCompletionRole(2) : completer->setCompletionRole(1);
+}
+
 void TabRoom::processRoomEvent(const RoomEvent &event)
 {
     switch (static_cast<RoomEvent::RoomEventType>(getPbExtension(event))) {
@@ -222,11 +249,17 @@ void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)
 {
     userList->processUserInfo(event.user_info(), true);
     userList->sortItems();
+    if (!autocompleteUserList.contains("@" + QString::fromStdString(event.user_info().name()))){
+        autocompleteUserList << "@" + QString::fromStdString(event.user_info().name());
+        sayEdit->setCompletionList(autocompleteUserList);
+    }    
 }
 
 void TabRoom::processLeaveRoomEvent(const Event_LeaveRoom &event)
 {
     userList->deleteUser(QString::fromStdString(event.name()));
+    autocompleteUserList.removeOne("@" + QString::fromStdString(event.name()));
+    sayEdit->setCompletionList(autocompleteUserList);
 }
 
 void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
@@ -243,6 +276,11 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     }
     chatView->appendMessage(QString::fromStdString(event.message()), senderName, userLevel, true);
     emit userEvent(false);
+}
+
+void TabRoom::refreshShortcuts()
+{
+    aClearChat->setShortcuts(settingsCache->shortcuts().getShortcut("tab_room/aClearChat"));
 }
 
 void TabRoom::addMentionTag(QString mentionTag) {

@@ -1,16 +1,19 @@
+syntax = "proto2";
 import "game_commands.proto";
 message Command_CreateToken {
-	extend GameCommand {
-		optional Command_CreateToken ext = 1010;
-	}
-	optional string zone = 1;
-	optional string card_name = 2;
-	optional string color = 3;
-	optional string pt = 4;
-	optional string annotation = 5;
-	optional bool destroy_on_zone_change = 6;
-	optional sint32 x = 7;
-	optional sint32 y = 8;
+    extend GameCommand {
+        optional Command_CreateToken ext = 1010;
+    }
+    optional string zone = 1;
+    optional string card_name = 2;
+    optional string color = 3;
+    optional string pt = 4;
+    optional string annotation = 5;
+    optional bool destroy_on_zone_change = 6;
+    optional sint32 x = 7;
+    optional sint32 y = 8;
+    optional string target_zone = 9;
+    optional sint32 target_card_id = 10 [default = -1];
 }
 
 

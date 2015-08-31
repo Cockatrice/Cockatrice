@@ -1,5 +1,6 @@
 #include "abstractcounter.h"
 #include "player.h"
+#include "settingscache.h"
 #include <QPainter>
 #include <QMenu>
 #include <QAction>
@@ -16,6 +17,8 @@ AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name,
 #else
     setAcceptHoverEvents(true);
 #endif
+
+    shortcutActive = false;
 
     if (player->getLocal()) {
         menu = new QMenu(name);
@@ -39,6 +42,8 @@ AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name,
     } else
         menu = 0;
     
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
     retranslateUi();
 }
 
@@ -65,19 +70,27 @@ void AbstractCounter::retranslateUi()
 void AbstractCounter::setShortcutsActive()
 {
     if (name == "life") {
-        aSet->setShortcut(QKeySequence("Ctrl+L"));
-        aDec->setShortcut(QKeySequence("F11"));
-        aInc->setShortcut(QKeySequence("F12"));
+        shortcutActive = true;
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSet"));
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDec"));
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aInc"));
     }
 }
 
 void AbstractCounter::setShortcutsInactive()
 {
+    shortcutActive = false;
     if (name == "life") {
         aSet->setShortcut(QKeySequence());
         aDec->setShortcut(QKeySequence());
         aInc->setShortcut(QKeySequence());
     }
+}
+
+void AbstractCounter::refreshShortcuts()
+{
+    if(shortcutActive)
+        setShortcutsActive();
 }
 
 void AbstractCounter::setValue(int _value)

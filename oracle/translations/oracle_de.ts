@@ -16,7 +16,7 @@
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
         <translation>Dieser Assistent wird eine Liste aller Editionen und Karten, die von Cockatrice genutzt werden, importieren.
-Sie müssen dazu eine URL oder einen Dateinamen die/der als Quelle genutzt werden soll angeben, dann können aus einer Liste aller verfügbaren Editionen die Gewünschten ausgwählt werden.</translation>
+Sie müssen dazu eine URL oder einen Dateinamen als Quelle angeben. Danach können Sie aus einer Liste aller verfügbaren Editionen die Gewünschten ausgewählen.</translation>
     </message>
 </context>
 <context>
@@ -39,7 +39,7 @@ Sie müssen dazu eine URL oder einen Dateinamen die/der als Quelle genutzt werde
     </message>
     <message>
         <source>Restore default url</source>
-        <translation>URL wiederherstellen</translation>
+        <translation>Standard-URL wiederherstellen</translation>
     </message>
     <message>
         <source>Choose file...</source>
@@ -115,6 +115,45 @@ Sie müssen dazu eine URL oder einen Dateinamen die/der als Quelle genutzt werde
     </message>
 </context>
 <context>
+    <name>LoadTokensPage</name>
+    <message>
+        <source>Tokens source selection</source>
+        <translation>Spielstein-Quellenauswahl</translation>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
+        <translation>Bitte geben Sie eine Quelle für die Liste der Spielsteine an. Sie können eine URL Adresse zum Herunterladen eingeben oder eine vorhandene Datei von Ihrem Computer verwenden.</translation>
+    </message>
+    <message>
+        <source>Download url:</source>
+        <translation>Download URL:</translation>
+    </message>
+    <message>
+        <source>Restore default url</source>
+        <translation>Standard-URL wiederherstellen</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Fehler</translation>
+    </message>
+    <message>
+        <source>The provided url is not valid.</source>
+        <translation>Die eingegebene URL ist nicht gültig.</translation>
+    </message>
+    <message>
+        <source>Downloading (0MB)</source>
+        <translation>Herunterladen (0MB)</translation>
+    </message>
+    <message>
+        <source>Downloading (%1MB)</source>
+        <translation>Herunterladen (%1MB)</translation>
+    </message>
+    <message>
+        <source>Network error: %1.</source>
+        <translation>Netzwerkfehler: %1.</translation>
+    </message>
+</context>
+<context>
     <name>OracleImporter</name>
     <message>
         <source>Dummy set containing tokens</source>
@@ -179,6 +218,48 @@ Sie müssen dazu eine URL oder einen Dateinamen die/der als Quelle genutzt werde
 %1</source>
         <translation>Die Kartendatenbank wurde erfolgreich gespeichert:
 %1</translation>
+    </message>
+    <message>
+        <source>The file could not be saved to %1</source>
+        <translation>Die Datei konnte nicht gespeichert werden:
+%1 </translation>
+    </message>
+</context>
+<context>
+    <name>SaveTokensPage</name>
+    <message>
+        <source>Tokens imported</source>
+        <translation>Spielsteine importiert</translation>
+    </message>
+    <message>
+        <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
+        <translation>Spielsteine wurden importiert. Drücken Sie „Speichern“, um die importierten Spielsteine in der Cockatrice Spielsteindatenbank abzuspeichern.</translation>
+    </message>
+    <message>
+        <source>Save to the default path (recommended)</source>
+        <translation>Im Standardverzeichnis abspeichern (Empfohlen)</translation>
+    </message>
+    <message>
+        <source>Save token database</source>
+        <translation>Spielsteindatenbank speichern</translation>
+    </message>
+    <message>
+        <source>XML; token database (*.xml)</source>
+        <translation>XML; Tokendatenbank (*.xml)</translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation>Erfolgreich</translation>
+    </message>
+    <message>
+        <source>The token database has been saved successfully to
+%1</source>
+        <translation>Die Spielsteindatenbank wurde erfolgreich im folgendem Pfad gespeichert:
+%1</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Fehler</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>

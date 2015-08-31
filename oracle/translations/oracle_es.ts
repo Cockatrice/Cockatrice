@@ -15,18 +15,18 @@
     </message>
     <message>
         <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation type="unfinished"/>
+        <translation>Este asistente importará la lista de los sets y cartas que serán usadas por Cocatrice.&lt;br/&gt;Necesitarás especificar la url o el nombre de archivo que será usado como origen y después elegir los sets deseados de la lista de sets disponibles.</translation>
     </message>
 </context>
 <context>
     <name>LoadSetsPage</name>
     <message>
         <source>Source selection</source>
-        <translation type="unfinished"/>
+        <translation>Seleccionar origen</translation>
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor especifica un origen para la lista de sets y cartas. Puedes especificar la url de donde descargarla o usar un archivo existente de tu ordenador.</translation>
     </message>
     <message>
         <source>Download url:</source>
@@ -50,11 +50,11 @@
     </message>
     <message>
         <source>Sets JSON file (*.json *.zip)</source>
-        <translation type="unfinished"/>
+        <translation>Archivo de sets en formato JSON (*.json *.zip)</translation>
     </message>
     <message>
         <source>Sets JSON file (*.json)</source>
-        <translation type="unfinished"/>
+        <translation>Archivo de sets en formato JSON (*.json)</translation>
     </message>
     <message>
         <source>Error</source>
@@ -86,30 +86,69 @@
     </message>
     <message>
         <source>Parsing file</source>
-        <translation type="unfinished"/>
+        <translation>Procesando archivo</translation>
     </message>
     <message>
         <source>Failed to open Zip archive: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Error al abrir el archivo Zip: %1.</translation>
     </message>
     <message>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
-        <translation type="unfinished"/>
+        <translation>Fallo al extraer el contenido: el Zip contiene más de un archivo.</translation>
     </message>
     <message>
         <source>Zip extraction failed: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Error al extraer el contenido del Zip: %1.</translation>
     </message>
     <message>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
-        <translation type="unfinished"/>
+        <translation>Lo sentimos, esta versión de Oracle no soporta archivos comprimidos.</translation>
     </message>
     <message>
         <source>Do you want to try to download a fresh copy of the uncompressed file instead?</source>
-        <translation type="unfinished"/>
+        <translation>¿Prefieres intentar descargar una copia nueva del fichero descomprimido?</translation>
     </message>
     <message>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
+        <translation>El archivo fue cargado correctamente pero no contiene datos sobre ningún set.</translation>
+    </message>
+</context>
+<context>
+    <name>LoadTokensPage</name>
+    <message>
+        <source>Tokens source selection</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download url:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default url</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided url is not valid.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Downloading (0MB)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Downloading (%1MB)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Network error: %1.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -117,14 +156,14 @@
     <name>OracleImporter</name>
     <message>
         <source>Dummy set containing tokens</source>
-        <translation type="unfinished"/>
+        <translation>Set dedicado para tokens</translation>
     </message>
 </context>
 <context>
     <name>OracleWizard</name>
     <message>
         <source>Oracle Importer</source>
-        <translation type="unfinished"/>
+        <translation>Importador de Oracle</translation>
     </message>
     <message>
         <source>Save</source>
@@ -135,15 +174,15 @@
     <name>SaveSetsPage</name>
     <message>
         <source>Sets imported</source>
-        <translation type="unfinished"/>
+        <translation>Sets importados</translation>
     </message>
     <message>
         <source>The following sets has been imported. Press &quot;Save&quot; to save the imported cards to the Cockatrice database.</source>
-        <translation type="unfinished"/>
+        <translation>Los siguientes sets han sido importados. Pulsa &quot;Guardar&quot; para guardar las cartas importadas en la base de datos de Cockatrice.</translation>
     </message>
     <message>
         <source>Save to the default path (recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Guardar en la ruta por defecto (recomendado)</translation>
     </message>
     <message>
         <source>Error</source>
@@ -151,23 +190,23 @@
     </message>
     <message>
         <source>No set has been imported.</source>
-        <translation type="unfinished"/>
+        <translation>Ningún set ha sido importado.</translation>
     </message>
     <message>
         <source>Import finished: %1 cards.</source>
-        <translation type="unfinished"/>
+        <translation>Importación terminada: %1 cartas.</translation>
     </message>
     <message>
         <source>%1: %2 cards imported</source>
-        <translation type="unfinished"/>
+        <translation>%1: %2 cartas importadas</translation>
     </message>
     <message>
         <source>Save card database</source>
-        <translation type="unfinished"/>
+        <translation>Guardar base de datos de cartas</translation>
     </message>
     <message>
         <source>XML; card database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; base de datos de cartas (*.xml)</translation>
     </message>
     <message>
         <source>Success</source>
@@ -176,6 +215,47 @@
     <message>
         <source>The card database has been saved successfully to
 %1</source>
+        <translation>La base de datos de cartas ha sido guardada correctamente en
+%1</translation>
+    </message>
+    <message>
+        <source>The file could not be saved to %1</source>
+        <translation>El archivo no ha podido ser guardado en %1</translation>
+    </message>
+</context>
+<context>
+    <name>SaveTokensPage</name>
+    <message>
+        <source>Tokens imported</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Save to the default path (recommended)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Save token database</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>XML; token database (*.xml)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The token database has been saved successfully to
+%1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Error</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -187,27 +267,27 @@
     <name>UnZip</name>
     <message>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>La operación se ha completado correctamente.</translation>
     </message>
     <message>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Fallo al iniciar o cargar la librería zlib.</translation>
     </message>
     <message>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>Error en la librería zlib.</translation>
     </message>
     <message>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>No se ha podido crear o abrir el archivo.</translation>
     </message>
     <message>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation type="unfinished"/>
+        <translation>Archivo parcialmente dañado. Algunos datos han podido ser extraídos.</translation>
     </message>
     <message>
         <source>Corrupted archive.</source>
-        <translation type="unfinished"/>
+        <translation>Archivo dañado.</translation>
     </message>
     <message>
         <source>Wrong password.</source>
@@ -215,27 +295,27 @@
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>No se ha creado ningún archivo todavía.</translation>
     </message>
     <message>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>El archivo o directorio no existen.</translation>
     </message>
     <message>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Error al leer el archivo.</translation>
     </message>
     <message>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Error al escribir en archivo.</translation>
     </message>
     <message>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Error al buscar en el archivo.</translation>
     </message>
     <message>
         <source>Unable to create a directory.</source>
-        <translation type="unfinished"/>
+        <translation>No es posible crear el directorio.</translation>
     </message>
     <message>
         <source>Invalid device.</source>
@@ -243,11 +323,11 @@
     </message>
     <message>
         <source>Invalid or incompatible zip archive.</source>
-        <translation type="unfinished"/>
+        <translation>Archivo zip inválido o incompatible.</translation>
     </message>
     <message>
         <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation type="unfinished"/>
+        <translation>Cabezeras inconsistentes. El archivo podría estar dañado.</translation>
     </message>
     <message>
         <source>Unknown error.</source>
@@ -258,11 +338,11 @@
     <name>Zip</name>
     <message>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Operación de descompresión completada correctamente.</translation>
     </message>
     <message>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Fallo al iniciar o cargar la librería zlib.</translation>
     </message>
     <message>
         <source>zlib library error.</source>
@@ -274,7 +354,7 @@
     </message>
     <message>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>No se ha creado ningún archivo todavía.</translation>
     </message>
     <message>
         <source>File or directory does not exist.</source>

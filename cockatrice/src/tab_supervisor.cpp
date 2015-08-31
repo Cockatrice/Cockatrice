@@ -1,3 +1,6 @@
+#include <QDebug>
+#include <QPainter>
+#include <QMessageBox>
 #include <QApplication>
 #include "tab_supervisor.h"
 #include "abstractclient.h"
@@ -13,14 +16,12 @@
 #include "pixmapgenerator.h"
 #include "userlist.h"
 #include "settingscache.h"
-#include <QDebug>
-#include <QPainter>
-#include <QMessageBox>
 
 #include "pb/room_commands.pb.h"
 #include "pb/room_event.pb.h"
 #include "pb/game_event_container.pb.h"
 #include "pb/event_user_message.pb.h"
+#include "pb/event_notify_user.pb.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_room.pb.h"
@@ -90,6 +91,7 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
     connect(client, SIGNAL(gameJoinedEventReceived(const Event_GameJoined &)), this, SLOT(gameJoined(const Event_GameJoined &)));
     connect(client, SIGNAL(userMessageEventReceived(const Event_UserMessage &)), this, SLOT(processUserMessageEvent(const Event_UserMessage &)));
     connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
+    connect(client, SIGNAL(notifyUserEventReceived(const Event_NotifyUser &)), this, SLOT(processNotifyUserEvent(const Event_NotifyUser &)));
     
     retranslateUi();
 }
@@ -184,6 +186,7 @@ int TabSupervisor::myAddTab(Tab *tab)
 
 void TabSupervisor::start(const ServerInfo_User &_userInfo)
 {
+    isLocalGame = false;
     userInfo = new ServerInfo_User(_userInfo);
     
     tabServer = new TabServer(this, client);
@@ -227,6 +230,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     tabDeckStorage = 0;
     tabReplays = 0;
     tabAdmin = 0;
+    isLocalGame = true;
     userInfo = new ServerInfo_User;
     localClients = _clients;
     for (int i = 0; i < localClients.size(); ++i)
@@ -557,3 +561,13 @@ bool TabSupervisor::getAdminLocked() const
         return true;
     return tabAdmin->getLocked();
 }
+
+void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
+{
+    switch ((Event_NotifyUser::NotificationType) event.type()) {
+        case Event_NotifyUser::PROMOTED: QMessageBox::information(this, tr("Promotion"), tr("You have been promoted to moderator. Please log out and back in for changes to take effect.")); break;
+        default: ;
+    }
+
+}
+

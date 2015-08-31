@@ -1,8 +1,9 @@
+syntax = "proto2";
 import "session_event.proto";
 
 message Event_UserLeft {
-	extend SessionEvent {
-		optional Event_UserLeft ext = 1008;
-	}
-	optional string name = 1;
+    extend SessionEvent {
+        optional Event_UserLeft ext = 1008;
+    }
+    optional string name = 1;
 }

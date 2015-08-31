@@ -22,6 +22,7 @@ class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;
 class Event_UserMessage;
+class Event_NotifyUser;
 class ServerInfo_Room;
 class ServerInfo_User;
 class GameReplay;
@@ -60,6 +61,7 @@ private:
     void addCloseButtonToTab(Tab *tab, int tabIndex);
     QString sanitizeTabName(QString dirty) const;
     QString sanitizeHtml(QString dirty) const;
+    bool isLocalGame;
 public:
     TabSupervisor(AbstractClient *_client, QWidget *parent = 0);
     ~TabSupervisor();
@@ -67,6 +69,7 @@ public:
     void start(const ServerInfo_User &userInfo);
     void startLocal(const QList<AbstractClient *> &_clients);
     void stop();
+    bool getIsLocalGame() const { return isLocalGame; }
     int getGameCount() const { return gameTabs.size(); }
     TabUserLists *getUserListsTab() const { return tabUserLists; }
     ServerInfo_User *getUserInfo() const { return userInfo; }
@@ -103,6 +106,7 @@ private slots:
     void processRoomEvent(const RoomEvent &event);
     void processGameEventContainer(const GameEventContainer &cont);
     void processUserMessageEvent(const Event_UserMessage &event);
+    void processNotifyUserEvent(const Event_NotifyUser &event);
 };
 
 #endif

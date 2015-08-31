@@ -8,11 +8,13 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QDebug>
+#include <QCompleter>
+#include <QWidget>
 
 #include "dlg_creategame.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
-#include "cardinfowidget.h"
+#include "cardframe.h"
 #include "playerlistwidget.h"
 #include "messagelogwidget.h"
 #include "phasestoolbar.h"
@@ -31,6 +33,7 @@
 #include "settingscache.h"
 #include "carddatabase.h"
 #include "replay_timeline_widget.h"
+#include "lineeditcompleter.h"
 
 #include <google/protobuf/descriptor.h>
 #include "pending_command.h"
@@ -120,12 +123,14 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     setLayout(deckViewLayout);
     
     retranslateUi();
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
 }
 
 void DeckViewContainer::retranslateUi()
 {
-    loadLocalButton->setText(tr("Load &local deck"));
-    loadRemoteButton->setText(tr("Load d&eck from server"));
+    loadLocalButton->setText(tr("Load local deck"));
+    loadRemoteButton->setText(tr("Load deck from server"));
     readyStartButton->setText(tr("Ready to s&tart"));
     updateSideboardLockButtonText();
 }
@@ -144,6 +149,58 @@ void DeckViewContainer::updateSideboardLockButtonText()
         sideboardLockButton->setText(tr("S&ideboard unlocked"));
     else
         sideboardLockButton->setText(tr("S&ideboard locked"));
+}
+
+void DeckViewContainer::refreshShortcuts()
+{
+    loadLocalButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/loadLocalButton"));
+    loadRemoteButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/loadRemoteButton"));
+}
+
+void TabGame::refreshShortcuts()
+{
+    for (int i = 0; i < phaseActions.size(); ++i) {
+        QAction *temp = phaseActions.at(i);
+        switch (i) {
+            case 0: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase0")); break;
+            case 1: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase1")); break;
+            case 2: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase2")); break;
+            case 3: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase3")); break;
+            case 4: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase4")); break;
+            case 5: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase5")); break;
+            case 6: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase6")); break;
+            case 7: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase7")); break;
+            case 8: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase8")); break;
+            case 9: temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase9")); break;
+            case 10:temp->setShortcuts(settingsCache->shortcuts().getShortcut("Player/phase10")); break;
+            default: ;
+        }
+    }
+
+    if (aNextPhase) {
+        aNextPhase->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aNextPhase"));
+    }
+    if (aNextTurn) {
+        aNextTurn->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aNextTurn"));
+    }
+    if (aRemoveLocalArrows) {
+        aRemoveLocalArrows->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aRemoveLocalArrows"));
+    }
+    if (aRotateViewCW) {
+        aRotateViewCW->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aRotateViewCW"));
+    }
+    if (aRotateViewCCW) {
+        aRotateViewCCW->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aRotateViewCCW"));
+    }
+    if (aConcede) {
+        aConcede->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aConcede"));
+    }
+    if (aLeaveGame) {
+        aLeaveGame->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aLeaveGame"));
+    }
+    if (aCloseReplay) {
+        aCloseReplay->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aCloseReplay"));
+    }
 }
 
 void DeckViewContainer::loadLocalDeck()
@@ -280,7 +337,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     gameView = new GameView(scene);
     gameView->hide();
     
-    cardInfo = new CardInfoWidget(CardInfoWidget::ModeGameTab);
+    cardInfo = new CardFrame();
     playerListWidget = new PlayerListWidget(0, 0, this);
     playerListWidget->setFocusPolicy(Qt::NoFocus);
     
@@ -293,6 +350,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     deckViewContainerLayout = new QVBoxLayout;
 
     QVBoxLayout *messageLogLayout = new QVBoxLayout;
+    messageLogLayout->setContentsMargins(0, 0, 0, 0);
     messageLogLayout->addWidget(messageLog);
     
     QWidget *messageLogLayoutWidget = new QWidget;
@@ -342,6 +400,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     aNextPhase = 0;
     aNextTurn = 0;
     aRemoveLocalArrows = 0;
+    aRotateViewCW = 0;
+    aRotateViewCCW = 0;
     aGameInfo = 0;
     aConcede = 0;
     aLeaveGame = 0;
@@ -354,10 +414,13 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     addTabMenu(gameMenu);
     
     retranslateUi();
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
     setLayout(superMainLayout);
 
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
-    
+    splitter->setChildrenCollapsible(false);
+
     messageLog->logReplayStarted(gameInfo.game_id());
 }
 
@@ -390,7 +453,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     gameView = new GameView(scene);
     gameView->hide();
     
-    cardInfo = new CardInfoWidget(CardInfoWidget::ModeGameTab);
+    cardInfo = new CardFrame();
     playerListWidget = new PlayerListWidget(tabSupervisor, clients.first(), this);
     playerListWidget->setFocusPolicy(Qt::NoFocus);
     connect(playerListWidget, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
@@ -403,8 +466,9 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(messageLog, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
+    connect(settingsCache, SIGNAL(chatMentionCompleterChanged()), this, SLOT(actCompleterChanged()));
     sayLabel = new QLabel;
-    sayEdit = new QLineEdit;
+    sayEdit = new LineEditCompleter;
     sayLabel->setBuddy(sayEdit);
 
     QHBoxLayout *hLayout = new QHBoxLayout;
@@ -414,6 +478,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     deckViewContainerLayout = new QVBoxLayout;
 
     QVBoxLayout *messageLogLayout = new QVBoxLayout;
+    messageLogLayout->setContentsMargins(0, 0, 0, 0);
     messageLogLayout->addWidget(timeElapsedLabel);
     messageLogLayout->addWidget(messageLog);
     messageLogLayout->addLayout(hLayout);
@@ -445,6 +510,10 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
     aRemoveLocalArrows = new QAction(this);
     connect(aRemoveLocalArrows, SIGNAL(triggered()), this, SLOT(actRemoveLocalArrows()));
+    aRotateViewCW = new QAction(this);
+    connect(aRotateViewCW, SIGNAL(triggered()), this, SLOT(actRotateViewCW()));
+    aRotateViewCCW = new QAction(this);
+    connect(aRotateViewCCW, SIGNAL(triggered()), this, SLOT(actRotateViewCCW()));
     aGameInfo = new QAction(this);
     connect(aGameInfo, SIGNAL(triggered()), this, SLOT(actGameInfo()));
     aConcede = new QAction(this);
@@ -457,18 +526,10 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     for (int i = 0; i < phasesToolbar->phaseCount(); ++i) {
         QAction *temp = new QAction(QString(), this);
         connect(temp, SIGNAL(triggered()), this, SLOT(actPhaseAction()));
-        switch (i) {
-            case 0: temp->setShortcut(QKeySequence("F5")); break;
-            case 2: temp->setShortcut(QKeySequence("F6")); break;
-            case 3: temp->setShortcut(QKeySequence("F7")); break;
-            case 4: temp->setShortcut(QKeySequence("F8")); break;
-            case 9: temp->setShortcut(QKeySequence("F9")); break;
-            case 10: temp->setShortcut(QKeySequence("F10")); break;
-            default: ;
-        }
         phasesMenu->addAction(temp);
         phaseActions.append(temp);
     }
+
     phasesMenu->addSeparator();
     phasesMenu->addAction(aNextPhase);
     
@@ -478,6 +539,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     gameMenu->addAction(aNextTurn);
     gameMenu->addSeparator();
     gameMenu->addAction(aRemoveLocalArrows);
+    gameMenu->addAction(aRotateViewCW);
+    gameMenu->addAction(aRotateViewCCW);
     gameMenu->addSeparator();
     gameMenu->addAction(aGameInfo);
     gameMenu->addAction(aConcede);
@@ -485,14 +548,28 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     addTabMenu(gameMenu);
     
     retranslateUi();
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    refreshShortcuts();
     setLayout(mainLayout);
 
     splitter->restoreState(settingsCache->getTabGameSplitterSizes());
+    splitter->setChildrenCollapsible(false);
     
     messageLog->logGameJoined(gameInfo.game_id());
 
     for (int i = gameInfo.game_types_size() - 1; i >= 0; i--)
         gameTypes.append(roomGameTypes.find(gameInfo.game_types(i)).value());
+
+    completer = new QCompleter(autocompleteUserList, sayEdit);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setMaxVisibleItems(5);
+
+    #if QT_VERSION >= 0x050000
+        completer->setFilterMode(Qt::MatchStartsWith);
+    #endif
+
+    sayEdit->setCompleter(completer);
+    actCompleterChanged();
 }
 
 void TabGame::addMentionTag(QString value) {
@@ -531,29 +608,29 @@ void TabGame::retranslateUi()
     gameMenu->setTitle(tr("&Game"));
     if (aNextPhase) {
         aNextPhase->setText(tr("Next &phase"));
-        aNextPhase->setShortcuts(QList<QKeySequence>() << QKeySequence("Ctrl+Space") << QKeySequence("Tab"));
     }
     if (aNextTurn) {
         aNextTurn->setText(tr("Next &turn"));
-        aNextTurn->setShortcuts(QList<QKeySequence>() << QKeySequence("Ctrl+Return") << QKeySequence("Ctrl+Enter"));
     }
     if (aRemoveLocalArrows) {
         aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
-        aRemoveLocalArrows->setShortcut(QKeySequence("Ctrl+R"));
+    }
+    if (aRotateViewCW) {
+        aRotateViewCW->setText(tr("Rotate View Cl&ockwise"));
+    }
+    if (aRotateViewCCW) {
+        aRotateViewCCW->setText(tr("Rotate View Co&unterclockwise"));
     }
     if (aGameInfo)
         aGameInfo->setText(tr("Game &information"));
     if (aConcede) {
         aConcede->setText(tr("&Concede"));
-        aConcede->setShortcut(QKeySequence("F2"));
     }
     if (aLeaveGame) {
         aLeaveGame->setText(tr("&Leave game"));
-        aLeaveGame->setShortcut(QKeySequence("Ctrl+Q"));
     }
     if (aCloseReplay) {
         aCloseReplay->setText(tr("C&lose replay"));
-        aCloseReplay->setShortcut(QKeySequence("Ctrl+Q"));
     }
     
     if (sayLabel)
@@ -659,6 +736,9 @@ void TabGame::actLeaveGame()
 
 void TabGame::actSay()
 {
+    if (completer->popup()->isVisible())
+        return;
+
     if (!sayEdit->text().isEmpty()) {
         Command_GameSay cmd;
         cmd.set_message(sayEdit->text().toStdString());
@@ -707,11 +787,31 @@ void TabGame::actRemoveLocalArrows()
     }
 }
 
+void TabGame::actRotateViewCW()
+{
+    scene->adjustPlayerRotation(-1);
+}
+
+void TabGame::actRotateViewCCW()
+{
+    scene->adjustPlayerRotation(1);
+}
+
+void TabGame::actCompleterChanged()
+{
+    settingsCache->getChatMentionCompleter() ? completer->setCompletionRole(2) : completer->setCompletionRole(1);
+}
+
 Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
 {
     bool local = ((clients.size() > 1) || (playerId == localPlayerId));
     Player *newPlayer = new Player(info, playerId, local, this);
     connect(newPlayer, SIGNAL(openDeckEditor(const DeckLoader *)), this, SIGNAL(openDeckEditor(const DeckLoader *)));
+    QString newPlayerName = "@" + newPlayer->getName();
+    if (!autocompleteUserList.contains(newPlayerName)){
+        autocompleteUserList << newPlayerName;
+        sayEdit->setCompletionList(autocompleteUserList);
+    }
     scene->addPlayer(newPlayer);
 
     connect(newPlayer, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
@@ -731,7 +831,6 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
     
     players.insert(playerId, newPlayer);
     emit playerAdded(newPlayer);
-
     return newPlayer;
 }
 
@@ -906,6 +1005,9 @@ void TabGame::eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, c
 
 void TabGame::eventSpectatorLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
 {
+    QString playerName = "@" + QString::fromStdString(spectators.value(eventPlayerId).name());
+    if (autocompleteUserList.removeOne(playerName))
+        sayEdit->setCompletionList(autocompleteUserList);
     messageLog->logLeaveSpectator(QString::fromStdString(spectators.value(eventPlayerId).name()));
     playerListWidget->removePlayer(eventPlayerId);
     spectators.remove(eventPlayerId);
@@ -920,6 +1022,11 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
         const ServerInfo_Player &playerInfo = event.player_list(i);
         const ServerInfo_PlayerProperties &prop = playerInfo.properties();
         const int playerId = prop.player_id();
+        QString playerName = "@" + QString::fromStdString(prop.user_info().name());
+        if (!autocompleteUserList.contains(playerName)){
+            autocompleteUserList << playerName;
+            sayEdit->setCompletionList(autocompleteUserList);
+        }
         if (prop.spectator()) {
             if (!spectators.contains(playerId)) {
                 spectators.insert(playerId, prop.user_info());
@@ -1027,11 +1134,18 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
 {
     const ServerInfo_PlayerProperties &playerInfo = event.player_properties();
     const int playerId = playerInfo.player_id();
+    QString playerName = QString::fromStdString(playerInfo.user_info().name());
+    if (!autocompleteUserList.contains("@" + playerName)){
+        autocompleteUserList << "@" + playerName;
+        sayEdit->setCompletionList(autocompleteUserList);
+    }
+
     if (players.contains(playerId))
         return;
+    
     if (playerInfo.spectator()) {
         spectators.insert(playerId, playerInfo.user_info());
-        messageLog->logJoinSpectator(QString::fromStdString(playerInfo.user_info().name()));
+        messageLog->logJoinSpectator(playerName);
     } else {
         Player *newPlayer = addPlayer(playerId, playerInfo.user_info());
         messageLog->logJoin(newPlayer);
@@ -1046,6 +1160,10 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     if (!player)
         return;
     
+    QString playerName = "@" + player->getName();
+    if(autocompleteUserList.removeOne(playerName))
+        sayEdit->setCompletionList(autocompleteUserList);
+
     messageLog->logLeave(player);
     playerListWidget->removePlayer(eventPlayerId);
     players.remove(eventPlayerId);

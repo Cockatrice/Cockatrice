@@ -27,10 +27,12 @@ private:
     QAction *aAddToIgnoreList, *aRemoveFromIgnoreList;
     QAction *aKick;
     QAction *aBan;
+    QAction *aPromoteToMod, *aDemoteFromMod;
 signals:
     void openMessageDialog(const QString &userName, bool focus);
 private slots:
     void banUser_processUserInfoResponse(const Response &resp);
+    void adjustMod_processUserResponse(const Response &resp, const CommandContainer &commandContainer);
     void banUser_dialogFinished();
     void gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer);
 public:

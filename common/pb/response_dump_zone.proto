@@ -1,9 +1,10 @@
+syntax = "proto2";
 import "response.proto";
 import "serverinfo_zone.proto";
 
 message Response_DumpZone {
-	extend Response {
-		optional Response_DumpZone ext = 1004;
-	}
-	optional ServerInfo_Zone zone_info = 1;
+    extend Response {
+        optional Response_DumpZone ext = 1004;
+    }
+    optional ServerInfo_Zone zone_info = 1;
 }

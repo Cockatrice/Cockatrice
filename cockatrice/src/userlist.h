@@ -24,8 +24,8 @@ class BanDialog : public QDialog {
     Q_OBJECT
 private:
     QLabel *daysLabel, *hoursLabel, *minutesLabel;
-    QCheckBox *nameBanCheckBox, *ipBanCheckBox;
-    QLineEdit *nameBanEdit, *ipBanEdit;
+    QCheckBox *nameBanCheckBox, *ipBanCheckBox, *idBanCheckBox;
+    QLineEdit *nameBanEdit, *ipBanEdit, *idBanEdit;
     QSpinBox *daysEdit, *hoursEdit, *minutesEdit;
     QRadioButton *permanentRadio, *temporaryRadio;
     QPlainTextEdit *reasonEdit, *visibleReasonEdit;
@@ -36,6 +36,7 @@ public:
     BanDialog(const ServerInfo_User &info, QWidget *parent = 0);
     QString getBanName() const;
     QString getBanIP() const;
+    QString getBanId() const;
     int getMinutes() const;
     QString getReason() const;
     QString getVisibleReason() const;
