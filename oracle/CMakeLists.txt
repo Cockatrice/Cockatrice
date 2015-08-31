@@ -14,6 +14,7 @@ SET(oracle_SOURCES
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/settingscache.cpp
     ../cockatrice/src/shortcutssettings.cpp
+    ../cockatrice/src/thememanager.cpp 
     ../cockatrice/src/qt-json/json.cpp
  )
 

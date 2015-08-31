@@ -49,7 +49,7 @@ private:
     static const int BOX_LINE_WIDTH = 10;
 
     /*
-    Default background color, inactive mask and boarder gradient 
+    Default inactive mask and border gradient
     */
     static const QColor BACKGROUND_COLOR;
     static const QColor FADE_MASK;
@@ -84,7 +84,7 @@ private slots:
     /**
        Loads in any found custom background and updates
      */
-    void updateBgPixmap();
+    void updateBg();
 
 public slots:
     /**

@@ -1,5 +1,7 @@
 #include "carddatabase.h"
 #include "settingscache.h"
+#include "thememanager.h"
+
 #include <QCryptographicHash>
 #include <QDir>
 #include <QDirIterator>
@@ -642,7 +644,7 @@ void CardInfo::loadPixmap(QPixmap &pixmap)
     pixmap = QPixmap();
 
     if (getName().isEmpty()) {
-        pixmap.load(settingsCache->getCardBackPicturePath());
+        pixmap = themeManager->getCardBackPixmap();
         return;
     }
 
@@ -672,15 +674,15 @@ void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
     QPixmap bigPixmap;
     loadPixmap(bigPixmap);
     if (bigPixmap.isNull()) {
-        if (!getName().isEmpty()) {
-            pixmap = QPixmap(); // null
-            return;
-        } else {
-            QSvgRenderer svg(QString(":/back.svg"));
+        if (getName().isEmpty()) {
+            QSvgRenderer svg(QString("theme:back.svg"));
             bigPixmap = QPixmap(svg.defaultSize());
             bigPixmap.fill(Qt::transparent);
             QPainter painter(&bigPixmap);
             svg.render(&painter);
+        } else {
+            pixmap = QPixmap(); // null
+            return;
         }
     }
 
@@ -808,7 +810,7 @@ CardDatabase::CardDatabase(QObject *parent)
     noCard = new CardInfo(this);
     QPixmap tmp;
     noCard->loadPixmap(tmp); // cache pixmap for card back
-    connect(settingsCache, SIGNAL(cardBackPicturePathChanged()), noCard, SLOT(updatePixmapCache()));
+    connect(themeManager, SIGNAL(themeChanged()), noCard, SLOT(updatePixmapCache()));
 }
 
 CardDatabase::~CardDatabase()
