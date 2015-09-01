@@ -1,8 +1,9 @@
+syntax = "proto2";
 import "game_event.proto";
 
 message Event_GameHostChanged {
-	extend GameEvent {
-		optional Event_GameHostChanged ext = 1003;
-	}
+    extend GameEvent {
+        optional Event_GameHostChanged ext = 1003;
+    }
 }
  

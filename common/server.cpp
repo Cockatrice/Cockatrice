@@ -111,8 +111,6 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
     Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
 
-    QWriteLocker locker(&clientsLock);
-
     AuthenticationResult authState = databaseInterface->checkUserPassword(session, name, password, clientid, reasonStr, secondsLeft);
     if (authState == NotLoggedIn || authState == UserIsBanned || authState == UsernameInvalid || authState == UserIsInactive)
         return authState;
@@ -121,24 +119,25 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     data.set_address(session->getAddress().toStdString());
     name = QString::fromStdString(data.name()); // Compensate for case indifference
 
-    databaseInterface->lockSessionTables();
-
     if (authState == PasswordRight) {
-
-        // verify that new session would not cause problems with older existing session
         if (users.contains(name) || databaseInterface->userSessionExists(name)) {
-            qDebug("Session already logged in, logging old session out");
+            if (users.contains(name)) {
+                qDebug("Session already logged in, logging old session out");
+                Event_ConnectionClosed event;
+                event.set_reason(Event_ConnectionClosed::LOGGEDINELSEWERE);
+                event.set_reason_str("You have been logged out due to logging in at another location.");
+                event.set_end_time(QDateTime::currentDateTime().toTime_t());
 
-            Event_ConnectionClosed event;
-            event.set_reason(Event_ConnectionClosed::LOGGEDINELSEWERE);
-            event.set_reason_str("You have been logged out due to logging in at another location.");
-            event.set_end_time(QDateTime::currentDateTime().toTime_t());
+                SessionEvent *se = users.value(name)->prepareSessionEvent(event);
+                users.value(name)->sendProtocolItem(*se);
+                delete se;
 
-            SessionEvent *se = users.value(name)->prepareSessionEvent(event);
-            users.value(name)->sendProtocolItem(*se);
-            delete se;
-
+                users.value(name)->prepareDestroy();
+            } else {
+                qDebug() << "Active session and sessions table inconsistent, please validate session table information for user " << name;
+            }
         }
+
     } else if (authState == UnknownUser) {
         // Change user name so that no two users have the same names,
         // don't interfere with registered user names though.
@@ -156,6 +155,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
         data.set_name(name.toStdString());
     }
 
+    QWriteLocker locker(&clientsLock);
+    databaseInterface->lockSessionTables();
     users.insert(name, session);
     qDebug() << "Server::loginUser:" << session << "name=" << name;
 

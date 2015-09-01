@@ -1,3 +1,4 @@
+syntax = "proto2";
 message Response {
     enum ResponseCode {
         RespNotConnected = -1;

@@ -1,8 +1,9 @@
+syntax = "proto2";
 import "game_commands.proto";
 message Command_RollDie {
-	extend GameCommand {
-		optional Command_RollDie ext = 1005;
-	}
-	optional uint32 sides = 1;
+    extend GameCommand {
+        optional Command_RollDie ext = 1005;
+    }
+    optional uint32 sides = 1;
 }
 

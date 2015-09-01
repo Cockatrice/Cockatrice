@@ -1,9 +1,10 @@
+syntax = "proto2";
 import "session_event.proto";
 
 message Event_ServerShutdown {
-	extend SessionEvent {
-		optional Event_ServerShutdown ext = 1001;
-	}
-	optional string reason = 1;
-	optional uint32 minutes = 2;
+    extend SessionEvent {
+        optional Event_ServerShutdown ext = 1001;
+    }
+    optional string reason = 1;
+    optional uint32 minutes = 2;
 }

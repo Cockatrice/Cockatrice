@@ -3,6 +3,7 @@
 #include "arrowitem.h"
 #include "stackzone.h"
 #include "settingscache.h"
+#include "thememanager.h"
 #include "player.h"
 #include "carddragitem.h"
 #include "carditem.h"
@@ -12,16 +13,13 @@
 StackZone::StackZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_p, "stack", false, false, true, parent), zoneHeight(_zoneHeight)
 {
-    connect(settingsCache, SIGNAL(stackBgPathChanged()), this, SLOT(updateBgPixmap()));
-    updateBgPixmap();
+    connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
+    updateBg();
     setCacheMode(DeviceCoordinateCache);
 }
 
-void StackZone::updateBgPixmap()
+void StackZone::updateBg()
 {
-    QString bgPath = settingsCache->getStackBgPath();
-    if (!bgPath.isEmpty())
-        bgPixmap.load(bgPath);
     update();
 }
 
@@ -48,10 +46,7 @@ QRectF StackZone::boundingRect() const
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    if (bgPixmap.isNull())
-        painter->fillRect(boundingRect(), QColor(113, 43, 43));
-    else
-        painter->fillRect(boundingRect(), QBrush(bgPixmap));
+    painter->fillRect(boundingRect(), themeManager->getStackBgBrush());
 }
 
 void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/)

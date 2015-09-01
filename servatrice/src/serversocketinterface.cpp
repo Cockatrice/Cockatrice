@@ -777,7 +777,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
         userList.append(user);
     }
 
-    if (userName.isEmpty() && address.isEmpty()) {
+    if (userName.isEmpty() && address.isEmpty() && (!QString::fromStdString(cmd.clientid()).isEmpty())) {
         QSqlQuery *query = sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
         query->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
         sqlInterface->execSqlQuery(query);

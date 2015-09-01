@@ -177,11 +177,10 @@ void IntroPage::languageBoxChanged(int index)
 void IntroPage::retranslateUi()
 {
     setTitle(tr("Introduction"));
-    label->setText(tr("This wizard will import the list of sets and cards "
-                          "that will be used by Cockatrice.<br/>You will need to "
-                          "specify an url or a filename that will be used as a "
-                          "source, and then choose the wanted sets from the list "
-                          "of the available ones."));
+    label->setText(tr("This wizard will import the list of sets, cards, and tokens "
+                      "that will be used by Cockatrice."
+                      "\nYou will need to specify a URL or a filename that "
+                      "will be used as a source."));
     languageLabel->setText(tr("Language:"));
 }
 
@@ -232,12 +231,12 @@ void LoadSetsPage::retranslateUi()
 {
     setTitle(tr("Source selection"));
     setSubTitle(tr("Please specify a source for the list of sets and cards. "
-                   "You can specify an url address that will be download or "
+                   "You can specify a URL address that will be downloaded or "
                    "use an existing file from your computer."));
 
-    urlRadioButton->setText(tr("Download url:"));
+    urlRadioButton->setText(tr("Download URL:"));
     fileRadioButton->setText(tr("Local file:"));
-    urlButton->setText(tr("Restore default url"));
+    urlButton->setText(tr("Restore default URL"));
     fileButton->setText(tr("Choose file..."));
 }
 
@@ -278,7 +277,7 @@ bool LoadSetsPage::validatePage()
         QUrl url = QUrl::fromUserInput(urlLineEdit->text());
         if(!url.isValid())
         {
-            QMessageBox::critical(this, tr("Error"), tr("The provided url is not valid."));
+            QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
             return false;
         }
 
@@ -606,11 +605,11 @@ void LoadTokensPage::retranslateUi()
 {
     setTitle(tr("Tokens source selection"));
     setSubTitle(tr("Please specify a source for the list of tokens. "
-                   "You can specify an url address that will be download or "
+                   "You can specify a URL address that will be downloaded or "
                    "use an existing file from your computer."));
 
-    urlLabel->setText(tr("Download url:"));
-    urlButton->setText(tr("Restore default url"));
+    urlLabel->setText(tr("Download URL:"));
+    urlButton->setText(tr("Restore default URL"));
 }
 
 void LoadTokensPage::actRestoreDefaultUrl()
@@ -627,7 +626,7 @@ bool LoadTokensPage::validatePage()
     QUrl url = QUrl::fromUserInput(urlLineEdit->text());
     if(!url.isValid())
     {
-        QMessageBox::critical(this, tr("Error"), tr("The provided url is not valid."));
+        QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
         return false;
     }
 

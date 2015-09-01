@@ -7,9 +7,11 @@
 #include "main.h"
 #include "oraclewizard.h"
 #include "settingscache.h"
+#include "thememanager.h"
 
 QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;
+ThemeManager *themeManager;
 
 const QString translationPrefix = "oracle";
 #ifdef TRANSLATION_PATH
@@ -51,6 +53,7 @@ int main(int argc, char *argv[])
     }
 
 	settingsCache = new SettingsCache;
+    themeManager = new ThemeManager;
 
     qtTranslator = new QTranslator;
     translator = new QTranslator;
@@ -58,7 +61,7 @@ int main(int argc, char *argv[])
 
 	OracleWizard wizard;
 
-    QIcon icon(":/resources/appicon.svg");
+    QIcon icon("theme:appicon.svg");
     wizard.setWindowIcon(icon);
 
 	wizard.show();

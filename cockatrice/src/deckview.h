@@ -53,7 +53,6 @@ private:
     QMultiMap<QString, DeckViewCard *> cardsByType;
     QList<QPair<int, int> > currentRowsAndCols;
     qreal width, height;
-    QPixmap bgPixmap;
     int getCardTypeTextWidth() const;
 public:
     enum { Type = typeDeckViewCardContainer };

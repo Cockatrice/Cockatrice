@@ -1,7 +1,8 @@
+syntax = "proto2";
 import "game_event_context.proto";
 
 message Context_ConnectionStateChanged {
-	extend GameEventContext {
-		optional Context_ConnectionStateChanged ext = 1007;
-	}
+    extend GameEventContext {
+        optional Context_ConnectionStateChanged ext = 1007;
+    }
 }

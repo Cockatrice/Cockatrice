@@ -125,31 +125,31 @@
     </message>
     <message>
         <source>Download url:</source>
-        <translation type="unfinished"/>
+        <translation>URL de téléchargement:</translation>
     </message>
     <message>
         <source>Restore default url</source>
-        <translation type="unfinished"/>
+        <translation>Restaurer l&apos;URL par défaut</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Érreur</translation>
     </message>
     <message>
         <source>The provided url is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;URL fournit est non valide.</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>Téléchargement (0MB)</translation>
     </message>
     <message>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>Téléchargement (%1MB)</translation>
     </message>
     <message>
         <source>Network error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Erreur réseau : %1.</translation>
     </message>
 </context>
 <context>
@@ -235,19 +235,19 @@
     </message>
     <message>
         <source>Save to the default path (recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Sauvergarder au chemin par défaut (recommendé)</translation>
     </message>
     <message>
         <source>Save token database</source>
-        <translation type="unfinished"/>
+        <translation>Sauvegarder la base des jetons</translation>
     </message>
     <message>
         <source>XML; token database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; bases de données des jetons (*.xml)</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Réussite</translation>
     </message>
     <message>
         <source>The token database has been saved successfully to
@@ -256,7 +256,7 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Érreur</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>

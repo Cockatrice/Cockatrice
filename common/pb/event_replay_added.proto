@@ -1,9 +1,10 @@
+syntax = "proto2";
 import "session_event.proto";
 import "serverinfo_replay_match.proto";
 
 message Event_ReplayAdded {
-	extend SessionEvent {
-		optional Event_ReplayAdded ext = 1100;
-	}
-	optional ServerInfo_ReplayMatch match_info = 1;
+    extend SessionEvent {
+        optional Event_ReplayAdded ext = 1100;
+    }
+    optional ServerInfo_ReplayMatch match_info = 1;
 }

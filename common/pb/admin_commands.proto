@@ -1,38 +1,39 @@
+syntax = "proto2";
 message AdminCommand {
-	enum AdminCommandType {
-		UPDATE_SERVER_MESSAGE = 1000;
-		SHUTDOWN_SERVER = 1001;
-		RELOAD_CONFIG = 1002;
-		ADJUST_MOD = 1003;
-	}
-	extensions 100 to max;
+    enum AdminCommandType {
+        UPDATE_SERVER_MESSAGE = 1000;
+        SHUTDOWN_SERVER = 1001;
+        RELOAD_CONFIG = 1002;
+        ADJUST_MOD = 1003;
+    }
+    extensions 100 to max;
 }
 
 message Command_UpdateServerMessage {
-	extend AdminCommand {
-		optional Command_UpdateServerMessage ext = 1000;
-	}
+    extend AdminCommand {
+        optional Command_UpdateServerMessage ext = 1000;
+    }
 }
 
 message Command_ShutdownServer {
-	extend AdminCommand {
-		optional Command_ShutdownServer ext = 1001;
-	}
-	optional string reason = 1;
-	optional uint32 minutes = 2;
+    extend AdminCommand {
+        optional Command_ShutdownServer ext = 1001;
+    }
+    optional string reason = 1;
+    optional uint32 minutes = 2;
 }
 
 message Command_ReloadConfig {
-	extend AdminCommand {
-		optional Command_ReloadConfig ext = 1002;
-	}
+    extend AdminCommand {
+        optional Command_ReloadConfig ext = 1002;
+    }
 }
 
 message Command_AdjustMod {
-	extend AdminCommand {
-		optional Command_AdjustMod ext = 1003;
-	}
-	required string user_name = 1;
-	required bool should_be_mod = 2;
+    extend AdminCommand {
+        optional Command_AdjustMod ext = 1003;
+    }
+    required string user_name = 1;
+    required bool should_be_mod = 2;
 }
 
