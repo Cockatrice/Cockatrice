@@ -33,6 +33,7 @@
 #include "rng_sfmt.h"
 #include "version_string.h"
 #include <google/protobuf/stubs/common.h>
+#include <qcommandlineparser.h>
 
 RNG_Abstract *rng;
 ServerLogger *logger;
@@ -45,13 +46,8 @@ SmtpClient *smtpClient;
 
 void testRNG();
 void testHash();
-#if QT_VERSION < 0x050000
-void myMessageOutput(QtMsgType type, const char *msg);
-void myMessageOutput2(QtMsgType type, const char *msg);
-#else
 void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &msg);
 void myMessageOutput2(QtMsgType type, const QMessageLogContext &, const QString &msg);
-#endif
 
 /* Implementations */
 
@@ -100,18 +96,6 @@ void testHash()
 	std::cerr << startTime.secsTo(endTime) << "secs" << std::endl;
 }
 
-#if QT_VERSION < 0x050000
-void myMessageOutput(QtMsgType /*type*/, const char *msg)
-{
-	logger->logMessage(msg);
-}
-
-void myMessageOutput2(QtMsgType /*type*/, const char *msg)
-{
-	logger->logMessage(msg);
-	std::cerr << msg << std::endl;
-}
-#else
 void myMessageOutput(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
 {
 	logger->logMessage(msg);
@@ -122,29 +106,44 @@ void myMessageOutput2(QtMsgType /*type*/, const QMessageLogContext &, const QStr
 	logger->logMessage(msg);
 	std::cerr << msg.toStdString() << std::endl;
 }
-#endif
 
 int main(int argc, char *argv[])
 {
 	QCoreApplication app(argc, argv);
 	app.setOrganizationName("Cockatrice");
 	app.setApplicationName("Servatrice");
-	
-	QStringList args = app.arguments();
-	bool testRandom = args.contains("--test-random");
-	bool testHashFunction = args.contains("--test-hash");
-	bool logToConsole = args.contains("--log-to-console");
+	app.setApplicationVersion(VERSION_STRING);
+
+	bool testRandom = false;
+	bool testHashFunction = false;
+	bool logToConsole = false;
 	QString configPath;
-	int hasConfigPath=args.indexOf("--config");
-	if(hasConfigPath > -1 && args.count() > hasConfigPath + 1)
-		configPath = args.at(hasConfigPath + 1);
+
+	QCommandLineParser parser;
+	parser.addHelpOption();
+	parser.addVersionOption();
+
+	QCommandLineOption testRandomOpt("test-random", "Test PRNG (chi^2)");
+	parser.addOption(testRandomOpt);
+
+	QCommandLineOption testHashFunctionOpt("test-hash", "Test password hash function");
+	parser.addOption(testHashFunctionOpt);
+
+	QCommandLineOption logToConsoleOpt("log-to-console", "Write server logs to console");
+	parser.addOption(logToConsoleOpt);
+
+	QCommandLineOption configPathOpt("config", "Read server configuration from <file>", "file", "");
+	parser.addOption(configPathOpt);
+
+	parser.process(app);
+
+	testRandom = parser.isSet(testRandomOpt);
+	testHashFunction = parser.isSet(testHashFunctionOpt);
+	logToConsole = parser.isSet(logToConsoleOpt);
+	configPath = parser.value(configPathOpt);
+
 	
 	qRegisterMetaType<QList<int> >("QList<int>");
-
-#if QT_VERSION < 0x050000
-	// gone in Qt5, all source files _MUST_ be utf8-encoded
-	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-#endif
 
 	configPath = SettingsCache::guessConfigurationPath(configPath);
 	qWarning() << "Using configuration file: " << configPath;
@@ -158,17 +157,10 @@ int main(int argc, char *argv[])
 	loggerThread->start();
 	QMetaObject::invokeMethod(logger, "startLog", Qt::BlockingQueuedConnection, Q_ARG(QString, settingsCache->value("server/logfile", QString("server.log")).toString()));
 
-#if QT_VERSION < 0x050000
-	if (logToConsole)
-		qInstallMsgHandler(myMessageOutput);
-	else
-		qInstallMsgHandler(myMessageOutput2);
-#else
 	if (logToConsole)
 		qInstallMessageHandler(myMessageOutput);
 	else
 		qInstallMessageHandler(myMessageOutput2);
-#endif
 
 	signalhandler = new SignalHandler();
 
@@ -193,11 +185,8 @@ int main(int argc, char *argv[])
 		std::cerr << "-------------------------" << std::endl;
 		std::cerr << "Server initialized." << std::endl;
 
-#if QT_VERSION < 0x050000		
-		qInstallMsgHandler(myMessageOutput);
-#else
 		qInstallMessageHandler(myMessageOutput);
-#endif
+
 		retval = app.exec();
 		
 		std::cerr << "Server quit." << std::endl;

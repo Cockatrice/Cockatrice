@@ -28,10 +28,6 @@
 
 #include <QtGlobal>
 
-#if QT_VERSION < 0x040300
-#   warning QxtHmac requires Qt 4.3.0 or greater
-#else
-
 #include <QCryptographicHash>
 #include "qxtglobal.h"
 
@@ -60,5 +56,4 @@ private:
     QXT_DECLARE_PRIVATE(QxtHmac)
 };
 
-#endif
 #endif
