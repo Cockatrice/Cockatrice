@@ -11,7 +11,7 @@
 
 QString SettingsCache::getSettingsPath()
 {
-    QString file = qApp->applicationDirPath() + "settings/";
+    QString file = qApp->applicationDirPath() + "/settings/";
 
 #ifndef PORTABLE_BUILD
     #if QT_VERSION >= 0x050000
