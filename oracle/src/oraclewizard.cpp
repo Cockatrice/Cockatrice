@@ -516,7 +516,7 @@ bool SaveSetsPage::validatePage()
         dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
 #else
-    dataDir = "data";
+    dataDir =  qApp->applicationDirPath() + "/data";
 #endif
 
 #ifdef PORTABLE_BUILD
@@ -731,7 +731,7 @@ bool SaveTokensPage::validatePage()
         dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
 #else
-    dataDir = "data";
+    dataDir = qApp->applicationDirPath() + "/data";
 #endif
 
 #ifdef PORTABLE_BUILD
