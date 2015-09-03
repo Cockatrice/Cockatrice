@@ -1,6 +1,7 @@
 #include "settingscache.h"
 #include <QSettings>
 #include <QFile>
+#include <QApplication>
 
 #if QT_VERSION >= 0x050000
     #include <QStandardPaths>
@@ -10,7 +11,7 @@
 
 QString SettingsCache::getSettingsPath()
 {
-    QString file = "settings/";
+    QString file = qApp->applicationDirPath() + "settings/";
 
 #ifndef PORTABLE_BUILD
     #if QT_VERSION >= 0x050000
@@ -26,7 +27,9 @@ QString SettingsCache::getSettingsPath()
 
 void SettingsCache::translateLegacySettings()
 {
-    //NOTE Please remove this legacy setting translation after 2016-9-1 (+1 year after creation)
+#ifdef PORTABLE_BUILD
+    return;
+#endif
 
     //Layouts
     QFile layoutFile(getSettingsPath()+"layouts/deckLayout.ini");
@@ -129,6 +132,13 @@ SettingsCache::SettingsCache()
 
     if(!QFile(settingsPath+"global.ini").exists())
         translateLegacySettings();
+
+#ifdef PORTABLE_BUILD
+    setDeckPath(qApp->applicationDirPath() + "data/decks");
+    setReplaysPath(qApp->applicationDirPath() +"data/replays");
+    setPicsPath(qApp->applicationDirPath() +  "data/pics");
+    setSoundPath(qApp->applicationDirPath() +"data/sounds");
+#endif
 
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     lang = settings->value("personal/lang").toString();
