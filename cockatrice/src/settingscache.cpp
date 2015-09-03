@@ -26,7 +26,13 @@ QString SettingsCache::getSettingsPath()
 
 void SettingsCache::translateLegacySettings()
 {
-    //NOTE Please remove this legacy setting translation after 2016-9-1 (+1 year after creation)
+#ifdef PORTABLE_BUILD
+    setDeckPath("data/decks");
+    setReplaysPath("data/replays");
+    setPicsPath("data/pics");
+    setSoundPath("data/sounds");
+    return;
+#endif
 
     //Layouts
     QFile layoutFile(getSettingsPath()+"layouts/deckLayout.ini");
