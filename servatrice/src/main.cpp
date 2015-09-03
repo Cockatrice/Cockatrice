@@ -198,6 +198,7 @@ int main(int argc, char *argv[])
 #else
 		qInstallMessageHandler(myMessageOutput);
 #endif
+
 		retval = app.exec();
 		
 		std::cerr << "Server quit." << std::endl;

@@ -3,21 +3,19 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
-#include <QSettings>
 
+#include "settingscache.h"
 #include "dlg_edit_password.h"
 
 DlgEditPassword::DlgEditPassword(QWidget *parent)
     : QDialog(parent)
 {
-    QSettings settings;
-    settings.beginGroup("server");
 
     oldPasswordLabel = new QLabel(tr("Old password:"));
     oldPasswordEdit = new QLineEdit();
 
-    if(settings.value("save_password", 1).toInt())
-        oldPasswordEdit->setText(settings.value("password").toString());
+    if(settingsCache->servers().getSavePassword())
+        oldPasswordEdit->setText(settingsCache->servers().getPassword());
 
     oldPasswordLabel->setBuddy(oldPasswordEdit);
     oldPasswordEdit->setEchoMode(QLineEdit::Password);
@@ -62,12 +60,8 @@ void DlgEditPassword::actOk()
         return;
     }
 
-    QSettings settings;
-    settings.beginGroup("server");
     // always save the password so it will be picked up by the connect dialog
-    settings.setValue("password", newPasswordEdit->text());
-    settings.endGroup();
-  
+    settingsCache->servers().setPassword(newPasswordEdit->text());
     accept();
 }
 

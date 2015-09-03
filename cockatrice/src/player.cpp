@@ -21,7 +21,6 @@
 #include "color.h"
 #include "deck_loader.h"
 #include "main.h"
-#include <QSettings>
 #include <QPainter>
 #include <QMenu>
 #include <QDebug>
@@ -826,12 +825,10 @@ void Player::initSayMenu()
 {
     sayMenu->clear();
 
-    QSettings settings;
-    settings.beginGroup("messages");
-    int count = settings.value("count", 0).toInt();
+    int count = settingsCache->messages().getCount();
 
     for (int i = 0; i < count; i++) {
-        QAction *newAction = new QAction(settings.value(QString("msg%1").arg(i)).toString(), this);
+        QAction *newAction = new QAction(settingsCache->messages().getMessageAt(i), this);
         if (i <= 10){
             newAction->setShortcut(QKeySequence("Ctrl+" + QString::number((i + 1) % 10)));
         }

@@ -51,10 +51,10 @@ public:
     Server_AbstractUserInterface *findUser(const QString &userName) const;
     const QMap<QString, Server_ProtocolHandler *> &getUsers() const { return users; }
     const QMap<qint64, Server_ProtocolHandler *> &getUsersBySessionId() const { return usersBySessionId; }
+    virtual QMap<QString, bool> getServerRequiredFeatureList() const { return QMap<QString, bool>(); }
     void addClient(Server_ProtocolHandler *player);
     void removeClient(Server_ProtocolHandler *player);
     virtual QString getLoginMessage() const { return QString(); }
-
     virtual bool permitUnregisteredUsers() const { return true; }
     virtual bool getGameShouldPing() const { return false; }
     virtual bool getClientIdRequired() const { return false; }
@@ -94,6 +94,7 @@ private:
     mutable QReadWriteLock persistentPlayersLock;
     int nextLocalGameId;
     QMutex nextLocalGameIdMutex;
+
 protected slots:
     void externalUserJoined(const ServerInfo_User &userInfo);
     void externalUserLeft(const QString &userName);

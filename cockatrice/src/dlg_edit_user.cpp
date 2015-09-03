@@ -1,4 +1,3 @@
-#include <QSettings>
 #include <QLabel>
 #include <QGridLayout>
 #include <QHBoxLayout>

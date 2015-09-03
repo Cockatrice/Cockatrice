@@ -32,6 +32,7 @@
 #include "pb/session_event.pb.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/isl_message.pb.h"
+#include "featureset.h"
 #include <QCoreApplication>
 #include <QThread>
 #include <QDebug>

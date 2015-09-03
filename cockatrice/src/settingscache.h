@@ -5,6 +5,11 @@
 #include <QSize>
 #include <QStringList>
 #include "shortcutssettings.h"
+#include "settings/carddatabasesettings.h"
+#include "settings/serverssettings.h"
+#include "settings/messagesettings.h"
+#include "settings/gamefilterssettings.h"
+#include "settings/layoutssettings.h"
 
 // the falbacks are used for cards without a muid
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
@@ -44,9 +49,16 @@ signals:
 private:
     QSettings *settings;
     ShortcutsSettings *shortcutsSettings;
+    CardDatabaseSettings *cardDatabaseSettings;
+    ServersSettings *serversSettings;
+    MessageSettings *messageSettings;
+    GameFiltersSettings *gameFiltersSettings;
+    LayoutsSettings *layoutsSettings;
+
     QByteArray mainWindowGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath, themeName;
+    bool notifyAboutUpdates;
     bool picDownload;
     bool picDownloadHq;
     bool notificationsEnabled;
@@ -97,14 +109,13 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
+    int keepalive;    
+    void translateLegacySettings();
     bool rememberGameSettings;
-    int keepalive;
-    QByteArray deckEditorLayoutState, deckEditorGeometry;
-    QSize deckEditorFilterSize, deckEditorDeckSize, deckEditorCardSize;
-    QString getSettingsPath();
 
 public:
     SettingsCache();
+    QString getSettingsPath();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
     QString getLang() const { return lang; }
     QString getDeckPath() const { return deckPath; }
@@ -119,6 +130,7 @@ public:
     bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
+    bool getNotifyAboutUpdates() const { return notifyAboutUpdates; }
 
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
@@ -173,19 +185,13 @@ public:
     bool getRememberGameSettings() const { return rememberGameSettings; }
     int getKeepAlive() const { return keepalive; }
     void setClientID(QString clientID);
-    QString getClientID() { return clientID; }
-    QByteArray getDeckEditorLayoutState() const { return deckEditorLayoutState; }
-    void setDeckEditorLayoutState(const QByteArray &value);
-    QByteArray getDeckEditorGeometry() const { return deckEditorGeometry; }
-    void setDeckEditorGeometry(const QByteArray &value);
-    QSize getDeckEditorCardSize() const { return deckEditorCardSize; }
-    void setDeckEditorCardSize(const QSize &value);
-    QSize getDeckEditorDeckSize() const { return deckEditorDeckSize; }
-    void setDeckEditorDeckSize(const QSize &value);
-    QSize getDeckEditorFilterSize() const { return deckEditorFilterSize; }
-    void setDeckEditorFilterSize(const QSize &value);
+    QString getClientID() { return clientID; }    
     ShortcutsSettings& shortcuts() const { return *shortcutsSettings; }
-
+    CardDatabaseSettings& cardDatabase() const { return *cardDatabaseSettings; }
+    ServersSettings& servers() const { return *serversSettings; }
+    MessageSettings& messages() const { return *messageSettings; }
+    GameFiltersSettings& gameFilters() const { return *gameFiltersSettings; }
+    LayoutsSettings& layouts() const { return *layoutsSettings; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -247,6 +253,7 @@ public slots:
     void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setRememberGameSettings(const bool _rememberGameSettings);
+    void setNotifyAboutUpdate(int _notifyaboutupdate);
 };
 
 extern SettingsCache *settingsCache;

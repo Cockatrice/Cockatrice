@@ -1,4 +1,3 @@
-#include <QSettings>
 #include <QLabel>
 #include <QCheckBox>
 #include <QGridLayout>
@@ -14,23 +13,20 @@
 DlgRegister::DlgRegister(QWidget *parent)
     : QDialog(parent)
 {
-    QSettings settings;
-    settings.beginGroup("server");
-
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit(settings.value("hostname", "cockatrice.woogerworks.com").toString());
+    hostEdit = new QLineEdit(settingsCache->servers().getHostname("cockatrice.woogerworks.com"));
     hostLabel->setBuddy(hostEdit);
 
-    portLabel = new QLabel(tr("&Port:"));
-    portEdit = new QLineEdit(settings.value("port", "4747").toString());
+    portLabel = new QLabel(tr("&Port:"));    
+    portEdit = new QLineEdit(settingsCache->servers().getPort("4747"));
     portLabel->setBuddy(portEdit);
 
-    playernameLabel = new QLabel(tr("Player &name:"));
-    playernameEdit = new QLineEdit(settings.value("playername", "Player").toString());
+    playernameLabel = new QLabel(tr("Player &name:"));    
+    playernameEdit = new QLineEdit(settingsCache->servers().getPlayerName("Player"));
     playernameLabel->setBuddy(playernameEdit);
 
-    passwordLabel = new QLabel(tr("P&assword:"));
-    passwordEdit = new QLineEdit(settings.value("password").toString());
+    passwordLabel = new QLabel(tr("P&assword:"));    
+    passwordEdit = new QLineEdit(settingsCache->servers().getPassword());
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
 
@@ -366,14 +362,11 @@ void DlgRegister::actOk()
         return;
     }
 
-    QSettings settings;
-    settings.beginGroup("server");
-    settings.setValue("hostname", hostEdit->text());
-    settings.setValue("port", portEdit->text());
-    settings.setValue("playername", playernameEdit->text());
+    settingsCache->servers().setHostName(hostEdit->text());
+    settingsCache->servers().setPort(portEdit->text());
+    settingsCache->servers().setPlayerName(playernameEdit->text());
     // always save the password so it will be picked up by the connect dialog
-    settings.setValue("password", passwordEdit->text());
-    settings.endGroup();
+    settingsCache->servers().setPassword(passwordEdit->text());
   
     accept();
 }

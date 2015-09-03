@@ -46,6 +46,7 @@ message Command_Login {
     optional string password = 2;
     optional string clientid = 3;
     optional string clientver = 4;
+    repeated string clientfeatures = 5;
 }
 
 message Command_Message {

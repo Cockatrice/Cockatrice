@@ -99,6 +99,12 @@ SET(cockatrice_SOURCES
     src/sequenceEdit/sequenceedit.cpp
     src/sequenceEdit/shortcutstab.cpp
     src/lineeditcompleter.cpp
+    src/settings/settingsmanager.cpp
+    src/settings/carddatabasesettings.cpp
+    src/settings/serverssettings.cpp
+    src/settings/messagesettings.cpp
+    src/settings/gamefilterssettings.cpp
+    src/settings/layoutssettings.cpp
     ${VERSION_STRING_CPP}
 )
 
@@ -327,4 +333,9 @@ Data = Resources\")
     if(WIN32SSLRUNTIME_FOUND)
         install(FILES ${WIN32SSLRUNTIME_LIBRARIES} DESTINATION ./)
     endif()
+endif()
+#Compile a portable version, default off
+option(PORTABLE "portable build" OFF)
+IF(PORTABLE)
+add_definitions(-DPORTABLE_BUILD)
 endif()

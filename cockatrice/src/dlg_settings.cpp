@@ -13,7 +13,6 @@
 #include <QToolBar>
 #include <QTranslator>
 #include <QAction>
-#include <QSettings>
 #include <QApplication>
 #include <QInputDialog>
 #include <QSpinBox>
@@ -46,6 +45,7 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
     picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
+    updateNotificationCheckBox.setChecked(settingsCache->getNotifyAboutUpdates());
 
     pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
     // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
@@ -65,19 +65,21 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
     connect(&picDownloadHqCheckBox, SIGNAL(clicked(bool)), this, SLOT(setEnabledStatus(bool)));
+    connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotifyAboutUpdate(int)));
     connect(highQualityURLEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrlHq(QString)));
 
     QGridLayout *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
     personalGrid->addWidget(&languageBox, 0, 1);
-    personalGrid->addWidget(&pixmapCacheLabel, 1, 0, 1, 1);
-    personalGrid->addWidget(&pixmapCacheEdit, 1, 1, 1, 1);
-    personalGrid->addWidget(&picDownloadCheckBox, 2, 0, 1, 2);
-    personalGrid->addWidget(&picDownloadHqCheckBox, 3, 0, 1, 2);
-    personalGrid->addWidget(&clearDownloadedPicsButton, 4, 0, 1, 1);
-    personalGrid->addWidget(&highQualityURLLabel, 5, 0, 1, 1);
-    personalGrid->addWidget(highQualityURLEdit, 5, 1, 1, 1);
-    personalGrid->addWidget(&highQualityURLLinkLabel, 6, 1, 1, 1);
+    personalGrid->addWidget(&pixmapCacheLabel, 1, 0);
+    personalGrid->addWidget(&pixmapCacheEdit, 1, 1);
+    personalGrid->addWidget(&updateNotificationCheckBox, 2, 0);
+    personalGrid->addWidget(&picDownloadCheckBox, 3, 0);
+    personalGrid->addWidget(&picDownloadHqCheckBox, 4, 0);
+    personalGrid->addWidget(&highQualityURLLabel, 5, 0);
+    personalGrid->addWidget(highQualityURLEdit, 5, 1);
+    personalGrid->addWidget(&highQualityURLLinkLabel, 6, 1);
+    personalGrid->addWidget(&clearDownloadedPicsButton, 6, 0);
     
     highQualityURLLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     highQualityURLLinkLabel.setOpenExternalLinks(true);
@@ -247,6 +249,7 @@ void GeneralSettingsPage::retranslateUi()
     highQualityURLLabel.setText(tr("Custom Card Download URL:"));
     highQualityURLLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(LINKING_FAQ_URL).arg(tr("Linking FAQ")));
     clearDownloadedPicsButton.setText(tr("Reset/Clear Downloaded Pictures"));
+    updateNotificationCheckBox.setText(tr("Notify when new client features are available"));
 }
 
 void GeneralSettingsPage::setEnabledStatus(bool status)
@@ -512,12 +515,11 @@ MessagesSettingsPage::MessagesSettingsPage()
     highlightGroupBox = new QGroupBox;
     highlightGroupBox->setLayout(highlightNotice);
 
-    QSettings settings;
     messageList = new QListWidget;
-    settings.beginGroup("messages");
-    int count = settings.value("count", 0).toInt();
+
+    int count = settingsCache->messages().getCount();
     for (int i = 0; i < count; i++)
-        messageList->addItem(settings.value(QString("msg%1").arg(i)).toString());
+        messageList->addItem(settingsCache->messages().getMessageAt(i));
     
     aAdd = new QAction(this);
     aAdd->setIcon(QIcon("theme:icons/increment.svg"));
@@ -589,11 +591,9 @@ void MessagesSettingsPage::updateHighlightPreview() {
 
 void MessagesSettingsPage::storeSettings()
 {
-    QSettings settings;
-    settings.beginGroup("messages");
-    settings.setValue("count", messageList->count());
+    settingsCache->messages().setCount(messageList->count());
     for (int i = 0; i < messageList->count(); i++)
-        settings.setValue(QString("msg%1").arg(i), messageList->item(i)->text());
+        settingsCache->messages().setMessageAt(i, messageList->item(i)->text());
 }
 
 void MessagesSettingsPage::actAdd()
@@ -918,3 +918,4 @@ void DlgSettings::retranslateUi()
     for (int i = 0; i < pagesWidget->count(); i++)
         dynamic_cast<AbstractSettingsPage *>(pagesWidget->widget(i))->retranslateUi();
 }
+

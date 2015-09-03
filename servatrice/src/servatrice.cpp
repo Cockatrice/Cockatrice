@@ -38,6 +38,7 @@
 #include "pb/event_server_message.pb.h"
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/event_connection_closed.pb.h"
+#include "featureset.h"
 
 Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent)
     : QTcpServer(parent),
@@ -178,6 +179,16 @@ bool Servatrice::initServer()
     qDebug() << "Registration enabled: " << regServerOnly;
     if (registrationEnabled)
         qDebug() << "Require email address to register: " << requireEmailForRegistration;
+
+    FeatureSet features;
+    features.initalizeFeatureList(serverRequiredFeatureList);
+    requiredFeatures = settingsCache->value("server/requiredfeatures","").toString();
+    QStringList listReqFeatures = requiredFeatures.split(",", QString::SkipEmptyParts);
+    if (!listReqFeatures.isEmpty())
+        foreach(QString reqFeature, listReqFeatures)
+            features.enableRequiredFeature(serverRequiredFeatureList,reqFeature);
+
+    qDebug() << "Required client features: " << serverRequiredFeatureList;
 
     QString dbTypeStr = settingsCache->value("database/type").toString();
     if (dbTypeStr == "mysql")

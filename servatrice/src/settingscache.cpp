@@ -15,9 +15,11 @@ SettingsCache::SettingsCache(const QString & fileName, QSettings::Format format,
 
 QString SettingsCache::guessConfigurationPath(QString & specificPath)
 {
-    const QString fileName="servatrice.ini";
+    const QString fileName="servatrice.ini";    
+    #ifdef PORTABLE_BUILD
+    return fileName;
+    #endif
     QString guessFileName;
-
     // specific path
     if(!specificPath.isEmpty() && QFile::exists(specificPath))
         return specificPath;

@@ -14,6 +14,12 @@ SET(oracle_SOURCES
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/settingscache.cpp
     ../cockatrice/src/shortcutssettings.cpp
+    ../cockatrice/src/settings/carddatabasesettings.cpp
+    ../cockatrice/src/settings/serverssettings.cpp
+    ../cockatrice/src/settings/settingsmanager.cpp
+    ../cockatrice/src/settings/messagesettings.cpp
+    ../cockatrice/src/settings/gamefilterssettings.cpp
+    ../cockatrice/src/settings/layoutssettings.cpp
     ../cockatrice/src/thememanager.cpp 
     ../cockatrice/src/qt-json/json.cpp
  )
@@ -233,3 +239,8 @@ Translations = Resources/translations\")
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
         " COMPONENT Runtime)
 endif() 
+#Compile a portable version, default off
+option(PORTABLE "portable build" OFF)
+IF(PORTABLE)
+add_definitions(-DPORTABLE_BUILD)
+endif()
