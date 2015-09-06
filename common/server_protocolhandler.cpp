@@ -384,6 +384,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 {
     QString userName = QString::fromStdString(cmd.user_name()).simplified();
     QString clientId = QString::fromStdString(cmd.clientid()).simplified();
+    QString clientVersion = QString::fromStdString(cmd.clientver()).simplified();
 
     if (userName.isEmpty() || (userInfo != 0))
         return Response::RespContextError;
@@ -412,7 +413,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 
     QString reasonStr;
     int banSecondsLeft = 0;
-    AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft, clientId);
+    AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft, clientId, clientVersion);
     switch (res) {
         case UserIsBanned: {
             Response_Login *re = new Response_Login;

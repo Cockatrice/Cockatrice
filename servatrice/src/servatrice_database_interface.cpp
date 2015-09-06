@@ -881,13 +881,45 @@ void Servatrice_DatabaseInterface::updateUsersClientID(const QString &userName, 
 
 }
 
-void Servatrice_DatabaseInterface::updateUsersLastLoginTime(const QString &userName)
-{
+void Servatrice_DatabaseInterface::updateUsersLastLoginData(const QString &userName, const QString &clientVersion) {
+
     if (!checkSql())
         return;
 
-    QSqlQuery *query = prepareQuery("update {prefix}_users set last_login = NOW() where name = :user_name");
-    query->bindValue(":user_name", userName);
-    execSqlQuery(query);
+    int usersID;
 
+    QSqlQuery *query = prepareQuery("select id from {prefix}_users where name = :user_name");
+    query->bindValue(":user_name", userName);
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to locate user id when updating users last login data: SQL Error");
+        return;
+    }
+
+    if (query->next()) {
+        usersID = query->value(0).toInt();
+    }
+
+    if (usersID) {
+        int userCount;
+        query = prepareQuery("select count(id) from {prefix}_user_analytics where id = :user_id");
+        query->bindValue(":user_id", usersID);
+        if (!execSqlQuery(query))
+            return;
+
+        if (query->next()) {
+            userCount = query->value(0).toInt();
+        }
+
+        if (!userCount) {
+            query = prepareQuery("insert into {prefix}_user_analytics (id,client_ver,last_login) values (:user_id,:client_ver,NOW())");
+            query->bindValue(":user_id", usersID);
+            query->bindValue(":client_ver", clientVersion);
+            execSqlQuery(query);
+        } else {
+            query = prepareQuery("update {prefix}_user_analytics set last_login = NOW(), client_ver = :client_ver where id = :user_id");
+            query->bindValue(":client_ver", clientVersion);
+            query->bindValue(":user_id", usersID);
+            execSqlQuery(query);
+        }
+    }
 }
