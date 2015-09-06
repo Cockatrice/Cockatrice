@@ -7,7 +7,6 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QTextStream>
-#include <QSvgRenderer>
 #include <QPainter>
 #include <QUrl>
 #include <QSet>
@@ -657,11 +656,7 @@ void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
     loadPixmap(bigPixmap);
     if (bigPixmap.isNull()) {
         if (getName().isEmpty()) {
-            QSvgRenderer svg(QString("theme:back.svg"));
-            bigPixmap = QPixmap(svg.defaultSize());
-            bigPixmap.fill(Qt::transparent);
-            QPainter painter(&bigPixmap);
-            svg.render(&painter);
+            pixmap = themeManager->getCardBackPixmap();
         } else {
             pixmap = QPixmap(); // null
             return;
