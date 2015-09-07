@@ -43,7 +43,9 @@ QStringMap & ThemeManager::getAvailableThemes()
 
     // load themes from user profile dir
     dir =
-#if QT_VERSION < 0x050000
+#ifdef PORTABLE_BUILD
+        qApp->applicationDirPath() +
+#elif QT_VERSION < 0x050000
         QDesktopServices::storageLocation(QDesktopServices::DataLocation) +
 #else
         QStandardPaths::standardLocations(QStandardPaths::DataLocation).first() +
