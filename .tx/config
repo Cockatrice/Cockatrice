@@ -1,0 +1,13 @@
+[main]
+host = https://www.transifex.com
+
+[cockatrice.cockatrice]
+file_filter = cockatrice/translations/cockatrice_<lang>.ts
+source_file = cockatrice/translations/cockatrice_en.ts
+source_lang = en
+
+[cockatrice.oracle]
+file_filter = oracle/translations/oracle_<lang>.ts
+source_file = oracle/translations/oracle_en.ts
+source_lang = en
+
