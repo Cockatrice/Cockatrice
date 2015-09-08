@@ -69,7 +69,7 @@ private slots:
 
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
 
-    void maximize();
+    void showWindowIfHidden();
 
     void actCheckCardUpdates();
     void cardUpdateError(QProcess::ProcessError err);
