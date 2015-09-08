@@ -306,6 +306,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     gameClosed(false),
     replay(_replay),
     currentReplayStep(0),
+    sayLabel(0),
     sayEdit(0)
 {
     setAttribute(Qt::WA_DeleteOnClose);
@@ -345,7 +346,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
     connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
-    sayLabel = 0;
 
     deckViewContainerLayout = new QVBoxLayout;
 
@@ -808,7 +808,7 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
     Player *newPlayer = new Player(info, playerId, local, this);
     connect(newPlayer, SIGNAL(openDeckEditor(const DeckLoader *)), this, SIGNAL(openDeckEditor(const DeckLoader *)));
     QString newPlayerName = "@" + newPlayer->getName();
-    if (!autocompleteUserList.contains(newPlayerName)){
+    if (sayEdit && !autocompleteUserList.contains(newPlayerName)){
         autocompleteUserList << newPlayerName;
         sayEdit->setCompletionList(autocompleteUserList);
     }
@@ -1006,7 +1006,7 @@ void TabGame::eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, c
 void TabGame::eventSpectatorLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
 {
     QString playerName = "@" + QString::fromStdString(spectators.value(eventPlayerId).name());
-    if (autocompleteUserList.removeOne(playerName))
+    if (sayEdit && autocompleteUserList.removeOne(playerName))
         sayEdit->setCompletionList(autocompleteUserList);
     messageLog->logLeaveSpectator(QString::fromStdString(spectators.value(eventPlayerId).name()));
     playerListWidget->removePlayer(eventPlayerId);
@@ -1023,7 +1023,7 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
         const ServerInfo_PlayerProperties &prop = playerInfo.properties();
         const int playerId = prop.player_id();
         QString playerName = "@" + QString::fromStdString(prop.user_info().name());
-        if (!autocompleteUserList.contains(playerName)){
+        if (sayEdit && !autocompleteUserList.contains(playerName)){
             autocompleteUserList << playerName;
             sayEdit->setCompletionList(autocompleteUserList);
         }
@@ -1135,7 +1135,7 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
     const ServerInfo_PlayerProperties &playerInfo = event.player_properties();
     const int playerId = playerInfo.player_id();
     QString playerName = QString::fromStdString(playerInfo.user_info().name());
-    if (!autocompleteUserList.contains("@" + playerName)){
+    if (sayEdit && !autocompleteUserList.contains("@" + playerName)){
         autocompleteUserList << "@" + playerName;
         sayEdit->setCompletionList(autocompleteUserList);
     }
@@ -1161,7 +1161,7 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
         return;
     
     QString playerName = "@" + player->getName();
-    if(autocompleteUserList.removeOne(playerName))
+    if(sayEdit && autocompleteUserList.removeOne(playerName))
         sayEdit->setCompletionList(autocompleteUserList);
 
     messageLog->logLeave(player);
