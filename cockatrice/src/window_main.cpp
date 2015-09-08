@@ -813,5 +813,5 @@ void MainWindow::refreshShortcuts()
 
 void MainWindow::notifyUserAboutUpdate()
 {
-    QMessageBox::information(this, tr("Information"), tr("Your client appears to be missing features that the server supports.\nThis usually means that your client version is out of date,pleae check to see if there is a new client available for download."));
+    QMessageBox::information(this, tr("Information"), tr("Your client appears to be missing features that the server supports.\nThis usually means that your client version is out of date, please check to see if there is a new client available for download."));
 }
