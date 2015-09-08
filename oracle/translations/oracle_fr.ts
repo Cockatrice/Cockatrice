@@ -14,8 +14,9 @@
         <translation>Langue:</translation>
     </message>
     <message>
-        <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation>Cet assistant va importer la liste des éditions et des cartes qui seront utilisées par Cockatrice.&lt;br/&gt;Vous devrez spécifier une url ou un fichier local avec la liste d&apos;édition comme fichier source, puis choisir quelles éditions seront importées parmi la liste proposée.</translation>
+        <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
+You will need to specify a URL or a filename that will be used as a source.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -25,20 +26,8 @@
         <translation>Choix du fichier source</translation>
     </message>
     <message>
-        <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>Choisissez un fichier d&apos;éditions source. Vous pouvez donner une addresse url qui sera téléchargée ou un fichier local.</translation>
-    </message>
-    <message>
-        <source>Download url:</source>
-        <translation>URL de téléchargement:</translation>
-    </message>
-    <message>
         <source>Local file:</source>
         <translation>Fichier local:</translation>
-    </message>
-    <message>
-        <source>Restore default url</source>
-        <translation>Restaurer l&apos;URL par défaut</translation>
     </message>
     <message>
         <source>Choose file...</source>
@@ -59,10 +48,6 @@
     <message>
         <source>Error</source>
         <translation>Erreur</translation>
-    </message>
-    <message>
-        <source>The provided url is not valid.</source>
-        <translation>L&apos;URL fournit est non valide.</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
@@ -112,6 +97,22 @@
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
         <translation>Le fichier a été trouvé, mais ne contient aucune éditions.</translation>
     </message>
+    <message>
+        <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download URL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default URL</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided URL is not valid.</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>LoadTokensPage</name>
@@ -120,24 +121,8 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Download url:</source>
-        <translation>URL de téléchargement:</translation>
-    </message>
-    <message>
-        <source>Restore default url</source>
-        <translation>Restaurer l&apos;URL par défaut</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Érreur</translation>
-    </message>
-    <message>
-        <source>The provided url is not valid.</source>
-        <translation>L&apos;URL fournit est non valide.</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
@@ -150,6 +135,22 @@
     <message>
         <source>Network error: %1.</source>
         <translation>Erreur réseau : %1.</translation>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download URL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default URL</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided URL is not valid.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

@@ -14,8 +14,9 @@
         <translation>Língua:</translation>
     </message>
     <message>
-        <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation>Este assistente importará a lista de expansões e cartas que serão usadas pelo Cockatrice.&lt;br/&gt; Você precisará especificar um endereço eletrônico ou um arquivo que será usado como origem, e então escolhe as expansões que deseja da lista de disponíveis.</translation>
+        <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
+You will need to specify a URL or a filename that will be used as a source.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -25,20 +26,8 @@
         <translation>Selecione a origem</translation>
     </message>
     <message>
-        <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>Por favor, especifique uma origem para a lista de expansão e cartas. Você pode especificar um endereço web para baixar ou use um arquivo existente em seu computador.</translation>
-    </message>
-    <message>
-        <source>Download url:</source>
-        <translation>Endereço para download</translation>
-    </message>
-    <message>
         <source>Local file:</source>
         <translation>Arquivo local:</translation>
-    </message>
-    <message>
-        <source>Restore default url</source>
-        <translation>Restaure o endereço padrão.</translation>
     </message>
     <message>
         <source>Choose file...</source>
@@ -59,10 +48,6 @@
     <message>
         <source>Error</source>
         <translation>Erro</translation>
-    </message>
-    <message>
-        <source>The provided url is not valid.</source>
-        <translation>O endereço web não é válido.</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
@@ -112,6 +97,22 @@
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
         <translation>O arquivo foi recebido com sucesso, mas não contém qualquer informação de expansão.</translation>
     </message>
+    <message>
+        <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download URL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default URL</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided URL is not valid.</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>LoadTokensPage</name>
@@ -120,23 +121,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Download url:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Restore default url</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <source>Error</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>The provided url is not valid.</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -149,6 +134,22 @@
     </message>
     <message>
         <source>Network error: %1.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download URL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default URL</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided URL is not valid.</source>
         <translation type="unfinished"/>
     </message>
 </context>

@@ -14,9 +14,9 @@
         <translation>Sprache:</translation>
     </message>
     <message>
-        <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation>Dieser Assistent wird eine Liste aller Editionen und Karten, die von Cockatrice genutzt werden, importieren.
-Sie müssen dazu eine URL oder einen Dateinamen als Quelle angeben. Danach können Sie aus einer Liste aller verfügbaren Editionen die Gewünschten ausgewählen.</translation>
+        <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
+You will need to specify a URL or a filename that will be used as a source.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -26,20 +26,8 @@ Sie müssen dazu eine URL oder einen Dateinamen als Quelle angeben. Danach könn
         <translation>Quellenauswahl</translation>
     </message>
     <message>
-        <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>Bitte geben Sie eine Quelle für die Liste von Editionen und Karten an. Sie können eine URL Adresse zum herunterladen eingeben, oder Sie verwenden eine vorhandene Datei von Ihrem Computer.</translation>
-    </message>
-    <message>
-        <source>Download url:</source>
-        <translation>Download URL:</translation>
-    </message>
-    <message>
         <source>Local file:</source>
         <translation>Lokale Datei:</translation>
-    </message>
-    <message>
-        <source>Restore default url</source>
-        <translation>Standard-URL wiederherstellen</translation>
     </message>
     <message>
         <source>Choose file...</source>
@@ -60,10 +48,6 @@ Sie müssen dazu eine URL oder einen Dateinamen als Quelle angeben. Danach könn
     <message>
         <source>Error</source>
         <translation>Fehler</translation>
-    </message>
-    <message>
-        <source>The provided url is not valid.</source>
-        <translation>Die eingegebene URL ist nicht gültig.</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
@@ -113,6 +97,22 @@ Sie müssen dazu eine URL oder einen Dateinamen als Quelle angeben. Danach könn
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
         <translation>Die Datei wurde erfolgreich abgerufen, sie enthält aber keine Editionsdaten.</translation>
     </message>
+    <message>
+        <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download URL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default URL</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided URL is not valid.</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>LoadTokensPage</name>
@@ -121,24 +121,8 @@ Sie müssen dazu eine URL oder einen Dateinamen als Quelle angeben. Danach könn
         <translation>Spielstein-Quellenauswahl</translation>
     </message>
     <message>
-        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>Bitte geben Sie eine Quelle für die Liste der Spielsteine an. Sie können eine URL Adresse zum Herunterladen eingeben oder eine vorhandene Datei von Ihrem Computer verwenden.</translation>
-    </message>
-    <message>
-        <source>Download url:</source>
-        <translation>Download URL:</translation>
-    </message>
-    <message>
-        <source>Restore default url</source>
-        <translation>Standard-URL wiederherstellen</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Fehler</translation>
-    </message>
-    <message>
-        <source>The provided url is not valid.</source>
-        <translation>Die eingegebene URL ist nicht gültig.</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
@@ -151,6 +135,22 @@ Sie müssen dazu eine URL oder einen Dateinamen als Quelle angeben. Danach könn
     <message>
         <source>Network error: %1.</source>
         <translation>Netzwerkfehler: %1.</translation>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download URL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default URL</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided URL is not valid.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

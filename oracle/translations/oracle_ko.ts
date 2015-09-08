@@ -14,8 +14,9 @@
         <translation>언어</translation>
     </message>
     <message>
-        <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation>오라클은 코카트리스에서 사용할 판본의 목록과 카드들의 정보를 갱신하는 프로그램입니다.&lt;br/&gt;판본 목록 파일이 있는 웹 주소나 파일을 입력하신 후에 읽어온 목록에서 원하는 판본을 선택해 불러올 수 있습니다.</translation>
+        <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
+You will need to specify a URL or a filename that will be used as a source.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -25,21 +26,8 @@
         <translation>판본 목록 파일 주소 입력</translation>
     </message>
     <message>
-        <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>판본 목록 및 카드 정보가 들어있는 파일의 위치를 입력해 주세요. 
-다운로드 할 수 있는 웹 주소나 컴퓨터에 저장되어 있는 파일을 선택 할 수 있습니다.</translation>
-    </message>
-    <message>
-        <source>Download url:</source>
-        <translation>웹 주소:</translation>
-    </message>
-    <message>
         <source>Local file:</source>
         <translation>파일 위치:</translation>
-    </message>
-    <message>
-        <source>Restore default url</source>
-        <translation>기본 주소로 복원</translation>
     </message>
     <message>
         <source>Choose file...</source>
@@ -60,10 +48,6 @@
     <message>
         <source>Error</source>
         <translation>오류</translation>
-    </message>
-    <message>
-        <source>The provided url is not valid.</source>
-        <translation>잘못된 주소를 입력하셨습니다.</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
@@ -113,6 +97,22 @@
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
         <translation>파일을 성공적으로 다운로드 하였으나 판본 정보가 들어있지 않습니다.</translation>
     </message>
+    <message>
+        <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download URL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default URL</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided URL is not valid.</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>LoadTokensPage</name>
@@ -121,25 +121,8 @@
         <translation>토큰 파일 주소 입력</translation>
     </message>
     <message>
-        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>토큰 목록 및 정보가 들어있는 파일의 위치를 입력해 주세요. 
-다운로드 할 수 있는 웹 주소나 컴퓨터에 저장되어 있는 파일을 선택 할 수 있습니다.</translation>
-    </message>
-    <message>
-        <source>Download url:</source>
-        <translation>웹 주소:</translation>
-    </message>
-    <message>
-        <source>Restore default url</source>
-        <translation>기본 주소로 복원</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>오류</translation>
-    </message>
-    <message>
-        <source>The provided url is not valid.</source>
-        <translation>잘못된 주소를 입력하셨습니다.</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
@@ -152,6 +135,22 @@
     <message>
         <source>Network error: %1.</source>
         <translation>네트워크 오류 : %1.</translation>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download URL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default URL</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided URL is not valid.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
