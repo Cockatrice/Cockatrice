@@ -81,7 +81,7 @@ signals:
     void setMenu(const QList<QMenu *> &newMenuList = QList<QMenu *>());
     void localGameEnded();
     void adminLockChanged(bool lock);
-    void maximize();
+    void showWindowIfHidden();
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
     void openReplay(GameReplay *replay);

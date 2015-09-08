@@ -437,7 +437,7 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
 }
 
 void TabSupervisor::maximizeMainWindow() {
-    emit maximize();
+    emit showWindowIfHidden();
 }
 
 void TabSupervisor::talkLeft(TabMessage *tab)

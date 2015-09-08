@@ -599,7 +599,7 @@ MainWindow::MainWindow(QWidget *parent)
     tabSupervisor = new TabSupervisor(client);
     connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
     connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
-    connect(tabSupervisor, SIGNAL(maximize()), this, SLOT(maximize()));
+    connect(tabSupervisor, SIGNAL(showWindowIfHidden()), this, SLOT(showWindowIfHidden()));
     tabSupervisor->addDeckEditorTab(0);
 
     setCentralWidget(tabSupervisor);
@@ -703,8 +703,10 @@ void MainWindow::pixmapCacheSizeChanged(int newSizeInMBs)
     QPixmapCache::setCacheLimit(newSizeInMBs * 1024);
 }
 
-void MainWindow::maximize() {
-    showNormal();
+void MainWindow::showWindowIfHidden() {
+    // keep the previous window state
+    setWindowState(windowState() & ~Qt::WindowMinimized);
+    show();
 }
 
 /* CARD UPDATER */
