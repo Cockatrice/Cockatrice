@@ -229,8 +229,10 @@ void TabDeckEditor::createFiltersDock()
     QGridLayout *filterLayout = new QGridLayout;
     filterLayout->setObjectName("filterLayout");
     filterLayout->setContentsMargins(0,0,0,0);
-    filterLayout->addWidget(filterBuilder, 0, 0, 1, 2);
-    filterLayout->addWidget(filterView, 1, 0, 1, 2);
+    filterLayout->addWidget(filterBuilder, 0, 0, 1, 3);
+    filterLayout->addWidget(filterView, 1, 0, 1, 3);
+    filterLayout->addWidget(filterDelOne, 2, 0, 1, 1);
+    filterLayout->addWidget(filterDelAll, 2, 2, 1, 1);
 
     filterBox = new QWidget();
     filterBox->setObjectName("filterBox");
