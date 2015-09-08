@@ -91,7 +91,6 @@ private:
     QString picUrlFallback;
     QString picUrlHqFallback;
     QString clientID;
-    bool attemptAutoConnect;
     int pixmapCacheSize;
     bool scaleCards;
     bool showMessagePopups;
@@ -163,7 +162,6 @@ public:
     QString getPicUrlHq() const { return picUrlHq; }
     QString getPicUrlFallback() const { return picUrlFallback; }
     QString getPicUrlHqFallback() const { return picUrlHqFallback; }
-    bool getAutoConnect() const { return attemptAutoConnect; }
     int getPixmapCacheSize() const { return pixmapCacheSize; }
     bool getScaleCards() const {  return scaleCards; }
     bool getShowMessagePopup() const { return showMessagePopups; }
@@ -234,7 +232,6 @@ public slots:
     void setPicUrlHq(const QString &_picUrlHq);
     void setPicUrlFallback(const QString &_picUrlFallback);
     void setPicUrlHqFallback(const QString &_picUrlHqFallback);
-    void setAutoConnect(const bool &_autoConnect);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setCardScaling(const int _scaleCards);
     void setShowMessagePopups(const int _showMessagePopups);

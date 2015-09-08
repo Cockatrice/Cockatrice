@@ -685,7 +685,7 @@ void MainWindow::changeEvent(QEvent *event)
     else if(event->type() == QEvent::ActivationChange) {
         if(isActiveWindow() && !bHasActivated){
             bHasActivated = true;
-            if(settingsCache->getAutoConnect()) {
+            if(settingsCache->servers().getAutoConnect()) {
                 qDebug() << "Attempting auto-connect...";
                  DlgConnect dlg(this);
                  client->connectToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getPassword());
