@@ -281,11 +281,6 @@ void TabSupervisor::stop()
     while (replayIterator.hasNext())
         replayIterator.next()->deleteLater();
     replayTabs.clear();
-
-    QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
-    while (messageIterator.hasNext())
-        messageIterator.next().value()->deleteLater();
-    messageTabs.clear();
     
     delete userInfo;
     userInfo = 0;
