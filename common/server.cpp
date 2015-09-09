@@ -105,7 +105,7 @@ Server_DatabaseInterface *Server::getDatabaseInterface() const
     return databaseInterfaces.value(QThread::currentThread());
 }
 
-AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft, QString &clientid)
+AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft, QString &clientid, QString &clientVersion)
 {
     if (name.size() > 35)
         name = name.left(35);
@@ -190,7 +190,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
         databaseInterface->updateUsersClientID(name, clientid);
     }
 
-    databaseInterface->updateUsersLastLoginTime(name);
+    databaseInterface->updateUsersLastLoginData(name, clientVersion);
     se = Server_ProtocolHandler::prepareSessionEvent(event);
     sendIsl_SessionEvent(*se);
     delete se;
