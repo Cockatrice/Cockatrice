@@ -123,3 +123,8 @@ void SoundEngine::playSound(QString fileName)
     audioData[fileName]->play();
 #endif
 }
+
+void SoundEngine::testSound()
+{
+    playSound("player_join");
+}

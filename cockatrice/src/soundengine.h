@@ -30,6 +30,8 @@ private slots:
 public:
     SoundEngine(QObject *parent = 0);
     void playSound(QString fileName);
+public slots:
+    void testSound();
 };
 
 extern SoundEngine *soundEngine;
