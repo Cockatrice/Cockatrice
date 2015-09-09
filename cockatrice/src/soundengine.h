@@ -4,6 +4,10 @@
 #include <QObject>
 #include <QMap>
 #include <QDateTime>
+#include <QStringList>
+#if QT_VERSION > 0x050000
+    #include <QMediaPlayer>
+#endif
 
 class QAudioOutput;
 class QBuffer;
@@ -11,25 +15,24 @@ class QBuffer;
 class SoundEngine : public QObject {
     Q_OBJECT
 private:
-    void playSound(const QString &fileName);
-    QMap<QString, QByteArray> audioData;
+    QMap<QString, QByteArray> audioCache;
     QBuffer *inputBuffer;
     QAudioOutput *audio;
-    QDateTime lastTapPlayed;
-    QDateTime lastEndStepPlayed;
-    QDateTime lastAttackStepPlayed;
+    bool enabled;
+    QStringList fileNames;
+    
+	#if QT_VERSION > 0x050000
+        QMap<QString, QMediaPlayer*> audioData;
+    #endif
 private slots:
     void cacheData();
     void soundEnabledChanged();
 public:
     SoundEngine(QObject *parent = 0);
+    void playSound(QString fileName);
 public slots:
-    void endStep();
-    void tap();
-    void playerJoined();
-    void attack();
+    void testSound();
 };
 
 extern SoundEngine *soundEngine;
-
 #endif

@@ -3,13 +3,14 @@
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QAction>
+#include <QSystemTrayIcon>
+#include <QApplication>
 #include "tab_message.h"
 #include "abstractclient.h"
 #include "chatview.h"
 #include "main.h"
 #include "settingscache.h"
-#include <QSystemTrayIcon>
-#include <QApplication>
+#include "soundengine.h"
 
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
@@ -111,6 +112,8 @@ void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 {
     const UserLevelFlags userLevel(event.sender_name() == otherUserInfo->name() ? otherUserInfo->user_level() : ownUserInfo->user_level());
     chatView->appendMessage(QString::fromStdString(event.message()), QString::fromStdString(event.sender_name()), userLevel, true);
+    if (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this))
+        soundEngine->playSound("private_message");
     if (settingsCache->getShowMessagePopup() && shouldShowSystemPopup(event))
         showSystemPopup(event);
 

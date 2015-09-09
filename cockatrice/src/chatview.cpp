@@ -11,6 +11,7 @@
 #include "pixmapgenerator.h"
 #include "settingscache.h"
 #include "tab_userlists.h"
+#include "soundengine.h"
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
 const QColor OTHER_USER_COLOR = QColor(0, 65, 255); // dark blue
@@ -276,6 +277,7 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, QString &send
             if (userName.toLower() == fullMentionUpToSpaceOrEnd.toLower()) // Is this user you?
             {
                 // You have received a valid mention!!
+                soundEngine->playSound("chat_mention");
                 mentionFormat.setBackground(QBrush(getCustomMentionColor()));
                 mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
                 cursor.insertText(mention, mentionFormat);
@@ -301,6 +303,7 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, QString &send
 
         if (isModeratorSendingGlobal(userLevel, fullMentionUpToSpaceOrEnd)) {
             // Moderator Sending Global Message
+            soundEngine->playSound("all_mention");
             mentionFormat.setBackground(QBrush(getCustomMentionColor()));
             mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
             cursor.insertText("@" + fullMentionUpToSpaceOrEnd, mentionFormat);

@@ -2,7 +2,7 @@
 #
 # Installs default sound files
 
-FILE(GLOB sounds "${CMAKE_CURRENT_SOURCE_DIR}/*.raw")
+FILE(GLOB sounds "${CMAKE_CURRENT_SOURCE_DIR}/*.wav")
 
 if(UNIX)
     if(APPLE)
