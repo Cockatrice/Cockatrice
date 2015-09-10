@@ -917,5 +917,7 @@ void DlgSettings::retranslateUi()
     
     for (int i = 0; i < pagesWidget->count(); i++)
         dynamic_cast<AbstractSettingsPage *>(pagesWidget->widget(i))->retranslateUi();
+
+    contentsWidget->reset();
 }
 
