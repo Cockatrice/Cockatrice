@@ -774,7 +774,7 @@ SoundSettingsPage::SoundSettingsPage()
     masterVolumeSlider->setValue(settingsCache->getMasterVolume());
     masterVolumeSlider->setToolTip(QString::number(settingsCache->getMasterVolume()));
     connect(settingsCache, SIGNAL(masterVolumeChanged(int)), this, SLOT(masterVolumeChanged(int)));
-    connect(masterVolumeSlider, SIGNAL(sliderReleased()), soundEngine, SLOT(playerJoined()));
+    connect(masterVolumeSlider, SIGNAL(sliderReleased()), soundEngine, SLOT(testSound()));
     connect(masterVolumeSlider, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMasterVolume(int)));
 
     
