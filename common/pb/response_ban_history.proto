@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "response.proto";
+import "serverinfo_ban.proto";
+
+message Response_BanHistory{
+    extend Response {
+        optional Response_BanHistory ext = 1012;
+    }
+    repeated ServerInfo_Ban ban_list = 1;
+}

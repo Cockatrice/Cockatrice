@@ -51,6 +51,7 @@
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_remove_from_list.pb.h"
 #include "pb/event_notify_user.pb.h"
+#include "pb/response_ban_history.pb.h"
 #include "pb/response_deck_list.pb.h"
 #include "pb/response_deck_download.pb.h"
 #include "pb/response_deck_upload.pb.h"
@@ -60,6 +61,7 @@
 #include "pb/serverinfo_replay.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
+#include "pb/serverinfo_ban.pb.h"
 
 #include "version_string.h"
 #include <string>
@@ -301,6 +303,7 @@ Response::ResponseCode ServerSocketInterface::processExtendedModeratorCommand(in
 {
     switch ((ModeratorCommand::ModeratorCommandType) cmdType) {
         case ModeratorCommand::BAN_FROM_SERVER: return cmdBanFromServer(cmd.GetExtension(Command_BanFromServer::ext), rc);
+        case ModeratorCommand::BAN_HISTORY: return cmdGetBanHistory(cmd.GetExtension(Command_GetBanHistory::ext), rc);
         default: return Response::RespFunctionNotAllowed;
     }
 }
@@ -746,6 +749,19 @@ Response::ResponseCode ServerSocketInterface::cmdReplayDeleteMatch(const Command
 
 // MODERATOR FUNCTIONS.
 // May be called by admins and moderators. Permission is checked by the calling function.
+
+Response::ResponseCode ServerSocketInterface::cmdGetBanHistory(const Command_GetBanHistory &cmd, ResponseContainer &rc)
+{
+    QList<ServerInfo_Ban> banList;
+    QString userName = QString::fromStdString(cmd.user_name());
+
+    Response_BanHistory *re = new Response_BanHistory;
+    QListIterator<ServerInfo_Ban> banIterator(sqlInterface->getUserBanHistory(userName));
+    while (banIterator.hasNext())
+        re->add_ban_list()->CopyFrom(banIterator.next());
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
 
 Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer & /*rc*/)
 {

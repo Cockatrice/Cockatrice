@@ -923,3 +923,33 @@ void Servatrice_DatabaseInterface::updateUsersLastLoginData(const QString &userN
         }
     }
 }
+
+QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QString userName)
+{
+    QList<ServerInfo_Ban> results;
+    ServerInfo_Ban banDetails;
+
+    if (!checkSql())
+        return results;
+
+    QSqlQuery *query = prepareQuery("SELECT A.id_admin, A.time_from, A.minutes, A.reason, A.visible_reason, B.name AS name_admin FROM {prefix}_bans A LEFT JOIN {prefix}_users B ON A.id_admin=B.id WHERE A.user_name = :user_name");
+    query->bindValue(":user_name", userName);
+
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to collect ban history information: SQL Error");
+        return results;
+    }
+
+    QString adminID,adminName,banTime,banLength,banReason,visibleReason;
+    while (query->next()){
+        banDetails.set_admin_id(QString(query->value(0).toString()).toStdString());
+        banDetails.set_admin_name(QString(query->value(5).toString()).toStdString());
+        banDetails.set_ban_time(QString(query->value(1).toString()).toStdString());
+        banDetails.set_ban_length(QString(query->value(2).toString()).toStdString());
+        banDetails.set_ban_reason(QString(query->value(3).toString()).toStdString());
+        banDetails.set_visible_reason(QString(query->value(4).toString()).toStdString());
+        results << banDetails;
+    }
+
+    return results;
+}

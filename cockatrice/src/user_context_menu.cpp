@@ -11,12 +11,18 @@
 #include "gameselector.h"
 #include "pending_command.h"
 
+#include <QtGui>
+#if QT_VERSION >= 0x050000
+#include <QtWidgets>
+#endif
+
 #include "pb/commands.pb.h"
 #include "pb/session_commands.pb.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/command_kick_from_game.pb.h"
 #include "pb/response_get_games_of_user.pb.h"
 #include "pb/response_get_user_info.pb.h"
+#include "pb/response_ban_history.pb.h"
 
 UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor), game(_game)
@@ -32,6 +38,7 @@ UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *p
     aRemoveFromIgnoreList = new QAction(QString(), this);
     aKick = new QAction(QString(), this);
     aBan = new QAction(QString(), this);
+    aBanHistory = new QAction(QString(), this);
     aPromoteToMod = new QAction(QString(), this);
     aDemoteFromMod = new QAction(QString(), this);
 
@@ -49,6 +56,7 @@ void UserContextMenu::retranslateUi()
     aRemoveFromIgnoreList->setText(tr("Remove from &ignore list"));
     aKick->setText(tr("Kick from &game"));
     aBan->setText(tr("Ban from &server"));
+    aBanHistory->setText(tr("View user's &ban history"));
     aPromoteToMod->setText(tr("&Promote user to moderator"));
     aDemoteFromMod->setText(tr("Dem&ote user from moderator"));
 }
@@ -92,6 +100,39 @@ void UserContextMenu::banUser_processUserInfoResponse(const Response &r)
     BanDialog *dlg = new BanDialog(response.user_info(), static_cast<QWidget *>(parent()));
     connect(dlg, SIGNAL(accepted()), this, SLOT(banUser_dialogFinished()));
     dlg->show();
+}
+
+void UserContextMenu::banUserHistory_processResponse(const Response &resp) {
+    const Response_BanHistory &response = resp.GetExtension(Response_BanHistory::ext);
+    if (resp.response_code() == Response::RespOk) {
+
+        if (response.ban_list_size() > 0) {
+            QTableWidget *table = new QTableWidget();
+            table->setWindowTitle(tr("Ban History"));
+            table->setRowCount(response.ban_list_size());
+            table->setColumnCount(5);
+            table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+            table->setHorizontalHeaderLabels(
+                    QString(tr("Ban Time;Moderator;Ban Length;Ban Reason;Visible Reason")).split(";"));
+
+            ServerInfo_Ban ban; for (int i = 0; i < response.ban_list_size(); ++i) {
+                ban = response.ban_list(i);
+                table->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(ban.ban_time())));
+                table->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(ban.admin_name())));
+                table->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(ban.ban_length())));
+                table->setItem(i, 3, new QTableWidgetItem(QString::fromStdString(ban.ban_reason())));
+                table->setItem(i, 4, new QTableWidgetItem(QString::fromStdString(ban.visible_reason())));
+            }
+
+            table->resizeColumnsToContents();
+            table->setMinimumSize(table->horizontalHeader()->length() + (table->columnCount() * 5), table->verticalHeader()->length() + (table->rowCount() * 3));
+            table->show();
+        } else
+            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Ban History"), tr("User has never been banned."));
+
+    } else
+        QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Ban History"), tr("Failed to collecting ban information."));
 }
 
 void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const CommandContainer &commandContainer)
@@ -158,6 +199,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     if (!tabSupervisor->getAdminLocked()) {
         menu->addSeparator();
         menu->addAction(aBan);
+        menu->addAction(aBanHistory);
 
         menu->addSeparator();
         if (userLevel.testFlag(ServerInfo_User::IsModerator) && (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
@@ -177,6 +219,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     aRemoveFromIgnoreList->setEnabled(anotherUser);
     aKick->setEnabled(anotherUser);
     aBan->setEnabled(anotherUser);
+    aBanHistory->setEnabled(anotherUser);
     aPromoteToMod->setEnabled(anotherUser);
     aDemoteFromMod->setEnabled(anotherUser);
 
@@ -238,6 +281,12 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
 
         PendingCommand *pend = client->prepareAdminCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(adjustMod_processUserResponse(Response, CommandContainer)));
+        client->sendCommand(pend);
+    } else if (actionClicked == aBanHistory) {
+        Command_GetBanHistory cmd;
+        cmd.set_user_name(userName.toStdString());
+        PendingCommand *pend = client->prepareModeratorCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(banUserHistory_processResponse(Response)));
         client->sendCommand(pend);
     }
 
