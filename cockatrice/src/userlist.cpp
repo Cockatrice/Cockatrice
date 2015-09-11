@@ -124,19 +124,19 @@ void BanDialog::okClicked()
     }
 
     if (nameBanCheckBox->isChecked())
-        if (nameBanEdit->text() == ""){
+        if (nameBanEdit->text().simplified() == ""){
             QMessageBox::critical(this, tr("Error"), tr("You must have a value in the name ban when selecting the name ban checkbox."));
             return;
         }
 
     if (ipBanCheckBox->isChecked())
-        if (ipBanEdit->text() == ""){
+        if (ipBanEdit->text().simplified() == ""){
             QMessageBox::critical(this, tr("Error"), tr("You must have a value in the ip ban when selecting the ip ban checkbox."));
             return;
         }
 
     if (idBanCheckBox->isChecked())
-        if (idBanCheckBox->text() == ""){
+        if (idBanEdit->text().simplified() == ""){
             QMessageBox::critical(this, tr("Error"), tr("You must have a value in the clientid ban when selecting the clientid ban checkbox."));
             return;
         }
