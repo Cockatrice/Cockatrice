@@ -452,6 +452,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     scene = new GameScene(phasesToolbar, this);
     gameView = new GameView(scene);
     gameView->hide();
+    gameView->setFocusPolicy(Qt::ClickFocus);
     
     cardInfo = new CardFrame();
     playerListWidget = new PlayerListWidget(tabSupervisor, clients.first(), this);

@@ -19,11 +19,11 @@ public:
     QString getDefaultShortcutString(QString name);
     QString getShortcutString(QString name);
 
-    void setShortcuts(QString name, QList<QKeySequence> secuence);
-    void setShortcuts(QString name, QKeySequence secuence);
-    void setShortcuts(QString name, QString secuences);
+    void setShortcuts(QString name, QList<QKeySequence> Sequence);
+    void setShortcuts(QString name, QKeySequence Sequence);
+    void setShortcuts(QString name, QString Sequences);
 
-    bool isValid(QString name, QString secuences);
+    bool isValid(QString name, QString Sequences);
 signals:
     void shortCutchanged();
 
@@ -33,8 +33,8 @@ private:
     QMap<QString,QList<QKeySequence> > defaultShortCuts;
     void fillDefaultShorcuts();
 
-    QString stringifySecuence(QList<QKeySequence> secuence) const;
-    QList<QKeySequence> parseSecuenceString(QString stringSecuence);
+    QString stringifySequence(QList<QKeySequence> Sequence) const;
+    QList<QKeySequence> parseSequenceString(QString stringSequence);
 };
 
 #endif // SHORTCUTSSETTINGS_H
