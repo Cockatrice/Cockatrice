@@ -222,7 +222,7 @@ bool Servatrice::initServer()
 
     const QString roomMethod = settingsCache->value("rooms/method").toString();
     if (roomMethod == "sql") {
-        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, permissionlevel, auto_join, join_message from {prefix}_rooms order by id asc");
+        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, permissionlevel, auto_join, join_message, chat_history_size from {prefix}_rooms order by id asc");
         servatriceDatabaseInterface->execSqlQuery(query);
         while (query->next()) {
             QSqlQuery *query2 = servatriceDatabaseInterface->prepareQuery("select name from {prefix}_rooms_gametypes where id_room = :id_room");
@@ -233,6 +233,7 @@ bool Servatrice::initServer()
                 gameTypes.append(query2->value(0).toString());
 
             addRoom(new Server_Room(query->value(0).toInt(),
+                                    query->value(6).toInt(),
                                     query->value(1).toString(),
                                     query->value(2).toString(),
                                     query->value(3).toString().toLower(),
@@ -257,6 +258,7 @@ bool Servatrice::initServer()
 
             Server_Room *newRoom = new Server_Room(
                 i,
+                settingsCache->value("chathistorysize").toInt(),
                 settingsCache->value("name").toString(),
                 settingsCache->value("description").toString(),
                 settingsCache->value("permissionlevel").toString().toLower(),
@@ -273,6 +275,7 @@ bool Servatrice::initServer()
             // no room defined in config, add a dummy one
             Server_Room *newRoom = new Server_Room(
                 0,
+                100,
                 "General room",
                 "Play anything here.",
                 "none",

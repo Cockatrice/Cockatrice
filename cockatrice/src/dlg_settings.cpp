@@ -483,6 +483,9 @@ MessagesSettingsPage::MessagesSettingsPage()
     mentionPopups.setChecked(settingsCache->getShowMentionPopup());
     connect(&mentionPopups, SIGNAL(stateChanged(int)), settingsCache, SLOT(setShowMentionPopups(int)));
 
+    roomHistory.setChecked(settingsCache->getRoomHistory());
+    connect(&roomHistory, SIGNAL(stateChanged(int)), settingsCache, SLOT(setRoomHistory(int)));
+
     customAlertString = new QLineEdit();
     customAlertString->setPlaceholderText("Word1 Word2 Word3");
     customAlertString->setText(settingsCache->getHighlightWords());
@@ -498,6 +501,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0);
     chatGrid->addWidget(&messagePopups, 4, 0);
     chatGrid->addWidget(&mentionPopups, 5, 0);
+    chatGrid->addWidget(&roomHistory, 6, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
     
@@ -626,7 +630,8 @@ void MessagesSettingsPage::retranslateUi()
     invertMentionForeground.setText(tr("Invert text color"));
     invertHighlightForeground.setText(tr("Invert text color"));
     messagePopups.setText(tr("Enable desktop notifications for private messages"));
-    mentionPopups.setText(tr("Enable desktop notification for mentions."));
+    mentionPopups.setText(tr("Enable desktop notification for mentions"));
+    roomHistory.setText(tr("Enable room message history on join"));
     hexLabel.setText(tr("(Color is hexadecimal)"));
     hexHighlightLabel.setText(tr("(Color is hexadecimal)"));
     customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));

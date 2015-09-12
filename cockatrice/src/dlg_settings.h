@@ -153,6 +153,7 @@ private:
     QCheckBox ignoreUnregUserMessages;
     QCheckBox messagePopups;
     QCheckBox mentionPopups;
+    QCheckBox roomHistory;
     QGroupBox *chatGroupBox;
     QGroupBox *highlightGroupBox;
     QGroupBox *messageShortcuts;

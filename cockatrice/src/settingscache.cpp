@@ -208,6 +208,7 @@ SettingsCache::SettingsCache()
     scaleCards = settings->value("cards/scaleCards", true).toBool();
     showMessagePopups = settings->value("chat/showmessagepopups", true).toBool();
     showMentionPopups = settings->value("chat/showmentionpopups", true).toBool();
+    roomHistory = settings->value("chat/roomhistory", true).toBool();
 
     leftJustified = settings->value("interface/leftjustified", false).toBool();
 
@@ -263,6 +264,11 @@ void SettingsCache::setShowMessagePopups(const int _showMessagePopups) {
 void SettingsCache::setShowMentionPopups(const int _showMentionPopus) {
     showMentionPopups = _showMentionPopus;
     settings->setValue("chat/showmentionpopups", showMentionPopups);
+}
+
+void SettingsCache::setRoomHistory(const int _roomHistory) {
+    roomHistory = _roomHistory;
+    settings->setValue("chat/roomhistory", roomHistory);
 }
 
 void SettingsCache::setLang(const QString &_lang)

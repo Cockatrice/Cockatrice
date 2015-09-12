@@ -8,6 +8,7 @@
 #include <QAction>
 #include "userlist.h"
 #include "user_level.h"
+#include "room_message_type.h"
 #include "tab_supervisor.h"
 
 class QTextTable;
@@ -59,7 +60,7 @@ public:
     void retranslateUi();
     void appendHtml(const QString &html);
     void appendHtmlServerMessage(const QString &html, bool optionalIsBold = false, QString optionalFontColor = QString());
-    void appendMessage(QString message, QString sender = QString(), UserLevelFlags userLevel = UserLevelFlags(), bool playerBold = false);
+    void appendMessage(QString message, RoomMessageTypeFlags messageType = 0, QString sender = QString(), UserLevelFlags userLevel = UserLevelFlags(), bool playerBold = false);
     void clearChat();
 protected:
     void enterEvent(QEvent *event);

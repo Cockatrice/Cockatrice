@@ -2,6 +2,7 @@
 #include "server_protocolhandler.h"
 #include "server_game.h"
 #include <QDebug>
+#include <QDateTime>
 
 #include "pb/commands.pb.h"
 #include "pb/room_commands.pb.h"
@@ -10,10 +11,11 @@
 #include "pb/event_list_games.pb.h"
 #include "pb/event_room_say.pb.h"
 #include "pb/serverinfo_room.pb.h"
+#include "pb/serverinfo_chat_message.pb.h"
 #include <google/protobuf/descriptor.h>
 
-Server_Room::Server_Room(int _id, const QString &_name, const QString &_description, const QString &_permissionLevel, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
-    : QObject(parent), id(_id), name(_name), description(_description), permissionLevel(_permissionLevel), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), gamesLock(QReadWriteLock::Recursive)
+Server_Room::Server_Room(int _id, int _chatHistorySize, const QString &_name, const QString &_description, const QString &_permissionLevel, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
+    : QObject(parent), id(_id), chatHistorySize(_chatHistorySize), name(_name), description(_description), permissionLevel(_permissionLevel), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), gamesLock(QReadWriteLock::Recursive)
 {
     connect(this, SIGNAL(gameListChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)), Qt::QueuedConnection);
 }
@@ -232,6 +234,22 @@ void Server_Room::say(const QString &userName, const QString &s, bool sendToIsl)
     event.set_name(userName.toStdString());
     event.set_message(s.toStdString());
     sendRoomEvent(prepareRoomEvent(event), sendToIsl);
+ 
+    if (chatHistorySize != 0) {
+
+        ServerInfo_ChatMessage chatMessage;
+        QDateTime dateTime = dateTime.currentDateTimeUtc();
+        QString dateTimeString = dateTime.toString();
+        chatMessage.set_time(dateTimeString.toStdString());
+        chatMessage.set_sender_name(userName.toStdString());
+        chatMessage.set_message(s.simplified().toStdString());
+
+        if (chatHistory.size() >= chatHistorySize)
+            chatHistory.removeAt(0);
+
+        chatHistory << chatMessage;
+    }
+
 }
 
 void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl)

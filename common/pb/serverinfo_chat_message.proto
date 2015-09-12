@@ -1,0 +1,16 @@
+syntax = "proto2";
+/*
+ * Chat communication of a user to a target.
+ * Targets can be users or rooms.
+ * These communications are also stored in the DB log table.
+ */
+message ServerInfo_ChatMessage {
+    optional string time = 1; // time chat was sent
+    optional string sender_id = 2; // id of sender
+    optional string sender_name = 3; // name of sender
+    optional string sender_ip = 4; // ip of sender
+    optional string message = 5;  // message
+    optional string target_type = 6; // target type (room,game,chat)
+    optional string target_id = 7; // id of target
+    optional string target_name = 8; // name of target
+}

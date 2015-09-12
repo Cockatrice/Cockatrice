@@ -168,12 +168,12 @@ void MessageLogWidget::logConnectionStateChanged(Player *player, bool connection
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-    appendMessage(message, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()), true);
+    appendMessage(message, 0, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()), true);
 }
 
 void MessageLogWidget::logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString message)
 {
-    appendMessage(message, spectatorName, spectatorUserLevel, false);
+    appendMessage(message, 0, spectatorName, spectatorUserLevel, false);
 }
 
 void MessageLogWidget::logShuffle(Player *player, CardZone *zone)

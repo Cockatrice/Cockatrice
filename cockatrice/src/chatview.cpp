@@ -12,6 +12,7 @@
 #include "settingscache.h"
 #include "tab_userlists.h"
 #include "soundengine.h"
+#include "room_message_type.h"
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
 const QColor OTHER_USER_COLOR = QColor(0, 65, 255); // dark blue
@@ -121,7 +122,7 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
     cursor.setCharFormat(oldFormat);
 }
 
-void ChatView::appendMessage(QString message, QString sender, UserLevelFlags userLevel, bool playerBold)
+void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, QString sender, UserLevelFlags userLevel, bool playerBold)
 {
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     bool sameSender = (sender == lastSender) && !lastSender.isEmpty();
@@ -129,7 +130,7 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     lastSender = sender;
     
     // timestamp
-    if (showTimestamps && !sameSender) {
+    if (showTimestamps && !sameSender && !sender.isEmpty()) {
         QTextCharFormat timeFormat;
         timeFormat.setForeground(QColor(SERVER_MESSAGE_COLOR));
         if (sender.isEmpty())
@@ -168,8 +169,17 @@ void ChatView::appendMessage(QString message, QString sender, UserLevelFlags use
     // use different color for server messages 
     defaultFormat = QTextCharFormat();
     if (sender.isEmpty()) {
-        defaultFormat.setForeground(Qt::darkGreen);
-        defaultFormat.setFontWeight(QFont::Bold);
+        switch (messageType) {
+            case Event_RoomSay::Welcome:
+                defaultFormat.setForeground(Qt::darkGreen);
+                defaultFormat.setFontWeight(QFont::Bold);
+                break;
+            case Event_RoomSay::ChatHistory:
+                defaultFormat.setForeground(Qt::gray);
+                defaultFormat.setFontWeight(QFont::Light);
+                defaultFormat.setFontItalic(true);
+                break;
+        }
     }
     cursor.setCharFormat(defaultFormat);
 
