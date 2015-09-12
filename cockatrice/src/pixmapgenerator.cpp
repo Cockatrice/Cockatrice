@@ -104,11 +104,12 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
     if (pmCache.contains(key))
         return pmCache.value(key);
     
-    QPixmap pixmap = QPixmap("theme:countries/" + countryCode.toLower()).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    int width = height * 2;
+    QPixmap pixmap = QPixmap("theme:countries/" + countryCode.toLower()).scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     QPainter painter(&pixmap);
     painter.setPen(Qt::black);
-    painter.drawRect(0, 0, height - 1, height - 1);
+    painter.drawRect(0, 0, pixmap.width() - 1, pixmap.height() - 1);
     
     pmCache.insert(key, pixmap);
     return pixmap;
