@@ -21,7 +21,7 @@ private:
     QStringMap availableThemes;
 protected:
     void ensureThemeDirectoryExists();
-    QBrush loadBrush(QDir dir, QString fileName, QColor fallbackColor);
+    QBrush loadBrush(QString fileName, QColor fallbackColor);
 public:
     QBrush &getHandBgBrush() { return handBgBrush; }
     QBrush &getStackBgBrush() { return stackBgBrush; }
