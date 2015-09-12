@@ -37,7 +37,7 @@ bool MessageLogWidget::userIsFemale() const
 
 void MessageLogWidget::logGameJoined(int gameId)
 {
-    soundEngine->playerJoined();
+    soundEngine->playSound("player_join");
     if (userIsFemale())
         appendHtmlServerMessage(tr("You have joined game #%1.", "female").arg("<font color=\"blue\">"+ QString::number(gameId) + "</font>"));
     else
@@ -54,7 +54,7 @@ void MessageLogWidget::logReplayStarted(int gameId)
 
 void MessageLogWidget::logJoin(Player *player)
 {
-    soundEngine->playerJoined();
+    soundEngine->playSound("player_join");
     if (isFemale(player))
         appendHtmlServerMessage(tr("%1 has joined the game.", "female").arg(sanitizeHtml(player->getName())));
     else
@@ -63,6 +63,7 @@ void MessageLogWidget::logJoin(Player *player)
 
 void MessageLogWidget::logLeave(Player *player)
 {
+    soundEngine->playSound("player_leave");
     if (isFemale(player))
         appendHtmlServerMessage(tr("%1 has left the game.", "female").arg(sanitizeHtml(player->getName())));
     else
@@ -81,11 +82,13 @@ void MessageLogWidget::logKicked()
 
 void MessageLogWidget::logJoinSpectator(QString name)
 {
+    soundEngine->playSound("spectator_join");
     appendHtmlServerMessage(tr("%1 is now watching the game.").arg(sanitizeHtml(name)));
 }
 
 void MessageLogWidget::logLeaveSpectator(QString name)
 {
+    soundEngine->playSound("spectator_leave");
     appendHtmlServerMessage(tr("%1 is not watching the game any more.").arg(sanitizeHtml(name)));
 }
 
@@ -134,6 +137,7 @@ void MessageLogWidget::logSetSideboardLock(Player *player, bool locked)
 
 void MessageLogWidget::logConcede(Player *player)
 {
+    soundEngine->playSound("player_concede");
     if (isFemale(player))
         appendHtmlServerMessage(tr("%1 has conceded the game.", "female").arg(sanitizeHtml(player->getName())));
     else
@@ -148,11 +152,13 @@ void MessageLogWidget::logGameStart()
 void MessageLogWidget::logConnectionStateChanged(Player *player, bool connectionState)
 {
     if (connectionState) {
+        soundEngine->playSound("player_reconnect");
         if (isFemale(player))
             appendHtmlServerMessage(tr("%1 has restored connection to the game.", "female").arg(sanitizeHtml(player->getName())));
         else
             appendHtmlServerMessage(tr("%1 has restored connection to the game.", "male").arg(sanitizeHtml(player->getName())));
     } else {
+        soundEngine->playSound("player_disconnect");
         if (isFemale(player))
             appendHtmlServerMessage(tr("%1 has lost connection to the game.", "female").arg(sanitizeHtml(player->getName())));
         else
@@ -172,6 +178,7 @@ void MessageLogWidget::logSpectatorSay(QString spectatorName, UserLevelFlags spe
 
 void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
 {
+    soundEngine->playSound("shuffle");
     if (currentContext != MessageContext_Mulligan) {
         appendHtmlServerMessage((isFemale(player)
             ? tr("%1 shuffles %2.", "female")
@@ -183,6 +190,7 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
 
 void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 {
+    soundEngine->playSound("roll_dice");
     if (isFemale(player))
         appendHtmlServerMessage(tr("%1 rolls a %2 with a %3-sided die.", "female").arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + QString::number(roll) + "</font>").arg("<font color=\"blue\">" + QString::number(sides) + "</font>"));
     else
@@ -194,6 +202,7 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
     if (currentContext == MessageContext_Mulligan)
         mulliganPlayer = player;
     else {
+        soundEngine->playSound("draw_card");
         if (isFemale(player))
             appendHtmlServerMessage(tr("%1 draws %2 card(s).", "female").arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + QString::number(number) + "</font>"));
         else
@@ -296,6 +305,7 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
     
     QString finalStr;
     if (targetName == "table") {
+        soundEngine->playSound("play_card");
         if (moveCardTapped.value(attributes.card))
             finalStr = tr("%1 puts %2 into play tapped%3.");
         else
@@ -318,6 +328,7 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
     } else if (targetName == "sb")
         finalStr = tr("%1 moves %2%3 to sideboard.");
     else if (targetName == "stack") {
+        soundEngine->playSound("play_card");
         finalStr = tr("%1 plays %2%3.");
     }
     
@@ -565,7 +576,10 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 
 void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 {
-    soundEngine->tap();
+    if (tapped)
+        soundEngine->playSound("tap_card");
+    else
+        soundEngine->playSound("untap_card");
     
     if (currentContext == MessageContext_MoveCard)
         moveCardTapped.insert(card, tapped);
@@ -603,6 +617,9 @@ void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 
 void MessageLogWidget::logSetCounter(Player *player, QString counterName, int value, int oldValue)
 {
+    if (counterName == "life")
+        soundEngine->playSound("life_change");
+    
     QString str;
     if (isFemale(player))
         str = tr("%1 sets counter %2 to %3 (%4%5).", "female");
@@ -799,17 +816,17 @@ void MessageLogWidget::logSetActivePhase(int phase)
 {
     QString phaseName;
     switch (phase) {
-        case 0: phaseName = tr("untap step"); break;
-        case 1: phaseName = tr("upkeep step"); break;
-        case 2: phaseName = tr("draw step"); break;
-        case 3: phaseName = tr("first main phase"); break;
-        case 4: phaseName = tr("beginning of combat step"); break;
-        case 5: phaseName = tr("declare attackers step"); soundEngine->attack(); break;
-        case 6: phaseName = tr("declare blockers step"); break;
-        case 7: phaseName = tr("combat damage step"); break;
-        case 8: phaseName = tr("end of combat step"); break;
-        case 9: phaseName = tr("second main phase"); break;
-        case 10: phaseName = tr("ending phase"); soundEngine->endStep(); break;
+        case 0: phaseName = tr("untap step"); soundEngine->playSound("untap_step"); break;
+        case 1: phaseName = tr("upkeep step"); soundEngine->playSound("upkeep_step"); break;
+        case 2: phaseName = tr("draw step"); soundEngine->playSound("draw_step"); break;
+        case 3: phaseName = tr("first main phase"); soundEngine->playSound("main_1"); break;
+        case 4: phaseName = tr("beginning of combat step"); soundEngine->playSound("start_combat"); break;
+        case 5: phaseName = tr("declare attackers step"); soundEngine->playSound("attack_step"); break;
+        case 6: phaseName = tr("declare blockers step"); soundEngine->playSound("block_step"); break;
+        case 7: phaseName = tr("combat damage step"); soundEngine->playSound("damage_step"); break;
+        case 8: phaseName = tr("end of combat step"); soundEngine->playSound("end_combat"); break;
+        case 9: phaseName = tr("second main phase"); soundEngine->playSound("main_2"); break;
+        case 10: phaseName = tr("ending phase"); soundEngine->playSound("end_step"); break;
     }
     appendHtml("<font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + tr("It is now the %1.").arg(phaseName) + "</b></font>");
 }

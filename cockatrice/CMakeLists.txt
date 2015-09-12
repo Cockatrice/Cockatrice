@@ -137,22 +137,14 @@ set(COCKATRICE_LIBS)
 
 # Qt4 stuff
 if(Qt4_FOUND)
-    if (NOT QT_QTMULTIMEDIA_FOUND)
-        FIND_PACKAGE(QtMobility REQUIRED)
-    endif()
-
     SET(QT_USE_QTNETWORK TRUE)
-    SET(QT_USE_QTMULTIMEDIA TRUE)
     SET(QT_USE_QTSVG TRUE)
 
     # Include directories
     INCLUDE(${QT_USE_FILE})
     INCLUDE_DIRECTORIES(${QT_INCLUDES})
-    INCLUDE_DIRECTORIES(${QT_MOBILITY_INCLUDE_DIR})
-    INCLUDE_DIRECTORIES(${QT_MOBILITY_MULTIMEDIAKIT_INCLUDE_DIR})
     LIST(APPEND COCKATRICE_LIBS ${QT_LIBRARIES})
     LIST(APPEND COCKATRICE_LIBS ${QT_QTMAIN_LIBRARY})
-    LIST(APPEND COCKATRICE_LIBS ${QT_MOBILITY_MULTIMEDIAKIT_LIBRARY})
 
     # Let cmake chew Qt4's translations and resource files
     # Note: header files are MOC-ed automatically by cmake
@@ -281,11 +273,11 @@ if(APPLE)
     set(plugin_dest_dir cockatrice.app/Contents/Plugins)
     set(qtconf_dest_dir cockatrice.app/Contents/Resources)
 
-    # qt4: codecs, iconengines, imageformats, phonon_backend
+    # qt4: codecs, iconengines, imageformats
     # qt5: audio, iconengines, imageformats, platforms, printsupport
 
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|phonon_backend|platforms|printsupport)/.*\\.dylib"
+        FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|platforms|printsupport)/.*\\.dylib"
         REGEX ".*_debug\\.dylib" EXCLUDE)
 
     install(CODE "
@@ -309,11 +301,11 @@ if(WIN32)
     set(plugin_dest_dir Plugins)
     set(qtconf_dest_dir .)
 
-    # qt4: codecs, iconengines, imageformats, phonon_backend
+    # qt4: codecs, iconengines, imageformats
     # qt5: audio, iconengines, imageformats, platforms, printsupport
 
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|phonon_backend|platforms|printsupport)/.*[^d]\\.dll")
+        FILES_MATCHING REGEX "(audio|codecs|iconengines|imageformats|platforms|printsupport)/.*[^d]\\.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]

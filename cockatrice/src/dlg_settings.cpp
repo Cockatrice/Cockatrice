@@ -646,7 +646,7 @@ SoundSettingsPage::SoundSettingsPage()
     connect(soundPathClearButton, SIGNAL(clicked()), this, SLOT(soundPathClearButtonClicked()));
     QPushButton *soundPathButton = new QPushButton("...");
     connect(soundPathButton, SIGNAL(clicked()), this, SLOT(soundPathButtonClicked()));
-    connect(&soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(playerJoined()));
+    connect(&soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(testSound()));
 
     masterVolumeSlider = new QSlider(Qt::Horizontal);
     masterVolumeSlider->setMinimum(0);
@@ -654,7 +654,7 @@ SoundSettingsPage::SoundSettingsPage()
     masterVolumeSlider->setValue(settingsCache->getMasterVolume());
     masterVolumeSlider->setToolTip(QString::number(settingsCache->getMasterVolume()));
     connect(settingsCache, SIGNAL(masterVolumeChanged(int)), this, SLOT(masterVolumeChanged(int)));
-    connect(masterVolumeSlider, SIGNAL(sliderReleased()), soundEngine, SLOT(playerJoined()));
+    connect(masterVolumeSlider, SIGNAL(sliderReleased()), soundEngine, SLOT(testSound()));
     connect(masterVolumeSlider, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMasterVolume(int)));
 
     
