@@ -53,21 +53,21 @@ void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 
 void TabDeckEditor::createShowHideDocksButtons()
 {
-    btnFilter = new QPushButton(QIcon("theme:icons/view.svg"),QString());
+    btnFilter = new QPushButton(QPixmap("theme:icons/view"),QString());
     btnFilter->setObjectName("btnFilter");
     btnFilter->setCheckable(true);
     btnFilter->setChecked(true);
     btnFilter->setMaximumWidth(30);
     searchLayout->addWidget(btnFilter);
 
-    btnDeck = new QPushButton(QIcon("theme:hand.svg"),QString());
+    btnDeck = new QPushButton(QPixmap("theme:hand"),QString());
     btnDeck->setObjectName("btnDeck");
     btnDeck->setCheckable(true);
     btnDeck->setChecked(true);
     btnDeck->setMaximumWidth(30);
     searchLayout->addWidget(btnDeck);
 
-    btnCard = new QPushButton(QIcon("theme:back.svg"),QString());
+    btnCard = new QPushButton(QPixmap("theme:cardback"),QString());
     btnCard->setObjectName("btnCard");
     btnCard->setCheckable(true);
     btnCard->setChecked(true);
@@ -134,7 +134,7 @@ void TabDeckEditor::createDeckDock()
 
     /* Update price
     aUpdatePrices = new QAction(QString(), this);
-    aUpdatePrices->setIcon(QIcon("theme:icons/update.png"));
+    aUpdatePrices->setIcon(QPixmap("theme:icons/update"));
     connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
     if (!settingsCache->getPriceTagFeature())
         aUpdatePrices->setVisible(false);
@@ -318,11 +318,11 @@ void TabDeckEditor::createMenus()
     addTabMenu(deckMenu);
 
     aClearFilterAll = new QAction(QString(), this);
-    aClearFilterAll->setIcon(QIcon("theme:icons/clearsearch.svg"));
+    aClearFilterAll->setIcon(QPixmap("theme:icons/clearsearch"));
     connect(aClearFilterAll, SIGNAL(triggered()), this, SLOT(actClearFilterAll()));
 
     aClearFilterOne = new QAction(QString(), this);
-    aClearFilterOne->setIcon(QIcon("theme:icons/decrement.svg"));
+    aClearFilterOne->setIcon(QPixmap("theme:icons/decrement"));
     connect(aClearFilterOne, SIGNAL(triggered()), this, SLOT(actClearFilterOne()));
 
     dbMenu = new QMenu(this);
@@ -344,7 +344,7 @@ void TabDeckEditor::createCentralFrame()
     searchEdit = new SearchLineEdit;
     searchEdit->setObjectName("searchEdit");
 #if QT_VERSION >= 0x050300
-    searchEdit->addAction(QIcon("theme:icons/search.svg"), QLineEdit::LeadingPosition);
+    searchEdit->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
 #endif
 
     setFocusProxy(searchEdit);
@@ -383,19 +383,19 @@ void TabDeckEditor::createCentralFrame()
     searchEdit->setTreeView(databaseView);
 
     aAddCard = new QAction(QString(), this);
-    aAddCard->setIcon(QIcon("theme:icons/arrow_right_green.svg"));
+    aAddCard->setIcon(QPixmap("theme:icons/arrow_right_green"));
     connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
     aAddCardToSideboard = new QAction(QString(), this);
-    aAddCardToSideboard->setIcon(QIcon("theme:icons/arrow_right_blue.svg"));
+    aAddCardToSideboard->setIcon(QPixmap("theme:icons/arrow_right_blue"));
     connect(aAddCardToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
     aRemoveCard = new QAction(QString(), this);
-    aRemoveCard->setIcon(QIcon("theme:icons/remove_row.svg"));
+    aRemoveCard->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
     aIncrement = new QAction(QString(), this);
-    aIncrement->setIcon(QIcon("theme:icons/increment.svg"));
+    aIncrement->setIcon(QPixmap("theme:icons/increment"));
     connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
     aDecrement = new QAction(QString(), this);
-    aDecrement->setIcon(QIcon("theme:icons/decrement.svg"));
+    aDecrement->setIcon(QPixmap("theme:icons/decrement"));
     connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
 
     QToolBar *deckEditToolBar = new QToolBar;

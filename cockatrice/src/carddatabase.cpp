@@ -625,7 +625,7 @@ void CardInfo::loadPixmap(QPixmap &pixmap)
     pixmap = QPixmap();
 
     if (getName().isEmpty()) {
-        pixmap = themeManager->getCardBackPixmap();
+        pixmap = QPixmap("theme:cardback");
         return;
     }
 
@@ -656,7 +656,7 @@ void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
     loadPixmap(bigPixmap);
     if (bigPixmap.isNull()) {
         if (getName().isEmpty()) {
-            pixmap = themeManager->getCardBackPixmap();
+            pixmap = pixmap = QPixmap("theme:cardback");
         } else {
             pixmap = QPixmap(); // null
             return;
