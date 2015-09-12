@@ -14,9 +14,9 @@
         <translation>言語:</translation>
     </message>
     <message>
-        <source>This wizard will import the list of sets and cards that will be used by Cockatrice.&lt;br/&gt;You will need to specify an url or a filename that will be used as a source, and then choose the wanted sets from the list of the available ones.</source>
-        <translation>このウィザードでは、Cockatriceが使用するカードセットやカードのリストをインポートします。
-ソースとして使用するURLまたはファイルを指定した後、利用可能リストから入れたいセットを選択します。</translation>
+        <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
+You will need to specify a URL or a filename that will be used as a source.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -26,20 +26,8 @@
         <translation>ソース選択</translation>
     </message>
     <message>
-        <source>Please specify a source for the list of sets and cards. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation>カードセットやカードのリストのソースを指定してください。ダウンロード可能なURLか、コンピューターにあるソースファイルを指定することができます。</translation>
-    </message>
-    <message>
-        <source>Download url:</source>
-        <translation>ダウンロードURL:</translation>
-    </message>
-    <message>
         <source>Local file:</source>
         <translation>ローカルファイル:</translation>
-    </message>
-    <message>
-        <source>Restore default url</source>
-        <translation>デフォルトのURLを復元</translation>
     </message>
     <message>
         <source>Choose file...</source>
@@ -60,10 +48,6 @@
     <message>
         <source>Error</source>
         <translation>エラー</translation>
-    </message>
-    <message>
-        <source>The provided url is not valid.</source>
-        <translation>指定されたURLは無効です。</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
@@ -113,43 +97,59 @@
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
         <translation>ファイルは正常に取得されたが、カードセットのデータが含まれていませんでした。</translation>
     </message>
+    <message>
+        <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download URL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default URL</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided URL is not valid.</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>LoadTokensPage</name>
     <message>
         <source>Tokens source selection</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Please specify a source for the list of tokens. You can specify an url address that will be download or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Download url:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Restore default url</source>
-        <translation type="unfinished"/>
+        <translation>トークンのソース選択</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>The provided url is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>エラー</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>ダウンロード中 (0MB)</translation>
     </message>
     <message>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>ダウンロード中 (%1MB)</translation>
     </message>
     <message>
         <source>Network error: %1.</source>
+        <translation>ネットワークエラー: %1。</translation>
+    </message>
+    <message>
+        <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Download URL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Restore default URL</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The provided URL is not valid.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -228,40 +228,41 @@
     <name>SaveTokensPage</name>
     <message>
         <source>Tokens imported</source>
-        <translation type="unfinished"/>
+        <translation>トークンインポート</translation>
     </message>
     <message>
         <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
-        <translation type="unfinished"/>
+        <translation>トークンがインポートされました。”保存”をクリックするとインポートしたトークンをCockatriceデータベースに保存します。</translation>
     </message>
     <message>
         <source>Save to the default path (recommended)</source>
-        <translation type="unfinished"/>
+        <translation>デフォルトのパスに保存 (推奨)</translation>
     </message>
     <message>
         <source>Save token database</source>
-        <translation type="unfinished"/>
+        <translation>トークンデータベースを保存</translation>
     </message>
     <message>
         <source>XML; token database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; token database (*.xml)</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>完了</translation>
     </message>
     <message>
         <source>The token database has been saved successfully to
 %1</source>
-        <translation type="unfinished"/>
+        <translation>トークンデータベースは以下に保存されました:
+%1</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>エラー</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>
-        <translation type="unfinished"/>
+        <translation>%1に保存できませんでした。</translation>
     </message>
 </context>
 <context>

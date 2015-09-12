@@ -30,6 +30,7 @@
 #include <QDateTime>
 #include <QSystemTrayIcon>
 #include <QApplication>
+
 #if QT_VERSION < 0x050000
     #include <QtGui/qtextdocument.h> // for Qt::escape()
 #endif
@@ -100,7 +101,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
 void MainWindow::processServerShutdownEvent(const Event_ServerShutdown &event)
 {
     serverShutdownMessageBox.setInformativeText(tr("The server is going to be restarted in %n minute(s).\nAll running games will be lost.\nReason for shutdown: %1", "", event.minutes()).arg(QString::fromStdString(event.reason())));
-    serverShutdownMessageBox.setIconPixmap(QPixmap(":/resources/appicon.svg").scaled(64, 64));
+    serverShutdownMessageBox.setIconPixmap(QPixmap("theme:appicon.svg").scaled(64, 64));
     serverShutdownMessageBox.setText(tr("Scheduled server shutdown"));
     serverShutdownMessageBox.setWindowModality(Qt::ApplicationModal);
     serverShutdownMessageBox.setVisible(true);
@@ -293,9 +294,23 @@ void MainWindow::serverTimeout()
     actConnect();
 }
 
-void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
+void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime, QList<QString> missingFeatures)
 {
     switch (r) {
+        case Response::RespClientUpdateRequired: {
+            QString formatedMissingFeatures;
+            formatedMissingFeatures = "Missing Features: ";
+            for (int i = 0; i < missingFeatures.size(); ++i)
+                formatedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i)   );
+
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.setWindowTitle(tr("Failed Login"));
+            msgBox.setText(tr("Your client does not support features that the server requires, please update your client and try again."));
+            msgBox.setDetailedText(formatedMissingFeatures);
+            msgBox.exec();
+            break;
+        }
         case Response::RespWrongPassword:
             QMessageBox::critical(this, tr("Error"), tr("Incorrect username or password. Please check your authentication information and try again."));
             break;
@@ -561,13 +576,13 @@ MainWindow::MainWindow(QWidget *parent)
     client = new RemoteClient;
     connect(client, SIGNAL(connectionClosedEventReceived(const Event_ConnectionClosed &)), this, SLOT(processConnectionClosedEvent(const Event_ConnectionClosed &)));
     connect(client, SIGNAL(serverShutdownEventReceived(const Event_ServerShutdown &)), this, SLOT(processServerShutdownEvent(const Event_ServerShutdown &)));
-    connect(client, SIGNAL(loginError(Response::ResponseCode, QString, quint32)), this, SLOT(loginError(Response::ResponseCode, QString, quint32)));
+    connect(client, SIGNAL(loginError(Response::ResponseCode, QString, quint32, QList<QString>)), this, SLOT(loginError(Response::ResponseCode, QString, quint32, QList<QString>)));
     connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
     connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
     connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
     connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
     connect(client, SIGNAL(userInfoChanged(const ServerInfo_User &)), this, SLOT(userInfoReceived(const ServerInfo_User &)), Qt::BlockingQueuedConnection);
-
+    connect(client, SIGNAL(notifyUserAboutUpdate()), this, SLOT(notifyUserAboutUpdate()));
     connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
     connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
     connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
@@ -584,7 +599,7 @@ MainWindow::MainWindow(QWidget *parent)
     tabSupervisor = new TabSupervisor(client);
     connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
     connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
-    connect(tabSupervisor, SIGNAL(maximize()), this, SLOT(maximize()));
+    connect(tabSupervisor, SIGNAL(showWindowIfHidden()), this, SLOT(showWindowIfHidden()));
     tabSupervisor->addDeckEditorTab(0);
 
     setCentralWidget(tabSupervisor);
@@ -618,7 +633,7 @@ void MainWindow::createTrayIcon() {
 
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
-    trayIcon->setIcon(QIcon(":/resources/appicon.svg"));
+    trayIcon->setIcon(QIcon("theme:cockatrice.svg"));
     trayIcon->show();
 
     connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,
@@ -670,7 +685,7 @@ void MainWindow::changeEvent(QEvent *event)
     else if(event->type() == QEvent::ActivationChange) {
         if(isActiveWindow() && !bHasActivated){
             bHasActivated = true;
-            if(settingsCache->getAutoConnect()) {
+            if(settingsCache->servers().getAutoConnect()) {
                 qDebug() << "Attempting auto-connect...";
                  DlgConnect dlg(this);
                  client->connectToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getPassword());
@@ -688,8 +703,10 @@ void MainWindow::pixmapCacheSizeChanged(int newSizeInMBs)
     QPixmapCache::setCacheLimit(newSizeInMBs * 1024);
 }
 
-void MainWindow::maximize() {
-    showNormal();
+void MainWindow::showWindowIfHidden() {
+    // keep the previous window state
+    setWindowState(windowState() & ~Qt::WindowMinimized);
+    show();
 }
 
 /* CARD UPDATER */
@@ -794,4 +811,9 @@ void MainWindow::refreshShortcuts()
     aSettings->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSettings"));
     aExit->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aExit"));
     aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aCheckCardUpdates"));
+}
+
+void MainWindow::notifyUserAboutUpdate()
+{
+    QMessageBox::information(this, tr("Information"), tr("Your client appears to be missing features that the server supports.\nThis usually means that your client version is out of date, please check to see if there is a new client available for download."));
 }

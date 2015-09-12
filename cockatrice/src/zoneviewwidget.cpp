@@ -20,44 +20,6 @@
 #include "pb/command_stop_dump_zone.pb.h"
 #include "pb/command_shuffle.pb.h"
 
-TitleLabel::TitleLabel()
-    : QGraphicsWidget(), text(" ")
-{
-    setAcceptHoverEvents(true);
-}
-
-void TitleLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
-{
-    QBrush windowBrush = palette().window();
-    windowBrush.setColor(windowBrush.color().darker(150));
-    painter->fillRect(boundingRect(), windowBrush);
-    painter->drawText(boundingRect(), Qt::AlignLeft | Qt::AlignVCenter, text);
-}
-
-QSizeF TitleLabel::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
-{
-    QFont f;
-    QFontMetrics fm(f);
-    if (which == Qt::MaximumSize)
-        return QSizeF(constraint.width(), fm.size(Qt::TextSingleLine, text).height() + 10);
-    else
-        return fm.size(Qt::TextSingleLine, text) + QSizeF(10, 10);
-}
-
-void TitleLabel::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        buttonDownPos = static_cast<GameScene *>(scene())->getViewTransform().inverted().map(event->pos());
-        event->accept();
-    } else
-        event->ignore();
-}
-
-void TitleLabel::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    emit mouseMoved(event->scenePos() - buttonDownPos);
-}
-
 ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, bool _revealZone, bool _writeableRevealZone, const QList<const ServerInfo_Card *> &cardList)
     : QGraphicsWidget(0, Qt::Window), canBeShuffled(_origZone->getIsShufflable()), player(_player)
 {
@@ -174,8 +136,20 @@ void ZoneViewWidget::retranslateUi()
     pileViewCheckBox.setText(tr("pile view"));
 }
 
-void ZoneViewWidget::moveWidget(QPointF scenePos)
+void ZoneViewWidget::moveEvent(QGraphicsSceneMoveEvent * /* event */)
 {
+    if(!scene())
+        return;
+
+    static int titleBarHeight = 0;
+    if(titleBarHeight == 0)
+    {
+        QStyleOptionTitleBar so;
+        titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight, &so, (QWidget*) this);
+    }
+
+    QPointF scenePos = pos();
+
     if(scenePos.x() < 0)
     {
         scenePos.setX(0);
@@ -185,16 +159,17 @@ void ZoneViewWidget::moveWidget(QPointF scenePos)
             scenePos.setX(maxw);
     }
 
-    if(scenePos.y() < 0)
+    if(scenePos.y() < titleBarHeight)
     {
-        scenePos.setY(0);
+        scenePos.setY(titleBarHeight);
     } else {
-        qreal maxh = scene()->sceneRect().height() - 100;
+        qreal maxh = scene()->sceneRect().height() - titleBarHeight;
         if(scenePos.y() > maxh)
             scenePos.setY(maxh);
     }
 
-    setPos(scenePos);
+    if(scenePos != pos())
+        setPos(scenePos);
 }
 
 void ZoneViewWidget::resizeToZoneContents()
@@ -250,5 +225,5 @@ void ZoneViewWidget::zoneDeleted()
 void ZoneViewWidget::initStyleOption(QStyleOption *option) const {
     QStyleOptionTitleBar *titleBar = qstyleoption_cast<QStyleOptionTitleBar *>(option);
     if (titleBar)
-        titleBar->icon = QIcon(":/resources/appicon.svg");
+        titleBar->icon = QIcon("theme:cockatrice.svg");
 }

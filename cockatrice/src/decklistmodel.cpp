@@ -469,7 +469,7 @@ void DeckListModel::printDeckList(QPrinter *printer)
     cursor.insertBlock(headerBlockFormat, headerCharFormat);
 
     for (int i = 0; i < root->size(); i++) {
-        cursor.insertHtml("<br><img src=:/resources/hr.jpg>");
+        cursor.insertHtml("<br><img src=theme:hr.jpg>");
         //cursor.insertHtml("<hr>");
         cursor.insertBlock(headerBlockFormat, headerCharFormat);
 

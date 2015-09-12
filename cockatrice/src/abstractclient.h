@@ -25,6 +25,7 @@ class Event_NotifyUser;
 class Event_ConnectionClosed;
 class Event_ServerShutdown;
 class Event_ReplayAdded;
+class FeatureSet;
 
 enum ClientStatus {
     StatusDisconnected,
@@ -96,6 +97,8 @@ public:
     static PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd, int roomId);
     static PendingCommand *prepareModeratorCommand(const ::google::protobuf::Message &cmd);
     static PendingCommand *prepareAdminCommand(const ::google::protobuf::Message &cmd);
+
+    QMap<QString, bool> clientFeatures;
 };
 
 #endif

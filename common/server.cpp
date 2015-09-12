@@ -32,6 +32,7 @@
 #include "pb/session_event.pb.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/isl_message.pb.h"
+#include "featureset.h"
 #include <QCoreApplication>
 #include <QThread>
 #include <QDebug>
@@ -39,6 +40,7 @@
 Server::Server(bool _threaded, QObject *parent)
     : QObject(parent), threaded(_threaded), nextLocalGameId(0)
 {
+    qRegisterMetaType<ServerInfo_Ban>("ServerInfo_Ban");
     qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
     qRegisterMetaType<ServerInfo_Room>("ServerInfo_Room");
     qRegisterMetaType<ServerInfo_User>("ServerInfo_User");
@@ -104,14 +106,12 @@ Server_DatabaseInterface *Server::getDatabaseInterface() const
     return databaseInterfaces.value(QThread::currentThread());
 }
 
-AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft, QString &clientid)
+AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft, QString &clientid, QString &clientVersion)
 {
     if (name.size() > 35)
         name = name.left(35);
 
     Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
-
-    QWriteLocker locker(&clientsLock);
 
     AuthenticationResult authState = databaseInterface->checkUserPassword(session, name, password, clientid, reasonStr, secondsLeft);
     if (authState == NotLoggedIn || authState == UserIsBanned || authState == UsernameInvalid || authState == UserIsInactive)
@@ -121,24 +121,25 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     data.set_address(session->getAddress().toStdString());
     name = QString::fromStdString(data.name()); // Compensate for case indifference
 
-    databaseInterface->lockSessionTables();
-
     if (authState == PasswordRight) {
-
-        // verify that new session would not cause problems with older existing session
         if (users.contains(name) || databaseInterface->userSessionExists(name)) {
-            qDebug("Session already logged in, logging old session out");
+            if (users.contains(name)) {
+                qDebug("Session already logged in, logging old session out");
+                Event_ConnectionClosed event;
+                event.set_reason(Event_ConnectionClosed::LOGGEDINELSEWERE);
+                event.set_reason_str("You have been logged out due to logging in at another location.");
+                event.set_end_time(QDateTime::currentDateTime().toTime_t());
 
-            Event_ConnectionClosed event;
-            event.set_reason(Event_ConnectionClosed::LOGGEDINELSEWERE);
-            event.set_reason_str("You have been logged out due to logging in at another location.");
-            event.set_end_time(QDateTime::currentDateTime().toTime_t());
+                SessionEvent *se = users.value(name)->prepareSessionEvent(event);
+                users.value(name)->sendProtocolItem(*se);
+                delete se;
 
-            SessionEvent *se = users.value(name)->prepareSessionEvent(event);
-            users.value(name)->sendProtocolItem(*se);
-            delete se;
-
+                users.value(name)->prepareDestroy();
+            } else {
+                qDebug() << "Active session and sessions table inconsistent, please validate session table information for user " << name;
+            }
         }
+
     } else if (authState == UnknownUser) {
         // Change user name so that no two users have the same names,
         // don't interfere with registered user names though.
@@ -156,6 +157,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
         data.set_name(name.toStdString());
     }
 
+    QWriteLocker locker(&clientsLock);
+    databaseInterface->lockSessionTables();
     users.insert(name, session);
     qDebug() << "Server::loginUser:" << session << "name=" << name;
 
@@ -188,7 +191,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
         databaseInterface->updateUsersClientID(name, clientid);
     }
 
-    databaseInterface->updateUsersLastLoginTime(name);
+    databaseInterface->updateUsersLastLoginData(name, clientVersion);
     se = Server_ProtocolHandler::prepareSessionEvent(event);
     sendIsl_SessionEvent(*se);
     delete se;

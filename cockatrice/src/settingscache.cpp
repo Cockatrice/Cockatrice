@@ -1,5 +1,8 @@
 #include "settingscache.h"
 #include <QSettings>
+#include <QFile>
+#include <QApplication>
+
 #if QT_VERSION >= 0x050000
     #include <QStandardPaths>
 #else
@@ -8,39 +11,145 @@
 
 QString SettingsCache::getSettingsPath()
 {
-    QString file = "";
+    QString file = qApp->applicationDirPath() + "/settings/";
 
 #ifndef PORTABLE_BUILD
-#if QT_VERSION >= 0x050000
+    #if QT_VERSION >= 0x050000
         file = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     #else
         file = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     #endif
         file.append("/settings/");
-#endif
+#endif        
 
     return file;
 }
 
+void SettingsCache::translateLegacySettings()
+{
+#ifdef PORTABLE_BUILD
+    return;
+#endif
+
+    //Layouts
+    QFile layoutFile(getSettingsPath()+"layouts/deckLayout.ini");
+    if(layoutFile.exists())
+        if(layoutFile.copy(getSettingsPath()+"layouts.ini"))
+            layoutFile.remove();
+
+    QStringList usedKeys;
+    QSettings legacySetting;
+
+    //Sets
+    legacySetting.beginGroup("sets");
+    QStringList setsGroups = legacySetting.childGroups();
+    for(int i = 0; i < setsGroups.size(); i++){        
+        legacySetting.beginGroup(setsGroups.at(i));
+        cardDatabase().setEnabled(setsGroups.at(i), legacySetting.value("enabled").toBool());
+        cardDatabase().setIsKnown(setsGroups.at(i), legacySetting.value("isknown").toBool());
+        cardDatabase().setSortKey(setsGroups.at(i), legacySetting.value("sortkey").toUInt());
+        legacySetting.endGroup();
+    }
+    QStringList setsKeys = legacySetting.allKeys();
+    for (int i = 0; i < setsKeys.size(); ++i) {
+        usedKeys.append("sets/"+setsKeys.at(i));
+    }
+    legacySetting.endGroup();
+
+    //Servers
+    legacySetting.beginGroup("server");
+    servers().setPreviousHostLogin(legacySetting.value("previoushostlogin").toInt());
+    servers().setPreviousHostList(legacySetting.value("previoushosts").toStringList());
+    servers().setPrevioushostindex(legacySetting.value("previoushostindex").toInt());
+    servers().setHostName(legacySetting.value("hostname").toString());
+    servers().setPort(legacySetting.value("port").toString());
+    servers().setPlayerName(legacySetting.value("playername").toString());
+    servers().setPassword(legacySetting.value("password").toString());
+    servers().setSavePassword(legacySetting.value("save_password").toInt());
+    servers().setAutoConnect(legacySetting.value("auto_connect").toInt());
+    usedKeys.append(legacySetting.allKeys());
+    QStringList allKeysServer = legacySetting.allKeys();
+    for (int i = 0; i < allKeysServer.size(); ++i) {
+        usedKeys.append("server/"+allKeysServer.at(i));
+    }
+    legacySetting.endGroup();
+
+    //Messages
+    legacySetting.beginGroup("messages");
+    QStringList allMessages = legacySetting.allKeys();
+    for (int i = 0; i < allMessages.size(); ++i) {
+        if(allMessages.at(i) != "count"){
+            QString temp = allMessages.at(i);
+            int index = temp.remove("msg").toInt();
+            messages().setMessageAt(index,legacySetting.value(allMessages.at(i)).toString());
+        }
+    }
+    messages().setCount(legacySetting.value("count").toInt());
+    QStringList allKeysmessages = legacySetting.allKeys();
+    for (int i = 0; i < allKeysmessages.size(); ++i) {
+        usedKeys.append("messages/"+allKeysmessages.at(i));
+    }
+    legacySetting.endGroup();
+
+    //Game filters
+    legacySetting.beginGroup("filter_games");
+    gameFilters().setUnavailableGamesVisible(legacySetting.value("unavailable_games_visible").toBool());
+    gameFilters().setShowPasswordProtectedGames(legacySetting.value("show_password_protected_games").toBool());
+    gameFilters().setGameNameFilter(legacySetting.value("game_name_filter").toString());
+    gameFilters().setMinPlayers(legacySetting.value("min_players").toInt());
+    gameFilters().setMaxPlayers(legacySetting.value("max_players").toInt());
+
+    QStringList allFilters = legacySetting.allKeys();
+    for (int i = 0; i < allFilters.size(); ++i) {
+        if(allFilters.at(i).startsWith("game_type")){
+            gameFilters().setGameHashedTypeEnabled(allFilters.at(i), legacySetting.value(allFilters.at(i)).toBool());
+        }
+    }
+    QStringList allKeysfilter_games = legacySetting.allKeys();
+    for (int i = 0; i < allKeysfilter_games.size(); ++i) {
+        usedKeys.append("filter_games/"+allKeysfilter_games.at(i));
+    }
+    legacySetting.endGroup();
+
+    QStringList allLegacyKeys = legacySetting.allKeys();
+    for (int i = 0; i < allLegacyKeys.size(); ++i) {
+        if(usedKeys.contains(allLegacyKeys.at(i)))
+            continue;
+        settings->setValue(allLegacyKeys.at(i), legacySetting.value(allLegacyKeys.at(i)));
+    }
+}
+
 SettingsCache::SettingsCache()
 {
-    settings = new QSettings(this);
-    shortcutsSettings = new ShortcutsSettings(getSettingsPath(),this);
+    QString settingsPath = getSettingsPath();
+    settings = new QSettings(settingsPath+"global.ini", QSettings::IniFormat, this);
+    shortcutsSettings = new ShortcutsSettings(settingsPath,this);
+    cardDatabaseSettings = new CardDatabaseSettings(settingsPath,this);
+    serversSettings = new ServersSettings(settingsPath,this);
+    messageSettings = new MessageSettings(settingsPath,this);
+    gameFiltersSettings = new GameFiltersSettings(settingsPath, this);
+    layoutsSettings = new LayoutsSettings(settingsPath, this);
 
+    if(!QFile(settingsPath+"global.ini").exists())
+        translateLegacySettings();
+
+#ifdef PORTABLE_BUILD
+    setDeckPath(qApp->applicationDirPath() + "data/decks");
+    setReplaysPath(qApp->applicationDirPath() +"data/replays");
+    setPicsPath(qApp->applicationDirPath() +  "data/pics");
+    setSoundPath(qApp->applicationDirPath() +"data/sounds");
+#endif
+
+    notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
-
     deckPath = settings->value("paths/decks").toString();
     replaysPath = settings->value("paths/replays").toString();
     picsPath = settings->value("paths/pics").toString();
     cardDatabasePath = settings->value("paths/carddatabase").toString();
     tokenDatabasePath = settings->value("paths/tokendatabase").toString();
 
-    handBgPath = settings->value("zonebg/hand").toString();
-    stackBgPath = settings->value("zonebg/stack").toString();
-    tableBgPath = settings->value("zonebg/table").toString();
-    playerBgPath = settings->value("zonebg/playerarea").toString();
-    cardBackPicturePath = settings->value("paths/cardbackpicture").toString();
+    themeName = settings->value("theme/name").toString();
 
     // we only want to reset the cache once, then its up to the user
     bool updateCache = settings->value("revert/pixmapCacheSize", false).toBool();
@@ -97,8 +206,6 @@ SettingsCache::SettingsCache()
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
     ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
 
-    attemptAutoConnect = settings->value("server/auto_connect", 0).toBool();
-
     scaleCards = settings->value("cards/scaleCards", true).toBool();
     showMessagePopups = settings->value("chat/showmessagepopups", true).toBool();
     showMentionPopups = settings->value("chat/showmentionpopups", true).toBool();
@@ -120,17 +227,6 @@ SettingsCache::SettingsCache()
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", "notset").toString();
-
-    QString file = getSettingsPath();
-    file.append("layouts/deckLayout.ini");
-
-    QSettings layout_settings(file , QSettings::IniFormat);
-    deckEditorLayoutState = layout_settings.value("layouts/deckEditor_state").toByteArray();
-    deckEditorGeometry = layout_settings.value("layouts/deckEditor_geometry").toByteArray();
-
-    deckEditorCardSize = layout_settings.value("layouts/deckEditor_CardSize", QSize(250,500)).toSize();
-    deckEditorFilterSize = layout_settings.value("layouts/deckEditor_FilterSize", QSize(250,250)).toSize();
-    deckEditorDeckSize = layout_settings.value("layouts/deckEditor_DeckSize", QSize(250,360)).toSize();
 }
 
 void SettingsCache::setCardInfoViewMode(const int _viewMode) {
@@ -210,39 +306,11 @@ void SettingsCache::setTokenDatabasePath(const QString &_tokenDatabasePath)
     emit tokenDatabasePathChanged();
 }
 
-void SettingsCache::setHandBgPath(const QString &_handBgPath)
+void SettingsCache::setThemeName(const QString &_themeName)
 {
-    handBgPath = _handBgPath;
-    settings->setValue("zonebg/hand", handBgPath);
-    emit handBgPathChanged();
-}
-
-void SettingsCache::setStackBgPath(const QString &_stackBgPath)
-{
-    stackBgPath = _stackBgPath;
-    settings->setValue("zonebg/stack", stackBgPath);
-    emit stackBgPathChanged();
-}
-
-void SettingsCache::setTableBgPath(const QString &_tableBgPath)
-{
-    tableBgPath = _tableBgPath;
-    settings->setValue("zonebg/table", tableBgPath);
-    emit tableBgPathChanged();
-}
-
-void SettingsCache::setPlayerBgPath(const QString &_playerBgPath)
-{
-    playerBgPath = _playerBgPath;
-    settings->setValue("zonebg/playerarea", playerBgPath);
-    emit playerBgPathChanged();
-}
-
-void SettingsCache::setCardBackPicturePath(const QString &_cardBackPicturePath)
-{
-    cardBackPicturePath = _cardBackPicturePath;
-    settings->setValue("paths/cardbackpicture", cardBackPicturePath);
-    emit cardBackPicturePathChanged();
+    themeName = _themeName;
+    settings->setValue("theme/name", themeName);
+    emit themeChanged();
 }
 
 void SettingsCache::setPicDownload(int _picDownload)
@@ -452,12 +520,6 @@ void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)
     settings->setValue("interface/main_window_geometry", mainWindowGeometry);
 }
 
-void SettingsCache::setAutoConnect(const bool &_autoConnect)
-{
-    attemptAutoConnect = _autoConnect;
-    settings->setValue("server/auto_connect", attemptAutoConnect ? 1 : 0);
-}
-
 void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
 {
     pixmapCacheSize = _pixmapCacheSize;
@@ -501,56 +563,6 @@ QStringList SettingsCache::getCountries() const
     << "vn" << "vu" << "wf" << "ws" << "ye" << "yt" << "za" << "zm" << "zw";
 
     return countries;
-}
-
-void SettingsCache::setDeckEditorLayoutState(const QByteArray &value)
-{
-    deckEditorLayoutState = value;
-
-    QString file = getSettingsPath();
-    file.append("layouts/deckLayout.ini");
-    QSettings layout_settings(file , QSettings::IniFormat);
-    layout_settings.setValue("layouts/deckEditor_state",value);
-}
-
-void SettingsCache::setDeckEditorGeometry(const QByteArray &value)
-{
-    deckEditorGeometry = value;
-
-    QString file = getSettingsPath();
-    file.append("layouts/deckLayout.ini");
-    QSettings layout_settings(file , QSettings::IniFormat);
-    layout_settings.setValue("layouts/deckEditor_geometry",value);
-}
-
-void SettingsCache::setDeckEditorCardSize(const QSize &value)
-{
-    deckEditorCardSize = value;
-
-    QString file = getSettingsPath();
-    file.append("layouts/deckLayout.ini");
-    QSettings layout_settings(file , QSettings::IniFormat);
-    layout_settings.setValue("layouts/deckEditor_CardSize",value);
-}
-
-void SettingsCache::setDeckEditorDeckSize(const QSize &value)
-{
-    deckEditorDeckSize = value;
-
-    QString file = getSettingsPath();
-    file.append("layouts/deckLayout.ini");
-    QSettings layout_settings(file , QSettings::IniFormat);
-    layout_settings.setValue("layouts/deckEditor_DeckSize",value);
-}
-
-void SettingsCache::setDeckEditorFilterSize(const QSize &value)
-{
-    deckEditorFilterSize = value;
-
-    QString file = getSettingsPath();
-    file.append("layouts/deckLayout.ini");
-    QSettings layout_settings(file , QSettings::IniFormat);
-    layout_settings.setValue("layouts/deckEditor_FilterSize",value);
 }
 
 void SettingsCache::setGameDescription(const QString _gameDescription)
@@ -611,4 +623,10 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 {
     rememberGameSettings = _rememberGameSettings;
     settings->setValue("game/remembergamesettings", rememberGameSettings);
+}
+
+void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
+{
+    notifyAboutUpdates = _notifyaboutupdate;
+    settings->setValue("personal/updatenotification", notifyAboutUpdates);
 }

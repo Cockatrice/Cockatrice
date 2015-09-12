@@ -1,4 +1,3 @@
-#include <QSettings>
 #include <QLabel>
 #include <QGridLayout>
 #include <QHBoxLayout>
@@ -19,9 +18,9 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, int gender, QString cou
     genderLabel = new QLabel(tr("Pronouns:"));
     genderEdit = new QComboBox();
     genderLabel->setBuddy(genderEdit);
-    genderEdit->insertItem(0, QIcon(":/resources/genders/unknown.svg"), tr("Neutral"));
-    genderEdit->insertItem(1, QIcon(":/resources/genders/male.svg"), tr("Masculine"));
-    genderEdit->insertItem(2, QIcon(":/resources/genders/female.svg"), tr("Feminine"));
+    genderEdit->insertItem(0, QIcon("theme:genders/unknown.svg"), tr("Neutral"));
+    genderEdit->insertItem(1, QIcon("theme:genders/male.svg"), tr("Masculine"));
+    genderEdit->insertItem(2, QIcon("theme:genders/female.svg"), tr("Feminine"));
     genderEdit->setCurrentIndex(gender + 1);
 
     countryLabel = new QLabel(tr("Country:"));
@@ -34,7 +33,7 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, int gender, QString cou
     int i = 1;
     foreach(QString c, countries)
     {
-        countryEdit->addItem(QPixmap(":/resources/countries/" + c + ".svg"), c);
+        countryEdit->addItem(QPixmap("theme:countries/" + c.toLower() + ".svg"), c);
         if (c == country)
             countryEdit->setCurrentIndex(i);
 

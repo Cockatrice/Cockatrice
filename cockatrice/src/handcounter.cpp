@@ -36,7 +36,7 @@ void HandCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 #else
     if (!QPixmapCache::find("handCounter" + QString::number(translatedSize.width()), cachedPixmap)) {
 #endif
-        QSvgRenderer svg(QString(":/resources/hand.svg"));
+        QSvgRenderer svg(QString("theme:hand.svg"));
         cachedPixmap = QPixmap(translatedSize);
         cachedPixmap.fill(Qt::transparent);
         QPainter painter(&cachedPixmap);

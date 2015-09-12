@@ -45,16 +45,22 @@
 OracleWizard::OracleWizard(QWidget *parent)
     : QWizard(parent)
 {
-    settings = new QSettings(this);
+    settings = new QSettings(settingsCache->getSettingsPath()+"global.ini",QSettings::IniFormat, this);
     connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
 
-    importer = new OracleImporter(
-#if QT_VERSION < 0x050000
-        QDesktopServices::storageLocation(QDesktopServices::DataLocation)
+    QString dataDir;
+
+#ifndef PORTABLE_BUILD
+    #if QT_VERSION < 0x050000
+            QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    #else
+            QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+    #endif
 #else
-        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first()
+    dataDir.append("data");
 #endif
-    , this);
+
+    importer = new OracleImporter(dataDir, this);
 
     addPage(new IntroPage);
     addPage(new LoadSetsPage);
@@ -171,11 +177,10 @@ void IntroPage::languageBoxChanged(int index)
 void IntroPage::retranslateUi()
 {
     setTitle(tr("Introduction"));
-    label->setText(tr("This wizard will import the list of sets and cards "
-                          "that will be used by Cockatrice.<br/>You will need to "
-                          "specify an url or a filename that will be used as a "
-                          "source, and then choose the wanted sets from the list "
-                          "of the available ones."));
+    label->setText(tr("This wizard will import the list of sets, cards, and tokens "
+                      "that will be used by Cockatrice."
+                      "\nYou will need to specify a URL or a filename that "
+                      "will be used as a source."));
     languageLabel->setText(tr("Language:"));
 }
 
@@ -226,12 +231,12 @@ void LoadSetsPage::retranslateUi()
 {
     setTitle(tr("Source selection"));
     setSubTitle(tr("Please specify a source for the list of sets and cards. "
-                   "You can specify an url address that will be download or "
+                   "You can specify a URL address that will be downloaded or "
                    "use an existing file from your computer."));
 
-    urlRadioButton->setText(tr("Download url:"));
+    urlRadioButton->setText(tr("Download URL:"));
     fileRadioButton->setText(tr("Local file:"));
-    urlButton->setText(tr("Restore default url"));
+    urlButton->setText(tr("Restore default URL"));
     fileButton->setText(tr("Choose file..."));
 }
 
@@ -272,7 +277,7 @@ bool LoadSetsPage::validatePage()
         QUrl url = QUrl::fromUserInput(urlLineEdit->text());
         if(!url.isValid())
         {
-            QMessageBox::critical(this, tr("Error"), tr("The provided url is not valid."));
+            QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
             return false;
         }
 
@@ -485,6 +490,9 @@ void SaveSetsPage::retranslateUi()
                    "Press \"Save\" to save the imported cards to the Cockatrice database."));
 
     defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
+    #ifdef PORTABLE_BUILD
+    defaultPathCheckBox->setEnabled(false);
+    #endif
 }
 
 void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, const QString &setName)
@@ -500,14 +508,25 @@ void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, co
 bool SaveSetsPage::validatePage()
 {
     bool ok = false;
-    const QString dataDir = 
+    QString dataDir;
+    #ifndef PORTABLE_BUILD
 #if QT_VERSION < 0x050000
-        QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+        dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #else
-        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+        dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
-    QSettings* settings = new QSettings(this);
+#else
+    dataDir =  qApp->applicationDirPath() + "/data";
+#endif
+
+#ifdef PORTABLE_BUILD
+    QSettings* settings = new QSettings("settings/global.ini",QSettings::IniFormat,this);
+    QString defaultPath = "data/cards.xml";
+    settings->setValue("paths/carddatabase", defaultPath);
+#else
+    QSettings* settings = new QSettings(settingsCache->getSettingsPath()+"global.ini",QSettings::IniFormat,this);
     QString defaultPath = settings->value("paths/carddatabase").toString();
+#endif
     QString windowName = tr("Save card database");
     QString fileType = tr("XML; card database (*.xml)");
 
@@ -518,6 +537,7 @@ bool SaveSetsPage::validatePage()
                 fileName = dataDir + "/cards.xml";
             else
                 fileName = QFileDialog::getSaveFileName(this, windowName, dataDir + "/cards.xml", fileType);
+
             settings->setValue("paths/carddatabase", fileName);
         }
         else {
@@ -585,11 +605,11 @@ void LoadTokensPage::retranslateUi()
 {
     setTitle(tr("Tokens source selection"));
     setSubTitle(tr("Please specify a source for the list of tokens. "
-                   "You can specify an url address that will be download or "
+                   "You can specify a URL address that will be downloaded or "
                    "use an existing file from your computer."));
 
-    urlLabel->setText(tr("Download url:"));
-    urlButton->setText(tr("Restore default url"));
+    urlLabel->setText(tr("Download URL:"));
+    urlButton->setText(tr("Restore default URL"));
 }
 
 void LoadTokensPage::actRestoreDefaultUrl()
@@ -606,7 +626,7 @@ bool LoadTokensPage::validatePage()
     QUrl url = QUrl::fromUserInput(urlLineEdit->text());
     if(!url.isValid())
     {
-        QMessageBox::critical(this, tr("Error"), tr("The provided url is not valid."));
+        QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
         return false;
     }
 
@@ -695,19 +715,34 @@ void SaveTokensPage::retranslateUi()
                    "Press \"Save\" to save the imported tokens to the Cockatrice tokens database."));
 
     defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
+    #ifdef PORTABLE_BUILD
+    defaultPathCheckBox->setEnabled(false);
+    #endif
 }
 
 bool SaveTokensPage::validatePage()
 {
     bool ok = false;
-    const QString dataDir = 
+    QString dataDir;
+    #ifndef PORTABLE_BUILD
 #if QT_VERSION < 0x050000
-        QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+        dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #else
-        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+        dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
-    QSettings* settings = new QSettings(this);
+#else
+    dataDir = qApp->applicationDirPath() + "/data";
+#endif
+
+#ifdef PORTABLE_BUILD
+    QSettings* settings = new QSettings("settings/global.ini",QSettings::IniFormat,this);
+    QString defaultPath = "data/tokens.xml";
+    settings->setValue("paths/tokendatabase", defaultPath);
+#else
+    QSettings* settings = new QSettings(settingsCache->getSettingsPath()+"global.ini",QSettings::IniFormat,this);
     QString defaultPath = settings->value("paths/tokendatabase").toString();
+#endif
+
     QString windowName = tr("Save token database");
     QString fileType = tr("XML; token database (*.xml)");
 

@@ -1,12 +1,12 @@
 #include "carddatabase.h"
 #include "settingscache.h"
+#include "thememanager.h"
+
 #include <QCryptographicHash>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QTextStream>
-#include <QSettings>
-#include <QSvgRenderer>
 #include <QPainter>
 #include <QUrl>
 #include <QSet>
@@ -50,46 +50,29 @@ QString CardSet::getCorrectedShortName() const
     return invalidFileNames.contains(shortName) ? shortName + "_" : shortName;
 }
 
+void CardSet::loadSetOptions()
+{
+    sortKey = settingsCache->cardDatabase().getSortKey(shortName);
+    enabled = settingsCache->cardDatabase().isEnabled(shortName);
+    isknown = settingsCache->cardDatabase().isKnown(shortName);
+}
+
 void CardSet::setSortKey(unsigned int _sortKey)
 {
     sortKey = _sortKey;
-
-    QSettings settings;
-    settings.beginGroup("sets");
-    settings.beginGroup(shortName);
-    settings.setValue("sortkey", sortKey);
-}
-
-void CardSet::loadSetOptions()
-{
-    QSettings settings;
-    settings.beginGroup("sets");
-    settings.beginGroup(shortName);
-
-    sortKey = settings.value("sortkey", 0).toInt();
-    enabled = settings.value("enabled", false).toBool();
-    isknown = settings.value("isknown", false).toBool();
-    // qDebug() << "load set" << shortName << "key" << sortKey;
+    settingsCache->cardDatabase().setSortKey(shortName,_sortKey);
 }
 
 void CardSet::setEnabled(bool _enabled)
 {
     enabled = _enabled;
-
-    QSettings settings;
-    settings.beginGroup("sets");
-    settings.beginGroup(shortName);
-    settings.setValue("enabled", enabled);
+    settingsCache->cardDatabase().setEnabled(shortName,_enabled);
 }
 
 void CardSet::setIsKnown(bool _isknown)
 {
     isknown = _isknown;
-
-    QSettings settings;
-    settings.beginGroup("sets");
-    settings.beginGroup(shortName);
-    settings.setValue("isknown", isknown);
+    settingsCache->cardDatabase().setIsKnown(shortName,_isknown);
 }
 
 class SetList::KeyCompareFunctor {
@@ -642,7 +625,7 @@ void CardInfo::loadPixmap(QPixmap &pixmap)
     pixmap = QPixmap();
 
     if (getName().isEmpty()) {
-        pixmap.load(settingsCache->getCardBackPicturePath());
+        pixmap = themeManager->getCardBackPixmap();
         return;
     }
 
@@ -672,15 +655,11 @@ void CardInfo::getPixmap(QSize size, QPixmap &pixmap)
     QPixmap bigPixmap;
     loadPixmap(bigPixmap);
     if (bigPixmap.isNull()) {
-        if (!getName().isEmpty()) {
+        if (getName().isEmpty()) {
+            pixmap = themeManager->getCardBackPixmap();
+        } else {
             pixmap = QPixmap(); // null
             return;
-        } else {
-            QSvgRenderer svg(QString(":/back.svg"));
-            bigPixmap = QPixmap(svg.defaultSize());
-            bigPixmap.fill(Qt::transparent);
-            QPainter painter(&bigPixmap);
-            svg.render(&painter);
         }
     }
 
@@ -808,7 +787,7 @@ CardDatabase::CardDatabase(QObject *parent)
     noCard = new CardInfo(this);
     QPixmap tmp;
     noCard->loadPixmap(tmp); // cache pixmap for card back
-    connect(settingsCache, SIGNAL(cardBackPicturePathChanged()), noCard, SLOT(updatePixmapCache()));
+    connect(themeManager, SIGNAL(themeChanged()), noCard, SLOT(updatePixmapCache()));
 }
 
 CardDatabase::~CardDatabase()

@@ -15,12 +15,12 @@
 #include "tab_game.h"
 #include "gamescene.h"
 #include "settingscache.h"
+#include "thememanager.h"
 #include "dlg_create_token.h"
 #include "carddatabase.h"
 #include "color.h"
 #include "deck_loader.h"
 #include "main.h"
-#include <QSettings>
 #include <QPainter>
 #include <QMenu>
 #include <QDebug>
@@ -69,25 +69,18 @@ PlayerArea::PlayerArea(QGraphicsItem *parentItem)
     : QObject(), QGraphicsItem(parentItem)
 {
     setCacheMode(DeviceCoordinateCache);
-    connect(settingsCache, SIGNAL(playerBgPathChanged()), this, SLOT(updateBgPixmap()));
-    updateBgPixmap();
+    connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
+    updateBg();
 }
 
-void PlayerArea::updateBgPixmap()
+void PlayerArea::updateBg()
 {
-    QString bgPath = settingsCache->getPlayerBgPath();
-    if (bgPath.isEmpty())
-        bgPixmapBrush = QBrush(QColor(200, 200, 200));
-    else {
-        qDebug() << "loading" << bgPath;
-        bgPixmapBrush = QBrush(QPixmap(bgPath));
-    }
     update();
 }
 
 void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    painter->fillRect(bRect, bgPixmapBrush);
+    painter->fillRect(bRect, themeManager->getPlayerBgBrush());
 }
 
 void PlayerArea::setSize(qreal width, qreal height)
@@ -832,12 +825,10 @@ void Player::initSayMenu()
 {
     sayMenu->clear();
 
-    QSettings settings;
-    settings.beginGroup("messages");
-    int count = settings.value("count", 0).toInt();
+    int count = settingsCache->messages().getCount();
 
     for (int i = 0; i < count; i++) {
-        QAction *newAction = new QAction(settings.value(QString("msg%1").arg(i)).toString(), this);
+        QAction *newAction = new QAction(settingsCache->messages().getMessageAt(i), this);
         if (i <= 10){
             newAction->setShortcut(QKeySequence("Ctrl+" + QString::number((i + 1) % 10)));
         }

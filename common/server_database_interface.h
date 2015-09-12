@@ -2,8 +2,6 @@
 #define SERVER_DATABASE_INTERFACE_H
 
 #include <QObject>
-#include <QSettings>
-
 #include "server.h"
 
 class Server_DatabaseInterface : public QObject {
@@ -42,7 +40,7 @@ public:
     virtual bool registerUser(const QString & /* userName */, const QString & /* realName */, ServerInfo_User_Gender const & /* gender */, const QString & /* password */, const QString & /* emailAddress */, const QString & /* country */, bool /* active = false */) { return false; }
     virtual bool activateUser(const QString & /* userName */, const QString & /* token */) { return false; }
     virtual void updateUsersClientID(const QString & /* userName */, const QString & /* userClientID */) { }
-    virtual void updateUsersLastLoginTime(const QString & /* userName */) { }
+    virtual void updateUsersLastLoginData(const QString & /* userName */, const QString & /* clientVersion */) { }
 
     enum LogMessage_TargetType { MessageTargetRoom, MessageTargetGame, MessageTargetChat, MessageTargetIslRoom };
     virtual void logMessage(const int /* senderId */, const QString & /* senderName */, const QString & /* senderIp */, const QString & /* logMessage */, LogMessage_TargetType /* targetType */, const int /* targetId */, const QString & /* targetName */) { };

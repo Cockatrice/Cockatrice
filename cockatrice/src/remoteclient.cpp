@@ -1,3 +1,4 @@
+#include <QList>
 #include <QTimer>
 #include <QThread>
 #include "remoteclient.h"
@@ -81,7 +82,6 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdRegister.set_country(country.toStdString());
         cmdRegister.set_real_name(realName.toStdString());
         cmdRegister.set_clientid(settingsCache->getClientID().toStdString());
-
         PendingCommand *pend = prepareSessionCommand(cmdRegister);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(registerResponse(Response)));
         sendCommand(pend);
@@ -105,8 +105,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
     doLogin();
 }
 
-void RemoteClient::doLogin()
-{
+void RemoteClient::doLogin() {
     setStatus(StatusLoggingIn);
 
     Command_Login cmdLogin;
@@ -114,6 +113,13 @@ void RemoteClient::doLogin()
     cmdLogin.set_password(password.toStdString());
     cmdLogin.set_clientid(settingsCache->getClientID().toStdString());
     cmdLogin.set_clientver(VERSION_STRING);
+
+    if (!clientFeatures.isEmpty()) {
+        QMap<QString, bool>::iterator i;
+        for (i = clientFeatures.begin(); i != clientFeatures.end(); ++i)
+            cmdLogin.add_clientfeatures(i.key().toStdString().c_str());
+    }
+
     PendingCommand *pend = prepareSessionCommand(cmdLogin);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
     sendCommand(pend);
@@ -140,8 +146,17 @@ void RemoteClient::loginResponse(const Response &response)
         for (int i = resp.ignore_list_size() - 1; i >= 0; --i)
             ignoreList.append(resp.ignore_list(i));
         emit ignoreListReceived(ignoreList);
+
+        if (resp.missing_features_size() > 0 && settingsCache->getNotifyAboutUpdates())
+                emit notifyUserAboutUpdate();
+
     } else {
-        emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()), resp.denied_end_time());
+        QList<QString> missingFeatures;
+        if (resp.missing_features_size() > 0) {
+            for (int i = 0; i < resp.missing_features_size(); ++i)
+                missingFeatures << QString::fromStdString(resp.missing_features(i));
+        }
+        emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()), resp.denied_end_time(), missingFeatures);
         setStatus(StatusDisconnecting);
     }
 }

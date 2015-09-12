@@ -9,6 +9,7 @@
 #include <QReadWriteLock>
 #include "pb/commands.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "pb/serverinfo_ban.pb.h"
 #include "server_player_reference.h"
 
 class Server_DatabaseInterface;
@@ -44,17 +45,17 @@ public:
     Server(bool _threaded, QObject *parent = 0);
     ~Server();
     void setThreaded(bool _threaded) { threaded = _threaded; }
-    AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft, QString &clientid);
+    AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft, QString &clientid, QString &clientVersion);
 
     const QMap<int, Server_Room *> &getRooms() { return rooms; }
 
     Server_AbstractUserInterface *findUser(const QString &userName) const;
     const QMap<QString, Server_ProtocolHandler *> &getUsers() const { return users; }
     const QMap<qint64, Server_ProtocolHandler *> &getUsersBySessionId() const { return usersBySessionId; }
+    virtual QMap<QString, bool> getServerRequiredFeatureList() const { return QMap<QString, bool>(); }
     void addClient(Server_ProtocolHandler *player);
     void removeClient(Server_ProtocolHandler *player);
     virtual QString getLoginMessage() const { return QString(); }
-
     virtual bool permitUnregisteredUsers() const { return true; }
     virtual bool getGameShouldPing() const { return false; }
     virtual bool getClientIdRequired() const { return false; }
@@ -94,6 +95,7 @@ private:
     mutable QReadWriteLock persistentPlayersLock;
     int nextLocalGameId;
     QMutex nextLocalGameIdMutex;
+
 protected slots:
     void externalUserJoined(const ServerInfo_User &userInfo);
     void externalUserLeft(const QString &userName);

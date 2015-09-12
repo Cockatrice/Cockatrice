@@ -24,6 +24,6 @@ Q_DECLARE_METATYPE(Event_UserMessage)
 Q_DECLARE_METATYPE(ServerInfo_User)
 Q_DECLARE_METATYPE(QList<ServerInfo_User>)
 Q_DECLARE_METATYPE(Event_ReplayAdded)
-
+Q_DECLARE_METATYPE(QList<QString>)
 
 #endif

@@ -1,6 +1,7 @@
 #include <QPainter>
 #include "handzone.h"
 #include "settingscache.h"
+#include "thememanager.h"
 #include "player.h"
 #include "carddragitem.h"
 #include "carditem.h"
@@ -10,16 +11,13 @@
 HandZone::HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_p, "hand", false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)
 {
-    connect(settingsCache, SIGNAL(handBgPathChanged()), this, SLOT(updateBgPixmap()));
-    updateBgPixmap();
+    connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
+    updateBg();
     setCacheMode(DeviceCoordinateCache);
 }
 
-void HandZone::updateBgPixmap()
+void HandZone::updateBg()
 {
-    QString bgPath = settingsCache->getHandBgPath();
-    if (!bgPath.isEmpty())
-        bgPixmap.load(bgPath);
     update();
 }
 
@@ -77,10 +75,7 @@ QRectF HandZone::boundingRect() const
 
 void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    if (bgPixmap.isNull())
-        painter->fillRect(boundingRect(), QColor(30, 30, 30));
-    else
-        painter->fillRect(boundingRect(), QBrush(bgPixmap));
+    painter->fillRect(boundingRect(), themeManager->getHandBgBrush());
 }
 
 void HandZone::reorganizeCards()

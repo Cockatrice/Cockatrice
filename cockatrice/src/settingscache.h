@@ -5,6 +5,11 @@
 #include <QSize>
 #include <QStringList>
 #include "shortcutssettings.h"
+#include "settings/carddatabasesettings.h"
+#include "settings/serverssettings.h"
+#include "settings/messagesettings.h"
+#include "settings/gamefilterssettings.h"
+#include "settings/layoutssettings.h"
 
 // the falbacks are used for cards without a muid
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
@@ -25,11 +30,7 @@ signals:
     void picsPathChanged();
     void cardDatabasePathChanged();
     void tokenDatabasePathChanged();
-    void handBgPathChanged();
-    void stackBgPathChanged();
-    void tableBgPathChanged();
-    void playerBgPathChanged();
-    void cardBackPicturePathChanged();
+    void themeChanged();
     void picDownloadChanged();
     void picDownloadHqChanged();
     void displayCardNamesChanged();
@@ -48,10 +49,16 @@ signals:
 private:
     QSettings *settings;
     ShortcutsSettings *shortcutsSettings;
+    CardDatabaseSettings *cardDatabaseSettings;
+    ServersSettings *serversSettings;
+    MessageSettings *messageSettings;
+    GameFiltersSettings *gameFiltersSettings;
+    LayoutsSettings *layoutsSettings;
+
     QByteArray mainWindowGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath;
-    QString handBgPath, stackBgPath, tableBgPath, playerBgPath, cardBackPicturePath;
+    QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath, themeName;
+    bool notifyAboutUpdates;
     bool picDownload;
     bool picDownloadHq;
     bool notificationsEnabled;
@@ -84,7 +91,6 @@ private:
     QString picUrlFallback;
     QString picUrlHqFallback;
     QString clientID;
-    bool attemptAutoConnect;
     int pixmapCacheSize;
     bool scaleCards;
     bool showMessagePopups;
@@ -102,14 +108,13 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
+    int keepalive;    
+    void translateLegacySettings();
     bool rememberGameSettings;
-    int keepalive;
-    QByteArray deckEditorLayoutState, deckEditorGeometry;
-    QSize deckEditorFilterSize, deckEditorDeckSize, deckEditorCardSize;
-    QString getSettingsPath();
 
 public:
     SettingsCache();
+    QString getSettingsPath();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
     QString getLang() const { return lang; }
     QString getDeckPath() const { return deckPath; }
@@ -117,17 +122,14 @@ public:
     QString getPicsPath() const { return picsPath; }
     QString getCardDatabasePath() const { return cardDatabasePath; }
     QString getTokenDatabasePath() const { return tokenDatabasePath; }
-    QString getHandBgPath() const { return handBgPath; }
-    QString getStackBgPath() const { return stackBgPath; }
-    QString getTableBgPath() const { return tableBgPath; }
-    QString getPlayerBgPath() const { return playerBgPath; }
-    QString getCardBackPicturePath() const { return cardBackPicturePath; }
+    QString getThemeName() const { return themeName; }
     QString getChatMentionColor() const { return chatMentionColor; }
     QString getChatHighlightColor() const { return chatHighlightColor; }
     bool getPicDownload() const { return picDownload; }
     bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
+    bool getNotifyAboutUpdates() const { return notifyAboutUpdates; }
 
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
@@ -160,7 +162,6 @@ public:
     QString getPicUrlHq() const { return picUrlHq; }
     QString getPicUrlFallback() const { return picUrlFallback; }
     QString getPicUrlHqFallback() const { return picUrlHqFallback; }
-    bool getAutoConnect() const { return attemptAutoConnect; }
     int getPixmapCacheSize() const { return pixmapCacheSize; }
     bool getScaleCards() const {  return scaleCards; }
     bool getShowMessagePopup() const { return showMessagePopups; }
@@ -182,19 +183,13 @@ public:
     bool getRememberGameSettings() const { return rememberGameSettings; }
     int getKeepAlive() const { return keepalive; }
     void setClientID(QString clientID);
-    QString getClientID() { return clientID; }
-    QByteArray getDeckEditorLayoutState() const { return deckEditorLayoutState; }
-    void setDeckEditorLayoutState(const QByteArray &value);
-    QByteArray getDeckEditorGeometry() const { return deckEditorGeometry; }
-    void setDeckEditorGeometry(const QByteArray &value);
-    QSize getDeckEditorCardSize() const { return deckEditorCardSize; }
-    void setDeckEditorCardSize(const QSize &value);
-    QSize getDeckEditorDeckSize() const { return deckEditorDeckSize; }
-    void setDeckEditorDeckSize(const QSize &value);
-    QSize getDeckEditorFilterSize() const { return deckEditorFilterSize; }
-    void setDeckEditorFilterSize(const QSize &value);
+    QString getClientID() { return clientID; }    
     ShortcutsSettings& shortcuts() const { return *shortcutsSettings; }
-
+    CardDatabaseSettings& cardDatabase() const { return *cardDatabaseSettings; }
+    ServersSettings& servers() const { return *serversSettings; }
+    MessageSettings& messages() const { return *messageSettings; }
+    GameFiltersSettings& gameFilters() const { return *gameFiltersSettings; }
+    LayoutsSettings& layouts() const { return *layoutsSettings; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);
@@ -203,11 +198,7 @@ public slots:
     void setPicsPath(const QString &_picsPath);
     void setCardDatabasePath(const QString &_cardDatabasePath);
     void setTokenDatabasePath(const QString &_tokenDatabasePath);
-    void setHandBgPath(const QString &_handBgPath);
-    void setStackBgPath(const QString &_stackBgPath);
-    void setTableBgPath(const QString &_tableBgPath);
-    void setPlayerBgPath(const QString &_playerBgPath);
-    void setCardBackPicturePath(const QString &_cardBackPicturePath);
+    void setThemeName(const QString &_themeName);
     void setChatMentionColor(const QString &_chatMentionColor);
     void setChatHighlightColor(const QString &_chatHighlightColor);
     void setPicDownload(int _picDownload);
@@ -241,7 +232,6 @@ public slots:
     void setPicUrlHq(const QString &_picUrlHq);
     void setPicUrlFallback(const QString &_picUrlFallback);
     void setPicUrlHqFallback(const QString &_picUrlHqFallback);
-    void setAutoConnect(const bool &_autoConnect);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setCardScaling(const int _scaleCards);
     void setShowMessagePopups(const int _showMessagePopups);
@@ -260,6 +250,7 @@ public slots:
     void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setRememberGameSettings(const bool _rememberGameSettings);
+    void setNotifyAboutUpdate(int _notifyaboutupdate);
 };
 
 extern SettingsCache *settingsCache;

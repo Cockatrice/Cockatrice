@@ -50,6 +50,12 @@ max_player_inactivity_time=15
 ' require that clients report the client ID in order to log into the server.  Default is false
 requireclientid=false
 
+; You can limit the types of clients that connect to the server by requiring different features be available
+; on the client.  This setting can contain a comma-seperated list of features.  if any of the features
+; listed in this line are not available on the client the client will be denied access to the server upon
+; attempting to log in.  Example: "client_id,client_ver"
+requiredfeatures=""
+
 [authentication]
 
 ; Servatrice can authenticate users connecting. It currently supports 3 different authentication methods:

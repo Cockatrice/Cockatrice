@@ -37,6 +37,7 @@ message Response {
         RespActivationFailed = 32; // Server didn't accept a reg user activation token
         RespRegistrationAcceptedNeedsActivation = 33; // Server accepted cient registration, but it will need token activation
         RespClientIdRequired = 34; // Server requires client to generate and send its client id before allowing access
+        RespClientUpdateRequired = 35; // Client is missing features that the server is requiring
     }
     enum ResponseType {
         JOIN_ROOM = 1000;
@@ -51,6 +52,7 @@ message Response {
         REGISTER = 1009;
         ACTIVATE = 1010;
         ADJUST_MOD = 1011;
+        BAN_HISTORY = 1012;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
     }

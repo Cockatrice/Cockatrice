@@ -30,6 +30,7 @@
 #include <QMetaType>
 #include "server.h"
 
+
 Q_DECLARE_METATYPE(QSqlDatabase)
 
 class QSqlQuery;
@@ -41,6 +42,7 @@ class Servatrice_ConnectionPool;
 class Servatrice_DatabaseInterface;
 class ServerSocketInterface;
 class IslInterface;
+class FeatureSet;
 
 class Servatrice_GameServer : public QTcpServer {
     Q_OBJECT
@@ -109,6 +111,8 @@ private:
     mutable QMutex loginMessageMutex;
     QString loginMessage;
     QString dbPrefix;
+    QString requiredFeatures;
+    QMap<QString, bool> serverRequiredFeatureList;
     Servatrice_DatabaseInterface *servatriceDatabaseInterface;
     int serverId;
     int uptime;
@@ -134,8 +138,10 @@ public:
     Servatrice(QObject *parent = 0);
     ~Servatrice();
     bool initServer();
+    QMap<QString, bool> getServerRequiredFeatureList() const { return serverRequiredFeatureList; }
     QString getServerName() const { return serverName; }
     QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
+    QString getRequiredFeatures() const { return requiredFeatures; }
     bool permitUnregisteredUsers() const { return authenticationMethod != AuthenticationNone; }
     bool getGameShouldPing() const { return true; }
     bool getClientIdRequired() const { return clientIdRequired; }

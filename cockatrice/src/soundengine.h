@@ -2,34 +2,19 @@
 #define SOUNDENGINE_H
 
 #include <QObject>
-#include <QMap>
-#include <QDateTime>
-
-class QAudioOutput;
-class QBuffer;
 
 class SoundEngine : public QObject {
     Q_OBJECT
 private:
-    void playSound(const QString &fileName);
-    QMap<QString, QByteArray> audioData;
-    QBuffer *inputBuffer;
-    QAudioOutput *audio;
-    QDateTime lastTapPlayed;
-    QDateTime lastEndStepPlayed;
-    QDateTime lastAttackStepPlayed;
+    bool enabled;
 private slots:
-    void cacheData();
     void soundEnabledChanged();
 public:
     SoundEngine(QObject *parent = 0);
+    void playSound(QString fileName);
 public slots:
-    void endStep();
-    void tap();
-    void playerJoined();
-    void attack();
+    void testSound();
 };
 
 extern SoundEngine *soundEngine;
-
 #endif

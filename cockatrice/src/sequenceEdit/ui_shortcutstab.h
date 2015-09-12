@@ -596,7 +596,7 @@ public:
 
         gridLayout_4->addWidget(lbl_abstractCounter_aInc, 1, 0, 1, 1);
 
-        abstractCounter_Inc = new SequenceEdit("Player/Inc",groupBox_4);
+        abstractCounter_Inc = new SequenceEdit("Player/aInc",groupBox_4);
         abstractCounter_Inc->setObjectName("abstractCounter_Inc");
 
         gridLayout_4->addWidget(abstractCounter_Inc, 1, 1, 1, 1);

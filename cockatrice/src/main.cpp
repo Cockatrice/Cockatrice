@@ -26,7 +26,6 @@
 #include <QTranslator>
 #include <QLibraryInfo>
 #include <QDateTime>
-#include <QSettings>
 #include <QIcon>
 #include <QDir>
 #include <QDesktopServices>
@@ -34,15 +33,16 @@
 #include <QSystemTrayIcon>
 #include "QtNetwork/QNetworkInterface"
 #include <QCryptographicHash>
-
 #include "main.h"
 #include "window_main.h"
 #include "dlg_settings.h"
 #include "carddatabase.h"
 #include "settingscache.h"
+#include "thememanager.h"
 #include "pixmapgenerator.h"
 #include "rng_sfmt.h"
 #include "soundengine.h"
+#include "featureset.h"
 
 //Q_IMPORT_PLUGIN(qjpeg)
 
@@ -52,7 +52,7 @@ SettingsCache *settingsCache;
 RNG_Abstract *rng;
 SoundEngine *soundEngine;
 QSystemTrayIcon *trayIcon;
-
+ThemeManager *themeManager;
 
 const QString translationPrefix = "cockatrice";
 #ifdef TRANSLATION_PATH
@@ -147,6 +147,7 @@ int main(int argc, char *argv[])
 
     rng = new RNG_SFMT;
     settingsCache = new SettingsCache;
+    themeManager = new ThemeManager;
     db = new CardDatabase;
 
     qtTranslator = new QTranslator;
@@ -154,12 +155,15 @@ int main(int argc, char *argv[])
     installNewTranslator();
 
     qsrand(QDateTime::currentDateTime().toTime_t());
-    
-#if QT_VERSION < 0x050000
+
+#ifdef PORTABLE_BUILD
+    const QString dataDir = "data/";
+#elif QT_VERSION < 0x050000
     const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 #else
     const QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
+    
     if (!db->getLoadSuccess())
         if (!db->loadCardDatabase(dataDir + "/cards.xml"))
             settingsCache->setCardDatabasePath(dataDir + "/cards.xml");
@@ -210,17 +214,17 @@ int main(int argc, char *argv[])
 
     if (settingsValid()) {
         qDebug("main(): starting main program");
+
         soundEngine = new SoundEngine;
         qDebug("main(): SoundEngine constructor finished");
 
         MainWindow ui;
         qDebug("main(): MainWindow constructor finished");
 
-        QIcon icon(":/resources/appicon.svg");
+        QIcon icon("theme:cockatrice.svg");
         ui.setWindowIcon(icon);
         
         settingsCache->setClientID(generateClientID());
-        qDebug() << "ClientID In Cache: " << settingsCache->getClientID();
 
         ui.show();
         qDebug("main(): ui.show() finished");

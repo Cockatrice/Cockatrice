@@ -1,102 +1,73 @@
 #include "soundengine.h"
 #include "settingscache.h"
-#include <QAudioOutput>
-#include <QAudioFormat>
-#include <QFile>
-#include <QBuffer>
+
+#include <QFileInfo>
+#include <QSound>
+
+/*
+    fileNames = QStringList()
+        // Phases
+        << "untap_step" << "upkeep_step" << "draw_step" << "main_1"
+        << "start_combat" << "attack_step" << "block_step" << "damage_step" << "end_combat"
+        << "main_2" << "end_step"
+        // Game Actions
+        << "draw_card" << "play_card" << "tap_card" << "untap_card"
+        << "shuffle" << "roll_dice" << "life_change"
+        // Player
+        << "player_join" << "player_leave" << "player_disconnect" << "player_reconnect" << "player_concede"
+        // Spectator
+        << "spectator_join" << "spectator_leave"
+        // Chat & UI
+        << "chat_mention" << "all_mention" << "private_message";
+*/
+
+#define TEST_SOUND_FILENAME "player_join"
 
 SoundEngine::SoundEngine(QObject *parent)
-    : QObject(parent), audio(0)
+: QObject(parent), enabled(false)
 {
-    inputBuffer = new QBuffer(this);
-    
-    connect(settingsCache, SIGNAL(soundPathChanged()), this, SLOT(cacheData()));
     connect(settingsCache, SIGNAL(soundEnabledChanged()), this, SLOT(soundEnabledChanged()));
-    cacheData();
+
     soundEnabledChanged();
-
-    lastTapPlayed = QDateTime::currentDateTime();
-    lastEndStepPlayed = QDateTime::currentDateTime();
-    lastAttackStepPlayed = QDateTime::currentDateTime();
-}
-
-void SoundEngine::cacheData()
-{
-    static const QStringList fileNames = QStringList()
-        << "end_step" << "tap" << "player_joined" << "attack";
-    for (int i = 0; i < fileNames.size(); ++i) {
-        QFile file(settingsCache->getSoundPath() + "/" + fileNames[i] + ".raw");
-        if(!file.exists())
-            continue;
-        file.open(QIODevice::ReadOnly);
-        audioData.insert(fileNames[i], file.readAll());
-        file.close();
-    }
 }
 
 void SoundEngine::soundEnabledChanged()
 {
     if (settingsCache->getSoundEnabled()) {
-        qDebug("SoundEngine: enabling sound");
-        QAudioFormat format;
-#if QT_VERSION < 0x050000
-        format.setFrequency(44100);
-        format.setChannels(1);
+#if QT_VERSION < 0x050000 //QT4
+        if(QSound::isAvailable())
+        {
+            qDebug("SoundEngine: enabling sound");
+            enabled = true;
+        } else {
+            qDebug("SoundEngine: sound not available");
+            enabled = false;
+        }
 #else
-        format.setSampleRate(44100);
-        format.setChannelCount(1);
+        qDebug("SoundEngine: enabling sound");
+        enabled = true;        
 #endif
-        format.setSampleSize(16);
-        format.setCodec("audio/pcm");
-        format.setByteOrder(QAudioFormat::LittleEndian);
-        format.setSampleType(QAudioFormat::SignedInt);
-        audio = new QAudioOutput(format, this);
-    } else if (audio) {
+    } else {
         qDebug("SoundEngine: disabling sound");
-        audio->stop();
-        audio->deleteLater();
-        audio = 0;
+        enabled = false;
     }
 }
 
-void SoundEngine::playSound(const QString &fileName)
+#include <QDebug>
+void SoundEngine::playSound(QString fileName)
 {
-    if (!audio)
+    if(!enabled)
         return;
-    
-    audio->stop();
-    inputBuffer->close();
-    inputBuffer->setData(audioData[fileName]);
-    inputBuffer->open(QIODevice::ReadOnly);
-#if QT_VERSION >= 0x050000
-    audio->setVolume(settingsCache->getMasterVolume() / 100.0);
-#endif
-    audio->start(inputBuffer);
-    
+
+    QFileInfo fi(settingsCache->getSoundPath() + "/" + fileName + ".wav");
+    qDebug() << "playing" << fi.absoluteFilePath();    
+    if(!fi.exists())
+        return;
+
+    QSound::play(fi.absoluteFilePath());
 }
 
-void SoundEngine::endStep()
+void SoundEngine::testSound()
 {
-    if (lastEndStepPlayed.secsTo(QDateTime::currentDateTime()) >= 1)
-        playSound("end_step");
-    lastEndStepPlayed = QDateTime::currentDateTime();
-}
-
-void SoundEngine::tap()
-{
-    if (lastTapPlayed.secsTo(QDateTime::currentDateTime()) >= 1)
-        playSound("tap");
-    lastTapPlayed = QDateTime::currentDateTime();
-}
-
-void SoundEngine::playerJoined()
-{
-    playSound("player_joined");
-}
-
-
-void SoundEngine::attack() {
-    if (lastAttackStepPlayed.secsTo(QDateTime::currentDateTime()) >= 1)
-        playSound("attack");
-    lastAttackStepPlayed = QDateTime::currentDateTime();
+    playSound(TEST_SOUND_FILENAME);
 }

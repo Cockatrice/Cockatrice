@@ -19,6 +19,7 @@
 #include "get_pb_extension.h"
 #include <google/protobuf/descriptor.h>
 #include "client_metatypes.h"
+#include "featureset.h"
 
 AbstractClient::AbstractClient(QObject *parent)
     : QObject(parent), nextCmdId(0), status(StatusDisconnected)
@@ -45,6 +46,10 @@ AbstractClient::AbstractClient(QObject *parent)
     qRegisterMetaType<ServerInfo_User>("ServerInfo_User");
     qRegisterMetaType<QList<ServerInfo_User> >("QList<ServerInfo_User>");
     qRegisterMetaType<Event_ReplayAdded>("Event_ReplayAdded");
+    qRegisterMetaType<QList<QString> >("missingFeatures");
+
+    FeatureSet features;
+    features.initalizeFeatureList(clientFeatures);
     
     connect(this, SIGNAL(sigQueuePendingCommand(PendingCommand *)), this, SLOT(queuePendingCommand(PendingCommand *)));
 }

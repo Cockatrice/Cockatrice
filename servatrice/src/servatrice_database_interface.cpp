@@ -881,13 +881,75 @@ void Servatrice_DatabaseInterface::updateUsersClientID(const QString &userName, 
 
 }
 
-void Servatrice_DatabaseInterface::updateUsersLastLoginTime(const QString &userName)
-{
+void Servatrice_DatabaseInterface::updateUsersLastLoginData(const QString &userName, const QString &clientVersion) {
+
     if (!checkSql())
         return;
 
-    QSqlQuery *query = prepareQuery("update {prefix}_users set last_login = NOW() where name = :user_name");
-    query->bindValue(":user_name", userName);
-    execSqlQuery(query);
+    int usersID;
 
+    QSqlQuery *query = prepareQuery("select id from {prefix}_users where name = :user_name");
+    query->bindValue(":user_name", userName);
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to locate user id when updating users last login data: SQL Error");
+        return;
+    }
+
+    if (query->next()) {
+        usersID = query->value(0).toInt();
+    }
+
+    if (usersID) {
+        int userCount;
+        query = prepareQuery("select count(id) from {prefix}_user_analytics where id = :user_id");
+        query->bindValue(":user_id", usersID);
+        if (!execSqlQuery(query))
+            return;
+
+        if (query->next()) {
+            userCount = query->value(0).toInt();
+        }
+
+        if (!userCount) {
+            query = prepareQuery("insert into {prefix}_user_analytics (id,client_ver,last_login) values (:user_id,:client_ver,NOW())");
+            query->bindValue(":user_id", usersID);
+            query->bindValue(":client_ver", clientVersion);
+            execSqlQuery(query);
+        } else {
+            query = prepareQuery("update {prefix}_user_analytics set last_login = NOW(), client_ver = :client_ver where id = :user_id");
+            query->bindValue(":client_ver", clientVersion);
+            query->bindValue(":user_id", usersID);
+            execSqlQuery(query);
+        }
+    }
+}
+
+QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QString userName)
+{
+    QList<ServerInfo_Ban> results;
+    ServerInfo_Ban banDetails;
+
+    if (!checkSql())
+        return results;
+
+    QSqlQuery *query = prepareQuery("SELECT A.id_admin, A.time_from, A.minutes, A.reason, A.visible_reason, B.name AS name_admin FROM {prefix}_bans A LEFT JOIN {prefix}_users B ON A.id_admin=B.id WHERE A.user_name = :user_name");
+    query->bindValue(":user_name", userName);
+
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to collect ban history information: SQL Error");
+        return results;
+    }
+
+    QString adminID,adminName,banTime,banLength,banReason,visibleReason;
+    while (query->next()){
+        banDetails.set_admin_id(QString(query->value(0).toString()).toStdString());
+        banDetails.set_admin_name(QString(query->value(5).toString()).toStdString());
+        banDetails.set_ban_time(QString(query->value(1).toString()).toStdString());
+        banDetails.set_ban_length(QString(query->value(2).toString()).toStdString());
+        banDetails.set_ban_reason(QString(query->value(3).toString()).toStdString());
+        banDetails.set_visible_reason(QString(query->value(4).toString()).toStdString());
+        results << banDetails;
+    }
+
+    return results;
 }

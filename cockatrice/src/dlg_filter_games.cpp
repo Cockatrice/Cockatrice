@@ -9,7 +9,6 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QDialogButtonBox>
-#include <QSettings>
 #include <QCryptographicHash>
 
 DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const GamesProxyModel *_gamesProxyModel, QWidget *parent)
@@ -17,9 +16,6 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const Ga
       allGameTypes(_allGameTypes),
       gamesProxyModel(_gamesProxyModel)
 {
-    QSettings settings;
-    settings.beginGroup("filter_games");
-
     unavailableGamesVisibleCheckBox = new QCheckBox(tr("Show &unavailable games"));
     unavailableGamesVisibleCheckBox->setChecked(gamesProxyModel->getUnavailableGamesVisible());
 
