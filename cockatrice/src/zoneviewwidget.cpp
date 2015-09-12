@@ -141,12 +141,7 @@ void ZoneViewWidget::moveEvent(QGraphicsSceneMoveEvent * /* event */)
     if(!scene())
         return;
 
-    static int titleBarHeight = 0;
-    if(titleBarHeight == 0)
-    {
-        QStyleOptionTitleBar so;
-        titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight, &so, (QWidget*) this);
-    }
+    int titleBarHeight = 24;
 
     QPointF scenePos = pos();
 
