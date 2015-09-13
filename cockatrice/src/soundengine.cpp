@@ -2,8 +2,10 @@
 #include "settingscache.h"
 
 #include <QApplication>
+#include <QAudioOutput>
+#include <QBuffer>
+#include <QDebug>
 #include <QFileInfo>
-#include <QSound>
 #include <QLibraryInfo>
 #if QT_VERSION < 0x050000
     #include <QDesktopServices>
@@ -12,29 +14,13 @@
 #endif
 
 #define DEFAULT_THEME_NAME "Default"
-
-/*
-    fileNames = QStringList()
-        // Phases
-        << "untap_step" << "upkeep_step" << "draw_step" << "main_1"
-        << "start_combat" << "attack_step" << "block_step" << "damage_step" << "end_combat"
-        << "main_2" << "end_step"
-        // Game Actions
-        << "draw_card" << "play_card" << "tap_card" << "untap_card"
-        << "shuffle" << "roll_dice" << "life_change"
-        // Player
-        << "player_join" << "player_leave" << "player_disconnect" << "player_reconnect" << "player_concede"
-        // Spectator
-        << "spectator_join" << "spectator_leave"
-        // Chat & UI
-        << "chat_mention" << "all_mention" << "private_message";
-*/
-
 #define TEST_SOUND_FILENAME "player_join"
 
 SoundEngine::SoundEngine(QObject *parent)
-: QObject(parent), engine(0)
+: QObject(parent), player(0)
 {
+    inputBuffer = new QBuffer(this);
+
     ensureThemeDirectoryExists();
     connect(settingsCache, SIGNAL(soundThemeChanged()), this, SLOT(themeChangedSlot()));
     connect(settingsCache, SIGNAL(soundEnabledChanged()), this, SLOT(soundEnabledChanged()));
@@ -45,59 +31,68 @@ SoundEngine::SoundEngine(QObject *parent)
 
 SoundEngine::~SoundEngine()
 {
-    if(engine)
+    if(player)
     {
-        delete engine;
-        engine = 0;
-    }    
+        player->deleteLater();
+        player = 0;
+    }
+
+    inputBuffer->deleteLater();
 }
 
 void SoundEngine::soundEnabledChanged()
 {
     if (settingsCache->getSoundEnabled()) {
-#if QT_VERSION < 0x050000 //QT4
-        if(QSound::isAvailable())
-        {
-            qDebug("SoundEngine: enabling sound");
-            enabled = true;
-        } else {
-            qDebug("SoundEngine: sound not available");
-            enabled = false;
-        }
-#else
         qDebug("SoundEngine: enabling sound");
-        enabled = true;
-#endif
+        if(!player)
+        {
+            QAudioFormat format;
+#if QT_VERSION < 0x050000
+            format.setFrequency(44100);
+            format.setChannels(1);
+ #else
+            format.setSampleRate(44100);
+            format.setChannelCount(1);
+ #endif
+            format.setSampleSize(16);
+            format.setCodec("audio/pcm");
+            format.setByteOrder(QAudioFormat::LittleEndian);
+            format.setSampleType(QAudioFormat::SignedInt);
+            player = new QAudioOutput(format, this);
+        }
     } else {
         qDebug("SoundEngine: disabling sound");
-        enabled = false;
+        if(player)
+        {
+            player->stop();
+            player->deleteLater();
+            player = 0;
+        }
     }
 }
 
-#include <QDebug>
 void SoundEngine::playSound(QString fileName)
 {
-    if(!enabled)
+    if(!player)
         return;
 
-    QFileInfo fi("sounds:/" + fileName + ".wav");
-    qDebug() << "playing" << fi.absoluteFilePath();    
-    if(!fi.exists())
+    // still playing the previous sound?
+    if(player->state() == QAudio::ActiveState)
         return;
 
-    if(engine)
-    {
-        if(engine->isFinished())
-        {
-            engine->stop();
-            delete engine;            
-        } else {
-            return;
-        }
-    }
+    if(!audioData.contains(fileName))
+        return;
 
-    engine = new QSound(fi.absoluteFilePath());
-    engine->play();
+    qDebug() << "playing" << fileName;
+
+    inputBuffer->close();
+    inputBuffer->setData(audioData[fileName]);
+    inputBuffer->open(QIODevice::ReadOnly);
+#if QT_VERSION >= 0x050000
+    player->setVolume(settingsCache->getMasterVolume());
+#endif
+    player->stop();
+    player->start(inputBuffer);
 }
 
 void SoundEngine::testSound()
@@ -161,8 +156,34 @@ void SoundEngine::themeChangedSlot()
 
     QDir dir = getAvailableThemes().value(themeName);
 
-    // resources
-    QStringList resources;
-    resources << dir.absolutePath();
-    QDir::setSearchPaths("sounds", resources);
+    audioData.clear();
+
+    static const QStringList fileNames = QStringList()
+        // Phases
+        << "untap_step" << "upkeep_step" << "draw_step" << "main_1"
+        << "start_combat" << "attack_step" << "block_step" << "damage_step" << "end_combat"
+        << "main_2" << "end_step"
+        // Game Actions
+        << "draw_card" << "play_card" << "tap_card" << "untap_card"
+        << "shuffle" << "roll_dice" << "life_change"
+        // Player
+        << "player_join" << "player_leave" << "player_disconnect" << "player_reconnect" << "player_concede"
+        // Spectator
+        << "spectator_join" << "spectator_leave"
+        // Chat & UI
+        << "chat_mention" << "all_mention" << "private_message"
+        << "end_step" << "tap" << "player_joined" << "attack";
+
+    for (int i = 0; i < fileNames.size(); ++i) {
+        if(!dir.exists(fileNames[i] + ".wav"))
+            continue;
+
+        QFile file(dir.filePath(fileNames[i] + ".wav"));
+        file.open(QIODevice::ReadOnly);
+        // 44 = length of wav header
+        audioData.insert(fileNames[i], file.readAll().mid(44));
+        file.close();
+    }
+
+    soundEnabledChanged();
 }

@@ -6,7 +6,8 @@
 #include <QDir>
 #include <QString>
 
-class QSound;
+class QAudioOutput;
+class QBuffer;
 
 typedef QMap<QString, QString> QStringMap;
 
@@ -18,8 +19,9 @@ public:
     void playSound(QString fileName);
     QStringMap &getAvailableThemes();
 private:
-    bool enabled;
-    QSound * engine;
+    QMap<QString, QByteArray> audioData;
+    QBuffer *inputBuffer;
+    QAudioOutput * player;
     QStringMap availableThemes;
 protected:
     void ensureThemeDirectoryExists();
