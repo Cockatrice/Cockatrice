@@ -80,7 +80,6 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
     : QTabWidget(parent), userInfo(0), client(_client), tabServer(0), tabUserLists(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0)
 {
-    tabChangedIcon = new QIcon("theme:icons/tab_changed.svg");
     setElideMode(Qt::ElideRight);
     setMovable(true);
     setIconSize(QSize(15, 15));
@@ -99,7 +98,6 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
 TabSupervisor::~TabSupervisor()
 {
     stop();
-    delete tabChangedIcon;
 }
 
 void TabSupervisor::retranslateUi()
@@ -471,7 +469,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
     Tab *tab = static_cast<Tab *>(sender());
     if (tab != currentWidget()) {
         tab->setContentsChanged(true);
-        setTabIcon(indexOf(tab), *tabChangedIcon);
+        setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
     }
     if (globalEvent && settingsCache->getNotificationsEnabled())
         QApplication::alert(this);

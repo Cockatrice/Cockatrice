@@ -25,8 +25,8 @@ SequenceEdit::SequenceEdit(QString _shorcutName, QWidget *parent) : QWidget(pare
     clearButton->setMaximumHeight(lineEdit->height());
     defaultButton->setMaximumHeight(lineEdit->height());
 
-    clearButton->setIcon(QIcon("theme:icons/clearsearch.svg"));
-    defaultButton->setIcon(QIcon("theme:icons/update.png"));
+    clearButton->setIcon(QPixmap("theme:icons/clearsearch"));
+    defaultButton->setIcon(QPixmap("theme:icons/update"));
 
     clearButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
     defaultButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);

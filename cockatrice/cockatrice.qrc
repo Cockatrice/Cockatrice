@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/" >
-        <file>resources/back.svg</file>
+        <file>resources/cardback.svg</file>
         <file>resources/cockatrice.svg</file>
         <file>resources/hand.svg</file>
         <file>resources/hr.jpg</file>
