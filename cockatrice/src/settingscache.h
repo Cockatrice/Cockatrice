@@ -39,7 +39,7 @@ signals:
     void invertVerticalCoordinateChanged();
     void minPlayersForMultiColumnLayoutChanged();
     void soundEnabledChanged();
-    void soundPathChanged();
+    void soundThemeChanged();
     void priceTagFeatureChanged(int enabled);
     void ignoreUnregisteredUsersChanged();
     void ignoreUnregisteredUserMessagesChanged();
@@ -81,7 +81,7 @@ private:
     bool chatHighlightForeground;
     bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
     bool soundEnabled;
-    QString soundPath;
+    QString soundThemeName;
     bool priceTagFeature;
     int priceTagSource;
     bool ignoreUnregisteredUsers;
@@ -153,7 +153,7 @@ public:
      */
     bool getZoneViewPileView() const { return zoneViewPileView; }
     bool getSoundEnabled() const { return soundEnabled; }
-    QString getSoundPath() const { return soundPath; }
+    QString getSoundThemeName() const { return soundThemeName; }
     bool getPriceTagFeature() const { return false; /* #859; priceTagFeature;*/ }
     int getPriceTagSource() const { return priceTagSource; }
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
@@ -223,7 +223,7 @@ public slots:
     void setZoneViewSortByType(int _zoneViewSortByType);
     void setZoneViewPileView(int _zoneViewPileView);
     void setSoundEnabled(int _soundEnabled);
-    void setSoundPath(const QString &_soundPath);
+    void setSoundThemeName(const QString &_soundThemeName);
     void setPriceTagFeature(int _priceTagFeature);
     void setPriceTagSource(int _priceTagSource);
     void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);

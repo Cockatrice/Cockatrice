@@ -640,12 +640,16 @@ SoundSettingsPage::SoundSettingsPage()
     soundEnabledCheckBox.setChecked(settingsCache->getSoundEnabled());
     connect(&soundEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSoundEnabled(int)));
 
-    soundPathEdit = new QLineEdit(settingsCache->getSoundPath());
-    soundPathEdit->setReadOnly(true);
-    QPushButton *soundPathClearButton = new QPushButton(deleteIcon, QString());
-    connect(soundPathClearButton, SIGNAL(clicked()), this, SLOT(soundPathClearButtonClicked()));
-    QPushButton *soundPathButton = new QPushButton("...");
-    connect(soundPathButton, SIGNAL(clicked()), this, SLOT(soundPathButtonClicked()));
+    QString themeName = settingsCache->getSoundThemeName();
+
+    QStringList themeDirs = soundEngine->getAvailableThemes().keys();
+    for (int i = 0; i < themeDirs.size(); i++) {
+        themeBox.addItem(themeDirs[i]);
+        if (themeDirs[i] == themeName)
+            themeBox.setCurrentIndex(i);
+    }
+
+    connect(&themeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(themeBoxChanged(int)));
     connect(&soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(testSound()));
 
     masterVolumeSlider = new QSlider(Qt::Horizontal);
@@ -656,8 +660,6 @@ SoundSettingsPage::SoundSettingsPage()
     connect(settingsCache, SIGNAL(masterVolumeChanged(int)), this, SLOT(masterVolumeChanged(int)));
     connect(masterVolumeSlider, SIGNAL(sliderReleased()), soundEngine, SLOT(testSound()));
     connect(masterVolumeSlider, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMasterVolume(int)));
-
-    
 
     masterVolumeSpinBox = new QSpinBox();
     masterVolumeSpinBox->setMinimum(0);
@@ -672,14 +674,12 @@ SoundSettingsPage::SoundSettingsPage()
 #endif
 
     QGridLayout *soundGrid = new QGridLayout;
-    soundGrid->addWidget(&soundEnabledCheckBox, 0, 0, 1, 4);
+    soundGrid->addWidget(&soundEnabledCheckBox, 0, 0, 1, 3);
     soundGrid->addWidget(&masterVolumeLabel, 1, 0);
     soundGrid->addWidget(masterVolumeSlider, 1, 1);
     soundGrid->addWidget(masterVolumeSpinBox, 1, 2);
-    soundGrid->addWidget(&soundPathLabel, 2, 0);
-    soundGrid->addWidget(soundPathEdit, 2, 1);
-    soundGrid->addWidget(soundPathClearButton, 2, 2);
-    soundGrid->addWidget(soundPathButton, 2, 3);
+    soundGrid->addWidget(&themeLabel, 2, 0);
+    soundGrid->addWidget(&themeBox, 2, 1);
     soundGrid->addWidget(&soundTestButton, 3, 1);
 
     soundGroupBox = new QGroupBox;
@@ -691,29 +691,20 @@ SoundSettingsPage::SoundSettingsPage()
     setLayout(mainLayout);
 }
 
+void SoundSettingsPage::themeBoxChanged(int index)
+{
+    QStringList themeDirs = soundEngine->getAvailableThemes().keys();
+    if(index >= 0 && index < themeDirs.count())
+        settingsCache->setSoundThemeName(themeDirs.at(index));
+}
+
 void SoundSettingsPage::masterVolumeChanged(int value) {
     masterVolumeSlider->setToolTip(QString::number(value));
 }
 
-void SoundSettingsPage::soundPathClearButtonClicked()
-{
-    soundPathEdit->setText(QString());
-    settingsCache->setSoundPath(QString());
-}
-
-void SoundSettingsPage::soundPathButtonClicked()
-{
-    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
-    if (path.isEmpty())
-        return;
-
-    soundPathEdit->setText(path);
-    settingsCache->setSoundPath(path);
-}
-
 void SoundSettingsPage::retranslateUi() {
     soundEnabledCheckBox.setText(tr("Enable &sounds"));
-    soundPathLabel.setText(tr("Path to sounds directory:"));
+    themeLabel.setText(tr("Current sounds theme:"));
     soundTestButton.setText(tr("Test system sound engine"));
     soundGroupBox->setTitle(tr("Sound settings"));
     #if QT_VERSION < 0x050000

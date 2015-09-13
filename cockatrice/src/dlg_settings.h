@@ -174,20 +174,17 @@ public:
     SoundSettingsPage();
     void retranslateUi();
 private:
+    QLabel themeLabel;
+    QComboBox themeBox;
     QGroupBox *soundGroupBox;
     QPushButton soundTestButton;
     QCheckBox soundEnabledCheckBox;
-    QLabel soundPathLabel;
-    QLineEdit *soundPathEdit;
     QLabel masterVolumeLabel;
     QSlider *masterVolumeSlider;
     QSpinBox *masterVolumeSpinBox;
-signals:
-    void soundPathChanged();
 private slots:
     void masterVolumeChanged(int value);
-    void soundPathClearButtonClicked();
-    void soundPathButtonClicked();
+    void themeBoxChanged(int index);
 };
 
 class DlgSettings : public QDialog {

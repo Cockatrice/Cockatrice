@@ -1,8 +1,17 @@
 #include "soundengine.h"
 #include "settingscache.h"
 
+#include <QApplication>
 #include <QFileInfo>
 #include <QSound>
+#include <QLibraryInfo>
+#if QT_VERSION < 0x050000
+    #include <QDesktopServices>
+#else
+    #include <QStandardPaths>
+#endif
+
+#define DEFAULT_THEME_NAME "Default"
 
 /*
     fileNames = QStringList()
@@ -26,9 +35,12 @@
 SoundEngine::SoundEngine(QObject *parent)
 : QObject(parent), enabled(false)
 {
+    ensureThemeDirectoryExists();
+    connect(settingsCache, SIGNAL(soundThemeChanged()), this, SLOT(themeChangedSlot()));
     connect(settingsCache, SIGNAL(soundEnabledChanged()), this, SLOT(soundEnabledChanged()));
 
     soundEnabledChanged();
+    themeChangedSlot();
 }
 
 void SoundEngine::soundEnabledChanged()
@@ -59,7 +71,7 @@ void SoundEngine::playSound(QString fileName)
     if(!enabled)
         return;
 
-    QFileInfo fi(settingsCache->getSoundPath() + "/" + fileName + ".wav");
+    QFileInfo fi("sounds:/" + fileName + ".wav");
     qDebug() << "playing" << fi.absoluteFilePath();    
     if(!fi.exists())
         return;
@@ -70,4 +82,66 @@ void SoundEngine::playSound(QString fileName)
 void SoundEngine::testSound()
 {
     playSound(TEST_SOUND_FILENAME);
+}
+
+void SoundEngine::ensureThemeDirectoryExists()
+{
+    if(settingsCache->getSoundThemeName().isEmpty() ||
+        !getAvailableThemes().contains(settingsCache->getSoundThemeName()))
+    {
+        qDebug() << "Sounds theme name not set, setting default value";
+        settingsCache->setSoundThemeName(DEFAULT_THEME_NAME);
+    }
+}
+
+QStringMap & SoundEngine::getAvailableThemes()
+{
+    QDir dir;
+    availableThemes.clear();
+
+    // load themes from user profile dir
+    dir =
+#ifdef PORTABLE_BUILD
+        qApp->applicationDirPath() +
+#elif QT_VERSION < 0x050000
+        QDesktopServices::storageLocation(QDesktopServices::DataLocation) +
+#else
+        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first() +
+#endif
+        "/sounds";
+
+    foreach(QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
+    {
+        if(!availableThemes.contains(themeName))
+            availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
+    }
+
+    // load themes from cockatrice system dir
+#ifdef Q_OS_MAC
+    dir = qApp->applicationDirPath() + "/../Resources/sounds";
+#elif defined(Q_OS_WIN)
+    dir = qApp->applicationDirPath() + "/sounds";
+#else // linux
+    dir = qApp->applicationDirPath() + "/../share/cockatrice/sounds";
+#endif
+    foreach(QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
+    {
+        if(!availableThemes.contains(themeName))
+            availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
+    }
+
+    return availableThemes;
+}
+
+void SoundEngine::themeChangedSlot()
+{
+    QString themeName = settingsCache->getSoundThemeName();
+    qDebug() << "Sound theme changed:" << themeName;
+
+    QDir dir = getAvailableThemes().value(themeName);
+
+    // resources
+    QStringList resources;
+    resources << dir.absolutePath();
+    QDir::setSearchPaths("sounds", resources);
 }
