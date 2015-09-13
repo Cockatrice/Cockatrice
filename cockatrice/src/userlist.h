@@ -3,9 +3,11 @@
 
 #include <QDialog>
 #include <QGroupBox>
+#include <QComboBox>
 #include <QTreeWidgetItem>
 #include <QStyledItemDelegate>
 #include "user_level.h"
+#include "pb/moderator_commands.pb.h"
 
 class QTreeWidget;
 class ServerInfo_User;
@@ -40,6 +42,23 @@ public:
     int getMinutes() const;
     QString getReason() const;
     QString getVisibleReason() const;
+};
+
+class WarningDialog : public QDialog {
+    Q_OBJECT
+private:
+    QLabel *descriptionLabel;
+    QLineEdit *nameWarning;
+    QComboBox *warningOption;
+    QLineEdit * warnClientID;
+private slots:
+    void okClicked();
+public:
+    WarningDialog(const QString userName, const QString clientID, QWidget *parent = 0);
+    QString getName() const;
+    QString getWarnID() const;
+    QString getReason() const;
+    void addWarningOption(const QString warning);
 };
 
 class UserListItemDelegate : public QStyledItemDelegate {

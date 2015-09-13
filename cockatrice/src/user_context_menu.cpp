@@ -14,6 +14,7 @@
 #include <QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets>
+#include <QSignalMapper>
 #endif
 
 #include "pb/commands.pb.h"
@@ -23,6 +24,8 @@
 #include "pb/response_get_games_of_user.pb.h"
 #include "pb/response_get_user_info.pb.h"
 #include "pb/response_ban_history.pb.h"
+#include "pb/response_warn_history.pb.h"
+#include "pb/response_warn_list.pb.h"
 
 UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor), game(_game)
@@ -37,6 +40,8 @@ UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *p
     aAddToIgnoreList = new QAction(QString(), this);
     aRemoveFromIgnoreList = new QAction(QString(), this);
     aKick = new QAction(QString(), this);
+    aWarnUser = new QAction(QString(), this);
+    aWarnHistory = new QAction(QString(), this);
     aBan = new QAction(QString(), this);
     aBanHistory = new QAction(QString(), this);
     aPromoteToMod = new QAction(QString(), this);
@@ -55,6 +60,8 @@ void UserContextMenu::retranslateUi()
     aAddToIgnoreList->setText(tr("Add to &ignore list"));
     aRemoveFromIgnoreList->setText(tr("Remove from &ignore list"));
     aKick->setText(tr("Kick from &game"));
+    aWarnUser->setText(tr("Warn user"));
+    aWarnHistory->setText(tr("View user's war&n history"));
     aBan->setText(tr("Ban from &server"));
     aBanHistory->setText(tr("View user's &ban history"));
     aPromoteToMod->setText(tr("&Promote user to moderator"));
@@ -102,6 +109,39 @@ void UserContextMenu::banUser_processUserInfoResponse(const Response &r)
     dlg->show();
 }
 
+void UserContextMenu::warnUser_processGetWarningsListResponse(const Response &r)
+{
+    const Response_WarnList &response = r.GetExtension(Response_WarnList::ext);
+
+    QString user = QString::fromStdString(response.user_name()).simplified();
+    QString clientid = QString::fromStdString(response.user_clientid()).simplified();
+
+    // The dialog needs to be non-modal in order to not block the event queue of the client.
+    WarningDialog *dlg = new WarningDialog(user, clientid, static_cast<QWidget *>(parent()));
+    connect(dlg, SIGNAL(accepted()), this, SLOT(warnUser_dialogFinished()));
+
+    if (response.warning_size() > 0) {
+        for (int i = 0; i < response.warning_size(); ++i) {
+            dlg->addWarningOption(QString::fromStdString(response.warning(i)).simplified());
+        }
+    }
+    dlg->show();
+}
+
+void UserContextMenu::warnUser_processUserInfoResponse(const Response &resp)
+{
+    const Response_GetUserInfo &response = resp.GetExtension(Response_GetUserInfo::ext);
+    ServerInfo_User userInfo = response.user_info();
+
+    Command_GetWarnList cmd;
+    cmd.set_user_name(userInfo.name());
+    cmd.set_user_clientid(userInfo.clientid());
+    PendingCommand *pend = client->prepareModeratorCommand(cmd);
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(warnUser_processGetWarningsListResponse(Response)));
+    client->sendCommand(pend);
+
+}
+
 void UserContextMenu::banUserHistory_processResponse(const Response &resp) {
     const Response_BanHistory &response = resp.GetExtension(Response_BanHistory::ext);
     if (resp.response_code() == Response::RespOk) {
@@ -133,6 +173,38 @@ void UserContextMenu::banUserHistory_processResponse(const Response &resp) {
 
     } else
         QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Ban History"), tr("Failed to collecting ban information."));
+}
+
+void UserContextMenu::warnUserHistory_processResponse(const Response &resp) {
+    const Response_WarnHistory &response = resp.GetExtension(Response_WarnHistory::ext);
+    if (resp.response_code() == Response::RespOk) {
+
+        if (response.warn_list_size() > 0) {
+            QTableWidget *table = new QTableWidget();
+            table->setWindowTitle(tr("Warning History"));
+            table->setRowCount(response.warn_list_size());
+            table->setColumnCount(4);
+            table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+            table->setHorizontalHeaderLabels(
+                    QString(tr("Warning Time;Moderator;User Name;Reason")).split(";"));
+
+            ServerInfo_Warning warn; for (int i = 0; i < response.warn_list_size(); ++i) {
+                warn = response.warn_list(i);
+                table->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(warn.time_of())));
+                table->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(warn.admin_name())));
+                table->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(warn.user_name())));
+                table->setItem(i, 3, new QTableWidgetItem(QString::fromStdString(warn.reason())));
+            }
+
+            table->resizeColumnsToContents();
+            table->setMinimumSize(table->horizontalHeader()->length() + (table->columnCount() * 5), table->verticalHeader()->length() + (table->rowCount() * 3));
+            table->show();
+        } else
+            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Warning History"), tr("User has never been warned."));
+
+    } else
+        QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Warning History"), tr("Failed to collecting warning information."));
 }
 
 void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const CommandContainer &commandContainer)
@@ -171,6 +243,22 @@ void UserContextMenu::banUser_dialogFinished()
     client->sendCommand(client->prepareModeratorCommand(cmd));
 }
 
+void UserContextMenu::warnUser_dialogFinished()
+{
+    WarningDialog *dlg = static_cast<WarningDialog *>(sender());
+
+    if (dlg->getName().isEmpty() || QString::fromStdString(tabSupervisor->getUserInfo()->name()).simplified().isEmpty())
+        return;
+
+    Command_WarnUser cmd;
+    cmd.set_user_name(dlg->getName().toStdString());
+    cmd.set_reason(dlg->getReason().toStdString());
+    cmd.set_clientid(dlg->getWarnID().toStdString());
+
+    client->sendCommand(client->prepareModeratorCommand(cmd));
+
+}
+
 void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName, UserLevelFlags userLevel, bool online, int playerId)
 {
     aUserName->setText(userName);
@@ -198,6 +286,9 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     }
     if (!tabSupervisor->getAdminLocked()) {
         menu->addSeparator();
+        menu->addAction(aWarnUser);
+        menu->addAction(aWarnHistory);
+        menu->addSeparator();
         menu->addAction(aBan);
         menu->addAction(aBanHistory);
 
@@ -218,6 +309,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     aAddToIgnoreList->setEnabled(anotherUser);
     aRemoveFromIgnoreList->setEnabled(anotherUser);
     aKick->setEnabled(anotherUser);
+    aWarnUser->setEnabled(anotherUser);
+    aWarnHistory->setEnabled(anotherUser);
     aBan->setEnabled(anotherUser);
     aBanHistory->setEnabled(anotherUser);
     aPromoteToMod->setEnabled(anotherUser);
@@ -287,6 +380,18 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
         cmd.set_user_name(userName.toStdString());
         PendingCommand *pend = client->prepareModeratorCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(banUserHistory_processResponse(Response)));
+        client->sendCommand(pend);
+    } else if (actionClicked == aWarnUser) {
+        Command_GetUserInfo cmd;
+        cmd.set_user_name(userName.toStdString());
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(warnUser_processUserInfoResponse(Response)));
+        client->sendCommand(pend);
+    } else if (actionClicked == aWarnHistory) {
+        Command_GetWarnHistory cmd;
+        cmd.set_user_name(userName.toStdString());
+        PendingCommand *pend = client->prepareModeratorCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(warnUserHistory_processResponse(Response)));
         client->sendCommand(pend);
     }
 

@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "response.proto";
+import "serverinfo_warning.proto";
+
+message Response_WarnHistory{
+    extend Response {
+        optional Response_WarnHistory ext = 1013;
+    }
+    repeated ServerInfo_Warning warn_list = 1;
+}

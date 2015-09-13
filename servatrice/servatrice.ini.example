@@ -56,6 +56,11 @@ requireclientid=false
 ; attempting to log in.  Example: "client_id,client_ver"
 requiredfeatures=""
 
+; You can define custom warnings that users are sent when the moderation staff uses the right client warn user
+; menu option.  This list is comma seperated that each item will appear in the drop down list for staff members
+; to choose from.  Example: "Flaming,Foul Language"
+officialwarnings="Flamming,Spamming,Causing Drama,Abusive Language"
+
 [authentication]
 
 ; Servatrice can authenticate users connecting. It currently supports 3 different authentication methods:
