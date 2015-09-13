@@ -137,7 +137,6 @@ SettingsCache::SettingsCache()
     setDeckPath(qApp->applicationDirPath() + "data/decks");
     setReplaysPath(qApp->applicationDirPath() +"data/replays");
     setPicsPath(qApp->applicationDirPath() +  "data/pics");
-    setSoundPath(qApp->applicationDirPath() +"data/sounds");
 #endif
 
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
@@ -198,7 +197,7 @@ SettingsCache::SettingsCache()
     zoneViewPileView = settings->value("zoneview/pileview", true).toBool();
 
     soundEnabled = settings->value("sound/enabled", false).toBool();
-    soundPath = settings->value("sound/path").toString();
+    soundThemeName = settings->value("sound/theme").toString();
 
     priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
     priceTagSource = settings->value("deckeditor/pricetagsource", 0).toInt();
@@ -482,11 +481,11 @@ void SettingsCache::setSoundEnabled(int _soundEnabled)
     emit soundEnabledChanged();
 }
 
-void SettingsCache::setSoundPath(const QString &_soundPath)
+void SettingsCache::setSoundThemeName(const QString &_soundThemeName)
 {
-    soundPath = _soundPath;
-    settings->setValue("sound/path", soundPath);
-    emit soundPathChanged();
+    soundThemeName = _soundThemeName;
+    settings->setValue("sound/theme", soundThemeName);
+    emit soundThemeChanged();
 }
 
 void SettingsCache::setPriceTagFeature(int _priceTagFeature)

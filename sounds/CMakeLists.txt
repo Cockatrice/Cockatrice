@@ -1,16 +1,19 @@
-# CMakeLists for sounds/ directory
+# CMakeLists for sounds directory
 #
-# Installs default sound files
+# add sounds subfolders
 
-FILE(GLOB sounds "${CMAKE_CURRENT_SOURCE_DIR}/*.wav")
+SET(defsounds
+    Default
+    Legacy
+)
 
 if(UNIX)
     if(APPLE)
-      	INSTALL(FILES ${sounds} DESTINATION cockatrice.app/Contents/Resources/sounds/)
+        INSTALL(DIRECTORY ${defsounds} DESTINATION cockatrice.app/Contents/Resources/sounds/)
     else()
         # Assume linux
-        INSTALL(FILES ${sounds} DESTINATION share/cockatrice/sounds/)
+        INSTALL(DIRECTORY ${defsounds} DESTINATION share/cockatrice/sounds/)
     endif()
 elseif(WIN32)
-    INSTALL(FILES ${sounds} DESTINATION sounds/)
+    INSTALL(DIRECTORY ${defsounds} DESTINATION sounds/)
 endif()
