@@ -18,6 +18,7 @@
 #include "pb/event_user_message.pb.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_room_say.pb.h"
+#include "pb/serverinfo_user.pb.h"
 #include <google/protobuf/descriptor.h>
 #include "featureset.h"
 
@@ -536,11 +537,13 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
         QReadLocker locker(&server->clientsLock);
 
         ServerInfo_User_Container *infoSource = server->findUser(userName);
-        if (!infoSource)
-            return Response::RespNameNotFound;
-
-        re->mutable_user_info()->CopyFrom(infoSource->copyUserInfo(true, false, userInfo->user_level() & ServerInfo_User::IsModerator));
+        if (!infoSource) {
+            re->mutable_user_info()->CopyFrom(databaseInterface->getUserData(userName,true));
+        } else {
+            re->mutable_user_info()->CopyFrom(infoSource->copyUserInfo(true, false, userInfo->user_level() & ServerInfo_User::IsModerator));
+        }
     }
+
 
     rc.setResponseExtension(re);
     return Response::RespOk;
