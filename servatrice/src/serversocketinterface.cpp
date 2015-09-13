@@ -768,8 +768,13 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
     if (!sqlInterface->checkSql())
         return Response::RespInternalError;
 
-    QString userName = QString::fromStdString(cmd.user_name());
-    QString address = QString::fromStdString(cmd.address());
+    QString userName = QString::fromStdString(cmd.user_name()).simplified();
+    QString address = QString::fromStdString(cmd.address()).simplified();
+    QString clientID = QString::fromStdString(cmd.clientid()).simplified();
+
+    if (userName.isEmpty() && address.isEmpty() && clientID.isEmpty())
+        return Response::RespOk;
+
     QString trustedSources = settingsCache->value("server/trusted_sources","127.0.0.1,::1").toString();
     int minutes = cmd.minutes();
     if (trustedSources.contains(address,Qt::CaseInsensitive))
@@ -790,10 +795,11 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 
     if (!userName.isEmpty()) {
         ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
-        userList.append(user);
+        if (user)
+            userList.append(user);
     }
 
-    if (userName.isEmpty() && address.isEmpty() && (!QString::fromStdString(cmd.clientid()).isEmpty())) {
+    if (userName.isEmpty() && address.isEmpty() && (!clientID.isEmpty())) {
         QSqlQuery *query = sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
         query->bindValue(":client_id", QString::fromStdString(cmd.clientid()));
         sqlInterface->execSqlQuery(query);

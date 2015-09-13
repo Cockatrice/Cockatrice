@@ -50,12 +50,12 @@ bool PlayerListTWI::operator<(const QTreeWidgetItem &other) const
 PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent)
     : QTreeWidget(parent), tabSupervisor(_tabSupervisor), client(_client), game(_game), gameStarted(false)
 {
-    readyIcon = QIcon("theme:icons/ready_start.svg");
-    notReadyIcon = QIcon("theme:icons/not_ready_start.svg");
-    concededIcon = QIcon("theme:icons/conceded.svg");
-    playerIcon = QIcon("theme:icons/player.svg");
-    spectatorIcon = QIcon("theme:icons/spectator.svg");
-    lockIcon = QIcon("theme:icons/lock.svg");
+    readyIcon = QPixmap("theme:icons/ready_start");
+    notReadyIcon = QPixmap("theme:icons/not_ready_start");
+    concededIcon = QPixmap("theme:icons/conceded");
+    playerIcon = QPixmap("theme:icons/player");
+    spectatorIcon = QPixmap("theme:icons/spectator");
+    lockIcon = QPixmap("theme:icons/lock");
     
     if (tabSupervisor) {
         itemDelegate = new PlayerListItemDelegate(this);

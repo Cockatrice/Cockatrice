@@ -16,7 +16,6 @@
 #define PLAYERZONE_BG_NAME "playerzone"
 #define STACKZONE_BG_NAME "stackzone"
 #define TABLEZONE_BG_NAME "tablezone"
-#define CARD_BACK_NAME "cardback"
 
 ThemeManager::ThemeManager(QObject *parent)
     :QObject(parent)
@@ -75,42 +74,19 @@ QStringMap & ThemeManager::getAvailableThemes()
     return availableThemes;
 }
 
-QBrush ThemeManager::loadBrush(QDir dir, QString fileName, QColor fallbackColor)
+QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 {
     QBrush brush;
-    QPixmap tmp;
-    QStringList exts;
-    exts << ".png" << ".jpg" << ".jpeg" << ".gif" << ".bmp";
-
-    brush.setColor(fallbackColor);
-    brush.setStyle(Qt::SolidPattern);
-
-    foreach (const QString &ext, exts) {
-        if (dir.exists(fileName + ext)) {
-            tmp.load(dir.absoluteFilePath(fileName + ext));
-            if(!tmp.isNull())
-                brush.setTexture(tmp);
-            break;
-        }
+    QPixmap tmp = QPixmap("theme:zones/" + fileName);
+    if(tmp.isNull())
+    {
+        brush.setColor(fallbackColor);
+        brush.setStyle(Qt::SolidPattern);
+    } else {
+        brush.setTexture(tmp);
     }
 
     return brush;
-}
-
-QPixmap ThemeManager::loadPixmap(QDir dir, QString fileName)
-{
-    QPixmap pix;
-    QStringList exts;
-    exts << ".png" << ".jpg" << ".jpeg" << ".gif" << ".bmp";
-
-    foreach (const QString &ext, exts) {
-        if (dir.exists(fileName + ext)) {
-            pix.load(dir.absoluteFilePath(fileName + ext));
-            break;
-        }
-    }
-
-    return pix;
 }
 
 void ThemeManager::themeChangedSlot()
@@ -127,20 +103,18 @@ void ThemeManager::themeChangedSlot()
     else
         qApp->setStyleSheet("");
 
-    // card background
-    cardBackPixmap = loadPixmap(dir, CARD_BACK_NAME);
-
-    // zones bg
-    dir.cd("zones");
-    handBgBrush = loadBrush(dir, HANDZONE_BG_NAME, QColor(80, 100, 50));
-    tableBgBrush = loadBrush(dir, TABLEZONE_BG_NAME, QColor(70, 50, 100));
-    playerBgBrush = loadBrush(dir, PLAYERZONE_BG_NAME, QColor(200, 200, 200));
-    stackBgBrush = loadBrush(dir, STACKZONE_BG_NAME, QColor(113, 43, 43));
-
     // resources
     QStringList resources;
     resources << dir.absolutePath() << ":/resources";
     QDir::setSearchPaths("theme", resources);
+
+    // zones bg
+    dir.cd("zones");
+    handBgBrush = loadBrush(HANDZONE_BG_NAME, QColor(80, 100, 50));
+    tableBgBrush = loadBrush(TABLEZONE_BG_NAME, QColor(70, 50, 100));
+    playerBgBrush = loadBrush(PLAYERZONE_BG_NAME, QColor(200, 200, 200));
+    stackBgBrush = loadBrush(STACKZONE_BG_NAME, QColor(113, 43, 43));
+
 
     emit themeChanged();
 }

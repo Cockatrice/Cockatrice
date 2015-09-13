@@ -26,7 +26,7 @@ FilterBuilder::FilterBuilder(QWidget *parent)
             QVariant(i)
         );
 
-    QPushButton *ok = new QPushButton(QIcon("theme:icons/increment.svg"), QString());
+    QPushButton *ok = new QPushButton(QPixmap("theme:icons/increment"), QString());
     ok->setObjectName("ok");
     ok->setMaximumSize(20, 20);
 

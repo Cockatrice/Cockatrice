@@ -363,17 +363,17 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     
     replayStartButton = new QToolButton;
     replayStartButton->setIconSize(QSize(32, 32));
-    replayStartButton->setIcon(QIcon("theme:replay/start.svg"));
+    replayStartButton->setIcon(QPixmap("theme:replay/start"));
     connect(replayStartButton, SIGNAL(clicked()), this, SLOT(replayStartButtonClicked()));
     replayPauseButton = new QToolButton;
     replayPauseButton->setIconSize(QSize(32, 32));
     replayPauseButton->setEnabled(false);
-    replayPauseButton->setIcon(QIcon("theme:replay/pause.svg"));
+    replayPauseButton->setIcon(QPixmap("theme:replay/pause"));
     connect(replayPauseButton, SIGNAL(clicked()), this, SLOT(replayPauseButtonClicked()));
     replayFastForwardButton = new QToolButton;
     replayFastForwardButton->setIconSize(QSize(32, 32));
     replayFastForwardButton->setEnabled(false);
-    replayFastForwardButton->setIcon(QIcon("theme:replay/fastforward.svg"));
+    replayFastForwardButton->setIcon(QPixmap("theme:replay/fastforward"));
     replayFastForwardButton->setCheckable(true);
     connect(replayFastForwardButton, SIGNAL(toggled(bool)), this, SLOT(replayFastForwardButtonToggled(bool)));
     

@@ -80,25 +80,25 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     hbox->addWidget(rightGroupBox);
     
     aOpenLocalDeck = new QAction(this);
-    aOpenLocalDeck->setIcon(QIcon("theme:icons/pencil.svg"));
+    aOpenLocalDeck->setIcon(QPixmap("theme:icons/pencil"));
     connect(aOpenLocalDeck, SIGNAL(triggered()), this, SLOT(actOpenLocalDeck()));
     aUpload = new QAction(this);
-    aUpload->setIcon(QIcon("theme:icons/arrow_right_green.svg"));
+    aUpload->setIcon(QPixmap("theme:icons/arrow_right_green"));
     connect(aUpload, SIGNAL(triggered()), this, SLOT(actUpload()));
     aDeleteLocalDeck = new QAction(this);
-    aDeleteLocalDeck->setIcon(QIcon("theme:icons/remove_row.svg"));
+    aDeleteLocalDeck->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteLocalDeck, SIGNAL(triggered()), this, SLOT(actDeleteLocalDeck()));
     aOpenRemoteDeck = new QAction(this);
-    aOpenRemoteDeck->setIcon(QIcon("theme:icons/pencil.svg"));
+    aOpenRemoteDeck->setIcon(QPixmap("theme:icons/pencil"));
     connect(aOpenRemoteDeck, SIGNAL(triggered()), this, SLOT(actOpenRemoteDeck()));
     aDownload = new QAction(this);
-    aDownload->setIcon(QIcon("theme:icons/arrow_left_green.svg"));
+    aDownload->setIcon(QPixmap("theme:icons/arrow_left_green"));
     connect(aDownload, SIGNAL(triggered()), this, SLOT(actDownload()));
     aNewFolder = new QAction(this);
     aNewFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
     connect(aNewFolder, SIGNAL(triggered()), this, SLOT(actNewFolder()));
     aDeleteRemoteDeck = new QAction(this);
-    aDeleteRemoteDeck->setIcon(QIcon("theme:icons/remove_row.svg"));
+    aDeleteRemoteDeck->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteRemoteDeck, SIGNAL(triggered()), this, SLOT(actDeleteRemoteDeck()));
     
     leftToolBar->addAction(aOpenLocalDeck);

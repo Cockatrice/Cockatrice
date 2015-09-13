@@ -1,7 +1,6 @@
 #include "pixmapgenerator.h"
 #include "pb/serverinfo_user.pb.h"
 #include <QPainter>
-#include <QSvgRenderer>
 #include <cmath>
 #ifdef _WIN32
 #include "round.h"
@@ -16,12 +15,8 @@ QPixmap PhasePixmapGenerator::generatePixmap(int height, QString name)
     if (pmCache.contains(key))
         return pmCache.value(key);
     
-    QSvgRenderer svg(QString("theme:phases/" + name + ".svg"));
-    
-    QPixmap pixmap(height, height);
-    pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
-    svg.render(&painter, QRectF(0, 0, height, height));
+    QPixmap pixmap = QPixmap("theme:phases/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
     pmCache.insert(key, pixmap);
     return pixmap;
 }
@@ -36,20 +31,16 @@ QPixmap CounterPixmapGenerator::generatePixmap(int height, QString name, bool hi
     if (pmCache.contains(key))
         return pmCache.value(key);
     
-    QSvgRenderer svg(QString("theme:counters/" + name + ".svg"));
-    
-    if (!svg.isValid()) {
+    QPixmap pixmap = QPixmap("theme:counters/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    if(pixmap.isNull())
+    {
         name = "general";
         if (highlight)
             name.append("_highlight");
-        svg.load(QString("theme:counters/" + name + ".svg"));
+        pixmap = QPixmap("theme:counters/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+       
     }
-    
-    int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
-    QPixmap pixmap(width, height);
-    pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
-    svg.render(&painter, QRectF(0, 0, width, height));
+
     pmCache.insert(key, pixmap);
     return pixmap;
 }
@@ -97,14 +88,8 @@ QPixmap GenderPixmapGenerator::generatePixmap(int height, int _gender)
         case ServerInfo_User::Female: genderStr = "female"; break;
         default: genderStr = "unknown";
     };
-    
-    QSvgRenderer svg(QString("theme:genders/" + genderStr + ".svg"));
-    int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
-    QPixmap pixmap(width, height);
-    pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
-    svg.render(&painter, QRectF(0, 0, width, height));
-    
+
+    QPixmap pixmap = QPixmap("theme:genders/" + genderStr).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     pmCache.insert(key, pixmap);
     return pixmap;
 }
@@ -119,14 +104,12 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
     if (pmCache.contains(key))
         return pmCache.value(key);
     
-    QSvgRenderer svg(QString("theme:countries/" + countryCode.toLower() + ".svg"));
-    int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
-    QPixmap pixmap(width, height);
-    pixmap.fill(Qt::transparent);
+    int width = height * 2;
+    QPixmap pixmap = QPixmap("theme:countries/" + countryCode.toLower()).scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
     QPainter painter(&pixmap);
-    svg.render(&painter, QRectF(0, 0, width, height));
     painter.setPen(Qt::black);
-    painter.drawRect(0, 0, width - 1, height - 1);
+    painter.drawRect(0, 0, pixmap.width() - 1, pixmap.height() - 1);
     
     pmCache.insert(key, pixmap);
     return pixmap;
@@ -154,13 +137,7 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
     if (isBuddy)
         levelString.append("_buddy");
 
-    QSvgRenderer svg(QString("theme:userlevels/" + levelString + ".svg"));
-    int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
-    QPixmap pixmap(width, height);
-    pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
-    svg.render(&painter, QRectF(0, 0, width, height));
-
+    QPixmap pixmap = QPixmap("theme:userlevels/" + levelString).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     pmCache.insert(key, pixmap);
     return pixmap;
 }
@@ -175,13 +152,7 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
     if (pmCache.contains(key))
         return pmCache.value(key);
 
-    QSvgRenderer svg(QString("theme:icons/lock.svg"));
-    int width = (int) round(height * (double) svg.defaultSize().width() / (double) svg.defaultSize().height());
-    QPixmap pixmap(width, height);
-    pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
-    svg.render(&painter, QRectF(0, 0, width, height));
-
+    QPixmap pixmap = QPixmap("theme:icons/lock").scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     pmCache.insert(key, pixmap);
     return pixmap;
 }

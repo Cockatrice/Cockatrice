@@ -83,10 +83,10 @@ DlgEditTokens::DlgEditTokens(CardDatabaseModel *_cardDatabaseModel, QWidget *par
     connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
     
     QAction *aAddToken = new QAction(tr("Add token"), this);
-    aAddToken->setIcon(QIcon("theme:icons/increment.svg"));
+    aAddToken->setIcon(QPixmap("theme:icons/increment"));
     connect(aAddToken, SIGNAL(triggered()), this, SLOT(actAddToken()));
     QAction *aRemoveToken = new QAction(tr("Remove token"), this);
-    aRemoveToken->setIcon(QIcon("theme:icons/decrement.svg"));
+    aRemoveToken->setIcon(QPixmap("theme:icons/decrement"));
     connect(aRemoveToken, SIGNAL(triggered()), this, SLOT(actRemoveToken()));
     
     QToolBar *databaseToolBar = new QToolBar;

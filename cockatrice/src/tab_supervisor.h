@@ -44,7 +44,6 @@ class TabSupervisor : public QTabWidget {
     Q_OBJECT
 private:
     ServerInfo_User *userInfo;
-    QIcon *tabChangedIcon;
     AbstractClient *client;
     QList<AbstractClient *> localClients;
     TabServer *tabServer;

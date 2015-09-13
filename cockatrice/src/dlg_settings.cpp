@@ -522,10 +522,10 @@ MessagesSettingsPage::MessagesSettingsPage()
         messageList->addItem(settingsCache->messages().getMessageAt(i));
     
     aAdd = new QAction(this);
-    aAdd->setIcon(QIcon("theme:icons/increment.svg"));
+    aAdd->setIcon(QPixmap("theme:icons/increment"));
     connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
     aRemove = new QAction(this);
-    aRemove->setIcon(QIcon("theme:icons/decrement.svg"));
+    aRemove->setIcon(QPixmap("theme:icons/decrement"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
 
     QToolBar *messageToolBar = new QToolBar;
@@ -635,8 +635,6 @@ void MessagesSettingsPage::retranslateUi()
 
 SoundSettingsPage::SoundSettingsPage()
 {
-    QIcon deleteIcon("theme:icons/delete.svg");
-
     soundEnabledCheckBox.setChecked(settingsCache->getSoundEnabled());
     connect(&soundEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSoundEnabled(int)));
 
@@ -763,37 +761,37 @@ void DlgSettings::createIcons()
     generalButton = new QListWidgetItem(contentsWidget);
     generalButton->setTextAlignment(Qt::AlignHCenter);
     generalButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    generalButton->setIcon(QIcon("theme:config/general.svg"));
+    generalButton->setIcon(QPixmap("theme:config/general"));
     
     appearanceButton = new QListWidgetItem(contentsWidget);
     appearanceButton->setTextAlignment(Qt::AlignHCenter);
     appearanceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    appearanceButton->setIcon(QIcon("theme:config/appearance.svg"));
+    appearanceButton->setIcon(QPixmap("theme:config/appearance"));
     
     userInterfaceButton = new QListWidgetItem(contentsWidget);
     userInterfaceButton->setTextAlignment(Qt::AlignHCenter);
     userInterfaceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    userInterfaceButton->setIcon(QIcon("theme:config/interface.svg"));
+    userInterfaceButton->setIcon(QPixmap("theme:config/interface"));
     
     deckEditorButton = new QListWidgetItem(contentsWidget);
     deckEditorButton->setTextAlignment(Qt::AlignHCenter);
     deckEditorButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    deckEditorButton->setIcon(QIcon("theme:config/deckeditor.svg"));
+    deckEditorButton->setIcon(QPixmap("theme:config/deckeditor"));
     
     messagesButton = new QListWidgetItem(contentsWidget);
     messagesButton->setTextAlignment(Qt::AlignHCenter);
     messagesButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    messagesButton->setIcon(QIcon("theme:config/messages.svg"));
+    messagesButton->setIcon(QPixmap("theme:config/messages"));
 
     soundButton = new QListWidgetItem(contentsWidget);
     soundButton->setTextAlignment(Qt::AlignHCenter);
     soundButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    soundButton->setIcon(QIcon("theme:config/sound.svg"));
+    soundButton->setIcon(QPixmap("theme:config/sound"));
     
     shortcutsButton = new QListWidgetItem(contentsWidget);
     shortcutsButton->setTextAlignment(Qt::AlignHCenter);
     shortcutsButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    shortcutsButton->setIcon(QIcon("theme:config/shorcuts.svg"));
+    shortcutsButton->setIcon(QPixmap("theme:config/shorcuts"));
 
     connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(changePage(QListWidgetItem *, QListWidgetItem *)));
 }

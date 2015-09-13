@@ -26,7 +26,6 @@
 #include <QTranslator>
 #include <QLibraryInfo>
 #include <QDateTime>
-#include <QIcon>
 #include <QDir>
 #include <QDesktopServices>
 #include <QDebug>
@@ -207,8 +206,7 @@ int main(int argc, char *argv[])
         MainWindow ui;
         qDebug("main(): MainWindow constructor finished");
 
-        QIcon icon("theme:cockatrice.svg");
-        ui.setWindowIcon(icon);
+        ui.setWindowIcon(QPixmap("theme:cockatrice"));
         
         settingsCache->setClientID(generateClientID());
 
