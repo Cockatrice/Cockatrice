@@ -33,7 +33,7 @@
 #define TEST_SOUND_FILENAME "player_join"
 
 SoundEngine::SoundEngine(QObject *parent)
-: QObject(parent), enabled(false)
+: QObject(parent), engine(0)
 {
     ensureThemeDirectoryExists();
     connect(settingsCache, SIGNAL(soundThemeChanged()), this, SLOT(themeChangedSlot()));
@@ -41,6 +41,15 @@ SoundEngine::SoundEngine(QObject *parent)
 
     soundEnabledChanged();
     themeChangedSlot();
+}
+
+SoundEngine::~SoundEngine()
+{
+    if(engine)
+    {
+        delete engine;
+        engine = 0;
+    }    
 }
 
 void SoundEngine::soundEnabledChanged()
@@ -57,7 +66,7 @@ void SoundEngine::soundEnabledChanged()
         }
 #else
         qDebug("SoundEngine: enabling sound");
-        enabled = true;        
+        enabled = true;
 #endif
     } else {
         qDebug("SoundEngine: disabling sound");
@@ -76,7 +85,19 @@ void SoundEngine::playSound(QString fileName)
     if(!fi.exists())
         return;
 
-    QSound::play(fi.absoluteFilePath());
+    if(engine)
+    {
+        if(engine->isFinished())
+        {
+            engine->stop();
+            delete engine;            
+        } else {
+            return;
+        }
+    }
+
+    engine = new QSound(fi.absoluteFilePath());
+    engine->play();
 }
 
 void SoundEngine::testSound()
