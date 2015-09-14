@@ -160,7 +160,7 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/aCloseMostRecentZoneView"] = parseSequenceString("Esc");
     defaultShortCuts["Player/IncP"] = parseSequenceString("Ctrl++");
     defaultShortCuts["Player/aAlwaysRevealTopCard"] = parseSequenceString("Ctrl+N");
-    defaultShortCuts["Player/aAttach"] = parseSequenceString("Ctrl+A");
+    defaultShortCuts["Player/aAttach"] = parseSequenceString("Ctrl+Alt+A");
     defaultShortCuts["Player/aCCGreen"] = parseSequenceString("");
     defaultShortCuts["Player/aCCRed"] = parseSequenceString("");
     defaultShortCuts["Player/aCCYellow"] = parseSequenceString("");
@@ -210,8 +210,8 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/aNextPhase"] = parseSequenceString("Ctrl+Space;Tab");
     defaultShortCuts["Player/aNextTurn"] = parseSequenceString("Ctrl+Return;Ctrl+Enter");
     defaultShortCuts["Player/aRemoveLocalArrows"] = parseSequenceString("Ctrl+R");
-    defaultShortCuts["Player/aRotateViewCCW"] = parseSequenceString("Ctrl+[");
-    defaultShortCuts["Player/aRotateViewCW"] = parseSequenceString("Ctrl+]");
+    defaultShortCuts["Player/aRotateViewCCW"] = parseSequenceString("");
+    defaultShortCuts["Player/aRotateViewCW"] = parseSequenceString("");
     defaultShortCuts["Player/phase0"] = parseSequenceString("F5");
     defaultShortCuts["Player/phase1"] = parseSequenceString("");
     defaultShortCuts["Player/phase10"] = parseSequenceString("F10");
