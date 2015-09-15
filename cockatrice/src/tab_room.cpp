@@ -13,6 +13,7 @@
 #include <QSystemTrayIcon>
 #include <QCompleter>
 #include <QWidget>
+#include <QtCore/qdatetime.h>
 #include "tab_supervisor.h"
 #include "tab_room.h"
 #include "tab_userlists.h"
@@ -33,6 +34,7 @@
 #include "pb/event_room_say.pb.h"
 #include "pending_command.h"
 #include "dlg_settings.h"
+
 
 TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *_ownUser, const ServerInfo_Room &info)
     : Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())), ownUser(_ownUser)
@@ -265,8 +267,11 @@ void TabRoom::processLeaveRoomEvent(const Event_LeaveRoom &event)
 void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
 {
     QString senderName = QString::fromStdString(event.name());
+    QString message = QString::fromStdString(event.message());
+
     if (tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(senderName))
         return;
+
     UserListTWI *twi = userList->getUsers().value(senderName);
     UserLevelFlags userLevel;
     if (twi) {
@@ -274,7 +279,15 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
         if (settingsCache->getIgnoreUnregisteredUsers() && !userLevel.testFlag(ServerInfo_User::IsRegistered))
             return;
     }
-    chatView->appendMessage(QString::fromStdString(event.message()), senderName, userLevel, true);
+
+    if (event.message_type() == Event_RoomSay::ChatHistory && !settingsCache->getRoomHistory())
+        return;
+
+    if (event.message_type() == Event_RoomSay::ChatHistory)
+        message = "[" + QString(QDateTime::fromMSecsSinceEpoch(event.time_of()).toLocalTime().toString("d MMM yyyy HH:mm:ss")) + "] " + message;
+
+
+    chatView->appendMessage(message, event.message_type(), senderName, userLevel, true);
     emit userEvent(false);
 }
 

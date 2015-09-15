@@ -600,7 +600,18 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
 
     Event_RoomSay joinMessageEvent;
     joinMessageEvent.set_message(r->getJoinMessage().toStdString());
+    joinMessageEvent.set_message_type(Event_RoomSay::Welcome);
     rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, r->prepareRoomEvent(joinMessageEvent));
+
+    ServerInfo_ChatMessage chatMessage; for (int i = 0; i < r->chatHistory.size(); ++i) {
+        chatMessage = r->chatHistory.at(i);
+        qDebug() << QString::fromStdString(chatMessage.message()).simplified();
+        Event_RoomSay roomChatHistory;
+        roomChatHistory.set_message(chatMessage.sender_name() + ": " + chatMessage.message());
+        roomChatHistory.set_message_type(Event_RoomSay::ChatHistory);
+        roomChatHistory.set_time_of(QDateTime::fromString(QString::fromStdString(chatMessage.time())).toMSecsSinceEpoch());
+        rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, r->prepareRoomEvent(roomChatHistory));
+    }
 
     Response_JoinRoom *re = new Response_JoinRoom;
     r->getInfo(*re->mutable_room_info(), true);

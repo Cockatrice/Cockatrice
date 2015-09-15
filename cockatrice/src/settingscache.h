@@ -95,6 +95,7 @@ private:
     bool scaleCards;
     bool showMessagePopups;
     bool showMentionPopups;
+    bool roomHistory;
     bool leftJustified;
     int masterVolume;
     int cardInfoViewMode;
@@ -166,6 +167,7 @@ public:
     bool getScaleCards() const {  return scaleCards; }
     bool getShowMessagePopup() const { return showMessagePopups; }
     bool getShowMentionPopup() const { return showMentionPopups; }
+    bool getRoomHistory() const { return roomHistory; }
     bool getLeftJustified() const { return leftJustified; }
     int getMasterVolume() const { return masterVolume; }
     int getCardInfoViewMode() const { return cardInfoViewMode; }
@@ -236,6 +238,7 @@ public slots:
     void setCardScaling(const int _scaleCards);
     void setShowMessagePopups(const int _showMessagePopups);
     void setShowMentionPopups(const int _showMentionPopups);
+    void setRoomHistory(const int _roomHistory);
     void setLeftJustified( const int _leftJustified);
     void setMasterVolume(const int _masterVolume);
     void setCardInfoViewMode(const int _viewMode);

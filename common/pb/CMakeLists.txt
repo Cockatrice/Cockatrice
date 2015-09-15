@@ -137,6 +137,7 @@ SET(PROTO_FILES
     serverinfo_ban.proto
     serverinfo_cardcounter.proto
     serverinfo_card.proto
+    serverinfo_chat_message.proto
     serverinfo_counter.proto
     serverinfo_deckstorage.proto
     serverinfo_game.proto
