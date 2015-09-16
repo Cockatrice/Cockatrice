@@ -831,7 +831,6 @@ void TabDeckEditor::actOpenCustomsetsFolder() {
     QStringList args;
     dataDir.append("/customsets");
     args << QDir::toNativeSeparators(dataDir);
-    aOpenCustomsetsFolder->setText(dataDir);
     QProcess::startDetached("explorer", args);
 #endif
 
