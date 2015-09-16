@@ -10,6 +10,7 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
+#include <QPushButton>
 #include <QSpacerItem>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -270,6 +271,8 @@ public:
     QSpacerItem *verticalSpacer_3;
     QWidget * tab_4;
     QLabel *faqLabel;
+    QPushButton *btnResetAll;
+    QPushButton *btnClearAll;
 
     void setupUi(QWidget *shortcutsTab)
     {
@@ -1410,8 +1413,19 @@ public:
         faqLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
         faqLabel->setOpenExternalLinks(true);
 
-        gridLayout_9->addWidget(tabWidget, 0, 0, 1, 1);
+        btnResetAll = new QPushButton(shortcutsTab);
+        btnClearAll = new QPushButton(shortcutsTab);
+
+        btnResetAll->setIcon(QPixmap("theme:icons/update"));
+        btnClearAll->setIcon(QPixmap("theme:icons/clearsearch"));
+
+        QHBoxLayout *buttonsLayout = new QHBoxLayout(shortcutsTab);
+        buttonsLayout->addWidget(btnClearAll);
+        buttonsLayout->addWidget(btnResetAll);
+
+        gridLayout_9->addWidget(tabWidget, 0, 0, 1, 2);
         gridLayout_9->addWidget(faqLabel,1,0,1,1);
+        gridLayout_9->addLayout(buttonsLayout,1,1,1,1,Qt::AlignRight);
         tabWidget->setCurrentIndex(0);
 
         grid->setSpacing(3);
@@ -1567,6 +1581,8 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("shortcutsTab", "Draw | Move | View | Gameplay", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("shortcutsTab","Counters", 0));
         faqLabel->setText(QString("<a href='%1'>%2</a>").arg(WIKI).arg(QApplication::translate("shortcutsTab","How to set custom shortcuts",0)));
+        btnResetAll->setText(QApplication::translate("shortcutsTab","Reset all shortcuts",0));
+        btnClearAll->setText(QApplication::translate("shortcutsTab","Clear all shortcuts",0));
     } // retranslateUi
 
 };

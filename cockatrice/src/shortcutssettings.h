@@ -24,9 +24,13 @@ public:
     void setShortcuts(QString name, QString Sequences);
 
     bool isValid(QString name, QString Sequences);
+
+    void resetAllShortcuts();
+    void clearAllShortcuts();
 signals:
     void shortCutchanged();
-
+    void allShortCutsReset();
+    void allShortCutsClear();
 private:
     QString settingsFilePath;
     QMap<QString,QList<QKeySequence> > shortCuts;

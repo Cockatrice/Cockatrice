@@ -14,11 +14,14 @@ class SequenceEdit : public QWidget
 public:
     SequenceEdit(QString _shorcutName, QWidget *parent = 0);
     QString getSecuence();
+    void refreshShortcut();
+    void clear();
 signals:
 
 private slots:
     void removeLastShortcut();
     void restoreDefault();
+
 protected:
     bool eventFilter(QObject *, QEvent *event);
 private:
