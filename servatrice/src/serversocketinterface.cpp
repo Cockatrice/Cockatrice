@@ -125,29 +125,29 @@ bool ServerSocketInterface::initSession()
     sendProtocolItem(*identSe);
     delete identSe;
 
-	//limit the number of total users based on configuration settings
-	bool enforceUserLimit = settingsCache->value("security/enable_max_user_limit", false).toBool();
-	if (enforceUserLimit){
-		int userLimit = settingsCache->value("security/max_users_total", 500).toInt();
-		int playerCount = (databaseInterface->getActiveUserCount() + 1);
-		if (playerCount > userLimit){
-			std::cerr << "Max Users Total Limit Reached, please increase the max_users_total setting." << std::endl;
-			logger->logMessage(QString("Max Users Total Limit Reached, please increase the max_users_total setting."), this);
-			Event_ConnectionClosed event;
-			event.set_reason(Event_ConnectionClosed::USER_LIMIT_REACHED);
-			SessionEvent *se = prepareSessionEvent(event);
-			sendProtocolItem(*se);
-			delete se;
-			return false;
-		}
-	}
+    //limit the number of total users based on configuration settings
+    bool enforceUserLimit = settingsCache->value("security/enable_max_user_limit", false).toBool();
+    if (enforceUserLimit){
+        int userLimit = settingsCache->value("security/max_users_total", 500).toInt();
+        int playerCount = (databaseInterface->getActiveUserCount() + 1);
+        if (playerCount > userLimit){
+            std::cerr << "Max Users Total Limit Reached, please increase the max_users_total setting." << std::endl;
+            logger->logMessage(QString("Max Users Total Limit Reached, please increase the max_users_total setting."), this);
+            Event_ConnectionClosed event;
+            event.set_reason(Event_ConnectionClosed::USER_LIMIT_REACHED);
+            SessionEvent *se = prepareSessionEvent(event);
+            sendProtocolItem(*se);
+            delete se;
+            return false;
+        }
+    }
 
     //allow unlimited number of connections from the trusted sources
     QString trustedSources = settingsCache->value("security/trusted_sources","127.0.0.1,::1").toString();
     if (trustedSources.contains(socket->peerAddress().toString(),Qt::CaseInsensitive))
         return true;
     
-	int maxUsers = servatrice->getMaxUsersPerAddress();
+    int maxUsers = servatrice->getMaxUsersPerAddress();
     if ((maxUsers > 0) && (servatrice->getUsersWithAddress(socket->peerAddress()) >= maxUsers)) {
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::TOO_MANY_CONNECTIONS);
@@ -524,15 +524,16 @@ void ServerSocketInterface::deckDelDirHelper(int basePathId)
 void ServerSocketInterface::sendServerMessage(const QString userName, const QString message)
 {
     ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
-    if (user) {
-        Event_UserMessage event;
-        event.set_sender_name("Servatrice");
-        event.set_receiver_name(userName.toStdString());
-        event.set_message(message.toStdString());
-        SessionEvent *se = user->prepareSessionEvent(event);
-        user->sendProtocolItem(*se);
-        delete se;
-    }
+    if (!user)
+        return;
+
+    Event_UserMessage event;
+    event.set_sender_name("Servatrice");
+    event.set_receiver_name(userName.toStdString());
+    event.set_message(message.toStdString());
+    SessionEvent *se = user->prepareSessionEvent(event);
+    user->sendProtocolItem(*se);
+    delete se;
 }
 
 Response::ResponseCode ServerSocketInterface::cmdDeckDelDir(const Command_DeckDelDir &cmd, ResponseContainer & /*rc*/)
@@ -849,7 +850,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
     QList<QString> moderatorList = server->getOnlineModeratorList();
     QListIterator<QString> modIterator(moderatorList);
     foreach(QString moderator, moderatorList) {
-        QString notificationMessage = "A ban has been put in with the following details:";
+        QString notificationMessage = "A ban has been added:";
         if (!userName.isEmpty())
             notificationMessage.append("\n    Username: " + userName);
         if (!address.isEmpty())
@@ -895,7 +896,7 @@ Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_R
         return Response::RespUsernameInvalid;
     }
 
-    if (userName.toLower() == "servatrice")
+    if (userName.toLower().simplified() == "servatrice")
         return Response::RespUsernameInvalid;
 
     if(sqlInterface->userExists(userName))
