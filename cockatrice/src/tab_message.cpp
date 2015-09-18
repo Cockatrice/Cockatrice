@@ -116,6 +116,8 @@ void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
         soundEngine->playSound("private_message");
     if (settingsCache->getShowMessagePopup() && shouldShowSystemPopup(event))
         showSystemPopup(event);
+    if (QString::fromStdString(event.sender_name()).simplified() == "Servatrice")
+        sayEdit->setDisabled(true);
 
     emit userEvent();
 }

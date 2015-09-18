@@ -130,7 +130,7 @@ void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, 
     lastSender = sender;
     
     // timestamp
-    if (showTimestamps && !sameSender && !sender.isEmpty()) {
+    if (showTimestamps && (!sameSender || sender.toLower() == "servatrice") && !sender.isEmpty()) {
         QTextCharFormat timeFormat;
         timeFormat.setForeground(QColor(SERVER_MESSAGE_COLOR));
         if (sender.isEmpty())
@@ -139,31 +139,35 @@ void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, 
         cursor.insertText(QDateTime::currentDateTime().toString("[hh:mm:ss] "));
     }
 
-    // nickname    
-    QTextCharFormat senderFormat;
-    if (tabSupervisor && tabSupervisor->getUserInfo() && (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
-        senderFormat.setForeground(QBrush(getCustomMentionColor()));
-        senderFormat.setFontWeight(QFont::Bold);
-    } else {
-        senderFormat.setForeground(QBrush(OTHER_USER_COLOR));
-        if (playerBold)
+    // nickname
+    if (sender.toLower() != "servatrice") {
+        QTextCharFormat senderFormat;
+        if (tabSupervisor && tabSupervisor->getUserInfo() &&
+            (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
+            senderFormat.setForeground(QBrush(getCustomMentionColor()));
             senderFormat.setFontWeight(QFont::Bold);
-    }
-    senderFormat.setAnchor(true);
-    senderFormat.setAnchorHref("user://" + QString::number(userLevel) + "_" + sender);
-    if (sameSender) {
-        cursor.insertText("    ");
-    } else {
-        if (!sender.isEmpty() && tabSupervisor->getUserListsTab()) {
-            const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
-            QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
-            cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, buddyList.contains(sender)).toImage());
-            cursor.insertText(" ");
+        } else {
+            senderFormat.setForeground(QBrush(OTHER_USER_COLOR));
+            if (playerBold)
+                senderFormat.setFontWeight(QFont::Bold);
         }
-        cursor.setCharFormat(senderFormat);
-        if (!sender.isEmpty())
-            sender.append(": ");
-        cursor.insertText(sender);
+        senderFormat.setAnchor(true);
+        senderFormat.setAnchorHref("user://" + QString::number(userLevel) + "_" + sender);
+        if (sameSender) {
+            cursor.insertText("    ");
+        } else {
+            if (!sender.isEmpty() && tabSupervisor->getUserListsTab()) {
+                const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
+                QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
+                cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel,
+                                                                            buddyList.contains(sender)).toImage());
+                cursor.insertText(" ");
+            }
+            cursor.setCharFormat(senderFormat);
+            if (!sender.isEmpty())
+                sender.append(": ");
+            cursor.insertText(sender);
+        }
     }
 
     // use different color for server messages 
@@ -180,6 +184,9 @@ void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, 
                 defaultFormat.setFontItalic(true);
                 break;
         }
+    } else if (sender.toLower() == "servatrice") {
+        defaultFormat.setForeground(Qt::darkGreen);
+        defaultFormat.setFontWeight(QFont::Bold);
     }
     cursor.setCharFormat(defaultFormat);
 

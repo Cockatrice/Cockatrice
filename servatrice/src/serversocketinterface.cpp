@@ -51,6 +51,7 @@
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_remove_from_list.pb.h"
 #include "pb/event_notify_user.pb.h"
+#include "pb/event_user_message.pb.h"
 #include "pb/response_ban_history.pb.h"
 #include "pb/response_deck_list.pb.h"
 #include "pb/response_deck_download.pb.h"
@@ -520,6 +521,20 @@ void ServerSocketInterface::deckDelDirHelper(int basePathId)
     sqlInterface->execSqlQuery(query);
 }
 
+void ServerSocketInterface::sendServerMessage(const QString userName, const QString message)
+{
+    ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
+    if (user) {
+        Event_UserMessage event;
+        event.set_sender_name("Servatrice");
+        event.set_receiver_name(userName.toStdString());
+        event.set_message(message.toStdString());
+        SessionEvent *se = user->prepareSessionEvent(event);
+        user->sendProtocolItem(*se);
+        delete se;
+    }
+}
+
 Response::ResponseCode ServerSocketInterface::cmdDeckDelDir(const Command_DeckDelDir &cmd, ResponseContainer & /*rc*/)
 {
     if (authState != PasswordRight)
@@ -795,7 +810,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
 
     if (!userName.isEmpty()) {
         ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
-        if (user)
+        if (user && !userList.contains(user))
             userList.append(user);
     }
 
@@ -831,6 +846,23 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
     }
     servatrice->clientsLock.unlock();
 
+    QList<QString> moderatorList = server->getOnlineModeratorList();
+    QListIterator<QString> modIterator(moderatorList);
+    foreach(QString moderator, moderatorList) {
+        QString notificationMessage = "A ban has been put in with the following details:";
+        if (!userName.isEmpty())
+            notificationMessage.append("\n    Username: " + userName);
+        if (!address.isEmpty())
+            notificationMessage.append("\n    IP Address: " + address);
+        if (!clientID.isEmpty())
+            notificationMessage.append("\n    Client ID: " + clientID);
+
+        notificationMessage.append("\n    Length: " + QString::number(minutes) + " minute(s)");
+        notificationMessage.append("\n    Internal Reason: " + QString::fromStdString(cmd.reason()));
+        notificationMessage.append("\n    Visible Reason: " + QString::fromStdString(cmd.visible_reason()));
+        sendServerMessage(moderator.simplified(), notificationMessage);
+    }
+
     return Response::RespOk;
 }
 
@@ -862,6 +894,9 @@ Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_R
         rc.setResponseExtension(re);
         return Response::RespUsernameInvalid;
     }
+
+    if (userName.toLower() == "servatrice")
+        return Response::RespUsernameInvalid;
 
     if(sqlInterface->userExists(userName))
         return Response::RespUserAlreadyExists;

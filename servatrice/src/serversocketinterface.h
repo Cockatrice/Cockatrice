@@ -86,6 +86,7 @@ private:
 	Response::ResponseCode cmdDeckList(const Command_DeckList &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer &rc);
 	void deckDelDirHelper(int basePathId);
+	void sendServerMessage(const QString userName, const QString message);
 	Response::ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdDeckDel(const Command_DeckDel &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, ResponseContainer &rc);
