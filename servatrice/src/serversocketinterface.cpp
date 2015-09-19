@@ -61,10 +61,12 @@
 #include "pb/response_replay_download.pb.h"
 #include "pb/response_warn_history.pb.h"
 #include "pb/response_warn_list.pb.h"
+#include "pb/response_viewlog_history.pb.h"
 #include "pb/serverinfo_replay.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
 #include "pb/serverinfo_ban.pb.h"
+#include "pb/serverinfo_chat_message.pb.h"
 
 #include "version_string.h"
 #include <string>
@@ -310,6 +312,7 @@ Response::ResponseCode ServerSocketInterface::processExtendedModeratorCommand(in
         case ModeratorCommand::WARN_USER: return cmdWarnUser(cmd.GetExtension(Command_WarnUser::ext), rc);
         case ModeratorCommand::WARN_HISTORY: return cmdGetWarnHistory(cmd.GetExtension(Command_GetWarnHistory::ext), rc);
         case ModeratorCommand::WARN_LIST: return cmdGetWarnList(cmd.GetExtension(Command_GetWarnList::ext), rc);
+        case ModeratorCommand::VIEWLOG_HISTORY: return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::ext), rc);
         default: return Response::RespFunctionNotAllowed;
     }
 }
@@ -770,6 +773,38 @@ Response::ResponseCode ServerSocketInterface::cmdReplayDeleteMatch(const Command
 
 // MODERATOR FUNCTIONS.
 // May be called by admins and moderators. Permission is checked by the calling function.
+Response::ResponseCode ServerSocketInterface::cmdGetLogHistory(const Command_ViewLogHistory &cmd, ResponseContainer &rc)
+{
+
+    QList<ServerInfo_ChatMessage> messageList;
+    QString userName = QString::fromStdString(cmd.user_name());
+    QString ipAddress = QString::fromStdString(cmd.ip_address());
+    QString gameName = QString::fromStdString(cmd.game_name());
+    QString gameID = QString::fromStdString(cmd.game_id());
+    QString message = QString::fromStdString(cmd.message());
+    bool chatType = false;
+    bool gameType = false;
+    bool roomType = false;
+
+    for (int i = 0; i != cmd.log_location_size(); ++i) {
+        if (QString::fromStdString(cmd.log_location(i)).simplified() == "room")
+            roomType = true;
+        if (QString::fromStdString(cmd.log_location(i)).simplified() == "game")
+            gameType = true;
+        if (QString::fromStdString(cmd.log_location(i)).simplified() == "chat")
+            chatType = true;
+    }
+
+    int dateRange = cmd.date_range();
+    int maximumResults = cmd.maximum_results();
+
+    Response_ViewLogHistory *re = new Response_ViewLogHistory;
+    QListIterator<ServerInfo_ChatMessage> messageIterator(sqlInterface->getMessageLogHistory(userName,ipAddress,gameName,gameID,message,chatType,gameType,roomType,dateRange,maximumResults));
+    while (messageIterator.hasNext())
+        re->add_log_message()->CopyFrom(messageIterator.next());
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
 
 Response::ResponseCode ServerSocketInterface::cmdGetBanHistory(const Command_GetBanHistory &cmd, ResponseContainer &rc)
 {

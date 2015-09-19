@@ -55,6 +55,7 @@ message Response {
         BAN_HISTORY = 1012;
         WARN_HISTORY = 1013;
         WARN_LIST = 1014;
+        VIEW_LOG = 1015;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
     }

@@ -75,6 +75,7 @@ SET(cockatrice_SOURCES
     src/tab_admin.cpp 
     src/tab_userlists.cpp 
     src/tab_deck_editor.cpp
+    src/tab_logs.cpp
     src/replay_timeline_widget.cpp
     src/deckstats_interface.cpp
     src/chatview.cpp 

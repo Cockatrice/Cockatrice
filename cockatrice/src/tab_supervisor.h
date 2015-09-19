@@ -18,6 +18,7 @@ class TabAdmin;
 class TabMessage;
 class TabUserLists;
 class TabDeckEditor;
+class TabLog;
 class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;
@@ -51,6 +52,7 @@ private:
     TabDeckStorage *tabDeckStorage;
     TabReplays *tabReplays;
     TabAdmin *tabAdmin;
+    TabLog *tabLog;
     QMap<int, TabRoom *> roomTabs;
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
