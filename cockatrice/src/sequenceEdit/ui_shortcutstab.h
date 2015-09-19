@@ -1581,7 +1581,7 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("shortcutsTab", "Draw | Move | View | Gameplay", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("shortcutsTab","Counters", 0));
         faqLabel->setText(QString("<a href='%1'>%2</a>").arg(WIKI).arg(QApplication::translate("shortcutsTab","How to set custom shortcuts",0)));
-        btnResetAll->setText(QApplication::translate("shortcutsTab","Reset all shortcuts",0));
+        btnResetAll->setText(QApplication::translate("shortcutsTab","Restore all default shortcuts",0));
         btnClearAll->setText(QApplication::translate("shortcutsTab","Clear all shortcuts",0));
     } // retranslateUi
 

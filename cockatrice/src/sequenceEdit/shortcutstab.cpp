@@ -26,30 +26,36 @@ ShortcutsTab::~ShortcutsTab()
 
 void ShortcutsTab::resetShortcuts()
 {
-    settingsCache->shortcuts().resetAllShortcuts();
+    if(QMessageBox::question(this,tr("Restore all default shortcuts"),
+                             tr("Do you really want to restore all default shortcuts?")) == QMessageBox::Yes)
+    {
+        settingsCache->shortcuts().resetAllShortcuts();
+    }
 }
 
 void ShortcutsTab::refreshEdits()
-{
+{    
     QList<SequenceEdit*> edits = this->findChildren<SequenceEdit*>();
     for(int i= 0; i < edits.length(); ++i)
     {
         edits.at(i)->refreshShortcut();
     }
-    QMessageBox::information(this,tr("Shortcuts reset"),tr("All shortcuts have been reset"));
 }
 
 void ShortcutsTab::clearShortcuts()
 {
-    settingsCache->shortcuts().clearAllShortcuts();
+    if(QMessageBox::question(this,tr("Clear all default shortcuts"),
+                             tr("Do you really want to clear all shortcuts?")) == QMessageBox::Yes)
+    {
+        settingsCache->shortcuts().clearAllShortcuts();
+    }
 }
 
 void ShortcutsTab::afterClear()
-{
+{    
     QList<SequenceEdit*> edits = this->findChildren<SequenceEdit*>();
     for(int i= 0; i < edits.length(); ++i)
     {
         edits.at(i)->clear();
     }
-    QMessageBox::information(this,tr("Shortcuts reset"),tr("All shortcuts have been cleared"));
 }
