@@ -171,8 +171,7 @@ void SoundEngine::themeChangedSlot()
         // Spectator
         << "spectator_join" << "spectator_leave"
         // Chat & UI
-        << "chat_mention" << "all_mention" << "private_message"
-        << "end_step" << "tap" << "player_joined" << "attack";
+        << "chat_mention" << "all_mention" << "private_message";
 
     for (int i = 0; i < fileNames.size(); ++i) {
         if(!dir.exists(fileNames[i] + ".wav"))
