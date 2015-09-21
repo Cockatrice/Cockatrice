@@ -56,6 +56,8 @@ class GameReplay;
 class ServerInfo_User;
 class PendingCommand;
 class LineEditCompleter;
+class QMainWindow;
+class QDockWidget;
 
 class ToggleButton : public QPushButton {
     Q_OBJECT
@@ -128,8 +130,7 @@ private:
     QList<int> replayTimeline;
     ReplayTimelineWidget *timelineWidget;
     QToolButton *replayStartButton, *replayPauseButton, *replayFastForwardButton;
-    
-    QSplitter *splitter;
+
     CardFrame *cardInfo;
     PlayerListWidget *playerListWidget;
     QLabel *timeElapsedLabel;
@@ -140,14 +141,17 @@ private:
     GameScene *scene;
     GameView *gameView;
     QMap<int, DeckViewContainer *> deckViewContainers;
-    QVBoxLayout *deckViewContainerLayout;
-    QHBoxLayout *mainLayout;
+    QVBoxLayout *cardVInfoLayout, *messageLogLayout, *gamePlayAreaVBox, *deckViewContainerLayout, *mainVLayout, *replayGameSceneLayout, *replayMessageLogVLayout, *centerVFrame;
+    QHBoxLayout *cardHInfoLayout, *sayHLayout, *gamePlayAreaHBox, *mainHLayout, *mainLayout, *replayControlLayout, *replayMessageLogHLayout, *mainTabLayout;
+    QWidget *cardBoxLayoutWidget, *messageLogLayoutWidget, *gamePlayAreaWidget, *replayGameLayout, *cardReplayBoxLayoutWidget, *centralWidget;
+    QDockWidget *replayDock, *cardInfoDock, *messageLayoutDock, *gameAreaDock, *playerListDock;
     ZoneViewLayout *zoneLayout;
     QAction *playersSeparator;
     QMenu *gameMenu;
     QMenu *phasesMenu;
-    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW;
+    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
     QList<QAction *> phaseActions;
+    QMainWindow *MainWindow;
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
 
@@ -171,6 +175,12 @@ private:
     void eventSetActivePhase(const Event_SetActivePhase &event, int eventPlayerId, const GameEventContext &context);
     void eventPing(const Event_Ping &event, int eventPlayerId, const GameEventContext &context);
     void emitUserEvent();
+    void createMenuItems();
+    void createReplayMenuItems();
+    void createPlayAreaDock();
+    void createCardInfoDock();
+    void createPlayerListDock();
+    void createMessageDock();
 signals:
     void gameClosing(TabGame *tab);
     void playerAdded(Player *player);
@@ -208,6 +218,7 @@ private slots:
     void refreshShortcuts();
 	
 	void actCompleterChanged();
+    void actResetLayout();
 public:
     TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
