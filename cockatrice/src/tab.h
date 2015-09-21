@@ -1,13 +1,13 @@
 #ifndef TAB_H
 #define TAB_H
 
-#include <QWidget>
+#include <QMainWindow>
 
 class QMenu;
 class TabSupervisor;
 class CardInfoWidget;
 
-class Tab : public QWidget {
+class Tab : public QMainWindow {
     Q_OBJECT
 signals:
     void userEvent(bool globalEvent = true);

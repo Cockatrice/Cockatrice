@@ -56,6 +56,8 @@ class GameReplay;
 class ServerInfo_User;
 class PendingCommand;
 class LineEditCompleter;
+class QDockWidget;
+class QStackedWidget;
 
 class ToggleButton : public QPushButton {
     Q_OBJECT
@@ -77,6 +79,7 @@ private:
     QPushButton *loadLocalButton, *loadRemoteButton;
     ToggleButton *readyStartButton, *sideboardLockButton;
     DeckView *deckView;
+    TabGame *parentGame;
     int playerId;
 private slots:
     void loadLocalDeck();
@@ -90,7 +93,7 @@ private slots:
 signals:
     void newCardAdded(AbstractCardItem *card);
 public:
-    DeckViewContainer(int _playerId, TabGame *parent = 0);
+    DeckViewContainer(int _playerId, TabGame *parent);
     void retranslateUi();
     void setButtonsVisible(bool _visible);
     void setReadyStart(bool ready);
@@ -121,6 +124,7 @@ private:
     QStringList gameTypes;
     QCompleter *completer;
     QStringList autocompleteUserList;
+    QStackedWidget * mainWidget;
     
     // Replay related members
     GameReplay *replay;
@@ -128,8 +132,7 @@ private:
     QList<int> replayTimeline;
     ReplayTimelineWidget *timelineWidget;
     QToolButton *replayStartButton, *replayPauseButton, *replayFastForwardButton;
-    
-    QSplitter *splitter;
+
     CardFrame *cardInfo;
     PlayerListWidget *playerListWidget;
     QLabel *timeElapsedLabel;
@@ -140,13 +143,14 @@ private:
     GameScene *scene;
     GameView *gameView;
     QMap<int, DeckViewContainer *> deckViewContainers;
-    QVBoxLayout *deckViewContainerLayout;
-    QHBoxLayout *mainLayout;
-    ZoneViewLayout *zoneLayout;
+    QVBoxLayout *cardVInfoLayout, *messageLogLayout, *gamePlayAreaVBox, *deckViewContainerLayout;
+    QHBoxLayout *cardHInfoLayout, *sayHLayout, *mainHLayout, *replayControlLayout;
+    QWidget *cardBoxLayoutWidget, *messageLogLayoutWidget, *gamePlayAreaWidget, *deckViewContainerWidget, *replayControlWidget;
+    QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
     QAction *playersSeparator;
-    QMenu *gameMenu;
-    QMenu *phasesMenu;
-    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW;
+    QMenu *gameMenu, *phasesMenu, *viewMenu, *cardInfoDockMenu, *messageLayoutDockMenu, *playerListDockMenu, *replayDockMenu;
+    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
+    QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aMessageLayoutDockVisible, *aMessageLayoutDockFloating, *aPlayerListDockVisible, *aPlayerListDockFloating, *aReplayDockVisible, *aReplayDockFloating;
     QList<QAction *> phaseActions;
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
@@ -171,6 +175,15 @@ private:
     void eventSetActivePhase(const Event_SetActivePhase &event, int eventPlayerId, const GameEventContext &context);
     void eventPing(const Event_Ping &event, int eventPlayerId, const GameEventContext &context);
     void emitUserEvent();
+    void createMenuItems();
+    void createReplayMenuItems();
+    void createViewMenuItems();
+    void createCardInfoDock(bool bReplay=false);
+    void createPlayerListDock(bool bReplay=false);
+    void createMessageDock(bool bReplay=false);
+    void createPlayAreaWidget(bool bReplay=false);
+    void createDeckViewContainerWidget(bool bReplay=false);
+    void createReplayDock();
 signals:
     void gameClosing(TabGame *tab);
     void playerAdded(Player *player);
@@ -207,7 +220,14 @@ private slots:
 	
     void refreshShortcuts();
 	
+    void loadLayout();
 	void actCompleterChanged();
+    void actResetLayout();
+
+    bool eventFilter(QObject *o, QEvent *e);
+    void dockVisibleTriggered();
+    void dockFloatingTriggered();
+    void dockTopLevelChanged(bool topLevel);
 public:
     TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);

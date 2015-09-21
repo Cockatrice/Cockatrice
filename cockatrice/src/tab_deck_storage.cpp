@@ -110,7 +110,10 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     rightToolBar->addAction(aDeleteRemoteDeck);
     
     retranslateUi();
-    setLayout(hbox);
+
+    QWidget * mainWidget = new QWidget(this);
+    mainWidget->setLayout(hbox);
+    setCentralWidget(mainWidget);
 }
 
 void TabDeckStorage::retranslateUi()

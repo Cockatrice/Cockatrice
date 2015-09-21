@@ -16,10 +16,10 @@ class QLabel;
 class QDockWidget;
 class QWidget;
 class QGridLayout;
+class QTableWidget;
 class CommandContainer;
 class Response;
 class AbstractClient;
-class QMainWindow;
 
 class TabLog : public Tab {
     Q_OBJECT
@@ -36,7 +36,7 @@ private:
     QGridLayout *criteriaGrid, *locationGrid, *rangeGrid, *maxResultsGrid, *descriptionGrid, *buttonGrid;
     QGroupBox *criteriaGroupBox, *locationGroupBox, *rangeGroupBox, *maxResultsGroupBox, *descriptionGroupBox, *buttonGroupBox;
     QVBoxLayout *mainLayout;
-    QMainWindow *MainWindow;
+    QTableWidget *roomTable, *gameTable, *chatTable;
 
     void createDock();
 signals:
