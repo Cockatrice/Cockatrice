@@ -183,6 +183,9 @@ void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, 
                 defaultFormat.setFontWeight(QFont::Light);
                 defaultFormat.setFontItalic(true);
                 break;
+            default:
+                defaultFormat.setForeground(Qt::darkGreen);
+                defaultFormat.setFontWeight(QFont::Bold);
         }
     } else if (sender.toLower() == "servatrice") {
         defaultFormat.setForeground(Qt::darkGreen);
