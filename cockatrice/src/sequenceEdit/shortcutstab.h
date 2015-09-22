@@ -17,7 +17,11 @@ public:
     ShortcutsTab();
     void retranslateUi();
     ~ShortcutsTab();
-
+private slots:
+    void resetShortcuts();
+    void refreshEdits();
+    void clearShortcuts();
+    void afterClear();
 private:
     Ui::shortcutsTab *ui;
 };

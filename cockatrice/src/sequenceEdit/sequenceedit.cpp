@@ -71,6 +71,16 @@ void SequenceEdit::restoreDefault()
     updateSettings();
 }
 
+void SequenceEdit::refreshShortcut()
+{
+    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shorcutName));
+}
+
+void SequenceEdit::clear()
+{
+    this->lineEdit->setText("");
+}
+
 bool SequenceEdit::eventFilter(QObject *, QEvent * event)
 {
     if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
