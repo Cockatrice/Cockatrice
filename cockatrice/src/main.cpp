@@ -147,6 +147,7 @@ int main(int argc, char *argv[])
     rng = new RNG_SFMT;
     settingsCache = new SettingsCache;
     themeManager = new ThemeManager;
+    soundEngine = new SoundEngine;
     db = new CardDatabase;
 
     qtTranslator = new QTranslator;
@@ -182,13 +183,6 @@ int main(int argc, char *argv[])
     }
     if (!QDir().mkpath(settingsCache->getPicsPath() + "/CUSTOM"))
         qDebug() << "Could not create " + settingsCache->getPicsPath().toUtf8() + "/CUSTOM. Will fall back on default card images.";
-    if (QDir().mkpath(dataDir + "/customsets"))
-    {
-        // if the dir exists (or has just been created)
-        db->loadCustomCardDatabases(dataDir + "/customsets");
-    } else {
-        qDebug() << "Could not create " + dataDir + "/customsets folder.";
-    }
 
     if (!settingsValid() || db->getLoadStatus() != Ok) {
         qDebug("main(): invalid settings or load status");
@@ -197,11 +191,17 @@ int main(int argc, char *argv[])
         app.exec();
     }
 
+    // load custom databased after LoadStatus check, so that they don't bring up the settings dialog
+    if (QDir().mkpath(dataDir + "/customsets"))
+    {
+        // if the dir exists (or has just been created)
+        db->loadCustomCardDatabases(dataDir + "/customsets");
+    } else {
+        qDebug() << "Could not create " + dataDir + "/customsets folder.";
+    }
+
     if (settingsValid()) {
         qDebug("main(): starting main program");
-
-        soundEngine = new SoundEngine;
-        qDebug("main(): SoundEngine constructor finished");
 
         MainWindow ui;
         qDebug("main(): MainWindow constructor finished");
