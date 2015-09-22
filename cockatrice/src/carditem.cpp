@@ -107,7 +107,8 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->save();
         transformPainter(painter, translatedSize, tapAngle);
 
-        QStringList ptDbSplit = db->getCard(name)->getPowTough().split("/");
+        CardInfo *card = db->getCard(name);
+        QStringList ptDbSplit = card ? card->getPowTough().split("/") : QStringList();
         QStringList ptSplit = pt.split("/");
         
         if (getFaceDown() || ptDbSplit.at(0) != ptSplit.at(0) || ptDbSplit.at(1) != ptSplit.at(1))
