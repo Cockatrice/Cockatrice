@@ -137,6 +137,7 @@ public:
     void setCustomPicURL(const QString &_set, const QString &_customPicURL) { customPicURLs.insert(_set, _customPicURL); }
     void setMuId(const QString &_set, const int &_muId) { muIds.insert(_set, _muId); }
     void addToSet(CardSet *set);
+    void emitPixmapUpdated() { emit pixmapUpdated(); }
 
     /**
      * Simplify a name to have no punctuation and lowercase all letters, for

@@ -415,7 +415,7 @@ void PictureLoader::imageLoaded(CardInfo *card, const QImage &image)
         QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap::fromImage(image));
     }
 
-    emit card->pixmapUpdated();
+    card->emitPixmapUpdated();
 }
 
 void PictureLoader::clearPixmapCache(CardInfo *card)
