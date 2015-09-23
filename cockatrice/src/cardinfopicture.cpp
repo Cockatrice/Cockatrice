@@ -6,7 +6,6 @@
 
 #include "carditem.h"
 #include "carddatabase.h"
-#include "pictureloader.h"
 #include "main.h"
 
 CardInfoPicture::CardInfoPicture(QWidget *parent)
@@ -22,8 +21,7 @@ void CardInfoPicture::setCard(CardInfo *card)
     if (info)
         disconnect(info, 0, this, 0);
     info = card;
-    if(info)
-        connect(info, SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
+    connect(info, SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
 
     updatePixmap();
 }
@@ -42,13 +40,13 @@ void CardInfoPicture::updatePixmap()
 void CardInfoPicture::loadPixmap()
 {
     if(info)
-        PictureLoader::getPixmap(resizedPixmap, info, size());
+        info->getPixmap(size(), resizedPixmap);
     else
         resizedPixmap = QPixmap();
 
 
     if (resizedPixmap.isNull())
-        PictureLoader::getPixmap(resizedPixmap, db->getCard(), size());
+        db->getCard()->getPixmap(size(), resizedPixmap);
 }
 
 void CardInfoPicture::paintEvent(QPaintEvent *)

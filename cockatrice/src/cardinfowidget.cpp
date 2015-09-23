@@ -8,7 +8,6 @@
 #include "cardinfowidget.h"
 #include "carditem.h"
 #include "carddatabase.h"
-#include "pictureloader.h"
 #include "main.h"
 #include "settingscache.h"
 
@@ -196,10 +195,10 @@ void CardInfoWidget::updatePixmap()
         return;
     
     QPixmap resizedPixmap;
-    PictureLoader::getPixmap(resizedPixmap, info, QSize(pixmapWidth, pixmapWidth * aspectRatio));
+    info->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio), resizedPixmap);
 
     if (resizedPixmap.isNull())
-        PictureLoader::getPixmap(resizedPixmap, getCard(), QSize(pixmapWidth, pixmapWidth * aspectRatio));
+        getCard()->getPixmap(QSize(pixmapWidth, pixmapWidth * aspectRatio), resizedPixmap);
     cardPicture->setPixmap(resizedPixmap);
 }
 

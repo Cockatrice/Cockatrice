@@ -29,6 +29,7 @@
                           <xs:extension base="xs:string">
                             <xs:attribute type="xs:int" name="muId" use="optional"/>
                             <xs:attribute type="xs:anyURI" name="picUrl" use="optional"/>
+                            <xs:attribute type="xs:anyURI" name="picUrlHq" use="optional"/>
                           </xs:extension>
                         </xs:simpleContent>
                       </xs:complexType>

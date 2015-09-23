@@ -53,23 +53,13 @@ CardInfoText::CardInfoText(QWidget *parent)
 
 void CardInfoText::setCard(CardInfo *card)
 {
-    if(card) {
-        nameLabel2->setText(card->getName());
-        manacostLabel2->setText(card->getManaCost());
-        colorLabel2->setText(card->getColors().join(""));
-        cardtypeLabel2->setText(card->getCardType());
-        powtoughLabel2->setText(card->getPowTough());
-        loyaltyLabel2->setText(card->getLoyalty() > 0 ? QString::number(card->getLoyalty()) : QString());
-        textLabel->setText(card->getText());
-    } else {
-        nameLabel2->setText("");
-        manacostLabel2->setText("");
-        colorLabel2->setText("");
-        cardtypeLabel2->setText("");
-        powtoughLabel2->setText("");
-        loyaltyLabel2->setText("");
-        textLabel->setText("");
-    }
+    nameLabel2->setText(card->getName());
+    manacostLabel2->setText(card->getManaCost());
+    colorLabel2->setText(card->getColors().join(""));
+    cardtypeLabel2->setText(card->getCardType());
+    powtoughLabel2->setText(card->getPowTough());
+    loyaltyLabel2->setText(card->getLoyalty() > 0 ? QString::number(card->getLoyalty()) : QString());
+    textLabel->setText(card->getText());
 }
 
 void CardInfoText::retranslateUi()

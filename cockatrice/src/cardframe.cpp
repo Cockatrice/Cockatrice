@@ -93,8 +93,7 @@ void CardFrame::setCard(CardInfo *card)
     if (info)
         disconnect(info, 0, this, 0);
     info = card;
-    if(info)
-        connect(info, SIGNAL(destroyed()), this, SLOT(clear()));
+    connect(info, SIGNAL(destroyed()), this, SLOT(clear()));
     text->setCard(info);
     pic->setCard(info);
 }

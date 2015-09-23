@@ -44,6 +44,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     }
 
     picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
+    picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
     updateNotificationCheckBox.setChecked(settingsCache->getNotifyAboutUpdates());
 
     pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
@@ -52,22 +53,20 @@ GeneralSettingsPage::GeneralSettingsPage()
     pixmapCacheEdit.setSingleStep(64);
     pixmapCacheEdit.setValue(settingsCache->getPixmapCacheSize());
     pixmapCacheEdit.setSuffix(" MB");
+    picDownloadHqCheckBox.setChecked(settingsCache->getPicDownloadHq());
+    picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
     
-    defaultUrlEdit = new QLineEdit(settingsCache->getPicUrl());
-    fallbackUrlEdit = new QLineEdit(settingsCache->getPicUrlFallback());
+    highQualityURLEdit = new QLineEdit(settingsCache->getPicUrlHq());
+    highQualityURLEdit->setEnabled(settingsCache->getPicDownloadHq());
 
     connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
+    connect(&picDownloadHqCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownloadHq(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
+    connect(&picDownloadHqCheckBox, SIGNAL(clicked(bool)), this, SLOT(setEnabledStatus(bool)));
     connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotifyAboutUpdate(int)));
-    connect(&picDownloadCheckBox, SIGNAL(clicked(bool)), this, SLOT(setEnabledStatus(bool)));
-    connect(defaultUrlEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrl(QString)));
-    connect(fallbackUrlEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrlFallback(QString)));
-    connect(&defaultUrlRestoreButton, SIGNAL(clicked()), this, SLOT(defaultUrlRestoreButtonClicked()));
-    connect(&fallbackUrlRestoreButton, SIGNAL(clicked()), this, SLOT(fallbackUrlRestoreButtonClicked()));
-
-    setEnabledStatus(settingsCache->getPicDownload());
+    connect(highQualityURLEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrlHq(QString)));
 
     QGridLayout *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
@@ -75,18 +74,15 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&pixmapCacheLabel, 1, 0);
     personalGrid->addWidget(&pixmapCacheEdit, 1, 1);
     personalGrid->addWidget(&updateNotificationCheckBox, 2, 0);
-    personalGrid->addWidget(&picDownloadCheckBox, 3, 0, 1, 3);
-    personalGrid->addWidget(&defaultUrlLabel, 4, 0, 1, 1);
-    personalGrid->addWidget(defaultUrlEdit, 4, 1, 1, 1);
-    personalGrid->addWidget(&defaultUrlRestoreButton, 4, 2, 1, 1);
-    personalGrid->addWidget(&fallbackUrlLabel, 5, 0, 1, 1);
-    personalGrid->addWidget(fallbackUrlEdit, 5, 1, 1, 1);
-    personalGrid->addWidget(&fallbackUrlRestoreButton, 5, 2, 1, 1);
-    personalGrid->addWidget(&urlLinkLabel, 6, 1, 1, 1);
-    personalGrid->addWidget(&clearDownloadedPicsButton, 7, 0, 1, 3);
+    personalGrid->addWidget(&picDownloadCheckBox, 3, 0);
+    personalGrid->addWidget(&picDownloadHqCheckBox, 4, 0);
+    personalGrid->addWidget(&highQualityURLLabel, 5, 0);
+    personalGrid->addWidget(highQualityURLEdit, 5, 1);
+    personalGrid->addWidget(&highQualityURLLinkLabel, 6, 1);
+    personalGrid->addWidget(&clearDownloadedPicsButton, 6, 0);
     
-    urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
-    urlLinkLabel.setOpenExternalLinks(true);
+    highQualityURLLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    highQualityURLLinkLabel.setOpenExternalLinks(true);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -156,20 +152,6 @@ QString GeneralSettingsPage::languageName(const QString &qmFile)
     translator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
     
     return translator.translate("GeneralSettingsPage", "English");
-}
-
-void GeneralSettingsPage::defaultUrlRestoreButtonClicked()
-{
-    QString path = PIC_URL_DEFAULT;
-    defaultUrlEdit->setText(path);
-    settingsCache->setPicUrl(path);
-}
-
-void GeneralSettingsPage::fallbackUrlRestoreButtonClicked()
-{
-    QString path = PIC_URL_FALLBACK;
-    fallbackUrlEdit->setText(path);
-    settingsCache->setPicUrlFallback(path);
 }
 
 void GeneralSettingsPage::deckPathButtonClicked()
@@ -256,6 +238,7 @@ void GeneralSettingsPage::retranslateUi()
     personalGroupBox->setTitle(tr("Personal settings"));
     languageLabel.setText(tr("Language:"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
+    picDownloadHqCheckBox.setText(tr("Download card pictures from a custom URL"));
     pathsGroupBox->setTitle(tr("Paths"));
     deckPathLabel.setText(tr("Decks directory:"));
     replaysPathLabel.setText(tr("Replays directory:"));
@@ -263,21 +246,15 @@ void GeneralSettingsPage::retranslateUi()
     cardDatabasePathLabel.setText(tr("Card database:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
-    defaultUrlLabel.setText(tr("Primary download URL:"));
-    fallbackUrlLabel.setText(tr("Fallback download URL:"));
-    urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(LINKING_FAQ_URL).arg(tr("Linking FAQ")));
+    highQualityURLLabel.setText(tr("Custom Card Download URL:"));
+    highQualityURLLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(LINKING_FAQ_URL).arg(tr("Linking FAQ")));
     clearDownloadedPicsButton.setText(tr("Reset/Clear Downloaded Pictures"));
     updateNotificationCheckBox.setText(tr("Notify when new client features are available"));
-    defaultUrlRestoreButton.setText(tr("Reset"));
-    fallbackUrlRestoreButton.setText(tr("Reset"));
 }
 
 void GeneralSettingsPage::setEnabledStatus(bool status)
 {
-    defaultUrlEdit->setEnabled(status);
-    fallbackUrlEdit->setEnabled(status);
-    defaultUrlRestoreButton.setEnabled(status);
-    fallbackUrlRestoreButton.setEnabled(status);
+    highQualityURLEdit->setEnabled(status);
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()
