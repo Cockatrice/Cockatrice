@@ -130,6 +130,8 @@ SET(PROTO_FILES
     response_replay_download.proto
     response_replay_list.proto
     response_adjust_mod.proto
+    response_warn_history.proto
+    response_warn_list.proto
     response.proto
     room_commands.proto
     room_event.proto
@@ -149,6 +151,7 @@ SET(PROTO_FILES
     serverinfo_replay_match.proto
     serverinfo_room.proto
     serverinfo_user.proto
+    serverinfo_warning.proto
     serverinfo_zone.proto
     server_message.proto
     session_commands.proto

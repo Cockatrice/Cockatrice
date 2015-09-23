@@ -59,6 +59,8 @@
 #include "pb/response_register.pb.h"
 #include "pb/response_replay_list.pb.h"
 #include "pb/response_replay_download.pb.h"
+#include "pb/response_warn_history.pb.h"
+#include "pb/response_warn_list.pb.h"
 #include "pb/serverinfo_replay.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
@@ -305,6 +307,9 @@ Response::ResponseCode ServerSocketInterface::processExtendedModeratorCommand(in
     switch ((ModeratorCommand::ModeratorCommandType) cmdType) {
         case ModeratorCommand::BAN_FROM_SERVER: return cmdBanFromServer(cmd.GetExtension(Command_BanFromServer::ext), rc);
         case ModeratorCommand::BAN_HISTORY: return cmdGetBanHistory(cmd.GetExtension(Command_GetBanHistory::ext), rc);
+        case ModeratorCommand::WARN_USER: return cmdWarnUser(cmd.GetExtension(Command_WarnUser::ext), rc);
+        case ModeratorCommand::WARN_HISTORY: return cmdGetWarnHistory(cmd.GetExtension(Command_GetWarnHistory::ext), rc);
+        case ModeratorCommand::WARN_LIST: return cmdGetWarnList(cmd.GetExtension(Command_GetWarnList::ext), rc);
         default: return Response::RespFunctionNotAllowed;
     }
 }
@@ -779,6 +784,70 @@ Response::ResponseCode ServerSocketInterface::cmdGetBanHistory(const Command_Get
     return Response::RespOk;
 }
 
+Response::ResponseCode ServerSocketInterface::cmdGetWarnList(const Command_GetWarnList &cmd, ResponseContainer &rc)
+{
+    Response_WarnList *re = new Response_WarnList;
+
+    QString officialWarnings = settingsCache->value("server/officialwarnings").toString();
+    QStringList warningsList = officialWarnings.split(",", QString::SkipEmptyParts);
+    foreach(QString warning, warningsList){
+        re->add_warning(warning.toStdString());
+    }
+    re->set_user_name(cmd.user_name());
+    re->set_user_clientid(cmd.user_clientid());
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdGetWarnHistory(const Command_GetWarnHistory &cmd, ResponseContainer &rc)
+{
+    QList<ServerInfo_Warning> warnList;
+    QString userName = QString::fromStdString(cmd.user_name());
+
+    Response_WarnHistory *re = new Response_WarnHistory;
+    QListIterator<ServerInfo_Warning> warnIterator(sqlInterface->getUserWarnHistory(userName));
+    while (warnIterator.hasNext())
+        re->add_warn_list()->CopyFrom(warnIterator.next());
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode ServerSocketInterface::cmdWarnUser(const Command_WarnUser &cmd, ResponseContainer & /*rc*/)
+{
+    if (!sqlInterface->checkSql())
+        return Response::RespInternalError;
+
+    QString userName = QString::fromStdString(cmd.user_name()).simplified();
+    QString warningReason = QString::fromStdString(cmd.reason()).simplified();
+    QString clientID = QString::fromStdString(cmd.clientid()).simplified();
+    QString sendingModerator = QString::fromStdString(userInfo->name()).simplified();
+
+    if (sqlInterface->addWarning(userName, sendingModerator, warningReason, clientID)) {
+        ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
+        if (user) {
+            Event_NotifyUser event;
+            event.set_type(Event_NotifyUser::WARNING);
+            event.set_warning_reason(cmd.reason());
+            SessionEvent *se = user->prepareSessionEvent(event);
+            user->sendProtocolItem(*se);
+            delete se;
+        }
+
+        QList<QString> moderatorList = server->getOnlineModeratorList();
+        QListIterator<QString> modIterator(moderatorList);
+        foreach(QString moderator, moderatorList) {
+            QString notificationMessage = sendingModerator + " has sent a warning with the following information";
+            notificationMessage.append("\n    Username: " + userName);
+            notificationMessage.append("\n    Reason: " + warningReason);
+            sendServerMessage(moderator.simplified(), notificationMessage);
+        }
+
+        return Response::RespOk;
+    } else {
+        return Response::RespInternalError;
+    }
+}
+
 Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer & /*rc*/)
 {
     if (!sqlInterface->checkSql())
@@ -850,7 +919,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
     QList<QString> moderatorList = server->getOnlineModeratorList();
     QListIterator<QString> modIterator(moderatorList);
     foreach(QString moderator, moderatorList) {
-        QString notificationMessage = "A ban has been added:";
+        QString notificationMessage = QString::fromStdString(userInfo->name()).simplified() + " has placed a ban with the following information";
         if (!userName.isEmpty())
             notificationMessage.append("\n    Username: " + userName);
         if (!address.isEmpty())

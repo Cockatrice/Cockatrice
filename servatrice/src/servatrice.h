@@ -113,6 +113,7 @@ private:
     QString dbPrefix;
     QString requiredFeatures;
     QMap<QString, bool> serverRequiredFeatureList;
+    QString officialWarnings;
     Servatrice_DatabaseInterface *servatriceDatabaseInterface;
     int serverId;
     int uptime;
@@ -139,6 +140,7 @@ public:
     ~Servatrice();
     bool initServer();
     QMap<QString, bool> getServerRequiredFeatureList() const { return serverRequiredFeatureList; }
+    QString getOfficialWarningsList() const { return officialWarnings; }
     QString getServerName() const { return serverName; }
     QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
     QString getRequiredFeatures() const { return requiredFeatures; }

@@ -940,7 +940,7 @@ QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QStr
         return results;
     }
 
-    QString adminID,adminName,banTime,banLength,banReason,visibleReason;
+    //QString adminID,adminName,banTime,banLength,banReason,visibleReason;
     while (query->next()){
         banDetails.set_admin_id(QString(query->value(0).toString()).toStdString());
         banDetails.set_admin_name(QString(query->value(5).toString()).toStdString());
@@ -949,6 +949,54 @@ QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QStr
         banDetails.set_ban_reason(QString(query->value(3).toString()).toStdString());
         banDetails.set_visible_reason(QString(query->value(4).toString()).toStdString());
         results << banDetails;
+    }
+
+    return results;
+}
+
+bool Servatrice_DatabaseInterface::addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID)
+{
+    if (!checkSql())
+        return false;
+
+    int userID = getUserIdInDB(userName);
+    QSqlQuery *query = prepareQuery("insert into {prefix}_warnings (id,user_name,mod_name,reason,time_of,clientid) values (:user_id,:user_name,:mod_name,:warn_reason,NOW(),:client_id)");
+    query->bindValue(":user_id", userID);
+    query->bindValue(":user_name", userName);
+    query->bindValue(":mod_name", adminName);
+    query->bindValue(":warn_reason", warningReason);
+    query->bindValue(":client_id", clientID);
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to collect create warning history information: SQL Error");
+        return false;
+    }
+
+    return true;
+}
+
+QList<ServerInfo_Warning> Servatrice_DatabaseInterface::getUserWarnHistory(const QString userName)
+{
+    QList<ServerInfo_Warning> results;
+    ServerInfo_Warning warnDetails;
+
+    if (!checkSql())
+        return results;
+
+    int userID = getUserIdInDB(userName);
+    QSqlQuery *query = prepareQuery("SELECT user_name, mod_name, reason, time_of FROM {prefix}_warnings WHERE id = :user_id");
+    query->bindValue(":user_id", userID);
+
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to collect warning history information: SQL Error");
+        return results;
+    }
+
+    while (query->next()){
+        warnDetails.set_user_name(QString(query->value(0).toString()).toStdString());
+        warnDetails.set_admin_name(QString(query->value(1).toString()).toStdString());
+        warnDetails.set_reason(QString(query->value(2).toString()).toStdString());
+        warnDetails.set_time_of(QString(query->value(3).toString()).toStdString());
+        results << warnDetails;
     }
 
     return results;

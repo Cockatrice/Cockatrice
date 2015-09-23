@@ -25,6 +25,7 @@
 #include "pb/event_game_joined.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_room.pb.h"
+#include "pb/moderator_commands.pb.h"
 
 CloseButton::CloseButton(QWidget *parent)
     : QAbstractButton(parent)
@@ -557,8 +558,14 @@ bool TabSupervisor::getAdminLocked() const
 
 void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 {
+
     switch ((Event_NotifyUser::NotificationType) event.type()) {
         case Event_NotifyUser::PROMOTED: QMessageBox::information(this, tr("Promotion"), tr("You have been promoted to moderator. Please log out and back in for changes to take effect.")); break;
+        case Event_NotifyUser::WARNING: {
+            if (!QString::fromStdString(event.warning_reason()).simplified().isEmpty())
+                QMessageBox::warning(this, tr("Warned"), tr("You have received a warning due to %1.\nPlease refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.").arg(QString::fromStdString(event.warning_reason()).simplified()));
+            break;
+        }
         default: ;
     }
 
