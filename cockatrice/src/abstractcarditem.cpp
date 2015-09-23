@@ -9,6 +9,7 @@
 #include "carddatabase.h"
 #include "cardinfowidget.h"
 #include "abstractcarditem.h"
+#include "pictureloader.h"
 #include "settingscache.h"
 #include "main.h"
 #include "gamescene.h"
@@ -45,7 +46,8 @@ void AbstractCardItem::pixmapUpdated()
 void AbstractCardItem::cardInfoUpdated()
 {
     info = db->getCard(name);
-    connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
+    if(info)
+        connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
 }
 
 void AbstractCardItem::setRealZValue(qreal _zValue)
@@ -93,7 +95,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     QPixmap translatedPixmap;
     // don't even spend time trying to load the picture if our size is too small
     if(translatedSize.width() > 10)
-        imageSource->getPixmap(translatedSize.toSize(), translatedPixmap);        
+        PictureLoader::getPixmap(translatedPixmap, imageSource, translatedSize.toSize());        
 
     painter->save();
     QColor bgColor = Qt::transparent;
@@ -191,10 +193,12 @@ void AbstractCardItem::setName(const QString &_name)
         return;
     
     emit deleteCardInfoPopup(name);
-    disconnect(info, 0, this, 0);
+    if(info)
+        disconnect(info, 0, this, 0);
     name = _name;
     info = db->getCard(name);
-    connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
+    if(info)
+        connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
     update();
 }
 

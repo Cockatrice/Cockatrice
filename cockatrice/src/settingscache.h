@@ -14,8 +14,6 @@
 // the falbacks are used for cards without a muid
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
 #define PIC_URL_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"
-#define PIC_URL_HQ_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
-#define PIC_URL_HQ_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"
 // size should be a multiple of 64
 #define PIXMAPCACHE_SIZE_DEFAULT 2047
 #define PIXMAPCACHE_SIZE_MIN 64
@@ -32,7 +30,6 @@ signals:
     void tokenDatabasePathChanged();
     void themeChanged();
     void picDownloadChanged();
-    void picDownloadHqChanged();
     void displayCardNamesChanged();
     void horizontalHandChanged();
     void handJustificationChanged();
@@ -60,7 +57,6 @@ private:
     QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     bool picDownload;
-    bool picDownloadHq;
     bool notificationsEnabled;
     bool spectatorNotificationsEnabled;
     bool doubleClickToPlay;
@@ -87,9 +83,7 @@ private:
     bool ignoreUnregisteredUsers;
     bool ignoreUnregisteredUserMessages;
     QString picUrl;
-    QString picUrlHq;
     QString picUrlFallback;
-    QString picUrlHqFallback;
     QString clientID;
     int pixmapCacheSize;
     bool scaleCards;
@@ -127,7 +121,6 @@ public:
     QString getChatMentionColor() const { return chatMentionColor; }
     QString getChatHighlightColor() const { return chatHighlightColor; }
     bool getPicDownload() const { return picDownload; }
-    bool getPicDownloadHq() const { return picDownloadHq; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
     bool getNotifyAboutUpdates() const { return notifyAboutUpdates; }
@@ -160,9 +153,7 @@ public:
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
     bool getIgnoreUnregisteredUserMessages() const { return ignoreUnregisteredUserMessages; }
     QString getPicUrl() const { return picUrl; }
-    QString getPicUrlHq() const { return picUrlHq; }
     QString getPicUrlFallback() const { return picUrlFallback; }
-    QString getPicUrlHqFallback() const { return picUrlHqFallback; }
     int getPixmapCacheSize() const { return pixmapCacheSize; }
     bool getScaleCards() const {  return scaleCards; }
     bool getShowMessagePopup() const { return showMessagePopups; }
@@ -204,7 +195,6 @@ public slots:
     void setChatMentionColor(const QString &_chatMentionColor);
     void setChatHighlightColor(const QString &_chatHighlightColor);
     void setPicDownload(int _picDownload);
-    void setPicDownloadHq(int _picDownloadHq);
     void setNotificationsEnabled(int _notificationsEnabled);
     void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
@@ -231,9 +221,7 @@ public slots:
     void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
     void setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages);
     void setPicUrl(const QString &_picUrl);
-    void setPicUrlHq(const QString &_picUrlHq);
     void setPicUrlFallback(const QString &_picUrlFallback);
-    void setPicUrlHqFallback(const QString &_picUrlHqFallback);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setCardScaling(const int _scaleCards);
     void setShowMessagePopups(const int _showMessagePopups);
