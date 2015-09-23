@@ -2,6 +2,7 @@
 #define ORACLEIMPORTER_H
 
 #include <QMap>
+#include <QVariant>
 
 #include <carddatabase.h>
 

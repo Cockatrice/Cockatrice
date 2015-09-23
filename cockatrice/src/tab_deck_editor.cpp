@@ -26,6 +26,7 @@
 #include "tab_deck_editor.h"
 #include "window_sets.h"
 #include "carddatabase.h"
+#include "pictureloader.h"
 #include "carddatabasemodel.h"
 #include "decklistmodel.h"
 #include "cardinfowidget.h"
@@ -1058,7 +1059,7 @@ void TabDeckEditor::setDeck(DeckLoader *_deck)
     deckView->expandAll();
     setModified(false);
 
-    db->cacheCardPixmaps(deckModel->getDeckList()->getCardList());
+    PictureLoader::cacheCardPixmaps(db->getCards(deckModel->getDeckList()->getCardList()));
     deckView->expandAll();
     setModified(false);
 }

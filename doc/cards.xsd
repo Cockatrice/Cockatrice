@@ -29,12 +29,12 @@
                           <xs:extension base="xs:string">
                             <xs:attribute type="xs:int" name="muId" use="optional"/>
                             <xs:attribute type="xs:anyURI" name="picUrl" use="optional"/>
-                            <xs:attribute type="xs:anyURI" name="picUrlHq" use="optional"/>
                           </xs:extension>
                         </xs:simpleContent>
                       </xs:complexType>
                     </xs:element>
                     <xs:element type="xs:string" name="color" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element type="xs:string" name="related" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element type="xs:string" name="manacost"/>
                     <xs:element type="xs:string" name="type"/>
                     <xs:element type="xs:string" name="pt" minOccurs="0"/>
