@@ -8,9 +8,17 @@
 #include <QDataStream>
 #include <QList>
 #include <QXmlStreamReader>
+#include <QNetworkRequest>
+#include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
+#include <QPixmapCache>
 
 class CardDatabase;
 class CardInfo;
+class QNetworkAccessManager;
+class QNetworkReply;
+class QNetworkRequest;
 
 typedef QMap<QString, QString> QStringMap;
 
@@ -47,7 +55,9 @@ public:
 class SetList : public QList<CardSet *> {
 private:
     class KeyCompareFunctor;
+    class EnabledAndKeyCompareFunctor;
 public:
+    void sortByEnabledAndKey();
     void sortByKey();
     void guessSortKeys();
     void enableAllUnknown();
@@ -55,6 +65,53 @@ public:
     void markAllAsKnown();
     int getEnabledSetsNum();
     int getUnknownSetsNum();
+};
+
+class PictureToLoad {
+private:
+    CardInfo *card;
+    SetList sortedSets;
+    int setIndex;
+    bool hq;
+public:
+    PictureToLoad(CardInfo *_card = 0, bool _hq = true);
+    CardInfo *getCard() const { return card; }
+    CardSet *getCurrentSet() const;
+    QString getSetName() const;
+    bool nextSet();
+    bool getHq() const { return hq; }
+    void setHq(bool _hq) { hq = _hq; }
+};
+
+class PictureLoader : public QObject {
+    Q_OBJECT
+private:
+    QString _picsPath;
+    QList<PictureToLoad> loadQueue;
+    QMutex mutex;
+    QNetworkAccessManager *networkManager;
+    QList<PictureToLoad> cardsToDownload;
+    PictureToLoad cardBeingLoaded;
+    PictureToLoad cardBeingDownloaded;
+    bool picDownload, picDownloadHq, downloadRunning, loadQueueRunning;
+    void startNextPicDownload();
+    QString getPicUrl();
+    static QStringList md5Blacklist;
+public:
+    PictureLoader(const QString &__picsPath, bool _picDownload, bool _picDownloadHq, QObject *parent = 0);
+    ~PictureLoader();
+    void setPicsPath(const QString &path);
+    void setPicDownload(bool _picDownload);
+    void setPicDownloadHq(bool _picDownloadHq);
+    void loadImage(CardInfo *card);
+private slots:
+    void picDownloadFinished(QNetworkReply *reply);
+    void picDownloadFailed();
+public slots:
+    void processLoadQueue();
+signals:
+    void startLoadQueue();
+    void imageLoaded(CardInfo *card, const QImage &image);
 };
 
 class CardInfo : public QObject {
@@ -81,7 +138,7 @@ private:
     QStringList relatedCards;
     bool upsideDownArt;
     int loyalty;
-    QStringMap customPicURLs;
+    QStringMap customPicURLs, customPicURLsHq;
     MuidMap muIds;
     bool cipt;
     int tableRow;
@@ -103,6 +160,7 @@ public:
         int _tableRow = 0,
         const SetList &_sets = SetList(),
         const QStringMap &_customPicURLs = QStringMap(),
+        const QStringMap &_customPicURLsHq = QStringMap(),
         MuidMap muids = MuidMap()
         );
     ~CardInfo();
@@ -115,7 +173,6 @@ public:
     const QString &getCardType() const { return cardtype; }
     const QString &getPowTough() const { return powtough; }
     const QString &getText() const { return text; }
-    const QString &getPixmapCacheKey() const { return pixmapCacheKey; }
     const int &getLoyalty() const { return loyalty; }
     bool getCipt() const { return cipt; }
     void setManaCost(const QString &_manaCost) { manacost = _manaCost; emit cardInfoChanged(this); }
@@ -128,6 +185,7 @@ public:
     const QStringList &getRelatedCards() const { return relatedCards; }
     bool getUpsideDownArt() const { return upsideDownArt; }
     QString getCustomPicURL(const QString &set) const { return customPicURLs.value(set); }
+    QString getCustomPicURLHq(const QString &set) const { return customPicURLsHq.value(set); }
     int getMuId(const QString &set) const { return muIds.value(set); }
     QString getMainCardType() const;
     QString getCorrectedName() const;
@@ -135,15 +193,22 @@ public:
     void setTableRow(int _tableRow) { tableRow = _tableRow; }
     void setLoyalty(int _loyalty) { loyalty = _loyalty; emit cardInfoChanged(this); }
     void setCustomPicURL(const QString &_set, const QString &_customPicURL) { customPicURLs.insert(_set, _customPicURL); }
+    void setCustomPicURLHq(const QString &_set, const QString &_customPicURL) { customPicURLsHq.insert(_set, _customPicURL); }
     void setMuId(const QString &_set, const int &_muId) { muIds.insert(_set, _muId); }
     void addToSet(CardSet *set);
-    void emitPixmapUpdated() { emit pixmapUpdated(); }
+    void loadPixmap(QPixmap &pixmap);
+    void getPixmap(QSize size, QPixmap &pixmap);
+    void clearPixmapCache();
+    void clearPixmapCacheMiss();
+    void imageLoaded(const QImage &image);
 
     /**
      * Simplify a name to have no punctuation and lowercase all letters, for
      * less strict name-matching.
      */
     static QString simplifyName(const QString &name);
+public slots:
+    void updatePixmapCache();
 signals:
     void pixmapUpdated();
     void cardInfoChanged(CardInfo *card);
@@ -172,6 +237,10 @@ protected:
      */
     SetNameMap sets;
 
+    CardInfo *noCard;
+
+    QThread *pictureLoaderThread;
+    PictureLoader *pictureLoader;
     LoadStatus loadStatus;
     bool detectedFirstRun;
 private:
@@ -189,14 +258,13 @@ public:
     void clear();
     void addCard(CardInfo *card);
     void removeCard(CardInfo *card);
-    CardInfo *getCard(const QString &cardName = QString(), bool createIfNotFound = false);
-    QList <CardInfo *> getCards(const QStringList &cardNames);
+    CardInfo *getCard(const QString &cardName = QString(), bool createIfNotFound = true);
 
     /*
      * Get a card by its simple name. The name will be simplified in this
      * function, so you don't need to simplify it beforehand.
      */
-    CardInfo *getCardBySimpleName(const QString &cardName = QString(), bool createIfNotFound = false);
+    CardInfo *getCardBySimpleName(const QString &cardName = QString(), bool createIfNotFound = true);
 
     CardSet *getSet(const QString &setName);
     QList<CardInfo *> getCardList() const { return cards.values(); }
@@ -207,12 +275,20 @@ public:
     QStringList getAllMainCardTypes() const;
     LoadStatus getLoadStatus() const { return loadStatus; }
     bool getLoadSuccess() const { return loadStatus == Ok; }
+    void cacheCardPixmaps(const QStringList &cardNames);
+    void loadImage(CardInfo *card);
     bool hasDetectedFirstRun();
 public slots:
+    void clearPixmapCache();
     LoadStatus loadCardDatabase(const QString &path, bool tokens = false);
     void loadCustomCardDatabases(const QString &path);
     void emitCardListChanged();
 private slots:
+    void imageLoaded(CardInfo *card, QImage image);
+    void picDownloadChanged();
+    void picDownloadHqChanged();
+    void picsPathChanged();
+
     void loadCardDatabase();
     void loadTokenDatabase();
 signals:

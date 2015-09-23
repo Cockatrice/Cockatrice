@@ -165,9 +165,12 @@ SettingsCache::SettingsCache()
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
+    picDownloadHq = settings->value("personal/picturedownloadhq", true).toBool();
 
     picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
+    picUrlHq = settings->value("personal/picUrlHq", PIC_URL_HQ_DEFAULT).toString();
     picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
+    picUrlHqFallback = settings->value("personal/picUrlHqFallback", PIC_URL_HQ_FALLBACK).toString();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
@@ -322,16 +325,35 @@ void SettingsCache::setPicDownload(int _picDownload)
     emit picDownloadChanged();
 }
 
+void SettingsCache::setPicDownloadHq(int _picDownloadHq)
+{
+    picDownloadHq = _picDownloadHq;
+    settings->setValue("personal/picturedownloadhq", picDownloadHq);
+    emit picDownloadHqChanged();
+}
+
 void SettingsCache::setPicUrl(const QString &_picUrl)
 {
     picUrl = _picUrl;
     settings->setValue("personal/picUrl", picUrl);
 }
 
+void SettingsCache::setPicUrlHq(const QString &_picUrlHq)
+{
+    picUrlHq = _picUrlHq;
+    settings->setValue("personal/picUrlHq", picUrlHq);
+}
+
 void SettingsCache::setPicUrlFallback(const QString &_picUrlFallback)
 {
     picUrlFallback = _picUrlFallback;
     settings->setValue("personal/picUrlFallback", picUrlFallback);
+}
+
+void SettingsCache::setPicUrlHqFallback(const QString &_picUrlHqFallback)
+{
+    picUrlHqFallback = _picUrlHqFallback;
+    settings->setValue("personal/picUrlHqFallback", picUrlHqFallback);
 }
 
 void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)

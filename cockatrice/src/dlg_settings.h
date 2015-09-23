@@ -45,8 +45,6 @@ private slots:
     void tokenDatabasePathButtonClicked();
     void languageBoxChanged(int index);
     void setEnabledStatus(bool);
-    void defaultUrlRestoreButtonClicked();
-    void fallbackUrlRestoreButtonClicked();
 private:
     QStringList findQmFiles();
     QString languageName(const QString &qmFile);
@@ -55,13 +53,13 @@ private:
     QLineEdit *picsPathEdit;
     QLineEdit *cardDatabasePathEdit;
     QLineEdit *tokenDatabasePathEdit;
-    QLineEdit *defaultUrlEdit;
-    QLineEdit *fallbackUrlEdit;
+    QLineEdit *highQualityURLEdit;
     QSpinBox pixmapCacheEdit;
     QGroupBox *personalGroupBox; 
     QGroupBox *pathsGroupBox;
     QComboBox languageBox;
     QCheckBox picDownloadCheckBox;
+    QCheckBox picDownloadHqCheckBox;
     QCheckBox updateNotificationCheckBox;
     QLabel languageLabel;
     QLabel pixmapCacheLabel;
@@ -70,12 +68,9 @@ private:
     QLabel picsPathLabel;
     QLabel cardDatabasePathLabel;
     QLabel tokenDatabasePathLabel;
-    QLabel defaultUrlLabel;
-    QLabel fallbackUrlLabel;
-    QLabel urlLinkLabel;
+    QLabel highQualityURLLabel;
+    QLabel highQualityURLLinkLabel;
     QPushButton clearDownloadedPicsButton;
-    QPushButton defaultUrlRestoreButton;
-    QPushButton fallbackUrlRestoreButton;
 };
 
 class AppearanceSettingsPage : public AbstractSettingsPage {
