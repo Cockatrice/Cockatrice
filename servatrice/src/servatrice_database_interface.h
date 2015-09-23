@@ -9,7 +9,7 @@
 #include "server.h"
 #include "server_database_interface.h"
 
-#define DATABASE_SCHEMA_VERSION 10
+#define DATABASE_SCHEMA_VERSION 11
 
 class Servatrice;
 
