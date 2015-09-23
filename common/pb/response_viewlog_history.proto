@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "response.proto";
+import "serverinfo_chat_message.proto";
+
+message Response_ViewLogHistory{
+    extend Response {
+        optional Response_ViewLogHistory ext = 1015;
+    }
+    repeated ServerInfo_ChatMessage log_message = 1;
+}

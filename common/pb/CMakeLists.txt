@@ -132,6 +132,7 @@ SET(PROTO_FILES
     response_adjust_mod.proto
     response_warn_history.proto
     response_warn_list.proto
+    response_viewlog_history.proto
     response.proto
     room_commands.proto
     room_event.proto
