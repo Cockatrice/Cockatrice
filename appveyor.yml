@@ -1,7 +1,7 @@
 version: 0.0.0.0.1-branch-{branch}-build-{build}
 cache:
     - 'c:\Program Files (x86)\NSIS'
-    - c:\protoc-2.6.1-win32.zip
+    - c:\deps
     - c:\ProgramData\chocolatey
 environment:
     matrix:
@@ -31,10 +31,8 @@ install:
         if (Test-Path c:\protoc-2.6.1-win32.zip) {
             echo "using prootbuf from cache"
         } else {
-            Invoke-WebRequest "https://github.com/google/protobuf/releases/download/v2.6.1/protoc-2.6.1-win32.zip" -OutFile c:\protoc-2.6.1-win32.zip
+            choco install protoc
         }
-    - c:\cygwin\bin\bash -lc "cd /cygdrive/c; 7z x -y protoc-2.6.1-win32.zip"
-    - c:\cygwin\bin\ls -l /cygdrive/c/protoc-2.6.1
 build_script:
     - mkdir build
     - cd build
