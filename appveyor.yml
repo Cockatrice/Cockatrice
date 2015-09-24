@@ -1,0 +1,60 @@
+version: 0.0.0.0.1-branch-{branch}-build-{build}
+cache:
+    - 'c:\Program Files (x86)\NSIS'
+    - c:\protoc-2.6.1-win32.zip
+    - c:\ProgramData\chocolatey
+environment:
+    matrix:
+        - vc_arch: amd64
+          choco_arch:
+          target_arch: x86_64
+          qt_ver: 5.5\msvc2013_64
+        - vc_arch: amd64_x86  # cross-compile from amd64 to x86
+          choco_arch: --x86
+          target_arch: x86
+          qt_ver: 5.5\msvc2013
+install:
+    - systeminfo
+    - ps: |
+        if (Test-Path "c:/Program Files (x86)/NSIS/makensis.exe") {
+            echo "using nsis from cache"
+        } else {
+            choco install nsis -y
+        }
+    - ps: |
+        if (Test-Path "c:/ProgramData/chocolatey/bin/jom.exe") {
+            echo "using jom from cache"
+        } else {
+            choco install jom
+        }
+    - ps: |
+        if (Test-Path c:\protoc-2.6.1-win32.zip) {
+            echo "using prootbuf from cache"
+        } else {
+            Invoke-WebRequest https://github.com/google/protobuf/releases/download/v2.6.1/protoc-2.6.1-win32.zip" -OutFile c:\protoc-2.6.1-win32.zip
+        }
+    - c:\cygwin\bin\bash -lc "cd /cygdrive/c; 7z x -y protoc-2.6.1-win32.zip"
+    - c:\cygwin\bin\ls -l /cygdrive/c/protoc-2.6.1
+build_script:
+    - mkdir build
+    - cd build
+    - '"c:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/vcvarsall" %vc_arch%'
+    - path
+    - ps: |
+        $protobufdir = c:\protoc-2.6.1'
+        cmake .. "-GNMake Makefiles JOM" "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protobufdir" "-DWANT_SERVER=1" "-DCMAKE_VERBOSE_MAKEFILE=1"
+    - ps: Push-AppveyorArtifact CMakeCache.txt
+    - jom install VERBOSE=1
+    - c:\cygwin\bin\ls -l release/
+    - '"c:\Program Files (x86)\NSIS\makensis.exe" KVIrc.nsi'
+    - c:\cygwin\bin\ls -l
+    - ps: |
+        $exe = dir -name *.exe
+        $new_name = $exe.Replace(".exe", "-$env:target_arch.exe")
+        Push-AppveyorArtifact $exe -FileName $new_name
+        $cmake_name = $exe.Replace(".exe", "-$env:target_arch.cmake.txt")
+        Push-AppveyorArtifact CMakeCache.txt -FileName $cmake_name
+        $json = New-Object PSObject
+        (New-Object PSObject | Add-Member -PassThru NoteProperty bin $new_name | Add-Member -PassThru NoteProperty cmake $cmake_name | Add-Member -PassThru NoteProperty commit $env:APPVEYOR_REPO_COMMIT) | ConvertTo-JSON | Out-File -FilePath "latest-$env:target_arch" -Encoding ASCII
+        Push-AppveyorArtifact "latest-$env:target_arch"
+test: off
