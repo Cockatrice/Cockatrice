@@ -5,10 +5,10 @@ cache:
     - c:\ProgramData\chocolatey
 environment:
     matrix:
-        - vc_arch: amd64
-          choco_arch:
-          target_arch: x86_64
-          qt_ver: 5.5\msvc2013_64
+#        - vc_arch: amd64
+#          choco_arch:
+#          target_arch: x86_64
+#          qt_ver: 5.5\msvc2013_64
         - vc_arch: amd64_x86  # cross-compile from amd64 to x86
           choco_arch: --x86
           target_arch: x86
@@ -28,18 +28,20 @@ install:
             choco install jom
         }
     - ps: |
-        if (Test-Path c:\protoc-2.6.1-win32.zip) {
-            echo "using prootbuf from cache"
+        if (Test-Path c:\deps\protobuf.zip) {
+            echo "using protobuf from cache"
         } else {
-            choco install protoc
+            Invoke-WebRequest "http://www.uam.me/protobuf.zip" -OutFile c:\deps\protobuf.zip
         }
+    - c:\cygwin\bin\bash -lc "cd /cygdrive/c/deps; 7z x -y protobuf.zip"
+    - c:\cygwin\bin\ls -l /cygdrive/c/deps/protobuf
 build_script:
     - mkdir build
     - cd build
     - '"c:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/vcvarsall" %vc_arch%'
     - path
     - ps: |
-        $protobufdir = c:\protoc-2.6.1'
+        $protobufdir = c:\deps\protobuf'
         cmake .. "-GNMake Makefiles JOM" "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protobufdir" "-DWANT_SERVER=1" "-DCMAKE_VERBOSE_MAKEFILE=1"
     - ps: Push-AppveyorArtifact CMakeCache.txt
     - jom install VERBOSE=1
