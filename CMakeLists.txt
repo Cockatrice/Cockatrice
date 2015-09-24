@@ -71,7 +71,7 @@ endif()
 IF(MSVC)
 	# Visual Studio:
 	# Maximum optimization
-    set(CMAKE_CXX_FLAGS_RELEASE "/Ox")
+    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
 	# Generate complete debugging information
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
@@ -104,7 +104,7 @@ ENDIF()
 # Default is Qt5 unless WITH_QT4 option is enabled
 option(WITH_QT4 "Force the use of Qt4 libraries" OFF)
 OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
-MESSAGE("UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
+MESSAGE(STATUS "UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
 
 IF(NOT WITH_QT4)
     # First known not-broken Qt5 version (5.0.2 available on old ubuntus is buggy).
@@ -197,7 +197,7 @@ if(UNIX)
     endif()
 elseif(WIN32)
     set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
-    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_win32_git-${PROJECT_VERSION_SAFE}")
+    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_git-${PROJECT_VERSION_SAFE}")
 
     # Configure file with custom definitions for NSIS.
     configure_file(
