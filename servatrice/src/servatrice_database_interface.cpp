@@ -959,7 +959,7 @@ bool Servatrice_DatabaseInterface::addWarning(const QString userName, const QStr
         return false;
 
     int userID = getUserIdInDB(userName);
-    QSqlQuery *query = prepareQuery("insert into {prefix}_warnings (id,user_name,mod_name,reason,time_of,clientid) values (:user_id,:user_name,:mod_name,:warn_reason,NOW(),:client_id)");
+    QSqlQuery *query = prepareQuery("insert into {prefix}_warnings (user_id,user_name,mod_name,reason,time_of,clientid) values (:user_id,:user_name,:mod_name,:warn_reason,NOW(),:client_id)");
     query->bindValue(":user_id", userID);
     query->bindValue(":user_name", userName);
     query->bindValue(":mod_name", adminName);
@@ -982,7 +982,7 @@ QList<ServerInfo_Warning> Servatrice_DatabaseInterface::getUserWarnHistory(const
         return results;
 
     int userID = getUserIdInDB(userName);
-    QSqlQuery *query = prepareQuery("SELECT user_name, mod_name, reason, time_of FROM {prefix}_warnings WHERE id = :user_id");
+    QSqlQuery *query = prepareQuery("SELECT user_name, mod_name, reason, time_of FROM {prefix}_warnings WHERE user_id = :user_id");
     query->bindValue(":user_id", userID);
 
     if (!execSqlQuery(query)) {
