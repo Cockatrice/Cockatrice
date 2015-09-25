@@ -212,8 +212,9 @@ int main(int argc, char *argv[])
 
         ui.show();
         qDebug("main(): ui.show() finished");
-
+#if QT_VERSION > 0x050000
         app.setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
         app.exec();
     }
 
