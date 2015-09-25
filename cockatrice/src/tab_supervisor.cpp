@@ -13,6 +13,7 @@
 #include "tab_message.h"
 #include "tab_userlists.h"
 #include "tab_deck_editor.h"
+#include "tab_logs.h"
 #include "pixmapgenerator.h"
 #include "userlist.h"
 #include "settingscache.h"
@@ -25,6 +26,7 @@
 #include "pb/event_game_joined.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_room.pb.h"
+#include "pb/moderator_commands.pb.h"
 
 CloseButton::CloseButton(QWidget *parent)
     : QAbstractButton(parent)
@@ -78,7 +80,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 }
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
-    : QTabWidget(parent), userInfo(0), client(_client), tabServer(0), tabUserLists(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0)
+    : QTabWidget(parent), userInfo(0), client(_client), tabServer(0), tabUserLists(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -108,6 +110,7 @@ void TabSupervisor::retranslateUi()
     tabs.append(tabDeckStorage);
     tabs.append(tabAdmin);
     tabs.append(tabUserLists);
+    tabs.append(tabLog);
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext())
         tabs.append(roomIterator.next().value());
@@ -182,42 +185,54 @@ int TabSupervisor::myAddTab(Tab *tab)
     return idx;
 }
 
-void TabSupervisor::start(const ServerInfo_User &_userInfo)
-{
+void TabSupervisor::start(const ServerInfo_User &_userInfo) {
     isLocalGame = false;
     userInfo = new ServerInfo_User(_userInfo);
-    
+
     tabServer = new TabServer(this, client);
-    connect(tabServer, SIGNAL(roomJoined(const ServerInfo_Room &, bool)), this, SLOT(addRoomTab(const ServerInfo_Room &, bool)));
+    connect(tabServer, SIGNAL(roomJoined(
+                                      const ServerInfo_Room &, bool)), this, SLOT(addRoomTab(
+                                                                                          const ServerInfo_Room &, bool)));
     myAddTab(tabServer);
-    
+
     tabUserLists = new TabUserLists(this, client, *userInfo);
-    connect(tabUserLists, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
+    connect(tabUserLists, SIGNAL(openMessageDialog(
+                                         const QString &, bool)), this, SLOT(addMessageTab(
+                                                                                     const QString &, bool)));
     connect(tabUserLists, SIGNAL(userJoined(ServerInfo_User)), this, SLOT(processUserJoined(ServerInfo_User)));
-    connect(tabUserLists, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
+    connect(tabUserLists, SIGNAL(userLeft(
+                                         const QString &)), this, SLOT(processUserLeft(
+                                                                               const QString &)));
     myAddTab(tabUserLists);
-    
+
     updatePingTime(0, -1);
-    
+
     if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
         tabDeckStorage = new TabDeckStorage(this, client);
-        connect(tabDeckStorage, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
+        connect(tabDeckStorage, SIGNAL(openDeckEditor(
+                                               const DeckLoader *)), this, SLOT(addDeckEditorTab(
+                                                                                        const DeckLoader *)));
         myAddTab(tabDeckStorage);
-        
+
         tabReplays = new TabReplays(this, client);
-        connect(tabReplays, SIGNAL(openReplay(GameReplay *)), this, SLOT(openReplay(GameReplay *)));
+        connect(tabReplays, SIGNAL(openReplay(GameReplay * )), this, SLOT(openReplay(GameReplay * )));
         myAddTab(tabReplays);
     } else {
         tabDeckStorage = 0;
         tabReplays = 0;
     }
-    
+
     if (userInfo->user_level() & ServerInfo_User::IsModerator) {
         tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
         connect(tabAdmin, SIGNAL(adminLockChanged(bool)), this, SIGNAL(adminLockChanged(bool)));
         myAddTab(tabAdmin);
-    } else
+
+        tabLog = new TabLog(this, client);
+        myAddTab(tabLog);
+    } else {
         tabAdmin = 0;
+        tabLog = 0;
+    }
 
     retranslateUi();
 }
@@ -228,6 +243,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     tabDeckStorage = 0;
     tabReplays = 0;
     tabAdmin = 0;
+    tabLog = 0;
     isLocalGame = true;
     userInfo = new ServerInfo_User;
     localClients = _clients;
@@ -258,12 +274,15 @@ void TabSupervisor::stop()
             tabReplays->deleteLater();
         if (tabAdmin)
             tabAdmin->deleteLater();
+        if (tabLog)
+            tabLog->deleteLater();
     }
     tabUserLists = 0;
     tabServer = 0;
     tabDeckStorage = 0;
     tabReplays = 0;
     tabAdmin = 0;
+    tabLog = 0;
     
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext())
@@ -279,7 +298,7 @@ void TabSupervisor::stop()
     while (replayIterator.hasNext())
         replayIterator.next()->deleteLater();
     replayTabs.clear();
-    
+
     delete userInfo;
     userInfo = 0;
 }
@@ -557,8 +576,14 @@ bool TabSupervisor::getAdminLocked() const
 
 void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 {
+
     switch ((Event_NotifyUser::NotificationType) event.type()) {
         case Event_NotifyUser::PROMOTED: QMessageBox::information(this, tr("Promotion"), tr("You have been promoted to moderator. Please log out and back in for changes to take effect.")); break;
+        case Event_NotifyUser::WARNING: {
+            if (!QString::fromStdString(event.warning_reason()).simplified().isEmpty())
+                QMessageBox::warning(this, tr("Warned"), tr("You have received a warning due to %1.\nPlease refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.").arg(QString::fromStdString(event.warning_reason()).simplified()));
+            break;
+        }
         default: ;
     }
 

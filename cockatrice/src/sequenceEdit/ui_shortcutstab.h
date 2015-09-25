@@ -10,6 +10,7 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
+#include <QPushButton>
 #include <QSpacerItem>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -17,6 +18,8 @@
 #include "sequenceedit.h"
 
 QT_BEGIN_NAMESPACE
+
+#define WIKI "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"
 
 class Ui_shortcutsTab
 {
@@ -267,6 +270,9 @@ public:
     SequenceEdit *Player_aAlwaysRevealTopCard;
     QSpacerItem *verticalSpacer_3;
     QWidget * tab_4;
+    QLabel *faqLabel;
+    QPushButton *btnResetAll;
+    QPushButton *btnClearAll;
 
     void setupUi(QWidget *shortcutsTab)
     {
@@ -1402,7 +1408,24 @@ public:
         grid->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding),1,0);
 
         tabWidget->addTab(tab_4, QString());
-        gridLayout_9->addWidget(tabWidget, 0, 0, 1, 1);        
+
+        faqLabel = new QLabel(shortcutsTab);
+        faqLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+        faqLabel->setOpenExternalLinks(true);
+
+        btnResetAll = new QPushButton(shortcutsTab);
+        btnClearAll = new QPushButton(shortcutsTab);
+
+        btnResetAll->setIcon(QPixmap("theme:icons/update"));
+        btnClearAll->setIcon(QPixmap("theme:icons/clearsearch"));
+
+        QHBoxLayout *buttonsLayout = new QHBoxLayout(shortcutsTab);
+        buttonsLayout->addWidget(btnClearAll);
+        buttonsLayout->addWidget(btnResetAll);
+
+        gridLayout_9->addWidget(tabWidget, 0, 0, 1, 2);
+        gridLayout_9->addWidget(faqLabel,1,0,1,1);
+        gridLayout_9->addLayout(buttonsLayout,1,1,1,1,Qt::AlignRight);
         tabWidget->setCurrentIndex(0);
 
         grid->setSpacing(3);
@@ -1557,6 +1580,9 @@ public:
         lbl_Player_aAlwaysRevealTopCard->setText(QApplication::translate("shortcutsTab", "Always reveal top card", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("shortcutsTab", "Draw | Move | View | Gameplay", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("shortcutsTab","Counters", 0));
+        faqLabel->setText(QString("<a href='%1'>%2</a>").arg(WIKI).arg(QApplication::translate("shortcutsTab","How to set custom shortcuts",0)));
+        btnResetAll->setText(QApplication::translate("shortcutsTab","Restore all default shortcuts",0));
+        btnClearAll->setText(QApplication::translate("shortcutsTab","Clear all shortcuts",0));
     } // retranslateUi
 
 };

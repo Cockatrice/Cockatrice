@@ -940,7 +940,6 @@ QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QStr
         return results;
     }
 
-    QString adminID,adminName,banTime,banLength,banReason,visibleReason;
     while (query->next()){
         banDetails.set_admin_id(QString(query->value(0).toString()).toStdString());
         banDetails.set_admin_name(QString(query->value(5).toString()).toStdString());
@@ -949,6 +948,137 @@ QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QStr
         banDetails.set_ban_reason(QString(query->value(3).toString()).toStdString());
         banDetails.set_visible_reason(QString(query->value(4).toString()).toStdString());
         results << banDetails;
+    }
+
+    return results;
+}
+
+bool Servatrice_DatabaseInterface::addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID)
+{
+    if (!checkSql())
+        return false;
+
+    int userID = getUserIdInDB(userName);
+    QSqlQuery *query = prepareQuery("insert into {prefix}_warnings (id,user_name,mod_name,reason,time_of,clientid) values (:user_id,:user_name,:mod_name,:warn_reason,NOW(),:client_id)");
+    query->bindValue(":user_id", userID);
+    query->bindValue(":user_name", userName);
+    query->bindValue(":mod_name", adminName);
+    query->bindValue(":warn_reason", warningReason);
+    query->bindValue(":client_id", clientID);
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to collect create warning history information: SQL Error");
+        return false;
+    }
+
+    return true;
+}
+
+QList<ServerInfo_Warning> Servatrice_DatabaseInterface::getUserWarnHistory(const QString userName)
+{
+    QList<ServerInfo_Warning> results;
+    ServerInfo_Warning warnDetails;
+
+    if (!checkSql())
+        return results;
+
+    int userID = getUserIdInDB(userName);
+    QSqlQuery *query = prepareQuery("SELECT user_name, mod_name, reason, time_of FROM {prefix}_warnings WHERE id = :user_id");
+    query->bindValue(":user_id", userID);
+
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to collect warning history information: SQL Error");
+        return results;
+    }
+
+    while (query->next()){
+        warnDetails.set_user_name(QString(query->value(0).toString()).toStdString());
+        warnDetails.set_admin_name(QString(query->value(1).toString()).toStdString());
+        warnDetails.set_reason(QString(query->value(2).toString()).toStdString());
+        warnDetails.set_time_of(QString(query->value(3).toString()).toStdString());
+        results << warnDetails;
+    }
+
+    return results;
+}
+
+QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory(const QString &user, const QString &ipaddress, const QString &gamename, const QString &gameid, const QString &message, bool &chat, bool &game, bool &room, int &range, int &maxresults)
+{
+
+    QList<ServerInfo_ChatMessage> results;
+    ServerInfo_ChatMessage chatMessage;
+
+    if (!checkSql())
+        return results;
+
+    // BUILD QUERY STRING BASED ON PASSED IN VALUES
+    QString queryString = "SELECT * FROM cockatrice_log WHERE `sender_ip` IS NOT NULL";
+    if (!user.isEmpty())
+        queryString.append(" AND (`sender_name` = :user_name OR `target_name` = :user_name)");
+
+    if (!ipaddress.isEmpty())
+        queryString.append(" AND `sender_ip` = :ip_to_find");
+
+    if (!gameid.isEmpty())
+        queryString.append(" AND (`target_id` = :game_id AND `target_type` = 'game')");
+
+    if (!gamename.isEmpty())
+        queryString.append(" AND (`target_name` = :game_name AND `target_type` = 'game')");
+
+    if (!message.isEmpty())
+        queryString.append(" AND `log_message` LIKE :log_message");
+
+    if (chat || game || room) {
+        queryString.append(" AND (");
+
+        if (chat)
+            queryString.append("`target_type` = 'chat'");
+
+        if (game) {
+            if (chat)
+                queryString.append(" OR `target_type` = 'game'");
+            else
+                queryString.append("`target_type` = 'game'");
+        }
+
+        if (room) {
+            if (game || chat)
+                queryString.append(" OR `target_type` = 'room'");
+            else
+                queryString.append("`target_type` = 'room'");
+        }
+        queryString.append(")");
+    }
+
+    if (range)
+        queryString.append(" AND log_time >= DATE_SUB(now(), INTERVAL :range_time HOUR)");
+
+    if (maxresults)
+        queryString.append(" LIMIT :limit_size");
+
+    QSqlQuery *query = prepareQuery(queryString);
+    if (!user.isEmpty()) { query->bindValue(":user_name", user); }
+    if (!ipaddress.isEmpty()) { query->bindValue(":ip_to_find", ipaddress); }
+    if (!gameid.isEmpty()) { query->bindValue(":game_id", gameid); }
+    if (!gamename.isEmpty()) { query->bindValue(":game_name", gamename); }
+    if (!message.isEmpty()) { query->bindValue(":log_message", message); }
+    if (range) { query->bindValue(":range_time", range); }
+    if (maxresults) { query->bindValue(":limit_size", maxresults); }
+
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to collect log history information: SQL Error");
+        return results;
+    }
+
+    while (query->next()) {
+        chatMessage.set_time(QString(query->value(0).toString()).toStdString());
+        chatMessage.set_sender_id(QString(query->value(1).toString()).toStdString());
+        chatMessage.set_sender_name(QString(query->value(2).toString()).toStdString());
+        chatMessage.set_sender_ip(QString(query->value(3).toString()).toStdString());
+        chatMessage.set_message(QString(query->value(4).toString()).toStdString());
+        chatMessage.set_target_type(QString(query->value(5).toString()).toStdString());
+        chatMessage.set_target_id(QString(query->value(6).toString()).toStdString());
+        chatMessage.set_target_name(QString(query->value(7).toString()).toStdString());
+        results << chatMessage;
     }
 
     return results;

@@ -18,7 +18,6 @@
 #include <QHBoxLayout>
 #include <QCheckBox>
 #include <QMessageBox>
-
 #include "pending_command.h"
 #include "pb/session_commands.pb.h"
 #include "pb/moderator_commands.pb.h"
@@ -114,6 +113,71 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent)
     
     setLayout(vbox);
     setWindowTitle(tr("Ban user from server"));
+}
+
+WarningDialog::WarningDialog(const QString userName, const QString clientID, QWidget *parent)
+        : QDialog(parent)
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+    descriptionLabel = new QLabel(tr("Which warning would you like to send?"));
+    nameWarning = new QLineEdit(userName);
+    warnClientID = new QLineEdit(clientID);
+    warningOption = new QComboBox();
+    warningOption->addItem("");
+
+    QPushButton *okButton = new QPushButton(tr("&OK"));
+    okButton->setAutoDefault(true);
+    connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
+    QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(okButton);
+    buttonLayout->addWidget(cancelButton);
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(descriptionLabel);
+    vbox->addWidget(nameWarning);
+    vbox->addWidget(warningOption);
+    vbox->addLayout(buttonLayout);
+    setLayout(vbox);
+    setWindowTitle(tr("Warn user for misconduct"));
+}
+
+void WarningDialog::okClicked()
+{
+    if (nameWarning->text().simplified().isEmpty()) {
+        QMessageBox::critical(this, tr("Error"), tr("User name to send a warning to can not be blank, please specify a user to warn."));
+        return;
+    }
+
+    if (warningOption->currentText().simplified().isEmpty()) {
+        QMessageBox::critical(this, tr("Error"), tr("Warning to use can not be blank, please select a valid warning to send."));
+        return;
+    }
+
+    accept();
+}
+
+QString WarningDialog::getName() const
+{
+    return nameWarning->text().simplified();
+}
+
+QString WarningDialog::getWarnID() const
+{
+    return warnClientID->text().simplified();
+}
+
+QString WarningDialog::getReason() const
+{
+    return warningOption->currentText().simplified();
+}
+
+void WarningDialog::addWarningOption(const QString warning)
+{
+    warningOption->addItem(warning);
 }
 
 void BanDialog::okClicked()

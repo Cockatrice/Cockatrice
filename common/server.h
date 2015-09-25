@@ -10,6 +10,8 @@
 #include "pb/commands.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_ban.pb.h"
+#include "pb/serverinfo_warning.pb.h"
+#include "pb/serverinfo_chat_message.pb.h"
 #include "server_player_reference.h"
 
 class Server_DatabaseInterface;

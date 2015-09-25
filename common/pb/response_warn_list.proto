@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "response.proto";
+
+message Response_WarnList{
+    extend Response {
+        optional Response_WarnList ext = 1014;
+    }
+    repeated string warning = 1;
+    optional string user_name = 2;
+    optional string user_clientid = 3;
+}

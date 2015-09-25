@@ -119,6 +119,24 @@ bool ShortcutsSettings::isValid(QString name, QString Sequences)
     return true;
 }
 
+void ShortcutsSettings::resetAllShortcuts()
+{
+   for(QMap<QString,QList<QKeySequence> >::const_iterator it = defaultShortCuts.begin();
+                                                        it != defaultShortCuts.end(); ++it){
+       setShortcuts(it.key(), it.value());
+   }
+   emit allShortCutsReset();
+}
+
+void ShortcutsSettings::clearAllShortcuts()
+{
+    for(QMap<QString,QList<QKeySequence> >::const_iterator it = shortCuts.begin();
+                                                         it != shortCuts.end(); ++it){
+        setShortcuts(it.key(), "");
+    }
+    emit allShortCutsClear();
+}
+
 void ShortcutsSettings::fillDefaultShorcuts()
 {
     defaultShortCuts["MainWindow/aCheckCardUpdates"] = parseSequenceString("");

@@ -11,6 +11,7 @@ class QPoint;
 class CommandContainer;
 class Response;
 class AbstractClient;
+class ServerInfo_User;
 
 class UserContextMenu : public QObject {
     Q_OBJECT
@@ -28,13 +29,18 @@ private:
     QAction *aKick;
     QAction *aBan, *aBanHistory;
     QAction *aPromoteToMod, *aDemoteFromMod;
+    QAction *aWarnUser, *aWarnHistory;
 signals:
     void openMessageDialog(const QString &userName, bool focus);
 private slots:
     void banUser_processUserInfoResponse(const Response &resp);
+    void warnUser_processGetWarningsListResponse(const Response &r);
+    void warnUser_processUserInfoResponse(const Response &resp);
     void banUserHistory_processResponse(const Response &resp);
+    void warnUserHistory_processResponse(const Response &resp);
     void adjustMod_processUserResponse(const Response &resp, const CommandContainer &commandContainer);
     void banUser_dialogFinished();
+    void warnUser_dialogFinished();
     void gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer);
 public:
     UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *_parent, TabGame *_game = 0);

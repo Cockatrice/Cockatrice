@@ -9,7 +9,7 @@
 #include "server.h"
 #include "server_database_interface.h"
 
-#define DATABASE_SCHEMA_VERSION 9
+#define DATABASE_SCHEMA_VERSION 10
 
 class Servatrice;
 
@@ -79,6 +79,9 @@ public:
     bool changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword);
     QChar getGenderChar(ServerInfo_User_Gender const &gender);
     QList<ServerInfo_Ban> getUserBanHistory(const QString userName);
+    bool addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID);
+    QList<ServerInfo_Warning> getUserWarnHistory(const QString userName);
+    QList<ServerInfo_ChatMessage> getMessageLogHistory(const QString &user, const QString &ipaddress, const QString &gamename, const QString &gameid, const QString &message, bool &chat, bool &game, bool &room, int &range, int &maxresults);
 };
 
 #endif
