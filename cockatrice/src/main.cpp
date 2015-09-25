@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
         ui.show();
         qDebug("main(): ui.show() finished");
 
-        app.setAttribute(Qt::AA_UseHighDpiPixmaps);.
+        app.setAttribute(Qt::AA_UseHighDpiPixmaps);
         app.exec();
     }
 
