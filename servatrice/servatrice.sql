@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_bans` (
 CREATE TABLE IF NOT EXISTS `cockatrice_warnings` (
   `user_id` int(7) unsigned NOT NULL,
   `user_name` varchar(255) NOT NULL,
-  `mod_name` varchar(255) NOT NULL
+  `mod_name` varchar(255) NOT NULL,
   `reason` text NOT NULL,
   `time_of` datetime NOT NULL,
   `clientid` varchar(15) NOT NULL,
