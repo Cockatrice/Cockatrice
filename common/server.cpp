@@ -262,18 +262,6 @@ void Server::removeClient(Server_ProtocolHandler *client)
     qDebug() << "Server::removeClient: removed" << (void *) client << ";" << clients.size() << "clients; " << users.size() << "users left";
 }
 
-QList<QString> Server::getOnlineModeratorList()
-{
-    QList<QString> results;
-    QReadLocker clientsLocker(&clientsLock);
-    for (int i = 0; i < clients.size(); ++i) {
-        ServerInfo_User *data = clients[i]->getUserInfo();
-        if (data->user_level() & ServerInfo_User::IsModerator || data->user_level() & ServerInfo_User::IsAdmin) //TODO: this line should be updated in the event there is any type of new user level created
-            results << QString::fromStdString(data->name()).simplified();
-    }
-    return results;
-}
-
 void Server::externalUserJoined(const ServerInfo_User &userInfo)
 {
     // This function is always called from the main thread via signal/slot.
