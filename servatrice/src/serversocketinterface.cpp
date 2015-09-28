@@ -858,7 +858,11 @@ Response::ResponseCode ServerSocketInterface::cmdWarnUser(const Command_WarnUser
     QString sendingModerator = QString::fromStdString(userInfo->name()).simplified();
 
     if (sqlInterface->addWarning(userName, sendingModerator, warningReason, clientID)) {
+        servatrice->clientsLock.lockForRead();
         ServerSocketInterface *user = static_cast<ServerSocketInterface *>(server->getUsers().value(userName));
+        QList<QString> moderatorList = server->getOnlineModeratorList();
+        servatrice->clientsLock.unlock();
+
         if (user) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::WARNING);
@@ -868,6 +872,13 @@ Response::ResponseCode ServerSocketInterface::cmdWarnUser(const Command_WarnUser
             delete se;
         }
 
+        QListIterator<QString> modIterator(moderatorList);
+        foreach(QString moderator, moderatorList) {
+            QString notificationMessage = sendingModerator + " has sent a warning with the following information";
+            notificationMessage.append("\n    Username: " + userName);
+            notificationMessage.append("\n    Reason: " + warningReason);
+            sendServerMessage(moderator.simplified(), notificationMessage);
+        }
 
         return Response::RespOk;
     } else {
@@ -903,6 +914,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
     sqlInterface->execSqlQuery(query);
 
     servatrice->clientsLock.lockForRead();
+    QList<QString> moderatorList = server->getOnlineModeratorList();
     QList<ServerSocketInterface *> userList = servatrice->getUsersWithAddressAsList(QHostAddress(address));
 
     if (!userName.isEmpty()) {
@@ -926,6 +938,7 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
             }
         }
     }
+    servatrice->clientsLock.unlock();
 
     if (!userList.isEmpty()) {
         Event_ConnectionClosed event;
@@ -941,7 +954,22 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
             QMetaObject::invokeMethod(userList[i], "prepareDestroy", Qt::QueuedConnection);
         }
     }
-    servatrice->clientsLock.unlock();
+
+    QListIterator<QString> modIterator(moderatorList);
+    foreach(QString moderator, moderatorList) {
+        QString notificationMessage = QString::fromStdString(userInfo->name()).simplified() + " has placed a ban with the following information";
+        if (!userName.isEmpty())
+            notificationMessage.append("\n    Username: " + userName);
+        if (!address.isEmpty())
+            notificationMessage.append("\n    IP Address: " + address);
+        if (!clientID.isEmpty())
+            notificationMessage.append("\n    Client ID: " + clientID);
+
+        notificationMessage.append("\n    Length: " + QString::number(minutes) + " minute(s)");
+        notificationMessage.append("\n    Internal Reason: " + QString::fromStdString(cmd.reason()));
+        notificationMessage.append("\n    Visible Reason: " + QString::fromStdString(cmd.visible_reason()));
+        sendServerMessage(moderator.simplified(), notificationMessage);
+    }
 
     return Response::RespOk;
 }
