@@ -231,3 +231,28 @@ if(WITH_ORACLE)
     add_subdirectory(oracle)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "release/oracle.app;oracle;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
+
+if(test)
+    find_package(Gtest REQUIRED)
+    if(GTEST_FOUND)
+        include_directories(${GTEST_INCLUDE_DIRS})
+    else()
+        message(STATUS "Downloading googletest")
+        configure_file(gtest-CMakeLists.txt gtest-download/CMakeLists.txt)
+        execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gtest-download )
+        execute_process(COMMAND ${CMAKE_COMMAND} --build .
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gtest-download )
+
+        # Add gtest directly to our build
+        add_subdirectory(${CMAKE_BINARY_DIR}/gtest-src
+                ${CMAKE_BINARY_DIR}/gtest-build
+                EXCLUDE_FROM_ALL )
+
+        # Add the gtest include directory, since gtest
+        # doesn't add that dependency to its gtest target
+        target_include_directories(gtest INTERFACE
+                "${CMAKE_BINARY_DIR}/gtest-src/include" )
+    endif()
+    enable_testing()
+endif()
