@@ -390,11 +390,12 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     if (userName.isEmpty() || (userInfo != 0))
         return Response::RespContextError;
 
-    // check client feature set against server feature set
     FeatureSet features;
     QMap<QString, bool> receivedClientFeatures;
     QMap<QString, bool> missingClientFeatures;
+    QMap<QString, bool> serverFeatures;
 
+    // check client feature set against server feature set
     for (int i = 0; i < cmd.clientfeatures().size(); ++i)
         receivedClientFeatures.insert(QString::fromStdString(cmd.clientfeatures(i)).simplified(), false);
 
@@ -461,6 +462,13 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         QMap<QString, bool>::iterator i;
         for (i = missingClientFeatures.begin(); i != missingClientFeatures.end(); ++i)
             re->add_missing_features(i.key().toStdString().c_str());
+    }
+
+    // return to client what features the server supports
+    serverFeatures = features.getDefaultFeatureList();
+    QMap<QString, bool>::iterator i;
+    for (i = serverFeatures.begin(); i != serverFeatures.end(); ++i) {
+        re->add_server_features(i.key().toStdString().c_str());
     }
 
     joinPersistentGames(rc);

@@ -26,6 +26,7 @@
 #include "pb/response_ban_history.pb.h"
 #include "pb/response_warn_history.pb.h"
 #include "pb/response_warn_list.pb.h"
+#include "settingscache.h"
 
 UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor), game(_game)
@@ -286,8 +287,12 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     }
     if (!tabSupervisor->getAdminLocked()) {
         menu->addSeparator();
-        menu->addAction(aWarnUser);
-        menu->addAction(aWarnHistory);
+        if (settingsCache->checkServerFeature(QString("client_warnings")))
+        {
+            menu->addAction(aWarnUser);
+            menu->addAction(aWarnHistory);
+        }
+
         menu->addSeparator();
         menu->addAction(aBan);
         menu->addAction(aBanHistory);

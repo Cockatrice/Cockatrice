@@ -112,10 +112,13 @@ private:
     int keepalive;    
     void translateLegacySettings();
     bool rememberGameSettings;
+    QList<QString> serverFeatures;
 
 public:
     SettingsCache();
     QString getSettingsPath();
+    void addServerFeatures(QString feature);
+    bool checkServerFeature(QString feature);
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
     QString getLang() const { return lang; }
     QString getDeckPath() const { return deckPath; }

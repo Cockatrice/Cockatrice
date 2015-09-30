@@ -150,6 +150,11 @@ void RemoteClient::loginResponse(const Response &response)
         if (resp.missing_features_size() > 0 && settingsCache->getNotifyAboutUpdates())
                 emit notifyUserAboutUpdate();
 
+        if (resp.server_features_size() > 0) {
+            for (int i = 0; i < resp.server_features_size(); ++i)
+                settingsCache->addServerFeatures(QString::fromStdString(resp.server_features(i)));
+        }
+
     } else {
         QList<QString> missingFeatures;
         if (resp.missing_features_size() > 0) {

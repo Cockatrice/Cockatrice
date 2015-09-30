@@ -8,8 +8,9 @@ FeatureSet::FeatureSet()
 }
 
 QMap<QString, bool> FeatureSet::getDefaultFeatureList() {
-    initalizeFeatureList(featureList);
-    return featureList;
+    QMap<QString, bool> defaultFeatureList;
+    initalizeFeatureList(defaultFeatureList);
+    return defaultFeatureList;
 }
 
 void FeatureSet::initalizeFeatureList(QMap<QString, bool> &featureList) {

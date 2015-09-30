@@ -635,3 +635,16 @@ void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
     notifyAboutUpdates = _notifyaboutupdate;
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
 }
+
+void SettingsCache::addServerFeatures(QString feature)
+{
+    serverFeatures << feature;
+}
+
+bool SettingsCache::checkServerFeature(QString feature)
+{
+    if (serverFeatures.contains(feature))
+        return true;
+
+    return false;
+}
