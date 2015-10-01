@@ -1,13 +1,11 @@
 language: cpp
 env:
-  - QT4=1
-  - QT4=0
+  - QT4=1 BUILDTYPE=Debug
+  - QT4=0 BUILDTYPE=Debug
+  - QT4=0 BUILDTYPE=Release
 os:
   - linux
   - osx
-compiler:
-  - gcc
-  - clang
 script: ./travis-compile.sh
 install: ./travis-dependencies.sh
 cache: apt

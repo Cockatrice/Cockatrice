@@ -1,11 +1,11 @@
 #!/bin/bash
 
 if [[ $TRAVIS_OS_NAME == "osx" ]] ; then
-  brew update
+  brew update > /dev/null
   if (( QT4 )); then
-    brew install qt protobuf libgcrypt
+    brew install qt protobuf libgcrypt > /dev/null
   else
-    brew install qt5 protobuf libgcrypt
+    brew install qt5 protobuf libgcrypt > /dev/null
   fi
 else
   if (( QT4 )); then
