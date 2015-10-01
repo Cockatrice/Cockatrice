@@ -146,6 +146,7 @@ if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir servatrice.app/Contents/Plugins)
     set(qtconf_dest_dir servatrice.app/Contents/Resources)
+    get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt4: codecs, sqldrivers
     # qt5: platforms, sqldrivers
