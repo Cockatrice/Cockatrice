@@ -492,6 +492,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     MainWindow->addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     MainWindow->addDockWidget(Qt::RightDockWidgetArea, playerListDock);
     MainWindow->addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
+    MainWindow->restoreGeometry(settingsCache->layouts().getGamePlayAreaGeometry());
+    MainWindow->restoreState(settingsCache->layouts().getGamePlayAreaLayoutState());
 
     deckViewContainerLayout = new QVBoxLayout;
     mainVLayout = new QVBoxLayout;
@@ -524,6 +526,8 @@ void TabGame::emitUserEvent() {
 
 TabGame::~TabGame()
 {
+    settingsCache->layouts().setGamePlayAreaState(MainWindow->saveState());
+    settingsCache->layouts().setGamePlayAreaGeometry(MainWindow->saveGeometry());
     delete replay;
 
     QMapIterator<int, Player *> i(players);
