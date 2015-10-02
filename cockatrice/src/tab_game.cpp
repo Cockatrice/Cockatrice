@@ -1383,7 +1383,6 @@ void TabGame::createPlayAreaDock()
     scene = new GameScene(phasesToolbar, this);
     gameView = new GameView(scene);
     gameView->hide();
-    gameView->setFocusPolicy(Qt::ClickFocus);
 
     gamePlayAreaVBox = new QVBoxLayout;
     gamePlayAreaHBox = new QHBoxLayout;
@@ -1482,4 +1481,3 @@ void TabGame::createMessageDock()
     messageLayoutDock->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
     messageLayoutDock->setWidget(messageLogLayoutWidget);
 }
-
