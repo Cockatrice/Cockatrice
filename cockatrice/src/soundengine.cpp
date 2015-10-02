@@ -89,7 +89,7 @@ void SoundEngine::playSound(QString fileName)
     inputBuffer->setData(audioData[fileName]);
     inputBuffer->open(QIODevice::ReadOnly);
 #if QT_VERSION >= 0x050000
-    player->setVolume(settingsCache->getMasterVolume());
+    player->setVolume(settingsCache->getMasterVolume() / 100.0);
 #endif
     player->stop();
     player->start(inputBuffer);
