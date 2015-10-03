@@ -286,8 +286,9 @@ void MessageLogWidget::logGameStart()
 
 void MessageLogWidget::logConnectionStateChanged(Player *player, bool connectionState)
 {
+    ServerInfo_User::Gender gender = genderOf(player);
     if (connectionState) {
-        switch(genderOf(player)) {
+        switch(gender) {
             case ServerInfo_User::GenderUnknown:
                 appendHtml(tr("%1 has restored connection to the game.", "unspecified gender").arg(sanitizeHtml(player->getName())));
                 break;
@@ -302,7 +303,7 @@ void MessageLogWidget::logConnectionStateChanged(Player *player, bool connection
                 break;
         }
     } else {
-        switch(genderOf(player)) {
+        switch(gender) {
             case ServerInfo_User::GenderUnknown:
                 appendHtml(tr("%1 has lost connection to the game.", "unspecified gender").arg(sanitizeHtml(player->getName())));
                 break;
@@ -360,10 +361,32 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
 
 void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 {
-    if (isFemale(player))
-        appendHtml(tr("%1 rolls a %2 with a %3-sided die.", "female").arg(sanitizeHtml(player->getName())).arg(roll).arg(sides));
-    else
-        appendHtml(tr("%1 rolls a %2 with a %3-sided die.", "male").arg(sanitizeHtml(player->getName())).arg(roll).arg(sides));
+    switch (genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            appendHtml(tr("%1 rolls a %2 with a %3-sided die.", "unspecified gender").
+                arg(sanitizeHtml(player->getName())).
+                arg(roll).
+                arg(sides));
+            break;
+        case ServerInfo_User::Male:
+            appendHtml(tr("%1 rolls a %2 with a %3-sided die.", "male").
+                arg(sanitizeHtml(player->getName())).
+                arg(roll).
+                arg(sides));
+            break;
+        case ServerInfo_User::Female:
+            appendHtml(tr("%1 rolls a %2 with a %3-sided die.", "female").
+                arg(sanitizeHtml(player->getName())).
+                arg(roll).
+                arg(sides));
+            break;
+        case ServerInfo_User::Neutral:
+            appendHtml(tr("%1 rolls a %2 with a %3-sided die.", "gender neutral").
+                arg(sanitizeHtml(player->getName())).
+                arg(roll).
+                arg(sides));
+            break;
+    }
 }
 
 void MessageLogWidget::logDrawCards(Player *player, int number)
@@ -372,19 +395,82 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
         mulliganPlayer = player;
     else {
         soundEngine->draw();
-        if (isFemale(player))
-            appendHtml(tr("%1 draws %n card(s).", "female", number).arg(sanitizeHtml(player->getName())));
-        else
-            appendHtml(tr("%1 draws %n card(s).", "male", number).arg(sanitizeHtml(player->getName())));
+        switch(genderOf(player)) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 draws %n card(s).", "unspecified gender", number).
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 draws %n card(s).", "male", number).
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 draws %n card(s).", "female", number).
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 draws %n card(s).", "gender neutral", number).
+                    arg(sanitizeHtml(player->getName())));
+                break;
+        }
     }
 }
 
 void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
 {
-    if (cardName.isEmpty())
-        appendHtml((isFemale(player) ? tr("%1 undoes her last draw.") : tr("%1 undoes his last draw.")).arg(sanitizeHtml(player->getName())));
-    else
-        appendHtml((isFemale(player) ? tr("%1 undoes her last draw (%2).") : tr("%1 undoes his last draw (%2).")).arg(sanitizeHtml(player->getName())).arg(QString("<a href=\"card://%1\">%2</a>").arg(sanitizeHtml(cardName)).arg(sanitizeHtml(cardName))));
+    ServerInfo_User::Gender gender = genderOf(player);
+    if (cardName.isEmpty()) {
+        switch(gender) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 undoes their last draw.", "unspecified gender").
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 undoes his last draw.", "male").
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 undoes her last draw.", "female").
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 undoes their last draw.", "gender neutral").
+                    arg(sanitizeHtml(player->getName())));
+                break;
+        }
+    }
+    else {
+        switch(gender) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 undoes their last draw (%2).", "unspecified gender").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(QString("<a href=\"card://%1\">%2</a>").
+                    arg(sanitizeHtml(cardName)).
+                    arg(sanitizeHtml(cardName))));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 undoes his last draw (%2).", "male").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(QString("<a href=\"card://%1\">%2</a>").
+                    arg(sanitizeHtml(cardName)).
+                    arg(sanitizeHtml(cardName))));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 undoes her last draw (%2).", "female").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(QString("<a href=\"card://%1\">%2</a>").
+                    arg(sanitizeHtml(cardName)).
+                    arg(sanitizeHtml(cardName))));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 undoes their last draw (%2).", "gender neutral").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(QString("<a href=\"card://%1\">%2</a>").
+                    arg(sanitizeHtml(cardName)).
+                    arg(sanitizeHtml(cardName))));
+                break;
+        }
+    }
 }
 
 QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const
@@ -392,6 +478,7 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
     bool cardNameContainsStartZone = false;
     QString fromStr;
     QString startName = zone->getName();
+    ServerInfo_User::Gender gender = genderOf(zone->getPlayer());
     
     if (startName == "table")
         fromStr = tr(" from table");
@@ -406,27 +493,82 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
             if (cardName.isEmpty()) {
                 if (ownerChange)
                     cardName = tr("the bottom card of %1's library").arg(zone->getPlayer()->getName());
-                else
-                    cardName = isFemale(zone->getPlayer()) ? tr("the bottom card of her library") : tr("the bottom card of his library");
+                else {
+                    switch (gender) {
+                        case ServerInfo_User::GenderUnknown:
+                            cardName = tr("the bottom card of their library", "unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            cardName = tr("the bottom card of his library", "male");
+                            break;
+                        case ServerInfo_User::Female:
+                            cardName = tr("the bottom card of her library", "female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            cardName = tr("the bottom card of their library", "gender neutral");
+                    }
+                }
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange)
                     fromStr = tr(" from the bottom of %1's library").arg(zone->getPlayer()->getName());
-                else
-                    fromStr = isFemale(zone->getPlayer()) ? tr(" from the bottom of her library") : tr(" from the bottom of his library");
+                else {
+                    switch (gender) {
+                        case ServerInfo_User::GenderUnknown:
+                            fromStr = tr(" from the bottom of their library", "unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            fromStr = tr(" from the bottom of his library", "male");
+                            break;
+                        case ServerInfo_User::Female:
+                            fromStr = tr(" from the bottom of her library", "female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            fromStr = tr(" from the bottom of their library", "gender neutral");
+                            break;
+                    }
+                }
             }
         } else if (position == 0) {
             if (cardName.isEmpty()) {
                 if (ownerChange)
                     cardName = tr("the top card of %1's library").arg(zone->getPlayer()->getName());
-                else
-                    cardName = isFemale(zone->getPlayer()) ? tr("the top card of her library") : tr("the top card of his library");
+                else {
+                    switch (gender) {
+                        case ServerInfo_User::GenderUnknown:
+                            cardName = tr("the top card of their library", "unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            cardName = tr("the top card of his library", "male");
+                            break;
+                        case ServerInfo_User::Female:
+                            cardName = tr("the top card of her library", "female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            cardName = tr("the top card of their library", "unspecified gender");
+                            break;
+                    }
+                }
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange)
                     fromStr = tr(" from the top of %1's library").arg(zone->getPlayer()->getName());
-                else
-                    fromStr = isFemale(zone->getPlayer()) ? tr(" from the top of her library") : tr(" from the top of his library");
+                else {
+                    switch (gender) {
+                        case ServerInfo_User::GenderUnknown:
+                            fromStr = tr(" from the top of their library", "unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            fromStr = tr(" from the top of his library", "male");
+                            break;
+                        case ServerInfo_User::Female:
+                            fromStr = tr(" from the top of her library", "female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            fromStr = tr(" from the top of their library", "gender neutral");
+                            break;
+                    } //progress
+                }
             }
         } else {
             if (ownerChange)
@@ -446,6 +588,7 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
 
 void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
 {
+    ServerInfo_User::Gender gender = genderOf(attributes.targetZone->getPlayer());
     bool ownerChange = attributes.startZone->getPlayer() != attributes.targetZone->getPlayer();
     QString startName = attributes.startZone->getName();
     QString targetName = attributes.targetZone->getName();
@@ -486,14 +629,68 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
     else if (targetName == "hand")
         finalStr = tr("%1 moves %2%3 to hand.");
     else if (targetName == "deck") {
-        if (attributes.newX == -1)
-            finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 into her library.") : tr("%1 puts %2%3 into his library.");
-        else if (attributes.newX == attributes.targetZone->getCards().size() - 1)
-            finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 on bottom of her library.") : tr("%1 puts %2%3 on bottom of his library.");
-        else if (attributes.newX == 0)
-            finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 on top of her library.") : tr("%1 puts %2%3 on top of his library.");
-        else
-            finalStr = isFemale(attributes.targetZone->getPlayer()) ? tr("%1 puts %2%3 into her library at position %4.") : tr("%1 puts %2%3 into his library at position %4.");
+        if (attributes.newX == -1) {
+            switch (gender) {
+                case ServerInfo_User::GenderUnknown:
+                    finalStr = tr("%1 puts %2%3 into their library.", "unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    finalStr = tr("%1 puts %2%3 into his library.", "male");
+                    break;
+                case ServerInfo_User::Female:
+                    finalStr = tr("%1 puts %2%3 into her library.", "unspecified gender");
+                    break;
+                case ServerInfo_User::Neutral:
+                    finalStr = tr("%1 puts %2%3 into their library.", "gender neutral");
+                    break;
+            }
+        } else if (attributes.newX == attributes.targetZone->getCards().size() - 1) {
+            switch (gender) {
+                case ServerInfo_User::GenderUnknown:
+                    finalStr = tr("%1 puts %2%3 on bottom of their library.", "unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    finalStr = tr("%1 puts %2%3 on bottom of his library.", "male");
+                    break;
+                case ServerInfo_User::Female:
+                    finalStr = tr("%1 puts %2%3 on bottom of her library.", "female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    finalStr = tr("%1 puts %2%3 on bottom of their library.", "gender neutral");
+                    break;
+            }
+            
+        } else if (attributes.newX == 0) {
+            switch (gender) {
+                case ServerInfo_User::GenderUnknown:
+                    finalStr = tr("%1 puts %2%3 on top of their library.", "unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    finalStr = tr("%1 puts %2%3 on top of his library.", "male");
+                    break;
+                case ServerInfo_User::Female:
+                    finalStr = tr("%1 puts %2%3 on top of her library.", "female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    finalStr = tr("%1 puts %2%3 on top of their library.", "neutral");
+                    break;
+            }
+        } else {
+            switch (gender) {
+                case ServerInfo_User::GenderUnknown:
+                    finalStr = tr("%1 puts %2%3 into their library at position %4.", "unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    finalStr = tr("%1 puts %2%3 into his library at position %4.", "male");
+                    break;
+                case ServerInfo_User::Female:
+                    finalStr = tr("%1 puts %2%3 into her library at position %4.", "female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    finalStr = tr("%1 puts %2%3 into their library at position %4.", "gender neutral");
+                    break;
+            }
+        }
     } else if (targetName == "sb")
         finalStr = tr("%1 moves %2%3 to sideboard.");
     else if (targetName == "stack") {
@@ -520,51 +717,195 @@ void MessageLogWidget::logMulligan(Player *player, int number)
     if (!player)
         return;
 
+    ServerInfo_User::Gender gender = genderOf(player);
     if (number > -1) {
-        if (isFemale(player))
-            appendHtml(tr("%1 takes a mulligan to %n.", "female", number).arg(sanitizeHtml(player->getName())));
-        else
-            appendHtml(tr("%1 takes a mulligan to %n.", "male", number).arg(sanitizeHtml(player->getName())));
-    } else
-        appendHtml((isFemale(player) ? tr("%1 draws her initial hand.") : tr("%1 draws his initial hand.")).arg(sanitizeHtml(player->getName())));
+        switch (gender) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 takes a mulligan to %n.", "unspecified gender", number).
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 takes a mulligan to %n.", "male", number).
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 takes a mulligan to %n.", "female", number).
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 takes a mulligan to %n.", "gender neutral", number).
+                    arg(sanitizeHtml(player->getName())));
+                break;
+        }
+    } else {
+        switch (gender) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 draws their initial hand.", "unspecified gender").
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 draws his initial hand.", "male").
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 draws her initial hand.", "female").
+                    arg(sanitizeHtml(player->getName())));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 draws their initial hand.", "gender neutral").
+                    arg(sanitizeHtml(player->getName())));
+                break;
+        }
+    }
 }
 
 void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
 {
+    ServerInfo_User::Gender gender = genderOf(player);
     if (faceDown) {
-        if (isFemale(player))
-            appendHtml(tr("%1 flips %2 face-down.", "female").arg(sanitizeHtml(player->getName())).arg(cardName));
-        else
-            appendHtml(tr("%1 flips %2 face-down.", "male").arg(sanitizeHtml(player->getName())).arg(cardName));
+        switch (gender) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 flips %2 face-down.", "unspecified gender").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(cardName));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 flips %2 face-down.", "male").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(cardName));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 flips %2 face-down.", "female").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(cardName));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 flips %2 face-down.", "gender neutral").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(cardName));
+                break;
+        }
     } else {
-        if (isFemale(player))
-            appendHtml(tr("%1 flips %2 face-up.", "female").arg(sanitizeHtml(player->getName())).arg(cardName));
-        else
-            appendHtml(tr("%1 flips %2 face-up.", "male").arg(sanitizeHtml(player->getName())).arg(cardName));
+        switch (gender) {
+            case ServerInfo_User::GenderUnknown:
+                appendHtml(tr("%1 flips %2 face-up.", "unspecified gender").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(cardName));
+                break;
+            case ServerInfo_User::Male:
+                appendHtml(tr("%1 flips %2 face-up.", "male").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(cardName));
+                break;
+            case ServerInfo_User::Female:
+                appendHtml(tr("%1 flips %2 face-up.", "female").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(cardName));
+                break;
+            case ServerInfo_User::Neutral:
+                appendHtml(tr("%1 flips %2 face-up.", "gender neutral").
+                    arg(sanitizeHtml(player->getName())).
+                    arg(cardName));
+                break;
+        }
     }
 }
 
 void MessageLogWidget::logDestroyCard(Player *player, QString cardName)
 {
-    if (isFemale(player))
-        appendHtml(tr("%1 destroys %2.", "female").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
-    else
-        appendHtml(tr("%1 destroys %2.", "male").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
+    switch (genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            appendHtml(tr("%1 destroys %2.", "unspecified gender").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)));
+            break;
+        case ServerInfo_User::Male:
+            appendHtml(tr("%1 destroys %2.", "male").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)));
+            break;
+        case ServerInfo_User::Female:
+            appendHtml(tr("%1 destroys %2.", "female").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)));
+            break;
+        case ServerInfo_User::Neutral:
+            appendHtml(tr("%1 destroys %2.", "gender neutral").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)));
+            break;
+    }
 }
 
 void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName)
 {
     QString str;
-    if (isFemale(player)) {
-        if (isFemale(targetPlayer))
-            str = tr("%1 attaches %2 to %3's %4.", "p1 female, p2 female");
-        else
-            str = tr("%1 attaches %2 to %3's %4.", "p1 female, p2 male");
-    } else {
-        if (isFemale(targetPlayer))
-            str = tr("%1 attaches %2 to %3's %4.", "p1 male, p2 female");
-        else
-            str = tr("%1 attaches %2 to %3's %4.", "p1 male, p2 male");
+    ServerInfo_User::Gender targetGender = genderOf(targetPlayer);
+    switch(genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            switch (targetGender) {
+                case ServerInfo_User::GenderUnknown:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 unspecified gender, p2 unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 unspecified gender, p2 male");
+                    break;
+                case ServerInfo_User::Female:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 unspecified gender, p2 female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 unspecified gender, p2 gender neutral");
+                    break;
+            }
+            break;
+        case ServerInfo_User::Male:
+            switch (targetGender) {
+                case ServerInfo_User::GenderUnknown:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 male, p2 unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 male, p2 male");
+                    break;
+                case ServerInfo_User::Female:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 male, p2 female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 male, p2 gender neutral");
+                    break;
+            }
+            break;
+        case ServerInfo_User::Female:
+            switch (targetGender) {
+                case ServerInfo_User::GenderUnknown:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 female, p2 unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 female, p2 male");
+                    break;
+                case ServerInfo_User::Female:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 female, p2 female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 female, p2 gender neutral");
+                    break;
+            }
+            break;
+        case ServerInfo_User::Neutral:
+            switch (targetGender) {
+                case ServerInfo_User::GenderUnknown:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 gender neutral, p2 unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 gender neutral, p2 male");
+                    break;
+                case ServerInfo_User::Female:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 gender neutral, p2 female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    str = tr("%1 attaches %2 to %3's %4.", "p1 gender neutral, p2 gender neutral");
+                    break;
+            }
+            break;
     }
     
     appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)).arg(sanitizeHtml(targetPlayer->getName())).arg(cardLink(targetCardName)));
@@ -572,18 +913,62 @@ void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *t
 
 void MessageLogWidget::logUnattachCard(Player *player, QString cardName)
 {
-    if (isFemale(player))
-        appendHtml(tr("%1 unattaches %2.", "female").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
-    else
-        appendHtml(tr("%1 unattaches %2.", "male").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
+    switch (genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            appendHtml(tr("%1 unattaches %2.", "unspecified gender").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)));
+            break;
+        case ServerInfo_User::Male:
+            appendHtml(tr("%1 unattaches %2.", "male").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)));
+            break;
+        case ServerInfo_User::Female:
+            appendHtml(tr("%1 unattaches %2.", "female").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)));
+            break;
+        case ServerInfo_User::Neutral:
+            appendHtml(tr("%1 unattaches %2.", "gender neutral").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)));
+            break;
+    }
 }
 
 void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt)
 {
-    if (isFemale(player))
-        appendHtml(tr("%1 creates token: %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
-    else
-        appendHtml(tr("%1 creates token: %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)).arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+    switch (genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            appendHtml(tr("%1 creates token: %2%3.", "unspecified gender").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)).
+                arg(pt.isEmpty() ? QString() : QString(" (%1)").
+                arg(sanitizeHtml(pt))));
+            break;
+        case ServerInfo_User::Male:
+            appendHtml(tr("%1 creates token: %2%3.", "male").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)).
+                arg(pt.isEmpty() ? QString() : QString(" (%1)").
+                arg(sanitizeHtml(pt))));
+            break;
+        case ServerInfo_User::Female:
+            appendHtml(tr("%1 creates token: %2%3.", "female").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)).
+                arg(pt.isEmpty() ? QString() : QString(" (%1)").
+                arg(sanitizeHtml(pt))));
+            break;
+        case ServerInfo_User::Neutral:
+            appendHtml(tr("%1 creates token: %2%3.", "gender neutral").
+                arg(sanitizeHtml(player->getName())).
+                arg(cardLink(cardName)).
+                arg(pt.isEmpty() ? QString() : QString(" (%1)").
+                arg(sanitizeHtml(pt))));
+            break;
+    }
 }
 
 void MessageLogWidget::logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard, bool playerTarget)
@@ -591,125 +976,866 @@ void MessageLogWidget::logCreateArrow(Player *player, Player *startPlayer, QStri
     startCard = cardLink(startCard);
     targetCard = cardLink(targetCard);
     QString str;
+    ServerInfo_User::Gender playerGender = genderOf(player),
+        startPlayerGender = genderOf(startPlayer),
+        targetPlayerGender = genderOf(targetPlayer);
     if (playerTarget) {
         if ((player == startPlayer) && (player == targetPlayer)) {
-            if (isFemale(player))
-                str = tr("%1 points from her %2 to herself.", "female");
-            else
-                str = tr("%1 points from his %2 to himself.", "male");
+            switch(playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    str = tr("%1 points from their %2 to themself.", "unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    str = tr("%1 points from his %2 to himself.", "male");
+                    break;
+                case ServerInfo_User::Female:
+                    str = tr("%1 points from her %2 to herself.", "female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    str = tr("%1 points from them %2 to themself.", "gender neutral");
+                    break;
+            }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(startCard));
         } else if (player == startPlayer) {
-            if (isFemale(player)) {
-                if (isFemale(targetPlayer))
-                    str = tr("%1 points from her %2 to %3.", "p1 female, p2 female");
-                else
-                    str = tr("%1 points from her %2 to %3.", "p1 female, p2 male");
-            } else {
-                if (isFemale(targetPlayer))
-                    str = tr("%1 points from his %2 to %3.", "p1 male, p2 female");
-                else
-                    str = tr("%1 points from his %2 to %3.", "p1 male, p2 male");
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from their %2 to %3.", "p1 unspecified gender, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from their %2 to %3.", "p1 unspecified gender, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from their %2 to %3.", "p1 unspecified gender, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from their %2 to %3.", "p1 unspecified gender, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Male:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from his %2 to %3.", "p1 male, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from his %2 to %3.", "p1 male, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from his %2 to %3.", "p1 male, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from his %2 to %3.", "p1 male, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Female:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from her %2 to %3.", "p1 female, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from her %2 to %3.", "p1 female, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from her %2 to %3.", "p1 female, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from her %2 to %3.", "p1 female, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Neutral:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from their %2 to %3.", "p1 gender neutral, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from their %2 to %3.", "p1 gender neutral, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from their %2 to %3.", "p1 gender neutral, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from their %2 to %3.", "p1 gender neutral, p2 gender neutral");
+                            break;
+                    }
+                    break;
             }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(startCard).arg(sanitizeHtml(targetPlayer->getName())));
         } else if (player == targetPlayer) {
-            if (isFemale(player)) {
-                if (isFemale(startPlayer))
-                    str = tr("%1 points from %2's %3 to herself.", "card owner female, target female");
-                else
-                    str = tr("%1 points from %2's %3 to herself.", "card owner male, target female");
-            } else {
-                if (isFemale(startPlayer))
-                    str = tr("%1 points from %2's %3 to himself.", "card owner female, target male");
-                else
-                    str = tr("%1 points from %2's %3 to himself.", "card owner male, target male");
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from %2's %3 to themself.", "card owner unspecified gender, target unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from %2's %3 to themself.", "card owner male, target unspecified gender");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from %2's %3 to themself.", "card owner female, target unspecified gender");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from %2's %3 to themself.", "card owner gender neutral, target unspecified gender");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Male:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from %2's %3 to himself.", "card owner unspecified gender, target male");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from %2's %3 to himself.", "card owner male, target male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from %2's %3 to himself.", "card owner female, target male");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from %2's %3 to himself.", "card owner gender neutral, target male");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Female:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from %2's %3 to herself.", "card owner unspecified gender, target female");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from %2's %3 to herself.", "card owner male, target female");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from %2's %3 to herself.", "card owner female, target female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from %2's %3 to herself.", "card owner gender neutral, target female");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Neutral:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from %2's %3 to themself.", "card owner unspecified gender, target gender neutral");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from %2's %3 to themself.", "card owner male, target gender neutral");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from %2's %3 to themself.", "card owner female, target gender neutral");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from %2's %3 to themself.", "card owner gender neutral, target gender neutral");
+                            break;
+                    }
+                    break;
             }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(startPlayer->getName())).arg(startCard));
         } else {
-            if (isFemale(player)) {
-                if (isFemale(startPlayer)) {
-                    if (isFemale(targetPlayer))
-                        str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 female, p3 female");
-                    else
-                        str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 female, p3 male");
-                } else {
-                    if (isFemale(targetPlayer))
-                        str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 male, p3 female");
-                    else
-                        str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 male, p3 male");
-                }
-            } else {
-                if (isFemale(startPlayer)) {
-                    if (isFemale(targetPlayer))
-                        str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 female, p3 female");
-                    else
-                        str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 female, p3 male");
-                } else {
-                    if (isFemale(targetPlayer))
-                        str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 male, p3 female");
-                    else
-                        str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 male, p3 male");
-                }
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 unspecified gender, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 unspecified gender, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 unspecified gender, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 unspecified gender, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Male:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 male, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 male, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 male, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 male, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Female:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 female, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 female, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 female, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 female, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Neutral:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 gender neutral, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 gender neutral, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 gender neutral, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 unspecified gender, p2 gender neutral, p3 neutral");
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Male:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 unspecified gender, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 unspecified gender, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 unspecified gender, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 unspecified gender, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Male:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 male, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 male, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 male, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 male, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Female:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 female, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 female, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 female, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 female, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Neutral:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 gender neutral, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 gender neutral, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 gender neutral, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 male, p2 gender neutral, p3 neutral");
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Female:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 unspecified gender, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 unspecified gender, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 unspecified gender, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 unspecified gender, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Male:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 male, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 male, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 male, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 male, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Female:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 female, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 female, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 female, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 female, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Neutral:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 gender neutral, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 gender neutral, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 gender neutral, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 female, p2 gender neutral, p3 neutral");
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Neutral:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 unspecified gender, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 unspecified gender, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 unspecified gender, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 unspecified gender, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Male:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 male, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 male, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 male, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 male, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Female:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 female, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 female, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 female, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 female, p3 neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Neutral:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 gender neutral, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 gender neutral, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 gender neutral, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4.", "p1 gender neutral, p2 gender neutral, p3 neutral");
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
             }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(startPlayer->getName())).arg(startCard).arg(sanitizeHtml(targetPlayer->getName())));
         }
     } else {
         if ((player == startPlayer) && (player == targetPlayer)) {
-            if (isFemale(player))
-                str = tr("%1 points from her %2 to her %3.", "female");
-            else
-                str = tr("%1 points from his %2 to his %3.", "male");
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    str = tr("%1 points from their %2 to their %3.", "unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    str = tr("%1 points from his %2 to his %3.", "male");
+                    break;
+                case ServerInfo_User::Female:
+                    str = tr("%1 points from her %2 to her %3.", "female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    str = tr("%1 points from their %2 to their %3.", "gender neutral");
+                    break;
+            }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(startCard).arg(targetCard));
         } else if (player == startPlayer) {
-            if (isFemale(player)) {
-                if (isFemale(targetPlayer))
-                    str = tr("%1 points from her %2 to %3's %4.", "p1 female, p2 female");
-                else
-                    str = tr("%1 points from her %2 to %3's %4.", "p1 female, p2 male");
-            } else {
-                if (isFemale(targetPlayer))
-                    str = tr("%1 points from his %2 to %3's %4.", "p1 male, p2 female");
-                else
-                    str = tr("%1 points from his %2 to %3's %4.", "p1 male, p2 male");
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from their %2 to %3's %4.", "p1 unspecified gender, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from their %2 to %3's %4.", "p1 unspecified gender, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from their %2 to %3's %4.", "p1 unspecified gender, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from their %2 to %3's %4.", "p1 unspecified gender, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Male:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from his %2 to %3's %4.", "p1 male, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from his %2 to %3's %4.", "p1 male, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from his %2 to %3's %4.", "p1 male, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from his %2 to %3's %4.", "p1 male, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Female:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from her %2 to %3's %4.", "p1 female, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from her %2 to %3's %4.", "p1 female, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from her %2 to %3's %4.", "p1 female, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from her %2 to %3's %4.", "p1 female, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Neutral:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from their %2 to %3's %4.", "p1 gender neutral, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from their %2 to %3's %4.", "p1 gender neutral, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from their %2 to %3's %4.", "p1 gender neutral, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from their %2 to %3's %4.", "p1 gender neutral, p2 gender neutral");
+                            break;
+                    }
+                    break;
             }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(startCard).arg(sanitizeHtml(targetPlayer->getName())).arg(targetCard));
         } else if (player == targetPlayer) {
-            if (isFemale(player)) {
-                if (isFemale(startPlayer))
-                    str = tr("%1 points from %2's %3 to her own %4.", "card owner female, target female");
-                else
-                    str = tr("%1 points from %2's %3 to her own %4.", "card owner male, target female");
-            } else {
-                if (isFemale(startPlayer))
-                    str = tr("%1 points from %2's %3 to his own %4.", "card owner female, target male");
-                else
-                    str = tr("%1 points from %2's %3 to his own %4.", "card owner male, target male");
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from %2's %3 to their own %4.", "card owner unspecified gender, target unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from %2's %3 to their own %4.", "card owner male, target unspecified gender");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from %2's %3 to their own %4.", "card owner female, target unspecified gender");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from %2's %3 to their own %4.", "card owner gender neutral, target unspecified gender");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Male:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from %2's %3 to his own %4.", "card owner unspecified gender, target male");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from %2's %3 to his own %4.", "card owner male, target male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from %2's %3 to his own %4.", "card owner female, target male");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from %2's %3 to his own %4.", "card owner gender neutral, target male");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Female:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from %2's %3 to her own %4.", "card owner unspecified gender, target female");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from %2's %3 to her own %4.", "card owner male, target female");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from %2's %3 to her own %4.", "card owner female, target female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from %2's %3 to her own %4.", "card owner gender neutral, target female");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Neutral:
+                    switch (targetPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 points from %2's %3 to their own %4.", "card owner unspecified gender, target gender neutral");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 points from %2's %3 to their own %4.", "card owner male, target gender neutral");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 points from %2's %3 to their own %4.", "card owner female, target gender neutral");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 points from %2's %3 to their own %4.", "card owner gender neutral, target gender neutral");
+                            break;
+                    }
+                    break;
             }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(startPlayer->getName())).arg(startCard).arg(targetCard));
         } else {
-            if (isFemale(player)) {
-                if (isFemale(startPlayer)) {
-                    if (isFemale(targetPlayer))
-                        str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 female, p3 female");
-                    else
-                        str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 female, p3 male");
-                } else {
-                    if (isFemale(targetPlayer))
-                        str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 male, p3 female");
-                    else
-                        str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 male, p3 male");
-                }
-            } else {
-                if (isFemale(startPlayer)) {
-                    if (isFemale(targetPlayer))
-                        str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 female, p3 female");
-                    else
-                        str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 female, p3 male");
-                } else {
-                    if (isFemale(targetPlayer))
-                        str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 male, p3 female");
-                    else
-                        str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 male, p3 male");
-                }
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 unspecified gender, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 unspecified gender, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 unspecified gender, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 unspecified gender, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Male:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 male, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 male, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 male, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 male, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Female:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 female, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 female, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 female, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 female, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Neutral:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 gender neutral, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 gender neutral, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 gender neutral, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 unspecified gender, p2 gender neutral, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Male:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 unspecified gender, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 unspecified gender, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 unspecified gender, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 unspecified gender, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Male:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 male, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 male, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 male, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 male, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Female:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 female, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 female, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 female, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 female, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Neutral:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 gender neutral, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 gender neutral, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 gender neutral, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 male, p2 gender neutral, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Female:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 unspecified gender, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 unspecified gender, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 unspecified gender, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 unspecified gender, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Male:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 male, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 male, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 male, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 male, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Female:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 femaler, p2 female, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 female, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 female, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 female, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Neutral:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 gender neutral, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 gender neutral, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 gender neutral, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 female, p2 gender neutral, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Neutral:
+                    switch (startPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 unspecified gender, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 unspecified gender, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 unspecified gender, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 unspecified gender, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Male:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 male, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 male, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 male, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 male, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Female:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 female, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 female, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 female, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 female, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                        case ServerInfo_User::Neutral:
+                            switch (targetPlayerGender) {
+                                case ServerInfo_User::GenderUnknown:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 gender neutral, p3 unspecified gender");
+                                    break;
+                                case ServerInfo_User::Male:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 gender neutral, p3 male");
+                                    break;
+                                case ServerInfo_User::Female:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 gender neutral, p3 female");
+                                    break;
+                                case ServerInfo_User::Neutral:
+                                    str = tr("%1 points from %2's %3 to %4's %5.", "p1 gender neutral, p2 gender neutral, p3 gender neutral");
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
             }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(startPlayer->getName())).arg(startCard).arg(sanitizeHtml(targetPlayer->getName())).arg(targetCard));
         }
@@ -719,18 +1845,39 @@ void MessageLogWidget::logCreateArrow(Player *player, Player *startPlayer, QStri
 void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue)
 {
     QString finalStr, colorStr;
+    ServerInfo_User::Gender gender = genderOf(player);
     
     int delta = abs(oldValue - value);
     if (value > oldValue) {
-        if (isFemale(player))
-            finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "female", delta);
-        else
-            finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "male", delta);
+        switch (gender) {
+            case ServerInfo_User::GenderUnknown:
+                finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "unspecified gender", delta);
+                break;
+            case ServerInfo_User::Male:
+                finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "male", delta);
+                break;
+            case ServerInfo_User::Female:
+                finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "female", delta);
+                break;
+            case ServerInfo_User::Neutral:
+                finalStr = tr("%1 places %n %2 counter(s) on %3 (now %4).", "gender neutral", delta);
+                break;
+        }
     } else {
-        if (isFemale(player))
-            finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "female", delta);
-        else
-            finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "male", delta);
+        switch (gender) {
+            case ServerInfo_User::GenderUnknown:
+                finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "unspecified gender", delta);
+                break;
+            case ServerInfo_User::Male:
+                finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "male", delta);
+                break;
+            case ServerInfo_User::Female:
+                finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "female", delta);
+                break;
+            case ServerInfo_User::Neutral:
+                finalStr = tr("%1 removes %n %2 counter(s) from %3 (now %4).", "gender neutral", delta);
+                break;
+        }
     }
     
     switch (counterId) {
@@ -745,6 +1892,8 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
 
 void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 {
+    ServerInfo_User::Gender gender = genderOf(player);
+    
     if (tapped)
         soundEngine->tap();
     else
@@ -755,29 +1904,59 @@ void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
     else {
         QString str;
         if (!card) {
-            if (isFemale(player)) {
-                if (tapped)
-                    str = tr("%1 taps her permanents.", "female");
-                else
-                    str = tr("%1 untaps her permanents.", "female");
-            } else {
-                if (tapped)
-                    str = tr("%1 taps his permanents.", "male");
-                else
-                    str = tr("%1 untaps his permanents.", "male");
+            switch (gender) {
+                case ServerInfo_User::GenderUnknown:
+                    if (tapped)
+                        str = tr("%1 taps their permanents.", "unspecified gender");
+                    else
+                        str = tr("%1 untaps their permanents.", "unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    if (tapped)
+                        str = tr("%1 taps his permanents.", "male");
+                    else
+                        str = tr("%1 untaps his permanents.", "male");
+                    break;
+                case ServerInfo_User::Female:
+                    if (tapped)
+                        str = tr("%1 taps her permanents.", "female");
+                    else
+                        str = tr("%1 untaps her permanents.", "female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    if (tapped)
+                        str = tr("%1 taps their permanents.", "gender neutral");
+                    else
+                        str = tr("%1 untaps their permanents.", "gender neutral");
+                    break;
             }
             appendHtml(str.arg(sanitizeHtml(player->getName())));
         } else {
-            if (isFemale(player)) {
-                if (tapped)
-                    str = tr("%1 taps %2.", "female");
-                else
-                    str = tr("%1 untaps %2.", "female");
-            } else {
-                if (tapped)
-                    str = tr("%1 taps %2.", "male");
-                else
-                    str = tr("%1 untaps %2.", "male");
+            switch (gender) {
+                case ServerInfo_User::GenderUnknown:
+                    if (tapped)
+                        str = tr("%1 taps %2.", "unspecified gender");
+                    else
+                        str = tr("%1 untaps %2.", "funspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    if (tapped)
+                        str = tr("%1 taps %2.", "male");
+                    else
+                        str = tr("%1 untaps %2.", "male");
+                    break;
+                case ServerInfo_User::Female:
+                    if (tapped)
+                        str = tr("%1 taps %2.", "female");
+                    else
+                        str = tr("%1 untaps %2.", "female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    if (tapped)
+                        str = tr("%1 taps %2.", "gender neutral");
+                    else
+                        str = tr("%1 untaps %2.", "gender neutral");
+                    break;
             }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardLink(card->getName())));
         }
@@ -787,26 +1966,57 @@ void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 void MessageLogWidget::logSetCounter(Player *player, QString counterName, int value, int oldValue)
 {
     QString str;
-    if (isFemale(player))
-        str = tr("%1 sets counter %2 to %3 (%4%5).", "female");
-    else
-        str = tr("%1 sets counter %2 to %3 (%4%5).", "male");
+    switch (genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            str = tr("%1 sets counter %2 to %3 (%4%5).", "unspecified gender");
+            break;
+        case ServerInfo_User::Male:
+            str = tr("%1 sets counter %2 to %3 (%4%5).", "male");
+            break;
+        case ServerInfo_User::Female:
+            str = tr("%1 sets counter %2 to %3 (%4%5).", "female");
+            break;
+        case ServerInfo_User::Neutral:
+            str = tr("%1 sets counter %2 to %3 (%4%5).", "gender neutral");
+            break;
+    }
     appendHtml(str.arg(sanitizeHtml(player->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(counterName))).arg(QString("<font color=\"blue\">%1</font>").arg(value)).arg(value > oldValue ? "+" : "").arg(value - oldValue));
 }
 
 void MessageLogWidget::logSetDoesntUntap(Player *player, CardItem *card, bool doesntUntap)
 {
     QString str;
+    ServerInfo_User::Gender gender = genderOf(player);
     if (doesntUntap) {
-        if (isFemale(player))
-            str = tr("%1 sets %2 to not untap normally.", "female");
-        else
-            str = tr("%1 sets %2 to not untap normally.", "male");
+        switch (gender) {
+            case ServerInfo_User::GenderUnknown:
+                str = tr("%1 sets %2 to not untap normally.", "unspecified gender");
+                break;
+            case ServerInfo_User::Male:
+                str = tr("%1 sets %2 to not untap normally.", "male");
+                break;
+            case ServerInfo_User::Female:
+                str = tr("%1 sets %2 to not untap normally.", "female");
+                break;
+            case ServerInfo_User::Neutral:
+                str = tr("%1 sets %2 to not untap normally.", "gender neutral");
+                break;
+        }
     } else {
-        if (isFemale(player))
-            str = tr("%1 sets %2 to untap normally.", "female");
-        else
-            str = tr("%1 sets %2 to untap normally.", "male");
+        switch (gender) {
+            case ServerInfo_User::GenderUnknown:
+                str = tr("%1 sets %2 to untap normally.", "unspecified gender");
+                break;
+            case ServerInfo_User::Male:
+                str = tr("%1 sets %2 to untap normally.", "male");
+                break;
+            case ServerInfo_User::Female:
+                str = tr("%1 sets %2 to untap normally.", "female");
+                break;
+            case ServerInfo_User::Neutral:
+                str = tr("%1 sets %2 to untap normally.", "gender neutral");
+                break;
+        }
     }
     appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardLink(card->getName())));
 }
@@ -817,10 +2027,20 @@ void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
         moveCardPT.insert(card, newPT);
     else {
         QString str;
-        if (isFemale(player))
-            str = tr("%1 sets PT of %2 to %3.", "female");
-        else
-            str = tr("%1 sets PT of %2 to %3.", "male");
+        switch (genderOf(player)) {
+            case ServerInfo_User::GenderUnknown:
+                str = tr("%1 sets PT of %2 to %3.", "unspecified gender");
+                break;
+            case ServerInfo_User::Male:
+                str = tr("%1 sets PT of %2 to %3.", "male");
+                break;
+            case ServerInfo_User::Female:
+                str = tr("%1 sets PT of %2 to %3.", "female");
+                break;
+            case ServerInfo_User::Neutral:
+                str = tr("%1 sets PT of %2 to %3.", "gender neutral");
+                break;
+        }
         appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardLink(card->getName())).arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newPT))));
     }
 }
@@ -828,42 +2048,95 @@ void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
 void MessageLogWidget::logSetAnnotation(Player *player, CardItem *card, QString newAnnotation)
 {
     QString str;
-    if (isFemale(player))
-        str = tr("%1 sets annotation of %2 to %3.", "female");
-    else
-        str = tr("%1 sets annotation of %2 to %3.", "male");
+    switch (genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            str = tr("%1 sets annotation of %2 to %3.", "unspecified gender");
+            break;
+        case ServerInfo_User::Male:
+            str = tr("%1 sets annotation of %2 to %3.", "male");
+            break;
+        case ServerInfo_User::Female:
+            str = tr("%1 sets annotation of %2 to %3.", "female");
+            break;
+        case ServerInfo_User::Neutral:
+            str = tr("%1 sets annotation of %2 to %3.", "gender neutral");
+            break;
+    }
     appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardLink(card->getName())).arg(QString("&quot;<font color=\"blue\">%1</font>&quot;").arg(sanitizeHtml(newAnnotation))));
 }
 
 void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards)
 {
-    if (numberCards == -1)
-        appendHtml((isFemale(player)
-            ? tr("%1 is looking at %2.", "female")
-            : tr("%1 is looking at %2.", "male")
-        ).arg(sanitizeHtml(player->getName()))
-         .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
-    else
-        appendHtml((isFemale(player)
-            ? tr("%1 is looking at the top %n card(s) %2.", "female", numberCards)
-            : tr("%1 is looking at the top %n card(s) %2.", "male", numberCards)
-        ).arg(sanitizeHtml(player->getName()))
-         .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone)));
+    ServerInfo_User::Gender gender = genderOf(player);
+    QString str;
+    
+    if (numberCards == -1) {
+        switch (gender) {
+            case ServerInfo_User::GenderUnknown:
+                str = tr("%1 is looking at %2.", "unspecified gender");
+                break;
+            case ServerInfo_User::Male:
+                str = tr("%1 is looking at %2.", "male");
+                break;
+            case ServerInfo_User::Female:
+                str = tr("%1 is looking at %2.", "female");
+                break;
+            case ServerInfo_User::Neutral:
+                str = tr("%1 is looking at %2.", "gender neutral");
+                break;
+        }
+        appendHtml(str.
+            arg(sanitizeHtml(player->getName()))
+            .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
+    } else {
+        switch (gender) {
+            case ServerInfo_User::GenderUnknown:
+                str = tr("%1 is looking at the top %n card(s) %2.", "unspecified gender");
+                break;
+            case ServerInfo_User::Male:
+                str = tr("%1 is looking at the top %n card(s) %2.", "male");
+                break;
+            case ServerInfo_User::Female:
+                str = tr("%1 is looking at the top %n card(s) %2.", "female");
+                break;
+            case ServerInfo_User::Neutral:
+                str = tr("%1 is looking at the top %n card(s) %2.", "gender neutral");
+                break;
+        }
+        appendHtml(str.
+            arg(sanitizeHtml(player->getName())).
+            arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone)));
+     }
 }
 
 void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)
 {
-    appendHtml((isFemale(player)
-        ? tr("%1 stops looking at %2.", "female")
-        : tr("%1 stops looking at %2.", "male")
-    ).arg(sanitizeHtml(player->getName()))
-     .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
+    QString str;
+    switch (genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            str = tr("%1 stops looking at %2.", "unspecified gender");
+            break;
+        case ServerInfo_User::Male:
+            str = tr("%1 stops looking at %2.", "male");
+            break;
+        case ServerInfo_User::Female:
+            str = tr("%1 stops looking at %2.", "female");
+            break;
+        case ServerInfo_User::Neutral:
+            str = tr("%1 stops looking at %2.", "gender neutral");
+            break;
+    }
+    appendHtml(str.
+        arg(sanitizeHtml(player->getName())).
+        arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
 }
 
 void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown)
 {
     QPair<QString, QString> temp = getFromStr(zone, cardName, cardId, false);
     bool cardNameContainsStartZone = false;
+    ServerInfo_User::Gender playerGender = genderOf(player),
+        otherPlayerGender = genderOf(otherPlayer);
     if (!temp.first.isEmpty()) {
         cardNameContainsStartZone = true;
         cardName = temp.first;
@@ -881,78 +2154,307 @@ void MessageLogWidget::logRevealCards(Player *player, CardZone *zone, int cardId
     QString str;
     if (cardId == -1) {
         if (otherPlayer) {
-            if (isFemale(player)) {
-                if (isFemale(otherPlayer))
-                    str = tr("%1 reveals %2 to %3.", "p1 female, p2 female");
-                else
-                    str = tr("%1 reveals %2 to %3.", "p1 female, p2 male");
-            } else {
-                if (isFemale(otherPlayer))
-                    str = tr("%1 reveals %2 to %3.", "p1 male, p2 female");
-                else
-                    str = tr("%1 reveals %2 to %3.", "p1 male, p2 male");
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 reveals %2 to %3.", "p1 unspecified gender, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 reveals %2 to %3.", "p1 unspecified gender, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 reveals %2 to %3.", "p1 unspecified gender, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 reveals %2 to %3.", "p1 unspecified gender, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Male:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 reveals %2 to %3.", "p1 male, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 reveals %2 to %3.", "p1 male, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 reveals %2 to %3.", "p1 male, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 reveals %2 to %3.", "p1 male, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Female:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 reveals %2 to %3.", "p1 female, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 reveals %2 to %3.", "p1 female, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 reveals %2 to %3.", "p1 female, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 reveals %2 to %3.", "p1 female, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Neutral:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 reveals %2 to %3.", "p1 gender neutral, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 reveals %2 to %3.", "p1 gender neutral, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 reveals %2 to %3.", "p1 gender neutral, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 reveals %2 to %3.", "p1 gender neutral, p2 gender neutral");
+                            break;
+                    }
+                    break;
             }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(zone->getTranslatedName(true, CaseRevealZone)).arg(sanitizeHtml(otherPlayer->getName())));
         } else {
-            appendHtml((isFemale(player)
-                ? tr("%1 reveals %2.", "female")
-                : tr("%1 reveals %2.", "male")
-            ).arg(sanitizeHtml(player->getName()))
-             .arg(zone->getTranslatedName(true, CaseRevealZone)));
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    str  = tr("%1 reveals %2.", "unspecified gender");
+                    break;
+                case ServerInfo_User::Male:
+                    str  = tr("%1 reveals %2.", "male");
+                    break;
+                case ServerInfo_User::Female:
+                    str  = tr("%1 reveals %2.", "female");
+                    break;
+                case ServerInfo_User::Neutral:
+                    str  = tr("%1 reveals %2.", "gender neutral");
+                    break;
+            }
+            appendHtml(str.
+                arg(sanitizeHtml(player->getName())).
+                arg(zone->getTranslatedName(true, CaseRevealZone)));
         }
     } else if (cardId == -2) {
         if (otherPlayer) {
-            if (isFemale(player)) {
-                if (isFemale(otherPlayer))
-                    str = tr("%1 randomly reveals %2%3 to %4.", "p1 female, p2 female");
-                else
-                    str = tr("%1 randomly reveals %2%3 to %4.", "p1 female, p2 male");
-            } else {
-                if (isFemale(otherPlayer))
-                    str = tr("%1 randomly reveals %2%3 to %4.", "p1 male, p2 female");
-                else
-                    str = tr("%1 randomly reveals %2%3 to %4.", "p1 male, p2 male");
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 unspecified gender, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 unspecified gender, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 unspecified gender, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 unspecified gender, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Male:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 male, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 male, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 male, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 male, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Female:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 female, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 female, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 female, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 female, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Neutral:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 gender neutral, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 gender neutral, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 gender neutral, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 randomly reveals %2%3 to %4.", "p1 gender neutral, p2 gender neutral");
+                            break;
+                    }
+                    break;
             }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(sanitizeHtml(otherPlayer->getName())));
         } else {
-            if (isFemale(player))
-                appendHtml(tr("%1 randomly reveals %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
-            else
-                appendHtml(tr("%1 randomly reveals %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    appendHtml(tr("%1 randomly reveals %2%3.", "unspecified gender").
+                        arg(sanitizeHtml(player->getName())).
+                        arg(cardStr).
+                        arg(fromStr));
+                    break;
+                case ServerInfo_User::Male:
+                    appendHtml(tr("%1 randomly reveals %2%3.", "male").
+                        arg(sanitizeHtml(player->getName())).
+                        arg(cardStr).
+                        arg(fromStr));
+                    break;
+                case ServerInfo_User::Female:
+                    appendHtml(tr("%1 randomly reveals %2%3.", "female").
+                        arg(sanitizeHtml(player->getName())).
+                        arg(cardStr).
+                        arg(fromStr));
+                    break;
+                case ServerInfo_User::Neutral:
+                    appendHtml(tr("%1 randomly reveals %2%3.", "gender neutral").
+                        arg(sanitizeHtml(player->getName())).
+                        arg(cardStr).
+                        arg(fromStr));
+                    break;
+            }
         }
     } else {
         if (faceDown && (player == otherPlayer)) {
             if (cardName.isEmpty()) {
-                if (isFemale(player))
-                    str = tr("%1 peeks at face down card #%2.", "female");
-                else
-                    str = tr("%1 peeks at face down card #%2.", "male");
+                switch (playerGender) {
+                    case ServerInfo_User::GenderUnknown:
+                        str = tr("%1 peeks at face down card #%2.", "unspecified gender");
+                        break;
+                    case ServerInfo_User::Male:
+                        str = tr("%1 peeks at face down card #%2.", "male");
+                        break;
+                    case ServerInfo_User::Female:
+                        str = tr("%1 peeks at face down card #%2.", "female");
+                        break;
+                    case ServerInfo_User::Neutral:
+                        str = tr("%1 peeks at face down card #%2.", "gender neutral");
+                        break;
+                }
                 appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardId));
             } else {
-                if (isFemale(player))
-                    str = tr("%1 peeks at face down card #%2: %3.", "female");
-                else
-                    str = tr("%1 peeks at face down card #%2: %3.", "male");
+                switch (playerGender) {
+                    case ServerInfo_User::GenderUnknown:
+                        str = tr("%1 peeks at face down card #%2: %3.", "unspecified gender");
+                        break;
+                    case ServerInfo_User::Male:
+                        str = tr("%1 peeks at face down card #%2: %3.", "male");
+                        break;
+                    case ServerInfo_User::Female:
+                        str = tr("%1 peeks at face down card #%2: %3.", "female");
+                        break;
+                    case ServerInfo_User::Neutral:
+                        str = tr("%1 peeks at face down card #%2: %3.", "gender neutral");
+                        break;
+                }
                 appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardId).arg(cardStr));
             }
         } else if (otherPlayer) {
-            if (isFemale(player)) {
-                if (isFemale(otherPlayer))
-                    str = tr("%1 reveals %2%3 to %4.", "p1 female, p2 female");
-                else
-                    str = tr("%1 reveals %2%3 to %4.", "p1 female, p2 male");
-            } else {
-                if (isFemale(otherPlayer))
-                    str = tr("%1 reveals %2%3 to %4.", "p1 male, p2 female");
-                else
-                    str = tr("%1 reveals %2%3 to %4.", "p1 male, p2 male");
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 unspecified gender, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 unspecified gender, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 unspecified gender, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 unspecified gender, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Male:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 male, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 male, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 male, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 male, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Female:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 female, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 female, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 female, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 female, p2 gender neutral");
+                            break;
+                    }
+                    break;
+                case ServerInfo_User::Neutral:
+                    switch (otherPlayerGender) {
+                        case ServerInfo_User::GenderUnknown:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 gender neutral, p2 unspecified gender");
+                            break;
+                        case ServerInfo_User::Male:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 gender neutral, p2 male");
+                            break;
+                        case ServerInfo_User::Female:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 gender neutral, p2 female");
+                            break;
+                        case ServerInfo_User::Neutral:
+                            str = tr("%1 reveals %2%3 to %4.", "p1 gender neutral, p2 gender neutral");
+                            break;
+                    }
+                    break;
             }
             appendHtml(str.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr).arg(sanitizeHtml(otherPlayer->getName())));
         } else {
-            if (isFemale(player))
-                appendHtml(tr("%1 reveals %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
-            else
-                appendHtml(tr("%1 reveals %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+            switch (playerGender) {
+                case ServerInfo_User::GenderUnknown:
+                    appendHtml(tr("%1 reveals %2%3.", "unspecified gender").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+                    break;
+                case ServerInfo_User::Male:
+                    appendHtml(tr("%1 reveals %2%3.", "male").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+                    break;
+                case ServerInfo_User::Female:
+                    appendHtml(tr("%1 reveals %2%3.", "female").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+                    break;
+                case ServerInfo_User::Neutral:
+                    appendHtml(tr("%1 reveals %2%3.", "gender neutral").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+                    break;
+            }
         }
     }
 }
@@ -972,10 +2474,20 @@ void MessageLogWidget::logSetActivePlayer(Player *player)
     soundEngine->notification();
     
     QString str;
-    if (isFemale(player))
-        str = tr("It is now %1's turn.", "female");
-    else
-        str = tr("It is now %1's turn.", "male");
+    switch (genderOf(player)) {
+        case ServerInfo_User::GenderUnknown:
+            str = tr("It is now %1's turn.", "unspecified gender");
+            break;
+        case ServerInfo_User::Male:
+            str = tr("It is now %1's turn.", "male");
+            break;
+        case ServerInfo_User::Female:
+            str = tr("It is now %1's turn.", "female");
+            break;
+        case ServerInfo_User::Neutral:
+            str = tr("It is now %1's turn.", "gender neutral");
+            break;
+    }
     appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + str.arg(player->getName()) + "</b></font><br>");
 }
 
