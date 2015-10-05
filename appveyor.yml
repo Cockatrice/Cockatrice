@@ -20,7 +20,6 @@ install:
     # upgrade cmake in order to have c++11 support
     - choco install cmake -y
     - choco install nsis -y
-    - choco install jom -y
     - ps: |
         if (Test-Path c:\protoc) {
             echo "using protoc from cache"
@@ -63,8 +62,8 @@ build_script:
         Write-Output "PROTOINC = $protoinc"
         Write-Output "PROTOLIB = $protolib"
         Write-Output "PROTOC   = $protoc"
-        cmake .. "-GNMake Makefiles JOM" "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver" "-DWITH_SERVER=1" "-DZLIB_INCLUDE_DIR=$zlibinc" "-DZLIB_LIBRARY=$zliblib" "-DPROTOBUF_INCLUDE_DIR=$protoinc" "-DPROTOBUF_LIBRARIES=$protolib" "-DPROTOBUF_LIBRARIES=$protolib" "-DPROTOBUF_LIBRARY=$protolib" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc"
-    - jom package
+        cmake .. "-GNMake Makefiles" "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver" "-DWITH_SERVER=1" "-DZLIB_INCLUDE_DIR=$zlibinc" "-DZLIB_LIBRARY=$zliblib" "-DPROTOBUF_INCLUDE_DIR=$protoinc" "-DPROTOBUF_LIBRARIES=$protolib" "-DPROTOBUF_LIBRARIES=$protolib" "-DPROTOBUF_LIBRARY=$protolib" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc"
+    - nmake package
     - c:\cygwin\bin\ls -l
     - ps: |
         $exe = dir -name *.exe
