@@ -2,7 +2,9 @@
 
 ---
 
+
 **Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Get Involved] (#get-involved-) | [Community Resources](#community-resources) | [Translation Status](#translation-status-) | [Building](#building-) | [Running](#running) | [License](#license-)
+
 
 ---
 
@@ -37,12 +39,12 @@ Language statistics for `Cockatrice` *(on the left)* and `Oracle` *(on the right
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information!<br>
 
 
-# Building [![Build Status](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice)
+# Building [![Travis Build Status - master](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice) [![Appveyor Build Status - master](https://ci.appveyor.com/api/projects/status/lp5h0dhk4mhmeps7/branch/master?svg=true)](https://ci.appveyor.com/project/Daenyth/cockatrice/branch/master)
 
 **Detailed compiling instructions are on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 
 Dependencies:
-- [Qt](http://qt-project.org/) 
+- [Qt](http://qt-project.org/)
 - [protobuf](http://code.google.com/p/protobuf/)
 - [CMake](http://www.cmake.org/)
 
@@ -85,4 +87,3 @@ The following flags can be passed to `cmake`:
 # License [![GPLv2 License](https://img.shields.io/badge/license-GPLv2-blue.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING)
 
 Cockatrice is free software, licensed under the [GPLv2](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING).
-
