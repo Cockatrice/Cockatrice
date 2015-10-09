@@ -868,14 +868,6 @@ Response::ResponseCode ServerSocketInterface::cmdWarnUser(const Command_WarnUser
             delete se;
         }
 
-        QList<QString> moderatorList = server->getOnlineModeratorList();
-        QListIterator<QString> modIterator(moderatorList);
-        foreach(QString moderator, moderatorList) {
-            QString notificationMessage = sendingModerator + " has sent a warning with the following information";
-            notificationMessage.append("\n    Username: " + userName);
-            notificationMessage.append("\n    Reason: " + warningReason);
-            sendServerMessage(moderator.simplified(), notificationMessage);
-        }
 
         return Response::RespOk;
     } else {
@@ -950,23 +942,6 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
         }
     }
     servatrice->clientsLock.unlock();
-
-    QList<QString> moderatorList = server->getOnlineModeratorList();
-    QListIterator<QString> modIterator(moderatorList);
-    foreach(QString moderator, moderatorList) {
-        QString notificationMessage = QString::fromStdString(userInfo->name()).simplified() + " has placed a ban with the following information";
-        if (!userName.isEmpty())
-            notificationMessage.append("\n    Username: " + userName);
-        if (!address.isEmpty())
-            notificationMessage.append("\n    IP Address: " + address);
-        if (!clientID.isEmpty())
-            notificationMessage.append("\n    Client ID: " + clientID);
-
-        notificationMessage.append("\n    Length: " + QString::number(minutes) + " minute(s)");
-        notificationMessage.append("\n    Internal Reason: " + QString::fromStdString(cmd.reason()));
-        notificationMessage.append("\n    Visible Reason: " + QString::fromStdString(cmd.visible_reason()));
-        sendServerMessage(moderator.simplified(), notificationMessage);
-    }
 
     return Response::RespOk;
 }

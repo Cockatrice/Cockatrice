@@ -185,6 +185,7 @@ if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir oracle.app/Contents/Plugins)
     set(qtconf_dest_dir oracle.app/Contents/Resources)
+    get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt4: codecs, iconengines, imageformats
     # qt5: iconengines, platforms
@@ -214,10 +215,13 @@ IF(WIN32)
     set(qtconf_dest_dir .)
     list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
     IF(ZLIB_FOUND)
+        # look for dll in the bin/ directory (gnuwin32 package)
         get_filename_component(ZLIB_DLL_DIR "${ZLIB_INCLUDE_DIRS}/../bin/" REALPATH)
         list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
+        # look for dll in the lib/ directory (nuget package)
+        get_filename_component(ZLIB_DLL_DIR "${ZLIB_LIBRARY}" DIRECTORY)
+        list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
     ENDIF()
-    MESSAGE(STATUS "Oracle: ZLIB dll found at ${ZLIB_DLL_DIR}")
 
     # qt4: codecs, iconengines, imageformats
     # qt5: iconengines, imageformats, platforms
