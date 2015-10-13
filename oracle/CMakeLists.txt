@@ -24,10 +24,6 @@ SET(oracle_SOURCES
     ../cockatrice/src/qt-json/json.cpp
  )
 
-if (UNIX AND NOT APPLE)
-    set_source_files_properties(src/main.cpp PROPERTIES COMPILE_FLAGS -DTRANSLATION_PATH=\\"${CMAKE_INSTALL_PREFIX}/share/oracle/translations\\")
-endif (UNIX AND NOT APPLE)
-
 set(oracle_RESOURCES oracle.qrc)
 
 IF(UPDATE_TRANSLATIONS)

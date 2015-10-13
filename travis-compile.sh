@@ -10,6 +10,7 @@ if [[ $TRAVIS_OS_NAME == "osx" && $QT4 == 0 ]]; then
 fi
 if [[ $TRAVIS_OS_NAME == "linux" && $QT4 == 0 ]]; then
   prefix="-DCMAKE_PREFIX_PATH=`echo /opt/qt5*/lib/cmake/`"
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`echo /opt/qt5*/lib/`
 fi
 
 if [[ $BUILDTYPE == "Debug" ]]; then
