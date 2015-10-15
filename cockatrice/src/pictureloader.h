@@ -14,7 +14,7 @@ class QThread;
 
 class PictureToLoad {
 private:
-    class EnabledAndKeyCompareFunctor;
+    class SetDownloadPriorityComparator;
 
     CardInfo *card;
     QList<CardSet *> sortedSets;
@@ -57,6 +57,8 @@ private:
     void startNextPicDownload();
     void imageLoaded(CardInfo *card, const QImage &image);
     QString getPicUrl();
+    bool cardImageExistsOnDisk(QString & setName, QString & correctedCardname);
+    bool imageIsBlackListed(const QByteArray &picData);
 public:
     void enqueueImageLoad(CardInfo *card);
     static void getPixmap(QPixmap &pixmap, CardInfo *card, QSize size);
