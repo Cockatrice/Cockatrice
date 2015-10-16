@@ -24,14 +24,11 @@ private:
     QTreeWidget *roomList;
     QPushButton *joinButton;
     AbstractClient *client;
-    
-    void joinRoom(int id, bool setCurrent);
 private slots:
     void processListRoomsEvent(const Event_ListRooms &event);
     void joinClicked();
-    void joinFinished(const Response &resp, const CommandContainer &commandContainer, const QVariant &extraData);
 signals:
-    void roomJoined(const ServerInfo_Room &info, bool setCurrent);
+    void joinRoomRequest(int, bool setCurrent);
 public:
     RoomSelector(AbstractClient *_client, QWidget *parent = 0);
     void retranslateUi();
@@ -43,6 +40,8 @@ signals:
     void roomJoined(const ServerInfo_Room &info, bool setCurrent);
 private slots:
     void processServerMessageEvent(const Event_ServerMessage &event);
+    void joinRoom(int id, bool setCurrent);
+    void joinRoomFinished(const Response &resp, const CommandContainer &commandContainer, const QVariant &extraData);
 private:
     AbstractClient *client;
     RoomSelector *roomSelector;

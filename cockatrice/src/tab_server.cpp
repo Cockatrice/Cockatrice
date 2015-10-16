@@ -12,6 +12,7 @@
 #include "tab_server.h"
 #include "abstractclient.h"
 #include "userlist.h"
+#include "tab_supervisor.h"
 #include <QDebug>
 
 #include "pending_command.h"
@@ -111,20 +112,8 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
         roomList->addTopLevelItem(twi);
         if (room.has_auto_join())
             if (room.auto_join())
-                joinRoom(room.room_id(), false);
+                emit joinRoomRequest(room.room_id(), false);
     }
-}
-
-void RoomSelector::joinRoom(int id, bool setCurrent)
-{
-    Command_JoinRoom cmd;
-    cmd.set_room_id(id);
-    
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    pend->setExtraData(setCurrent);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(joinFinished(Response, CommandContainer, QVariant)));
-    
-    client->sendCommand(pend);
 }
 
 void RoomSelector::joinClicked()
@@ -133,21 +122,9 @@ void RoomSelector::joinClicked()
     if (!twi)
         return;
     
-    joinRoom(twi->data(0, Qt::UserRole).toInt(), true);
-}
+    int id = twi->data(0, Qt::UserRole).toInt();
 
-void RoomSelector::joinFinished(const Response &r, const CommandContainer & /*commandContainer*/, const QVariant &extraData)
-{
-    switch (r.response_code()) {
-        case Response::RespOk: break;
-        case Response::RespUserLevelTooLow: QMessageBox::critical(this, tr("Error"), tr("You do not have the proper permission to join this room.")); return;
-        default:
-            QMessageBox::critical(this, tr("Error"), tr("Failed to join the room due to an unknown error."));
-            return;
-    }
-
-    const Response_JoinRoom &resp = r.GetExtension(Response_JoinRoom::ext);
-    emit roomJoined(resp.room_info(), extraData.toBool());
+    emit joinRoomRequest(id, true);
 }
 
 TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
@@ -157,7 +134,7 @@ TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWi
     serverInfoBox = new QTextBrowser;
     serverInfoBox->setOpenExternalLinks(true);
     
-    connect(roomSelector, SIGNAL(roomJoined(const ServerInfo_Room &, bool)), this, SIGNAL(roomJoined(const ServerInfo_Room &, bool)));
+    connect(roomSelector, SIGNAL(joinRoomRequest(int, bool)), this, SLOT(joinRoom(int, bool)));
     
     connect(client, SIGNAL(serverMessageEventReceived(const Event_ServerMessage &)), this, SLOT(processServerMessageEvent(const Event_ServerMessage &)));
     
@@ -177,4 +154,48 @@ void TabServer::processServerMessageEvent(const Event_ServerMessage &event)
 {
     serverInfoBox->setHtml(QString::fromStdString(event.message()));
     emit userEvent();
+}
+
+void TabServer::joinRoom(int id, bool setCurrent)
+{
+    TabRoom *room = tabSupervisor->getRoomTabs().value(id);
+    if(!room)
+    {
+        Command_JoinRoom cmd;
+        cmd.set_room_id(id);
+        
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        pend->setExtraData(setCurrent);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(joinRoomFinished(Response, CommandContainer, QVariant)));
+        
+        client->sendCommand(pend);
+
+        return;   
+    }
+
+    if(setCurrent)
+        tabSupervisor->setCurrentWidget((QWidget*)room);
+}
+
+void TabServer::joinRoomFinished(const Response &r, const CommandContainer & /*commandContainer*/, const QVariant &extraData)
+{
+    switch (r.response_code()) {
+        case Response::RespOk:
+            break;
+        case Response::RespNameNotFound:
+            QMessageBox::critical(this, tr("Error"), tr("Failed to join the room: it doesn't exists on the server."));
+            return;
+        case Response::RespContextError:
+            QMessageBox::critical(this, tr("Error"), tr("The server thinks you are in the room but Cockatrice is unable to display it. Try restarting Cockatrice."));
+            return;
+        case Response::RespUserLevelTooLow:
+            QMessageBox::critical(this, tr("Error"), tr("You do not have the required permission to join this room."));
+            return;
+        default:
+            QMessageBox::critical(this, tr("Error"), tr("Failed to join the room due to an unknown error: %1.").arg(r.response_code()));
+            return;
+    }
+
+    const Response_JoinRoom &resp = r.GetExtension(Response_JoinRoom::ext);
+    emit roomJoined(resp.room_info(), extraData.toBool());
 }
