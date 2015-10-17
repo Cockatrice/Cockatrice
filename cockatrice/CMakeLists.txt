@@ -109,10 +109,6 @@ SET(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
 )
 
-if (UNIX AND NOT APPLE)
-    set_source_files_properties(src/main.cpp PROPERTIES COMPILE_FLAGS -DTRANSLATION_PATH=\\"${CMAKE_INSTALL_PREFIX}/share/cockatrice/translations\\")
-endif (UNIX AND NOT APPLE)
-
 set(cockatrice_RESOURCES cockatrice.qrc)
 
 IF(UPDATE_TRANSLATIONS)

@@ -54,11 +54,7 @@ QSystemTrayIcon *trayIcon;
 ThemeManager *themeManager;
 
 const QString translationPrefix = "cockatrice";
-#ifdef TRANSLATION_PATH
-QString translationPath = TRANSLATION_PATH;
-#else
-QString translationPath = QString();
-#endif
+QString translationPath;
 
 #if QT_VERSION < 0x050000
 static void myMessageOutput(QtMsgType /*type*/, const char *msg)
@@ -136,13 +132,13 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("cockatrice.de");
     QCoreApplication::setApplicationName("Cockatrice");
 
-    if (translationPath.isEmpty()) {
 #ifdef Q_OS_MAC
-        translationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+    translationPath = qApp->applicationDirPath() + "/../Resources/translations";
 #elif defined(Q_OS_WIN)
-        translationPath = app.applicationDirPath() + "/translations";
+    translationPath = qApp->applicationDirPath() + "/translations";
+#else // linux
+    translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
 #endif
-    }
 
     rng = new RNG_SFMT;
     settingsCache = new SettingsCache;

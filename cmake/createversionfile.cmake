@@ -3,7 +3,7 @@ set(VERSION_STRING_H "${PROJECT_BINARY_DIR}/version_string.h")
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})
 
 set( hstring "extern const char *VERSION_STRING\;\n" )
-set( cppstring "const char * VERSION_STRING = \"${PROJECT_VERSION}\"\;\n")
+set( cppstring "const char * VERSION_STRING = \"${PROJECT_VERSION_FRIENDLY}\"\;\n")
 
 file(WRITE ${PROJECT_BINARY_DIR}/version_string.cpp.txt ${cppstring} )
 file(WRITE ${PROJECT_BINARY_DIR}/version_string.h.txt ${hstring} )

@@ -14,11 +14,7 @@ SettingsCache *settingsCache;
 ThemeManager *themeManager;
 
 const QString translationPrefix = "oracle";
-#ifdef TRANSLATION_PATH
-QString translationPath = TRANSLATION_PATH;
-#else
-QString translationPath = QString();
-#endif
+QString translationPath;
 
 void installNewTranslator()
 {
@@ -44,13 +40,13 @@ int main(int argc, char *argv[])
 	// this can't be changed, as it influences the default savepath for cards.xml
 	QCoreApplication::setApplicationName("Cockatrice");
 
-    if (translationPath.isEmpty()) {
 #ifdef Q_OS_MAC
-        translationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+    translationPath = qApp->applicationDirPath() + "/../Resources/translations";
 #elif defined(Q_OS_WIN)
-        translationPath = app.applicationDirPath() + "/translations";
+    translationPath = qApp->applicationDirPath() + "/translations";
+#else // linux
+    translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
 #endif
-    }
 
 	settingsCache = new SettingsCache;
     themeManager = new ThemeManager;
