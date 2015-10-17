@@ -15,7 +15,7 @@ else
     sudo apt-get update -qq
     sudo apt-get install -y qtmobility-dev libqt4-dev
   else
-    sudo add-apt-repository -y ppa:beineri/opt-qt541
+    sudo add-apt-repository -y ppa:beineri/opt-qt542
     sudo apt-get update -qq
     sudo apt-get install -y libsqlite3-dev\
       qt54base qt54webkit qt54tools qt54svg qt54multimedia
