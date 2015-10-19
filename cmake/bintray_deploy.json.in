@@ -1,6 +1,6 @@
 {
     "package": {
-        "name": "Cockatrice-dev",
+        "name": "Cockatrice-git",
         "repo": "Cockatrice",
         "subject": "cockatrice",
         "desc": "Cockatrice master branch automated builds",
@@ -12,7 +12,7 @@
         "licenses": ["GPL-2.0"],
         "labels": ["card", "tabletop", "game"],
         "public_download_numbers": false,
-        "public_stats": false
+        "public_stats": true
     },
     "version": {
         "name": "@PROJECT_VERSION@",
