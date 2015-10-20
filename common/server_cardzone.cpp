@@ -147,7 +147,12 @@ int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName, bo
     if (x == -1) {
         if (!dontStackSameName && freePilesMap[y].contains(cardName)) {
             x = (freePilesMap[y].value(cardName) / 3) * 3;
-            if (!coordMap.contains(x))
+            
+            if(coordMap.contains(x) && 
+                (coordMap[x]->getFaceDown() || 
+                    !coordMap[x]->getAttachedCards().isEmpty())) {
+                // don't pile up on: 1. facedown cards 2. cards with attached cards
+            } else if (!coordMap.contains(x))
                 return x;
             else if (!coordMap.contains(x + 1))
                 return x + 1;
