@@ -176,7 +176,7 @@ SettingsCache::SettingsCache()
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
-    playToStack = settings->value("interface/playtostack", false).toBool();
+    playToStack = settings->value("interface/playtostack", true).toBool();
     annotateTokens = settings->value("interface/annotatetokens", false).toBool();
     cardInfoMinimized = settings->value("interface/cardinfominimized", 0).toInt();
     tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
