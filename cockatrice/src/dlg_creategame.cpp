@@ -133,6 +133,7 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
         actReset();
     }
 
+    descriptionEdit->setFocus();
     clearButton = new QPushButton(tr("&Clear"));
     buttonBox->addButton(QDialogButtonBox::Cancel);
     buttonBox->addButton(clearButton, QDialogButtonBox::ActionRole);
@@ -205,7 +206,7 @@ void DlgCreateGame::actReset()
         gameTypeCheckBoxIterator.value()->setChecked(false);
     }
 
-descriptionEdit->setFocus();
+    descriptionEdit->setFocus();
 }
 
 
