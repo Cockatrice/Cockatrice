@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `avatar_bmp` blob NOT NULL,
   `registrationDate` datetime NOT NULL,
   `active` tinyint(1) NOT NULL,
-  `token` binary(16) NOT NULL,
+  `token` binary(16),
   `clientid` varchar(15) NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`),
