@@ -30,7 +30,7 @@
 #include "soundengine.h"
 #include "sequenceEdit/shortcutstab.h"
 
-#define LINKING_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Download-URLs"
+#define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Download-URLs"
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
@@ -247,7 +247,7 @@ void GeneralSettingsPage::retranslateUi()
     tokenDatabasePathLabel.setText(tr("Token database:"));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
     highQualityURLLabel.setText(tr("Custom Card Download URL:"));
-    highQualityURLLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(LINKING_FAQ_URL).arg(tr("Linking FAQ")));
+    highQualityURLLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to set a custom picture url")));
     clearDownloadedPicsButton.setText(tr("Reset/Clear Downloaded Pictures"));
     updateNotificationCheckBox.setText(tr("Notify when new client features are available"));
 }
