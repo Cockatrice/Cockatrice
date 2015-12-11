@@ -124,6 +124,8 @@ bool Servatrice_DatabaseInterface::execSqlQuery(QSqlQuery *query)
 bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString & error)
 {
     int minNameLength = settingsCache->value("users/minnamelength", 6).toInt();
+    if(minNameLength < 1)
+        minNameLength = 1;
     int maxNameLength = settingsCache->value("users/maxnamelength", 12).toInt();
     bool allowLowercase = settingsCache->value("users/allowlowercase", true).toBool();
     bool allowUppercase = settingsCache->value("users/allowuppercase", true).toBool();
