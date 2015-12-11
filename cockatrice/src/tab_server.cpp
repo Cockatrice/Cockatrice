@@ -36,7 +36,6 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
 #else
     roomList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     roomList->header()->setSectionResizeMode(1, QHeaderView::Stretch);
-    roomList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
     roomList->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     roomList->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 #endif    
