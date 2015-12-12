@@ -2115,6 +2115,9 @@ void Player::actSetPT()
 
 void Player::actDrawArrow()
 {
+    if(!game->getActiveCard())
+        return;
+
     game->getActiveCard()->drawArrow(Qt::red);
 }
 
@@ -2183,6 +2186,9 @@ void Player::actSetAnnotation()
 
 void Player::actAttach()
 {
+    if(!game->getActiveCard())
+        return;
+    
     ArrowAttachItem *arrow = new ArrowAttachItem(game->getActiveCard());
     scene()->addItem(arrow);
     arrow->grabMouse();
@@ -2190,6 +2196,9 @@ void Player::actAttach()
 
 void Player::actUnattach()
 {
+    if(!game->getActiveCard())
+        return;
+
     Command_AttachCard cmd;
     cmd.set_start_zone(game->getActiveCard()->getZone()->getName().toStdString());
     cmd.set_card_id(game->getActiveCard()->getId());
@@ -2268,16 +2277,25 @@ void Player::actCardCounterTrigger()
 
 void Player::actPlay()
 {
+    if(!game->getActiveCard())
+        return;
+
     playCard(game->getActiveCard(), false, game->getActiveCard()->getInfo()->getCipt());
 }
 
 void Player::actHide()
 {
+    if(!game->getActiveCard())
+        return;
+
     game->getActiveCard()->getZone()->removeCard(game->getActiveCard());
 }
 
 void Player::actPlayFacedown()
 {
+    if(!game->getActiveCard())
+        return;
+
     playCard(game->getActiveCard(), true, false);
 }
 
