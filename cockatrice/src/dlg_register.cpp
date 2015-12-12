@@ -361,6 +361,11 @@ void DlgRegister::actOk()
         QMessageBox::critical(this, tr("Registration Warning"), tr("Your email addresses do not match, please try again."));
         return;
     }
+    if(playernameEdit->text().isEmpty())
+    {
+        QMessageBox::critical(this, tr("Registration Warning"), tr("The player name can't be empty."));
+        return;
+    }
 
     settingsCache->servers().setHostName(hostEdit->text());
     settingsCache->servers().setPort(portEdit->text());

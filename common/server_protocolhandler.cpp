@@ -387,7 +387,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QString clientId = QString::fromStdString(cmd.clientid()).simplified();
     QString clientVersion = QString::fromStdString(cmd.clientver()).simplified();
 
-    if (userName.isEmpty() || (userInfo != 0))
+    if (userInfo != 0)
         return Response::RespContextError;
 
     // check client feature set against server feature set
