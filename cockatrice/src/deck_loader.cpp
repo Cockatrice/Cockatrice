@@ -5,7 +5,7 @@
 #include "decklist.h"
 
 const QStringList DeckLoader::fileNameFilters = QStringList()
-    << QObject::tr("Common deck formats (*.cod *.dec *.mwDeck)")
+    << QObject::tr("Common deck formats (*.cod *.dec *.txt *.mwDeck)")
     << QObject::tr("All files (*.*)");
 
 DeckLoader::DeckLoader()
