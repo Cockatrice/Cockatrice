@@ -2,6 +2,8 @@
 
 set -e
 
+./servatrice/check_schema_version.sh
+
 mkdir build
 cd build
 prefix=""

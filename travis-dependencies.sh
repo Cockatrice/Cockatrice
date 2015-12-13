@@ -14,7 +14,7 @@ else
 
   # common prerequisites
   sudo apt-get update -qq
-  sudo apt-get install -y libprotobuf-dev protobuf-compiler cmake
+  sudo apt-get install -y libprotobuf-dev protobuf-compiler cmake bc
 
   if (( QT4 )); then
     # qt4 prerequisites
