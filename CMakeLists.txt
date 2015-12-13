@@ -188,9 +188,11 @@ if(UNIX)
         set(CPACK_GENERATOR DEB ${CPACK_GENERATOR})
         set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
     	set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-    	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins")
     	set(CPACK_DEBIAN_PACKAGE_SECTION "games")
     	set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
+        IF(Qt5Widgets_FOUND)
+            set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins")
+        ENDIF()
     endif()
 elseif(WIN32)
     set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
@@ -202,6 +204,12 @@ elseif(WIN32)
         ${PROJECT_BINARY_DIR}/NSIS.definitions.nsh
     )
 endif()
+
+# Configure file with build deployment data for travis
+configure_file(
+    ${CMAKE_MODULE_PATH}/bintray_deploy.json.in
+    ${PROJECT_BINARY_DIR}/bintray_deploy.json
+)
 
 include(CPack)
 

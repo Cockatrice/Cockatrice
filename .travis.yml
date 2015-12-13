@@ -1,11 +1,27 @@
 language: cpp
-env:
-  - QT4=1 BUILDTYPE=Debug
-  - QT4=0 BUILDTYPE=Debug
-  - QT4=0 BUILDTYPE=Release
-os:
-  - linux
-  - osx
+matrix:
+  fast_finish: true
+  include:
+    # linux precise debug build, precise + gcc + qt4
+    - os: linux
+      env: QT4=1 BUILDTYPE=Debug DIST=precise
+    # linux debug build, trusty + gcc + qt5
+    - os: linux
+      dist: trusty
+      env: QT4=0 BUILDTYPE=Debug DIST=trusty
+    # osx debug build, osx + clang + qt5
+    - os: osx
+      env: QT4=0 BUILDTYPE=Debug
+    # linux precise release build, precise + gcc + qt4
+    - os: linux
+      env: QT4=1 BUILDTYPE=Release DIST=precise
+    # linux trusty release build, precise + gcc + qt5
+    - os: linux
+      dist: trusty
+      env: QT4=0 BUILDTYPE=Release DIST=trusty
+    # osx release build, osx + gcc + qt5
+    - os: osx
+      env: QT4=0 BUILDTYPE=Release
 script: ./travis-compile.sh
 install: ./travis-dependencies.sh
 cache: apt
@@ -16,6 +32,12 @@ notifications:
       - https://webhooks.gitter.im/e/d94969c3b01b22cbdcb7
     on_success: change
     on_failure: change
-    on_start: false
-matrix:
-  fast_finish: true
+    on_start: never
+deploy:
+  provider: bintray
+  file: "build/bintray_deploy.json"
+  user: "ctrlaltca"
+  key:
+    secure: b9Nv8FeYJGaTs1bZD8z0a7VksmEDkgVSDu8Os1ldYVaE6AwgYTt++RAbX60eu6jRb0G1bUCTWNF5wh3vhjYNl2xrj7N89O5FQAIgQcyWveAU91pn2I92pMcRfhHMIUVLwgzHoSy9JQPFG3ecE6CtWAi9+rbqcRwQRg+A2jfd7yI=
+  on:
+    condition: $BUILDTYPE = Release
