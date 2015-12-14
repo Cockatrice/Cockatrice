@@ -13,6 +13,12 @@ such as Magic: The Gathering, over a network. It is fully client-server based
 to prevent any kind of cheating, though it supports single-player games without
 a network interface as well. Both client and server are written in Qt, supporting both Qt4 and Qt5.<br>
 
+# Downloads
+We offer a download for both the last stable version (recommended for users) and the last development version. The development version contains the last implemented features, but can be unstable and unsuitable for gaming.
+Downloads are hosted on [BinTray](https://bintray.com/).
+
+- Latest stable version download: [ ![Download](https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice/images/download.svg) ](https://bintray.com/cockatrice/Cockatrice/Cockatrice/_latestVersion)
+- Latest development (unstable) version download: [ ![Download](https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice-git/images/download.svg) ](https://bintray.com/cockatrice/Cockatrice/Cockatrice-git/_latestVersion)
 
 # Get Involved [![Gitter chat](https://badges.gitter.im/Cockatrice/Cockatrice.png)](https://gitter.im/Cockatrice/Cockatrice)
 
