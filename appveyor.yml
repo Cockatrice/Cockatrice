@@ -1,4 +1,4 @@
-version: 0.0.0.0.1-branch-{branch}-build-{build}
+version: 0.0.1-branch-{branch}-build-{build}
 cache:
     - c:\protobuf
     - c:\protoc
@@ -10,11 +10,13 @@ environment:
           nuget_arch: x64
           target_arch: x86_64
           qt_ver: 5.5\msvc2013_64
+          bintray_path: Win64
         - vc_arch: amd64_x86  # cross-compile from amd64 to x86
           choco_arch: --x86
           nuget_arch: Win32
           target_arch: x86
           qt_ver: 5.5\msvc2013
+          bintray_path: Win32
 install:
     - systeminfo
     # upgrade cmake in order to have c++11 support
@@ -74,4 +76,17 @@ build_script:
         $json = New-Object PSObject
         (New-Object PSObject | Add-Member -PassThru NoteProperty bin $new_name | Add-Member -PassThru NoteProperty cmake $cmake_name | Add-Member -PassThru NoteProperty commit $env:APPVEYOR_REPO_COMMIT) | ConvertTo-JSON | Out-File -FilePath "latest-$env:target_arch" -Encoding ASCII
         Push-AppveyorArtifact "latest-$env:target_arch"
+        $bt_password = ConvertTo-SecureString $Env:BINTRAY_APIKEY -AsPlainText -Force
+        $bt_credentials = New-Object System.Management.Automation.PSCredential ($Env:BINTRAY_USER, $bt_password)
+        $exe -match "Cockatrice-(?<content>.*)\.exe"
+        $version = $matches['content']
+        $bt_headers = @{
+            "X-Bintray-Package" = "Cockatrice-git";
+            "X-Bintray-Version" = $version;
+            "X-Bintray-Publish" = 1;
+            "X-Bintray-Override" = 1;
+        }
+        $url = "https://api.bintray.com/content/cockatrice/Cockatrice/$env:bintray_path/$new_name"
+        $result = Invoke-WebRequest -Uri $url -Credential $bt_credentials -Method PUT -Headers $bt_headers -InFile "$exe"
+        Write-Host $result
 test: off
