@@ -5039,12 +5039,12 @@ The more information you put in, the more specific your results will be.</source
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="325"/>
-        <source>There is no messages for the selected iilters.</source>
+        <source>There are no messages for the selected filters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="328"/>
-        <source>Failed to collecting message history information.</source>
+        <source>Failed to collect message history information.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
