@@ -322,10 +322,10 @@ void TabLog::viewLogHistory_processResponse(const Response &resp)
             }
 
         } else
-            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Message History"), tr("There is no messages for the selected iilters."));
+            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Message History"), tr("There are no messages for the selected filters."));
 
     } else
-        QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Message History"), tr("Failed to collecting message history information."));
+        QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Message History"), tr("Failed to collect message history information."));
 }
 
 void TabLog::restartLayout()
