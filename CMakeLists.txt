@@ -19,6 +19,10 @@ if(POLICY CMP0048)
     cmake_policy(SET CMP0048 OLD)
 endif()
 
+if(POLICY CMP0064)
+    cmake_policy(SET CMP0064 OLD)
+endif()
+
 set(PROJECT_NAME "Cockatrice")
 
 # Default to "Release" build type
