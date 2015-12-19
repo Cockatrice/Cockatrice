@@ -133,6 +133,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("Cockatrice");
 
 #ifdef Q_OS_MAC
+    qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
+#endif
+
+#ifdef Q_OS_MAC
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
 #elif defined(Q_OS_WIN)
     translationPath = qApp->applicationDirPath() + "/translations";
