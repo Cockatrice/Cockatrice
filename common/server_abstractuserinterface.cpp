@@ -86,6 +86,8 @@ void Server_AbstractUserInterface::joinPersistentGames(ResponseContainer &rc)
         QMutexLocker gameLocker(&game->gameMutex);
         
         Server_Player *player = game->getPlayers().value(pr.getPlayerId());
+        if (!player)
+            continue;
         
         player->setUserInterface(this);
         playerAddedToGame(game->getGameId(), room->getId(), player->getPlayerId());
