@@ -1,0 +1,54 @@
+p {
+  position: relative;
+}
+
+#tab-login {
+	padding: 1em;
+}
+
+#tab-login label {
+    display: block;
+    width: 100px;
+    float: left;
+    padding-right: 10px;
+    clear:left;
+}
+
+#tab-login input {
+    margin-bottom: 10px;
+}
+
+#loading {
+	font-size: 200%;
+	text-align:center;
+	margin-top:200px;
+}
+
+.output, #servermessages {
+	width:100%;
+	min-height: 400px;
+	overflow-x: hidden;
+    overflow-y: scroll;
+	word-wrap: break-word;
+	word-break:break-all;
+	background-color: #fff;
+	box-shadow: inset 1px 1px 3px #999;
+	padding: .5em;
+}
+
+.input {
+	width:95%;
+}
+
+.serverwelcome {
+	color: #006600;
+	font-weight: bold;
+}
+
+.chathistory {
+	color: #c0c0c0;
+}
+
+#buddies, #ignores, .userlist {
+	width: 20em;
+}

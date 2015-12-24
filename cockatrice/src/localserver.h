@@ -27,7 +27,7 @@ public:
     AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, const QString &clientId, QString &reasonStr, int &secondsLeft);
     int getNextGameId() { return localServer->getNextLocalGameId(); }
     int getNextReplayId() { return -1; }
-    int getActiveUserCount() { return 0; }
+    int getActiveUserCount(QString /* connectionType */) { return 0; }
 };
 
 #endif

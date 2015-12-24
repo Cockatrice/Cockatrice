@@ -1,0 +1,226 @@
+<!doctype html> 
+<html> 
+<head>
+  <title>Servatrice web client</title>
+  <link rel="stylesheet" href="js/jquery-ui-1.11.4.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="loading">
+Loading servatrice web client...
+</div>
+
+<div id="tabs" style="display:none">
+  <ul>
+    <li><a href="#tab-login">Login</a></li>
+    <li><a href="#tab-server">Server</a></li>
+    <li><a href="#tab-account">Account</a></li>
+  </ul>
+
+  <div id="tab-login">
+    <h3>Login to server</h3>  
+    <label for="host">Host</label>
+    <input type="text" id="host" value="127.0.0.1" />
+    <br/>
+    <label for="port">Port</label>
+    <input type="text" id="port" value ="4748" />
+    <br/>
+    <label for="user">Username</label>
+    <input type="text" id="user" />
+    <br/>
+    <label for="pass">Password</label>
+    <input type="password" id="pass" />
+    <br/>
+    <button id="loginnow">Connect</button>
+    <button id="quit" style="display:none">Disconnect</button>
+    <span id="status"></span>
+  </div>
+
+  <div id="tab-server">
+    <h3>Rooms</h3>
+    <span id="roomslist"></span>
+    <h3>Server messages</h3>
+    <div id="servermessages"></div>
+  </div>
+
+  <div id="tab-account">
+    <h3>User info</h3>
+    <span id="userinfo"></span>
+    <h3>Buddies</h3>
+    <select id="buddies" size="10"></select>
+    <h3>Ignores</h3>
+    <select id="ignores" size="10"></select>
+    <h3>Missing features</h3>
+    <span id="features"></span>
+  </div>
+
+</div>
+
+<script src="js/jquery-1.11.3.js"></script>
+<script src="js/jquery-ui-1.11.4.js"></script>
+<script src="js/long.js"></script>
+<script src="js/bytebuffer.js"></script>
+<script src="js/protobuf.js"></script>
+<script src="webclient.js"></script>
+
+<script>
+  $("#tabs").tabs();
+  $("#tabs").tabs("disable").tabs("enable", "tab-login");
+  $("#loading").hide();
+  $("#tabs").show();
+
+  $( document ).ready(function() {
+
+    function ts2time(ts) {
+      var d = new Date(Number(ts));
+      return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + ':' + ('0' + d.getSeconds()).slice(-2);
+    }
+
+    function getTime() {
+      var d = new Date();
+      return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + ':' + ('0' + d.getSeconds()).slice(-2);
+    }
+
+    function htmlEscape(msg) {
+      return $("<div>").text(msg).html();
+    }
+
+    $("#loginnow").click(connect);
+    $("#host, #port, #user, #pass").keydown(function(e) {
+        if (e.keyCode == 13) { connect(); }
+    });
+
+    function connect() {
+      var host = $("#host").val();
+      var port = $("#port").val();
+      if(!host.length || !port.length)
+      {
+        alert('Please enter a valid host and port.');
+        return;
+      }
+
+      var options = {
+        "debug": true,
+        "autojoinrooms" : true,
+        "host": host,
+        "port": port,
+        "user": $("#user").val(), 
+        "pass": $("#pass").val(),
+        "statusCallback" : function(id, desc) {
+          $("#status").text(desc);
+          if(id == StatusEnum.LOGGEDIN)
+          {
+            $("#tabs").tabs("enable").tabs("option", "active", 1);
+            $("#loginnow").hide();
+            $("#quit").show();
+          } else {
+            $("#tabs").tabs("disable").tabs("enable", "tab-login").tabs("option", "active", 0);
+            $("#quit").hide();
+            $("#loginnow").show().prop("disabled", false);
+            // close rooms
+            $(".room-header, .room-div").remove();
+
+          }
+        },
+        "connectionClosedCallback" : function(id, desc) {
+          $("#status").text('Connection closed: ' + desc);
+          $("#tabs").tabs("disable").tabs("enable", "tab-login").tabs("option", "active", 0);
+          $("#quit").hide();
+          $("#loginnow").show().prop("disabled", false);
+          // close rooms
+          $(".room-header, .room-div").remove();
+        },
+        "serverMessageCallback" : function(message) {
+          $("#servermessages").append(htmlEscape(message) + '<br/>');
+        },
+        "userInfoCallback" : function(data) {
+            $("#userinfo").empty();
+            $.each(data.userInfo, function(key, value) {
+              // filter out inherited properties
+              if (data.userInfo.hasOwnProperty(key))
+                $('#userinfo').append(key + ': ' + value + '<br/>');
+            });
+
+            $('#buddies').empty();
+            $.each(data.buddyList, function(key, value) {
+              $('#buddies').append('<option>' + value.name + '</option>');
+            });
+
+            $('#ignores').empty();
+            $.each(data.ignoreList, function(key, value) {
+              $('#ignores').append('<option>' + value.name + '</option>');
+            });
+            
+            $("#features").text(JSON.stringify(data.missingFeatures, null, 4));
+        },
+        "listRoomsCallback" : function(rooms) {
+          $("#roomslist").text(JSON.stringify(rooms, null, 4));
+        },
+        "errorCallback" : function(id, desc) {
+          $("#roomslist").text(desc);
+        },
+        "joinRoomCallback" : function(room) {
+          $("div#tabs ul").append(
+              "<li class='room-header'><a href='#tab-room-" + room["roomId"] + "'>" + room["name"] + "</a></li>"
+          );
+          $("div#tabs").append(
+              "<div class='room-div' id='tab-room-" + room["roomId"] + "'>" + room["name"] + 
+              "<h3>Userlist</h3>" +
+              "<select class=\"userlist\" size=\"10\"></select>" +
+              "<h3>Chat</h3>" +
+              "<div class=\"output\"></div>" +
+              "<br/><input type=\"text\" class=\"input\" />" +
+              "<button class=\"say\">say</button>" +
+              "</div>"
+          );
+          $("div#tabs").tabs("refresh");
+
+          $("#tab-room-" + room["roomId"] + " .userlist").empty();
+          $.each(room["userList"], function(key, value) {
+            $("#tab-room-" + room["roomId"] + " .userlist").append('<option>' + value.name + '</option>');
+          });
+
+          $("#tab-room-" + room["roomId"] + " .say").click(function() {
+            var msg = $("#tab-room-" + room["roomId"] + " .input").val();
+            $("#tab-room-" + room["roomId"] + " .input").val("");
+            WebClient.roomSay(room["roomId"], msg);
+          });
+          $("#tab-room-" + room["roomId"] + " .input").keydown(function(e) {
+            if (e.keyCode == 13) {
+              var msg = $("#tab-room-" + room["roomId"] + " .input").val();
+              $("#tab-room-" + room["roomId"] + " .input").val("");
+              WebClient.roomSay(room["roomId"], msg);
+            }
+          });
+        },
+        "roomMessageCallback" : function(roomId, message) {
+          var text;
+          switch(message["messageType"])
+          {
+            case WebClient.pb.Event_RoomSay.RoomMessageType.Welcome:
+              text = "<span class='serverwelcome'>" + htmlEscape(message["message"]) + "</span>";
+              break;
+            case WebClient.pb.Event_RoomSay.RoomMessageType.ChatHistory:
+              text = "<span class='chathistory'>[" + ts2time(message["timeOf"]) + "] " + htmlEscape(message["message"]) + "</span>";
+              break;
+            default:
+              text = "[" + getTime() + "] " + htmlEscape(message["name"]) + ": " + htmlEscape(message["message"]);
+              break;
+          }
+          $("#tab-room-" + roomId + " .output").append(text + '<br/>');
+        },
+      };
+
+      $(this).prop("disabled", true);
+      WebClient.connect(options);
+    };
+
+    $("#quit").click(function() {
+      WebClient.disconnect();
+    });
+
+  });
+</script>
+</body> 
+</html>

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
-INSERT INTO cockatrice_schema_version VALUES(13);
+INSERT INTO cockatrice_schema_version VALUES(14);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -190,6 +190,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_sessions` (
   `start_time` datetime NOT NULL,
   `end_time` datetime DEFAULT NULL,
   `clientid` varchar(15) NOT NULL,
+  `connection_type` ENUM('tcp', 'websocket'),
   PRIMARY KEY (`id`),
   KEY `username` (`user_name`)
 ) ENGINE=INNODB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

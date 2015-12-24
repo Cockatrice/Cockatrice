@@ -414,7 +414,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 
     QString reasonStr;
     int banSecondsLeft = 0;
-    AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft, clientId, clientVersion);
+    QString connectionType = getConnectionType();
+    AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft, clientId, clientVersion, connectionType);
     switch (res) {
         case UserIsBanned: {
             Response_Login *re = new Response_Login;

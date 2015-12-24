@@ -21,11 +21,13 @@
 #define SERVERSOCKETINTERFACE_H
 
 #include <QTcpSocket>
+#if QT_VERSION > 0x050300
+  #include <QWebSocket>
+#endif
 #include <QHostAddress>
 #include <QMutex>
 #include "server_protocolhandler.h"
 
-class QTcpSocket;
 class Servatrice;
 class Servatrice_DatabaseInterface;
 class DeckList;
@@ -53,31 +55,27 @@ class Command_AccountEdit;
 class Command_AccountImage;
 class Command_AccountPassword;
 
-
-class ServerSocketInterface : public Server_ProtocolHandler
+class AbstractServerSocketInterface : public Server_ProtocolHandler
 {
 	Q_OBJECT
-private slots:
-	void readClient();
+protected slots:
 	void catchSocketError(QAbstractSocket::SocketError socketError);
-	void flushOutputQueue();
+	virtual void flushOutputQueue() = 0;
 signals:
 	void outputQueueChanged();
 protected:
 	void logDebugMessage(const QString &message);
 	bool tooManyRegistrationAttempts(const QString &ipAddress);
-private:
-	QMutex outputQueueMutex;
+
+	virtual void writeToSocket(QByteArray & data) = 0;
+	virtual void flushSocket() = 0;
+
 	Servatrice *servatrice;
-	Servatrice_DatabaseInterface *sqlInterface;
-	QTcpSocket *socket;
-	
-	QByteArray inputBuffer;
 	QList<ServerMessage> outputQueue;
-	bool messageInProgress;
-	bool handshakeStarted;
-	int messageLength;
-	
+	QMutex outputQueueMutex;
+private:
+	Servatrice_DatabaseInterface *sqlInterface;
+		
 	Response::ResponseCode cmdAddToList(const Command_AddToList &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
 	int getDeckPathId(int basePathId, QStringList path);
@@ -117,16 +115,67 @@ private:
 	Response::ResponseCode cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdAccountPassword(const Command_AccountPassword &cmd, ResponseContainer &rc);
 public:
-	ServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent = 0);
-	~ServerSocketInterface();
-	void initSessionDeprecated();
+	AbstractServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent = 0);
+	~AbstractServerSocketInterface() { };
 	bool initSession();
-	QHostAddress getPeerAddress() const { return socket->peerAddress(); }
-	QString getAddress() const { return socket->peerAddress().toString(); }
+
+	virtual QHostAddress getPeerAddress() const = 0;
+	virtual QString getAddress() const = 0;
 
 	void transmitProtocolItem(const ServerMessage &item);
+};
+
+class TcpServerSocketInterface : public AbstractServerSocketInterface
+{
+	Q_OBJECT
+public:
+	TcpServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent = 0);
+	~TcpServerSocketInterface();
+
+	QHostAddress getPeerAddress() const { return socket->peerAddress(); }
+	QString getAddress() const { return socket->peerAddress().toString(); }
+	QString getConnectionType() const { return "tcp"; };
+private:
+	QTcpSocket *socket;
+	QByteArray inputBuffer;
+	bool messageInProgress;
+	bool handshakeStarted;
+	int messageLength;
+protected:
+	void writeToSocket(QByteArray & data) { socket->write(data); };
+	void flushSocket() { socket->flush(); };
+	void initSessionDeprecated();
+	bool initTcpSession();
+protected slots:
+	void readClient();
+	void flushOutputQueue();
 public slots:
 	void initConnection(int socketDescriptor);
 };
+
+#if QT_VERSION > 0x050300
+class WebsocketServerSocketInterface : public AbstractServerSocketInterface
+{
+	Q_OBJECT
+public:
+	WebsocketServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent = 0);
+	~WebsocketServerSocketInterface();
+
+	QHostAddress getPeerAddress() const { return socket->peerAddress(); }
+	QString getAddress() const { return socket->peerAddress().toString(); }
+	QString getConnectionType() const { return "websocket"; };
+private:
+	QWebSocket *socket;
+protected:
+	void writeToSocket(QByteArray & data) { socket->sendBinaryMessage(data); };
+	void flushSocket() { socket->flush(); };
+	bool initWebsocketSession();
+protected slots:
+	void binaryMessageReceived(const QByteArray & message);
+	void flushOutputQueue();
+public slots:
+	void initConnection(void * _socket);
+};
+#endif
 
 #endif

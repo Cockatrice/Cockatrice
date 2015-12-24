@@ -20,7 +20,15 @@ port=4747
 ; Servatrice can scale up to serve big number of users using more than one parallel thread of execution;
 ; If your server is hosting a lot of players and they frequently report of being unable to login or
 ; long delays (lag), you may want to try increasing this value; default is 1.
+; Set to 0 to disable the tcp server.
 number_pools=1
+
+; Servatrice can listen for clients on websockets, too. Unfortunately it can't support more than one thread.
+; Set to 0 to disable the websocket server.
+websocket_number_pools=1
+
+; The TCP port number servatrice will listen on for websockets clients; default is 4748
+websocket_port=4748
 
 ; When database is enabled, servatrice writes the server status in the "update" database table; this
 ; setting defines every how many milliseconds servatrice will update its status; default is 15000 (15 secs)
@@ -226,6 +234,12 @@ enable_max_user_limit=false
 
 ; Maximum number of users that can connect to the server, default is 500.
 max_users_total=500
+
+; Maximum number of users that can connect to the server using a tcp connection, default is 500.
+max_users_tcp=500
+
+; Maximum number of users that can connect to the server using a websocket connection, default is 500.
+max_users_websocket=500
 
 ; Maximum number of users that can connect from the same IP address; useful to avoid bots, default is 4
 max_users_per_address=4
