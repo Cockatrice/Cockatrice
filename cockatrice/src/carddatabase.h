@@ -78,7 +78,12 @@ private:
     QString powtough;
     QString text;
     QStringList colors;
+    // the cards i'm related to
     QStringList relatedCards;
+    // the card i'm reverse-related to
+    QStringList reverseRelatedCards;
+    // the cards thare are reverse-related to me
+    QStringList reverseRelatedCardsToMe;
     bool upsideDownArt;
     int loyalty;
     QStringMap customPicURLs;
@@ -86,6 +91,7 @@ private:
     bool cipt;
     int tableRow;
     QString pixmapCacheKey;
+
 public:
     CardInfo(CardDatabase *_db,
         const QString &_name = QString(),
@@ -97,6 +103,7 @@ public:
         const QString &_text = QString(),
         const QStringList &_colors = QStringList(),
         const QStringList &_relatedCards = QStringList(),
+        const QStringList &_reverseRelatedCards = QStringList(),
         bool _upsideDownArt = false,
         int _loyalty = 0,
         bool _cipt = false,
@@ -126,6 +133,10 @@ public:
     void setColors(const QStringList &_colors) { colors = _colors; emit cardInfoChanged(this); }
     const QStringList &getColors() const { return colors; }
     const QStringList &getRelatedCards() const { return relatedCards; }
+    const QStringList &getReverseRelatedCards() const { return reverseRelatedCards; }
+    const QStringList &getReverseRelatedCards2Me() const { return reverseRelatedCardsToMe; }
+    void resetReverseRelatedCards2Me() { reverseRelatedCardsToMe = QStringList(); }
+    void addReverseRelatedCards2Me(QString & cardName) { reverseRelatedCardsToMe.append(cardName); }
     bool getUpsideDownArt() const { return upsideDownArt; }
     QString getCustomPicURL(const QString &set) const { return customPicURLs.value(set); }
     int getMuId(const QString &set) const { return muIds.value(set); }
@@ -216,6 +227,7 @@ public:
     LoadStatus getLoadStatus() const { return loadStatus; }
     bool getLoadSuccess() const { return loadStatus == Ok; }
     bool hasDetectedFirstRun();
+    void refreshCachedReverseRelatedCards();
 public slots:
     LoadStatus loadCardDatabase(const QString &path, bool tokens = false);
     void loadCustomCardDatabases(const QString &path);

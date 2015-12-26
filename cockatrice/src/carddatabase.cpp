@@ -167,6 +167,7 @@ CardInfo::CardInfo(CardDatabase *_db,
                    const QString &_text,
                    const QStringList &_colors,
                    const QStringList &_relatedCards,
+                   const QStringList &_reverseRelatedCards,
                    bool _upsideDownArt,
                    int _loyalty,
                    bool _cipt,
@@ -186,6 +187,7 @@ CardInfo::CardInfo(CardDatabase *_db,
       text(_text),
       colors(_colors),
       relatedCards(_relatedCards),
+      reverseRelatedCards(_reverseRelatedCards),
       upsideDownArt(_upsideDownArt),
       loyalty(_loyalty),
       customPicURLs(_customPicURLs),
@@ -297,6 +299,10 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
     const QStringList &related = info->getRelatedCards();
     for (int i = 0; i < related.size(); i++)
         xml.writeTextElement("related", related[i]);
+
+    const QStringList &reverseRelated = info->getReverseRelatedCards();
+    for (int i = 0; i < reverseRelated.size(); i++)
+        xml.writeTextElement("reverse-related", reverseRelated[i]);
 
     xml.writeTextElement("manacost", info->getManaCost());
     xml.writeTextElement("cmc", info->getCmc());
@@ -447,7 +453,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             break;
         if (xml.name() == "card") {
             QString name, manacost, cmc, type, pt, text;
-            QStringList colors, relatedCards;
+            QStringList colors, relatedCards, reverseRelatedCards;
             QStringMap customPicURLs;
             MuidMap muids;
             SetList sets;
@@ -485,6 +491,8 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
                     colors << xml.readElementText();
                 else if (xml.name() == "related")
                     relatedCards << xml.readElementText();
+                else if (xml.name() == "reverse-related")
+                    reverseRelatedCards << xml.readElementText();
                 else if (xml.name() == "tablerow")
                     tableRow = xml.readElementText().toInt();
                 else if (xml.name() == "cipt")
@@ -498,7 +506,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             }
 
             if (isToken == tokens) {
-                addCard(new CardInfo(this, name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids));
+                addCard(new CardInfo(this, name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids));
             }
         }
     }
@@ -639,6 +647,27 @@ void CardDatabase::loadCustomCardDatabases(const QString &path)
     foreach(QString fileName, dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase))
     {
         loadCardDatabase(dir.absoluteFilePath(fileName), false);
+    }
+}
+
+void CardDatabase::refreshCachedReverseRelatedCards()
+{
+    foreach(CardInfo * card, cards)
+        card->resetReverseRelatedCards2Me();
+
+    foreach(CardInfo * card, cards)
+    {
+        if(card->getReverseRelatedCards().isEmpty())
+            continue;
+
+        QString relatedCardName = card->getName();
+        foreach(QString targetCard, card->getReverseRelatedCards())
+        {
+            if (!cards.contains(targetCard))
+                continue;
+
+            cards.value(targetCard)->addReverseRelatedCards2Me(relatedCardName);
+        }
     }
 }
 

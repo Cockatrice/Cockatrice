@@ -200,6 +200,9 @@ int main(int argc, char *argv[])
         qDebug() << "Could not create " + dataDir + "/customsets folder.";
     }
 
+    // when all the cards have been loaded, resolve the reverse-related tags
+    db->refreshCachedReverseRelatedCards();
+
     if (settingsValid()) {
         qDebug("main(): starting main program");
 
