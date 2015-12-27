@@ -798,6 +798,7 @@ void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
 
     // this will force a database reload
     settingsCache->setCardDatabasePath(settingsCache->getCardDatabasePath());
+    settingsCache->setTokenDatabasePath(settingsCache->getTokenDatabasePath());
 }
 
 void MainWindow::refreshShortcuts()
