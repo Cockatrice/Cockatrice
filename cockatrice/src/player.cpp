@@ -1135,7 +1135,14 @@ void Player::actCreateRelatedCard()
 
     // get the target card name
     QAction *action = static_cast<QAction *>(sender());
-    CardInfo *cardInfo = db->getCard(action->text());
+
+    // removes p/t from tokens (and leading space))
+    QStringList spaces = action->text().split(" ");
+
+    if (spaces.at(0).indexOf("/") != -1) // Strip space from creatures
+        spaces.removeFirst();
+
+    CardInfo *cardInfo = db->getCard(spaces.join(" "));
 
     // create the token for the related card
     Command_CreateToken cmd;
