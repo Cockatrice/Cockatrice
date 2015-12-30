@@ -6,6 +6,7 @@
 
 #include "carditem.h"
 #include "carddatabase.h"
+#include "pictureloader.h"
 #include "main.h"
 
 CardInfoPicture::CardInfoPicture(QWidget *parent)
@@ -40,13 +41,13 @@ void CardInfoPicture::updatePixmap()
 void CardInfoPicture::loadPixmap()
 {
     if(info)
-        info->getPixmap(size(), resizedPixmap);
+        PictureLoader::getPixmap(resizedPixmap, info, size());
     else
         resizedPixmap = QPixmap();
 
 
     if (resizedPixmap.isNull())
-        db->getCard()->getPixmap(size(), resizedPixmap);
+        PictureLoader::getPixmap(resizedPixmap, db->getCard(), size());
 }
 
 void CardInfoPicture::paintEvent(QPaintEvent *)

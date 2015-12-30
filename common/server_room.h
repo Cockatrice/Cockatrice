@@ -42,12 +42,13 @@ private:
     QMap<int, ServerInfo_Game> externalGames;
     QMap<QString, Server_ProtocolHandler *> users;
     QMap<QString, ServerInfo_User_Container> externalUsers;
+    QList<ServerInfo_ChatMessage> chatHistory;
 private slots:
     void broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool sendToIsl = true);
 public:
     mutable QReadWriteLock usersLock;
     mutable QReadWriteLock gamesLock;
-    QList<ServerInfo_ChatMessage> chatHistory;
+    mutable QReadWriteLock historyLock;
     Server_Room(int _id, int _chatHistorySize, const QString &_name, const QString &_description, const QString &_permissionLevel, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent );
     ~Server_Room();
     int getId() const { return id; }
@@ -63,7 +64,7 @@ public:
     const ServerInfo_Room &getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes = false, bool includeExternalData = true) const;
     int getGamesCreatedByUser(const QString &name) const;
     QList<ServerInfo_Game> getGamesOfUser(const QString &name) const;
-    QList<ServerInfo_ChatMessage> getChatHistory() { return chatHistory; }
+    QList<ServerInfo_ChatMessage> & getChatHistory() { return chatHistory; }
     
     void addClient(Server_ProtocolHandler *client);
     void removeClient(Server_ProtocolHandler *client);

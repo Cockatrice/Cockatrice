@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QColor>
+#include <QPixmapCache>
 #include <QLibraryInfo>
 #if QT_VERSION < 0x050000
     #include <QDesktopServices>
@@ -115,6 +116,7 @@ void ThemeManager::themeChangedSlot()
     playerBgBrush = loadBrush(PLAYERZONE_BG_NAME, QColor(200, 200, 200));
     stackBgBrush = loadBrush(STACKZONE_BG_NAME, QColor(113, 43, 43));
 
+    QPixmapCache::clear();
 
     emit themeChanged();
 }

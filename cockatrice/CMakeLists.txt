@@ -96,6 +96,7 @@ SET(cockatrice_SOURCES
     src/qt-json/json.cpp
     src/soundengine.cpp
     src/pending_command.cpp
+    src/pictureloader.cpp
     src/shortcutssettings.cpp
     src/sequenceEdit/sequenceedit.cpp
     src/sequenceEdit/shortcutstab.cpp
@@ -108,10 +109,6 @@ SET(cockatrice_SOURCES
     src/settings/layoutssettings.cpp
     ${VERSION_STRING_CPP}
 )
-
-if (UNIX AND NOT APPLE)
-    set_source_files_properties(src/main.cpp PROPERTIES COMPILE_FLAGS -DTRANSLATION_PATH=\\"${CMAKE_INSTALL_PREFIX}/share/cockatrice/translations\\")
-endif (UNIX AND NOT APPLE)
 
 set(cockatrice_RESOURCES cockatrice.qrc)
 
@@ -281,6 +278,7 @@ if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir cockatrice.app/Contents/Plugins)
     set(qtconf_dest_dir cockatrice.app/Contents/Resources)
+    get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt4: codecs, iconengines, imageformats
     # qt5: audio, iconengines, imageformats, platforms, printsupport

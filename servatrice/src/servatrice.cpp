@@ -176,7 +176,8 @@ bool Servatrice::initServer()
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
     bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
 
-    qDebug() << "Registration enabled: " << regServerOnly;
+    qDebug() << "Accept registered users only: " << regServerOnly;
+    qDebug() << "Registration enabled: " << registrationEnabled;
     if (registrationEnabled)
         qDebug() << "Require email address to register: " << requireEmailForRegistration;
 

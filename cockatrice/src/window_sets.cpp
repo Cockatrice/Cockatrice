@@ -1,6 +1,8 @@
 #include "window_sets.h"
 #include "setsmodel.h"
+#include "pictureloader.h"
 #include "main.h"
+
 #include <QTreeView>
 #include <QGridLayout>
 #include <QHeaderView>
@@ -123,7 +125,7 @@ WndSets::~WndSets()
 void WndSets::actSave()
 {
     model->save(db);
-    db->clearPixmapCache();
+    PictureLoader::clearPixmapCache();
     QMessageBox::information(this, tr("Success"), tr("The sets database has been saved successfully."));
     close();
 }

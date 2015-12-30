@@ -236,7 +236,6 @@ void Server_Room::say(const QString &userName, const QString &s, bool sendToIsl)
     sendRoomEvent(prepareRoomEvent(event), sendToIsl);
  
     if (chatHistorySize != 0) {
-
         ServerInfo_ChatMessage chatMessage;
         QDateTime dateTime = dateTime.currentDateTimeUtc();
         QString dateTimeString = dateTime.toString();
@@ -244,10 +243,12 @@ void Server_Room::say(const QString &userName, const QString &s, bool sendToIsl)
         chatMessage.set_sender_name(userName.toStdString());
         chatMessage.set_message(s.simplified().toStdString());
 
+        historyLock.lockForWrite();
         if (chatHistory.size() >= chatHistorySize)
             chatHistory.removeAt(0);
 
         chatHistory << chatMessage;
+        historyLock.unlock();
     }
 
 }
