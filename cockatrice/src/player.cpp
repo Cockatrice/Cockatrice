@@ -1135,7 +1135,12 @@ void Player::actCreateRelatedCard()
 
     // get the target card name
     QAction *action = static_cast<QAction *>(sender());
-    CardInfo *cardInfo = db->getCard(action->text());
+
+    // removes p/t from tokens (and leading space))
+    QStringList spaces = action->text().split(" ");
+    if (spaces.at(0).indexOf("/") != -1) // Strip space from creatures
+        spaces.removeFirst();
+    CardInfo *cardInfo = db->getCard(spaces.join(" "));
     
     // get the target token's location
     // TODO: Define this QPoint into its own function along with the one below
