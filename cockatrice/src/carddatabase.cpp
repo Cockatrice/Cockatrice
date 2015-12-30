@@ -660,7 +660,12 @@ void CardDatabase::refreshCachedReverseRelatedCards()
         if(card->getReverseRelatedCards().isEmpty())
             continue;
 
-        QString relatedCardName = card->getName();
+        QString relatedCardName;
+        if (card->getPowTough().size() > 0)
+            relatedCardName = card->getPowTough() + " " + card->getName(); // "n/n name"
+        else
+            relatedCardName = card->getName(); // "name"
+
         foreach(QString targetCard, card->getReverseRelatedCards())
         {
             if (!cards.contains(targetCard))
