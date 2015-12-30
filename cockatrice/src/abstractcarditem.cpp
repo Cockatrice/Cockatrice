@@ -9,6 +9,7 @@
 #include "carddatabase.h"
 #include "cardinfowidget.h"
 #include "abstractcarditem.h"
+#include "pictureloader.h"
 #include "settingscache.h"
 #include "main.h"
 #include "gamescene.h"
@@ -93,7 +94,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     QPixmap translatedPixmap;
     // don't even spend time trying to load the picture if our size is too small
     if(translatedSize.width() > 10)
-        imageSource->getPixmap(translatedSize.toSize(), translatedPixmap);        
+        PictureLoader::getPixmap(translatedPixmap, imageSource, translatedSize.toSize());        
 
     painter->save();
     QColor bgColor = Qt::transparent;

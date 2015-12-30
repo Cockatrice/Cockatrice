@@ -19,6 +19,10 @@ if(POLICY CMP0048)
     cmake_policy(SET CMP0048 OLD)
 endif()
 
+if(POLICY CMP0064)
+    cmake_policy(SET CMP0064 OLD)
+endif()
+
 set(PROJECT_NAME "Cockatrice")
 
 # Default to "Release" build type
@@ -71,7 +75,7 @@ endif()
 IF(MSVC)
 	# Visual Studio:
 	# Maximum optimization
-    set(CMAKE_CXX_FLAGS_RELEASE "/Ox")
+    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
 	# Generate complete debugging information
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
@@ -104,7 +108,7 @@ ENDIF()
 # Default is Qt5 unless WITH_QT4 option is enabled
 option(WITH_QT4 "Force the use of Qt4 libraries" OFF)
 OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
-MESSAGE("UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
+MESSAGE(STATUS "UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
 
 IF(NOT WITH_QT4)
     # First known not-broken Qt5 version (5.0.2 available on old ubuntus is buggy).
@@ -174,11 +178,6 @@ set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 
-# Create a version string suitable for file names
-string(REPLACE " " "_" PROJECT_VERSION_SAFE "${PROJECT_VERSION}")
-string(REPLACE "(" "" PROJECT_VERSION_SAFE "${PROJECT_VERSION_SAFE}")
-string(REPLACE ")" "" PROJECT_VERSION_SAFE "${PROJECT_VERSION_SAFE}")
-
 if(UNIX)
     if(APPLE)
         set(CPACK_GENERATOR DragNDrop ${CPACK_GENERATOR})
@@ -186,18 +185,22 @@ if(UNIX)
         set(CPACK_DMG_FORMAT "UDBZ")
         set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
         set(CPACK_SYSTEM_NAME "OSX")
-        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-osx_git-${PROJECT_VERSION_SAFE}")
+        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
         set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/cockatrice/resources/appicon.icns")
     else()
         # linux
         set(CPACK_GENERATOR DEB ${CPACK_GENERATOR})
-        set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}/${PROJECT_VERSION_SAFE}")
-        set(CPACK_STRIP_FILES "bin/${PROJECT_NAME}")
-        set(CPACK_SOURCE_STRIP_FILES "")
+        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
+    	set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    	set(CPACK_DEBIAN_PACKAGE_SECTION "games")
+    	set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
+        IF(Qt5Widgets_FOUND)
+            set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins")
+        ENDIF()
     endif()
 elseif(WIN32)
     set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
-    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_win32_git-${PROJECT_VERSION_SAFE}")
+    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
 
     # Configure file with custom definitions for NSIS.
     configure_file(
@@ -205,6 +208,12 @@ elseif(WIN32)
         ${PROJECT_BINARY_DIR}/NSIS.definitions.nsh
     )
 endif()
+
+# Configure file with build deployment data for travis
+configure_file(
+    ${CMAKE_MODULE_PATH}/bintray_deploy.json.in
+    ${PROJECT_BINARY_DIR}/bintray_deploy.json
+)
 
 include(CPack)
 
@@ -230,4 +239,11 @@ option(WITH_ORACLE "build oracle" ON)
 if(WITH_ORACLE)
     add_subdirectory(oracle)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "release/oracle.app;oracle;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+endif()
+
+# Compile tests (default off)
+option(TEST "build tests" OFF)
+if(TEST)
+    include(CTest)
+    add_subdirectory(tests)
 endif()

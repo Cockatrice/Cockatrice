@@ -12,6 +12,7 @@ SET(oracle_SOURCES
     src/oraclewizard.cpp
     src/oracleimporter.cpp
     ../cockatrice/src/carddatabase.cpp
+    ../cockatrice/src/pictureloader.cpp
     ../cockatrice/src/settingscache.cpp
     ../cockatrice/src/shortcutssettings.cpp
     ../cockatrice/src/settings/carddatabasesettings.cpp
@@ -23,10 +24,6 @@ SET(oracle_SOURCES
     ../cockatrice/src/thememanager.cpp 
     ../cockatrice/src/qt-json/json.cpp
  )
-
-if (UNIX AND NOT APPLE)
-    set_source_files_properties(src/main.cpp PROPERTIES COMPILE_FLAGS -DTRANSLATION_PATH=\\"${CMAKE_INSTALL_PREFIX}/share/oracle/translations\\")
-endif (UNIX AND NOT APPLE)
 
 set(oracle_RESOURCES oracle.qrc)
 
@@ -185,6 +182,7 @@ if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir oracle.app/Contents/Plugins)
     set(qtconf_dest_dir oracle.app/Contents/Resources)
+    get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt4: codecs, iconengines, imageformats
     # qt5: iconengines, platforms
@@ -214,10 +212,13 @@ IF(WIN32)
     set(qtconf_dest_dir .)
     list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
     IF(ZLIB_FOUND)
+        # look for dll in the bin/ directory (gnuwin32 package)
         get_filename_component(ZLIB_DLL_DIR "${ZLIB_INCLUDE_DIRS}/../bin/" REALPATH)
         list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
+        # look for dll in the lib/ directory (nuget package)
+        get_filename_component(ZLIB_DLL_DIR "${ZLIB_LIBRARY}" DIRECTORY)
+        list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
     ENDIF()
-    MESSAGE(STATUS "Oracle: ZLIB dll found at ${ZLIB_DLL_DIR}")
 
     # qt4: codecs, iconengines, imageformats
     # qt5: iconengines, imageformats, platforms

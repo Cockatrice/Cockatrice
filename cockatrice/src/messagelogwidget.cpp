@@ -190,8 +190,15 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
 
 void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 {
+    QString coinOptions[2] = {tr("Heads (1)"), tr("Tails (2)")};
     soundEngine->playSound("roll_dice");
-    if (isFemale(player))
+
+    if (sides == 2)
+        if (isFemale(player))
+            appendHtmlServerMessage(tr("%1 flipped a coin. It landed as %2.", "female").arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + coinOptions[roll - 1] + "</font>"));
+        else
+            appendHtmlServerMessage(tr("%1 flipped a coin. It landed as %2.", "male").arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + coinOptions[roll - 1] + "</font>"));
+    else if (isFemale(player))
         appendHtmlServerMessage(tr("%1 rolls a %2 with a %3-sided die.", "female").arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + QString::number(roll) + "</font>").arg("<font color=\"blue\">" + QString::number(sides) + "</font>"));
     else
         appendHtmlServerMessage(tr("%1 rolls a %2 with a %3-sided die.", "male").arg(sanitizeHtml(player->getName())).arg("<font color=\"blue\">" + QString::number(roll) + "</font>").arg("<font color=\"blue\">" + QString::number(sides) + "</font>"));

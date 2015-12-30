@@ -83,6 +83,28 @@ endif()
 
 SET(QT_DONT_USE_QTGUI TRUE)
 
+# Mysql connector
+if(UNIX)
+    if(APPLE)
+        SET(MYSQLCLIENT_DEFAULT_PATHS "/usr/local/lib" "/opt/local/lib/mysql55/mysql/" "/opt/local/lib/mysql56/mysql/")
+    else()
+        SET(MYSQLCLIENT_DEFAULT_PATHS "/usr/lib" "/usr/local/lib")
+    endif()
+elseif(WIN32)
+    SET(MYSQLCLIENT_DEFAULT_PATHS "C:\\Program Files\\MySQL\\MySQL Server 5.5\\lib" "C:\\Program Files\\MySQL\\MySQL Server 5.6\\lib")
+endif()
+
+find_library(MYSQLCLIENT_LIBRARIES NAMES mysqlclient PATHS ${MYSQLCLIENT_DEFAULT_PATHS} PATH_SUFFIXES mysql mariadb)
+if(${MYSQLCLIENT_LIBRARIES} MATCHES "NOTFOUND")
+  set(MYSQLCLIENT_FOUND FALSE CACHE INTERNAL "")
+  MESSAGE(STATUS "Mysql connector NOT FOUND: servatrice won't be able to connect to a mysql server")
+  unset(MYSQLCLIENT_LIBRARIES)
+else()
+  set(MYSQLCLIENT_FOUND TRUE CACHE INTERNAL "")
+  get_filename_component(MYSQLCLIENT_LIBRARY_DIR ${MYSQLCLIENT_LIBRARIES} PATH)
+  MESSAGE(STATUS "Mysql connector found at: ${MYSQLCLIENT_LIBRARY_DIR}")
+endif()
+
 # Declare path variables
 set(ICONDIR share/icons CACHE STRING "icon dir")
 set(DESKTOPDIR share/applications CACHE STRING "desktop file destination")
@@ -146,12 +168,13 @@ if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir servatrice.app/Contents/Plugins)
     set(qtconf_dest_dir servatrice.app/Contents/Resources)
+    get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt4: codecs, sqldrivers
     # qt5: platforms, sqldrivers
 
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(codecs|platforms|sqldrivers)/.*\\.dylib"
+        FILES_MATCHING REGEX "(codecs/.*|platforms/.*|sqldrivers/libqsqlmysql)\\.dylib"
         REGEX ".*_debug\\.dylib" EXCLUDE)
 
     install(CODE "
@@ -165,7 +188,7 @@ Translations = Resources/translations\")
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
     set(BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
     " COMPONENT Runtime)
 endif()
 
@@ -178,7 +201,8 @@ if(WIN32)
     # qt5: platforms, sqldrivers
 
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(codecs|platforms|sqldrivers)/.*[^d]\\.dll")
+        FILES_MATCHING REGEX "(codecs/.*|platforms/.*|sqldrivers/libqsqlmysql)\\.dll"
+        REGEX ".*d\\.dll" EXCLUDE)
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
@@ -191,7 +215,7 @@ Translations = Resources/translations\")
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
     set(BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
     " COMPONENT Runtime)
 endif()
 #Compile a portable version, default off

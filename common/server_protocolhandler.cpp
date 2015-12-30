@@ -387,7 +387,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QString clientId = QString::fromStdString(cmd.clientid()).simplified();
     QString clientVersion = QString::fromStdString(cmd.clientver()).simplified();
 
-    if (userName.isEmpty() || (userInfo != 0))
+    if (userInfo != 0)
         return Response::RespContextError;
 
     FeatureSet features;
@@ -611,8 +611,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     joinMessageEvent.set_message_type(Event_RoomSay::Welcome);
     rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, r->prepareRoomEvent(joinMessageEvent));
 
-    ServerInfo_ChatMessage chatMessage; for (int i = 0; i < r->chatHistory.size(); ++i) {
-        chatMessage = r->chatHistory.at(i);
+    QReadLocker chatHistoryLocker(&r->historyLock);
+    QList<ServerInfo_ChatMessage> chatHistory = r->getChatHistory();
+    ServerInfo_ChatMessage chatMessage;
+    for (int i = 0; i < chatHistory.size(); ++i) {
+        chatMessage = chatHistory.at(i);
         qDebug() << QString::fromStdString(chatMessage.message()).simplified();
         Event_RoomSay roomChatHistory;
         roomChatHistory.set_message(chatMessage.sender_name() + ": " + chatMessage.message());

@@ -54,11 +54,7 @@ QSystemTrayIcon *trayIcon;
 ThemeManager *themeManager;
 
 const QString translationPrefix = "cockatrice";
-#ifdef TRANSLATION_PATH
-QString translationPath = TRANSLATION_PATH;
-#else
-QString translationPath = QString();
-#endif
+QString translationPath;
 
 #if QT_VERSION < 0x050000
 static void myMessageOutput(QtMsgType /*type*/, const char *msg)
@@ -136,13 +132,17 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("cockatrice.de");
     QCoreApplication::setApplicationName("Cockatrice");
 
-    if (translationPath.isEmpty()) {
 #ifdef Q_OS_MAC
-        translationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
-#elif defined(Q_OS_WIN)
-        translationPath = app.applicationDirPath() + "/translations";
+    qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
-    }
+
+#ifdef Q_OS_MAC
+    translationPath = qApp->applicationDirPath() + "/../Resources/translations";
+#elif defined(Q_OS_WIN)
+    translationPath = qApp->applicationDirPath() + "/translations";
+#else // linux
+    translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
+#endif
 
     rng = new RNG_SFMT;
     settingsCache = new SettingsCache;
@@ -200,6 +200,9 @@ int main(int argc, char *argv[])
         qDebug() << "Could not create " + dataDir + "/customsets folder.";
     }
 
+    // when all the cards have been loaded, resolve the reverse-related tags
+    db->refreshCachedReverseRelatedCards();
+
     if (settingsValid()) {
         qDebug("main(): starting main program");
 
@@ -212,7 +215,9 @@ int main(int argc, char *argv[])
 
         ui.show();
         qDebug("main(): ui.show() finished");
-
+#if QT_VERSION > 0x050000
+        app.setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
         app.exec();
     }
 

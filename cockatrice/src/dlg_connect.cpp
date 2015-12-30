@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QMessageBox>
 #include <iostream>
 #include "dlg_connect.h"
 #include "settingscache.h"
@@ -148,6 +149,12 @@ void DlgConnect::actOk()
     
     settingsCache->servers().setPreviousHostList(hostList);
     settingsCache->servers().setPrevioushostindex(previousHosts->currentIndex());
+
+    if(playernameEdit->text().isEmpty())
+    {
+        QMessageBox::critical(this, tr("Connect Warning"), tr("The player name can't be empty."));
+        return;
+    }
 
     accept();
 }

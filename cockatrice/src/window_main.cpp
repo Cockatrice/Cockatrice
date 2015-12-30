@@ -485,6 +485,7 @@ void MainWindow::retranslateUi()
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
     aSettings->setText(tr("&Settings..."));
+    aSettings->setIcon(QPixmap("theme:icons/settings"));
     aExit->setText(tr("&Exit"));
 
 #if defined(__APPLE__)  /* For OSX */
@@ -797,6 +798,7 @@ void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
 
     // this will force a database reload
     settingsCache->setCardDatabasePath(settingsCache->getCardDatabasePath());
+    settingsCache->setTokenDatabasePath(settingsCache->getTokenDatabasePath());
 }
 
 void MainWindow::refreshShortcuts()
