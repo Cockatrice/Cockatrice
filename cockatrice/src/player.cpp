@@ -1138,6 +1138,7 @@ void Player::actCreateRelatedCard()
     CardInfo *cardInfo = db->getCard(action->text());
     
     // get the target token's location
+    // TODO: Define this QPoint into its own function along with the one below
     QPoint gridPoint = QPoint(-1, table->clampValidTableRow(2 - cardInfo->getTableRow()));
 
     // create the token for the related card
