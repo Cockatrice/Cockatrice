@@ -1136,6 +1136,9 @@ void Player::actCreateRelatedCard()
     // get the target card name
     QAction *action = static_cast<QAction *>(sender());
     CardInfo *cardInfo = db->getCard(action->text());
+    
+    // get the target token's location
+    QPoint gridPoint = QPoint(-1, table->clampValidTableRow(2 - cardInfo->getTableRow()));
 
     // create the token for the related card
     Command_CreateToken cmd;
@@ -1146,6 +1149,9 @@ void Player::actCreateRelatedCard()
     cmd.set_annotation(settingsCache->getAnnotateTokens() ? cardInfo->getText().toStdString() : QString().toStdString());
     cmd.set_destroy_on_zone_change(true);
     cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
+    cmd.set_x(gridPoint.x());
+    cmd.set_y(gridPoint.y());
+
     if(!cardInfo->getIsToken())
         cmd.set_target_card_id(sourceCard->getId());
 
