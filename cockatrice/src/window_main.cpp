@@ -54,6 +54,7 @@
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_shutdown.pb.h"
 
+#define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
 #define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#cockatrice"
 #define GITHUB_TRANSLATOR_RECOGNIZE_URL "https://github.com/Cockatrice/Cockatrice/wiki/Translators"
@@ -273,6 +274,7 @@ void MainWindow::actAbout()
     QMessageBox::about(this, tr("About Cockatrice"), QString(
         "<font size=\"8\"><b>Cockatrice</b></font><br>"
         + tr("Version %1").arg(VERSION_STRING)
+        + "<br><br><b><a href='" + GITHUB_PAGES_URL + "'>" + tr("Cockatrice Webpage") + "</a></b><br>"
         + "<br><br><b>" + tr("Project Manager:") + "</b><br>Gavin Bisesi<br><br>"
         + "<b>" + tr("Past Project Managers:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
         + "<b>" + tr("Developers:") + "</b><br>"
