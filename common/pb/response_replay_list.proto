@@ -1,4 +1,3 @@
-syntax = "proto2";
 import "response.proto";
 import "serverinfo_replay_match.proto";
 

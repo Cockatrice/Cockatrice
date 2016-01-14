@@ -1,4 +1,3 @@
-syntax = "proto2";
 message ServerInfo_User {
     enum UserLevelFlag {
         IsNothing = 0;

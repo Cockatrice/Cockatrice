@@ -1,4 +1,3 @@
-syntax = "proto2";
 import "game_event_context.proto";
 
 message Context_Concede {
