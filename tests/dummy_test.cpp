@@ -8,8 +8,7 @@ namespace {
 
     };
 
-    class MockTabSupervisor : TabSupervisor {
-
+    class MockTabSupervisor : public TabSupervisor {
         public:
         MockTabSupervisor(
                 AbstractClient *_client = nullptr,
@@ -23,7 +22,7 @@ namespace {
     TEST(ChatViewTest, HandlesUrlTag) {
         bool showTimestamps = true;
         auto const *tabSupervisor = new MockTabSupervisor();
-        auto chatView = ChatView(tabSupervisor, nullptr, showTimestamps);
+        auto chatView = new ChatView(tabSupervisor, nullptr, showTimestamps);
         // TODO Add some chat messages with [tags] and make sure the result has links in it.
     }
 }
