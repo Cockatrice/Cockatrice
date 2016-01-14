@@ -1,4 +1,3 @@
-syntax = "proto2";
 import "serverinfo_replay.proto";
 
 message ServerInfo_ReplayMatch {

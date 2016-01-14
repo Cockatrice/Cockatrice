@@ -1,4 +1,3 @@
-syntax = "proto2";
 import "serverinfo_game.proto";
 import "game_event_container.proto";
 

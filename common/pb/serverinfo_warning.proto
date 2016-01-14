@@ -1,4 +1,3 @@
-syntax = "proto2";
 /*
  * Historical warning information stored in the warnings table
  */

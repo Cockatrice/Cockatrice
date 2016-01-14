@@ -1,4 +1,3 @@
-syntax = "proto2";
 message color {
     optional uint32 r = 1;
     optional uint32 g = 2;

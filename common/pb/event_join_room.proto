@@ -1,4 +1,3 @@
-syntax = "proto2";
 import "room_event.proto";
 import "serverinfo_user.proto";
 
