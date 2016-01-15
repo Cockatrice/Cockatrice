@@ -157,8 +157,7 @@ void SetList::guessSortKeys()
     }
 }
 
-CardInfo::CardInfo(CardDatabase *_db,
-                   const QString &_name,
+CardInfo::CardInfo(const QString &_name,
                    bool _isToken,
                    const QString &_manacost,
                    const QString &_cmc,
@@ -176,8 +175,7 @@ CardInfo::CardInfo(CardDatabase *_db,
                    const QStringMap &_customPicURLs,
                    MuidMap _muIds
                    )
-    : db(_db),
-      name(_name),
+    : name(_name),
       isToken(_isToken),
       sets(_sets),
       manacost(_manacost),
@@ -188,6 +186,7 @@ CardInfo::CardInfo(CardDatabase *_db,
       colors(_colors),
       relatedCards(_relatedCards),
       reverseRelatedCards(_reverseRelatedCards),
+      setsNames(),
       upsideDownArt(_upsideDownArt),
       loyalty(_loyalty),
       customPicURLs(_customPicURLs),
@@ -200,6 +199,8 @@ CardInfo::CardInfo(CardDatabase *_db,
 
     for (int i = 0; i < sets.size(); i++)
         sets[i]->append(this);
+
+    refreshCachedSetNames();
 }
 
 CardInfo::~CardInfo()
@@ -249,6 +250,21 @@ void CardInfo::addToSet(CardSet *set)
 {
     set->append(this);
     sets << set;
+
+    refreshCachedSetNames();
+}
+
+void CardInfo::refreshCachedSetNames()
+{
+    // update the cached list of set names
+    QStringList setList;
+    for (int i = 0; i < sets.size(); i++)
+    {
+        if(sets[i]->getEnabled())
+            setList << sets[i]->getShortName();
+    }
+    setsNames = setList.join(", ");
+
 }
 
 QString CardInfo::simplifyName(const QString &name) {
@@ -330,10 +346,7 @@ CardDatabase::CardDatabase(QObject *parent)
     connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabase()));
     connect(settingsCache, SIGNAL(tokenDatabasePathChanged()), this, SLOT(loadTokenDatabase()));
 
-    loadCardDatabase();
-    loadTokenDatabase();
-
-    noCard = new CardInfo(this);
+    noCard = new CardInfo();
 }
 
 CardDatabase::~CardDatabase()
@@ -506,7 +519,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
             }
 
             if (isToken == tokens) {
-                addCard(new CardInfo(this, name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids));
+                addCard(new CardInfo(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids));
             }
         }
     }
@@ -517,7 +530,7 @@ CardInfo *CardDatabase::getCardFromMap(CardNameMap &cardMap, const QString &card
         return cardMap.value(cardName);
     
     if (createIfNotFound) {
-        CardInfo *newCard = new CardInfo(this, cardName, true);
+        CardInfo *newCard = new CardInfo(cardName, true);
         newCard->addToSet(getSet(CardDatabase::TOKENS_SETNAME));
         cardMap.insert(cardName, newCard);
         return newCard;
@@ -619,23 +632,22 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
         emit cardListChanged();
     }
 
-    if (!tokens) {
+    if (!tokens)
         loadStatus = tempLoadStatus;
-        qDebug() << "loadCardDatabase(): Path = " << path << " Status = " << loadStatus;
-    }
 
+    qDebug() << "loadCardDatabase(): Path =" << path << "Tokens =" << tokens << "Status =" << loadStatus;
 
     return tempLoadStatus;
 }
 
-void CardDatabase::loadCardDatabase()
+LoadStatus CardDatabase::loadCardDatabase()
 {
-    loadCardDatabase(settingsCache->getCardDatabasePath(), false);
+    return loadCardDatabase(settingsCache->getCardDatabasePath(), false);
 }
 
-void CardDatabase::loadTokenDatabase()
+LoadStatus CardDatabase::loadTokenDatabase()
 {
-    loadCardDatabase(settingsCache->getTokenDatabasePath(), true);
+    return loadCardDatabase(settingsCache->getTokenDatabasePath(), true);
 }
 
 void CardDatabase::loadCustomCardDatabases(const QString &path)
