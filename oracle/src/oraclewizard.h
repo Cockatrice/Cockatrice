@@ -80,6 +80,7 @@ protected:
      void initializePage();
      bool validatePage();
      void readSetsFromByteArray(QByteArray data);
+     void downloadSetsFile(QUrl url);
 private:
      QRadioButton *urlRadioButton;
      QRadioButton *fileRadioButton;
@@ -128,6 +129,7 @@ public:
 protected:
      void initializePage();
      bool validatePage();
+     void downloadTokensFile(QUrl url);
 private:
      QLabel *urlLabel;
      QLineEdit *urlLineEdit;
