@@ -30,13 +30,13 @@
 #include "settingscache.h"
 
 #define ZIP_SIGNATURE "PK"
-#define ALLSETS_URL_FALLBACK "http://mtgjson.com/json/AllSets.json"
+#define ALLSETS_URL_FALLBACK "https://mtgjson.com/json/AllSets.json"
 
 #ifdef HAS_ZLIB
     #include "zip/unzip.h"
-    #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json.zip"
+    #define ALLSETS_URL "https://mtgjson.com/json/AllSets.json.zip"
 #else
-    #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json"
+    #define ALLSETS_URL "https://mtgjson.com/json/AllSets.json"
 #endif
 
 #define TOKENS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml"
