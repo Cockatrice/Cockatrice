@@ -58,7 +58,8 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
     painter.fillPath(path, Qt::black);
     
     const QColor barColor = QColor::fromHsv(120, 255, 255, 100);
-    painter.fillRect(0, 0, (width() - 1) * currentTime / maxTime, height() - 1, barColor);
+    quint64 w = (quint64)(width() - 1) * (quint64) currentTime / maxTime;
+    painter.fillRect(0, 0, w, height() - 1, barColor);
 }
 
 QSize ReplayTimelineWidget::sizeHint() const
