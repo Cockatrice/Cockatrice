@@ -2,9 +2,15 @@
 
 ---
 
-**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Get Involved] (#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [License](#license-)
+**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads) | [Get Involved] (#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [License](#license-)
 
 ---
+
+<br><pre>
+<b>If you're getting started &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
+<b>If you're trying to get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues/new)</b>
+</pre><br>
+
 
 # Cockatrice
 
@@ -13,12 +19,15 @@ such as Magic: The Gathering, over a network. It is fully client-server based
 to prevent any kind of cheating, though it supports single-player games without
 a network interface as well. Both client and server are written in Qt, supporting both Qt4 and Qt5.<br>
 
-# Downloads
-We offer a download for both the last stable version (recommended for users) and the last development version. The development version contains the last implemented features, but can be unstable and unsuitable for gaming.
-Downloads are hosted on [BinTray](https://bintray.com/).
 
-- Latest stable version download: [ ![Download](https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice/images/download.svg) ](https://bintray.com/cockatrice/Cockatrice/Cockatrice/_latestVersion)
-- Latest development (unstable) version download: [ ![Download](https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice-git/images/download.svg) ](https://bintray.com/cockatrice/Cockatrice/Cockatrice-git/_latestVersion)
+# Downloads
+
+We offer a download for all full releases and the latest development version (recommended). Full releases are checkpoints with major feature or UI enhancements between them, but are infrequently updated. The development version contains the most recently added features and bugfixes, but can be more unstable. Downloads for development versions are updated automatically with every change.
+Downloads are hosted on [BinTray](https://bintray.com/cockatrice/Cockatrice).
+
+- Latest development version (recommended): [ ![Download](https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice-git/images/download.svg) ](https://bintray.com/cockatrice/Cockatrice/Cockatrice-git/_latestVersion#files)
+- Latest full release: [ ![Download](https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice/images/download.svg) ](https://bintray.com/cockatrice/Cockatrice/Cockatrice/_latestVersion#files)
+
 
 # Get Involved [![Gitter chat](https://badges.gitter.im/Cockatrice/Cockatrice.png)](https://gitter.im/Cockatrice/Cockatrice)
 
@@ -26,21 +35,20 @@ Chat with the Cockatrice developers on Gitter. Come here to talk about the appli
 
 
 # Community Resources
+- [Cockatrice Official Site](https://cockatrice.github.io)
 - [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
-- [reddit r/Cockatrice](http://reddit.com/r/cockatrice)
-- [Woogerworks](http://www.woogerworks.com) / [Chickatrice] (http://www.chickatrice.net/) / [Poixen](http://www.poixen.com/) (incomplete Serverlist)<br>
+- [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
 
 # Translation Status [![Cockatrice on Transiflex](https://ds0k0en9abmn1.cloudfront.net/static/charts/images/tx-logo-micro.646b0065fce6.png)](https://www.transifex.com/projects/p/cockatrice/)
 
-Cockatrice uses Transifex for translations. You can help us bring Cockatrice/Oracle to your language or edit single wordings by clicking on the associated charts below.<br>
-Our [project page](https://www.transifex.com/projects/p/cockatrice/) offers a detailed overview for contributors.
+Cockatrice uses Transifex for translations. You can help us bring Cockatrice and Oracle to your language or just edit single wordings right from within your browser by simply visiting our [Transifex project page](https://www.transifex.com/projects/p/cockatrice/).<br>
 
-Language statistics for `Cockatrice` *(on the left)* and `Oracle` *(on the right)*:
+| Cockatrice | Oracle |
+|:-:|:-:|
+| [![Cockatrice Translation Status](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/) | [![Oracle Translation Status](https://www.transifex.com/projects/p/cockatrice/resource/oracle/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/) |
 
-[![Cockatrice translations](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice/)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Oracle translations](https://www.transifex.com/projects/p/cockatrice/resource/oracle/chart/image_png)](https://www.transifex.com/projects/p/cockatrice/resource/oracle/)
-
-Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information!<br>
+Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 
 
 # Building [![Travis Build Status - master](https://travis-ci.org/Cockatrice/Cockatrice.svg?branch=master)](https://travis-ci.org/Cockatrice/Cockatrice) [![Appveyor Build Status - master](https://ci.appveyor.com/api/projects/status/lp5h0dhk4mhmeps7/branch/master?svg=true)](https://ci.appveyor.com/project/Daenyth/cockatrice/branch/master)
@@ -48,15 +56,15 @@ Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Tra
 **Detailed compiling instructions are on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 
 Dependencies:
-- [Qt](http://qt-project.org/) 
-- [protobuf](http://code.google.com/p/protobuf/)
-- [CMake](http://www.cmake.org/)
+- [Qt](https://www.qt.io/developers/) 
+- [protobuf](https://github.com/google/protobuf)
+- [CMake](https://www.cmake.org/)
 
 Oracle can optionally use zlib to load zipped files:
-- [zlib](http://www.zlib.net/)
+- [zlib](http://www.zlib.net/) (no https!)
 
 The server requires an additional dependency when compiled under Qt4:
-- [libgcrypt](http://www.gnu.org/software/libgcrypt/)
+- [libgcrypt](https://www.gnu.org/software/libgcrypt/)
 
 
 To compile:
@@ -99,7 +107,7 @@ The following flags can be passed to `cmake`:
 `servatrice` is the server<br>
 
 
-# License [![GPLv2 License](https://img.shields.io/badge/license-GPLv2-blue.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING)
+# License [![GPLv2 License](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING)
 
 Cockatrice is free software, licensed under the [GPLv2](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING).
 

@@ -1,4 +1,3 @@
-syntax = "proto2";
 import "color.proto";
 
 message ServerInfo_Counter {

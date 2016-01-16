@@ -1,4 +1,3 @@
-syntax = "proto2";
 message SessionEvent {
     enum SessionEventType {
         SERVER_IDENTIFICATION = 500;

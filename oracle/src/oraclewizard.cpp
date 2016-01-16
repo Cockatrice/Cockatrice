@@ -30,13 +30,13 @@
 #include "settingscache.h"
 
 #define ZIP_SIGNATURE "PK"
-#define ALLSETS_URL_FALLBACK "http://mtgjson.com/json/AllSets.json"
+#define ALLSETS_URL_FALLBACK "https://mtgjson.com/json/AllSets.json"
 
 #ifdef HAS_ZLIB
     #include "zip/unzip.h"
-    #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json.zip"
+    #define ALLSETS_URL "https://mtgjson.com/json/AllSets.json.zip"
 #else
-    #define ALLSETS_URL "http://mtgjson.com/json/AllSets.json"
+    #define ALLSETS_URL "https://mtgjson.com/json/AllSets.json"
 #endif
 
 #define TOKENS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml"
@@ -292,13 +292,7 @@ bool LoadSetsPage::validatePage()
         wizard()->disableButtons();
         setEnabled(false);
 
-        if(!nam)
-            nam = new QNetworkAccessManager(this);
-        QNetworkReply *reply = nam->get(QNetworkRequest(url));
- 
-        connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSetsFile()));
-        connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(actDownloadProgressSetsFile(qint64, qint64)));
-
+        downloadSetsFile(url);
     } else if(fileRadioButton->isChecked()) {
         QFile setsFile(fileLineEdit->text());
         if(!setsFile.exists())
@@ -321,6 +315,16 @@ bool LoadSetsPage::validatePage()
     return false;
 }
 
+void LoadSetsPage::downloadSetsFile(QUrl url)
+{
+    if(!nam)
+        nam = new QNetworkAccessManager(this);
+    QNetworkReply *reply = nam->get(QNetworkRequest(url));
+
+    connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSetsFile()));
+    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(actDownloadProgressSetsFile(qint64, qint64)));
+}
+
 void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
 {
     if(total > 0)
@@ -333,9 +337,6 @@ void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
 
 void LoadSetsPage::actDownloadFinishedSetsFile()
 {
-    progressLabel->hide();
-    progressBar->hide();
-
     // check for a reply
     QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError errorCode = reply->error();
@@ -348,6 +349,18 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
         reply->deleteLater();
         return;
     }
+
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (statusCode == 301 || statusCode == 302) {
+        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        qDebug() << "following redirect url:" << redirectUrl.toString();
+        downloadSetsFile(redirectUrl);
+        reply->deleteLater();
+        return;
+    }
+
+    progressLabel->hide();
+    progressBar->hide();
 
     // save allsets.json url, but only if the user customized it and download was successfull
     if(urlLineEdit->text() != QString(ALLSETS_URL))
@@ -641,14 +654,18 @@ bool LoadTokensPage::validatePage()
     wizard()->disableButtons();
     setEnabled(false);
 
+    downloadTokensFile(url);
+    return false;
+}
+
+void LoadTokensPage::downloadTokensFile(QUrl url)
+{
     if(!nam)
         nam = new QNetworkAccessManager(this);
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
 
     connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedTokensFile()));
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(actDownloadProgressTokensFile(qint64, qint64)));
-
-    return false;
 }
 
 void LoadTokensPage::actDownloadProgressTokensFile(qint64 received, qint64 total)
@@ -663,9 +680,6 @@ void LoadTokensPage::actDownloadProgressTokensFile(qint64 received, qint64 total
 
 void LoadTokensPage::actDownloadFinishedTokensFile()
 {
-    progressLabel->hide();
-    progressBar->hide();
-
     // check for a reply
     QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError errorCode = reply->error();
@@ -678,6 +692,18 @@ void LoadTokensPage::actDownloadFinishedTokensFile()
         reply->deleteLater();
         return;
     }
+
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (statusCode == 301 || statusCode == 302) {
+        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        qDebug() << "following redirect url:" << redirectUrl.toString();
+        downloadTokensFile(redirectUrl);
+        reply->deleteLater();
+        return;
+    }
+
+    progressLabel->hide();
+    progressBar->hide();
 
     // save tokens.xml url, but only if the user customized it and download was successfull
     if(urlLineEdit->text() != QString(TOKENS_URL))

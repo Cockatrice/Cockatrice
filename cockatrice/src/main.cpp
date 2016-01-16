@@ -163,12 +163,15 @@ int main(int argc, char *argv[])
 #else
     const QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
-    
-    if (!db->getLoadSuccess())
-        if (!db->loadCardDatabase(dataDir + "/cards.xml"))
-            settingsCache->setCardDatabasePath(dataDir + "/cards.xml");
-    if (settingsCache->getTokenDatabasePath().isEmpty())
+
+    if (settingsCache->getCardDatabasePath().isEmpty() ||
+        db->loadCardDatabase() != Ok)
+        settingsCache->setCardDatabasePath(dataDir + "/cards.xml");
+
+    if (settingsCache->getTokenDatabasePath().isEmpty() ||
+        db->loadTokenDatabase() != Ok)
         settingsCache->setTokenDatabasePath(dataDir + "/tokens.xml");
+
     if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty()) {
         QDir().mkpath(dataDir + "/decks");
         settingsCache->setDeckPath(dataDir + "/decks");
