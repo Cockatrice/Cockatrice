@@ -1,4 +1,3 @@
-syntax = "proto2";
 import "serverinfo_card.proto";
 
 message ServerInfo_Zone {

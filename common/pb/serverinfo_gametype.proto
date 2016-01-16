@@ -1,4 +1,3 @@
-syntax = "proto2";
 message ServerInfo_GameType {
     optional sint32 game_type_id = 1;
     optional string description = 2;

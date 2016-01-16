@@ -96,7 +96,7 @@ CardInfo *OracleImporter::addCard(const QString &setName,
         bool cipt = cardText.contains("Hideaway") || (cardText.contains(cardName + " enters the battlefield tapped") && !cardText.contains(cardName + " enters the battlefield tapped unless"));
         
         // insert the card and its properties
-        card = new CardInfo(this, cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards, reverseRelatedCards, upsideDown, cardLoyalty, cipt);
+        card = new CardInfo(cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards, reverseRelatedCards, upsideDown, cardLoyalty, cipt);
         int tableRow = 1;
         QString mainCardType = card->getMainCardType();
         if ((mainCardType == "Land") || mArtifact)

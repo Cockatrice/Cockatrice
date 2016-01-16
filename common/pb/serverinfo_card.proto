@@ -1,4 +1,3 @@
-syntax = "proto2";
 import "serverinfo_cardcounter.proto";
 
 message ServerInfo_Card {

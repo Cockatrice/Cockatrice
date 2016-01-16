@@ -1,4 +1,3 @@
-syntax = "proto2";
 import "serverinfo_zone.proto";
 import "serverinfo_counter.proto";
 import "serverinfo_arrow.proto";

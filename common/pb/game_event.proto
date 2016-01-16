@@ -1,4 +1,3 @@
-syntax = "proto2";
 message GameEvent {
     enum GameEventType {
         JOIN = 1000;

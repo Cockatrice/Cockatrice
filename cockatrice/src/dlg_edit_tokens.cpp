@@ -145,7 +145,7 @@ void DlgEditTokens::actAddToken()
     if (name.isEmpty())
         return;
     
-    CardInfo *card = new CardInfo(cardDatabaseModel->getDatabase(), name, true);
+    CardInfo *card = new CardInfo(name, true);
     card->addToSet(cardDatabaseModel->getDatabase()->getSet(CardDatabase::TOKENS_SETNAME));
     card->setCardType("Token");
     cardDatabaseModel->getDatabase()->addCard(card);

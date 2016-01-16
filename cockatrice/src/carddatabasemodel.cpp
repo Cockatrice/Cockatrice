@@ -28,26 +28,16 @@ int CardDatabaseModel::columnCount(const QModelIndex &/*parent*/) const
 
 QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
-        return QVariant();
-    if ((index.row() >= cardList.size()) || (index.column() >= CARDDBMODEL_COLUMNS))
-        return QVariant();
-    if (role != Qt::DisplayRole && role != SortRole)
+    if (!index.isValid() ||
+        index.row() >= cardList.size() || 
+        index.column() >= CARDDBMODEL_COLUMNS || 
+        (role != Qt::DisplayRole && role != SortRole))
         return QVariant();
 
     CardInfo *card = cardList.at(index.row());
     switch (index.column()){
         case NameColumn: return card->getName();
-        case SetListColumn: {
-            QStringList setList;
-            const QList<CardSet *> &sets = card->getSets();
-            for (int i = 0; i < sets.size(); i++)
-            {
-                if(sets[i]->getEnabled())
-                    setList << sets[i]->getShortName();
-            }
-            return setList.join(", ");
-        }
+        case SetListColumn: return card->getSetsNames();
         case ManaCostColumn: return role == SortRole ?
             QString("%1%2").arg(card->getCmc(), 4, QChar('0')).arg(card->getManaCost()) :
             card->getManaCost();
@@ -139,8 +129,30 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
     filterTree = NULL;
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
+
+    loadedRowCount = 0;
 }
 
+bool CardDatabaseDisplayModel::canFetchMore(const QModelIndex & index) const
+{
+    return loadedRowCount < sourceModel()->rowCount(index);
+}
+
+void CardDatabaseDisplayModel::fetchMore(const QModelIndex & index)
+{
+    int remainder = sourceModel()->rowCount(index) - loadedRowCount;
+    int itemsToFetch = qMin(100, remainder);
+
+    beginInsertRows(QModelIndex(), loadedRowCount, loadedRowCount+itemsToFetch-1);
+
+    loadedRowCount += itemsToFetch;
+    endInsertRows();
+}
+
+int CardDatabaseDisplayModel::rowCount(const QModelIndex &parent) const
+{
+    return qMin(QSortFilterProxyModel::rowCount(parent), loadedRowCount);
+}
 
 bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
 

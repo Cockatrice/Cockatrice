@@ -42,6 +42,7 @@ private:
     QString searchTerm;
     QSet<QString> cardNameSet, cardTypes, cardColors;
     FilterTree *filterTree;
+    int loadedRowCount;
 public:
     CardDatabaseDisplayModel(QObject *parent = 0);
     void setFilterTree(FilterTree *filterTree);
@@ -54,9 +55,13 @@ public:
     void setCardTypes(const QSet<QString> &_cardTypes) { cardTypes = _cardTypes; invalidate(); }
     void setCardColors(const QSet<QString> &_cardColors) { cardColors = _cardColors; invalidate(); }
     void clearFilterAll();
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+
+    bool canFetchMore(const QModelIndex &parent) const;
+    void fetchMore(const QModelIndex &parent);
 private slots:
     void filterTreeChanged();
 };
