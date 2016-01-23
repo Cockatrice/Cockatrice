@@ -28,6 +28,42 @@ public:
     bool nextSet();
 };
 
+class PictureLoaderWorker : public QObject {
+Q_OBJECT
+public:
+    PictureLoaderWorker();
+    ~PictureLoaderWorker();
+
+    void enqueueImageLoad(CardInfo *card);
+private:
+    static QStringList md5Blacklist;
+
+    QThread *pictureLoaderThread;
+    QString picsPath;
+    QList<PictureToLoad> loadQueue;
+    QMutex mutex;
+    QNetworkAccessManager *networkManager;
+    QList<PictureToLoad> cardsToDownload;
+    PictureToLoad cardBeingLoaded;
+    PictureToLoad cardBeingDownloaded;
+    bool picDownload, downloadRunning, loadQueueRunning;
+    void startNextPicDownload();
+    QString getPicUrl();
+    bool cardImageExistsOnDisk(QString & setName, QString & correctedCardname);
+    bool imageIsBlackListed(const QByteArray &picData);
+private slots:
+    void picDownloadFinished(QNetworkReply *reply);
+    void picDownloadFailed();
+
+    void picDownloadChanged();
+    void picsPathChanged();
+public slots:
+    void processLoadQueue();
+signals:
+    void startLoadQueue();
+    void imageLoaded(CardInfo *card, const QImage &image);
+};
+
 class PictureLoader : public QObject {
 Q_OBJECT
 public:
@@ -43,24 +79,8 @@ private:
     PictureLoader(PictureLoader const&);
     void operator=(PictureLoader const&); 
 
-    static QStringList md5Blacklist;
-
-    QThread *pictureLoaderThread;
-    QString picsPath;
-    QList<PictureToLoad> loadQueue;
-    QMutex mutex;
-    QNetworkAccessManager *networkManager;
-    QList<PictureToLoad> cardsToDownload;
-    PictureToLoad cardBeingLoaded;
-    PictureToLoad cardBeingDownloaded;
-    bool picDownload, downloadRunning, loadQueueRunning;
-    void startNextPicDownload();
-    void imageLoaded(CardInfo *card, const QImage &image);
-    QString getPicUrl();
-    bool cardImageExistsOnDisk(QString & setName, QString & correctedCardname);
-    bool imageIsBlackListed(const QByteArray &picData);
+    PictureLoaderWorker * worker;
 public:
-    void enqueueImageLoad(CardInfo *card);
     static void getPixmap(QPixmap &pixmap, CardInfo *card, QSize size);
     static void clearPixmapCache(CardInfo *card);
     static void clearPixmapCache();
@@ -68,15 +88,9 @@ public:
 protected:
     static void internalGetCardBackPixmap(QPixmap &pixmap, QSize size);
 private slots:
-    void picDownloadFinished(QNetworkReply *reply);
-    void picDownloadFailed();
-
     void picDownloadChanged();
     void picsPathChanged();
 public slots:
-    void processLoadQueue();
-signals:
-    void startLoadQueue();
+    void imageLoaded(CardInfo *card, const QImage &image);
 };
-
 #endif
