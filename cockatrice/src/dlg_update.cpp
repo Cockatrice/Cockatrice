@@ -85,6 +85,7 @@ void DlgUpdate::gotoDownloadPage() {
 
 void DlgUpdate::downloadUpdate() {
     setLabel("Downloading update...");
+    enableUpdateButton(false);
     uDownloader->beginDownload(updateUrl);
 }
 
@@ -156,6 +157,7 @@ void DlgUpdate::updateCheckError(QString errorString) {
 
 void DlgUpdate::downloadError(QString errorString) {
     setLabel("Error");
+    enableUpdateButton(true);
     QMessageBox::critical(this, tr("Update Error"), "An error occurred while downloading an update: " + errorString);
 }
 
