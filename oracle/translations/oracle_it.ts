@@ -16,7 +16,7 @@
     <message>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
 You will need to specify a URL or a filename that will be used as a source.</source>
-        <translation type="unfinished"/>
+        <translation>Questo wizard importerà la lista dei set e delle carte che verranno usate da Cockatrice.&lt;br/&gt;Dovrai specificare un indirizzo url o il nome di un file che verrà utilizzato come sorgente.</translation>
     </message>
 </context>
 <context>
@@ -99,19 +99,19 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Specifica una sorgente per la lista dei set e delle carte. Puoi specificare un indirizzo url da cui scaricare il file o alternativamente usare un file già presente nel tuo computer.</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Indirizzo download:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Usa l&apos;indirizzo predefinito</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;indirizzo specificato non è valido.</translation>
     </message>
 </context>
 <context>
@@ -138,19 +138,19 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Specifica una sorgente per la lista delle pedine. Puoi specificare un indirizzo url da cui scaricare il file o alternativamente usare un file già presente nel tuo computer.</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Indirizzo download:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Usa l&apos;indirizzo predefinito</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;indirizzo specificato non è valido.</translation>
     </message>
 </context>
 <context>

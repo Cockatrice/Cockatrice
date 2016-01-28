@@ -16,7 +16,8 @@
     <message>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
 You will need to specify a URL or a filename that will be used as a source.</source>
-        <translation type="unfinished"/>
+        <translation>Este asistente importará la lista de los sets y cartas que serán usadas por Cockatrice.
+Necesitarás especificar la URL o el nombre de archivo que será usado como origen.</translation>
     </message>
 </context>
 <context>
@@ -99,58 +100,58 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor especifica un origen para la lista de sets y cartas. Puedes especificar la URL de donde descargarla o usar un archivo existente de tu ordenador.</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>URL de descarga:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Restablecer URL predeterminada</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>La URL suministrada no es válida.</translation>
     </message>
 </context>
 <context>
     <name>LoadTokensPage</name>
     <message>
         <source>Tokens source selection</source>
-        <translation type="unfinished"/>
+        <translation>Selección de origen de tokens</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Error</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>Descargando (0MB)</translation>
     </message>
     <message>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>Descargando (%1MB)</translation>
     </message>
     <message>
         <source>Network error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Error de red: %1.</translation>
     </message>
     <message>
         <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor especifica un origen para la lista de tokens. Puedes especificar la URL de donde descargarla o usar un archivo existente en tu ordenador.</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>URL de descarga:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Restablecer URL predeterminada</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>La URL suministrada no es válida.</translation>
     </message>
 </context>
 <context>
@@ -228,40 +229,41 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <name>SaveTokensPage</name>
     <message>
         <source>Tokens imported</source>
-        <translation type="unfinished"/>
+        <translation>Tokens importados</translation>
     </message>
     <message>
         <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
-        <translation type="unfinished"/>
+        <translation>Los tokens han sido importados. Pulsa &quot;Guardar&quot; para guardar los tokens importados en la base de datos de tokens de Cockatrice.</translation>
     </message>
     <message>
         <source>Save to the default path (recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Guardar en la ruta por defecto (recomendado)</translation>
     </message>
     <message>
         <source>Save token database</source>
-        <translation type="unfinished"/>
+        <translation>Base de datos de tokens:</translation>
     </message>
     <message>
         <source>XML; token database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; base de datos de tokens (*.xml)</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Éxito</translation>
     </message>
     <message>
         <source>The token database has been saved successfully to
 %1</source>
-        <translation type="unfinished"/>
+        <translation>La base de datos de cartas ha sido guardada correctamente en
+%1</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Error</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>
-        <translation type="unfinished"/>
+        <translation>El archivo no ha podido ser guardado en %1</translation>
     </message>
 </context>
 <context>

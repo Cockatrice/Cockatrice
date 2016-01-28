@@ -16,7 +16,8 @@
     <message>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
 You will need to specify a URL or a filename that will be used as a source.</source>
-        <translation type="unfinished"/>
+        <translation>Cet assistant va importer la liste des éditions, cartes et jetons qui seront utilisés par Cockatrice.
+Vous devrez spécifier une URL ou un fichier qui sera utilisé comme source.</translation>
     </message>
 </context>
 <context>
@@ -31,7 +32,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Choose file...</source>
-        <translation>Choisir un fichier...</translation>
+        <translation>Choisissez un fichier...</translation>
     </message>
     <message>
         <source>Load sets file</source>
@@ -79,11 +80,11 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
-        <translation>Ce fichier ne peut être enregistré au répertoire</translation>
+        <translation>Extraction zip échouée: l&apos;archive zip contient plus qu&apos;un fichier.</translation>
     </message>
     <message>
         <source>Zip extraction failed: %1.</source>
-        <translation>l&apos;extraction du zip à échoué : %1.</translation>
+        <translation>L&apos;extraction du zip a échoué : %1.</translation>
     </message>
     <message>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
@@ -99,30 +100,30 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Spécifiez une source pour la liste des éditions et des cartes. Vous pouvez spécifier une URL qui sera téléchargée ou utiliser un fichier existant sur votre ordinateur.</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>URL de téléchargement:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Restaurer l&apos;URL par défaut</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;URL fournie n&apos;est pas valable</translation>
     </message>
 </context>
 <context>
     <name>LoadTokensPage</name>
     <message>
         <source>Tokens source selection</source>
-        <translation type="unfinished"/>
+        <translation>sélection de la source des jetons</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Érreur</translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
@@ -138,19 +139,19 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Spécifiez une source pour la liste des jetons. Vous pouvez spécifier une URL qui sera téléchargée ou utiliser un fichier existant sur votre ordinateur.</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>URL de téléchargement:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Restorer l&apos;URL par défaut</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;URL fournie n&apos;est pas valide.</translation>
     </message>
 </context>
 <context>
@@ -228,11 +229,11 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <name>SaveTokensPage</name>
     <message>
         <source>Tokens imported</source>
-        <translation type="unfinished"/>
+        <translation>Jetons importés</translation>
     </message>
     <message>
         <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
-        <translation type="unfinished"/>
+        <translation>Les jetons ont été importés. Pressez sur &quot;Sauvegarder&quot; pour sauver les jetons importés dans la base de données des jetons Cockatrice.</translation>
     </message>
     <message>
         <source>Save to the default path (recommended)</source>
@@ -253,7 +254,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <source>The token database has been saved successfully to
 %1</source>
-        <translation type="unfinished"/>
+        <translation>La base de donnée de jetons a été correctement sauvegardée dans %1</translation>
     </message>
     <message>
         <source>Error</source>
@@ -261,7 +262,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>The file could not be saved to %1</source>
-        <translation type="unfinished"/>
+        <translation>Le fichier n&apos;a pas pu être sauvegardé dans %1</translation>
     </message>
 </context>
 <context>

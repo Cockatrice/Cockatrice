@@ -16,7 +16,8 @@
     <message>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
 You will need to specify a URL or a filename that will be used as a source.</source>
-        <translation type="unfinished"/>
+        <translation>このウィザードでは、Cockatriceが使用するカードセットやトークンのリストをインポートします。
+ソースとして使用するURLまたはファイルを指定した後、利用可能リストから入れたいセットを選択します。</translation>
     </message>
 </context>
 <context>
@@ -99,19 +100,19 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>カードセットとカードのリストのソースファイルを指定してください。ダウンロード可能なURLか、コンピューターに保存したソースファイルを指定することができます（通常はデフォルトのURLからダウンロードで構いません）。</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>ダウンロードURL:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>デフォルトのURLを復元</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>指定されたURLは無効です。</translation>
     </message>
 </context>
 <context>
@@ -138,19 +139,19 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>トークンのソースファイルを指定してください。ダウンロード可能なURLか、コンピューターに保存したソースファイルを指定することができます（通常はデフォルトのURLからダウンロードで構いません）。</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>ダウンロードURL:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>デフォルトのURLを復元</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>指定されたURLは無効です。</translation>
     </message>
 </context>
 <context>
