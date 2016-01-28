@@ -30,6 +30,7 @@
 #include <QDateTime>
 #include <QSystemTrayIcon>
 #include <QApplication>
+#include <QtNetwork>
 
 #if QT_VERSION < 0x050000
     #include <QtGui/qtextdocument.h> // for Qt::escape()
@@ -40,6 +41,7 @@
 #include "dlg_connect.h"
 #include "dlg_register.h"
 #include "dlg_settings.h"
+#include "dlg_update.h"
 #include "tab_supervisor.h"
 #include "remoteclient.h"
 #include "localserver.h"
@@ -48,6 +50,7 @@
 #include "settingscache.h"
 #include "tab_game.h"
 #include "version_string.h"
+#include "update_checker.h"
 
 #include "pb/game_replay.pb.h"
 #include "pb/room_commands.pb.h"
@@ -61,6 +64,8 @@
 #define GITHUB_ISSUES_URL "https://github.com/Cockatrice/Cockatrice/issues"
 #define GITHUB_TROUBLESHOOTING_URL "https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting"
 #define GITHUB_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions"
+
+#define DOWNLOAD_URL "https://dl.bintray.com/cockatrice/Cockatrice/"
 
 const QString MainWindow::appName = "Cockatrice";
 
@@ -288,6 +293,12 @@ void MainWindow::actAbout()
     ));
 }
 
+void MainWindow::actUpdate()
+{
+    DlgUpdate dlg(this);
+    dlg.exec();
+}
+
 void MainWindow::serverTimeout()
 {
     QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
@@ -495,6 +506,7 @@ void MainWindow::retranslateUi()
 #endif
 
     aAbout->setText(tr("&About Cockatrice"));
+    aUpdate->setText(tr("&Update Cockatrice"));
     helpMenu->setTitle(tr("&Help"));
     aCheckCardUpdates->setText(tr("Check for card updates..."));
     tabSupervisor->retranslateUi();
@@ -525,6 +537,8 @@ void MainWindow::createActions()
 
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
+    aUpdate = new QAction(this);
+    connect(aUpdate, SIGNAL(triggered()), this, SLOT(actUpdate()));
 
     aCheckCardUpdates = new QAction(this);
     connect(aCheckCardUpdates, SIGNAL(triggered()), this, SLOT(actCheckCardUpdates()));
@@ -566,6 +580,7 @@ void MainWindow::createMenus()
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
+    helpMenu->addAction(aUpdate);
 }
 
 MainWindow::MainWindow(QWidget *parent)
