@@ -2,6 +2,7 @@
 #include "userlist.h"
 #include "userinfobox.h"
 #include "abstractclient.h"
+#include "soundengine.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -146,12 +147,19 @@ void TabUserLists::processUserJoinedEvent(const Event_UserJoined &event)
     ignoreList->sortItems();
     buddyList->sortItems();
     
+    if (buddyList->getUsers().keys().contains(userName))
+        soundEngine->playSound("buddy_join");
+
     emit userJoined(info);
 }
 
 void TabUserLists::processUserLeftEvent(const Event_UserLeft &event)
 {
     QString userName = QString::fromStdString(event.name());
+
+    if (buddyList->getUsers().keys().contains(userName))
+        soundEngine->playSound("buddy_leave");
+
     if (allUsersList->deleteUser(userName)) {
         ignoreList->setUserOnline(userName, false);
         buddyList->setUserOnline(userName, false);

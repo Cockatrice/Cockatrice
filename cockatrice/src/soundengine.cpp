@@ -170,6 +170,8 @@ void SoundEngine::themeChangedSlot()
         << "player_join" << "player_leave" << "player_disconnect" << "player_reconnect" << "player_concede"
         // Spectator
         << "spectator_join" << "spectator_leave"
+        // Buddy
+        << "buddy_join" << "buddy_leave"
         // Chat & UI
         << "chat_mention" << "all_mention" << "private_message";
 
