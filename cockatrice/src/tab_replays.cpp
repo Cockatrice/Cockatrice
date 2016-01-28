@@ -106,7 +106,10 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
     rightToolBar->addAction(aDeleteRemoteReplay);
     
     retranslateUi();
-    setLayout(hbox);
+
+    QWidget * mainWidget = new QWidget(this);
+    mainWidget->setLayout(hbox);
+    setCentralWidget(mainWidget);
     
     connect(client, SIGNAL(replayAddedEventReceived(const Event_ReplayAdded &)), this, SLOT(replayAddedEventReceived(const Event_ReplayAdded &)));
 }

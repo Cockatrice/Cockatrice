@@ -83,7 +83,10 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
     mainLayout->addWidget(lockButton);
     
     retranslateUi();
-    setLayout(mainLayout);
+
+    QWidget * mainWidget = new QWidget(this);
+    mainWidget->setLayout(mainLayout);
+    setCentralWidget(mainWidget);
 }
 
 void TabAdmin::retranslateUi()

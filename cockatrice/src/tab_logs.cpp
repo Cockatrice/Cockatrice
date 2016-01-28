@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QRadioButton>
+#include <QTabWidget>
 #include "tab_logs.h"
 #include "abstractclient.h"
 #include "window_sets.h"
@@ -23,7 +24,27 @@
 TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
     : Tab(_tabSupervisor, parent), client(_client)
 {
-    MainWindow = new QMainWindow;
+    roomTable = new QTableWidget();
+    roomTable->setColumnCount(6);
+    roomTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    roomTable->setHorizontalHeaderLabels(QString(tr("Time;SenderName;SenderIP;Message;TargetID;TargetName")).split(";"));
+
+    gameTable = new QTableWidget();
+    gameTable->setColumnCount(6);
+    gameTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    gameTable->setHorizontalHeaderLabels(QString(tr("Time;SenderName;SenderIP;Message;TargetID;TargetName")).split(";"));
+
+    chatTable = new QTableWidget();
+    chatTable->setColumnCount(6);
+    chatTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    chatTable->setHorizontalHeaderLabels(QString(tr("Time;SenderName;SenderIP;Message;TargetID;TargetName")).split(";"));
+
+    QTabWidget *tabManager = new QTabWidget();
+    tabManager->addTab(roomTable, tr("Room Logs"));
+    tabManager->addTab(gameTable, tr("Game Logs"));
+    tabManager->addTab(chatTable, tr("Chat Logs"));
+    setCentralWidget(tabManager);
+
     createDock();
     restartLayout();
     clearClicked();
@@ -212,7 +233,7 @@ void TabLog::createDock()
     buttonGroupBox = new QGroupBox(tr(""));
     buttonGroupBox->setLayout(buttonGrid);
 
-    mainLayout = new QVBoxLayout(MainWindow);
+    mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(criteriaGroupBox);
     mainLayout->addWidget(locationGroupBox);
     mainLayout->addWidget(rangeGroupBox);
@@ -221,116 +242,94 @@ void TabLog::createDock()
     mainLayout->addWidget(buttonGroupBox);
     mainLayout->setAlignment(Qt::AlignCenter);
 
-    searchDockContents = new QWidget(MainWindow);
+    searchDockContents = new QWidget(this);
     searchDockContents->setLayout(mainLayout);
 
-    searchDock = new QDockWidget(MainWindow);
+    searchDock = new QDockWidget(this);
     searchDock->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
     searchDock->setWidget(searchDockContents);
-
-    QVBoxLayout *mainVLayoutContent = new QVBoxLayout;
-    QHBoxLayout *mainHLayoutContent = new QHBoxLayout;
-    mainHLayoutContent->addWidget(MainWindow);
-    mainHLayoutContent->addLayout(mainVLayoutContent);
-    setLayout(mainHLayoutContent);
 }
 
 void TabLog::viewLogHistory_processResponse(const Response &resp)
 {
     const Response_ViewLogHistory &response = resp.GetExtension(Response_ViewLogHistory::ext);
-    if (resp.response_code() == Response::RespOk) {
-
-        if (response.log_message_size() > 0) {
-
-            int j = 0;
-            QTableWidget *roomTable = new QTableWidget();
-            roomTable->setWindowTitle(tr("Room Logs"));
-            roomTable->setRowCount(response.log_message_size());
-            roomTable->setColumnCount(6);
-            roomTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            roomTable->setHorizontalHeaderLabels(QString(tr("Time;SenderName;SenderIP;Message;TargetID;TargetName")).split(";"));
-
-            int k = 0;
-            QTableWidget *gameTable = new QTableWidget();
-            gameTable->setWindowTitle(tr("Game Logs"));
-            gameTable->setRowCount(response.log_message_size());
-            gameTable->setColumnCount(6);
-            gameTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            gameTable->setHorizontalHeaderLabels(QString(tr("Time;SenderName;SenderIP;Message;TargetID;TargetName")).split(";"));
-
-            int l = 0;
-            QTableWidget *chatTable = new QTableWidget();
-            chatTable->setWindowTitle(tr("Chat Logs"));
-            chatTable->setRowCount(response.log_message_size());
-            chatTable->setColumnCount(6);
-            chatTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            chatTable->setHorizontalHeaderLabels(QString(tr("Time;SenderName;SenderIP;Message;TargetID;TargetName")).split(";"));
-
-            ServerInfo_ChatMessage message; for (int i = 0; i < response.log_message_size(); ++i) {
-                message = response.log_message(i);
-                if (QString::fromStdString(message.target_type()) == "room") {
-                    roomTable->setItem(j, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
-                    roomTable->setItem(j, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
-                    roomTable->setItem(j, 2, new QTableWidgetItem(QString::fromStdString(message.sender_ip())));
-                    roomTable->setItem(j, 3, new QTableWidgetItem(QString::fromStdString(message.message())));
-                    roomTable->setItem(j, 4, new QTableWidgetItem(QString::fromStdString(message.target_id())));
-                    roomTable->setItem(j, 5, new QTableWidgetItem(QString::fromStdString(message.target_name())));
-                    ++j;
-                }
-
-                if (QString::fromStdString(message.target_type()) == "game") {
-                    gameTable->setItem(k, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
-                    gameTable->setItem(k, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
-                    gameTable->setItem(k, 2, new QTableWidgetItem(QString::fromStdString(message.sender_ip())));
-                    gameTable->setItem(k, 3, new QTableWidgetItem(QString::fromStdString(message.message())));
-                    gameTable->setItem(k, 4, new QTableWidgetItem(QString::fromStdString(message.target_id())));
-                    gameTable->setItem(k, 5, new QTableWidgetItem(QString::fromStdString(message.target_name())));
-                    ++k;
-                }
-
-                if (QString::fromStdString(message.target_type()) == "chat") {
-                    chatTable->setItem(l, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
-                    chatTable->setItem(l, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
-                    chatTable->setItem(l, 2, new QTableWidgetItem(QString::fromStdString(message.sender_ip())));
-                    chatTable->setItem(l, 3, new QTableWidgetItem(QString::fromStdString(message.message())));
-                    chatTable->setItem(l, 4, new QTableWidgetItem(QString::fromStdString(message.target_id())));
-                    chatTable->setItem(l, 5, new QTableWidgetItem(QString::fromStdString(message.target_name())));
-                    ++l;
-                }
-            }
-
-            roomTable->setRowCount(j);
-            roomTable->resizeColumnsToContents();
-            gameTable->setRowCount(k);
-            gameTable->resizeColumnsToContents();
-            chatTable->setRowCount(l);
-            chatTable->resizeColumnsToContents();
-
-            if (mainRoom->isChecked()) {
-                roomTable->resize(600, 200);
-                roomTable->show();
-            }
-
-            if (gameRoom->isChecked()) {
-                gameTable->resize(600, 200);
-                gameTable->show();
-            }
-
-            if (privateChat->isChecked()) {
-                chatTable->resize(600, 200);
-                chatTable->show();
-            }
-
-        } else
-            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Message History"), tr("There are no messages for the selected filters."));
-
-    } else
+    if (resp.response_code() != Response::RespOk) {
         QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Message History"), tr("Failed to collect message history information."));
+        return;
+    }
+
+    if (response.log_message_size() == 0) {
+        QMessageBox::information(static_cast<QWidget *>(parent()), tr("Message History"), tr("There are no messages for the selected filters."));
+        return;
+    }
+
+    int roomCounter = 0, gameCounter = 0, chatCounter = 0;
+    roomTable->setRowCount(roomCounter);
+    gameTable->setRowCount(gameCounter);
+    chatTable->setRowCount(chatCounter);
+
+    for (int i = 0; i < response.log_message_size(); ++i)
+    {
+        ServerInfo_ChatMessage message = response.log_message(i);
+        if (QString::fromStdString(message.target_type()) == "room") {
+            roomTable->insertRow(roomCounter);
+            roomTable->setItem(roomCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
+            roomTable->setItem(roomCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
+            roomTable->setItem(roomCounter, 2, new QTableWidgetItem(QString::fromStdString(message.sender_ip())));
+            roomTable->setItem(roomCounter, 3, new QTableWidgetItem(QString::fromStdString(message.message())));
+            roomTable->setItem(roomCounter, 4, new QTableWidgetItem(QString::fromStdString(message.target_id())));
+            roomTable->setItem(roomCounter, 5, new QTableWidgetItem(QString::fromStdString(message.target_name())));
+            ++roomCounter;
+        }
+
+        if (QString::fromStdString(message.target_type()) == "game") {
+            gameTable->insertRow(gameCounter);
+            gameTable->setItem(gameCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
+            gameTable->setItem(gameCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
+            gameTable->setItem(gameCounter, 2, new QTableWidgetItem(QString::fromStdString(message.sender_ip())));
+            gameTable->setItem(gameCounter, 3, new QTableWidgetItem(QString::fromStdString(message.message())));
+            gameTable->setItem(gameCounter, 4, new QTableWidgetItem(QString::fromStdString(message.target_id())));
+            gameTable->setItem(gameCounter, 5, new QTableWidgetItem(QString::fromStdString(message.target_name())));
+            ++gameCounter;
+        }
+
+        if (QString::fromStdString(message.target_type()) == "chat") {
+            chatTable->insertRow(chatCounter);
+            chatTable->setItem(chatCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
+            chatTable->setItem(chatCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
+            chatTable->setItem(chatCounter, 2, new QTableWidgetItem(QString::fromStdString(message.sender_ip())));
+            chatTable->setItem(chatCounter, 3, new QTableWidgetItem(QString::fromStdString(message.message())));
+            chatTable->setItem(chatCounter, 4, new QTableWidgetItem(QString::fromStdString(message.target_id())));
+            chatTable->setItem(chatCounter, 5, new QTableWidgetItem(QString::fromStdString(message.target_name())));
+            ++chatCounter;
+        }
+    }
+
+    if (roomCounter) {
+        roomTable->show();
+        roomTable->resizeColumnsToContents();
+    } else {
+        roomTable->hide();
+    }
+
+    if (gameCounter) {
+        gameTable->resizeColumnsToContents();
+        gameTable->show();
+    } else {
+        gameTable->hide();
+    }
+
+    if (chatCounter) {
+        chatTable->resizeColumnsToContents();
+        chatTable->show();
+    } else {
+        chatTable->hide();
+    }
 }
 
 void TabLog::restartLayout()
 {
     searchDock->setFloating(false);
-    MainWindow->addDockWidget(Qt::TopDockWidgetArea, searchDock);
+    addDockWidget(Qt::LeftDockWidgetArea, searchDock);
     searchDock->setVisible(true);
 }

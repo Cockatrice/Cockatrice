@@ -15,12 +15,20 @@ public:
     void setDeckEditorCardSize(const QSize &value);
     void setDeckEditorDeckSize(const QSize &value);
     void setDeckEditorFilterSize(const QSize &value);
+    void setGamePlayAreaGeometry(const QByteArray &value);
+    void setGamePlayAreaState(const QByteArray &value);
+    void setReplayPlayAreaGeometry(const QByteArray &value);
+    void setReplayPlayAreaState(const QByteArray &value);
 
     const QByteArray getDeckEditorLayoutState();
     const QByteArray getDeckEditorGeometry();
     const QSize getDeckEditorCardSize();
     const QSize getDeckEditorDeckSize();
     const QSize getDeckEditorFilterSize();
+    const QByteArray getGamePlayAreaLayoutState();
+    const QByteArray getGamePlayAreaGeometry();
+    const QByteArray getReplayPlayAreaLayoutState();
+    const QByteArray getReplayPlayAreaGeometry();
 signals:
 
 public slots:

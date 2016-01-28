@@ -75,7 +75,11 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     mainLayout->addLayout(ignorePanel);
     mainLayout->addLayout(vbox);
 
-    setLayout(mainLayout);
+    retranslateUi();
+
+    QWidget * mainWidget = new QWidget(this);
+    mainWidget->setLayout(mainLayout);
+    setCentralWidget(mainWidget);
 }
 
 void TabUserLists::addToBuddyList()

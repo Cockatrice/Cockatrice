@@ -22,7 +22,6 @@ class CardInfo;
 class QGroupBox;
 class QHBoxLayout;
 class QPushButton;
-class QMainWindow;
 class QDockWidget;
 
 class SearchLineEdit : public QLineEdit {
@@ -79,12 +78,15 @@ class TabDeckEditor : public Tab {
             void filterRemove(QAction *action);
             void setPriceTagFeatureEnabled(int enabled);
 
-            bool eventFilter(QObject *o, QEvent *e);
             void loadLayout();
             void restartLayout();
             void freeDocksSize();
             void refreshShortcuts();
 
+            bool eventFilter(QObject *o, QEvent *e);
+            void dockVisibleTriggered();
+            void dockFloatingTriggered();
+            void dockTopLevelChanged(bool topLevel);
 private:
     CardInfo *currentCardInfo() const;
     void addCardHelper(QString zoneName);
@@ -113,19 +115,16 @@ private:
     QTreeView *filterView;
     QWidget *filterBox;
 
-    QMenu *deckMenu, *dbMenu;
+    QMenu *deckMenu, *dbMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu;
     QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose, *aOpenCustomFolder, *aOpenCustomsetsFolder;
     QAction *aEditSets, *aEditTokens, *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;// *aUpdatePrices;
     QAction *aResetLayout;
+    QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating, *aFilterDockVisible, *aFilterDockFloating;
 
     bool modified;
-    QMainWindow *MainWindow;
     QVBoxLayout *centralFrame;
     QHBoxLayout *searchLayout;
-    QPushButton *btnFilter;
-    QPushButton *btnDeck;
-    QPushButton *btnCard;
     QDockWidget *cardInfoDock;
     QDockWidget *deckDock;
     QDockWidget *filterDock;
@@ -138,7 +137,6 @@ public:
     void setDeck(DeckLoader *_deckLoader);
     void setModified(bool _windowModified);
     bool confirmClose();
-    void createShowHideDocksButtons();
     void createDeckDock();
     void createCardInfoDock();
     void createFiltersDock();

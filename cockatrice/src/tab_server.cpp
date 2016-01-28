@@ -140,8 +140,12 @@ TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWi
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(roomSelector);
     vbox->addWidget(serverInfoBox);
-    
-    setLayout(vbox);
+ 
+    retranslateUi();
+
+    QWidget * mainWidget = new QWidget(this);
+    mainWidget->setLayout(vbox);
+    setCentralWidget(mainWidget);
 }
 
 void TabServer::retranslateUi()
