@@ -16,7 +16,8 @@
     <message>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
 You will need to specify a URL or a filename that will be used as a source.</source>
-        <translation type="unfinished"/>
+        <translation>Dieser Assistent wird eine Liste aller Editionen, Karten und Spielsteine, die von Cockatrice genutzt werden, importieren.
+Sie müssen eine URL oder einen Dateinamen als Quelle angeben.</translation>
     </message>
 </context>
 <context>
@@ -91,7 +92,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Do you want to try to download a fresh copy of the uncompressed file instead?</source>
-        <translation>Möchtest du stattdessen eine neue Kopie der nicht komprimierten Datei herunerladen?</translation>
+        <translation>Möchtest du stattdessen eine neue Kopie der nicht komprimierten Datei herunterladen?</translation>
     </message>
     <message>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
@@ -99,19 +100,19 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Bitte geben Sie eine Quelle für die Liste von Editionen und Karten an. Sie können eine URL Adresse zum Herunterladen angeben oder eine Datei von Ihrem Computer verwenden.</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Download URL:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Standard-URL wiederherstellen</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>Die eingegebene URL ist nicht gültig.</translation>
     </message>
 </context>
 <context>
@@ -138,19 +139,19 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Bitte geben Sie eine Quelle für die Liste der Spielsteine an. Sie können eine URL Adresse zum Herunterladen angeben oder eine Datei von Ihrem Computer verwenden.</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Download URL:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Standard-URL wiederherstellen</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>Die eingegebene URL ist nicht gültig.</translation>
     </message>
 </context>
 <context>
