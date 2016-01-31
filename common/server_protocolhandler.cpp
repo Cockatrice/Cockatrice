@@ -608,7 +608,6 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     ServerInfo_ChatMessage chatMessage;
     for (int i = 0; i < chatHistory.size(); ++i) {
         chatMessage = chatHistory.at(i);
-        qDebug() << QString::fromStdString(chatMessage.message()).simplified();
         Event_RoomSay roomChatHistory;
         roomChatHistory.set_message(chatMessage.sender_name() + ": " + chatMessage.message());
         roomChatHistory.set_message_type(Event_RoomSay::ChatHistory);

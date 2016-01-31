@@ -16,14 +16,15 @@
     <message>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
 You will need to specify a URL or a filename that will be used as a source.</source>
-        <translation type="unfinished"/>
+        <translation>오라클은 코카트리스에서 사용할 확장판의 목록과 카드들의 정보를 갱신하는 프로그램입니다.
+판본 목록 파일이 있는 웹 주소나 파일을 입력하신 후에 읽어온 목록에서 원하는 확장판을 선택해 불러올 수 있습니다.</translation>
     </message>
 </context>
 <context>
     <name>LoadSetsPage</name>
     <message>
         <source>Source selection</source>
-        <translation>판본 목록 파일 주소 입력</translation>
+        <translation>확장판 목록 파일 주소 입력</translation>
     </message>
     <message>
         <source>Local file:</source>
@@ -35,15 +36,15 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Load sets file</source>
-        <translation>판본 목록 파일 불러오기</translation>
+        <translation>확장판 목록 파일 불러오기</translation>
     </message>
     <message>
         <source>Sets JSON file (*.json *.zip)</source>
-        <translation>판본 목록 JSON 파일 (*.json *.zip)</translation>
+        <translation>확장판 목록 JSON 파일 (*.json *.zip)</translation>
     </message>
     <message>
         <source>Sets JSON file (*.json)</source>
-        <translation>판본 목록 JSON 파일 (*.json)</translation>
+        <translation>확장판 목록 JSON 파일 (*.json)</translation>
     </message>
     <message>
         <source>Error</source>
@@ -55,7 +56,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Please choose a file.</source>
-        <translation>판본 목록 파일을 선택해 주세요.</translation>
+        <translation>확장판 목록 파일을 선택해 주세요.</translation>
     </message>
     <message>
         <source>Cannot open file &apos;%1&apos;.</source>
@@ -79,7 +80,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
-        <translation>압축 풀기 실패 : 압축 파일에 판본 목록 파일 이외의 파일이 있습니다.</translation>
+        <translation>압축 풀기 실패 : 압축 파일에 확장판 목록 파일 이외의 파일이 있습니다.</translation>
     </message>
     <message>
         <source>Zip extraction failed: %1.</source>
@@ -91,27 +92,28 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Do you want to try to download a fresh copy of the uncompressed file instead?</source>
-        <translation>압축되지 않은 판본 목록을 대신 내려받으시겠습니까?</translation>
+        <translation>압축되지 않은 확장판 목록을 대신 내려받으시겠습니까?</translation>
     </message>
     <message>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
-        <translation>파일을 성공적으로 다운로드 하였으나 판본 정보가 들어있지 않습니다.</translation>
+        <translation>파일을 성공적으로 다운로드 하였으나 확장판 정보가 들어있지 않습니다.</translation>
     </message>
     <message>
         <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>확장판 목록 및 카드 정보가 들어있는 파일의 위치를 입력해 주세요. 
+다운로드 할 수 있는 웹 주소나 컴퓨터에 저장되어 있는 파일을 선택 할 수 있습니다.</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>웹 주소:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>기본 주소로 복원</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>잘못된 주소를 입력하셨습니다.</translation>
     </message>
 </context>
 <context>
@@ -138,26 +140,27 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>토큰 목록 및 정보가 들어있는 파일의 위치를 입력해 주세요. 
+다운로드 할 수 있는 웹 주소나 컴퓨터에 저장되어 있는 파일을 선택 할 수 있습니다.</translation>
     </message>
     <message>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>웹 주소:</translation>
     </message>
     <message>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>기본 주소로 복원</translation>
     </message>
     <message>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>잘못된 주소를 입력하셨습니다.</translation>
     </message>
 </context>
 <context>
     <name>OracleImporter</name>
     <message>
         <source>Dummy set containing tokens</source>
-        <translation>토큰 정보가 들어있는 더미 판본</translation>
+        <translation>토큰 정보가 들어있는 더미 확장판</translation>
     </message>
 </context>
 <context>
@@ -175,11 +178,11 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <name>SaveSetsPage</name>
     <message>
         <source>Sets imported</source>
-        <translation>판본 불러오기 완료</translation>
+        <translation>확장판 불러오기 완료</translation>
     </message>
     <message>
         <source>The following sets has been imported. Press &quot;Save&quot; to save the imported cards to the Cockatrice database.</source>
-        <translation>아래와 같이 판본을 불러왔습니다.
+        <translation>아래와 같이 확장판을 불러왔습니다.
 &quot;저장&quot; 버튼을 눌러 코카트리스에서 사용할 수 있는 카드 데이터베이스를 저장하실 수 있습니다.</translation>
     </message>
     <message>
@@ -192,7 +195,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>No set has been imported.</source>
-        <translation>아무 판본도 불러오지 못했습니다.</translation>
+        <translation>아무 확장판도 불러오지 못했습니다.</translation>
     </message>
     <message>
         <source>Import finished: %1 cards.</source>

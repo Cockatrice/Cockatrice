@@ -243,4 +243,5 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/phase9"] = parseSequenceString("F9");
     defaultShortCuts["tab_room/aClearChat"] = parseSequenceString("F12");
     defaultShortCuts["DlgLoadDeckFromClipboard/refreshButton"] = parseSequenceString("F5");
+    defaultShortCuts["Player/aResetLayout"] = parseSequenceString("");
 }

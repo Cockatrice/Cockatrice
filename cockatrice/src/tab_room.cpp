@@ -104,9 +104,6 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     roomMenu->addAction(aLeaveRoom);
     addTabMenu(roomMenu);
 
-    retranslateUi();
-    setLayout(hbox);
-
     const int userListSize = info.user_list_size();
     for (int i = 0; i < userListSize; ++i){
         userList->processUserInfo(info.user_list(i), true);
@@ -130,6 +127,12 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     actCompleterChanged();
     connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
     refreshShortcuts();
+
+    retranslateUi();
+
+    QWidget * mainWidget = new QWidget(this);
+    mainWidget->setLayout(hbox);
+    setCentralWidget(mainWidget);
 }
 
 TabRoom::~TabRoom()

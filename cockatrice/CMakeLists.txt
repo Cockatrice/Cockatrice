@@ -16,7 +16,8 @@ SET(cockatrice_SOURCES
     src/dlg_edit_tokens.cpp
     src/dlg_edit_user.cpp
     src/dlg_register.cpp 
-    src/abstractclient.cpp 
+    src/dlg_update.cpp
+    src/abstractclient.cpp
     src/remoteclient.cpp 
     src/main.cpp 
     src/window_main.cpp 
@@ -107,6 +108,8 @@ SET(cockatrice_SOURCES
     src/settings/messagesettings.cpp
     src/settings/gamefilterssettings.cpp
     src/settings/layoutssettings.cpp
+    src/update_checker.cpp
+    src/update_downloader.cpp
     ${VERSION_STRING_CPP}
 )
 

@@ -14,10 +14,7 @@
 
 # Cockatrice
 
-Cockatrice is an open-source multiplatform software for playing card games,
-such as Magic: The Gathering, over a network. It is fully client-server based
-to prevent any kind of cheating, though it supports single-player games without
-a network interface as well. Both client and server are written in Qt, supporting both Qt4 and Qt5.<br>
+Cockatrice is an open-source multiplatform supported program for playing tabletop card games over a network. The program's server design prevents any kind of client modifications to gain an unfair advantage in a game. The client also has a built in single-player mode where you can brew without being connected to a server. This project is written in C++/Qt with support for both Qt4 and Qt5.<br>
 
 
 # Downloads

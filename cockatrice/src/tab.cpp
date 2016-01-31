@@ -4,8 +4,9 @@
 #include <QApplication>
 #include <QDebug>
 Tab::Tab(TabSupervisor *_tabSupervisor, QWidget *parent)
-    : QWidget(parent), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)
+    : QMainWindow(parent), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName)

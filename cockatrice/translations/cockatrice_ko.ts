@@ -20,57 +20,57 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="340"/>
+        <location filename="../src/dlg_settings.cpp" line="363"/>
         <source>Theme settings</source>
-        <translation type="unfinished"/>
+        <translation>테마 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="341"/>
+        <location filename="../src/dlg_settings.cpp" line="364"/>
         <source>Current theme:</source>
-        <translation type="unfinished"/>
+        <translation>현재 테마:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="343"/>
+        <location filename="../src/dlg_settings.cpp" line="366"/>
         <source>Card rendering</source>
         <translation>카드 렌더링</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="344"/>
+        <location filename="../src/dlg_settings.cpp" line="367"/>
         <source>Display card names on cards having a picture</source>
         <translation>이미지가 존재하는 카드에도 카드 이름 표시</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="345"/>
+        <location filename="../src/dlg_settings.cpp" line="368"/>
         <source>Scale cards on mouse over</source>
         <translation>마우스 오버 시 카드 확대</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="347"/>
+        <location filename="../src/dlg_settings.cpp" line="370"/>
         <source>Hand layout</source>
         <translation>손 레이아웃</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="348"/>
+        <location filename="../src/dlg_settings.cpp" line="371"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation>손의 카드를 가로로 정렬</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="349"/>
+        <location filename="../src/dlg_settings.cpp" line="372"/>
         <source>Enable left justification</source>
         <translation>손의 카드를 좌측으로 정렬</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="351"/>
+        <location filename="../src/dlg_settings.cpp" line="374"/>
         <source>Table grid layout</source>
         <translation>테이블 격자 레이아웃</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="352"/>
+        <location filename="../src/dlg_settings.cpp" line="375"/>
         <source>Invert vertical coordinate</source>
         <translation>전장의 상하배치를 전환 (대지를 앞에 배치)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="353"/>
+        <location filename="../src/dlg_settings.cpp" line="376"/>
         <source>Minimum player count for multi-column layout:</source>
         <translation>다열 레이아웃를 위한 최소 플레이어 인원 (4명 이상 권장)</translation>
     </message>
@@ -78,120 +78,120 @@
 <context>
     <name>BanDialog</name>
     <message>
-        <location filename="../src/userlist.cpp" line="33"/>
+        <location filename="../src/userlist.cpp" line="32"/>
         <source>ban &amp;user name</source>
         <translation>사용자 계정 추방</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="36"/>
+        <location filename="../src/userlist.cpp" line="35"/>
         <source>ban &amp;IP address</source>
         <translation>IP 주소 추방</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="39"/>
+        <location filename="../src/userlist.cpp" line="38"/>
         <source>ban client I&amp;D</source>
         <translation>클라이언트 ID 추방</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="52"/>
+        <location filename="../src/userlist.cpp" line="51"/>
         <source>Ban type</source>
         <translation>추방 유형</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="55"/>
+        <location filename="../src/userlist.cpp" line="54"/>
         <source>&amp;permanent ban</source>
         <translation>영구 추방</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="56"/>
+        <location filename="../src/userlist.cpp" line="55"/>
         <source>&amp;temporary ban</source>
         <translation>기간제 추방</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="59"/>
+        <location filename="../src/userlist.cpp" line="58"/>
         <source>&amp;Days:</source>
         <translation>일:</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="65"/>
+        <location filename="../src/userlist.cpp" line="64"/>
         <source>&amp;Hours:</source>
         <translation>시간:</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="71"/>
+        <location filename="../src/userlist.cpp" line="70"/>
         <source>&amp;Minutes:</source>
         <translation>분:</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="86"/>
+        <location filename="../src/userlist.cpp" line="85"/>
         <source>Duration of the ban</source>
         <translation>추방 기간</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="89"/>
+        <location filename="../src/userlist.cpp" line="88"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
         <translation>추방 사유를 적어주세요.
 해당 사유는 관리자들만 볼 수 있고 추방 당한 사용자는 볼 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="92"/>
+        <location filename="../src/userlist.cpp" line="91"/>
         <source>Please enter the reason for the ban that will be visible to the banned person.</source>
         <translation>추방된 사용자가 보게 될 추방 사유를 적어주세요.</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="95"/>
+        <location filename="../src/userlist.cpp" line="94"/>
         <source>&amp;OK</source>
         <translation>확인</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="98"/>
+        <location filename="../src/userlist.cpp" line="97"/>
         <source>&amp;Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="116"/>
+        <location filename="../src/userlist.cpp" line="115"/>
         <source>Ban user from server</source>
         <translation>사용자를 서버에서 추방</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="122"/>
-        <location filename="../src/userlist.cpp" line="128"/>
-        <location filename="../src/userlist.cpp" line="134"/>
-        <location filename="../src/userlist.cpp" line="140"/>
+        <location filename="../src/userlist.cpp" line="186"/>
+        <location filename="../src/userlist.cpp" line="192"/>
+        <location filename="../src/userlist.cpp" line="198"/>
+        <location filename="../src/userlist.cpp" line="204"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="122"/>
+        <location filename="../src/userlist.cpp" line="186"/>
         <source>You have to select a name-based, IP-based, clientId based, or some combination of the three to place a ban.</source>
         <translation>추방의 유형을 선택해 주세요.</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="128"/>
+        <location filename="../src/userlist.cpp" line="192"/>
         <source>You must have a value in the name ban when selecting the name ban checkbox.</source>
-        <translation type="unfinished"/>
+        <translation>사용자명 추방을 하기 위해선 사용자명을 입력하셔야 합니다.</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="134"/>
+        <location filename="../src/userlist.cpp" line="198"/>
         <source>You must have a value in the ip ban when selecting the ip ban checkbox.</source>
-        <translation type="unfinished"/>
+        <translation>아이피 추방을 하기 위해선 아이피 주소를 입력하셔야 합니다.</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="140"/>
+        <location filename="../src/userlist.cpp" line="204"/>
         <source>You must have a value in the clientid ban when selecting the clientid ban checkbox.</source>
-        <translation type="unfinished"/>
+        <translation>클라이언트 ID 추방을 하기 위해선 클라이언트 ID를 입력하셔야 합니다.</translation>
     </message>
 </context>
 <context>
     <name>CardDatabase</name>
     <message>
-        <location filename="../src/carddatabase.cpp" line="1209"/>
+        <location filename="../src/carddatabase.cpp" line="737"/>
         <source>New sets found</source>
         <translation>새로운 확장판 감지</translation>
     </message>
     <message>
-        <location filename="../src/carddatabase.cpp" line="1209"/>
+        <location filename="../src/carddatabase.cpp" line="737"/>
         <source>%1 new set(s) have been found in the card database. Do you want to enable them?</source>
         <translation>%1개의 새로운 확장판이 카드 데이터베이스에 추가되었습니다.
 새로운 확장판을 활성화 시키시겠습니까?</translation>
@@ -200,27 +200,27 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardDatabaseModel</name>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="67"/>
+        <location filename="../src/carddatabasemodel.cpp" line="57"/>
         <source>Name</source>
         <translation>카드 이름</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="68"/>
+        <location filename="../src/carddatabasemodel.cpp" line="58"/>
         <source>Sets</source>
         <translation>확장판</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="69"/>
+        <location filename="../src/carddatabasemodel.cpp" line="59"/>
         <source>Mana cost</source>
         <translation>마나 비용</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="70"/>
+        <location filename="../src/carddatabasemodel.cpp" line="60"/>
         <source>Card type</source>
         <translation>카드 유형</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="71"/>
+        <location filename="../src/carddatabasemodel.cpp" line="61"/>
         <source>P/T</source>
         <translation>공/방</translation>
     </message>
@@ -279,47 +279,47 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardInfoWidget</name>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="24"/>
+        <location filename="../src/cardinfowidget.cpp" line="25"/>
         <source>Show card only</source>
         <translation>카드만 표시</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="24"/>
+        <location filename="../src/cardinfowidget.cpp" line="25"/>
         <source>Show text only</source>
         <translation>텍스트만 표시</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="24"/>
+        <location filename="../src/cardinfowidget.cpp" line="25"/>
         <source>Show full info</source>
         <translation>정보 전체 표시</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="207"/>
+        <location filename="../src/cardinfowidget.cpp" line="208"/>
         <source>Name:</source>
         <translation>카드 이름:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="208"/>
+        <location filename="../src/cardinfowidget.cpp" line="209"/>
         <source>Mana cost:</source>
         <translation>마나 비용:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="209"/>
+        <location filename="../src/cardinfowidget.cpp" line="210"/>
         <source>Color(s):</source>
         <translation>카드 색:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="210"/>
+        <location filename="../src/cardinfowidget.cpp" line="211"/>
         <source>Card type:</source>
         <translation>카드 유형:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="211"/>
+        <location filename="../src/cardinfowidget.cpp" line="212"/>
         <source>P / T:</source>
         <translation>공/방:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfowidget.cpp" line="212"/>
+        <location filename="../src/cardinfowidget.cpp" line="213"/>
         <source>Loyalty:</source>
         <translation>충성도:</translation>
     </message>
@@ -583,12 +583,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckEditorSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="428"/>
+        <location filename="../src/dlg_settings.cpp" line="451"/>
         <source>Nothing is here... yet</source>
         <translation>준비중입니다.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="442"/>
+        <location filename="../src/dlg_settings.cpp" line="465"/>
         <source>General</source>
         <translation>일반</translation>
     </message>
@@ -628,42 +628,42 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckViewContainer</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="132"/>
+        <location filename="../src/tab_game.cpp" line="136"/>
         <source>Load local deck</source>
         <translation>로컬 덱 불러오기</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="133"/>
+        <location filename="../src/tab_game.cpp" line="137"/>
         <source>Load deck from server</source>
         <translation>서버에 저장된 덱 불러오기</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="134"/>
+        <location filename="../src/tab_game.cpp" line="138"/>
         <source>Ready to s&amp;tart</source>
         <translation>시작 준비</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="149"/>
+        <location filename="../src/tab_game.cpp" line="153"/>
         <source>S&amp;ideboard unlocked</source>
         <translation>사이드보드 카드 교체 가능</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="151"/>
+        <location filename="../src/tab_game.cpp" line="155"/>
         <source>S&amp;ideboard locked</source>
         <translation>사이드보드 카드 교체 불가능</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="208"/>
+        <location filename="../src/tab_game.cpp" line="215"/>
         <source>Load deck</source>
         <translation>덱 불러오기</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="218"/>
+        <location filename="../src/tab_game.cpp" line="225"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="218"/>
+        <location filename="../src/tab_game.cpp" line="225"/>
         <source>The selected file could not be loaded.</source>
         <translation>지정하신 파일을 불러올 수 없었습니다.</translation>
     </message>
@@ -709,54 +709,64 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="18"/>
+        <location filename="../src/dlg_connect.cpp" line="19"/>
         <source>Previous Host</source>
         <translation>지난번에 접속한 서버</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="31"/>
+        <location filename="../src/dlg_connect.cpp" line="32"/>
         <source>New Host</source>
         <translation>새로운 서버</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="33"/>
+        <location filename="../src/dlg_connect.cpp" line="34"/>
         <source>&amp;Host:</source>
         <translation>호스트 IP:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="35"/>
+        <location filename="../src/dlg_connect.cpp" line="36"/>
         <source>Enter host name</source>
         <translation>서버 주소 입력</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="38"/>
+        <location filename="../src/dlg_connect.cpp" line="39"/>
         <source>&amp;Port:</source>
         <translation>포트:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="42"/>
+        <location filename="../src/dlg_connect.cpp" line="43"/>
         <source>Player &amp;name:</source>
         <translation>사용자명:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="46"/>
+        <location filename="../src/dlg_connect.cpp" line="47"/>
         <source>P&amp;assword:</source>
         <translation>비밀번호:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="51"/>
+        <location filename="../src/dlg_connect.cpp" line="52"/>
         <source>&amp;Save password</source>
         <translation>비밀번호 저장</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="54"/>
+        <location filename="../src/dlg_connect.cpp" line="55"/>
         <source>A&amp;uto connect at start</source>
         <translation>코카트리스 시작 시 자동 연결</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="91"/>
+        <location filename="../src/dlg_connect.cpp" line="92"/>
         <source>Connect to server</source>
         <translation>서버로 연결</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="155"/>
+        <source>Connect Warning</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="155"/>
+        <source>The player name can&apos;t be empty.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -827,27 +837,27 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation>관전자</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="136"/>
+        <location filename="../src/dlg_creategame.cpp" line="137"/>
         <source>&amp;Clear</source>
         <translation>설정 초기화</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="142"/>
+        <location filename="../src/dlg_creategame.cpp" line="143"/>
         <source>Create game</source>
         <translation>게임 만들기</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="185"/>
+        <location filename="../src/dlg_creategame.cpp" line="186"/>
         <source>Game information</source>
         <translation>게임 정보</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="261"/>
+        <location filename="../src/dlg_creategame.cpp" line="262"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="261"/>
+        <location filename="../src/dlg_creategame.cpp" line="262"/>
         <source>Server error.</source>
         <translation>서버 오류.</translation>
     </message>
@@ -1112,7 +1122,7 @@ To remove your current avatar, confirm without choosing a new image.</source>
         <source>The chosen name conflicts with an existing card or token.
 Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; dialog to display them correctly.</source>
         <translation>다른 토큰이나 카드와 중복되는 이름입니다.
-&apos;확장판 편집&apos; 창에서 &apos;토큰 전용 더미 판본&apos;이 체크되어있는지 확인하여 주십시오.</translation>
+&apos;확장판 편집&apos; 창에서 &apos;토큰 전용 더미 확장판&apos;이 체크되어있는지 확인하여 주십시오.</translation>
     </message>
 </context>
 <context>
@@ -1309,6 +1319,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_register.cpp" line="356"/>
         <location filename="../src/dlg_register.cpp" line="361"/>
+        <location filename="../src/dlg_register.cpp" line="366"/>
         <source>Registration Warning</source>
         <translation>가입 실패</translation>
     </message>
@@ -1321,6 +1332,11 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
         <location filename="../src/dlg_register.cpp" line="361"/>
         <source>Your email addresses do not match, please try again.</source>
         <translation>입력된 이메일이 서로 다릅니다. 다시 시도하여 주십시오.</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_register.cpp" line="366"/>
+        <source>The player name can&apos;t be empty.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="54"/>
@@ -1341,19 +1357,19 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="887"/>
-        <location filename="../src/dlg_settings.cpp" line="893"/>
-        <location filename="../src/dlg_settings.cpp" line="899"/>
+        <location filename="../src/dlg_settings.cpp" line="904"/>
+        <location filename="../src/dlg_settings.cpp" line="910"/>
+        <location filename="../src/dlg_settings.cpp" line="916"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="841"/>
+        <location filename="../src/dlg_settings.cpp" line="858"/>
         <source>Unknown Error loading card database</source>
         <translation>데이터베이스를 불러올 때 미상의 오류가 발생하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="850"/>
+        <location filename="../src/dlg_settings.cpp" line="867"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1370,7 +1386,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="857"/>
+        <location filename="../src/dlg_settings.cpp" line="874"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1387,7 +1403,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="870"/>
+        <location filename="../src/dlg_settings.cpp" line="887"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
@@ -1396,7 +1412,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="875"/>
+        <location filename="../src/dlg_settings.cpp" line="892"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
@@ -1405,7 +1421,7 @@ Would you like to change your database location setting?</source>
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="864"/>
+        <location filename="../src/dlg_settings.cpp" line="881"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
@@ -1418,7 +1434,7 @@ http://github.com/Cockatrice/Cockatrice/issues 에 cards.xml을 첨부한 버그
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="880"/>
+        <location filename="../src/dlg_settings.cpp" line="897"/>
         <source>Unknown card database load status
 
 Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues
@@ -1431,56 +1447,91 @@ http://github.com/Cockatrice/Cockatrice/issues 에 cards.xml을 첨부한 버그
 데이터베이스 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="893"/>
+        <location filename="../src/dlg_settings.cpp" line="910"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>덱 파일을 보관하는 디렉토리의 경로가 잘못되었습니다.
 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="899"/>
+        <location filename="../src/dlg_settings.cpp" line="916"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>카드 이미지 파일을 보관하는 디렉토리의 경로가 잘못되었습니다.
 경로를 다시 설정하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="908"/>
+        <location filename="../src/dlg_settings.cpp" line="925"/>
         <source>Settings</source>
         <translation>환경설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="910"/>
+        <location filename="../src/dlg_settings.cpp" line="927"/>
         <source>General</source>
         <translation>일반</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="911"/>
+        <location filename="../src/dlg_settings.cpp" line="928"/>
         <source>Appearance</source>
         <translation>외형</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="912"/>
+        <location filename="../src/dlg_settings.cpp" line="929"/>
         <source>User Interface</source>
         <translation>인터페이스</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="913"/>
+        <location filename="../src/dlg_settings.cpp" line="930"/>
         <source>Deck Editor</source>
         <translation>덱 편집기</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="914"/>
+        <location filename="../src/dlg_settings.cpp" line="931"/>
         <source>Chat</source>
         <translation>대화</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="915"/>
+        <location filename="../src/dlg_settings.cpp" line="932"/>
         <source>Sound</source>
         <translation>소리</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="916"/>
+        <location filename="../src/dlg_settings.cpp" line="933"/>
         <source>Shortcuts</source>
         <translation>단축키</translation>
+    </message>
+</context>
+<context>
+    <name>DlgUpdate</name>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="52"/>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="53"/>
+        <source>Cockatrice was not built with SSL support, so cannot download updates! Please visit the download page and update manually.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="132"/>
+        <source>Your version of Cockatrice is out of date, but there are no packages available for your operating system. You may have to use a developer build or build from source yourself. Please visit the download page.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="140"/>
+        <source>Cockatrice Update</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="140"/>
+        <source>Your version of Cockatrice is up to date.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="155"/>
+        <location filename="../src/dlg_update.cpp" line="161"/>
+        <location filename="../src/dlg_update.cpp" line="173"/>
+        <source>Update Error</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1501,7 +1552,7 @@ http://github.com/Cockatrice/Cockatrice/issues 에 cards.xml을 첨부한 버그
     <message>
         <location filename="../src/gameselector.cpp" line="146"/>
         <source>Please join the appropriate room first.</source>
-        <translation>게임에 먼저 들어가시기 바랍니다.</translation>
+        <translation>해당 게임이 열려있는 채널에 먼저 들어가시기 바랍니다.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="147"/>
@@ -1551,7 +1602,7 @@ http://github.com/Cockatrice/Cockatrice/issues 에 cards.xml을 첨부한 버그
     <message>
         <location filename="../src/gameselector.cpp" line="182"/>
         <source>Please join the respective room first.</source>
-        <translation>해당되는 게임에 먼저 들어가시기 바랍니다.</translation>
+        <translation>해당 게임이 열려있는 채널에 먼저 들어가시기 바랍니다.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="198"/>
@@ -1696,112 +1747,118 @@ http://github.com/Cockatrice/Cockatrice/issues 에 cards.xml을 첨부한 버그
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="251"/>
+        <location filename="../src/dlg_settings.cpp" line="269"/>
         <source>Reset/Clear Downloaded Pictures</source>
         <translation>저장된 이미지 초기화</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="159"/>
-        <location filename="../src/dlg_settings.cpp" line="169"/>
-        <location filename="../src/dlg_settings.cpp" line="179"/>
-        <location filename="../src/dlg_settings.cpp" line="213"/>
-        <location filename="../src/dlg_settings.cpp" line="223"/>
+        <location filename="../src/dlg_settings.cpp" line="177"/>
+        <location filename="../src/dlg_settings.cpp" line="187"/>
+        <location filename="../src/dlg_settings.cpp" line="197"/>
+        <location filename="../src/dlg_settings.cpp" line="231"/>
+        <location filename="../src/dlg_settings.cpp" line="241"/>
         <source>Choose path</source>
         <translation>경로 선택</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="206"/>
+        <location filename="../src/dlg_settings.cpp" line="224"/>
         <source>Success</source>
         <translation>성공</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="206"/>
+        <location filename="../src/dlg_settings.cpp" line="224"/>
         <source>Downloaded card pictures have been reset.</source>
         <translation>저장된 카드 이미지 파일들이 초기화 되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="208"/>
+        <location filename="../src/dlg_settings.cpp" line="226"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="208"/>
+        <location filename="../src/dlg_settings.cpp" line="226"/>
         <source>One or more downloaded card pictures could not be cleared.</source>
         <translation>저장된 카드 이미지 파일을 초기화 시킬 수 없었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="238"/>
+        <location filename="../src/dlg_settings.cpp" line="256"/>
         <source>Personal settings</source>
         <translation>개인 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="239"/>
+        <location filename="../src/dlg_settings.cpp" line="257"/>
         <source>Language:</source>
         <translation>언어:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="240"/>
+        <location filename="../src/dlg_settings.cpp" line="258"/>
         <source>Download card pictures on the fly</source>
         <translation>카드 이미지 파일 자동 다운로드</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="241"/>
-        <source>Download card pictures from a custom URL</source>
-        <translation>지정된 URL에서 카드 이미지 다운로드</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="249"/>
-        <source>Custom Card Download URL:</source>
-        <translation>카드 이미지 다운로드 URL:</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="250"/>
-        <source>Linking FAQ</source>
-        <translation>카드 이미지 서버 설정 FAQ</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="252"/>
-        <source>Notify when new client features are available</source>
+        <location filename="../src/dlg_settings.cpp" line="266"/>
+        <source>Primary download URL:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="242"/>
+        <location filename="../src/dlg_settings.cpp" line="267"/>
+        <source>Fallback download URL:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="271"/>
+        <location filename="../src/dlg_settings.cpp" line="272"/>
+        <source>Reset</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="268"/>
+        <source>How to set a custom picture url</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="270"/>
+        <source>Notify when new client features are available</source>
+        <translation>클라이언트 업데이트 필요 시 알림</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="259"/>
         <source>Paths</source>
         <translation>디렉토리 경로</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="243"/>
+        <location filename="../src/dlg_settings.cpp" line="260"/>
         <source>Decks directory:</source>
         <translation>덱 파일 경로:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="244"/>
+        <location filename="../src/dlg_settings.cpp" line="261"/>
         <source>Replays directory:</source>
         <translation>리플레이 파일 경로:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="245"/>
+        <location filename="../src/dlg_settings.cpp" line="262"/>
         <source>Pictures directory:</source>
         <translation>카드 이미지 경로:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="246"/>
+        <location filename="../src/dlg_settings.cpp" line="263"/>
         <source>Card database:</source>
         <translation>카드 데이터베이스 경로:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="247"/>
+        <location filename="../src/dlg_settings.cpp" line="264"/>
         <source>Token database:</source>
         <translation>토큰 데이터베이스 경로:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="248"/>
+        <location filename="../src/dlg_settings.cpp" line="265"/>
         <source>Picture cache size:</source>
         <translation>카드 이미지 캐시 최대 용량:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="42"/>
-        <location filename="../src/dlg_settings.cpp" line="154"/>
+        <location filename="../src/dlg_settings.cpp" line="158"/>
         <source>English</source>
         <translation>한국어 (Korean)</translation>
     </message>
@@ -1809,49 +1866,49 @@ http://github.com/Cockatrice/Cockatrice/issues 에 cards.xml을 첨부한 버그
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/window_main.cpp" line="82"/>
+        <location filename="../src/window_main.cpp" line="88"/>
         <source>There are too many concurrent connections from your address.</source>
         <translation>해당 IP주소에서 동시에 연결된 회선이 너무 많습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="93"/>
+        <location filename="../src/window_main.cpp" line="99"/>
         <source>Scheduled server shutdown.</source>
         <translation>정기 점검 중입니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="84"/>
+        <location filename="../src/window_main.cpp" line="90"/>
         <source>Banned by moderator</source>
         <translation>관리자에 의해 서버에서 추방 당하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="86"/>
+        <location filename="../src/window_main.cpp" line="92"/>
         <source>Expected end time: %1</source>
         <translation>예상 추방 종료 시간: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="88"/>
+        <location filename="../src/window_main.cpp" line="94"/>
         <source>This ban lasts indefinitely.</source>
         <translation>영구적 추방입니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="98"/>
+        <location filename="../src/window_main.cpp" line="104"/>
         <source>Connection closed</source>
         <translation>서버와의 연결이 끊어졌습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="98"/>
+        <location filename="../src/window_main.cpp" line="104"/>
         <source>The server has terminated your connection.
 Reason: %1</source>
         <translation>서버에서 연결을 끊었습니다.
 사유: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="105"/>
+        <location filename="../src/window_main.cpp" line="111"/>
         <source>Scheduled server shutdown</source>
         <translation>정기 점검</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/window_main.cpp" line="103"/>
+        <location filename="../src/window_main.cpp" line="109"/>
         <source>The server is going to be restarted in %n minute(s).
 All running games will be lost.
 Reason for shutdown: %1</source>
@@ -1860,193 +1917,199 @@ Reason for shutdown: %1</source>
 서버 재시작 사유: %1</numerusform></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="190"/>
+        <location filename="../src/window_main.cpp" line="196"/>
         <source>Number of players</source>
         <translation>플레이어 인원</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="190"/>
+        <location filename="../src/window_main.cpp" line="196"/>
         <source>Please enter the number of players.</source>
         <translation>최대 플레이어 인원을 입력해 주세요.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="200"/>
         <location filename="../src/window_main.cpp" line="206"/>
+        <location filename="../src/window_main.cpp" line="212"/>
         <source>Player %1</source>
         <translation>플레이어 %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="218"/>
+        <location filename="../src/window_main.cpp" line="224"/>
         <source>Load replay</source>
         <translation>리플레이 불러오기</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="273"/>
+        <location filename="../src/window_main.cpp" line="279"/>
         <source>About Cockatrice</source>
         <translation>코카트리스에 관하여</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="275"/>
+        <location filename="../src/window_main.cpp" line="281"/>
         <source>Version %1</source>
         <translation>버전 %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="281"/>
+        <location filename="../src/window_main.cpp" line="288"/>
         <source>Translators:</source>
         <translation>번역진:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="276"/>
+        <location filename="../src/window_main.cpp" line="283"/>
         <source>Project Manager:</source>
         <translation>현 프로젝트 매니저:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="81"/>
+        <location filename="../src/window_main.cpp" line="87"/>
         <source>The server has reached its maximum user capacity, please check back later.</source>
         <translation>서버가 꽉 찼습니다. 나중에 다시 접속하여 주십시오.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="94"/>
-        <location filename="../src/window_main.cpp" line="367"/>
+        <location filename="../src/window_main.cpp" line="100"/>
+        <location filename="../src/window_main.cpp" line="380"/>
         <source>Invalid username.</source>
         <translation>잘못된 사용자명입니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="95"/>
+        <location filename="../src/window_main.cpp" line="101"/>
         <source>You have been logged out due to logging in at another location.</source>
         <translation>다른 장소에서 로그인하여 접속이 해제되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="142"/>
-        <location filename="../src/window_main.cpp" line="152"/>
+        <location filename="../src/window_main.cpp" line="148"/>
+        <location filename="../src/window_main.cpp" line="158"/>
         <source>Success</source>
         <translation>성공</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="142"/>
+        <location filename="../src/window_main.cpp" line="148"/>
         <source>Registration accepted.
 Will now login.</source>
         <translation>가입이 승인되었습니다.
 로그인합니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="152"/>
+        <location filename="../src/window_main.cpp" line="158"/>
         <source>Account activation accepted.
 Will now login.</source>
         <translation>계정이 활성화 되었습니다.
 로그인합니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="277"/>
+        <location filename="../src/window_main.cpp" line="282"/>
+        <source>Cockatrice Webpage</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="284"/>
         <source>Past Project Managers:</source>
         <translation>전 프로젝트 매니저:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="278"/>
+        <location filename="../src/window_main.cpp" line="285"/>
         <source>Developers:</source>
         <translation>개발진:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="279"/>
+        <location filename="../src/window_main.cpp" line="286"/>
         <source>Our Developers</source>
         <translation>기여자 목록</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="280"/>
+        <location filename="../src/window_main.cpp" line="287"/>
         <source>Help Develop!</source>
         <translation>개발을 도와주세요!</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="282"/>
+        <location filename="../src/window_main.cpp" line="289"/>
         <source>Recognition Page</source>
         <translation>번역자 목록</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="283"/>
+        <location filename="../src/window_main.cpp" line="290"/>
         <source>Help Translate!</source>
         <translation>번역을 도와주세요!</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="284"/>
+        <location filename="../src/window_main.cpp" line="291"/>
         <source>Support:</source>
         <translation> 기술 지원:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="285"/>
+        <location filename="../src/window_main.cpp" line="292"/>
         <source>Report an Issue</source>
         <translation>문제점 보고</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="293"/>
-        <location filename="../src/window_main.cpp" line="315"/>
-        <location filename="../src/window_main.cpp" line="318"/>
-        <location filename="../src/window_main.cpp" line="329"/>
-        <location filename="../src/window_main.cpp" line="333"/>
-        <location filename="../src/window_main.cpp" line="337"/>
+        <location filename="../src/window_main.cpp" line="306"/>
+        <location filename="../src/window_main.cpp" line="328"/>
+        <location filename="../src/window_main.cpp" line="331"/>
         <location filename="../src/window_main.cpp" line="342"/>
-        <location filename="../src/window_main.cpp" line="345"/>
-        <location filename="../src/window_main.cpp" line="359"/>
-        <location filename="../src/window_main.cpp" line="427"/>
-        <location filename="../src/window_main.cpp" line="431"/>
-        <location filename="../src/window_main.cpp" line="435"/>
-        <location filename="../src/window_main.cpp" line="438"/>
-        <location filename="../src/window_main.cpp" line="445"/>
-        <location filename="../src/window_main.cpp" line="452"/>
-        <location filename="../src/window_main.cpp" line="459"/>
-        <location filename="../src/window_main.cpp" line="461"/>
-        <location filename="../src/window_main.cpp" line="750"/>
-        <location filename="../src/window_main.cpp" line="786"/>
+        <location filename="../src/window_main.cpp" line="346"/>
+        <location filename="../src/window_main.cpp" line="350"/>
+        <location filename="../src/window_main.cpp" line="355"/>
+        <location filename="../src/window_main.cpp" line="358"/>
+        <location filename="../src/window_main.cpp" line="372"/>
+        <location filename="../src/window_main.cpp" line="440"/>
+        <location filename="../src/window_main.cpp" line="444"/>
+        <location filename="../src/window_main.cpp" line="448"/>
+        <location filename="../src/window_main.cpp" line="451"/>
+        <location filename="../src/window_main.cpp" line="458"/>
+        <location filename="../src/window_main.cpp" line="465"/>
+        <location filename="../src/window_main.cpp" line="472"/>
+        <location filename="../src/window_main.cpp" line="474"/>
+        <location filename="../src/window_main.cpp" line="770"/>
+        <location filename="../src/window_main.cpp" line="806"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="293"/>
+        <location filename="../src/window_main.cpp" line="306"/>
         <source>Server timeout</source>
         <translation>서버 응답시간 초과</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="308"/>
+        <location filename="../src/window_main.cpp" line="321"/>
         <source>Failed Login</source>
-        <translation type="unfinished"/>
+        <translation>로그인 실패</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="309"/>
+        <location filename="../src/window_main.cpp" line="322"/>
         <source>Your client does not support features that the server requires, please update your client and try again.</source>
-        <translation type="unfinished"/>
+        <translation>현재 사용하고 계신 클라이언트는 접속하신 서버가 필요로 하는 기능을 지원하지 않습니다.
+클라이언트를 업데이트하고 다시 시도하여 주십시오.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="315"/>
+        <location filename="../src/window_main.cpp" line="328"/>
         <source>Incorrect username or password. Please check your authentication information and try again.</source>
         <translation>잘못된 사용자명이나 비밀번호입니다.
 확인 후 다시 시도해 주세요.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="318"/>
+        <location filename="../src/window_main.cpp" line="331"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
         <translation>해당 사용자명으로 연결된 다른 세션이 있습니다.
 해당 세션을 종료 한 후에 다시 시도해 주세요.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="323"/>
-        <location filename="../src/window_main.cpp" line="421"/>
+        <location filename="../src/window_main.cpp" line="336"/>
+        <location filename="../src/window_main.cpp" line="434"/>
         <source>You are banned until %1.</source>
         <translation>%1까지 추방 당하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="325"/>
-        <location filename="../src/window_main.cpp" line="423"/>
+        <location filename="../src/window_main.cpp" line="338"/>
+        <location filename="../src/window_main.cpp" line="436"/>
         <source>You are banned indefinitely.</source>
         <translation>당신은 무기한 추방 당하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="337"/>
+        <location filename="../src/window_main.cpp" line="350"/>
         <source>This server requires user registration. Do you want to register now?</source>
         <translation>본 서버는 가입이 필요합니다.
 지금 가입하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="342"/>
+        <location filename="../src/window_main.cpp" line="355"/>
         <source>This server requires client ID's. Your client is either failing to generate an ID or you are running a modified client.
 Please close and reopen your client to try again.</source>
         <translation>본 서버는 클라이언트 ID가 필요합니다. 현재 사용중인 코카트리스는 올바른 ID를 생성하지 못하거나 수정된 버전일 수 있습니다.
@@ -2054,134 +2117,134 @@ Please close and reopen your client to try again.</source>
 코카트리스를 다시 실행하여 주시기 바랍니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="345"/>
+        <location filename="../src/window_main.cpp" line="358"/>
         <source>An internal error has occurred, please try closing and reopening your client and try again. If the error persists try updating your client to the most recent build and if need be contact your software provider.</source>
         <translation>내부 오류가 발생하였습니다.
 
 코카트리스를 다시 실행하시고 다시 시도하거나 오류가 지속될 경우 코카트리스를 새로 다운받아 주시기 바랍니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="349"/>
+        <location filename="../src/window_main.cpp" line="362"/>
         <source>Account activation</source>
         <translation>계정 활성화</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="359"/>
+        <location filename="../src/window_main.cpp" line="372"/>
         <source>Unknown login error: %1</source>
         <translation>알 수 없는 로그인 오류: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="359"/>
-        <location filename="../src/window_main.cpp" line="438"/>
+        <location filename="../src/window_main.cpp" line="372"/>
+        <location filename="../src/window_main.cpp" line="451"/>
         <source>
 This usually means that your client version is out of date, and the server sent a reply your client doesn&apos;t understand.</source>
         <translation>
 대부분 클라이언트가 오래되어서 서버와 클라이언트가 말이 제대로 통하지 않을때 발생하는 문제입니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="371"/>
+        <location filename="../src/window_main.cpp" line="384"/>
         <source>Your username must respect these rules:</source>
         <translation>사용자명은 다음 조건을 만족해야 합니다:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="373"/>
+        <location filename="../src/window_main.cpp" line="386"/>
         <source>is %1 - %2 characters long</source>
         <translation>%1에서 %2자 사이</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="374"/>
+        <location filename="../src/window_main.cpp" line="387"/>
         <source>can %1 contain lowercase characters</source>
         <translation>소문자 사용 %1가능</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="374"/>
-        <location filename="../src/window_main.cpp" line="375"/>
-        <location filename="../src/window_main.cpp" line="376"/>
+        <location filename="../src/window_main.cpp" line="387"/>
+        <location filename="../src/window_main.cpp" line="388"/>
         <location filename="../src/window_main.cpp" line="389"/>
+        <location filename="../src/window_main.cpp" line="402"/>
         <source>NOT</source>
         <translation>불</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="375"/>
+        <location filename="../src/window_main.cpp" line="388"/>
         <source>can %1 contain uppercase characters</source>
         <translation>대문자 사용 %1가능</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="376"/>
+        <location filename="../src/window_main.cpp" line="389"/>
         <source>can %1 contain numeric characters</source>
         <translation>숫자 사용 %1가능</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="380"/>
+        <location filename="../src/window_main.cpp" line="393"/>
         <source>can contain the following punctuation: %1</source>
         <translation>다음 문장 부호를 사용 가능 :</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="389"/>
+        <location filename="../src/window_main.cpp" line="402"/>
         <source>first character can %1 be a punctuation mark</source>
         <translation>첫 글자를 문장 부호로 입력 %1가능</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="394"/>
+        <location filename="../src/window_main.cpp" line="407"/>
         <source>You may only use A-Z, a-z, 0-9, _, ., and - in your username.</source>
         <translation>사용자명에는 영어 대소문자, 숫자, _(밑줄), .(마침표)나 -(대쉬)만 사용하실 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="404"/>
-        <location filename="../src/window_main.cpp" line="407"/>
-        <location filename="../src/window_main.cpp" line="410"/>
-        <location filename="../src/window_main.cpp" line="413"/>
-        <location filename="../src/window_main.cpp" line="416"/>
+        <location filename="../src/window_main.cpp" line="417"/>
+        <location filename="../src/window_main.cpp" line="420"/>
+        <location filename="../src/window_main.cpp" line="423"/>
+        <location filename="../src/window_main.cpp" line="426"/>
+        <location filename="../src/window_main.cpp" line="429"/>
         <source>Registration denied</source>
         <translation>가입 실패</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="404"/>
+        <location filename="../src/window_main.cpp" line="417"/>
         <source>Registration is currently disabled on this server</source>
         <translation>본 서버는 현재 가입을 받지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="407"/>
+        <location filename="../src/window_main.cpp" line="420"/>
         <source>There is already an existing account with the same user name.</source>
         <translation>이미 존재하는 사용자명 입니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="410"/>
+        <location filename="../src/window_main.cpp" line="423"/>
         <source>It&apos;s mandatory to specify a valid email address when registering.</source>
         <translation>사용 가능한 이메일 주소를 작성하셔야 합니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="413"/>
+        <location filename="../src/window_main.cpp" line="426"/>
         <source>Too many registration attempts from your IP address.</source>
         <translation>현 IP주소에서 너무 많은 가입 요청이 있었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="416"/>
+        <location filename="../src/window_main.cpp" line="429"/>
         <source>Password too short.</source>
         <translation>비밀번호가 너무 짧습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="435"/>
+        <location filename="../src/window_main.cpp" line="448"/>
         <source>Registration failed for a technical problem on the server.</source>
         <translation>서버의 기술적 문제로 가입에 실패하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="438"/>
+        <location filename="../src/window_main.cpp" line="451"/>
         <source>Unknown registration error: %1</source>
         <translation>가입 중 알 수 없는 오류 발생: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="445"/>
+        <location filename="../src/window_main.cpp" line="458"/>
         <source>Account activation failed</source>
         <translation>계정 활성화 실패</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="452"/>
+        <location filename="../src/window_main.cpp" line="465"/>
         <source>Socket error: %1</source>
         <translation>소켓 오류: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="459"/>
+        <location filename="../src/window_main.cpp" line="472"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation>서버 버전이 클라이언트보다 오래되었습니다.
@@ -2189,7 +2252,7 @@ Local version is %1, remote version is %2.</source>
 클라이언트 버전 %1, 서버 버전 %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="461"/>
+        <location filename="../src/window_main.cpp" line="474"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation>코카트리스 클라이언트 버전이 오래되었습니다.
@@ -2197,175 +2260,181 @@ Local version is %1, remote version is %2.</source>
 클라이언트 버전 %1, 서버 버전 %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="467"/>
+        <location filename="../src/window_main.cpp" line="480"/>
         <source>Connecting to %1...</source>
         <translation>%1로 연결 시도 중...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="468"/>
+        <location filename="../src/window_main.cpp" line="481"/>
         <source>Registering to %1 as %2...</source>
         <translation>서버 %1에 %2(으)로 가입 중...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="469"/>
+        <location filename="../src/window_main.cpp" line="482"/>
         <source>Disconnected</source>
         <translation>연결 안됨</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="470"/>
+        <location filename="../src/window_main.cpp" line="483"/>
         <source>Connected, logging in at %1</source>
         <translation>연결됨, %1로 로그인 시도 중</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="480"/>
+        <location filename="../src/window_main.cpp" line="493"/>
         <source>&amp;Connect...</source>
         <translation>서버로 연결</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="481"/>
+        <location filename="../src/window_main.cpp" line="494"/>
         <source>&amp;Disconnect</source>
         <translation>서버와의 연결 해제</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="482"/>
+        <location filename="../src/window_main.cpp" line="495"/>
         <source>Start &amp;local game...</source>
         <translation>오프라인 게임 시작</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="483"/>
+        <location filename="../src/window_main.cpp" line="496"/>
         <source>&amp;Watch replay...</source>
         <translation>리플레이 재생</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="484"/>
+        <location filename="../src/window_main.cpp" line="497"/>
         <source>&amp;Deck editor</source>
         <translation>덱 편집기</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="485"/>
+        <location filename="../src/window_main.cpp" line="498"/>
         <source>&amp;Full screen</source>
         <translation>전체 화면</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="486"/>
+        <location filename="../src/window_main.cpp" line="499"/>
         <source>&amp;Register to server...</source>
         <translation>서버에 가입</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="487"/>
+        <location filename="../src/window_main.cpp" line="500"/>
         <source>&amp;Settings...</source>
         <translation>환경설정</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="488"/>
-        <location filename="../src/window_main.cpp" line="656"/>
+        <location filename="../src/window_main.cpp" line="502"/>
+        <location filename="../src/window_main.cpp" line="674"/>
         <source>&amp;Exit</source>
         <translation>끝내기</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="491"/>
+        <location filename="../src/window_main.cpp" line="505"/>
         <source>A&amp;ctions</source>
         <translation>액션</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="493"/>
+        <location filename="../src/window_main.cpp" line="507"/>
         <source>&amp;Cockatrice</source>
         <translation>코카트리스</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="496"/>
+        <location filename="../src/window_main.cpp" line="510"/>
         <source>&amp;About Cockatrice</source>
         <translation>코카트리스에 관하여</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="497"/>
+        <location filename="../src/window_main.cpp" line="511"/>
+        <source>&amp;Update Cockatrice</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="512"/>
         <source>&amp;Help</source>
         <translation>도움말</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="498"/>
+        <location filename="../src/window_main.cpp" line="513"/>
         <source>Check for card updates...</source>
         <translation>카드 데이터베이스 업데이트 확인</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="716"/>
+        <location filename="../src/window_main.cpp" line="736"/>
         <source>A card database update is already running.</source>
         <translation>이미 카드 데이터베이스 업데이트가 진행 중입니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="750"/>
+        <location filename="../src/window_main.cpp" line="770"/>
         <source>Unable to run the card database updater: </source>
         <translation>카드 데이터베이스 업데이트를 진행할 수 없습니다:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="786"/>
+        <location filename="../src/window_main.cpp" line="806"/>
         <source>The card database updater exited with an error: %1</source>
         <translation>카드 데이터베이스 업데이트 중 다음 오류가 발생하였습니다:
 %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="794"/>
+        <location filename="../src/window_main.cpp" line="814"/>
         <source>Update completed successfully. Cockatrice will now reload the card database.</source>
         <translation>카드 데이터베이스가 성공적으로 업데이트 되었습니다.
 데이터베이스를 다시 불러오겠습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="816"/>
+        <location filename="../src/window_main.cpp" line="837"/>
         <source>Your client appears to be missing features that the server supports.
 This usually means that your client version is out of date, please check to see if there is a new client available for download.</source>
-        <translation type="unfinished"/>
+        <translation>현재 사용하고 계신 클라이언트 접속하신 서버가 제공하는 몇가지 기능을 지원하지 않습니다.
+보통 클라이언트가 오래되어 생기는 문제로 새로운 클라이언트를 받으면 해결됩니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="716"/>
-        <location filename="../src/window_main.cpp" line="794"/>
-        <location filename="../src/window_main.cpp" line="816"/>
+        <location filename="../src/window_main.cpp" line="736"/>
+        <location filename="../src/window_main.cpp" line="814"/>
+        <location filename="../src/window_main.cpp" line="837"/>
         <source>Information</source>
         <translation>알림</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="286"/>
+        <location filename="../src/window_main.cpp" line="293"/>
         <source>Troubleshooting</source>
         <translation>문제 해결</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="287"/>
+        <location filename="../src/window_main.cpp" line="294"/>
         <source>F.A.Q.</source>
         <translation>자주 묻는 질문</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="349"/>
+        <location filename="../src/window_main.cpp" line="362"/>
         <source>Your account has not been activated yet.
 You need to provide the activation token received in the activation email</source>
         <translation>계정이 아직 활성화 되지 않았습니다.
 가입 시 기입한 메일 주소에서 계정 활성화 토큰을 확인하여 주십시오.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="763"/>
+        <location filename="../src/window_main.cpp" line="783"/>
         <source>failed to start.</source>
         <translation>업데이트 시작 실패</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="766"/>
+        <location filename="../src/window_main.cpp" line="786"/>
         <source>crashed.</source>
         <translation>강제 종료됨.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="769"/>
+        <location filename="../src/window_main.cpp" line="789"/>
         <source>timed out.</source>
         <translation>시간 초과.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="772"/>
+        <location filename="../src/window_main.cpp" line="792"/>
         <source>write error.</source>
         <translation>파일 쓰기 오류.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="775"/>
+        <location filename="../src/window_main.cpp" line="795"/>
         <source>read error.</source>
         <translation>파일 읽기 오류.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="779"/>
+        <location filename="../src/window_main.cpp" line="799"/>
         <source>unknown error.</source>
         <translation>알 수 없는 오류.</translation>
     </message>
@@ -2373,17 +2442,17 @@ You need to provide the activation token received in the activation email</sourc
 <context>
     <name>MessageLogWidget</name>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="74"/>
+        <location filename="../src/messagelogwidget.cpp" line="75"/>
         <source>The game has been closed.</source>
         <translation>게임이 종료되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="84"/>
+        <location filename="../src/messagelogwidget.cpp" line="86"/>
         <source>%1 is now watching the game.</source>
         <translation>%1이(가) 관전을 시작하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="89"/>
+        <location filename="../src/messagelogwidget.cpp" line="92"/>
         <source>%1 is not watching the game any more.</source>
         <translation>%1이(가) 관전을 종료하였습니다.</translation>
     </message>
@@ -2431,136 +2500,136 @@ You need to provide the activation token received in the activation email</sourc
         <translation>%1이(가) 게임에 참가하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="67"/>
+        <location filename="../src/messagelogwidget.cpp" line="68"/>
         <source>%1 has left the game.</source>
         <comment>female</comment>
         <translation>%1이(가) 게임에서 나갔습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="69"/>
+        <location filename="../src/messagelogwidget.cpp" line="70"/>
         <source>%1 has left the game.</source>
         <comment>male</comment>
         <translation>%1이(가) 게임에서 나갔습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="79"/>
+        <location filename="../src/messagelogwidget.cpp" line="80"/>
         <source>You have been kicked out of the game.</source>
         <translation>게임에서 강제 퇴장 당하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="96"/>
+        <location filename="../src/messagelogwidget.cpp" line="99"/>
         <source>%1 has loaded a deck (%2).</source>
         <translation>%1이(가) 덱을 불러왔습니다. (해시값: %2)</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="98"/>
+        <location filename="../src/messagelogwidget.cpp" line="101"/>
         <source>%1 has loaded a deck with %2 sideboard cards (%3).</source>
         <translation>%1이(가) %2장의 사이드보드가 있는 덱을 불러왔습니다. (해시값: %3)</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="107"/>
+        <location filename="../src/messagelogwidget.cpp" line="110"/>
         <source>%1 is ready to start the game.</source>
         <comment>female</comment>
         <translation>%1이(가) 게임을 시작할 준비가 되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="109"/>
+        <location filename="../src/messagelogwidget.cpp" line="112"/>
         <source>%1 is ready to start the game.</source>
         <comment>male</comment>
         <translation>%1이(가) 게임을 시작할 준비가 되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="115"/>
+        <location filename="../src/messagelogwidget.cpp" line="118"/>
         <source>%1 is not ready to start the game any more.</source>
         <comment>female</comment>
         <translation>%1은(는) 더 이상 게임을 시작할 준비가 안되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="117"/>
+        <location filename="../src/messagelogwidget.cpp" line="120"/>
         <source>%1 is not ready to start the game any more.</source>
         <comment>male</comment>
         <translation>%1은(는) 더 이상 게임을 시작할 준비가 안되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="124"/>
+        <location filename="../src/messagelogwidget.cpp" line="127"/>
         <source>%1 has locked her sideboard.</source>
         <comment>female</comment>
         <translation>%1이(가) 덱에서 사이드보드 카드를 제외합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="126"/>
+        <location filename="../src/messagelogwidget.cpp" line="129"/>
         <source>%1 has locked his sideboard.</source>
         <comment>male</comment>
         <translation>%1이(가) 덱에서 사이드보드 카드를 제외합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="129"/>
+        <location filename="../src/messagelogwidget.cpp" line="132"/>
         <source>%1 has unlocked her sideboard.</source>
         <comment>female</comment>
         <translation>%1이(가) 덱에 사이드보드 카드를 넣으려고 합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="131"/>
+        <location filename="../src/messagelogwidget.cpp" line="134"/>
         <source>%1 has unlocked his sideboard.</source>
         <comment>male</comment>
         <translation>%1이(가) 덱에 사이드보드 카드를 넣으려고 합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="138"/>
+        <location filename="../src/messagelogwidget.cpp" line="142"/>
         <source>%1 has conceded the game.</source>
         <comment>female</comment>
         <translation>%1이(가) 항복하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="140"/>
+        <location filename="../src/messagelogwidget.cpp" line="144"/>
         <source>%1 has conceded the game.</source>
         <comment>male</comment>
         <translation>%1이(가) 항복하였습니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="152"/>
-        <source>%1 has restored connection to the game.</source>
-        <comment>female</comment>
-        <translation>%1의 연결이 복구되었습니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="154"/>
-        <source>%1 has restored connection to the game.</source>
-        <comment>male</comment>
-        <translation>%1의 연결이 복구되었습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="157"/>
-        <source>%1 has lost connection to the game.</source>
+        <source>%1 has restored connection to the game.</source>
         <comment>female</comment>
-        <translation>%1의 연결이 끊어졌습니다.</translation>
+        <translation>%1의 연결이 복구되었습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="159"/>
+        <source>%1 has restored connection to the game.</source>
+        <comment>male</comment>
+        <translation>%1의 연결이 복구되었습니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="163"/>
+        <source>%1 has lost connection to the game.</source>
+        <comment>female</comment>
+        <translation>%1의 연결이 끊어졌습니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="165"/>
         <source>%1 has lost connection to the game.</source>
         <comment>male</comment>
         <translation>%1의 연결이 끊어졌습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="177"/>
+        <location filename="../src/messagelogwidget.cpp" line="184"/>
         <source>%1 shuffles %2.</source>
         <comment>female</comment>
         <translation>%1이(가) %2 섞습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="178"/>
+        <location filename="../src/messagelogwidget.cpp" line="185"/>
         <source>%1 shuffles %2.</source>
         <comment>male</comment>
         <translation>%1이(가) %2 섞습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="187"/>
+        <location filename="../src/messagelogwidget.cpp" line="202"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <comment>female</comment>
         <translation>%1이(가) %3면체 주사위로 %2을(를) 굴렸습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="189"/>
+        <location filename="../src/messagelogwidget.cpp" line="204"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <comment>male</comment>
         <translation>%1이(가) %3면체 주사위로 %2을(를) 굴렸습니다.</translation>
@@ -2582,464 +2651,486 @@ You need to provide the activation token received in the activation email</sourc
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="207"/>
+        <location filename="../src/messagelogwidget.cpp" line="223"/>
         <source>%1 undoes his last draw.</source>
         <translation>%1이(가) 마지막으로 뽑은 카드를 서고에 돌려놓습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="207"/>
+        <location filename="../src/messagelogwidget.cpp" line="223"/>
         <source>%1 undoes her last draw.</source>
         <translation>%1이(가) 마지막으로 뽑은 카드를 서고에 돌려놓습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="209"/>
+        <location filename="../src/messagelogwidget.cpp" line="225"/>
         <source>%1 undoes his last draw (%2).</source>
         <translation>%1이(가) 마지막으로 뽑은 카드를 서고로 돌려놓습니다 (%2).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="209"/>
+        <location filename="../src/messagelogwidget.cpp" line="225"/>
         <source>%1 undoes her last draw (%2).</source>
         <translation>%1이(가) 마지막으로 뽑은 카드를 서고로 돌려놓습니다 (%2).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="223"/>
+        <location filename="../src/messagelogwidget.cpp" line="239"/>
         <source> from exile</source>
         <translation>추방 영역에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="243"/>
+        <location filename="../src/messagelogwidget.cpp" line="259"/>
         <source>the bottom card of %1&apos;s library</source>
         <translation>%1의 서고 맨 밑의 카드</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="245"/>
+        <location filename="../src/messagelogwidget.cpp" line="261"/>
         <source>the bottom card of his library</source>
         <translation>그의 서고 맨 밑의 카드</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="245"/>
+        <location filename="../src/messagelogwidget.cpp" line="261"/>
         <source>the bottom card of her library</source>
         <translation>그녀의 서고 맨 밑의 카드</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="249"/>
+        <location filename="../src/messagelogwidget.cpp" line="265"/>
         <source> from the bottom of %1&apos;s library</source>
         <translation>%1의 서고 맨 밑에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="251"/>
+        <location filename="../src/messagelogwidget.cpp" line="267"/>
         <source> from the bottom of his library</source>
         <translation>그의 서고 맨 밑에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="251"/>
+        <location filename="../src/messagelogwidget.cpp" line="267"/>
         <source> from the bottom of her library</source>
         <translation>그녀의 서고 맨 밑에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="230"/>
+        <location filename="../src/messagelogwidget.cpp" line="246"/>
         <source>the top card of %1&apos;s library</source>
         <translation>%1의 서고 맨 위의 카드</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="232"/>
+        <location filename="../src/messagelogwidget.cpp" line="193"/>
+        <source>Heads (1)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="193"/>
+        <source>Tails (2)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="198"/>
+        <source>%1 flipped a coin. It landed as %2.</source>
+        <comment>female</comment>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="200"/>
+        <source>%1 flipped a coin. It landed as %2.</source>
+        <comment>male</comment>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="248"/>
         <source>the top card of his library</source>
         <translation>그의 서고 맨 위의 카드</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="232"/>
+        <location filename="../src/messagelogwidget.cpp" line="248"/>
         <source>the top card of her library</source>
         <translation>그녀의 서고 맨 위의 카드</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="236"/>
+        <location filename="../src/messagelogwidget.cpp" line="252"/>
         <source> from the top of %1&apos;s library</source>
         <translation>%1의 서고 맨 위에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="238"/>
+        <location filename="../src/messagelogwidget.cpp" line="254"/>
         <source> from the top of his library</source>
         <translation>그의 서고 맨 위에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="238"/>
+        <location filename="../src/messagelogwidget.cpp" line="254"/>
         <source> from the top of her library</source>
         <translation>그녀의 서고 맨 위에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="255"/>
+        <location filename="../src/messagelogwidget.cpp" line="271"/>
         <source> from %1&apos;s library</source>
         <translation>%1의 서고에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="257"/>
+        <location filename="../src/messagelogwidget.cpp" line="273"/>
         <source> from library</source>
         <translation>서고에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="260"/>
+        <location filename="../src/messagelogwidget.cpp" line="276"/>
         <source> from sideboard</source>
         <translation>사이드보드에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="262"/>
+        <location filename="../src/messagelogwidget.cpp" line="278"/>
         <source> from the stack</source>
         <translation>스택에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="293"/>
+        <location filename="../src/messagelogwidget.cpp" line="309"/>
         <source>%1 gives %2 control over %3.</source>
         <translation>%1이(가) %3의 조종권을 %2에게 넘깁니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="300"/>
+        <location filename="../src/messagelogwidget.cpp" line="317"/>
         <source>%1 puts %2 into play tapped%3.</source>
         <translation>%1이(가) %3서 %2을(를) 탭된 채로 전장에 놓았습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="302"/>
+        <location filename="../src/messagelogwidget.cpp" line="319"/>
         <source>%1 puts %2 into play%3.</source>
         <translation>%1이(가) %3서 %2을(를) 전장에 놓았습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="306"/>
+        <location filename="../src/messagelogwidget.cpp" line="323"/>
         <source>%1 exiles %2%3.</source>
         <translation>%1이(가) %3 있던 %2을(를) 추방합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="311"/>
+        <location filename="../src/messagelogwidget.cpp" line="328"/>
         <source>%1 puts %2%3 into his library.</source>
         <translation>%1이(가) %3 있던 %2을(를) 서고에 넣었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="311"/>
+        <location filename="../src/messagelogwidget.cpp" line="328"/>
         <source>%1 puts %2%3 into her library.</source>
         <translation>%1이(가) %3 있던 %2을(를) 서고에 넣었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="313"/>
+        <location filename="../src/messagelogwidget.cpp" line="330"/>
         <source>%1 puts %2%3 on bottom of his library.</source>
         <translation>%1이(가) %3 있던 %2을(를) 서고 맨 밑에 넣었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="313"/>
+        <location filename="../src/messagelogwidget.cpp" line="330"/>
         <source>%1 puts %2%3 on bottom of her library.</source>
         <translation>%1이(가) %3 있던 %2을(를) 서고 맨 밑에 넣었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="315"/>
+        <location filename="../src/messagelogwidget.cpp" line="332"/>
         <source>%1 puts %2%3 on top of his library.</source>
         <translation>%1이(가) %3 있던 %2을(를) 서고 맨 위에 올려두었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="315"/>
+        <location filename="../src/messagelogwidget.cpp" line="332"/>
         <source>%1 puts %2%3 on top of her library.</source>
         <translation>%1이(가) %3 있던 %2을(를) 서고 맨 위에 올려두었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="317"/>
+        <location filename="../src/messagelogwidget.cpp" line="334"/>
         <source>%1 puts %2%3 into his library at position %4.</source>
         <translation>%1이 %3 있던 %2을(를) 서고 %4번째 자리에 넣었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="317"/>
+        <location filename="../src/messagelogwidget.cpp" line="334"/>
         <source>%1 puts %2%3 into her library at position %4.</source>
         <translation>%1이(가) %3 있던 %2을(를) 서고 %4번째 자리에 넣었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="319"/>
+        <location filename="../src/messagelogwidget.cpp" line="336"/>
         <source>%1 moves %2%3 to sideboard.</source>
         <translation>%1이(가) %3 있던 %2을(를) 서고 맨 밑에 넣었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="321"/>
+        <location filename="../src/messagelogwidget.cpp" line="339"/>
         <source>%1 plays %2%3.</source>
         <translation>%1이(가) %3서 %2을(를) 플레이 하였습니다.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="345"/>
+        <location filename="../src/messagelogwidget.cpp" line="363"/>
         <source>%1 takes a mulligan to %n.</source>
         <comment>female</comment>
         <translation><numerusform>%1이(가) %n장으로 멀리건을 하였습니다.</numerusform></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="347"/>
+        <location filename="../src/messagelogwidget.cpp" line="365"/>
         <source>%1 takes a mulligan to %n.</source>
         <comment>male</comment>
         <translation><numerusform>%1이(가) %n장으로 멀리건을 하였습니다.</numerusform></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="356"/>
+        <location filename="../src/messagelogwidget.cpp" line="374"/>
         <source>%1 flips %2 face-down.</source>
         <comment>female</comment>
         <translation>%1이(가) %2을(를) 뒷면으로 뒤집어 놓습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="358"/>
+        <location filename="../src/messagelogwidget.cpp" line="376"/>
         <source>%1 flips %2 face-down.</source>
         <comment>male</comment>
         <translation>%1이(가) %2을(를) 뒷면으로 뒤집어 놓습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="361"/>
+        <location filename="../src/messagelogwidget.cpp" line="379"/>
         <source>%1 flips %2 face-up.</source>
         <comment>female</comment>
         <translation>%1이(가) %2을(를) 앞면으로 뒤집어 놓습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="363"/>
+        <location filename="../src/messagelogwidget.cpp" line="381"/>
         <source>%1 flips %2 face-up.</source>
         <comment>male</comment>
         <translation>%1이(가) %2을(를) 앞면으로 뒤집어 놓습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="370"/>
+        <location filename="../src/messagelogwidget.cpp" line="388"/>
         <source>%1 destroys %2.</source>
         <comment>female</comment>
         <translation>%1이(가) %2을(를) 파괴합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="372"/>
+        <location filename="../src/messagelogwidget.cpp" line="390"/>
         <source>%1 destroys %2.</source>
         <comment>male</comment>
         <translation>%1이(가) %2을(를) 파괴합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="396"/>
+        <location filename="../src/messagelogwidget.cpp" line="414"/>
         <source>%1 unattaches %2.</source>
         <comment>female</comment>
         <translation>%1이(가) %2을(를) 떼어냅니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="398"/>
+        <location filename="../src/messagelogwidget.cpp" line="416"/>
         <source>%1 unattaches %2.</source>
         <comment>male</comment>
         <translation>%1이(가) %2을(를) 떼어냅니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="404"/>
+        <location filename="../src/messagelogwidget.cpp" line="422"/>
         <source>%1 creates token: %2%3.</source>
         <comment>female</comment>
         <translation>%1이(가) %2%3 토큰을 생성합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="406"/>
+        <location filename="../src/messagelogwidget.cpp" line="424"/>
         <source>%1 creates token: %2%3.</source>
         <comment>male</comment>
         <translation>%1이(가) %2%3 토큰을 생성합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="417"/>
+        <location filename="../src/messagelogwidget.cpp" line="435"/>
         <source>%1 points from her %2 to herself.</source>
         <comment>female</comment>
         <translation>%1이(가) 그녀의 %2로(으로) 자기 자신을 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="419"/>
+        <location filename="../src/messagelogwidget.cpp" line="437"/>
         <source>%1 points from his %2 to himself.</source>
         <comment>male</comment>
         <translation>%1이(가) 그의 %2로(으로) 자기 자신을 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="424"/>
+        <location filename="../src/messagelogwidget.cpp" line="442"/>
         <source>%1 points from her %2 to %3.</source>
         <comment>p1 female, p2 female</comment>
         <translation>%1이(가) 그녀의 %2로(으로) %3을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="426"/>
+        <location filename="../src/messagelogwidget.cpp" line="444"/>
         <source>%1 points from her %2 to %3.</source>
         <comment>p1 female, p2 male</comment>
         <translation>%1이(가) 그녀의 %2로(으로) %3을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="429"/>
+        <location filename="../src/messagelogwidget.cpp" line="447"/>
         <source>%1 points from his %2 to %3.</source>
         <comment>p1 male, p2 female</comment>
         <translation>%1이(가) 그의 %2로(으로) %3을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="431"/>
+        <location filename="../src/messagelogwidget.cpp" line="449"/>
         <source>%1 points from his %2 to %3.</source>
         <comment>p1 male, p2 male</comment>
         <translation>%1이(가) 그의 %2로(으로) %3을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="437"/>
+        <location filename="../src/messagelogwidget.cpp" line="455"/>
         <source>%1 points from %2&apos;s %3 to herself.</source>
         <comment>card owner female, target female</comment>
         <translation>%1이(가) %2의 %3로(으로) 자기 자신을 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="439"/>
+        <location filename="../src/messagelogwidget.cpp" line="457"/>
         <source>%1 points from %2&apos;s %3 to herself.</source>
         <comment>card owner male, target female</comment>
         <translation>%1이(가) %2의 %3로(으로) 자기 자신을 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="442"/>
+        <location filename="../src/messagelogwidget.cpp" line="460"/>
         <source>%1 points from %2&apos;s %3 to himself.</source>
         <comment>card owner female, target male</comment>
         <translation>%1이(가) %2의 %3로(으로) 자기 자신을 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="444"/>
+        <location filename="../src/messagelogwidget.cpp" line="462"/>
         <source>%1 points from %2&apos;s %3 to himself.</source>
         <comment>card owner male, target male</comment>
         <translation>%1이(가) %2의 %3로(으로) 자기 자신을 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="451"/>
+        <location filename="../src/messagelogwidget.cpp" line="469"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 female, p3 female</comment>
         <translation>%1이(가) %2의 %3로(으로) %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="453"/>
+        <location filename="../src/messagelogwidget.cpp" line="471"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 female, p3 male</comment>
         <translation>%1이(가) %2의 %3로(으로) %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="456"/>
+        <location filename="../src/messagelogwidget.cpp" line="474"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 male, p3 female</comment>
         <translation>%1이(가) %2의 %3로(으로) %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="458"/>
+        <location filename="../src/messagelogwidget.cpp" line="476"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 female, p2 male, p3 male</comment>
         <translation>%1이(가) %2의 %3로(으로) %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="463"/>
+        <location filename="../src/messagelogwidget.cpp" line="481"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 female, p3 female</comment>
         <translation>%1이(가) %2의 %3로(으로) %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="465"/>
+        <location filename="../src/messagelogwidget.cpp" line="483"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 female, p3 male</comment>
         <translation>%1이(가) %2의 %3로(으로) %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="468"/>
+        <location filename="../src/messagelogwidget.cpp" line="486"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 male, p3 female</comment>
         <translation>%1이(가) %2의 %3로(으로) %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="470"/>
+        <location filename="../src/messagelogwidget.cpp" line="488"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
         <comment>p1 male, p2 male, p3 male</comment>
         <translation>%1이(가) %2의 %3로(으로) %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="478"/>
+        <location filename="../src/messagelogwidget.cpp" line="496"/>
         <source>%1 points from her %2 to her %3.</source>
         <comment>female</comment>
         <translation>%1이(가) 그녀의 %2로(으로) 그녀의 %3을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="480"/>
+        <location filename="../src/messagelogwidget.cpp" line="498"/>
         <source>%1 points from his %2 to his %3.</source>
         <comment>male</comment>
         <translation>%1이(가) 그의 %2로(으로) 그의 %3을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="485"/>
+        <location filename="../src/messagelogwidget.cpp" line="503"/>
         <source>%1 points from her %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 female</comment>
         <translation>%1이(가) 그녀의 %2로(으로) %3의 %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="487"/>
+        <location filename="../src/messagelogwidget.cpp" line="505"/>
         <source>%1 points from her %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 male</comment>
         <translation>%1이(가) 그녀의 %2로(으로) %3의 %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="490"/>
+        <location filename="../src/messagelogwidget.cpp" line="508"/>
         <source>%1 points from his %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 female</comment>
         <translation>%1이(가) 그의 %2로(으로) %3의 %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="492"/>
+        <location filename="../src/messagelogwidget.cpp" line="510"/>
         <source>%1 points from his %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 male</comment>
         <translation>%1이(가) 그의 %2로(으로) %3의 %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="498"/>
+        <location filename="../src/messagelogwidget.cpp" line="516"/>
         <source>%1 points from %2&apos;s %3 to her own %4.</source>
         <comment>card owner female, target female</comment>
         <translation>%1이(가) %2의 %3로(으로) 그녀의 %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="500"/>
+        <location filename="../src/messagelogwidget.cpp" line="518"/>
         <source>%1 points from %2&apos;s %3 to her own %4.</source>
         <comment>card owner male, target female</comment>
         <translation>%1이(가) %2의 %3로(으로) 그녀의 %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="503"/>
+        <location filename="../src/messagelogwidget.cpp" line="521"/>
         <source>%1 points from %2&apos;s %3 to his own %4.</source>
         <comment>card owner female, target male</comment>
         <translation>%1이(가) %2의 %3로(으로) 그의 %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="505"/>
+        <location filename="../src/messagelogwidget.cpp" line="523"/>
         <source>%1 points from %2&apos;s %3 to his own %4.</source>
         <comment>card owner male, target male</comment>
         <translation>%1이(가) %2의 %3로(으로) 그의 %4을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="512"/>
+        <location filename="../src/messagelogwidget.cpp" line="530"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 female, p3 female</comment>
         <translation>%1이(가) %2의 %3로(으로) %4의 %5을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="514"/>
+        <location filename="../src/messagelogwidget.cpp" line="532"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 female, p3 male</comment>
         <translation>%1이(가) %2의 %3로(으로) %4의 %5을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="517"/>
+        <location filename="../src/messagelogwidget.cpp" line="535"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 male, p3 female</comment>
         <translation>%1이(가) %2의 %3로(으로) %4의 %5을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="519"/>
+        <location filename="../src/messagelogwidget.cpp" line="537"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 female, p2 male, p3 male</comment>
         <translation>%1이(가) %2의 %3로(으로) %4의 %5을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="524"/>
+        <location filename="../src/messagelogwidget.cpp" line="542"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 female, p3 female</comment>
         <translation>%1이(가) %2의 %3로(으로) %4의 %5을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="526"/>
+        <location filename="../src/messagelogwidget.cpp" line="544"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 female, p3 male</comment>
         <translation>%1이(가) %2의 %3로(으로) %4의 %5을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="529"/>
+        <location filename="../src/messagelogwidget.cpp" line="547"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 male, p3 female</comment>
         <translation>%1이(가) %2의 %3로(으로) %4의 %5을(를) 가르킵니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="531"/>
+        <location filename="../src/messagelogwidget.cpp" line="549"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
         <comment>p1 male, p2 male, p3 male</comment>
         <translation>%1이(가) %2의 %3로(으로) %4의 %5을(를) 가르킵니다.</translation>
@@ -3065,304 +3156,304 @@ You need to provide the activation token received in the activation email</sourc
         <translation type="vanished"><numerusform>%1이(가) %n개의 %2 카운터를 %3에서 제거합니다 (현재 %4개).</numerusform></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="577"/>
+        <location filename="../src/messagelogwidget.cpp" line="598"/>
         <source>%1 taps her permanents.</source>
         <comment>female</comment>
         <translation>%1이(가) 그녀의 지속물을 전부 탭합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="579"/>
+        <location filename="../src/messagelogwidget.cpp" line="600"/>
         <source>%1 untaps her permanents.</source>
         <comment>female</comment>
         <translation>%1이(가) 그녀의 지속물을 전부 언탭합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="582"/>
+        <location filename="../src/messagelogwidget.cpp" line="603"/>
         <source>%1 taps his permanents.</source>
         <comment>male</comment>
         <translation>%1이(가) 그의 지속물을 전부 탭합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="584"/>
+        <location filename="../src/messagelogwidget.cpp" line="605"/>
         <source>%1 untaps his permanents.</source>
         <comment>male</comment>
         <translation>%1이(가) 그의 지속물을 전부 언탭합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="590"/>
+        <location filename="../src/messagelogwidget.cpp" line="611"/>
         <source>%1 taps %2.</source>
         <comment>female</comment>
         <translation>%1이(가) %2을(를) 탭합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="592"/>
+        <location filename="../src/messagelogwidget.cpp" line="613"/>
         <source>%1 untaps %2.</source>
         <comment>female</comment>
         <translation>%1이(가) %2을(를) 언탭합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="595"/>
+        <location filename="../src/messagelogwidget.cpp" line="616"/>
         <source>%1 taps %2.</source>
         <comment>male</comment>
         <translation>%1이(가) %2을(를) 탭합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="597"/>
+        <location filename="../src/messagelogwidget.cpp" line="618"/>
         <source>%1 untaps %2.</source>
         <comment>male</comment>
         <translation>%1이(가) %2을(를) 언탭합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="608"/>
+        <location filename="../src/messagelogwidget.cpp" line="632"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <comment>female</comment>
         <translation>%1이(가) %2 카운터를 %3로(으로) 맞춥니다 (%4%5).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="610"/>
+        <location filename="../src/messagelogwidget.cpp" line="634"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <comment>male</comment>
         <translation>%1이(가) %2 카운터를 %3로(으로) 맞춥니다 (%4%5).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="619"/>
+        <location filename="../src/messagelogwidget.cpp" line="643"/>
         <source>%1 sets %2 to not untap normally.</source>
         <comment>female</comment>
         <translation>%1이(가) %2을(를) 언탭단에 언탭하지 않도록 지정합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="621"/>
+        <location filename="../src/messagelogwidget.cpp" line="645"/>
         <source>%1 sets %2 to not untap normally.</source>
         <comment>male</comment>
         <translation>%1이(가) %2을(를) 언탭단에 언탭하지 않도록 지정합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="624"/>
+        <location filename="../src/messagelogwidget.cpp" line="648"/>
         <source>%1 sets %2 to untap normally.</source>
         <comment>female</comment>
         <translation>%1이(가) %2을(를) 언탭단에 언탭하도록 지정합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="626"/>
+        <location filename="../src/messagelogwidget.cpp" line="650"/>
         <source>%1 sets %2 to untap normally.</source>
         <comment>male</comment>
         <translation>%1이(가) %2을(를) 언탭단에 언탭하도록 지정합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="638"/>
+        <location filename="../src/messagelogwidget.cpp" line="662"/>
         <source>%1 sets PT of %2 to %3.</source>
         <comment>female</comment>
         <translation>%1이(가) %2의 공/방을 %3로(으로) 지정합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="640"/>
+        <location filename="../src/messagelogwidget.cpp" line="664"/>
         <source>%1 sets PT of %2 to %3.</source>
         <comment>male</comment>
         <translation>%1이(가) %2의 공/방을 %3로(으로) 지정합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="649"/>
+        <location filename="../src/messagelogwidget.cpp" line="673"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <comment>female</comment>
         <translation>%1이(가) %2의 주석을 %3로(으로) 달았습니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="651"/>
-        <source>%1 sets annotation of %2 to %3.</source>
-        <comment>male</comment>
-        <translation>%1이(가) %2의 주석을 %3로(으로) 달았습니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="659"/>
-        <source>%1 is looking at %2.</source>
-        <comment>female</comment>
-        <translation>%1이(가) %2 보고 있습니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="660"/>
-        <source>%1 is looking at %2.</source>
-        <comment>male</comment>
-        <translation>%1이(가) %2 보고 있습니다.</translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 is looking at the top %n card(s) %2.</source>
-        <comment>female</comment>
-        <translation type="vanished"><numerusform>%1이(가) %2 맨 위 %n장의 카드를 보고 있습니다.</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 is looking at the top %n card(s) %2.</source>
-        <comment>male</comment>
-        <translation type="vanished"><numerusform>%1이(가) %2 맨 위 %n장의 카드를 보고 있습니다.</numerusform></translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="674"/>
-        <source>%1 stops looking at %2.</source>
-        <comment>female</comment>
-        <translation>%1이(가) %2 더 이상 보고 있지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="675"/>
+        <source>%1 sets annotation of %2 to %3.</source>
+        <comment>male</comment>
+        <translation>%1이(가) %2의 주석을 %3로(으로) 달았습니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="683"/>
+        <source>%1 is looking at %2.</source>
+        <comment>female</comment>
+        <translation>%1이(가) %2 보고 있습니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="684"/>
+        <source>%1 is looking at %2.</source>
+        <comment>male</comment>
+        <translation>%1이(가) %2 보고 있습니다.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 is looking at the top %n card(s) %2.</source>
+        <comment>female</comment>
+        <translation type="vanished"><numerusform>%1이(가) %2 맨 위 %n장의 카드를 보고 있습니다.</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 is looking at the top %n card(s) %2.</source>
+        <comment>male</comment>
+        <translation type="vanished"><numerusform>%1이(가) %2 맨 위 %n장의 카드를 보고 있습니다.</numerusform></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="698"/>
+        <source>%1 stops looking at %2.</source>
+        <comment>female</comment>
+        <translation>%1이(가) %2 더 이상 보고 있지 않습니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="699"/>
         <source>%1 stops looking at %2.</source>
         <comment>male</comment>
         <translation>%1이(가) %2 더 이상 보고 있지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="703"/>
+        <location filename="../src/messagelogwidget.cpp" line="727"/>
         <source>%1 reveals %2 to %3.</source>
         <comment>p1 female, p2 female</comment>
         <translation>%1이(가) %2을(를) %3에게 공개합니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="705"/>
-        <source>%1 reveals %2 to %3.</source>
-        <comment>p1 female, p2 male</comment>
-        <translation>%1이(가) %2을(를) %3에게 공개합니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="708"/>
-        <source>%1 reveals %2 to %3.</source>
-        <comment>p1 male, p2 female</comment>
-        <translation>%1이(가) %2을(를) %3에게 공개합니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="710"/>
-        <source>%1 reveals %2 to %3.</source>
-        <comment>p1 male, p2 male</comment>
-        <translation>%1이(가) %2을(를) %3에게 공개합니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="715"/>
-        <source>%1 reveals %2.</source>
-        <comment>female</comment>
-        <translation>%1이(가) %2을(를) 공개합니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="716"/>
-        <source>%1 reveals %2.</source>
-        <comment>male</comment>
-        <translation>%1이(가) %2을(를) 공개합니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="724"/>
-        <source>%1 randomly reveals %2%3 to %4.</source>
-        <comment>p1 female, p2 female</comment>
-        <translation>%1이(가) 무작위로 %3 있는 %2을(를) %4에게 공개합니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="726"/>
-        <source>%1 randomly reveals %2%3 to %4.</source>
-        <comment>p1 female, p2 male</comment>
-        <translation>%1이(가) 무작위로 %3 있는 %2을(를) %4에게 공개합니다.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="729"/>
+        <source>%1 reveals %2 to %3.</source>
+        <comment>p1 female, p2 male</comment>
+        <translation>%1이(가) %2을(를) %3에게 공개합니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="732"/>
+        <source>%1 reveals %2 to %3.</source>
+        <comment>p1 male, p2 female</comment>
+        <translation>%1이(가) %2을(를) %3에게 공개합니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="734"/>
+        <source>%1 reveals %2 to %3.</source>
+        <comment>p1 male, p2 male</comment>
+        <translation>%1이(가) %2을(를) %3에게 공개합니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="739"/>
+        <source>%1 reveals %2.</source>
+        <comment>female</comment>
+        <translation>%1이(가) %2을(를) 공개합니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="740"/>
+        <source>%1 reveals %2.</source>
+        <comment>male</comment>
+        <translation>%1이(가) %2을(를) 공개합니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="748"/>
+        <source>%1 randomly reveals %2%3 to %4.</source>
+        <comment>p1 female, p2 female</comment>
+        <translation>%1이(가) 무작위로 %3 있는 %2을(를) %4에게 공개합니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="750"/>
+        <source>%1 randomly reveals %2%3 to %4.</source>
+        <comment>p1 female, p2 male</comment>
+        <translation>%1이(가) 무작위로 %3 있는 %2을(를) %4에게 공개합니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="753"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <comment>p1 male, p2 female</comment>
         <translation>%1이(가) 무작위로 %3 있는 %2을(를) %4에게 공개합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="731"/>
+        <location filename="../src/messagelogwidget.cpp" line="755"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <comment>p1 male, p2 male</comment>
         <translation>%1이(가) 무작위로 %3 있는 %2을(를) %4에게 공개합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="736"/>
+        <location filename="../src/messagelogwidget.cpp" line="760"/>
         <source>%1 randomly reveals %2%3.</source>
         <comment>female</comment>
         <translation>%1이(가) 무작위로 %3 있는 %2을(를) 공개합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="738"/>
+        <location filename="../src/messagelogwidget.cpp" line="762"/>
         <source>%1 randomly reveals %2%3.</source>
         <comment>male</comment>
         <translation>%1이(가) 무작위로 %3 있는 %2을(를) 공개합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="744"/>
+        <location filename="../src/messagelogwidget.cpp" line="768"/>
         <source>%1 peeks at face down card #%2.</source>
         <comment>female</comment>
         <translation>%1이(가) 뒷면으로 놓여있는 카드 #%2의 앞면을 봅니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="746"/>
+        <location filename="../src/messagelogwidget.cpp" line="770"/>
         <source>%1 peeks at face down card #%2.</source>
         <comment>male</comment>
         <translation>%1이(가) 뒷면으로 놓여있는 카드 #%2의 앞면을 봅니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="750"/>
+        <location filename="../src/messagelogwidget.cpp" line="774"/>
         <source>%1 peeks at face down card #%2: %3.</source>
         <comment>female</comment>
         <translation>%1이(가) 뒷면으로 놓여있는 카드 #%2 (%3)의 앞면을 봅니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="752"/>
+        <location filename="../src/messagelogwidget.cpp" line="776"/>
         <source>%1 peeks at face down card #%2: %3.</source>
         <comment>male</comment>
         <translation>%1이(가) 뒷면으로 놓여있는 카드 #%2 (%3)의 앞면을 봅니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="758"/>
+        <location filename="../src/messagelogwidget.cpp" line="782"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 female, p2 female</comment>
         <translation>%1이(가) %3 있는 %2을(를) %4에게 공개합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="760"/>
+        <location filename="../src/messagelogwidget.cpp" line="784"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 female, p2 male</comment>
         <translation>%1이(가) %3 있는 %2을(를) %4에게 공개합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="763"/>
+        <location filename="../src/messagelogwidget.cpp" line="787"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 male, p2 female</comment>
         <translation>%1이(가) %3 있는 %2을(를) %4에게 공개합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="765"/>
+        <location filename="../src/messagelogwidget.cpp" line="789"/>
         <source>%1 reveals %2%3 to %4.</source>
         <comment>p1 male, p2 male</comment>
         <translation>%1이(가) %3 있는 %2을(를) %4에게 공개합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="770"/>
+        <location filename="../src/messagelogwidget.cpp" line="794"/>
         <source>%1 reveals %2%3.</source>
         <comment>female</comment>
         <translation>%1이(가) %3 있는 %2을(를) 공개합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="772"/>
+        <location filename="../src/messagelogwidget.cpp" line="796"/>
         <source>%1 reveals %2%3.</source>
         <comment>male</comment>
         <translation>%1이(가) %3 있는 %2을(를) 공개합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="780"/>
+        <location filename="../src/messagelogwidget.cpp" line="804"/>
         <source>%1 is now keeping the top card %2 revealed.</source>
         <translation>%1이(가) %2 맨 위 카드를 공개합니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="781"/>
+        <location filename="../src/messagelogwidget.cpp" line="805"/>
         <source>%1 is not revealing the top card %2 any longer.</source>
         <translation>%1이(가) %2 맨 위 카드를 더 이상 공개하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="792"/>
+        <location filename="../src/messagelogwidget.cpp" line="816"/>
         <source>It is now %1&apos;s turn.</source>
         <comment>female</comment>
         <translation>지금부터 %1의 턴입니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="794"/>
+        <location filename="../src/messagelogwidget.cpp" line="818"/>
         <source>It is now %1&apos;s turn.</source>
         <comment>male</comment>
         <translation>지금부터 %1의 턴입니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="288"/>
-        <location filename="../src/messagelogwidget.cpp" line="694"/>
+        <location filename="../src/messagelogwidget.cpp" line="304"/>
+        <location filename="../src/messagelogwidget.cpp" line="718"/>
         <source>a card</source>
         <translation>카드 한 장</translation>
     </message>
@@ -3381,32 +3472,32 @@ You need to provide the activation token received in the activation email</sourc
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="557"/>
+        <location filename="../src/messagelogwidget.cpp" line="575"/>
         <source>red</source>
         <translation><numerusform>적색</numerusform></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="558"/>
+        <location filename="../src/messagelogwidget.cpp" line="576"/>
         <source>yellow</source>
         <translation><numerusform>황색</numerusform></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="559"/>
+        <location filename="../src/messagelogwidget.cpp" line="577"/>
         <source>green</source>
         <translation><numerusform>녹색</numerusform></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="145"/>
+        <location filename="../src/messagelogwidget.cpp" line="149"/>
         <source>The game has started.</source>
         <translation>게임이 시작되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="349"/>
+        <location filename="../src/messagelogwidget.cpp" line="367"/>
         <source>%1 draws his initial hand.</source>
         <translation>%1이(가) 시작 카드를 뽑았습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="349"/>
+        <location filename="../src/messagelogwidget.cpp" line="367"/>
         <source>%1 draws her initial hand.</source>
         <translation>%1이(가) 시작 카드를 뽑았습니다.</translation>
     </message>
@@ -3425,179 +3516,179 @@ You need to provide the activation token received in the activation email</sourc
         </translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="812"/>
+        <location filename="../src/messagelogwidget.cpp" line="836"/>
         <source>ending phase</source>
         <translation>종료단</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="802"/>
+        <location filename="../src/messagelogwidget.cpp" line="826"/>
         <source>untap step</source>
         <translation>언탭단</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="198"/>
+        <location filename="../src/messagelogwidget.cpp" line="214"/>
         <source>%1 draws %2 card(s).</source>
         <comment>female</comment>
         <translation>%1이(가) %2장의 카드를 뽑습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="200"/>
+        <location filename="../src/messagelogwidget.cpp" line="216"/>
         <source>%1 draws %2 card(s).</source>
         <comment>male</comment>
         <translation>%1이(가) %2장의 카드를 뽑습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="219"/>
+        <location filename="../src/messagelogwidget.cpp" line="235"/>
         <source> from play</source>
         <translation>전장에</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="221"/>
+        <location filename="../src/messagelogwidget.cpp" line="237"/>
         <source> from her graveyard</source>
         <translation>그녀의 무덤</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="221"/>
+        <location filename="../src/messagelogwidget.cpp" line="237"/>
         <source> from his graveyard</source>
         <translation>그의 무덤</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="225"/>
+        <location filename="../src/messagelogwidget.cpp" line="241"/>
         <source> from her hand</source>
         <translation>그녀의 손</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="225"/>
+        <location filename="../src/messagelogwidget.cpp" line="241"/>
         <source> from his hand</source>
         <translation>그의 손</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="304"/>
+        <location filename="../src/messagelogwidget.cpp" line="321"/>
         <source>%1 puts %2%3 into her graveyard.</source>
         <translation>%1이(가) %3에 있던 %2을(를) 그녀의 무덤에 넣었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="304"/>
+        <location filename="../src/messagelogwidget.cpp" line="321"/>
         <source>%1 puts %2%3 into his graveyard.</source>
         <translation>%1이(가) %3에 있던 %2을(를) 그의 무덤에 넣었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="308"/>
+        <location filename="../src/messagelogwidget.cpp" line="325"/>
         <source>%1 moves %2%3 to her hand.</source>
         <translation>%1이(가) %3에 있던 %2을(를) 그녀의 손으로 가져갑니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="308"/>
+        <location filename="../src/messagelogwidget.cpp" line="325"/>
         <source>%1 moves %2%3 to his hand.</source>
         <translation>%1이(가) %3에 있던 %2을(를) 그의 손으로 가져갑니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="380"/>
+        <location filename="../src/messagelogwidget.cpp" line="398"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 female</comment>
         <translation>%1이(가) %2을(를) %3의 %4에 붙입니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="382"/>
+        <location filename="../src/messagelogwidget.cpp" line="400"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 female, p2 male</comment>
         <translation>%1이(가) %2을(를) %3의 %4에 붙입니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="385"/>
+        <location filename="../src/messagelogwidget.cpp" line="403"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 female</comment>
         <translation>%1이(가) %2을(를) %3의 %4에 붙입니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="387"/>
+        <location filename="../src/messagelogwidget.cpp" line="405"/>
         <source>%1 attaches %2 to %3&apos;s %4.</source>
         <comment>p1 male, p2 male</comment>
         <translation>%1이(가) %2을(를) %3의 %4에 붙입니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="546"/>
+        <location filename="../src/messagelogwidget.cpp" line="564"/>
         <source>%1 places %2 %3 counter(s) on %4 (now %5).</source>
         <comment>female</comment>
         <translation>%1이(가) %2개의 %3 카운터를 %4에 올려놓습니다 (현재 %5개).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="548"/>
+        <location filename="../src/messagelogwidget.cpp" line="566"/>
         <source>%1 places %2 %3 counter(s) on %4 (now %5).</source>
         <comment>male</comment>
         <translation>%1이(가) %2개의 %3 카운터를 %4에 올려놓습니다 (현재 %5개).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="551"/>
+        <location filename="../src/messagelogwidget.cpp" line="569"/>
         <source>%1 removes %2 %3 counter(s) from %4 (now %5).</source>
         <comment>female</comment>
         <translation>%1이(가) %2개의 %3 카운터를 %4에서 제거합니다 (현재 %5개).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="553"/>
+        <location filename="../src/messagelogwidget.cpp" line="571"/>
         <source>%1 removes %2 %3 counter(s) from %4 (now %5).</source>
         <comment>male</comment>
         <translation>%1이(가) %2개의 %3 카운터를 %4에서 제거합니다 (현재 %5개).</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="665"/>
+        <location filename="../src/messagelogwidget.cpp" line="689"/>
         <source>%1 is looking at the top %2 card(s) %3.</source>
         <comment>female</comment>
         <translation>%1이(가) %3 맨 위 %2장의 카드를 보고 있습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="666"/>
+        <location filename="../src/messagelogwidget.cpp" line="690"/>
         <source>%1 is looking at the top %2 card(s) %3.</source>
         <comment>male</comment>
         <translation>%1이(가) %3 맨 위 %2장의 카드를 보고 있습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="803"/>
+        <location filename="../src/messagelogwidget.cpp" line="827"/>
         <source>upkeep step</source>
         <translation>유지단</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="804"/>
+        <location filename="../src/messagelogwidget.cpp" line="828"/>
         <source>draw step</source>
         <translation>뽑기단</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="805"/>
+        <location filename="../src/messagelogwidget.cpp" line="829"/>
         <source>first main phase</source>
         <translation>첫번째 본단계</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="806"/>
+        <location filename="../src/messagelogwidget.cpp" line="830"/>
         <source>beginning of combat step</source>
         <translation>전투단 시작</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="807"/>
+        <location filename="../src/messagelogwidget.cpp" line="831"/>
         <source>declare attackers step</source>
         <translation>공격자 선언단</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="808"/>
+        <location filename="../src/messagelogwidget.cpp" line="832"/>
         <source>declare blockers step</source>
         <translation>방어자 선언단</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="809"/>
+        <location filename="../src/messagelogwidget.cpp" line="833"/>
         <source>combat damage step</source>
         <translation>전투 피해단</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="810"/>
+        <location filename="../src/messagelogwidget.cpp" line="834"/>
         <source>end of combat step</source>
         <translation>전투 종료단</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="811"/>
+        <location filename="../src/messagelogwidget.cpp" line="835"/>
         <source>second main phase</source>
         <translation>두번째 본단계</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="814"/>
+        <location filename="../src/messagelogwidget.cpp" line="838"/>
         <source>It is now the %1.</source>
         <translation>현재 턴의 %1입니다.</translation>
     </message>
@@ -3605,74 +3696,79 @@ You need to provide the activation token received in the activation email</sourc
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="619"/>
+        <location filename="../src/dlg_settings.cpp" line="646"/>
         <source>Chat settings</source>
         <translation>대화 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="620"/>
+        <location filename="../src/dlg_settings.cpp" line="647"/>
         <source>Custom alert words</source>
         <translation>키워드 알림</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="621"/>
+        <location filename="../src/dlg_settings.cpp" line="648"/>
         <source>Enable chat mentions</source>
         <translation>대화 중 본인의 사용자명 멘션 시 해당 문장을 강조</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="622"/>
+        <location filename="../src/dlg_settings.cpp" line="649"/>
         <source>Enable mention completer</source>
         <translation>멘션 자동완성 기능</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="623"/>
+        <location filename="../src/dlg_settings.cpp" line="650"/>
         <source>In-game message macros</source>
         <translation>게임 내 대화 매크로</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="624"/>
+        <location filename="../src/dlg_settings.cpp" line="651"/>
         <source>Ignore chat room messages sent by unregistered users</source>
         <translation>서버에 가입하지 않은 사용자의 채널 대화 차단</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="625"/>
+        <location filename="../src/dlg_settings.cpp" line="652"/>
         <source>Ignore private messages sent by unregistered users</source>
         <translation>서버에 가입하지 않은 사용자가 보낸 1:1 대화 차단</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="628"/>
+        <location filename="../src/dlg_settings.cpp" line="655"/>
         <source>Enable desktop notifications for private messages</source>
         <translation>1:1 대화를 받을 시 데스크탑 알림 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="632"/>
+        <location filename="../src/dlg_settings.cpp" line="656"/>
+        <source>Enable desktop notification for mentions</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="657"/>
+        <source>Enable room message history on join</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="660"/>
         <source>Separate words with a space, alphanumeric characters only</source>
         <translation>각 단어마다 스페이스바로 띄어써주세요. 문자 및 숫자만 가능합니다.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="626"/>
-        <location filename="../src/dlg_settings.cpp" line="627"/>
+        <location filename="../src/dlg_settings.cpp" line="653"/>
+        <location filename="../src/dlg_settings.cpp" line="654"/>
         <source>Invert text color</source>
         <translation>문장 색 반전</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="629"/>
-        <source>Enable desktop notification for mentions.</source>
-        <translation>본인의 사용자명 멘션 시 데스크탑 알림 설정</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="630"/>
-        <location filename="../src/dlg_settings.cpp" line="631"/>
+        <location filename="../src/dlg_settings.cpp" line="658"/>
+        <location filename="../src/dlg_settings.cpp" line="659"/>
         <source>(Color is hexadecimal)</source>
         <translation>(16진수 색상 코드)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="602"/>
+        <location filename="../src/dlg_settings.cpp" line="629"/>
         <source>Add message</source>
         <translation>메세지 추가</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="602"/>
+        <location filename="../src/dlg_settings.cpp" line="629"/>
         <source>Message:</source>
         <translation>메세지:</translation>
     </message>
@@ -4116,7 +4212,7 @@ You need to provide the activation token received in the activation email</sourc
         <location filename="../src/player.cpp" line="937"/>
         <location filename="../src/player.cpp" line="958"/>
         <location filename="../src/player.cpp" line="987"/>
-        <location filename="../src/player.cpp" line="2245"/>
+        <location filename="../src/player.cpp" line="2267"/>
         <source>Number:</source>
         <translation>원하는 숫자:</translation>
     </message>
@@ -4141,32 +4237,33 @@ You need to provide the activation token received in the activation email</sourc
         <translation>주사위 면의 수:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2091"/>
+        <location filename="../src/player.cpp" line="2104"/>
         <source>Set power/toughness</source>
         <translation>공격력 및 방어력 설정</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2091"/>
+        <location filename="../src/player.cpp" line="2104"/>
         <source>Please enter the new PT:</source>
         <translation>새로운 공/방 값을 입력해 주세요:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2163"/>
+        <location filename="../src/player.cpp" line="2179"/>
         <source>Set annotation</source>
         <translation>주석 설정</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2163"/>
+        <location filename="../src/player.cpp" line="2179"/>
         <source>Please enter the new annotation:</source>
         <translation>새로운 주석을 입력해 주세요:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2245"/>
+        <location filename="../src/player.cpp" line="2267"/>
         <source>Set counters</source>
         <translation>카운터 설정</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2349"/>
+        <location filename="../src/player.cpp" line="2381"/>
+        <location filename="../src/player.cpp" line="2420"/>
         <source>Cr&amp;eate related card</source>
         <translation>관련된 카드 생성</translation>
     </message>
@@ -4174,37 +4271,37 @@ You need to provide the activation token received in the activation email</sourc
 <context>
     <name>QMenuBar</name>
     <message>
-        <location filename="../src/window_main.cpp" line="537"/>
+        <location filename="../src/window_main.cpp" line="554"/>
         <source>Services</source>
         <translation>서비스</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="538"/>
+        <location filename="../src/window_main.cpp" line="555"/>
         <source>Hide %1</source>
         <translation>%1 가리기</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="539"/>
+        <location filename="../src/window_main.cpp" line="556"/>
         <source>Hide Others</source>
         <translation>기타 가리기</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="540"/>
+        <location filename="../src/window_main.cpp" line="557"/>
         <source>Show All</source>
         <translation>모두 보기</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="541"/>
+        <location filename="../src/window_main.cpp" line="558"/>
         <source>Preferences...</source>
         <translation>환경설정...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="542"/>
+        <location filename="../src/window_main.cpp" line="559"/>
         <source>Quit %1</source>
         <translation>%1 종료</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="543"/>
+        <location filename="../src/window_main.cpp" line="560"/>
         <source>About %1</source>
         <translation>%1에 관하여</translation>
     </message>
@@ -4212,14 +4309,14 @@ You need to provide the activation token received in the activation email</sourc
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/window_main.cpp" line="220"/>
+        <location filename="../src/window_main.cpp" line="226"/>
         <source>Cockatrice replays (*.cor)</source>
         <translation>코카트리스 리플레이 파일 (*.cor)</translation>
     </message>
     <message>
         <location filename="../src/deck_loader.cpp" line="8"/>
-        <source>Common deck formats (*.cod *.dec *.mwDeck)</source>
-        <translation>일반적인 덱 파일 포맷 (*.cod *.dec *.mwDeck)</translation>
+        <source>Common deck formats (*.cod *.dec *.txt *.mwDeck)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/deck_loader.cpp" line="9"/>
@@ -4315,27 +4412,11 @@ You need to provide the activation token received in the activation email</sourc
         <source>Games</source>
         <translation>게임</translation>
     </message>
-    <message>
-        <location filename="../src/tab_server.cpp" line="143"/>
-        <location filename="../src/tab_server.cpp" line="145"/>
-        <source>Error</source>
-        <translation>오류</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_server.cpp" line="143"/>
-        <source>You do not have the proper permission to join this room.</source>
-        <translation>본 채널에 들어가는데 필요한 권한을 가지고 있지 않습니다.</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_server.cpp" line="145"/>
-        <source>Failed to join the room due to an unknown error.</source>
-        <translation>알 수 없는 오류로 채널에 들어갈 수 없었습니다.</translation>
-    </message>
 </context>
 <context>
     <name>SequenceEdit</name>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="142"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="152"/>
         <source>Shortcut already in use</source>
         <translation>이미 사용중인 단축키 입니다.</translation>
     </message>
@@ -4369,6 +4450,29 @@ You need to provide the activation token received in the activation email</sourc
     </message>
 </context>
 <context>
+    <name>ShortcutsTab</name>
+    <message>
+        <location filename="../src/sequenceEdit/shortcutstab.cpp" line="29"/>
+        <source>Restore all default shortcuts</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/shortcutstab.cpp" line="30"/>
+        <source>Do you really want to restore all default shortcuts?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/shortcutstab.cpp" line="47"/>
+        <source>Clear all default shortcuts</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/shortcutstab.cpp" line="48"/>
+        <source>Do you really want to clear all shortcuts?</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>ShutdownDialog</name>
     <message>
         <location filename="../src/tab_admin.cpp" line="19"/>
@@ -4389,37 +4493,32 @@ You need to provide the activation token received in the activation email</sourc
 <context>
     <name>SoundSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="706"/>
-        <source>Choose path</source>
-        <translation>경로 선택</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="715"/>
+        <location filename="../src/dlg_settings.cpp" line="732"/>
         <source>Enable &amp;sounds</source>
         <translation>음향 효과 켜기</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="716"/>
-        <source>Path to sounds directory:</source>
-        <translation>음향 효과 파일 디렉토리 경로:</translation>
+        <location filename="../src/dlg_settings.cpp" line="733"/>
+        <source>Current sounds theme:</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="717"/>
+        <location filename="../src/dlg_settings.cpp" line="734"/>
         <source>Test system sound engine</source>
         <translation>시스템 사운드 엔진 테스트</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="718"/>
+        <location filename="../src/dlg_settings.cpp" line="735"/>
         <source>Sound settings</source>
         <translation>음향 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="720"/>
+        <location filename="../src/dlg_settings.cpp" line="737"/>
         <source>Master volume requires QT5</source>
         <translation>주 음량 조절 옵션은 QT5가 필요합니다.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="722"/>
+        <location filename="../src/dlg_settings.cpp" line="739"/>
         <source>Master volume</source>
         <translation>주 음량</translation>
     </message>
@@ -4427,42 +4526,42 @@ You need to provide the activation token received in the activation email</sourc
 <context>
     <name>TabAdmin</name>
     <message>
-        <location filename="../src/tab_admin.cpp" line="91"/>
+        <location filename="../src/tab_admin.cpp" line="94"/>
         <source>Update server &amp;message</source>
         <translation>서버 공지사항 작성</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="92"/>
+        <location filename="../src/tab_admin.cpp" line="95"/>
         <source>&amp;Shut down server</source>
         <translation>서버 종료</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="93"/>
+        <location filename="../src/tab_admin.cpp" line="96"/>
         <source>&amp;Reload configuration</source>
         <translation>설정 새로고침</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="94"/>
+        <location filename="../src/tab_admin.cpp" line="97"/>
         <source>Server administration functions</source>
         <translation>서버 관리 기능</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="96"/>
+        <location filename="../src/tab_admin.cpp" line="99"/>
         <source>&amp;Unlock functions</source>
         <translation>기능 잠금 해제</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="97"/>
+        <location filename="../src/tab_admin.cpp" line="100"/>
         <source>&amp;Lock functions</source>
         <translation>기능 잠금</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="125"/>
+        <location filename="../src/tab_admin.cpp" line="128"/>
         <source>Unlock administration functions</source>
         <translation>서버 관리 기능 잠금 해제</translation>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="125"/>
+        <location filename="../src/tab_admin.cpp" line="128"/>
         <source>Do you really want to unlock the administration functions?</source>
         <translation>정말 서버 관리 기능의 잠금을 해제하시겠습니까?</translation>
     </message>
@@ -4475,152 +4574,140 @@ You need to provide the activation token received in the activation email</sourc
 <context>
     <name>TabDeckEditor</name>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="569"/>
+        <location filename="../src/tab_deck_editor.cpp" line="584"/>
         <source>&amp;Print deck...</source>
         <translation>덱 인쇄</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="573"/>
+        <location filename="../src/tab_deck_editor.cpp" line="588"/>
         <source>&amp;Close</source>
         <translation>덱 닫기</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="587"/>
+        <location filename="../src/tab_deck_editor.cpp" line="602"/>
         <source>&amp;Edit sets...</source>
         <translation>확장판 목록 편집</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="596"/>
+        <location filename="../src/tab_deck_editor.cpp" line="607"/>
+        <location filename="../src/tab_deck_editor.cpp" line="612"/>
         <source>Filters</source>
         <translation>카드 필터</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="553"/>
+        <location filename="../src/tab_deck_editor.cpp" line="568"/>
         <source>&amp;Clear all filters</source>
         <translation>모든 필터 초기화</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="554"/>
+        <location filename="../src/tab_deck_editor.cpp" line="569"/>
         <source>Delete selected</source>
         <translation>선택한 필터 삭제</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="556"/>
+        <location filename="../src/tab_deck_editor.cpp" line="571"/>
         <source>Deck &amp;name:</source>
         <translation>덱 이름:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="557"/>
+        <location filename="../src/tab_deck_editor.cpp" line="572"/>
         <source>&amp;Comments:</source>
         <translation>설명:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="558"/>
+        <location filename="../src/tab_deck_editor.cpp" line="573"/>
         <source>Hash:</source>
         <translation>해시값:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="563"/>
+        <location filename="../src/tab_deck_editor.cpp" line="578"/>
         <source>&amp;New deck</source>
         <translation>새로운 덱 작성</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="564"/>
+        <location filename="../src/tab_deck_editor.cpp" line="579"/>
         <source>&amp;Load deck...</source>
         <translation>덱 불러오기</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="565"/>
+        <location filename="../src/tab_deck_editor.cpp" line="580"/>
         <source>&amp;Save deck</source>
         <translation>덱 저장</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="566"/>
+        <location filename="../src/tab_deck_editor.cpp" line="581"/>
         <source>Save deck &amp;as...</source>
         <translation>다른 이름으로 저장</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="567"/>
+        <location filename="../src/tab_deck_editor.cpp" line="582"/>
         <source>Load deck from cl&amp;ipboard...</source>
         <translation>클립보드에서 덱 가져오기</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="568"/>
+        <location filename="../src/tab_deck_editor.cpp" line="583"/>
         <source>Save deck to clip&amp;board</source>
         <translation>클립보드로 덱 보내기</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="570"/>
+        <location filename="../src/tab_deck_editor.cpp" line="585"/>
         <source>&amp;Analyze deck on deckstats.net</source>
         <translation>deckstats.net에서 덱 분석</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="571"/>
+        <location filename="../src/tab_deck_editor.cpp" line="586"/>
         <source>Open custom image folder</source>
         <translation>사용자 카드 이미지 폴더 열기</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="572"/>
+        <location filename="../src/tab_deck_editor.cpp" line="587"/>
         <source>Open custom sets folder</source>
         <translation>사용자 확장판 폴더 열기</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="575"/>
+        <location filename="../src/tab_deck_editor.cpp" line="590"/>
         <source>Add card to &amp;maindeck</source>
         <translation>메인덱에 카드 추가</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="576"/>
+        <location filename="../src/tab_deck_editor.cpp" line="591"/>
         <source>Add card to &amp;sideboard</source>
         <translation>사이드보드에 카드 추가</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="584"/>
+        <location filename="../src/tab_deck_editor.cpp" line="599"/>
         <source>&amp;Deck Editor</source>
         <translation>덱 편집기</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="585"/>
+        <location filename="../src/tab_deck_editor.cpp" line="600"/>
         <source>C&amp;ard Database</source>
         <translation>카드 데이터베이스</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="590"/>
-        <source>Show/Hide card information</source>
-        <translation>카드 정보 표시/숨김</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="591"/>
-        <source>Show/Hide deck</source>
-        <translation>덱 표시/숨김</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="592"/>
-        <source>Show/Hide filters</source>
-        <translation>검색 필터 표시/숨김</translation>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="593"/>
+        <location filename="../src/tab_deck_editor.cpp" line="623"/>
         <source>Reset layout</source>
         <translation>화면 레이아웃 초기화</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="594"/>
+        <location filename="../src/tab_deck_editor.cpp" line="605"/>
+        <location filename="../src/tab_deck_editor.cpp" line="610"/>
         <source>Card Info</source>
         <translation>카드 정보</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="595"/>
+        <location filename="../src/tab_deck_editor.cpp" line="606"/>
+        <location filename="../src/tab_deck_editor.cpp" line="611"/>
         <source>Deck</source>
         <translation>덱</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="1105"/>
+        <location filename="../src/tab_deck_editor.cpp" line="1109"/>
         <source>Welcome</source>
         <translation>환영합니다</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="1105"/>
+        <location filename="../src/tab_deck_editor.cpp" line="1109"/>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Edit Sets&quot; window.</source>
@@ -4629,69 +4716,88 @@ Read more about changing the set order or disabling specific sets and consequent
 &apos;확장판 목록 편집&apos; 창에서 원하지 않는 확장판을 빼거나 확장판 순서를 변경하는게 가능합니다.</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="578"/>
+        <location filename="../src/tab_deck_editor.cpp" line="593"/>
         <source>&amp;Remove row</source>
         <translation>선택한 카드 전부 제거</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="580"/>
+        <location filename="../src/tab_deck_editor.cpp" line="595"/>
         <source>&amp;Increment number</source>
         <translation>선택한 카드 한장 추가</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="582"/>
+        <location filename="../src/tab_deck_editor.cpp" line="597"/>
         <source>&amp;Decrement number</source>
         <translation>선택한 카드 한장 제거</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="588"/>
+        <location filename="../src/tab_deck_editor.cpp" line="603"/>
         <source>Edit &amp;tokens...</source>
         <translation>토큰 목록 편집</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="601"/>
+        <location filename="../src/tab_deck_editor.cpp" line="609"/>
+        <source>&amp;View</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="614"/>
+        <location filename="../src/tab_deck_editor.cpp" line="617"/>
+        <location filename="../src/tab_deck_editor.cpp" line="620"/>
+        <source>Visible</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="615"/>
+        <location filename="../src/tab_deck_editor.cpp" line="618"/>
+        <location filename="../src/tab_deck_editor.cpp" line="621"/>
+        <source>Floating</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="628"/>
         <source>Deck: %1</source>
         <translation>덱 편집기: %1</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="649"/>
+        <location filename="../src/tab_deck_editor.cpp" line="676"/>
         <source>Are you sure?</source>
         <translation>확실하십니까?</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="650"/>
+        <location filename="../src/tab_deck_editor.cpp" line="677"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation>덱 리스트가 변경되었습니다.
 변경사항을 저장하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="683"/>
+        <location filename="../src/tab_deck_editor.cpp" line="710"/>
         <source>Load deck</source>
         <translation>덱 불러오기</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="702"/>
-        <location filename="../src/tab_deck_editor.cpp" line="726"/>
-        <location filename="../src/tab_deck_editor.cpp" line="746"/>
+        <location filename="../src/tab_deck_editor.cpp" line="729"/>
+        <location filename="../src/tab_deck_editor.cpp" line="753"/>
+        <location filename="../src/tab_deck_editor.cpp" line="773"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="702"/>
+        <location filename="../src/tab_deck_editor.cpp" line="729"/>
         <source>The deck could not be saved.</source>
         <translation>덱을 저장하는데 실패하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="726"/>
-        <location filename="../src/tab_deck_editor.cpp" line="746"/>
+        <location filename="../src/tab_deck_editor.cpp" line="753"/>
+        <location filename="../src/tab_deck_editor.cpp" line="773"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation>덱을 저장하는데 실패하였습니다.
 덱 파일 디렉토리에 쓰기가 가능한지 확인하시고 다시 시도해 주세요.</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="732"/>
+        <location filename="../src/tab_deck_editor.cpp" line="759"/>
         <source>Save deck</source>
         <translation>덱 저장</translation>
     </message>
@@ -4699,84 +4805,84 @@ Please check that the directory is writable and try again.</source>
 <context>
     <name>TabDeckStorage</name>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="118"/>
+        <location filename="../src/tab_deck_storage.cpp" line="121"/>
         <source>Local file system</source>
         <translation>로컬 파일 시스템</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="119"/>
+        <location filename="../src/tab_deck_storage.cpp" line="122"/>
         <source>Server deck storage</source>
         <translation>서버 덱 보관함</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="121"/>
-        <location filename="../src/tab_deck_storage.cpp" line="123"/>
+        <location filename="../src/tab_deck_storage.cpp" line="124"/>
+        <location filename="../src/tab_deck_storage.cpp" line="126"/>
         <source>Open in deck editor</source>
         <translation>덱 편집기로 열기</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="122"/>
+        <location filename="../src/tab_deck_storage.cpp" line="125"/>
         <source>Upload deck</source>
         <translation>덱 업로드</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="124"/>
+        <location filename="../src/tab_deck_storage.cpp" line="127"/>
         <source>Download deck</source>
         <translation>덱 다운로드</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="125"/>
-        <location filename="../src/tab_deck_storage.cpp" line="271"/>
+        <location filename="../src/tab_deck_storage.cpp" line="128"/>
+        <location filename="../src/tab_deck_storage.cpp" line="274"/>
         <source>New folder</source>
         <translation>새 폴더</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="126"/>
-        <location filename="../src/tab_deck_storage.cpp" line="127"/>
+        <location filename="../src/tab_deck_storage.cpp" line="129"/>
+        <location filename="../src/tab_deck_storage.cpp" line="130"/>
         <source>Delete</source>
         <translation>삭제</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="157"/>
+        <location filename="../src/tab_deck_storage.cpp" line="160"/>
         <source>Enter deck name</source>
         <translation>덱 이름 작성</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="157"/>
+        <location filename="../src/tab_deck_storage.cpp" line="160"/>
         <source>This decklist does not have a name.
 Please enter a name:</source>
         <translation>이 덱리스트는 이름이 없습니다.
 이름을 입력해 주세요:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="161"/>
+        <location filename="../src/tab_deck_storage.cpp" line="164"/>
         <source>Unnamed deck</source>
         <translation>이름 없는 덱</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="196"/>
+        <location filename="../src/tab_deck_storage.cpp" line="199"/>
         <source>Delete local file</source>
         <translation>로컬 파일 삭제</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="196"/>
-        <location filename="../src/tab_deck_storage.cpp" line="313"/>
-        <location filename="../src/tab_deck_storage.cpp" line="321"/>
+        <location filename="../src/tab_deck_storage.cpp" line="199"/>
+        <location filename="../src/tab_deck_storage.cpp" line="316"/>
+        <location filename="../src/tab_deck_storage.cpp" line="324"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
         <translation>정말로 &quot;%1&quot;을(를) 삭제하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="271"/>
+        <location filename="../src/tab_deck_storage.cpp" line="274"/>
         <source>Name of new folder:</source>
         <translation>새 폴더의 이름:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="313"/>
+        <location filename="../src/tab_deck_storage.cpp" line="316"/>
         <source>Delete remote folder</source>
         <translation>서버 보관함의 폴더 삭제</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="321"/>
+        <location filename="../src/tab_deck_storage.cpp" line="324"/>
         <source>Delete remote deck</source>
         <translation>서버에 저장된 덱 삭제</translation>
     </message>
@@ -4789,135 +4895,343 @@ Please enter a name:</source>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="605"/>
+        <location filename="../src/tab_game.cpp" line="450"/>
+        <location filename="../src/tab_game.cpp" line="494"/>
+        <source>Card Info</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="451"/>
+        <location filename="../src/tab_game.cpp" line="496"/>
+        <source>Player List</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="452"/>
+        <location filename="../src/tab_game.cpp" line="495"/>
+        <source>Messages</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="454"/>
+        <location filename="../src/tab_game.cpp" line="509"/>
+        <source>Replay Timeline</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="459"/>
         <source>&amp;Phases</source>
         <translation>단계</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="608"/>
+        <location filename="../src/tab_game.cpp" line="462"/>
         <source>&amp;Game</source>
         <translation>게임</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="610"/>
+        <location filename="../src/tab_game.cpp" line="464"/>
         <source>Next &amp;phase</source>
         <translation>다음 단계로 진행</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="613"/>
+        <location filename="../src/tab_game.cpp" line="467"/>
         <source>Next &amp;turn</source>
         <translation>턴 넘기기</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="616"/>
+        <location filename="../src/tab_game.cpp" line="470"/>
         <source>&amp;Remove all local arrows</source>
         <translation>내가 그린 화살표 제거</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="619"/>
+        <location filename="../src/tab_game.cpp" line="473"/>
         <source>Rotate View Cl&amp;ockwise</source>
         <translation>플레이어 위치 시계방향으로 조정</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="622"/>
+        <location filename="../src/tab_game.cpp" line="476"/>
         <source>Rotate View Co&amp;unterclockwise</source>
         <translation>플레이어 위치 반시계방향으로 조정</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="625"/>
+        <location filename="../src/tab_game.cpp" line="479"/>
         <source>Game &amp;information</source>
         <translation>게임 정보</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="627"/>
+        <location filename="../src/tab_game.cpp" line="481"/>
         <source>&amp;Concede</source>
         <translation>항복</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="630"/>
+        <location filename="../src/tab_game.cpp" line="484"/>
         <source>&amp;Leave game</source>
         <translation>게임 나가기</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="633"/>
+        <location filename="../src/tab_game.cpp" line="487"/>
         <source>C&amp;lose replay</source>
         <translation>리플레이 닫기</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="637"/>
+        <location filename="../src/tab_game.cpp" line="490"/>
         <source>&amp;Say:</source>
         <translation>말하기:</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="717"/>
+        <location filename="../src/tab_game.cpp" line="493"/>
+        <source>&amp;View</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="498"/>
+        <location filename="../src/tab_game.cpp" line="501"/>
+        <location filename="../src/tab_game.cpp" line="504"/>
+        <location filename="../src/tab_game.cpp" line="510"/>
+        <source>Visible</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="499"/>
+        <location filename="../src/tab_game.cpp" line="502"/>
+        <location filename="../src/tab_game.cpp" line="505"/>
+        <location filename="../src/tab_game.cpp" line="511"/>
+        <source>Floating</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="514"/>
+        <source>Reset layout</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="595"/>
         <source>Concede</source>
         <translation>항복</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="717"/>
+        <location filename="../src/tab_game.cpp" line="595"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>정말 게임에서 항복하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="727"/>
+        <location filename="../src/tab_game.cpp" line="605"/>
         <source>Leave game</source>
         <translation>게임 나가기</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="727"/>
+        <location filename="../src/tab_game.cpp" line="605"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>정말 게임에서 나가시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="923"/>
+        <location filename="../src/tab_game.cpp" line="801"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
         <translation>너무 빨리 말하고 있습니다. 조금만 기다려 주십시오.</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1190"/>
+        <location filename="../src/tab_game.cpp" line="1068"/>
         <source>You have been kicked out of the game.</source>
         <translation>게임에서 강제 퇴장 당하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1295"/>
+        <location filename="../src/tab_game.cpp" line="1173"/>
         <source>REPLAY </source>
         <translation>리플레이</translation>
     </message>
 </context>
 <context>
+    <name>TabLog</name>
+    <message>
+        <location filename="../src/tab_logs.h" line="54"/>
+        <source>Logs</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="67"/>
+        <location filename="../src/tab_logs.cpp" line="77"/>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="67"/>
+        <source>You must select at least one filter.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="77"/>
+        <source>You have to select a valid number of days to locate.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="142"/>
+        <source>Username: </source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="145"/>
+        <source>IP Address: </source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="148"/>
+        <source>Game Name: </source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="151"/>
+        <source>GameID: </source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="154"/>
+        <source>Message: </source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="158"/>
+        <source>Main Room</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="159"/>
+        <source>Game Room</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="160"/>
+        <source>Private Chat</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="162"/>
+        <source>Past X Days: </source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="163"/>
+        <source>Today</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="164"/>
+        <source>Last Hour</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="169"/>
+        <source>Maximum Results: </source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="173"/>
+        <source>At least one filter is required.
+The more information you put in, the more specific your results will be.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="175"/>
+        <source>Get User Logs</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="179"/>
+        <source>Clear Filters</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="195"/>
+        <source>Filters</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="204"/>
+        <source>Log Locations</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="213"/>
+        <source>Date Range</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="220"/>
+        <source>Maximum Results</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="43"/>
+        <source>Room Logs</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="30"/>
+        <location filename="../src/tab_logs.cpp" line="35"/>
+        <location filename="../src/tab_logs.cpp" line="40"/>
+        <source>Time;SenderName;SenderIP;Message;TargetID;TargetName</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="44"/>
+        <source>Game Logs</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="45"/>
+        <source>Chat Logs</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="257"/>
+        <location filename="../src/tab_logs.cpp" line="262"/>
+        <source>Message History</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="262"/>
+        <source>There are no messages for the selected filters.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_logs.cpp" line="257"/>
+        <source>Failed to collect message history information.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>TabMessage</name>
     <message>
-        <location filename="../src/tab_message.cpp" line="58"/>
+        <location filename="../src/tab_message.cpp" line="62"/>
         <source>Private &amp;chat</source>
         <translation>1:1 대화</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="59"/>
+        <location filename="../src/tab_message.cpp" line="63"/>
         <source>&amp;Leave</source>
         <translation>나가기</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="75"/>
+        <location filename="../src/tab_message.cpp" line="79"/>
         <source>%1 - Private chat</source>
         <translation>%1 - 1:1 대화</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="102"/>
+        <location filename="../src/tab_message.cpp" line="106"/>
         <source>This user is ignoring you.</source>
         <translation>이 사용자는 당신을 차단하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="127"/>
+        <location filename="../src/tab_message.cpp" line="135"/>
         <source>Private message from </source>
         <translation>1:1 대화 요청 - </translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="139"/>
+        <location filename="../src/tab_message.cpp" line="147"/>
         <source>%1 has left the server.</source>
         <translation>%1이(가) 서버와의 연결을 끊었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="145"/>
+        <location filename="../src/tab_message.cpp" line="153"/>
         <source>%1 has joined the server.</source>
         <translation>%1이(가) 서버에 연결하였습니다.</translation>
     </message>
@@ -4925,54 +5239,54 @@ Please enter a name:</source>
 <context>
     <name>TabReplays</name>
     <message>
-        <location filename="../src/tab_replays.cpp" line="116"/>
+        <location filename="../src/tab_replays.cpp" line="119"/>
         <source>Local file system</source>
         <translation>로컬 파일 시스템</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="117"/>
+        <location filename="../src/tab_replays.cpp" line="120"/>
         <source>Server replay storage</source>
         <translation>서버 리플레이 보관함</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="119"/>
-        <location filename="../src/tab_replays.cpp" line="121"/>
+        <location filename="../src/tab_replays.cpp" line="122"/>
+        <location filename="../src/tab_replays.cpp" line="124"/>
         <source>Watch replay</source>
         <translation>리플레이 보기</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="120"/>
-        <location filename="../src/tab_replays.cpp" line="124"/>
+        <location filename="../src/tab_replays.cpp" line="123"/>
+        <location filename="../src/tab_replays.cpp" line="127"/>
         <source>Delete</source>
         <translation>삭제</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="122"/>
+        <location filename="../src/tab_replays.cpp" line="125"/>
         <source>Download replay</source>
         <translation>리플레이 다운로드</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="123"/>
+        <location filename="../src/tab_replays.cpp" line="126"/>
         <source>Toggle expiration lock</source>
         <translation>자동 삭제 여부 토글</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="149"/>
+        <location filename="../src/tab_replays.cpp" line="152"/>
         <source>Delete local file</source>
         <translation>로컬 파일 삭제</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="149"/>
+        <location filename="../src/tab_replays.cpp" line="152"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
         <translation>정말로 &quot;%1&quot;을(를) 삭제하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="255"/>
+        <location filename="../src/tab_replays.cpp" line="258"/>
         <source>Delete remote replay</source>
         <translation>서버에 저장된 리플레이 삭제</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="255"/>
+        <location filename="../src/tab_replays.cpp" line="258"/>
         <source>Are you sure you want to delete the replay of game %1?</source>
         <translation>정말 게임 %1의 리플레이를 삭제하시겠습니까?</translation>
     </message>
@@ -4985,47 +5299,47 @@ Please enter a name:</source>
 <context>
     <name>TabRoom</name>
     <message>
-        <location filename="../src/tab_room.cpp" line="143"/>
+        <location filename="../src/tab_room.cpp" line="148"/>
         <source>&amp;Say:</source>
         <translation>말하기:</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="144"/>
+        <location filename="../src/tab_room.cpp" line="149"/>
         <source>Chat</source>
         <translation>대화</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="145"/>
+        <location filename="../src/tab_room.cpp" line="150"/>
         <source>&amp;Room</source>
         <translation>채널</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="146"/>
+        <location filename="../src/tab_room.cpp" line="151"/>
         <source>&amp;Leave room</source>
         <translation>채널에서 나가기</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="147"/>
+        <location filename="../src/tab_room.cpp" line="152"/>
         <source>&amp;Clear chat</source>
         <translation>대화 내용 삭제</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="148"/>
+        <location filename="../src/tab_room.cpp" line="153"/>
         <source>Chat Settings...</source>
         <translation>대화 설정...</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="161"/>
+        <location filename="../src/tab_room.cpp" line="166"/>
         <source> mentioned you.</source>
         <translation>이(가) 당신에게 멘션을 보냈습니다.</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="161"/>
+        <location filename="../src/tab_room.cpp" line="166"/>
         <source>Click to view</source>
         <translation>여기를 눌러 확인</translation>
     </message>
     <message>
-        <location filename="../src/tab_room.cpp" line="206"/>
+        <location filename="../src/tab_room.cpp" line="211"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
         <translation>너무 빨리 말하고 있습니다. 조금만 기다려 주세요.</translation>
     </message>
@@ -5033,44 +5347,83 @@ Please enter a name:</source>
 <context>
     <name>TabServer</name>
     <message>
-        <location filename="../src/tab_server.h" line="53"/>
+        <location filename="../src/tab_server.h" line="52"/>
         <source>Server</source>
         <translation>서버</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_server.cpp" line="189"/>
+        <location filename="../src/tab_server.cpp" line="192"/>
+        <location filename="../src/tab_server.cpp" line="195"/>
+        <location filename="../src/tab_server.cpp" line="198"/>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_server.cpp" line="189"/>
+        <source>Failed to join the room: it doesn&apos;t exists on the server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_server.cpp" line="192"/>
+        <source>The server thinks you are in the room but Cockatrice is unable to display it. Try restarting Cockatrice.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_server.cpp" line="195"/>
+        <source>You do not have the required permission to join this room.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_server.cpp" line="198"/>
+        <source>Failed to join the room due to an unknown error: %1.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>TabSupervisor</name>
     <message>
-        <location filename="../src/tab_supervisor.cpp" line="142"/>
+        <location filename="../src/tab_supervisor.cpp" line="143"/>
         <source>Are you sure?</source>
         <translation>확실하십니까?</translation>
     </message>
     <message>
-        <location filename="../src/tab_supervisor.cpp" line="142"/>
+        <location filename="../src/tab_supervisor.cpp" line="143"/>
         <source>There are still open games. Are you sure you want to quit?</source>
         <translation>참가 중인 게임이 있습니다. 
 정말로 코카트리스를 종료하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/tab_supervisor.cpp" line="568"/>
+        <location filename="../src/tab_supervisor.cpp" line="581"/>
         <source>Promotion</source>
         <translation>승급</translation>
     </message>
     <message>
-        <location filename="../src/tab_supervisor.cpp" line="568"/>
+        <location filename="../src/tab_supervisor.cpp" line="581"/>
         <source>You have been promoted to moderator. Please log out and back in for changes to take effect.</source>
         <translation>관리자로 승급되셨습니다. 다시 로그인 하시면 해당 등급이 적용됩니다.</translation>
+    </message>
+    <message>
+        <location filename="../src/tab_supervisor.cpp" line="584"/>
+        <source>Warned</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_supervisor.cpp" line="584"/>
+        <source>You have received a warning due to %1.
+Please refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>TabUserLists</name>
     <message>
-        <location filename="../src/tab_userlists.cpp" line="48"/>
+        <location filename="../src/tab_userlists.cpp" line="49"/>
         <source>Add to Buddy List</source>
         <translation>친구 목록에 추가</translation>
     </message>
     <message>
-        <location filename="../src/tab_userlists.cpp" line="57"/>
+        <location filename="../src/tab_userlists.cpp" line="58"/>
         <source>Add to Ignore List</source>
         <translation>차단 목록에 추가</translation>
     </message>
@@ -5083,94 +5436,153 @@ Please enter a name:</source>
 <context>
     <name>UserContextMenu</name>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="43"/>
+        <location filename="../src/user_context_menu.cpp" line="55"/>
         <source>User &amp;details</source>
         <translation>사용자 정보</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="44"/>
+        <location filename="../src/user_context_menu.cpp" line="56"/>
         <source>Private &amp;chat</source>
         <translation>1:1 대화</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="45"/>
+        <location filename="../src/user_context_menu.cpp" line="57"/>
         <source>Show this user&apos;s &amp;games</source>
         <translation>이 사용자의 게임 보기</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="46"/>
+        <location filename="../src/user_context_menu.cpp" line="58"/>
         <source>Add to &amp;buddy list</source>
         <translation>친구 목록에 추가</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="47"/>
+        <location filename="../src/user_context_menu.cpp" line="59"/>
         <source>Remove from &amp;buddy list</source>
         <translation>친구 목록에서 삭제</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="48"/>
+        <location filename="../src/user_context_menu.cpp" line="60"/>
         <source>Add to &amp;ignore list</source>
         <translation>차단 목록에 추가</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="49"/>
+        <location filename="../src/user_context_menu.cpp" line="61"/>
         <source>Remove from &amp;ignore list</source>
         <translation>차단 목록에서 제거</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="50"/>
+        <location filename="../src/user_context_menu.cpp" line="62"/>
         <source>Kick from &amp;game</source>
         <translation>게임에서 강제 퇴장</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="51"/>
+        <location filename="../src/user_context_menu.cpp" line="63"/>
+        <source>Warn user</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/user_context_menu.cpp" line="64"/>
+        <source>View user&apos;s war&amp;n history</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/user_context_menu.cpp" line="65"/>
         <source>Ban from &amp;server</source>
         <translation>서버에서 추방</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="52"/>
+        <location filename="../src/user_context_menu.cpp" line="66"/>
+        <source>View user&apos;s &amp;ban history</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/user_context_menu.cpp" line="67"/>
         <source>&amp;Promote user to moderator</source>
         <translation>사용자를 관리자로 승급</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="53"/>
+        <location filename="../src/user_context_menu.cpp" line="68"/>
         <source>Dem&amp;ote user from moderator</source>
         <translation>사용자를 관리자로부터 강등</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="81"/>
+        <location filename="../src/user_context_menu.cpp" line="96"/>
         <source>%1&apos;s games</source>
         <translation>%1의 게임</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="104"/>
-        <location filename="../src/user_context_menu.cpp" line="106"/>
+        <location filename="../src/user_context_menu.cpp" line="151"/>
+        <location filename="../src/user_context_menu.cpp" line="172"/>
+        <location filename="../src/user_context_menu.cpp" line="175"/>
+        <source>Ban History</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/user_context_menu.cpp" line="157"/>
+        <source>Ban Time;Moderator;Ban Length;Ban Reason;Visible Reason</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/user_context_menu.cpp" line="172"/>
+        <source>User has never been banned.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/user_context_menu.cpp" line="175"/>
+        <source>Failed to collecting ban information.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/user_context_menu.cpp" line="184"/>
+        <location filename="../src/user_context_menu.cpp" line="204"/>
+        <location filename="../src/user_context_menu.cpp" line="207"/>
+        <source>Warning History</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/user_context_menu.cpp" line="190"/>
+        <source>Warning Time;Moderator;User Name;Reason</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/user_context_menu.cpp" line="204"/>
+        <source>User has never been warned.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/user_context_menu.cpp" line="207"/>
+        <source>Failed to collecting warning information.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/user_context_menu.cpp" line="217"/>
+        <location filename="../src/user_context_menu.cpp" line="219"/>
         <source>Success</source>
         <translation>성공</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="104"/>
+        <location filename="../src/user_context_menu.cpp" line="217"/>
         <source>Successfully promoted user.</source>
         <translation>해당 사용자 승급에 성공하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="106"/>
+        <location filename="../src/user_context_menu.cpp" line="219"/>
         <source>Successfully demoted user.</source>
         <translation>해당 사용자 강등에 성공하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="111"/>
-        <location filename="../src/user_context_menu.cpp" line="113"/>
+        <location filename="../src/user_context_menu.cpp" line="224"/>
+        <location filename="../src/user_context_menu.cpp" line="226"/>
         <source>Failed</source>
         <translation>실패</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="111"/>
+        <location filename="../src/user_context_menu.cpp" line="224"/>
         <source>Failed to promote user.</source>
         <translation>해당 사용자 승급에 실패하였습니다.</translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="113"/>
+        <location filename="../src/user_context_menu.cpp" line="226"/>
         <source>Failed to demote user.</source>
         <translation>해당 사용자 강등에 실패하였습니다.</translation>
     </message>
@@ -5342,42 +5754,42 @@ Please enter a name:</source>
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="407"/>
+        <location filename="../src/dlg_settings.cpp" line="430"/>
         <source>General interface settings</source>
         <translation>일반 인터페이스 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="408"/>
+        <location filename="../src/dlg_settings.cpp" line="431"/>
         <source>Enable notifications in taskbar</source>
         <translation>상태 표시줄 알림 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="409"/>
+        <location filename="../src/dlg_settings.cpp" line="432"/>
         <source>Notify in the taskbar for game events while you are spectating</source>
         <translation>관전중인 게임의 상태 표시줄 알림 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="410"/>
+        <location filename="../src/dlg_settings.cpp" line="433"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>카드를 더블 클릭해서 발동 (해제시 한번만 클릭하면 발동 됨)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="411"/>
+        <location filename="../src/dlg_settings.cpp" line="434"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
         <translation>모든 대지가 아닌 카드를 발동 시에 스택으로 이동 (해제시 전장으로 바로 이동)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="412"/>
+        <location filename="../src/dlg_settings.cpp" line="435"/>
         <source>Annotate card text on tokens</source>
         <translation>토큰에 카드 텍스트 주석 자동 추가</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="413"/>
+        <location filename="../src/dlg_settings.cpp" line="436"/>
         <source>Animation settings</source>
         <translation>애니메이션 설정</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="414"/>
+        <location filename="../src/dlg_settings.cpp" line="437"/>
         <source>&amp;Tap/untap animation</source>
         <translation>탭/언탭 애니메이션</translation>
     </message>
@@ -5385,95 +5797,134 @@ Please enter a name:</source>
 <context>
     <name>UserList</name>
     <message>
-        <location filename="../src/userlist.cpp" line="274"/>
+        <location filename="../src/userlist.cpp" line="338"/>
         <source>Users connected to server: %1</source>
         <translation>서버에 접속한 사용자 수: %1</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="275"/>
+        <location filename="../src/userlist.cpp" line="339"/>
         <source>Users in this room: %1</source>
         <translation>현재 채널에 있는 사용자 목록 : %1</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="276"/>
+        <location filename="../src/userlist.cpp" line="340"/>
         <source>Buddies online: %1 / %2</source>
         <translation>온라인 친구 목록: %1 / %2</translation>
     </message>
     <message>
-        <location filename="../src/userlist.cpp" line="277"/>
+        <location filename="../src/userlist.cpp" line="341"/>
         <source>Ignored users online: %1 / %2</source>
         <translation>차단한 사용자 목록: %1 / %2</translation>
     </message>
 </context>
 <context>
+    <name>WarningDialog</name>
+    <message>
+        <location filename="../src/userlist.cpp" line="122"/>
+        <source>Which warning would you like to send?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/userlist.cpp" line="128"/>
+        <source>&amp;OK</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/userlist.cpp" line="131"/>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/userlist.cpp" line="145"/>
+        <source>Warn user for misconduct</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/userlist.cpp" line="151"/>
+        <location filename="../src/userlist.cpp" line="156"/>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/userlist.cpp" line="151"/>
+        <source>User name to send a warning to can not be blank, please specify a user to warn.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/userlist.cpp" line="156"/>
+        <source>Warning to use can not be blank, please select a valid warning to send.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>WndSets</name>
     <message>
-        <location filename="../src/window_sets.cpp" line="88"/>
+        <location filename="../src/window_sets.cpp" line="90"/>
         <source>Enable all sets</source>
         <translation>모든 확장판 활성화</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="90"/>
+        <location filename="../src/window_sets.cpp" line="92"/>
         <source>Disable all sets</source>
         <translation>모든 확장판 비활성화</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="35"/>
+        <location filename="../src/window_sets.cpp" line="37"/>
         <source>Move selected set up</source>
         <translation>선택한 확장판을 한 단계 올리기</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="28"/>
+        <location filename="../src/window_sets.cpp" line="30"/>
         <source>Move selected set to the top</source>
         <translation>선택한 확장판을 맨 위로 올리기</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="42"/>
+        <location filename="../src/window_sets.cpp" line="44"/>
         <source>Move selected set down</source>
         <translation>선택한 확장판을 한 단계 내리기</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="49"/>
+        <location filename="../src/window_sets.cpp" line="51"/>
         <source>Move selected set to the bottom</source>
         <translation>선택한 확장판을 맨 아래로 내리기</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="95"/>
+        <location filename="../src/window_sets.cpp" line="97"/>
         <source>hints:</source>
         <translation>설명:</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="95"/>
+        <location filename="../src/window_sets.cpp" line="97"/>
         <source>Enable the sets that you want to have available in the deck editor</source>
         <translation>덱 편집기에 사용할 확장판을 선택하여 주십시오.</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="95"/>
+        <location filename="../src/window_sets.cpp" line="97"/>
         <source>Move sets around to change their order, or click on a column header to sort sets on that field</source>
         <translation>확장판의 순서를 수동으로 변경하거나 카테고리 이름을 클릭하여 정렬할 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="95"/>
+        <location filename="../src/window_sets.cpp" line="97"/>
         <source>Sets order decides the source that will be used when loading images for a specific card</source>
         <translation>확장판의 순서에 따라 카드가 어떤 확장판의 이미지를 사용할지가 결정됩니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="95"/>
+        <location filename="../src/window_sets.cpp" line="97"/>
         <source>Disabled sets will be used for loading images only if all the enabled sets failed</source>
-        <translation>선택하지 않은 판본도 카드 이미지를 불러오기 위하여 사용될 수 있습니다.</translation>
+        <translation>선택하지 않은 확장판도 카드 이미지를 불러오기 위하여 사용될 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="115"/>
+        <location filename="../src/window_sets.cpp" line="117"/>
         <source>Edit sets</source>
         <translation>확장판 목록 편집</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="127"/>
+        <location filename="../src/window_sets.cpp" line="129"/>
         <source>Success</source>
         <translation>성공</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="127"/>
+        <location filename="../src/window_sets.cpp" line="129"/>
         <source>The sets database has been saved successfully.</source>
         <translation>확장판 데이터베이스가 성공적으로 저장되었습니다.</translation>
     </message>
@@ -5481,22 +5932,22 @@ Please enter a name:</source>
 <context>
     <name>ZoneViewWidget</name>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="171"/>
+        <location filename="../src/zoneviewwidget.cpp" line="133"/>
         <source>sort by name</source>
         <translation>카드 이름순 정렬</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="172"/>
+        <location filename="../src/zoneviewwidget.cpp" line="134"/>
         <source>sort by type</source>
         <translation>카드 유형별 정렬</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="173"/>
+        <location filename="../src/zoneviewwidget.cpp" line="135"/>
         <source>shuffle when closing</source>
         <translation>닫은 후 덱 섞기</translation>
     </message>
     <message>
-        <location filename="../src/zoneviewwidget.cpp" line="174"/>
+        <location filename="../src/zoneviewwidget.cpp" line="136"/>
         <source>pile view</source>
         <translation>카드 유형별 행 정렬</translation>
     </message>
@@ -5504,558 +5955,573 @@ Please enter a name:</source>
 <context>
     <name>shortcutsTab</name>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1438"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1461"/>
         <source>Form</source>
         <translation>양식</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1439"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1462"/>
         <source>Main Window</source>
         <translation>메인 화면</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1440"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1463"/>
         <source>Deck editor</source>
         <translation>덱 편집기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1441"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1464"/>
         <source>Local gameplay</source>
         <translation>오프라인 게임 시작</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1442"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1465"/>
         <source>Watch replay</source>
         <translation>리플레이 보기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1443"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1466"/>
         <source>Connect</source>
         <translation>서버로 연결</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1444"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1467"/>
         <source>Register</source>
         <translation>서버에 가입</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1445"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1468"/>
         <source>Full screen</source>
         <translation>전체 화면</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1446"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1469"/>
         <source>Settings</source>
         <translation>환경설정</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1447"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1470"/>
         <source>Check for card updates</source>
         <translation>카드 DB 업데이트 확인</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1449"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1472"/>
         <source>Exit</source>
         <translation>끝내기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1450"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1473"/>
         <source>Deck Editor</source>
         <translation>덱 편집기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1451"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1474"/>
         <source>Analyze deck</source>
         <translation>덱 분석</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1452"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1475"/>
         <source>Load deck (clipboard)</source>
         <translation>클립보드에서 덱 가져오기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1453"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1476"/>
         <source>Clerar all filters</source>
         <translation>모든 필터 초기화</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1454"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1477"/>
         <source>New deck</source>
         <translation>새로운 덱 작성</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1455"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1478"/>
         <source>Clear one filter</source>
         <translation>선택한 필터 초기화</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1456"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1479"/>
         <source>Open custom folder</source>
         <translation>사용자 폴더 열기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1457"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1480"/>
         <source>Close</source>
         <translation>덱 닫기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1458"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1481"/>
         <source>Print deck</source>
         <translation>덱 인쇄</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1459"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1482"/>
         <source>Edit sets</source>
         <translation>확장판 목록 편집</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1460"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1483"/>
         <source>Delete card</source>
         <translation>카드 삭제</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1461"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1484"/>
         <source>Edit tokens</source>
         <translation>토큰 수정</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1462"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1485"/>
         <source>Reset layout</source>
         <translation>레이아웃 초기화</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1463"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1486"/>
         <source>Add card</source>
         <translation>카드 추가</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1464"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1487"/>
         <source>Save deck</source>
         <translation>덱 저장</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1465"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1488"/>
         <source>Remove card</source>
         <translation>카드 제거</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1466"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1489"/>
         <source>Save deck as</source>
         <translation>다른 이름으로 저장</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1467"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1490"/>
         <source>Load deck</source>
         <translation>덱 불러오기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1468"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1491"/>
         <source>Save deck (clipboard)</source>
         <translation>클립보드로 덱 보내기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1469"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1559"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1492"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1582"/>
         <source>Counters</source>
         <translation>카운터</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1470"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1493"/>
         <source>Life</source>
         <translation>생명점</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1471"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1475"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1479"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1483"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1491"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1494"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1498"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1502"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1506"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1514"/>
         <source>Set</source>
         <translation>설정</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1472"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1476"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1480"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1484"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1495"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1499"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1503"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1507"/>
         <source>Add</source>
         <translation>증가</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1473"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1477"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1481"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1485"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1496"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1500"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1504"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1508"/>
         <source>Remove</source>
         <translation>감소</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1474"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1497"/>
         <source>Red</source>
         <translation>적색</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1478"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1501"/>
         <source>Green</source>
         <translation>녹색</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1482"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1505"/>
         <source>Yellow</source>
         <translation>황색</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1486"/>
-        <source>Mainwindow / Deck editor</source>
-        <translation>메인 화면 / 덱 편집기</translation>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1535"/>
+        <source>Playing Area</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1487"/>
-        <source>Power / toughness</source>
-        <translation>공격력 / 방어력 설정</translation>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1549"/>
+        <source>Phases | P/T | Playing Area</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1488"/>
-        <source>Power and toughness</source>
-        <translation>공격력 및 방어력</translation>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1563"/>
+        <source>Game Lobby</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1489"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1566"/>
+        <source>Gameplay</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1581"/>
+        <source>Draw | Move | View | Gameplay</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1583"/>
+        <source>How to set custom shortcuts</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1584"/>
+        <source>Restore all default shortcuts</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1585"/>
+        <source>Clear all shortcuts</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1512"/>
         <source>Add (+1/+1)</source>
         <translation>+1/+1 부여</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1490"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1513"/>
         <source>Remove (-1/-1)</source>
         <translation>-1/-1 부여</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1492"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1515"/>
         <source>Toughness</source>
         <translation>방어력</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1493"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1516"/>
         <source>Remove (-0/-1)</source>
         <translation>-0/-1 부여</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1494"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1517"/>
         <source>Add (+0/+1)</source>
         <translation>+0/+1 부여</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1495"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1518"/>
         <source>Power</source>
         <translation>공격력</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1496"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1519"/>
         <source>Remove (-1/-0)</source>
         <translation>-1/-0 부여</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1497"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1520"/>
         <source>Add (+1/+0)</source>
         <translation>+1/+0 부여</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1498"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1521"/>
         <source>Game Phases</source>
         <translation>턴 단계</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1499"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1522"/>
         <source>Untap</source>
         <translation>언탭단</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1448"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1471"/>
         <source>Disconnect</source>
         <translation>서버와의 연결 해제</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1500"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1509"/>
+        <source>Main Window | Deck Editor</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1510"/>
+        <source>Power / Toughness</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1511"/>
+        <source>Power and Toughness</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1523"/>
         <source>Upkeep</source>
         <translation>유지단</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1501"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1552"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1524"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1575"/>
         <source>Draw</source>
         <translation>뽑기단</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1502"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1525"/>
         <source>Main 1</source>
         <translation>전투 전 본단계</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1503"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1526"/>
         <source>Start combat</source>
         <translation>전투 시작단</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1504"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1527"/>
         <source>Attack</source>
         <translation>공격자 선언단</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1505"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1528"/>
         <source>Block</source>
         <translation>방어자 선언단</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1506"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1529"/>
         <source>Damage</source>
         <translation>전투 피해단</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1507"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1530"/>
         <source>End combat</source>
         <translation>전투 종료단</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1508"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1531"/>
         <source>Main 2</source>
         <translation>전투 후 본단계</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1509"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1532"/>
         <source>End</source>
         <translation>종료단</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1510"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1533"/>
         <source>Next phase</source>
         <translation>다음 단계로 진행</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1511"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1534"/>
         <source>Next turn</source>
         <translation>턴 넘기기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1512"/>
-        <source>Player</source>
-        <translation>플레이어</translation>
-    </message>
-    <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1513"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1536"/>
         <source>Tap Card</source>
         <translation>카드 탭</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1514"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1537"/>
         <source>Untap Card</source>
         <translation>카드 언탭</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1515"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1538"/>
         <source>Untap all</source>
         <translation>모든 지속물 언탭</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1516"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1539"/>
         <source>Toogle untap</source>
         <translation>언탭단에서 언탭 여부 변경</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1517"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1540"/>
         <source>Flip card</source>
         <translation>카드 뒤집기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1518"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1541"/>
         <source>Peek card</source>
         <translation>카드 앞면 보기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1519"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1542"/>
         <source>Play card</source>
         <translation>카드 플레이</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1520"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1543"/>
         <source>Attach card</source>
         <translation>다른 카드에 부착</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1521"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1544"/>
         <source>Unattach card</source>
         <translation>부착 해제</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1522"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1545"/>
         <source>Clone card</source>
         <translation>카드 복제</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1523"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1546"/>
         <source>Create token</source>
         <translation>토큰 생성</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1524"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1547"/>
         <source>Create another token</source>
         <translation>같은 종류의 토큰 추가 생성</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1525"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1548"/>
         <source>Set annotation</source>
         <translation>주석 설정</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1526"/>
-        <source>Phases / P/T / Player</source>
-        <translation>턴 단계 / 공/방 / 플레이어</translation>
-    </message>
-    <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1527"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1550"/>
         <source>Move card to</source>
         <translation>다른 영역으로 이동:</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1528"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1551"/>
         <source>Bottom library</source>
         <translation>서고 맨 아래</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1529"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1552"/>
         <source>Top library</source>
         <translation>서고 맨 위</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1530"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1534"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1553"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1557"/>
         <source>Graveyard</source>
         <translation>무덤</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1531"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1538"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1554"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1561"/>
         <source>Exile</source>
         <translation>추방 영역</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1532"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1555"/>
         <source>Hand</source>
         <translation>손</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1533"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1556"/>
         <source>View</source>
         <translation>보기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1535"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1558"/>
         <source>Library</source>
         <translation>서고</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1536"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1559"/>
         <source>Tops card of library</source>
         <translation>서고 위 카드</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1537"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1560"/>
         <source>Sideboard</source>
         <translation>사이드보드</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1539"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1562"/>
         <source>Close recent view</source>
         <translation>특정 영역 보기 닫음</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1540"/>
-        <source>Pre-play</source>
-        <translation>플레이 전</translation>
-    </message>
-    <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1541"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1564"/>
         <source>Load remote deck</source>
         <translation>서버에 저장된 덱 불러오기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1542"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1565"/>
         <source>Load local deck</source>
         <translation>로컬 덱 불러오기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1543"/>
-        <source>Game play</source>
-        <translation>게임 플레이</translation>
-    </message>
-    <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1544"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1567"/>
         <source>Draw arrow</source>
         <translation>화살표 그리기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1545"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1568"/>
         <source>Leave game</source>
         <translation>게임 나가기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1546"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1569"/>
         <source>Remove local arrows</source>
         <translation>내가 그린 화살표 제거</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1547"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1570"/>
         <source>Concede</source>
         <translation>항복</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1548"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1571"/>
         <source>Roll dice</source>
         <translation>주사위 굴리기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1549"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1572"/>
         <source>Rotate view CW</source>
         <translation>플레이어 위치 시계방향으로 조정</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1550"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1573"/>
         <source>Shuffle library</source>
         <translation>서고 섞기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1551"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1574"/>
         <source>Rotate view CCW</source>
         <translation>플레이어 위치 반시계방향으로 조정</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1553"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1576"/>
         <source>Mulligan</source>
         <translation>멀리건</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1554"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1577"/>
         <source>Draw card</source>
         <translation>카드 뽑기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1555"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1578"/>
         <source>Draw cards</source>
         <translation>카드 X장 뽑기</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1556"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1579"/>
         <source>Undo draw</source>
         <translation>카드 뽑기 취소</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1557"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1580"/>
         <source>Always reveal top card</source>
         <translation>서고 맨 위 카드 항상 공개</translation>
-    </message>
-    <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1558"/>
-        <source>Draw / Move / View / Game play</source>
-        <translation>카드 뽑기 / 이동 / 보기 / 게임플레이</translation>
     </message>
 </context>
 </TS>

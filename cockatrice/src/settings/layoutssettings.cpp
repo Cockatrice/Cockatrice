@@ -57,3 +57,43 @@ void LayoutsSettings::setDeckEditorFilterSize(const QSize &value)
 {
     setValue(value,"layouts/deckEditor_FilterSize");
 }
+
+void LayoutsSettings::setGamePlayAreaGeometry(const QByteArray &value)
+{
+    setValue(value,"layouts/gameplayarea_geometry");
+}
+
+void LayoutsSettings::setGamePlayAreaState(const QByteArray &value)
+{
+    setValue(value,"layouts/gameplayarea_state");
+}
+
+const QByteArray LayoutsSettings::getGamePlayAreaLayoutState()
+{
+    return getValue("layouts/gameplayarea_state").toByteArray();
+}
+
+const QByteArray LayoutsSettings::getGamePlayAreaGeometry()
+{
+    return getValue("layouts/gameplayarea_geometry").toByteArray();
+}
+
+void LayoutsSettings::setReplayPlayAreaGeometry(const QByteArray &value)
+{
+    setValue(value,"layouts/replayplayarea_geometry");
+}
+
+void LayoutsSettings::setReplayPlayAreaState(const QByteArray &value)
+{
+    setValue(value,"layouts/replayplayarea_state");
+}
+
+const QByteArray LayoutsSettings::getReplayPlayAreaLayoutState()
+{
+    return getValue("layouts/replayplayarea_state").toByteArray();
+}
+
+const QByteArray LayoutsSettings::getReplayPlayAreaGeometry()
+{
+    return getValue("layouts/replayplayarea_geometry").toByteArray();
+}

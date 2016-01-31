@@ -39,7 +39,10 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     addTabMenu(messageMenu);
 
     retranslateUi();
-    setLayout(vbox);
+
+    QWidget * mainWidget = new QWidget(this);
+    mainWidget->setLayout(vbox);
+    setCentralWidget(mainWidget);
 }
 
 TabMessage::~TabMessage()
