@@ -1501,34 +1501,34 @@ Möchten Sie Ihren Speicherort der Datenbank aktualisieren?</translation>
     <message>
         <location filename="../src/dlg_update.cpp" line="52"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Fehler</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="53"/>
         <source>Cockatrice was not built with SSL support, so cannot download updates! Please visit the download page and update manually.</source>
-        <translation type="unfinished"/>
+        <translation>Ihre Version von Cockatrice hat keine SSL-Unterstützung, dadurch ist das Herunterladen von Aktualisierungen nicht möglich! Bitte besuchen Sie die Downloadseite und aktualisieren Sie manuell.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="132"/>
         <source>Your version of Cockatrice is out of date, but there are no packages available for your operating system. You may have to use a developer build or build from source yourself. Please visit the download page.</source>
-        <translation type="unfinished"/>
+        <translation>Ihre Cockatrice Version ist nicht mehr aktuell, jedoch sind keine Installationspakete für Ihr Betriebssystem erhältlich. Sie müssen eventuell einen Entwicklungsbuild verwenden, oder den Quellcode für einen eigenen Build verwenden. Bitte besuchen Sie die Downloadseite.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="140"/>
         <source>Cockatrice Update</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice Aktualisierung</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="140"/>
         <source>Your version of Cockatrice is up to date.</source>
-        <translation type="unfinished"/>
+        <translation>Ihre Version von Cockatrice ist aktuell.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="155"/>
         <location filename="../src/dlg_update.cpp" line="161"/>
         <location filename="../src/dlg_update.cpp" line="173"/>
         <source>Update Error</source>
-        <translation type="unfinished"/>
+        <translation>Aktualisierungsfehler</translation>
     </message>
 </context>
 <context>
@@ -1795,18 +1795,18 @@ Möchten Sie Ihren Speicherort der Datenbank aktualisieren?</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="266"/>
         <source>Primary download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Primäre URL zum Herunterladen:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="267"/>
         <source>Fallback download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Ersatz-URL zum Herunterladen:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="271"/>
         <location filename="../src/dlg_settings.cpp" line="272"/>
         <source>Reset</source>
-        <translation type="unfinished"/>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="268"/>
@@ -1995,7 +1995,7 @@ Login läuft.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="282"/>
         <source>Cockatrice Webpage</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice Webseite</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="284"/>
@@ -2334,7 +2334,7 @@ Lokale Version ist %1, Serverversion ist %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="511"/>
         <source>&amp;Update Cockatrice</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice akt&amp;ualisieren</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="512"/>
@@ -2702,24 +2702,24 @@ Sie müssen den Aktivierungstoken aus der Aktivierungsemail verwenden</translati
     <message>
         <location filename="../src/messagelogwidget.cpp" line="193"/>
         <source>Heads (1)</source>
-        <translation type="unfinished"/>
+        <translation>Kopf (1)</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="193"/>
         <source>Tails (2)</source>
-        <translation type="unfinished"/>
+        <translation>Zahl (2)</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="198"/>
         <source>%1 flipped a coin. It landed as %2.</source>
         <comment>female</comment>
-        <translation type="unfinished"/>
+        <translation>%1 warf eine Münze. Es fiel %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="200"/>
         <source>%1 flipped a coin. It landed as %2.</source>
         <comment>male</comment>
-        <translation type="unfinished"/>
+        <translation>%1 warf eine Münze. Es fiel %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="248"/>
@@ -4727,21 +4727,21 @@ Lesen Sie mehr über das Ändern der Editionsreihenfolge oder die Deaktivierung 
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="609"/>
         <source>&amp;View</source>
-        <translation type="unfinished"/>
+        <translation>Ansicht</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="614"/>
         <location filename="../src/tab_deck_editor.cpp" line="617"/>
         <location filename="../src/tab_deck_editor.cpp" line="620"/>
         <source>Visible</source>
-        <translation type="unfinished"/>
+        <translation>Sichtbar</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="615"/>
         <location filename="../src/tab_deck_editor.cpp" line="618"/>
         <location filename="../src/tab_deck_editor.cpp" line="621"/>
         <source>Floating</source>
-        <translation type="unfinished"/>
+        <translation>Schwebend</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="628"/>
@@ -4887,25 +4887,25 @@ Bitte geben Sie einen Namen ein:</translation>
         <location filename="../src/tab_game.cpp" line="450"/>
         <location filename="../src/tab_game.cpp" line="494"/>
         <source>Card Info</source>
-        <translation type="unfinished"/>
+        <translation>Karteninformationen</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="451"/>
         <location filename="../src/tab_game.cpp" line="496"/>
         <source>Player List</source>
-        <translation type="unfinished"/>
+        <translation>Spielerliste</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="452"/>
         <location filename="../src/tab_game.cpp" line="495"/>
         <source>Messages</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="454"/>
         <location filename="../src/tab_game.cpp" line="509"/>
         <source>Replay Timeline</source>
-        <translation type="unfinished"/>
+        <translation>Zeitleiste der Aufzeichnung</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="459"/>
@@ -4970,7 +4970,7 @@ Bitte geben Sie einen Namen ein:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="493"/>
         <source>&amp;View</source>
-        <translation type="unfinished"/>
+        <translation>Ansicht</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="498"/>
@@ -4978,7 +4978,7 @@ Bitte geben Sie einen Namen ein:</translation>
         <location filename="../src/tab_game.cpp" line="504"/>
         <location filename="../src/tab_game.cpp" line="510"/>
         <source>Visible</source>
-        <translation type="unfinished"/>
+        <translation>Sichtbar</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="499"/>
@@ -4986,12 +4986,12 @@ Bitte geben Sie einen Namen ein:</translation>
         <location filename="../src/tab_game.cpp" line="505"/>
         <location filename="../src/tab_game.cpp" line="511"/>
         <source>Floating</source>
-        <translation type="unfinished"/>
+        <translation>Schwebend</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="514"/>
         <source>Reset layout</source>
-        <translation type="unfinished"/>
+        <translation>Darstellung zurücksetzen</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="595"/>

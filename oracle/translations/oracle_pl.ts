@@ -122,7 +122,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
     <message>
         <source>Downloading (0MB)</source>
@@ -257,7 +257,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
     <message>
         <source>The file could not be saved to %1</source>
