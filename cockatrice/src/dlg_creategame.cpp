@@ -193,7 +193,7 @@ void DlgCreateGame::actReset()
 
     passwordEdit->setText("");
     onlyBuddiesCheckBox->setChecked(false);
-    onlyRegisteredCheckBox->setChecked(true);
+    onlyRegisteredCheckBox->setChecked(room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered);
 
     spectatorsAllowedCheckBox->setChecked(true);
     spectatorsNeedPasswordCheckBox->setChecked(false);
