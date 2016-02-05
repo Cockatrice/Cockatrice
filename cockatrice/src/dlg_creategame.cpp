@@ -116,9 +116,9 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
     rememberGameSettings->setChecked(settingsCache->getRememberGameSettings());
     descriptionEdit->setText(settingsCache->getGameDescription());
     maxPlayersEdit->setValue(settingsCache->getMaxPlayers());
-    onlyBuddiesCheckBox->setChecked(settingsCache->getOnlyBuddies());
     if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered)
     {
+        onlyBuddiesCheckBox->setChecked(settingsCache->getOnlyBuddies());
         onlyRegisteredCheckBox->setChecked(settingsCache->getOnlyRegistered());
     } else {
         onlyBuddiesCheckBox->setEnabled(false);
