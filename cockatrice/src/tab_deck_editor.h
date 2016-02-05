@@ -89,6 +89,7 @@ class TabDeckEditor : public Tab {
             void dockFloatingTriggered();
             void dockTopLevelChanged(bool topLevel);
 private:
+    static const QStringList fileNameFilters;
     CardInfo *currentCardInfo() const;
     void addCardHelper(QString zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);

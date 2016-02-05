@@ -45,6 +45,10 @@
 #include "cardframe.h"
 #include "filterbuilder.h"
 
+const QStringList TabDeckEditor::fileNameFilters = QStringList()
+    << QObject::tr("Cockatrice set format (*.xml)")
+    << QObject::tr("All files (*.*)");
+
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
     if (treeView && ((event->key() == Qt::Key_Up) || (event->key() == Qt::Key_Down)))
@@ -871,6 +875,22 @@ void TabDeckEditor::actOpenCustomsetsFolder() {
 void TabDeckEditor::actAddCustomSet()
 {
 
+#if QT_VERSION < 0x050000
+    QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#else
+    QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+#endif
+
+    if (!confirmClose())
+        return;
+
+    QFileDialog dialog(this, tr("Load set"));
+    dialog.setDirectory(dataDir);
+    dialog.setNameFilters(TabDeckEditor::fileNameFilters);
+    if (!dialog.exec())
+        return;
+
+    QString fileName = dialog.selectedFiles().at(0);
 }
 
 void TabDeckEditor::actEditSets()
