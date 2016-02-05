@@ -267,6 +267,9 @@ void TabDeckEditor::createMenus()
     aOpenCustomFolder = new QAction(QString(), this);
     connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
 
+    aAddCustomSet = new QAction(QString(), this);
+    connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
+
     aEditSets = new QAction(QString(), this);
     connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
 
@@ -307,6 +310,7 @@ void TabDeckEditor::createMenus()
     dbMenu->addSeparator();
     dbMenu->addAction(aOpenCustomFolder);
     dbMenu->addAction(aOpenCustomsetsFolder);
+    dbMenu->addAction(aAddCustomSet);
 #endif
     addTabMenu(dbMenu);
 
@@ -584,7 +588,8 @@ void TabDeckEditor::retranslateUi()
     aPrintDeck->setText(tr("&Print deck..."));
     aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
     aOpenCustomFolder->setText(tr("Open custom image folder"));
-    aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));    
+    aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
+    aAddCustomSet->setText(tr("Add custom set"));
     aClose->setText(tr("&Close"));
     
     aAddCard->setText(tr("Add card to &maindeck"));
@@ -860,6 +865,11 @@ void TabDeckEditor::actOpenCustomsetsFolder() {
     args << QDir::toNativeSeparators(dataDir);
     QProcess::startDetached("explorer", args);
 #endif
+
+}
+
+void TabDeckEditor::actAddCustomSet()
+{
 
 }
 

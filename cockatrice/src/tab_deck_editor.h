@@ -54,6 +54,7 @@ class TabDeckEditor : public Tab {
             void actAnalyzeDeck();
             void actOpenCustomFolder();
             void actOpenCustomsetsFolder();
+            void actAddCustomSet();
 
             void actEditSets();
             void actEditTokens();
@@ -116,7 +117,7 @@ private:
     QWidget *filterBox;
 
     QMenu *deckMenu, *dbMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu;
-    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose, *aOpenCustomFolder, *aOpenCustomsetsFolder;
+    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     QAction *aEditSets, *aEditTokens, *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;// *aUpdatePrices;
     QAction *aResetLayout;
