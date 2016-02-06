@@ -11,7 +11,7 @@ DlgAddSet::DlgAddSet(QWidget *parent, bool success) : QDialog(parent) {
     if (success) {
         setWindowTitle(tr("Success"));
         status->setText(QString("Set added to Cockatrice."));
-        restart->setText(QString("You must restart to use your new set."));
+        restart->setText(QString("You must restart Cockatrice to use the new set."));
     }
     else {
         setWindowTitle(tr("Failed"));
