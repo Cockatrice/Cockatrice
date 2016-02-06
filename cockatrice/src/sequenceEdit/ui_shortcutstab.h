@@ -1473,10 +1473,10 @@ public:
         groupBox_2->setTitle(QApplication::translate("shortcutsTab", "Deck Editor", 0));
         lbl_TabDeckEditor_aAnalyzeDeck->setText(QApplication::translate("shortcutsTab", "Analyze deck", 0));
         lbl_TabDeckEditor_aLoadDeckFromClipboard->setText(QApplication::translate("shortcutsTab", "Load deck (clipboard)", 0));
-        lbl_TabDeckEditor_aClearFilterAll->setText(QApplication::translate("shortcutsTab", "Clerar all filters", 0));
+        lbl_TabDeckEditor_aClearFilterAll->setText(QApplication::translate("shortcutsTab", "Clear all filters", 0));
         lbl_TabDeckEditor_aNewDeck->setText(QApplication::translate("shortcutsTab", "New deck", 0));
-        lbl_TabDeckEditor_aClearFilterOne->setText(QApplication::translate("shortcutsTab", "Clear one filter", 0));
-        lbl_TabDeckEditor_aOpenCustomFolder->setText(QApplication::translate("shortcutsTab", "Open custom folder", 0));
+        lbl_TabDeckEditor_aClearFilterOne->setText(QApplication::translate("shortcutsTab", "Clear selected filter", 0));
+        lbl_TabDeckEditor_aOpenCustomFolder->setText(QApplication::translate("shortcutsTab", "Open custom pic folder", 0));
         lbl_TabDeckEditor_aClose->setText(QApplication::translate("shortcutsTab", "Close", 0));
         lbl_TabDeckEditor_aPrintDeck->setText(QApplication::translate("shortcutsTab", "Print deck", 0));
         lbl_TabDeckEditor_aEditSets->setText(QApplication::translate("shortcutsTab", "Edit sets", 0));
