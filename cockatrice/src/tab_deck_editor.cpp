@@ -311,12 +311,12 @@ void TabDeckEditor::createMenus()
     dbMenu->addSeparator();
     dbMenu->addAction(aClearFilterOne);
     dbMenu->addAction(aClearFilterAll);
-#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     dbMenu->addSeparator();
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     dbMenu->addAction(aOpenCustomFolder);
     dbMenu->addAction(aOpenCustomsetsFolder);
-    dbMenu->addAction(aAddCustomSet);
 #endif
+    dbMenu->addAction(aAddCustomSet);
     addTabMenu(dbMenu);
 
     viewMenu = new QMenu(this);
