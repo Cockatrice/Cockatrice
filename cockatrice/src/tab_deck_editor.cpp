@@ -891,6 +891,19 @@ void TabDeckEditor::actAddCustomSet()
         return;
 
     QString fileName = dialog.selectedFiles().at(0);
+    QDir dir(dataDir.append("/customsets"));
+    QStringList files = dir.entryList();
+    int maxIndex = 0;
+    for (int i = 0; i < files.size(); ++i) {
+        int fileIndex = files.at(i).split(".").at(0).toInt();
+        if (fileIndex > maxIndex)
+            maxIndex = fileIndex;
+    }
+    maxIndex++;
+    bool res = QFile::copy(
+        fileName, dir.absolutePath() + "/" + (maxIndex > 9 ? "" : "0") +
+        QString::number(maxIndex) + "." + QFileInfo(fileName).fileName()
+    );
 }
 
 void TabDeckEditor::actEditSets()
