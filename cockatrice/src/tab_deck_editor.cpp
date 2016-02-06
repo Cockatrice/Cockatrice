@@ -907,6 +907,7 @@ void TabDeckEditor::actAddCustomSet()
     );
 
     DlgAddSet dlg(this, res);
+    dlg.exec();
 }
 
 void TabDeckEditor::actEditSets()

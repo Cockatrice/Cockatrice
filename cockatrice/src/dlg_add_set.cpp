@@ -29,8 +29,6 @@ DlgAddSet::DlgAddSet(QWidget *parent, bool success) : QDialog(parent) {
     parentLayout->addWidget(buttonBox);
 
     setLayout(parentLayout);
-
-    exec();
 }
 
 void DlgAddSet::closeDialog()
