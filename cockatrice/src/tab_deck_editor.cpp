@@ -47,7 +47,7 @@
 #include "filterbuilder.h"
 
 const QStringList TabDeckEditor::fileNameFilters = QStringList()
-    << QObject::tr("Cockatrice set format (*.xml)")
+    << QObject::tr("Cockatrice card database (*.xml)")
     << QObject::tr("All files (*.*)");
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
@@ -594,7 +594,7 @@ void TabDeckEditor::retranslateUi()
     aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
     aOpenCustomFolder->setText(tr("Open custom image folder"));
     aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
-    aAddCustomSet->setText(tr("Add custom set"));
+    aAddCustomSet->setText(tr("Add custom sets/cards"));
     aClose->setText(tr("&Close"));
     
     aAddCard->setText(tr("Add card to &maindeck"));
@@ -885,7 +885,7 @@ void TabDeckEditor::actAddCustomSet()
     if (!confirmClose())
         return;
 
-    QFileDialog dialog(this, tr("Load set"));
+    QFileDialog dialog(this, tr("Load sets/cards"));
     dialog.setDirectory(dataDir);
     dialog.setNameFilters(TabDeckEditor::fileNameFilters);
     if (!dialog.exec())

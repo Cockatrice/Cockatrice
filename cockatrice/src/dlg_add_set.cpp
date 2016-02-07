@@ -10,12 +10,12 @@ DlgAddSet::DlgAddSet(QWidget *parent, bool success) : QDialog(parent) {
 
     if (success) {
         setWindowTitle(tr("Success"));
-        status->setText(QString("Set added to Cockatrice."));
-        restart->setText(QString("You must restart Cockatrice to use the new set."));
+        status->setText(QString("Sets/cards added to Cockatrice."));
+        restart->setText(QString("You must restart Cockatrice to use the new sets/cards."));
     }
     else {
         setWindowTitle(tr("Failed"));
-        status->setText(QString("Set failed to import."));
+        status->setText(QString("Sets/cards failed to import."));
     }
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
