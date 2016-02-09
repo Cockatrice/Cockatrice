@@ -4,18 +4,19 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-DlgAddSetResult::DlgAddSetResult(QWidget *parent, bool success) : QDialog(parent) {
+DlgAddSetResult::DlgAddSetResult(QWidget *parent, bool success, QString msg) : QDialog(parent) {
     status = new QLabel(this);
-    restart = new QLabel(this);
+    message = new QLabel(this);
 
     if (success) {
         setWindowTitle(tr("Success"));
         status->setText(QString("Sets/cards added to Cockatrice."));
-        restart->setText(QString("You must restart Cockatrice to use the new sets/cards."));
+        message->setText(QString("You must restart Cockatrice to use the new sets/cards."));
     }
     else {
         setWindowTitle(tr("Failed"));
         status->setText(QString("Sets/cards failed to import."));
+        message->setText(msg);
     }
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
@@ -25,7 +26,7 @@ DlgAddSetResult::DlgAddSetResult(QWidget *parent, bool success) : QDialog(parent
 
     QVBoxLayout *parentLayout = new QVBoxLayout(this);
     parentLayout->addWidget(status);
-    parentLayout->addWidget(restart);
+    parentLayout->addWidget(message);
     parentLayout->addWidget(buttonBox);
 
     setLayout(parentLayout);

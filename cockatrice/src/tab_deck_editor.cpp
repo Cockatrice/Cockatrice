@@ -885,16 +885,23 @@ void TabDeckEditor::actAddCustomSet()
     if (!dialog.exec())
         return;
 
+    QString fileName = dialog.selectedFiles().at(0);
+
+    if (!QFile::exists(fileName)) {
+        DlgAddSetResult dlg(this, false, QString("Selected file cannot be found."));
+        dlg.exec();
+        return;
+    }
+
     QDir dir(dataDir + "/customsets");
     int nextPrefix = getNextCustomSetPrefix(dir);
 
-    QString fileName = dialog.selectedFiles().at(0);
     bool res = QFile::copy(
         fileName, dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") +
         QString::number(nextPrefix) + "." + QFileInfo(fileName).fileName()
     );
 
-    DlgAddSetResult dlg(this, res);
+    DlgAddSetResult dlg(this, res, QString());
     dlg.exec();
 }
 

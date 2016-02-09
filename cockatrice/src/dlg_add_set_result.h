@@ -3,15 +3,16 @@
 
 #include <QDialog>
 #include <QLabel>
+#include <QString>
 
 class DlgAddSetResult : public QDialog {
 Q_OBJECT
 public:
-    DlgAddSetResult(QWidget *parent, bool success);
+    DlgAddSetResult(QWidget *parent, bool success, QString msg);
 private slots:
     void closeDialog();
 private:
-    QLabel *status, *restart;
+    QLabel *status, *message;
     QPushButton *ok;
 };
 
