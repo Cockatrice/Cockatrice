@@ -7,7 +7,7 @@ PROJECT(cockatrice)
 SET(cockatrice_SOURCES
     src/abstractcounter.cpp 
     src/counter_general.cpp
-    src/dlg_add_set.cpp
+    src/dlg_add_set_result.cpp
     src/dlg_creategame.cpp
     src/dlg_filter_games.cpp
     src/dlg_connect.cpp 

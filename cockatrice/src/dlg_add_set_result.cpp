@@ -1,4 +1,4 @@
-#include "dlg_add_set.h"
+#include "dlg_add_set_result.h"
 
 #include <QDialogButtonBox>
 #include <QPushButton>

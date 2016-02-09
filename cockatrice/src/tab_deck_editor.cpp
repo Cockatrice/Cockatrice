@@ -32,7 +32,7 @@
 #include "cardinfowidget.h"
 #include "dlg_load_deck_from_clipboard.h"
 #include "dlg_edit_tokens.h"
-#include "dlg_add_set.h"
+#include "dlg_add_set_result.h"
 #include "main.h"
 #include "settingscache.h"
 #include "priceupdater.h"
