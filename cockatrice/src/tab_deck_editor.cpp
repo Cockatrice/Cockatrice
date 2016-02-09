@@ -879,9 +879,6 @@ void TabDeckEditor::actAddCustomSet()
     QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
 #endif
 
-    if (!confirmClose())
-        return;
-
     QFileDialog dialog(this, tr("Load sets/cards"));
     dialog.setDirectory(dataDir);
     dialog.setNameFilters(TabDeckEditor::fileNameFilters);
