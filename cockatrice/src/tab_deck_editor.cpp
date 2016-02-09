@@ -906,7 +906,7 @@ void TabDeckEditor::actAddCustomSet()
         QString::number(maxIndex) + "." + QFileInfo(fileName).fileName()
     );
 
-    DlgAddSet dlg(this, res);
+    DlgAddSetResult dlg(this, res);
     dlg.exec();
 }
 

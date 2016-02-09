@@ -4,7 +4,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-DlgAddSet::DlgAddSet(QWidget *parent, bool success) : QDialog(parent) {
+DlgAddSetResult::DlgAddSetResult(QWidget *parent, bool success) : QDialog(parent) {
     status = new QLabel(this);
     restart = new QLabel(this);
 
@@ -31,7 +31,7 @@ DlgAddSet::DlgAddSet(QWidget *parent, bool success) : QDialog(parent) {
     setLayout(parentLayout);
 }
 
-void DlgAddSet::closeDialog()
+void DlgAddSetResult::closeDialog()
 {
     accept();
 }
