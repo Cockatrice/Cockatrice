@@ -714,9 +714,6 @@ void TabDeckEditor::actNewDeck()
 
 void TabDeckEditor::actLoadDeck()
 {
-    if (!confirmClose())
-        return;
-
     QFileDialog dialog(this, tr("Load deck"));
     dialog.setDirectory(settingsCache->getDeckPath());
     dialog.setNameFilters(DeckLoader::fileNameFilters);
@@ -891,23 +888,31 @@ void TabDeckEditor::actAddCustomSet()
     if (!dialog.exec())
         return;
 
+    QDir dir(dataDir + "/customsets");
+    int nextPrefix = getNextCustomSetPrefix(dir);
+
     QString fileName = dialog.selectedFiles().at(0);
-    QDir dir(dataDir.append("/customsets"));
-    QStringList files = dir.entryList();
-    int maxIndex = 0;
-    for (int i = 0; i < files.size(); ++i) {
-        int fileIndex = files.at(i).split(".").at(0).toInt();
-        if (fileIndex > maxIndex)
-            maxIndex = fileIndex;
-    }
-    maxIndex++;
     bool res = QFile::copy(
-        fileName, dir.absolutePath() + "/" + (maxIndex > 9 ? "" : "0") +
-        QString::number(maxIndex) + "." + QFileInfo(fileName).fileName()
+        fileName, dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") +
+        QString::number(nextPrefix) + "." + QFileInfo(fileName).fileName()
     );
 
     DlgAddSetResult dlg(this, res);
     dlg.exec();
+}
+
+int TabDeckEditor::getNextCustomSetPrefix(QDir dataDir) {
+    QStringList files = dataDir.entryList();
+    int maxIndex = 0;
+
+    QStringList::const_iterator filesIterator;
+    for (filesIterator = files.constBegin(); filesIterator != files.constEnd(); ++filesIterator) {
+        int fileIndex = (*filesIterator).split(".").at(0).toInt();
+        if (fileIndex > maxIndex)
+            maxIndex = fileIndex;
+    }
+
+    return maxIndex + 1;
 }
 
 void TabDeckEditor::actEditSets()

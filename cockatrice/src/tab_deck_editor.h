@@ -3,6 +3,7 @@
 
 #include "tab.h"
 #include <QAbstractItemModel>
+#include <QDir>
 #include <QLineEdit>
 #include "keysignals.h"
 
@@ -95,6 +96,7 @@ private:
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(QString zoneName);
     void recursiveExpand(const QModelIndex &index);
+    int getNextCustomSetPrefix(QDir dataDir);
 
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
