@@ -5,5 +5,3 @@ DBNAME="servatrice"					#set this to the database name used
 TABLEPREFIX="cockatrice"			#set this to the prefix used for the table names in the database (do not inclue the _)
 SQLCONFFILE="./mysql.cnf" 			#set this to the path that contains the mysql.cnf file
 mysql --defaults-file=$SQLCONFFILE -h localhost -e 'delete from servatrice.cockatrice_games where time_finished < DATE_SUB(now(), INTERVAL 8 DAY)'
-mysql --defaults-file=$SQLCONFFILE -h localhost -e 'delete from servatrice.cockatrice_replays where id_game NOT IN (select id from servatrice.cockatrice_games)'
-mysql --defaults-file=$SQLCONFFILE -h localhost -e 'delete from servatrice.cockatrice_replays_access where id_game NOT IN (select id from servatrice.cockatrice_games)'

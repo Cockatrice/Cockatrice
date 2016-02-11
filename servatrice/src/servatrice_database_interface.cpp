@@ -675,7 +675,7 @@ int Servatrice_DatabaseInterface::getNextReplayId()
     if (!checkSql())
         return -1;
 
-    QSqlQuery *query = prepareQuery("insert into {prefix}_replays () values ()");
+    QSqlQuery *query = prepareQuery("insert into {prefix}_replays (id_game) values (NULL)");
     execSqlQuery(query);
 
     return query->lastInsertId().toInt();
@@ -1013,7 +1013,7 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         return results;
 
     // BUILD QUERY STRING BASED ON PASSED IN VALUES
-    QString queryString = "SELECT * FROM cockatrice_log WHERE `sender_ip` IS NOT NULL";
+    QString queryString = "SELECT * FROM {prefix}_log WHERE `sender_ip` IS NOT NULL";
     if (!user.isEmpty())
         queryString.append(" AND (`sender_name` = :user_name OR `target_name` = :user_name)");
 
