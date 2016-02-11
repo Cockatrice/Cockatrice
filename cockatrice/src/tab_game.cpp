@@ -1420,7 +1420,25 @@ void TabGame::actResetLayout()
         addDockWidget(Qt::BottomDockWidgetArea, replayDock);
         aReplayDockVisible->setChecked(true);
         aReplayDockFloating->setChecked(false);
+
+        cardInfoDock->setMinimumSize(250,360);
+        cardInfoDock->setMaximumSize(250,360);
+        messageLayoutDock->setMinimumSize(250,200);
+        messageLayoutDock->setMaximumSize(250,200);
+        playerListDock->setMinimumSize(250,50);
+        playerListDock->setMaximumSize(250,50);
+        replayDock->setMinimumSize(900,100);
+        replayDock->setMaximumSize(900,100);
+    } else {
+        cardInfoDock->setMinimumSize(250,360);
+        cardInfoDock->setMaximumSize(250,360);
+        messageLayoutDock->setMinimumSize(250,250);
+        messageLayoutDock->setMaximumSize(250,250);
+        playerListDock->setMinimumSize(250,50);
+        playerListDock->setMaximumSize(250,50);
     }
+
+    QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
 
 void TabGame::createPlayAreaWidget(bool bReplay)
