@@ -440,13 +440,13 @@ TabGame::~TabGame()
 
 void TabGame::retranslateUi()
 {
-    QString tabText = getTabText() + " - ";
+    QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
 
-    cardInfoDock->setWindowTitle((cardInfoDock->isWindow() ? tabText : QString()) + tr("Card Info"));
-    playerListDock->setWindowTitle((playerListDock->isWindow() ? tabText : QString()) + tr("Player List"));
-    messageLayoutDock->setWindowTitle((messageLayoutDock->isWindow() ? tabText : QString()) + tr("Messages"));
+    cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
+    playerListDock->setWindowTitle(tr("Player List") + (playerListDock->isWindow() ? tabText : QString()));
+    messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
     if(replayDock)
-        replayDock->setWindowTitle((replayDock->isWindow() ? tabText : QString()) + tr("Replay Timeline"));
+        replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
 
     if (phasesMenu) {
         for (int i = 0; i < phaseActions.size(); ++i)
@@ -1165,7 +1165,7 @@ QString TabGame::getTabText() const
 
     QString tabText;
     if (replay)
-        tabText.append(tr("REPLAY "));
+        tabText.append(tr("Replay") + " ");
     if (!gameTypeInfo.isEmpty())
         tabText.append(gameTypeInfo + " ");
     if (!gameDesc.isEmpty()) {
