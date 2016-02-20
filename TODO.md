@@ -10,13 +10,6 @@ Note that "improve" and "write" always also means: "document and comment"
 ##Scripts
 * Write example init script for servatrice.
 
-##Improve usermanual:
-* Improve Layout, Text, Screenshots; nearly everything is still quick n dirty copy and paste.
-* Add missing TODOs
-* Translate the Documentation
-* Rename the picture filenames to something more meaningful.
-* Create an index, lists of tables/figures/...
-
 ##Create developer documentation:
 * Create developer manual
 * Add comments to code
