@@ -113,6 +113,9 @@ SET(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
 )
 
+add_subdirectory(sounds)
+add_subdirectory(themes)
+
 set(cockatrice_RESOURCES cockatrice.qrc)
 
 IF(UPDATE_TRANSLATIONS)
