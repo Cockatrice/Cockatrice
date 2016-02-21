@@ -223,6 +223,7 @@ private slots:
     void loadLayout();
 	void actCompleterChanged();
     void actResetLayout();
+    void freeDocksSize();
 
     bool eventFilter(QObject *o, QEvent *e);
     void dockVisibleTriggered();

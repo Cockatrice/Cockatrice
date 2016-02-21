@@ -22,12 +22,12 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="363"/>
         <source>Theme settings</source>
-        <translation type="unfinished"/>
+        <translation>Ustawienia motywu użytkownika</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="364"/>
         <source>Current theme:</source>
-        <translation type="unfinished"/>
+        <translation>Bieżący motyw:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="366"/>
@@ -257,7 +257,7 @@ Informacja ta zachowywana jest dla moderatorów i nie jest widoczna dla zbanowan
     <message>
         <location filename="../src/cardinfotext.cpp" line="69"/>
         <source>Color(s):</source>
-        <translation type="unfinished"/>
+        <translation>Kolor(y):</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="70"/>
@@ -305,7 +305,7 @@ Informacja ta zachowywana jest dla moderatorów i nie jest widoczna dla zbanowan
     <message>
         <location filename="../src/cardinfowidget.cpp" line="210"/>
         <source>Color(s):</source>
-        <translation type="unfinished"/>
+        <translation>Kolor(y):</translation>
     </message>
     <message>
         <location filename="../src/cardinfowidget.cpp" line="211"/>
@@ -710,12 +710,12 @@ Informacja ta zachowywana jest dla moderatorów i nie jest widoczna dla zbanowan
     <message>
         <location filename="../src/dlg_connect.cpp" line="19"/>
         <source>Previous Host</source>
-        <translation type="unfinished"/>
+        <translation>Poprzedni Host</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="32"/>
         <source>New Host</source>
-        <translation type="unfinished"/>
+        <translation>Nowy Host</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="34"/>
@@ -725,7 +725,7 @@ Informacja ta zachowywana jest dla moderatorów i nie jest widoczna dla zbanowan
     <message>
         <location filename="../src/dlg_connect.cpp" line="36"/>
         <source>Enter host name</source>
-        <translation type="unfinished"/>
+        <translation>Wprowadź nazwę Hosta</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="39"/>
@@ -765,7 +765,7 @@ Informacja ta zachowywana jest dla moderatorów i nie jest widoczna dla zbanowan
     <message>
         <location filename="../src/dlg_connect.cpp" line="155"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Nazwa użytkownika nie może być pusta</translation>
     </message>
 </context>
 <context>
@@ -971,17 +971,17 @@ To remove your current avatar, confirm without choosing a new image.</source>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="22"/>
         <source>Browse...</source>
-        <translation type="unfinished"/>
+        <translation>Przeglądaj...</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="39"/>
         <source>Change avatar</source>
-        <translation type="unfinished"/>
+        <translation>Zmień awatar</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="56"/>
         <source>Open Image</source>
-        <translation type="unfinished"/>
+        <translation>Otwórz plik obrazu</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="56"/>
@@ -999,27 +999,27 @@ To remove your current avatar, confirm without choosing a new image.</source>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="14"/>
         <source>Old password:</source>
-        <translation type="unfinished"/>
+        <translation>Bieżące hasło:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="23"/>
         <source>New password:</source>
-        <translation type="unfinished"/>
+        <translation>Nowe hasło:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="28"/>
         <source>Confirm new password:</source>
-        <translation type="unfinished"/>
+        <translation>Potwierdź nowe hasło:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="50"/>
         <source>Change password</source>
-        <translation type="unfinished"/>
+        <translation>Zmień hasło</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="59"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="59"/>
@@ -1277,7 +1277,7 @@ Upewnij się, że &apos;Dodatek zawierający tokeny&apos; jest włączony w okni
     <message>
         <location filename="../src/dlg_register.cpp" line="33"/>
         <source>Password (again):</source>
-        <translation type="unfinished"/>
+        <translation>Hasło (ponownie):</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="38"/>
@@ -1287,7 +1287,7 @@ Upewnij się, że &apos;Dodatek zawierający tokeny&apos; jest włączony w okni
     <message>
         <location filename="../src/dlg_register.cpp" line="42"/>
         <source>Email (again):</source>
-        <translation type="unfinished"/>
+        <translation>Email (ponownie):</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="46"/>
@@ -1334,7 +1334,7 @@ Upewnij się, że &apos;Dodatek zawierający tokeny&apos; jest włączony w okni
     <message>
         <location filename="../src/dlg_register.cpp" line="366"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Nazwa użytkownika nie może być pusta</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="54"/>
@@ -1484,7 +1484,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="933"/>
         <source>Shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Skróty</translation>
     </message>
 </context>
 <context>
@@ -1492,7 +1492,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="52"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="53"/>
@@ -5027,7 +5027,7 @@ Wprowadź nazwę:</translation>
         <location filename="../src/tab_logs.cpp" line="67"/>
         <location filename="../src/tab_logs.cpp" line="77"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="67"/>
@@ -5333,7 +5333,7 @@ The more information you put in, the more specific your results will be.</source
         <location filename="../src/tab_server.cpp" line="195"/>
         <location filename="../src/tab_server.cpp" line="198"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="189"/>
@@ -5602,12 +5602,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="77"/>
         <source>Change password</source>
-        <translation type="unfinished"/>
+        <translation>Zmień hasło</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="78"/>
         <source>Change avatar</source>
-        <translation type="unfinished"/>
+        <translation>Zmień awatar</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="110"/>
@@ -5677,7 +5677,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/userinfobox.cpp" line="280"/>
         <location filename="../src/userinfobox.cpp" line="284"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="241"/>
@@ -5818,7 +5818,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/userlist.cpp" line="151"/>
         <location filename="../src/userlist.cpp" line="156"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="151"/>

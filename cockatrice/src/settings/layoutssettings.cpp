@@ -78,6 +78,39 @@ const QByteArray LayoutsSettings::getGamePlayAreaGeometry()
     return getValue("layouts/gameplayarea_geometry").toByteArray();
 }
 
+const QSize LayoutsSettings::getGameCardInfoSize()
+{
+    QVariant previous = getValue("layouts/gameplayarea_CardInfoSize");
+    return previous == QVariant() ? QSize(250,360) : previous.toSize();
+}
+
+void LayoutsSettings::setGameCardInfoSize(const QSize &value)
+{
+    setValue(value,"layouts/gameplayarea_CardInfoSize");
+}
+
+const QSize LayoutsSettings::getGameMessageLayoutSize()
+{
+    QVariant previous = getValue("layouts/gameplayarea_MessageLayoutSize");
+    return previous == QVariant() ? QSize(250,250) : previous.toSize();
+}
+
+void LayoutsSettings::setGameMessageLayoutSize(const QSize &value)
+{
+    setValue(value,"layouts/gameplayarea_MessageLayoutSize");
+}
+
+const QSize LayoutsSettings::getGamePlayerListSize()
+{
+    QVariant previous = getValue("layouts/gameplayarea_PlayerListSize");
+    return previous == QVariant() ? QSize(250,50) : previous.toSize();
+}
+
+void LayoutsSettings::setGamePlayerListSize(const QSize &value)
+{
+    setValue(value,"layouts/gameplayarea_PlayerListSize");
+}
+
 void LayoutsSettings::setReplayPlayAreaGeometry(const QByteArray &value)
 {
     setValue(value,"layouts/replayplayarea_geometry");
@@ -96,4 +129,48 @@ const QByteArray LayoutsSettings::getReplayPlayAreaLayoutState()
 const QByteArray LayoutsSettings::getReplayPlayAreaGeometry()
 {
     return getValue("layouts/replayplayarea_geometry").toByteArray();
+}
+
+const QSize LayoutsSettings::getReplayCardInfoSize()
+{
+    QVariant previous = getValue("layouts/replayplayarea_CardInfoSize");
+    return previous == QVariant() ? QSize(250,360) : previous.toSize();
+}
+
+void LayoutsSettings::setReplayCardInfoSize(const QSize &value)
+{
+    setValue(value,"layouts/replayplayarea_CardInfoSize");
+}
+
+const QSize LayoutsSettings::getReplayMessageLayoutSize()
+{
+    QVariant previous = getValue("layouts/replayplayarea_MessageLayoutSize");
+    return previous == QVariant() ? QSize(250,200) : previous.toSize();
+}
+
+void LayoutsSettings::setReplayMessageLayoutSize(const QSize &value)
+{
+    setValue(value,"layouts/replayplayarea_MessageLayoutSize");
+}
+
+const QSize LayoutsSettings::getReplayPlayerListSize()
+{
+    QVariant previous = getValue("layouts/replayplayarea_PlayerListSize");
+    return previous == QVariant() ? QSize(250,50) : previous.toSize();
+}
+
+void LayoutsSettings::setReplayPlayerListSize(const QSize &value)
+{
+    setValue(value,"layouts/replayplayarea_PlayerListSize");
+}
+
+const QSize LayoutsSettings::getReplayReplaySize()
+{
+    QVariant previous = getValue("layouts/replayplayarea_ReplaySize");
+    return previous == QVariant() ? QSize(900,100) : previous.toSize();
+}
+
+void LayoutsSettings::setReplayReplaySize(const QSize &value)
+{
+    setValue(value,"layouts/replayplayarea_ReplaySize");
 }

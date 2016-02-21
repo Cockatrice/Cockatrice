@@ -362,6 +362,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     refreshShortcuts();
     messageLog->logReplayStarted(gameInfo.game_id());
 
+    this->installEventFilter(this);
     QTimer::singleShot(0, this, SLOT(loadLayout()));
 }
 
@@ -410,6 +411,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     for (int i = gameInfo.game_types_size() - 1; i >= 0; i--)
         gameTypes.append(roomGameTypes.find(gameInfo.game_types(i)).value());
 
+    this->installEventFilter(this);
     QTimer::singleShot(0, this, SLOT(loadLayout()));
 }
 
@@ -426,14 +428,7 @@ void TabGame::emitUserEvent() {
 TabGame::~TabGame()
 {
     if(replay)
-    {
-        settingsCache->layouts().setReplayPlayAreaState(saveState());
-        settingsCache->layouts().setReplayPlayAreaGeometry(saveGeometry());
         delete replay;
-    } else {
-        settingsCache->layouts().setGamePlayAreaState(saveState());
-        settingsCache->layouts().setGamePlayAreaGeometry(saveGeometry());
-    }
 
     QMapIterator<int, Player *> i(players);
     while (i.hasNext())
@@ -445,13 +440,13 @@ TabGame::~TabGame()
 
 void TabGame::retranslateUi()
 {
-    QString tabText = getTabText() + " - ";
+    QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
 
-    cardInfoDock->setWindowTitle((cardInfoDock->isWindow() ? tabText : QString()) + tr("Card Info"));
-    playerListDock->setWindowTitle((playerListDock->isWindow() ? tabText : QString()) + tr("Player List"));
-    messageLayoutDock->setWindowTitle((messageLayoutDock->isWindow() ? tabText : QString()) + tr("Messages"));
+    cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
+    playerListDock->setWindowTitle(tr("Player List") + (playerListDock->isWindow() ? tabText : QString()));
+    messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
     if(replayDock)
-        replayDock->setWindowTitle((replayDock->isWindow() ? tabText : QString()) + tr("Replay Timeline"));
+        replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
 
     if (phasesMenu) {
         for (int i = 0; i < phaseActions.size(); ++i)
@@ -1170,7 +1165,7 @@ QString TabGame::getTabText() const
 
     QString tabText;
     if (replay)
-        tabText.append(tr("REPLAY "));
+        tabText.append(tr("Replay") + " ");
     if (!gameTypeInfo.isEmpty())
         tabText.append(gameTypeInfo + " ");
     if (!gameDesc.isEmpty()) {
@@ -1335,9 +1330,25 @@ void TabGame::loadLayout()
     {
         restoreGeometry(settingsCache->layouts().getReplayPlayAreaGeometry());
         restoreState(settingsCache->layouts().getReplayPlayAreaLayoutState());
+
+        cardInfoDock->setMinimumSize(settingsCache->layouts().getReplayCardInfoSize());
+        cardInfoDock->setMaximumSize(settingsCache->layouts().getReplayCardInfoSize());
+        messageLayoutDock->setMinimumSize(settingsCache->layouts().getReplayMessageLayoutSize());
+        messageLayoutDock->setMaximumSize(settingsCache->layouts().getReplayMessageLayoutSize());
+        playerListDock->setMinimumSize(settingsCache->layouts().getReplayPlayerListSize());
+        playerListDock->setMaximumSize(settingsCache->layouts().getReplayPlayerListSize());
+        replayDock->setMinimumSize(settingsCache->layouts().getReplayReplaySize());
+        replayDock->setMaximumSize(settingsCache->layouts().getReplayReplaySize());
     } else {
         restoreGeometry(settingsCache->layouts().getGamePlayAreaGeometry());
         restoreState(settingsCache->layouts().getGamePlayAreaLayoutState());
+
+        cardInfoDock->setMinimumSize(settingsCache->layouts().getGameCardInfoSize());
+        cardInfoDock->setMaximumSize(settingsCache->layouts().getGameCardInfoSize());
+        messageLayoutDock->setMinimumSize(settingsCache->layouts().getGameMessageLayoutSize());
+        messageLayoutDock->setMaximumSize(settingsCache->layouts().getGameMessageLayoutSize());
+        playerListDock->setMinimumSize(settingsCache->layouts().getGamePlayerListSize());
+        playerListDock->setMaximumSize(settingsCache->layouts().getGamePlayerListSize());
     }
 
     aCardInfoDockVisible->setChecked(cardInfoDock->isVisible());
@@ -1357,6 +1368,26 @@ void TabGame::loadLayout()
         aReplayDockVisible->setChecked(replayDock->isVisible());
         aReplayDockFloating->setEnabled(aReplayDockVisible->isChecked());
         aReplayDockFloating->setChecked(replayDock->isFloating());
+    }
+
+    QTimer::singleShot(100, this, SLOT(freeDocksSize()));
+}
+
+void TabGame::freeDocksSize()
+{
+    cardInfoDock->setMinimumSize(100, 100);
+    cardInfoDock->setMaximumSize(5000, 5000);
+
+    messageLayoutDock->setMinimumSize(100, 100);
+    messageLayoutDock->setMaximumSize(5000, 5000);
+
+    playerListDock->setMinimumSize(100,100);
+    playerListDock->setMaximumSize(5000,5000);
+
+    if(replayDock)
+    {
+        replayDock->setMinimumSize(100,100);
+        replayDock->setMaximumSize(5000,5000);
     }
 }
 
@@ -1389,7 +1420,25 @@ void TabGame::actResetLayout()
         addDockWidget(Qt::BottomDockWidgetArea, replayDock);
         aReplayDockVisible->setChecked(true);
         aReplayDockFloating->setChecked(false);
+
+        cardInfoDock->setMinimumSize(250,360);
+        cardInfoDock->setMaximumSize(250,360);
+        messageLayoutDock->setMinimumSize(250,200);
+        messageLayoutDock->setMaximumSize(250,200);
+        playerListDock->setMinimumSize(250,50);
+        playerListDock->setMaximumSize(250,50);
+        replayDock->setMinimumSize(900,100);
+        replayDock->setMaximumSize(900,100);
+    } else {
+        cardInfoDock->setMinimumSize(250,360);
+        cardInfoDock->setMaximumSize(250,360);
+        messageLayoutDock->setMinimumSize(250,250);
+        messageLayoutDock->setMaximumSize(250,250);
+        playerListDock->setMinimumSize(250,50);
+        playerListDock->setMaximumSize(250,50);
     }
+
+    QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
 
 void TabGame::createPlayAreaWidget(bool bReplay)
@@ -1595,6 +1644,23 @@ bool TabGame::eventFilter(QObject * o, QEvent * e)
         }
     }   
 
+    if( o == this && e->type() == QEvent::Hide){
+        if(replay)
+        {
+            settingsCache->layouts().setReplayPlayAreaState(saveState());
+            settingsCache->layouts().setReplayPlayAreaGeometry(saveGeometry());
+            settingsCache->layouts().setReplayCardInfoSize(cardInfoDock->size());
+            settingsCache->layouts().setReplayMessageLayoutSize(messageLayoutDock->size());
+            settingsCache->layouts().setReplayPlayerListSize(playerListDock->size());
+            settingsCache->layouts().setReplayReplaySize(replayDock->size());
+        } else {
+            settingsCache->layouts().setGamePlayAreaState(saveState());
+            settingsCache->layouts().setGamePlayAreaGeometry(saveGeometry());
+            settingsCache->layouts().setGameCardInfoSize(cardInfoDock->size());
+            settingsCache->layouts().setGameMessageLayoutSize(messageLayoutDock->size());
+            settingsCache->layouts().setGamePlayerListSize(playerListDock->size());
+        }
+    }
     return false;
 }
 

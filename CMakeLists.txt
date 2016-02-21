@@ -74,6 +74,8 @@ endif()
 # Define proper compilation flags
 IF(MSVC)
 	# Visual Studio:
+    # Support from Windows XP
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS,5.01")
 	# Maximum optimization
     set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
 	# Generate complete debugging information
