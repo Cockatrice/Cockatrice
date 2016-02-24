@@ -3,6 +3,7 @@
 
 #include "tab.h"
 #include <QAbstractItemModel>
+#include <QDir>
 #include <QLineEdit>
 #include "keysignals.h"
 
@@ -54,6 +55,7 @@ class TabDeckEditor : public Tab {
             void actAnalyzeDeck();
             void actOpenCustomFolder();
             void actOpenCustomsetsFolder();
+            void actAddCustomSet();
 
             void actEditSets();
             void actEditTokens();
@@ -88,11 +90,13 @@ class TabDeckEditor : public Tab {
             void dockFloatingTriggered();
             void dockTopLevelChanged(bool topLevel);
 private:
+    static const QStringList fileNameFilters;
     CardInfo *currentCardInfo() const;
     void addCardHelper(QString zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(QString zoneName);
     void recursiveExpand(const QModelIndex &index);
+    int getNextCustomSetPrefix(QDir dataDir);
 
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
@@ -116,7 +120,7 @@ private:
     QWidget *filterBox;
 
     QMenu *deckMenu, *dbMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu;
-    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose, *aOpenCustomFolder, *aOpenCustomsetsFolder;
+    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     QAction *aEditSets, *aEditTokens, *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;// *aUpdatePrices;
     QAction *aResetLayout;

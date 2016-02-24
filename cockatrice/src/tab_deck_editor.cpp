@@ -32,6 +32,7 @@
 #include "cardinfowidget.h"
 #include "dlg_load_deck_from_clipboard.h"
 #include "dlg_edit_tokens.h"
+#include "dlg_add_set_result.h"
 #include "main.h"
 #include "settingscache.h"
 #include "priceupdater.h"
@@ -44,6 +45,10 @@
 #include "filtertreemodel.h"
 #include "cardframe.h"
 #include "filterbuilder.h"
+
+const QStringList TabDeckEditor::fileNameFilters = QStringList()
+    << QObject::tr("Cockatrice card database (*.xml)")
+    << QObject::tr("All files (*.*)");
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
@@ -267,6 +272,9 @@ void TabDeckEditor::createMenus()
     aOpenCustomFolder = new QAction(QString(), this);
     connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
 
+    aAddCustomSet = new QAction(QString(), this);
+    connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
+
     aEditSets = new QAction(QString(), this);
     connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
 
@@ -303,11 +311,12 @@ void TabDeckEditor::createMenus()
     dbMenu->addSeparator();
     dbMenu->addAction(aClearFilterOne);
     dbMenu->addAction(aClearFilterAll);
-#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     dbMenu->addSeparator();
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     dbMenu->addAction(aOpenCustomFolder);
     dbMenu->addAction(aOpenCustomsetsFolder);
 #endif
+    dbMenu->addAction(aAddCustomSet);
     addTabMenu(dbMenu);
 
     viewMenu = new QMenu(this);
@@ -584,7 +593,8 @@ void TabDeckEditor::retranslateUi()
     aPrintDeck->setText(tr("&Print deck..."));
     aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
     aOpenCustomFolder->setText(tr("Open custom image folder"));
-    aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));    
+    aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
+    aAddCustomSet->setText(tr("Add custom sets/cards"));
     aClose->setText(tr("&Close"));
     
     aAddCard->setText(tr("Add card to &maindeck"));
@@ -704,9 +714,6 @@ void TabDeckEditor::actNewDeck()
 
 void TabDeckEditor::actLoadDeck()
 {
-    if (!confirmClose())
-        return;
-
     QFileDialog dialog(this, tr("Load deck"));
     dialog.setDirectory(settingsCache->getDeckPath());
     dialog.setNameFilters(DeckLoader::fileNameFilters);
@@ -861,6 +868,55 @@ void TabDeckEditor::actOpenCustomsetsFolder() {
     QProcess::startDetached("explorer", args);
 #endif
 
+}
+
+void TabDeckEditor::actAddCustomSet()
+{
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#else
+    QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
+#endif
+
+    QFileDialog dialog(this, tr("Load sets/cards"));
+    dialog.setDirectory(dataDir);
+    dialog.setNameFilters(TabDeckEditor::fileNameFilters);
+    if (!dialog.exec())
+        return;
+
+    QString fileName = dialog.selectedFiles().at(0);
+
+    if (!QFile::exists(fileName)) {
+        DlgAddSetResult dlg(this, false, QString("Selected file cannot be found."));
+        dlg.exec();
+        return;
+    }
+
+    QDir dir(dataDir + "/customsets");
+    int nextPrefix = getNextCustomSetPrefix(dir);
+
+    bool res = QFile::copy(
+        fileName, dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") +
+        QString::number(nextPrefix) + "." + QFileInfo(fileName).fileName()
+    );
+
+    DlgAddSetResult dlg(this, res, QString());
+    dlg.exec();
+}
+
+int TabDeckEditor::getNextCustomSetPrefix(QDir dataDir) {
+    QStringList files = dataDir.entryList();
+    int maxIndex = 0;
+
+    QStringList::const_iterator filesIterator;
+    for (filesIterator = files.constBegin(); filesIterator != files.constEnd(); ++filesIterator) {
+        int fileIndex = (*filesIterator).split(".").at(0).toInt();
+        if (fileIndex > maxIndex)
+            maxIndex = fileIndex;
+    }
+
+    return maxIndex + 1;
 }
 
 void TabDeckEditor::actEditSets()
