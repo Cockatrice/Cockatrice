@@ -44,12 +44,6 @@ void ServersSettings::setHostName(QString hostname)
     setValue(hostname, "hostname", "server");
 }
 
-QString ServersSettings::getHostname(QString defaultHost)
-{
-    QVariant hostname = getValue("hostname","server");
-    return hostname == QVariant() ? defaultHost : hostname.toString();
-}
-
 void ServersSettings::setPort(QString port)
 {
     setValue(port, "port", "server");

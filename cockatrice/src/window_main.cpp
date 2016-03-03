@@ -174,7 +174,7 @@ void MainWindow::actRegister()
     {
         client->registerToServer(
             dlg.getHost(),
-            dlg.getPort(),
+            dlg.getPort(),  // TODO fix method param is unsigned int, getPort returns signed int
             dlg.getPlayerName(),
             dlg.getPassword(),
             dlg.getEmail(),

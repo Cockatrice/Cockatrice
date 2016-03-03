@@ -14,7 +14,6 @@ public:
     int getPreviousHostLogin();
     QStringList getPreviousHostList();
     int getPrevioushostindex();
-    QString getHostname(QString defaultHost = "");
     QString getPort(QString defaultPort = "");
     QString getPlayerName(QString defaultName = "");
     QString getPassword();

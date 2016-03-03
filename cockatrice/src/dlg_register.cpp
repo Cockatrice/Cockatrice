@@ -14,7 +14,10 @@ DlgRegister::DlgRegister(QWidget *parent)
     : QDialog(parent)
 {
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit(settingsCache->servers().getHostname("cockatrice.woogerworks.com"));
+    QStringList hostList = settingsCache->servers().getPreviousHostList();
+    hostEdit = new QComboBox();
+    hostEdit->addItems(hostList);
+    hostEdit->setCurrentIndex(settingsCache->servers().getPrevioushostindex());
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));    
@@ -118,7 +121,7 @@ void DlgRegister::actOk()
         return;
     }
 
-    settingsCache->servers().setHostName(hostEdit->text());
+    settingsCache->servers().setHostName(hostEdit->currentText());
     settingsCache->servers().setPort(portEdit->text());
     settingsCache->servers().setPlayerName(playernameEdit->text());
     // always save the password so it will be picked up by the connect dialog
