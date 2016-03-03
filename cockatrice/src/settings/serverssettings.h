@@ -4,6 +4,7 @@
 #include "settingsmanager.h"
 #include <QObject>
 
+
 class ServersSettings : public SettingsManager
 {
     Q_OBJECT
@@ -29,6 +30,11 @@ public:
     void setPassword(QString password);
     void setSavePassword(int save);
     void setAutoConnect(int autoconnect);
+
+    QStringList DEFAULT_SERVER_HOSTS = QStringList()
+                                       << "cockatrice.woogerworks.com"
+                                       << "vps.poixen.com"
+                                       << "chickatrice.net";
 signals:
 
 public slots:

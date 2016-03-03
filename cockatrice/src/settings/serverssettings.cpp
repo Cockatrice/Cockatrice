@@ -23,7 +23,10 @@ void ServersSettings::setPreviousHostList(QStringList list)
 
 QStringList ServersSettings::getPreviousHostList()
 {
-    return getValue("previoushosts", "server").toStringList();
+    const QStringList &hosts = getValue("previoushosts", "server").toStringList();
+    if (hosts.isEmpty())
+        return DEFAULT_SERVER_HOSTS;
+    return hosts;
 }
 
 void ServersSettings::setPrevioushostindex(int index)
