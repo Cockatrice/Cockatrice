@@ -10,7 +10,14 @@ class ServersSettings : public SettingsManager
     Q_OBJECT
     friend class SettingsCache;
 
-public:    
+public:
+    QStringList getDefaultHostList() {
+       return QStringList()
+              << "cockatrice.woogerworks.com"
+              << "vps.poixen.com"
+              << "chickatrice.net";
+    }
+
     int getPreviousHostLogin();
     QStringList getPreviousHostList();
     int getPrevioushostindex();
@@ -30,10 +37,6 @@ public:
     void setSavePassword(int save);
     void setAutoConnect(int autoconnect);
 
-    QStringList DEFAULT_SERVER_HOSTS = QStringList()
-                                       << "cockatrice.woogerworks.com"
-                                       << "vps.poixen.com"
-                                       << "chickatrice.net";
 signals:
 
 public slots:

@@ -25,7 +25,7 @@ QStringList ServersSettings::getPreviousHostList()
 {
     const QStringList &hosts = getValue("previoushosts", "server").toStringList();
     if (hosts.isEmpty())
-        return DEFAULT_SERVER_HOSTS;
+        return getDefaultHostList();
     return hosts;
 }
 
