@@ -201,7 +201,7 @@ if(WIN32)
     # qt5: platforms, sqldrivers
 
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(codecs/.*|platforms/.*|sqldrivers/libqsqlmysql)\\.dll"
+        FILES_MATCHING REGEX "(codecs/.*|platforms/.*|sqldrivers/qsqlmysql)\\.dll"
         REGEX ".*d\\.dll" EXCLUDE)
 
     install(CODE "
