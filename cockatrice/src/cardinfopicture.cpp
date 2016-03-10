@@ -11,7 +11,7 @@
 
 CardInfoPicture::CardInfoPicture(QWidget *parent)
     : QWidget(parent),
-    info(0),
+    info(nullptr),
     pixmapDirty(true)
 {
     setMinimumHeight(100);
@@ -20,9 +20,10 @@ CardInfoPicture::CardInfoPicture(QWidget *parent)
 void CardInfoPicture::setCard(CardInfo *card)
 {
     if (info)
-        disconnect(info, 0, this, 0);
+        disconnect(info, nullptr, this, nullptr);
     info = card;
-    connect(info, SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
+    if(info)
+        connect(info, SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
 
     updatePixmap();
 }
@@ -40,14 +41,7 @@ void CardInfoPicture::updatePixmap()
 
 void CardInfoPicture::loadPixmap()
 {
-    if(info)
-        PictureLoader::getPixmap(resizedPixmap, info, size());
-    else
-        resizedPixmap = QPixmap();
-
-
-    if (resizedPixmap.isNull())
-        PictureLoader::getPixmap(resizedPixmap, db->getCard(), size());
+    PictureLoader::getPixmap(resizedPixmap, info, size());
 }
 
 void CardInfoPicture::paintEvent(QPaintEvent *)

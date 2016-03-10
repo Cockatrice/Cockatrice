@@ -27,7 +27,6 @@
 #include <QLibraryInfo>
 #include <QDateTime>
 #include <QDir>
-#include <QDesktopServices>
 #include <QDebug>
 #include <QSystemTrayIcon>
 #include "QtNetwork/QNetworkInterface"
@@ -84,14 +83,6 @@ void installNewTranslator()
     qApp->installTranslator(qtTranslator);
     translator->load(translationPrefix + "_" + lang, translationPath);
     qApp->installTranslator(translator);
-}
-
-bool settingsValid()
-{
-    return QDir(settingsCache->getDeckPath()).exists() &&
-        !settingsCache->getDeckPath().isEmpty() &&
-        QDir(settingsCache->getPicsPath()).exists() &&
-        !settingsCache->getPicsPath().isEmpty();
 }
 
 QString const generateClientID()
@@ -156,73 +147,21 @@ int main(int argc, char *argv[])
 
     qsrand(QDateTime::currentDateTime().toTime_t());
 
-#ifdef PORTABLE_BUILD
-    const QString dataDir = "data/";
-#elif QT_VERSION < 0x050000
-    const QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-#else
-    const QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
-#endif
+    qDebug("main(): starting main program");
 
-    if (settingsCache->getCardDatabasePath().isEmpty() ||
-        db->loadCardDatabase() != Ok)
-        settingsCache->setCardDatabasePath(dataDir + "/cards.xml");
+    MainWindow ui;
+    qDebug("main(): MainWindow constructor finished");
 
-    if (settingsCache->getTokenDatabasePath().isEmpty() ||
-        db->loadTokenDatabase() != Ok)
-        settingsCache->setTokenDatabasePath(dataDir + "/tokens.xml");
+    ui.setWindowIcon(QPixmap("theme:cockatrice"));
+    
+    settingsCache->setClientID(generateClientID());
 
-    if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty()) {
-        QDir().mkpath(dataDir + "/decks");
-        settingsCache->setDeckPath(dataDir + "/decks");
-    }
-    if (!QDir(settingsCache->getReplaysPath()).exists() || settingsCache->getReplaysPath().isEmpty()) {
-        QDir().mkpath(dataDir + "/replays");
-        settingsCache->setReplaysPath(dataDir + "/replays");
-    }
-    if (!QDir(settingsCache->getPicsPath()).exists() || settingsCache->getPicsPath().isEmpty()) {
-        QDir().mkpath(dataDir + "/pics");
-        settingsCache->setPicsPath(dataDir + "/pics");
-    }
-    if (!QDir().mkpath(settingsCache->getPicsPath() + "/CUSTOM"))
-        qDebug() << "Could not create " + settingsCache->getPicsPath().toUtf8() + "/CUSTOM. Will fall back on default card images.";
-
-    if (!settingsValid() || db->getLoadStatus() != Ok) {
-        qDebug("main(): invalid settings or load status");
-        DlgSettings dlgSettings;
-        dlgSettings.show();
-        app.exec();
-    }
-
-    // load custom databased after LoadStatus check, so that they don't bring up the settings dialog
-    if (QDir().mkpath(dataDir + "/customsets"))
-    {
-        // if the dir exists (or has just been created)
-        db->loadCustomCardDatabases(dataDir + "/customsets");
-    } else {
-        qDebug() << "Could not create " + dataDir + "/customsets folder.";
-    }
-
-    // when all the cards have been loaded, resolve the reverse-related tags
-    db->refreshCachedReverseRelatedCards();
-
-    if (settingsValid()) {
-        qDebug("main(): starting main program");
-
-        MainWindow ui;
-        qDebug("main(): MainWindow constructor finished");
-
-        ui.setWindowIcon(QPixmap("theme:cockatrice"));
-        
-        settingsCache->setClientID(generateClientID());
-
-        ui.show();
-        qDebug("main(): ui.show() finished");
+    ui.show();
+    qDebug("main(): ui.show() finished");
 #if QT_VERSION > 0x050000
-        app.setAttribute(Qt::AA_UseHighDpiPixmaps);
+    app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
-        app.exec();
-    }
+    app.exec();
 
     qDebug("Event loop finished, terminating...");
     delete db;

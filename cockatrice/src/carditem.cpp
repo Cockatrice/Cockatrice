@@ -107,13 +107,18 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->save();
         transformPainter(painter, translatedSize, tapAngle);
 
-        QStringList ptDbSplit = db->getCard(name)->getPowTough().split("/");
-        QStringList ptSplit = pt.split("/");
+        if(info)
+        {
+            QStringList ptSplit = pt.split("/");
+            QStringList ptDbSplit = info->getPowTough().split("/");
         
-        if (getFaceDown() || ptDbSplit.at(0) != ptSplit.at(0) || ptDbSplit.at(1) != ptSplit.at(1))
-            painter->setPen(QColor(255, 150, 0));
-        else
+            if (getFaceDown() || ptDbSplit.at(0) != ptSplit.at(0) || ptDbSplit.at(1) != ptSplit.at(1))
+                painter->setPen(QColor(255, 150, 0));
+            else
+                painter->setPen(Qt::white);
+        } else {
             painter->setPen(Qt::white);
+        }
         painter->setBackground(Qt::black);
         painter->setBackgroundMode(Qt::OpaqueMode);
         
@@ -329,7 +334,7 @@ void CardItem::playCard(bool faceDown)
     if (tz)
         tz->toggleTapped();
     else
-        zone->getPlayer()->playCard(this, faceDown, info->getCipt());
+        zone->getPlayer()->playCard(this, faceDown, info ? info->getCipt() : false);
 }
 
 void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

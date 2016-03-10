@@ -25,11 +25,13 @@ public:
 private:
     QList<CardInfo *> cardList;
     CardDatabase *db;
+
+    inline bool checkCardHasAtLeastOneEnabledSet(CardInfo *card);
 private slots:
-    void updateCardList();
     void cardAdded(CardInfo *card);
     void cardRemoved(CardInfo *card);
     void cardInfoChanged(CardInfo *card);
+    void cardDatabaseEnabledSetsChanged();
 };
 
 class CardDatabaseDisplayModel : public QSortFilterProxyModel {
@@ -64,6 +66,14 @@ protected:
     void fetchMore(const QModelIndex &parent);
 private slots:
     void filterTreeChanged();
+};
+
+class TokenDisplayModel : public CardDatabaseDisplayModel {
+    Q_OBJECT
+public:
+    TokenDisplayModel(QObject *parent = 0);
+protected:
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };
 
 #endif

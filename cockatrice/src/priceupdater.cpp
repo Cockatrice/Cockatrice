@@ -60,7 +60,9 @@ void DBPriceUpdater::updatePrices()
     bool bNotFirst=false;
 
     for (int i = 0; i < cards.size(); ++i) {
-        card = db->getCard(cards[i], false);
+        card = db->getCard(cards[i]);
+        if(!card)
+            continue;
         sets = card->getSets();
         for(int j = 0; j < sets.size(); ++j)
         {

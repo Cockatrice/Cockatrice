@@ -5,7 +5,7 @@
 
 class QModelIndex;
 class CardDatabaseModel;
-class CardDatabaseDisplayModel;
+class TokenDisplayModel;
 class QLabel;
 class QComboBox;
 class QLineEdit;
@@ -24,15 +24,15 @@ private slots:
     void actRemoveToken();
 private:
     CardInfo *currentCard;
-    CardDatabaseModel *cardDatabaseModel;
-    CardDatabaseDisplayModel *cardDatabaseDisplayModel;
+    CardDatabaseModel *databaseModel;
+    TokenDisplayModel *cardDatabaseDisplayModel;
     QStringList predefinedTokens;
     QLabel *nameLabel, *colorLabel, *ptLabel, *annotationLabel;
     QComboBox *colorEdit;
     QLineEdit *nameEdit, *ptEdit, *annotationEdit;
     QTreeView *chooseTokenView;
 public:
-    DlgEditTokens(CardDatabaseModel *_cardDatabaseModel, QWidget *parent = 0);
+    DlgEditTokens(QWidget *parent = 0);
 };
 
 #endif

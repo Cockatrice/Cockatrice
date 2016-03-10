@@ -194,7 +194,7 @@ void SetsModel::save(CardDatabase *db)
 
     sets.sortByKey();
 
-    db->emitCardListChanged();
+    db->notifyEnabledSetsChanged();
 }
 
 void SetsModel::restore(CardDatabase *db)

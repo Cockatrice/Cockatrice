@@ -7,7 +7,6 @@ PROJECT(cockatrice)
 SET(cockatrice_SOURCES
     src/abstractcounter.cpp 
     src/counter_general.cpp
-    src/dlg_add_set_result.cpp
     src/dlg_creategame.cpp
     src/dlg_filter_games.cpp
     src/dlg_connect.cpp 
@@ -174,6 +173,13 @@ endif()
 if(Qt5Widgets_FOUND)
     include_directories(${Qt5Widgets_INCLUDE_DIRS})
     list(APPEND COCKATRICE_LIBS Widgets)
+
+    # QtConcurrent
+    find_package(Qt5Concurrent)
+    if(Qt5Concurrent_FOUND)
+        include_directories(${Qt5Concurrent_INCLUDE_DIRS})
+        list(APPEND ORACLE_LIBS Concurrent)
+    endif()
 
     # QtNetwork
     find_package(Qt5Network)

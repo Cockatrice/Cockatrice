@@ -90,8 +90,6 @@ private:
     bool cipt;
     int tableRow;
     QString pixmapCacheKey;
-
-    void refreshCachedSetNames();
 public:
     CardInfo(const QString &_name = QString(),
         bool _isToken = false,
@@ -131,6 +129,7 @@ public:
     void setPowTough(const QString &_powTough) { powtough = _powTough; emit cardInfoChanged(this); }
     void setText(const QString &_text) { text = _text; emit cardInfoChanged(this); }
     void setColors(const QStringList &_colors) { colors = _colors; emit cardInfoChanged(this); }
+    const QChar getColorChar() const;
     const QStringList &getColors() const { return colors; }
     const QStringList &getRelatedCards() const { return relatedCards; }
     const QStringList &getReverseRelatedCards() const { return reverseRelatedCards; }
@@ -149,6 +148,7 @@ public:
     void setMuId(const QString &_set, const int &_muId) { muIds.insert(_set, _muId); }
     void addToSet(CardSet *set);
     void emitPixmapUpdated() { emit pixmapUpdated(); }
+    void refreshCachedSetNames();
 
     /**
      * Simplify a name to have no punctuation and lowercase all letters, for
@@ -183,20 +183,15 @@ protected:
      */
     SetNameMap sets;
 
-    /*
-     * A dummy card returned by getCard() ad a fallback
-     */
-    CardInfo *noCard;
-
     LoadStatus loadStatus;
-    bool detectedFirstRun;
 private:
     static const int versionNeeded;
-    void loadCardsFromXml(QXmlStreamReader &xml, bool tokens);
+    void loadCardsFromXml(QXmlStreamReader &xml);
     void loadSetsFromXml(QXmlStreamReader &xml);
 
-    CardInfo *getCardFromMap(CardNameMap &cardMap, const QString &cardName, bool createIfNotFound);
+    CardInfo *getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     void checkUnknownSets();
+    void refreshCachedReverseRelatedCards();
 public:
     static const char* TOKENS_SETNAME;
 
@@ -205,38 +200,37 @@ public:
     void clear();
     void addCard(CardInfo *card);
     void removeCard(CardInfo *card);
-    /*
-     * Get card object by name. Ensured to return a valid CardInfo * object; check noCard
-     */
-    CardInfo *getCard(const QString &cardName = QString(), bool createIfNotFound = false);
-    QList <CardInfo *> getCards(const QStringList &cardNames);
+    CardInfo *getCard(const QString &cardName) const;
+    QList <CardInfo *> getCards(const QStringList &cardNames) const;
 
     /*
      * Get a card by its simple name. The name will be simplified in this
      * function, so you don't need to simplify it beforehand.
      */
-    CardInfo *getCardBySimpleName(const QString &cardName = QString(), bool createIfNotFound = false);
+    CardInfo *getCardBySimpleName(const QString &cardName) const;
 
     CardSet *getSet(const QString &setName);
     QList<CardInfo *> getCardList() const { return cards.values(); }
     SetList getSetList() const;
-    LoadStatus loadFromFile(const QString &fileName, bool tokens = false);
+    LoadStatus loadFromFile(const QString &fileName);
     bool saveToFile(const QString &fileName, bool tokens = false);
+    bool saveCustomTokensToFile();
     QStringList getAllColors() const;
     QStringList getAllMainCardTypes() const;
     LoadStatus getLoadStatus() const { return loadStatus; }
-    bool getLoadSuccess() const { return loadStatus == Ok; }
-    bool hasDetectedFirstRun();
-    void refreshCachedReverseRelatedCards();
+    void enableAllUnknownSets();
+    void markAllSetsAsKnown();
+    void notifyEnabledSetsChanged();
+
 public slots:
-    LoadStatus loadCardDatabase();
-    LoadStatus loadTokenDatabase();
-    void loadCustomCardDatabases(const QString &path);
-    void emitCardListChanged();
+    LoadStatus loadCardDatabases();
 private slots:
-    LoadStatus loadCardDatabase(const QString &path, bool tokens = false);
+    LoadStatus loadCardDatabase(const QString &path);
 signals:
-    void cardListChanged();
+    void cardDatabaseLoadingFailed();
+    void cardDatabaseNewSetsFound(int numUnknownSets);
+    void cardDatabaseAllNewSetsEnabled();
+    void cardDatabaseEnabledSetsChanged();
     void cardAdded(CardInfo *card);
     void cardRemoved(CardInfo *card);
 };

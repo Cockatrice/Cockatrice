@@ -1081,7 +1081,8 @@ void Player::actCreateToken()
 
     lastTokenName = dlg.getName();
     lastTokenPT = dlg.getPT();
-    if (CardInfo *correctedCard = db->getCardBySimpleName(lastTokenName, false)) {
+    CardInfo *correctedCard = db->getCardBySimpleName(lastTokenName);
+    if (correctedCard) {
         lastTokenName = correctedCard->getName();
         lastTokenTableRow = table->clampValidTableRow(2 - correctedCard->getTableRow());
         if (lastTokenPT.isEmpty())
@@ -1114,7 +1115,9 @@ void Player::actCreatePredefinedToken()
 {
     QAction *action = static_cast<QAction *>(sender());
     CardInfo *cardInfo = db->getCard(action->text());
-    
+    if(!cardInfo)
+        return;
+
     lastTokenName = cardInfo->getName();
     lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first().toLower();
     lastTokenPT = cardInfo->getPowTough();
@@ -1141,6 +1144,8 @@ void Player::actCreateRelatedCard()
     if (spaces.at(0).indexOf("/") != -1) // Strip space from creatures
         spaces.removeFirst();
     CardInfo *cardInfo = db->getCard(spaces.join(" "));
+    if(!cardInfo)
+        return;
     
     // get the target token's location
     // TODO: Define this QPoint into its own function along with the one below
@@ -1256,9 +1261,13 @@ void Player::eventCreateToken(const Event_CreateToken &event)
     CardItem *card = new CardItem(this, QString::fromStdString(event.card_name()), event.card_id());
     // use db PT if not provided in event
     if (!QString::fromStdString(event.pt()).isEmpty())
+    {
         card->setPT(QString::fromStdString(event.pt()));
-    else
-        card->setPT(db->getCard(QString::fromStdString(event.card_name()))->getPowTough());
+    } else {
+        CardInfo * dbCard = db->getCard(QString::fromStdString(event.card_name()));
+        if(dbCard)
+            card->setPT(dbCard->getPowTough());
+    }
     card->setColor(QString::fromStdString(event.color()));
     card->setAnnotation(QString::fromStdString(event.annotation()));
     card->setDestroyOnZoneChange(event.destroy_on_zone_change());
@@ -1713,6 +1722,8 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
     cardToMove->set_card_id(c->getId());
     
     CardInfo *ci = c->getInfo();
+    if(!ci)
+        return;
     if (!faceDown && ((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) ||
         ((settingsCache->getPlayToStack() && ci->getTableRow() != 0) &&
         c->getZone()->getName().toStdString() != "stack"))) {
@@ -2293,7 +2304,8 @@ void Player::actPlay()
     if(!game->getActiveCard())
         return;
 
-    playCard(game->getActiveCard(), false, game->getActiveCard()->getInfo()->getCipt());
+    bool cipt = game->getActiveCard()->getInfo() ? game->getActiveCard()->getInfo()->getCipt(): false;
+    playCard(game->getActiveCard(), false, cipt);
 }
 
 void Player::actHide()
@@ -2374,20 +2386,23 @@ void Player::updateCardMenu(CardItem *card)
                 if (card->getFaceDown())
                     cardMenu->addAction(aPeek);
 
-                QStringList relatedCards = card->getInfo()->getRelatedCards();
-                QStringList reverserelatedCards2Me = card->getInfo()->getReverseRelatedCards2Me();
-                if(relatedCards.size() || reverserelatedCards2Me.size())
+                if(card->getInfo())
                 {
-                    QMenu * createRelatedCardMenu = cardMenu->addMenu(tr("Cr&eate related card"));
+                    QStringList relatedCards = card->getInfo()->getRelatedCards();
+                    QStringList reverserelatedCards2Me = card->getInfo()->getReverseRelatedCards2Me();
+                    if(relatedCards.size() || reverserelatedCards2Me.size())
+                    {
+                        QMenu * createRelatedCardMenu = cardMenu->addMenu(tr("Cr&eate related card"));
 
-                    for (int i = 0; i < relatedCards.size(); ++i) {
-                        QAction *a = createRelatedCardMenu->addAction(relatedCards.at(i));
-                        connect(a, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
-                    }
+                        for (int i = 0; i < relatedCards.size(); ++i) {
+                            QAction *a = createRelatedCardMenu->addAction(relatedCards.at(i));
+                            connect(a, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
+                        }
 
-                    for (int i = 0; i < reverserelatedCards2Me.size(); ++i) {
-                        QAction *a = createRelatedCardMenu->addAction(reverserelatedCards2Me.at(i));
-                        connect(a, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
+                        for (int i = 0; i < reverserelatedCards2Me.size(); ++i) {
+                            QAction *a = createRelatedCardMenu->addAction(reverserelatedCards2Me.at(i));
+                            connect(a, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
+                        }
                     }
                 }
                 cardMenu->addSeparator();
@@ -2413,20 +2428,23 @@ void Player::updateCardMenu(CardItem *card)
                 cardMenu->addAction(aDrawArrow);
                 cardMenu->addMenu(moveMenu);
 
-                QStringList relatedCards = card->getInfo()->getRelatedCards();
-                QStringList reverserelatedCards2Me = card->getInfo()->getReverseRelatedCards2Me();
-                if(relatedCards.size() || reverserelatedCards2Me.size())
+                if(card->getInfo())
                 {
-                    QMenu * createRelatedCardMenu = cardMenu->addMenu(tr("Cr&eate related card"));
+                    QStringList relatedCards = card->getInfo()->getRelatedCards();
+                    QStringList reverserelatedCards2Me = card->getInfo()->getReverseRelatedCards2Me();
+                    if(relatedCards.size() || reverserelatedCards2Me.size())
+                    {
+                        QMenu * createRelatedCardMenu = cardMenu->addMenu(tr("Cr&eate related card"));
 
-                    for (int i = 0; i < relatedCards.size(); ++i) {
-                        QAction *a = createRelatedCardMenu->addAction(relatedCards.at(i));
-                        connect(a, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
-                    }
+                        for (int i = 0; i < relatedCards.size(); ++i) {
+                            QAction *a = createRelatedCardMenu->addAction(relatedCards.at(i));
+                            connect(a, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
+                        }
 
-                    for (int i = 0; i < reverserelatedCards2Me.size(); ++i) {
-                        QAction *a = createRelatedCardMenu->addAction(reverserelatedCards2Me.at(i));
-                        connect(a, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
+                        for (int i = 0; i < reverserelatedCards2Me.size(); ++i) {
+                            QAction *a = createRelatedCardMenu->addAction(reverserelatedCards2Me.at(i));
+                            connect(a, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
+                        }
                     }
                 }
             } else {

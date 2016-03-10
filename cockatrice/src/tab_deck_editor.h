@@ -53,12 +53,6 @@ class TabDeckEditor : public Tab {
             void actSaveDeckToClipboard();
             void actPrintDeck();
             void actAnalyzeDeck();
-            void actOpenCustomFolder();
-            void actOpenCustomsetsFolder();
-            void actAddCustomSet();
-
-            void actEditSets();
-            void actEditTokens();
 
             void actClearFilterAll();
             void actClearFilterOne();
@@ -90,13 +84,11 @@ class TabDeckEditor : public Tab {
             void dockFloatingTriggered();
             void dockTopLevelChanged(bool topLevel);
 private:
-    static const QStringList fileNameFilters;
     CardInfo *currentCardInfo() const;
     void addCardHelper(QString zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(QString zoneName);
     void recursiveExpand(const QModelIndex &index);
-    int getNextCustomSetPrefix(QDir dataDir);
 
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
@@ -119,9 +111,9 @@ private:
     QTreeView *filterView;
     QWidget *filterBox;
 
-    QMenu *deckMenu, *dbMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu;
-    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
-    QAction *aEditSets, *aEditTokens, *aClearFilterAll, *aClearFilterOne;
+    QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu;
+    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose;
+    QAction *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;// *aUpdatePrices;
     QAction *aResetLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating, *aFilterDockVisible, *aFilterDockFloating;
@@ -149,7 +141,6 @@ public:
 
 public slots:
     void closeRequest();
-    void checkFirstRunDetected();
 signals:
     void deckEditorClosing(TabDeckEditor *tab);
 };

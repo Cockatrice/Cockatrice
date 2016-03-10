@@ -34,6 +34,8 @@
 
 #if QT_VERSION < 0x050000
     #include <QtGui/qtextdocument.h> // for Qt::escape()
+#else 
+    #include <QtConcurrent>
 #endif
 
 #include "main.h"
@@ -51,6 +53,9 @@
 #include "tab_game.h"
 #include "version_string.h"
 #include "update_checker.h"
+#include "carddatabase.h"
+#include "window_sets.h"
+#include "dlg_edit_tokens.h"
 
 #include "pb/game_replay.pb.h"
 #include "pb/room_commands.pb.h"
@@ -69,6 +74,9 @@
 #define DOWNLOAD_URL "https://dl.bintray.com/cockatrice/Cockatrice/"
 
 const QString MainWindow::appName = "Cockatrice";
+const QStringList MainWindow::fileNameFilters = QStringList()
+    << QObject::tr("Cockatrice card database (*.xml)")
+    << QObject::tr("All files (*.*)");
 
 void MainWindow::updateTabMenu(const QList<QMenu *> &newMenuList)
 {
@@ -507,6 +515,13 @@ void MainWindow::retranslateUi()
     cockatriceMenu->setTitle(tr("&Cockatrice"));
 #endif
 
+    dbMenu->setTitle(tr("C&ard Database"));
+    aOpenCustomFolder->setText(tr("Open custom image folder"));
+    aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
+    aAddCustomSet->setText(tr("Add custom sets/cards"));    
+    aEditSets->setText(tr("&Edit sets..."));
+    aEditTokens->setText(tr("Edit &tokens..."));
+
     aAbout->setText(tr("&About Cockatrice"));
     aUpdate->setText(tr("&Update Cockatrice"));
     helpMenu->setTitle(tr("&Help"));
@@ -545,6 +560,21 @@ void MainWindow::createActions()
     aCheckCardUpdates = new QAction(this);
     connect(aCheckCardUpdates, SIGNAL(triggered()), this, SLOT(actCheckCardUpdates()));
 
+    aOpenCustomsetsFolder = new QAction(QString(), this);
+    connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
+
+    aOpenCustomFolder = new QAction(QString(), this);
+    connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
+
+    aAddCustomSet = new QAction(QString(), this);
+    connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
+
+    aEditSets = new QAction(QString(), this);
+    connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
+
+    aEditTokens = new QAction(QString(), this);
+    connect(aEditTokens, SIGNAL(triggered()), this, SLOT(actEditTokens()));
+
 #if defined(__APPLE__)  /* For OSX */
     aSettings->setMenuRole(QAction::PreferencesRole);
     aExit->setMenuRole(QAction::QuitRole);
@@ -579,6 +609,16 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aCheckCardUpdates);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aExit);
+
+    dbMenu = menuBar()->addMenu(QString());
+    dbMenu->addAction(aEditSets);
+    dbMenu->addAction(aEditTokens);
+    dbMenu->addSeparator();
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
+    dbMenu->addAction(aOpenCustomFolder);
+    dbMenu->addAction(aOpenCustomsetsFolder);
+#endif
+    dbMenu->addAction(aAddCustomSet);
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
@@ -635,6 +675,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
     refreshShortcuts();
+
+    connect(db, SIGNAL(cardDatabaseLoadingFailed()), this, SLOT(cardDatabaseLoadingFailed()));
+    connect(db, SIGNAL(cardDatabaseNewSetsFound(int)), this, SLOT(cardDatabaseNewSetsFound(int)));
+    connect(db, SIGNAL(cardDatabaseAllNewSetsEnabled()), this, SLOT(cardDatabaseAllNewSetsEnabled()));
+    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 }
 
 MainWindow::~MainWindow()
@@ -727,6 +772,59 @@ void MainWindow::showWindowIfHidden() {
     show();
 }
 
+void MainWindow::cardDatabaseLoadingFailed()
+{
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(tr("Card database"));
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText(tr("Cockatrice is unable to load the card database.\n"
+        "Do you want to update your card database now?\n"
+        "If unsure or first time user, choose \"Yes\""));
+
+    QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
+    msgBox.addButton(tr("No"), QMessageBox::NoRole);
+    QPushButton *settingsButton = msgBox.addButton(tr("Open settings"), QMessageBox::ActionRole);
+    msgBox.setDefaultButton(yesButton);
+
+    msgBox.exec();
+
+    if (msgBox.clickedButton() == yesButton) {
+        actCheckCardUpdates();
+    } else if (msgBox.clickedButton() == settingsButton) {
+        actSettings();
+    }
+}
+
+void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets)
+{
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(tr("New sets found"));
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setText(tr("%1 new set(s) have been found in the card database.\n"
+        "Do you want to enable them?").arg(numUnknownSets));
+
+    QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
+    QPushButton *noButton = msgBox.addButton(tr("No"), QMessageBox::NoRole);
+    QPushButton *settingsButton = msgBox.addButton(tr("View sets"), QMessageBox::ActionRole);
+    msgBox.setDefaultButton(yesButton);
+
+    msgBox.exec();
+
+    if (msgBox.clickedButton() == yesButton) {
+        db->enableAllUnknownSets();
+    } else if (msgBox.clickedButton() == noButton) {
+        db->markAllSetsAsKnown();
+    } else if (msgBox.clickedButton() == settingsButton) {
+        actEditSets();
+    }
+}
+
+void MainWindow::cardDatabaseAllNewSetsEnabled()
+{
+    QMessageBox::information(this, tr("Welcome"), tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the card database have been enabled.\nRead more about changing the set order or disabling specific sets and consequent effects in the \"Edit Sets\" window."));
+    actEditSets();
+}
+
 /* CARD UPDATER */
 
 void MainWindow::actCheckCardUpdates()
@@ -811,11 +909,9 @@ void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = 0;
 
-    QMessageBox::information(this, tr("Information"), tr("Update completed successfully. Cockatrice will now reload the card database."));
+    QMessageBox::information(this, tr("Information"), tr("Update completed successfully.\nCockatrice will now reload the card database."));
 
-    // this will force a database reload
-    settingsCache->setCardDatabasePath(settingsCache->getCardDatabasePath());
-    settingsCache->setTokenDatabasePath(settingsCache->getTokenDatabasePath());
+    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 }
 
 void MainWindow::refreshShortcuts()
@@ -830,9 +926,107 @@ void MainWindow::refreshShortcuts()
     aSettings->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSettings"));
     aExit->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aExit"));
     aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aCheckCardUpdates"));
+    aOpenCustomFolder->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aOpenCustomFolder"));
+    aEditSets->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aEditSets"));
+    aEditTokens->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aEditTokens"));
 }
 
 void MainWindow::notifyUserAboutUpdate()
 {
     QMessageBox::information(this, tr("Information"), tr("Your client appears to be missing features that the server supports.\nThis usually means that your client version is out of date, please check to see if there is a new client available for download."));
+}
+
+void MainWindow::actOpenCustomFolder()
+{
+    QString dir = settingsCache->getCustomPicsPath();
+#if defined(Q_OS_MAC)
+    QStringList scriptArgs;
+    scriptArgs << QLatin1String("-e");
+    scriptArgs << QString::fromLatin1("tell application \"Finder\" to open POSIX file \"%1\"").arg(dir);
+    scriptArgs << QLatin1String("-e");
+    scriptArgs << QLatin1String("tell application \"Finder\" to activate");
+
+    QProcess::execute("/usr/bin/osascript", scriptArgs);
+#elif defined(Q_OS_WIN)
+    QStringList args;
+    args << QDir::toNativeSeparators(dir);
+    QProcess::startDetached("explorer", args);
+#endif
+}
+
+void MainWindow::actOpenCustomsetsFolder()
+{
+    QString dir = settingsCache->getCustomCardDatabasePath();
+
+#if defined(Q_OS_MAC)
+    QStringList scriptArgs;
+    scriptArgs << QLatin1String("-e");
+    scriptArgs << QString::fromLatin1("tell application \"Finder\" to open POSIX file \"%1\"").arg(dir);
+    scriptArgs << QLatin1String("-e");
+    scriptArgs << QLatin1String("tell application \"Finder\" to activate");
+
+    QProcess::execute("/usr/bin/osascript", scriptArgs);
+#elif defined(Q_OS_WIN)
+    QStringList args;
+    args << QDir::toNativeSeparators(dir);
+    QProcess::startDetached("explorer", args);
+#endif
+}
+
+void MainWindow::actAddCustomSet()
+{
+    QFileDialog dialog(this, tr("Load sets/cards"), QDir::homePath());
+    dialog.setNameFilters(MainWindow::fileNameFilters);
+    if (!dialog.exec())
+        return;
+
+    QString fileName = dialog.selectedFiles().at(0);
+
+    if (!QFile::exists(fileName)) {
+        QMessageBox::warning(this, tr("Load sets/cards"), tr("Selected file cannot be found."));
+        return;
+    }
+
+    QDir dir = settingsCache->getCustomCardDatabasePath();
+    int nextPrefix = getNextCustomSetPrefix(dir);
+
+    bool res = QFile::copy(
+        fileName, dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") +
+        QString::number(nextPrefix) + "." + QFileInfo(fileName).fileName()
+    );
+
+    if (res) {
+        QMessageBox::information(this, tr("Load sets/cards"), tr("The new sets/cards have been added successfully.\nCockatrice will now reload the card database."));
+        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    } else {
+        QMessageBox::warning(this, tr("Load sets/cards"), tr("Sets/cards failed to import."));
+    }
+}
+
+int MainWindow::getNextCustomSetPrefix(QDir dataDir) {
+    QStringList files = dataDir.entryList();
+    int maxIndex = 0;
+
+    QStringList::const_iterator filesIterator;
+    for (filesIterator = files.constBegin(); filesIterator != files.constEnd(); ++filesIterator) {
+        int fileIndex = (*filesIterator).split(".").at(0).toInt();
+        if (fileIndex > maxIndex)
+            maxIndex = fileIndex;
+    }
+
+    return maxIndex + 1;
+}
+
+void MainWindow::actEditSets()
+{
+    WndSets *w = new WndSets;
+    w->setWindowModality(Qt::WindowModal);
+    w->show();
+}
+
+void MainWindow::actEditTokens()
+{
+    DlgEditTokens dlg;
+    dlg.exec();
+    db->saveCustomTokensToFile();
 }

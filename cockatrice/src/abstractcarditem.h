@@ -4,9 +4,7 @@
 #include "arrowtarget.h"
 
 class CardInfo;
-class CardInfoWidget;
 class Player;
-class QTimer;
 
 const int CARD_WIDTH = 72;
 const int CARD_HEIGHT = 102;
@@ -15,13 +13,13 @@ class AbstractCardItem : public ArrowTarget {
     Q_OBJECT
 protected:
     CardInfo *info;
-    CardInfoWidget *infoWidget;
     int id;
     QString name;
     bool tapped;
     bool facedown;
     int tapAngle;
     QString color;
+    QColor bgColor;
 private:
     bool isHovered;
     qreal realZValue;
@@ -65,6 +63,7 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
+    void cacheBgColor();
 };
  
 #endif

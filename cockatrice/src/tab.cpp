@@ -15,7 +15,7 @@ void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName)
         infoPopup->deleteLater();
     }
 	currentCardName = cardName;
-    infoPopup = new CardInfoWidget(CardInfoWidget::ModePopUp, cardName, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
+    infoPopup = new CardInfoWidget(cardName, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
     infoPopup->setAttribute(Qt::WA_TransparentForMouseEvents);
     QRect screenRect = qApp->desktop()->screenGeometry(this);
     infoPopup->move(

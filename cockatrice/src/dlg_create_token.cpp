@@ -27,13 +27,13 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 
     colorLabel = new QLabel(tr("C&olor:"));
     colorEdit = new QComboBox;
-    colorEdit->addItem(tr("white"), "w");
-    colorEdit->addItem(tr("blue"), "u");
-    colorEdit->addItem(tr("black"), "b");
-    colorEdit->addItem(tr("red"), "r");
-    colorEdit->addItem(tr("green"), "g");
-    colorEdit->addItem(tr("multicolor"), "m");
-    colorEdit->addItem(tr("colorless"), QString());
+    colorEdit->addItem(tr("white"), QChar('w'));
+    colorEdit->addItem(tr("blue"), QChar('u'));
+    colorEdit->addItem(tr("black"), QChar('b'));
+    colorEdit->addItem(tr("red"), QChar('r'));
+    colorEdit->addItem(tr("green"), QChar('g'));
+    colorEdit->addItem(tr("multicolor"), QChar('m'));
+    colorEdit->addItem(tr("colorless"), QChar());
     colorLabel->setBuddy(colorEdit);
 
     ptLabel = new QLabel(tr("&P/T:"));
@@ -132,14 +132,22 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
-    const CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : db->getCard();
+    const CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : 0;
     
-    nameEdit->setText(cardInfo->getName());
-    const QString cardColor = cardInfo->getColors().isEmpty() ? QString() : (cardInfo->getColors().size() > 1 ? QString("m") : cardInfo->getColors().first());
-    colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
-    ptEdit->setText(cardInfo->getPowTough());
-    if(settingsCache->getAnnotateTokens())
-        annotationEdit->setText(cardInfo->getText());
+    if(cardInfo)
+    {
+        nameEdit->setText(cardInfo->getName());
+        const QChar cardColor = cardInfo->getColorChar();
+        colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
+        ptEdit->setText(cardInfo->getPowTough());
+        if(settingsCache->getAnnotateTokens())
+            annotationEdit->setText(cardInfo->getText());
+    } else {
+        nameEdit->setText("");
+        colorEdit->setCurrentIndex(colorEdit->findData(QString(), Qt::UserRole, Qt::MatchFixedString));
+        ptEdit->setText("");
+        annotationEdit->setText("");
+    }
 }
 
 void DlgCreateToken::actChooseTokenFromAll(bool checked)
@@ -166,7 +174,7 @@ QString DlgCreateToken::getName() const
 
 QString DlgCreateToken::getColor() const
 {
-    return colorEdit->itemData(colorEdit->currentIndex()).toString();
+    return QString(colorEdit->itemData(colorEdit->currentIndex()).toChar());
 }
 
 QString DlgCreateToken::getPT() const

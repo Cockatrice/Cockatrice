@@ -1,6 +1,8 @@
 #include "settingscache.h"
 #include <QSettings>
 #include <QFile>
+#include <QDir>
+#include <QDebug>
 #include <QApplication>
 
 #if QT_VERSION >= 0x050000
@@ -9,20 +11,21 @@
     #include <QDesktopServices>
 #endif
 
+QString SettingsCache::getDataPath()
+{
+    return 
+#ifdef PORTABLE_BUILD
+    qApp->applicationDirPath() + "/data/";
+#elif QT_VERSION >= 0x050000
+    QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+    QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
+}
+
 QString SettingsCache::getSettingsPath()
 {
-    QString file = qApp->applicationDirPath() + "/settings/";
-
-#ifndef PORTABLE_BUILD
-    #if QT_VERSION >= 0x050000
-        file = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    #else
-        file = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    #endif
-        file.append("/settings/");
-#endif        
-
-    return file;
+    return getDataPath() + "/settings/";
 }
 
 void SettingsCache::translateLegacySettings()
@@ -119,8 +122,31 @@ void SettingsCache::translateLegacySettings()
     }
 }
 
+QString SettingsCache::getSafeConfigPath(QString configEntry, QString defaultPath) const
+{
+    QString tmp = settings->value(configEntry).toString();
+    // if the config settings is empty or refers to a not-existing folder,
+    // ensure that the defaut path exists and return it
+    if (!QDir(tmp).exists() || tmp.isEmpty()) {
+        if(!QDir().mkpath(defaultPath))
+            qDebug() << "[SettingsCache] Could not create folder:" << defaultPath;
+        tmp = defaultPath;
+    }
+    return tmp;
+}
+
+QString SettingsCache::getSafeConfigFilePath(QString configEntry, QString defaultPath) const
+{
+    QString tmp = settings->value(configEntry).toString();
+    // if the config settings is empty or refers to a not-existing file,
+    // return the default Path
+    if (!QFile::exists(tmp) || tmp.isEmpty())
+        tmp = defaultPath;
+    return tmp;
+}
 SettingsCache::SettingsCache()
 {
+    QString dataPath = getDataPath();
     QString settingsPath = getSettingsPath();
     settings = new QSettings(settingsPath+"global.ini", QSettings::IniFormat, this);
     shortcutsSettings = new ShortcutsSettings(settingsPath,this);
@@ -133,20 +159,20 @@ SettingsCache::SettingsCache()
     if(!QFile(settingsPath+"global.ini").exists())
         translateLegacySettings();
 
-#ifdef PORTABLE_BUILD
-    setDeckPath(qApp->applicationDirPath() + "data/decks");
-    setReplaysPath(qApp->applicationDirPath() +"data/replays");
-    setPicsPath(qApp->applicationDirPath() +  "data/pics");
-#endif
-
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
-    deckPath = settings->value("paths/decks").toString();
-    replaysPath = settings->value("paths/replays").toString();
-    picsPath = settings->value("paths/pics").toString();
-    cardDatabasePath = settings->value("paths/carddatabase").toString();
-    tokenDatabasePath = settings->value("paths/tokendatabase").toString();
+
+    deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
+    replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
+    picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
+    // this has never been exposed as an user-configurable setting
+    customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
+    // this has never been exposed as an user-configurable setting
+    customCardDatabasePath = getSafeConfigPath("paths/customsets", dataPath + "/customsets/");    
+
+    cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
+    tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
 
     themeName = settings->value("theme/name").toString();
 
@@ -175,7 +201,6 @@ SettingsCache::SettingsCache()
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     playToStack = settings->value("interface/playtostack", true).toBool();
     annotateTokens = settings->value("interface/annotatetokens", false).toBool();
-    cardInfoMinimized = settings->value("interface/cardinfominimized", 0).toInt();
     tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
@@ -291,6 +316,8 @@ void SettingsCache::setPicsPath(const QString &_picsPath)
 {
     picsPath = _picsPath;
     settings->setValue("paths/pics", picsPath);
+    // get a new value for customPicsPath, currently derived from picsPath
+    customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");
     emit picsPathChanged();
 }
 
@@ -305,7 +332,7 @@ void SettingsCache::setTokenDatabasePath(const QString &_tokenDatabasePath)
 {
     tokenDatabasePath = _tokenDatabasePath;
     settings->setValue("paths/tokendatabase", tokenDatabasePath);
-    emit tokenDatabasePathChanged();
+    emit cardDatabasePathChanged();
 }
 
 void SettingsCache::setThemeName(const QString &_themeName)
@@ -361,12 +388,6 @@ void SettingsCache::setAnnotateTokens(int _annotateTokens)
 {
     annotateTokens = _annotateTokens;
     settings->setValue("interface/annotatetokens", annotateTokens);
-}
-
-void SettingsCache::setCardInfoMinimized(int _cardInfoMinimized)
-{
-        cardInfoMinimized = _cardInfoMinimized;
-    settings->setValue("interface/cardinfominimized", cardInfoMinimized);
 }
 
 void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes)

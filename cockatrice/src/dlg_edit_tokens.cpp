@@ -1,5 +1,7 @@
 #include "dlg_edit_tokens.h"
+#include "carddatabase.h"
 #include "carddatabasemodel.h"
+#include "main.h"
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -15,8 +17,8 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-DlgEditTokens::DlgEditTokens(CardDatabaseModel *_cardDatabaseModel, QWidget *parent)
-    : QDialog(parent), currentCard(0), cardDatabaseModel(_cardDatabaseModel)
+DlgEditTokens::DlgEditTokens(QWidget *parent)
+    : QDialog(parent), currentCard(0)
 {
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit;
@@ -25,13 +27,13 @@ DlgEditTokens::DlgEditTokens(CardDatabaseModel *_cardDatabaseModel, QWidget *par
     
     colorLabel = new QLabel(tr("C&olor:"));
     colorEdit = new QComboBox;
-    colorEdit->addItem(tr("white"), "w");
-    colorEdit->addItem(tr("blue"), "u");
-    colorEdit->addItem(tr("black"), "b");
-    colorEdit->addItem(tr("red"), "r");
-    colorEdit->addItem(tr("green"), "g");
-    colorEdit->addItem(tr("multicolor"), "m");
-    colorEdit->addItem(tr("colorless"), QString());
+    colorEdit->addItem(tr("white"), QChar('w'));
+    colorEdit->addItem(tr("blue"), QChar('u'));
+    colorEdit->addItem(tr("black"), QChar('b'));
+    colorEdit->addItem(tr("red"), QChar('r'));
+    colorEdit->addItem(tr("green"), QChar('g'));
+    colorEdit->addItem(tr("multicolor"), QChar('m'));
+    colorEdit->addItem(tr("colorless"), QChar());
     colorLabel->setBuddy(colorEdit);
     connect(colorEdit, SIGNAL(currentIndexChanged(int)), this, SLOT(colorChanged(int)));
     
@@ -57,9 +59,11 @@ DlgEditTokens::DlgEditTokens(CardDatabaseModel *_cardDatabaseModel, QWidget *par
     
     QGroupBox *tokenDataGroupBox = new QGroupBox(tr("Token data"));
     tokenDataGroupBox->setLayout(grid);
-    
-    cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
-    cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
+
+    databaseModel = new CardDatabaseModel(db, this);
+    databaseModel->setObjectName("databaseModel");
+    cardDatabaseDisplayModel = new TokenDisplayModel(this);
+    cardDatabaseDisplayModel->setSourceModel(databaseModel);
     cardDatabaseDisplayModel->setIsToken(CardDatabaseDisplayModel::ShowTrue);
     
     chooseTokenView = new QTreeView;
@@ -116,39 +120,43 @@ DlgEditTokens::DlgEditTokens(CardDatabaseModel *_cardDatabaseModel, QWidget *par
 void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /* previous */)
 {
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
-    CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : cardDatabaseModel->getDatabase()->getCard();
-    if (!cardInfo->getName().isEmpty())
-        currentCard = cardInfo;
-    else
-        currentCard = 0;
-    
-    nameEdit->setText(cardInfo->getName());
-    const QString cardColor = cardInfo->getColors().isEmpty() ? QString() : (cardInfo->getColors().size() > 1 ? QString("m") : cardInfo->getColors().first());
-    colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
-    ptEdit->setText(cardInfo->getPowTough());
-    annotationEdit->setText(cardInfo->getText());
+    currentCard = current.row() >= 0 ? databaseModel->getCard(realIndex.row()) : 0;
+
+    if(currentCard)
+    {
+        nameEdit->setText(currentCard->getName());
+        const QChar cardColor = currentCard->getColorChar();
+        colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
+        ptEdit->setText(currentCard->getPowTough());
+        annotationEdit->setText(currentCard->getText());
+    } else {
+        nameEdit->setText("");
+        colorEdit->setCurrentIndex(colorEdit->findData(QChar(), Qt::UserRole, Qt::MatchFixedString));
+        ptEdit->setText("");
+        annotationEdit->setText("");
+    }
 }
 
 void DlgEditTokens::actAddToken()
 {
     QString name;
-    bool askAgain;
+    bool askAgain = true;
     do {
         name = QInputDialog::getText(this, tr("Add token"), tr("Please enter the name of the token:"));
-        if (!name.isEmpty() && cardDatabaseModel->getDatabase()->getCard(name, false)) {
+        if(name.isEmpty())
+            return;
+        if (databaseModel->getDatabase()->getCard(name)) {
             QMessageBox::critical(this, tr("Error"), tr("The chosen name conflicts with an existing card or token.\nMake sure to enable the 'token set' in the 'Edit sets...' dialog to display them correctly."));
-            askAgain = true;
-        } else
+        } else {
             askAgain = false;
+        }
     } while (askAgain);
     
-    if (name.isEmpty())
-        return;
     
     CardInfo *card = new CardInfo(name, true);
-    card->addToSet(cardDatabaseModel->getDatabase()->getSet(CardDatabase::TOKENS_SETNAME));
+    card->addToSet(databaseModel->getDatabase()->getSet(CardDatabase::TOKENS_SETNAME));
     card->setCardType("Token");
-    cardDatabaseModel->getDatabase()->addCard(card);
+    databaseModel->getDatabase()->addCard(card);
 }
 
 void DlgEditTokens::actRemoveToken()
@@ -156,7 +164,7 @@ void DlgEditTokens::actRemoveToken()
     if (currentCard) {
         CardInfo *cardToRemove = currentCard; // the currentCard property gets modified during db->removeCard()
         currentCard = 0;
-        cardDatabaseModel->getDatabase()->removeCard(cardToRemove);
+        databaseModel->getDatabase()->removeCard(cardToRemove);
         delete cardToRemove;
     }
 }
@@ -164,7 +172,7 @@ void DlgEditTokens::actRemoveToken()
 void DlgEditTokens::colorChanged(int colorIndex)
 {
     if (currentCard)
-        currentCard->setColors(QStringList() << colorEdit->itemData(colorIndex).toString());
+        currentCard->setColors(QStringList() << QString(colorEdit->itemData(colorIndex).toChar()));
 }
 
 void DlgEditTokens::ptChanged(const QString &_pt)
