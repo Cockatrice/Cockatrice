@@ -160,8 +160,8 @@ void TabRoom::focusTab() {
 }
 
 void TabRoom::actShowMentionPopup(QString &sender) {
-    if (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this) 
-        || QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0) {
+    if (trayIcon && (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this) || QApplication::activeWindow() == 0
+        || QApplication::focusWidget() == 0)) {
         disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
         trayIcon->showMessage(sender + tr(" mentioned you."), tr("Click to view"));
         connect(trayIcon, SIGNAL(messageClicked()), chatView, SLOT(actMessageClicked()));

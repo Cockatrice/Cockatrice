@@ -5,6 +5,7 @@
 #include <QAction>
 #include <QSystemTrayIcon>
 #include <QApplication>
+#include <QDebug>
 #include "tab_message.h"
 #include "abstractclient.h"
 #include "chatview.h"
@@ -131,9 +132,15 @@ bool TabMessage::shouldShowSystemPopup(const Event_UserMessage &event) {
 }
 
 void TabMessage::showSystemPopup(const Event_UserMessage &event) {
-    disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
-    trayIcon->showMessage(tr("Private message from ") + otherUserInfo->name().c_str(), event.message().c_str());
-    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
+    if (trayIcon) {
+        disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
+        trayIcon->showMessage(tr("Private message from ") + otherUserInfo->name().c_str(), event.message().c_str());
+        connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
+    }
+    else
+    {
+        qDebug() << "Error: trayIcon is NULL. TabMessage::showSystemPopup failed";
+    }
 }
 
 void TabMessage::messageClicked() {
