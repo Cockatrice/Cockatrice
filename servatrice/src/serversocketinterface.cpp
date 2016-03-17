@@ -1034,12 +1034,13 @@ Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_R
         return Response::RespPasswordTooShort;
 
     QString token;
-    bool regSucceeded = sqlInterface->registerUser(userName, realName, gender, password, emailAddress, country, token, !requireEmailForRegistration);
+    bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
+    bool regSucceeded = sqlInterface->registerUser(userName, realName, gender, password, emailAddress, country, token, !requireEmailActivation);
 
     if(regSucceeded)
     {
         qDebug() << "Accepted register command for user: " << userName;
-        if(requireEmailForRegistration)
+        if(requireEmailActivation)
         {
             QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
             query->bindValue(":name", userName);
