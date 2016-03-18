@@ -175,11 +175,15 @@ bool Servatrice::initServer()
 
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
     bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
+    bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
 
     qDebug() << "Accept registered users only: " << regServerOnly;
     qDebug() << "Registration enabled: " << registrationEnabled;
     if (registrationEnabled)
+    {
         qDebug() << "Require email address to register: " << requireEmailForRegistration;
+        qDebug() << "Require email activation via token: " << requireEmailActivation;
+    }
 
     FeatureSet features;
     features.initalizeFeatureList(serverRequiredFeatureList);
@@ -498,8 +502,8 @@ void Servatrice::statusUpdate()
 
     // send activation emails
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
-    bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
-    if (registrationEnabled && requireEmailForRegistration)
+    bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
+    if (registrationEnabled && requireEmailActivation)
     {
         QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
         if (!servatriceDatabaseInterface->execSqlQuery(query))
