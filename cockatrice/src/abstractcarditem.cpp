@@ -99,7 +99,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         PictureLoader::getPixmap(translatedPixmap, nullptr, translatedSize.toSize());
     } else {
         // don't even spend time trying to load the picture if our size is too small
-        if(info && translatedSize.width() > 10)
+        if(translatedSize.width() > 10)
         {
             PictureLoader::getPixmap(translatedPixmap, info, translatedSize.toSize());
             if(translatedPixmap.isNull())
