@@ -520,8 +520,15 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
         const QString clientid = query->value(9).toString();
         if (!clientid.isEmpty())
             result.set_clientid(clientid.toStdString());
+
+		result.set_suspicion(LocateUserSuspicion(QString::fromStdString(query->value(1).toString().toStdString())));
     }
     return result;
+}
+
+int Servatrice_DatabaseInterface::LocateUserSuspicion(const QString &userName)
+{
+	return 0;
 }
 
 ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, bool withId)
