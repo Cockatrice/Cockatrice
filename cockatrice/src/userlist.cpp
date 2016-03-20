@@ -320,7 +320,6 @@ UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserL
     userTree->setRootIsDecorated(false);
     userTree->setIconSize(QSize(20, 12));
     userTree->setItemDelegate(itemDelegate);
-    userTree->setAlternatingRowColors(true);
     connect(userTree, SIGNAL(itemActivated(QTreeWidgetItem *, int)), this, SLOT(userClicked(QTreeWidgetItem *, int)));
     
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -352,6 +351,21 @@ void UserList::processUserInfo(const ServerInfo_User &user, bool online)
     else {
         item = new UserListTWI(user);
         users.insert(userName, item);
+
+		if (user.user_level() > 3) {  //NEED TO CORRECT THIS TO EITHER LOCATE IF YOUR ARE ADMIN/MOD AND SHOW OR BLOCK SUSPICION LEVEL FROM BEING RETURNED IF A REG USER REQUESTS USER DATA
+			if (user.suspicion() > 50) { // apply warning level due to user suspicion level being elevated
+				item->setBackground(0, *(new QBrush(Qt::yellow, Qt::Dense6Pattern)));
+				item->setBackground(1, *(new QBrush(Qt::yellow , Qt::Dense6Pattern)));
+				item->setBackground(2, *(new QBrush(Qt::yellow, Qt::Dense6Pattern)));
+			}
+
+			if (user.suspicion() > 80) { // apply alert level due to user suspicion level being elevated
+				item->setBackground(0, *(new QBrush(Qt::red, Qt::Dense6Pattern)));
+				item->setBackground(1, *(new QBrush(Qt::red, Qt::Dense6Pattern)));
+				item->setBackground(2, *(new QBrush(Qt::red, Qt::Dense6Pattern)));
+			}
+		}
+
         userTree->addTopLevelItem(item);
         if (online)
             ++onlineCount;
