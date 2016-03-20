@@ -1,7 +1,6 @@
 #include "carddatabase.h"
 #include "pictureloader.h"
 #include "settingscache.h"
-#include "thememanager.h"
 
 #include <QCryptographicHash>
 #include <QDebug>
@@ -386,6 +385,8 @@ void CardDatabase::clear()
         delete setIt.value();
     }
     sets.clear();
+
+    loadStatus = NotLoaded;
 }
 
 void CardDatabase::addCard(CardInfo *card)

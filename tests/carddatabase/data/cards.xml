@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cockatrice_carddatabase version="3">
+    <cards>
+        <card>
+            <name>Cat</name>
+            <set muId="111">CAT</set>
+            <color>G</color>
+            <manacost>2G</manacost>
+            <cmc>2</cmc>
+            <type>Creature</type>
+            <pt>3/3</pt>
+            <tablerow>0</tablerow>
+            <text>Meow!</text>
+        </card>
+        <card>
+            <name>Dog</name>
+            <set muId="222">DOG</set>
+            <color>R</color>
+            <manacost>2RR</manacost>
+            <cmc>4</cmc>
+            <type>Creature</type>
+            <pt>4/4</pt>
+            <tablerow>0</tablerow>
+            <text>Woof!</text>
+        </card>
+    </cards>
+</cockatrice_carddatabase>
