@@ -18,7 +18,7 @@ if(Qt4_FOUND)
     # Include directories
     INCLUDE(${QT_USE_FILE})
     INCLUDE_DIRECTORIES(${QT_INCLUDES})
-    TARGET_LINK_LIBRARIES(carddatabase_test {QT_LIBRARIES})
+    TARGET_LINK_LIBRARIES(carddatabase_test ${QT_LIBRARIES})
 endif()
 
 # qt5 stuff
