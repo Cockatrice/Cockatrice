@@ -130,8 +130,6 @@ ENDIF()
 
 # Build oracle binary and link it
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
-set_property(TARGET oracle PROPERTY CXX_STANDARD 11)
-set_property(TARGET oracle PROPERTY CXX_STANDARD_REQUIRED ON)
 
 if(Qt4_FOUND)
     if(MSVC) 

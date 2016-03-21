@@ -37,6 +37,9 @@ ENDIF()
 # A project name is needed for CPack
 PROJECT("${PROJECT_NAME}")
 
+# Use c++11 for all targets
+set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ ISO Standard")
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Set conventional loops
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
