@@ -57,6 +57,7 @@
 #include "pb/response_deck_download.pb.h"
 #include "pb/response_deck_upload.pb.h"
 #include "pb/response_register.pb.h"
+#include "pb/response_forgot_password.pb.h"
 #include "pb/response_replay_list.pb.h"
 #include "pb/response_replay_download.pb.h"
 #include "pb/response_warn_history.pb.h"
@@ -296,7 +297,7 @@ Response::ResponseCode ServerSocketInterface::processExtendedSessionCommand(int 
         case SessionCommand::REPLAY_DELETE_MATCH: return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
         case SessionCommand::REGISTER: return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc); break;
         case SessionCommand::ACTIVATE: return cmdActivateAccount(cmd.GetExtension(Command_Activate::ext), rc); break;
-
+		case SessionCommand::FORGOT_PASSWORD: return cmdForgotPassword(cmd.GetExtension(Command_ForgotPassword::ext), rc);
         case SessionCommand::ACCOUNT_EDIT: return cmdAccountEdit(cmd.GetExtension(Command_AccountEdit::ext), rc);
         case SessionCommand::ACCOUNT_IMAGE: return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD: return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
@@ -974,6 +975,48 @@ Response::ResponseCode ServerSocketInterface::cmdBanFromServer(const Command_Ban
     return Response::RespOk;
 }
 
+Response::ResponseCode ServerSocketInterface::cmdForgotPassword(const Command_ForgotPassword &cmd, ResponseContainer &rc)
+{
+
+	bool forgotPasswordEnabled = settingsCache->value("users/enableForgotPassword", true).toBool();
+	if (!forgotPasswordEnabled)
+		return Response::RespInternalError;
+
+	if (tooManyForgotPasswordAttempts(this->getAddress()))
+		return Response::RespInternalError;
+
+	bool requireForgotPasswordEmail = settingsCache->value("users/forgotpasswordemailrequired", true).toBool();;
+	bool requireForgotPasswordClientID = settingsCache->value("users/forgotpasswordclientidrequired", true).toBool();
+
+	QString userName = QString::fromStdString(cmd.user_name());
+	QString password = QString::fromStdString(cmd.password());
+	QString userEmail = QString::fromStdString(cmd.email());
+	QString clientID = QString::fromStdString(cmd.clientid());
+
+	//if requesting user is a trusted user, change the password for the requested user
+	if (userInfo)
+		if (ServerInfo_User::IsModerator || ServerInfo_User::IsAdmin)
+			if (!(sqlInterface->changeUserPassword(userName, QString(""), password, false)))
+				return Response::RespOk;
+
+	ServerInfo_User data = databaseInterface->getUserData(userName, true);
+	QString dbUserEmail = QString::fromStdString(data.email());
+	QString dbUserClientID = QString::fromStdString(data.clientid());
+
+	if (requireForgotPasswordEmail)
+		if (QString::compare(userEmail, dbUserEmail, Qt::CaseInsensitive))
+			return Response::RespInternalError;
+	
+	if (requireForgotPasswordClientID)
+		if (QString::compare(clientID,dbUserClientID, Qt::CaseInsensitive))
+			return Response::RespInternalError;
+	
+	if (!(sqlInterface->changeUserPassword(userName, QString(""), password, false)))
+		return Response::RespOk;
+	
+	return Response::RespInternalError;
+}
+
 Response::ResponseCode ServerSocketInterface::cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc)
 {
     QString userName = QString::fromStdString(cmd.user_name());
@@ -1063,6 +1106,13 @@ bool ServerSocketInterface::tooManyRegistrationAttempts(const QString &ipAddress
     return false;
 }
 
+bool ServerSocketInterface::tooManyForgotPasswordAttempts(const QString &ipAddress)
+{
+	// TODO: implement
+	Q_UNUSED(ipAddress);
+	return false;
+}
+
 Response::ResponseCode ServerSocketInterface::cmdActivateAccount(const Command_Activate &cmd, ResponseContainer & /*rc*/)
 {
     QString userName = QString::fromStdString(cmd.user_name());
@@ -1140,7 +1190,7 @@ Response::ResponseCode ServerSocketInterface::cmdAccountPassword(const Command_A
 
     QString userName = QString::fromStdString(userInfo->name());
 
-    bool changeFailed = databaseInterface->changeUserPassword(userName, oldPassword, newPassword);
+    bool changeFailed = databaseInterface->changeUserPassword(userName, oldPassword, newPassword, true);
 
     if(changeFailed)
         return Response::RespWrongPassword;

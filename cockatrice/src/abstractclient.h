@@ -35,6 +35,7 @@ enum ClientStatus {
     StatusActivating,
     StatusLoggingIn,
     StatusLoggedIn,
+	StatusForgotPassword,
 };
 
 class AbstractClient : public QObject {
@@ -66,6 +67,8 @@ signals:
     void registerAccepted();
     void registerAcceptedNeedsActivate();
     void activateAccepted();
+	void forgotPasswordSuccess();
+	void forgotPasswordFailed();
     
     void sigQueuePendingCommand(PendingCommand *pend);
 private:

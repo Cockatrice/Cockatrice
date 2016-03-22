@@ -133,6 +133,7 @@ SET(PROTO_FILES
     response_warn_history.proto
     response_warn_list.proto
     response_viewlog_history.proto
+	response_forgot_password.proto
     response.proto
     room_commands.proto
     room_event.proto

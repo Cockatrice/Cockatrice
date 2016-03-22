@@ -185,6 +185,16 @@ bool Servatrice::initServer()
         qDebug() << "Require email activation via token: " << requireEmailActivation;
     }
 
+	bool forgotPasswordEnabled = settingsCache->value("users/enableForgotPassword", true).toBool();
+	bool requireForgotPasswordEmail = settingsCache->value("users/forgotpasswordemailrequired", true).toBool();;
+	bool requireForgotPasswordClientID = settingsCache->value("users/forgotpasswordclientidrequired", true).toBool();;
+
+	if (forgotPasswordEnabled)
+	{
+		qDebug() << "Require email validation to use forgot password functionality: " << requireForgotPasswordEmail;
+		qDebug() << "Require clientid validation to use forgot password functionality: " << requireForgotPasswordClientID;
+	}
+
     FeatureSet features;
     features.initalizeFeatureList(serverRequiredFeatureList);
     requiredFeatures = settingsCache->value("server/requiredfeatures","").toString();
