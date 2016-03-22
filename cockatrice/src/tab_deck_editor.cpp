@@ -114,32 +114,10 @@ void TabDeckEditor::createDeckDock()
     grid->addWidget(hashLabel1, 2, 0);
     grid->addWidget(hashLabel, 2, 1);
 
-    /* Update price
-    aUpdatePrices = new QAction(QString(), this);
-    aUpdatePrices->setIcon(QPixmap("theme:icons/update"));
-    connect(aUpdatePrices, SIGNAL(triggered()), this, SLOT(actUpdatePrices()));
-    if (!settingsCache->getPriceTagFeature())
-        aUpdatePrices->setVisible(false);
-    connect(settingsCache, SIGNAL(priceTagFeatureChanged(int)), this, SLOT(setPriceTagFeatureEnabled(int)));
-    */
-
-    QToolBar *deckToolBar = new QToolBar;
-    deckToolBar->setObjectName("deckToolBar");
-    deckToolBar->setOrientation(Qt::Vertical);
-    deckToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    deckToolBar->setIconSize(QSize(24, 24));
-    //deckToolBar->addAction(aUpdatePrices);
-    QHBoxLayout *deckToolbarLayout = new QHBoxLayout;
-    deckToolbarLayout->setObjectName("deckToolbarLayout");
-    deckToolbarLayout->addStretch();
-    deckToolbarLayout->addWidget(deckToolBar);
-    deckToolbarLayout->addStretch();
-
     QVBoxLayout *rightFrame = new QVBoxLayout;
     rightFrame->setObjectName("rightFrame");
     rightFrame->addLayout(grid);
     rightFrame->addWidget(deckView, 10);
-    rightFrame->addLayout(deckToolbarLayout);
 
     deckDock = new QDockWidget(this);
     deckDock->setObjectName("deckDock");
