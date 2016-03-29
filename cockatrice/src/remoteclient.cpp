@@ -81,7 +81,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdRegister.set_gender((ServerInfo_User_Gender) gender);
         cmdRegister.set_country(country.toStdString());
         cmdRegister.set_real_name(realName.toStdString());
-        cmdRegister.set_clientid(settingsCache->getClientID().toStdString());
+        cmdRegister.set_clientid(settingsCache->getSrvClientID(lastHostname).toStdString());
         PendingCommand *pend = prepareSessionCommand(cmdRegister);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(registerResponse(Response)));
         sendCommand(pend);
@@ -111,7 +111,7 @@ void RemoteClient::doLogin() {
     Command_Login cmdLogin;
     cmdLogin.set_user_name(userName.toStdString());
     cmdLogin.set_password(password.toStdString());
-    cmdLogin.set_clientid(settingsCache->getClientID().toStdString());
+    cmdLogin.set_clientid(settingsCache->getSrvClientID(lastHostname).toStdString());
     cmdLogin.set_clientver(VERSION_STRING);
 
     if (!clientFeatures.isEmpty()) {
@@ -119,7 +119,6 @@ void RemoteClient::doLogin() {
         for (i = clientFeatures.begin(); i != clientFeatures.end(); ++i)
             cmdLogin.add_clientfeatures(i.key().toStdString().c_str());
     }
-
     PendingCommand *pend = prepareSessionCommand(cmdLogin);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
     sendCommand(pend);
@@ -263,7 +262,6 @@ void RemoteClient::doConnectToServer(const QString &hostname, unsigned int port,
 
     userName = _userName;
     password = _password;
-    QString clientid = settingsCache->getClientID();
     lastHostname = hostname;
     lastPort = port;
 

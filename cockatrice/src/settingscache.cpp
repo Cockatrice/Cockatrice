@@ -2,6 +2,7 @@
 #include <QSettings>
 #include <QFile>
 #include <QApplication>
+#include <QCryptographicHash>
 
 #if QT_VERSION >= 0x050000
     #include <QStandardPaths>
@@ -612,4 +613,12 @@ void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
     notifyAboutUpdates = _notifyaboutupdate;
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+QString SettingsCache::getSrvClientID(const QString _hostname)
+{
+    QString srvClientID = getClientID();
+    srvClientID += _hostname;
+    QString uniqueServerClientID = QCryptographicHash::hash(srvClientID.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
+    return uniqueServerClientID;
 }
