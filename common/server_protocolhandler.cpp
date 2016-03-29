@@ -137,10 +137,14 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
                 SessionCommand debugSc(sc);
                 debugSc.MutableExtension(Command_Login::ext)->clear_password();
                 logDebugMessage(QString::fromStdString(debugSc.ShortDebugString()));
-            } else if (num == SessionCommand::REGISTER) {
-                SessionCommand logSc(sc);
-                logSc.MutableExtension(Command_Register::ext)->clear_password();
-                logDebugMessage(QString::fromStdString(logSc.ShortDebugString()));
+			} else if (num == SessionCommand::REGISTER) {
+				SessionCommand logSc(sc);
+				logSc.MutableExtension(Command_Register::ext)->clear_password();
+				logDebugMessage(QString::fromStdString(logSc.ShortDebugString()));
+			} else if (num == SessionCommand::FORGOT_PASSWORD) {
+				SessionCommand logSc(sc);
+				logSc.MutableExtension(Command_ForgotPassword::ext)->clear_password();
+				logDebugMessage(QString::fromStdString(logSc.ShortDebugString()));
             } else
                 logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
         }

@@ -45,7 +45,7 @@ public:
     enum LogMessage_TargetType { MessageTargetRoom, MessageTargetGame, MessageTargetChat, MessageTargetIslRoom };
     virtual void logMessage(const int /* senderId */, const QString & /* senderName */, const QString & /* senderIp */, const QString & /* logMessage */, LogMessage_TargetType /* targetType */, const int /* targetId */, const QString & /* targetName */) { };
     bool checkUserIsBanned(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining);
-    virtual bool changeUserPassword(const QString & /* user */, const QString & /* oldPassword */, const QString & /* newPassword */) { return true; };
+    virtual bool changeUserPassword(const QString & /* user */, const QString & /* oldPassword */, const QString & /* newPassword */, const bool & /* validateOldPassword */) { return true; };
     virtual QChar getGenderChar(ServerInfo_User_Gender const & /* gender */) { return QChar('u'); };
 };
 

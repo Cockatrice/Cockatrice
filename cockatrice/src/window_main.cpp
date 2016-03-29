@@ -39,6 +39,7 @@
 #include "main.h"
 #include "window_main.h"
 #include "dlg_connect.h"
+#include "dlg_forgotpassword.h"
 #include "dlg_register.h"
 #include "dlg_settings.h"
 #include "dlg_update.h"
@@ -122,16 +123,19 @@ void MainWindow::statusChanged(ClientStatus _status)
             aSinglePlayer->setEnabled(true);
             aConnect->setEnabled(true);
             aRegister->setEnabled(true);
+			aForgotPassword->setEnabled(true);
             aDisconnect->setEnabled(false);
             break;
         case StatusLoggingIn:
             aSinglePlayer->setEnabled(false);
             aConnect->setEnabled(false);
             aRegister->setEnabled(false);
+			aForgotPassword->setEnabled(false);
             aDisconnect->setEnabled(true);
             break;
         case StatusConnecting:
         case StatusRegistering:
+		case StatusForgotPassword:
         case StatusLoggedIn:
         default:
             break;
@@ -167,6 +171,23 @@ void MainWindow::actConnect()
         client->connectToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getPassword());
 }
 
+void MainWindow::actForgotPassword()
+{
+	DlgForgotPassword dlg(this);
+	if (dlg.exec())
+		client->forgotPassword(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getPassword(), dlg.getEmail());
+}
+
+void MainWindow::forgotPasswordSuccess()
+{
+	QMessageBox::information(this, tr("Forgot Password"), tr("Successfully reset user account password. You can now log in using the new password to the account."));
+}
+
+void MainWindow::forgotPasswordFailed()
+{
+	QMessageBox::information(this, tr("Forgot Password"), tr("Failed to reset user account password.  Try again and if the problem persists contact the server owner for assistance."));
+}
+
 void MainWindow::actRegister()
 {
     DlgRegister dlg(this);
@@ -199,6 +220,7 @@ void MainWindow::actSinglePlayer()
 
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
+	aForgotPassword->setEnabled(false);
     aSinglePlayer->setEnabled(false);
 
     localServer = new LocalServer(this);
@@ -496,7 +518,8 @@ void MainWindow::retranslateUi()
     aWatchReplay->setText(tr("&Watch replay..."));
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
-    aRegister->setText(tr("&Register to server..."));
+	aForgotPassword->setText(tr("For&got password..."));
+	aRegister->setText(tr("&Register to server..."));
     aSettings->setText(tr("&Settings..."));
     aSettings->setIcon(QPixmap("theme:icons/settings"));
     aExit->setText(tr("&Exit"));
@@ -530,6 +553,8 @@ void MainWindow::createActions()
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
+	aForgotPassword = new QAction(this);
+	connect(aForgotPassword, SIGNAL(triggered()), this, SLOT(actForgotPassword()));
     aRegister = new QAction(this);
     connect(aRegister, SIGNAL(triggered()), this, SLOT(actRegister()));
     aSettings = new QAction(this);
@@ -566,7 +591,8 @@ void MainWindow::createMenus()
     cockatriceMenu = menuBar()->addMenu(QString());
     cockatriceMenu->addAction(aConnect);
     cockatriceMenu->addAction(aDisconnect);
-    cockatriceMenu->addAction(aRegister);
+	cockatriceMenu->addAction(aForgotPassword);
+	cockatriceMenu->addAction(aRegister);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
@@ -606,6 +632,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
     connect(client, SIGNAL(activateAccepted()), this, SLOT(activateAccepted()));
     connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
+	connect(client, SIGNAL(forgotPasswordSuccess()), this, SLOT(forgotPasswordSuccess()));
+	connect(client, SIGNAL(forgotPasswordFailed()), this, SLOT(forgotPasswordFailed()));
 
     clientThread = new QThread(this);
     client->moveToThread(clientThread);
@@ -826,6 +854,7 @@ void MainWindow::refreshShortcuts()
     aWatchReplay->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aWatchReplay"));
     aDeckEditor->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aDeckEditor"));
     aFullScreen->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aFullScreen"));
+	aForgotPassword->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aForgotPassword"));
     aRegister->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aRegister"));
     aSettings->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aSettings"));
     aExit->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aExit"));

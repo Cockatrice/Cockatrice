@@ -99,6 +99,15 @@ allowedpunctuation=_.-
 ; If a username can begin with punctuation defined in allowedpunctuation
 allowpunctuationprefix=false
 
+; Enable forgot password functionality
+enableForgotPassword=true
+
+; Validate users inputed email matches email on account before allowing forgot password reset
+forgotpasswordemailrequired=true
+
+; Validate users clientid matches clientid on account before allowing forgot password reset
+forgotpasswordclientidrequired=true
+
 [registration]
 
 ; Servatrice can process registration requests to add new users on the fly.
