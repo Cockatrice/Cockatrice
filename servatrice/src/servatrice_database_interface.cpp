@@ -812,7 +812,7 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId, const QString 
     execSqlQuery(query);
 }
 
-bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword, const bool &validateOldPasswordd)
+bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword, const bool &validateOldPassword)
 {
 	//note: function returns false if password is successfully changed
 
@@ -836,7 +836,7 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const
     if (!passwordQuery->next())
         return true;
 
-	if (validateOldPasswordd) {
+	if (validateOldPassword) {
 		const QString correctPassword = passwordQuery->value(0).toString();
 		if (correctPassword != PasswordHasher::computeHash(oldPassword, correctPassword.left(16)))
 			return true;

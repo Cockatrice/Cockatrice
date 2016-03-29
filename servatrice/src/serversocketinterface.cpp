@@ -995,7 +995,7 @@ Response::ResponseCode ServerSocketInterface::cmdForgotPassword(const Command_Fo
 
 	//if requesting user is a trusted user, change the password for the requested user
 	if (userInfo)
-		if (ServerInfo_User::IsModerator || ServerInfo_User::IsAdmin)
+		if (userInfo->user_level() & ServerInfo_User::IsModerator)
 			if (!(sqlInterface->changeUserPassword(userName, QString(""), password, false)))
 				return Response::RespOk;
 
