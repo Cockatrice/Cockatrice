@@ -1,6 +1,7 @@
 #include <QList>
 #include <QTimer>
 #include <QThread>
+#include <QCryptographicHash>
 #include "remoteclient.h"
 #include "settingscache.h"
 #include "pending_command.h"
@@ -81,7 +82,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdRegister.set_gender((ServerInfo_User_Gender) gender);
         cmdRegister.set_country(country.toStdString());
         cmdRegister.set_real_name(realName.toStdString());
-        cmdRegister.set_clientid(settingsCache->getSrvClientID(lastHostname).toStdString());
+        cmdRegister.set_clientid(getSrvClientID(lastHostname).toStdString());
         PendingCommand *pend = prepareSessionCommand(cmdRegister);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(registerResponse(Response)));
         sendCommand(pend);
@@ -107,11 +108,10 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
 
 void RemoteClient::doLogin() {
     setStatus(StatusLoggingIn);
-
     Command_Login cmdLogin;
     cmdLogin.set_user_name(userName.toStdString());
     cmdLogin.set_password(password.toStdString());
-    cmdLogin.set_clientid(settingsCache->getSrvClientID(lastHostname).toStdString());
+    cmdLogin.set_clientid(getSrvClientID(lastHostname).toStdString());
     cmdLogin.set_clientver(VERSION_STRING);
 
     if (!clientFeatures.isEmpty()) {
@@ -360,4 +360,12 @@ void RemoteClient::activateToServer(const QString &_token)
 void RemoteClient::disconnectFromServer()
 {
     emit sigDisconnectFromServer();
+}
+
+QString RemoteClient::getSrvClientID(const QString _hostname)
+{
+	QString srvClientID = settingsCache->getClientID();
+	srvClientID += _hostname;
+	QString uniqueServerClientID = QCryptographicHash::hash(srvClientID.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
+	return uniqueServerClientID;
 }

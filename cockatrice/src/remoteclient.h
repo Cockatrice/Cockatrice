@@ -51,6 +51,7 @@ private:
     QTcpSocket *socket;
     QString lastHostname;
     int lastPort;
+	QString getSrvClientID(const QString _hostname);
 protected slots:    
     void sendCommandContainer(const CommandContainer &cont);
 public:
