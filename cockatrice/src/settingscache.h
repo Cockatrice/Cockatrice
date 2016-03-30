@@ -176,7 +176,7 @@ public:
     bool getRememberGameSettings() const { return rememberGameSettings; }
     int getKeepAlive() const { return keepalive; }
     void setClientID(QString clientID);
-    QString getClientID() { return clientID; }    
+    QString getClientID() { return clientID; }
     ShortcutsSettings& shortcuts() const { return *shortcutsSettings; }
     CardDatabaseSettings& cardDatabase() const { return *cardDatabaseSettings; }
     ServersSettings& servers() const { return *serversSettings; }
