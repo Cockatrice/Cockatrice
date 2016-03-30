@@ -6,10 +6,11 @@
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, QObject *parent)
     : QAbstractListModel(parent), db(_db)
 {
-    connect(db, SIGNAL(cardListChanged()), this, SLOT(updateCardList()));
     connect(db, SIGNAL(cardAdded(CardInfo *)), this, SLOT(cardAdded(CardInfo *)));
     connect(db, SIGNAL(cardRemoved(CardInfo *)), this, SLOT(cardRemoved(CardInfo *)));
-    updateCardList();
+    connect(db, SIGNAL(cardDatabaseEnabledSetsChanged()), this, SLOT(cardDatabaseEnabledSetsChanged()));
+
+    cardDatabaseEnabledSetsChanged();
 }
 
 CardDatabaseModel::~CardDatabaseModel()
@@ -63,37 +64,6 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
     }
 }
 
-void CardDatabaseModel::updateCardList()
-{
-    beginResetModel();
-
-    for (int i = 0; i < cardList.size(); ++i)
-        disconnect(cardList[i], 0, this, 0);
-    
-    cardList.clear();
-
-    foreach(CardInfo * card, db->getCardList())
-    {
-        bool hasSet = false;
-        foreach(CardSet * set, card->getSets())
-        {
-            if(set->getEnabled())
-            {
-                hasSet = true;
-                break;
-            }
-        }
-
-        if(hasSet)
-        {
-            cardList.append(card);
-            connect(card, SIGNAL(cardInfoChanged(CardInfo *)), this, SLOT(cardInfoChanged(CardInfo *)));
-        }
-    }
-    
-    endResetModel();
-}
-
 void CardDatabaseModel::cardInfoChanged(CardInfo *card)
 {
     const int row = cardList.indexOf(card);
@@ -103,12 +73,44 @@ void CardDatabaseModel::cardInfoChanged(CardInfo *card)
     emit dataChanged(index(row, 0), index(row, CARDDBMODEL_COLUMNS - 1));
 }
 
+bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfo *card)
+{
+    foreach(CardSet * set, card->getSets())
+    {
+        if(set->getEnabled())
+            return true;
+    }
+
+    return false;
+}
+
+void CardDatabaseModel::cardDatabaseEnabledSetsChanged()
+{
+    // remove all the cards no more present in at least one enabled set
+    foreach(CardInfo * card, cardList)
+    {
+        if(!checkCardHasAtLeastOneEnabledSet(card))
+            cardRemoved(card);
+    }
+
+    // re-check all the card currently not shown, maybe their part of a newly-enabled set
+    foreach(CardInfo * card, db->getCardList())
+    {
+        if(!cardList.contains(card))
+            cardAdded(card);
+    }
+}
+
 void CardDatabaseModel::cardAdded(CardInfo *card)
 {
-    beginInsertRows(QModelIndex(), cardList.size(), cardList.size());
-    cardList.append(card);
-    connect(card, SIGNAL(cardInfoChanged(CardInfo *)), this, SLOT(cardInfoChanged(CardInfo *)));
-    endInsertRows();
+    if(checkCardHasAtLeastOneEnabledSet(card))
+    {
+        // add the card if it's present in at least one enabled set
+        beginInsertRows(QModelIndex(), cardList.size(), cardList.size());
+        cardList.append(card);
+        connect(card, SIGNAL(cardInfoChanged(CardInfo *)), this, SLOT(cardInfoChanged(CardInfo *)));
+        endInsertRows();
+    }
 }
 
 void CardDatabaseModel::cardRemoved(CardInfo *card)
@@ -118,6 +120,7 @@ void CardDatabaseModel::cardRemoved(CardInfo *card)
         return;
     
     beginRemoveRows(QModelIndex(), row, row);
+    disconnect(card, 0, this, 0);
     cardList.removeAt(row);
     endRemoveRows();
 }
@@ -219,4 +222,17 @@ void CardDatabaseDisplayModel::setFilterTree(FilterTree *filterTree)
 void CardDatabaseDisplayModel::filterTreeChanged()
 {
     invalidate();
+}
+
+TokenDisplayModel::TokenDisplayModel(QObject *parent)
+    : CardDatabaseDisplayModel(parent)
+{
+
+}
+
+bool TokenDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
+{
+    CardInfo const *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
+    
+    return info->getIsToken();
 }

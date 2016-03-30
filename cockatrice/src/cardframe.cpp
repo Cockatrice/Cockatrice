@@ -11,7 +11,7 @@
 #include <QVBoxLayout>
 
 CardFrame::CardFrame(const QString &cardName, QWidget *parent)
-    : QTabWidget(parent), info(0), cardTextOnly(false)
+    : QTabWidget(parent), info(nullptr), cardTextOnly(false)
 {
     setContentsMargins(3, 3, 3, 3);
     pic = new CardInfoPicture();
@@ -91,9 +91,11 @@ void CardFrame::setViewMode(int mode)
 void CardFrame::setCard(CardInfo *card)
 {
     if (info)
-        disconnect(info, 0, this, 0);
+        disconnect(info, nullptr, this, nullptr);
     info = card;
-    connect(info, SIGNAL(destroyed()), this, SLOT(clear()));
+    if(info)
+        connect(info, SIGNAL(destroyed()), this, SLOT(clear()));
+
     text->setCard(info);
     pic->setCard(info);
 }
@@ -110,5 +112,5 @@ void CardFrame::setCard(AbstractCardItem *card)
 
 void CardFrame::clear()
 {
-    setCard(db->getCard());
+    setCard((CardInfo*) nullptr);
 }

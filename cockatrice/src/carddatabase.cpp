@@ -1,7 +1,6 @@
 #include "carddatabase.h"
 #include "pictureloader.h"
 #include "settingscache.h"
-#include "thememanager.h"
 
 #include <QCryptographicHash>
 #include <QDebug>
@@ -287,6 +286,22 @@ QString CardInfo::simplifyName(const QString &name) {
     return simpleName;
 }
 
+const QChar CardInfo::getColorChar() const
+{
+    switch(colors.size())
+    {
+        case 0:
+            return QChar();
+            break;
+        case 1:
+            return colors.first().isEmpty() ? QChar() : colors.first().at(0);
+            break;
+        default:
+            return QChar('m');
+            break;
+    }
+}
+
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 {
     xml.writeStartElement("card");
@@ -341,39 +356,37 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 }
 
 CardDatabase::CardDatabase(QObject *parent)
-    : QObject(parent), noCard(0), loadStatus(NotLoaded)
+    : QObject(parent), loadStatus(NotLoaded)
 {
-    connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabase()));
-    connect(settingsCache, SIGNAL(tokenDatabasePathChanged()), this, SLOT(loadTokenDatabase()));
-
-    noCard = new CardInfo();
+    connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabases()));
 }
 
 CardDatabase::~CardDatabase()
 {
     clear();
-    delete noCard;
 }
 
 void CardDatabase::clear()
 {
+    QHashIterator<QString, CardInfo *> i(cards);
+    while (i.hasNext()) {
+        i.next();
+        removeCard(i.value());
+        i.value()->deleteLater();
+    }
+
+    // The pointers themselves were already deleted, so we don't delete them again.
+    cards.clear();
+    simpleNameCards.clear();
+
     QHashIterator<QString, CardSet *> setIt(sets);
     while (setIt.hasNext()) {
         setIt.next();
         delete setIt.value();
     }
     sets.clear();
-    
-    QHashIterator<QString, CardInfo *> i(cards);
-    while (i.hasNext()) {
-        i.next();
-        delete i.value();
-    }
-    cards.clear();
 
-    // The pointers themselves were already deleted, so we don't delete them
-    // again.
-    simpleNameCards.clear();
+    loadStatus = NotLoaded;
 }
 
 void CardDatabase::addCard(CardInfo *card)
@@ -390,22 +403,23 @@ void CardDatabase::removeCard(CardInfo *card)
     emit cardRemoved(card);
 }
 
-CardInfo *CardDatabase::getCard(const QString &cardName, bool createIfNotFound) {
-    return getCardFromMap(cards, cardName, createIfNotFound);
+CardInfo *CardDatabase::getCard(const QString &cardName) const
+{
+    return getCardFromMap(cards, cardName);
 }
 
-QList<CardInfo *> CardDatabase::getCards(const QStringList &cardNames)
+QList<CardInfo *> CardDatabase::getCards(const QStringList &cardNames) const
 {
     QList<CardInfo *> cardInfos;
     foreach(QString cardName, cardNames)
-        cardInfos.append(getCardFromMap(cards, cardName, false));
+        cardInfos.append(getCardFromMap(cards, cardName));
 
     return cardInfos;
 }
 
-CardInfo *CardDatabase::getCardBySimpleName(const QString &cardName, bool createIfNotFound) {
-    QString simpleName = CardInfo::simplifyName(cardName);
-    return getCardFromMap(simpleNameCards, simpleName, createIfNotFound);
+CardInfo *CardDatabase::getCardBySimpleName(const QString &cardName) const
+{
+    return getCardFromMap(simpleNameCards, CardInfo::simplifyName(cardName));
 }
 
 CardSet *CardDatabase::getSet(const QString &setName)
@@ -459,7 +473,7 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
     }
 }
 
-void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
+void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 {
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement)
@@ -518,28 +532,20 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml, bool tokens)
                     isToken = xml.readElementText().toInt();
             }
 
-            if (isToken == tokens) {
-                addCard(new CardInfo(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids));
-            }
+            addCard(new CardInfo(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids));
         }
     }
 }
 
-CardInfo *CardDatabase::getCardFromMap(CardNameMap &cardMap, const QString &cardName, bool createIfNotFound) {
+CardInfo *CardDatabase::getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const
+{
     if (cardMap.contains(cardName))
         return cardMap.value(cardName);
-    
-    if (createIfNotFound) {
-        CardInfo *newCard = new CardInfo(cardName, true);
-        newCard->addToSet(getSet(CardDatabase::TOKENS_SETNAME));
-        cardMap.insert(cardName, newCard);
-        return newCard;
-    }
 
-    return noCard;
+    return nullptr;
 }
 
-LoadStatus CardDatabase::loadFromFile(const QString &fileName, bool tokens)
+LoadStatus CardDatabase::loadFromFile(const QString &fileName)
 {
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
@@ -562,11 +568,10 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName, bool tokens)
                 if (xml.name() == "sets")
                     loadSetsFromXml(xml);
                 else if (xml.name() == "cards")
-                    loadCardsFromXml(xml, tokens);
+                    loadCardsFromXml(xml);
             }
         }
     }
-    qDebug() << cards.size() << "cards in" << sets.size() << "sets loaded";
 
     if (cards.isEmpty()) return NoCards;
 
@@ -609,57 +614,59 @@ bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
     return true;
 }
 
-void CardDatabase::emitCardListChanged()
-{
-    emit cardListChanged();
-}
-
-LoadStatus CardDatabase::loadCardDatabase(const QString &path, bool tokens)
+LoadStatus CardDatabase::loadCardDatabase(const QString &path)
 {
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty())
-        tempLoadStatus = loadFromFile(path, tokens);
+        tempLoadStatus = loadFromFile(path);
 
-    if (tempLoadStatus == Ok) {
-        SetList allSets;
-        QHashIterator<QString, CardSet *> setsIterator(sets);
-        while (setsIterator.hasNext())
-            allSets.append(setsIterator.next().value());
-        allSets.sortByKey();
-
-        if(!tokens)
-            checkUnknownSets();
-        emit cardListChanged();
-    }
-
-    if (!tokens)
-        loadStatus = tempLoadStatus;
-
-    qDebug() << "loadCardDatabase(): Path =" << path << "Tokens =" << tokens << "Status =" << loadStatus;
+    qDebug() << "[CardDatabase] loadCardDatabase(): Path =" << path << "Status =" << tempLoadStatus << "Cards =" << cards.size() << "Sets=" << sets.size();
 
     return tempLoadStatus;
 }
 
-LoadStatus CardDatabase::loadCardDatabase()
+LoadStatus CardDatabase::loadCardDatabases()
 {
-    return loadCardDatabase(settingsCache->getCardDatabasePath(), false);
-}
-
-LoadStatus CardDatabase::loadTokenDatabase()
-{
-    return loadCardDatabase(settingsCache->getTokenDatabasePath(), true);
-}
-
-void CardDatabase::loadCustomCardDatabases(const QString &path)
-{
-    QDir dir(path);
-    if(!dir.exists())
-        return;
-
+    qDebug() << "CardDatabase::loadCardDatabases start";
+    // clean old db
+    clear();
+    // load main card database
+    loadStatus = loadCardDatabase(settingsCache->getCardDatabasePath());
+    // laod tokens database
+    loadCardDatabase(settingsCache->getTokenDatabasePath());
+    // load custom card databases
+    QDir dir(settingsCache->getCustomCardDatabasePath());
     foreach(QString fileName, dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase))
     {
-        loadCardDatabase(dir.absoluteFilePath(fileName), false);
+        loadCardDatabase(dir.absoluteFilePath(fileName));
     }
+
+    // AFTER all the cards have been loaded
+
+    // reorder sets (TODO: refactor, this smells)
+    SetList allSets;
+    QHashIterator<QString, CardSet *> setsIterator(sets);
+    while (setsIterator.hasNext())
+        allSets.append(setsIterator.next().value());
+    allSets.sortByKey();
+
+    // resolve the reverse-related tags
+    refreshCachedReverseRelatedCards();
+
+    if(loadStatus == Ok)
+    {
+        // check for unknown sets
+        checkUnknownSets();
+        // update deck editors, etc
+        qDebug() << "CardDatabase::loadCardDatabases success";
+    } else {
+        // bring up thr settings dialog
+        qDebug() << "CardDatabase::loadCardDatabases failed";
+        emit cardDatabaseLoadingFailed();
+    }
+
+    // return the loadstatus of the main card database.
+    return loadStatus;
 }
 
 void CardDatabase::refreshCachedReverseRelatedCards()
@@ -716,48 +723,70 @@ void CardDatabase::checkUnknownSets()
 {
     SetList sets = getSetList();
 
-    // no set is enabled. Probably this is the first time running trice
-    if(!sets.getEnabledSetsNum())
+    if(sets.getEnabledSetsNum())
     {
+        // if some sets are first found on thus run, ask the user
+        int numUnknownSets = sets.getUnknownSetsNum();
+        if(numUnknownSets > 0)
+            emit cardDatabaseNewSetsFound(numUnknownSets);
+    } else {
+        // No set enabled. Probably this is the first time running trice
         sets.guessSortKeys();
         sets.sortByKey();
         sets.enableAll();
+        notifyEnabledSetsChanged();
 
-        detectedFirstRun = true;
-        return;
+        emit cardDatabaseAllNewSetsEnabled();
     }
-
-    detectedFirstRun = false;
-
-    int numUnknownSets = sets.getUnknownSetsNum();
-    // no unkown sets. 
-    if(!numUnknownSets)
-        return;
-
-    QMessageBox msgbox(QMessageBox::Question, tr("New sets found"), tr("%1 new set(s) have been found in the card database. Do you want to enable them?").arg(numUnknownSets), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
-
-    switch(msgbox.exec())
-    {
-        case QMessageBox::No:
-            sets.markAllAsKnown();
-            break;
-        case QMessageBox::Yes:
-            sets.enableAllUnknown();
-            break;
-        default:
-            break;
-    }
-
-    return;
 }
 
-bool CardDatabase::hasDetectedFirstRun()
+void CardDatabase::enableAllUnknownSets()
 {
-    if(detectedFirstRun)
-    {
-        detectedFirstRun=false;
-        return true;
-    }
+    SetList sets = getSetList();
+    sets.enableAllUnknown();
+}
 
-    return false;
+void CardDatabase::markAllSetsAsKnown()
+{
+    SetList sets = getSetList();
+    sets.markAllAsKnown();
+}
+
+void CardDatabase::notifyEnabledSetsChanged()
+{
+    // refresh the list of cached set names
+    foreach(CardInfo * card, cards)
+        card->refreshCachedSetNames();
+
+    // inform the carddatabasemodels that they need to re-check their list of cards
+    emit cardDatabaseEnabledSetsChanged();
+}
+
+bool CardDatabase::saveCustomTokensToFile()
+{
+    CardSet * customTokensSet = getSet(CardDatabase::TOKENS_SETNAME);
+    QString fileName = settingsCache->getCustomCardDatabasePath() + "/" + CardDatabase::TOKENS_SETNAME + ".xml";
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly))
+        return false;
+    QXmlStreamWriter xml(&file);
+
+    xml.setAutoFormatting(true);
+    xml.writeStartDocument();
+    xml.writeStartElement("cockatrice_carddatabase");
+    xml.writeAttribute("version", QString::number(versionNeeded));
+
+    xml.writeStartElement("cards");
+    QHashIterator<QString, CardInfo *> cardIterator(cards);
+    while (cardIterator.hasNext()) {
+        CardInfo *card = cardIterator.next().value();
+        if(card->getSets().contains(customTokensSet))
+            xml << card;
+    }
+    xml.writeEndElement(); // cards
+
+    xml.writeEndElement(); // cockatrice_carddatabase
+    xml.writeEndDocument();
+
+    return true;
 }

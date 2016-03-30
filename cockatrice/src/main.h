@@ -16,6 +16,4 @@ void installNewTranslator();
 
 QString const generateClientID();
 
-bool settingsValid();
-
 #endif

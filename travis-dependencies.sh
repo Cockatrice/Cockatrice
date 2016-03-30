@@ -11,9 +11,10 @@ if [[ $TRAVIS_OS_NAME == "osx" ]] ; then
   brew upgrade cmake
 
 else
-
   # common prerequisites
+  sudo add-apt-repository -y ppa:smspillaz/cmake-master
   sudo apt-get update -qq
+  sudo apt-get -y purge cmake
   sudo apt-get install -y libprotobuf-dev protobuf-compiler cmake bc
 
   if (( QT4 )); then
@@ -28,15 +29,7 @@ else
 
   # prerequisites for tests
   if [[ $BUILDTYPE == "Debug" ]]; then
-    if [[ $DIST == "precise" ]]; then
-      sudo add-apt-repository -y ppa:george-edison55/precise-backports
-      sudo apt-get update -qq
-      sudo apt-get install -y cmake cmake-data libgtest-dev
-    else
-      sudo add-apt-repository -y ppa:george-edison55/cmake-3.x
-      sudo apt-get update -qq
-      sudo apt-get install -y cmake cmake-extras libgtest-dev
-    fi
+    sudo apt-get install -y libgtest-dev
 
     sudo mkdir /usr/src/gtest/build
     cd /usr/src/gtest/build

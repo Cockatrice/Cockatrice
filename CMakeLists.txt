@@ -5,7 +5,8 @@
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-cmake_minimum_required(VERSION 2.6)
+# Cmake 3.1 is required to enable C++11 support correctly
+cmake_minimum_required(VERSION 3.1)
 
 if(POLICY CMP0020)
     cmake_policy(SET CMP0020 OLD)
@@ -36,6 +37,9 @@ ENDIF()
 # A project name is needed for CPack
 PROJECT("${PROJECT_NAME}")
 
+# Use c++11 for all targets
+set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ ISO Standard")
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Set conventional loops
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
@@ -171,7 +175,7 @@ IF(WIN32)
 ENDIF()
 
 # Package builder
-set(CPACK_PACKAGE_CONTACT "Daenyth+github@gmail.com") 
+set(CPACK_PACKAGE_CONTACT "Gavin Bisesi <Daenyth+github@gmail.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_NAME})
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")

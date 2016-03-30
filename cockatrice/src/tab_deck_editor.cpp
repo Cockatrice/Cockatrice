@@ -24,15 +24,11 @@
 #include <QDir>
 #include <QDesktopServices>
 #include "tab_deck_editor.h"
-#include "window_sets.h"
 #include "carddatabase.h"
 #include "pictureloader.h"
 #include "carddatabasemodel.h"
 #include "decklistmodel.h"
-#include "cardinfowidget.h"
 #include "dlg_load_deck_from_clipboard.h"
-#include "dlg_edit_tokens.h"
-#include "dlg_add_set_result.h"
 #include "main.h"
 #include "settingscache.h"
 #include "priceupdater.h"
@@ -45,10 +41,6 @@
 #include "filtertreemodel.h"
 #include "cardframe.h"
 #include "filterbuilder.h"
-
-const QStringList TabDeckEditor::fileNameFilters = QStringList()
-    << QObject::tr("Cockatrice card database (*.xml)")
-    << QObject::tr("All files (*.*)");
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
@@ -229,9 +221,6 @@ void TabDeckEditor::createMenus()
     aSaveDeckAs = new QAction(QString(), this);
     connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
 
-    aOpenCustomsetsFolder = new QAction(QString(), this);
-        connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
-
     aLoadDeckFromClipboard = new QAction(QString(), this);
     connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
 
@@ -247,17 +236,13 @@ void TabDeckEditor::createMenus()
     aClose = new QAction(QString(), this);
     connect(aClose, SIGNAL(triggered()), this, SLOT(closeRequest()));
 
-    aOpenCustomFolder = new QAction(QString(), this);
-    connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
+    aClearFilterAll = new QAction(QString(), this);
+    aClearFilterAll->setIcon(QPixmap("theme:icons/clearsearch"));
+    connect(aClearFilterAll, SIGNAL(triggered()), this, SLOT(actClearFilterAll()));
 
-    aAddCustomSet = new QAction(QString(), this);
-    connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
-
-    aEditSets = new QAction(QString(), this);
-    connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
-
-    aEditTokens = new QAction(QString(), this);
-    connect(aEditTokens, SIGNAL(triggered()), this, SLOT(actEditTokens()));
+    aClearFilterOne = new QAction(QString(), this);
+    aClearFilterOne->setIcon(QPixmap("theme:icons/decrement"));
+    connect(aClearFilterOne, SIGNAL(triggered()), this, SLOT(actClearFilterOne()));
 
     deckMenu = new QMenu(this);
     deckMenu->addAction(aNewDeck);
@@ -269,33 +254,13 @@ void TabDeckEditor::createMenus()
     deckMenu->addAction(aSaveDeckToClipboard);
     deckMenu->addSeparator();
     deckMenu->addAction(aPrintDeck);
-    deckMenu->addSeparator();
     deckMenu->addAction(aAnalyzeDeck);
+    deckMenu->addSeparator();
+    deckMenu->addAction(aClearFilterOne);
+    deckMenu->addAction(aClearFilterAll);
     deckMenu->addSeparator();
     deckMenu->addAction(aClose);
     addTabMenu(deckMenu);
-
-    aClearFilterAll = new QAction(QString(), this);
-    aClearFilterAll->setIcon(QPixmap("theme:icons/clearsearch"));
-    connect(aClearFilterAll, SIGNAL(triggered()), this, SLOT(actClearFilterAll()));
-
-    aClearFilterOne = new QAction(QString(), this);
-    aClearFilterOne->setIcon(QPixmap("theme:icons/decrement"));
-    connect(aClearFilterOne, SIGNAL(triggered()), this, SLOT(actClearFilterOne()));
-
-    dbMenu = new QMenu(this);
-    dbMenu->addAction(aEditSets);
-    dbMenu->addAction(aEditTokens);
-    dbMenu->addSeparator();
-    dbMenu->addAction(aClearFilterOne);
-    dbMenu->addAction(aClearFilterAll);
-    dbMenu->addSeparator();
-#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
-    dbMenu->addAction(aOpenCustomFolder);
-    dbMenu->addAction(aOpenCustomsetsFolder);
-#endif
-    dbMenu->addAction(aAddCustomSet);
-    addTabMenu(dbMenu);
 
     viewMenu = new QMenu(this);
 
@@ -370,7 +335,12 @@ void TabDeckEditor::createCentralFrame()
     databaseView->setSortingEnabled(true);
     databaseView->sortByColumn(0, Qt::AscendingOrder);
     databaseView->setModel(databaseDisplayModel);
-    databaseView->resizeColumnToContents(0);
+    databaseView->header()->setStretchLastSection(false);
+#if QT_VERSION >= 0x050000
+    databaseView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+#else
+    databaseView->header()->setResizeMode(0, QHeaderView::Stretch);
+#endif
     connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
     connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
     searchEdit->setTreeView(databaseView);
@@ -475,9 +445,6 @@ void TabDeckEditor::refreshShortcuts()
     aPrintDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aPrintDeck"));
     aAnalyzeDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aAnalyzeDeck"));
     aClose->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClose"));
-    aOpenCustomFolder->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aOpenCustomFolder"));
-    aEditSets->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aEditSets"));
-    aEditTokens->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aEditTokens"));
     aResetLayout->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aResetLayout"));
     aClearFilterAll->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterAll"));
     aClearFilterOne->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterOne"));
@@ -539,7 +506,6 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent)
     connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
     refreshShortcuts();
 
-    QTimer::singleShot(0, this, SLOT(checkFirstRunDetected()));
     QTimer::singleShot(0, this, SLOT(loadLayout()));
 }
 
@@ -570,9 +536,6 @@ void TabDeckEditor::retranslateUi()
     aSaveDeckToClipboard->setText(tr("Save deck to clip&board"));
     aPrintDeck->setText(tr("&Print deck..."));
     aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
-    aOpenCustomFolder->setText(tr("Open custom image folder"));
-    aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
-    aAddCustomSet->setText(tr("Add custom sets/cards"));
     aClose->setText(tr("&Close"));
     
     aAddCard->setText(tr("Add card to &maindeck"));
@@ -585,10 +548,6 @@ void TabDeckEditor::retranslateUi()
     aDecrement->setText(tr("&Decrement number"));
     
     deckMenu->setTitle(tr("&Deck Editor"));
-    dbMenu->setTitle(tr("C&ard Database"));
-    
-    aEditSets->setText(tr("&Edit sets..."));
-    aEditTokens->setText(tr("Edit &tokens..."));
 
     cardInfoDock->setWindowTitle(tr("Card Info"));
     deckDock->setWindowTitle(tr("Deck"));
@@ -798,117 +757,6 @@ void TabDeckEditor::actAnalyzeDeck()
         this
     ); // it deletes itself when done
     interface->analyzeDeck(deckModel->getDeckList());
-}
-
-
-void TabDeckEditor::actOpenCustomFolder() {
-
-#if defined(Q_OS_MAC)
-
-    QStringList scriptArgs;
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QString::fromLatin1("tell application \"Finder\" to open POSIX file \"%1\"").arg(settingsCache->getPicsPath() + "/custom/");
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QLatin1String("tell application \"Finder\" to activate");
-
-    QProcess::execute("/usr/bin/osascript", scriptArgs);
-#endif
-#if defined(Q_OS_WIN)
-    QStringList args;
-    QString pathToFolder = settingsCache->getPicsPath().append("/custom");
-    args << QDir::toNativeSeparators(pathToFolder);
-    QProcess::startDetached("explorer", args);
-#endif
-
-}
-
-void TabDeckEditor::actOpenCustomsetsFolder() {
-#if QT_VERSION < 0x050000
-    QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-#else
-    QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
-#endif
-
-#if defined(Q_OS_MAC)
-
-    QStringList scriptArgs;
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QString::fromLatin1("tell application \"Finder\" to open POSIX file \"%1\"").arg(dataDir + "/customsets/");
-    scriptArgs << QLatin1String("-e");
-    scriptArgs << QLatin1String("tell application \"Finder\" to activate");
-
-    QProcess::execute("/usr/bin/osascript", scriptArgs);
-#endif
-#if defined(Q_OS_WIN)
-    QStringList args;
-    dataDir.append("/customsets");
-    args << QDir::toNativeSeparators(dataDir);
-    QProcess::startDetached("explorer", args);
-#endif
-
-}
-
-void TabDeckEditor::actAddCustomSet()
-{
-
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-    QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-#else
-    QString dataDir = QStandardPaths::standardLocations(QStandardPaths::DataLocation).first();
-#endif
-
-    QFileDialog dialog(this, tr("Load sets/cards"));
-    dialog.setDirectory(dataDir);
-    dialog.setNameFilters(TabDeckEditor::fileNameFilters);
-    if (!dialog.exec())
-        return;
-
-    QString fileName = dialog.selectedFiles().at(0);
-
-    if (!QFile::exists(fileName)) {
-        DlgAddSetResult dlg(this, false, QString("Selected file cannot be found."));
-        dlg.exec();
-        return;
-    }
-
-    QDir dir(dataDir + "/customsets");
-    int nextPrefix = getNextCustomSetPrefix(dir);
-
-    bool res = QFile::copy(
-        fileName, dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") +
-        QString::number(nextPrefix) + "." + QFileInfo(fileName).fileName()
-    );
-
-    DlgAddSetResult dlg(this, res, QString());
-    dlg.exec();
-}
-
-int TabDeckEditor::getNextCustomSetPrefix(QDir dataDir) {
-    QStringList files = dataDir.entryList();
-    int maxIndex = 0;
-
-    QStringList::const_iterator filesIterator;
-    for (filesIterator = files.constBegin(); filesIterator != files.constEnd(); ++filesIterator) {
-        int fileIndex = (*filesIterator).split(".").at(0).toInt();
-        if (fileIndex > maxIndex)
-            maxIndex = fileIndex;
-    }
-
-    return maxIndex + 1;
-}
-
-void TabDeckEditor::actEditSets()
-{
-    WndSets *w = new WndSets;
-    w->setWindowModality(Qt::WindowModal);
-    w->show();
-}
-
-void TabDeckEditor::actEditTokens()
-{
-    DlgEditTokens dlg(databaseModel);
-    dlg.exec();
-    db->saveToFile(settingsCache->getTokenDatabasePath(), true);
 }
 
 void TabDeckEditor::actClearFilterAll()
@@ -1134,15 +982,6 @@ void TabDeckEditor::filterRemove(QAction *action) {
         return;
 
     filterModel->removeRow(idx.row(), idx.parent());
-}
-
-void TabDeckEditor::checkFirstRunDetected()
-{
-    if(db->hasDetectedFirstRun())
-    {
-        QMessageBox::information(this, tr("Welcome"), tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the card database have been enabled.\nRead more about changing the set order or disabling specific sets and consequent effects in the \"Edit Sets\" window."));
-        actEditSets();
-    }
 }
 
 // Method uses to sync docks state with menu items state

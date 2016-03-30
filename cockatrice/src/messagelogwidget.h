@@ -7,7 +7,6 @@
 
 class Player;
 class CardZone;
-class CardInfoWidget;
 class GameEventContext;
 class CardItem;
 

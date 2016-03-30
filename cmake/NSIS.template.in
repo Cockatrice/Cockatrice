@@ -16,9 +16,8 @@ InstallDir "$PROGRAMFILES\Cockatrice"
 !define MUI_HEADERIMAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\headerimage.bmp"
 !define MUI_HEADERIMAGE_UNBITMAP "${NSIS_SOURCE_PATH}\cmake\headerimage.bmp"
 !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Cockatrice.$\r$\n$\r$\nClick Next to continue."
-!define MUI_FINISHPAGE_RUN "$INSTDIR/oracle.exe"
-!define MUI_FINISHPAGE_RUN_TEXT "Run 'Oracle' now to update your card database"
-!define MUI_FINISHPAGE_RUN_PARAMETERS "-dlsets"
+!define MUI_FINISHPAGE_RUN "$INSTDIR/cockatrice.exe"
+!define MUI_FINISHPAGE_RUN_TEXT "Run 'Cockatrice' now"
 
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "${NSIS_SOURCE_PATH}\COPYING"
@@ -68,22 +67,20 @@ Section "Start menu item" SecStartMenu
 	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Servatrice.lnk" "$INSTDIR\servatrice.exe"
-	createShortCut "$SMPROGRAMS\Cockatrice\Usermanual.lnk" "$INSTDIR\Usermanual.pdf"
 SectionEnd
 
 Section "un.Application" UnSecApplication
 	SetShellVarContext all
-	RMDir /r "$INSTDIR\zonebg"
 	RMDir /r "$INSTDIR\plugins"
 	RMDir /r "$INSTDIR\sounds"
+	RMDir /r "$INSTDIR\themes"
 	RMDir /r "$INSTDIR\translations"
 	Delete "$INSTDIR\uninstall.exe"
 	Delete "$INSTDIR\cockatrice.exe"
 	Delete "$INSTDIR\oracle.exe"
 	Delete "$INSTDIR\servatrice.exe"
-	Delete "$INSTDIR\Usermanual.pdf"
-	Delete "$INSTDIR\libprotobuf.lib"
 	Delete "$INSTDIR\Qt*.dll"
+	Delete "$INSTDIR\libmysql.dll"
 	Delete "$INSTDIR\icu*.dll"
 	Delete "$INSTDIR\libeay32.dll"
 	Delete "$INSTDIR\ssleay32.dll"
@@ -91,7 +88,7 @@ Section "un.Application" UnSecApplication
 	Delete "$INSTDIR\qdebug.txt"
 	Delete "$INSTDIR\servatrice.sql"
 	Delete "$INSTDIR\servatrice.ini.example"
-	Delete "$INSTDIR\zlib1.dll"
+	Delete "$INSTDIR\zlib*.dll"
 	RMDir "$INSTDIR"
 
 	RMDir "$SMPROGRAMS\Cockatrice"

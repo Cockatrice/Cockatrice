@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cockatrice_carddatabase version="3">
+    <cards>
+        <card>
+            <name>Sparrow</name>
+            <set muId="333">BRD</set>
+            <color>W</color>
+            <manacost>W</manacost>
+            <cmc>1</cmc>
+            <type>Creature</type>
+            <pt>1/1</pt>
+            <tablerow>0</tablerow>
+            <text></text>
+        </card>
+        <card>
+            <name>Crow</name>
+            <set muId="334">BRD</set>
+            <color>B</color>
+            <manacost>1B</manacost>
+            <cmc>2</cmc>
+            <type>Creature</type>
+            <pt>2/2</pt>
+            <tablerow>0</tablerow>
+            <text></text>
+        </card>
+    </cards>
+</cockatrice_carddatabase>

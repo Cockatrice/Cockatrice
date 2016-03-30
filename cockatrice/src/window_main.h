@@ -79,8 +79,19 @@ private slots:
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void refreshShortcuts();
+    void cardDatabaseLoadingFailed();
+    void cardDatabaseNewSetsFound(int numUnknownSets);
+    void cardDatabaseAllNewSetsEnabled();
+
+    void actOpenCustomFolder();
+    void actOpenCustomsetsFolder();
+    void actAddCustomSet();
+
+    void actEditSets();
+    void actEditTokens();
 private:
     static const QString appName;
+    static const QStringList fileNameFilters;
     void setClientStatusTitle();
     void retranslateUi();
     void createActions();
@@ -88,13 +99,15 @@ private:
 
     void createTrayIcon();
     void createTrayActions();
+    int getNextCustomSetPrefix(QDir dataDir);
     // TODO: add a preference item to choose updater name for other games
     inline QString getCardUpdaterBinaryName() { return "oracle"; };
 
     QList<QMenu *> tabMenus;
-    QMenu *cockatriceMenu, *helpMenu;
+    QMenu *cockatriceMenu, *dbMenu, *helpMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
         *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate;
+    QAction *aEditSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
 
     QMenu *trayIconMenu;

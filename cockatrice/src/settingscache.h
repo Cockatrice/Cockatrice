@@ -27,7 +27,6 @@ signals:
     void langChanged();
     void picsPathChanged();
     void cardDatabasePathChanged();
-    void tokenDatabasePathChanged();
     void themeChanged();
     void picDownloadChanged();
     void displayCardNamesChanged();
@@ -54,7 +53,7 @@ private:
 
     QByteArray mainWindowGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, cardDatabasePath, tokenDatabasePath, themeName;
+    QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     bool picDownload;
     bool notificationsEnabled;
@@ -62,7 +61,6 @@ private:
     bool doubleClickToPlay;
     bool playToStack;
     bool annotateTokens;
-    int cardInfoMinimized;
     QByteArray tabGameSplitterSizes;
     bool displayCardNames;
     bool horizontalHand;
@@ -105,16 +103,21 @@ private:
     bool spectatorsCanSeeEverything;
     int keepalive;    
     void translateLegacySettings();
+    QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
+    QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
     bool rememberGameSettings;
 
 public:
     SettingsCache();
+    QString getDataPath();
     QString getSettingsPath();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
     QString getLang() const { return lang; }
     QString getDeckPath() const { return deckPath; }
     QString getReplaysPath() const { return replaysPath; }
     QString getPicsPath() const { return picsPath; }
+    QString getCustomPicsPath() const { return customPicsPath; }
+    QString getCustomCardDatabasePath() const { return customCardDatabasePath; }
     QString getCardDatabasePath() const { return cardDatabasePath; }
     QString getTokenDatabasePath() const { return tokenDatabasePath; }
     QString getThemeName() const { return themeName; }
@@ -128,7 +131,6 @@ public:
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
     bool getAnnotateTokens() const { return annotateTokens; }
-    int  getCardInfoMinimized() const { return cardInfoMinimized; }
     QByteArray getTabGameSplitterSizes() const { return tabGameSplitterSizes; }
     bool getDisplayCardNames() const { return displayCardNames; }
     bool getHorizontalHand() const { return horizontalHand; }
@@ -200,7 +202,6 @@ public slots:
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
     void setAnnotateTokens(int _annotateTokens);
-    void setCardInfoMinimized(int _cardInfoMinimized);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setDisplayCardNames(int _displayCardNames);
     void setHorizontalHand(int _horizontalHand);

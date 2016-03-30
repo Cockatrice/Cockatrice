@@ -39,7 +39,7 @@ private:
     static QStringList md5Blacklist;
 
     QThread *pictureLoaderThread;
-    QString picsPath;
+    QString picsPath, customPicsPath;
     QList<PictureToLoad> loadQueue;
     QMutex mutex;
     QNetworkAccessManager *networkManager;

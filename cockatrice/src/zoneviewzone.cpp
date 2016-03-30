@@ -116,7 +116,7 @@ void ZoneViewZone::reorganizeCards()
         QString lastCardType;
         for (int i = 0; i < cardCount; i++) {
             CardItem *c = cardsToDisplay.at(i);
-            QString cardType = c->getInfo()->getMainCardType();
+            QString cardType = c->getInfo() ? c->getInfo()->getMainCardType() : "";
 
             if (i){ // if not the first card
                 if (cardType == lastCardType)
