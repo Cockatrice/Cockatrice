@@ -364,8 +364,8 @@ void RemoteClient::disconnectFromServer()
 
 QString RemoteClient::getSrvClientID(const QString _hostname)
 {
-	QString srvClientID = settingsCache->getClientID();
-	srvClientID += _hostname;
-	QString uniqueServerClientID = QCryptographicHash::hash(srvClientID.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
-	return uniqueServerClientID;
+    QString srvClientID = settingsCache->getClientID();
+    srvClientID += _hostname;
+    QString uniqueServerClientID = QCryptographicHash::hash(srvClientID.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
+    return uniqueServerClientID;
 }
