@@ -72,6 +72,7 @@ class TokenDisplayModel : public CardDatabaseDisplayModel {
     Q_OBJECT
 public:
     TokenDisplayModel(QObject *parent = 0);
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };

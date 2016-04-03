@@ -236,3 +236,9 @@ bool TokenDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*so
     
     return info->getIsToken();
 }
+
+int TokenDisplayModel::rowCount(const QModelIndex &parent) const
+{
+    // always load all tokens at start
+    return QSortFilterProxyModel::rowCount(parent);
+}
