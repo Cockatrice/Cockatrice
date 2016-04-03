@@ -12,7 +12,7 @@ class QPushButton;
 class QRadioButton;
 class DeckList;
 class CardDatabaseModel;
-class CardDatabaseDisplayModel;
+class TokenDisplayModel;
 
 class DlgCreateToken : public QDialog {
     Q_OBJECT
@@ -30,7 +30,7 @@ private slots:
     void actOk();
 private:
     CardDatabaseModel *cardDatabaseModel;
-    CardDatabaseDisplayModel *cardDatabaseDisplayModel;
+    TokenDisplayModel *cardDatabaseDisplayModel;
     QStringList predefinedTokens;
     QLabel *nameLabel, *colorLabel, *ptLabel, *annotationLabel;
     QComboBox *colorEdit;
