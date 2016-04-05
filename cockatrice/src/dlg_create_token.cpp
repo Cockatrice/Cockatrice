@@ -62,9 +62,8 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     tokenDataGroupBox->setLayout(grid);
     
     cardDatabaseModel = new CardDatabaseModel(db, this);
-    cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
+    cardDatabaseDisplayModel = new TokenDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
-    cardDatabaseDisplayModel->setIsToken(CardDatabaseDisplayModel::ShowTrue);
     
     chooseTokenFromAllRadioButton = new QRadioButton(tr("Show &all tokens"));
     connect(chooseTokenFromAllRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromAll(bool)));
