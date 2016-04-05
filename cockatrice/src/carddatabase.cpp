@@ -463,6 +463,10 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
                     setType = xml.readElementText();
                 else if (xml.name() == "releasedate")
                     releaseDate = QDate::fromString(xml.readElementText(), Qt::ISODate);
+                else if (xml.name() != "") {
+                    qDebug() << "[XMLReader] Unknown set property" << xml.name() << ", trying to continue anyway";
+                    xml.skipCurrentElement();
+                }
             }
 
             CardSet * newSet = getSet(shortName);
@@ -530,6 +534,10 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                     loyalty = xml.readElementText().toInt();
                 else if (xml.name() == "token")
                     isToken = xml.readElementText().toInt();
+                else if (xml.name() != "") {
+                    qDebug() << "[XMLReader] Unknown card property" << xml.name() << ", trying to continue anyway";
+                    xml.skipCurrentElement();
+                }
             }
 
             addCard(new CardInfo(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids));
@@ -559,7 +567,7 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName)
                 return Invalid;
             int version = xml.attributes().value("version").toString().toInt();
             if (version < versionNeeded) {
-                qDebug() << "loadFromFile(): Version too old: " << version;
+                qDebug() << "[XMLReader] Version too old: " << version;
                 return VersionTooOld;
             }
             while (!xml.atEnd()) {
@@ -569,6 +577,10 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName)
                     loadSetsFromXml(xml);
                 else if (xml.name() == "cards")
                     loadCardsFromXml(xml);
+                else if (xml.name() != "") {
+                    qDebug() << "[XMLReader] Unknown item" << xml.name() << ", trying to continue anyway";
+                    xml.skipCurrentElement();
+                }
             }
         }
     }
