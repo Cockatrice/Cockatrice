@@ -1,11 +1,11 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="ru" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="lt" version="2.1">
 <context>
     <name>IntroPage</name>
     <message>
         <location filename="../src/oraclewizard.cpp" line="131"/>
         <location filename="../src/oraclewizard.cpp" line="157"/>
         <source>English</source>
-        <translation>Русский (Russian)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="167"/>
@@ -79,7 +79,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
         <location filename="../src/oraclewizard.cpp" line="431"/>
         <location filename="../src/oraclewizard.cpp" line="452"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="268"/>
@@ -173,7 +173,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
         <location filename="../src/oraclewizard.cpp" line="602"/>
         <location filename="../src/oraclewizard.cpp" line="647"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="602"/>
@@ -223,7 +223,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
         <location filename="../src/oraclewizard.cpp" line="484"/>
         <location filename="../src/oraclewizard.cpp" line="538"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="484"/>
@@ -323,7 +323,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="735"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="735"/>
