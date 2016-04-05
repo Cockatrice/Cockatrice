@@ -335,14 +335,19 @@ void TabDeckEditor::createCentralFrame()
     databaseView->setSortingEnabled(true);
     databaseView->sortByColumn(0, Qt::AscendingOrder);
     databaseView->setModel(databaseDisplayModel);
-    databaseView->header()->setStretchLastSection(false);
-#if QT_VERSION >= 0x050000
-    databaseView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-#else
-    databaseView->header()->setResizeMode(0, QHeaderView::Stretch);
-#endif
     connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
     connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
+
+    QByteArray dbHeaderState = settingsCache->layouts().getDeckEditorDbHeaderState();
+    if(dbHeaderState.isNull())
+    {
+        // first run
+        databaseView->setColumnWidth(0, 200);
+    } else {
+        databaseView->header()->restoreState(dbHeaderState);
+    }
+    connect(databaseView->header(), SIGNAL(geometriesChanged()), this, SLOT(saveDbHeaderState()));
+
     searchEdit->setTreeView(databaseView);
 
     aAddCard = new QAction(QString(), this);
@@ -1078,4 +1083,9 @@ void TabDeckEditor::dockTopLevelChanged(bool topLevel)
         aFilterDockFloating->setChecked(topLevel);
         return;
     }
+}
+
+void TabDeckEditor::saveDbHeaderState()
+{
+    settingsCache->layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
 }

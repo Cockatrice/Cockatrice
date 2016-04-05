@@ -83,6 +83,7 @@ class TabDeckEditor : public Tab {
             void dockVisibleTriggered();
             void dockFloatingTriggered();
             void dockTopLevelChanged(bool topLevel);
+            void saveDbHeaderState();
 private:
     CardInfo *currentCardInfo() const;
     void addCardHelper(QString zoneName);

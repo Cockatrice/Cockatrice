@@ -58,6 +58,16 @@ void LayoutsSettings::setDeckEditorFilterSize(const QSize &value)
     setValue(value,"layouts/deckEditor_FilterSize");
 }
 
+const QByteArray LayoutsSettings::getDeckEditorDbHeaderState()
+{
+    return getValue("layouts/deckEditorDbHeader_state").toByteArray();
+}
+
+void LayoutsSettings::setDeckEditorDbHeaderState(const QByteArray &value)
+{
+    setValue(value,"layouts/deckEditorDbHeader_state");
+}
+
 void LayoutsSettings::setGamePlayAreaGeometry(const QByteArray &value)
 {
     setValue(value,"layouts/gameplayarea_geometry");
