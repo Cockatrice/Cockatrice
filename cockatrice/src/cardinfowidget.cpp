@@ -51,7 +51,7 @@ void CardInfoWidget::setCard(CardInfo *card)
 
 void CardInfoWidget::setCard(const QString &cardName)
 {
-    setCard(db->getCard(cardName));
+    setCard(db->getCardBySimpleName(cardName));
 }
 
 void CardInfoWidget::setCard(AbstractCardItem *card)
