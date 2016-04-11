@@ -172,7 +172,8 @@ CardInfo::CardInfo(const QString &_name,
                    int _tableRow,
                    const SetList &_sets,
                    const QStringMap &_customPicURLs,
-                   MuidMap _muIds
+                   MuidMap _muIds,
+                   QStringMap _setNumbers
                    )
     : name(_name),
       isToken(_isToken),
@@ -190,6 +191,7 @@ CardInfo::CardInfo(const QString &_name,
       loyalty(_loyalty),
       customPicURLs(_customPicURLs),
       muIds(_muIds),
+      setNumbers(_setNumbers),
       cipt(_cipt),
       tableRow(_tableRow)
 {
@@ -315,6 +317,10 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 
         tmpSet=sets[i]->getShortName();
         xml.writeAttribute("muId", QString::number(info->getMuId(tmpSet)));
+
+        tmpString = info->getSetNumber(tmpSet);
+        if(!tmpString.isEmpty())
+            xml.writeAttribute("num", info->getSetNumber(tmpSet));
 
         tmpString = info->getCustomPicURL(tmpSet);
         if(!tmpString.isEmpty())
@@ -487,6 +493,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
             QStringList colors, relatedCards, reverseRelatedCards;
             QStringMap customPicURLs;
             MuidMap muids;
+            QStringMap setNumbers;
             SetList sets;
             int tableRow = 0;
             int loyalty = 0;
@@ -518,6 +525,9 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                     if (attrs.hasAttribute("picURL")) {
                         customPicURLs[setName] = attrs.value("picURL").toString();
                     }
+                    if (attrs.hasAttribute("num")) {
+                        setNumbers[setName] = attrs.value("num").toString();
+                    }
                 } else if (xml.name() == "color")
                     colors << xml.readElementText();
                 else if (xml.name() == "related")
@@ -540,7 +550,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                 }
             }
 
-            addCard(new CardInfo(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids));
+            addCard(new CardInfo(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids, setNumbers));
         }
     }
 }
