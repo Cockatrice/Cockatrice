@@ -95,19 +95,21 @@ The following flags can be passed to `cmake`:
 
 #### Servatrice Docker container
 
-A Dockerfile is provided to run Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/what-docker).
-You just need to create an image from the Dockerfile
-`docker build -t servatrice .`
-And then run it
-`docker run -i -p 4747:4747/tcp -t servatrice:latest`
-Please note that running this command will expose the TCP port 4747 of the docker container to permit connections to the server.
-<br>
+A Dockerfile is provided to run Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/what-docker).<br>
+
+You just need to create an image from the Dockerfile<br>
+`docker build -t servatrice .`<br>
+And then run it<br>
+`docker run -i -p 4747:4747/tcp -t servatrice:latest`<br>
+
+Please note that running this command will expose the TCP port 4747 of the docker container to permit connections to the server.<br>
+More infos on how to use Servatrice with Docker can be found in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
 
 
 # Running
 
-`oracle` fetches card data  
-`cockatrice` is the game client  
+`cockatrice` is the game client    
+`oracle` fetches card data    
 `servatrice` is the server<br>
 
 
