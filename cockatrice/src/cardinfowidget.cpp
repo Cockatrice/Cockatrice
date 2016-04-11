@@ -35,6 +35,9 @@ CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::Win
     setFixedWidth(pixmapWidth + 150);
     
     setCard(cardName);
+
+    // ensure our parent gets a valid size to position us correctly
+    resize(width(), sizeHint().height());
 }
 
 void CardInfoWidget::setCard(CardInfo *card)
