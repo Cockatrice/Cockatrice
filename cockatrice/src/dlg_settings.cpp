@@ -39,7 +39,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     for (int i = 0; i < qmFiles.size(); i++) {
         QString langName = languageName(qmFiles[i]);
         languageBox.addItem(langName, qmFiles[i]);
-        if ((qmFiles[i] == setLanguage) || (setLanguage.isEmpty() && langName == tr("English")))
+        if ((qmFiles[i] == setLanguage) || (setLanguage.isEmpty() && langName == tr(DEFAULT_LANG_NAME)))
             languageBox.setCurrentIndex(i);
     }
 
@@ -152,10 +152,13 @@ QStringList GeneralSettingsPage::findQmFiles()
 
 QString GeneralSettingsPage::languageName(const QString &qmFile)
 {
+    if(qmFile == DEFAULT_LANG_CODE)
+        return DEFAULT_LANG_NAME;
+
     QTranslator translator;
     translator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
     
-    return translator.translate("GeneralSettingsPage", "English");
+    return translator.translate("GeneralSettingsPage", DEFAULT_LANG_NAME);
 }
 
 void GeneralSettingsPage::defaultUrlRestoreButtonClicked()

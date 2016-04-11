@@ -19,6 +19,9 @@
 #define PIXMAPCACHE_SIZE_MIN 64
 #define PIXMAPCACHE_SIZE_MAX 2047
 
+#define DEFAULT_LANG_CODE "en"
+#define DEFAULT_LANG_NAME "English"
+
 class QSettings;
 
 class SettingsCache : public QObject {
