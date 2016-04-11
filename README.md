@@ -93,8 +93,15 @@ The following flags can be passed to `cmake`:
 - `-DTEST=1` Enable regression tests (default 0 = no). Note: needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```.
 
 
-#### Building servatrice Docker container
-`docker build -t servatrice .`<br>
+#### Servatrice Docker container
+
+A Dockerfile is provided to run Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/what-docker).
+You just need to create an image from the Dockerfile
+`docker build -t servatrice .`
+And then run it
+`docker run -i -p 4747:4747/tcp -t servatrice:latest`
+Please note that running this command will expose the TCP port 4747 of the docker container to permit connections to the server.
+<br>
 
 
 # Running
