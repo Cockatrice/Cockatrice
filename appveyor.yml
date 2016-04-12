@@ -27,7 +27,8 @@ install:
     - systeminfo
     # upgrade cmake in order to have c++11 support
     - choco install cmake -y
-    - choco install nsis -y
+    # The chocolatey guys like to push broken packages; better stick with a working one
+    - choco install nsis -y --version 2.50.0.20160103
     - ps: |
         if (Test-Path c:\protoc) {
             echo "using protoc from cache"
