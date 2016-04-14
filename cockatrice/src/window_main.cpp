@@ -815,6 +815,7 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets)
     } else if (msgBox.clickedButton() == noButton) {
         db->markAllSetsAsKnown();
     } else if (msgBox.clickedButton() == settingsButton) {
+        db->markAllSetsAsKnown();
         actEditSets();
     }
 }
