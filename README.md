@@ -8,7 +8,7 @@
 
 <br><pre>
 <b>If you're getting started &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
-<b>If you're trying to get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues/new)</b>
+<b>If you're trying to get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket))</b>
 </pre><br>
 
 
