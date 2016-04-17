@@ -21,11 +21,6 @@ DlgConnect::DlgConnect(QWidget *parent)
     previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
 
     QStringList previousHostList = settingsCache->servers().getPreviousHostList();
-    if (previousHostList.isEmpty()) {
-        previousHostList << "cockatrice.woogerworks.com";
-        previousHostList << "vps.poixen.com";
-        previousHostList << "chickatrice.net";
-    }
     previousHosts->addItems(previousHostList);
     previousHosts->setCurrentIndex(settingsCache->servers().getPrevioushostindex());
 

@@ -13,7 +13,7 @@ class DlgRegister : public QDialog {
     Q_OBJECT
 public:
     DlgRegister(QWidget *parent = 0);
-    QString getHost() const { return hostEdit->text(); }
+    QString getHost() const { return hostEdit->currentText(); }
     int getPort() const { return portEdit->text().toInt(); }
     QString getPlayerName() const { return playernameEdit->text(); }
     QString getPassword() const { return passwordEdit->text(); }
@@ -26,8 +26,8 @@ private slots:
     void actCancel();
 private:
     QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *passwordConfirmationLabel, *emailLabel, *emailConfirmationLabel, *genderLabel, *countryLabel, *realnameLabel;
-    QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *passwordConfirmationEdit, *emailEdit, *emailConfirmationEdit, *realnameEdit;
-    QComboBox *genderEdit, *countryEdit;
+    QLineEdit *portEdit, *playernameEdit, *passwordEdit, *passwordConfirmationEdit, *emailEdit, *emailConfirmationEdit, *realnameEdit;
+    QComboBox *hostEdit, *genderEdit, *countryEdit;
 };
 
 #endif

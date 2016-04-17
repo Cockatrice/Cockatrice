@@ -23,7 +23,10 @@ void ServersSettings::setPreviousHostList(QStringList list)
 
 QStringList ServersSettings::getPreviousHostList()
 {
-    return getValue("previoushosts", "server").toStringList();
+    const QStringList &hosts = getValue("previoushosts", "server").toStringList();
+    if (hosts.isEmpty())
+        return getDefaultHostList();
+    return hosts;
 }
 
 void ServersSettings::setPrevioushostindex(int index)
@@ -39,12 +42,6 @@ int ServersSettings::getPrevioushostindex()
 void ServersSettings::setHostName(QString hostname)
 {
     setValue(hostname, "hostname", "server");
-}
-
-QString ServersSettings::getHostname(QString defaultHost)
-{
-    QVariant hostname = getValue("hostname","server");
-    return hostname == QVariant() ? defaultHost : hostname.toString();
 }
 
 void ServersSettings::setPort(QString port)

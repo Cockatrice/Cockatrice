@@ -4,16 +4,23 @@
 #include "settingsmanager.h"
 #include <QObject>
 
+
 class ServersSettings : public SettingsManager
 {
     Q_OBJECT
     friend class SettingsCache;
 
-public:    
+public:
+    QStringList getDefaultHostList() {
+       return QStringList()
+              << "cockatrice.woogerworks.com"
+              << "vps.poixen.com"
+              << "chickatrice.net";
+    }
+
     int getPreviousHostLogin();
     QStringList getPreviousHostList();
     int getPrevioushostindex();
-    QString getHostname(QString defaultHost = "");
     QString getPort(QString defaultPort = "");
     QString getPlayerName(QString defaultName = "");
     QString getPassword();
@@ -29,6 +36,7 @@ public:
     void setPassword(QString password);
     void setSavePassword(int save);
     void setAutoConnect(int autoconnect);
+
 signals:
 
 public slots:
