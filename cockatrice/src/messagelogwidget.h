@@ -24,18 +24,16 @@ class MessageLogWidget : public ChatView {
     Q_OBJECT
 private:
     enum MessageContext { MessageContext_None, MessageContext_MoveCard, MessageContext_Mulligan };
-    
+
     QString sanitizeHtml(QString dirty) const;
     QString cardLink(const QString &cardName) const;
-    bool isFemale(Player *player) const;
-    bool userIsFemale() const;
     QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const;
     MessageContext currentContext;
-    
+
     QList<LogMoveCard> moveCardQueue;
     QMap<CardItem *, QString> moveCardPT;
     QMap<CardItem *, bool> moveCardTapped;
-    
+
     Player *mulliganPlayer;
     int mulliganNumber;
 public slots:

@@ -17,15 +17,15 @@ DlgRegister::DlgRegister(QWidget *parent)
     hostEdit = new QLineEdit(settingsCache->servers().getHostname("cockatrice.woogerworks.com"));
     hostLabel->setBuddy(hostEdit);
 
-    portLabel = new QLabel(tr("&Port:"));    
+    portLabel = new QLabel(tr("&Port:"));
     portEdit = new QLineEdit(settingsCache->servers().getPort("4747"));
     portLabel->setBuddy(portEdit);
 
-    playernameLabel = new QLabel(tr("Player &name:"));    
+    playernameLabel = new QLabel(tr("Player &name:"));
     playernameEdit = new QLineEdit(settingsCache->servers().getPlayerName("Player"));
     playernameLabel->setBuddy(playernameEdit);
 
-    passwordLabel = new QLabel(tr("P&assword:"));    
+    passwordLabel = new QLabel(tr("P&assword:"));
     passwordEdit = new QLineEdit(settingsCache->servers().getPassword());
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
@@ -42,14 +42,6 @@ DlgRegister::DlgRegister(QWidget *parent)
     emailConfirmationLabel = new QLabel(tr("Email (again):"));
     emailConfirmationEdit = new QLineEdit();
     emailConfirmationLabel->setBuddy(emailConfirmationEdit);
-
-    genderLabel = new QLabel(tr("Pronouns:"));
-    genderEdit = new QComboBox();
-    genderLabel->setBuddy(genderEdit);
-    genderEdit->insertItem(0, QPixmap("theme:genders/unknown"), tr("Neutral"));
-    genderEdit->insertItem(1, QPixmap("theme:genders/male"), tr("Masculine"));
-    genderEdit->insertItem(2, QPixmap("theme:genders/female"), tr("Feminine"));
-    genderEdit->setCurrentIndex(0);
 
     countryLabel = new QLabel(tr("Country:"));
     countryEdit = new QComboBox();
@@ -312,7 +304,7 @@ DlgRegister::DlgRegister(QWidget *parent)
     realnameLabel = new QLabel(tr("Real name:"));
     realnameEdit = new QLineEdit();
     realnameLabel->setBuddy(realnameEdit);
-    
+
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(hostLabel, 0, 0);
     grid->addWidget(hostEdit, 0, 1);
@@ -328,17 +320,15 @@ DlgRegister::DlgRegister(QWidget *parent)
     grid->addWidget(emailEdit, 5, 1);
     grid->addWidget(emailConfirmationLabel, 6, 0);
     grid->addWidget(emailConfirmationEdit, 6, 1);
-    grid->addWidget(genderLabel, 7, 0);
-    grid->addWidget(genderEdit, 7, 1);
     grid->addWidget(countryLabel, 8, 0);
     grid->addWidget(countryEdit, 8, 1);
     grid->addWidget(realnameLabel, 9, 0);
     grid->addWidget(realnameEdit, 9, 1);
-    
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
-         
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
     mainLayout->addWidget(buttonBox);
@@ -372,7 +362,7 @@ void DlgRegister::actOk()
     settingsCache->servers().setPlayerName(playernameEdit->text());
     // always save the password so it will be picked up by the connect dialog
     settingsCache->servers().setPassword(passwordEdit->text());
-  
+
     accept();
 }
 
