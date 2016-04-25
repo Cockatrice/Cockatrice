@@ -7,21 +7,13 @@
 #include "dlg_edit_user.h"
 #include "settingscache.h"
 
-DlgEditUser::DlgEditUser(QWidget *parent, QString email, int gender, QString country, QString realName)
+DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QString realName)
     : QDialog(parent)
 {
     emailLabel = new QLabel(tr("Email:"));
     emailEdit = new QLineEdit();
     emailLabel->setBuddy(emailEdit);
     emailEdit->setText(email);
-
-    genderLabel = new QLabel(tr("Pronouns:"));
-    genderEdit = new QComboBox();
-    genderLabel->setBuddy(genderEdit);
-    genderEdit->insertItem(0, QPixmap("theme:genders/unknown"), tr("Neutral"));
-    genderEdit->insertItem(1, QPixmap("theme:genders/male"), tr("Masculine"));
-    genderEdit->insertItem(2, QPixmap("theme:genders/female"), tr("Feminine"));
-    genderEdit->setCurrentIndex(gender + 1);
 
     countryLabel = new QLabel(tr("Country:"));
     countryEdit = new QComboBox();
@@ -44,21 +36,19 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, int gender, QString cou
     realnameEdit = new QLineEdit();
     realnameLabel->setBuddy(realnameEdit);
     realnameEdit->setText(realName);
-    
+
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(emailLabel, 0, 0);
     grid->addWidget(emailEdit, 0, 1);
-    grid->addWidget(genderLabel, 1, 0);
-    grid->addWidget(genderEdit, 1, 1);
     grid->addWidget(countryLabel, 2, 0);
     grid->addWidget(countryEdit, 2, 1);
     grid->addWidget(realnameLabel, 3, 0);
     grid->addWidget(realnameEdit, 3, 1);
-    
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
-         
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
     mainLayout->addWidget(buttonBox);

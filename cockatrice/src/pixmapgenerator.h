@@ -34,7 +34,7 @@ class GenderPixmapGenerator {
 private:
     static QMap<int, QPixmap> pmCache;
 public:
-    static QPixmap generatePixmap(int height, int gender);
+    static QPixmap generatePixmap(int height);
     static void clear() { pmCache.clear(); }
 };
 

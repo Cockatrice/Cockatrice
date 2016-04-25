@@ -29,14 +29,12 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
 
     avatarLabel.setMaximumWidth(400);
     avatarLabel.setMaximumHeight(200);
-    
+
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(&avatarLabel, 0, 0, 1, 3, Qt::AlignCenter);
     mainLayout->addWidget(&nameLabel, 1, 0, 1, 3);
     mainLayout->addWidget(&realNameLabel1, 2, 0, 1, 1);
     mainLayout->addWidget(&realNameLabel2, 2, 1, 1, 2);
-    mainLayout->addWidget(&genderLabel1, 3, 0, 1, 1);
-    mainLayout->addWidget(&genderLabel2, 3, 1, 1, 2);
     mainLayout->addWidget(&countryLabel1, 4, 0, 1, 1);
     mainLayout->addWidget(&countryLabel2, 4, 1, 1, 2);
     mainLayout->addWidget(&countryLabel3, 4, 2, 1, 1);
@@ -59,7 +57,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
         connect(&passwordButton, SIGNAL(clicked()), this, SLOT(actPassword()));
         connect(&avatarButton, SIGNAL(clicked()), this, SLOT(actAvatar()));
     }
-    
+
     setWindowTitle(tr("User information"));
     setLayout(mainLayout);
     retranslateUi();
@@ -68,7 +66,6 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
 void UserInfoBox::retranslateUi()
 {
     realNameLabel1.setText(tr("Real name:"));
-    genderLabel1.setText(tr("Pronouns:"));
     countryLabel1.setText(tr("Location:"));
     userLevelLabel1.setText(tr("User level:"));
     accountAgeLebel1.setText(tr("Account Age:"));
@@ -81,16 +78,15 @@ void UserInfoBox::retranslateUi()
 void UserInfoBox::updateInfo(const ServerInfo_User &user)
 {
     const UserLevelFlags userLevel(user.user_level());
-    
+
     QPixmap avatarPixmap;
     const std::string bmp = user.avatar_bmp();
     if (!avatarPixmap.loadFromData((const uchar *) bmp.data(), bmp.size()))
         avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel, false);
     avatarLabel.setPixmap(avatarPixmap.scaled(avatarLabel.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    
+
     nameLabel.setText(QString::fromStdString(user.name()));
     realNameLabel2.setText(QString::fromStdString(user.real_name()));
-    genderLabel2.setPixmap(GenderPixmapGenerator::generatePixmap(15, user.gender()));
     QString country = QString::fromStdString(user.country());
 
     if (country.length() != 0)
@@ -103,7 +99,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         countryLabel2.setText("");
         countryLabel3.setText("");
     }
-	
+
     userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, false));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
@@ -118,7 +114,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 
     QString accountAgeString = tr("Unregistered user");
     if (userLevel.testFlag(ServerInfo_User::IsAdmin) || userLevel.testFlag(ServerInfo_User::IsModerator) || userLevel.testFlag(ServerInfo_User::IsRegistered)) {
-        if (user.accountage_secs() == 0) 
+        if (user.accountage_secs() == 0)
             accountAgeString = tr("Unknown");
         else {
             qint64 seconds = user.accountage_secs();
@@ -148,10 +144,10 @@ void UserInfoBox::updateInfo(const QString &userName)
 {
     Command_GetUserInfo cmd;
     cmd.set_user_name(userName.toStdString());
-    
+
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processResponse(const Response &)));
-    
+
     client->sendCommand(pend);
 }
 
@@ -166,10 +162,10 @@ void UserInfoBox::processResponse(const Response &r)
 void UserInfoBox::actEdit()
 {
     Command_GetUserInfo cmd;
-    
+
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(actEditInternal(const Response &)));
-    
+
     client->sendCommand(pend);
 }
 
@@ -179,11 +175,10 @@ void UserInfoBox::actEditInternal(const Response &r)
     const ServerInfo_User &user = response.user_info();
 
     QString email = QString::fromStdString(user.email());
-    int gender = user.gender();
     QString country = QString::fromStdString(user.country());
     QString realName = QString::fromStdString(user.real_name());
 
-    DlgEditUser dlg(this, email, gender, country, realName);
+    DlgEditUser dlg(this, email, country, realName);
     if(!dlg.exec())
         return;
 
@@ -192,10 +187,10 @@ void UserInfoBox::actEditInternal(const Response &r)
     cmd.set_email(dlg.getEmail().toStdString());
     cmd.set_gender((ServerInfo_User_Gender) dlg.getGender());
     cmd.set_country(dlg.getCountry().toStdString());
-    
+
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processEditResponse(const Response &)));
-    
+
     client->sendCommand(pend);
 }
 
@@ -208,10 +203,10 @@ void UserInfoBox::actPassword()
     Command_AccountPassword cmd;
     cmd.set_old_password(dlg.getOldPassword().toStdString());
     cmd.set_new_password(dlg.getNewPassword().toStdString());
-    
+
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processPasswordResponse(const Response &)));
-    
+
     client->sendCommand(pend);
 }
 
@@ -223,10 +218,10 @@ void UserInfoBox::actAvatar()
 
     Command_AccountImage cmd;
     cmd.set_image(dlg.getImage().data(), dlg.getImage().size());
-    
+
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(processAvatarResponse(const Response &)));
-    
+
     client->sendCommand(pend);
 }
 
