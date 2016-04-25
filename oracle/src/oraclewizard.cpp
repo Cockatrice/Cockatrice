@@ -128,7 +128,7 @@ IntroPage::IntroPage(QWidget *parent)
     for (int i = 0; i < qmFiles.size(); i++) {
         QString langName = languageName(qmFiles[i]);
         languageBox->addItem(langName, qmFiles[i]);
-        if ((qmFiles[i] == setLanguage) || (setLanguage.isEmpty() && langName == tr(DEFAULT_LANG_NAME)))
+        if ((qmFiles[i] == setLanguage) || (setLanguage.isEmpty() && langName == QCoreApplication::translate("i18n", DEFAULT_LANG_NAME)))
             languageBox->setCurrentIndex(i);
     }
     connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
@@ -157,7 +157,7 @@ QString IntroPage::languageName(const QString &qmFile)
     QTranslator translator;
     translator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
     
-    return translator.translate("IntroPage", DEFAULT_LANG_NAME);
+    return translator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
 void IntroPage::languageBoxChanged(int index)

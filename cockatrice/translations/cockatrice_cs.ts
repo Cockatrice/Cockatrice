@@ -20,57 +20,57 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="363"/>
+        <location filename="../src/dlg_settings.cpp" line="366"/>
         <source>Theme settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="364"/>
+        <location filename="../src/dlg_settings.cpp" line="367"/>
         <source>Current theme:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="366"/>
+        <location filename="../src/dlg_settings.cpp" line="369"/>
         <source>Card rendering</source>
         <translation>Vykreslování karet</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="367"/>
+        <location filename="../src/dlg_settings.cpp" line="370"/>
         <source>Display card names on cards having a picture</source>
         <translation>Zobrazit jména karet na kartách s obrázky</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="368"/>
+        <location filename="../src/dlg_settings.cpp" line="371"/>
         <source>Scale cards on mouse over</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="370"/>
+        <location filename="../src/dlg_settings.cpp" line="373"/>
         <source>Hand layout</source>
         <translation>Rozvržení ruky</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="371"/>
+        <location filename="../src/dlg_settings.cpp" line="374"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation>Zobrazit ruku horizontálně (plýtvá místem)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="372"/>
+        <location filename="../src/dlg_settings.cpp" line="375"/>
         <source>Enable left justification</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="374"/>
+        <location filename="../src/dlg_settings.cpp" line="377"/>
         <source>Table grid layout</source>
         <translation>Rozložení herní mřížky</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="375"/>
+        <location filename="../src/dlg_settings.cpp" line="378"/>
         <source>Invert vertical coordinate</source>
         <translation>Převrátit vertikální souřadnice</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="376"/>
+        <location filename="../src/dlg_settings.cpp" line="379"/>
         <source>Minimum player count for multi-column layout:</source>
         <translation>Minimální počet hráčů pro víceřádkové rozvržení:</translation>
     </message>
@@ -278,255 +278,135 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
 <context>
     <name>CardZone</name>
     <message>
-        <location filename="../src/cardzone.cpp" line="54"/>
-        <source>her hand</source>
-        <comment>nominative, female owner</comment>
-        <translation>její ruka</translation>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="55"/>
-        <source>%1&apos;s hand</source>
-        <comment>nominative, female owner</comment>
+        <location filename="../src/cardzone.cpp" line="52"/>
+        <source>their hand</source>
+        <comment>nominative</comment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/cardzone.cpp" line="57"/>
-        <source>his hand</source>
-        <comment>nominative, male owner</comment>
+        <location filename="../src/cardzone.cpp" line="53"/>
+        <source>%1&apos;s hand</source>
+        <comment>nominative</comment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/cardzone.cpp" line="58"/>
-        <source>%1&apos;s hand</source>
-        <comment>nominative, male owner</comment>
+        <location filename="../src/cardzone.cpp" line="59"/>
+        <source>their library</source>
+        <comment>look at zone</comment>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/cardzone.cpp" line="60"/>
+        <source>%1&apos;s library</source>
+        <comment>look at zone</comment>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/cardzone.cpp" line="64"/>
+        <source>of their library</source>
+        <comment>top cards of zone,</comment>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
-        <source>her library</source>
-        <comment>look at zone, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="66"/>
-        <source>%1&apos;s library</source>
-        <comment>look at zone, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="68"/>
-        <source>his library</source>
-        <comment>look at zone, male owner</comment>
+        <source>of %1&apos;s library</source>
+        <comment>top cards of zone</comment>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="69"/>
+        <source>their library</source>
+        <comment>reveal zone</comment>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/cardzone.cpp" line="70"/>
         <source>%1&apos;s library</source>
-        <comment>look at zone, male owner</comment>
+        <comment>reveal zone</comment>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="74"/>
-        <source>of her library</source>
-        <comment>top cards of zone, female owner</comment>
+        <source>their library</source>
+        <comment>shuffle</comment>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="75"/>
-        <source>of %1&apos;s library</source>
-        <comment>top cards of zone, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="77"/>
-        <source>of his library</source>
-        <comment>top cards of zone, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="78"/>
-        <source>of %1&apos;s library</source>
-        <comment>top cards of zone, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="83"/>
-        <source>her library</source>
-        <comment>reveal zone, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="84"/>
         <source>%1&apos;s library</source>
-        <comment>reveal zone, female owner</comment>
+        <comment>shuffle</comment>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/cardzone.cpp" line="79"/>
+        <source>their library</source>
+        <comment>nominative</comment>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/cardzone.cpp" line="80"/>
+        <source>%1&apos;s library</source>
+        <comment>nominative</comment>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/cardzone.cpp" line="85"/>
+        <source>their graveyard</source>
+        <comment>nominative</comment>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="86"/>
-        <source>his library</source>
-        <comment>reveal zone, male owner</comment>
+        <source>%1&apos;s graveyard</source>
+        <comment>nominative</comment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/cardzone.cpp" line="87"/>
-        <source>%1&apos;s library</source>
-        <comment>reveal zone, male owner</comment>
+        <location filename="../src/cardzone.cpp" line="90"/>
+        <source>their exile</source>
+        <comment>nominative</comment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/cardzone.cpp" line="92"/>
-        <source>her library</source>
-        <comment>shuffle, female owner</comment>
+        <location filename="../src/cardzone.cpp" line="91"/>
+        <source>%1&apos;s exile</source>
+        <comment>nominative</comment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/cardzone.cpp" line="93"/>
-        <source>%1&apos;s library</source>
-        <comment>shuffle, female owner</comment>
+        <location filename="../src/cardzone.cpp" line="97"/>
+        <source>their sideboard</source>
+        <comment>look at zone</comment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/cardzone.cpp" line="95"/>
-        <source>his library</source>
-        <comment>shuffle, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="96"/>
-        <source>%1&apos;s library</source>
-        <comment>shuffle, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="101"/>
-        <source>her library</source>
-        <comment>nominative, female owner</comment>
+        <location filename="../src/cardzone.cpp" line="98"/>
+        <source>%1&apos;s sideboard</source>
+        <comment>look at zone</comment>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="102"/>
-        <source>%1&apos;s library</source>
-        <comment>nominative, female owner</comment>
+        <source>their sideboard</source>
+        <comment>nominative</comment>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/cardzone.cpp" line="104"/>
-        <source>his library</source>
-        <comment>nominative, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="105"/>
-        <source>%1&apos;s library</source>
-        <comment>nominative, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="111"/>
-        <source>her graveyard</source>
-        <comment>nominative, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="112"/>
-        <source>%1&apos;s graveyard</source>
-        <comment>nominative, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="114"/>
-        <source>his graveyard</source>
-        <comment>nominative, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="115"/>
-        <source>%1&apos;s graveyard</source>
-        <comment>nominative, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="120"/>
-        <source>her exile</source>
-        <comment>nominative, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="121"/>
-        <source>%1&apos;s exile</source>
-        <comment>nominative, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="123"/>
-        <source>his exile</source>
-        <comment>nominative, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="124"/>
-        <source>%1&apos;s exile</source>
-        <comment>nominative, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="131"/>
-        <source>her sideboard</source>
-        <comment>look at zone, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="132"/>
+        <location filename="../src/cardzone.cpp" line="103"/>
         <source>%1&apos;s sideboard</source>
-        <comment>look at zone, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="134"/>
-        <source>his sideboard</source>
-        <comment>look at zone, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="135"/>
-        <source>%1&apos;s sideboard</source>
-        <comment>look at zone, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="140"/>
-        <source>her sideboard</source>
-        <comment>nominative, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="141"/>
-        <source>%1&apos;s sideboard</source>
-        <comment>nominative, female owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="143"/>
-        <source>his sideboard</source>
-        <comment>nominative, male owner</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/cardzone.cpp" line="144"/>
-        <source>%1&apos;s sideboard</source>
-        <comment>nominative, male owner</comment>
+        <comment>nominative</comment>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>DeckEditorSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="451"/>
+        <location filename="../src/dlg_settings.cpp" line="454"/>
         <source>Nothing is here... yet</source>
         <translation>Tady zatím nic není</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="465"/>
+        <location filename="../src/dlg_settings.cpp" line="468"/>
         <source>General</source>
         <translation>Obecné</translation>
     </message>
@@ -1070,41 +950,21 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="18"/>
-        <source>Pronouns:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/dlg_edit_user.cpp" line="21"/>
-        <source>Neutral</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/dlg_edit_user.cpp" line="22"/>
-        <source>Masculine</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/dlg_edit_user.cpp" line="23"/>
-        <source>Feminine</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/dlg_edit_user.cpp" line="26"/>
         <source>Country:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_edit_user.cpp" line="29"/>
+        <location filename="../src/dlg_edit_user.cpp" line="21"/>
         <source>Undefined</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_edit_user.cpp" line="43"/>
+        <location filename="../src/dlg_edit_user.cpp" line="35"/>
         <source>Real name:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_edit_user.cpp" line="67"/>
+        <location filename="../src/dlg_edit_user.cpp" line="57"/>
         <source>Edit user profile</source>
         <translation type="unfinished"/>
     </message>
@@ -1229,63 +1089,43 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="46"/>
-        <source>Pronouns:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/dlg_register.cpp" line="49"/>
-        <source>Neutral</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/dlg_register.cpp" line="50"/>
-        <source>Masculine</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/dlg_register.cpp" line="51"/>
-        <source>Feminine</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/dlg_register.cpp" line="54"/>
         <source>Country:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="57"/>
+        <location filename="../src/dlg_register.cpp" line="49"/>
         <source>Undefined</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="312"/>
+        <location filename="../src/dlg_register.cpp" line="304"/>
         <source>Real name:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="347"/>
+        <location filename="../src/dlg_register.cpp" line="337"/>
         <source>Register to server</source>
         <translation type="unfinished"/>
     </message>
     <message>
+        <location filename="../src/dlg_register.cpp" line="346"/>
+        <location filename="../src/dlg_register.cpp" line="351"/>
         <location filename="../src/dlg_register.cpp" line="356"/>
-        <location filename="../src/dlg_register.cpp" line="361"/>
-        <location filename="../src/dlg_register.cpp" line="366"/>
         <source>Registration Warning</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="356"/>
+        <location filename="../src/dlg_register.cpp" line="346"/>
         <source>Your passwords do not match, please try again.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="361"/>
+        <location filename="../src/dlg_register.cpp" line="351"/>
         <source>Your email addresses do not match, please try again.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_register.cpp" line="366"/>
+        <location filename="../src/dlg_register.cpp" line="356"/>
         <source>The player name can&apos;t be empty.</source>
         <translation type="unfinished"/>
     </message>
@@ -1293,12 +1133,12 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="858"/>
+        <location filename="../src/dlg_settings.cpp" line="861"/>
         <source>Unknown Error loading card database</source>
         <translation>Neznámý error při nahrávání databáze karet.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="867"/>
+        <location filename="../src/dlg_settings.cpp" line="870"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1312,7 +1152,7 @@ Je možné že bude nutné znovu spustit Oracle pro obnovení databáze karet.
 Chtěl/a by jste změnit nastavení lokace databáze?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="874"/>
+        <location filename="../src/dlg_settings.cpp" line="877"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1323,7 +1163,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="881"/>
+        <location filename="../src/dlg_settings.cpp" line="884"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
@@ -1332,21 +1172,21 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="887"/>
+        <location filename="../src/dlg_settings.cpp" line="890"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="892"/>
+        <location filename="../src/dlg_settings.cpp" line="895"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="897"/>
+        <location filename="../src/dlg_settings.cpp" line="900"/>
         <source>Unknown card database load status
 
 Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues
@@ -1355,59 +1195,59 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="904"/>
-        <location filename="../src/dlg_settings.cpp" line="910"/>
-        <location filename="../src/dlg_settings.cpp" line="916"/>
+        <location filename="../src/dlg_settings.cpp" line="907"/>
+        <location filename="../src/dlg_settings.cpp" line="913"/>
+        <location filename="../src/dlg_settings.cpp" line="919"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="910"/>
+        <location filename="../src/dlg_settings.cpp" line="913"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Cesta k adresáři s balíčky je neplatná. Chcete se vrátit a nastavit správnou?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="916"/>
+        <location filename="../src/dlg_settings.cpp" line="919"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>Cesta k adresáři s obrázky je neplatná. Chcete se vrátit a nastavit správnou?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="925"/>
+        <location filename="../src/dlg_settings.cpp" line="928"/>
         <source>Settings</source>
         <translation>Nastavení</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="927"/>
+        <location filename="../src/dlg_settings.cpp" line="930"/>
         <source>General</source>
         <translation>Obecné</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="928"/>
+        <location filename="../src/dlg_settings.cpp" line="931"/>
         <source>Appearance</source>
         <translation>Vzhled</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="929"/>
+        <location filename="../src/dlg_settings.cpp" line="932"/>
         <source>User Interface</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="930"/>
+        <location filename="../src/dlg_settings.cpp" line="933"/>
         <source>Deck Editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="931"/>
+        <location filename="../src/dlg_settings.cpp" line="934"/>
         <source>Chat</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="932"/>
+        <location filename="../src/dlg_settings.cpp" line="935"/>
         <source>Sound</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="933"/>
+        <location filename="../src/dlg_settings.cpp" line="936"/>
         <source>Shortcuts</source>
         <translation type="unfinished"/>
     </message>
@@ -1660,118 +1500,112 @@ Would you like to change your database location setting?</source>
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="42"/>
-        <location filename="../src/dlg_settings.cpp" line="158"/>
-        <source>English</source>
-        <translation>Česky (Czech)</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="177"/>
-        <location filename="../src/dlg_settings.cpp" line="187"/>
-        <location filename="../src/dlg_settings.cpp" line="197"/>
-        <location filename="../src/dlg_settings.cpp" line="231"/>
-        <location filename="../src/dlg_settings.cpp" line="241"/>
+        <location filename="../src/dlg_settings.cpp" line="180"/>
+        <location filename="../src/dlg_settings.cpp" line="190"/>
+        <location filename="../src/dlg_settings.cpp" line="200"/>
+        <location filename="../src/dlg_settings.cpp" line="234"/>
+        <location filename="../src/dlg_settings.cpp" line="244"/>
         <source>Choose path</source>
         <translation>Vyberte cestu</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="224"/>
+        <location filename="../src/dlg_settings.cpp" line="227"/>
         <source>Success</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="224"/>
+        <location filename="../src/dlg_settings.cpp" line="227"/>
         <source>Downloaded card pictures have been reset.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="226"/>
+        <location filename="../src/dlg_settings.cpp" line="229"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="226"/>
+        <location filename="../src/dlg_settings.cpp" line="229"/>
         <source>One or more downloaded card pictures could not be cleared.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="256"/>
+        <location filename="../src/dlg_settings.cpp" line="259"/>
         <source>Personal settings</source>
         <translation>Osobní nastavení</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="257"/>
+        <location filename="../src/dlg_settings.cpp" line="260"/>
         <source>Language:</source>
         <translation>Jazyk:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="258"/>
+        <location filename="../src/dlg_settings.cpp" line="261"/>
         <source>Download card pictures on the fly</source>
         <translation>Stahovat obrázky karet za běhu</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="259"/>
+        <location filename="../src/dlg_settings.cpp" line="262"/>
         <source>Paths</source>
         <translation>Cesty</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="260"/>
+        <location filename="../src/dlg_settings.cpp" line="263"/>
         <source>Decks directory:</source>
         <translation>Adresář s balíčky:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="261"/>
+        <location filename="../src/dlg_settings.cpp" line="264"/>
         <source>Replays directory:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="262"/>
+        <location filename="../src/dlg_settings.cpp" line="265"/>
         <source>Pictures directory:</source>
         <translation>Adresář s obrázky:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="263"/>
+        <location filename="../src/dlg_settings.cpp" line="266"/>
         <source>Card database:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="264"/>
+        <location filename="../src/dlg_settings.cpp" line="267"/>
         <source>Token database:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="265"/>
+        <location filename="../src/dlg_settings.cpp" line="268"/>
         <source>Picture cache size:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="266"/>
+        <location filename="../src/dlg_settings.cpp" line="269"/>
         <source>Primary download URL:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="267"/>
+        <location filename="../src/dlg_settings.cpp" line="270"/>
         <source>Fallback download URL:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="268"/>
+        <location filename="../src/dlg_settings.cpp" line="271"/>
         <source>How to set a custom picture url</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="269"/>
+        <location filename="../src/dlg_settings.cpp" line="272"/>
         <source>Reset/Clear Downloaded Pictures</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="270"/>
+        <location filename="../src/dlg_settings.cpp" line="273"/>
         <source>Notify when new client features are available</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="271"/>
-        <location filename="../src/dlg_settings.cpp" line="272"/>
+        <location filename="../src/dlg_settings.cpp" line="274"/>
+        <location filename="../src/dlg_settings.cpp" line="275"/>
         <source>Reset</source>
         <translation type="unfinished"/>
     </message>
@@ -1975,8 +1809,8 @@ Will now login.</source>
         <location filename="../src/window_main.cpp" line="473"/>
         <location filename="../src/window_main.cpp" line="480"/>
         <location filename="../src/window_main.cpp" line="482"/>
-        <location filename="../src/window_main.cpp" line="868"/>
-        <location filename="../src/window_main.cpp" line="904"/>
+        <location filename="../src/window_main.cpp" line="869"/>
+        <location filename="../src/window_main.cpp" line="905"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
@@ -2346,102 +2180,102 @@ Do you want to enable them?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="824"/>
+        <location filename="../src/window_main.cpp" line="825"/>
         <source>Welcome</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="824"/>
+        <location filename="../src/window_main.cpp" line="825"/>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Edit Sets&quot; window.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="834"/>
-        <location filename="../src/window_main.cpp" line="912"/>
-        <location filename="../src/window_main.cpp" line="936"/>
+        <location filename="../src/window_main.cpp" line="835"/>
+        <location filename="../src/window_main.cpp" line="913"/>
+        <location filename="../src/window_main.cpp" line="937"/>
         <source>Information</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="834"/>
+        <location filename="../src/window_main.cpp" line="835"/>
         <source>A card database update is already running.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="868"/>
+        <location filename="../src/window_main.cpp" line="869"/>
         <source>Unable to run the card database updater: </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="881"/>
+        <location filename="../src/window_main.cpp" line="882"/>
         <source>failed to start.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="884"/>
+        <location filename="../src/window_main.cpp" line="885"/>
         <source>crashed.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="887"/>
+        <location filename="../src/window_main.cpp" line="888"/>
         <source>timed out.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="890"/>
+        <location filename="../src/window_main.cpp" line="891"/>
         <source>write error.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="893"/>
+        <location filename="../src/window_main.cpp" line="894"/>
         <source>read error.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="897"/>
+        <location filename="../src/window_main.cpp" line="898"/>
         <source>unknown error.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="904"/>
+        <location filename="../src/window_main.cpp" line="905"/>
         <source>The card database updater exited with an error: %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="912"/>
+        <location filename="../src/window_main.cpp" line="913"/>
         <source>Update completed successfully.
 Cockatrice will now reload the card database.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="936"/>
+        <location filename="../src/window_main.cpp" line="937"/>
         <source>Your client appears to be missing features that the server supports.
 This usually means that your client version is out of date, please check to see if there is a new client available for download.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="978"/>
-        <location filename="../src/window_main.cpp" line="986"/>
-        <location filename="../src/window_main.cpp" line="999"/>
-        <location filename="../src/window_main.cpp" line="1002"/>
+        <location filename="../src/window_main.cpp" line="979"/>
+        <location filename="../src/window_main.cpp" line="987"/>
+        <location filename="../src/window_main.cpp" line="1000"/>
+        <location filename="../src/window_main.cpp" line="1003"/>
         <source>Load sets/cards</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="986"/>
+        <location filename="../src/window_main.cpp" line="987"/>
         <source>Selected file cannot be found.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="999"/>
+        <location filename="../src/window_main.cpp" line="1000"/>
         <source>The new sets/cards have been added successfully.
 Cockatrice will now reload the card database.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1002"/>
+        <location filename="../src/window_main.cpp" line="1003"/>
         <source>Sets/cards failed to import.</source>
         <translation type="unfinished"/>
     </message>
@@ -2449,1172 +2283,558 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>MessageLogWidget</name>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="42"/>
-        <source>You have joined game #%1.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="44"/>
-        <source>You have joined game #%1.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="50"/>
-        <source>You are watching a replay of game #%1.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="52"/>
-        <source>You are watching a replay of game #%1.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="59"/>
-        <source>%1 has joined the game.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="61"/>
-        <source>%1 has joined the game.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="68"/>
-        <source>%1 has left the game.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="70"/>
-        <source>%1 has left the game.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="75"/>
+        <location filename="../src/messagelogwidget.cpp" line="53"/>
         <source>The game has been closed.</source>
         <translation>Hra byla ukončena.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="80"/>
+        <location filename="../src/messagelogwidget.cpp" line="58"/>
         <source>You have been kicked out of the game.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="86"/>
+        <location filename="../src/messagelogwidget.cpp" line="64"/>
         <source>%1 is now watching the game.</source>
         <translation>%1 nyní sleduje hru.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="92"/>
+        <location filename="../src/messagelogwidget.cpp" line="70"/>
         <source>%1 is not watching the game any more.</source>
         <translation>%1 přestal sledovat hru.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="99"/>
+        <location filename="../src/messagelogwidget.cpp" line="76"/>
         <source>%1 has loaded a deck (%2).</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="101"/>
+        <location filename="../src/messagelogwidget.cpp" line="78"/>
         <source>%1 has loaded a deck with %2 sideboard cards (%3).</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="110"/>
-        <source>%1 is ready to start the game.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="112"/>
-        <source>%1 is ready to start the game.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="118"/>
-        <source>%1 is not ready to start the game any more.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="120"/>
-        <source>%1 is not ready to start the game any more.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="127"/>
-        <source>%1 has locked her sideboard.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="129"/>
-        <source>%1 has locked his sideboard.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="132"/>
-        <source>%1 has unlocked her sideboard.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="134"/>
-        <source>%1 has unlocked his sideboard.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="142"/>
-        <source>%1 has conceded the game.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="144"/>
-        <source>%1 has conceded the game.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="149"/>
+        <location filename="../src/messagelogwidget.cpp" line="111"/>
         <source>The game has started.</source>
         <translation>Hra začíná.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="157"/>
-        <source>%1 has restored connection to the game.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="159"/>
-        <source>%1 has restored connection to the game.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="163"/>
-        <source>%1 has lost connection to the game.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="165"/>
-        <source>%1 has lost connection to the game.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="184"/>
-        <source>%1 shuffles %2.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="185"/>
-        <source>%1 shuffles %2.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="193"/>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
         <source>Heads (1)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="193"/>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
         <source>Tails (2)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="198"/>
-        <source>%1 flipped a coin. It landed as %2.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="200"/>
-        <source>%1 flipped a coin. It landed as %2.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="202"/>
-        <source>%1 rolls a %2 with a %3-sided die.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="204"/>
-        <source>%1 rolls a %2 with a %3-sided die.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="214"/>
-        <source>%1 draws %2 card(s).</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="216"/>
-        <source>%1 draws %2 card(s).</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="223"/>
-        <source>%1 undoes her last draw.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="223"/>
-        <source>%1 undoes his last draw.</source>
-        <translation>%1 vrátil zpět svoje poslední líznutí.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="225"/>
-        <source>%1 undoes her last draw (%2).</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="225"/>
-        <source>%1 undoes his last draw (%2).</source>
-        <translation>%1 vrátil svoje poslední líznutí (%2).</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="235"/>
+        <location filename="../src/messagelogwidget.cpp" line="182"/>
         <source> from play</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="237"/>
-        <source> from her graveyard</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="237"/>
-        <source> from his graveyard</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="239"/>
+        <location filename="../src/messagelogwidget.cpp" line="186"/>
         <source> from exile</source>
         <translation> z exilnutých karet</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="241"/>
-        <source> from her hand</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="241"/>
-        <source> from his hand</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="246"/>
+        <location filename="../src/messagelogwidget.cpp" line="193"/>
         <source>the top card of %1&apos;s library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="248"/>
-        <source>the top card of her library</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="248"/>
-        <source>the top card of his library</source>
-        <translation>vrchní kartu knihovny</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="252"/>
+        <location filename="../src/messagelogwidget.cpp" line="199"/>
         <source> from the top of %1&apos;s library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="254"/>
-        <source> from the top of her library</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="254"/>
-        <source> from the top of his library</source>
-        <translation>z vršku knihovny</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="259"/>
+        <location filename="../src/messagelogwidget.cpp" line="206"/>
         <source>the bottom card of %1&apos;s library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="261"/>
-        <source>the bottom card of her library</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="261"/>
-        <source>the bottom card of his library</source>
-        <translation>spodní kartu knihovny</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="265"/>
+        <location filename="../src/messagelogwidget.cpp" line="212"/>
         <source> from the bottom of %1&apos;s library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="267"/>
-        <source> from the bottom of her library</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="267"/>
-        <source> from the bottom of his library</source>
-        <translation> ze spodku knihovny</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="271"/>
+        <location filename="../src/messagelogwidget.cpp" line="218"/>
         <source> from %1&apos;s library</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="273"/>
-        <source> from library</source>
-        <translation> z knihovny</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="276"/>
+        <location filename="../src/messagelogwidget.cpp" line="223"/>
         <source> from sideboard</source>
         <translation> ze sideboardu</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="278"/>
+        <location filename="../src/messagelogwidget.cpp" line="225"/>
         <source> from the stack</source>
         <translation> ze stacku</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="304"/>
-        <location filename="../src/messagelogwidget.cpp" line="718"/>
+        <location filename="../src/messagelogwidget.cpp" line="251"/>
+        <location filename="../src/messagelogwidget.cpp" line="505"/>
         <source>a card</source>
         <translation>kartu</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="309"/>
+        <location filename="../src/messagelogwidget.cpp" line="256"/>
         <source>%1 gives %2 control over %3.</source>
         <translation>%1 předává kontrolu hráči %2 karty %3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="317"/>
+        <location filename="../src/messagelogwidget.cpp" line="264"/>
         <source>%1 puts %2 into play tapped%3.</source>
         <translation>%1 dává kartu %2 do hry %3 tapnutou.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="319"/>
+        <location filename="../src/messagelogwidget.cpp" line="266"/>
         <source>%1 puts %2 into play%3.</source>
         <translation>%1 dává kartu %2 %3 do hry.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="321"/>
-        <source>%1 puts %2%3 into her graveyard.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="321"/>
-        <source>%1 puts %2%3 into his graveyard.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="323"/>
+        <location filename="../src/messagelogwidget.cpp" line="270"/>
         <source>%1 exiles %2%3.</source>
         <translation>%1 exiluje %2%3.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="325"/>
-        <source>%1 moves %2%3 to her hand.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="325"/>
-        <source>%1 moves %2%3 to his hand.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="328"/>
-        <source>%1 puts %2%3 into her library.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="328"/>
-        <source>%1 puts %2%3 into his library.</source>
-        <translation>%1 dává %2%3 do knihovny.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="330"/>
-        <source>%1 puts %2%3 on bottom of her library.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="330"/>
-        <source>%1 puts %2%3 on bottom of his library.</source>
-        <translation>%1 dává %2%3 na spodek knihovny.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="332"/>
-        <source>%1 puts %2%3 on top of her library.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="332"/>
-        <source>%1 puts %2%3 on top of his library.</source>
-        <translation>%1 dává %2%3 na vršek knihovny.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="334"/>
-        <source>%1 puts %2%3 into her library at position %4.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="334"/>
-        <source>%1 puts %2%3 into his library at position %4.</source>
-        <translation>%1 dává %2%3 knihovny na pozici %4.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="336"/>
+        <location filename="../src/messagelogwidget.cpp" line="283"/>
         <source>%1 moves %2%3 to sideboard.</source>
         <translation>%1 přesouvá %2%3 do sideboardu.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="339"/>
+        <location filename="../src/messagelogwidget.cpp" line="286"/>
         <source>%1 plays %2%3.</source>
         <translation>%1 sesílá %2%3.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="363"/>
-        <source>%1 takes a mulligan to %n.</source>
-        <comment>female</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="365"/>
-        <source>%1 takes a mulligan to %n.</source>
-        <comment>male</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="367"/>
-        <source>%1 draws her initial hand.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="367"/>
-        <source>%1 draws his initial hand.</source>
-        <translation>%1 líže startovní ruku.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="374"/>
-        <source>%1 flips %2 face-down.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="376"/>
-        <source>%1 flips %2 face-down.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="379"/>
-        <source>%1 flips %2 face-up.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="381"/>
-        <source>%1 flips %2 face-up.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="388"/>
-        <source>%1 destroys %2.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="390"/>
-        <source>%1 destroys %2.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="398"/>
-        <source>%1 attaches %2 to %3&apos;s %4.</source>
-        <comment>p1 female, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="400"/>
-        <source>%1 attaches %2 to %3&apos;s %4.</source>
-        <comment>p1 female, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="403"/>
-        <source>%1 attaches %2 to %3&apos;s %4.</source>
-        <comment>p1 male, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="405"/>
-        <source>%1 attaches %2 to %3&apos;s %4.</source>
-        <comment>p1 male, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="414"/>
-        <source>%1 unattaches %2.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="416"/>
-        <source>%1 unattaches %2.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="422"/>
-        <source>%1 creates token: %2%3.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="424"/>
-        <source>%1 creates token: %2%3.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="435"/>
-        <source>%1 points from her %2 to herself.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="437"/>
-        <source>%1 points from his %2 to himself.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="442"/>
-        <source>%1 points from her %2 to %3.</source>
-        <comment>p1 female, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="444"/>
-        <source>%1 points from her %2 to %3.</source>
-        <comment>p1 female, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="447"/>
-        <source>%1 points from his %2 to %3.</source>
-        <comment>p1 male, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="449"/>
-        <source>%1 points from his %2 to %3.</source>
-        <comment>p1 male, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="455"/>
-        <source>%1 points from %2&apos;s %3 to herself.</source>
-        <comment>card owner female, target female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="457"/>
-        <source>%1 points from %2&apos;s %3 to herself.</source>
-        <comment>card owner male, target female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="460"/>
-        <source>%1 points from %2&apos;s %3 to himself.</source>
-        <comment>card owner female, target male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="462"/>
-        <source>%1 points from %2&apos;s %3 to himself.</source>
-        <comment>card owner male, target male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="469"/>
-        <source>%1 points from %2&apos;s %3 to %4.</source>
-        <comment>p1 female, p2 female, p3 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="471"/>
-        <source>%1 points from %2&apos;s %3 to %4.</source>
-        <comment>p1 female, p2 female, p3 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="474"/>
-        <source>%1 points from %2&apos;s %3 to %4.</source>
-        <comment>p1 female, p2 male, p3 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="476"/>
-        <source>%1 points from %2&apos;s %3 to %4.</source>
-        <comment>p1 female, p2 male, p3 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="481"/>
-        <source>%1 points from %2&apos;s %3 to %4.</source>
-        <comment>p1 male, p2 female, p3 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="483"/>
-        <source>%1 points from %2&apos;s %3 to %4.</source>
-        <comment>p1 male, p2 female, p3 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="486"/>
-        <source>%1 points from %2&apos;s %3 to %4.</source>
-        <comment>p1 male, p2 male, p3 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="488"/>
-        <source>%1 points from %2&apos;s %3 to %4.</source>
-        <comment>p1 male, p2 male, p3 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="496"/>
-        <source>%1 points from her %2 to her %3.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="498"/>
-        <source>%1 points from his %2 to his %3.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="503"/>
-        <source>%1 points from her %2 to %3&apos;s %4.</source>
-        <comment>p1 female, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="505"/>
-        <source>%1 points from her %2 to %3&apos;s %4.</source>
-        <comment>p1 female, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="508"/>
-        <source>%1 points from his %2 to %3&apos;s %4.</source>
-        <comment>p1 male, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="510"/>
-        <source>%1 points from his %2 to %3&apos;s %4.</source>
-        <comment>p1 male, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="516"/>
-        <source>%1 points from %2&apos;s %3 to her own %4.</source>
-        <comment>card owner female, target female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="518"/>
-        <source>%1 points from %2&apos;s %3 to her own %4.</source>
-        <comment>card owner male, target female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="521"/>
-        <source>%1 points from %2&apos;s %3 to his own %4.</source>
-        <comment>card owner female, target male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="523"/>
-        <source>%1 points from %2&apos;s %3 to his own %4.</source>
-        <comment>card owner male, target male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="530"/>
-        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
-        <comment>p1 female, p2 female, p3 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="532"/>
-        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
-        <comment>p1 female, p2 female, p3 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="535"/>
-        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
-        <comment>p1 female, p2 male, p3 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="537"/>
-        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
-        <comment>p1 female, p2 male, p3 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="542"/>
-        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
-        <comment>p1 male, p2 female, p3 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="544"/>
-        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
-        <comment>p1 male, p2 female, p3 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="547"/>
-        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
-        <comment>p1 male, p2 male, p3 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="549"/>
-        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
-        <comment>p1 male, p2 male, p3 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="564"/>
-        <source>%1 places %2 %3 counter(s) on %4 (now %5).</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="566"/>
-        <source>%1 places %2 %3 counter(s) on %4 (now %5).</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="569"/>
-        <source>%1 removes %2 %3 counter(s) from %4 (now %5).</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="571"/>
-        <source>%1 removes %2 %3 counter(s) from %4 (now %5).</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="575"/>
+        <location filename="../src/messagelogwidget.cpp" line="394"/>
         <source>red</source>
         <translation><numerusform>červený</numerusform><numerusform>červené</numerusform><numerusform>červených</numerusform></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="576"/>
+        <location filename="../src/messagelogwidget.cpp" line="395"/>
         <source>yellow</source>
         <translation><numerusform>žlutý</numerusform><numerusform>žluté</numerusform><numerusform>žlutých</numerusform></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="577"/>
+        <location filename="../src/messagelogwidget.cpp" line="396"/>
         <source>green</source>
         <translation><numerusform>zelený</numerusform><numerusform>zelené</numerusform><numerusform>zelených</numerusform></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="598"/>
-        <source>%1 taps her permanents.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="600"/>
-        <source>%1 untaps her permanents.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="603"/>
-        <source>%1 taps his permanents.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="605"/>
-        <source>%1 untaps his permanents.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="611"/>
-        <source>%1 taps %2.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="613"/>
-        <source>%1 untaps %2.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="616"/>
-        <source>%1 taps %2.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="618"/>
-        <source>%1 untaps %2.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="632"/>
-        <source>%1 sets counter %2 to %3 (%4%5).</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="634"/>
-        <source>%1 sets counter %2 to %3 (%4%5).</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="643"/>
-        <source>%1 sets %2 to not untap normally.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="645"/>
-        <source>%1 sets %2 to not untap normally.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="648"/>
-        <source>%1 sets %2 to untap normally.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="650"/>
-        <source>%1 sets %2 to untap normally.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="662"/>
-        <source>%1 sets PT of %2 to %3.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="664"/>
-        <source>%1 sets PT of %2 to %3.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="673"/>
-        <source>%1 sets annotation of %2 to %3.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="675"/>
-        <source>%1 sets annotation of %2 to %3.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="683"/>
-        <source>%1 is looking at %2.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="684"/>
-        <source>%1 is looking at %2.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="689"/>
-        <source>%1 is looking at the top %2 card(s) %3.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="690"/>
-        <source>%1 is looking at the top %2 card(s) %3.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="698"/>
-        <source>%1 stops looking at %2.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="699"/>
-        <source>%1 stops looking at %2.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="727"/>
-        <source>%1 reveals %2 to %3.</source>
-        <comment>p1 female, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="729"/>
-        <source>%1 reveals %2 to %3.</source>
-        <comment>p1 female, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="732"/>
-        <source>%1 reveals %2 to %3.</source>
-        <comment>p1 male, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="734"/>
-        <source>%1 reveals %2 to %3.</source>
-        <comment>p1 male, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="739"/>
-        <source>%1 reveals %2.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="740"/>
-        <source>%1 reveals %2.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="748"/>
-        <source>%1 randomly reveals %2%3 to %4.</source>
-        <comment>p1 female, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="750"/>
-        <source>%1 randomly reveals %2%3 to %4.</source>
-        <comment>p1 female, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="753"/>
-        <source>%1 randomly reveals %2%3 to %4.</source>
-        <comment>p1 male, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="755"/>
-        <source>%1 randomly reveals %2%3 to %4.</source>
-        <comment>p1 male, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="760"/>
-        <source>%1 randomly reveals %2%3.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="762"/>
-        <source>%1 randomly reveals %2%3.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="768"/>
-        <source>%1 peeks at face down card #%2.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="770"/>
-        <source>%1 peeks at face down card #%2.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="774"/>
-        <source>%1 peeks at face down card #%2: %3.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="776"/>
-        <source>%1 peeks at face down card #%2: %3.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="782"/>
-        <source>%1 reveals %2%3 to %4.</source>
-        <comment>p1 female, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="784"/>
-        <source>%1 reveals %2%3 to %4.</source>
-        <comment>p1 female, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="787"/>
-        <source>%1 reveals %2%3 to %4.</source>
-        <comment>p1 male, p2 female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="789"/>
-        <source>%1 reveals %2%3 to %4.</source>
-        <comment>p1 male, p2 male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="794"/>
-        <source>%1 reveals %2%3.</source>
-        <comment>female</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="796"/>
-        <source>%1 reveals %2%3.</source>
-        <comment>male</comment>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="804"/>
+        <location filename="../src/messagelogwidget.cpp" line="550"/>
         <source>%1 is now keeping the top card %2 revealed.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="805"/>
+        <location filename="../src/messagelogwidget.cpp" line="551"/>
         <source>%1 is not revealing the top card %2 any longer.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="816"/>
-        <source>It is now %1&apos;s turn.</source>
-        <comment>female</comment>
+        <location filename="../src/messagelogwidget.cpp" line="31"/>
+        <source>You have joined game #%1.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="818"/>
-        <source>It is now %1&apos;s turn.</source>
-        <comment>male</comment>
+        <location filename="../src/messagelogwidget.cpp" line="36"/>
+        <source>You are watching a replay of game #%1.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="826"/>
+        <location filename="../src/messagelogwidget.cpp" line="42"/>
+        <source>%1 has joined the game.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="48"/>
+        <source>%1 has left the game.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="86"/>
+        <source>%1 is ready to start the game.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="91"/>
+        <source>%1 is not ready to start the game any more.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="97"/>
+        <source>%1 has locked their sideboard.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="99"/>
+        <source>%1 has unlocked their sideboard.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="106"/>
+        <source>%1 has conceded the game.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="118"/>
+        <source>%1 has restored connection to the game.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="121"/>
+        <source>%1 has lost connection to the game.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="140"/>
+        <source>%1 shuffles %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="152"/>
+        <source>%1 flipped a coin. It landed as %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="154"/>
+        <source>%1 rolls a %2 with a %3-sided die.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="163"/>
+        <source>%1 draws %2 card(s).</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="170"/>
+        <source>%1 undoes their last draw.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="172"/>
+        <source>%1 undoes their last draw (%2).</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="184"/>
+        <source> from their graveyard</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="188"/>
+        <source> from their hand</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="195"/>
+        <source>the top card of their library</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="201"/>
+        <source> from the top of their library</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="208"/>
+        <source>the bottom card of their library</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="214"/>
+        <source> from the bottom of their library</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="220"/>
+        <source> from their library</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="268"/>
+        <source>%1 puts %2%3 into their graveyard.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="272"/>
+        <source>%1 moves %2%3 to their hand.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="275"/>
+        <source>%1 puts %2%3 into their library.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="277"/>
+        <source>%1 puts %2%3 on bottom of their library.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="279"/>
+        <source>%1 puts %2%3 on top of their library.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="281"/>
+        <source>%1 puts %2%3 into their library at position %4.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="309"/>
+        <source>%1 takes a mulligan to %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="311"/>
+        <source>%1 draws their initial hand.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="318"/>
+        <source>%1 flips %2 face-down.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="320"/>
+        <source>%1 flips %2 face-up.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="326"/>
+        <source>%1 destroys %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="332"/>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="338"/>
+        <source>%1 unattaches %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="343"/>
+        <source>%1 creates token: %2%3.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="353"/>
+        <source>%1 points from their %2 to themselves.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="356"/>
+        <source>%1 points from their %2 to %3.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="359"/>
+        <source>%1 points from %2&apos;s %3 to themselves.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="362"/>
+        <source>%1 points from %2&apos;s %3 to %4.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="367"/>
+        <source>%1 points from their %2 to their %3.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="370"/>
+        <source>%1 points from their %2 to %3&apos;s %4.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="373"/>
+        <source>%1 points from %2&apos;s %3 to their own %4.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="376"/>
+        <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="388"/>
+        <source>%1 places %2 %3 counter(s) on %4 (now %5).</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="390"/>
+        <source>%1 removes %2 %3 counter(s) from %4 (now %5).</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="416"/>
+        <source>%1 taps their permanents.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="418"/>
+        <source>%1 untaps their permanents.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="422"/>
+        <source>%1 taps %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="424"/>
+        <source>%1 untaps %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="436"/>
+        <source>%1 sets counter %2 to %3 (%4%5).</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="444"/>
+        <source>%1 sets %2 to not untap normally.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="446"/>
+        <source>%1 sets %2 to untap normally.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="457"/>
+        <source>%1 sets PT of %2 to %3.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="465"/>
+        <source>%1 sets annotation of %2 to %3.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="473"/>
+        <source>%1 is looking at %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="478"/>
+        <source>%1 is looking at the top %2 card(s) %3.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="486"/>
+        <source>%1 stops looking at %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="512"/>
+        <source>%1 reveals %2 to %3.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="516"/>
+        <source>%1 reveals %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="523"/>
+        <source>%1 randomly reveals %2%3 to %4.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="526"/>
+        <source>%1 randomly reveals %2%3.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="531"/>
+        <source>%1 peeks at face down card #%2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="534"/>
+        <source>%1 peeks at face down card #%2: %3.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="539"/>
+        <source>%1 reveals %2%3 to %4.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="542"/>
+        <source>%1 reveals %2%3.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="561"/>
+        <source>It is now %1&apos;s turn.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="569"/>
         <source>untap step</source>
         <translation>Odtapovací fáze</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="827"/>
+        <location filename="../src/messagelogwidget.cpp" line="570"/>
         <source>upkeep step</source>
         <translation>Upkeep</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="828"/>
+        <location filename="../src/messagelogwidget.cpp" line="571"/>
         <source>draw step</source>
         <translation>Lízací fáze</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="829"/>
+        <location filename="../src/messagelogwidget.cpp" line="572"/>
         <source>first main phase</source>
         <translation>První hlavní fáze</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="830"/>
+        <location filename="../src/messagelogwidget.cpp" line="573"/>
         <source>beginning of combat step</source>
         <translation>Začátek bojové fáze</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="831"/>
+        <location filename="../src/messagelogwidget.cpp" line="574"/>
         <source>declare attackers step</source>
         <translation>Oznámení útočníků</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="832"/>
+        <location filename="../src/messagelogwidget.cpp" line="575"/>
         <source>declare blockers step</source>
         <translation>Oznámení blokujících</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="833"/>
+        <location filename="../src/messagelogwidget.cpp" line="576"/>
         <source>combat damage step</source>
         <translation>Udělení bojového zranění</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="834"/>
+        <location filename="../src/messagelogwidget.cpp" line="577"/>
         <source>end of combat step</source>
         <translation>Konec bojové fáze</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="835"/>
+        <location filename="../src/messagelogwidget.cpp" line="578"/>
         <source>second main phase</source>
         <translation>Druhá hlavní fáze</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="836"/>
+        <location filename="../src/messagelogwidget.cpp" line="579"/>
         <source>ending phase</source>
         <translation>Konec kola</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="838"/>
+        <location filename="../src/messagelogwidget.cpp" line="581"/>
         <source>It is now the %1.</source>
         <translation>Nyní je %1.</translation>
     </message>
@@ -3622,79 +2842,79 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="629"/>
+        <location filename="../src/dlg_settings.cpp" line="632"/>
         <source>Add message</source>
         <translation>Přidat zprávu</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="629"/>
+        <location filename="../src/dlg_settings.cpp" line="632"/>
         <source>Message:</source>
         <translation>Zpráva:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="646"/>
+        <location filename="../src/dlg_settings.cpp" line="649"/>
         <source>Chat settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="647"/>
+        <location filename="../src/dlg_settings.cpp" line="650"/>
         <source>Custom alert words</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="648"/>
+        <location filename="../src/dlg_settings.cpp" line="651"/>
         <source>Enable chat mentions</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="649"/>
+        <location filename="../src/dlg_settings.cpp" line="652"/>
         <source>Enable mention completer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="650"/>
+        <location filename="../src/dlg_settings.cpp" line="653"/>
         <source>In-game message macros</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="651"/>
+        <location filename="../src/dlg_settings.cpp" line="654"/>
         <source>Ignore chat room messages sent by unregistered users</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="652"/>
+        <location filename="../src/dlg_settings.cpp" line="655"/>
         <source>Ignore private messages sent by unregistered users</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="653"/>
-        <location filename="../src/dlg_settings.cpp" line="654"/>
+        <location filename="../src/dlg_settings.cpp" line="656"/>
+        <location filename="../src/dlg_settings.cpp" line="657"/>
         <source>Invert text color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="655"/>
+        <location filename="../src/dlg_settings.cpp" line="658"/>
         <source>Enable desktop notifications for private messages</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="656"/>
+        <location filename="../src/dlg_settings.cpp" line="659"/>
         <source>Enable desktop notification for mentions</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="657"/>
+        <location filename="../src/dlg_settings.cpp" line="660"/>
         <source>Enable room message history on join</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="658"/>
-        <location filename="../src/dlg_settings.cpp" line="659"/>
+        <location filename="../src/dlg_settings.cpp" line="661"/>
+        <location filename="../src/dlg_settings.cpp" line="662"/>
         <source>(Color is hexadecimal)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="660"/>
+        <location filename="../src/dlg_settings.cpp" line="663"/>
         <source>Separate words with a space, alphanumeric characters only</source>
         <translation type="unfinished"/>
     </message>
@@ -4425,32 +3645,32 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>SoundSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="732"/>
+        <location filename="../src/dlg_settings.cpp" line="735"/>
         <source>Enable &amp;sounds</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="733"/>
+        <location filename="../src/dlg_settings.cpp" line="736"/>
         <source>Current sounds theme:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="734"/>
+        <location filename="../src/dlg_settings.cpp" line="737"/>
         <source>Test system sound engine</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="735"/>
+        <location filename="../src/dlg_settings.cpp" line="738"/>
         <source>Sound settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="737"/>
+        <location filename="../src/dlg_settings.cpp" line="740"/>
         <source>Master volume requires QT5</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="739"/>
+        <location filename="../src/dlg_settings.cpp" line="742"/>
         <source>Master volume</source>
         <translation type="unfinished"/>
     </message>
@@ -5486,163 +4706,158 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>UserInfoBox</name>
     <message>
-        <location filename="../src/userinfobox.cpp" line="63"/>
+        <location filename="../src/userinfobox.cpp" line="61"/>
         <source>User information</source>
         <translation>Informace o uživateli</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="70"/>
+        <location filename="../src/userinfobox.cpp" line="68"/>
         <source>Real name:</source>
         <translation>Pravé jméno:</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="71"/>
-        <source>Pronouns:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/userinfobox.cpp" line="72"/>
+        <location filename="../src/userinfobox.cpp" line="69"/>
         <source>Location:</source>
         <translation>Místo:</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="73"/>
+        <location filename="../src/userinfobox.cpp" line="70"/>
         <source>User level:</source>
         <translation>Úroveň:</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="74"/>
+        <location filename="../src/userinfobox.cpp" line="71"/>
         <source>Account Age:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="76"/>
+        <location filename="../src/userinfobox.cpp" line="73"/>
         <source>Edit</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="77"/>
+        <location filename="../src/userinfobox.cpp" line="74"/>
         <source>Change password</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="78"/>
+        <location filename="../src/userinfobox.cpp" line="75"/>
         <source>Change avatar</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="110"/>
+        <location filename="../src/userinfobox.cpp" line="106"/>
         <source>Administrator</source>
         <translation>Administrátor</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="112"/>
+        <location filename="../src/userinfobox.cpp" line="108"/>
         <source>Moderator</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="114"/>
+        <location filename="../src/userinfobox.cpp" line="110"/>
         <source>Registered user</source>
         <translation>Registrovaný</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="116"/>
-        <location filename="../src/userinfobox.cpp" line="119"/>
+        <location filename="../src/userinfobox.cpp" line="112"/>
+        <location filename="../src/userinfobox.cpp" line="115"/>
         <source>Unregistered user</source>
         <translation>Neregistrovaný</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="122"/>
+        <location filename="../src/userinfobox.cpp" line="118"/>
         <source>Unknown</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="135"/>
+        <location filename="../src/userinfobox.cpp" line="131"/>
         <source>Year</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="135"/>
+        <location filename="../src/userinfobox.cpp" line="131"/>
         <source>Years</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="141"/>
+        <location filename="../src/userinfobox.cpp" line="137"/>
         <source>Day</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="141"/>
+        <location filename="../src/userinfobox.cpp" line="137"/>
         <source>Days</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="238"/>
-        <location filename="../src/userinfobox.cpp" line="254"/>
-        <location filename="../src/userinfobox.cpp" line="277"/>
+        <location filename="../src/userinfobox.cpp" line="233"/>
+        <location filename="../src/userinfobox.cpp" line="249"/>
+        <location filename="../src/userinfobox.cpp" line="272"/>
         <source>Information</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="238"/>
+        <location filename="../src/userinfobox.cpp" line="233"/>
         <source>User information updated.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="241"/>
-        <location filename="../src/userinfobox.cpp" line="245"/>
-        <location filename="../src/userinfobox.cpp" line="257"/>
-        <location filename="../src/userinfobox.cpp" line="260"/>
-        <location filename="../src/userinfobox.cpp" line="263"/>
-        <location filename="../src/userinfobox.cpp" line="267"/>
-        <location filename="../src/userinfobox.cpp" line="280"/>
-        <location filename="../src/userinfobox.cpp" line="284"/>
+        <location filename="../src/userinfobox.cpp" line="236"/>
+        <location filename="../src/userinfobox.cpp" line="240"/>
+        <location filename="../src/userinfobox.cpp" line="252"/>
+        <location filename="../src/userinfobox.cpp" line="255"/>
+        <location filename="../src/userinfobox.cpp" line="258"/>
+        <location filename="../src/userinfobox.cpp" line="262"/>
+        <location filename="../src/userinfobox.cpp" line="275"/>
+        <location filename="../src/userinfobox.cpp" line="279"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="241"/>
+        <location filename="../src/userinfobox.cpp" line="236"/>
         <source>This server does not permit you to update your user informations.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="245"/>
-        <location filename="../src/userinfobox.cpp" line="267"/>
+        <location filename="../src/userinfobox.cpp" line="240"/>
+        <location filename="../src/userinfobox.cpp" line="262"/>
         <source>An error occured while trying to update your user informations.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="254"/>
+        <location filename="../src/userinfobox.cpp" line="249"/>
         <source>Password changed.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="257"/>
+        <location filename="../src/userinfobox.cpp" line="252"/>
         <source>This server does not permit you to change your password.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="260"/>
+        <location filename="../src/userinfobox.cpp" line="255"/>
         <source>The new password is too short.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="263"/>
+        <location filename="../src/userinfobox.cpp" line="258"/>
         <source>The old password is incorrect.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="277"/>
+        <location filename="../src/userinfobox.cpp" line="272"/>
         <source>Avatar updated.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="280"/>
+        <location filename="../src/userinfobox.cpp" line="275"/>
         <source>This server does not permit you to update your avatar.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/userinfobox.cpp" line="284"/>
+        <location filename="../src/userinfobox.cpp" line="279"/>
         <source>An error occured while trying to updater your avatar.</source>
         <translation type="unfinished"/>
     </message>
@@ -5650,42 +4865,42 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="430"/>
+        <location filename="../src/dlg_settings.cpp" line="433"/>
         <source>General interface settings</source>
         <translation>Obecné</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="431"/>
+        <location filename="../src/dlg_settings.cpp" line="434"/>
         <source>Enable notifications in taskbar</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="432"/>
+        <location filename="../src/dlg_settings.cpp" line="435"/>
         <source>Notify in the taskbar for game events while you are spectating</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="433"/>
+        <location filename="../src/dlg_settings.cpp" line="436"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>&amp;Pro zahraní karty je třeba dvojklik</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="434"/>
+        <location filename="../src/dlg_settings.cpp" line="437"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="435"/>
+        <location filename="../src/dlg_settings.cpp" line="438"/>
         <source>Annotate card text on tokens</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="436"/>
+        <location filename="../src/dlg_settings.cpp" line="439"/>
         <source>Animation settings</source>
         <translation>Animace</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="437"/>
+        <location filename="../src/dlg_settings.cpp" line="440"/>
         <source>&amp;Tap/untap animation</source>
         <translation>&amp;Animace tapnutí/odtapnutí</translation>
     </message>
@@ -5846,6 +5061,14 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/zoneviewwidget.cpp" line="136"/>
         <source>pile view</source>
         <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>i18n</name>
+    <message>
+        <location filename="../src/settingscache.cpp" line="150"/>
+        <source>English</source>
+        <translation>Česky (Czech)</translation>
     </message>
 </context>
 <context>

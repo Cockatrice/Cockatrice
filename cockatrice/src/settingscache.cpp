@@ -146,6 +146,9 @@ QString SettingsCache::getSafeConfigFilePath(QString configEntry, QString defaul
 }
 SettingsCache::SettingsCache()
 {
+    // define a dummy context that will be used where needed
+    QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
+
     QString dataPath = getDataPath();
     QString settingsPath = getSettingsPath();
     settings = new QSettings(settingsPath+"global.ini", QSettings::IniFormat, this);

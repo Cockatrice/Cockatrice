@@ -28,7 +28,7 @@ SET(oracle_SOURCES
 set(oracle_RESOURCES oracle.qrc)
 
 IF(UPDATE_TRANSLATIONS)
-    FILE(GLOB_RECURSE translate_oracle_SRCS ${CMAKE_SOURCE_DIR}/oracle/src/*.cpp ${CMAKE_SOURCE_DIR}/oracle/src/*.h)
+    FILE(GLOB_RECURSE translate_oracle_SRCS src/*.cpp src/*.h ../cockatrice/src/settingscache.cpp)
     SET(translate_SRCS ${translate_oracle_SRCS})
     SET(oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/oracle_en.ts")
 ELSE()
