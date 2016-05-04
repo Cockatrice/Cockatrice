@@ -145,7 +145,7 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
 
 void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 {
-    QString coinOptions[2] = {tr("Heads (1)"), tr("Tails (2)")};
+    QString coinOptions[2] = {tr("Heads")+" (1)"), tr("Tails")+" (2)")};
     soundEngine->playSound("roll_dice");
 
     if (sides == 2)
