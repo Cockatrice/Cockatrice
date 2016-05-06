@@ -2357,16 +2357,6 @@ Il database delle carte verrà ricaricato.</translation>
         <translation>La partita è iniziata.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="148"/>
-        <source>Heads (1)</source>
-        <translation>Testa (1)</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="148"/>
-        <source>Tails (2)</source>
-        <translation>Croce (2)</translation>
-    </message>
-    <message>
         <location filename="../src/messagelogwidget.cpp" line="182"/>
         <source> from play</source>
         <translation>dal gioco</translation>
@@ -2531,6 +2521,16 @@ Il database delle carte verrà ricaricato.</translation>
         <location filename="../src/messagelogwidget.cpp" line="140"/>
         <source>%1 shuffles %2.</source>
         <translation>%1 mischia %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
+        <source>Heads</source>
+        <translation>Testa</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
+        <source>Tails</source>
+        <translation>Croce</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="152"/>

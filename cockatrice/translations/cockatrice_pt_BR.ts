@@ -22,12 +22,12 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="366"/>
         <source>Theme settings</source>
-        <translation type="unfinished"/>
+        <translation>Definição de Tema</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="367"/>
         <source>Current theme:</source>
-        <translation type="unfinished"/>
+        <translation>Tema atual:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="369"/>
@@ -90,7 +90,7 @@
     <message>
         <location filename="../src/userlist.cpp" line="38"/>
         <source>ban client I&amp;D</source>
-        <translation type="unfinished"/>
+        <translation>banido cliente I&amp;D:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="51"/>
@@ -165,22 +165,22 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="../src/userlist.cpp" line="186"/>
         <source>You have to select a name-based, IP-based, clientId based, or some combination of the three to place a ban.</source>
-        <translation type="unfinished"/>
+        <translation>Você deve selecionar um nome, IP, cliente ou alguma combinação desses três itens para banir.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="192"/>
         <source>You must have a value in the name ban when selecting the name ban checkbox.</source>
-        <translation type="unfinished"/>
+        <translation>Você têm que colocar um nome válido quando seleciona a caixa de banimento por nome.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="198"/>
         <source>You must have a value in the ip ban when selecting the ip ban checkbox.</source>
-        <translation type="unfinished"/>
+        <translation>Você têm que colocar um IP válido quando seleciona a caixa de banimento por IP.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="204"/>
         <source>You must have a value in the clientid ban when selecting the clientid ban checkbox.</source>
-        <translation type="unfinished"/>
+        <translation>Você têm que colocar um ID de cliente válido quando seleciona a caixa de banimento por ID de cliente.</translation>
     </message>
 </context>
 <context>
@@ -244,7 +244,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="../src/cardinfotext.cpp" line="80"/>
         <source>Color(s):</source>
-        <translation type="unfinished"/>
+        <translation>Cor(es):</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="81"/>
@@ -281,97 +281,97 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/cardzone.cpp" line="52"/>
         <source>their hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>Mãos deles</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="53"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1ª mão</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="59"/>
         <source>their library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>Grimório deles</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="60"/>
         <source>%1&apos;s library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>%1º grimório.</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="64"/>
         <source>of their library</source>
         <comment>top cards of zone,</comment>
-        <translation type="unfinished"/>
+        <translation>do grimório deles.</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
         <source>of %1&apos;s library</source>
         <comment>top cards of zone</comment>
-        <translation type="unfinished"/>
+        <translation>do 1º grimório</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="69"/>
         <source>their library</source>
         <comment>reveal zone</comment>
-        <translation type="unfinished"/>
+        <translation>grimório deles</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="70"/>
         <source>%1&apos;s library</source>
         <comment>reveal zone</comment>
-        <translation type="unfinished"/>
+        <translation>%1º grimório.</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="74"/>
         <source>their library</source>
         <comment>shuffle</comment>
-        <translation type="unfinished"/>
+        <translation>grimório deles</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="75"/>
         <source>%1&apos;s library</source>
         <comment>shuffle</comment>
-        <translation type="unfinished"/>
+        <translation>%1º grimório.</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="79"/>
         <source>their library</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>grimório deles</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="80"/>
         <source>%1&apos;s library</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1º grimório.</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="85"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>cemitério deles</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="86"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1º cemitério</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="90"/>
         <source>their exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>Exílio</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="91"/>
         <source>%1&apos;s exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>exílio de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="97"/>
@@ -2343,16 +2343,6 @@ Cockatrice will now reload the card database.</source>
         <translation>O jogo começou.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="148"/>
-        <source>Heads (1)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="148"/>
-        <source>Tails (2)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location filename="../src/messagelogwidget.cpp" line="182"/>
         <source> from play</source>
         <translation type="unfinished"/>
@@ -2516,6 +2506,16 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="140"/>
         <source>%1 shuffles %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
+        <source>Heads</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
+        <source>Tails</source>
         <translation type="unfinished"/>
     </message>
     <message>
