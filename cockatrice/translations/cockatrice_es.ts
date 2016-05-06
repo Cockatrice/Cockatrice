@@ -281,121 +281,121 @@ Se almacenará unicamente para moderadores y no podrá ser visto por la persona 
         <location filename="../src/cardzone.cpp" line="52"/>
         <source>their hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>su mano</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="53"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>mano de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="59"/>
         <source>their library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>su biblioteca</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="60"/>
         <source>%1&apos;s library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>biblioteca de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="64"/>
         <source>of their library</source>
         <comment>top cards of zone,</comment>
-        <translation type="unfinished"/>
+        <translation>de su biblioteca</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
         <source>of %1&apos;s library</source>
         <comment>top cards of zone</comment>
-        <translation type="unfinished"/>
+        <translation>de la biblioteca de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="69"/>
         <source>their library</source>
         <comment>reveal zone</comment>
-        <translation type="unfinished"/>
+        <translation>su biblioteca</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="70"/>
         <source>%1&apos;s library</source>
         <comment>reveal zone</comment>
-        <translation type="unfinished"/>
+        <translation>biblioteca de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="74"/>
         <source>their library</source>
         <comment>shuffle</comment>
-        <translation type="unfinished"/>
+        <translation>su biblioteca</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="75"/>
         <source>%1&apos;s library</source>
         <comment>shuffle</comment>
-        <translation type="unfinished"/>
+        <translation>biblioteca de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="79"/>
         <source>their library</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>su biblioteca</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="80"/>
         <source>%1&apos;s library</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>biblioteca de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="85"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>su cementerio</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="86"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>cementerio de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="90"/>
         <source>their exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>su exilio</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="91"/>
         <source>%1&apos;s exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>el exilio de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="97"/>
         <source>their sideboard</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>su banquillo</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="98"/>
         <source>%1&apos;s sideboard</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>el banquillo de %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="102"/>
         <source>their sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>su banquillo</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="103"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>el banquillo de %1</translation>
     </message>
 </context>
 <context>
@@ -2119,32 +2119,32 @@ La versión local es %1, la versión remota es %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="518"/>
         <source>C&amp;ard Database</source>
-        <translation type="unfinished"/>
+        <translation>Base de datos de c&amp;artas</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="519"/>
         <source>Open custom image folder</source>
-        <translation type="unfinished"/>
+        <translation>Abrir carpeta de imágenes personalizadas</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="520"/>
         <source>Open custom sets folder</source>
-        <translation type="unfinished"/>
+        <translation>Abrir carpeta de ediciones personalizadas</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="521"/>
         <source>Add custom sets/cards</source>
-        <translation type="unfinished"/>
+        <translation>Agregar cartas/ediciones personalizadas</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="522"/>
         <source>&amp;Edit sets...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Editar ediciones...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="523"/>
         <source>Edit &amp;tokens...</source>
-        <translation type="unfinished"/>
+        <translation>Editar &amp;fichas...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="525"/>
@@ -2169,7 +2169,7 @@ La versión local es %1, la versión remota es %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="778"/>
         <source>Card database</source>
-        <translation type="unfinished"/>
+        <translation>Base de datos de cartas</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="780"/>
@@ -2182,46 +2182,49 @@ If unsure or first time user, choose &quot;Yes&quot;</source>
         <location filename="../src/window_main.cpp" line="784"/>
         <location filename="../src/window_main.cpp" line="806"/>
         <source>Yes</source>
-        <translation type="unfinished"/>
+        <translation>Si</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="785"/>
         <location filename="../src/window_main.cpp" line="807"/>
         <source>No</source>
-        <translation type="unfinished"/>
+        <translation>No</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="786"/>
         <source>Open settings</source>
-        <translation type="unfinished"/>
+        <translation>Abrir preferencias</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="801"/>
         <source>New sets found</source>
-        <translation type="unfinished"/>
+        <translation>Nuevas ediciones encontradas</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="803"/>
         <source>%1 new set(s) have been found in the card database.
 Do you want to enable them?</source>
-        <translation type="unfinished"/>
+        <translation>%1 nuevo(s) set(s) ha(n) sido encontrado(s) en la base de datos de cartas.
+¿Quieres habilitarlos?</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="808"/>
         <source>View sets</source>
-        <translation type="unfinished"/>
+        <translation>Ver ediciones</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="825"/>
         <source>Welcome</source>
-        <translation type="unfinished"/>
+        <translation>Bienvenido/a</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="825"/>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Edit Sets&quot; window.</source>
-        <translation type="unfinished"/>
+        <translation>¡Hola! Parece que es la primera vez que ejecutas esta versión de Cockatrice.
+Todas las ediciones de la base de datos de cartas han sido habilitados.
+Puedes leer más sobre cambiar el orden de las ediciones o deshabilitar ediciones específicas en la ventana &quot;Editar ediciones&quot;.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="835"/>
@@ -2279,7 +2282,8 @@ Read more about changing the set order or disabling specific sets and consequent
         <location filename="../src/window_main.cpp" line="913"/>
         <source>Update completed successfully.
 Cockatrice will now reload the card database.</source>
-        <translation type="unfinished"/>
+        <translation>Actualización completada correctamente.
+Cockatrice está recargando la base de datos de cartas.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="937"/>
@@ -2294,23 +2298,24 @@ Esto suele ser debido a que tu versión del cliente está desfasada, por favor c
         <location filename="../src/window_main.cpp" line="1000"/>
         <location filename="../src/window_main.cpp" line="1003"/>
         <source>Load sets/cards</source>
-        <translation type="unfinished"/>
+        <translation>Cargar ediciones/cartas</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="987"/>
         <source>Selected file cannot be found.</source>
-        <translation type="unfinished"/>
+        <translation>El archivo seleccionado no fue encontrado.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1000"/>
         <source>The new sets/cards have been added successfully.
 Cockatrice will now reload the card database.</source>
-        <translation type="unfinished"/>
+        <translation>Las nuevas ediciones/cartas se han agregado correctamente.
+Cockatrice está recargando la base de datos de cartas.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1003"/>
         <source>Sets/cards failed to import.</source>
-        <translation type="unfinished"/>
+        <translation>Las ediciones/cartas fallaron al ser importadas.</translation>
     </message>
 </context>
 <context>
@@ -2349,16 +2354,6 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/messagelogwidget.cpp" line="111"/>
         <source>The game has started.</source>
         <translation>La partida ha comenzado.</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="148"/>
-        <source>Heads (1)</source>
-        <translation>Cara (1)</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="148"/>
-        <source>Tails (2)</source>
-        <translation>Cruz (2)</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="182"/>
@@ -2469,102 +2464,112 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="31"/>
         <source>You have joined game #%1.</source>
-        <translation type="unfinished"/>
+        <translation>Te has unido a la partida #%1.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="36"/>
         <source>You are watching a replay of game #%1.</source>
-        <translation type="unfinished"/>
+        <translation>Estás viendo una repetición de la partida #%1.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="42"/>
         <source>%1 has joined the game.</source>
-        <translation type="unfinished"/>
+        <translation>%1 se ha unido a la partida.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="48"/>
         <source>%1 has left the game.</source>
-        <translation type="unfinished"/>
+        <translation>%1 ha dejado la partida.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="86"/>
         <source>%1 is ready to start the game.</source>
-        <translation type="unfinished"/>
+        <translation>%1 está preparado/a para empezar la partida.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="91"/>
         <source>%1 is not ready to start the game any more.</source>
-        <translation type="unfinished"/>
+        <translation>%1 está preparado/a para empezar la partida.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="97"/>
         <source>%1 has locked their sideboard.</source>
-        <translation type="unfinished"/>
+        <translation>%1 ha bloqueado su banquillo.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="99"/>
         <source>%1 has unlocked their sideboard.</source>
-        <translation type="unfinished"/>
+        <translation>%1 ha desbloqueado su banquillo.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="106"/>
         <source>%1 has conceded the game.</source>
-        <translation type="unfinished"/>
+        <translation>%1 ha concedido la partida.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="118"/>
         <source>%1 has restored connection to the game.</source>
-        <translation type="unfinished"/>
+        <translation>%1 ha recuperado la conexión a la partida.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="121"/>
         <source>%1 has lost connection to the game.</source>
-        <translation type="unfinished"/>
+        <translation>%1 ha perdido la conexión a la partida.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="140"/>
         <source>%1 shuffles %2.</source>
-        <translation type="unfinished"/>
+        <translation>%1 baraja %2.</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
+        <source>Heads</source>
+        <translation>Cara</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
+        <source>Tails</source>
+        <translation>Cruz</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="152"/>
         <source>%1 flipped a coin. It landed as %2.</source>
-        <translation type="unfinished"/>
+        <translation>%1 tira una moneda. Ha salido %2.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="154"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
-        <translation type="unfinished"/>
+        <translation>%1 sacó un %2 con un dado de %3 caras.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="163"/>
         <source>%1 draws %2 card(s).</source>
-        <translation type="unfinished"/>
+        <translation>%1 roba %2 carta(s).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="170"/>
         <source>%1 undoes their last draw.</source>
-        <translation type="unfinished"/>
+        <translation>%1 deshace su último robo.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="172"/>
         <source>%1 undoes their last draw (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1 deshace su último robo (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="184"/>
         <source> from their graveyard</source>
-        <translation type="unfinished"/>
+        <translation> de su cementerio</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="188"/>
         <source> from their hand</source>
-        <translation type="unfinished"/>
+        <translation> de su mano</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="195"/>
         <source>the top card of their library</source>
-        <translation type="unfinished"/>
+        <translation>la parte superior de su biblioteca</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="201"/>

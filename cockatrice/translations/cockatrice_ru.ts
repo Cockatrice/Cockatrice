@@ -1460,7 +1460,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/gamesmodel.cpp" line="161"/>
         <source>can see hands</source>
-        <translation>Зрители могут видеть руки игроков</translation>
+        <translation>могут видеть руки</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="166"/>
@@ -2207,7 +2207,7 @@ Do you want to enable them?</source>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Edit Sets&quot; window.</source>
-        <translation type="unfinished"/>
+        <translation>Добро пожаловать в Cockatrice! Все издания в базе карт включены по умолчанию. Подробнее об изменении настроек работы с изданиями - в окне &quot;Редактировать издания&quot;</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="835"/>
@@ -2219,37 +2219,37 @@ Read more about changing the set order or disabling specific sets and consequent
     <message>
         <location filename="../src/window_main.cpp" line="835"/>
         <source>A card database update is already running.</source>
-        <translation type="unfinished"/>
+        <translation>Обновление базы карт уже идет.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="869"/>
         <source>Unable to run the card database updater: </source>
-        <translation type="unfinished"/>
+        <translation>Не удалось запустить обновление базы карт:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="882"/>
         <source>failed to start.</source>
-        <translation type="unfinished"/>
+        <translation>ошибка при запуске.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="885"/>
         <source>crashed.</source>
-        <translation type="unfinished"/>
+        <translation>прервано.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="888"/>
         <source>timed out.</source>
-        <translation type="unfinished"/>
+        <translation>превышен лимит ожидания.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="891"/>
         <source>write error.</source>
-        <translation type="unfinished"/>
+        <translation>ошибка записи.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="894"/>
         <source>read error.</source>
-        <translation type="unfinished"/>
+        <translation>ошибка чтения.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="898"/>
@@ -2259,19 +2259,21 @@ Read more about changing the set order or disabling specific sets and consequent
     <message>
         <location filename="../src/window_main.cpp" line="905"/>
         <source>The card database updater exited with an error: %1</source>
-        <translation type="unfinished"/>
+        <translation>Обновление базы карт прервано с ошибкой: %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="913"/>
         <source>Update completed successfully.
 Cockatrice will now reload the card database.</source>
-        <translation type="unfinished"/>
+        <translation>Обновление успешно завершено.
+Сейчас Cockatrice перезагрузит базу карт.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="937"/>
         <source>Your client appears to be missing features that the server supports.
 This usually means that your client version is out of date, please check to see if there is a new client available for download.</source>
-        <translation type="unfinished"/>
+        <translation>В вашем клиенте, видимо, отсутствуют некоторые опции, поддерживаемые сервером.
+Обычно это означает, что версия клиента устарела. Пожалуйста, попробуйте скачать последнюю версию клиента.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="979"/>
@@ -2279,23 +2281,24 @@ This usually means that your client version is out of date, please check to see 
         <location filename="../src/window_main.cpp" line="1000"/>
         <location filename="../src/window_main.cpp" line="1003"/>
         <source>Load sets/cards</source>
-        <translation type="unfinished"/>
+        <translation>Загрузить издания/карты</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="987"/>
         <source>Selected file cannot be found.</source>
-        <translation type="unfinished"/>
+        <translation>Выбранный файл не найден.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1000"/>
         <source>The new sets/cards have been added successfully.
 Cockatrice will now reload the card database.</source>
-        <translation type="unfinished"/>
+        <translation>Новые издания/карты успешно добавлены.
+Сейчас Cockatrice перезагрузит базу карт.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1003"/>
         <source>Sets/cards failed to import.</source>
-        <translation type="unfinished"/>
+        <translation>Не удалось импортировать издания/карты.</translation>
     </message>
 </context>
 <context>
@@ -2318,17 +2321,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="70"/>
         <source>%1 is not watching the game any more.</source>
-        <translation>%1 покинул зрительскую ложу.</translation>
+        <translation>%1 больше не наблюдает за игрой.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="76"/>
         <source>%1 has loaded a deck (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1 загрузил колоду (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="78"/>
         <source>%1 has loaded a deck with %2 sideboard cards (%3).</source>
-        <translation type="unfinished"/>
+        <translation>%1 загрузил колоду с %2 картами из сайдборда (%3).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="111"/>
@@ -2336,19 +2339,9 @@ Cockatrice will now reload the card database.</source>
         <translation>Игра началась.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="148"/>
-        <source>Heads (1)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="148"/>
-        <source>Tails (2)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location filename="../src/messagelogwidget.cpp" line="182"/>
         <source> from play</source>
-        <translation type="unfinished"/>
+        <translation>из игры</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="186"/>
@@ -2358,32 +2351,32 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="193"/>
         <source>the top card of %1&apos;s library</source>
-        <translation type="unfinished"/>
+        <translation>верхняя карта библиотеки %1</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="199"/>
         <source> from the top of %1&apos;s library</source>
-        <translation type="unfinished"/>
+        <translation>с верха библиотеки %1</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="206"/>
         <source>the bottom card of %1&apos;s library</source>
-        <translation type="unfinished"/>
+        <translation>нижняя карта библиотеки %1</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="212"/>
         <source> from the bottom of %1&apos;s library</source>
-        <translation type="unfinished"/>
+        <translation>Со дна библиотеки %1</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="218"/>
         <source> from %1&apos;s library</source>
-        <translation type="unfinished"/>
+        <translation>из библиотеки %1</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="223"/>
         <source> from sideboard</source>
-        <translation> из сайда</translation>
+        <translation> из сайдборда</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="225"/>
@@ -2444,42 +2437,42 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="550"/>
         <source>%1 is now keeping the top card %2 revealed.</source>
-        <translation type="unfinished"/>
+        <translation>%1 оставляет верхнюю карту %2 открытой.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="551"/>
         <source>%1 is not revealing the top card %2 any longer.</source>
-        <translation type="unfinished"/>
+        <translation>Верхняя карта %2 %1 больше не остается открытой.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="31"/>
         <source>You have joined game #%1.</source>
-        <translation type="unfinished"/>
+        <translation>Вы присоединились к игре #%1.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="36"/>
         <source>You are watching a replay of game #%1.</source>
-        <translation type="unfinished"/>
+        <translation>Вы просматриваете запись игры #%1.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="42"/>
         <source>%1 has joined the game.</source>
-        <translation type="unfinished"/>
+        <translation>%1 присоединился к игре.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="48"/>
         <source>%1 has left the game.</source>
-        <translation type="unfinished"/>
+        <translation>%1 покинул игру.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="86"/>
         <source>%1 is ready to start the game.</source>
-        <translation type="unfinished"/>
+        <translation>%1 готов начать игру.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="91"/>
         <source>%1 is not ready to start the game any more.</source>
-        <translation type="unfinished"/>
+        <translation>%1 пока не готов начать игру.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="97"/>
@@ -2509,6 +2502,16 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="140"/>
         <source>%1 shuffles %2.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
+        <source>Heads</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
+        <source>Tails</source>
         <translation type="unfinished"/>
     </message>
     <message>

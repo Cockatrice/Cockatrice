@@ -2360,16 +2360,6 @@ Cockatrice will now reload the card database.</source>
         <translation>게임이 시작되었습니다.</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="148"/>
-        <source>Heads (1)</source>
-        <translation>앞면 (1)</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="148"/>
-        <source>Tails (2)</source>
-        <translation>뒷면 (2)</translation>
-    </message>
-    <message>
         <location filename="../src/messagelogwidget.cpp" line="182"/>
         <source> from play</source>
         <translation>전장에</translation>
@@ -2534,6 +2524,16 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/messagelogwidget.cpp" line="140"/>
         <source>%1 shuffles %2.</source>
         <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
+        <source>Heads</source>
+        <translation>앞면</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="148"/>
+        <source>Tails</source>
+        <translation>뒷면</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="152"/>
