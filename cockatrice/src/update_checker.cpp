@@ -43,23 +43,13 @@ bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
             .contains("osx");
 }
 #elif defined(Q_OS_WIN)
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
 {
        return build
             .toMap()["name"]
             .toString()
-            .contains("qt5.exe");
+            .contains("exe");
 }
-#else
-bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
-{
-       return build
-            .toMap()["name"]
-            .toString()
-            .contains("qt4.exe");
-}
-#endif
 #else
 
 bool UpdateChecker::downloadMatchesCurrentOS(QVariant)
@@ -73,7 +63,7 @@ bool UpdateChecker::downloadMatchesCurrentOS(QVariant)
 QDate UpdateChecker::dateFromBuild(QVariant build)
 {
     QString formatString = "yyyy-MM-dd";
-    QString dateString = build.toMap()["date"].toString();
+    QString dateString = build.toMap()["created"].toString();
     dateString = dateString.remove(formatString.length(), dateString.length());
 
     return QDate::fromString(dateString, formatString);

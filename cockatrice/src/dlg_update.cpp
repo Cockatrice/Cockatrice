@@ -85,6 +85,7 @@ void DlgUpdate::gotoDownloadPage() {
 
 void DlgUpdate::downloadUpdate() {
     setLabel("Downloading update...");
+    enableOkButton(false);
     enableUpdateButton(false);
     uDownloader->beginDownload(updateUrl);
 }
@@ -127,7 +128,8 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, QVaria
             if (reply == QMessageBox::Yes)
                 downloadUpdate();
         }
-        else {
+        else
+        {
             QMessageBox::information(this, "Cockatrice Update",
                                      tr("Your version of Cockatrice is out of date, but there are no packages"
                                                 " available for your operating system. You may have to use a developer build or build from source"
@@ -144,6 +146,10 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, QVaria
 
 void DlgUpdate::enableUpdateButton(bool enable) {
     manualDownload->setEnabled(enable);
+}
+
+void DlgUpdate::enableOkButton(bool enable) {
+    ok->setEnabled(enable);
 }
 
 void DlgUpdate::setLabel(QString newText) {

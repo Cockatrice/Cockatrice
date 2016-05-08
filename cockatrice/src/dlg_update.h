@@ -24,6 +24,7 @@ private slots:
 private:
     QUrl updateUrl;
     void enableUpdateButton(bool enable);
+    void enableOkButton(bool enable);
     void beginUpdateCheck();
     void setLabel(QString text);
     QLabel *text;
