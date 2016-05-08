@@ -43,7 +43,6 @@ bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
             .contains("osx");
 }
 #elif defined(Q_OS_WIN)
-
 bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
 {
        return build
@@ -51,7 +50,6 @@ bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
             .toString()
             .contains("exe");
 }
-#endif
 #else
 
 bool UpdateChecker::downloadMatchesCurrentOS(QVariant)
