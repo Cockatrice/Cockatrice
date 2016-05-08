@@ -49,7 +49,8 @@ bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
        return build
             .toMap()["name"]
             .toString()
-            .contains("qt5.exe");
+            .contains("qt5")
+            .contains("exe");
 }
 #else
 bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
@@ -57,7 +58,8 @@ bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
        return build
             .toMap()["name"]
             .toString()
-            .contains("qt4.exe");
+            .contains("qt4")
+            .contains("exe");
 }
 #endif
 #else
@@ -73,7 +75,7 @@ bool UpdateChecker::downloadMatchesCurrentOS(QVariant)
 QDate UpdateChecker::dateFromBuild(QVariant build)
 {
     QString formatString = "yyyy-MM-dd";
-    QString dateString = build.toMap()["date"].toString();
+    QString dateString = build.toMap()["created"].toString();
     dateString = dateString.remove(formatString.length(), dateString.length());
 
     return QDate::fromString(dateString, formatString);
