@@ -43,22 +43,12 @@ bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
             .contains("osx");
 }
 #elif defined(Q_OS_WIN)
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+
 bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
 {
        return build
             .toMap()["name"]
             .toString()
-            .contains("qt5")
-            .contains("exe");
-}
-#else
-bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
-{
-       return build
-            .toMap()["name"]
-            .toString()
-            .contains("qt4")
             .contains("exe");
 }
 #endif
