@@ -12,10 +12,8 @@
 #include "pending_command.h"
 
 #include <QtGui>
-#if QT_VERSION >= 0x050000
 #include <QtWidgets>
 #include <QSignalMapper>
-#endif
 
 #include "pb/commands.pb.h"
 #include "pb/session_commands.pb.h"

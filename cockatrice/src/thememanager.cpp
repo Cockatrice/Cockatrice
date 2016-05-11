@@ -5,11 +5,7 @@
 #include <QColor>
 #include <QPixmapCache>
 #include <QLibraryInfo>
-#if QT_VERSION < 0x050000
-    #include <QDesktopServices>
-#else
-    #include <QStandardPaths>
-#endif
+#include <QStandardPaths>
 
 #define DEFAULT_THEME_NAME "Default"
 #define STYLE_CSS_NAME "style.css"
@@ -45,8 +41,6 @@ QStringMap & ThemeManager::getAvailableThemes()
     dir =
 #ifdef PORTABLE_BUILD
         qApp->applicationDirPath() +
-#elif QT_VERSION < 0x050000
-        QDesktopServices::storageLocation(QDesktopServices::DataLocation) +
 #else
         QStandardPaths::standardLocations(QStandardPaths::DataLocation).first() +
 #endif

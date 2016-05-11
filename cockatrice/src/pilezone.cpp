@@ -13,11 +13,7 @@ PileZone::PileZone(Player *_p, const QString &_name, bool _isShufflable, bool _c
     : CardZone(_p, _name, false, _isShufflable, _contentsKnown, parent)
 {
     setCacheMode(DeviceCoordinateCache); // Do not move this line to the parent constructor!
-#if QT_VERSION < 0x050000
-    setAcceptsHoverEvents(true);
-#else
     setAcceptHoverEvents(true);
-#endif
     setCursor(Qt::OpenHandCursor);
     
     setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(90).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));

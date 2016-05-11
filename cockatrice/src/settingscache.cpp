@@ -4,22 +4,15 @@
 #include <QDir>
 #include <QDebug>
 #include <QApplication>
-
-#if QT_VERSION >= 0x050000
-    #include <QStandardPaths>
-#else
-    #include <QDesktopServices>
-#endif
+#include <QStandardPaths>
 
 QString SettingsCache::getDataPath()
 {
     return 
 #ifdef PORTABLE_BUILD
     qApp->applicationDirPath() + "/data/";
-#elif QT_VERSION >= 0x050000
-    QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 #else
-    QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 #endif
 }
 

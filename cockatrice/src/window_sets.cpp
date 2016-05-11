@@ -70,13 +70,8 @@ WndSets::WndSets(QWidget *parent)
     view->setDropIndicatorShown(true);
     view->setDragDropMode(QAbstractItemView::InternalMove);
 
-#if QT_VERSION < 0x050000
-    view->header()->setResizeMode(QHeaderView::Stretch);
-    view->header()->setResizeMode(SetsModel::LongNameCol, QHeaderView::ResizeToContents);
-#else
     view->header()->setSectionResizeMode(QHeaderView::Stretch);
     view->header()->setSectionResizeMode(SetsModel::LongNameCol, QHeaderView::ResizeToContents);
-#endif
 
     view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
     view->setColumnHidden(SetsModel::SortKeyCol, true);

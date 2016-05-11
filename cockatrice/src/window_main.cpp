@@ -31,12 +31,7 @@
 #include <QSystemTrayIcon>
 #include <QApplication>
 #include <QtNetwork>
-
-#if QT_VERSION < 0x050000
-    #include <QtGui/qtextdocument.h> // for Qt::escape()
-#else 
-    #include <QtConcurrent>
-#endif
+#include <QtConcurrent>
 
 #include "main.h"
 #include "window_main.h"
@@ -397,15 +392,7 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
         out += "<li>" + tr("can %1 contain numeric characters").arg((rules.at(4).toInt() > 0) ? "" : tr("NOT")) + "</li>";
 
         if (rules.at(6).size() > 0)
-        {
-            out += "<li>" + tr("can contain the following punctuation: %1").arg(
-                #if QT_VERSION < 0x050000
-                    Qt::escape(rules.at(6))
-                #else
-                    rules.at(6).toHtmlEscaped()
-                #endif
-            ) + "</li>";
-        }
+            out += "<li>" + tr("can contain the following punctuation: %1").arg(rules.at(6).toHtmlEscaped()) + "</li>";
 
         out += "<li>" + tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) + "</li>";
         out += "</ul>";

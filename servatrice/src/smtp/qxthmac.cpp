@@ -26,9 +26,6 @@
 #include "qxthmac.h"
 #include <QtGlobal>
 
-#if QT_VERSION >= 0x040300
-
-
 /*
 \class QxtHmac
 
@@ -207,5 +204,3 @@ bool QxtHmac::verify(const QByteArray& key, const QByteArray& hmac, const QByteA
     d->ohash->addData(inner);
     return hmac == d->ohash->result();
 }
-
-#endif

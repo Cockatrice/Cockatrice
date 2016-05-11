@@ -83,11 +83,8 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     chooseTokenView->setWordWrap(true);
     chooseTokenView->setColumnWidth(0, 130);
     chooseTokenView->setColumnWidth(3, 178);
-#if QT_VERSION < 0x050000
-    chooseTokenView->header()->setResizeMode(4, QHeaderView::ResizeToContents);
-#else
     chooseTokenView->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
-#endif
+
     connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
     
     if (predefinedTokens.isEmpty())

@@ -28,17 +28,11 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
     roomList->setRootIsDecorated(false);
     roomList->setColumnCount(5);
     roomList->header()->setStretchLastSection(false);
-#if QT_VERSION < 0x050000
-    roomList->header()->setResizeMode(0, QHeaderView::ResizeToContents);
-    roomList->header()->setResizeMode(1, QHeaderView::Stretch);
-    roomList->header()->setResizeMode(2, QHeaderView::ResizeToContents);
-    roomList->header()->setResizeMode(3, QHeaderView::ResizeToContents);
-#else
     roomList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     roomList->header()->setSectionResizeMode(1, QHeaderView::Stretch);
     roomList->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     roomList->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
-#endif    
+
     joinButton = new QPushButton;
     connect(joinButton, SIGNAL(clicked()), this, SLOT(joinClicked()));
     QHBoxLayout *buttonLayout = new QHBoxLayout;

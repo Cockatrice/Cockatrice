@@ -38,11 +38,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     localDirView->setColumnHidden(1, true);
     localDirView->setRootIndex(localDirModel->index(localDirModel->rootPath(), 0));
     localDirView->setSortingEnabled(true);
-#if QT_VERSION < 0x050000
-    localDirView->header()->setResizeMode(QHeaderView::ResizeToContents);
-#else
     localDirView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-#endif
     localDirView->header()->setSortIndicator(0, Qt::AscendingOrder);
     
     leftToolBar = new QToolBar;

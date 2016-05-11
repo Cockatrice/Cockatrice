@@ -47,28 +47,6 @@ ENDIF(APPLE)
 
 set(ORACLE_LIBS)
 
-# Qt4 stuff
-if(Qt4_FOUND)
-    SET(QT_USE_QTNETWORK TRUE)
-    SET(QT_USE_QTSVG TRUE)
-
-    # Include directories
-    INCLUDE(${QT_USE_FILE})
-    include_directories(${QT_INCLUDES})
-    LIST(APPEND ORACLE_LIBS ${QT_QTMAIN_LIBRARY})
-    LIST(APPEND ORACLE_LIBS ${QT_LIBRARIES})
-
-    # Let cmake chew Qt4's translations and resource files
-    # Note: header files are MOC-ed automatically by cmake
-    IF(UPDATE_TRANSLATIONS)
-        QT4_CREATE_TRANSLATION(oracle_QM ${translate_SRCS} ${oracle_TS})
-    ELSE(UPDATE_TRANSLATIONS)
-        QT4_ADD_TRANSLATION(oracle_QM ${oracle_TS})
-    ENDIF(UPDATE_TRANSLATIONS)
-
-    QT4_ADD_RESOURCES(oracle_RESOURCES_RCC ${oracle_RESOURCES})
-endif()
-
 # qt5 stuff
 if(Qt5Widgets_FOUND)
     include_directories(${Qt5Widgets_INCLUDE_DIRS})
@@ -131,18 +109,10 @@ ENDIF()
 # Build oracle binary and link it
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
 
-if(Qt4_FOUND)
-    if(MSVC) 
-        set(QT_USE_QTMAIN true) 
-    endif() 
-    TARGET_LINK_LIBRARIES(oracle ${ORACLE_LIBS})
+if(MSVC)
+    TARGET_LINK_LIBRARIES(oracle Qt5::WinMain)
 endif()
-if(Qt5Widgets_FOUND)
-    if(MSVC)
-        TARGET_LINK_LIBRARIES(oracle Qt5::WinMain)
-    endif()
-    qt5_use_modules(oracle ${ORACLE_LIBS})
-endif()
+qt5_use_modules(oracle ${ORACLE_LIBS})
 
 IF(ZLIB_FOUND)
     TARGET_LINK_LIBRARIES(oracle ${ZLIB_LIBRARIES})
@@ -182,11 +152,9 @@ if(APPLE)
     set(qtconf_dest_dir oracle.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
-    # qt4: codecs, iconengines, imageformats
-    # qt5: iconengines, platforms
-
+    # qt5 plugins: iconengines, platforms
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(codecs|iconengines|platforms)/.*\\.dylib"
+        FILES_MATCHING REGEX "(iconengines|platforms)/.*\\.dylib"
         REGEX ".*_debug\\.dylib" EXCLUDE)
 
     install(CODE "
@@ -218,11 +186,10 @@ IF(WIN32)
         list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
     ENDIF()
 
-    # qt4: codecs, iconengines, imageformats
-    # qt5: iconengines, imageformats, platforms
+    # qt5 plugins: iconengines, platforms
 
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(codecs|iconengines|platforms)/.*[^d]\\.dll")
+        FILES_MATCHING REGEX "(iconengines|platforms)/.*[^d]\\.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
