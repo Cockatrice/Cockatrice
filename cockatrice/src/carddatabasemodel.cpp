@@ -186,6 +186,10 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
     if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
         return false;
 
+    return rowMatchesCardName(info);
+}
+
+bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfo const *info) const {
     if (!cardName.isEmpty() && !info->getName().contains(cardName, Qt::CaseInsensitive))
         return false;
 

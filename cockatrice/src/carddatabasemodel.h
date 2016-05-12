@@ -61,7 +61,7 @@ public:
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
-
+    bool rowMatchesCardName(CardInfo const *info) const;
     bool canFetchMore(const QModelIndex &parent) const;
     void fetchMore(const QModelIndex &parent);
 private slots:
