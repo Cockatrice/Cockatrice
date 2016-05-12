@@ -237,8 +237,7 @@ TokenDisplayModel::TokenDisplayModel(QObject *parent)
 bool TokenDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
     CardInfo const *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
-    
-    return info->getIsToken();
+    return info->getIsToken() && rowMatchesCardName(info);
 }
 
 int TokenDisplayModel::rowCount(const QModelIndex &parent) const
