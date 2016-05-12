@@ -23,6 +23,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit(tr("Token"));
     nameEdit->selectAll();
+    connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
     nameLabel->setBuddy(nameEdit);
 
     colorLabel = new QLabel(tr("C&olor:"));
@@ -135,7 +136,7 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
     
     if(cardInfo)
     {
-        nameEdit->setText(cardInfo->getName());
+        updateSearchFieldWithoutUpdatingFilter(cardInfo->getName());
         const QChar cardColor = cardInfo->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
         ptEdit->setText(cardInfo->getPowTough());
@@ -147,6 +148,17 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         ptEdit->setText("");
         annotationEdit->setText("");
     }
+}
+
+void DlgCreateToken::updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const {
+    nameEdit->blockSignals(true);
+    nameEdit->setText(newValue);
+    nameEdit->blockSignals(false);
+}
+
+void DlgCreateToken::updateSearch(const QString &search)
+{
+    cardDatabaseDisplayModel->setCardName(search);
 }
 
 void DlgCreateToken::actChooseTokenFromAll(bool checked)
