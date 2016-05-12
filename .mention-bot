@@ -1,6 +1,5 @@
 {
   "message": "@pullRequester, thanks for contributing! @reviewers are the best people to review the changes.",
-             // custom message using @pullRequester and @reviewers
-  "fileBlacklist": ["*.md"], // mention-bot will ignore any files that match these file globs
-  "userBlacklist": ["mbruker"], // users in this list will never be mentioned by mention-bot
+  "fileBlacklist": ["*.md"],
+  "userBlacklist": ["mbruker"],
 }
