@@ -110,17 +110,11 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     ADD_DEFINITIONS("-DSFMT_MEXP=19937")
 ENDIF()
 
-# Find Qt and enable the needed features
-# Default is Qt5 unless WITH_QT4 option is enabled
-option(WITH_QT4 "Force the use of Qt4 libraries" OFF)
+# Find Qt5
 OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
 MESSAGE(STATUS "UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
 
-IF(NOT WITH_QT4)
-    # First known not-broken Qt5 version (5.0.2 available on old ubuntus is buggy).
-    FIND_PACKAGE(Qt5Widgets 5.0.3)
-ENDIF()
-
+FIND_PACKAGE(Qt5Widgets 5.0.3 REQUIRED)
 IF(Qt5Widgets_FOUND)
     MESSAGE(STATUS "Found Qt ${Qt5Widgets_VERSION_STRING}")
 
@@ -141,27 +135,7 @@ IF(Qt5Widgets_FOUND)
     ENDIF()
 
 ELSE()
-    FIND_PACKAGE(Qt4 4.8.0 REQUIRED)
-    IF(QT4_FOUND)
-        # Old FindQt4.cmake modules used the same flag with different case
-        SET(Qt4_FOUND TRUE)
-    ENDIF()
-    IF(Qt4_FOUND)
-        MESSAGE(STATUS "Found Qt ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
-
-        IF(UPDATE_TRANSLATIONS)
-            IF(NOT QT_LUPDATE_EXECUTABLE)
-                MESSAGE(WARNING "Qt's lupdate not found.")
-            ENDIF()
-        ENDIF()
-
-        IF(NOT QT_LRELEASE_EXECUTABLE)
-            MESSAGE(WARNING "Qt's lrelease not found.")
-        ENDIF()
-
-    ELSE()
-        MESSAGE(FATAL_ERROR "No Qt4 or Qt5 found!")
-    ENDIF()
+    MESSAGE(FATAL_ERROR "No Qt5 found!")
 ENDIF()
 
 set(CMAKE_AUTOMOC TRUE)
@@ -200,9 +174,7 @@ if(UNIX)
     	set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     	set(CPACK_DEBIAN_PACKAGE_SECTION "games")
     	set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
-        IF(Qt5Widgets_FOUND)
-            set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
-        ENDIF()
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
     endif()
 elseif(WIN32)
     set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})

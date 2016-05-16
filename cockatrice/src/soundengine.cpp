@@ -7,11 +7,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QLibraryInfo>
-#if QT_VERSION < 0x050000
-    #include <QDesktopServices>
-#else
-    #include <QStandardPaths>
-#endif
+#include <QStandardPaths>
 
 #define DEFAULT_THEME_NAME "Default"
 #define TEST_SOUND_FILENAME "player_join"
@@ -47,13 +43,8 @@ void SoundEngine::soundEnabledChanged()
         if(!player)
         {
             QAudioFormat format;
-#if QT_VERSION < 0x050000
-            format.setFrequency(44100);
-            format.setChannels(1);
- #else
             format.setSampleRate(44100);
             format.setChannelCount(1);
- #endif
             format.setSampleSize(16);
             format.setCodec("audio/pcm");
             format.setByteOrder(QAudioFormat::LittleEndian);
@@ -88,9 +79,8 @@ void SoundEngine::playSound(QString fileName)
     inputBuffer->close();
     inputBuffer->setData(audioData[fileName]);
     inputBuffer->open(QIODevice::ReadOnly);
-#if QT_VERSION >= 0x050000
+
     player->setVolume(settingsCache->getMasterVolume() / 100.0);
-#endif
     player->stop();
     player->start(inputBuffer);
 }
@@ -119,8 +109,6 @@ QStringMap & SoundEngine::getAvailableThemes()
     dir =
 #ifdef PORTABLE_BUILD
         qApp->applicationDirPath() +
-#elif QT_VERSION < 0x050000
-        QDesktopServices::storageLocation(QDesktopServices::DataLocation) +
 #else
         QStandardPaths::standardLocations(QStandardPaths::DataLocation).first() +
 #endif

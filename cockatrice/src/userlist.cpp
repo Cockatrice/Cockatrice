@@ -311,11 +311,7 @@ UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserL
     
     userTree = new QTreeWidget;
     userTree->setColumnCount(3);
-#if QT_VERSION < 0x050000
-    userTree->header()->setResizeMode(QHeaderView::ResizeToContents);
-#else
     userTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-#endif
     userTree->setHeaderHidden(true);
     userTree->setRootIsDecorated(false);
     userTree->setIconSize(QSize(20, 12));

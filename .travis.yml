@@ -2,26 +2,20 @@ language: cpp
 matrix:
   fast_finish: true
   include:
-    # linux precise debug build, precise + gcc + qt4
-    - os: linux
-      env: QT4=1 BUILDTYPE=Debug DIST=precise
     # linux debug build, trusty + gcc + qt5
     - os: linux
       dist: trusty
-      env: QT4=0 BUILDTYPE=Debug DIST=trusty
+      env: BUILDTYPE=Debug DIST=trusty
     # osx debug build, osx + clang + qt5
     - os: osx
-      env: QT4=0 BUILDTYPE=Debug
-    # linux precise release build, precise + gcc + qt4
-    - os: linux
-      env: QT4=1 BUILDTYPE=Release DIST=precise
+      env: BUILDTYPE=Debug
     # linux trusty release build, precise + gcc + qt5
     - os: linux
       dist: trusty
-      env: QT4=0 BUILDTYPE=Release DIST=trusty
+      env: BUILDTYPE=Release DIST=trusty
     # osx release build, osx + gcc + qt5
     - os: osx
-      env: QT4=0 BUILDTYPE=Release
+      env: BUILDTYPE=Release
 script: ./travis-compile.sh
 install: ./travis-dependencies.sh
 cache: apt

@@ -60,11 +60,7 @@ void TabDeckEditor::createDeckDock()
     deckView->setUniformRowHeights(true);
     deckView->setSortingEnabled(true);
     deckView->sortByColumn(1, Qt::AscendingOrder);
-#if QT_VERSION < 0x050000
-    deckView->header()->setResizeMode(QHeaderView::ResizeToContents);
-#else
     deckView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-#endif
     deckView->installEventFilter(&deckViewKeySignals);
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
     connect(deckView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actSwapCard()));

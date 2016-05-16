@@ -54,11 +54,8 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     if (showfilters && restoresettings)
     	gameListProxyModel->loadFilterParameters(gameTypeMap);
 
-#if QT_VERSION < 0x050000
-    gameListView->header()->setResizeMode(0, QHeaderView::ResizeToContents);
-#else
     gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-#endif
+
     filterButton = new QPushButton;
     filterButton->setIcon(QPixmap("theme:icons/search"));
     connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));

@@ -77,13 +77,9 @@ DlgEditTokens::DlgEditTokens(QWidget *parent)
     chooseTokenView->header()->setStretchLastSection(false);
     chooseTokenView->header()->hideSection(1);
     chooseTokenView->header()->hideSection(2);
-#if QT_VERSION < 0x050000
-    chooseTokenView->header()->setResizeMode(3, QHeaderView::ResizeToContents);
-    chooseTokenView->header()->setResizeMode(4, QHeaderView::ResizeToContents);
-#else
     chooseTokenView->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
     chooseTokenView->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
-#endif
+
     connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
     
     QAction *aAddToken = new QAction(tr("Add token"), this);

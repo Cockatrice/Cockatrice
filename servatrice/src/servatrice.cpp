@@ -81,11 +81,7 @@ Servatrice_GameServer::~Servatrice_GameServer()
     }
 }
 
-#if QT_VERSION < 0x050000
-void Servatrice_GameServer::incomingConnection(int socketDescriptor)
-#else
 void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
-#endif
 {
     // Determine connection pool with smallest client count
     int minClientCount = -1;
@@ -110,11 +106,7 @@ void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
     QMetaObject::invokeMethod(ssi, "initConnection", Qt::QueuedConnection, Q_ARG(int, socketDescriptor));
 }
 
-#if QT_VERSION < 0x050000
-void Servatrice_IslServer::incomingConnection(int socketDescriptor)
-#else
 void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
-#endif
 {
     QThread *thread = new QThread;
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
@@ -317,16 +309,13 @@ bool Servatrice::initServer()
         if (!certFile.open(QIODevice::ReadOnly))
             throw QString("Error opening certificate file: %1").arg(certFileName);
         QSslCertificate cert(&certFile);
-#if QT_VERSION < 0x050000
-        if (!cert.isValid())
-            throw(QString("Invalid certificate."));
-#else
+
         const QDateTime currentTime = QDateTime::currentDateTime();
         if(currentTime < cert.effectiveDate() ||
             currentTime > cert.expiryDate() ||
             cert.isBlacklisted())
             throw(QString("Invalid certificate."));
-#endif
+
         qDebug() << "Loading private key...";
         QFile keyFile(keyFileName);
         if (!keyFile.open(QIODevice::ReadOnly))

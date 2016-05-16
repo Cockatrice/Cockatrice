@@ -697,11 +697,6 @@ SoundSettingsPage::SoundSettingsPage()
     connect(masterVolumeSlider, SIGNAL(valueChanged(int)), masterVolumeSpinBox, SLOT(setValue(int)));
     connect(masterVolumeSpinBox, SIGNAL(valueChanged(int)), masterVolumeSlider, SLOT(setValue(int)));
 
-#if QT_VERSION < 0x050000
-    masterVolumeSlider->setEnabled(false);
-    masterVolumeSpinBox->setEnabled(false);
-#endif
-
     QGridLayout *soundGrid = new QGridLayout;
     soundGrid->addWidget(&soundEnabledCheckBox, 0, 0, 1, 3);
     soundGrid->addWidget(&masterVolumeLabel, 1, 0);
@@ -736,12 +731,7 @@ void SoundSettingsPage::retranslateUi() {
     themeLabel.setText(tr("Current sounds theme:"));
     soundTestButton.setText(tr("Test system sound engine"));
     soundGroupBox->setTitle(tr("Sound settings"));
-    #if QT_VERSION < 0x050000
-    masterVolumeLabel.setText(tr("Master volume requires QT5"));
-#else
-    masterVolumeLabel.setText(tr("Master volume"));
-#endif
-    
+    masterVolumeLabel.setText(tr("Master volume"));    
 }
 
 DlgSettings::DlgSettings(QWidget *parent)

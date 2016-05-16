@@ -118,10 +118,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     completer = new QCompleter(autocompleteUserList, sayEdit);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setMaxVisibleItems(5);
-
-    #if QT_VERSION >= 0x050000
-        completer->setFilterMode(Qt::MatchStartsWith);
-    #endif
+    completer->setFilterMode(Qt::MatchStartsWith);
 
     sayEdit->setCompleter(completer);
     actCompleterChanged();

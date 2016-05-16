@@ -30,21 +30,10 @@ SET(common_SOURCES
 
 set(ORACLE_LIBS)
 
-# Qt4 stuff
-if(Qt4_FOUND)
-    # Include directories
-    INCLUDE(${QT_USE_FILE})
-    include_directories(${QT_INCLUDES})
-endif()
-
-# qt5 stuff
-if(Qt5Widgets_FOUND)
-    include_directories(${Qt5Widgets_INCLUDE_DIRS})
-endif()
-
 INCLUDE_DIRECTORIES(pb)
 INCLUDE_DIRECTORIES(sfmt)
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
+include_directories(${Qt5Widgets_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(cockatrice_common ${common_SOURCES} ${common_MOC_SRCS})

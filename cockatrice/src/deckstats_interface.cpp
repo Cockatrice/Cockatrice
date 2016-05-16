@@ -6,10 +6,7 @@
 #include <QRegExp>
 #include <QMessageBox>
 #include <QDesktopServices>
-
-#if QT_VERSION >= 0x050000
 #include <QUrlQuery>
-#endif
 
 DeckStatsInterface::DeckStatsInterface(
     CardDatabase &_cardDatabase,
@@ -50,19 +47,12 @@ void DeckStatsInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
     DeckList deckWithoutTokens;
     copyDeckWithoutTokens(*deck, deckWithoutTokens);
 
-#if QT_VERSION < 0x050000
-    QUrl params;
-    params.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
-    params.addQueryItem("decktitle", deck->getName());
-    data->append(params.encodedQuery());
-#else
     QUrl params;
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
     urlQuery.addQueryItem("decktitle", deck->getName());
     params.setQuery(urlQuery);
     data->append(params.query(QUrl::EncodeReserved));
-#endif
 }
 
 void DeckStatsInterface::analyzeDeck(DeckList *deck)

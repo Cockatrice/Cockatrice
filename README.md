@@ -14,7 +14,7 @@
 
 # Cockatrice
 
-Cockatrice is an open-source multiplatform supported program for playing tabletop card games over a network. The program's server design prevents any kind of client modifications to gain an unfair advantage in a game. The client also has a built in single-player mode where you can brew without being connected to a server. This project is written in C++/Qt with support for both Qt4 and Qt5.<br>
+Cockatrice is an open-source multiplatform supported program for playing tabletop card games over a network. The program's server design prevents any kind of client modifications to gain an unfair advantage in a game. The client also has a built in single-player mode where you can brew without being connected to a server. This project is written in C++ and is using the Qt5 libraries.<br>
 
 
 # Downloads
@@ -60,10 +60,6 @@ Dependencies:
 Oracle can optionally use zlib to load zipped files:
 - [zlib](http://www.zlib.net/) (no https!)
 
-The server requires an additional dependency when compiled under Qt4:
-- [libgcrypt](https://www.gnu.org/software/libgcrypt/)
-
-
 To compile:
 
     mkdir build
@@ -87,7 +83,6 @@ The following flags can be passed to `cmake`:
 - `-DWITH_CLIENT=0` Whether to build the client (default 1 = yes).
 - `-DWITH_ORACLE=0` Whether to build oracle (default 1 = yes).
 - `-DPORTABLE=1` Build portable versions of client & oracle (default 0 = no).
-- `-DWITH_QT4=1` Force compilation to use Qt4 instead of Qt5 (default 0 = no).
 - `-DCMAKE_BUILD_TYPE=Debug` Compile in debug mode. Enables extra logging output, debug symbols, and much more verbose compiler warnings (default `Release`).
 - `-DUPDATE_TRANSLATIONS=1` Configure `make` to update the translation .ts files for new strings in the source code. Note: Running `make clean` will remove the .ts files (default 0 = no).
 - `-DTEST=1` Enable regression tests (default 0 = no). Note: needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```.

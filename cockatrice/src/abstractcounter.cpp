@@ -12,11 +12,7 @@
 AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name, bool _shownInCounterArea, int _value, QGraphicsItem *parent)
     : QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value), hovered(false), aDec(0), aInc(0), dialogSemaphore(false), deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
 {
-#if QT_VERSION < 0x050000
-    setAcceptsHoverEvents(true);
-#else
     setAcceptHoverEvents(true);
-#endif
 
     shortcutActive = false;
 
@@ -149,12 +145,7 @@ void AbstractCounter::setCounter()
     bool ok;
     dialogSemaphore = true;
     int newValue = 
-#if QT_VERSION < 0x050000
-    QInputDialog::getInteger(
-#else
-    QInputDialog::getInt(
-#endif
-        0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value, -2000000000, 2000000000, 1, &ok);
+    QInputDialog::getInt(0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value, -2000000000, 2000000000, 1, &ok);
     if (deleteAfterDialog) {
         deleteLater();
         return;

@@ -516,13 +516,7 @@ void Player::playerListActionTriggered()
     } else if (menu == mRevealTopCard) {
         int decksize = zones.value("deck")->getCards().size();
         bool ok;
-        int number = 
-#if QT_VERSION < 0x050000
-            QInputDialog::getInteger(
-#else
-            QInputDialog::getInt(
-#endif
-            0, tr("Reveal top cards of library"), tr("Number of cards: (max. %1)").arg(decksize), defaultNumberTopCards, 1, decksize, 1, &ok);
+        int number = QInputDialog::getInt(0, tr("Reveal top cards of library"), tr("Number of cards: (max. %1)").arg(decksize), defaultNumberTopCards, 1, decksize, 1, &ok);
         if (ok) {
             cmd.set_zone_name("deck");
             cmd.set_top_cards(number);
@@ -867,13 +861,7 @@ void Player::actViewLibrary()
 void Player::actViewTopCards()
 {
     bool ok;
-    int number = 
-#if QT_VERSION < 0x050000
-    QInputDialog::getInteger(
-#else
-    QInputDialog::getInt(
-#endif
-        0, tr("View top cards of library"), tr("Number of cards:"), defaultNumberTopCards, 1, 2000000000, 1, &ok);
+    int number = QInputDialog::getInt(0, tr("View top cards of library"), tr("Number of cards:"), defaultNumberTopCards, 1, 2000000000, 1, &ok);
     if (ok) {
         defaultNumberTopCards = number;
         static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", number);
@@ -928,14 +916,8 @@ void Player::actMulligan()
 
 void Player::actDrawCards()
 {
-    int number = 
-#if QT_VERSION < 0x050000
-    QInputDialog::getInteger(
-#else
-    QInputDialog::getInt(
-#endif
-    0, tr("Draw cards"), tr("Number:"));
-        if (number) {
+    int number = QInputDialog::getInt(0, tr("Draw cards"), tr("Number:"));
+    if (number) {
         Command_DrawCards cmd;
         cmd.set_number(number);
         sendGameCommand(cmd);
@@ -949,13 +931,7 @@ void Player::actUndoDraw()
 
 void Player::actMoveTopCardsToGrave()
 {
-    int number = 
-#if QT_VERSION < 0x050000
-    QInputDialog::getInteger(
-#else
-    QInputDialog::getInt(
-#endif
-    0, tr("Move top cards to grave"), tr("Number:"));
+    int number = QInputDialog::getInt(0, tr("Move top cards to grave"), tr("Number:"));
     if (!number)
         return;
 
@@ -978,13 +954,7 @@ void Player::actMoveTopCardsToGrave()
 
 void Player::actMoveTopCardsToExile()
 {
-    int number =
-#if QT_VERSION < 0x050000
-    QInputDialog::getInteger(
-#else
-    QInputDialog::getInt(
-#endif
-    0, tr("Move top cards to exile"), tr("Number:"));
+    int number = QInputDialog::getInt(0, tr("Move top cards to exile"), tr("Number:"));
     if (!number)
         return;
 
@@ -1059,13 +1029,7 @@ void Player::actUntapAll()
 void Player::actRollDie()
 {
     bool ok;
-    int sides =
-#if QT_VERSION < 0x050000
-    QInputDialog::getInteger(
-#else
-    QInputDialog::getInt(
-#endif
-    static_cast<QWidget *>(parent()), tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
+    int sides = QInputDialog::getInt(static_cast<QWidget *>(parent()), tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
     if (ok) {
         Command_RollDie cmd;
         cmd.set_sides(sides);
@@ -2269,13 +2233,7 @@ void Player::actCardCounterTrigger()
         case 11: {
             bool ok;
             dialogSemaphore = true;
-            int number = 
-#if QT_VERSION < 0x050000
-                QInputDialog::getInteger(
-#else
-                QInputDialog::getInt(
-#endif
-                    0, tr("Set counters"), tr("Number:"), 0, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
+            int number = QInputDialog::getInt(0, tr("Set counters"), tr("Number:"), 0, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
             dialogSemaphore = false;
             if (clearCardsToDelete())
                 return;

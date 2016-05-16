@@ -1,10 +1,6 @@
 #include <QtGui>
-#if QT_VERSION < 0x050000
-    #include <QDesktopServices>
-#else 
-    #include <QStandardPaths>
-    #include <QtConcurrent>
-#endif
+#include <QStandardPaths>
+#include <QtConcurrent>
 #include <QAbstractButton>
 #include <QBuffer>
 #include <QCheckBox>

@@ -1581,10 +1581,7 @@ void TabGame::createMessageDock(bool bReplay)
         completer = new QCompleter(autocompleteUserList, sayEdit);
         completer->setCaseSensitivity(Qt::CaseInsensitive);
         completer->setMaxVisibleItems(5);
-
-    #if QT_VERSION >= 0x050000
         completer->setFilterMode(Qt::MatchStartsWith);
-    #endif
 
         sayEdit->setCompleter(completer);
         actCompleterChanged();

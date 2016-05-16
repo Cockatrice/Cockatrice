@@ -81,11 +81,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     QSize translatedSize = translatedRect.size().toSize();
     QPixmap cachedPixmap;
     const QString cacheKey = "avatar" + QString::number(translatedSize.width()) + "_" + QString::number(info->user_level()) + "_" + QString::number(fullPixmap.cacheKey());
-#if QT_VERSION >= 0x040600
     if (!QPixmapCache::find(cacheKey, &cachedPixmap)) {
-#else
-    if (!QPixmapCache::find(cacheKey, cachedPixmap)) {
-#endif
         cachedPixmap = QPixmap(translatedSize.width(), translatedSize.height());
         
         QPainter tempPainter(&cachedPixmap);

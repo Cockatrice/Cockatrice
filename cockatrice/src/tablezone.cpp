@@ -35,11 +35,7 @@ TableZone::TableZone(Player *_p, QGraphicsItem *parent)
     currentMinimumWidth = width;
 
     setCacheMode(DeviceCoordinateCache);
-#if QT_VERSION < 0x050000
-    setAcceptsHoverEvents(true);
-#else
     setAcceptHoverEvents(true);
-#endif
 }
 
 

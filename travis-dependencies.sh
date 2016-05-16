@@ -2,30 +2,20 @@
 
 if [[ $TRAVIS_OS_NAME == "osx" ]] ; then
   brew update > /dev/null
-  if (( QT4 )); then
-    brew install qt protobuf libgcrypt > /dev/null
-  else
-    brew install qt5 protobuf libgcrypt > /dev/null
-  fi
+  brew install qt5 protobuf > /dev/null
   brew unlink cmake
   brew upgrade cmake
-
 else
   # common prerequisites
   sudo add-apt-repository -y ppa:smspillaz/cmake-master
   sudo apt-get update -qq
   sudo apt-get -y purge cmake
-  sudo apt-get install -y libprotobuf-dev protobuf-compiler cmake bc
-
-  if (( QT4 )); then
-    # qt4 prerequisites
-    sudo apt-get install -y qtmobility-dev libqt4-dev
-  else
-    # qt5 prerequisites
-    sudo apt-get install -y libprotobuf-dev protobuf-compiler \
-      qt5-default qttools5-dev qttools5-dev-tools \
-      qtmultimedia5-dev libqt5multimedia5-plugins libqt5svg5-dev libqt5sql5-mysql
-  fi
+  sudo apt-get install -y \
+    libprotobuf-dev protobuf-compiler \
+    cmake \
+    bc \
+    qt5-default qttools5-dev qttools5-dev-tools \
+    qtmultimedia5-dev libqt5multimedia5-plugins libqt5svg5-dev libqt5sql5-mysql
 
   # prerequisites for tests
   if [[ $BUILDTYPE == "Debug" ]]; then
