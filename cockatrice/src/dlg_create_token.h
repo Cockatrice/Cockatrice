@@ -25,6 +25,7 @@ public:
     bool getDestroy() const;
 private slots:
     void tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
+    void updateSearch(const QString &search);
     void actChooseTokenFromAll(bool checked);
     void actChooseTokenFromDeck(bool checked);
     void actOk();
@@ -37,6 +38,8 @@ private:
     QLineEdit *nameEdit, *ptEdit, *annotationEdit;
     QCheckBox *destroyCheckBox;
     QRadioButton *chooseTokenFromAllRadioButton, *chooseTokenFromDeckRadioButton;
+
+    void updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const;
 };
 
 #endif
