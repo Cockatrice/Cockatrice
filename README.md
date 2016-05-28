@@ -37,7 +37,7 @@ Chat with the Cockatrice developers on Gitter. Come here to talk about the appli
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
 
-# Translation Status [![Cockatrice on Transiflex](https://ds0k0en9abmn1.cloudfront.net/static/charts/images/tx-logo-micro.646b0065fce6.png)](https://www.transifex.com/projects/p/cockatrice/)
+# Translation Status [![Cockatrice on Transiflex](https://cdn-txweb.pressidium.com/wp-content/themes/transifex/assets/dist/svg/logo.svg)](https://www.transifex.com/projects/p/cockatrice/)
 
 Cockatrice uses Transifex for translations. You can help us bring Cockatrice and Oracle to your language or just edit single wordings right from within your browser by simply visiting our [Transifex project page](https://www.transifex.com/projects/p/cockatrice/).<br>
 
