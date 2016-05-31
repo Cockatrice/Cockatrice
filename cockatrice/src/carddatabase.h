@@ -74,6 +74,7 @@ private:
     QString cmc;
     QString cardtype;
     QString powtough;
+    QString rarity;
     QString text;
     QStringList colors;
     // the cards i'm related to
@@ -98,6 +99,7 @@ public:
         const QString &_cmc = QString(),
         const QString &_cardtype = QString(),
         const QString &_powtough = QString(),
+        const QString &_rarity = QString(),
         const QString &_text = QString(),
         const QStringList &_colors = QStringList(),
         const QStringList &_relatedCards = QStringList(),
@@ -121,6 +123,7 @@ public:
     inline const QString &getCmc() const { return cmc; }
     inline const QString &getCardType() const { return cardtype; }
     inline const QString &getPowTough() const { return powtough; }
+    inline const QString &getRarity() const { return rarity; }
     const QString &getText() const { return text; }
     const QString &getPixmapCacheKey() const { return pixmapCacheKey; }
     const int &getLoyalty() const { return loyalty; }
@@ -129,6 +132,7 @@ public:
     void setCmc(const QString &_cmc) { cmc = _cmc; emit cardInfoChanged(this); }
     void setCardType(const QString &_cardType) { cardtype = _cardType; emit cardInfoChanged(this); }
     void setPowTough(const QString &_powTough) { powtough = _powTough; emit cardInfoChanged(this); }
+    void setRarity(const QString &_rarity) { rarity = _rarity; emit cardInfoChanged(this); }
     void setText(const QString &_text) { text = _text; emit cardInfoChanged(this); }
     void setColors(const QStringList &_colors) { colors = _colors; emit cardInfoChanged(this); }
     const QChar getColorChar() const;

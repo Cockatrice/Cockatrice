@@ -118,6 +118,7 @@ public:
     bool acceptSet(const CardInfo *info) const;
     bool acceptManaCost(const CardInfo *info) const;
     bool acceptCmc(const CardInfo *info) const;
+    bool acceptRarity(const CardInfo *info) const;
     bool acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) const;
 };
 

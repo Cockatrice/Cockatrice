@@ -23,6 +23,7 @@ public:
         AttrSet,
         AttrManaCost,
         AttrCmc,
+        AttrRarity,
         AttrEnd
     };
 
