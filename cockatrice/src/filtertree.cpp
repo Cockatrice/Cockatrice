@@ -224,6 +224,17 @@ bool FilterItem::acceptCmc(const CardInfo *info) const
     return (info->getCmc() == term);
 }
 
+bool FilterItem::acceptRarity(const CardInfo *info) const
+{
+    foreach (QString rareLevel, info->getRarities())
+    {
+        if (rareLevel.compare(term, Qt::CaseInsensitive) == 0)
+            return true;
+    }
+
+    return false;
+}
+
 bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) const
 {
     switch (attr) {
@@ -241,6 +252,8 @@ bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) con
             return acceptManaCost(info);
         case CardFilter::AttrCmc:
             return acceptCmc(info);
+        case CardFilter::AttrRarity:
+            return acceptRarity(info);
         default:
             return true; /* ignore this attribute */
     }
