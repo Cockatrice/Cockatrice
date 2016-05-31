@@ -45,7 +45,8 @@ private:
         const QStringList & colors,
         const QStringList & relatedCards,
         const QStringList & reverseRelatedCards,
-        bool upsideDown
+        bool upsideDown,
+        QString &rarity
     );
 signals:
     void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
