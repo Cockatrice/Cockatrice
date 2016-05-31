@@ -162,6 +162,7 @@ CardInfo::CardInfo(const QString &_name,
                    const QString &_cmc,
                    const QString &_cardtype,
                    const QString &_powtough,
+                   const QString &_rarity,
                    const QString &_text,
                    const QStringList &_colors,
                    const QStringList &_relatedCards,
@@ -182,6 +183,7 @@ CardInfo::CardInfo(const QString &_name,
       cmc(_cmc),
       cardtype(_cardtype),
       powtough(_powtough),
+      rarity(_rarity),
       text(_text),
       colors(_colors),
       relatedCards(_relatedCards),
@@ -308,6 +310,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 {
     xml.writeStartElement("card");
     xml.writeTextElement("name", info->getName());
+    xml.writeTextElement("rarity", info->getRarity());
 
     const SetList &sets = info->getSets();
     QString tmpString;
@@ -489,7 +492,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
         if (xml.readNext() == QXmlStreamReader::EndElement)
             break;
         if (xml.name() == "card") {
-            QString name, manacost, cmc, type, pt, text;
+            QString name, manacost, cmc, type, pt, rarity, text;
             QStringList colors, relatedCards, reverseRelatedCards;
             QStringMap customPicURLs;
             MuidMap muids;
@@ -513,6 +516,8 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                     type = xml.readElementText();
                 else if (xml.name() == "pt")
                     pt = xml.readElementText();
+                else if (xml.name() == "rarity")
+                    rarity = xml.readElementText();
                 else if (xml.name() == "text")
                     text = xml.readElementText();
                 else if (xml.name() == "set") {
@@ -550,7 +555,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                 }
             }
 
-            addCard(new CardInfo(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids, setNumbers));
+            addCard(new CardInfo(name, isToken, manacost, cmc, type, pt, rarity, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids, setNumbers));
         }
     }
 }

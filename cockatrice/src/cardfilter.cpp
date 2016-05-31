@@ -33,6 +33,8 @@ const char *CardFilter::attrName(Attr a)
             return "mana cost";
         case AttrCmc:
             return "cmc";
+        case AttrRarity:
+            return "rarity";
         default:
             return "";
     }

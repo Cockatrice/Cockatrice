@@ -40,6 +40,7 @@ private:
         QString &cmc,
         const QString &cardType,
         const QString &cardPT,
+        const QString &rarity,
         int cardLoyalty,
         const QString &cardText,
         const QStringList & colors,
