@@ -93,7 +93,11 @@ void SettingsCache::translateLegacySettings()
     gameFilters().setShowPasswordProtectedGames(legacySetting.value("show_password_protected_games").toBool());
     gameFilters().setGameNameFilter(legacySetting.value("game_name_filter").toString());
     gameFilters().setMinPlayers(legacySetting.value("min_players").toInt());
-    gameFilters().setMaxPlayers(legacySetting.value("max_players").toInt());
+
+    if (legacySetting.value("max_players").toInt() > 1)
+        gameFilters().setMaxPlayers(legacySetting.value("max_players").toInt());
+    else
+        gameFilters().setMaxPlayers(99); // This prevents a bug where no games will show if max was not set before
 
     QStringList allFilters = legacySetting.allKeys();
     for (int i = 0; i < allFilters.size(); ++i) {
