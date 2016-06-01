@@ -80,7 +80,7 @@ private slots:
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void refreshShortcuts();
     void cardDatabaseLoadingFailed();
-    void cardDatabaseNewSetsFound(int numUnknownSets);
+    void cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames);
     void cardDatabaseAllNewSetsEnabled();
 
     void actOpenCustomFolder();

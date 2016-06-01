@@ -664,7 +664,7 @@ MainWindow::MainWindow(QWidget *parent)
     refreshShortcuts();
 
     connect(db, SIGNAL(cardDatabaseLoadingFailed()), this, SLOT(cardDatabaseLoadingFailed()));
-    connect(db, SIGNAL(cardDatabaseNewSetsFound(int)), this, SLOT(cardDatabaseNewSetsFound(int)));
+    connect(db, SIGNAL(cardDatabaseNewSetsFound(int, QStringList)), this, SLOT(cardDatabaseNewSetsFound(int, QStringList)));
     connect(db, SIGNAL(cardDatabaseAllNewSetsEnabled()), this, SLOT(cardDatabaseAllNewSetsEnabled()));
     QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 }
@@ -782,13 +782,16 @@ void MainWindow::cardDatabaseLoadingFailed()
     }
 }
 
-void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets)
+void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames)
 {
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("New sets found"));
     msgBox.setIcon(QMessageBox::Question);
-    msgBox.setText(tr("%1 new set(s) have been found in the card database.\n"
-        "Do you want to enable them?").arg(numUnknownSets));
+    msgBox.setText(
+        tr("%1 new sets found in the card database\n"
+        "Set codes: %2\n"
+        "Do you want to enable them?"
+        ).arg(numUnknownSets).arg(unknownSetsNames.join(", ")));
 
     QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
     QPushButton *noButton = msgBox.addButton(tr("No"), QMessageBox::NoRole);

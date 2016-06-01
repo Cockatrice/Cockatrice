@@ -55,6 +55,7 @@ public:
     void markAllAsKnown();
     int getEnabledSetsNum();
     int getUnknownSetsNum();
+    QStringList getUnknownSetsNames();
 };
 
 class CardInfo : public QObject {
@@ -237,7 +238,7 @@ private slots:
     LoadStatus loadCardDatabase(const QString &path);
 signals:
     void cardDatabaseLoadingFailed();
-    void cardDatabaseNewSetsFound(int numUnknownSets);
+    void cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames);
     void cardDatabaseAllNewSetsEnabled();
     void cardDatabaseEnabledSetsChanged();
     void cardAdded(CardInfo *card);
