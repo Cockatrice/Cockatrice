@@ -1536,7 +1536,7 @@ public:
         lbl_Player_aTap->setText(QApplication::translate("shortcutsTab", "Tap Card", 0));
         lbl_Player_aUntap->setText(QApplication::translate("shortcutsTab", "Untap Card", 0));
         lbl_Player_aUntapAll->setText(QApplication::translate("shortcutsTab", "Untap all", 0));
-        lbl_Player_aDoesntUntap->setText(QApplication::translate("shortcutsTab", "Toogle untap", 0));
+        lbl_Player_aDoesntUntap->setText(QApplication::translate("shortcutsTab", "Toggle untap", 0));
         lbl_Player_aFlip->setText(QApplication::translate("shortcutsTab", "Flip card", 0));
         lbl_Player_aPeek->setText(QApplication::translate("shortcutsTab", "Peek card", 0));
         lbl_Player_aPlay->setText(QApplication::translate("shortcutsTab", "Play card", 0));
