@@ -9,7 +9,7 @@ environment:
           choco_arch:
           nuget_arch: x64
           target_arch: x86_64
-          qt_ver: 5.5\msvc2013_64
+          qt_ver: 5.6\msvc2013_64
           bintray_path: Win64
           MYSQL_DRIVER_URL: https://dev.mysql.com/get/Downloads/Connector-C/mysql-connector-c-6.1.6-winx64.zip
           MYSQL_DRIVER_ARCHIVE: mysql-connector-c-6.1.6-winx64.zip
@@ -18,17 +18,13 @@ environment:
           choco_arch: --x86
           nuget_arch: Win32
           target_arch: x86
-          qt_ver: 5.5\msvc2013
+          qt_ver: 5.6\msvc2013
           bintray_path: Win32
           MYSQL_DRIVER_URL: https://dev.mysql.com/get/Downloads/Connector-C/mysql-connector-c-6.1.6-win32.zip
           MYSQL_DRIVER_ARCHIVE: mysql-connector-c-6.1.6-win32.zip
           MYSQL_DRIVER_NAME: mysql-connector-c-6.1.6-win32
 install:
     - systeminfo
-    # upgrade cmake in order to have c++11 support
-    - choco install cmake -y
-    # The chocolatey guys like to push broken packages; better stick with a working one
-    - choco install nsis -y --version 2.50.0.20160103
     - ps: |
         if (Test-Path c:\protoc) {
             echo "using protoc from cache"
