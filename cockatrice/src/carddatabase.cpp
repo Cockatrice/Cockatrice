@@ -105,6 +105,18 @@ int SetList::getUnknownSetsNum()
     return num;
 }
 
+QStringList SetList::getUnknownSetsNames()
+{
+    QStringList sets = QStringList();
+    for (int i = 0; i < size(); ++i)
+    {
+        CardSet *set = at(i);
+        if(!set->getIsKnown())
+            sets << set->getShortName();
+    }
+    return sets;
+}
+
 void SetList::enableAllUnknown()
 {
     for (int i = 0; i < size(); ++i)
@@ -755,8 +767,9 @@ void CardDatabase::checkUnknownSets()
     {
         // if some sets are first found on thus run, ask the user
         int numUnknownSets = sets.getUnknownSetsNum();
+        QStringList unknownSetNames = sets.getUnknownSetsNames();
         if(numUnknownSets > 0)
-            emit cardDatabaseNewSetsFound(numUnknownSets);
+            emit cardDatabaseNewSetsFound(numUnknownSets, unknownSetNames);
     } else {
         // No set enabled. Probably this is the first time running trice
         sets.guessSortKeys();
