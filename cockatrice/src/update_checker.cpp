@@ -1,7 +1,3 @@
-//
-// Created by miguel on 28/12/15.
-//
-
 #include <algorithm>
 #include <QMessageBox>
 
@@ -11,7 +7,8 @@
 
 #define LATEST_FILES_URL "https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice/files"
 
-UpdateChecker::UpdateChecker(QObject *parent) : QObject(parent){
+UpdateChecker::UpdateChecker(QObject *parent) : QObject(parent)
+{
     //Parse the commit date. We'll use this to check for new versions
     //We know the format because it's based on `git log` which is documented here:
     //  https://git-scm.com/docs/git-log#_commit_formatting
@@ -37,18 +34,33 @@ void UpdateChecker::check()
 #if defined(Q_OS_OSX)
 bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
 {
-   return build
+    return build
             .toMap()["name"]
             .toString()
-            .contains("osx");
+            .endsWith(".dmg");
 }
+
 #elif defined(Q_OS_WIN)
 bool UpdateChecker::downloadMatchesCurrentOS(QVariant build)
 {
-       return build
-            .toMap()["name"]
-            .toString()
-            .contains("exe");
+    QString wordSize = QSysInfo::buildAbi().split('-')[2];
+    QString arch;
+    if (wordSize == "llp64") {
+        arch = "win64";
+    } else if (wordSize == "ilp32") {
+        arch = "win32";
+    } else {
+        qWarning() << "Error checking for upgrade version: wordSize is" << wordSize;
+        return false;
+    }
+
+    auto fileName = build
+        .toMap()["name"]
+        .toString();
+    // Checking for .zip is a workaround for the May 6th 2016 release
+    auto zipName = arch + ".zip";
+    auto exeName = arch + ".exe";
+    return fileName.endsWith(exeName) || fileName.endsWith(zipName);
 }
 #else
 
@@ -79,22 +91,23 @@ QDate UpdateChecker::findOldestBuild(QVariantList allBuilds)
     return *std::min_element(dateArray.begin(), dateArray.end());
 }
 
-QVariantMap *UpdateChecker::findCompatibleBuild(QVariantList allBuilds) {
+QVariantMap *UpdateChecker::findCompatibleBuild(QVariantList allBuilds)
+{
 
     QVariantList::iterator result = std::find_if(allBuilds.begin(), allBuilds.end(), downloadMatchesCurrentOS);
 
     //If there is no compatible version, return NULL
     if (result == allBuilds.end())
         return NULL;
-    else
-    {
+    else {
         QVariantMap *ret = new QVariantMap;
         *ret = (*result).toMap();
         return ret;
     }
 }
 
-void UpdateChecker::fileListFinished() {
+void UpdateChecker::fileListFinished()
+{
     try {
         QVariantList builds = QtJson::Json::parse(response->readAll()).toList();
         build = findCompatibleBuild(builds);
@@ -105,7 +118,7 @@ void UpdateChecker::fileListFinished() {
 
         emit finishedCheck(needToUpdate, compatibleVersion, build);
     }
-    catch (const std::exception &exc){
+    catch (const std::exception &exc) {
         emit error(exc.what());
     }
 }
