@@ -1458,7 +1458,6 @@ public:
 
     void retranslateUi(QWidget *shortcutsTab)
     {
-        shortcutsTab->setWindowTitle(QApplication::translate("shortcutsTab", "Form", 0));
         groupBox->setTitle(QApplication::translate("shortcutsTab", "Main Window", 0));
         lbl_MainWindow_aDeckEditor->setText(QApplication::translate("shortcutsTab", "Deck editor", 0));
         lbl_MainWindow_aSinglePlayer->setText(QApplication::translate("shortcutsTab", "Local gameplay", 0));
