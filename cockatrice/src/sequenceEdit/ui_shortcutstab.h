@@ -1456,7 +1456,7 @@ public:
         retranslateUi(shortcutsTab);
     } // setupUi
 
-    void retranslateUi(QWidget *shortcutsTab)
+    void retranslateUi(QWidget * /*shortcutsTab */)
     {
         groupBox->setTitle(QApplication::translate("shortcutsTab", "Main Window", 0));
         lbl_MainWindow_aDeckEditor->setText(QApplication::translate("shortcutsTab", "Deck editor", 0));
