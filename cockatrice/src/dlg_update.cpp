@@ -26,9 +26,9 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent) {
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
     ok = new QPushButton("Ok", this);
-    manualDownload = new QPushButton("Update Anyway", this);
+    manualDownload = new QPushButton(tr("Update Anyway"), this);
     enableUpdateButton(false); //Unless we know there's an update available, you can't install
-    gotoDownload = new QPushButton("Open Download Page", this);
+    gotoDownload = new QPushButton(tr("Open Download Page"), this);
     buttonBox->addButton(manualDownload, QDialogButtonBox::ActionRole);
     buttonBox->addButton(gotoDownload, QDialogButtonBox::ActionRole);
     buttonBox->addButton(ok, QDialogButtonBox::AcceptRole);
@@ -84,7 +84,7 @@ void DlgUpdate::gotoDownloadPage() {
 }
 
 void DlgUpdate::downloadUpdate() {
-    setLabel("Downloading update...");
+    setLabel(tr("Downloading update..."));
     enableOkButton(false);
     enableUpdateButton(false);
     uDownloader->beginDownload(updateUrl);
@@ -93,7 +93,7 @@ void DlgUpdate::downloadUpdate() {
 void DlgUpdate::beginUpdateCheck() {
     progress->setMinimum(0);
     progress->setMaximum(0);
-    setLabel("Checking for updates...");
+    setLabel(tr("Checking for updates..."));
     uChecker->check();
 }
 
@@ -103,7 +103,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, QVaria
 
     //Update the UI to say we've finished
     progress->setMaximum(100);
-    setLabel("Finished checking for updates.");
+    setLabel(tr("Finished checking for updates."));
 
     //If there are no available builds, then they can't auto update.
     enableUpdateButton(isCompatible);
@@ -130,7 +130,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, QVaria
         }
         else
         {
-            QMessageBox::information(this, "Cockatrice Update",
+            QMessageBox::information(this, tr("Cockatrice Update"),
                                      tr("Your version of Cockatrice is out of date, but there are no packages"
                                                 " available for your operating system. You may have to use a developer build or build from source"
                                                 " yourself. Please visit the download page."));
@@ -158,24 +158,24 @@ void DlgUpdate::setLabel(QString newText) {
 
 void DlgUpdate::updateCheckError(QString errorString) {
     setLabel("Error");
-    QMessageBox::critical(this, tr("Update Error"), "An error occurred while checking for updates: " + errorString);
+    QMessageBox::critical(this, tr("Update Error"), tr("An error occurred while checking for updates: ") + errorString);
 }
 
 void DlgUpdate::downloadError(QString errorString) {
-    setLabel("Error");
+    setLabel(tr("Error"));
     enableUpdateButton(true);
-    QMessageBox::critical(this, tr("Update Error"), "An error occurred while downloading an update: " + errorString);
+    QMessageBox::critical(this, tr("Update Error"), tr("An error occurred while downloading an update: ") + errorString);
 }
 
 void DlgUpdate::downloadSuccessful(QUrl filepath) {
-    setLabel("Installing...");
+    setLabel(tr("Installing..."));
     //Try to open the installer. If it opens, quit Cockatrice
     if (QDesktopServices::openUrl(filepath))
     {
         QMetaObject::invokeMethod((MainWindow*) parent(), "close", Qt::QueuedConnection);
         close();
     } else {
-        setLabel("Error");
+        setLabel(tr("Error"));
         QMessageBox::critical(this, tr("Update Error"), "Unable to open the installer. You might be able to manually update"
                 " by closing Cockatrice and running the installer at " + filepath.toLocalFile() + ".");
     }
