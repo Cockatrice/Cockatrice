@@ -788,9 +788,9 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
     msgBox.setWindowTitle(tr("New sets found"));
     msgBox.setIcon(QMessageBox::Question);
     msgBox.setText(
-        tr("%1 new sets found in the card database\n"
-        "Set codes: %2\n"
-        "Do you want to enable them?"
+        tr("%1 new set(s) found in the card database\n"
+        "Set code(s): %2\n"
+        "Do you want to enable it/them?"
         ).arg(numUnknownSets).arg(unknownSetsNames.join(", ")));
 
     QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
