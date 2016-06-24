@@ -75,7 +75,7 @@ public:
 private:
     PictureLoader();
     ~PictureLoader();
-    // Don't implement
+    // Singleton - Don't implement copy constructor and assign operator
     PictureLoader(PictureLoader const&);
     void operator=(PictureLoader const&); 
 

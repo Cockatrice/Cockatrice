@@ -41,8 +41,7 @@
 #include "rng_sfmt.h"
 #include "soundengine.h"
 #include "featureset.h"
-
-//Q_IMPORT_PLUGIN(qjpeg)
+#include "logger.h"
 
 CardDatabase *db;
 QTranslator *translator, *qtTranslator;
@@ -55,13 +54,8 @@ ThemeManager *themeManager;
 const QString translationPrefix = "cockatrice";
 QString translationPath;
 
-static void myMessageOutput(QtMsgType /*type*/, const QMessageLogContext &, const QString &msg)
-{
-    QFile file("qdebug.txt");
-    file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
-    QTextStream out(&file);
-    out << msg << endl;
-    file.close();
+static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, const QString &message) {
+    Logger::getInstance().log(type, ctx, message);
 }
 
 void installNewTranslator()
@@ -91,8 +85,9 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    qInstallMessageHandler(CockatriceLogger);
     if (app.arguments().contains("--debug-output"))
-        qInstallMessageHandler(myMessageOutput);
+        Logger::getInstance().logToFile(true);
 
 #ifdef Q_OS_WIN
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
