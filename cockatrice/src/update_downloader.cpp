@@ -44,7 +44,7 @@ void UpdateDownloader::fileFinished() {
     //Save the build in a temporary directory
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
-        emit error("Could not open the file for reading.");
+        emit error(tr("Could not open the file for reading."));
         return;
     }
 
