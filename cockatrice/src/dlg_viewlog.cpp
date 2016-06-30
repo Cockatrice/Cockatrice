@@ -15,7 +15,7 @@ DlgViewLog::DlgViewLog(QWidget *parent)
 
     setLayout(mainLayout);
 
-    setWindowTitle(tr("View debug log"));
+    setWindowTitle(tr("Debug Log"));
     resize(800, 500);
 
     loadInitialLogBuffer();
