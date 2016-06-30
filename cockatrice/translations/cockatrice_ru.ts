@@ -1267,6 +1267,8 @@ Would you like to change your database location setting?</source>
     <name>DlgUpdate</name>
     <message>
         <location filename="../src/dlg_update.cpp" line="52"/>
+        <location filename="../src/dlg_update.cpp" line="165"/>
+        <location filename="../src/dlg_update.cpp" line="178"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -1281,9 +1283,35 @@ Would you like to change your database location setting?</source>
         <translation>Ваша версия Cockatrice устарела, но пакетов обновлений, поддерживающих вашу операционную систему, нет. Вы можете использовать сборку разработчика или скомпилировать сборку из исходных файлов самостоятельно. Пожалуйста, перейдите на страницу загрузки.</translation>
     </message>
     <message>
+        <location filename="../src/dlg_update.cpp" line="133"/>
         <location filename="../src/dlg_update.cpp" line="142"/>
         <source>Cockatrice Update</source>
         <translation>Обновить Cockatrice</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="29"/>
+        <source>Update Anyway</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="31"/>
+        <source>Open Download Page</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="87"/>
+        <source>Downloading update...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="96"/>
+        <source>Checking for updates...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="106"/>
+        <source>Finished checking for updates.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="142"/>
@@ -1296,6 +1324,29 @@ Would you like to change your database location setting?</source>
         <location filename="../src/dlg_update.cpp" line="179"/>
         <source>Update Error</source>
         <translation>Ошибка при оновлении</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="161"/>
+        <source>An error occurred while checking for updates: </source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="167"/>
+        <source>An error occurred while downloading an update: </source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_update.cpp" line="171"/>
+        <source>Installing...</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>DlgViewLog</name>
+    <message>
+        <location filename="../src/dlg_viewlog.cpp" line="18"/>
+        <source>View debug log</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1624,60 +1675,60 @@ Would you like to change your database location setting?</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/window_main.cpp" line="90"/>
+        <location filename="../src/window_main.cpp" line="91"/>
         <source>The server has reached its maximum user capacity, please check back later.</source>
         <translation>Этот сервер достиг максимального количества пользователей, попробуйте позже.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="91"/>
+        <location filename="../src/window_main.cpp" line="92"/>
         <source>There are too many concurrent connections from your address.</source>
         <translation>Слишком много одновременных подключений с Вашего адреса.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="93"/>
+        <location filename="../src/window_main.cpp" line="94"/>
         <source>Banned by moderator</source>
         <translation>Забанен модератором</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="95"/>
+        <location filename="../src/window_main.cpp" line="96"/>
         <source>Expected end time: %1</source>
         <translation>Ожидаемое время: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="97"/>
+        <location filename="../src/window_main.cpp" line="98"/>
         <source>This ban lasts indefinitely.</source>
         <translation>Этот бан не ограничен по времени.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="102"/>
+        <location filename="../src/window_main.cpp" line="103"/>
         <source>Scheduled server shutdown.</source>
         <translation>Плановый перерыв в работе сервера.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="103"/>
-        <location filename="../src/window_main.cpp" line="383"/>
+        <location filename="../src/window_main.cpp" line="104"/>
+        <location filename="../src/window_main.cpp" line="390"/>
         <source>Invalid username.</source>
         <translation>Неверное имя пользователя.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="104"/>
+        <location filename="../src/window_main.cpp" line="105"/>
         <source>You have been logged out due to logging in at another location.</source>
         <translation>Вы вышли из аккаунта, так как был выполнен вход из другого расположения.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="107"/>
+        <location filename="../src/window_main.cpp" line="108"/>
         <source>Connection closed</source>
         <translation>Соединение прервано</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="107"/>
+        <location filename="../src/window_main.cpp" line="108"/>
         <source>The server has terminated your connection.
 Reason: %1</source>
         <translation>Ваше подключение было прервано сервером.
 Причина: %1</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/window_main.cpp" line="112"/>
+        <location filename="../src/window_main.cpp" line="113"/>
         <source>The server is going to be restarted in %n minute(s).
 All running games will be lost.
 Reason for shutdown: %1</source>
@@ -1686,618 +1737,623 @@ Reason for shutdown: %1</source>
 Причина перезагрузки: %1</numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="114"/>
+        <location filename="../src/window_main.cpp" line="115"/>
         <source>Scheduled server shutdown</source>
         <translation>Плановый перерыв в работе сервера</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="151"/>
-        <location filename="../src/window_main.cpp" line="161"/>
+        <location filename="../src/window_main.cpp" line="152"/>
+        <location filename="../src/window_main.cpp" line="162"/>
         <source>Success</source>
         <translation>Успешно</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="151"/>
+        <location filename="../src/window_main.cpp" line="152"/>
         <source>Registration accepted.
 Will now login.</source>
         <translation>Регистрация прошла успешно.
 Идет соединение.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="161"/>
+        <location filename="../src/window_main.cpp" line="162"/>
         <source>Account activation accepted.
 Will now login.</source>
         <translation>Активация аккаунта прошла успешно.
 Идет соединение.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="199"/>
+        <location filename="../src/window_main.cpp" line="200"/>
         <source>Number of players</source>
         <translation>Количество игроков</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="199"/>
+        <location filename="../src/window_main.cpp" line="200"/>
         <source>Please enter the number of players.</source>
         <translation>Введите количество игроков.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="209"/>
-        <location filename="../src/window_main.cpp" line="215"/>
+        <location filename="../src/window_main.cpp" line="210"/>
+        <location filename="../src/window_main.cpp" line="216"/>
         <source>Player %1</source>
         <translation>Игрок %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="227"/>
+        <location filename="../src/window_main.cpp" line="228"/>
         <source>Load replay</source>
         <translation>Загрузить повтор</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="282"/>
+        <location filename="../src/window_main.cpp" line="283"/>
         <source>About Cockatrice</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="284"/>
+        <location filename="../src/window_main.cpp" line="285"/>
         <source>Version %1</source>
         <translation>Версия %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="285"/>
+        <location filename="../src/window_main.cpp" line="286"/>
         <source>Cockatrice Webpage</source>
         <translation>Страница Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="286"/>
+        <location filename="../src/window_main.cpp" line="287"/>
         <source>Project Manager:</source>
         <translation>Руководитель проекта:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="287"/>
+        <location filename="../src/window_main.cpp" line="288"/>
         <source>Past Project Managers:</source>
         <translation>Предыдущие руководители проекта:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="288"/>
+        <location filename="../src/window_main.cpp" line="289"/>
         <source>Developers:</source>
         <translation>Разработчики:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="289"/>
+        <location filename="../src/window_main.cpp" line="290"/>
         <source>Our Developers</source>
         <translation>Наши разработчики</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="290"/>
+        <location filename="../src/window_main.cpp" line="291"/>
         <source>Help Develop!</source>
         <translation>Помочь в разработке!</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="291"/>
+        <location filename="../src/window_main.cpp" line="292"/>
         <source>Translators:</source>
         <translation>Переводчики:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="292"/>
+        <location filename="../src/window_main.cpp" line="293"/>
         <source>Recognition Page</source>
         <translation>Cockatrice в деталях</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="293"/>
+        <location filename="../src/window_main.cpp" line="294"/>
         <source>Help Translate!</source>
         <translation>Помочь с переводом!</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="294"/>
+        <location filename="../src/window_main.cpp" line="295"/>
         <source>Support:</source>
         <translation>Поддержать проект:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="295"/>
+        <location filename="../src/window_main.cpp" line="296"/>
         <source>Report an Issue</source>
         <translation>Сообщить о проблеме</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="296"/>
+        <location filename="../src/window_main.cpp" line="297"/>
         <source>Troubleshooting</source>
         <translation>Устранение неполадок</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="297"/>
+        <location filename="../src/window_main.cpp" line="298"/>
         <source>F.A.Q.</source>
         <translation>ЧАВо</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="309"/>
-        <location filename="../src/window_main.cpp" line="331"/>
-        <location filename="../src/window_main.cpp" line="334"/>
-        <location filename="../src/window_main.cpp" line="345"/>
-        <location filename="../src/window_main.cpp" line="349"/>
-        <location filename="../src/window_main.cpp" line="353"/>
-        <location filename="../src/window_main.cpp" line="358"/>
-        <location filename="../src/window_main.cpp" line="361"/>
-        <location filename="../src/window_main.cpp" line="375"/>
-        <location filename="../src/window_main.cpp" line="435"/>
-        <location filename="../src/window_main.cpp" line="439"/>
-        <location filename="../src/window_main.cpp" line="443"/>
+        <location filename="../src/window_main.cpp" line="316"/>
+        <location filename="../src/window_main.cpp" line="338"/>
+        <location filename="../src/window_main.cpp" line="341"/>
+        <location filename="../src/window_main.cpp" line="352"/>
+        <location filename="../src/window_main.cpp" line="356"/>
+        <location filename="../src/window_main.cpp" line="360"/>
+        <location filename="../src/window_main.cpp" line="365"/>
+        <location filename="../src/window_main.cpp" line="368"/>
+        <location filename="../src/window_main.cpp" line="382"/>
+        <location filename="../src/window_main.cpp" line="442"/>
         <location filename="../src/window_main.cpp" line="446"/>
+        <location filename="../src/window_main.cpp" line="450"/>
         <location filename="../src/window_main.cpp" line="453"/>
         <location filename="../src/window_main.cpp" line="460"/>
         <location filename="../src/window_main.cpp" line="467"/>
-        <location filename="../src/window_main.cpp" line="469"/>
-        <location filename="../src/window_main.cpp" line="859"/>
-        <location filename="../src/window_main.cpp" line="895"/>
+        <location filename="../src/window_main.cpp" line="474"/>
+        <location filename="../src/window_main.cpp" line="476"/>
+        <location filename="../src/window_main.cpp" line="870"/>
+        <location filename="../src/window_main.cpp" line="906"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="309"/>
+        <location filename="../src/window_main.cpp" line="316"/>
         <source>Server timeout</source>
         <translation>Нет связи с сервером</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="324"/>
+        <location filename="../src/window_main.cpp" line="331"/>
         <source>Failed Login</source>
         <translation>Не могу подключиться</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="325"/>
+        <location filename="../src/window_main.cpp" line="332"/>
         <source>Your client does not support features that the server requires, please update your client and try again.</source>
         <translation>Ваш клиент не соответствует критериям сервера. Пожалуйста, обновите клиент и попробуйте снова.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="331"/>
+        <location filename="../src/window_main.cpp" line="338"/>
         <source>Incorrect username or password. Please check your authentication information and try again.</source>
         <translation>Неверное имя пользователя или пароль. Пожалуйста, уточните регистрационные данные и попробуйте снова.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="334"/>
+        <location filename="../src/window_main.cpp" line="341"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
         <translation>Пользователь с таким именем уже подключен.
 Пожалуйста, закройте это подключение и войдите заново.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="339"/>
-        <location filename="../src/window_main.cpp" line="429"/>
+        <location filename="../src/window_main.cpp" line="346"/>
+        <location filename="../src/window_main.cpp" line="436"/>
         <source>You are banned until %1.</source>
         <translation>Вы забанены до %1.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="341"/>
-        <location filename="../src/window_main.cpp" line="431"/>
+        <location filename="../src/window_main.cpp" line="348"/>
+        <location filename="../src/window_main.cpp" line="438"/>
         <source>You are banned indefinitely.</source>
         <translation>Вы забанены бессрочно.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="353"/>
+        <location filename="../src/window_main.cpp" line="360"/>
         <source>This server requires user registration. Do you want to register now?</source>
         <translation>На этом сервере требуется регистрация. Вы хотите зарегистрироваться сейчас?</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="358"/>
+        <location filename="../src/window_main.cpp" line="365"/>
         <source>This server requires client ID's. Your client is either failing to generate an ID or you are running a modified client.
 Please close and reopen your client to try again.</source>
         <translation>На этом сервере используется ID клиентов. Ваш клиент не может сгенерировать ID, либо ваш клиент был модифицирован.
 Пожалуйста, перезапустите клиент и попробуйте снова.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="361"/>
+        <location filename="../src/window_main.cpp" line="368"/>
         <source>An internal error has occurred, please try closing and reopening your client and try again. If the error persists try updating your client to the most recent build and if need be contact your software provider.</source>
         <translation>Возникла внутренняя ошибка. Пожалуйста, перезапустите клиент. Если ошибка повторится, попробуйте обновить клиент до последней версии или свяжитесь с разработчиком.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="365"/>
+        <location filename="../src/window_main.cpp" line="372"/>
         <source>Account activation</source>
         <translation>Активация аккаунта</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="365"/>
+        <location filename="../src/window_main.cpp" line="372"/>
         <source>Your account has not been activated yet.
 You need to provide the activation token received in the activation email</source>
         <translation>Ваш аккаунт пока не активирован. Вам необходимо следовать указаниям по активации, отправленным на ваш email.
 </translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="375"/>
+        <location filename="../src/window_main.cpp" line="382"/>
         <source>Unknown login error: %1</source>
         <translation>Неизвестная ошибка входа: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="375"/>
-        <location filename="../src/window_main.cpp" line="446"/>
+        <location filename="../src/window_main.cpp" line="382"/>
+        <location filename="../src/window_main.cpp" line="453"/>
         <source>
 This usually means that your client version is out of date, and the server sent a reply your client doesn&apos;t understand.</source>
         <translation>
 Обычно это означает, что Вы используете устаревшую версию клиента, и тот не отвечает запросам сервера.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="387"/>
+        <location filename="../src/window_main.cpp" line="394"/>
         <source>Your username must respect these rules:</source>
         <translation>Имя пользователя должно удовлетворять следующим условиям:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="389"/>
+        <location filename="../src/window_main.cpp" line="396"/>
         <source>is %1 - %2 characters long</source>
         <translation>длиной в %1 - %2 символов</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="390"/>
+        <location filename="../src/window_main.cpp" line="397"/>
         <source>can %1 contain lowercase characters</source>
         <translation>%1 может содержать строчные буквы</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="390"/>
-        <location filename="../src/window_main.cpp" line="391"/>
-        <location filename="../src/window_main.cpp" line="392"/>
         <location filename="../src/window_main.cpp" line="397"/>
+        <location filename="../src/window_main.cpp" line="398"/>
+        <location filename="../src/window_main.cpp" line="399"/>
+        <location filename="../src/window_main.cpp" line="404"/>
         <source>NOT</source>
         <translation>НЕ</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="391"/>
+        <location filename="../src/window_main.cpp" line="398"/>
         <source>can %1 contain uppercase characters</source>
         <translation>%1 может содержать заглавные буквы</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="392"/>
+        <location filename="../src/window_main.cpp" line="399"/>
         <source>can %1 contain numeric characters</source>
         <translation>%1 может содержать цифры</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="395"/>
+        <location filename="../src/window_main.cpp" line="402"/>
         <source>can contain the following punctuation: %1</source>
         <translation>Может содержать следующие символы: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="397"/>
+        <location filename="../src/window_main.cpp" line="404"/>
         <source>first character can %1 be a punctuation mark</source>
         <translation>Первый знак %1 может быть знаком пунктуации</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="402"/>
+        <location filename="../src/window_main.cpp" line="409"/>
         <source>You may only use A-Z, a-z, 0-9, _, ., and - in your username.</source>
         <translation>Имя пользователя может включать только следующие символы: A-Z, a-z, 0-9, &quot;_&quot;, &quot;.&quot; и &quot;-&quot;</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="412"/>
-        <location filename="../src/window_main.cpp" line="415"/>
-        <location filename="../src/window_main.cpp" line="418"/>
-        <location filename="../src/window_main.cpp" line="421"/>
-        <location filename="../src/window_main.cpp" line="424"/>
+        <location filename="../src/window_main.cpp" line="419"/>
+        <location filename="../src/window_main.cpp" line="422"/>
+        <location filename="../src/window_main.cpp" line="425"/>
+        <location filename="../src/window_main.cpp" line="428"/>
+        <location filename="../src/window_main.cpp" line="431"/>
         <source>Registration denied</source>
         <translation>Запрос на регистрацию отклонен</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="412"/>
+        <location filename="../src/window_main.cpp" line="419"/>
         <source>Registration is currently disabled on this server</source>
         <translation>Регистрация на данном сервере в настоящий момент недоступна</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="415"/>
+        <location filename="../src/window_main.cpp" line="422"/>
         <source>There is already an existing account with the same user name.</source>
         <translation>Аккаунт с таким именем уже существует.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="418"/>
+        <location filename="../src/window_main.cpp" line="425"/>
         <source>It&apos;s mandatory to specify a valid email address when registering.</source>
         <translation>При регистрации необходимо указать действующий e-mail.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="421"/>
+        <location filename="../src/window_main.cpp" line="428"/>
         <source>Too many registration attempts from your IP address.</source>
         <translation>С Вашего IP зарегистрировано слишком много регистрационных запросов.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="424"/>
+        <location filename="../src/window_main.cpp" line="431"/>
         <source>Password too short.</source>
         <translation>Слишком короткий пароль.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="443"/>
+        <location filename="../src/window_main.cpp" line="450"/>
         <source>Registration failed for a technical problem on the server.</source>
         <translation>Регистрация не удалась из-за технических неполадок на сервере.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="446"/>
+        <location filename="../src/window_main.cpp" line="453"/>
         <source>Unknown registration error: %1</source>
         <translation>Неизвестная ошибка при регистрации: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="453"/>
+        <location filename="../src/window_main.cpp" line="460"/>
         <source>Account activation failed</source>
         <translation>Не удалось активировать аккаунт</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="460"/>
+        <location filename="../src/window_main.cpp" line="467"/>
         <source>Socket error: %1</source>
         <translation>Ошибка сокета: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="467"/>
+        <location filename="../src/window_main.cpp" line="474"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation>Вы пытаетесь подключиться к несуществующему серверу. Пожалуйста, обновите Cockatrice или выберите другой сервер.
 Локальная версия %1, удаленная версия %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="469"/>
+        <location filename="../src/window_main.cpp" line="476"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation>Ваш клиент Cockatrice устарел. Пожалуйста, обновите Cockatrice.
 Локальная версия %1, удаленная версия %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="475"/>
+        <location filename="../src/window_main.cpp" line="482"/>
         <source>Connecting to %1...</source>
         <translation>Подключение к %1...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="476"/>
+        <location filename="../src/window_main.cpp" line="483"/>
         <source>Registering to %1 as %2...</source>
         <translation>Регистрация на %1 как %2...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="477"/>
+        <location filename="../src/window_main.cpp" line="484"/>
         <source>Disconnected</source>
         <translation>Подключение прервано</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="478"/>
+        <location filename="../src/window_main.cpp" line="485"/>
         <source>Connected, logging in at %1</source>
         <translation>Соединение установлено, выполняется вход на %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="488"/>
+        <location filename="../src/window_main.cpp" line="495"/>
         <source>&amp;Connect...</source>
         <translation>Подключение... &amp;С</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="489"/>
+        <location filename="../src/window_main.cpp" line="496"/>
         <source>&amp;Disconnect</source>
         <translation>П&amp;рервать подключение</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="490"/>
+        <location filename="../src/window_main.cpp" line="497"/>
         <source>Start &amp;local game...</source>
         <translation>&amp;Начать локальную игру...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="491"/>
+        <location filename="../src/window_main.cpp" line="498"/>
         <source>&amp;Watch replay...</source>
         <translation>&amp;Смотреть повтор...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="492"/>
+        <location filename="../src/window_main.cpp" line="499"/>
         <source>&amp;Deck editor</source>
         <translation>Редактор &amp;колод</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="493"/>
+        <location filename="../src/window_main.cpp" line="500"/>
         <source>&amp;Full screen</source>
         <translation>Полный экран &amp;F</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="494"/>
+        <location filename="../src/window_main.cpp" line="501"/>
         <source>&amp;Register to server...</source>
         <translation>&amp;Регистрация на сервере...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="495"/>
+        <location filename="../src/window_main.cpp" line="502"/>
         <source>&amp;Settings...</source>
         <translation>&amp;Настройки</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="497"/>
-        <location filename="../src/window_main.cpp" line="706"/>
+        <location filename="../src/window_main.cpp" line="504"/>
+        <location filename="../src/window_main.cpp" line="717"/>
         <source>&amp;Exit</source>
         <translation>&amp;Выход</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="500"/>
+        <location filename="../src/window_main.cpp" line="507"/>
         <source>A&amp;ctions</source>
         <translation>&amp;Действия</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="502"/>
+        <location filename="../src/window_main.cpp" line="509"/>
         <source>&amp;Cockatrice</source>
         <translation>&amp;Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="505"/>
+        <location filename="../src/window_main.cpp" line="512"/>
         <source>C&amp;ard Database</source>
         <translation>&amp;База карт</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="506"/>
+        <location filename="../src/window_main.cpp" line="513"/>
         <source>Open custom image folder</source>
         <translation>Открыть папку с изображениями</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="507"/>
+        <location filename="../src/window_main.cpp" line="514"/>
         <source>Open custom sets folder</source>
         <translation>Открыть папку с изданиями</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="508"/>
+        <location filename="../src/window_main.cpp" line="515"/>
         <source>Add custom sets/cards</source>
         <translation>Добавить издания/карты</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="509"/>
+        <location filename="../src/window_main.cpp" line="516"/>
         <source>&amp;Edit sets...</source>
         <translation>Редактировать &amp;издания</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="510"/>
+        <location filename="../src/window_main.cpp" line="517"/>
         <source>Edit &amp;tokens...</source>
         <translation>Редактировать &amp;фишки</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="512"/>
+        <location filename="../src/window_main.cpp" line="519"/>
         <source>&amp;About Cockatrice</source>
         <translation>О про&amp;грамме</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="513"/>
+        <location filename="../src/window_main.cpp" line="520"/>
         <source>&amp;Update Cockatrice</source>
         <translation>&amp;Обновить Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="514"/>
+        <location filename="../src/window_main.cpp" line="521"/>
+        <source>View &amp;debug log</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="522"/>
         <source>&amp;Help</source>
         <translation>&amp;Справка</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="515"/>
+        <location filename="../src/window_main.cpp" line="523"/>
         <source>Check for card updates...</source>
         <translation>Проверить обновления базы карт...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="765"/>
+        <location filename="../src/window_main.cpp" line="776"/>
         <source>Card database</source>
         <translation>База карт</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="767"/>
+        <location filename="../src/window_main.cpp" line="778"/>
         <source>Cockatrice is unable to load the card database.
 Do you want to update your card database now?
 If unsure or first time user, choose &quot;Yes&quot;</source>
         <translation>Cockatrice не может загрузить базу карт. Обновить вашу базу карт сейчас? Если Вы не уверены, или впервые запустили программу, нажмите &quot;Да&quot;</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="771"/>
-        <location filename="../src/window_main.cpp" line="796"/>
+        <location filename="../src/window_main.cpp" line="782"/>
+        <location filename="../src/window_main.cpp" line="807"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="772"/>
-        <location filename="../src/window_main.cpp" line="797"/>
+        <location filename="../src/window_main.cpp" line="783"/>
+        <location filename="../src/window_main.cpp" line="808"/>
         <source>No</source>
         <translation>Нет</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="773"/>
+        <location filename="../src/window_main.cpp" line="784"/>
         <source>Open settings</source>
         <translation>Открыть настройки</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="788"/>
+        <location filename="../src/window_main.cpp" line="799"/>
         <source>New sets found</source>
         <translation>Найдены новые издания</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="791"/>
-        <source>%1 new sets found in the card database
-Set codes: %2
-Do you want to enable them?</source>
+        <location filename="../src/window_main.cpp" line="802"/>
+        <source>%1 new set(s) found in the card database
+Set code(s): %2
+Do you want to enable it/them?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="798"/>
+        <location filename="../src/window_main.cpp" line="809"/>
         <source>View sets</source>
         <translation>Просмотреть издания</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="815"/>
+        <location filename="../src/window_main.cpp" line="826"/>
         <source>Welcome</source>
         <translation>Добро пожаловать</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="815"/>
+        <location filename="../src/window_main.cpp" line="826"/>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Edit Sets&quot; window.</source>
         <translation>Добро пожаловать в Cockatrice! Все издания в базе карт включены по умолчанию. Подробнее об изменении настроек работы с изданиями - в окне &quot;Редактировать издания&quot;</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="825"/>
-        <location filename="../src/window_main.cpp" line="903"/>
-        <location filename="../src/window_main.cpp" line="927"/>
+        <location filename="../src/window_main.cpp" line="836"/>
+        <location filename="../src/window_main.cpp" line="914"/>
+        <location filename="../src/window_main.cpp" line="938"/>
         <source>Information</source>
         <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="825"/>
+        <location filename="../src/window_main.cpp" line="836"/>
         <source>A card database update is already running.</source>
         <translation>Обновление базы карт уже идет.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="859"/>
+        <location filename="../src/window_main.cpp" line="870"/>
         <source>Unable to run the card database updater: </source>
         <translation>Не удалось запустить обновление базы карт:</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="872"/>
+        <location filename="../src/window_main.cpp" line="883"/>
         <source>failed to start.</source>
         <translation>ошибка при запуске.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="875"/>
+        <location filename="../src/window_main.cpp" line="886"/>
         <source>crashed.</source>
         <translation>прервано.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="878"/>
+        <location filename="../src/window_main.cpp" line="889"/>
         <source>timed out.</source>
         <translation>превышен лимит ожидания.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="881"/>
+        <location filename="../src/window_main.cpp" line="892"/>
         <source>write error.</source>
         <translation>ошибка записи.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="884"/>
+        <location filename="../src/window_main.cpp" line="895"/>
         <source>read error.</source>
         <translation>ошибка чтения.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="888"/>
+        <location filename="../src/window_main.cpp" line="899"/>
         <source>unknown error.</source>
         <translation>неизвестная ошибка.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="895"/>
+        <location filename="../src/window_main.cpp" line="906"/>
         <source>The card database updater exited with an error: %1</source>
         <translation>Обновление базы карт прервано с ошибкой: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="903"/>
+        <location filename="../src/window_main.cpp" line="914"/>
         <source>Update completed successfully.
 Cockatrice will now reload the card database.</source>
         <translation>Обновление успешно завершено.
 Сейчас Cockatrice перезагрузит базу карт.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="927"/>
+        <location filename="../src/window_main.cpp" line="938"/>
         <source>Your client appears to be missing features that the server supports.
 This usually means that your client version is out of date, please check to see if there is a new client available for download.</source>
         <translation>В вашем клиенте, видимо, отсутствуют некоторые опции, поддерживаемые сервером.
 Обычно это означает, что версия клиента устарела. Пожалуйста, попробуйте скачать последнюю версию клиента.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="969"/>
-        <location filename="../src/window_main.cpp" line="977"/>
-        <location filename="../src/window_main.cpp" line="990"/>
-        <location filename="../src/window_main.cpp" line="993"/>
+        <location filename="../src/window_main.cpp" line="980"/>
+        <location filename="../src/window_main.cpp" line="988"/>
+        <location filename="../src/window_main.cpp" line="1001"/>
+        <location filename="../src/window_main.cpp" line="1004"/>
         <source>Load sets/cards</source>
         <translation>Загрузить издания/карты</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="977"/>
+        <location filename="../src/window_main.cpp" line="988"/>
         <source>Selected file cannot be found.</source>
         <translation>Выбранный файл не найден.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="990"/>
+        <location filename="../src/window_main.cpp" line="1001"/>
         <source>The new sets/cards have been added successfully.
 Cockatrice will now reload the card database.</source>
         <translation>Новые издания/карты успешно добавлены.
 Сейчас Cockatrice перезагрузит базу карт.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="993"/>
+        <location filename="../src/window_main.cpp" line="1004"/>
         <source>Sets/cards failed to import.</source>
         <translation>Не удалось импортировать издания/карты.</translation>
     </message>
@@ -3045,7 +3101,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="614"/>
         <source>&amp;Move hand to...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Поместить руку..</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="615"/>
@@ -3053,7 +3109,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="627"/>
         <location filename="../src/player.cpp" line="710"/>
         <source>&amp;Top of library</source>
-        <translation type="unfinished"/>
+        <translation>&amp;на верх библиотеки</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="616"/>
@@ -3061,12 +3117,12 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="628"/>
         <location filename="../src/player.cpp" line="711"/>
         <source>&amp;Bottom of library</source>
-        <translation type="unfinished"/>
+        <translation>&amp;вниз библиотеки</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="620"/>
         <source>&amp;Move graveyard to...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Поместить карты кладбища..</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="623"/>
@@ -3079,7 +3135,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="626"/>
         <source>&amp;Move exile to...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Поместить карты изгнания..</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="632"/>
@@ -3094,22 +3150,22 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="634"/>
         <source>Reveal &amp;library to...</source>
-        <translation type="unfinished"/>
+        <translation>Показать &amp;библиотеку..</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="635"/>
         <source>Reveal t&amp;op cards to...</source>
-        <translation type="unfinished"/>
+        <translation>Показать &amp;верхние карты..</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="636"/>
         <source>&amp;Always reveal top card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Всегда показывать верхнюю карту</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="637"/>
         <source>O&amp;pen deck in deck editor</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Открыть колоду в редакторе</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="638"/>
@@ -3144,7 +3200,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="644"/>
         <source>Play top card &amp;face down</source>
-        <translation type="unfinished"/>
+        <translation>Разыграть верхнюю карту &amp;рубашкой вверх</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="645"/>
@@ -3164,7 +3220,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="648"/>
         <source>Put bottom card &amp;in graveyard</source>
-        <translation type="unfinished"/>
+        <translation>Поместить нижнюю карту &amp;на кладбище</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="651"/>
@@ -3439,37 +3495,37 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>QMenuBar</name>
     <message>
-        <location filename="../src/window_main.cpp" line="571"/>
+        <location filename="../src/window_main.cpp" line="581"/>
         <source>Services</source>
         <translation>Сервисы</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="572"/>
+        <location filename="../src/window_main.cpp" line="582"/>
         <source>Hide %1</source>
         <translation>Скрыть %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="573"/>
+        <location filename="../src/window_main.cpp" line="583"/>
         <source>Hide Others</source>
         <translation>Скрыть остальные</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="574"/>
+        <location filename="../src/window_main.cpp" line="584"/>
         <source>Show All</source>
         <translation>Показать все</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="575"/>
+        <location filename="../src/window_main.cpp" line="585"/>
         <source>Preferences...</source>
         <translation>Параметры...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="576"/>
+        <location filename="../src/window_main.cpp" line="586"/>
         <source>Quit %1</source>
         <translation>Выйти %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="577"/>
+        <location filename="../src/window_main.cpp" line="587"/>
         <source>About %1</source>
         <translation>О %1</translation>
     </message>
@@ -3477,40 +3533,40 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/window_main.cpp" line="73"/>
+        <location filename="../src/window_main.cpp" line="74"/>
         <source>Cockatrice card database (*.xml)</source>
         <translation>База карт Cockatrice (*.xml)</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="74"/>
+        <location filename="../src/window_main.cpp" line="75"/>
         <location filename="../src/deck_loader.cpp" line="9"/>
         <source>All files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="229"/>
+        <location filename="../src/window_main.cpp" line="230"/>
         <source>Cockatrice replays (*.cor)</source>
-        <translation type="unfinished"/>
+        <translation>Записи игр Cockatrice (*.cor)</translation>
     </message>
     <message>
         <location filename="../src/deck_loader.cpp" line="8"/>
         <source>Common deck formats (*.cod *.dec *.txt *.mwDeck)</source>
-        <translation type="unfinished"/>
+        <translation>Стандартные форматы деклистов (*.cod *.dec *.txt *.mwDeck)</translation>
     </message>
     <message>
         <location filename="../../common/decklist.cpp" line="99"/>
         <source>Maindeck</source>
-        <translation type="unfinished"/>
+        <translation>Основная колода</translation>
     </message>
     <message>
         <location filename="../../common/decklist.cpp" line="101"/>
         <source>Sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Сайдборд</translation>
     </message>
     <message>
         <location filename="../../common/decklist.cpp" line="103"/>
         <source>Tokens</source>
-        <translation type="unfinished"/>
+        <translation>Фишки</translation>
     </message>
 </context>
 <context>
@@ -3523,7 +3579,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/remotedecklist_treewidget.cpp" line="162"/>
         <source>ID</source>
-        <translation type="unfinished"/>
+        <translation>ID</translation>
     </message>
     <message>
         <location filename="../src/remotedecklist_treewidget.cpp" line="163"/>
@@ -3536,32 +3592,32 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/remotereplaylist_treewidget.cpp" line="137"/>
         <source>ID</source>
-        <translation type="unfinished"/>
+        <translation>ID</translation>
     </message>
     <message>
         <location filename="../src/remotereplaylist_treewidget.cpp" line="138"/>
         <source>Name</source>
-        <translation type="unfinished"/>
+        <translation>Имя</translation>
     </message>
     <message>
         <location filename="../src/remotereplaylist_treewidget.cpp" line="139"/>
         <source>Players</source>
-        <translation type="unfinished"/>
+        <translation>Игроки</translation>
     </message>
     <message>
         <location filename="../src/remotereplaylist_treewidget.cpp" line="140"/>
         <source>Keep</source>
-        <translation type="unfinished"/>
+        <translation>Оставить</translation>
     </message>
     <message>
         <location filename="../src/remotereplaylist_treewidget.cpp" line="141"/>
         <source>Time started</source>
-        <translation type="unfinished"/>
+        <translation>Время начала</translation>
     </message>
     <message>
         <location filename="../src/remotereplaylist_treewidget.cpp" line="142"/>
         <source>Duration (sec)</source>
-        <translation type="unfinished"/>
+        <translation>Длительность (сек)</translation>
     </message>
 </context>
 <context>
@@ -3589,7 +3645,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_server.cpp" line="61"/>
         <source>Permissions</source>
-        <translation type="unfinished"/>
+        <translation>Разрешения</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="62"/>
@@ -3607,7 +3663,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/sequenceEdit/sequenceedit.cpp" line="152"/>
         <source>Shortcut already in use</source>
-        <translation type="unfinished"/>
+        <translation>Сочетание клавиш уже используется</translation>
     </message>
 </context>
 <context>
@@ -3615,17 +3671,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/setsmodel.cpp" line="67"/>
         <source>Enabled</source>
-        <translation type="unfinished"/>
+        <translation>Включено</translation>
     </message>
     <message>
         <location filename="../src/setsmodel.cpp" line="68"/>
         <source>Set type</source>
-        <translation type="unfinished"/>
+        <translation>Установить тип</translation>
     </message>
     <message>
         <location filename="../src/setsmodel.cpp" line="69"/>
         <source>Set code</source>
-        <translation type="unfinished"/>
+        <translation>Установить код</translation>
     </message>
     <message>
         <location filename="../src/setsmodel.cpp" line="70"/>
@@ -3635,7 +3691,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/setsmodel.cpp" line="71"/>
         <source>Release date</source>
-        <translation type="unfinished"/>
+        <translation>Дата релиза</translation>
     </message>
 </context>
 <context>
@@ -3643,22 +3699,22 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/sequenceEdit/shortcutstab.cpp" line="29"/>
         <source>Restore all default shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Восстановить сочетания клавиш по умолчанию</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/shortcutstab.cpp" line="30"/>
         <source>Do you really want to restore all default shortcuts?</source>
-        <translation type="unfinished"/>
+        <translation>Вы действительно хотите восстановить все сочетания клавиш по умолчанию?</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/shortcutstab.cpp" line="47"/>
         <source>Clear all default shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Очистить все сочетания клавиш по умолчанию</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/shortcutstab.cpp" line="48"/>
         <source>Do you really want to clear all shortcuts?</source>
-        <translation type="unfinished"/>
+        <translation>Вы действительно хотите очистить все сочетания клавиш?</translation>
     </message>
 </context>
 <context>
@@ -3684,27 +3740,27 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="730"/>
         <source>Enable &amp;sounds</source>
-        <translation type="unfinished"/>
+        <translation>Включить &amp;звуки</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="731"/>
         <source>Current sounds theme:</source>
-        <translation type="unfinished"/>
+        <translation>Звуковая тема:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="732"/>
         <source>Test system sound engine</source>
-        <translation type="unfinished"/>
+        <translation>Протестировать системный звук</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="733"/>
         <source>Sound settings</source>
-        <translation type="unfinished"/>
+        <translation>Настройки звука</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="734"/>
         <source>Master volume</source>
-        <translation type="unfinished"/>
+        <translation>Громкости</translation>
     </message>
 </context>
 <context>
@@ -3712,7 +3768,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_admin.h" line="46"/>
         <source>Administration</source>
-        <translation type="unfinished"/>
+        <translation>Управление</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="94"/>
@@ -3727,7 +3783,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_admin.cpp" line="96"/>
         <source>&amp;Reload configuration</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Обновить конфигурацию</translation>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="97"/>
@@ -3760,114 +3816,114 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="522"/>
         <source>&amp;Clear all filters</source>
-        <translation type="unfinished"/>
+        <translation>Очистить все фильтры</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="523"/>
         <source>Delete selected</source>
-        <translation type="unfinished"/>
+        <translation>Удалить выбранное</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="525"/>
         <source>Deck &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>Имя колоды:</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="526"/>
         <source>&amp;Comments:</source>
-        <translation type="unfinished"/>
+        <translation>Комментарии:</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="527"/>
         <source>Hash:</source>
-        <translation type="unfinished"/>
+        <translation>Хэш:</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="532"/>
         <source>&amp;New deck</source>
-        <translation type="unfinished"/>
+        <translation>Новая колода</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="533"/>
         <source>&amp;Load deck...</source>
-        <translation type="unfinished"/>
+        <translation>Загрузить колоду...</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="534"/>
         <source>&amp;Save deck</source>
-        <translation type="unfinished"/>
+        <translation>Сохранить колоду</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="535"/>
         <source>Save deck &amp;as...</source>
-        <translation type="unfinished"/>
+        <translation>Сохранить колоду как...</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="536"/>
         <source>Load deck from cl&amp;ipboard...</source>
-        <translation type="unfinished"/>
+        <translation>Загрузить колоду из буфера...</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="537"/>
         <source>Save deck to clip&amp;board</source>
-        <translation type="unfinished"/>
+        <translation>Сохранить колоду из буфера</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="538"/>
         <source>&amp;Print deck...</source>
-        <translation type="unfinished"/>
+        <translation>Распечатать колоду...</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="539"/>
         <source>&amp;Analyze deck on deckstats.net</source>
-        <translation type="unfinished"/>
+        <translation>Анализировать колоду на deckstats.net</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="540"/>
         <source>&amp;Close</source>
-        <translation type="unfinished"/>
+        <translation>Закрыть</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="542"/>
         <source>Add card to &amp;maindeck</source>
-        <translation type="unfinished"/>
+        <translation>Добавить карту в основную колоду</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="543"/>
         <source>Add card to &amp;sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Добавить карту в сайдборд</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="545"/>
         <source>&amp;Remove row</source>
-        <translation type="unfinished"/>
+        <translation>Удалить строку</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="547"/>
         <source>&amp;Increment number</source>
-        <translation type="unfinished"/>
+        <translation>Увеличить количество</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="549"/>
         <source>&amp;Decrement number</source>
-        <translation type="unfinished"/>
+        <translation>Уменьшить количество</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="551"/>
         <source>&amp;Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Редактор колод</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="553"/>
         <location filename="../src/tab_deck_editor.cpp" line="558"/>
         <source>Card Info</source>
-        <translation type="unfinished"/>
+        <translation>Информация о карте</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="554"/>
         <location filename="../src/tab_deck_editor.cpp" line="559"/>
         <source>Deck</source>
-        <translation type="unfinished"/>
+        <translation>Колода</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="555"/>
@@ -3878,31 +3934,31 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="557"/>
         <source>&amp;View</source>
-        <translation type="unfinished"/>
+        <translation>Вид</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="562"/>
         <location filename="../src/tab_deck_editor.cpp" line="565"/>
         <location filename="../src/tab_deck_editor.cpp" line="568"/>
         <source>Visible</source>
-        <translation type="unfinished"/>
+        <translation>Видимый</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="563"/>
         <location filename="../src/tab_deck_editor.cpp" line="566"/>
         <location filename="../src/tab_deck_editor.cpp" line="569"/>
         <source>Floating</source>
-        <translation type="unfinished"/>
+        <translation>Плавающий</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="571"/>
         <source>Reset layout</source>
-        <translation type="unfinished"/>
+        <translation>Сбросить слой</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="576"/>
         <source>Deck: %1</source>
-        <translation type="unfinished"/>
+        <translation>Колода: %1</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="624"/>
@@ -3913,7 +3969,8 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/tab_deck_editor.cpp" line="625"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
-        <translation type="unfinished"/>
+        <translation>Деклист был изменен.
+Вы хотите сохранить изменения?</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="655"/>
@@ -3930,14 +3987,15 @@ Do you want to save the changes?</source>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="674"/>
         <source>The deck could not be saved.</source>
-        <translation type="unfinished"/>
+        <translation>Колода не может быть сохранена.</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="698"/>
         <location filename="../src/tab_deck_editor.cpp" line="718"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
-        <translation type="unfinished"/>
+        <translation>Колода не может быть сохранена.
+Пожалуйста, проверьте расположение файла и попробуйте снова.</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="704"/>
@@ -3950,7 +4008,7 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="../src/tab_deck_storage.h" line="52"/>
         <source>Deck storage</source>
-        <translation type="unfinished"/>
+        <translation>Хранилище колод</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="117"/>
@@ -4000,24 +4058,24 @@ Please check that the directory is writable and try again.</source>
         <source>This decklist does not have a name.
 Please enter a name:</source>
         <translation>У этой колоды нет названия.
-Пожалуйста, проявите фантазию:</translation>
+Пожалуйста, введите имя:</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="160"/>
         <source>Unnamed deck</source>
-        <translation>Еще одна унылая дека</translation>
+        <translation>Безымянная колода</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="195"/>
         <source>Delete local file</source>
-        <translation type="unfinished"/>
+        <translation>Удалить файл</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="195"/>
         <location filename="../src/tab_deck_storage.cpp" line="312"/>
         <location filename="../src/tab_deck_storage.cpp" line="320"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
-        <translation type="unfinished"/>
+        <translation>Вы действительно хотите удалить &quot;%1&quot;?</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="270"/>
@@ -4027,12 +4085,12 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="312"/>
         <source>Delete remote folder</source>
-        <translation type="unfinished"/>
+        <translation>Удалить папку</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="320"/>
         <source>Delete remote deck</source>
-        <translation type="unfinished"/>
+        <translation>Удалить колоду</translation>
     </message>
 </context>
 <context>
@@ -4041,36 +4099,36 @@ Please enter a name:</source>
         <location filename="../src/tab_game.cpp" line="443"/>
         <location filename="../src/tab_game.cpp" line="1168"/>
         <source>Replay</source>
-        <translation type="unfinished"/>
+        <translation>Запись игры</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="443"/>
         <source>Game</source>
-        <translation type="unfinished"/>
+        <translation>Игра</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="445"/>
         <location filename="../src/tab_game.cpp" line="489"/>
         <source>Card Info</source>
-        <translation type="unfinished"/>
+        <translation>Информация о карте</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="446"/>
         <location filename="../src/tab_game.cpp" line="491"/>
         <source>Player List</source>
-        <translation type="unfinished"/>
+        <translation>Список игроков</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="447"/>
         <location filename="../src/tab_game.cpp" line="490"/>
         <source>Messages</source>
-        <translation type="unfinished"/>
+        <translation>Сообщения</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="449"/>
         <location filename="../src/tab_game.cpp" line="504"/>
         <source>Replay Timeline</source>
-        <translation type="unfinished"/>
+        <translation>Полоса прокрутки записи</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="454"/>
@@ -4100,12 +4158,12 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="468"/>
         <source>Rotate View Cl&amp;ockwise</source>
-        <translation type="unfinished"/>
+        <translation>Повернуть вид по часовой стрелке</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="471"/>
         <source>Rotate View Co&amp;unterclockwise</source>
-        <translation type="unfinished"/>
+        <translation>Повернуть вид против часовой стрелки</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="474"/>
@@ -4135,7 +4193,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="488"/>
         <source>&amp;View</source>
-        <translation type="unfinished"/>
+        <translation>Вид</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="493"/>
@@ -4143,7 +4201,7 @@ Please enter a name:</source>
         <location filename="../src/tab_game.cpp" line="499"/>
         <location filename="../src/tab_game.cpp" line="505"/>
         <source>Visible</source>
-        <translation type="unfinished"/>
+        <translation>Видимый</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="494"/>
@@ -4151,12 +4209,12 @@ Please enter a name:</source>
         <location filename="../src/tab_game.cpp" line="500"/>
         <location filename="../src/tab_game.cpp" line="506"/>
         <source>Floating</source>
-        <translation type="unfinished"/>
+        <translation>Плавающий</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="509"/>
         <source>Reset layout</source>
-        <translation type="unfinished"/>
+        <translation>Сбросить слой</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="590"/>
@@ -4181,12 +4239,12 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="796"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
-        <translation type="unfinished"/>
+        <translation>Кажется, Вы нафлудили. Пожалуйста, подождите пару секунд.</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1063"/>
         <source>You have been kicked out of the game.</source>
-        <translation type="unfinished"/>
+        <translation>Вы были отключены от игры</translation>
     </message>
 </context>
 <context>
@@ -4194,29 +4252,29 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_logs.h" line="54"/>
         <source>Logs</source>
-        <translation type="unfinished"/>
+        <translation>Логи</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="28"/>
         <location filename="../src/tab_logs.cpp" line="33"/>
         <location filename="../src/tab_logs.cpp" line="38"/>
         <source>Time;SenderName;SenderIP;Message;TargetID;TargetName</source>
-        <translation type="unfinished"/>
+        <translation>Время;ИмяОтправителя;IPОтправителя;Сообщение;IDПолучателя;ИмяПолучателя</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="41"/>
         <source>Room Logs</source>
-        <translation type="unfinished"/>
+        <translation>Логи Комнаты</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="42"/>
         <source>Game Logs</source>
-        <translation type="unfinished"/>
+        <translation>Логи Игры</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="43"/>
         <source>Chat Logs</source>
-        <translation type="unfinished"/>
+        <translation>Логи Чата</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="65"/>
@@ -4227,12 +4285,12 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_logs.cpp" line="65"/>
         <source>You must select at least one filter.</source>
-        <translation type="unfinished"/>
+        <translation>Вы должны выбрать хотя бы один фильтр</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="75"/>
         <source>You have to select a valid number of days to locate.</source>
-        <translation type="unfinished"/>
+        <translation>Вы должны указать верное количество дней для размещения.</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="140"/>
@@ -4247,12 +4305,12 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_logs.cpp" line="146"/>
         <source>Game Name: </source>
-        <translation type="unfinished"/>
+        <translation>Имя игры:</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="149"/>
         <source>GameID: </source>
-        <translation type="unfinished"/>
+        <translation>ID Игры:</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="152"/>
@@ -4262,22 +4320,22 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_logs.cpp" line="156"/>
         <source>Main Room</source>
-        <translation type="unfinished"/>
+        <translation>Основная комната</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="157"/>
         <source>Game Room</source>
-        <translation type="unfinished"/>
+        <translation>Игровая комната</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="158"/>
         <source>Private Chat</source>
-        <translation type="unfinished"/>
+        <translation>Приватный чат</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="160"/>
         <source>Past X Days: </source>
-        <translation type="unfinished"/>
+        <translation>Последние X Дней:</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="161"/>
@@ -4292,23 +4350,24 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_logs.cpp" line="167"/>
         <source>Maximum Results: </source>
-        <translation type="unfinished"/>
+        <translation>Максимальный результат:</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="171"/>
         <source>At least one filter is required.
 The more information you put in, the more specific your results will be.</source>
-        <translation type="unfinished"/>
+        <translation>Должен быть как минимум один фильтр.
+Чем больше информации Вы укажете, тем точнее будет результат.</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="173"/>
         <source>Get User Logs</source>
-        <translation type="unfinished"/>
+        <translation>Получить логи пользователя</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="177"/>
         <source>Clear Filters</source>
-        <translation type="unfinished"/>
+        <translation>Очистить фильтры</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="193"/>
@@ -4318,17 +4377,17 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_logs.cpp" line="202"/>
         <source>Log Locations</source>
-        <translation type="unfinished"/>
+        <translation>Размещение логов</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="211"/>
         <source>Date Range</source>
-        <translation type="unfinished"/>
+        <translation>Интервал дат</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="218"/>
         <source>Maximum Results</source>
-        <translation type="unfinished"/>
+        <translation>Максимальный результат</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="255"/>
@@ -4339,12 +4398,12 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_logs.cpp" line="255"/>
         <source>Failed to collect message history information.</source>
-        <translation type="unfinished"/>
+        <translation>Не удалось собрать историю сообщений.</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="260"/>
         <source>There are no messages for the selected filters.</source>
-        <translation type="unfinished"/>
+        <translation>Нет сообщений для указанных фильтров.</translation>
     </message>
 </context>
 <context>
@@ -4352,7 +4411,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="63"/>
         <source>Private &amp;chat</source>
-        <translation type="unfinished"/>
+        <translation>Приватный чат</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="64"/>
@@ -4362,7 +4421,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="80"/>
         <source>%1 - Private chat</source>
-        <translation type="unfinished"/>
+        <translation>%1 - Приватный чат</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="107"/>
@@ -4372,7 +4431,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="137"/>
         <source>Private message from </source>
-        <translation type="unfinished"/>
+        <translation>Личное сообщение от</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="154"/>
@@ -4395,12 +4454,12 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_replays.cpp" line="115"/>
         <source>Local file system</source>
-        <translation type="unfinished"/>
+        <translation>Локальная файловая система</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="116"/>
         <source>Server replay storage</source>
-        <translation type="unfinished"/>
+        <translation>Хранилище записей игр на сервере</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="118"/>
@@ -4417,32 +4476,32 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_replays.cpp" line="121"/>
         <source>Download replay</source>
-        <translation type="unfinished"/>
+        <translation>Скачать запись игры</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="122"/>
         <source>Toggle expiration lock</source>
-        <translation type="unfinished"/>
+        <translation>Переключить блокировку срока</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="148"/>
         <source>Delete local file</source>
-        <translation type="unfinished"/>
+        <translation>Удалить локальный файл</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="148"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
-        <translation type="unfinished"/>
+        <translation>Вы действительно хотите удалить &quot;%1&quot;?</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="254"/>
         <source>Delete remote replay</source>
-        <translation type="unfinished"/>
+        <translation>Удалить запись игры</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="254"/>
         <source>Are you sure you want to delete the replay of game %1?</source>
-        <translation type="unfinished"/>
+        <translation>Вы действительно хотите удалить запись игры &quot;%1&quot;?</translation>
     </message>
 </context>
 <context>
@@ -4480,12 +4539,12 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_room.cpp" line="163"/>
         <source> mentioned you.</source>
-        <translation type="unfinished"/>
+        <translation>упомянул(а) Вас.</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="163"/>
         <source>Click to view</source>
-        <translation type="unfinished"/>
+        <translation>Нажмите для просмотра</translation>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="208"/>
@@ -4498,7 +4557,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_server.h" line="52"/>
         <source>Server</source>
-        <translation type="unfinished"/>
+        <translation>Сервер</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="183"/>
@@ -4511,22 +4570,22 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_server.cpp" line="183"/>
         <source>Failed to join the room: it doesn&apos;t exists on the server.</source>
-        <translation type="unfinished"/>
+        <translation>Не удалось присоединиться к комнате; она перестала существовать на сервере.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="186"/>
         <source>The server thinks you are in the room but Cockatrice is unable to display it. Try restarting Cockatrice.</source>
-        <translation type="unfinished"/>
+        <translation>По данным сервера вы находитесь в комнате, но Cockatrice не может ее отобразить. Попробуйте перезапустить клиент Cockatrice.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="189"/>
         <source>You do not have the required permission to join this room.</source>
-        <translation type="unfinished"/>
+        <translation>У вас нет необходимого разрешения для того, чтобы присоединиться к этой комнате.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="192"/>
         <source>Failed to join the room due to an unknown error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Невозможно присоединиться к комнате из-за неизвестной ошибки: %1.</translation>
     </message>
 </context>
 <context>
@@ -4539,28 +4598,28 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_supervisor.cpp" line="143"/>
         <source>There are still open games. Are you sure you want to quit?</source>
-        <translation type="unfinished"/>
+        <translation>У вас все еще есть активные игры. Уверены, что хотите выйти?</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="581"/>
         <source>Promotion</source>
-        <translation type="unfinished"/>
+        <translation>Повышение</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="581"/>
         <source>You have been promoted to moderator. Please log out and back in for changes to take effect.</source>
-        <translation type="unfinished"/>
+        <translation>Вас повысили до модератора. Пожалуйста, перезайдите в свою учетную запись, чтобы изменения вступили в силу.</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="584"/>
         <source>Warned</source>
-        <translation type="unfinished"/>
+        <translation>Предупрежден</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="584"/>
         <source>You have received a warning due to %1.
 Please refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.</source>
-        <translation type="unfinished"/>
+        <translation>Вы получили предупреждение по причине %1. Пожалуйста, воздержитесь от подобных действий, иначе в ваш адрес будут применены дальнейшие меры. При возникновении каких-либо вопросов напишите личное сообщение любому модератору.</translation>
     </message>
 </context>
 <context>
@@ -4568,16 +4627,24 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/tab_userlists.h" line="48"/>
         <source>Account</source>
-        <translation type="unfinished"/>
+        <translation>Учетная запись</translation>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="49"/>
         <source>Add to Buddy List</source>
-        <translation type="unfinished"/>
+        <translation>Добавить в список друзей</translation>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="58"/>
         <source>Add to Ignore List</source>
+        <translation>Добавить в игнор-лист</translation>
+    </message>
+</context>
+<context>
+    <name>UpdateDownloader</name>
+    <message>
+        <location filename="../src/update_downloader.cpp" line="47"/>
+        <source>Could not open the file for reading.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -4586,153 +4653,153 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/user_context_menu.cpp" line="53"/>
         <source>User &amp;details</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Детали пользователя</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="54"/>
         <source>Private &amp;chat</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Приватный чат</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="55"/>
         <source>Show this user&apos;s &amp;games</source>
-        <translation type="unfinished"/>
+        <translation>Показать &amp;игры этого пользователя</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="56"/>
         <source>Add to &amp;buddy list</source>
-        <translation type="unfinished"/>
+        <translation>Добавить в &amp;список друзей</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="57"/>
         <source>Remove from &amp;buddy list</source>
-        <translation type="unfinished"/>
+        <translation>Удалить из &amp;списка друзей</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="58"/>
         <source>Add to &amp;ignore list</source>
-        <translation type="unfinished"/>
+        <translation>Добавить в &amp;игнор-лист</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="59"/>
         <source>Remove from &amp;ignore list</source>
-        <translation type="unfinished"/>
+        <translation>Удалить из &amp;игнор-листа</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="60"/>
         <source>Kick from &amp;game</source>
-        <translation type="unfinished"/>
+        <translation>Кикнуть из &amp;игры</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="61"/>
         <source>Warn user</source>
-        <translation type="unfinished"/>
+        <translation>Дать предупреждение пользователю</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="62"/>
         <source>View user&apos;s war&amp;n history</source>
-        <translation type="unfinished"/>
+        <translation>Просмотреть &amp;историю предупреждений пользователя</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="63"/>
         <source>Ban from &amp;server</source>
-        <translation type="unfinished"/>
+        <translation>Забанить на &amp;сервере</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="64"/>
         <source>View user&apos;s &amp;ban history</source>
-        <translation type="unfinished"/>
+        <translation>Просмотреть &amp;историю банов пользователя</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="65"/>
         <source>&amp;Promote user to moderator</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Повысить пользователя до модератора</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="66"/>
         <source>Dem&amp;ote user from moderator</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Разжаловать пользователя из модератора</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="94"/>
         <source>%1&apos;s games</source>
-        <translation type="unfinished"/>
+        <translation>Игры %1</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="149"/>
         <location filename="../src/user_context_menu.cpp" line="170"/>
         <location filename="../src/user_context_menu.cpp" line="173"/>
         <source>Ban History</source>
-        <translation type="unfinished"/>
+        <translation>История банов</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="155"/>
         <source>Ban Time;Moderator;Ban Length;Ban Reason;Visible Reason</source>
-        <translation type="unfinished"/>
+        <translation>ВремяБана;Модератор;ПродолжительностьБана;ПричинаБана;ВидимаяПричина</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="170"/>
         <source>User has never been banned.</source>
-        <translation type="unfinished"/>
+        <translation>Пользователя никогда не банили.</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="173"/>
         <source>Failed to collecting ban information.</source>
-        <translation type="unfinished"/>
+        <translation>Не удалось получить информацию о банах.</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="182"/>
         <location filename="../src/user_context_menu.cpp" line="202"/>
         <location filename="../src/user_context_menu.cpp" line="205"/>
         <source>Warning History</source>
-        <translation type="unfinished"/>
+        <translation>История предупреждений</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="188"/>
         <source>Warning Time;Moderator;User Name;Reason</source>
-        <translation type="unfinished"/>
+        <translation>ВремяПредупреждения;Модератор;ИмяПольозователя;Причина</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="202"/>
         <source>User has never been warned.</source>
-        <translation type="unfinished"/>
+        <translation>Пользователя никогда не предупреждали.</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="205"/>
         <source>Failed to collecting warning information.</source>
-        <translation type="unfinished"/>
+        <translation>Не удалось получить информацию о предупреждениях.</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="215"/>
         <location filename="../src/user_context_menu.cpp" line="217"/>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Успешно</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="215"/>
         <source>Successfully promoted user.</source>
-        <translation type="unfinished"/>
+        <translation>Пользователь успешно повышен.</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="217"/>
         <source>Successfully demoted user.</source>
-        <translation type="unfinished"/>
+        <translation>Пользователь успешно понижен.</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="222"/>
         <location filename="../src/user_context_menu.cpp" line="224"/>
         <source>Failed</source>
-        <translation type="unfinished"/>
+        <translation>Не удалось</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="222"/>
         <source>Failed to promote user.</source>
-        <translation type="unfinished"/>
+        <translation>Не удалось повысить пользователя.</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="224"/>
         <source>Failed to demote user.</source>
-        <translation type="unfinished"/>
+        <translation>Не удалось понизить пользователя.</translation>
     </message>
 </context>
 <context>
@@ -4760,12 +4827,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="71"/>
         <source>Account Age:</source>
-        <translation type="unfinished"/>
+        <translation>Возраст учетной записи:</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="73"/>
         <source>Edit</source>
-        <translation type="unfinished"/>
+        <translation>Рендактировать</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="74"/>
@@ -4833,7 +4900,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="233"/>
         <source>User information updated.</source>
-        <translation type="unfinished"/>
+        <translation>Информация о пользователе обновлена.</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="236"/>
@@ -4850,13 +4917,13 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="236"/>
         <source>This server does not permit you to update your user informations.</source>
-        <translation type="unfinished"/>
+        <translation>Этот сервер не позволяет обновить пользовательскую информацию.</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="240"/>
         <location filename="../src/userinfobox.cpp" line="262"/>
         <source>An error occured while trying to update your user informations.</source>
-        <translation type="unfinished"/>
+        <translation>При обновлении пользовательской информации произошла ошибка.</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="249"/>
@@ -4876,22 +4943,22 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="258"/>
         <source>The old password is incorrect.</source>
-        <translation type="unfinished"/>
+        <translation>Предыдущий пароль неверен.</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="272"/>
         <source>Avatar updated.</source>
-        <translation type="unfinished"/>
+        <translation>Аватар изменен.</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="275"/>
         <source>This server does not permit you to update your avatar.</source>
-        <translation type="unfinished"/>
+        <translation>Этот сервер не позволяет Вам изменить аватар.</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="279"/>
         <source>An error occured while trying to updater your avatar.</source>
-        <translation type="unfinished"/>
+        <translation>При изменении аватара произошла ошибка.</translation>
     </message>
 </context>
 <context>
@@ -4904,12 +4971,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/dlg_settings.cpp" line="434"/>
         <source>Enable notifications in taskbar</source>
-        <translation type="unfinished"/>
+        <translation>Включить оповещения в панели задач.</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="435"/>
         <source>Notify in the taskbar for game events while you are spectating</source>
-        <translation type="unfinished"/>
+        <translation>Уведомлять об игровых событиях в панели задач, когда вы наблюдаете за игрой</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="436"/>
@@ -4919,12 +4986,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/dlg_settings.cpp" line="437"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Разыгрывать все неземельные заклинания по умолчанию в стек (вместо поля боя)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="438"/>
         <source>Annotate card text on tokens</source>
-        <translation type="unfinished"/>
+        <translation>Изменить текст карты на токенах</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="439"/>
@@ -4942,7 +5009,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userlist.cpp" line="334"/>
         <source>Users connected to server: %1</source>
-        <translation type="unfinished"/>
+        <translation>Подключенных к серверу пользователей: %1</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="335"/>
@@ -4965,7 +5032,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userlist.cpp" line="122"/>
         <source>Which warning would you like to send?</source>
-        <translation type="unfinished"/>
+        <translation>Какое предупреждение Вы бы хотели отправить?</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="128"/>
@@ -4975,12 +5042,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userlist.cpp" line="131"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Отменить</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="145"/>
         <source>Warn user for misconduct</source>
-        <translation type="unfinished"/>
+        <translation>Дать предупреждение пользователю за проступок</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="151"/>
@@ -4991,12 +5058,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userlist.cpp" line="151"/>
         <source>User name to send a warning to can not be blank, please specify a user to warn.</source>
-        <translation type="unfinished"/>
+        <translation>Поле не может быть пустым. Пожалуйста, уточните имя пользователя для выдачи предупреждения.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="156"/>
         <source>Warning to use can not be blank, please select a valid warning to send.</source>
-        <translation type="unfinished"/>
+        <translation>Поле предупреждения не может быть пустым. Пожалуйста, выберите корректную причину.</translation>
     </message>
 </context>
 <context>
@@ -5004,7 +5071,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/window_sets.cpp" line="30"/>
         <source>Move selected set to the top</source>
-        <translation type="unfinished"/>
+        <translation>Переместить выбранный сет наверх</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="37"/>
@@ -5019,42 +5086,42 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/window_sets.cpp" line="51"/>
         <source>Move selected set to the bottom</source>
-        <translation type="unfinished"/>
+        <translation>Переместить выбранный сет в конец.</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="85"/>
         <source>Enable all sets</source>
-        <translation type="unfinished"/>
+        <translation>Выбрать все сеты</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="87"/>
         <source>Disable all sets</source>
-        <translation type="unfinished"/>
+        <translation>Убрать все сеты</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="92"/>
         <source>hints:</source>
-        <translation type="unfinished"/>
+        <translation>подсказки:</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="92"/>
         <source>Enable the sets that you want to have available in the deck editor</source>
-        <translation type="unfinished"/>
+        <translation>Выбрать сеты, которые будут доступны в редакторе</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="92"/>
         <source>Move sets around to change their order, or click on a column header to sort sets on that field</source>
-        <translation type="unfinished"/>
+        <translation>Перемещайте сеты, чтобы изменить их порядок; или нажмите на столбец, чтобы отсортировать сеты по выбранному параметру.</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="92"/>
         <source>Sets order decides the source that will be used when loading images for a specific card</source>
-        <translation type="unfinished"/>
+        <translation>Порядок сетов определяет источник, используемый при загрузке картинки определенной карты.</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="92"/>
         <source>Disabled sets will be used for loading images only if all the enabled sets failed</source>
-        <translation type="unfinished"/>
+        <translation>Убранные сеты будут использоваться для загрузки картинок только если не удалось найти ни один из уже выбранных</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="112"/>
@@ -5092,7 +5159,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="136"/>
         <source>pile view</source>
-        <translation type="unfinished"/>
+        <translation>просмотр вразнобой</translation>
     </message>
 </context>
 <context>
@@ -5118,22 +5185,22 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1463"/>
         <source>Local gameplay</source>
-        <translation type="unfinished"/>
+        <translation>Локальные игры</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1464"/>
         <source>Watch replay</source>
-        <translation type="unfinished"/>
+        <translation>Посмотреть повтор</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1465"/>
         <source>Connect</source>
-        <translation type="unfinished"/>
+        <translation>Подключиться</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1466"/>
         <source>Register</source>
-        <translation type="unfinished"/>
+        <translation>Зарегистрироваться</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1467"/>
@@ -5143,17 +5210,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1468"/>
         <source>Settings</source>
-        <translation type="unfinished"/>
+        <translation>Настройки</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1469"/>
         <source>Check for card updates</source>
-        <translation type="unfinished"/>
+        <translation>Проверить наличие обновлений базы карт</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1470"/>
         <source>Disconnect</source>
-        <translation type="unfinished"/>
+        <translation>Прервать подключение</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1471"/>
@@ -5168,17 +5235,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1473"/>
         <source>Analyze deck</source>
-        <translation type="unfinished"/>
+        <translation>Анализировать колоду</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1474"/>
         <source>Load deck (clipboard)</source>
-        <translation type="unfinished"/>
+        <translation>Загрузить колоду (буфер)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1475"/>
         <source>Clear all filters</source>
-        <translation type="unfinished"/>
+        <translation>Убрать все фильтры</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1476"/>
@@ -5188,12 +5255,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1477"/>
         <source>Clear selected filter</source>
-        <translation type="unfinished"/>
+        <translation>Убрать выбранный фильтр</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1478"/>
         <source>Open custom pic folder</source>
-        <translation type="unfinished"/>
+        <translation>Открыть папку авторских картинок</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1479"/>
@@ -5208,7 +5275,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1481"/>
         <source>Edit sets</source>
-        <translation type="unfinished"/>
+        <translation>Изменить сеты</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1482"/>
@@ -5218,12 +5285,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1483"/>
         <source>Edit tokens</source>
-        <translation type="unfinished"/>
+        <translation>Изменить фишки</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1484"/>
         <source>Reset layout</source>
-        <translation type="unfinished"/>
+        <translation>Переназначить вид</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1485"/>
@@ -5238,7 +5305,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1487"/>
         <source>Remove card</source>
-        <translation type="unfinished"/>
+        <translation>Удалить карту</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1488"/>
@@ -5253,18 +5320,18 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1490"/>
         <source>Save deck (clipboard)</source>
-        <translation type="unfinished"/>
+        <translation>Сохранить колоду (в буфер)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1491"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1581"/>
         <source>Counters</source>
-        <translation type="unfinished"/>
+        <translation>Жетоны</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1492"/>
         <source>Life</source>
-        <translation type="unfinished"/>
+        <translation>Жизни</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1493"/>
@@ -5273,7 +5340,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1505"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1513"/>
         <source>Set</source>
-        <translation type="unfinished"/>
+        <translation>Сет</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1494"/>
@@ -5281,7 +5348,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1502"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1506"/>
         <source>Add</source>
-        <translation type="unfinished"/>
+        <translation>Добавить</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1495"/>
@@ -5289,12 +5356,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1503"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1507"/>
         <source>Remove</source>
-        <translation type="unfinished"/>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1496"/>
         <source>Red</source>
-        <translation type="unfinished"/>
+        <translation>Красный</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1500"/>
@@ -5309,7 +5376,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1508"/>
         <source>Main Window | Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Главное окно | Редактор</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1509"/>
@@ -5364,78 +5431,78 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1520"/>
         <source>Game Phases</source>
-        <translation type="unfinished"/>
+        <translation>Игровые фазы</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1521"/>
         <source>Untap</source>
-        <translation type="unfinished"/>
+        <translation>Шаг разворота</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1522"/>
         <source>Upkeep</source>
-        <translation type="unfinished"/>
+        <translation>Шаг поддержки</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1523"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1574"/>
         <source>Draw</source>
-        <translation type="unfinished"/>
+        <translation>Шаг взятия карты</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1524"/>
         <source>Main 1</source>
-        <translation type="unfinished"/>
+        <translation>Первая основная фаза</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1525"/>
         <source>Start combat</source>
-        <translation type="unfinished"/>
+        <translation>Шаг начала боя</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1526"/>
         <source>Attack</source>
-        <translation type="unfinished"/>
+        <translation>Шаг атаки</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1527"/>
         <source>Block</source>
-        <translation type="unfinished"/>
+        <translation>Шаг блока</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1528"/>
         <source>Damage</source>
-        <translation type="unfinished"/>
+        <translation>Шаг повреждений</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1529"/>
         <source>End combat</source>
-        <translation type="unfinished"/>
+        <translation>Шаг завершения боя</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1530"/>
         <source>Main 2</source>
-        <translation type="unfinished"/>
+        <translation>Вторая основная фаза</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1531"/>
         <source>End</source>
-        <translation type="unfinished"/>
+        <translation>Конец хода</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1532"/>
         <source>Next phase</source>
-        <translation type="unfinished"/>
+        <translation>Следующая фаза</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1533"/>
         <source>Next turn</source>
-        <translation type="unfinished"/>
+        <translation>Предыдущая фаза</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1534"/>
         <source>Playing Area</source>
-        <translation type="unfinished"/>
+        <translation>Игровое поле</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1535"/>
