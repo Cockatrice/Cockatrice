@@ -80,7 +80,7 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 {
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
 
-    QString htmlText = "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : SERVER_MESSAGE_COLOR) + ">" + html + "</font>";
+    QString htmlText = "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : SERVER_MESSAGE_COLOR) + ">" + QDateTime::currentDateTime().toString("[hh:mm:ss] ")+ html + "</font>";
 
     if (optionalIsBold)
         htmlText = "<b>" + htmlText + "</b>";
