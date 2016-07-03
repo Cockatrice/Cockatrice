@@ -104,7 +104,7 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
-    int keepalive;    
+    int keepalive;
     void translateLegacySettings();
     QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
     QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
