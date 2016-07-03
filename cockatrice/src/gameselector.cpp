@@ -109,6 +109,7 @@ void GameSelector::actSetFilter()
 
     clearFilterButton->setEnabled(true);
 
+    gameListProxyModel->setShowBuddiesOnlyGames(dlg.getShowBuddiesOnlyGames());
     gameListProxyModel->setUnavailableGamesVisible(dlg.getUnavailableGamesVisible());
     gameListProxyModel->setShowPasswordProtectedGames(dlg.getShowPasswordProtectedGames());
     gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());

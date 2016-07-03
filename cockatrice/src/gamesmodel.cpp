@@ -231,6 +231,11 @@ GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
     setDynamicSortFilter(true);
 }
 
+void GamesProxyModel::setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames) {
+    showBuddiesOnlyGames = _showBuddiesOnlyGames;
+    invalidateFilter();
+}
+
 void GamesProxyModel::setUnavailableGamesVisible(bool _unavailableGamesVisible)
 {
     unavailableGamesVisible = _unavailableGamesVisible;
@@ -303,6 +308,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
 
 void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameTypes)
 {
+    settingsCache->gameFilters().setShowBuddiesOnlyGames(showBuddiesOnlyGames);
     settingsCache->gameFilters().setUnavailableGamesVisible(unavailableGamesVisible);
     settingsCache->gameFilters().setShowPasswordProtectedGames(showPasswordProtectedGames);
     settingsCache->gameFilters().setGameNameFilter(gameNameFilter);
@@ -325,6 +331,10 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
         return false;
 
     const ServerInfo_Game &game = model->getGame(sourceRow);
+
+    if (!showBuddiesOnlyGames && game.only_buddies()) {
+        return false;
+    }
     if (!unavailableGamesVisible) {
         if (game.player_count() == game.max_players())
             return false;
