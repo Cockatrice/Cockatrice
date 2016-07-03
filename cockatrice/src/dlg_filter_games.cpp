@@ -16,6 +16,9 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const Ga
       allGameTypes(_allGameTypes),
       gamesProxyModel(_gamesProxyModel)
 {
+    showBuddiesOnlyGames = new QCheckBox(tr("Show '&buddies only' games"));
+    showBuddiesOnlyGames->setChecked(gamesProxyModel->getShowBuddiesOnlyGames());
+
     unavailableGamesVisibleCheckBox = new QCheckBox(tr("Show &unavailable games"));
     unavailableGamesVisibleCheckBox->setChecked(gamesProxyModel->getUnavailableGamesVisible());
 
@@ -73,14 +76,23 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const Ga
     QGroupBox *maxPlayersGroupBox = new QGroupBox(tr("Maximum player count"));
     maxPlayersGroupBox->setLayout(maxPlayersFilterLayout);
 
+    QGridLayout *restrictionsLayout = new QGridLayout;
+    restrictionsLayout->addWidget(unavailableGamesVisibleCheckBox, 0, 0);
+    restrictionsLayout->addWidget(showPasswordProtectedGames, 1, 0);
+    restrictionsLayout->addWidget(showBuddiesOnlyGames, 2, 0);
+
+    QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
+    restrictionsGroupBox->setLayout(restrictionsLayout);
+
+
     QGridLayout *leftGrid = new QGridLayout;
     leftGrid->addWidget(gameNameFilterLabel, 0, 0);
     leftGrid->addWidget(gameNameFilterEdit, 0, 1);
     leftGrid->addWidget(creatorNameFilterLabel, 1, 0);
     leftGrid->addWidget(creatorNameFilterEdit, 1, 1);
     leftGrid->addWidget(maxPlayersGroupBox, 2, 0, 1, 2);
-    leftGrid->addWidget(unavailableGamesVisibleCheckBox, 3, 0, 1, 2);
-    leftGrid->addWidget(showPasswordProtectedGames, 4, 0, 1, 2);
+    leftGrid->addWidget(restrictionsGroupBox, 3, 0, 1, 2);
+
 
     QVBoxLayout *leftColumn = new QVBoxLayout;
     leftColumn->addLayout(leftGrid);
@@ -117,6 +129,16 @@ bool DlgFilterGames::getUnavailableGamesVisible() const
 void DlgFilterGames::setUnavailableGamesVisible(bool _unavailableGamesVisible)
 {
     unavailableGamesVisibleCheckBox->setChecked(_unavailableGamesVisible);
+}
+
+bool DlgFilterGames::getShowBuddiesOnlyGames() const
+{
+    return showBuddiesOnlyGames->isChecked();
+}
+
+void DlgFilterGames::setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames)
+{
+    showBuddiesOnlyGames->setChecked(_showBuddiesOnlyGames);
 }
 
 bool DlgFilterGames::getShowPasswordProtectedGames() const
