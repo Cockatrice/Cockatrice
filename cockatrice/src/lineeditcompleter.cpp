@@ -75,10 +75,12 @@ void LineEditCompleter::keyPressEvent(QKeyEvent * event)
     }
 
     QLineEdit::keyPressEvent(event);
-    QString textValue = text();
-    //Wait until the first character after @
-    if (!c || text().right(1).contains("@"))
+    // return if the completer is null or if the most recently typed char was '@'.
+    // Only want the popup AFTER typing the first char of the mention.
+    if (!c || text().right(1).contains("@")) {
+        c->popup()->hide();
         return;
+    }
 
     //Set new completion prefix
     c->setCompletionPrefix(cursorWord(text()));
