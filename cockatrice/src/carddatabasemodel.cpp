@@ -1,7 +1,7 @@
 #include "carddatabasemodel.h"
 #include "filtertree.h"
 
-#define CARDDBMODEL_COLUMNS 5
+#define CARDDBMODEL_COLUMNS 6
 
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, QObject *parent)
     : QAbstractListModel(parent), db(_db)
@@ -44,6 +44,7 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
             card->getManaCost();
         case CardTypeColumn: return card->getCardType();
         case PTColumn: return card->getPowTough();
+        case ColorColumn: return card->getColors().join("");
         default: return QVariant();
     }
 }
@@ -60,6 +61,7 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
         case ManaCostColumn: return QString(tr("Mana cost"));
         case CardTypeColumn: return QString(tr("Card type"));
         case PTColumn: return QString(tr("P/T"));
+        case ColorColumn: return QString(tr("Color(s)"));
         default: return QVariant();
     }
 }
