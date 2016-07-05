@@ -1,18 +1,14 @@
 #include <QLineEdit>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QMenu>
-#include <QAction>
 #include <QPushButton>
 #include <QMessageBox>
-#include <QCheckBox>
 #include <QLabel>
 #include <QToolButton>
 #include <QSplitter>
 #include <QApplication>
 #include <QSystemTrayIcon>
 #include <QCompleter>
-#include <QWidget>
 #include <QtCore/qdatetime.h>
 #include "tab_supervisor.h"
 #include "tab_room.h"
@@ -23,7 +19,7 @@
 #include "gameselector.h"
 #include "settingscache.h"
 #include "main.h"
-#include "lineeditcompleter.h"
+#include "carddatabase.h"
 
 #include "get_pb_extension.h"
 #include "pb/room_commands.pb.h"
@@ -31,26 +27,29 @@
 #include "pb/event_list_games.pb.h"
 #include "pb/event_join_room.pb.h"
 #include "pb/event_leave_room.pb.h"
-#include "pb/event_room_say.pb.h"
 #include "pending_command.h"
 #include "dlg_settings.h"
 
 
-TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *_ownUser, const ServerInfo_Room &info)
-    : Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())), ownUser(_ownUser)
-{
+TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *_ownUser,
+                 const ServerInfo_Room &info)
+        : Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())),
+          ownUser(_ownUser) {
     const int gameTypeListSize = info.gametype_list_size();
     for (int i = 0; i < gameTypeListSize; ++i)
-        gameTypes.insert(info.gametype_list(i).game_type_id(), QString::fromStdString(info.gametype_list(i).description()));
+        gameTypes.insert(info.gametype_list(i).game_type_id(),
+                         QString::fromStdString(info.gametype_list(i).description()));
 
     QMap<int, GameTypeMap> tempMap;
     tempMap.insert(info.room_id(), gameTypes);
     gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap, true, true);
     userList = new UserList(tabSupervisor, client, UserList::RoomList);
-    connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
+    connect(userList, SIGNAL(openMessageDialog(
+                                     const QString &, bool)), this, SIGNAL(openMessageDialog(
+                                                                                   const QString &, bool)));
 
     chatView = new ChatView(tabSupervisor, 0, true);
-    connect(chatView, SIGNAL(showMentionPopup(QString&)), this, SLOT(actShowMentionPopup(QString&)));
+    connect(chatView, SIGNAL(showMentionPopup(QString & )), this, SLOT(actShowMentionPopup(QString & )));
     connect(chatView, SIGNAL(messageClickedSignal()), this, SLOT(focusTab()));
     connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
@@ -105,40 +104,48 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     addTabMenu(roomMenu);
 
     const int userListSize = info.user_list_size();
-    for (int i = 0; i < userListSize; ++i){
+    for (int i = 0; i < userListSize; ++i) {
         userList->processUserInfo(info.user_list(i), true);
         autocompleteUserList.append("@" + QString::fromStdString(info.user_list(i).name()));
     }
     userList->sortItems();
 
+    foreach(CardInfo* cardInfo, db->getCardList()) {
+        autocompleteCardList.append("[[" + cardInfo->getCorrectedName() + "]]");
+    }
+
     const int gameListSize = info.game_list_size();
     for (int i = 0; i < gameListSize; ++i)
         gameSelector->processGameInfo(info.game_list(i));
 
-    completer = new QCompleter(autocompleteUserList, sayEdit);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setMaxVisibleItems(5);
-    completer->setFilterMode(Qt::MatchStartsWith);
+    mentionCompleter = new QCompleter(autocompleteUserList, sayEdit);
+    mentionCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    mentionCompleter->setMaxVisibleItems(5);
+    mentionCompleter->setFilterMode(Qt::MatchStartsWith);
+    sayEdit->setMentionCompleter(mentionCompleter);
 
-    sayEdit->setCompleter(completer);
+    cardCompleter = new QCompleter(autocompleteCardList, sayEdit);
+    cardCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    cardCompleter->setMaxVisibleItems(5);
+    cardCompleter->setFilterMode(Qt::MatchStartsWith);
+    sayEdit->setCardCompleter(cardCompleter);
+
     actCompleterChanged();
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 
     retranslateUi();
 
-    QWidget * mainWidget = new QWidget(this);
+    QWidget *mainWidget = new QWidget(this);
     mainWidget->setLayout(hbox);
     setCentralWidget(mainWidget);
 }
 
-TabRoom::~TabRoom()
-{
+TabRoom::~TabRoom() {
     emit roomClosing(this);
 }
 
-void TabRoom::retranslateUi()
-{
+void TabRoom::retranslateUi() {
     gameSelector->retranslateUi();
     chatView->retranslateUi();
     userList->retranslateUi();
@@ -158,58 +165,54 @@ void TabRoom::focusTab() {
 
 void TabRoom::actShowMentionPopup(QString &sender) {
     if (trayIcon && (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this) || QApplication::activeWindow() == 0
-        || QApplication::focusWidget() == 0)) {
+                     || QApplication::focusWidget() == 0)) {
         disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
         trayIcon->showMessage(sender + tr(" mentioned you."), tr("Click to view"));
         connect(trayIcon, SIGNAL(messageClicked()), chatView, SLOT(actMessageClicked()));
     }
 }
 
-void TabRoom::closeRequest()
-{
+void TabRoom::closeRequest() {
     actLeaveRoom();
 }
 
-void TabRoom::tabActivated()
-{
-    if(!sayEdit->hasFocus())
+void TabRoom::tabActivated() {
+    if (!sayEdit->hasFocus())
         sayEdit->setFocus();
 }
 
-QString TabRoom::sanitizeHtml(QString dirty) const
-{
+QString TabRoom::sanitizeHtml(QString dirty) const {
     return dirty
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;");
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;");
 }
 
-void TabRoom::sendMessage()
-{
-    if (sayEdit->text().isEmpty()){
+void TabRoom::sendMessage() {
+    if (sayEdit->text().isEmpty()) {
         return;
-    }else if (completer->popup()->isVisible()){
-        completer->popup()->hide();
+    } else if (mentionCompleter->popup()->isVisible() || cardCompleter->popup()->isVisible()) {
+        mentionCompleter->popup()->hide();
+        cardCompleter->popup()->hide();
         return;
-    }else{
+    } else {
         Command_RoomSay cmd;
         cmd.set_message(sayEdit->text().toStdString());
 
         PendingCommand *pend = prepareRoomCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(sayFinished(const Response &)));
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(sayFinished(
+                                                                                                 const Response &)));
         sendRoomCommand(pend);
         sayEdit->clear();
     }
 }
 
-void TabRoom::sayFinished(const Response &response)
-{
+void TabRoom::sayFinished(const Response &response) {
     if (response.response_code() == Response::RespChatFlood)
         chatView->appendMessage(tr("You are flooding the chat. Please wait a couple of seconds."));
 }
 
-void TabRoom::actLeaveRoom()
-{
+void TabRoom::actLeaveRoom() {
     sendRoomCommand(prepareRoomCommand(Command_LeaveRoom()));
     deleteLater();
 }
@@ -224,48 +227,51 @@ void TabRoom::actOpenChatSettings() {
     settings.exec();
 }
 
-void TabRoom::actCompleterChanged()
-{
-    settingsCache->getChatMentionCompleter() ? completer->setCompletionRole(2) : completer->setCompletionRole(1);
+void TabRoom::actCompleterChanged() {
+    settingsCache->getChatMentionCompleter() ? mentionCompleter->setCompletionRole(2)
+                                             : mentionCompleter->setCompletionRole(1);
 }
 
-void TabRoom::processRoomEvent(const RoomEvent &event)
-{
+void TabRoom::processRoomEvent(const RoomEvent &event) {
     switch (static_cast<RoomEvent::RoomEventType>(getPbExtension(event))) {
-        case RoomEvent::LIST_GAMES: processListGamesEvent(event.GetExtension(Event_ListGames::ext)); break;
-        case RoomEvent::JOIN_ROOM: processJoinRoomEvent(event.GetExtension(Event_JoinRoom::ext)); break;
-        case RoomEvent::LEAVE_ROOM: processLeaveRoomEvent(event.GetExtension(Event_LeaveRoom::ext)); break;
-        case RoomEvent::ROOM_SAY: processRoomSayEvent(event.GetExtension(Event_RoomSay::ext)); break;
-        default: ;
+        case RoomEvent::LIST_GAMES:
+            processListGamesEvent(event.GetExtension(Event_ListGames::ext));
+            break;
+        case RoomEvent::JOIN_ROOM:
+            processJoinRoomEvent(event.GetExtension(Event_JoinRoom::ext));
+            break;
+        case RoomEvent::LEAVE_ROOM:
+            processLeaveRoomEvent(event.GetExtension(Event_LeaveRoom::ext));
+            break;
+        case RoomEvent::ROOM_SAY:
+            processRoomSayEvent(event.GetExtension(Event_RoomSay::ext));
+            break;
+        default:;
     }
 }
 
-void TabRoom::processListGamesEvent(const Event_ListGames &event)
-{
+void TabRoom::processListGamesEvent(const Event_ListGames &event) {
     const int gameListSize = event.game_list_size();
     for (int i = 0; i < gameListSize; ++i)
         gameSelector->processGameInfo(event.game_list(i));
 }
 
-void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)
-{
+void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event) {
     userList->processUserInfo(event.user_info(), true);
     userList->sortItems();
-    if (!autocompleteUserList.contains("@" + QString::fromStdString(event.user_info().name()))){
+    if (!autocompleteUserList.contains("@" + QString::fromStdString(event.user_info().name()))) {
         autocompleteUserList << "@" + QString::fromStdString(event.user_info().name());
-        sayEdit->setCompletionList(autocompleteUserList);
-    }    
+        sayEdit->setMentionCompletionList(autocompleteUserList);
+    }
 }
 
-void TabRoom::processLeaveRoomEvent(const Event_LeaveRoom &event)
-{
+void TabRoom::processLeaveRoomEvent(const Event_LeaveRoom &event) {
     userList->deleteUser(QString::fromStdString(event.name()));
     autocompleteUserList.removeOne("@" + QString::fromStdString(event.name()));
-    sayEdit->setCompletionList(autocompleteUserList);
+    sayEdit->setMentionCompletionList(autocompleteUserList);
 }
 
-void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
-{
+void TabRoom::processRoomSayEvent(const Event_RoomSay &event) {
     QString senderName = QString::fromStdString(event.name());
     QString message = QString::fromStdString(event.message());
 
@@ -284,15 +290,15 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
         return;
 
     if (event.message_type() == Event_RoomSay::ChatHistory)
-        message = "[" + QString(QDateTime::fromMSecsSinceEpoch(event.time_of()).toLocalTime().toString("d MMM yyyy HH:mm:ss")) + "] " + message;
+        message = "[" + QString(QDateTime::fromMSecsSinceEpoch(event.time_of()).toLocalTime().toString(
+                "d MMM yyyy HH:mm:ss")) + "] " + message;
 
 
     chatView->appendMessage(message, event.message_type(), senderName, userLevel, true);
     emit userEvent(false);
 }
 
-void TabRoom::refreshShortcuts()
-{
+void TabRoom::refreshShortcuts() {
     aClearChat->setShortcuts(settingsCache->shortcuts().getShortcut("tab_room/aClearChat"));
 }
 
@@ -301,12 +307,10 @@ void TabRoom::addMentionTag(QString mentionTag) {
     sayEdit->setFocus();
 }
 
-PendingCommand *TabRoom::prepareRoomCommand(const ::google::protobuf::Message &cmd)
-{
+PendingCommand *TabRoom::prepareRoomCommand(const ::google::protobuf::Message &cmd) {
     return client->prepareRoomCommand(cmd, roomId);
 }
 
-void TabRoom::sendRoomCommand(PendingCommand *pend)
-{
+void TabRoom::sendRoomCommand(PendingCommand *pend) {
     client->sendCommand(pend);
 }
