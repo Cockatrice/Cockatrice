@@ -9,7 +9,7 @@
 #include "server.h"
 #include "server_database_interface.h"
 
-#define DATABASE_SCHEMA_VERSION 13
+#define DATABASE_SCHEMA_VERSION 14
 
 class Servatrice;
 
@@ -59,8 +59,9 @@ public:
 
     int getNextGameId();
     int getNextReplayId();
-    int getActiveUserCount();
-    qint64 startSession(const QString &userName, const QString &address, const QString &clientId);
+    int getActiveUserCount(QString connectionType = QString());
+
+    qint64 startSession(const QString &userName, const QString &address, const QString &clientId, const QString & connectionType);
     void endSession(qint64 sessionId);
     void clearSessionTables();
     void lockSessionTables();

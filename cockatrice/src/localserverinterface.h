@@ -13,6 +13,7 @@ public:
     ~LocalServerInterface();
     
     QString getAddress() const { return QString(); }
+    QString getConnectionType() const { return "local"; };
     void transmitProtocolItem(const ServerMessage &item);
 signals:
     void itemToClient(const ServerMessage &item);

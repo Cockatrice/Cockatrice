@@ -57,6 +57,13 @@ if(Qt5Widgets_FOUND)
         list(APPEND SERVATRICE_LIBS Sql)
     endif()
 
+    # QtWebsockets
+    find_package(Qt5WebSockets)
+    if(Qt5WebSockets_FOUND)
+        include_directories(${Qt5WebSockets_INCLUDE_DIRS})
+        list(APPEND SERVATRICE_LIBS WebSockets)
+    endif()
+
     QT5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
 
     # guess plugins and libraries directory

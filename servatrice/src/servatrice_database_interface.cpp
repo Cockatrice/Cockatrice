@@ -579,7 +579,7 @@ bool Servatrice_DatabaseInterface::userSessionExists(const QString &userName)
     return query->next();
 }
 
-qint64 Servatrice_DatabaseInterface::startSession(const QString &userName, const QString &address, const QString &clientId)
+qint64 Servatrice_DatabaseInterface::startSession(const QString &userName, const QString &address, const QString &clientId, const QString & connectionType)
 {
     if (server->getAuthenticationMethod() == Servatrice::AuthenticationNone)
         return -1;
@@ -587,11 +587,12 @@ qint64 Servatrice_DatabaseInterface::startSession(const QString &userName, const
     if (!checkSql())
         return -1;
 
-    QSqlQuery *query = prepareQuery("insert into {prefix}_sessions (user_name, id_server, ip_address, start_time, clientid) values(:user_name, :id_server, :ip_address, NOW(), :client_id)");
+    QSqlQuery *query = prepareQuery("insert into {prefix}_sessions (user_name, id_server, ip_address, start_time, clientid, connection_type) values(:user_name, :id_server, :ip_address, NOW(), :client_id, :connection_type)");
     query->bindValue(":user_name", userName);
     query->bindValue(":id_server", server->getServerId());
     query->bindValue(":ip_address", address);
     query->bindValue(":client_id", clientId);
+    query->bindValue(":connection_type", connectionType);
     if (execSqlQuery(query))
         return query->lastInsertId().toInt();
     return -1;
@@ -850,22 +851,27 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const
     return false;
 }
 
-int Servatrice_DatabaseInterface::getActiveUserCount()
+int Servatrice_DatabaseInterface::getActiveUserCount(QString connectionType)
 {
     int userCount = 0;
 
     if (!checkSql())
         return userCount;
 
-    QSqlQuery *query = prepareQuery("select count(*) from {prefix}_sessions where id_server = :serverid AND end_time is NULL");
-    query->bindValue(":serverid", server->getServerId());
-    if (!execSqlQuery(query)){
-        return userCount;
-    }
+    QString text = "select count(*) from {prefix}_sessions where id_server = :serverid AND end_time is NULL";
+    if(!connectionType.isEmpty())
+        text +=" AND connection_type = :connection_type";
+    QSqlQuery *query = prepareQuery(text);
 
-    if (query->next()){
+    query->bindValue(":serverid", server->getServerId());
+    if(!connectionType.isEmpty())
+        query->bindValue(":connection_type", connectionType);
+
+    if (!execSqlQuery(query))
+        return userCount;
+
+    if (query->next())
         userCount = query->value(0).toInt();
-    }
 
     return userCount;
 }
