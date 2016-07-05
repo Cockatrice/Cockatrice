@@ -61,7 +61,10 @@ private:
     QString sanitizeHtml(QString dirty) const;
 
     QStringList autocompleteUserList;
-    QCompleter *completer;
+    QStringList autocompleteCardList;
+    QCompleter *mentionCompleter;
+    QCompleter *cardCompleter;
+
 signals:
     void roomClosing(TabRoom *tab);
     void openMessageDialog(const QString &userName, bool focus);

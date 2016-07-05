@@ -11,7 +11,10 @@ class LineEditCompleter : public QLineEdit
     Q_OBJECT
 private:
     QString cursorWord(const QString &line) const;
-    QCompleter *c;
+    void processMention() const;
+    void processCard() const;
+    QCompleter *mentionCompleter;
+    QCompleter *cardCompleter;
 private slots:
     void insertCompletion(QString);
 
@@ -21,8 +24,9 @@ protected:
 
 public:
     explicit LineEditCompleter(QWidget *parent = 0);
-    void setCompleter(QCompleter *);
-    void setCompletionList(QStringList);
+    void setMentionCompleter(QCompleter *mentionCompleter);
+    void setCardCompleter(QCompleter *cardCompleter);
+    void setMentionCompletionList(QStringList completionList);
 };
 
 #endif
