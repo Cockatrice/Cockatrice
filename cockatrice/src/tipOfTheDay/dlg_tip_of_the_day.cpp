@@ -80,5 +80,13 @@ void DlgTipOfTheDay::markTipAsRead(const QString &tipSettingName)
 
 }
 
+void DlgTipOfTheDay::showFirstUnseenTip()
+{
+    // TODO fix logic
+    renderTip(tips.at(0));
+}
+
+
+
 
 

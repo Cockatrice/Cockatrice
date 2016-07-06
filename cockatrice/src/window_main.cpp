@@ -57,6 +57,7 @@
 #include "pb/room_commands.pb.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_shutdown.pb.h"
+#include "tipOfTheDay/dlg_tip_of_the_day.h"
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
@@ -682,6 +683,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(db, SIGNAL(cardDatabaseNewSetsFound(int, QStringList)), this, SLOT(cardDatabaseNewSetsFound(int, QStringList)));
     connect(db, SIGNAL(cardDatabaseAllNewSetsEnabled()), this, SLOT(cardDatabaseAllNewSetsEnabled()));
     QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+
+    showTipOfTheDay(settingsCache->tipOfTheDay());
 }
 
 MainWindow::~MainWindow()
@@ -690,6 +693,12 @@ MainWindow::~MainWindow()
     trayIcon->deleteLater();
     client->deleteLater();
     clientThread->wait();
+}
+
+void MainWindow::showTipOfTheDay(TipOfTheDaySettings& settings) {
+    DlgTipOfTheDay totd;
+    totd.addTips(TipOfTheDay::AllTips);
+    totd.showFirstUnseenTip();
 }
 
 void MainWindow::createTrayIcon() {

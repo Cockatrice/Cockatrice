@@ -27,6 +27,10 @@ public:
     QVBoxLayout* getLayoutForTip(TipOfTheDay &day);
 
     void markTipAsRead(const QString &tipSettingName);
+signals:
+    void tipSeen(QString tipSettingName);
+
+    void showFirstUnseenTip();
 };
 
 #endif //DLG_TIPOFTHEDAY_H

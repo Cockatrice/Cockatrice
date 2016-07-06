@@ -10,6 +10,7 @@
 #include "settings/messagesettings.h"
 #include "settings/gamefilterssettings.h"
 #include "settings/layoutssettings.h"
+#include "tipOfTheDay/tip_of_the_day_settings.h"
 
 // the falbacks are used for cards without a muid
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
@@ -53,6 +54,7 @@ private:
     MessageSettings *messageSettings;
     GameFiltersSettings *gameFiltersSettings;
     LayoutsSettings *layoutsSettings;
+    TipOfTheDaySettings *tipOfTheDaySettings;
 
     QByteArray mainWindowGeometry;
     QString lang;
@@ -188,6 +190,8 @@ public:
     MessageSettings& messages() const { return *messageSettings; }
     GameFiltersSettings& gameFilters() const { return *gameFiltersSettings; }
     LayoutsSettings& layouts() const { return *layoutsSettings; }
+    TipOfTheDaySettings& tipOfTheDay() const { return *tipOfTheDaySettings; }
+
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setLang(const QString &_lang);

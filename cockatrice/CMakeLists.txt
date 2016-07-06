@@ -17,7 +17,7 @@ SET(cockatrice_SOURCES
     src/dlg_edit_user.cpp
     src/dlg_register.cpp
     src/tipOfTheDay/dlg_tip_of_the_day.cpp
-    src/tipOfTheDay/tip_of_the_day.h
+    src/tipOfTheDay/tip_of_the_day.cpp
     src/tipOfTheDay/tip_of_the_day_settings.cpp
     src/dlg_update.cpp
     src/dlg_viewlog.cpp

@@ -6,8 +6,9 @@
 class TipOfTheDaySettings : public SettingsManager
 {
     Q_OBJECT
-private:
-    TipOfTheDaySettings(const QString &settingPath, QObject *parent): SettingsManager(settingPath, parent) { }
+//private:
+public:
+    TipOfTheDaySettings(const QString &settingPath, QObject *parent);
 
 
 public slots:

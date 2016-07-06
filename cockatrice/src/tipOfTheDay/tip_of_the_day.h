@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_TIP_OF_THE_DAY_H
 #define COCKATRICE_TIP_OF_THE_DAY_H
 
+#include <QString>
 #include "optional.h"
 
 namespace ex = std::experimental;
@@ -22,6 +23,7 @@ public:
                                                             settingName(_settingName),
                                                             tipImageFileName(_tipImageFileName)
     { };
+    static QList<TipOfTheDay> &AllTips;
 };
 
 #endif //COCKATRICE_TIP_OF_THE_DAY_H
