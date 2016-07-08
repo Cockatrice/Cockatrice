@@ -19,7 +19,7 @@ Cockatrice is an open-source multiplatform supported program for playing tableto
 
 # Downloads
 
-We offer a download for all full releases and the latest development version (recommended). Full releases are checkpoints with major feature or UI enhancements between them, but are infrequently updated. The development version contains the most recently added features and bugfixes, but can be more unstable. Downloads for development versions are updated automatically with every change.
+We offer downloads for all full releases (recommended) and the latest development versions. Full releases are checkpoints with major feature or UI enhancements between them, but currently we don't have a set schedule for releasing new updates. The development version contains the most recently added features and bugfixes, but can be more unstable. Downloads for development versions are updated automatically with every change.
 Downloads are hosted on [BinTray](https://bintray.com/cockatrice/Cockatrice).
 
 - Latest full release (**recommended**): [ ![Download](https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice/images/download.svg) ](https://bintray.com/cockatrice/Cockatrice/Cockatrice/_latestVersion#files)<br>
