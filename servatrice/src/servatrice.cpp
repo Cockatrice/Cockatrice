@@ -103,7 +103,7 @@ Servatrice_ConnectionPool *Servatrice_GameServer::findLeastUsedConnectionPool()
 #if QT_VERSION > 0x050300
 #define WEBSOCKET_POOL_NUMBER 999
 
-Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent)
+Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_server, int /* _numberPools */, const QSqlDatabase &_sqlDatabase, QObject *parent)
     : QWebSocketServer("Servatrice", QWebSocketServer::NonSecureMode, parent),
       server(_server)
 {
