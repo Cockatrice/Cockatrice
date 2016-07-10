@@ -2,7 +2,8 @@
 
 ### Compatibility ###
 
-Cockatrice is written in C++-03, so do not use C++11 constructs such as `auto`.
+Cockatrice is compiled on all platform using C++11, even if the majority of the
+code is written in C++03.
 
 For consistency, use Qt data structures where possible, such as `QString` over
 `std::string` or `QList` over `std::vector`.
@@ -63,7 +64,8 @@ variable name:
     Bar* bar1 = new Bar;
     Bar& bar2 = *bar1;
 
-Use `0` instead of `NULL` (or `nullptr`) for null pointers.
+Use `nullptr` instead of `NULL` (or `0`) for null pointers.
+If you find any usage of the old keywords, we encourage you to fix it.
 
 ### Braces ###
 
@@ -122,6 +124,17 @@ mutating objects.)
 
 When pointers can't be avoided, try to use a smart pointer of some sort, such
 as `QScopedPointer`, or, less preferably, `QSharedPointer`.
+
+### Database migrations ###
+
+The servatrice database's schema can be found at `servatrice/servatrice.sql`.
+Everytime the schema gets modified, some other steps are due:
+ 1. Increment the value of `cockatrice_schema_version` in `servatrice.sql`;
+ 2. Increment the value of `DATABASE_SCHEMA_VERSION` in `servatrice_database_interface.h` accordingly;
+ 3. Create a new migration file inside the `servatrice/migrations` directory named after the new schema version.
+ 4. Run the `servatrice/check_schema_version.sh` script to ensure everything is fine.
+ 
+The migration file should include the sql statements needed to migrate the database schema and data from the previous to the new version, and an additional statement that updates `cockatrice_schema_version` to the correct value.
 
 ### Translations: introduction ###
 
