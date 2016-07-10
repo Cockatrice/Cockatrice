@@ -8,10 +8,8 @@
 #include "gametypemap.h"
 #include "pb/serverinfo_game.pb.h"
 
-class ServerInfo_User;
-
 class GamesModel : public QAbstractTableModel {
-    Q_OBJECT
+Q_OBJECT
 private:
     QList<ServerInfo_Game> gameList;
     QMap<int, QString> rooms;
@@ -19,6 +17,7 @@ private:
 
     static const int NUM_COLS = 8;
     static const int SECS_PER_MIN  = 60;
+    static const int SECS_PER_TEN_MIN = 600;
     static const int SECS_PER_HOUR = 3600;
 public:
     static const int SORT_ROLE = Qt::UserRole+1;
@@ -41,6 +40,8 @@ public:
 
     const QMap<int, GameTypeMap> &getGameTypes() { return gameTypes; }
 };
+
+class ServerInfo_User;
 
 class GamesProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
