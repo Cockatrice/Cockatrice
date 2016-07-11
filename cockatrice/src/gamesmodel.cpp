@@ -58,7 +58,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             switch (role) {
                 case Qt::DisplayRole: return getGameCreatedString(secs);
                 case SORT_ROLE: return QVariant(secs);
-                case Qt::TextAlignmentRole: return Qt::AlignLeft;
+                case Qt::TextAlignmentRole: return Qt::AlignCenter;
                 default: return QVariant();
             }
         }
