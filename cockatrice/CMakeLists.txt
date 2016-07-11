@@ -17,6 +17,7 @@ SET(cockatrice_SOURCES
     src/dlg_edit_user.cpp
     src/dlg_register.cpp 
     src/dlg_update.cpp
+    src/dlg_viewlog.cpp
     src/abstractclient.cpp
     src/remoteclient.cpp 
     src/main.cpp 
@@ -110,6 +111,7 @@ SET(cockatrice_SOURCES
     src/settings/layoutssettings.cpp
     src/update_checker.cpp
     src/update_downloader.cpp
+    src/logger.cpp
     ${VERSION_STRING_CPP}
 )
 
@@ -120,7 +122,7 @@ set(cockatrice_RESOURCES cockatrice.qrc)
 
 IF(UPDATE_TRANSLATIONS)
     FILE(GLOB_RECURSE translate_cockatrice_SRCS ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp ${CMAKE_SOURCE_DIR}/cockatrice/src/*.h)
-    FILE(GLOB_RECURSE translate_common_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/common/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/common/*.h)
+    FILE(GLOB_RECURSE translate_common_SRCS ${CMAKE_SOURCE_DIR}/common/*.cpp ${CMAKE_SOURCE_DIR}/common/*.h)
     SET(translate_SRCS ${translate_cockatrice_SRCS} ${translate_common_SRCS})
     SET(cockatrice_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/cockatrice_en.ts")
 ELSE()

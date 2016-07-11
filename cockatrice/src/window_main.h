@@ -70,6 +70,7 @@ private slots:
     
     void actAbout();
     void actUpdate();
+    void actViewLog();
 
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
 
@@ -106,7 +107,7 @@ private:
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate;
+        *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
     QAction *aEditSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
 

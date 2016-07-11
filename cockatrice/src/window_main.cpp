@@ -39,6 +39,7 @@
 #include "dlg_register.h"
 #include "dlg_settings.h"
 #include "dlg_update.h"
+#include "dlg_viewlog.h"
 #include "tab_supervisor.h"
 #include "remoteclient.h"
 #include "localserver.h"
@@ -304,6 +305,12 @@ void MainWindow::actUpdate()
     dlg.exec();
 }
 
+void MainWindow::actViewLog()
+{
+    DlgViewLog dlg(this);
+    dlg.exec();
+}
+
 void MainWindow::serverTimeout()
 {
     QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
@@ -511,6 +518,7 @@ void MainWindow::retranslateUi()
 
     aAbout->setText(tr("&About Cockatrice"));
     aUpdate->setText(tr("&Update Cockatrice"));
+    aViewLog->setText(tr("View &debug log"));
     helpMenu->setTitle(tr("&Help"));
     aCheckCardUpdates->setText(tr("Check for card updates..."));
     tabSupervisor->retranslateUi();
@@ -543,6 +551,8 @@ void MainWindow::createActions()
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
     aUpdate = new QAction(this);
     connect(aUpdate, SIGNAL(triggered()), this, SLOT(actUpdate()));
+    aViewLog = new QAction(this);
+    connect(aViewLog, SIGNAL(triggered()), this, SLOT(actViewLog()));
 
     aCheckCardUpdates = new QAction(this);
     connect(aCheckCardUpdates, SIGNAL(triggered()), this, SLOT(actCheckCardUpdates()));
@@ -610,6 +620,7 @@ void MainWindow::createMenus()
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
     helpMenu->addAction(aUpdate);
+    helpMenu->addAction(aViewLog);
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -788,9 +799,9 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
     msgBox.setWindowTitle(tr("New sets found"));
     msgBox.setIcon(QMessageBox::Question);
     msgBox.setText(
-        tr("%1 new sets found in the card database\n"
-        "Set codes: %2\n"
-        "Do you want to enable them?"
+        tr("%1 new set(s) found in the card database\n"
+        "Set code(s): %2\n"
+        "Do you want to enable it/them?"
         ).arg(numUnknownSets).arg(unknownSetsNames.join(", ")));
 
     QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);

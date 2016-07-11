@@ -37,8 +37,8 @@
 #include <QThread>
 #include <QDebug>
 
-Server::Server(bool _threaded, QObject *parent)
-    : QObject(parent), threaded(_threaded), nextLocalGameId(0)
+Server::Server(QObject *parent)
+    : QObject(parent), nextLocalGameId(0)
 {
     qRegisterMetaType<ServerInfo_Ban>("ServerInfo_Ban");
     qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
@@ -60,32 +60,26 @@ Server::~Server()
 void Server::prepareDestroy()
 {
     // dirty :(
-    if (threaded) {
+    clientsLock.lockForRead();
+    for (int i = 0; i < clients.size(); ++i)
+        QMetaObject::invokeMethod(clients.at(i), "prepareDestroy", Qt::QueuedConnection);
+    clientsLock.unlock();
+
+    bool done = false;
+
+    class SleeperThread : public QThread
+    {
+    public:
+        static void msleep(unsigned long msecs) { QThread::usleep(msecs); }
+    };
+
+    do {
+        SleeperThread::msleep(10);
         clientsLock.lockForRead();
-        for (int i = 0; i < clients.size(); ++i)
-            QMetaObject::invokeMethod(clients.at(i), "prepareDestroy", Qt::QueuedConnection);
+        if (clients.isEmpty())
+            done = true;
         clientsLock.unlock();
-
-        bool done = false;
-
-        class SleeperThread : public QThread
-        {
-        public:
-            static void msleep(unsigned long msecs) { QThread::usleep(msecs); }
-        };
-
-        do {
-            SleeperThread::msleep(10);
-            clientsLock.lockForRead();
-            if (clients.isEmpty())
-                done = true;
-            clientsLock.unlock();
-        } while (!done);
-    } else {
-        // no locking is needed in unthreaded mode
-        while (!clients.isEmpty())
-            clients.first()->prepareDestroy();
-    }
+    } while (!done);
 
     roomsLock.lockForWrite();
     QMapIterator<int, Server_Room *> roomIterator(rooms);
@@ -106,7 +100,7 @@ Server_DatabaseInterface *Server::getDatabaseInterface() const
     return databaseInterfaces.value(QThread::currentThread());
 }
 
-AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft, QString &clientid, QString &clientVersion)
+AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft, QString &clientid, QString &clientVersion, QString & /* connectionType */)
 {
     if (name.size() > 35)
         name = name.left(35);
@@ -162,7 +156,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     users.insert(name, session);
     qDebug() << "Server::loginUser:" << session << "name=" << name;
 
-    data.set_session_id(databaseInterface->startSession(name, session->getAddress(), clientid));
+    data.set_session_id(databaseInterface->startSession(name, session->getAddress(), clientid, session->getConnectionType()));
     databaseInterface->unlockSessionTables();
 
     usersBySessionId.insert(data.session_id(), session);

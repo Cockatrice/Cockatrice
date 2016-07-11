@@ -7,7 +7,8 @@ class GameFiltersSettings : public SettingsManager
 {
     Q_OBJECT
     friend class SettingsCache;
-public:    
+public:
+    bool isShowBuddiesOnlyGames();
     bool isUnavailableGamesVisible();
     bool isShowPasswordProtectedGames();
     QString getGameNameFilter();
@@ -15,6 +16,7 @@ public:
     int getMaxPlayers();
     bool isGameTypeEnabled(QString gametype);
 
+    void setShowBuddiesOnlyGames(bool show);
     void setUnavailableGamesVisible(bool enabled);
     void setShowPasswordProtectedGames(bool show);
     void setGameNameFilter(QString gameName);

@@ -12,7 +12,7 @@ class FilterTree;
 class CardDatabaseModel : public QAbstractListModel {
     Q_OBJECT
 public:
-    enum Columns { NameColumn, SetListColumn, ManaCostColumn, PTColumn, CardTypeColumn, CMCColumn };
+    enum Columns { NameColumn, SetListColumn, ManaCostColumn, PTColumn, CardTypeColumn, ColorColumn };
     enum Role { SortRole=Qt::UserRole };
     CardDatabaseModel(CardDatabase *_db, QObject *parent = 0);
     ~CardDatabaseModel();

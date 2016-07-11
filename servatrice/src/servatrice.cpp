@@ -44,16 +44,6 @@ Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server, int _numberPoo
     : QTcpServer(parent),
       server(_server)
 {
-    if (_numberPools == 0) {
-        server->setThreaded(false);
-        Servatrice_DatabaseInterface *newDatabaseInterface = new Servatrice_DatabaseInterface(0, server);
-        Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
-
-        server->addDatabaseInterface(thread(), newDatabaseInterface);
-        newDatabaseInterface->initDatabase(_sqlDatabase);
-
-        connectionPools.append(newPool);
-    } else
     for (int i = 0; i < _numberPools; ++i) {
         Servatrice_DatabaseInterface *newDatabaseInterface = new Servatrice_DatabaseInterface(i, server);
         Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
@@ -83,7 +73,18 @@ Servatrice_GameServer::~Servatrice_GameServer()
 
 void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
 {
-    // Determine connection pool with smallest client count
+    Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
+
+    TcpServerSocketInterface *ssi = new TcpServerSocketInterface(server, pool->getDatabaseInterface());
+    ssi->moveToThread(pool->thread());
+    pool->addClient();
+    connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
+
+    QMetaObject::invokeMethod(ssi, "initConnection", Qt::QueuedConnection, Q_ARG(int, socketDescriptor));
+}
+
+Servatrice_ConnectionPool *Servatrice_GameServer::findLeastUsedConnectionPool()
+{
     int minClientCount = -1;
     int poolIndex = -1;
     QStringList debugStr;
@@ -96,15 +97,67 @@ void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
         debugStr.append(QString::number(clientCount));
     }
     qDebug() << "Pool utilisation:" << debugStr;
-    Servatrice_ConnectionPool *pool = connectionPools[poolIndex];
+    return connectionPools[poolIndex];
+}
 
-    ServerSocketInterface *ssi = new ServerSocketInterface(server, pool->getDatabaseInterface());
-    ssi->moveToThread(pool->thread());
+#if QT_VERSION > 0x050300
+#define WEBSOCKET_POOL_NUMBER 999
+
+Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_server, int /* _numberPools */, const QSqlDatabase &_sqlDatabase, QObject *parent)
+    : QWebSocketServer("Servatrice", QWebSocketServer::NonSecureMode, parent),
+      server(_server)
+{
+    // Qt limitation: websockets can't be moved to another thread
+    Servatrice_DatabaseInterface *newDatabaseInterface = new Servatrice_DatabaseInterface(WEBSOCKET_POOL_NUMBER, server);
+    Servatrice_ConnectionPool *newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
+
+    server->addDatabaseInterface(thread(), newDatabaseInterface);
+    newDatabaseInterface->initDatabase(_sqlDatabase);
+
+    connectionPools.append(newPool);
+
+    connect(this, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+}
+
+Servatrice_WebsocketGameServer::~Servatrice_WebsocketGameServer()
+{
+    for (int i = 0; i < connectionPools.size(); ++i) {
+        logger->logMessage(QString("Closing websocket pool %1...").arg(i));
+        QThread *poolThread = connectionPools[i]->thread();
+        connectionPools[i]->deleteLater(); // pool destructor calls thread()->quit()
+        poolThread->wait();
+    }
+}
+
+void Servatrice_WebsocketGameServer::onNewConnection()
+{
+    Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
+
+    WebsocketServerSocketInterface *ssi = new WebsocketServerSocketInterface(server, pool->getDatabaseInterface());
+//    ssi->moveToThread(pool->thread());
     pool->addClient();
     connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
 
-    QMetaObject::invokeMethod(ssi, "initConnection", Qt::QueuedConnection, Q_ARG(int, socketDescriptor));
+    QMetaObject::invokeMethod(ssi, "initConnection", Qt::QueuedConnection, Q_ARG(void *, nextPendingConnection()));
 }
+
+Servatrice_ConnectionPool *Servatrice_WebsocketGameServer::findLeastUsedConnectionPool()
+{
+    int minClientCount = -1;
+    int poolIndex = -1;
+    QStringList debugStr;
+    for (int i = 0; i < connectionPools.size(); ++i) {
+        const int clientCount = connectionPools[i]->getClientCount();
+        if ((poolIndex == -1) || (clientCount < minClientCount)) {
+            minClientCount = clientCount;
+            poolIndex = i;
+        }
+        debugStr.append(QString::number(clientCount));
+    }
+    qDebug() << "Pool utilisation:" << debugStr;
+    return connectionPools[poolIndex];
+}
+#endif
 
 void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 {
@@ -120,7 +173,7 @@ void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 }
 
 Servatrice::Servatrice(QObject *parent)
-    : Server(true, parent), uptime(0), shutdownTimer(0), isFirstShutdownMessage(true)
+    : Server(parent), uptime(0), shutdownTimer(0), isFirstShutdownMessage(true)
 {
     qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
@@ -162,7 +215,11 @@ bool Servatrice::initServer()
 
     if (maxUserLimitEnabled){
         int maxUserLimit = settingsCache->value("security/max_users_total", 500).toInt();
-        qDebug() << "Maximum user limit: " << maxUserLimit;
+        qDebug() << "Maximum total user limit: " << maxUserLimit;
+        int maxTcpUserLimit = settingsCache->value("security/max_users_tcp", 500).toInt();
+        qDebug() << "Maximum tcp user limit: " << maxTcpUserLimit;
+        int maxWebsocketUserLimit = settingsCache->value("security/max_users_websocket", 500).toInt();
+        qDebug() << "Maximum websocket user limit: " << maxWebsocketUserLimit;
     }
 
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
@@ -369,17 +426,39 @@ bool Servatrice::initServer()
         statusUpdateClock->start(statusUpdateTime);
     }
 
+    // SOCKET SERVER
     const int numberPools = settingsCache->value("server/number_pools", 1).toInt();
-    gameServer = new Servatrice_GameServer(this, numberPools, servatriceDatabaseInterface->getDatabase(), this);
-    gameServer->setMaxPendingConnections(1000);
-    const int gamePort = settingsCache->value("server/port", 4747).toInt();
-    qDebug() << "Starting server on port" << gamePort;
-    if (gameServer->listen(QHostAddress::Any, gamePort))
-        qDebug() << "Server listening.";
-    else {
-        qDebug() << "gameServer->listen(): Error:" << gameServer->errorString();
-        return false;
+    if(numberPools > 0)
+    {
+        gameServer = new Servatrice_GameServer(this, numberPools, servatriceDatabaseInterface->getDatabase(), this);
+        gameServer->setMaxPendingConnections(1000);
+        const int gamePort = settingsCache->value("server/port", 4747).toInt();
+        qDebug() << "Starting server on port" << gamePort;
+        if (gameServer->listen(QHostAddress::Any, gamePort))
+            qDebug() << "Server listening.";
+        else {
+            qDebug() << "gameServer->listen(): Error:" << gameServer->errorString();
+            return false;
+        }
     }
+
+#if QT_VERSION > 0x050300
+    // WEBSOCKET SERVER
+    const int wesocketNumberPools = settingsCache->value("server/websocket_number_pools", 1).toInt();
+    if(wesocketNumberPools > 0)
+    {
+        websocketGameServer = new Servatrice_WebsocketGameServer(this, wesocketNumberPools, servatriceDatabaseInterface->getDatabase(), this);
+        websocketGameServer->setMaxPendingConnections(1000);
+        const int websocketGamePort = settingsCache->value("server/websocket_port", 4748).toInt();
+        qDebug() << "Starting websocket server on port" << websocketGamePort;
+        if (websocketGameServer->listen(QHostAddress::Any, websocketGamePort))
+            qDebug() << "Websocket server listening.";
+        else {
+            qDebug() << "websocketGameServer->listen(): Error:" << websocketGameServer->errorString();
+            return false;
+        }
+    }
+#endif
     return true;
 }
 
@@ -420,19 +499,19 @@ int Servatrice::getUsersWithAddress(const QHostAddress &address) const
     int result = 0;
     QReadLocker locker(&clientsLock);
     for (int i = 0; i < clients.size(); ++i)
-    if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
+    if (static_cast<AbstractServerSocketInterface *>(clients[i])->getPeerAddress() == address)
         ++result;
 
     return result;
 }
 
-QList<ServerSocketInterface *> Servatrice::getUsersWithAddressAsList(const QHostAddress &address) const
+QList<AbstractServerSocketInterface *> Servatrice::getUsersWithAddressAsList(const QHostAddress &address) const
 {
-    QList<ServerSocketInterface *> result;
+    QList<AbstractServerSocketInterface *> result;
     QReadLocker locker(&clientsLock);
     for (int i = 0; i < clients.size(); ++i)
-        if (static_cast<ServerSocketInterface *>(clients[i])->getPeerAddress() == address)
-            result.append(static_cast<ServerSocketInterface *>(clients[i]));
+        if (static_cast<AbstractServerSocketInterface *>(clients[i])->getPeerAddress() == address)
+            result.append(static_cast<AbstractServerSocketInterface *>(clients[i]));
     return result;
 }
 

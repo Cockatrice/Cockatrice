@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QSet>
 #include <QMap>
+#include <QCheckBox>
 #include "gamesmodel.h"
 
 class QCheckBox;
@@ -13,6 +14,7 @@ class QSpinBox;
 class DlgFilterGames : public QDialog {
     Q_OBJECT
 private:
+    QCheckBox *showBuddiesOnlyGames;
     QCheckBox *unavailableGamesVisibleCheckBox;
     QCheckBox *showPasswordProtectedGames;
     QLineEdit *gameNameFilterEdit;
@@ -33,6 +35,8 @@ public:
     void setUnavailableGamesVisible(bool _unavailableGamesVisible);
     bool getShowPasswordProtectedGames() const;
     void setShowPasswordProtectedGames(bool _passwordProtectedGamesHidden);
+    bool getShowBuddiesOnlyGames() const;
+    void setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames);
     QString getGameNameFilter() const;
     void setGameNameFilter(const QString &_gameNameFilter);
     QString getCreatorNameFilter() const;

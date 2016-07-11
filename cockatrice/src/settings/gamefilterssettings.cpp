@@ -15,6 +15,17 @@ QString GameFiltersSettings::hashGameType(const QString &gameType) const
     return QCryptographicHash::hash(gameType.toUtf8(), QCryptographicHash::Md5).toHex();
 }
 
+void GameFiltersSettings::setShowBuddiesOnlyGames(bool show)
+{
+    setValue(show, "show_buddies_only_games", "filter_games");
+}
+
+bool GameFiltersSettings::isShowBuddiesOnlyGames()
+{
+    QVariant previous = getValue("show_buddies_only_games", "filter_games");
+    return previous == QVariant() ? true : previous.toBool();
+}
+
 void GameFiltersSettings::setUnavailableGamesVisible(bool enabled)
 {
     setValue(enabled, "unavailable_games_visible","filter_games");

@@ -22,14 +22,14 @@ public:
     virtual void storeGameInformation(const QString & /* roomName */, const QStringList & /* roomGameTypes */, const ServerInfo_Game & /* gameInfo */, const QSet<QString> & /* allPlayersEver */, const QSet<QString> & /* allSpectatorsEver */, const QList<GameReplay *> & /* replayList */) { }
     virtual DeckList *getDeckFromDatabase(int /* deckId */, int /* userId */) { return 0; }
     
-    virtual qint64 startSession(const QString & /* userName */, const QString & /* address */, const QString & /* clientId */) { return 0; }
+    virtual qint64 startSession(const QString & /* userName */, const QString & /* address */, const QString & /* clientId */, const QString & /* connectionType */) { return 0; }
     virtual bool usernameIsValid(const QString & /*userName */, QString & /* error */) { return true; };
 public slots:
     virtual void endSession(qint64 /* sessionId */ ) { }
 public:
     virtual int getNextGameId() = 0;
     virtual int getNextReplayId() = 0;
-    virtual int getActiveUserCount() = 0;
+    virtual int getActiveUserCount(QString connectionType = QString()) = 0;
     
     virtual void clearSessionTables() { }
     virtual void lockSessionTables() { }

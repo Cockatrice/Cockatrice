@@ -21,6 +21,9 @@
 #define SERVATRICE_H
 
 #include <QTcpServer>
+#if QT_VERSION > 0x050300
+  #include <QWebSocketServer>
+#endif
 #include <QMutex>
 #include <QSslCertificate>
 #include <QSslKey>
@@ -40,7 +43,7 @@ class GameReplay;
 class Servatrice;
 class Servatrice_ConnectionPool;
 class Servatrice_DatabaseInterface;
-class ServerSocketInterface;
+class AbstractServerSocketInterface;
 class IslInterface;
 class FeatureSet;
 
@@ -54,7 +57,24 @@ public:
     ~Servatrice_GameServer();
 protected:
     void incomingConnection(qintptr socketDescriptor);
+    Servatrice_ConnectionPool *findLeastUsedConnectionPool();
 };
+
+#if QT_VERSION > 0x050300
+class Servatrice_WebsocketGameServer : public QWebSocketServer {
+    Q_OBJECT
+private:
+    Servatrice *server;
+    QList<Servatrice_ConnectionPool *> connectionPools;
+public:
+    Servatrice_WebsocketGameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
+    ~Servatrice_WebsocketGameServer();
+protected:
+    Servatrice_ConnectionPool *findLeastUsedConnectionPool();
+protected slots:
+    void onNewConnection();
+};
+#endif
 
 class Servatrice_IslServer : public QTcpServer {
     Q_OBJECT
@@ -98,6 +118,9 @@ private:
     DatabaseType databaseType;
     QTimer *pingClock, *statusUpdateClock;
     Servatrice_GameServer *gameServer;
+#if QT_VERSION > 0x050300
+    Servatrice_WebsocketGameServer *websocketGameServer;
+#endif
     Servatrice_IslServer *islServer;
     QString serverName;
     mutable QMutex loginMessageMutex;
@@ -154,7 +177,7 @@ public:
     QString getDbPrefix() const { return dbPrefix; }
     int getServerId() const { return serverId; }
     int getUsersWithAddress(const QHostAddress &address) const;
-    QList<ServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
+    QList<AbstractServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
     void incTxBytes(quint64 num);
     void incRxBytes(quint64 num);
     void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);

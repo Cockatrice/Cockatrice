@@ -46,6 +46,7 @@ class GamesProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
 private:
     ServerInfo_User *ownUser;
+    bool showBuddiesOnlyGames;
     bool unavailableGamesVisible;
     bool showPasswordProtectedGames;
     QString gameNameFilter, creatorNameFilter;
@@ -56,6 +57,8 @@ private:
 public:
     GamesProxyModel(QObject *parent = 0, ServerInfo_User *_ownUser = 0);
 
+    bool getShowBuddiesOnlyGames() const {return showBuddiesOnlyGames; }
+    void setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames);
     bool getUnavailableGamesVisible() const { return unavailableGamesVisible; }
     void setUnavailableGamesVisible(bool _unavailableGamesVisible);
     bool getShowPasswordProtectedGames() const { return showPasswordProtectedGames; }

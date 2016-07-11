@@ -92,6 +92,7 @@ public:
     bool getAcceptsUserListChanges() const { return acceptsUserListChanges; }
     bool getAcceptsRoomListChanges() const { return acceptsRoomListChanges; }
     virtual QString getAddress() const = 0;
+    virtual QString getConnectionType() const = 0;
     Server_DatabaseInterface *getDatabaseInterface() const { return databaseInterface; }
 
     int getLastCommandTime() const { return timeRunning - lastDataReceived; }

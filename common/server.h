@@ -44,10 +44,9 @@ private slots:
     void broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl = false);
 public:
     mutable QReadWriteLock clientsLock, roomsLock; // locking order: roomsLock before clientsLock
-    Server(bool _threaded, QObject *parent = 0);
+    Server(QObject *parent = 0);
     ~Server();
-    void setThreaded(bool _threaded) { threaded = _threaded; }
-    AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft, QString &clientid, QString &clientVersion);
+    AuthenticationResult loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reason, int &secondsLeft, QString &clientid, QString &clientVersion, QString &connectionType);
 
     const QMap<int, Server_Room *> &getRooms() { return rooms; }
 
@@ -73,8 +72,6 @@ public:
     virtual int getCommandCountingInterval() const { return 0; }
     virtual int getMaxCommandCountPerInterval() const { return 0; }
 
-    virtual bool getThreaded() const { return false; }
-
     Server_DatabaseInterface *getDatabaseInterface() const;
     int getNextLocalGameId() { QMutexLocker locker(&nextLocalGameIdMutex); return ++nextLocalGameId; }
 
@@ -93,7 +90,6 @@ public:
     void removePersistentPlayer(const QString &userName, int roomId, int gameId, int playerId);
     QList<PlayerReference> getPersistentPlayerReferences(const QString &userName) const;
 private:
-    bool threaded;
     QMultiMap<QString, PlayerReference> persistentPlayers;
     mutable QReadWriteLock persistentPlayersLock;
     int nextLocalGameId;
