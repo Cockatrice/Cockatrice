@@ -43,7 +43,8 @@ var WebClient = {
     "pb/event_list_rooms.proto",
     "pb/response_join_room.proto",
     "pb/room_event.proto",
-    "pb/event_room_say.proto"
+    "pb/event_room_say.proto",
+    "pb/serverinfo_user.proto"
   ],
 
   initialize : function()

@@ -1,15 +1,20 @@
 <!doctype html> 
 <html> 
 <head>
-  <title>Servatrice web client</title>
+  <title>Cockatrice web client</title>
   <link rel="stylesheet" href="js/jquery-ui-1.11.4.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<header>
+  <h1><img src="imgs/cockatrice.png" align="absmiddle"/> Cockatrice web client</h1>
+</header>
 <div id="loading">
-Loading servatrice web client...
+Loading cockatrice web client...
 </div>
+
+<div id="error-dialog" title="Error" style="display:none"></div>
 
 <div id="tabs" style="display:none">
   <ul>
@@ -38,21 +43,32 @@ Loading servatrice web client...
   </div>
 
   <div id="tab-server">
+  <!--
     <h3>Rooms</h3>
     <span id="roomslist"></span>
+  -->
     <h3>Server messages</h3>
     <div id="servermessages"></div>
   </div>
 
   <div id="tab-account">
-    <h3>User info</h3>
-    <span id="userinfo"></span>
-    <h3>Buddies</h3>
-    <select id="buddies" size="10"></select>
-    <h3>Ignores</h3>
-    <select id="ignores" size="10"></select>
-    <h3>Missing features</h3>
-    <span id="features"></span>
+    <div class="buddies-container">
+      <h3>Buddies</h3>
+      <select id="buddies" size="10"></select>
+    </div>
+    <div class="ignores-container">
+      <h3>Ignores</h3>
+      <select id="ignores" size="10"></select>
+    </div>
+    <div class="userinfo-container">
+      <h3>User info</h3>
+      <span id="userinfo"></span>
+    </div>
+    <div class="missingfeatures-container">
+      <h3>Missing features</h3>
+      <span id="features"></span>
+    </div>
+    <div class="clearfix"></div>
   </div>
 
 </div>
@@ -84,6 +100,63 @@ Loading servatrice web client...
 
     function htmlEscape(msg) {
       return $("<div>").text(msg).html();
+    }
+
+    function timeAgoToInterval(secs)
+    {
+      var days = Math.floor(secs / 86400);
+      var years = Math.floor(days / 365);
+      days -= years * 365;
+      var txt = '';
+
+      switch(years)
+      {
+        case 0:
+          break
+        case 1:
+          txt += '1 year ';
+          break;
+        default:
+          txt += years + ' years ';
+          break;
+      }
+
+      switch(days)
+      {
+        case 0:
+          txt += '0 days ';
+        case 1:
+          txt += '1 day ';
+          break;
+        default:
+          txt += days + ' days ';
+          break;
+      }
+
+      return txt;
+    }
+
+    function decodeUserLevel(id) {
+      var levels = WebClient.pb.ServerInfo_User.UserLevelFlag;
+      if (id & levels.IsAdmin)
+          return "Administrator";
+      else if (id & levels.IsModerator)
+          return "Moderator";
+      else if (id & levels.IsRegistered)
+          return "Registered user";
+      else
+          return "Unregistered user";
+    }
+
+    function decodeGender(id) {
+      var genders = WebClient.pb.ServerInfo_User.Gender;
+      for(var key in genders)
+      {
+          if(id == genders[key])
+            return key;
+      }
+
+      return "Unknown";
     }
 
     $("#loginnow").click(connect);
@@ -138,8 +211,31 @@ Loading servatrice web client...
             $("#userinfo").empty();
             $.each(data.userInfo, function(key, value) {
               // filter out inherited properties
-              if (data.userInfo.hasOwnProperty(key))
-                $('#userinfo').append(key + ': ' + value + '<br/>');
+              if (!data.userInfo.hasOwnProperty(key))
+                return true;
+
+              // filter out empty values
+              if(value === null)
+                return true;
+
+              switch(key)
+              {
+                case 'avatarBmp':
+                  $('#userinfo').prepend("<img id='avatar' src='data:image/JPEG;base64," + value.toBase64() + "' /><br/>");
+                  break;
+                case 'accountageSecs':
+                  $('#userinfo').append('Registered since: ' + timeAgoToInterval(value) + '<br/>');
+                  break;
+                case 'userLevel':
+                  $('#userinfo').append('User level: ' + decodeUserLevel(value) + '<br/>');
+                  break;
+                case 'gender':
+                  $('#userinfo').append('Gender: ' + decodeGender(value) + '<br/>');
+                  break;                  
+                default:
+                  $('#userinfo').append(key + ': ' + value + '<br/>');
+                  break;
+              }
             });
 
             $('#buddies').empty();
@@ -152,27 +248,34 @@ Loading servatrice web client...
               $('#ignores').append('<option>' + value.name + '</option>');
             });
             
-            $("#features").text(JSON.stringify(data.missingFeatures, null, 4));
+            $("#features").empty();
+            $.each(data.missingFeatures, function(key, value) {
+                $('#features').append(value + '<br/>');
+            });
         },
         "listRoomsCallback" : function(rooms) {
-          $("#roomslist").text(JSON.stringify(rooms, null, 4));
+          // hide
+          //$("#roomslist").text(JSON.stringify(rooms, null, 4));
         },
         "errorCallback" : function(id, desc) {
-          $("#roomslist").text(desc);
+          $("#error-dialog").text(desc);
+          $("#error-dialog").dialog();
         },
         "joinRoomCallback" : function(room) {
           $("div#tabs ul").append(
               "<li class='room-header'><a href='#tab-room-" + room["roomId"] + "'>" + room["name"] + "</a></li>"
           );
           $("div#tabs").append(
-              "<div class='room-div' id='tab-room-" + room["roomId"] + "'>" + room["name"] + 
+              "<div class='room-container' id='tab-room-" + room["roomId"] + "'>" + 
+              "<div class='userlist-container'>" +
               "<h3>Userlist</h3>" +
               "<select class=\"userlist\" size=\"10\"></select>" +
+              "</div><div class='chat-container'>" +
               "<h3>Chat</h3>" +
               "<div class=\"output\"></div>" +
               "<br/><input type=\"text\" class=\"input\" />" +
               "<button class=\"say\">say</button>" +
-              "</div>"
+              "</div></div><div class='clearfix'></div>"
           );
           $("div#tabs").tabs("refresh");
 
