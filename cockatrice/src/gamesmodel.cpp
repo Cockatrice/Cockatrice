@@ -13,30 +13,21 @@ enum GameListColumn {ROOM, CREATED, DESCRIPTION, CREATOR, GAME_TYPE, RESTRICTION
 const QString GamesModel::getGameCreatedString(const int secs) const {
 
     QString ret;
-    if (secs < SECS_PER_MIN)
-        ret = tr("<1m ago");
-    else if (secs < SECS_PER_MIN * 5)
-        ret = tr("<5m ago");
-    else if (secs < SECS_PER_HOUR)
-        ret = tr("%1m ago").arg(QString::number(secs / SECS_PER_MIN));
-    else if (secs < SECS_PER_MIN * 90) {
-        ret = tr("1hr %1m ago").arg(QString::number((secs / SECS_PER_MIN) - 60));
-    } else if (secs < SECS_PER_HOUR * 4) {
-        unsigned int hours = secs / SECS_PER_HOUR;
-        if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30)
+    if (secs < SECS_PER_MIN * 2) // for first min we display "New"
+        ret = tr("New");
+    else if (secs < SECS_PER_MIN * 10) // from 2 - 10 mins we show the mins
+        ret = QString("%1 min").arg(QString::number(secs / SECS_PER_MIN));
+    else if (secs < SECS_PER_MIN * 60) { // from 10 mins to 1h we aggregate every 10 mins
+        int unitOfTen = secs / SECS_PER_TEN_MIN;
+        QString str = "%1%2";
+        ret = str.arg(QString::number(unitOfTen), "0+ min");
+    } else { // from 1 hr onward we show hrs
+        int hours = secs / SECS_PER_HOUR;
+        if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30) // if the room is open for 1hr 30 mins, we round to 2hrs
             hours++;
-        ret = tr("%1hr ago").arg(QString::number(hours));
-    } else
-        ret = tr("5+ hrs ago");
-
+        ret = QString("%1+ h").arg(QString::number(hours));
+    }
     return ret;
-
-    /*
-    todo
-    . would like less if()
-    . would like less code repition 
-    */
-
 }
 
 GamesModel::GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent)
@@ -67,6 +58,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             switch (role) {
                 case Qt::DisplayRole: return getGameCreatedString(secs);
                 case SORT_ROLE: return QVariant(secs);
+                case Qt::TextAlignmentRole: return Qt::AlignCenter;
                 default: return QVariant();
             }
         }
@@ -135,7 +127,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             case Qt::DisplayRole: 
                 return QString("%1/%2").arg(g.player_count()).arg(g.max_players());
             case Qt::TextAlignmentRole:
-                return Qt::AlignLeft;
+                return Qt::AlignCenter;
             default:
                 return QVariant();
             }
@@ -174,18 +166,32 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
     }
 }
 
-QVariant GamesModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, int role) const
 {
-    if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
+    if ((role != Qt::DisplayRole) && (role != Qt::TextAlignmentRole))
         return QVariant();
     switch (section) {
     case ROOM: return tr("Room");
-    case CREATED: return tr("Game Created");
+    case CREATED: {
+        switch(role) {
+            case Qt::DisplayRole:
+                return tr("Age");
+            case Qt::TextAlignmentRole:
+                return Qt::AlignCenter;
+        }
+    }
     case DESCRIPTION: return tr("Description");
     case CREATOR: return tr("Creator");
-    case GAME_TYPE: return tr("Game Type");
+    case GAME_TYPE: return tr("Type");
     case RESTRICTIONS: return tr("Restrictions");
-    case PLAYERS: return tr("Players");
+    case PLAYERS: {
+        switch(role) {
+            case Qt::DisplayRole:
+                return tr("Players");
+            case Qt::TextAlignmentRole:
+                return Qt::AlignCenter;
+        }
+    }
     case SPECTATORS: return tr("Spectators");
     default: return QVariant();
     }
