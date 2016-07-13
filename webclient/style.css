@@ -1,5 +1,13 @@
+body {
+	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+}
+
 p {
   position: relative;
+}
+
+h3 {
+	margin: 0 0 .5em 0;
 }
 
 #tab-login {
@@ -25,7 +33,6 @@ p {
 }
 
 .output, #servermessages {
-	width:100%;
 	min-height: 400px;
 	overflow-x: hidden;
     overflow-y: scroll;
@@ -37,7 +44,11 @@ p {
 }
 
 .input {
-	width:95%;
+	width:93%;
+}
+
+.say {
+	float: right;
 }
 
 .serverwelcome {
@@ -49,6 +60,34 @@ p {
 	color: #c0c0c0;
 }
 
+.room-container {
+	position:relative;
+}
+
+.chat-container {
+	width: 70%;
+}
+
+.userlist-container {
+	float:right;
+	width: 28%;
+}
+
 #buddies, #ignores, .userlist {
-	width: 20em;
+	width: 100%;
+	min-height: 470px;
+}
+
+.buddies-container, .ignores-container, .userinfo-container, .missingfeatures-container {
+	float: left;
+	width: 30%;
+	margin: 1%;
+}
+
+.clearfix:after {
+	content: " ";
+	visibility: hidden;
+	display: block;
+	height: 0;
+	clear: both;
 }
