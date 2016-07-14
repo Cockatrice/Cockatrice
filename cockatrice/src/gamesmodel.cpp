@@ -283,6 +283,7 @@ void GamesProxyModel::resetFilterParameters()
 {
     unavailableGamesVisible = false;
     showPasswordProtectedGames = true;
+    showBuddiesOnlyGames = true;
     gameNameFilter = QString();
     creatorNameFilter = QString();
     gameTypeFilter.clear();
