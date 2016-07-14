@@ -55,7 +55,7 @@ clientkeepalive=1
 max_player_inactivity_time=15
 
 ; More modern clients generate client IDs based on specific client side information.  Enable this option to
-' require that clients report the client ID in order to log into the server.  Default is false
+; require that clients report the client ID in order to log into the server.  Default is false
 requireclientid=false
 
 ; You can limit the types of clients that connect to the server by requiring different features be available
