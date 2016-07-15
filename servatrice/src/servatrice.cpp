@@ -624,8 +624,6 @@ void Servatrice::incRxBytes(quint64 num)
 
 void Servatrice::shutdownTimeout()
 {
-    --shutdownMinutes;
-
     // Show every time counter cut in half & every minute for last 5 minutes
     if (shutdownMinutes <= 5 || shutdownMinutes == nextShutdownMessageMinutes) {
         if (shutdownMinutes == nextShutdownMessageMinutes)
@@ -652,6 +650,7 @@ void Servatrice::shutdownTimeout()
         if (!shutdownMinutes)
             deleteLater();
     }
+    shutdownMinutes--;
 }
 
 bool Servatrice::islConnectionExists(int serverId) const
