@@ -625,7 +625,8 @@ void Servatrice::shutdownTimeout()
 {
     --shutdownMinutes;
 
-    if (shutdownMinutes <= 5 || isFirstShutdownMessage || shutdownMinutes % 10 == 0) {
+    // Show every half hour and the last 5 mins
+    if (shutdownMinutes <= 5 || isFirstShutdownMessage || shutdownMinutes % 30 == 0) {
         isFirstShutdownMessage = false;
         SessionEvent *se;
         if (shutdownMinutes) {
