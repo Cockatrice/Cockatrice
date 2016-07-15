@@ -599,6 +599,7 @@ void Servatrice::scheduleShutdown(const QString &reason, int minutes)
 {
     shutdownReason = reason;
     shutdownMinutes = minutes + 1;
+    totalMinutes = shutdownMinutes;
     if (minutes > 0) {
         shutdownTimer = new QTimer;
         connect(shutdownTimer, SIGNAL(timeout()), this, SLOT(shutdownTimeout()));
@@ -625,9 +626,12 @@ void Servatrice::shutdownTimeout()
 {
     --shutdownMinutes;
 
-    // Show every half hour and the last 5 mins
-    if (shutdownMinutes <= 5 || isFirstShutdownMessage || shutdownMinutes % 30 == 0) {
+    // Show every time counter cut in half & every minute for last 5 minutes
+    if (shutdownMinutes <= 5 || isFirstShutdownMessage || ceil(totalMinutes / shutdownMinutes * 1.0) == 2) {
         isFirstShutdownMessage = false;
+        if (ceil(totalMinutes / shutdownMinutes) == 2)
+            totalMinutes = ceil(shutdownMinutes / 2.0)
+
         SessionEvent *se;
         if (shutdownMinutes) {
             Event_ServerShutdown event;
