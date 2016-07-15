@@ -599,6 +599,7 @@ void Servatrice::scheduleShutdown(const QString &reason, int minutes)
 {
     shutdownReason = reason;
     shutdownMinutes = minutes + 1;
+    nextShutdownMessageMinutes = shutdownMinutes;
     if (minutes > 0) {
         shutdownTimer = new QTimer;
         connect(shutdownTimer, SIGNAL(timeout()), this, SLOT(shutdownTimeout()));
@@ -623,10 +624,11 @@ void Servatrice::incRxBytes(quint64 num)
 
 void Servatrice::shutdownTimeout()
 {
-    --shutdownMinutes;
+    // Show every time counter cut in half & every minute for last 5 minutes
+    if (shutdownMinutes <= 5 || shutdownMinutes == nextShutdownMessageMinutes) {
+        if (shutdownMinutes == nextShutdownMessageMinutes)
+            nextShutdownMessageMinutes = shutdownMinutes / 2;
 
-    if (shutdownMinutes <= 5 || isFirstShutdownMessage || shutdownMinutes % 10 == 0) {
-        isFirstShutdownMessage = false;
         SessionEvent *se;
         if (shutdownMinutes) {
             Event_ServerShutdown event;
@@ -648,6 +650,7 @@ void Servatrice::shutdownTimeout()
         if (!shutdownMinutes)
             deleteLater();
     }
+    shutdownMinutes--;
 }
 
 bool Servatrice::islConnectionExists(int serverId) const

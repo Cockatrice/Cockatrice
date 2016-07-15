@@ -139,6 +139,7 @@ private:
 
     QString shutdownReason;
     int shutdownMinutes;
+    int nextShutdownMessageMinutes;
     QTimer *shutdownTimer;
     bool isFirstShutdownMessage, clientIdRequired, regServerOnly;
 
