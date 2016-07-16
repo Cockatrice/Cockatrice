@@ -1,7 +1,10 @@
+#include <QDebug>
 #include <QList>
 #include <QTimer>
 #include <QThread>
 #include <QCryptographicHash>
+#include <QHostInfo>
+#include <QHostAddress>
 #include "remoteclient.h"
 #include "settingscache.h"
 #include "pending_command.h"
@@ -365,7 +368,15 @@ void RemoteClient::disconnectFromServer()
 QString RemoteClient::getSrvClientID(const QString _hostname)
 {
     QString srvClientID = settingsCache->getClientID();
-    srvClientID += _hostname;
+    QHostInfo hostInfo = QHostInfo::fromName(_hostname);
+    if (!hostInfo.error()) {
+        QHostAddress hostAddress = hostInfo.addresses().first();
+        srvClientID += hostAddress.toString();
+    }
+    else {
+        qDebug() << "Warning: ClientID generation host lookup failure [" << hostInfo.errorString() << "]";
+        srvClientID += _hostname;
+    }
     QString uniqueServerClientID = QCryptographicHash::hash(srvClientID.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
     return uniqueServerClientID;
 }
