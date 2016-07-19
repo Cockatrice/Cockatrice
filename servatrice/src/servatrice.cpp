@@ -598,7 +598,7 @@ void Servatrice::statusUpdate()
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)
 {
     shutdownReason = reason;
-    shutdownMinutes = minutes + 1;
+    shutdownMinutes = minutes;
     nextShutdownMessageMinutes = shutdownMinutes;
     if (minutes > 0) {
         shutdownTimer = new QTimer;
