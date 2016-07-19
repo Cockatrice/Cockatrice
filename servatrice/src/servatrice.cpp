@@ -181,6 +181,30 @@ Servatrice::Servatrice(QObject *parent)
 Servatrice::~Servatrice()
 {
     gameServer->close();
+
+    // clients live in other threads, we need to lock them 
+    clientsLock.lockForRead();
+    for (int i = 0; i < clients.size(); ++i)
+        QMetaObject::invokeMethod(clients.at(i), "prepareDestroy", Qt::QueuedConnection);
+    clientsLock.unlock();
+
+    // client destruction is asynchronous, wait for all clients to be gone
+    bool done = false;
+
+    class SleeperThread : public QThread
+    {
+    public:
+        static void msleep(unsigned long msecs) { QThread::usleep(msecs); }
+    };
+
+    do {
+        SleeperThread::msleep(10);
+        clientsLock.lockForRead();
+        if (clients.isEmpty())
+            done = true;
+        clientsLock.unlock();
+    } while (!done);
+
     prepareDestroy();
 }
 
