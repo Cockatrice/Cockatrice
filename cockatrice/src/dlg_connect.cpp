@@ -53,7 +53,9 @@ DlgConnect::DlgConnect(QWidget *parent)
     savePasswordCheckBox = new QCheckBox(tr("&Save password"));
     savePasswordCheckBox->setChecked(settingsCache->servers().getSavePassword());
 
-    autoConnectCheckBox = new QCheckBox(tr("A&uto connect at start"));
+    autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
+    autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
+
     if(savePasswordCheckBox->isChecked())
     {
         autoConnectCheckBox->setChecked(settingsCache->servers().getAutoConnect());
@@ -74,6 +76,7 @@ DlgConnect::DlgConnect(QWidget *parent)
     connectionLayout->addWidget(hostEdit, 3, 1);
     connectionLayout->addWidget(portLabel, 4, 0);
     connectionLayout->addWidget(portEdit, 4, 1);
+    connectionLayout->addWidget(autoConnectCheckBox, 5, 1);
 
     QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Server"));
     restrictionsGroupBox->setLayout(connectionLayout);
@@ -83,6 +86,7 @@ DlgConnect::DlgConnect(QWidget *parent)
     loginLayout->addWidget(playernameEdit, 0, 1);
     loginLayout->addWidget(passwordLabel, 1, 0);
     loginLayout->addWidget(passwordEdit, 1, 1);
+    loginLayout->addWidget(savePasswordCheckBox, 2, 1);
 
     QGroupBox *loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
@@ -90,9 +94,7 @@ DlgConnect::DlgConnect(QWidget *parent)
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
     grid->addWidget(loginGroupBox, 1, 0);
-    grid->addWidget(savePasswordCheckBox, 3, 0);
-    grid->addWidget(autoConnectCheckBox, 4, 0);
-    
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
