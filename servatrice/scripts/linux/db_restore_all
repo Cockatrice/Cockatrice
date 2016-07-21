@@ -25,7 +25,6 @@ TABLES=(
 	"cockatrice_schema_version"
 	"cockatrice_servermessages"
 	"cockatrice_servers"
-	"cockatrice_news"
 	"cockatrice_rooms"
     "cockatrice_rooms_gametypes"
 	)
