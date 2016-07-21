@@ -140,7 +140,7 @@ void ShortcutsSettings::clearAllShortcuts()
 void ShortcutsSettings::fillDefaultShorcuts()
 {
     defaultShortCuts["MainWindow/aCheckCardUpdates"] = parseSequenceString("");
-    defaultShortCuts["MainWindow/aConnect"] = parseSequenceString("");
+    defaultShortCuts["MainWindow/aConnect"] = parseSequenceString("Ctrl+L");
     defaultShortCuts["MainWindow/aDeckEditor"] = parseSequenceString("");
     defaultShortCuts["MainWindow/aDisconnect"] = parseSequenceString("");
     defaultShortCuts["MainWindow/aExit"] = parseSequenceString("");
