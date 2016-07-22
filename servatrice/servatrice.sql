@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
-INSERT INTO cockatrice_schema_version VALUES(15);
+INSERT INTO cockatrice_schema_version VALUES(16);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -141,17 +141,6 @@ CREATE TABLE IF NOT EXISTS `cockatrice_replays_access` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 -- server administration
-
--- Note: unused table
-CREATE TABLE IF NOT EXISTS `cockatrice_news` (
-  `id` int(7) unsigned zerofill NOT NULL auto_increment,
-  `id_user` int(7) unsigned zerofill NOT NULL,
-  `news_date` datetime NOT NULL,
-  `subject` varchar(255) NOT NULL,
-  `content` text NOT NULL,
-  PRIMARY KEY  (`id`),
-  FOREIGN KEY(`id_user`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=INNODB  DEFAULT CHARSET=utf8;
 
 -- Note: unused table
 CREATE TABLE IF NOT EXISTS `cockatrice_servers` (
