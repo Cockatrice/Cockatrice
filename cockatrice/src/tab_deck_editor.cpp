@@ -573,7 +573,7 @@ void TabDeckEditor::retranslateUi()
 
 QString TabDeckEditor::getTabText() const
 {
-    QString result = tr("Deck: %1").arg(nameEdit->text());
+    QString result = tr("Deck: %1").arg(nameEdit->text().simplified());
     if (modified)
         result.prepend("* ");
     return result;

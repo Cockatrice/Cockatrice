@@ -10,6 +10,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <iostream>
+#include <QGroupBox>
 #include "dlg_connect.h"
 #include "settingscache.h"
 
@@ -52,7 +53,9 @@ DlgConnect::DlgConnect(QWidget *parent)
     savePasswordCheckBox = new QCheckBox(tr("&Save password"));
     savePasswordCheckBox->setChecked(settingsCache->servers().getSavePassword());
 
-    autoConnectCheckBox = new QCheckBox(tr("A&uto connect at start"));
+    autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
+    autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
+
     if(savePasswordCheckBox->isChecked())
     {
         autoConnectCheckBox->setChecked(settingsCache->servers().getAutoConnect());
@@ -65,21 +68,33 @@ DlgConnect::DlgConnect(QWidget *parent)
 
     connect(savePasswordCheckBox, SIGNAL(stateChanged(int)), this, SLOT(passwordSaved(int)));
 
+    QGridLayout *connectionLayout = new QGridLayout;
+    connectionLayout->addWidget(previousHostButton, 0, 1);
+    connectionLayout->addWidget(previousHosts, 1, 1);
+    connectionLayout->addWidget(newHostButton, 2, 1);
+    connectionLayout->addWidget(hostLabel, 3, 0);
+    connectionLayout->addWidget(hostEdit, 3, 1);
+    connectionLayout->addWidget(portLabel, 4, 0);
+    connectionLayout->addWidget(portEdit, 4, 1);
+    connectionLayout->addWidget(autoConnectCheckBox, 5, 1);
+
+    QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Server"));
+    restrictionsGroupBox->setLayout(connectionLayout);
+
+    QGridLayout *loginLayout = new QGridLayout;
+    loginLayout->addWidget(playernameLabel, 0, 0);
+    loginLayout->addWidget(playernameEdit, 0, 1);
+    loginLayout->addWidget(passwordLabel, 1, 0);
+    loginLayout->addWidget(passwordEdit, 1, 1);
+    loginLayout->addWidget(savePasswordCheckBox, 2, 1);
+
+    QGroupBox *loginGroupBox = new QGroupBox(tr("Login"));
+    loginGroupBox->setLayout(loginLayout);
+
     QGridLayout *grid = new QGridLayout;
-    grid->addWidget(previousHostButton, 0, 1);
-    grid->addWidget(previousHosts, 1, 1);
-    grid->addWidget(newHostButton, 2, 1);
-    grid->addWidget(hostLabel, 3, 0);
-    grid->addWidget(hostEdit, 3, 1);
-    grid->addWidget(portLabel, 4, 0);
-    grid->addWidget(portEdit, 4, 1);
-    grid->addWidget(playernameLabel, 5, 0);
-    grid->addWidget(playernameEdit, 5, 1);
-    grid->addWidget(passwordLabel, 6, 0);
-    grid->addWidget(passwordEdit, 6, 1);
-    grid->addWidget(savePasswordCheckBox, 7, 0, 1, 2);
-    grid->addWidget(autoConnectCheckBox, 8, 0, 1, 2);
-    
+    grid->addWidget(restrictionsGroupBox, 0, 0);
+    grid->addWidget(loginGroupBox, 1, 0);
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
@@ -100,11 +115,14 @@ DlgConnect::DlgConnect(QWidget *parent)
         previousHostButton->setChecked(true);
     else
         newHostButton->setChecked(true);
+
+    playernameEdit->setFocus();
 }
 
 
 void DlgConnect::previousHostSelected(bool state) {
     if (state) {
+        hostLabel->setDisabled(true);
         hostEdit->setDisabled(true);
         previousHosts->setDisabled(false);
     }
@@ -113,6 +131,7 @@ void DlgConnect::previousHostSelected(bool state) {
 void DlgConnect::newHostSelected(bool state) {
     if (state) {
         hostEdit->setDisabled(false);
+        hostLabel->setDisabled(false);
         previousHosts->setDisabled(true);
     }
 }

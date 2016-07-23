@@ -36,7 +36,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     gameListView->setAlternatingRowColors(true);
     gameListView->setRootIsDecorated(true);
     // game created width
-    gameListView->resizeColumnToContents(1);
+    gameListView->setColumnWidth(1, gameListView->columnWidth(2) * 0.7);
     // players width
     gameListView->resizeColumnToContents(6);
     // description width

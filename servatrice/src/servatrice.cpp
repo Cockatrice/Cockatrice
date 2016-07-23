@@ -276,10 +276,12 @@ bool Servatrice::initServer()
 
     const QString roomMethod = settingsCache->value("rooms/method").toString();
     if (roomMethod == "sql") {
-        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, permissionlevel, auto_join, join_message, chat_history_size from {prefix}_rooms order by id asc");
+        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, permissionlevel, auto_join, join_message, chat_history_size from {prefix}_rooms where id_server = :id_server order by id asc");
+        query->bindValue(":id_server", serverId);
         servatriceDatabaseInterface->execSqlQuery(query);
         while (query->next()) {
-            QSqlQuery *query2 = servatriceDatabaseInterface->prepareQuery("select name from {prefix}_rooms_gametypes where id_room = :id_room");
+            QSqlQuery *query2 = servatriceDatabaseInterface->prepareQuery("select name from {prefix}_rooms_gametypes where id_room = :id_room AND id_server = :id_server");
+            query2->bindValue(":id_server", serverId);
             query2->bindValue(":id_room", query->value(0).toInt());
             servatriceDatabaseInterface->execSqlQuery(query2);
             QStringList gameTypes;
@@ -598,7 +600,8 @@ void Servatrice::statusUpdate()
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)
 {
     shutdownReason = reason;
-    shutdownMinutes = minutes + 1;
+    shutdownMinutes = minutes;
+    nextShutdownMessageMinutes = shutdownMinutes;
     if (minutes > 0) {
         shutdownTimer = new QTimer;
         connect(shutdownTimer, SIGNAL(timeout()), this, SLOT(shutdownTimeout()));
@@ -623,10 +626,11 @@ void Servatrice::incRxBytes(quint64 num)
 
 void Servatrice::shutdownTimeout()
 {
-    --shutdownMinutes;
+    // Show every time counter cut in half & every minute for last 5 minutes
+    if (shutdownMinutes <= 5 || shutdownMinutes == nextShutdownMessageMinutes) {
+        if (shutdownMinutes == nextShutdownMessageMinutes)
+            nextShutdownMessageMinutes = shutdownMinutes / 2;
 
-    if (shutdownMinutes <= 5 || isFirstShutdownMessage || shutdownMinutes % 10 == 0) {
-        isFirstShutdownMessage = false;
         SessionEvent *se;
         if (shutdownMinutes) {
             Event_ServerShutdown event;
@@ -648,6 +652,7 @@ void Servatrice::shutdownTimeout()
         if (!shutdownMinutes)
             deleteLater();
     }
+    shutdownMinutes--;
 }
 
 bool Servatrice::islConnectionExists(int serverId) const
