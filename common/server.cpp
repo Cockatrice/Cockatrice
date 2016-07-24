@@ -59,28 +59,6 @@ Server::~Server()
 
 void Server::prepareDestroy()
 {
-    // dirty :(
-    clientsLock.lockForRead();
-    for (int i = 0; i < clients.size(); ++i)
-        QMetaObject::invokeMethod(clients.at(i), "prepareDestroy", Qt::QueuedConnection);
-    clientsLock.unlock();
-
-    bool done = false;
-
-    class SleeperThread : public QThread
-    {
-    public:
-        static void msleep(unsigned long msecs) { QThread::usleep(msecs); }
-    };
-
-    do {
-        SleeperThread::msleep(10);
-        clientsLock.lockForRead();
-        if (clients.isEmpty())
-            done = true;
-        clientsLock.unlock();
-    } while (!done);
-
     roomsLock.lockForWrite();
     QMapIterator<int, Server_Room *> roomIterator(rooms);
     while (roomIterator.hasNext())
