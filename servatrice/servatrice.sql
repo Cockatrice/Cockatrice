@@ -90,12 +90,14 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
   `auto_join` tinyint(1) default 0,
   `join_message` varchar(255) NOT NULL,
   `chat_history_size` int(4) NOT NULL,
+  `id_server` tinyint(3) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_rooms_gametypes` (
   `id_room` int(7) unsigned NOT NULL,
   `name` varchar(50) NOT NULL,
+  `id_server` tinyint(3) NOT NULL,
   FOREIGN KEY(`id_room`) REFERENCES `cockatrice_rooms`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
