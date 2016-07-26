@@ -192,7 +192,7 @@ Loading cockatrice web client...
             $("#quit").hide();
             $("#loginnow").show().prop("disabled", false);
             // close rooms
-            $(".room-header, .room-div").remove();
+            $(".room-header, .room-container").remove();
 
           }
         },
@@ -202,7 +202,7 @@ Loading cockatrice web client...
           $("#quit").hide();
           $("#loginnow").show().prop("disabled", false);
           // close rooms
-          $(".room-header, .room-div").remove();
+          $(".room-header, .room-container").remove();
         },
         "serverMessageCallback" : function(message) {
           $("#servermessages").append(htmlEscape(message) + '<br/>');
