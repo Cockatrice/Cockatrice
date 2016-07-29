@@ -9,6 +9,7 @@ var StatusEnum = {
 
 var WebClient = {
   status : StatusEnum.DISCONNECTED,
+  protocolVersion : 14,
   socket : 0,
   keepalivecb: null,
   lastPingPending: false,
@@ -39,6 +40,9 @@ var WebClient = {
     "pb/response_login.proto",
     "pb/session_event.proto",
     "pb/event_server_message.proto",
+    "pb/event_server_identification.proto",
+    "pb/event_server_shutdown.proto",
+    "pb/event_notify_user.proto",
     "pb/event_connection_closed.proto",
     "pb/event_list_rooms.proto",
     "pb/response_join_room.proto",
@@ -157,8 +161,14 @@ var WebClient = {
       "userName" : this.options.user,
       "password" : this.options.pass,
       "clientid" : this.guid(),
-      "clientver" : "webclient-0.1 (2015-12-23)",
-      "clientfeatures" : [ "client_id", "client_ver"],
+      "clientver" : "webclient-0.2 (2016-08-03)",
+      "clientfeatures" : [
+        "client_id",
+        "client_ver",
+        "feature_set",
+        "room_chat_history",
+        "client_warnings"
+      ]
     });
 
     var sc = new WebClient.pb.SessionCommand({
@@ -293,6 +303,37 @@ var WebClient = {
       }
       return;
     }
+
+    if(raw[".Event_ServerIdentification.ext"]) {
+      if(this.options.serverIdentificationCallback)
+        this.options.serverIdentificationCallback(
+          raw[".Event_ServerIdentification.ext"]
+        );
+
+      if(raw[".Event_ServerIdentification.ext"].protocolVersion != WebClient.protocolVersion)
+      {
+        WebClient.socket.close();
+        WebClient.setStatus(StatusEnum.DISCONNECTED, 'Protocol version mismatch: ' + raw[".Event_ServerIdentification.ext"].protocolVersion);
+        return;
+      }
+
+      WebClient.setStatus(StatusEnum.CONNECTED, 'Logging in...');
+      WebClient.resetConnectionvars();
+      WebClient.doLogin();
+      return;
+    }
+
+    if(raw[".Event_ServerShutdown.ext"]) {
+      if(this.options.serverShutdownCallback)
+        this.options.serverShutdownCallback(raw[".Event_ServerShutdown.ext"]);
+      return;
+    }
+
+    if(raw[".Event_NotifyUser.ext"]) {
+      if(this.options.notifyUserCallback)
+        this.options.notifyUserCallback(raw[".Event_NotifyUser.ext"]);
+      return;
+    }
   },
 
   processRoomEvent : function (raw)
@@ -348,9 +389,7 @@ var WebClient = {
     }
 
     this.socket.onopen = function(){
-      WebClient.setStatus(StatusEnum.CONNECTED, 'Connected, logging in...');
-      WebClient.resetConnectionvars();
-      WebClient.doLogin();
+      WebClient.setStatus(StatusEnum.CONNECTED, 'Connected');
     } 
 
     this.socket.onmessage = function(event) {

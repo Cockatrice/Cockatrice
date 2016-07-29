@@ -2,6 +2,7 @@
 <html> 
 <head>
   <title>Cockatrice web client</title>
+  <link rel="shortcut icon" href="imgs/cockatrice.png" />
   <link rel="stylesheet" href="js/jquery-ui-1.11.4.css">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -15,6 +16,7 @@ Loading cockatrice web client...
 </div>
 
 <div id="error-dialog" title="Error" style="display:none"></div>
+<div id="info-dialog" title="Information" style="display:none"></div>
 
 <div id="tabs" style="display:none">
   <ul>
@@ -26,7 +28,7 @@ Loading cockatrice web client...
   <div id="tab-login">
     <h3>Login to server</h3>  
     <label for="host">Host</label>
-    <input type="text" id="host" value="127.0.0.1" />
+    <input type="text" id="host" value="" />
     <br/>
     <label for="port">Port</label>
     <input type="text" id="port" value ="4748" />
@@ -54,11 +56,11 @@ Loading cockatrice web client...
   <div id="tab-account">
     <div class="buddies-container">
       <h3>Buddies</h3>
-      <select id="buddies" size="10"></select>
+      <ul id="buddies" size="10"></ul>
     </div>
     <div class="ignores-container">
       <h3>Ignores</h3>
-      <select id="ignores" size="10"></select>
+      <ul id="ignores" size="10"></ul>
     </div>
     <div class="userinfo-container">
       <h3>User info</h3>
@@ -86,6 +88,16 @@ Loading cockatrice web client...
   $("#loading").hide();
   $("#tabs").show();
 
+  $( "#host" ).autocomplete({
+    source: [
+      // add custom servers here
+      "cockatrice.woogerworks.com",
+      "vps.poixen.com",
+      "chickatrice.net",
+      "127.0.0.1"
+    ]
+  });
+
   $( document ).ready(function() {
 
     function ts2time(ts) {
@@ -100,6 +112,43 @@ Loading cockatrice web client...
 
     function htmlEscape(msg) {
       return $("<div>").text(msg).html();
+    }
+
+    function htmlSanitize(msg) {
+      var div = $("<div>").html(msg);
+
+      // remove all tags except some
+      var tagsWhitelist = "br,a,img,center,b,font";
+      $(div).find("*").not(tagsWhitelist).each(function() {
+        $(this).replaceWith(this.innerHTML);
+      });
+
+      // remove all attributes except some
+      var attributesWhitelist = ["href","color"];
+
+      $(div).find("*").each(function() {
+        var attributes = this.attributes;
+        var i = attributes.length;
+        while( i-- ) {
+          var attr = attributes[i];
+          if( $.inArray(attr.name,attributesWhitelist) == -1 )
+            this.removeAttributeNode(attr);
+        }
+      });
+
+      // permit only some protocols in href
+      var hrefWhitelist = ["http://","https://","ftp://","//"];
+
+      $(div).find("[href]").each(function() {
+        var attributeValue = $(this).attr('href');
+        for(var protocol in hrefWhitelist)
+          if(attributeValue.indexOf(hrefWhitelist[protocol]) == 0)
+            return;
+
+        $(this).removeAttr('href');        
+      });
+
+      return $(div).html();
     }
 
     function timeAgoToInterval(secs)
@@ -205,8 +254,29 @@ Loading cockatrice web client...
           $(".room-header, .room-container").remove();
         },
         "serverMessageCallback" : function(message) {
-          $("#servermessages").append(htmlEscape(message) + '<br/>');
+          $("#servermessages").append(htmlSanitize(message) + '<br/>');
         },
+        "serverIdentificationCallback" : function(data) {
+          console.log('Connected to: ' + data.serverName + ' version ' + data.serverVersion + ' protocol ' + data.protocolVersion);
+        },
+        "serverShutdownCallback" : function(data) {
+          $("#info-dialog").text('The server is going to be restarted in ' + data.minutes + ' minute(s).\nAll running games will be lost.\nReason for shutdown: ' + data.reason);
+          $("#info-dialog").dialog();
+        },
+        "notifyUserCallback" : function(data) {
+          switch(data.type)
+          {
+            case WebClient.pb.Event_NotifyUser.NotificationType.PROMOTED:
+              $("#info-dialog").text('You have been promoted to moderator. Please log out and back in for changes to take effect.');
+              $("#info-dialog").dialog();
+              break;
+            case WebClient.pb.Event_NotifyUser.NotificationType.WARNING:
+              $("#info-dialog").text('You have received a warning due to ' + data.warningReason + '.\nPlease refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.');
+              $("#info-dialog").dialog();
+              break;
+          }
+        },
+
         "userInfoCallback" : function(data) {
             $("#userinfo").empty();
             $.each(data.userInfo, function(key, value) {
@@ -240,13 +310,16 @@ Loading cockatrice web client...
 
             $('#buddies').empty();
             $.each(data.buddyList, function(key, value) {
-              $('#buddies').append('<option>' + value.name + '</option>');
+              debugger;
+              $('#buddies').append('<li>' + value.name + '</li>');
             });
+            $("#buddies").selectable();
 
             $('#ignores').empty();
             $.each(data.ignoreList, function(key, value) {
-              $('#ignores').append('<option>' + value.name + '</option>');
+              $('#ignores').append('<li>' + value.name + '</li>');
             });
+            $("#ignores").selectable();
             
             $("#features").empty();
             $.each(data.missingFeatures, function(key, value) {
@@ -262,14 +335,14 @@ Loading cockatrice web client...
           $("#error-dialog").dialog();
         },
         "joinRoomCallback" : function(room) {
-          $("div#tabs ul").append(
+          $("div#tabs > ul").append(
               "<li class='room-header'><a href='#tab-room-" + room["roomId"] + "'>" + room["name"] + "</a></li>"
           );
           $("div#tabs").append(
               "<div class='room-container' id='tab-room-" + room["roomId"] + "'>" + 
               "<div class='userlist-container'>" +
               "<h3>Userlist</h3>" +
-              "<select class=\"userlist\" size=\"10\"></select>" +
+              "<ul class=\"userlist\" size=\"10\"></ul>" +
               "</div><div class='chat-container'>" +
               "<h3>Chat</h3>" +
               "<div class=\"output\"></div>" +
@@ -281,8 +354,9 @@ Loading cockatrice web client...
 
           $("#tab-room-" + room["roomId"] + " .userlist").empty();
           $.each(room["userList"], function(key, value) {
-            $("#tab-room-" + room["roomId"] + " .userlist").append('<option>' + value.name + '</option>');
+            $("#tab-room-" + room["roomId"] + " .userlist").append('<li>' + value.name + '</li>');
           });
+          $("#tab-room-" + room["roomId"] + " .userlist").selectable();
 
           $("#tab-room-" + room["roomId"] + " .say").click(function() {
             var msg = $("#tab-room-" + room["roomId"] + " .input").val();

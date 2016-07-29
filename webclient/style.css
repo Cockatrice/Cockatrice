@@ -24,6 +24,7 @@ h3 {
 
 #tab-login input {
     margin-bottom: 10px;
+    width: 20em;
 }
 
 #loading {
@@ -33,7 +34,7 @@ h3 {
 }
 
 .output, #servermessages {
-	min-height: 400px;
+	height: 400px;
 	overflow-x: hidden;
     overflow-y: scroll;
 	word-wrap: break-word;
@@ -44,7 +45,7 @@ h3 {
 }
 
 .input {
-	width:93%;
+	width:92%;
 }
 
 .say {
@@ -75,7 +76,27 @@ h3 {
 
 #buddies, #ignores, .userlist {
 	width: 100%;
-	min-height: 470px;
+	height: 500px;
+	list-style-type: none;
+	overflow-x: hidden;
+    overflow-y: scroll;
+	background: #fff;
+	padding: 0;
+	margin: 0;
+	cursor: pointer;
+	border: 1px solid #999;
+}
+
+#buddies li, #ignores li, .userlist li {
+	padding: 0 3px;
+}
+
+#buddies .ui-selecting, #ignores .ui-selecting, .userlist .ui-selecting {
+	background: #FECA40;
+}
+
+#buddies .ui-selected, #ignores .ui-selected, .userlist .ui-selected {
+	background: #F39814; color: white;
 }
 
 .buddies-container, .ignores-container, .userinfo-container, .missingfeatures-container {
