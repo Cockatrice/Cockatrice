@@ -8,6 +8,7 @@ class QLabel;
 class QLineEdit;
 class QPushButton;
 class QCheckBox;
+class QRadioButton;
 class QGroupBox;
 class QSpinBox;
 class QDialogButtonBox;
@@ -29,7 +30,7 @@ private slots:
 private:
     TabRoom *room;
     QMap<int, QString> gameTypes;
-    QMap<int, QCheckBox *> gameTypeCheckBoxes;
+    QMap<int, QRadioButton *> gameTypeCheckBoxes;
 
     QGroupBox *spectatorsGroupBox;
     QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;
