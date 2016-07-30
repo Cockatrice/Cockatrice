@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
-INSERT INTO cockatrice_schema_version VALUES(16);
+INSERT INTO cockatrice_schema_version VALUES(17);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -90,14 +90,14 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
   `auto_join` tinyint(1) default 0,
   `join_message` varchar(255) NOT NULL,
   `chat_history_size` int(4) NOT NULL,
-  `id_server` tinyint(3) NOT NULL,
+  `id_server` tinyint(3) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_rooms_gametypes` (
   `id_room` int(7) unsigned NOT NULL,
   `name` varchar(50) NOT NULL,
-  `id_server` tinyint(3) NOT NULL,
+  `id_server` tinyint(3) NOT NULL DEFAULT 1,
   FOREIGN KEY(`id_room`) REFERENCES `cockatrice_rooms`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_uptime` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_servermessages` (
-  `id_server` tinyint(3) not null default 0,
+  `id_server` tinyint(3) not null default 1,
   `timest` datetime NOT NULL default '0000-00-00 00:00:00',
   `message` text,
   PRIMARY KEY  (`timest`)
