@@ -447,13 +447,13 @@ Questo è solo visibile ai moderatori e non alla persona bannata.</translation>
     <name>DeckViewContainer</name>
     <message>
         <location filename="../src/tab_game.cpp" line="136"/>
-        <source>Load local deck</source>
-        <translation>Carica mazzo dal pc</translation>
+        <source>Load deck...</source>
+        <translation>Carica mazzo...</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="137"/>
-        <source>Load deck from server</source>
-        <translation>Carica mazzo dal server</translation>
+        <source>Load remote deck...</source>
+        <translation>Carica mazzo remoto...</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="138"/>
