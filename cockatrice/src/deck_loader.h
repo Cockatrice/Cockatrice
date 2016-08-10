@@ -28,6 +28,14 @@ public:
     bool loadFromFile(const QString &fileName, FileFormat fmt);
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
     bool saveToFile(const QString &fileName, FileFormat fmt);
+
+    // overload
+    bool saveToStream_Plain(QTextStream &out);
+
+protected:
+    void saveToStream_DeckHeader(QTextStream &out);
+    void saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode *zoneNode);
+    void saveToStream_DeckZoneCards(QTextStream &out, const InnerDecklistNode *zoneNode, QList <DecklistCardNode*> cards);
 };
 
 #endif

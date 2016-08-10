@@ -80,6 +80,7 @@ SET(cockatrice_SOURCES
     src/tab_logs.cpp
     src/replay_timeline_widget.cpp
     src/deckstats_interface.cpp
+    src/tappedout_interface.cpp
     src/chatview.cpp 
     src/userlist.cpp 
     src/userinfobox.cpp 

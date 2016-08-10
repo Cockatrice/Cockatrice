@@ -52,7 +52,8 @@ class TabDeckEditor : public Tab {
             void actLoadDeckFromClipboard();
             void actSaveDeckToClipboard();
             void actPrintDeck();
-            void actAnalyzeDeck();
+            void actAnalyzeDeckDeckstats();
+            void actAnalyzeDeckTappedout();
 
             void actClearFilterAll();
             void actClearFilterOne();
@@ -112,8 +113,8 @@ private:
     QTreeView *filterView;
     QWidget *filterBox;
 
-    QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu;
-    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeck, *aClose;
+    QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *analyzeDeckMenu;
+    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aClose;
     QAction *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;// *aUpdatePrices;
     QAction *aResetLayout;
