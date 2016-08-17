@@ -823,7 +823,7 @@ void TabDeckEditor::actSwapCard()
 
     QModelIndex newCardIndex = deckModel->addCard(cardName, otherZoneName);
     recursiveExpand(newCardIndex);
-    deckView->setCurrentIndex(newCardIndex);
+
     setModified(true);
 }
 
