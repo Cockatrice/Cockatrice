@@ -185,7 +185,7 @@ CardInfo::CardInfo(const QString &_name,
                    const SetList &_sets,
                    const QStringMap &_customPicURLs,
                    MuidMap _muIds,
-                   QStringMap _setNumbers,
+                   QStringMap _collectorNumbers,
                    QStringMap _rarities
                    )
     : name(_name),
@@ -204,7 +204,7 @@ CardInfo::CardInfo(const QString &_name,
       loyalty(_loyalty),
       customPicURLs(_customPicURLs),
       muIds(_muIds),
-      setNumbers(_setNumbers),
+      collectorNumbers(_collectorNumbers),
       rarities(_rarities),
       cipt(_cipt),
       tableRow(_tableRow)
@@ -333,9 +333,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
         xml.writeAttribute("rarity", info->getRarity(tmpSet));
         xml.writeAttribute("muId", QString::number(info->getMuId(tmpSet)));
 
-        tmpString = info->getSetNumber(tmpSet);
+        tmpString = info->getCollectorNumber(tmpSet);
         if(!tmpString.isEmpty())
-            xml.writeAttribute("num", info->getSetNumber(tmpSet));
+            xml.writeAttribute("num", info->getCollectorNumber(tmpSet));
 
         tmpString = info->getCustomPicURL(tmpSet);
         if(!tmpString.isEmpty())
@@ -508,7 +508,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
             QStringList colors, relatedCards, reverseRelatedCards;
             QStringMap customPicURLs;
             MuidMap muids;
-            QStringMap setNumbers, rarities;
+            QStringMap collectorNumbers, rarities;
             SetList sets;
             int tableRow = 0;
             int loyalty = 0;
@@ -541,7 +541,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                         customPicURLs[setName] = attrs.value("picURL").toString();
                     }
                     if (attrs.hasAttribute("num")) {
-                        setNumbers[setName] = attrs.value("num").toString();
+                        collectorNumbers[setName] = attrs.value("num").toString();
                     }
                     if (attrs.hasAttribute("rarity")) {
                         rarities[setName] = attrs.value("rarity").toString();
@@ -568,7 +568,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                 }
             }
 
-            addCard(new CardInfo(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids, setNumbers, rarities));
+            addCard(new CardInfo(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids, collectorNumbers, rarities));
         }
     }
 }

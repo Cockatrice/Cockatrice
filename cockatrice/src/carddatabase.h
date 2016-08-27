@@ -88,7 +88,7 @@ private:
     int loyalty;
     QStringMap customPicURLs;
     MuidMap muIds;
-    QStringMap setNumbers;
+    QStringMap collectorNumbers;
     QStringMap rarities;
     bool cipt;
     int tableRow;
@@ -111,7 +111,7 @@ public:
         const SetList &_sets = SetList(),
         const QStringMap &_customPicURLs = QStringMap(),
         MuidMap muids = MuidMap(),
-        QStringMap _setNumbers = QStringMap(),
+        QStringMap _collectorNumbers = QStringMap(),
         QStringMap _rarities = QStringMap()
         );
     ~CardInfo();
@@ -144,7 +144,7 @@ public:
     bool getUpsideDownArt() const { return upsideDownArt; }
     QString getCustomPicURL(const QString &set) const { return customPicURLs.value(set); }
     int getMuId(const QString &set) const { return muIds.value(set); }
-    QString getSetNumber(const QString &set) const { return setNumbers.value(set); }
+    QString getCollectorNumber(const QString &set) const { return collectorNumbers.value(set); }
     QString getRarity(const QString &set) const { return rarities.value(set); }
     QStringMap getRarities() const { return rarities; }
     QString getMainCardType() const;
@@ -154,7 +154,7 @@ public:
     void setLoyalty(int _loyalty) { loyalty = _loyalty; emit cardInfoChanged(this); }
     void setCustomPicURL(const QString &_set, const QString &_customPicURL) { customPicURLs.insert(_set, _customPicURL); }
     void setMuId(const QString &_set, const int &_muId) { muIds.insert(_set, _muId); }
-    void setSetNumber(const QString &_set, const QString &_setNumber) { setNumbers.insert(_set, _setNumber); }
+    void setSetNumber(const QString &_set, const QString &_setNumber) { collectorNumbers.insert(_set, _setNumber); }
     void setRarity(const QString &_set, const QString &_setNumber) { rarities.insert(_set, _setNumber); }
     void addToSet(CardSet *set);
     void emitPixmapUpdated() { emit pixmapUpdated(); }
