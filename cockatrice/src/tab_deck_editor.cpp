@@ -34,6 +34,7 @@
 #include "priceupdater.h"
 #include "tab_supervisor.h"
 #include "deckstats_interface.h"
+#include "tappedout_interface.h"
 #include "abstractclient.h"
 #include "pending_command.h"
 #include "pb/response.pb.h"
@@ -226,8 +227,15 @@ void TabDeckEditor::createMenus()
     aPrintDeck = new QAction(QString(), this);
     connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
 
-    aAnalyzeDeck = new QAction(QString(), this);
-    connect(aAnalyzeDeck, SIGNAL(triggered()), this, SLOT(actAnalyzeDeck()));
+    aAnalyzeDeckDeckstats = new QAction(QString(), this);
+    connect(aAnalyzeDeckDeckstats, SIGNAL(triggered()), this, SLOT(actAnalyzeDeckDeckstats()));
+
+    aAnalyzeDeckTappedout = new QAction(QString(), this);
+    connect(aAnalyzeDeckTappedout, SIGNAL(triggered()), this, SLOT(actAnalyzeDeckTappedout()));
+
+    analyzeDeckMenu = new QMenu(this);
+    analyzeDeckMenu->addAction(aAnalyzeDeckDeckstats);
+    analyzeDeckMenu->addAction(aAnalyzeDeckTappedout);
 
     aClose = new QAction(QString(), this);
     connect(aClose, SIGNAL(triggered()), this, SLOT(closeRequest()));
@@ -250,7 +258,7 @@ void TabDeckEditor::createMenus()
     deckMenu->addAction(aSaveDeckToClipboard);
     deckMenu->addSeparator();
     deckMenu->addAction(aPrintDeck);
-    deckMenu->addAction(aAnalyzeDeck);
+    deckMenu->addMenu(analyzeDeckMenu);
     deckMenu->addSeparator();
     deckMenu->addAction(aClearFilterOne);
     deckMenu->addAction(aClearFilterAll);
@@ -444,7 +452,7 @@ void TabDeckEditor::refreshShortcuts()
     aSaveDeckAs->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeckAs"));
     aLoadDeckFromClipboard->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
     aPrintDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aPrintDeck"));
-    aAnalyzeDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aAnalyzeDeck"));
+    aAnalyzeDeckDeckstats->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aAnalyzeDeck"));
     aClose->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClose"));
     aResetLayout->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aResetLayout"));
     aClearFilterAll->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterAll"));
@@ -536,7 +544,11 @@ void TabDeckEditor::retranslateUi()
     aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
     aSaveDeckToClipboard->setText(tr("Save deck to clip&board"));
     aPrintDeck->setText(tr("&Print deck..."));
-    aAnalyzeDeck->setText(tr("&Analyze deck on deckstats.net"));
+
+    analyzeDeckMenu->setTitle(tr("&Analyze deck online"));
+    aAnalyzeDeckDeckstats->setText(tr("deckstats.net"));
+    aAnalyzeDeckTappedout->setText(tr("tappedout.net"));
+
     aClose->setText(tr("&Close"));
     
     aAddCard->setText(tr("Add card to &maindeck"));
@@ -751,9 +763,18 @@ void TabDeckEditor::actPrintDeck()
     dlg->exec();
 }
 
-void TabDeckEditor::actAnalyzeDeck()
+void TabDeckEditor::actAnalyzeDeckDeckstats()
 {
     DeckStatsInterface *interface = new DeckStatsInterface(
+        *databaseModel->getDatabase(),
+        this
+    ); // it deletes itself when done
+    interface->analyzeDeck(deckModel->getDeckList());
+}
+
+void TabDeckEditor::actAnalyzeDeckTappedout()
+{
+    TappedOutInterface *interface = new TappedOutInterface(
         *databaseModel->getDatabase(),
         this
     ); // it deletes itself when done
