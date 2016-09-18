@@ -24,6 +24,8 @@ public:
         AttrManaCost,
         AttrCmc,
         AttrRarity,
+        AttrPow,
+        AttrTough,
         AttrEnd
     };
 

@@ -224,13 +224,29 @@ bool FilterItem::acceptCmc(const CardInfo *info) const
     return (info->getCmc() == term);
 }
 
+bool FilterItem::acceptPower(const CardInfo *info) const
+{
+    int slash = info->getPowTough().indexOf("/");
+    if (slash != -1)
+        return (info->getPowTough().mid(0,slash) == term);
+
+    return false;
+}
+
+bool FilterItem::acceptToughness(const CardInfo *info) const
+{
+    int slash = info->getPowTough().indexOf("/");
+    if (slash != -1)
+        return (info->getPowTough().mid(slash+1) == term);
+
+    return false;
+}
+
 bool FilterItem::acceptRarity(const CardInfo *info) const
 {
     foreach (QString rareLevel, info->getRarities())
-    {
         if (rareLevel.compare(term, Qt::CaseInsensitive) == 0)
             return true;
-    }
 
     return false;
 }
@@ -254,6 +270,10 @@ bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) con
             return acceptCmc(info);
         case CardFilter::AttrRarity:
             return acceptRarity(info);
+        case CardFilter::AttrPow:
+            return acceptPower(info);
+        case CardFilter::AttrTough:
+            return acceptToughness(info);
         default:
             return true; /* ignore this attribute */
     }
