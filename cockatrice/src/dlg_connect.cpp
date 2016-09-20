@@ -26,6 +26,7 @@ DlgConnect::DlgConnect(QWidget *parent)
         previousHostList << "cockatrice.woogerworks.com";
         previousHostList << "vps.poixen.com";
         previousHostList << "chickatrice.net";
+        previousHostList << "mtg.tetrarch.co";
     }
     previousHosts->addItems(previousHostList);
     previousHosts->setCurrentIndex(settingsCache->servers().getPrevioushostindex());
