@@ -35,6 +35,10 @@ const char *CardFilter::attrName(Attr a)
             return "cmc";
         case AttrRarity:
             return "rarity";
+        case AttrPow:
+            return "power";
+        case AttrTough:
+            return "toughness";
         default:
             return "";
     }
