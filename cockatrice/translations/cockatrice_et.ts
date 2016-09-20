@@ -186,29 +186,34 @@ See on mõeldud ainult moderaatoritele ja blokeeritav isik seda ei näe.</transl
 <context>
     <name>CardDatabaseModel</name>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="58"/>
+        <location filename="../src/carddatabasemodel.cpp" line="59"/>
         <source>Name</source>
         <translation>Nimi</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="59"/>
+        <location filename="../src/carddatabasemodel.cpp" line="60"/>
         <source>Sets</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="60"/>
+        <location filename="../src/carddatabasemodel.cpp" line="61"/>
         <source>Mana cost</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="61"/>
+        <location filename="../src/carddatabasemodel.cpp" line="62"/>
         <source>Card type</source>
         <translation>Kaardi tüüp</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="62"/>
+        <location filename="../src/carddatabasemodel.cpp" line="63"/>
         <source>P/T</source>
         <translation>P/T</translation>
+    </message>
+    <message>
+        <location filename="../src/carddatabasemodel.cpp" line="64"/>
+        <source>Color(s)</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -232,32 +237,32 @@ See on mõeldud ainult moderaatoritele ja blokeeritav isik seda ei näe.</transl
 <context>
     <name>CardInfoText</name>
     <message>
-        <location filename="../src/cardinfotext.cpp" line="78"/>
+        <location filename="../src/cardinfotext.cpp" line="84"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfotext.cpp" line="79"/>
+        <location filename="../src/cardinfotext.cpp" line="85"/>
         <source>Mana cost:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/cardinfotext.cpp" line="80"/>
+        <location filename="../src/cardinfotext.cpp" line="86"/>
         <source>Color(s):</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/cardinfotext.cpp" line="81"/>
+        <location filename="../src/cardinfotext.cpp" line="87"/>
         <source>Card type:</source>
         <translation>Kaardi tüüp:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfotext.cpp" line="82"/>
+        <location filename="../src/cardinfotext.cpp" line="88"/>
         <source>P / T:</source>
         <translation>P  / T:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfotext.cpp" line="83"/>
+        <location filename="../src/cardinfotext.cpp" line="89"/>
         <source>Loyalty:</source>
         <translation>Hinnang:</translation>
     </message>
@@ -446,42 +451,42 @@ See on mõeldud ainult moderaatoritele ja blokeeritav isik seda ei näe.</transl
 <context>
     <name>DeckViewContainer</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="136"/>
-        <source>Load local deck</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/tab_game.cpp" line="137"/>
-        <source>Load deck from server</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location filename="../src/tab_game.cpp" line="138"/>
+        <source>Load deck...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="139"/>
+        <source>Load remote deck...</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_game.cpp" line="140"/>
         <source>Ready to s&amp;tart</source>
         <translation>Valmis a&amp;lustama</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="153"/>
+        <location filename="../src/tab_game.cpp" line="155"/>
         <source>S&amp;ideboard unlocked</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="155"/>
+        <location filename="../src/tab_game.cpp" line="157"/>
         <source>S&amp;ideboard locked</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="215"/>
+        <location filename="../src/tab_game.cpp" line="217"/>
         <source>Load deck</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="225"/>
+        <location filename="../src/tab_game.cpp" line="227"/>
         <source>Error</source>
         <translation>Viga</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="225"/>
+        <location filename="../src/tab_game.cpp" line="227"/>
         <source>The selected file could not be loaded.</source>
         <translation>Valitud faili ei suudetud laadida.</translation>
     </message>
@@ -527,62 +532,77 @@ See on mõeldud ainult moderaatoritele ja blokeeritav isik seda ei näe.</transl
 <context>
     <name>DlgConnect</name>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="19"/>
+        <location filename="../src/dlg_connect.cpp" line="20"/>
         <source>Previous Host</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="32"/>
+        <location filename="../src/dlg_connect.cpp" line="33"/>
         <source>New Host</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="34"/>
+        <location filename="../src/dlg_connect.cpp" line="35"/>
         <source>&amp;Host:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="36"/>
+        <location filename="../src/dlg_connect.cpp" line="37"/>
         <source>Enter host name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="39"/>
+        <location filename="../src/dlg_connect.cpp" line="40"/>
         <source>&amp;Port:</source>
         <translation>&amp;Port:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="43"/>
+        <location filename="../src/dlg_connect.cpp" line="44"/>
         <source>Player &amp;name:</source>
         <translation>Mängija &amp;nimi:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="47"/>
+        <location filename="../src/dlg_connect.cpp" line="48"/>
         <source>P&amp;assword:</source>
         <translation>P&amp;arool:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="52"/>
+        <location filename="../src/dlg_connect.cpp" line="53"/>
         <source>&amp;Save password</source>
         <translation>&amp;Salvesta parool</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="55"/>
-        <source>A&amp;uto connect at start</source>
-        <translation>Ü&amp;hendu käivitumisel automaatselt</translation>
+        <location filename="../src/dlg_connect.cpp" line="56"/>
+        <source>A&amp;uto connect</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="92"/>
+        <location filename="../src/dlg_connect.cpp" line="57"/>
+        <source>Automatically connect to the most recent login when Cockatrice opens</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="81"/>
+        <source>Server</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="91"/>
+        <source>Login</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="107"/>
         <source>Connect to server</source>
         <translation>Ühenda serveriga</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="155"/>
+        <location filename="../src/dlg_connect.cpp" line="174"/>
         <source>Connect Warning</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="155"/>
+        <location filename="../src/dlg_connect.cpp" line="174"/>
         <source>The player name can&apos;t be empty.</source>
         <translation type="unfinished"/>
     </message>
@@ -590,92 +610,92 @@ See on mõeldud ainult moderaatoritele ja blokeeritav isik seda ei näe.</transl
 <context>
     <name>DlgCreateGame</name>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="24"/>
+        <location filename="../src/dlg_creategame.cpp" line="21"/>
         <source>Re&amp;member settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="25"/>
+        <location filename="../src/dlg_creategame.cpp" line="22"/>
         <source>&amp;Description:</source>
         <translation>&amp;Kirjeldus:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="30"/>
+        <location filename="../src/dlg_creategame.cpp" line="27"/>
         <source>P&amp;layers:</source>
         <translation>M&amp;ängijad:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="53"/>
+        <location filename="../src/dlg_creategame.cpp" line="51"/>
         <source>Game type</source>
         <translation>Mängu tüüp</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="56"/>
+        <location filename="../src/dlg_creategame.cpp" line="54"/>
         <source>&amp;Password:</source>
         <translation>&amp;Parool:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="60"/>
+        <location filename="../src/dlg_creategame.cpp" line="58"/>
         <source>Only &amp;buddies can join</source>
         <translation>Ainult &amp;sõbrad saavad liituda</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="61"/>
+        <location filename="../src/dlg_creategame.cpp" line="59"/>
         <source>Only &amp;registered users can join</source>
         <translation>Ainult &amp;registreeritud kasutajad saavad liituda</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="76"/>
+        <location filename="../src/dlg_creategame.cpp" line="73"/>
         <source>Joining restrictions</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="79"/>
+        <location filename="../src/dlg_creategame.cpp" line="76"/>
         <source>&amp;Spectators can watch</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="82"/>
+        <location filename="../src/dlg_creategame.cpp" line="79"/>
         <source>Spectators &amp;need a password to watch</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="83"/>
+        <location filename="../src/dlg_creategame.cpp" line="80"/>
         <source>Spectators can &amp;chat</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="84"/>
+        <location filename="../src/dlg_creategame.cpp" line="81"/>
         <source>Spectators can see &amp;hands</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="90"/>
+        <location filename="../src/dlg_creategame.cpp" line="87"/>
         <source>Spectators</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="137"/>
+        <location filename="../src/dlg_creategame.cpp" line="132"/>
         <source>&amp;Clear</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="143"/>
+        <location filename="../src/dlg_creategame.cpp" line="138"/>
         <source>Create game</source>
         <translation>Loo mäng</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="186"/>
+        <location filename="../src/dlg_creategame.cpp" line="180"/>
         <source>Game information</source>
         <translation>Mängu info</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="262"/>
+        <location filename="../src/dlg_creategame.cpp" line="256"/>
         <source>Error</source>
         <translation>Viga</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="262"/>
+        <location filename="../src/dlg_creategame.cpp" line="256"/>
         <source>Server error.</source>
         <translation>Serveri viga.</translation>
     </message>
@@ -973,46 +993,56 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <name>DlgFilterGames</name>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="19"/>
+        <source>Show &apos;&amp;buddies only&apos; games</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_filter_games.cpp" line="22"/>
         <source>Show &amp;unavailable games</source>
         <translation>Näita &amp;kättesaamatuid mänge</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="22"/>
+        <location filename="../src/dlg_filter_games.cpp" line="25"/>
         <source>Show &amp;password protected games</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="27"/>
+        <location filename="../src/dlg_filter_games.cpp" line="30"/>
         <source>Game &amp;description:</source>
         <translation>Mängu &amp;kirjeldus:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="32"/>
+        <location filename="../src/dlg_filter_games.cpp" line="35"/>
         <source>&amp;Creator name:</source>
         <translation>%Looja nimi:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="48"/>
+        <location filename="../src/dlg_filter_games.cpp" line="51"/>
         <source>&amp;Game types</source>
         <translation>&amp;Mängu tüübid</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="53"/>
+        <location filename="../src/dlg_filter_games.cpp" line="56"/>
         <source>at &amp;least:</source>
         <translation>&amp;vähemalt:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="60"/>
+        <location filename="../src/dlg_filter_games.cpp" line="63"/>
         <source>at &amp;most:</source>
         <translation>&amp;enamjaolt:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="73"/>
+        <location filename="../src/dlg_filter_games.cpp" line="76"/>
         <source>Maximum player count</source>
         <translation>Mängijate ülempiir</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="105"/>
+        <location filename="../src/dlg_filter_games.cpp" line="84"/>
+        <source>Restrictions</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dlg_filter_games.cpp" line="117"/>
         <source>Filter games</source>
         <translation type="unfinished"/>
     </message>
@@ -1331,14 +1361,13 @@ Would you like to change your database location setting?</source>
     <name>DlgViewLog</name>
     <message>
         <location filename="../src/dlg_viewlog.cpp" line="18"/>
-        <source>View debug log</source>
+        <source>Debug Log</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>GameSelector</name>
     <message>
-        <location filename="../src/gameselector.cpp" line="143"/>
         <location filename="../src/gameselector.cpp" line="144"/>
         <location filename="../src/gameselector.cpp" line="145"/>
         <location filename="../src/gameselector.cpp" line="146"/>
@@ -1346,92 +1375,93 @@ Would you like to change your database location setting?</source>
         <location filename="../src/gameselector.cpp" line="148"/>
         <location filename="../src/gameselector.cpp" line="149"/>
         <location filename="../src/gameselector.cpp" line="150"/>
-        <location filename="../src/gameselector.cpp" line="179"/>
+        <location filename="../src/gameselector.cpp" line="151"/>
+        <location filename="../src/gameselector.cpp" line="180"/>
         <source>Error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="143"/>
+        <location filename="../src/gameselector.cpp" line="144"/>
         <source>Please join the appropriate room first.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="144"/>
+        <location filename="../src/gameselector.cpp" line="145"/>
         <source>Wrong password.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="145"/>
+        <location filename="../src/gameselector.cpp" line="146"/>
         <source>Spectators are not allowed in this game.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="146"/>
+        <location filename="../src/gameselector.cpp" line="147"/>
         <source>The game is already full.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="147"/>
+        <location filename="../src/gameselector.cpp" line="148"/>
         <source>The game does not exist any more.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="148"/>
+        <location filename="../src/gameselector.cpp" line="149"/>
         <source>This game is only open to registered users.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="149"/>
+        <location filename="../src/gameselector.cpp" line="150"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="150"/>
+        <location filename="../src/gameselector.cpp" line="151"/>
         <source>You are being ignored by the creator of this game.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="166"/>
+        <location filename="../src/gameselector.cpp" line="167"/>
         <source>Join game</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="166"/>
+        <location filename="../src/gameselector.cpp" line="167"/>
         <source>Password:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="179"/>
+        <location filename="../src/gameselector.cpp" line="180"/>
         <source>Please join the respective room first.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="195"/>
+        <location filename="../src/gameselector.cpp" line="196"/>
         <source>Games</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="196"/>
+        <location filename="../src/gameselector.cpp" line="197"/>
         <source>&amp;Filter games</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="197"/>
+        <location filename="../src/gameselector.cpp" line="198"/>
         <source>C&amp;lear filter</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="199"/>
+        <location filename="../src/gameselector.cpp" line="200"/>
         <source>C&amp;reate</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="200"/>
+        <location filename="../src/gameselector.cpp" line="201"/>
         <source>&amp;Join</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gameselector.cpp" line="201"/>
+        <location filename="../src/gameselector.cpp" line="202"/>
         <source>J&amp;oin as spectator</source>
         <translation type="unfinished"/>
     </message>
@@ -1440,107 +1470,82 @@ Would you like to change your database location setting?</source>
     <name>GamesModel</name>
     <message>
         <location filename="../src/gamesmodel.cpp" line="17"/>
-        <source>&lt;1m ago</source>
+        <source>New</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="19"/>
-        <source>&lt;5m ago</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="21"/>
-        <source>%1m ago</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="23"/>
-        <source>1hr %1m ago</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="28"/>
-        <source>%1hr ago</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="30"/>
-        <source>5+ hrs ago</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="117"/>
+        <location filename="../src/gamesmodel.cpp" line="109"/>
         <source>password</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="119"/>
+        <location filename="../src/gamesmodel.cpp" line="111"/>
         <source>buddies only</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="121"/>
+        <location filename="../src/gamesmodel.cpp" line="113"/>
         <source>reg. users only</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="153"/>
-        <location filename="../src/gamesmodel.cpp" line="157"/>
+        <location filename="../src/gamesmodel.cpp" line="145"/>
+        <location filename="../src/gamesmodel.cpp" line="149"/>
         <source>can chat</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="153"/>
+        <location filename="../src/gamesmodel.cpp" line="145"/>
         <source>see hands</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="161"/>
+        <location filename="../src/gamesmodel.cpp" line="153"/>
         <source>can see hands</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="166"/>
+        <location filename="../src/gamesmodel.cpp" line="158"/>
         <source>not allowed</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="182"/>
+        <location filename="../src/gamesmodel.cpp" line="174"/>
         <source>Room</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="183"/>
-        <source>Game Created</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="184"/>
-        <source>Description</source>
+        <location filename="../src/gamesmodel.cpp" line="178"/>
+        <source>Age</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="185"/>
+        <source>Type</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="183"/>
+        <source>Description</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/gamesmodel.cpp" line="184"/>
         <source>Creator</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="186"/>
-        <source>Game Type</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gamesmodel.cpp" line="187"/>
         <source>Restrictions</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="188"/>
+        <location filename="../src/gamesmodel.cpp" line="190"/>
         <source>Players</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/gamesmodel.cpp" line="189"/>
+        <location filename="../src/gamesmodel.cpp" line="195"/>
         <source>Spectators</source>
         <translation type="unfinished"/>
     </message>
@@ -1692,7 +1697,7 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="104"/>
-        <location filename="../src/window_main.cpp" line="390"/>
+        <location filename="../src/window_main.cpp" line="394"/>
         <source>Invalid username.</source>
         <translation type="unfinished"/>
     </message>
@@ -1839,493 +1844,493 @@ Will now login.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="316"/>
-        <location filename="../src/window_main.cpp" line="338"/>
-        <location filename="../src/window_main.cpp" line="341"/>
-        <location filename="../src/window_main.cpp" line="352"/>
+        <location filename="../src/window_main.cpp" line="320"/>
+        <location filename="../src/window_main.cpp" line="342"/>
+        <location filename="../src/window_main.cpp" line="345"/>
         <location filename="../src/window_main.cpp" line="356"/>
         <location filename="../src/window_main.cpp" line="360"/>
-        <location filename="../src/window_main.cpp" line="365"/>
-        <location filename="../src/window_main.cpp" line="368"/>
-        <location filename="../src/window_main.cpp" line="382"/>
-        <location filename="../src/window_main.cpp" line="442"/>
+        <location filename="../src/window_main.cpp" line="364"/>
+        <location filename="../src/window_main.cpp" line="369"/>
+        <location filename="../src/window_main.cpp" line="372"/>
+        <location filename="../src/window_main.cpp" line="386"/>
         <location filename="../src/window_main.cpp" line="446"/>
         <location filename="../src/window_main.cpp" line="450"/>
-        <location filename="../src/window_main.cpp" line="453"/>
-        <location filename="../src/window_main.cpp" line="460"/>
-        <location filename="../src/window_main.cpp" line="467"/>
-        <location filename="../src/window_main.cpp" line="474"/>
-        <location filename="../src/window_main.cpp" line="476"/>
-        <location filename="../src/window_main.cpp" line="870"/>
-        <location filename="../src/window_main.cpp" line="906"/>
+        <location filename="../src/window_main.cpp" line="454"/>
+        <location filename="../src/window_main.cpp" line="457"/>
+        <location filename="../src/window_main.cpp" line="464"/>
+        <location filename="../src/window_main.cpp" line="471"/>
+        <location filename="../src/window_main.cpp" line="478"/>
+        <location filename="../src/window_main.cpp" line="480"/>
+        <location filename="../src/window_main.cpp" line="874"/>
+        <location filename="../src/window_main.cpp" line="910"/>
         <source>Error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="316"/>
+        <location filename="../src/window_main.cpp" line="320"/>
         <source>Server timeout</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="331"/>
+        <location filename="../src/window_main.cpp" line="335"/>
         <source>Failed Login</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="332"/>
+        <location filename="../src/window_main.cpp" line="336"/>
         <source>Your client does not support features that the server requires, please update your client and try again.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="338"/>
+        <location filename="../src/window_main.cpp" line="342"/>
         <source>Incorrect username or password. Please check your authentication information and try again.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="341"/>
+        <location filename="../src/window_main.cpp" line="345"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="346"/>
-        <location filename="../src/window_main.cpp" line="436"/>
+        <location filename="../src/window_main.cpp" line="350"/>
+        <location filename="../src/window_main.cpp" line="440"/>
         <source>You are banned until %1.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="348"/>
-        <location filename="../src/window_main.cpp" line="438"/>
+        <location filename="../src/window_main.cpp" line="352"/>
+        <location filename="../src/window_main.cpp" line="442"/>
         <source>You are banned indefinitely.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="360"/>
+        <location filename="../src/window_main.cpp" line="364"/>
         <source>This server requires user registration. Do you want to register now?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="365"/>
+        <location filename="../src/window_main.cpp" line="369"/>
         <source>This server requires client ID's. Your client is either failing to generate an ID or you are running a modified client.
 Please close and reopen your client to try again.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="368"/>
+        <location filename="../src/window_main.cpp" line="372"/>
         <source>An internal error has occurred, please try closing and reopening your client and try again. If the error persists try updating your client to the most recent build and if need be contact your software provider.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="372"/>
+        <location filename="../src/window_main.cpp" line="376"/>
         <source>Account activation</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="372"/>
+        <location filename="../src/window_main.cpp" line="376"/>
         <source>Your account has not been activated yet.
 You need to provide the activation token received in the activation email</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="382"/>
+        <location filename="../src/window_main.cpp" line="386"/>
         <source>Unknown login error: %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="382"/>
-        <location filename="../src/window_main.cpp" line="453"/>
+        <location filename="../src/window_main.cpp" line="386"/>
+        <location filename="../src/window_main.cpp" line="457"/>
         <source>
 This usually means that your client version is out of date, and the server sent a reply your client doesn&apos;t understand.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="394"/>
+        <location filename="../src/window_main.cpp" line="398"/>
         <source>Your username must respect these rules:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="396"/>
+        <location filename="../src/window_main.cpp" line="400"/>
         <source>is %1 - %2 characters long</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="397"/>
+        <location filename="../src/window_main.cpp" line="401"/>
         <source>can %1 contain lowercase characters</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="397"/>
-        <location filename="../src/window_main.cpp" line="398"/>
-        <location filename="../src/window_main.cpp" line="399"/>
-        <location filename="../src/window_main.cpp" line="404"/>
+        <location filename="../src/window_main.cpp" line="401"/>
+        <location filename="../src/window_main.cpp" line="402"/>
+        <location filename="../src/window_main.cpp" line="403"/>
+        <location filename="../src/window_main.cpp" line="408"/>
         <source>NOT</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="398"/>
+        <location filename="../src/window_main.cpp" line="402"/>
         <source>can %1 contain uppercase characters</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="399"/>
+        <location filename="../src/window_main.cpp" line="403"/>
         <source>can %1 contain numeric characters</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="402"/>
+        <location filename="../src/window_main.cpp" line="406"/>
         <source>can contain the following punctuation: %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="404"/>
+        <location filename="../src/window_main.cpp" line="408"/>
         <source>first character can %1 be a punctuation mark</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="409"/>
+        <location filename="../src/window_main.cpp" line="413"/>
         <source>You may only use A-Z, a-z, 0-9, _, ., and - in your username.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="419"/>
-        <location filename="../src/window_main.cpp" line="422"/>
-        <location filename="../src/window_main.cpp" line="425"/>
-        <location filename="../src/window_main.cpp" line="428"/>
-        <location filename="../src/window_main.cpp" line="431"/>
+        <location filename="../src/window_main.cpp" line="423"/>
+        <location filename="../src/window_main.cpp" line="426"/>
+        <location filename="../src/window_main.cpp" line="429"/>
+        <location filename="../src/window_main.cpp" line="432"/>
+        <location filename="../src/window_main.cpp" line="435"/>
         <source>Registration denied</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="419"/>
+        <location filename="../src/window_main.cpp" line="423"/>
         <source>Registration is currently disabled on this server</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="422"/>
+        <location filename="../src/window_main.cpp" line="426"/>
         <source>There is already an existing account with the same user name.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="425"/>
+        <location filename="../src/window_main.cpp" line="429"/>
         <source>It&apos;s mandatory to specify a valid email address when registering.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="428"/>
+        <location filename="../src/window_main.cpp" line="432"/>
         <source>Too many registration attempts from your IP address.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="431"/>
+        <location filename="../src/window_main.cpp" line="435"/>
         <source>Password too short.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="450"/>
+        <location filename="../src/window_main.cpp" line="454"/>
         <source>Registration failed for a technical problem on the server.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="453"/>
+        <location filename="../src/window_main.cpp" line="457"/>
         <source>Unknown registration error: %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="460"/>
+        <location filename="../src/window_main.cpp" line="464"/>
         <source>Account activation failed</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="467"/>
+        <location filename="../src/window_main.cpp" line="471"/>
         <source>Socket error: %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="474"/>
+        <location filename="../src/window_main.cpp" line="478"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="476"/>
+        <location filename="../src/window_main.cpp" line="480"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="482"/>
+        <location filename="../src/window_main.cpp" line="486"/>
         <source>Connecting to %1...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="483"/>
+        <location filename="../src/window_main.cpp" line="487"/>
         <source>Registering to %1 as %2...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="484"/>
+        <location filename="../src/window_main.cpp" line="488"/>
         <source>Disconnected</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="485"/>
+        <location filename="../src/window_main.cpp" line="489"/>
         <source>Connected, logging in at %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="495"/>
+        <location filename="../src/window_main.cpp" line="499"/>
         <source>&amp;Connect...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="496"/>
+        <location filename="../src/window_main.cpp" line="500"/>
         <source>&amp;Disconnect</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="497"/>
+        <location filename="../src/window_main.cpp" line="501"/>
         <source>Start &amp;local game...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="498"/>
+        <location filename="../src/window_main.cpp" line="502"/>
         <source>&amp;Watch replay...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="499"/>
+        <location filename="../src/window_main.cpp" line="503"/>
         <source>&amp;Deck editor</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="500"/>
+        <location filename="../src/window_main.cpp" line="504"/>
         <source>&amp;Full screen</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="501"/>
+        <location filename="../src/window_main.cpp" line="505"/>
         <source>&amp;Register to server...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="502"/>
+        <location filename="../src/window_main.cpp" line="506"/>
         <source>&amp;Settings...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="504"/>
-        <location filename="../src/window_main.cpp" line="717"/>
+        <location filename="../src/window_main.cpp" line="508"/>
+        <location filename="../src/window_main.cpp" line="721"/>
         <source>&amp;Exit</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="507"/>
+        <location filename="../src/window_main.cpp" line="511"/>
         <source>A&amp;ctions</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="509"/>
+        <location filename="../src/window_main.cpp" line="513"/>
         <source>&amp;Cockatrice</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="512"/>
+        <location filename="../src/window_main.cpp" line="516"/>
         <source>C&amp;ard Database</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="513"/>
+        <location filename="../src/window_main.cpp" line="517"/>
         <source>Open custom image folder</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="514"/>
+        <location filename="../src/window_main.cpp" line="518"/>
         <source>Open custom sets folder</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="515"/>
+        <location filename="../src/window_main.cpp" line="519"/>
         <source>Add custom sets/cards</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="516"/>
+        <location filename="../src/window_main.cpp" line="520"/>
         <source>&amp;Edit sets...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="517"/>
+        <location filename="../src/window_main.cpp" line="521"/>
         <source>Edit &amp;tokens...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="519"/>
+        <location filename="../src/window_main.cpp" line="523"/>
         <source>&amp;About Cockatrice</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="520"/>
+        <location filename="../src/window_main.cpp" line="524"/>
         <source>&amp;Update Cockatrice</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="521"/>
+        <location filename="../src/window_main.cpp" line="525"/>
         <source>View &amp;debug log</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="522"/>
+        <location filename="../src/window_main.cpp" line="526"/>
         <source>&amp;Help</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="523"/>
+        <location filename="../src/window_main.cpp" line="527"/>
         <source>Check for card updates...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="776"/>
+        <location filename="../src/window_main.cpp" line="780"/>
         <source>Card database</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="778"/>
+        <location filename="../src/window_main.cpp" line="782"/>
         <source>Cockatrice is unable to load the card database.
 Do you want to update your card database now?
 If unsure or first time user, choose &quot;Yes&quot;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="782"/>
-        <location filename="../src/window_main.cpp" line="807"/>
+        <location filename="../src/window_main.cpp" line="786"/>
+        <location filename="../src/window_main.cpp" line="811"/>
         <source>Yes</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="783"/>
-        <location filename="../src/window_main.cpp" line="808"/>
+        <location filename="../src/window_main.cpp" line="787"/>
+        <location filename="../src/window_main.cpp" line="812"/>
         <source>No</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="784"/>
+        <location filename="../src/window_main.cpp" line="788"/>
         <source>Open settings</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="799"/>
+        <location filename="../src/window_main.cpp" line="803"/>
         <source>New sets found</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="802"/>
+        <location filename="../src/window_main.cpp" line="806"/>
         <source>%1 new set(s) found in the card database
 Set code(s): %2
 Do you want to enable it/them?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="809"/>
+        <location filename="../src/window_main.cpp" line="813"/>
         <source>View sets</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="826"/>
+        <location filename="../src/window_main.cpp" line="830"/>
         <source>Welcome</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="826"/>
+        <location filename="../src/window_main.cpp" line="830"/>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Edit Sets&quot; window.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="836"/>
-        <location filename="../src/window_main.cpp" line="914"/>
-        <location filename="../src/window_main.cpp" line="938"/>
+        <location filename="../src/window_main.cpp" line="840"/>
+        <location filename="../src/window_main.cpp" line="918"/>
+        <location filename="../src/window_main.cpp" line="942"/>
         <source>Information</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="836"/>
+        <location filename="../src/window_main.cpp" line="840"/>
         <source>A card database update is already running.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="870"/>
+        <location filename="../src/window_main.cpp" line="874"/>
         <source>Unable to run the card database updater: </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="883"/>
+        <location filename="../src/window_main.cpp" line="887"/>
         <source>failed to start.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="886"/>
+        <location filename="../src/window_main.cpp" line="890"/>
         <source>crashed.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="889"/>
+        <location filename="../src/window_main.cpp" line="893"/>
         <source>timed out.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="892"/>
+        <location filename="../src/window_main.cpp" line="896"/>
         <source>write error.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="895"/>
+        <location filename="../src/window_main.cpp" line="899"/>
         <source>read error.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="899"/>
+        <location filename="../src/window_main.cpp" line="903"/>
         <source>unknown error.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="906"/>
+        <location filename="../src/window_main.cpp" line="910"/>
         <source>The card database updater exited with an error: %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="914"/>
+        <location filename="../src/window_main.cpp" line="918"/>
         <source>Update completed successfully.
 Cockatrice will now reload the card database.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="938"/>
+        <location filename="../src/window_main.cpp" line="942"/>
         <source>Your client appears to be missing features that the server supports.
 This usually means that your client version is out of date, please check to see if there is a new client available for download.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="980"/>
-        <location filename="../src/window_main.cpp" line="988"/>
-        <location filename="../src/window_main.cpp" line="1001"/>
-        <location filename="../src/window_main.cpp" line="1004"/>
+        <location filename="../src/window_main.cpp" line="984"/>
+        <location filename="../src/window_main.cpp" line="992"/>
+        <location filename="../src/window_main.cpp" line="1005"/>
+        <location filename="../src/window_main.cpp" line="1008"/>
         <source>Load sets/cards</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="988"/>
+        <location filename="../src/window_main.cpp" line="992"/>
         <source>Selected file cannot be found.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1001"/>
+        <location filename="../src/window_main.cpp" line="1005"/>
         <source>The new sets/cards have been added successfully.
 Cockatrice will now reload the card database.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1004"/>
+        <location filename="../src/window_main.cpp" line="1008"/>
         <source>Sets/cards failed to import.</source>
         <translation type="unfinished"/>
     </message>
@@ -3467,37 +3472,37 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>QMenuBar</name>
     <message>
-        <location filename="../src/window_main.cpp" line="581"/>
+        <location filename="../src/window_main.cpp" line="585"/>
         <source>Services</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="582"/>
+        <location filename="../src/window_main.cpp" line="586"/>
         <source>Hide %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="583"/>
+        <location filename="../src/window_main.cpp" line="587"/>
         <source>Hide Others</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="584"/>
+        <location filename="../src/window_main.cpp" line="588"/>
         <source>Show All</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="585"/>
+        <location filename="../src/window_main.cpp" line="589"/>
         <source>Preferences...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="586"/>
+        <location filename="../src/window_main.cpp" line="590"/>
         <source>Quit %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="587"/>
+        <location filename="../src/window_main.cpp" line="591"/>
         <source>About %1</source>
         <translation type="unfinished"/>
     </message>
@@ -3511,7 +3516,7 @@ Cockatrice will now reload the card database.</source>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="75"/>
-        <location filename="../src/deck_loader.cpp" line="9"/>
+        <location filename="../src/deck_loader.cpp" line="11"/>
         <source>All files (*.*)</source>
         <translation type="unfinished"/>
     </message>
@@ -3521,7 +3526,7 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/deck_loader.cpp" line="8"/>
+        <location filename="../src/deck_loader.cpp" line="10"/>
         <source>Common deck formats (*.cod *.dec *.txt *.mwDeck)</source>
         <translation type="unfinished"/>
     </message>
@@ -3743,232 +3748,232 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="94"/>
+        <location filename="../src/tab_admin.cpp" line="96"/>
         <source>Update server &amp;message</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="95"/>
+        <location filename="../src/tab_admin.cpp" line="97"/>
         <source>&amp;Shut down server</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="96"/>
+        <location filename="../src/tab_admin.cpp" line="98"/>
         <source>&amp;Reload configuration</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="97"/>
+        <location filename="../src/tab_admin.cpp" line="99"/>
         <source>Server administration functions</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="99"/>
+        <location filename="../src/tab_admin.cpp" line="101"/>
         <source>&amp;Unlock functions</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_admin.cpp" line="100"/>
+        <location filename="../src/tab_admin.cpp" line="102"/>
         <source>&amp;Lock functions</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/tab_admin.cpp" line="128"/>
-        <source>Unlock administration functions</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/tab_admin.cpp" line="128"/>
-        <source>Do you really want to unlock the administration functions?</source>
         <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>TabDeckEditor</name>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="522"/>
+        <location filename="../src/tab_deck_editor.cpp" line="530"/>
         <source>&amp;Clear all filters</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="523"/>
+        <location filename="../src/tab_deck_editor.cpp" line="531"/>
         <source>Delete selected</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="525"/>
+        <location filename="../src/tab_deck_editor.cpp" line="533"/>
         <source>Deck &amp;name:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="526"/>
+        <location filename="../src/tab_deck_editor.cpp" line="534"/>
         <source>&amp;Comments:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="527"/>
+        <location filename="../src/tab_deck_editor.cpp" line="535"/>
         <source>Hash:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="532"/>
+        <location filename="../src/tab_deck_editor.cpp" line="540"/>
         <source>&amp;New deck</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="533"/>
+        <location filename="../src/tab_deck_editor.cpp" line="541"/>
         <source>&amp;Load deck...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="534"/>
+        <location filename="../src/tab_deck_editor.cpp" line="542"/>
         <source>&amp;Save deck</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="535"/>
+        <location filename="../src/tab_deck_editor.cpp" line="543"/>
         <source>Save deck &amp;as...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="536"/>
+        <location filename="../src/tab_deck_editor.cpp" line="544"/>
         <source>Load deck from cl&amp;ipboard...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="537"/>
+        <location filename="../src/tab_deck_editor.cpp" line="545"/>
         <source>Save deck to clip&amp;board</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="538"/>
+        <location filename="../src/tab_deck_editor.cpp" line="546"/>
         <source>&amp;Print deck...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="539"/>
-        <source>&amp;Analyze deck on deckstats.net</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="540"/>
-        <source>&amp;Close</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="542"/>
-        <source>Add card to &amp;maindeck</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="543"/>
-        <source>Add card to &amp;sideboard</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="545"/>
-        <source>&amp;Remove row</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/tab_deck_editor.cpp" line="547"/>
-        <source>&amp;Increment number</source>
+        <location filename="../src/tab_deck_editor.cpp" line="548"/>
+        <source>&amp;Analyze deck online</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="549"/>
-        <source>&amp;Decrement number</source>
+        <source>deckstats.net</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="551"/>
-        <source>&amp;Deck Editor</source>
+        <location filename="../src/tab_deck_editor.cpp" line="550"/>
+        <source>tappedout.net</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="553"/>
-        <location filename="../src/tab_deck_editor.cpp" line="558"/>
-        <source>Card Info</source>
+        <location filename="../src/tab_deck_editor.cpp" line="552"/>
+        <source>&amp;Close</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="554"/>
-        <location filename="../src/tab_deck_editor.cpp" line="559"/>
-        <source>Deck</source>
+        <source>Add card to &amp;maindeck</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="555"/>
-        <location filename="../src/tab_deck_editor.cpp" line="560"/>
-        <source>Filters</source>
+        <source>Add card to &amp;sideboard</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="557"/>
-        <source>&amp;View</source>
+        <source>&amp;Remove row</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="562"/>
-        <location filename="../src/tab_deck_editor.cpp" line="565"/>
-        <location filename="../src/tab_deck_editor.cpp" line="568"/>
-        <source>Visible</source>
+        <location filename="../src/tab_deck_editor.cpp" line="559"/>
+        <source>&amp;Increment number</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="561"/>
+        <source>&amp;Decrement number</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="563"/>
+        <source>&amp;Deck Editor</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="565"/>
+        <location filename="../src/tab_deck_editor.cpp" line="570"/>
+        <source>Card Info</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
         <location filename="../src/tab_deck_editor.cpp" line="566"/>
+        <location filename="../src/tab_deck_editor.cpp" line="571"/>
+        <source>Deck</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="567"/>
+        <location filename="../src/tab_deck_editor.cpp" line="572"/>
+        <source>Filters</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
         <location filename="../src/tab_deck_editor.cpp" line="569"/>
+        <source>&amp;View</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="574"/>
+        <location filename="../src/tab_deck_editor.cpp" line="577"/>
+        <location filename="../src/tab_deck_editor.cpp" line="580"/>
+        <source>Visible</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_deck_editor.cpp" line="575"/>
+        <location filename="../src/tab_deck_editor.cpp" line="578"/>
+        <location filename="../src/tab_deck_editor.cpp" line="581"/>
         <source>Floating</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="571"/>
+        <location filename="../src/tab_deck_editor.cpp" line="583"/>
         <source>Reset layout</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="576"/>
+        <location filename="../src/tab_deck_editor.cpp" line="588"/>
         <source>Deck: %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="624"/>
+        <location filename="../src/tab_deck_editor.cpp" line="636"/>
         <source>Are you sure?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="625"/>
+        <location filename="../src/tab_deck_editor.cpp" line="637"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="655"/>
+        <location filename="../src/tab_deck_editor.cpp" line="667"/>
         <source>Load deck</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="674"/>
-        <location filename="../src/tab_deck_editor.cpp" line="698"/>
-        <location filename="../src/tab_deck_editor.cpp" line="718"/>
+        <location filename="../src/tab_deck_editor.cpp" line="686"/>
+        <location filename="../src/tab_deck_editor.cpp" line="710"/>
+        <location filename="../src/tab_deck_editor.cpp" line="730"/>
         <source>Error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="674"/>
+        <location filename="../src/tab_deck_editor.cpp" line="686"/>
         <source>The deck could not be saved.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="698"/>
-        <location filename="../src/tab_deck_editor.cpp" line="718"/>
+        <location filename="../src/tab_deck_editor.cpp" line="710"/>
+        <location filename="../src/tab_deck_editor.cpp" line="730"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="704"/>
+        <location filename="../src/tab_deck_editor.cpp" line="716"/>
         <source>Save deck</source>
         <translation type="unfinished"/>
     </message>
@@ -4065,153 +4070,153 @@ Please enter a name:</source>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="443"/>
-        <location filename="../src/tab_game.cpp" line="1168"/>
+        <location filename="../src/tab_game.cpp" line="446"/>
+        <location filename="../src/tab_game.cpp" line="1171"/>
         <source>Replay</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="443"/>
+        <location filename="../src/tab_game.cpp" line="446"/>
         <source>Game</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="445"/>
-        <location filename="../src/tab_game.cpp" line="489"/>
+        <location filename="../src/tab_game.cpp" line="448"/>
+        <location filename="../src/tab_game.cpp" line="492"/>
         <source>Card Info</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="446"/>
-        <location filename="../src/tab_game.cpp" line="491"/>
+        <location filename="../src/tab_game.cpp" line="449"/>
+        <location filename="../src/tab_game.cpp" line="494"/>
         <source>Player List</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="447"/>
-        <location filename="../src/tab_game.cpp" line="490"/>
+        <location filename="../src/tab_game.cpp" line="450"/>
+        <location filename="../src/tab_game.cpp" line="493"/>
         <source>Messages</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="449"/>
-        <location filename="../src/tab_game.cpp" line="504"/>
+        <location filename="../src/tab_game.cpp" line="452"/>
+        <location filename="../src/tab_game.cpp" line="507"/>
         <source>Replay Timeline</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="454"/>
+        <location filename="../src/tab_game.cpp" line="457"/>
         <source>&amp;Phases</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="457"/>
+        <location filename="../src/tab_game.cpp" line="460"/>
         <source>&amp;Game</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="459"/>
+        <location filename="../src/tab_game.cpp" line="462"/>
         <source>Next &amp;phase</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="462"/>
+        <location filename="../src/tab_game.cpp" line="465"/>
         <source>Next &amp;turn</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="465"/>
+        <location filename="../src/tab_game.cpp" line="468"/>
         <source>&amp;Remove all local arrows</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="468"/>
+        <location filename="../src/tab_game.cpp" line="471"/>
         <source>Rotate View Cl&amp;ockwise</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="471"/>
+        <location filename="../src/tab_game.cpp" line="474"/>
         <source>Rotate View Co&amp;unterclockwise</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="474"/>
+        <location filename="../src/tab_game.cpp" line="477"/>
         <source>Game &amp;information</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="476"/>
+        <location filename="../src/tab_game.cpp" line="479"/>
         <source>&amp;Concede</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="479"/>
+        <location filename="../src/tab_game.cpp" line="482"/>
         <source>&amp;Leave game</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="482"/>
+        <location filename="../src/tab_game.cpp" line="485"/>
         <source>C&amp;lose replay</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="485"/>
+        <location filename="../src/tab_game.cpp" line="488"/>
         <source>&amp;Say:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="488"/>
+        <location filename="../src/tab_game.cpp" line="491"/>
         <source>&amp;View</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="493"/>
         <location filename="../src/tab_game.cpp" line="496"/>
         <location filename="../src/tab_game.cpp" line="499"/>
-        <location filename="../src/tab_game.cpp" line="505"/>
+        <location filename="../src/tab_game.cpp" line="502"/>
+        <location filename="../src/tab_game.cpp" line="508"/>
         <source>Visible</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="494"/>
         <location filename="../src/tab_game.cpp" line="497"/>
         <location filename="../src/tab_game.cpp" line="500"/>
-        <location filename="../src/tab_game.cpp" line="506"/>
+        <location filename="../src/tab_game.cpp" line="503"/>
+        <location filename="../src/tab_game.cpp" line="509"/>
         <source>Floating</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="509"/>
+        <location filename="../src/tab_game.cpp" line="512"/>
         <source>Reset layout</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="590"/>
+        <location filename="../src/tab_game.cpp" line="593"/>
         <source>Concede</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="590"/>
+        <location filename="../src/tab_game.cpp" line="593"/>
         <source>Are you sure you want to concede this game?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="600"/>
+        <location filename="../src/tab_game.cpp" line="603"/>
         <source>Leave game</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="600"/>
+        <location filename="../src/tab_game.cpp" line="603"/>
         <source>Are you sure you want to leave this game?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="796"/>
+        <location filename="../src/tab_game.cpp" line="799"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1063"/>
+        <location filename="../src/tab_game.cpp" line="1066"/>
         <source>You have been kicked out of the game.</source>
         <translation type="unfinished"/>
     </message>
@@ -4605,6 +4610,20 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/tab_userlists.cpp" line="58"/>
         <source>Add to Ignore List</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>TappedOutInterface</name>
+    <message>
+        <location filename="../src/tappedout_interface.cpp" line="23"/>
+        <location filename="../src/tappedout_interface.cpp" line="67"/>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tappedout_interface.cpp" line="45"/>
+        <source>Unable to analyze the deck.</source>
         <translation type="unfinished"/>
     </message>
 </context>
