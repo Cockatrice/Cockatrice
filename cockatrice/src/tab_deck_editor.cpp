@@ -546,8 +546,8 @@ void TabDeckEditor::retranslateUi()
     aPrintDeck->setText(tr("&Print deck..."));
 
     analyzeDeckMenu->setTitle(tr("&Analyze deck online"));
-    aAnalyzeDeckDeckstats->setText(tr("deckstats.net"));
-    aAnalyzeDeckTappedout->setText(tr("tappedout.net"));
+    aAnalyzeDeckDeckstats->setText("deckstats.net");
+    aAnalyzeDeckTappedout->setText("tappedout.net");
 
     aClose->setText(tr("&Close"));
     
