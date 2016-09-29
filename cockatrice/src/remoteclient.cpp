@@ -152,7 +152,7 @@ void RemoteClient::loginResponse(const Response &response)
         if (resp.missing_features_size() > 0 && settingsCache->getNotifyAboutUpdates())
                 emit notifyUserAboutUpdate();
 
-    } else {
+    } else if (response.response_code() != Response::RespNotConnected) {
         QList<QString> missingFeatures;
         if (resp.missing_features_size() > 0) {
             for (int i = 0; i < resp.missing_features_size(); ++i)
