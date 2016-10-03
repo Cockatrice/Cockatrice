@@ -309,6 +309,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
           secondsElapsed(0),
           hostId(-1),
           localPlayerId(-1),
+          isLocalGame(_tabSupervisor->getIsLocalGame()),
           spectator(true),
           gameStateKnown(false),
           resuming(false),
@@ -318,8 +319,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
           replay(_replay),
           currentReplayStep(0),
           sayLabel(0),
-          sayEdit(0),
-          isLocalGame(_tabSupervisor->getIsLocalGame())
+          sayEdit(0)
 {
     // THIS CTOR IS USED ON REPLAY
     gameInfo.CopyFrom(replay->game_info());
@@ -378,6 +378,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
           roomGameTypes(_roomGameTypes),
           hostId(event.host_id()),
           localPlayerId(event.player_id()),
+          isLocalGame(_tabSupervisor->getIsLocalGame()),
           spectator(event.spectator()),
           gameStateKnown(false),
           resuming(event.resuming()),
@@ -385,8 +386,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
           activeCard(0),
           gameClosed(false),
           replay(0),
-          replayDock(0),
-          isLocalGame(_tabSupervisor->getIsLocalGame())
+          replayDock(0)
 {
     // THIS CTOR IS USED ON GAMES
     gameInfo.set_started(false);
