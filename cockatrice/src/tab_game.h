@@ -111,6 +111,7 @@ private:
     QMap<int, QString> roomGameTypes;
     int hostId;
     int localPlayerId;
+    bool isLocalGame;
     bool spectator;
     QMap<int, Player *> players;
     QMap<int, ServerInfo_User> spectators;
@@ -238,6 +239,7 @@ public:
     const QMap<int, Player *> &getPlayers() const { return players; }
     CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
     bool isHost() const { return hostId == localPlayerId; }
+    bool getIsLocalGame() const { return isLocalGame; }
     int getGameId() const { return gameInfo.game_id(); }
     QString getTabText() const;
     bool getSpectator() const { return spectator; }
