@@ -107,8 +107,8 @@ allowedpunctuation=_.-
 ; If a username can begin with punctuation defined in allowedpunctuation
 allowpunctuationprefix=false
 
-; Disallow usernames containing these words
-disallowedwords="admin,administrator"
+; Disallow usernames containing these words. This list is comma seperated
+disallowedwords="admin"
 
 [registration]
 
