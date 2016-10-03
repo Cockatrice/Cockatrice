@@ -100,6 +100,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 {
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
+    if (parentGame->getIsLocalGame())
+        loadRemoteButton->setEnabled(false);
     readyStartButton = new ToggleButton;
     readyStartButton->setEnabled(false);
     sideboardLockButton = new ToggleButton;
