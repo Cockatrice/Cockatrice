@@ -407,11 +407,11 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
 
         out += "<li>" + tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) + "</li>";
 
-		if (rules.at(7).size() > 0)
-			out += "<li>" + tr("can not contain any of the following words: %1").arg(rules.at(7).toHtmlEscaped()) + "</li>";
+        if (rules.at(7).size() > 0)
+            out += "<li>" + tr("can not contain any of the following words: %1").arg(rules.at(7).toHtmlEscaped()) + "</li>";
 
-		if (rules.at(8).size() > 0)
-			out += "<li>" + tr("can not match any of the following expressions: %1").arg(rules.at(8).toHtmlEscaped()) + "</li>";
+        if (rules.at(8).size() > 0)
+            out += "<li>" + tr("can not match any of the following expressions: %1").arg(rules.at(8).toHtmlEscaped()) + "</li>";
 
         out += "</ul>";
     }
