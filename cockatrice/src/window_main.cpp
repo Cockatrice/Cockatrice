@@ -393,7 +393,7 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
 {
     QString out = tr("Invalid username.") + "<br/>";
     QStringList rules = in.split(QChar('|'));
-    if (rules.size() == 8)
+    if (rules.size() == 9)
     {
         out += tr("Your username must respect these rules:") + "<ul>";
 
@@ -409,6 +409,9 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
 
 		if (rules.at(7).size() > 0)
 			out += "<li>" + tr("can not contain any of the following words: %1").arg(rules.at(7).toHtmlEscaped()) + "</li>";
+
+		if (rules.at(8).size() > 0)
+			out += "<li>" + tr("can not match any of the following expressions: %1").arg(rules.at(8).toHtmlEscaped()) + "</li>";
 
         out += "</ul>";
     }

@@ -137,7 +137,7 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
     QStringList disallowedRegExp = settingsCache->value("users/disallowedregexp", "").toString().split(",", QString::SkipEmptyParts);
     disallowedRegExp.removeDuplicates();
 
-    error = QString("%1|%2|%3|%4|%5|%6|%7|%8").arg(minNameLength).arg(maxNameLength).arg(allowLowercase).arg(allowUppercase).arg(allowNumerics).arg(allowPunctuationPrefix).arg(allowedPunctuation).arg(disallowedWords.join(","));
+    error = QString("%1|%2|%3|%4|%5|%6|%7|%8|%9").arg(minNameLength).arg(maxNameLength).arg(allowLowercase).arg(allowUppercase).arg(allowNumerics).arg(allowPunctuationPrefix).arg(allowedPunctuation).arg(disallowedWords.join(",")).arg(disallowedRegExp.join(","));
 
     if (user.length() < minNameLength || user.length() > maxNameLength)
         return false;
