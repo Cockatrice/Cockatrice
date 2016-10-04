@@ -111,7 +111,7 @@ private:
     QMap<int, QString> roomGameTypes;
     int hostId;
     int localPlayerId;
-    bool isLocalGame;
+    const bool isLocalGame;
     bool spectator;
     QMap<int, Player *> players;
     QMap<int, ServerInfo_User> spectators;
