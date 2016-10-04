@@ -110,6 +110,11 @@ allowpunctuationprefix=false
 ; Disallow usernames containing these words. This list is comma seperated
 disallowedwords="admin"
 
+; Disallow usernames matching these regular expressions. This list is comma
+; separated, hence you cannot use commas in your expressions. Backslashes must
+; be escaped, so `\w+\d+` becomes `\\w+\\d+`
+disallowedregexp=""
+
 [registration]
 
 ; Servatrice can process registration requests to add new users on the fly.
