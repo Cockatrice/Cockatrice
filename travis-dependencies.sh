@@ -3,8 +3,6 @@
 if [[ $TRAVIS_OS_NAME == "osx" ]] ; then
   brew update > /dev/null
   brew install qt5 protobuf > /dev/null
-  brew unlink cmake
-  brew upgrade cmake
 else
   # common prerequisites
   sudo add-apt-repository -y ppa:smspillaz/cmake-master
