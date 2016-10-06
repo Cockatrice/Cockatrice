@@ -30,6 +30,7 @@
 #include "abstractclient.h"
 #include "pb/response.pb.h"
 #include "update_checker.h"
+#include "tipOfTheDay/tip_of_the_day_settings.h"
 
 class TabSupervisor;
 class RemoteClient;
@@ -131,6 +132,8 @@ protected:
     void closeEvent(QCloseEvent *event);
     void changeEvent(QEvent *event);
     QString extractInvalidUsernameMessage(QString & in);
+
+    void showTipOfTheDay(TipOfTheDaySettings &settings);
 };
 
 #endif

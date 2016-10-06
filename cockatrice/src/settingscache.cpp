@@ -1,4 +1,5 @@
 #include "settingscache.h"
+#include "tipOfTheDay/tip_of_the_day_settings.h"
 #include <QSettings>
 #include <QFile>
 #include <QDir>
@@ -155,6 +156,7 @@ SettingsCache::SettingsCache()
     messageSettings = new MessageSettings(settingsPath,this);
     gameFiltersSettings = new GameFiltersSettings(settingsPath, this);
     layoutsSettings = new LayoutsSettings(settingsPath, this);
+    tipOfTheDaySettings = new TipOfTheDaySettings(settingsPath, this);
 
     if(!QFile(settingsPath+"global.ini").exists())
         translateLegacySettings();
