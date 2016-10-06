@@ -520,8 +520,82 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
         const QString clientid = query->value(9).toString();
         if (!clientid.isEmpty())
             result.set_clientid(clientid.toStdString());
+
+		result.set_suspicion(LocateUserSuspicion(QString::fromStdString(query->value(1).toString().toStdString())));
     }
     return result;
+}
+
+int Servatrice_DatabaseInterface::LocateUserSuspicion(const QString &userName)
+{
+	
+	if (!checkSql()) 
+		return 0;
+
+	QString clientID;
+	int admin;
+	int calculatedSuspicion = 0;
+	int userID = getUserIdInDB(userName);
+
+	//determin if user is mod/admin
+	QSqlQuery *adminQuery = prepareQuery("select admin from cockatrice_users where id = :userID");
+	adminQuery->bindValue(":userID", userID);
+	if (!execSqlQuery(adminQuery))
+		return 0;
+
+	if (adminQuery->next())
+		admin = adminQuery->value(0).toInt();
+	
+	if (admin)
+		return 0;
+	
+	QSqlQuery *clientidQuery = prepareQuery("select clientid from cockatrice_users where id = :userID");
+	clientidQuery->bindValue(":userID", userID);
+	if (!execSqlQuery(clientidQuery)) 
+		return 0;
+
+	if (clientidQuery->next())
+		clientID = clientidQuery->value(0).toString();
+
+	//count number of accounts
+	QSqlQuery *accountsQuery = prepareQuery("select count(name) from cockatrice_users where clientid = :clientID");
+	accountsQuery->bindValue(":clientID", clientID);
+	if (!execSqlQuery(accountsQuery))
+		return 0;
+
+	if (accountsQuery->next())
+		calculatedSuspicion = calculatedSuspicion + accountsQuery->value(0).toInt();
+
+	//calculate bans
+	QSqlQuery *banQuery = prepareQuery("select count(*) from cockatrice_bans where user_name = :userName");
+	banQuery->bindValue(":userName", userName);
+	if (!execSqlQuery(banQuery))
+		return 0;
+
+	if (banQuery->next())
+		calculatedSuspicion = calculatedSuspicion + banQuery->value(0).toInt();
+
+	//count buddies
+	QSqlQuery *buddyQuery = prepareQuery("select count(*) from cockatrice_buddylist where id_user2 = :userID");
+	buddyQuery->bindValue(":userID", userID);
+	if (!execSqlQuery(buddyQuery))
+		return 0;
+
+	if (buddyQuery->next())
+		calculatedSuspicion = calculatedSuspicion - buddyQuery->value(0).toInt();
+
+	//count ignores
+	QSqlQuery *ignoreQuery = prepareQuery("select count(*) from cockatrice_ignorelist where id_user2 = :userID");
+	ignoreQuery->bindValue(":userID", userID);
+	if (!execSqlQuery(ignoreQuery))
+		return 0;
+
+	if (ignoreQuery->next())
+		calculatedSuspicion = calculatedSuspicion - ignoreQuery->value(0).toInt();
+
+	qDebug() << userName << " suspicion leven calculated to be: " << calculatedSuspicion;
+	return calculatedSuspicion;
+	
 }
 
 ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, bool withId)
