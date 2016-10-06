@@ -690,7 +690,7 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
     QString newPlayerName = "@" + newPlayer->getName();
     if (sayEdit && !autocompleteUserList.contains(newPlayerName)){
         autocompleteUserList << newPlayerName;
-        sayEdit->setCompletionList(autocompleteUserList);
+        sayEdit->setMentionCompletionList(autocompleteUserList);
     }
     scene->addPlayer(newPlayer);
 
@@ -887,7 +887,7 @@ void TabGame::eventSpectatorLeave(const Event_Leave & /*event*/, int eventPlayer
 {
     QString playerName = "@" + QString::fromStdString(spectators.value(eventPlayerId).name());
     if (sayEdit && autocompleteUserList.removeOne(playerName))
-        sayEdit->setCompletionList(autocompleteUserList);
+        sayEdit->setMentionCompletionList(autocompleteUserList);
     messageLog->logLeaveSpectator(QString::fromStdString(spectators.value(eventPlayerId).name()));
     playerListWidget->removePlayer(eventPlayerId);
     spectators.remove(eventPlayerId);
@@ -905,7 +905,7 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event, int /*e
         QString playerName = "@" + QString::fromStdString(prop.user_info().name());
         if (sayEdit && !autocompleteUserList.contains(playerName)){
             autocompleteUserList << playerName;
-            sayEdit->setCompletionList(autocompleteUserList);
+            sayEdit->setMentionCompletionList(autocompleteUserList);
         }
         if (prop.spectator()) {
             if (!spectators.contains(playerId)) {
@@ -1017,7 +1017,7 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
     QString playerName = QString::fromStdString(playerInfo.user_info().name());
     if (sayEdit && !autocompleteUserList.contains("@" + playerName)){
         autocompleteUserList << "@" + playerName;
-        sayEdit->setCompletionList(autocompleteUserList);
+        sayEdit->setMentionCompletionList(autocompleteUserList);
     }
 
     if (players.contains(playerId))
@@ -1042,7 +1042,7 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
 
     QString playerName = "@" + player->getName();
     if(sayEdit && autocompleteUserList.removeOne(playerName))
-        sayEdit->setCompletionList(autocompleteUserList);
+        sayEdit->setMentionCompletionList(autocompleteUserList);
 
     messageLog->logLeave(player);
     playerListWidget->removePlayer(eventPlayerId);
