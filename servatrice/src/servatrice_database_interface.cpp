@@ -134,10 +134,8 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
     QString allowedPunctuation = settingsCache->value("users/allowedpunctuation", "_").toString();
     QStringList disallowedWords = settingsCache->value("users/disallowedwords", "").toString().split(",", QString::SkipEmptyParts);
     disallowedWords.removeDuplicates();
-    QStringList disallowedRegExp = settingsCache->value("users/disallowedregexp", "").toString().split(",", QString::SkipEmptyParts);
-    disallowedRegExp.removeDuplicates();
 
-    error = QString("%1|%2|%3|%4|%5|%6|%7|%8|%9").arg(minNameLength).arg(maxNameLength).arg(allowLowercase).arg(allowUppercase).arg(allowNumerics).arg(allowPunctuationPrefix).arg(allowedPunctuation).arg(disallowedWords.join(",")).arg(disallowedRegExp.join(","));
+    error = QString("%1|%2|%3|%4|%5|%6|%7|%8|%9").arg(minNameLength).arg(maxNameLength).arg(allowLowercase).arg(allowUppercase).arg(allowNumerics).arg(allowPunctuationPrefix).arg(allowedPunctuation).arg(settingsCache->value("users/disallowedwords", "").toString()).arg(settingsCache->value("users/disallowedregexp", "").toString());
 
     if (user.length() < minNameLength || user.length() > maxNameLength)
         return false;
@@ -149,8 +147,8 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
         if (user.contains(word, Qt::CaseInsensitive)) return false;
     }
 
-    for (const QString &regExp : disallowedRegExp) {
-        if (QRegExp(regExp).exactMatch(user)) return false;
+    for (const QRegExp &regExp : settingsCache->disallowedRegExp) {
+        if (regExp.exactMatch(user)) return false;
     }
 
     QString regEx("[");
