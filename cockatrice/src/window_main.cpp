@@ -321,6 +321,17 @@ void MainWindow::serverTimeout()
     actConnect();
 }
 
+void MainWindow::idleTimeout()
+{
+    QMessageBox::critical(this, tr("Inactivity Timeout"), tr("You have been signed out due to inactivity."));
+    actConnect();
+}
+
+void MainWindow::idleTimerReset()
+{
+    client->resetIdleTimer();
+}
+
 void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime, QList<QString> missingFeatures)
 {
     switch (r) {
@@ -639,6 +650,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(loginError(Response::ResponseCode, QString, quint32, QList<QString>)), this, SLOT(loginError(Response::ResponseCode, QString, quint32, QList<QString>)));
     connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
     connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
+    connect(client, SIGNAL(idleTimeout()), this, SLOT(idleTimeout()));
     connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
     connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
     connect(client, SIGNAL(userInfoChanged(const ServerInfo_User &)), this, SLOT(userInfoReceived(const ServerInfo_User &)), Qt::BlockingQueuedConnection);
@@ -660,6 +672,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
     connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
     connect(tabSupervisor, SIGNAL(showWindowIfHidden()), this, SLOT(showWindowIfHidden()));
+    connect(tabSupervisor, SIGNAL(idleTimerReset()), this, SLOT(idleTimerReset()));
     tabSupervisor->addDeckEditorTab(0);
 
     setCentralWidget(tabSupervisor);

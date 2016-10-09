@@ -65,6 +65,7 @@ private:
     bool state;
 signals:
     void stateChanged();
+    void notIdle();
 public:
     ToggleButton(QWidget *parent = 0);
     bool getState() const { return state; }
@@ -92,6 +93,7 @@ private slots:
     void refreshShortcuts();
 signals:
     void newCardAdded(AbstractCardItem *card);
+    void notIdle();
 public:
     DeckViewContainer(int _playerId, TabGame *parent);
     void retranslateUi();
@@ -193,6 +195,7 @@ signals:
     void containerProcessingDone();
     void openMessageDialog(const QString &userName, bool focus);
     void openDeckEditor(const DeckLoader *deck);
+    void notIdle();
 private slots:
     void replayNextEvent();
     void replayFinished();
