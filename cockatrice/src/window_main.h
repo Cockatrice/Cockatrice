@@ -46,6 +46,8 @@ private slots:
     void processConnectionClosedEvent(const Event_ConnectionClosed &event);
     void processServerShutdownEvent(const Event_ServerShutdown &event);
     void serverTimeout();
+    void idleTimerReset();
+    void idleTimeout();
     void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime, QList<QString> missingFeatures);
     void registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
     void activateError();
