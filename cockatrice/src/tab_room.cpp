@@ -24,7 +24,6 @@
 #include "settingscache.h"
 #include "main.h"
 #include "lineeditcompleter.h"
-
 #include "get_pb_extension.h"
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_room.pb.h"
@@ -200,6 +199,7 @@ void TabRoom::sendMessage()
         sendRoomCommand(pend);
         sayEdit->clear();
     }
+    emit notIdle();
 }
 
 void TabRoom::sayFinished(const Response &response)
