@@ -9,7 +9,7 @@ class Server_DatabaseInterface : public QObject {
 public:
     Server_DatabaseInterface(QObject *parent = 0)
         : QObject(parent) { }
-    
+
     virtual AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler, const QString &user, const QString &password, const QString &clientId, QString &reasonStr, int &secondsLeft) = 0;
     virtual bool checkUserIsBanned(const QString & /* ipAddress */, const QString & /* userName */, const QString & /* clientId */, QString & /* banReason */, int & /* banSecondsRemaining */) { return false; }
     virtual bool activeUserExists(const QString & /* user */) { return false; }
@@ -21,9 +21,10 @@ public:
     virtual ServerInfo_User getUserData(const QString &name, bool withId = false) = 0;
     virtual void storeGameInformation(const QString & /* roomName */, const QStringList & /* roomGameTypes */, const ServerInfo_Game & /* gameInfo */, const QSet<QString> & /* allPlayersEver */, const QSet<QString> & /* allSpectatorsEver */, const QList<GameReplay *> & /* replayList */) { }
     virtual DeckList *getDeckFromDatabase(int /* deckId */, int /* userId */) { return 0; }
-    
+
     virtual qint64 startSession(const QString & /* userName */, const QString & /* address */, const QString & /* clientId */, const QString & /* connectionType */) { return 0; }
     virtual bool usernameIsValid(const QString & /*userName */, QString & /* error */) { return true; };
+    virtual bool isUserADonator(const QString & /* user */) { return false; };
 public slots:
     virtual void endSession(qint64 /* sessionId */ ) { }
 public:

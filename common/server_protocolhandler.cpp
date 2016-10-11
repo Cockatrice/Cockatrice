@@ -436,6 +436,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         case RegistrationRequired: return Response::RespRegistrationRequired;
         case ClientIdRequired: return Response::RespClientIdRequired;
         case UserIsInactive: return Response::RespAccountNotActivated;
+        case UserLimitReached: return Response::RespUserLimitReached;
         default: authState = res;
     }
 

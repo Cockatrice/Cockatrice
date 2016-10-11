@@ -1091,3 +1091,23 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
 
     return results;
 }
+
+bool Servatrice_DatabaseInterface::isUserADonator(const QString &user)
+{
+    if (!checkSql())
+        return false;
+    
+    QSqlQuery *query = prepareQuery("SELECT donator from {prefix}_users WHERE name = :user_name");
+    query->bindValue(":user_name", user);
+
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to collect donator information: SQL Error");
+        return false;
+    }
+
+    if (query->next()) {
+        if (query->value(0).toInt() > 0)
+            return true;
+    }
+    return false;
+}
