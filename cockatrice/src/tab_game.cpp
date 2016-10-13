@@ -100,6 +100,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 {
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
+    if (parentGame->getIsLocalGame())
+        loadRemoteButton->setEnabled(false);
     readyStartButton = new ToggleButton;
     readyStartButton->setEnabled(false);
     sideboardLockButton = new ToggleButton;
@@ -307,6 +309,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
           secondsElapsed(0),
           hostId(-1),
           localPlayerId(-1),
+          isLocalGame(_tabSupervisor->getIsLocalGame()),
           spectator(true),
           gameStateKnown(false),
           resuming(false),
@@ -375,6 +378,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
           roomGameTypes(_roomGameTypes),
           hostId(event.host_id()),
           localPlayerId(event.player_id()),
+          isLocalGame(_tabSupervisor->getIsLocalGame()),
           spectator(event.spectator()),
           gameStateKnown(false),
           resuming(event.resuming()),
@@ -543,6 +547,7 @@ void TabGame::replayFinished()
 
 void TabGame::replayStartButtonClicked()
 {
+    emit notIdle();
     replayStartButton->setEnabled(false);
     replayPauseButton->setEnabled(true);
     replayFastForwardButton->setEnabled(true);
@@ -552,6 +557,7 @@ void TabGame::replayStartButtonClicked()
 
 void TabGame::replayPauseButtonClicked()
 {
+    emit notIdle();
     replayStartButton->setEnabled(true);
     replayPauseButton->setEnabled(false);
     replayFastForwardButton->setEnabled(false);
@@ -561,6 +567,7 @@ void TabGame::replayPauseButtonClicked()
 
 void TabGame::replayFastForwardButtonToggled(bool checked)
 {
+    emit notIdle();
     timelineWidget->setTimeScaleFactor(checked ? 10.0 : 1.0);
 }
 
@@ -590,6 +597,7 @@ void TabGame::actGameInfo()
 
 void TabGame::actConcede()
 {
+    emit notIdle();
     if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
         return;
 
@@ -598,6 +606,7 @@ void TabGame::actConcede()
 
 void TabGame::actLeaveGame()
 {
+    emit notIdle();
     if (!gameClosed) {
         if (!spectator)
         if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
@@ -621,6 +630,7 @@ void TabGame::actSay()
         sendGameCommand(cmd);
         sayEdit->clear();
     }
+    emit notIdle();
 }
 
 void TabGame::actPhaseAction()
@@ -774,6 +784,7 @@ AbstractClient *TabGame::getClientForPlayer(int playerId) const
 
 void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
 {
+    emit notIdle();
     AbstractClient *client = getClientForPlayer(playerId);
     if (!client)
         return;
@@ -784,6 +795,7 @@ void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
 
 void TabGame::sendGameCommand(const google::protobuf::Message &command, int playerId)
 {
+    emit notIdle();
     AbstractClient *client = getClientForPlayer(playerId);
     if (!client)
         return;
