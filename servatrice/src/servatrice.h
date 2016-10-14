@@ -135,13 +135,13 @@ private:
     QMutex txBytesMutex, rxBytesMutex;
     quint64 txBytes, rxBytes;
     int maxGameInactivityTime, maxPlayerInactivityTime;
-    int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser, commandCountingInterval, maxCommandCountPerInterval, pingClockInterval;
+    int maxUserLimit, maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser, commandCountingInterval, maxCommandCountPerInterval, pingClockInterval;
 
     QString shutdownReason;
     int shutdownMinutes;
     int nextShutdownMessageMinutes;
     QTimer *shutdownTimer;
-    bool isFirstShutdownMessage, clientIdRequired, regServerOnly;
+    bool isFirstShutdownMessage, clientIdRequired, regServerOnly, maxUserLimitEnabled;
 
     mutable QMutex serverListMutex;
     QList<ServerProperties> serverList;
@@ -164,10 +164,12 @@ public:
     bool getGameShouldPing() const { return true; }
     bool getClientIdRequired() const { return clientIdRequired; }
     bool getRegOnlyServer() const { return regServerOnly; }
+    bool getMaxUserLimitEnabled() const { return maxUserLimitEnabled; }
     int getPingClockInterval() const { return pingClockInterval; }
     int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
     int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
     int getMaxUsersPerAddress() const { return maxUsersPerAddress; }
+    int getMaxUsers() const { return maxUserLimit; }
     int getMessageCountingInterval() const { return messageCountingInterval; }
     int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
     int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }

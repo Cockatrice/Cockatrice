@@ -84,7 +84,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
         name = name.left(35);
 
     Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
-
+    
     AuthenticationResult authState = databaseInterface->checkUserPassword(session, name, password, clientid, reasonStr, secondsLeft);
     if (authState == NotLoggedIn || authState == UserIsBanned || authState == UsernameInvalid || authState == UserIsInactive)
         return authState;
@@ -92,8 +92,20 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     ServerInfo_User data = databaseInterface->getUserData(name, true);
     data.set_address(session->getAddress().toStdString());
     name = QString::fromStdString(data.name()); // Compensate for case indifference
-
+    
     if (authState == PasswordRight) {
+        //check to see if user is full but allow users that donate access to server regardless of user count
+        if (!databaseInterface->isUserADonator(name)) {
+            //limit the number of total users based on configuration settings
+            if (getMaxUserLimitEnabled()) {
+                int userLimit = getMaxUsers();
+                int playerCount = (databaseInterface->getActiveUserCount() + 1);
+                if (playerCount > userLimit) {
+                    return UserLimitReached;
+                }
+            }
+        }
+
         if (users.contains(name) || databaseInterface->userSessionExists(name)) {
             if (users.contains(name)) {
                 qDebug("Session already logged in, logging old session out");
@@ -167,7 +179,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     se = Server_ProtocolHandler::prepareSessionEvent(event);
     sendIsl_SessionEvent(*se);
     delete se;
-
+    
     return authState;
 }
 

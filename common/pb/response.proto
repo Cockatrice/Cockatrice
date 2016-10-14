@@ -37,6 +37,7 @@ message Response {
         RespRegistrationAcceptedNeedsActivation = 33; // Server accepted cient registration, but it will need token activation
         RespClientIdRequired = 34; // Server requires client to generate and send its client id before allowing access
         RespClientUpdateRequired = 35; // Client is missing features that the server is requiring
+        RespUserLimitReached = 36; // Server has a user limit and it has been reached
     }
     enum ResponseType {
         JOIN_ROOM = 1000;

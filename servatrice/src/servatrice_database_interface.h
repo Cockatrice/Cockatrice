@@ -9,7 +9,7 @@
 #include "server.h"
 #include "server_database_interface.h"
 
-#define DATABASE_SCHEMA_VERSION 17
+#define DATABASE_SCHEMA_VERSION 18
 
 class Servatrice;
 
@@ -69,7 +69,7 @@ public:
     bool userSessionExists(const QString &userName);
     bool usernameIsValid(const QString &user, QString & error);
     bool checkUserIsBanned(const QString &ipAddress, const QString &userName, const QString &clientId, QString &banReason, int &banSecondsRemaining);
-
+    bool isUserADonator(const QString &user);
     bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender,
         const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active = false);
     bool activateUser(const QString &userName, const QString &token);

@@ -31,7 +31,7 @@ class GameEventContainer;
 class CommandContainer;
 class Command_JoinGame;
 
-enum AuthenticationResult { NotLoggedIn, PasswordRight, UnknownUser, WouldOverwriteOldSession, UserIsBanned, UsernameInvalid, RegistrationRequired, UserIsInactive, ClientIdRequired };
+enum AuthenticationResult { NotLoggedIn, PasswordRight, UnknownUser, WouldOverwriteOldSession, UserIsBanned, UsernameInvalid, RegistrationRequired, UserIsInactive, ClientIdRequired, UserLimitReached };
 
 class Server : public QObject
 {
@@ -62,6 +62,8 @@ public:
     virtual bool getGameShouldPing() const { return false; }
     virtual bool getClientIdRequired() const { return false; }
     virtual bool getRegOnlyServer() const { return false; }
+    virtual bool getMaxUserLimitEnabled() const { return false; }
+    virtual int getMaxUsers() const { return 0; }
     virtual int getPingClockInterval() const { return 0; }
     virtual int getMaxGameInactivityTime() const { return 9999999; }
     virtual int getMaxPlayerInactivityTime() const { return 9999999; }
