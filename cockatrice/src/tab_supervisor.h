@@ -83,6 +83,7 @@ signals:
     void localGameEnded();
     void adminLockChanged(bool lock);
     void showWindowIfHidden();
+    void idleTimerReset();
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
     void openReplay(GameReplay *replay);
@@ -108,6 +109,7 @@ private slots:
     void processGameEventContainer(const GameEventContainer &cont);
     void processUserMessageEvent(const Event_UserMessage &event);
     void processNotifyUserEvent(const Event_NotifyUser &event);
+    void resetIdleTimer();
 };
 
 #endif

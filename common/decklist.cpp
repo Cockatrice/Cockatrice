@@ -578,7 +578,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         rx.setPattern("’");
         cardName.replace(rx, "'");
         rx.setPattern("Æ");
-        cardName.replace(rx, "AE");
+        cardName.replace(rx, "Ae");
         rx.setPattern("\\s*[|/]{1,2}\\s*");
         cardName.replace(rx, " // ");
 

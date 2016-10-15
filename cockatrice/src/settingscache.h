@@ -104,7 +104,8 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
-    int keepalive;    
+    int keepalive;
+    int idlekeepalive;    
     void translateLegacySettings();
     QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
     QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
@@ -180,6 +181,7 @@ public:
     bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
     bool getRememberGameSettings() const { return rememberGameSettings; }
     int getKeepAlive() const { return keepalive; }
+    int getIdleKeepAlive() const { return idlekeepalive; }
     void setClientID(QString clientID);
     QString getClientID() { return clientID; }
     ShortcutsSettings& shortcuts() const { return *shortcutsSettings; }
