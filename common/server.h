@@ -62,6 +62,7 @@ public:
     virtual bool getGameShouldPing() const { return false; }
     virtual bool getClientIdRequired() const { return false; }
     virtual bool getRegOnlyServer() const { return false; }
+    virtual bool getmaxUserLimitEnabled() const { return false; }
     virtual int getPingClockInterval() const { return 0; }
     virtual int getMaxGameInactivityTime() const { return 9999999; }
     virtual int getMaxPlayerInactivityTime() const { return 9999999; }
@@ -71,6 +72,7 @@ public:
     virtual int getMaxGamesPerUser() const { return 0; }
     virtual int getCommandCountingInterval() const { return 0; }
     virtual int getMaxCommandCountPerInterval() const { return 0; }
+    virtual int getMaxUserLimit() const { return 9999999; }
 
     Server_DatabaseInterface *getDatabaseInterface() const;
     int getNextLocalGameId() { QMutexLocker locker(&nextLocalGameIdMutex); return ++nextLocalGameId; }
@@ -89,6 +91,8 @@ public:
     void addPersistentPlayer(const QString &userName, int roomId, int gameId, int playerId);
     void removePersistentPlayer(const QString &userName, int roomId, int gameId, int playerId);
     QList<PlayerReference> getPersistentPlayerReferences(const QString &userName) const;
+    int getUsersCount() const;
+    int getGamesCount() const;
 private:
     QMultiMap<QString, PlayerReference> persistentPlayers;
     mutable QReadWriteLock persistentPlayersLock;
@@ -118,9 +122,6 @@ protected:
     QMap<QString, Server_AbstractUserInterface *> externalUsers;
     QMap<int, Server_Room *> rooms;
     QMap<QThread *, Server_DatabaseInterface *> databaseInterfaces;
-
-    int getUsersCount() const;
-    int getGamesCount() const;
     void addRoom(Server_Room *newRoom);
 };
 

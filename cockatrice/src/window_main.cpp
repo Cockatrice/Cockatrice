@@ -393,6 +393,10 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             client->disconnectFromServer();
             break;
         }
+        case Response::RespServerFull: {
+            QMessageBox::critical(this, tr("Server Full"), tr("The server has reached its maximum user capacity, please check back later."));
+            break;
+        }
         default:
             QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)) + tr("\nThis usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
             break;
