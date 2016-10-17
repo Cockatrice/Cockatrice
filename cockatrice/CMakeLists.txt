@@ -61,7 +61,6 @@ SET(cockatrice_SOURCES
     src/abstractgraphicsitem.cpp 
     src/abstractcarddragitem.cpp 
     src/dlg_settings.cpp 
-    src/dlg_cardsearch.cpp 
     src/phasestoolbar.cpp 
     src/gamescene.cpp 
     src/arrowitem.cpp 
