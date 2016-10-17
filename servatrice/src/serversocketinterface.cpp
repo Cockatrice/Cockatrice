@@ -94,23 +94,6 @@ bool AbstractServerSocketInterface::initSession()
     sendProtocolItem(*identSe);
     delete identSe;
 
-    //limit the number of total users based on configuration settings
-    bool enforceUserLimit = settingsCache->value("security/enable_max_user_limit", false).toBool();
-    if (enforceUserLimit){
-        int userLimit = settingsCache->value("security/max_users_total", 500).toInt();
-        int playerCount = (databaseInterface->getActiveUserCount() + 1);
-        if (playerCount > userLimit){
-            std::cerr << "Max Users Total Limit Reached, please increase the max_users_total setting." << std::endl;
-            logger->logMessage(QString("Max Users Total Limit Reached, please increase the max_users_total setting."), this);
-            Event_ConnectionClosed event;
-            event.set_reason(Event_ConnectionClosed::USER_LIMIT_REACHED);
-            SessionEvent *se = prepareSessionEvent(event);
-            sendProtocolItem(*se);
-            delete se;
-            return false;
-        }
-    }
-
     //allow unlimited number of connections from the trusted sources
     QString trustedSources = settingsCache->value("security/trusted_sources","127.0.0.1,::1").toString();
     if (trustedSources.contains(getAddress(),Qt::CaseInsensitive))
@@ -123,7 +106,6 @@ bool AbstractServerSocketInterface::initSession()
         SessionEvent *se = prepareSessionEvent(event);
         sendProtocolItem(*se);
         delete se;
-
         return false;
     }
 
