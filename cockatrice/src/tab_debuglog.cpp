@@ -1,11 +1,11 @@
-#include "dlg_viewlog.h"
+#include "tab_debuglog.h"
 #include "logger.h"
 
 #include <QVBoxLayout>
 #include <QPlainTextEdit>
 
-DlgViewLog::DlgViewLog(QWidget *parent)
-: QDialog(parent)
+TabDebugLog::TabDebugLog(TabSupervisor *tabSupervisor, QWidget *parent)
+: Tab(tabSupervisor, parent)
 {
     logArea = new QPlainTextEdit;
     logArea->setReadOnly(true);
@@ -13,23 +13,36 @@ DlgViewLog::DlgViewLog(QWidget *parent)
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(logArea);
 
-    setLayout(mainLayout);
-
-    setWindowTitle(tr("Debug Log"));
-    resize(800, 500);
+    QWidget *mainWidget = new QWidget(this);
+    mainWidget->setLayout(mainLayout);
+    setCentralWidget(mainWidget);
 
     loadInitialLogBuffer();
     connect(&Logger::getInstance(), SIGNAL(logEntryAdded(QString)), this, SLOT(logEntryAdded(QString)));    
 }
 
-void DlgViewLog::loadInitialLogBuffer()
+TabDebugLog::~TabDebugLog()
+{
+    emit debugLogClosing();
+}
+
+void TabDebugLog::closeRequest()
+{
+    deleteLater();
+}
+
+void TabDebugLog::retranslateUi()
+{
+}
+
+void TabDebugLog::loadInitialLogBuffer()
 {
     QVector<QString> logBuffer = Logger::getInstance().getLogBuffer();
     foreach(QString message, logBuffer)
         logEntryAdded(message);
 }
 
-void DlgViewLog::logEntryAdded(QString message)
+void TabDebugLog::logEntryAdded(QString message)
 {
     logArea->appendPlainText(message);
 }

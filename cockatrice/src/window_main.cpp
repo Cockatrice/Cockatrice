@@ -39,7 +39,6 @@
 #include "dlg_register.h"
 #include "dlg_settings.h"
 #include "dlg_update.h"
-#include "dlg_viewlog.h"
 #include "tab_supervisor.h"
 #include "remoteclient.h"
 #include "localserver.h"
@@ -311,8 +310,7 @@ void MainWindow::actUpdate()
 
 void MainWindow::actViewLog()
 {
-    DlgViewLog dlg(this);
-    dlg.exec();
+    tabSupervisor->openDebugLogTab();
 }
 
 void MainWindow::serverTimeout()
