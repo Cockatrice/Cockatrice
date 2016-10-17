@@ -132,13 +132,26 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
     bool allowNumerics = settingsCache->value("users/allownumerics", true).toBool();
     bool allowPunctuationPrefix = settingsCache->value("users/allowpunctuationprefix", false).toBool();
     QString allowedPunctuation = settingsCache->value("users/allowedpunctuation", "_").toString();
-    error = QString("%1|%2|%3|%4|%5|%6|%7").arg(minNameLength).arg(maxNameLength).arg(allowLowercase).arg(allowUppercase).arg(allowNumerics).arg(allowPunctuationPrefix).arg(allowedPunctuation);
+    QString disallowedWordsStr = settingsCache->value("users/disallowedwords", "").toString();
+    QStringList disallowedWords = disallowedWordsStr.split(",", QString::SkipEmptyParts);
+    disallowedWords.removeDuplicates();
+    QString disallowedRegExpStr = settingsCache->value("users/disallowedregexp", "").toString();
+
+    error = QString("%1|%2|%3|%4|%5|%6|%7|%8|%9").arg(minNameLength).arg(maxNameLength).arg(allowLowercase).arg(allowUppercase).arg(allowNumerics).arg(allowPunctuationPrefix).arg(allowedPunctuation).arg(disallowedWordsStr).arg(disallowedRegExpStr);
 
     if (user.length() < minNameLength || user.length() > maxNameLength)
         return false;
 
     if (!allowPunctuationPrefix && allowedPunctuation.contains(user.at(0)))
         return false;
+
+    for (const QString &word : disallowedWords) {
+        if (user.contains(word, Qt::CaseInsensitive)) return false;
+    }
+
+    for (const QRegExp &regExp : settingsCache->disallowedRegExp) {
+        if (regExp.exactMatch(user)) return false;
+    }
 
     QString regEx("[");
     if (allowLowercase)
