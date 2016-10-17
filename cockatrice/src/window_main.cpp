@@ -404,9 +404,9 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
 {
     QString out = tr("Invalid username.") + "<br/>";
     QStringList rules = in.split(QChar('|'));
-    if (rules.size() == 7)
+    if (rules.size() == 7 || rules.size() == 9)
     {
-        out += tr("Your username must respect these rules:") + "<br><ul>";
+        out += tr("Your username must respect these rules:") + "<ul>";
 
         out += "<li>" + tr("is %1 - %2 characters long").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
         out += "<li>" + tr("can %1 contain lowercase characters").arg((rules.at(2).toInt() > 0) ? "" : tr("NOT")) + "</li>";
@@ -417,6 +417,16 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
             out += "<li>" + tr("can contain the following punctuation: %1").arg(rules.at(6).toHtmlEscaped()) + "</li>";
 
         out += "<li>" + tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+
+        if (rules.size() == 9)
+        {
+            if (rules.at(7).size() > 0)
+                out += "<li>" + tr("can not contain any of the following words: %1").arg(rules.at(7).toHtmlEscaped()) + "</li>";
+
+            if (rules.at(8).size() > 0)
+                out += "<li>" + tr("can not match any of the following expressions: %1").arg(rules.at(8).toHtmlEscaped()) + "</li>";
+        }
+
         out += "</ul>";
     }
     else
@@ -527,7 +537,7 @@ void MainWindow::retranslateUi()
     dbMenu->setTitle(tr("C&ard Database"));
     aOpenCustomFolder->setText(tr("Open custom image folder"));
     aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
-    aAddCustomSet->setText(tr("Add custom sets/cards"));    
+    aAddCustomSet->setText(tr("Add custom sets/cards"));
     aEditSets->setText(tr("&Edit sets..."));
     aEditTokens->setText(tr("Edit &tokens..."));
 

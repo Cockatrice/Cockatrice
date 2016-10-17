@@ -107,6 +107,18 @@ allowedpunctuation=_.-
 ; If a username can begin with punctuation defined in allowedpunctuation
 allowpunctuationprefix=false
 
+; Disallow usernames containing these words. This list is comma seperated, e.g.
+; "admin,user,name"
+disallowedwords="admin"
+
+; Disallow usernames matching these regular expressions. This list is comma
+; separated, e.g. "\\w+\\d+,\\d{2}user", hence you cannot use commas in your
+; expressions. Backslashes must be escaped, so `\w+\d+` becomes `\\w+\\d+`.
+; WARNING: Complex expressions can be harmful to performance. Please make sure
+;          your expressions are considered well formed. See this page for info:
+;          http://www.regular-expressions.info/catastrophic.html
+disallowedregexp=""
+
 [registration]
 
 ; Servatrice can process registration requests to add new users on the fly.
