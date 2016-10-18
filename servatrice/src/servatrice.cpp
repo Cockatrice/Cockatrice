@@ -234,11 +234,11 @@ bool Servatrice::initServer()
 
     qDebug() << "Store Replays: " << settingsCache->value("game/store_replays", true).toBool();
     qDebug() << "Client ID Required: " << clientIdRequired;
-    bool maxUserLimitEnabled = settingsCache->value("security/enable_max_user_limit", false).toBool();
+    maxUserLimitEnabled = settingsCache->value("security/enable_max_user_limit", false).toBool();
     qDebug() << "Maximum user limit enabled: " << maxUserLimitEnabled;
 
     if (maxUserLimitEnabled){
-        int maxUserLimit = settingsCache->value("security/max_users_total", 500).toInt();
+        maxUserLimit = settingsCache->value("security/max_users_total", 500).toInt();
         qDebug() << "Maximum total user limit: " << maxUserLimit;
         int maxTcpUserLimit = settingsCache->value("security/max_users_tcp", 500).toInt();
         qDebug() << "Maximum tcp user limit: " << maxTcpUserLimit;
