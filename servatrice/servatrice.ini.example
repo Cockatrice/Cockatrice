@@ -39,6 +39,8 @@ writelog=1
 
 ; Choose a name for the log file, if enabled; you can specify an absolute path or a path relative to
 ; the servatrice executable; the default file name is server.log (in the same path as servatrice)
+; Note: When running servatrice under windows you will need to use double backslashes between folder locations
+; [ex: C:\\Temp\\server.log
 logfile=server.log
 
 ; You may want to silence some commonly recurring messages in the logfile. This setting can contain a
