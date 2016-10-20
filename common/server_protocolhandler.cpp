@@ -383,14 +383,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdPing(const Command_Ping & /*cm
 
 Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd, ResponseContainer &rc)
 {
-    // limit the number of users that can connect to the server based on configuration settings
-    if (server->getMaxUserLimitEnabled()) {
-        if (server->getUsersCount() >= server->getMaxUserLimit()) {
-            qDebug() << "Max Users Total Limit Reached, please increase the max_users_total setting.";
-            return Response::RespServerFull;
-        }
-    }
-
+    
     QString userName = QString::fromStdString(cmd.user_name()).simplified();
     QString clientId = QString::fromStdString(cmd.clientid()).simplified();
     QString clientVersion = QString::fromStdString(cmd.clientver()).simplified();
@@ -445,6 +438,16 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         case ClientIdRequired: return Response::RespClientIdRequired;
         case UserIsInactive: return Response::RespAccountNotActivated;
         default: authState = res;
+    }
+
+    // limit the number of non-privileged users that can connect to the server based on configuration settings
+    if (QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
+        if (server->getmaxUserLimitEnabled()) {
+            if (server->getUsersCount() > server->getMaxUserLimit()) {
+                qDebug() << "Max Users Total Limit Reached, please increase the max_users_total setting.";
+                return Response::RespServerFull;
+            }
+        }
     }
 
     userName = QString::fromStdString(userInfo->name());
