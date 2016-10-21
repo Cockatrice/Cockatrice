@@ -39,6 +39,8 @@ writelog=1
 
 ; Choose a name for the log file, if enabled; you can specify an absolute path or a path relative to
 ; the servatrice executable; the default file name is server.log (in the same path as servatrice)
+; Note: When running servatrice under windows you will need to use double backslashes between folder locations
+; [ex: C:\\Temp\\server.log ]
 logfile=server.log
 
 ; You may want to silence some commonly recurring messages in the logfile. This setting can contain a
@@ -106,6 +108,18 @@ allowedpunctuation=_.-
 
 ; If a username can begin with punctuation defined in allowedpunctuation
 allowpunctuationprefix=false
+
+; Disallow usernames containing these words. This list is comma seperated, e.g.
+; "admin,user,name"
+disallowedwords="admin"
+
+; Disallow usernames matching these regular expressions. This list is comma
+; separated, e.g. "\\w+\\d+,\\d{2}user", hence you cannot use commas in your
+; expressions. Backslashes must be escaped, so `\w+\d+` becomes `\\w+\\d+`.
+; WARNING: Complex expressions can be harmful to performance. Please make sure
+;          your expressions are considered well formed. See this page for info:
+;          http://www.regular-expressions.info/catastrophic.html
+disallowedregexp=""
 
 [registration]
 

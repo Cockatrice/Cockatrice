@@ -4,14 +4,18 @@
 #include <QStandardPaths>
 
 SettingsCache::SettingsCache(const QString & fileName, QSettings::Format format, QObject * parent)
-:QSettings(fileName, format, parent)
+    :QSettings(fileName, format, parent)
 {
-
+    QStringList disallowedRegExpStr = value("users/disallowedregexp", "").toString().split(",", QString::SkipEmptyParts);
+    disallowedRegExpStr.removeDuplicates();
+    for (const QString &regExpStr : disallowedRegExpStr) {
+        disallowedRegExp.append(QRegExp(regExpStr));
+    }
 }
 
 QString SettingsCache::guessConfigurationPath(QString & specificPath)
 {
-    const QString fileName="servatrice.ini";    
+    const QString fileName="servatrice.ini";
     #ifdef PORTABLE_BUILD
     return fileName;
     #endif
