@@ -133,14 +133,15 @@ void PictureLoaderWorker::processLoadQueue()
         mutex.unlock();
 
         QString setName = cardBeingLoaded.getSetName();
-        QString correctedCardname = cardBeingLoaded.getCard()->getCorrectedName();
-        qDebug() << "Trying to load picture (set: " << setName << " card: " << correctedCardname << ")";
+        QString cardName = cardBeingLoaded.getCard()->getName();
+        QString correctedCardName = cardBeingLoaded.getCard()->getCorrectedName();
+        qDebug() << "Trying to load picture (set: " << setName << " card: " << cardName << ")";
 
-        if(cardImageExistsOnDisk(setName, correctedCardname))
+        if(cardImageExistsOnDisk(setName, correctedCardName))
             continue;
 
         if (picDownload) {
-            qDebug() << "Picture NOT found, trying to download (set: " << setName << " card: " << correctedCardname << ")";
+            qDebug() << "Picture NOT found, trying to download (set: " << setName << " card: " << cardName << ")";
             cardsToDownload.append(cardBeingLoaded);
             cardBeingLoaded=0;
             if (!downloadRunning)
@@ -148,13 +149,13 @@ void PictureLoaderWorker::processLoadQueue()
         } else {
             if (cardBeingLoaded.nextSet())
             {
-                qDebug() << "Picture NOT found and download disabled, moving to next set (newset: " << setName << " card: " << correctedCardname << ")";
+                qDebug() << "Picture NOT found and download disabled, moving to next set (newset: " << setName << " card: " << cardName << ")";
                 mutex.lock();
                 loadQueue.prepend(cardBeingLoaded);
                 cardBeingLoaded=0;
                 mutex.unlock();
             } else {
-                qDebug() << "Picture NOT found, download disabled, no more sets to try: BAILING OUT (oldset: " << setName << " card: " << correctedCardname << ")";
+                qDebug() << "Picture NOT found, download disabled, no more sets to try: BAILING OUT (oldset: " << setName << " card: " << cardName << ")";
                 imageLoaded(cardBeingLoaded.getCard(), QImage());
             }
         }
@@ -180,13 +181,13 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString & setName, QString & cor
     for (int i = 0; i < picsPaths.length(); i ++) {
         imgReader.setFileName(picsPaths.at(i));
         if (imgReader.read(&image)) {
-            qDebug() << "Picture found on disk (set: " << setName << " card: " << correctedCardname << ")";
+            qDebug() << "Picture found on disk (set: " << setName << " file: " << correctedCardname << ")";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
         imgReader.setFileName(picsPaths.at(i) + ".full");
         if (imgReader.read(&image)) {
-            qDebug() << "Picture.full found on disk (set: " << setName << " card: " << correctedCardname << ")";
+            qDebug() << "Picture.full found on disk (set: " << setName << " file: " << correctedCardname << ")";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
@@ -215,8 +216,8 @@ QString PictureLoaderWorker::getPicUrl()
     int muid = set ? card->getMuId(set->getShortName()) : 0;
     picUrl = muid ? settingsCache->getPicUrl() : settingsCache->getPicUrlFallback();
 
-    picUrl.replace("!name!", QUrl::toPercentEncoding(card->getCorrectedName()));
-    picUrl.replace("!name_lower!", QUrl::toPercentEncoding(card->getCorrectedName().toLower()));
+    picUrl.replace("!name!", QUrl::toPercentEncoding(card->getName()));
+    picUrl.replace("!name_lower!", QUrl::toPercentEncoding(card->getName().toLower()));
     picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
     if (set)
     {
@@ -277,12 +278,12 @@ void PictureLoaderWorker::picDownloadFailed()
 {
     if (cardBeingDownloaded.nextSet())
     {
-        qDebug() << "Picture NOT found, download failed, moving to next set (newset: " << cardBeingDownloaded.getSetName() << " card: " << cardBeingDownloaded.getCard()->getCorrectedName() << ")";
+        qDebug() << "Picture NOT found, download failed, moving to next set (newset: " << cardBeingDownloaded.getSetName() << " card: " << cardBeingDownloaded.getCard()->getName() << ")";
         mutex.lock();
         loadQueue.prepend(cardBeingDownloaded);
         mutex.unlock();
     } else {
-        qDebug() << "Picture NOT found, download failed, no more sets to try: BAILING OUT (oldset: " << cardBeingDownloaded.getSetName() << " card: " << cardBeingDownloaded.getCard()->getCorrectedName() << ")";
+        qDebug() << "Picture NOT found, download failed, no more sets to try: BAILING OUT (oldset: " << cardBeingDownloaded.getSetName() << " card: " << cardBeingDownloaded.getCard()->getName() << ")";
         imageLoaded(cardBeingDownloaded.getCard(), QImage());
         cardBeingDownloaded = 0;
     }
