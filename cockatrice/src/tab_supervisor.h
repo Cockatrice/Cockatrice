@@ -19,6 +19,7 @@ class TabMessage;
 class TabUserLists;
 class TabDeckEditor;
 class TabLog;
+class TabDebugLog;
 class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;
@@ -53,6 +54,7 @@ private:
     TabReplays *tabReplays;
     TabAdmin *tabAdmin;
     TabLog *tabLog;
+    TabDebugLog *tabDebugLog;
     QMap<int, TabRoom *> roomTabs;
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
@@ -88,6 +90,7 @@ public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
+    void openDebugLogTab();
 private slots:
     void closeButtonPressed();
     void updateCurrent(int index);
@@ -103,6 +106,7 @@ private slots:
     void processUserJoined(const ServerInfo_User &userInfo);
     void talkLeft(TabMessage *tab);
     void deckEditorClosed(TabDeckEditor *tab);
+    void debugLogClosed();
     void tabUserEvent(bool globalEvent);
     void updateTabText(Tab *tab, const QString &newTabText);
     void processRoomEvent(const RoomEvent &event);

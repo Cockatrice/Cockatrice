@@ -14,6 +14,7 @@
 #include "tab_userlists.h"
 #include "tab_deck_editor.h"
 #include "tab_logs.h"
+#include "tab_debuglog.h"
 #include "pixmapgenerator.h"
 #include "userlist.h"
 #include "settingscache.h"
@@ -80,7 +81,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 }
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
-    : QTabWidget(parent), userInfo(0), client(_client), tabServer(0), tabUserLists(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0)
+    : QTabWidget(parent), userInfo(0), client(_client), tabServer(0), tabUserLists(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0), tabDebugLog(0)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -111,6 +112,7 @@ void TabSupervisor::retranslateUi()
     tabs.append(tabAdmin);
     tabs.append(tabUserLists);
     tabs.append(tabLog);
+    tabs.append(tabDebugLog);
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext())
         tabs.append(roomIterator.next().value());
@@ -597,4 +599,21 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 void TabSupervisor::resetIdleTimer()
 {
     emit idleTimerReset();
+}
+
+void TabSupervisor::openDebugLogTab()
+{
+    if(tabDebugLog == nullptr)
+    {
+        tabDebugLog = new TabDebugLog(this);
+        int tabIndex = myAddTab(tabDebugLog);
+        connect(tabDebugLog, SIGNAL(debugLogClosing()), this, SLOT(debugLogClosed()));
+        addCloseButtonToTab(tabDebugLog, tabIndex);
+    }
+    setCurrentWidget(tabDebugLog);
+}
+
+void TabSupervisor::debugLogClosed()
+{
+    tabDebugLog = nullptr;
 }
