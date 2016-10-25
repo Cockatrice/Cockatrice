@@ -442,7 +442,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 
     // limit the number of non-privileged users that can connect to the server based on configuration settings
     if (QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
-        if (server->getMaxUserLimitEnabled()) {
+        if (server->getmaxUserLimitEnabled()) {
             if (server->getUsersCount() > server->getMaxUserLimit()) {
                 qDebug() << "Max Users Total Limit Reached, please increase the max_users_total setting.";
                 return Response::RespServerFull;
