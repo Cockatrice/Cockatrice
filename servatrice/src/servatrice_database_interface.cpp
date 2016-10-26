@@ -533,6 +533,10 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
         const QString clientid = query->value(9).toString();
         if (!clientid.isEmpty())
             result.set_clientid(clientid.toStdString());
+
+        const QString privlevel = query->value(10).toString();
+        if (!privlevel.isEmpty())
+            result.set_privlevel(privlevel.toStdString());
     }
     return result;
 }
@@ -547,7 +551,7 @@ ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, b
         if (!checkSql())
             return result;
 
-        QSqlQuery *query = prepareQuery("select id, name, admin, country, gender, realname, avatar_bmp, registrationDate, email, clientid from {prefix}_users where name = :name and active = 1");
+        QSqlQuery *query = prepareQuery("select id, name, admin, country, gender, realname, avatar_bmp, registrationDate, email, clientid, privlevel from {prefix}_users where name = :name and active = 1");
         query->bindValue(":name", name);
         if (!execSqlQuery(query))
             return result;
