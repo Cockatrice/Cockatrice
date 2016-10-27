@@ -122,7 +122,6 @@ private:
     Servatrice_WebsocketGameServer *websocketGameServer;
 #endif
     Servatrice_IslServer *islServer;
-    //QString serverName;
     mutable QMutex loginMessageMutex;
     QString loginMessage;
     QString dbPrefix;
@@ -134,8 +133,6 @@ private:
     int uptime;
     QMutex txBytesMutex, rxBytesMutex;
     quint64 txBytes, rxBytes;
-    //int maxGameInactivityTime, maxPlayerInactivityTime;
-    //int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser, commandCountingInterval, maxCommandCountPerInterval, pingClockInterval;
 
     QString shutdownReason;
     int shutdownMinutes;
@@ -191,16 +188,6 @@ public:
     bool getRegistrationEnabled() const;
     bool getRequireEmailForRegistrationEnabled() const;
     bool getRequireEmailActivationEnabled() const;
-    //int getPingClockInterval() const { return pingClockInterval; }
-    //int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
-    //int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
-    //int getMaxUsersPerAddress() const { return maxUsersPerAddress; }
-    //int getMessageCountingInterval() const { return messageCountingInterval; }
-    //int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
-    //int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
-    //int getMaxGamesPerUser() const { return maxGamesPerUser; }
-    //int getCommandCountingInterval() const { return commandCountingInterval; }
-    //int getMaxCommandCountPerInterval() const { return maxCommandCountPerInterval; }
     int getServerID() const;
     int getMaxGameInactivityTime() const;
     int getMaxPlayerInactivityTime() const;

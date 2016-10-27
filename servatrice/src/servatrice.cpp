@@ -210,11 +210,7 @@ Servatrice::~Servatrice()
 
 bool Servatrice::initServer()
 {
-    //serverName = getServerName();
     serverId = getServerID();
-    //clientIdRequired = getClientIDRequiredEnabled();
-    //regServerOnly = getRegOnlyServerEnabled();
-    //const QString authenticationMethodStr = getAuthenticationMethodString();
     if (getAuthenticationMethodString() == "sql") {
         qDebug() << "Authenticating method: sql";
         authenticationMethod = AuthenticationSql;
@@ -232,21 +228,13 @@ bool Servatrice::initServer()
 
     qDebug() << "Store Replays: " << getStoreReplaysEnabled();
     qDebug() << "Client ID Required: " << getClientIDRequiredEnabled();
-    //bool maxUserLimitEnabled = getMaxUserLimitEnabled();
     qDebug() << "Maximum user limit enabled: " << getMaxUserLimitEnabled();
 
     if (getMaxUserLimitEnabled()) {
-        //int maxUserLimit = getMaxUserLimit();
         qDebug() << "Maximum total user limit: " << getMaxUserTotal();
-        //int maxTcpUserLimit = settingsCache->value("security/max_users_tcp", 500).toInt();
         qDebug() << "Maximum tcp user limit: " << getMaxTcpUserLimit();
-        //int maxWebsocketUserLimit = settingsCache->value("security/max_users_websocket", 500).toInt();
         qDebug() << "Maximum websocket user limit: " << getMaxWebSocketUserLimit();
     }
-
-    //bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
-    //bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
-    //bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
 
     qDebug() << "Accept registered users only: " << getRegOnlyServerEnabled();
     qDebug() << "Registration enabled: " << getRegistrationEnabled();
@@ -265,7 +253,6 @@ bool Servatrice::initServer()
 
     qDebug() << "Required client features: " << serverRequiredFeatureList;
 
-    //QString dbTypeStr = getDBTypeString();
     if (getDBTypeString() == "mysql") {
         databaseType = DatabaseMySql;
     } else {
@@ -275,10 +262,8 @@ bool Servatrice::initServer()
     setDatabaseInterface(servatriceDatabaseInterface);
 
     if (databaseType != DatabaseNone) {
-        //settingsCache->beginGroup("database");
         dbPrefix = getDBPrefixString();
         bool dbOpened = servatriceDatabaseInterface->initDatabase("QMYSQL",getDBHostNameString(),getDBDatabaseNameString(),getDBUserNameString(),getDBPasswordString());
-        //settingsCache->endGroup();
         if (!dbOpened) {
             qDebug() << "Failed to open database";
             return false;
@@ -288,7 +273,6 @@ bool Servatrice::initServer()
         servatriceDatabaseInterface->clearSessionTables();
     }
 
-    //const QString roomMethod = settingsCache->value("rooms/method").toString();
     if (getRoomsMethodString() == "sql") {
         QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, permissionlevel, auto_join, join_message, chat_history_size from {prefix}_rooms where id_server = :id_server order by id asc");
         query->bindValue(":id_server", serverId);
@@ -336,21 +320,9 @@ bool Servatrice::initServer()
     }
 
     updateLoginMessage();
-    //maxGameInactivityTime = getGameInactivityTime();
-    //maxPlayerInactivityTime = getPlayerInactivityTime();
-    //pingClockInterval = getPingClockInterval();
-    //maxUsersPerAddress = getMaxUsersPerAddress();
-    //messageCountingInterval = getMessageCountInterval();
-    //maxMessageCountPerInterval = getMessageCountPerInterval();
-    //maxMessageSizePerInterval = getMessageSizePerInterval();
-    //maxGamesPerUser = getMaxGamesPerUser();
-    //commandCountingInterval = getCommandCountingInterval();
-    //maxCommandCountPerInterval = getMaxCommandCountPerInterval();
 
     try { if (getISLNetworkEnabled()) {
         qDebug() << "Connecting to ISL network.";
-        //const QString certFileName = settingsCache->value("servernetwork/ssl_cert").toString();
-        //const QString keyFileName = settingsCache->value("servernetwork/ssl_key").toString();
         qDebug() << "Loading certificate...";
         QFile certFile(getISLNetworkSSLCertFile());
         if (!certFile.open(QIODevice::ReadOnly))
@@ -391,9 +363,7 @@ bool Servatrice::initServer()
             QMetaObject::invokeMethod(interface, "initClient", Qt::BlockingQueuedConnection);
         }
 
-        //const int networkPort = settingsCache->value("servernetwork/port", 14747).toInt();
         qDebug() << "Starting ISL server on port" << getISLNetworkPort();
-
         islServer = new Servatrice_IslServer(this, cert, key, this);
         if (islServer->listen(QHostAddress::Any, getISLNetworkPort()))
             qDebug() << "ISL server listening.";
@@ -408,7 +378,6 @@ bool Servatrice::initServer()
     connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
     pingClock->start(getClientKeepAlive() * 1000);
 
-    //int statusUpdateTime = settingsCache->value("server/statusupdate", 15000).toInt();
     statusUpdateClock = new QTimer(this);
     connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
     if (getServerStatusUpdateTime() != 0) {
@@ -417,12 +386,10 @@ bool Servatrice::initServer()
     }
 
     // SOCKET SERVER
-    //const int numberPools = settingsCache->value("server/number_pools", 1).toInt();
     if(getNumberOfTCPPools() > 0)
     {
         gameServer = new Servatrice_GameServer(this, getNumberOfTCPPools(), servatriceDatabaseInterface->getDatabase(), this);
         gameServer->setMaxPendingConnections(1000);
-        //const int gamePort = settingsCache->value("server/port", 4747).toInt();
         qDebug() << "Starting server on port" << getServerTCPPort();
         if (gameServer->listen(QHostAddress::Any, getServerTCPPort()))
             qDebug() << "Server listening.";
@@ -434,12 +401,10 @@ bool Servatrice::initServer()
 
 #if QT_VERSION > 0x050300
     // WEBSOCKET SERVER
-    //const int wesocketNumberPools = settingsCache->value("server/websocket_number_pools", 1).toInt();
     if(getNumberOfWebSocketPools() > 0)
     {
         websocketGameServer = new Servatrice_WebsocketGameServer(this, getNumberOfWebSocketPools(), servatriceDatabaseInterface->getDatabase(), this);
         websocketGameServer->setMaxPendingConnections(1000);
-        //const int websocketGamePort = settingsCache->value("server/websocket_port", 4748).toInt();
         qDebug() << "Starting websocket server on port" << getServerWebSocketPort();
         if (websocketGameServer->listen(QHostAddress::Any, getServerWebSocketPort()))
             qDebug() << "Websocket server listening.";
@@ -559,8 +524,6 @@ void Servatrice::statusUpdate()
     servatriceDatabaseInterface->execSqlQuery(query);
 
     // send activation emails
-    //bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
-    //bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
     if (getRegistrationEnabled() && getRequireEmailActivationEnabled())
     {
         QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
