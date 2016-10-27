@@ -348,7 +348,7 @@ void Server_ProtocolHandler::pingClockTimeout()
 
     int cmdcountinterval = server->getCommandCountingInterval();
     int msgcountinterval = server->getMessageCountingInterval();
-    int pingclockinterval = server->getPingClockInterval();
+    int pingclockinterval = server->getClientKeepAlive();
 
     int interval = server->getMessageCountingInterval();
     if (interval > 0) {
@@ -443,7 +443,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     // limit the number of non-privileged users that can connect to the server based on configuration settings
     if (QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
         if (server->getMaxUserLimitEnabled()) {
-            if (server->getUsersCount() > server->getMaxUserLimit()) {
+            if (server->getUsersCount() > server->getMaxUserTotal()) {
                 qDebug() << "Max Users Total Limit Reached, please increase the max_users_total setting.";
                 return Response::RespServerFull;
             }

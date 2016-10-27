@@ -211,7 +211,7 @@ Servatrice::~Servatrice()
 bool Servatrice::initServer()
 {
     //serverName = getServerName();
-    serverId = getServerId();
+    serverId = getServerID();
     //clientIdRequired = getClientIDRequiredEnabled();
     //regServerOnly = getRegOnlyServerEnabled();
     //const QString authenticationMethodStr = getAuthenticationMethodString();
@@ -237,7 +237,7 @@ bool Servatrice::initServer()
 
     if (getMaxUserLimitEnabled()) {
         //int maxUserLimit = getMaxUserLimit();
-        qDebug() << "Maximum total user limit: " << getMaxUserLimit();
+        qDebug() << "Maximum total user limit: " << getMaxUserTotal();
         //int maxTcpUserLimit = settingsCache->value("security/max_users_tcp", 500).toInt();
         qDebug() << "Maximum tcp user limit: " << getMaxTcpUserLimit();
         //int maxWebsocketUserLimit = settingsCache->value("security/max_users_websocket", 500).toInt();
@@ -289,7 +289,7 @@ bool Servatrice::initServer()
     }
 
     //const QString roomMethod = settingsCache->value("rooms/method").toString();
-    if (getRoomMethodString() == "sql") {
+    if (getRoomsMethodString() == "sql") {
         QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, permissionlevel, auto_join, join_message, chat_history_size from {prefix}_rooms where id_server = :id_server order by id asc");
         query->bindValue(":id_server", serverId);
         servatriceDatabaseInterface->execSqlQuery(query);
@@ -315,7 +315,6 @@ bool Servatrice::initServer()
         int size = settingsCache->beginReadArray("rooms/roomlist");
         for (int i = 0; i < size; ++i) {
             settingsCache->setArrayIndex(i);
-
             QStringList gameTypes;
             int size2 = settingsCache->beginReadArray("game_types");
                 for (int j = 0; j < size2; ++j) {
@@ -323,18 +322,7 @@ bool Servatrice::initServer()
                 gameTypes.append(settingsCache->value("name").toString());
             }
             settingsCache->endArray();
-
-            Server_Room *newRoom = new Server_Room(
-                i,
-                settingsCache->value("chathistorysize").toInt(),
-                settingsCache->value("name").toString(),
-                settingsCache->value("description").toString(),
-                settingsCache->value("permissionlevel").toString().toLower(),
-                settingsCache->value("autojoin").toBool(),
-                settingsCache->value("joinmessage").toString(),
-                gameTypes,
-                this
-            );
+            Server_Room *newRoom = new Server_Room(i,settingsCache->value("chathistorysize").toInt(),settingsCache->value("name").toString(),settingsCache->value("description").toString(),settingsCache->value("permissionlevel").toString().toLower(),settingsCache->value("autojoin").toBool(),settingsCache->value("joinmessage").toString(),gameTypes,this);
             addRoom(newRoom);
         }
 
@@ -348,25 +336,25 @@ bool Servatrice::initServer()
     }
 
     updateLoginMessage();
-    maxGameInactivityTime = getGameInactivityTime();
-    maxPlayerInactivityTime = getPlayerInactivityTime();
-    pingClockInterval = getPingClockInterval();
-    maxUsersPerAddress = getMaxUsersPerAddress();
-    messageCountingInterval = getMessageCountInterval();
-    maxMessageCountPerInterval = getMessageCountPerInterval();
-    maxMessageSizePerInterval = getMessageSizePerInterval();
-    maxGamesPerUser = getMaxGamesPerUser();
-    commandCountingInterval = getCommandCountingInterval();
-    maxCommandCountPerInterval = getMaxCommandCountPerInterval();
+    //maxGameInactivityTime = getGameInactivityTime();
+    //maxPlayerInactivityTime = getPlayerInactivityTime();
+    //pingClockInterval = getPingClockInterval();
+    //maxUsersPerAddress = getMaxUsersPerAddress();
+    //messageCountingInterval = getMessageCountInterval();
+    //maxMessageCountPerInterval = getMessageCountPerInterval();
+    //maxMessageSizePerInterval = getMessageSizePerInterval();
+    //maxGamesPerUser = getMaxGamesPerUser();
+    //commandCountingInterval = getCommandCountingInterval();
+    //maxCommandCountPerInterval = getMaxCommandCountPerInterval();
 
-    try { if (settingsCache->value("servernetwork/active", 0).toInt()) {
+    try { if (getISLNetworkEnabled()) {
         qDebug() << "Connecting to ISL network.";
-        const QString certFileName = settingsCache->value("servernetwork/ssl_cert").toString();
-        const QString keyFileName = settingsCache->value("servernetwork/ssl_key").toString();
+        //const QString certFileName = settingsCache->value("servernetwork/ssl_cert").toString();
+        //const QString keyFileName = settingsCache->value("servernetwork/ssl_key").toString();
         qDebug() << "Loading certificate...";
-        QFile certFile(certFileName);
+        QFile certFile(getISLNetworkSSLCertFile());
         if (!certFile.open(QIODevice::ReadOnly))
-            throw QString("Error opening certificate file: %1").arg(certFileName);
+            throw QString("Error opening certificate file: %1").arg(getISLNetworkSSLCertFile());
         QSslCertificate cert(&certFile);
 
         const QDateTime currentTime = QDateTime::currentDateTime();
@@ -376,9 +364,9 @@ bool Servatrice::initServer()
             throw(QString("Invalid certificate."));
 
         qDebug() << "Loading private key...";
-        QFile keyFile(keyFileName);
+        QFile keyFile(getISLNetworkSSLKeyFile());
         if (!keyFile.open(QIODevice::ReadOnly))
-            throw QString("Error opening private key file: %1").arg(keyFileName);
+            throw QString("Error opening private key file: %1").arg(getISLNetworkSSLKeyFile());
         QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
         if (key.isNull())
             throw QString("Invalid private key.");
@@ -403,11 +391,11 @@ bool Servatrice::initServer()
             QMetaObject::invokeMethod(interface, "initClient", Qt::BlockingQueuedConnection);
         }
 
-        const int networkPort = settingsCache->value("servernetwork/port", 14747).toInt();
-        qDebug() << "Starting ISL server on port" << networkPort;
+        //const int networkPort = settingsCache->value("servernetwork/port", 14747).toInt();
+        qDebug() << "Starting ISL server on port" << getISLNetworkPort();
 
         islServer = new Servatrice_IslServer(this, cert, key, this);
-        if (islServer->listen(QHostAddress::Any, networkPort))
+        if (islServer->listen(QHostAddress::Any, getISLNetworkPort()))
             qDebug() << "ISL server listening.";
         else
             throw QString("islServer->listen()");
@@ -418,25 +406,25 @@ bool Servatrice::initServer()
 
     pingClock = new QTimer(this);
     connect(pingClock, SIGNAL(timeout()), this, SIGNAL(pingClockTimeout()));
-    pingClock->start(pingClockInterval * 1000);
+    pingClock->start(getClientKeepAlive() * 1000);
 
-    int statusUpdateTime = settingsCache->value("server/statusupdate", 15000).toInt();
+    //int statusUpdateTime = settingsCache->value("server/statusupdate", 15000).toInt();
     statusUpdateClock = new QTimer(this);
     connect(statusUpdateClock, SIGNAL(timeout()), this, SLOT(statusUpdate()));
-    if (statusUpdateTime != 0) {
-        qDebug() << "Starting status update clock, interval " << statusUpdateTime << " ms";
-        statusUpdateClock->start(statusUpdateTime);
+    if (getServerStatusUpdateTime() != 0) {
+        qDebug() << "Starting status update clock, interval " << getServerStatusUpdateTime() << " ms";
+        statusUpdateClock->start(getServerStatusUpdateTime());
     }
 
     // SOCKET SERVER
-    const int numberPools = settingsCache->value("server/number_pools", 1).toInt();
-    if(numberPools > 0)
+    //const int numberPools = settingsCache->value("server/number_pools", 1).toInt();
+    if(getNumberOfTCPPools() > 0)
     {
-        gameServer = new Servatrice_GameServer(this, numberPools, servatriceDatabaseInterface->getDatabase(), this);
+        gameServer = new Servatrice_GameServer(this, getNumberOfTCPPools(), servatriceDatabaseInterface->getDatabase(), this);
         gameServer->setMaxPendingConnections(1000);
-        const int gamePort = settingsCache->value("server/port", 4747).toInt();
-        qDebug() << "Starting server on port" << gamePort;
-        if (gameServer->listen(QHostAddress::Any, gamePort))
+        //const int gamePort = settingsCache->value("server/port", 4747).toInt();
+        qDebug() << "Starting server on port" << getServerTCPPort();
+        if (gameServer->listen(QHostAddress::Any, getServerTCPPort()))
             qDebug() << "Server listening.";
         else {
             qDebug() << "gameServer->listen(): Error:" << gameServer->errorString();
@@ -446,14 +434,14 @@ bool Servatrice::initServer()
 
 #if QT_VERSION > 0x050300
     // WEBSOCKET SERVER
-    const int wesocketNumberPools = settingsCache->value("server/websocket_number_pools", 1).toInt();
-    if(wesocketNumberPools > 0)
+    //const int wesocketNumberPools = settingsCache->value("server/websocket_number_pools", 1).toInt();
+    if(getNumberOfWebSocketPools() > 0)
     {
-        websocketGameServer = new Servatrice_WebsocketGameServer(this, wesocketNumberPools, servatriceDatabaseInterface->getDatabase(), this);
+        websocketGameServer = new Servatrice_WebsocketGameServer(this, getNumberOfWebSocketPools(), servatriceDatabaseInterface->getDatabase(), this);
         websocketGameServer->setMaxPendingConnections(1000);
-        const int websocketGamePort = settingsCache->value("server/websocket_port", 4748).toInt();
-        qDebug() << "Starting websocket server on port" << websocketGamePort;
-        if (websocketGameServer->listen(QHostAddress::Any, websocketGamePort))
+        //const int websocketGamePort = settingsCache->value("server/websocket_port", 4748).toInt();
+        qDebug() << "Starting websocket server on port" << getServerWebSocketPort();
+        if (websocketGameServer->listen(QHostAddress::Any, getServerWebSocketPort()))
             qDebug() << "Websocket server listening.";
         else {
             qDebug() << "websocketGameServer->listen(): Error:" << websocketGameServer->errorString();
@@ -571,9 +559,9 @@ void Servatrice::statusUpdate()
     servatriceDatabaseInterface->execSqlQuery(query);
 
     // send activation emails
-    bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
-    bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
-    if (registrationEnabled && requireEmailActivation)
+    //bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
+    //bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
+    if (getRegistrationEnabled() && getRequireEmailActivationEnabled())
     {
         QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
         if (!servatriceDatabaseInterface->execSqlQuery(query))
@@ -658,14 +646,12 @@ void Servatrice::shutdownTimeout()
 bool Servatrice::islConnectionExists(int serverId) const
 {
     // Only call with islLock locked at least for reading
-
     return islInterfaces.contains(serverId);
 }
 
 void Servatrice::addIslInterface(int serverId, IslInterface *interface)
 {
     // Only call with islLock locked for writing
-
     islInterfaces.insert(serverId, interface);
     connect(interface, SIGNAL(externalUserJoined(ServerInfo_User)), this, SLOT(externalUserJoined(ServerInfo_User)));
     connect(interface, SIGNAL(externalUserLeft(QString)), this, SLOT(externalUserLeft(QString)));
@@ -682,8 +668,7 @@ void Servatrice::addIslInterface(int serverId, IslInterface *interface)
 void Servatrice::removeIslInterface(int serverId)
 {
     // Only call with islLock locked for writing
-
-    // XXX we probably need to delete everything that belonged to it...
+    // XXX we probably need to delete everything that belonged to it...  <-- THIS SHOULD BE FIXED FOR ISL FUNCTIONALITY TO WORK COMPLETLY!
     islInterfaces.remove(serverId);
 }
 
@@ -704,7 +689,7 @@ void Servatrice::doSendIslMessage(const IslMessage &msg, int serverId)
 
 // start helper functions
 
-int Servatrice::getMaxUserLimit() const {
+int Servatrice::getMaxUserTotal() const {
     return settingsCache->value("security/max_users_total", 500).toInt();
 }
 
@@ -784,19 +769,19 @@ QString Servatrice::getDBPasswordString() const {
     return settingsCache->value("database/password").toString();
 }
 
-QString Servatrice::getRoomMethodString() const {
+QString Servatrice::getRoomsMethodString() const {
     return settingsCache->value("rooms/method").toString();
 }
 
-int Servatrice::getGameInactivityTime() const {
+int Servatrice::getMaxGameInactivityTime() const {
     return settingsCache->value("game/max_game_inactivity_time", 120).toInt();
 }
 
-int Servatrice::getPlayerInactivityTime() const {
+int Servatrice::getMaxPlayerInactivityTime() const {
     return settingsCache->value("server/max_player_inactivity_time", 15).toInt();
 }
 
-int Servatrice::getPingClockInterval() const {
+int Servatrice::getClientKeepAlive() const {
     return settingsCache->value("server/clientkeepalive", 1).toInt();
 }
 
@@ -804,15 +789,15 @@ int Servatrice::getMaxUsersPerAddress() const {
     return settingsCache->value("security/max_users_per_address", 4).toInt();
 }
 
-int Servatrice::getMessageCountInterval() const {
+int Servatrice::getMessageCountingInterval() const {
     return settingsCache->value("security/message_counting_interval", 10).toInt();
 }
 
-int Servatrice::getMessageCountPerInterval() const {
+int Servatrice::getMaxMessageCountPerInterval() const {
     return settingsCache->value("security/max_message_count_per_interval", 15).toInt();
 }
 
-int Servatrice::getMessageSizePerInterval() const {
+int Servatrice::getMaxMessageSizePerInterval() const {
     return settingsCache->value("security/max_message_size_per_interval", 1000).toInt();
 }
 
@@ -826,4 +811,40 @@ int Servatrice::getCommandCountingInterval() const {
 
 int Servatrice::getMaxCommandCountPerInterval() const {
     return settingsCache->value("game/max_command_count_per_interval", 20).toInt();
+}
+
+int Servatrice::getServerStatusUpdateTime() const {
+    return settingsCache->value("server/statusupdate", 15000).toInt();
+}
+
+int Servatrice::getNumberOfTCPPools() const {
+    return settingsCache->value("server/number_pools", 1).toInt();
+}
+
+int Servatrice::getServerTCPPort() const {
+    return settingsCache->value("server/port", 4747).toInt();
+}
+
+int Servatrice::getNumberOfWebSocketPools() const {
+    return settingsCache->value("server/websocket_number_pools", 1).toInt();
+}
+
+int Servatrice::getServerWebSocketPort() const {
+    return settingsCache->value("server/websocket_port", 4748).toInt();
+}
+
+bool Servatrice::getISLNetworkEnabled() const {
+    return settingsCache->value("servernetwork/active", false).toBool();
+}
+
+QString Servatrice::getISLNetworkSSLCertFile() const {
+    return settingsCache->value("servernetwork/ssl_cert").toString();
+}
+
+QString Servatrice::getISLNetworkSSLKeyFile() const {
+    return settingsCache->value("servernetwork/ssl_key").toString();
+}
+
+int Servatrice::getISLNetworkPort() const {
+    return settingsCache->value("servernetwork/port", 14747).toInt();
 }

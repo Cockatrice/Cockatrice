@@ -568,7 +568,7 @@ void Servatrice_DatabaseInterface::clearSessionTables()
 {
     lockSessionTables();
     QSqlQuery *query = prepareQuery("update {prefix}_sessions set end_time=now() where end_time is null and id_server = :id_server");
-    query->bindValue(":id_server", server->getServerId());
+    query->bindValue(":id_server", server->getServerID());
     execSqlQuery(query);
     unlockSessionTables();
 }
@@ -590,7 +590,7 @@ bool Servatrice_DatabaseInterface::userSessionExists(const QString &userName)
     // Call only after lockSessionTables().
 
     QSqlQuery *query = prepareQuery("select 1 from {prefix}_sessions where user_name = :user_name and id_server = :id_server and end_time is null");
-    query->bindValue(":id_server", server->getServerId());
+    query->bindValue(":id_server", server->getServerID());
     query->bindValue(":user_name", userName);
     execSqlQuery(query);
     return query->next();
@@ -606,7 +606,7 @@ qint64 Servatrice_DatabaseInterface::startSession(const QString &userName, const
 
     QSqlQuery *query = prepareQuery("insert into {prefix}_sessions (user_name, id_server, ip_address, start_time, clientid, connection_type) values(:user_name, :id_server, :ip_address, NOW(), :client_id, :connection_type)");
     query->bindValue(":user_name", userName);
-    query->bindValue(":id_server", server->getServerId());
+    query->bindValue(":id_server", server->getServerID());
     query->bindValue(":ip_address", address);
     query->bindValue(":client_id", clientId);
     query->bindValue(":connection_type", connectionType);
@@ -880,7 +880,7 @@ int Servatrice_DatabaseInterface::getActiveUserCount(QString connectionType)
         text +=" AND connection_type = :connection_type";
     QSqlQuery *query = prepareQuery(text);
 
-    query->bindValue(":serverid", server->getServerId());
+    query->bindValue(":serverid", server->getServerID());
     if(!connectionType.isEmpty())
         query->bindValue(":connection_type", connectionType);
 

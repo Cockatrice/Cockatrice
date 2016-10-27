@@ -125,7 +125,7 @@ private:
     //QString serverName;
     mutable QMutex loginMessageMutex;
     QString loginMessage;
-    //QString dbPrefix;
+    QString dbPrefix;
     QString requiredFeatures;
     QMap<QString, bool> serverRequiredFeatureList;
     QString officialWarnings;
@@ -154,9 +154,17 @@ private:
     QString getDBDatabaseNameString() const;
     QString getDBUserNameString() const;
     QString getDBPasswordString() const;
-    QString getRoomMethodString() const;
-    int getGameInactivityTime() const;
-    int getPlayerInactivityTime() const;
+    QString getRoomsMethodString() const;
+    QString getISLNetworkSSLCertFile() const;
+    QString getISLNetworkSSLKeyFile() const;
+    
+    int getServerStatusUpdateTime() const;
+    int getNumberOfTCPPools() const;
+    int getServerTCPPort() const;
+    int getNumberOfWebSocketPools() const;
+    int getServerWebSocketPort() const;
+    int getISLNetworkPort() const;
+    bool getISLNetworkEnabled() const;
 
 public slots:
     void scheduleShutdown(const QString &reason, int minutes);
@@ -193,17 +201,18 @@ public:
     //int getMaxGamesPerUser() const { return maxGamesPerUser; }
     //int getCommandCountingInterval() const { return commandCountingInterval; }
     //int getMaxCommandCountPerInterval() const { return maxCommandCountPerInterval; }
-    
-    int getPingClockInterval() const;
+    int getServerID() const;
+    int getMaxGameInactivityTime() const;
+    int getMaxPlayerInactivityTime() const;
+    int getClientKeepAlive() const;
     int getMaxUsersPerAddress() const;
-    int getMessageCountInterval() const;
-    int getMessageCountPerInterval() const;
-    int getMessageSizePerInterval() const;
+    int getMessageCountingInterval() const;
+    int getMaxMessageCountPerInterval() const;
+    int getMaxMessageSizePerInterval() const;
     int getMaxGamesPerUser() const;
     int getCommandCountingInterval() const;
     int getMaxCommandCountPerInterval() const;
-    int getServerID() const;
-    int getMaxUserLimit() const;
+    int getMaxUserTotal() const;
     int getMaxTcpUserLimit() const;
     int getMaxWebSocketUserLimit() const;
     int getUsersWithAddress(const QHostAddress &address) const;
