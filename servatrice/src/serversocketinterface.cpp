@@ -1021,6 +1021,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReloadConfig(const Comm
 {
     logDebugMessage("Received admin command: reloading configuration");
     settingsCache->sync();
+    QMetaObject::invokeMethod(server, "setRequiredFeatures", Q_ARG(QString, server->getRequiredFeatures()));
     return Response::RespOk;
 }
 
