@@ -442,7 +442,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
-    idleClientTimeOutCheckBox.setText(tr("Disconnect from server if sitting idle for extended periods of time"));
+    idleClientTimeOutCheckBox.setText(tr("Disconnect from server if sitting idle for an extended periods of time"));
 }
 
 
