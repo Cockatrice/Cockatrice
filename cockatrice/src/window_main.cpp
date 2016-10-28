@@ -966,7 +966,7 @@ void MainWindow::refreshShortcuts()
 
 void MainWindow::notifyUserAboutUpdate()
 {
-    QMessageBox::information(this, tr("Information"), tr("Your client appears to be missing features that the server supports.\nThis usually means that your client version is out of date, please check to see if there is a new client available for download."));
+    QMessageBox::information(this, tr("Information"), tr("This server supports additional features that your client doesn't have.\nThis is most likely not a problem, but this message might mean there is a new version of Cockatrice available."));
 }
 
 void MainWindow::actOpenCustomFolder()
