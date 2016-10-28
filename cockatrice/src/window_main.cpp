@@ -337,11 +337,11 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
     switch (r) {
         case Response::RespClientUpdateRequired: {
             QString formatedMissingFeatures;
-			formatedMissingFeatures = "Missing Features: ";
+            formatedMissingFeatures = "Missing Features: ";
             for (int i = 0; i < missingFeatures.size(); ++i)
                 formatedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i)   );
-			formatedMissingFeatures.append("\nTo update your client, go to Help &rarr; Update Cockatrice.")
-			
+            formatedMissingFeatures.append("\nTo update your client, go to Help &rarr; Update Cockatrice.")
+            
             QMessageBox msgBox;
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.setWindowTitle(tr("Failed Login"));
