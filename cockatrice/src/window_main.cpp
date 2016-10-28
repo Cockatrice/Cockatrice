@@ -340,11 +340,12 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             formatedMissingFeatures = "Missing Features: ";
             for (int i = 0; i < missingFeatures.size(); ++i)
                 formatedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i)   );
-
+            formatedMissingFeatures.append("\nTo update your client, go to Help -> Update Cockatrice.");
+            
             QMessageBox msgBox;
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.setWindowTitle(tr("Failed Login"));
-            msgBox.setText(tr("Your client does not support features that the server requires, please update your client and try again."));
+            msgBox.setText(tr("Your client seems to be missing features this server requires for connection."));
             msgBox.setDetailedText(formatedMissingFeatures);
             msgBox.exec();
             break;
@@ -966,7 +967,7 @@ void MainWindow::refreshShortcuts()
 
 void MainWindow::notifyUserAboutUpdate()
 {
-    QMessageBox::information(this, tr("Information"), tr("Your client appears to be missing features that the server supports.\nThis usually means that your client version is out of date, please check to see if there is a new client available for download."));
+    QMessageBox::information(this, tr("Information"), tr("This server supports additional features that your client doesn't have.\nThis is most likely not a problem, but this message might mean there is a new version of Cockatrice available.\n\nTo update your client, go to Help -> Update Cockatrice."));
 }
 
 void MainWindow::actOpenCustomFolder()
