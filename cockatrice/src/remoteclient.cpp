@@ -35,7 +35,7 @@ RemoteClient::RemoteClient(QObject *parent)
     idleTimer->setInterval(idlekeepalive * 1000);
     connect(idleTimer, SIGNAL(timeout()), this, SLOT(doIdleTimeOut()));
     connect(this, SIGNAL(resetIdleTimerClock()), idleTimer, SLOT(start()));
-
+   
     socket = new QTcpSocket(this);
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     connect(socket, SIGNAL(connected()), this, SLOT(slotConnected()));
@@ -390,8 +390,11 @@ QString RemoteClient::getSrvClientID(const QString _hostname)
 
 void RemoteClient::doIdleTimeOut()
 {
-    doDisconnectFromServer();
-    emit idleTimeout();
+    if (settingsCache->getIdleClientTimeOutEnabled()) {
+        doDisconnectFromServer();
+        emit idleTimeout();
+    }
+ 
 }
 
 void RemoteClient::resetIdleTimer()
