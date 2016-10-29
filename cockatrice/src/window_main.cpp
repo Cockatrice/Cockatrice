@@ -339,14 +339,23 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             QString formattedMissingFeatures;
             formattedMissingFeatures = "Missing Features: ";
             for (int i = 0; i < missingFeatures.size(); ++i)
+<<<<<<< HEAD
                 formattedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i)   );
             formattedMissingFeatures.append("\nTo update your client, go to Help -> Update Cockatrice.");
+=======
+                formatedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i)   );
+            formatedMissingFeatures.append("\nTo update your client, go to Help -> Update Cockatrice.");
+>>>>>>> f523bb2
             
             QMessageBox msgBox;
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.setWindowTitle(tr("Failed Login"));
             msgBox.setText(tr("Your client seems to be missing features this server requires for connection."));
+<<<<<<< HEAD
             msgBox.setDetailedText(formattedMissingFeatures);
+=======
+            msgBox.setDetailedText(formatedMissingFeatures);
+>>>>>>> f523bb2
             msgBox.exec();
             break;
         }
