@@ -20,7 +20,6 @@ void FeatureSet::initalizeFeatureList(QMap<QString, bool> &featureList) {
     featureList.insert("room_chat_history", false);
     featureList.insert("client_warnings", false);
     featureList.insert("mod_log_lookup", false);
-    featureList.insert("client_inactivetimeout", false);
 }
 
 void FeatureSet::enableRequiredFeature(QMap<QString, bool> &featureList, QString featureName){
