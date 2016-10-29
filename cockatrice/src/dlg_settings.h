@@ -112,6 +112,7 @@ private:
     QCheckBox playToStackCheckBox;
     QCheckBox annotateTokensCheckBox;
     QCheckBox tapAnimationCheckBox;
+    QCheckBox idleClientTimeOutCheckBox;
     QGroupBox *generalGroupBox;
     QGroupBox *animationGroupBox;
     
