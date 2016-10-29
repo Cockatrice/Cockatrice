@@ -58,6 +58,7 @@ public:
     void removeClient(Server_ProtocolHandler *player);
     QList<QString> getOnlineModeratorList();
     virtual QString getLoginMessage() const { return QString(); }
+    virtual QString getRequiredFeatures() const { return QString(); }
     virtual bool permitUnregisteredUsers() const { return true; }
     virtual bool getGameShouldPing() const { return false; }
     virtual bool getClientIDRequiredEnabled() const { return false; }

@@ -210,6 +210,7 @@ Servatrice::~Servatrice()
 
 bool Servatrice::initServer()
 {
+    
     serverId = getServerID();
     if (getAuthenticationMethodString() == "sql") {
         qDebug() << "Authenticating method: sql";
@@ -242,16 +243,6 @@ bool Servatrice::initServer()
         qDebug() << "Require email address to register: " << getRequireEmailForRegistrationEnabled();
         qDebug() << "Require email activation via token: " << getRequireEmailActivationEnabled();
     }
-
-    FeatureSet features;
-    features.initalizeFeatureList(serverRequiredFeatureList);
-    requiredFeatures = getRequiredFeatures();
-    QStringList listReqFeatures = requiredFeatures.split(",", QString::SkipEmptyParts);
-    if (!listReqFeatures.isEmpty())
-        foreach(QString reqFeature, listReqFeatures)
-            features.enableRequiredFeature(serverRequiredFeatureList,reqFeature);
-
-    qDebug() << "Required client features: " << serverRequiredFeatureList;
 
     if (getDBTypeString() == "mysql") {
         databaseType = DatabaseMySql;
@@ -414,6 +405,7 @@ bool Servatrice::initServer()
         }
     }
 #endif
+    setRequiredFeatures(getRequiredFeatures());
     return true;
 }
 
@@ -493,6 +485,18 @@ void Servatrice::updateLoginMessage()
                 usersIterator.next().value()->sendProtocolItem(*se);
             delete se;
         }
+}
+
+void Servatrice::setRequiredFeatures(const QString featureList) {
+    FeatureSet features;
+    serverRequiredFeatureList.clear();
+    features.initalizeFeatureList(serverRequiredFeatureList);
+    QStringList listReqFeatures = featureList.split(",", QString::SkipEmptyParts);
+    if (!listReqFeatures.isEmpty())
+        foreach(QString reqFeature, listReqFeatures)
+        features.enableRequiredFeature(serverRequiredFeatureList, reqFeature);
+
+    qDebug() << "Set required client features to: " << serverRequiredFeatureList;
 }
 
 void Servatrice::statusUpdate()

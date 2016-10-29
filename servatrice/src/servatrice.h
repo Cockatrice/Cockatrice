@@ -166,6 +166,7 @@ private:
 public slots:
     void scheduleShutdown(const QString &reason, int minutes);
     void updateLoginMessage();
+    void setRequiredFeatures(const QString featureList);
 public:
     Servatrice(QObject *parent = 0);
     ~Servatrice();
