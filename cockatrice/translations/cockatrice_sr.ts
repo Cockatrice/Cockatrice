@@ -1,20 +1,20 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="cs" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="sr" version="2.1">
 <context>
     <name>AbstractCounter</name>
     <message>
         <location filename="../src/abstractcounter.cpp" line="62"/>
         <source>&amp;Set counter...</source>
-        <translation>&amp;Nastavit žeton...</translation>
+        <translation>Podesi brojač...</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="148"/>
         <source>Set counter</source>
-        <translation>Nastavit žeton</translation>
+        <translation>Podesi brojač</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="148"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation>Nová hodnota pro žeton &apos;%1&apos;:</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -22,22 +22,22 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="366"/>
         <source>Theme settings</source>
-        <translation type="unfinished"/>
+        <translation>Podešavanja teme</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="367"/>
         <source>Current theme:</source>
-        <translation type="unfinished"/>
+        <translation>Sadašnja tema:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="369"/>
         <source>Card rendering</source>
-        <translation>Vykreslování karet</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="370"/>
         <source>Display card names on cards having a picture</source>
-        <translation>Zobrazit jména karet na kartách s obrázky</translation>
+        <translation>Pokazuj imena karti na kartama koje imaju sliku</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="371"/>
@@ -47,12 +47,12 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="373"/>
         <source>Hand layout</source>
-        <translation>Rozvržení ruky</translation>
+        <translation>Raspored ruke</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="374"/>
         <source>Display hand horizontally (wastes space)</source>
-        <translation>Zobrazit ruku horizontálně (plýtvá místem)</translation>
+        <translation>Prikazuj ruku horizontalno (troši prostor)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="375"/>
@@ -62,17 +62,17 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="377"/>
         <source>Table grid layout</source>
-        <translation>Rozložení herní mřížky</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="378"/>
         <source>Invert vertical coordinate</source>
-        <translation>Převrátit vertikální souřadnice</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="379"/>
         <source>Minimum player count for multi-column layout:</source>
-        <translation>Minimální počet hráčů pro víceřádkové rozvržení:</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -80,79 +80,79 @@
     <message>
         <location filename="../src/userlist.cpp" line="32"/>
         <source>ban &amp;user name</source>
-        <translation type="unfinished"/>
+        <translation>zabrani ime igrača</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="35"/>
         <source>ban &amp;IP address</source>
-        <translation type="unfinished"/>
+        <translation>zabrani IP adresa</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="38"/>
         <source>ban client I&amp;D</source>
-        <translation type="unfinished"/>
+        <translation>zabranite ID klijenta</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="51"/>
         <source>Ban type</source>
-        <translation>Typ banu</translation>
+        <translation>Tip zabrane</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="54"/>
         <source>&amp;permanent ban</source>
-        <translation type="unfinished"/>
+        <translation>stalna zabrana</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="55"/>
         <source>&amp;temporary ban</source>
-        <translation type="unfinished"/>
+        <translation>privremena zabrana</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="58"/>
         <source>&amp;Days:</source>
-        <translation type="unfinished"/>
+        <translation>Dani:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="64"/>
         <source>&amp;Hours:</source>
-        <translation type="unfinished"/>
+        <translation>Sati:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="70"/>
         <source>&amp;Minutes:</source>
-        <translation type="unfinished"/>
+        <translation>Minuti:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="85"/>
         <source>Duration of the ban</source>
-        <translation>Trvání banu</translation>
+        <translation>Dužina trajanja zabrane</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="88"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
-        <translation>Uveďte prosím důvod pro ban.
-Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translation>
+        <translation>Molimo Vas ukucajte razlog zabrane.
+Ovo je samo sačuvano za moderatore i ne može biti viđeno od strane zabranjene osobe.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="91"/>
         <source>Please enter the reason for the ban that will be visible to the banned person.</source>
-        <translation>Uveďte prosám důvod pro ban, který uvidí banovaná osoba.</translation>
+        <translation>Molimo Vas ukucajte razlog zabrane koji će biti vidljiv zabranjenoj osobi.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="94"/>
         <source>&amp;OK</source>
-        <translation>&amp;OK</translation>
+        <translation>U redu</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="97"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Poništi</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="115"/>
         <source>Ban user from server</source>
-        <translation>Zabanovat uživatele ze serveru</translation>
+        <translation>Zabranite ulaz korisniku u server</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="186"/>
@@ -160,7 +160,7 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
         <location filename="../src/userlist.cpp" line="198"/>
         <location filename="../src/userlist.cpp" line="204"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="186"/>
@@ -188,32 +188,32 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="59"/>
         <source>Name</source>
-        <translation>Jméno</translation>
+        <translation>Ime</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="60"/>
         <source>Sets</source>
-        <translation>Sady</translation>
+        <translation>Setovi</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="61"/>
         <source>Mana cost</source>
-        <translation>Sesílací cena</translation>
+        <translation>Cena mane</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="62"/>
         <source>Card type</source>
-        <translation>Typ karty</translation>
+        <translation>Tip karte</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="63"/>
         <source>P/T</source>
-        <translation>S/O</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="64"/>
         <source>Color(s)</source>
-        <translation type="unfinished"/>
+        <translation>Boja (boje)</translation>
     </message>
 </context>
 <context>
@@ -221,17 +221,17 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
     <message>
         <location filename="../src/cardframe.cpp" line="65"/>
         <source>Image</source>
-        <translation>Obrázek</translation>
+        <translation>Slika</translation>
     </message>
     <message>
         <location filename="../src/cardframe.cpp" line="66"/>
         <source>Description</source>
-        <translation>Popis</translation>
+        <translation>Opis</translation>
     </message>
     <message>
         <location filename="../src/cardframe.cpp" line="67"/>
         <source>Both</source>
-        <translation>Obojí</translation>
+        <translation>Oba</translation>
     </message>
 </context>
 <context>
@@ -239,32 +239,32 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
     <message>
         <location filename="../src/cardinfotext.cpp" line="84"/>
         <source>Name:</source>
-        <translation>Jméno:</translation>
+        <translation>Ime:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="85"/>
         <source>Mana cost:</source>
-        <translation>Sesílací cena:</translation>
+        <translation>Cena mane:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="86"/>
         <source>Color(s):</source>
-        <translation>Barva:</translation>
+        <translation>Boja (boje):</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="87"/>
         <source>Card type:</source>
-        <translation>Typ karty:</translation>
+        <translation>Tip karte:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="88"/>
         <source>P / T:</source>
-        <translation>S / O:</translation>
+        <translation>M / I</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="89"/>
         <source>Loyalty:</source>
-        <translation>Loajalita:</translation>
+        <translation>Odanost:</translation>
     </message>
 </context>
 <context>
@@ -272,12 +272,12 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
     <message>
         <location filename="../src/carditem.cpp" line="83"/>
         <source>&amp;Move to</source>
-        <translation>&amp;Přesunout</translation>
+        <translation>Pomeri na</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="84"/>
         <source>&amp;Power / toughness</source>
-        <translation>&amp;Síla / odolnost</translation>
+        <translation>Moć / Izdržljivost</translation>
     </message>
 </context>
 <context>
@@ -286,13 +286,13 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
         <location filename="../src/cardzone.cpp" line="52"/>
         <source>their hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>njihova ruka</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="53"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>Ruka od %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="59"/>
@@ -358,25 +358,25 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
         <location filename="../src/cardzone.cpp" line="85"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>njihovo groblje</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="86"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>groblje od %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="90"/>
         <source>their exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>njihovo izgnanstvo</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="91"/>
         <source>%1&apos;s exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>izgnanstvo od %1</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="97"/>
@@ -408,12 +408,12 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
     <message>
         <location filename="../src/dlg_settings.cpp" line="459"/>
         <source>Nothing is here... yet</source>
-        <translation>Tady zatím nic není</translation>
+        <translation>Ovde nema ničega... još</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="473"/>
         <source>General</source>
-        <translation>Obecné</translation>
+        <translation>Opšto</translation>
     </message>
 </context>
 <context>
@@ -421,7 +421,7 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
     <message>
         <location filename="../src/decklistmodel.cpp" line="142"/>
         <source>Number</source>
-        <translation>Počet</translation>
+        <translation>Broj</translation>
     </message>
     <message>
         <location filename="../src/decklistmodel.cpp" line="143"/>
@@ -440,12 +440,12 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
         <location filename="../src/deckstats_interface.cpp" line="23"/>
         <location filename="../src/deckstats_interface.cpp" line="34"/>
         <source>Error</source>
-        <translation>Error</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <location filename="../src/deckstats_interface.cpp" line="34"/>
         <source>The reply from the server could not be parsed.</source>
-        <translation type="unfinished"/>
+        <translation>Odgovor od servera nije mogao biti parsovan.</translation>
     </message>
 </context>
 <context>
@@ -453,17 +453,17 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
     <message>
         <location filename="../src/tab_game.cpp" line="140"/>
         <source>Load deck...</source>
-        <translation type="unfinished"/>
+        <translation>Učitaj špil...</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="141"/>
         <source>Load remote deck...</source>
-        <translation type="unfinished"/>
+        <translation>Učitaj daljinski špil...</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="142"/>
         <source>Ready to s&amp;tart</source>
-        <translation>Připraven ke &amp;hře</translation>
+        <translation>Spreman za početak</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="157"/>
@@ -478,17 +478,17 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
     <message>
         <location filename="../src/tab_game.cpp" line="219"/>
         <source>Load deck</source>
-        <translation>Nahrát balíček</translation>
+        <translation>Učitaj špil</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="229"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="229"/>
         <source>The selected file could not be loaded.</source>
-        <translation>Vybraný soubor se nepodařilo načíst.</translation>
+        <translation>Izabrani fajl nije mogao biti učitan.</translation>
     </message>
 </context>
 <context>
@@ -496,77 +496,77 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
     <message>
         <location filename="../src/dlg_connect.cpp" line="20"/>
         <source>Previous Host</source>
-        <translation type="unfinished"/>
+        <translation>Prošli Domaćin</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="34"/>
         <source>New Host</source>
-        <translation type="unfinished"/>
+        <translation>Novi Domaćin</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="36"/>
         <source>&amp;Host:</source>
-        <translation>&amp;Hostitel:</translation>
+        <translation>Domaćin:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="38"/>
         <source>Enter host name</source>
-        <translation type="unfinished"/>
+        <translation>Ukucaj ime domaćina</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="41"/>
         <source>&amp;Port:</source>
-        <translation>&amp;Port:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="45"/>
         <source>Player &amp;name:</source>
-        <translation>Jméno &amp;hráče:</translation>
+        <translation>Ime igrača:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="49"/>
         <source>P&amp;assword:</source>
-        <translation>H&amp;eslo:</translation>
+        <translation>Lozinka:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="54"/>
         <source>&amp;Save password</source>
-        <translation type="unfinished"/>
+        <translation>Sačuvajte lozinku:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="57"/>
         <source>A&amp;uto connect</source>
-        <translation type="unfinished"/>
+        <translation>Automatsko povezivanje</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="58"/>
         <source>Automatically connect to the most recent login when Cockatrice opens</source>
-        <translation type="unfinished"/>
+        <translation>Automatski se poveži na najskoriju prijavu kada se Cockatrice otvori</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="82"/>
         <source>Server</source>
-        <translation type="unfinished"/>
+        <translation>Server</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="92"/>
         <source>Login</source>
-        <translation type="unfinished"/>
+        <translation>Prijava</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="108"/>
         <source>Connect to server</source>
-        <translation>Připojit k serveru</translation>
+        <translation>Povežite se na server</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="175"/>
         <source>Connect Warning</source>
-        <translation type="unfinished"/>
+        <translation>Upozorenje o povezivanju</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="175"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Ime igrača ne može biti prazno.</translation>
     </message>
 </context>
 <context>
@@ -574,92 +574,92 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
     <message>
         <location filename="../src/dlg_creategame.cpp" line="21"/>
         <source>Re&amp;member settings</source>
-        <translation type="unfinished"/>
+        <translation>Za&amp;pamti podešavanja</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="22"/>
         <source>&amp;Description:</source>
-        <translation>&amp;Popis:</translation>
+        <translation>Opis:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="27"/>
         <source>P&amp;layers:</source>
-        <translation>H&amp;ráči:</translation>
+        <translation>Igrači:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="51"/>
         <source>Game type</source>
-        <translation>Formát</translation>
+        <translation>Tip igre</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="54"/>
         <source>&amp;Password:</source>
-        <translation>&amp;Heslo:</translation>
+        <translation>Lozinka:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="58"/>
         <source>Only &amp;buddies can join</source>
-        <translation>Jen pro &amp;přátele</translation>
+        <translation>Samo prijatelji mogu da se pridruže</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="59"/>
         <source>Only &amp;registered users can join</source>
-        <translation>Jen pro &amp;registrované</translation>
+        <translation>Samo &amp;registrovani korisnici mogu da se pridruže</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="73"/>
         <source>Joining restrictions</source>
-        <translation>Omezení připojení</translation>
+        <translation>Ograničenja pridruživanja</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="76"/>
         <source>&amp;Spectators can watch</source>
-        <translation type="unfinished"/>
+        <translation>Posmatrači mogu da gledaju</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="79"/>
         <source>Spectators &amp;need a password to watch</source>
-        <translation type="unfinished"/>
+        <translation>Posmatračima &amp;je potrebna lozinka da gledaju</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="80"/>
         <source>Spectators can &amp;chat</source>
-        <translation>Diváci mohou &amp;chatovat</translation>
+        <translation>Posmatrači mogu &amp;da ćaskaju</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="81"/>
         <source>Spectators can see &amp;hands</source>
-        <translation type="unfinished"/>
+        <translation>Posmatrači mogu da &amp;vide ruke </translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="87"/>
         <source>Spectators</source>
-        <translation>Diváci</translation>
+        <translation>Posmatrači</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="132"/>
         <source>&amp;Clear</source>
-        <translation type="unfinished"/>
+        <translation>Očisti</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="138"/>
         <source>Create game</source>
-        <translation>Vytvořit hru</translation>
+        <translation>Započni igru</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="180"/>
         <source>Game information</source>
-        <translation>Informace o hře</translation>
+        <translation>Informacije o igri</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="256"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="256"/>
         <source>Server error.</source>
-        <translation>Chyba serveru.</translation>
+        <translation>Greška servera.</translation>
     </message>
 </context>
 <context>
@@ -667,92 +667,92 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
     <message>
         <location filename="../src/dlg_create_token.cpp" line="23"/>
         <source>&amp;Name:</source>
-        <translation>&amp;Jméno:</translation>
+        <translation>Ime:</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="24"/>
         <source>Token</source>
-        <translation>Token</translation>
+        <translation>Žeton</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="29"/>
         <source>C&amp;olor:</source>
-        <translation>B&amp;arva:</translation>
+        <translation>Boja:</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="31"/>
         <source>white</source>
-        <translation>bílá</translation>
+        <translation>belo</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="32"/>
         <source>blue</source>
-        <translation>modrá</translation>
+        <translation>plavo</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="33"/>
         <source>black</source>
-        <translation>černá</translation>
+        <translation>crno</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="34"/>
         <source>red</source>
-        <translation>červená</translation>
+        <translation>crveno</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="35"/>
         <source>green</source>
-        <translation>zelená</translation>
+        <translation>zeleno</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="36"/>
         <source>multicolor</source>
-        <translation>vícebarevný</translation>
+        <translation>višebojno</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="37"/>
         <source>colorless</source>
-        <translation>bezbarvý</translation>
+        <translation>bezbojno</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="40"/>
         <source>&amp;P/T:</source>
-        <translation>&amp;S/O:</translation>
+        <translation>M/I:</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="44"/>
         <source>&amp;Annotation:</source>
-        <translation>&amp;Poznámka:</translation>
+        <translation>Anotacija:</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="48"/>
         <source>&amp;Destroy token when it leaves the table</source>
-        <translation>&amp;Token se při odchodu z bojiště zničí</translation>
+        <translation>Uništi token kada napusti sto</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="62"/>
         <source>Token data</source>
-        <translation>Data tokenů</translation>
+        <translation>Podaci o tokenima</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="69"/>
         <source>Show &amp;all tokens</source>
-        <translation type="unfinished"/>
+        <translation>Prikaži sve tokene</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="71"/>
         <source>Show tokens from this &amp;deck</source>
-        <translation type="unfinished"/>
+        <translation>Prikaži tokene iz ovog špila</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="103"/>
         <source>Choose token from list</source>
-        <translation>Vybrat token ze seznamu.</translation>
+        <translation>Izaberi token iz liste</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="124"/>
         <source>Create token</source>
-        <translation>Vytvořit token</translation>
+        <translation>Napravi token</translation>
     </message>
 </context>
 <context>
@@ -761,38 +761,39 @@ Toto je uloženo pouze pro moderátory a banovaná osoba to neuvidí.</translati
         <location filename="../src/dlg_edit_avatar.cpp" line="16"/>
         <location filename="../src/dlg_edit_avatar.cpp" line="59"/>
         <source>No image chosen.</source>
-        <translation type="unfinished"/>
+        <translation>Slika nije izabrana.</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="21"/>
         <source>To change your avatar, choose a new image.
 To remove your current avatar, confirm without choosing a new image.</source>
-        <translation type="unfinished"/>
+        <translation>Da promenite svoj avatar, izaberite novu sliku
+Da izbrišete vaš sadašnji avatar, potvrdite bez biranja nove slike.</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="22"/>
         <source>Browse...</source>
-        <translation type="unfinished"/>
+        <translation>Pretraži...</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="39"/>
         <source>Change avatar</source>
-        <translation type="unfinished"/>
+        <translation>Promeni avatar</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="56"/>
         <source>Open Image</source>
-        <translation type="unfinished"/>
+        <translation>Otvori sliku</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="56"/>
         <source>Image Files (*.png *.jpg *.bmp)</source>
-        <translation type="unfinished"/>
+        <translation>Fajlovi Slika (*.png *.jpg *.bmp)</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="70"/>
         <source>Invalid image chosen.</source>
-        <translation type="unfinished"/>
+        <translation>Neispravna slika izabrana.</translation>
     </message>
 </context>
 <context>
@@ -800,32 +801,32 @@ To remove your current avatar, confirm without choosing a new image.</source>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="14"/>
         <source>Old password:</source>
-        <translation type="unfinished"/>
+        <translation>Stara lozinka:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="23"/>
         <source>New password:</source>
-        <translation type="unfinished"/>
+        <translation>Nova lozinka:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="28"/>
         <source>Confirm new password:</source>
-        <translation type="unfinished"/>
+        <translation>Potvrdi novu lozinku:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="50"/>
         <source>Change password</source>
-        <translation type="unfinished"/>
+        <translation>Promeni lozinku</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="59"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="59"/>
         <source>The new passwords don&apos;t match.</source>
-        <translation type="unfinished"/>
+        <translation>Nove lozinke se ne podudaraju</translation>
     </message>
 </context>
 <context>
@@ -833,88 +834,88 @@ To remove your current avatar, confirm without choosing a new image.</source>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="23"/>
         <source>&amp;Name:</source>
-        <translation type="unfinished"/>
+        <translation>Ime:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="28"/>
         <source>C&amp;olor:</source>
-        <translation type="unfinished"/>
+        <translation>Boja:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="30"/>
         <source>white</source>
-        <translation type="unfinished"/>
+        <translation>belo</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="31"/>
         <source>blue</source>
-        <translation type="unfinished"/>
+        <translation>plavo</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="32"/>
         <source>black</source>
-        <translation type="unfinished"/>
+        <translation>crno</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="33"/>
         <source>red</source>
-        <translation type="unfinished"/>
+        <translation>crveno</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="34"/>
         <source>green</source>
-        <translation type="unfinished"/>
+        <translation>zeleno</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="35"/>
         <source>multicolor</source>
-        <translation type="unfinished"/>
+        <translation>višebojno</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="36"/>
         <source>colorless</source>
-        <translation type="unfinished"/>
+        <translation>bezbojno</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="40"/>
         <source>&amp;P/T:</source>
-        <translation type="unfinished"/>
+        <translation>M/I:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="45"/>
         <source>&amp;Annotation:</source>
-        <translation type="unfinished"/>
+        <translation>Anotacija:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="60"/>
         <source>Token data</source>
-        <translation type="unfinished"/>
+        <translation>Podaci o tokenima</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="85"/>
         <location filename="../src/dlg_edit_tokens.cpp" line="141"/>
         <source>Add token</source>
-        <translation type="unfinished"/>
+        <translation>Dodaj token</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="88"/>
         <source>Remove token</source>
-        <translation type="unfinished"/>
+        <translation>Uklonite token</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="113"/>
         <source>Edit tokens</source>
-        <translation type="unfinished"/>
+        <translation>Promenite tokene</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="141"/>
         <source>Please enter the name of the token:</source>
-        <translation>Zadejte prosím jméno pro token:</translation>
+        <translation>Molim Vas, ukucajte ime tokena:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="145"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="145"/>
@@ -928,27 +929,27 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="13"/>
         <source>Email:</source>
-        <translation type="unfinished"/>
+        <translation>I-mejl:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="18"/>
         <source>Country:</source>
-        <translation type="unfinished"/>
+        <translation>Država:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="21"/>
         <source>Undefined</source>
-        <translation type="unfinished"/>
+        <translation>Neodređeno</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="35"/>
         <source>Real name:</source>
-        <translation type="unfinished"/>
+        <translation>Pravo ime:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="57"/>
         <source>Edit user profile</source>
-        <translation type="unfinished"/>
+        <translation>Promenite korisnički profil</translation>
     </message>
 </context>
 <context>
@@ -956,57 +957,57 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="19"/>
         <source>Show &apos;&amp;buddies only&apos; games</source>
-        <translation type="unfinished"/>
+        <translation>Prikaži &apos;samo prijatelji&apos; igre</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="22"/>
         <source>Show &amp;unavailable games</source>
-        <translation type="unfinished"/>
+        <translation>Prikaži nedostupne igre</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="25"/>
         <source>Show &amp;password protected games</source>
-        <translation type="unfinished"/>
+        <translation>Prikaži igre zaštićene lozinkom</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="30"/>
         <source>Game &amp;description:</source>
-        <translation type="unfinished"/>
+        <translation>Opis igre:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="35"/>
         <source>&amp;Creator name:</source>
-        <translation type="unfinished"/>
+        <translation>Ime kreatora:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="51"/>
         <source>&amp;Game types</source>
-        <translation type="unfinished"/>
+        <translation>Tipovi igara</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="56"/>
         <source>at &amp;least:</source>
-        <translation type="unfinished"/>
+        <translation>barem:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="63"/>
         <source>at &amp;most:</source>
-        <translation type="unfinished"/>
+        <translation>najviše:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="76"/>
         <source>Maximum player count</source>
-        <translation type="unfinished"/>
+        <translation>Maksimalni broj igrača</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="84"/>
         <source>Restrictions</source>
-        <translation type="unfinished"/>
+        <translation>Ograničenja</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="117"/>
         <source>Filter games</source>
-        <translation>Filtrovat hry</translation>
+        <translation>Filtriraj igre</translation>
     </message>
 </context>
 <context>
@@ -1014,24 +1015,24 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="20"/>
         <source>&amp;Refresh</source>
-        <translation>&amp;Obnovit</translation>
+        <translation>Osveži</translation>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="34"/>
         <source>Load deck from clipboard</source>
-        <translation>Nahrát balíček ze schránky</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="67"/>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="75"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="67"/>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="75"/>
         <source>Invalid deck list.</source>
-        <translation>Neplatný formát balíčku.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1039,7 +1040,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_load_remote_deck.cpp" line="25"/>
         <source>Load deck</source>
-        <translation>Nahrát balíček</translation>
+        <translation>Učitaj špil</translation>
     </message>
 </context>
 <context>
@@ -1047,7 +1048,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_register.cpp" line="16"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>Domaćin:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="20"/>
@@ -1057,69 +1058,69 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_register.cpp" line="24"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>Ime igrača:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="28"/>
         <source>P&amp;assword:</source>
-        <translation type="unfinished"/>
+        <translation>Lozinka:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="33"/>
         <source>Password (again):</source>
-        <translation type="unfinished"/>
+        <translation>Lozinka (ponovo):</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="38"/>
         <source>Email:</source>
-        <translation type="unfinished"/>
+        <translation>I-mejl:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="42"/>
         <source>Email (again):</source>
-        <translation type="unfinished"/>
+        <translation>I-mejl (ponovo):</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="46"/>
         <source>Country:</source>
-        <translation type="unfinished"/>
+        <translation>Država:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="49"/>
         <source>Undefined</source>
-        <translation type="unfinished"/>
+        <translation>Neodređeno</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="304"/>
         <source>Real name:</source>
-        <translation type="unfinished"/>
+        <translation>Pravo ime:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="337"/>
         <source>Register to server</source>
-        <translation type="unfinished"/>
+        <translation>Registruj se na server</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="346"/>
         <location filename="../src/dlg_register.cpp" line="351"/>
         <location filename="../src/dlg_register.cpp" line="356"/>
         <source>Registration Warning</source>
-        <translation type="unfinished"/>
+        <translation>Upozorenje o registraciji</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="346"/>
         <source>Your passwords do not match, please try again.</source>
-        <translation type="unfinished"/>
+        <translation>Vaše lozinke se ne podudaraju, molim Vas, pokušajte ponovo</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="351"/>
         <source>Your email addresses do not match, please try again.</source>
-        <translation type="unfinished"/>
+        <translation>Vaše i-mejl adrese se ne podudaraju, molimo Vas, pokušajte ponovo.</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="356"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Ime igrača ne može biti prazno.</translation>
     </message>
 </context>
 <context>
@@ -1127,7 +1128,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_settings.cpp" line="856"/>
         <source>Unknown Error loading card database</source>
-        <translation>Neznámý error při nahrávání databáze karet.</translation>
+        <translation>Nepoznata Greška učitavanja baze podataka karte</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="865"/>
@@ -1138,10 +1139,7 @@ Cockatrice may not function correctly with an invalid database
 You may need to rerun oracle to update your card database.
 
 Would you like to change your database location setting?</source>
-        <translation>Vaše databáze karet je neplatná.
-Cockatrice s neplatnou databází nemusí fungovat správně.
-Je možné že bude nutné znovu spustit Oracle pro obnovení databáze karet.
-Chtěl/a by jste změnit nastavení lokace databáze?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="872"/>
@@ -1175,7 +1173,9 @@ Would you like to change your database location setting?</source>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>Vaša baza podataka karata je učitana ali ne sadrži karte.
+
+Da li bi ste želeli da promenite vaše podešavanje lokacije baze podataka?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="895"/>
@@ -1191,37 +1191,37 @@ Would you like to change your database location setting?</source>
         <location filename="../src/dlg_settings.cpp" line="908"/>
         <location filename="../src/dlg_settings.cpp" line="914"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="908"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation>Cesta k adresáři s balíčky je neplatná. Chcete se vrátit a nastavit správnou?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="914"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation>Cesta k adresáři s obrázky je neplatná. Chcete se vrátit a nastavit správnou?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="923"/>
         <source>Settings</source>
-        <translation>Nastavení</translation>
+        <translation>Podešavanja</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="925"/>
         <source>General</source>
-        <translation>Obecné</translation>
+        <translation>Opšto</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="926"/>
         <source>Appearance</source>
-        <translation>Vzhled</translation>
+        <translation>Izgled</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="927"/>
         <source>User Interface</source>
-        <translation type="unfinished"/>
+        <translation>Korisnički interfejs</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="928"/>
@@ -1231,17 +1231,17 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="929"/>
         <source>Chat</source>
-        <translation type="unfinished"/>
+        <translation>Ćaskanje</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="930"/>
         <source>Sound</source>
-        <translation type="unfinished"/>
+        <translation>Zvuk</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="931"/>
         <source>Shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Prečice</translation>
     </message>
 </context>
 <context>
@@ -1251,7 +1251,7 @@ Would you like to change your database location setting?</source>
         <location filename="../src/dlg_update.cpp" line="165"/>
         <location filename="../src/dlg_update.cpp" line="178"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="53"/>
@@ -1267,32 +1267,32 @@ Would you like to change your database location setting?</source>
         <location filename="../src/dlg_update.cpp" line="133"/>
         <location filename="../src/dlg_update.cpp" line="142"/>
         <source>Cockatrice Update</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice Ažuriranje</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="29"/>
         <source>Update Anyway</source>
-        <translation type="unfinished"/>
+        <translation>Ipak Ažuriraj</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="31"/>
         <source>Open Download Page</source>
-        <translation type="unfinished"/>
+        <translation>Otvori Stranicu Za Preuzimanje</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="87"/>
         <source>Downloading update...</source>
-        <translation type="unfinished"/>
+        <translation>Preuzimanje ažuriranja</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="96"/>
         <source>Checking for updates...</source>
-        <translation type="unfinished"/>
+        <translation>Provera za ažuriranja...</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="106"/>
         <source>Finished checking for updates.</source>
-        <translation type="unfinished"/>
+        <translation>Završena provera za ažuriranja.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="142"/>
@@ -1304,22 +1304,22 @@ Would you like to change your database location setting?</source>
         <location filename="../src/dlg_update.cpp" line="167"/>
         <location filename="../src/dlg_update.cpp" line="179"/>
         <source>Update Error</source>
-        <translation type="unfinished"/>
+        <translation>Greška Ažuriranja</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="161"/>
         <source>An error occurred while checking for updates: </source>
-        <translation type="unfinished"/>
+        <translation>Desila se greška tokom provere za ažuriranja:</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="167"/>
         <source>An error occurred while downloading an update: </source>
-        <translation type="unfinished"/>
+        <translation>Desila se greška tokom preuzimanja ažuriranja:</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="171"/>
         <source>Installing...</source>
-        <translation type="unfinished"/>
+        <translation>Instalacija...</translation>
     </message>
 </context>
 <context>
@@ -1343,7 +1343,7 @@ Would you like to change your database location setting?</source>
         <location filename="../src/gameselector.cpp" line="151"/>
         <location filename="../src/gameselector.cpp" line="180"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="144"/>
@@ -1353,47 +1353,47 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/gameselector.cpp" line="145"/>
         <source>Wrong password.</source>
-        <translation>Špatné heslo.</translation>
+        <translation>Pogrešna lozinka.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="146"/>
         <source>Spectators are not allowed in this game.</source>
-        <translation>Do této hry je divákům přístup zakázán.</translation>
+        <translation>Posmatrači nisu dozvoljeni u ovoj igri.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="147"/>
         <source>The game is already full.</source>
-        <translation>Hra je plná.</translation>
+        <translation>Igra je već puna.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="148"/>
         <source>The game does not exist any more.</source>
-        <translation>Hra již neexistuje.</translation>
+        <translation>Ova igra više ne postoji.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="149"/>
         <source>This game is only open to registered users.</source>
-        <translation>Hra je určena jen pro registrované.</translation>
+        <translation>Ova igra je samo otvorena za registrovane korisnike.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="150"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
-        <translation>Hra je dostupná jen pro přátele zakládajícícho.</translation>
+        <translation>Ova igra je samo otvorena za prijatelje njenog kreatora.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="151"/>
         <source>You are being ignored by the creator of this game.</source>
-        <translation>Zakladatel hry vás ignoruje.</translation>
+        <translation>Vi ste ignorisani od strane kreatore ove igre.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="167"/>
         <source>Join game</source>
-        <translation>Připojit ke hře</translation>
+        <translation>Pridruži se igri</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="167"/>
         <source>Password:</source>
-        <translation>Heslo:</translation>
+        <translation>Lozinka:</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="180"/>
@@ -1403,32 +1403,32 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/gameselector.cpp" line="196"/>
         <source>Games</source>
-        <translation>Hry</translation>
+        <translation>Igre</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="197"/>
         <source>&amp;Filter games</source>
-        <translation type="unfinished"/>
+        <translation>Filtriraj igre</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="198"/>
         <source>C&amp;lear filter</source>
-        <translation type="unfinished"/>
+        <translation>Očisti filter</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="200"/>
         <source>C&amp;reate</source>
-        <translation type="unfinished"/>
+        <translation>Kreiraj</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="201"/>
         <source>&amp;Join</source>
-        <translation type="unfinished"/>
+        <translation>Pridruži se</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="202"/>
         <source>J&amp;oin as spectator</source>
-        <translation>P&amp;řipojit se jako divák</translation>
+        <translation>Pridruži se kao posmatrač</translation>
     </message>
 </context>
 <context>
@@ -1436,83 +1436,83 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/gamesmodel.cpp" line="17"/>
         <source>New</source>
-        <translation type="unfinished"/>
+        <translation>Novi</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="109"/>
         <source>password</source>
-        <translation type="unfinished"/>
+        <translation>lozinka</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="111"/>
         <source>buddies only</source>
-        <translation>jen pro přátele</translation>
+        <translation>samo prijatelji</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="113"/>
         <source>reg. users only</source>
-        <translation>jen pro registrované</translation>
+        <translation>samo reg. korisnici</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="145"/>
         <location filename="../src/gamesmodel.cpp" line="149"/>
         <source>can chat</source>
-        <translation type="unfinished"/>
+        <translation>može da ćaska</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="145"/>
         <source>see hands</source>
-        <translation type="unfinished"/>
+        <translation>vidi ruke</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="153"/>
         <source>can see hands</source>
-        <translation type="unfinished"/>
+        <translation>može da vidi ruke</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="158"/>
         <source>not allowed</source>
-        <translation>nepovolené</translation>
+        <translation>nije dozvoljeno</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="174"/>
         <source>Room</source>
-        <translation type="unfinished"/>
+        <translation>Soba</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="178"/>
         <source>Age</source>
-        <translation type="unfinished"/>
+        <translation>Starost</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="185"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Tip</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="183"/>
         <source>Description</source>
-        <translation>Popis</translation>
+        <translation>Opis</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="184"/>
         <source>Creator</source>
-        <translation>Zakladatel</translation>
+        <translation>Kreator</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="186"/>
         <source>Restrictions</source>
-        <translation>Omezení</translation>
+        <translation>Ograničenja</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="190"/>
         <source>Players</source>
-        <translation>Hráči</translation>
+        <translation>Igrači</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="195"/>
         <source>Spectators</source>
-        <translation>Diváci</translation>
+        <translation>Posmatrači</translation>
     </message>
 </context>
 <context>
@@ -1524,22 +1524,22 @@ Would you like to change your database location setting?</source>
         <location filename="../src/dlg_settings.cpp" line="234"/>
         <location filename="../src/dlg_settings.cpp" line="244"/>
         <source>Choose path</source>
-        <translation>Vyberte cestu</translation>
+        <translation>Izaberi put</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="227"/>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Uspeh</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="227"/>
         <source>Downloaded card pictures have been reset.</source>
-        <translation type="unfinished"/>
+        <translation>Preuzete slike karata su resetovane.</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="229"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="229"/>
@@ -1549,27 +1549,27 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="259"/>
         <source>Personal settings</source>
-        <translation>Osobní nastavení</translation>
+        <translation>Lična podešavanja</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="260"/>
         <source>Language:</source>
-        <translation>Jazyk:</translation>
+        <translation>Jezik:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="261"/>
         <source>Download card pictures on the fly</source>
-        <translation>Stahovat obrázky karet za běhu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="262"/>
         <source>Paths</source>
-        <translation>Cesty</translation>
+        <translation>Putevi</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="263"/>
         <source>Decks directory:</source>
-        <translation>Adresář s balíčky:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="264"/>
@@ -1579,17 +1579,17 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="265"/>
         <source>Pictures directory:</source>
-        <translation>Adresář s obrázky:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="266"/>
         <source>Card database:</source>
-        <translation type="unfinished"/>
+        <translation>Baza podataka karata:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="267"/>
         <source>Token database:</source>
-        <translation type="unfinished"/>
+        <translation>Baza podataka tokena:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="268"/>
@@ -1625,7 +1625,7 @@ Would you like to change your database location setting?</source>
         <location filename="../src/dlg_settings.cpp" line="274"/>
         <location filename="../src/dlg_settings.cpp" line="275"/>
         <source>Reset</source>
-        <translation type="unfinished"/>
+        <translation>Resetuj</translation>
     </message>
 </context>
 <context>
@@ -1639,12 +1639,12 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/window_main.cpp" line="92"/>
         <source>There are too many concurrent connections from your address.</source>
-        <translation>Z vaší adresy jde mnoho současných připojení.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="94"/>
         <source>Banned by moderator</source>
-        <translation type="unfinished"/>
+        <translation>Zabranjen od strane moderatora</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="96"/>
@@ -1665,7 +1665,7 @@ Would you like to change your database location setting?</source>
         <location filename="../src/window_main.cpp" line="104"/>
         <location filename="../src/window_main.cpp" line="409"/>
         <source>Invalid username.</source>
-        <translation type="unfinished"/>
+        <translation>Nevažeće korisničko ime.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="105"/>
@@ -1675,14 +1675,13 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/window_main.cpp" line="108"/>
         <source>Connection closed</source>
-        <translation>Připojení uzavřeno</translation>
+        <translation>Povezanost prekinuta</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="108"/>
         <source>The server has terminated your connection.
 Reason: %1</source>
-        <translation>Server přerušil spojení.
-Důvod: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message numerus="yes">
         <location filename="../src/window_main.cpp" line="113"/>
@@ -1700,7 +1699,7 @@ Reason for shutdown: %1</source>
         <location filename="../src/window_main.cpp" line="152"/>
         <location filename="../src/window_main.cpp" line="162"/>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Uspeh</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="152"/>
@@ -1717,18 +1716,18 @@ Will now login.</source>
     <message>
         <location filename="../src/window_main.cpp" line="200"/>
         <source>Number of players</source>
-        <translation>Počet hráčů</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="200"/>
         <source>Please enter the number of players.</source>
-        <translation>Vložte počet hráčů.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="210"/>
         <location filename="../src/window_main.cpp" line="216"/>
         <source>Player %1</source>
-        <translation>Hráč %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="228"/>
@@ -1738,12 +1737,12 @@ Will now login.</source>
     <message>
         <location filename="../src/window_main.cpp" line="283"/>
         <source>About Cockatrice</source>
-        <translation>O Cockatrice</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="285"/>
         <source>Version %1</source>
-        <translation>Verze %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="286"/>
@@ -1778,7 +1777,7 @@ Will now login.</source>
     <message>
         <location filename="../src/window_main.cpp" line="292"/>
         <source>Translators:</source>
-        <translation>Překlad:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="293"/>
@@ -1831,12 +1830,12 @@ Will now login.</source>
         <location filename="../src/window_main.cpp" line="901"/>
         <location filename="../src/window_main.cpp" line="937"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="320"/>
         <source>Server timeout</source>
-        <translation>Vypršel časový limit</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="326"/>
@@ -1867,8 +1866,7 @@ Will now login.</source>
         <location filename="../src/window_main.cpp" line="356"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
-        <translation>S tímto uživatelským jménem jste již připojeni.
-Přerušte spojení a znovu se přihlašte.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="361"/>
@@ -2036,26 +2034,24 @@ This usually means that your client version is out of date, and the server sent 
     <message>
         <location filename="../src/window_main.cpp" line="496"/>
         <source>Socket error: %1</source>
-        <translation>Chyba socketu: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="503"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
-        <translation>Snažíte se připojit na zastaralý server. Prosíme, stáhněte si nižší verzi Cockatrice, nebo se připojte k odpovídajícímu serveru.
-Lokální verze je %1, verze serveru je %2.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="505"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
-        <translation>Váš klient je zastaralý. Prosíme, aktualizujte Cockatrice na vyšší verzi.
-Lokální verze je %1, verze serveru je %2.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="511"/>
         <source>Connecting to %1...</source>
-        <translation>Připojování k %1...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="512"/>
@@ -2065,7 +2061,7 @@ Lokální verze je %1, verze serveru je %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="513"/>
         <source>Disconnected</source>
-        <translation>Odpojeno</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="514"/>
@@ -2075,17 +2071,17 @@ Lokální verze je %1, verze serveru je %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="524"/>
         <source>&amp;Connect...</source>
-        <translation>&amp;Připojit...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="525"/>
         <source>&amp;Disconnect</source>
-        <translation>&amp;Odpojit</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="526"/>
         <source>Start &amp;local game...</source>
-        <translation>Spustit &amp;lokální hru...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="527"/>
@@ -2095,12 +2091,12 @@ Lokální verze je %1, verze serveru je %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="528"/>
         <source>&amp;Deck editor</source>
-        <translation>&amp;Editor balíčků</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="529"/>
         <source>&amp;Full screen</source>
-        <translation>&amp;Celá obrazovka</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="530"/>
@@ -2110,13 +2106,13 @@ Lokální verze je %1, verze serveru je %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="531"/>
         <source>&amp;Settings...</source>
-        <translation>&amp;Nastavení...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="533"/>
         <location filename="../src/window_main.cpp" line="748"/>
         <source>&amp;Exit</source>
-        <translation>&amp;Konec</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="536"/>
@@ -2126,7 +2122,7 @@ Lokální verze je %1, verze serveru je %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="538"/>
         <source>&amp;Cockatrice</source>
-        <translation>&amp;Cockatrice</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="541"/>
@@ -2161,7 +2157,7 @@ Lokální verze je %1, verze serveru je %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="548"/>
         <source>&amp;About Cockatrice</source>
-        <translation>&amp;O Cockatrice</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="549"/>
@@ -2176,7 +2172,7 @@ Lokální verze je %1, verze serveru je %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="551"/>
         <source>&amp;Help</source>
-        <translation>&amp;Nápověda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="552"/>
@@ -2335,7 +2331,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="53"/>
         <source>The game has been closed.</source>
-        <translation>Hra byla ukončena.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="58"/>
@@ -2345,12 +2341,12 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="64"/>
         <source>%1 is now watching the game.</source>
-        <translation>%1 nyní sleduje hru.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="70"/>
         <source>%1 is not watching the game any more.</source>
-        <translation>%1 přestal sledovat hru.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="76"/>
@@ -2365,7 +2361,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="111"/>
         <source>The game has started.</source>
-        <translation>Hra začíná.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="182"/>
@@ -2375,7 +2371,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="186"/>
         <source> from exile</source>
-        <translation> z exilnutých karet</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="193"/>
@@ -2405,63 +2401,63 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="223"/>
         <source> from sideboard</source>
-        <translation> ze sideboardu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="225"/>
         <source> from the stack</source>
-        <translation> ze stacku</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="251"/>
         <location filename="../src/messagelogwidget.cpp" line="505"/>
         <source>a card</source>
-        <translation>kartu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="256"/>
         <source>%1 gives %2 control over %3.</source>
-        <translation>%1 předává kontrolu hráči %2 karty %3.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="264"/>
         <source>%1 puts %2 into play tapped%3.</source>
-        <translation>%1 dává kartu %2 do hry %3 tapnutou.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="266"/>
         <source>%1 puts %2 into play%3.</source>
-        <translation>%1 dává kartu %2 %3 do hry.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="270"/>
         <source>%1 exiles %2%3.</source>
-        <translation>%1 exiluje %2%3.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="283"/>
         <source>%1 moves %2%3 to sideboard.</source>
-        <translation>%1 přesouvá %2%3 do sideboardu.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="286"/>
         <source>%1 plays %2%3.</source>
-        <translation>%1 sesílá %2%3.</translation>
+        <translation type="unfinished"/>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="394"/>
         <source>red</source>
-        <translation><numerusform>červený</numerusform><numerusform>červené</numerusform><numerusform>červených</numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="395"/>
         <source>yellow</source>
-        <translation><numerusform>žlutý</numerusform><numerusform>žluté</numerusform><numerusform>žlutých</numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="396"/>
         <source>green</source>
-        <translation><numerusform>zelený</numerusform><numerusform>zelené</numerusform><numerusform>zelených</numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="550"/>
@@ -2831,62 +2827,62 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="569"/>
         <source>untap step</source>
-        <translation>Odtapovací fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="570"/>
         <source>upkeep step</source>
-        <translation>Upkeep</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="571"/>
         <source>draw step</source>
-        <translation>Lízací fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="572"/>
         <source>first main phase</source>
-        <translation>První hlavní fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="573"/>
         <source>beginning of combat step</source>
-        <translation>Začátek bojové fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="574"/>
         <source>declare attackers step</source>
-        <translation>Oznámení útočníků</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="575"/>
         <source>declare blockers step</source>
-        <translation>Oznámení blokujících</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="576"/>
         <source>combat damage step</source>
-        <translation>Udělení bojového zranění</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="577"/>
         <source>end of combat step</source>
-        <translation>Konec bojové fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="578"/>
         <source>second main phase</source>
-        <translation>Druhá hlavní fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="579"/>
         <source>ending phase</source>
-        <translation>Konec kola</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="581"/>
         <source>It is now the %1.</source>
-        <translation>Nyní je %1.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2894,12 +2890,12 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="637"/>
         <source>Add message</source>
-        <translation>Přidat zprávu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="637"/>
         <source>Message:</source>
-        <translation>Zpráva:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="654"/>
@@ -2974,57 +2970,57 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="151"/>
         <source>Untap step</source>
-        <translation>Odtapovací fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="152"/>
         <source>Upkeep step</source>
-        <translation>Upkeep</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="153"/>
         <source>Draw step</source>
-        <translation>Lízací fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="154"/>
         <source>First main phase</source>
-        <translation>První hlavní fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="155"/>
         <source>Beginning of combat step</source>
-        <translation>Začátek bojové fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="156"/>
         <source>Declare attackers step</source>
-        <translation>Oznámení útočníků</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="157"/>
         <source>Declare blockers step</source>
-        <translation>Oznámení blokujících</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="158"/>
         <source>Combat damage step</source>
-        <translation>Udělení bojového zranění</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="159"/>
         <source>End of combat step</source>
-        <translation>Konec bojové fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="160"/>
         <source>Second main phase</source>
-        <translation>Druhá hlavní fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="161"/>
         <source>End of turn step</source>
-        <translation>Konec kola</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3042,17 +3038,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="606"/>
         <source>&amp;View graveyard</source>
-        <translation>&amp;Zobrazit hřbitov</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="607"/>
         <source>&amp;View exile</source>
-        <translation>&amp;Zobrazit exilnuté karty</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="609"/>
         <source>Player &quot;%1&quot;</source>
-        <translation>Hráč &quot;%1&quot;</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="610"/>
@@ -3060,7 +3056,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="630"/>
         <location filename="../src/player.cpp" line="713"/>
         <source>&amp;Graveyard</source>
-        <translation>&amp;Hřbitov</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="611"/>
@@ -3068,7 +3064,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="624"/>
         <location filename="../src/player.cpp" line="714"/>
         <source>&amp;Exile</source>
-        <translation>&amp;Exilnuté karty</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="614"/>
@@ -3102,7 +3098,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="650"/>
         <location filename="../src/player.cpp" line="712"/>
         <source>&amp;Hand</source>
-        <translation>&amp;Ruka</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="626"/>
@@ -3112,12 +3108,12 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="632"/>
         <source>&amp;View library</source>
-        <translation>&amp;Zobrazit knihovnu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="633"/>
         <source>View &amp;top cards of library...</source>
-        <translation>Zobrazit &amp;vrchní karty knihovny...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="634"/>
@@ -3142,32 +3138,32 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="638"/>
         <source>&amp;View sideboard</source>
-        <translation>&amp;Zobrazit sideboard</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="639"/>
         <source>&amp;Draw card</source>
-        <translation>&amp;Líznout kartu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="640"/>
         <source>D&amp;raw cards...</source>
-        <translation>L&amp;íznout karty...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="641"/>
         <source>&amp;Undo last draw</source>
-        <translation>&amp;Vrátit zpět poslední líznutí</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="642"/>
         <source>Take &amp;mulligan</source>
-        <translation>&amp;Mulliganovat</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="643"/>
         <source>&amp;Shuffle</source>
-        <translation>&amp;Zamíchat</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="644"/>
@@ -3177,17 +3173,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="645"/>
         <source>Move top cards to &amp;graveyard...</source>
-        <translation>Přesunout vrchní karty do &amp;hřbitova...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="646"/>
         <source>Move top cards to &amp;exile...</source>
-        <translation>&amp;Exilnout vrchní karty...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="647"/>
         <source>Put top card on &amp;bottom</source>
-        <translation>Dát kartu na &amp;spodek</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="648"/>
@@ -3207,37 +3203,37 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="653"/>
         <source>&amp;Sideboard</source>
-        <translation>&amp;Sideboard</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="654"/>
         <source>&amp;Library</source>
-        <translation>&amp;Knihovna</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="655"/>
         <source>&amp;Counters</source>
-        <translation>&amp;Žetony</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="657"/>
         <source>&amp;Untap all permanents</source>
-        <translation>&amp;Odtapnout všechny permanenty</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="658"/>
         <source>R&amp;oll die...</source>
-        <translation>H&amp;odit kostkou...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="659"/>
         <source>&amp;Create token...</source>
-        <translation>&amp;Vytvořit token...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="660"/>
         <source>C&amp;reate another token</source>
-        <translation>V&amp;ytvořit další token</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="661"/>
@@ -3247,17 +3243,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="662"/>
         <source>S&amp;ay</source>
-        <translation>&amp;Chat</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="668"/>
         <source>C&amp;ard</source>
-        <translation>K&amp;arta</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="671"/>
         <source>&amp;All players</source>
-        <translation>&amp;Všem hráčům</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="674"/>
@@ -3392,17 +3388,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="864"/>
         <source>View top cards of library</source>
-        <translation>Zobrazit vrchní karty knihovny</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="864"/>
         <source>Number of cards:</source>
-        <translation>Počet karet:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="919"/>
         <source>Draw cards</source>
-        <translation>Líznout karty</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="919"/>
@@ -3410,52 +3406,52 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="957"/>
         <location filename="../src/player.cpp" line="2236"/>
         <source>Number:</source>
-        <translation>Počet:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="934"/>
         <source>Move top cards to grave</source>
-        <translation>Přesunout vrchní karty do hřbitova</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="957"/>
         <source>Move top cards to exile</source>
-        <translation>Exilnout vrchní karty</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1032"/>
         <source>Roll die</source>
-        <translation>Hodit kostkou</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1032"/>
         <source>Number of sides:</source>
-        <translation>Počet stran:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2079"/>
         <source>Set power/toughness</source>
-        <translation>Nastavit sílu/odolnost</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2079"/>
         <source>Please enter the new PT:</source>
-        <translation>Vložte novou odolnost/sílu:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2154"/>
         <source>Set annotation</source>
-        <translation>Nastavit poznámku</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2154"/>
         <source>Please enter the new annotation:</source>
-        <translation>Vložte novou poznámku:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2236"/>
         <source>Set counters</source>
-        <translation>Nastavit žetony</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2353"/>
@@ -3546,17 +3542,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/remotedecklist_treewidget.cpp" line="161"/>
         <source>Name</source>
-        <translation>Jméno</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/remotedecklist_treewidget.cpp" line="162"/>
         <source>ID</source>
-        <translation>ID</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/remotedecklist_treewidget.cpp" line="163"/>
         <source>Upload time</source>
-        <translation>Průběh nahrávání</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3597,22 +3593,22 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_server.cpp" line="55"/>
         <source>Rooms</source>
-        <translation>Místnosti</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="56"/>
         <source>Joi&amp;n</source>
-        <translation>&amp;Připojit</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="59"/>
         <source>Room</source>
-        <translation>Místnost</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="60"/>
         <source>Description</source>
-        <translation>Popis</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="61"/>
@@ -3622,12 +3618,12 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_server.cpp" line="62"/>
         <source>Players</source>
-        <translation>Hráči</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="63"/>
         <source>Games</source>
-        <translation>Hry</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3658,7 +3654,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/setsmodel.cpp" line="70"/>
         <source>Long name</source>
-        <translation>Dlouhý název</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/setsmodel.cpp" line="71"/>
@@ -3745,7 +3741,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_admin.cpp" line="96"/>
         <source>Update server &amp;message</source>
-        <translation>Aktualizovat &amp;zprávu serveru</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="97"/>
@@ -3760,17 +3756,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_admin.cpp" line="99"/>
         <source>Server administration functions</source>
-        <translation>Administrační funkce serveru</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="101"/>
         <source>&amp;Unlock functions</source>
-        <translation>&amp;Odemknout funkce</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_admin.cpp" line="102"/>
         <source>&amp;Lock functions</source>
-        <translation>&amp;Zamknout funkce</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3943,7 +3939,7 @@ Do you want to save the changes?</source>
         <location filename="../src/tab_deck_editor.cpp" line="710"/>
         <location filename="../src/tab_deck_editor.cpp" line="730"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="686"/>
@@ -3973,57 +3969,56 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="117"/>
         <source>Local file system</source>
-        <translation>Lokální systém souborů</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="118"/>
         <source>Server deck storage</source>
-        <translation>Balíčky na serveru</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="120"/>
         <location filename="../src/tab_deck_storage.cpp" line="122"/>
         <source>Open in deck editor</source>
-        <translation>Otevřít v editoru balíčků</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="121"/>
         <source>Upload deck</source>
-        <translation>Nahrát balíček</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="123"/>
         <source>Download deck</source>
-        <translation>Stáhnout balíček</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="124"/>
         <location filename="../src/tab_deck_storage.cpp" line="270"/>
         <source>New folder</source>
-        <translation>Nová složka</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="125"/>
         <location filename="../src/tab_deck_storage.cpp" line="126"/>
         <source>Delete</source>
-        <translation>Smazat</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="156"/>
         <source>Enter deck name</source>
-        <translation>Vložit jméno balíčku</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="156"/>
         <source>This decklist does not have a name.
 Please enter a name:</source>
-        <translation>Tentobalíček nemá jméno.
-Prosím vložte jméno:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="160"/>
         <source>Unnamed deck</source>
-        <translation>Bezejmenný balíček</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="195"/>
@@ -4040,7 +4035,7 @@ Prosím vložte jméno:</translation>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="270"/>
         <source>Name of new folder:</source>
-        <translation>Název nové složky:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="312"/>
@@ -4093,27 +4088,27 @@ Prosím vložte jméno:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="461"/>
         <source>&amp;Phases</source>
-        <translation>&amp;Fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="464"/>
         <source>&amp;Game</source>
-        <translation>&amp;Hra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="466"/>
         <source>Next &amp;phase</source>
-        <translation>Další &amp;fáze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="469"/>
         <source>Next &amp;turn</source>
-        <translation>Další &amp;kolo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="472"/>
         <source>&amp;Remove all local arrows</source>
-        <translation>&amp;Odstranit všechny lokální šipky</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="475"/>
@@ -4133,12 +4128,12 @@ Prosím vložte jméno:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="483"/>
         <source>&amp;Concede</source>
-        <translation>&amp;Ukončit hru</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="486"/>
         <source>&amp;Leave game</source>
-        <translation>&amp;Opustit hru</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="489"/>
@@ -4148,7 +4143,7 @@ Prosím vložte jméno:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="492"/>
         <source>&amp;Say:</source>
-        <translation>&amp;Chat:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="495"/>
@@ -4179,22 +4174,22 @@ Prosím vložte jméno:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="601"/>
         <source>Concede</source>
-        <translation>Ukončit hru</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="601"/>
         <source>Are you sure you want to concede this game?</source>
-        <translation>Opravdu chcete ukončit tuto hru?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="612"/>
         <source>Leave game</source>
-        <translation>Opustit hru</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="612"/>
         <source>Are you sure you want to leave this game?</source>
-        <translation>Opravdu chcete opustit tuto hru?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="811"/>
@@ -4240,7 +4235,7 @@ Prosím vložte jméno:</translation>
         <location filename="../src/tab_logs.cpp" line="65"/>
         <location filename="../src/tab_logs.cpp" line="75"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="65"/>
@@ -4375,7 +4370,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="64"/>
         <source>&amp;Leave</source>
-        <translation>&amp;Odejít</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="80"/>
@@ -4385,7 +4380,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="108"/>
         <source>This user is ignoring you.</source>
-        <translation>Tento uživatel vás ignoruje.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="138"/>
@@ -4395,12 +4390,12 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="155"/>
         <source>%1 has left the server.</source>
-        <translation>%1 opustil server.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="161"/>
         <source>%1 has joined the server.</source>
-        <translation>%1 se připojil k serveru.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4468,22 +4463,22 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_room.cpp" line="144"/>
         <source>&amp;Say:</source>
-        <translation>&amp;Chat:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="145"/>
         <source>Chat</source>
-        <translation>Chatovat</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="146"/>
         <source>&amp;Room</source>
-        <translation>&amp;Místnost</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="147"/>
         <source>&amp;Leave room</source>
-        <translation>&amp;Opustit místnost</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="148"/>
@@ -4508,7 +4503,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_room.cpp" line="208"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
-        <translation>Píšete příliš intenzivně. Počkejte pár sekund.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4524,7 +4519,7 @@ The more information you put in, the more specific your results will be.</source
         <location filename="../src/tab_server.cpp" line="189"/>
         <location filename="../src/tab_server.cpp" line="192"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="183"/>
@@ -4780,22 +4775,22 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="61"/>
         <source>User information</source>
-        <translation>Informace o uživateli</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="68"/>
         <source>Real name:</source>
-        <translation>Pravé jméno:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="69"/>
         <source>Location:</source>
-        <translation>Místo:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="70"/>
         <source>User level:</source>
-        <translation>Úroveň:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="71"/>
@@ -4820,7 +4815,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="106"/>
         <source>Administrator</source>
-        <translation>Administrátor</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="108"/>
@@ -4830,13 +4825,13 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="110"/>
         <source>Registered user</source>
-        <translation>Registrovaný</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="112"/>
         <location filename="../src/userinfobox.cpp" line="115"/>
         <source>Unregistered user</source>
-        <translation>Neregistrovaný</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="118"/>
@@ -4885,7 +4880,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/userinfobox.cpp" line="275"/>
         <location filename="../src/userinfobox.cpp" line="279"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="236"/>
@@ -4939,7 +4934,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/dlg_settings.cpp" line="437"/>
         <source>General interface settings</source>
-        <translation>Obecné</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="438"/>
@@ -4954,7 +4949,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/dlg_settings.cpp" line="440"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
-        <translation>&amp;Pro zahraní karty je třeba dvojklik</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="441"/>
@@ -4969,12 +4964,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/dlg_settings.cpp" line="443"/>
         <source>Animation settings</source>
-        <translation>Animace</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="444"/>
         <source>&amp;Tap/untap animation</source>
-        <translation>&amp;Animace tapnutí/odtapnutí</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="445"/>
@@ -4992,17 +4987,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userlist.cpp" line="335"/>
         <source>Users in this room: %1</source>
-        <translation>Uživatelů v této místnosti: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="336"/>
         <source>Buddies online: %1 / %2</source>
-        <translation>Přátelé online: %1 / %2</translation>
+        <translation>Aktivni prijatelji: %1 / %2</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="337"/>
         <source>Ignored users online: %1 / %2</source>
-        <translation>Ignorovaných online: %1 / %2</translation>
+        <translation>Aktivni ignorisani korisnici: %1 / %2</translation>
     </message>
 </context>
 <context>
@@ -5015,7 +5010,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userlist.cpp" line="128"/>
         <source>&amp;OK</source>
-        <translation type="unfinished"/>
+        <translation>U redu</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="131"/>
@@ -5031,7 +5026,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/userlist.cpp" line="151"/>
         <location filename="../src/userlist.cpp" line="156"/>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="151"/>
@@ -5104,12 +5099,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/window_sets.cpp" line="112"/>
         <source>Edit sets</source>
-        <translation>Upravit edice</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="124"/>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Uspeh</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="124"/>
@@ -5122,17 +5117,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="133"/>
         <source>sort by name</source>
-        <translation>seřadit dle jména</translation>
+        <translation>sortiraj po imenu</translation>
     </message>
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="134"/>
         <source>sort by type</source>
-        <translation>seřadit dle typu</translation>
+        <translation>sortiraj po tipu</translation>
     </message>
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="135"/>
         <source>shuffle when closing</source>
-        <translation>zamíchat po zavření</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="136"/>
@@ -5145,7 +5140,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/settingscache.cpp" line="147"/>
         <source>English</source>
-        <translation>Česky (Czech)</translation>
+        <translation>Srpski</translation>
     </message>
 </context>
 <context>
@@ -5173,22 +5168,22 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1465"/>
         <source>Connect</source>
-        <translation type="unfinished"/>
+        <translation>Povežite se</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1466"/>
         <source>Register</source>
-        <translation type="unfinished"/>
+        <translation>Registracija</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1467"/>
         <source>Full screen</source>
-        <translation type="unfinished"/>
+        <translation>Ceo ekran</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1468"/>
         <source>Settings</source>
-        <translation type="unfinished"/>
+        <translation>Podešavanja</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1469"/>
@@ -5203,7 +5198,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1471"/>
         <source>Exit</source>
-        <translation type="unfinished"/>
+        <translation>Izađite</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1472"/>
@@ -5213,7 +5208,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1473"/>
         <source>Analyze deck</source>
-        <translation type="unfinished"/>
+        <translation>Analizirajte špil</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1474"/>
@@ -5223,12 +5218,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1475"/>
         <source>Clear all filters</source>
-        <translation type="unfinished"/>
+        <translation>Uklonite sve filtere</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1476"/>
         <source>New deck</source>
-        <translation type="unfinished"/>
+        <translation>Novi špil</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1477"/>
@@ -5243,7 +5238,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1479"/>
         <source>Close</source>
-        <translation type="unfinished"/>
+        <translation>Zatvorite</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1480"/>
@@ -5258,7 +5253,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1482"/>
         <source>Delete card</source>
-        <translation type="unfinished"/>
+        <translation>Izbrišite kartu</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1483"/>
@@ -5273,27 +5268,27 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1485"/>
         <source>Add card</source>
-        <translation type="unfinished"/>
+        <translation>Dodajte kartu</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1486"/>
         <source>Save deck</source>
-        <translation type="unfinished"/>
+        <translation>Sačuvajte špil</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1487"/>
         <source>Remove card</source>
-        <translation type="unfinished"/>
+        <translation>Uklonite kartu</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1488"/>
         <source>Save deck as</source>
-        <translation type="unfinished"/>
+        <translation>Sačuvajte špil kao</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1489"/>
         <source>Load deck</source>
-        <translation type="unfinished"/>
+        <translation>Učitajte špil</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1490"/>
@@ -5304,12 +5299,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1491"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1581"/>
         <source>Counters</source>
-        <translation type="unfinished"/>
+        <translation>Brojači</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1492"/>
         <source>Life</source>
-        <translation type="unfinished"/>
+        <translation>Život</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1493"/>
@@ -5318,7 +5313,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1505"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1513"/>
         <source>Set</source>
-        <translation type="unfinished"/>
+        <translation>Postavite</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1494"/>
@@ -5326,7 +5321,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1502"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1506"/>
         <source>Add</source>
-        <translation type="unfinished"/>
+        <translation>Dodajte</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1495"/>
@@ -5334,22 +5329,22 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1503"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1507"/>
         <source>Remove</source>
-        <translation type="unfinished"/>
+        <translation>Oduzmite</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1496"/>
         <source>Red</source>
-        <translation type="unfinished"/>
+        <translation>Crveno</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1500"/>
         <source>Green</source>
-        <translation type="unfinished"/>
+        <translation>Zeleno</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1504"/>
         <source>Yellow</source>
-        <translation type="unfinished"/>
+        <translation>Žuto</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1508"/>
@@ -5359,57 +5354,57 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1509"/>
         <source>Power / Toughness</source>
-        <translation type="unfinished"/>
+        <translation>Moć / Izdržljivost</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1510"/>
         <source>Power and Toughness</source>
-        <translation type="unfinished"/>
+        <translation>Moć i Izdržljivost</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1511"/>
         <source>Add (+1/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Dodajte (+1/+1)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1512"/>
         <source>Remove (-1/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Oduzmite (-1/-1)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1514"/>
         <source>Toughness</source>
-        <translation type="unfinished"/>
+        <translation>Izdržljivost</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1515"/>
         <source>Remove (-0/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Oduzmite (-0/-1)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1516"/>
         <source>Add (+0/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Dodajte (+0/+1)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1517"/>
         <source>Power</source>
-        <translation type="unfinished"/>
+        <translation>Moć</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1518"/>
         <source>Remove (-1/-0)</source>
-        <translation type="unfinished"/>
+        <translation>Oduzmite (-1/-0)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1519"/>
         <source>Add (+1/+0)</source>
-        <translation type="unfinished"/>
+        <translation>Dodajte (+1/+0)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1520"/>
         <source>Game Phases</source>
-        <translation type="unfinished"/>
+        <translation>Faze Igre</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1521"/>
@@ -5425,7 +5420,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1523"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1574"/>
         <source>Draw</source>
-        <translation type="unfinished"/>
+        <translation>Izvlačenje</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1524"/>
@@ -5435,12 +5430,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1525"/>
         <source>Start combat</source>
-        <translation type="unfinished"/>
+        <translation>Započnite borbu</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1526"/>
         <source>Attack</source>
-        <translation type="unfinished"/>
+        <translation>Napad</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1527"/>
@@ -5455,7 +5450,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1529"/>
         <source>End combat</source>
-        <translation type="unfinished"/>
+        <translation>Završite borbu</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1530"/>
@@ -5465,12 +5460,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1531"/>
         <source>End</source>
-        <translation type="unfinished"/>
+        <translation>Kraj</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1532"/>
         <source>Next phase</source>
-        <translation type="unfinished"/>
+        <translation>Sledeća faza</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1533"/>
@@ -5505,7 +5500,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1539"/>
         <source>Flip card</source>
-        <translation type="unfinished"/>
+        <translation>Obrnite kartu</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1540"/>
@@ -5515,7 +5510,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1541"/>
         <source>Play card</source>
-        <translation type="unfinished"/>
+        <translation>Igrajte kartu</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1542"/>
@@ -5530,12 +5525,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1544"/>
         <source>Clone card</source>
-        <translation type="unfinished"/>
+        <translation>Klonirajte kartu</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1545"/>
         <source>Create token</source>
-        <translation type="unfinished"/>
+        <translation>Kreirajte žeton</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1546"/>
@@ -5571,28 +5566,28 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1552"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1556"/>
         <source>Graveyard</source>
-        <translation type="unfinished"/>
+        <translation>Groblje</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1553"/>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1560"/>
         <source>Exile</source>
-        <translation type="unfinished"/>
+        <translation>Izgnanstvo</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1554"/>
         <source>Hand</source>
-        <translation type="unfinished"/>
+        <translation>Ruka</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1555"/>
         <source>View</source>
-        <translation type="unfinished"/>
+        <translation>Pogled</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1557"/>
         <source>Library</source>
-        <translation type="unfinished"/>
+        <translation>Špil</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1558"/>
@@ -5637,7 +5632,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1567"/>
         <source>Leave game</source>
-        <translation type="unfinished"/>
+        <translation>Napustite igru</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1568"/>
@@ -5652,7 +5647,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1570"/>
         <source>Roll dice</source>
-        <translation type="unfinished"/>
+        <translation>Bacite kockicu</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1571"/>
@@ -5662,7 +5657,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1572"/>
         <source>Shuffle library</source>
-        <translation type="unfinished"/>
+        <translation>Mešajte špil</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1573"/>
@@ -5677,12 +5672,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1576"/>
         <source>Draw card</source>
-        <translation type="unfinished"/>
+        <translation>Izvucite kartu</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1577"/>
         <source>Draw cards</source>
-        <translation type="unfinished"/>
+        <translation>Izvucite karte</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1578"/>
