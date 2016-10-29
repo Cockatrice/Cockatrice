@@ -340,7 +340,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             formatedMissingFeatures = "Missing Features: ";
             for (int i = 0; i < missingFeatures.size(); ++i)
                 formatedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i)   );
-            formatedMissingFeatures.append("\nTo update your client, go to Help &rarr; Update Cockatrice.");
+            formatedMissingFeatures.append("\nTo update your client, go to Help -> Update Cockatrice.");
             
             QMessageBox msgBox;
             msgBox.setIcon(QMessageBox::Critical);
@@ -967,7 +967,7 @@ void MainWindow::refreshShortcuts()
 
 void MainWindow::notifyUserAboutUpdate()
 {
-    QMessageBox::information(this, tr("Information"), tr("This server supports additional features that your client doesn't have.\nThis is most likely not a problem, but this message might mean there is a new version of Cockatrice available.\n\nTo update your client, go to Help &rarr; Update Cockatrice."));
+    QMessageBox::information(this, tr("Information"), tr("This server supports additional features that your client doesn't have.\nThis is most likely not a problem, but this message might mean there is a new version of Cockatrice available.\n\nTo update your client, go to Help -> Update Cockatrice."));
 }
 
 void MainWindow::actOpenCustomFolder()
