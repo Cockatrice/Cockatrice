@@ -64,6 +64,7 @@ private:
     bool doubleClickToPlay;
     bool playToStack;
     bool annotateTokens;
+    bool idleClientTimeOutEnabled;
     QByteArray tabGameSplitterSizes;
     bool displayCardNames;
     bool horizontalHand;
@@ -131,6 +132,7 @@ public:
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
     bool getNotifyAboutUpdates() const { return notifyAboutUpdates; }
+    bool getIdleClientTimeOutEnabled() const { return idleClientTimeOutEnabled;  }
 
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
@@ -207,6 +209,7 @@ public slots:
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
     void setAnnotateTokens(int _annotateTokens);
+    void setIdleClientTimeOutEnabled(int _idleClientTimeOutEnabled);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setDisplayCardNames(int _displayCardNames);
     void setHorizontalHand(int _horizontalHand);
