@@ -10,7 +10,8 @@
         <location filename="../src/oraclewizard.cpp" line="167"/>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
 You will need to specify a URL or a filename that will be used as a source.</source>
-        <translation type="unfinished"/>
+        <translation>Este wizard irá importar uma lista de expansões, cartas e ficheiros que serão usados pelo Cockatrice. %s
+Você terá de especificar um URL ou o nome de um ficheiro que será usado como fonte.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="171"/>
@@ -28,12 +29,12 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="220"/>
         <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor especifique uma fonte para a lista de cartas e expansões. Poderá especificar um endereço de URL para baixar ou utilize um ficheiro já existente no seu computador.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="224"/>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>URL de download:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="225"/>
@@ -43,7 +44,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="226"/>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>URL para repor definições de origem</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="227"/>
@@ -58,12 +59,12 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="241"/>
         <source>Sets JSON file (*.json *.zip)</source>
-        <translation type="unfinished"/>
+        <translation>Ficheiro JSON de expansões (*.json *.zip)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="243"/>
         <source>Sets JSON file (*.json)</source>
-        <translation type="unfinished"/>
+        <translation>Ficheiro JSON de expansões (*.json)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="267"/>
@@ -78,7 +79,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="267"/>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>O URL fornecido não é válido.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="271"/>
@@ -108,7 +109,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="368"/>
         <source>Parsing file</source>
-        <translation type="unfinished"/>
+        <translation>Ficheiro de análise</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="385"/>
@@ -118,7 +119,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="391"/>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
-        <translation type="unfinished"/>
+        <translation>Extracção do ZIP falhada: o arquivo ZIP não contem exactamente um ficheiro.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="399"/>
@@ -128,17 +129,17 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="408"/>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
-        <translation type="unfinished"/>
+        <translation>Pedimos desculpa, mas esta versão do Oracle não suporta ficheiros zipados.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="430"/>
         <source>Do you want to try to download a fresh copy of the uncompressed file instead?</source>
-        <translation type="unfinished"/>
+        <translation>Deseja tentar baixar uma cópia recente do ficheiro descomprimido?</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="451"/>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
-        <translation type="unfinished"/>
+        <translation>O ficheiro foi recuperado com sucesso, mas não contem nenhum dado sobre expansões.</translation>
     </message>
 </context>
 <context>
@@ -146,22 +147,22 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="578"/>
         <source>Tokens source selection</source>
-        <translation type="unfinished"/>
+        <translation>Selecção da fonte das fichas</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="579"/>
         <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor especifique uma fonte para a lista de fichas. Pode especificar um endereço de URL para baixar ou utilize um ficheiro já existente no seu computador.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="583"/>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>URL de download:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="584"/>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>URL para repor definições de origem</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="601"/>
@@ -172,7 +173,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="601"/>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>O URL fornecido não é válido.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="605"/>
@@ -195,7 +196,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oracleimporter.cpp" line="318"/>
         <source>Dummy set containing tokens</source>
-        <translation type="unfinished"/>
+        <translation>Set básico contendo fichas</translation>
     </message>
 </context>
 <context>
@@ -222,7 +223,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="483"/>
         <source>No set has been imported.</source>
-        <translation type="unfinished"/>
+        <translation>Nenhuma expansão foi importada.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="488"/>
@@ -232,17 +233,17 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="489"/>
         <source>The following sets has been imported. Press &quot;Save&quot; to save the imported cards to the Cockatrice database.</source>
-        <translation type="unfinished"/>
+        <translation>As seguintes expansões foram importadas. Pressione &quot;Guardar&quot; para guardar as cartas importadas na base de dados do Cockatrice.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="492"/>
         <source>Save to the default path (recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Guardar no caminho predefinido (recomendado)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="501"/>
         <source>Import finished: %1 cards.</source>
-        <translation type="unfinished"/>
+        <translation>Importação terminada: %1 cartas.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="503"/>
@@ -252,12 +253,12 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="512"/>
         <source>Save card database</source>
-        <translation type="unfinished"/>
+        <translation>Guardar base de dados das cartas</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="513"/>
         <source>XML; card database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; Base de dados de cartas (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="534"/>
@@ -268,12 +269,13 @@ You will need to specify a URL or a filename that will be used as a source.</sou
         <location filename="../src/oraclewizard.cpp" line="535"/>
         <source>The card database has been saved successfully to
 %1</source>
-        <translation type="unfinished"/>
+        <translation>A base de dados das cartas foi gravada com sucesso em %s
+%1</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="537"/>
         <source>The file could not be saved to %1</source>
-        <translation type="unfinished"/>
+        <translation>O ficheiro não pode ser gravado em %1</translation>
     </message>
 </context>
 <context>
@@ -281,27 +283,27 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="698"/>
         <source>Tokens imported</source>
-        <translation type="unfinished"/>
+        <translation>Fichas importadas</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="699"/>
         <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
-        <translation type="unfinished"/>
+        <translation>As fichas foram importadas. Pressione &quot;Guardar&quot; para gravar as fichas importadas na base de dados de fichas do Cockatrice</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="702"/>
         <source>Save to the default path (recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Guardar no caminho predefinido (recomendado)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="709"/>
         <source>Save token database</source>
-        <translation type="unfinished"/>
+        <translation>Gravar base de dados das fichas</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="710"/>
         <source>XML; token database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; base de dados de fichas (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="731"/>
@@ -312,7 +314,8 @@ You will need to specify a URL or a filename that will be used as a source.</sou
         <location filename="../src/oraclewizard.cpp" line="732"/>
         <source>The token database has been saved successfully to
 %1</source>
-        <translation type="unfinished"/>
+        <translation>a base de dados de fichas foi gravada com sucesso em %s
+%1</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="734"/>
@@ -322,7 +325,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="734"/>
         <source>The file could not be saved to %1</source>
-        <translation type="unfinished"/>
+        <translation>O ficheiro não pode ser gravado em %1</translation>
     </message>
 </context>
 <context>
@@ -330,27 +333,27 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/zip/unzip.cpp" line="1180"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Operação ZIP completa com sucesso.</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1181"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Falha na inicialização ou carregamento da biblioteca zlib</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1182"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro da biblioteca zlib</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1183"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Incapaz de criar ou abrir ficheiro</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1184"/>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation type="unfinished"/>
+        <translation>Arquivo parcialmente corrompido. Alguns ficheiros possivelmente serão extraídos.</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1185"/>
@@ -370,42 +373,42 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/zip/unzip.cpp" line="1188"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>O ficheiro ou directório não existe.</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1189"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro na leitura do ficheiro.</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1190"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>erro na escrita do ficheiro.</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1191"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro na procura do ficheiro.</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1192"/>
         <source>Unable to create a directory.</source>
-        <translation type="unfinished"/>
+        <translation>Incapaz de criar directório.</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1193"/>
         <source>Invalid device.</source>
-        <translation type="unfinished"/>
+        <translation>Dispositivo inválido.</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1194"/>
         <source>Invalid or incompatible zip archive.</source>
-        <translation type="unfinished"/>
+        <translation>Arquivo ZIP inválido ou incompatível</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1195"/>
         <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation type="unfinished"/>
+        <translation>Cabeçalhos inconsistentes. O arquivo pode estar corrompido,</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1199"/>
@@ -418,22 +421,22 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/zip/zip.cpp" line="1604"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Operação ZIP completa com sucesso.</translation>
     </message>
     <message>
         <location filename="../src/zip/zip.cpp" line="1605"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Falha na inicialização ou carregamento da biblioteca zlib</translation>
     </message>
     <message>
         <location filename="../src/zip/zip.cpp" line="1606"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro da biblioteca zlib</translation>
     </message>
     <message>
         <location filename="../src/zip/zip.cpp" line="1607"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Incapaz de criar ou abrir ficheiro</translation>
     </message>
     <message>
         <location filename="../src/zip/zip.cpp" line="1608"/>
@@ -443,22 +446,22 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/zip/zip.cpp" line="1609"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>O ficheiro ou directório não existe.</translation>
     </message>
     <message>
         <location filename="../src/zip/zip.cpp" line="1610"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro na leitura do ficheiro.</translation>
     </message>
     <message>
         <location filename="../src/zip/zip.cpp" line="1611"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>erro na escrita do ficheiro.</translation>
     </message>
     <message>
         <location filename="../src/zip/zip.cpp" line="1612"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro na procura do ficheiro.</translation>
     </message>
     <message>
         <location filename="../src/zip/zip.cpp" line="1616"/>
