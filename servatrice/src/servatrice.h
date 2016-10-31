@@ -122,7 +122,6 @@ private:
     Servatrice_WebsocketGameServer *websocketGameServer;
 #endif
     Servatrice_IslServer *islServer;
-    QString serverName;
     mutable QMutex loginMessageMutex;
     QString loginMessage;
     QString dbPrefix;
@@ -134,51 +133,76 @@ private:
     int uptime;
     QMutex txBytesMutex, rxBytesMutex;
     quint64 txBytes, rxBytes;
-    int maxGameInactivityTime, maxPlayerInactivityTime;
-    int maxUsersPerAddress, messageCountingInterval, maxMessageCountPerInterval, maxMessageSizePerInterval, maxGamesPerUser, commandCountingInterval, maxCommandCountPerInterval, pingClockInterval;
 
     QString shutdownReason;
     int shutdownMinutes;
     int nextShutdownMessageMinutes;
     QTimer *shutdownTimer;
-    bool isFirstShutdownMessage, clientIdRequired, regServerOnly;
+    bool isFirstShutdownMessage;
 
     mutable QMutex serverListMutex;
     QList<ServerProperties> serverList;
     void updateServerList();
 
     QMap<int, IslInterface *> islInterfaces;
+
+    QString getDBPrefixString() const;
+    QString getDBHostNameString() const;
+    QString getDBDatabaseNameString() const;
+    QString getDBUserNameString() const;
+    QString getDBPasswordString() const;
+    QString getRoomsMethodString() const;
+    QString getISLNetworkSSLCertFile() const;
+    QString getISLNetworkSSLKeyFile() const;
+    
+    int getServerStatusUpdateTime() const;
+    int getNumberOfTCPPools() const;
+    int getServerTCPPort() const;
+    int getNumberOfWebSocketPools() const;
+    int getServerWebSocketPort() const;
+    int getISLNetworkPort() const;
+    bool getISLNetworkEnabled() const;
+
 public slots:
     void scheduleShutdown(const QString &reason, int minutes);
     void updateLoginMessage();
+    void setRequiredFeatures(const QString featureList);
 public:
     Servatrice(QObject *parent = 0);
     ~Servatrice();
     bool initServer();
     QMap<QString, bool> getServerRequiredFeatureList() const { return serverRequiredFeatureList; }
     QString getOfficialWarningsList() const { return officialWarnings; }
-    QString getServerName() const { return serverName; }
+    QString getServerName() const;
     QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
-    QString getRequiredFeatures() const { return requiredFeatures; }
+    QString getRequiredFeatures() const;
+    QString getAuthenticationMethodString() const;
+    QString getDBTypeString() const;
+    QString getDbPrefix() const { return dbPrefix; }
+    AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
     bool permitUnregisteredUsers() const { return authenticationMethod != AuthenticationNone; }
     bool getGameShouldPing() const { return true; }
-    bool getClientIdRequired() const { return clientIdRequired; }
-    bool getRegOnlyServer() const { return regServerOnly; }
+    bool getClientIDRequiredEnabled() const;
+    bool getRegOnlyServerEnabled() const;
     bool getMaxUserLimitEnabled() const;
-    int getPingClockInterval() const { return pingClockInterval; }
-    int getMaxGameInactivityTime() const { return maxGameInactivityTime; }
-    int getMaxPlayerInactivityTime() const { return maxPlayerInactivityTime; }
-    int getMaxUsersPerAddress() const { return maxUsersPerAddress; }
-    int getMessageCountingInterval() const { return messageCountingInterval; }
-    int getMaxMessageCountPerInterval() const { return maxMessageCountPerInterval; }
-    int getMaxMessageSizePerInterval() const { return maxMessageSizePerInterval; }
-    int getMaxGamesPerUser() const { return maxGamesPerUser; }
-    int getCommandCountingInterval() const { return commandCountingInterval; }
-    int getMaxCommandCountPerInterval() const { return maxCommandCountPerInterval; }
-    int getMaxUserLimit() const;
-    AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
-    QString getDbPrefix() const { return dbPrefix; }
-    int getServerId() const { return serverId; }
+    bool getStoreReplaysEnabled() const;
+    bool getRegistrationEnabled() const;
+    bool getRequireEmailForRegistrationEnabled() const;
+    bool getRequireEmailActivationEnabled() const;
+    int getServerID() const;
+    int getMaxGameInactivityTime() const;
+    int getMaxPlayerInactivityTime() const;
+    int getClientKeepAlive() const;
+    int getMaxUsersPerAddress() const;
+    int getMessageCountingInterval() const;
+    int getMaxMessageCountPerInterval() const;
+    int getMaxMessageSizePerInterval() const;
+    int getMaxGamesPerUser() const;
+    int getCommandCountingInterval() const;
+    int getMaxCommandCountPerInterval() const;
+    int getMaxUserTotal() const;
+    int getMaxTcpUserLimit() const;
+    int getMaxWebSocketUserLimit() const;
     int getUsersWithAddress(const QHostAddress &address) const;
     QList<AbstractServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
     void incTxBytes(quint64 num);

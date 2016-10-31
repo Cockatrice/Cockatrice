@@ -58,12 +58,13 @@ public:
     void removeClient(Server_ProtocolHandler *player);
     QList<QString> getOnlineModeratorList();
     virtual QString getLoginMessage() const { return QString(); }
+    virtual QString getRequiredFeatures() const { return QString(); }
     virtual bool permitUnregisteredUsers() const { return true; }
     virtual bool getGameShouldPing() const { return false; }
-    virtual bool getClientIdRequired() const { return false; }
-    virtual bool getRegOnlyServer() const { return false; }
+    virtual bool getClientIDRequiredEnabled() const { return false; }
+    virtual bool getRegOnlyServerEnabled() const { return false; }
     virtual bool getMaxUserLimitEnabled() const { return false; }
-    virtual int getPingClockInterval() const { return 0; }
+    virtual int getClientKeepAlive() const { return 0; }
     virtual int getMaxGameInactivityTime() const { return 9999999; }
     virtual int getMaxPlayerInactivityTime() const { return 9999999; }
     virtual int getMessageCountingInterval() const { return 0; }
@@ -72,7 +73,8 @@ public:
     virtual int getMaxGamesPerUser() const { return 0; }
     virtual int getCommandCountingInterval() const { return 0; }
     virtual int getMaxCommandCountPerInterval() const { return 0; }
-    virtual int getMaxUserLimit() const { return 9999999; }
+    virtual int getMaxUserTotal() const { return 9999999; }
+    virtual int getServerID() const { return 0; }
 
     Server_DatabaseInterface *getDatabaseInterface() const;
     int getNextLocalGameId() { QMutexLocker locker(&nextLocalGameIdMutex); return ++nextLocalGameId; }
