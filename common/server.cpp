@@ -115,7 +115,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     } else if (authState == UnknownUser) {
         // Change user name so that no two users have the same names,
         // don't interfere with registered user names though.
-        if (getRegOnlyServer()) {
+        if (getRegOnlyServerEnabled()) {
             qDebug("Login denied: registration required");
             databaseInterface->unlockSessionTables();
             return RegistrationRequired;
@@ -155,7 +155,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
     if (clientid.isEmpty()){
         // client id is empty, either out dated client or client has been modified
-        if (getClientIdRequired())
+        if (getClientIDRequiredEnabled())
             return ClientIdRequired;
     }
     else {

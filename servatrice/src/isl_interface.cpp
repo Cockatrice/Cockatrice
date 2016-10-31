@@ -115,7 +115,7 @@ void IslInterface::initServer()
 	serverId = serverList[listIndex].id;
 	
 	Event_ServerCompleteList event;
-	event.set_server_id(server->getServerId());
+	event.set_server_id(server->getServerID());
 	
 	server->clientsLock.lockForRead();
 	QMapIterator<QString, Server_ProtocolHandler *> userIterator(server->getUsers());
