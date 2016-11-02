@@ -71,6 +71,10 @@ requiredfeatures=""
 ; to choose from.  Example: "Flaming,Foul Language"
 officialwarnings="Flamming,Spamming,Causing Drama,Abusive Language"
 
+; Maximum time in seconds a player can stay connected but idle.  Default is 3600 (0 = disabled)
+; Clients will be notified at the 90% time period of pending disconnection if they do not take action.
+idleclienttimeout=3600
+
 [authentication]
 
 ; Servatrice can authenticate users connecting. It currently supports 3 different authentication methods:

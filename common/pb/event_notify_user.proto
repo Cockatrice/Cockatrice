@@ -5,6 +5,7 @@ message Event_NotifyUser {
     enum NotificationType {
         PROMOTED = 1;
         WARNING = 2;
+        IDLEWARNING = 3;
     }
 
     extend SessionEvent {

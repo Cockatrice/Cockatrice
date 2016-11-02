@@ -583,6 +583,7 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 {
 
     switch ((Event_NotifyUser::NotificationType) event.type()) {
+        case Event_NotifyUser::IDLEWARNING: QMessageBox::information(this, tr("Idle Timeout"), tr("You are about to be logged out due to inactivity.")); break;
         case Event_NotifyUser::PROMOTED: QMessageBox::information(this, tr("Promotion"), tr("You have been promoted to moderator. Please log out and back in for changes to take effect.")); break;
         case Event_NotifyUser::WARNING: {
             if (!QString::fromStdString(event.warning_reason()).simplified().isEmpty())

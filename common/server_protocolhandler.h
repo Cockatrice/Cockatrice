@@ -55,7 +55,7 @@ protected:
     virtual void logDebugMessage(const QString & /* message */) { }
 private:
     QList<int> messageSizeOverTime, messageCountOverTime, commandCountOverTime;
-    int timeRunning, lastDataReceived;
+    int timeRunning, lastDataReceived, lastActionReceived;
     QTimer *pingClock;
 
     virtual void transmitProtocolItem(const ServerMessage &item) = 0;

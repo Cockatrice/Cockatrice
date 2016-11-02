@@ -19,6 +19,7 @@
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_room_say.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "pb/event_notify_user.pb.h"
 #include <google/protobuf/descriptor.h>
 #include "featureset.h"
 
@@ -32,7 +33,8 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, Server_DatabaseI
       acceptsUserListChanges(false),
       acceptsRoomListChanges(false),
       timeRunning(0),
-      lastDataReceived(0)
+      lastDataReceived(0),
+      lastActionReceived(0)
 {
     connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -171,6 +173,8 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
     if (!room)
         return Response::RespNotInRoom;
 
+    lastActionReceived = timeRunning;
+
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.room_command_size() - 1; i >= 0; --i) {
         Response::ResponseCode resp = Response::RespInvalidCommand;
@@ -240,6 +244,8 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     if (!player)
         return Response::RespNotInRoom;
 
+    lastActionReceived = timeRunning;
+
     int commandCountingInterval = server->getCommandCountingInterval();
     int maxCommandCountPerInterval = server->getMaxCommandCountPerInterval();
     GameEventStorage ges;
@@ -280,6 +286,8 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
     if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
         return Response::RespLoginNeeded;
 
+    lastActionReceived = timeRunning;
+
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.moderator_command_size() - 1; i >= 0; --i) {
         Response::ResponseCode resp = Response::RespInvalidCommand;
@@ -300,6 +308,8 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
         return Response::RespLoginNeeded;
     if (!(userInfo->user_level() & ServerInfo_User::IsAdmin))
         return Response::RespLoginNeeded;
+
+    lastActionReceived = timeRunning;
 
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.admin_command_size() - 1; i >= 0; --i) {
@@ -373,6 +383,20 @@ void Server_ProtocolHandler::pingClockTimeout()
 
     if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
         prepareDestroy();
+
+    if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
+        if ((timeRunning - lastActionReceived) == ceil(server->getIdleClientTimout() *.9)) {
+            Event_NotifyUser event;
+            event.set_type(Event_NotifyUser::IDLEWARNING);
+            SessionEvent *se = prepareSessionEvent(event);
+            sendProtocolItem(*se);
+            delete se;
+        }
+
+    if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
+        if (server->getIdleClientTimout() > 0)
+            if (timeRunning - lastActionReceived > server->getIdleClientTimout())
+                prepareDestroy();
     ++timeRunning;
 }
 
