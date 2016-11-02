@@ -385,7 +385,7 @@ void Server_ProtocolHandler::pingClockTimeout()
         prepareDestroy();
 
     if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
-        if ((timeRunning - lastActionReceived) == ceil(server->getIdleClientTimout() *.9)) {
+        if ((timeRunning - lastActionReceived) == round(server->getIdleClientTimout() *.9)) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::IDLEWARNING);
             SessionEvent *se = prepareSessionEvent(event);
