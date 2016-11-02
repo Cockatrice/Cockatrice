@@ -162,7 +162,7 @@ SettingsCache::SettingsCache()
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
-    idlekeepalive = settings->value("personal/idlekeepalive", 36000).toInt();
+    idlekeepalive = settings->value("personal/idlekeepalive", 3600).toInt();
 
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
