@@ -33,10 +33,11 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, Server_DatabaseI
       authState(NotLoggedIn),
       acceptsUserListChanges(false),
       acceptsRoomListChanges(false),
+      idleClientWarningSent(false),
       timeRunning(0),
       lastDataReceived(0),
-      lastActionReceived(0),
-      idleClientWarningSent(false)
+      lastActionReceived(0)
+      
 {
     connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
