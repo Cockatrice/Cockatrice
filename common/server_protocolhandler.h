@@ -52,9 +52,9 @@ protected:
     AuthenticationResult authState;
     bool acceptsUserListChanges;
     bool acceptsRoomListChanges;
+    bool idleClientWarningSent;
     virtual void logDebugMessage(const QString & /* message */) { }
 private:
-    bool idleClientWarningSent;
     QList<int> messageSizeOverTime, messageCountOverTime, commandCountOverTime;
     int timeRunning, lastDataReceived, lastActionReceived;
     QTimer *pingClock;
