@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QDateTime>
+#include <math.h>
 #include "server_protocolhandler.h"
 #include "server_database_interface.h"
 #include "server_room.h"
@@ -34,7 +35,8 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, Server_DatabaseI
       acceptsRoomListChanges(false),
       timeRunning(0),
       lastDataReceived(0),
-      lastActionReceived(0)
+      lastActionReceived(0),
+      idleClientWarningSent(false)
 {
     connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -174,6 +176,7 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
         return Response::RespNotInRoom;
 
     lastActionReceived = timeRunning;
+    idleClientWarningSent = false;
 
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.room_command_size() - 1; i >= 0; --i) {
@@ -245,6 +248,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
         return Response::RespNotInRoom;
 
     lastActionReceived = timeRunning;
+    idleClientWarningSent = false;
 
     int commandCountingInterval = server->getCommandCountingInterval();
     int maxCommandCountPerInterval = server->getMaxCommandCountPerInterval();
@@ -287,6 +291,7 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
         return Response::RespLoginNeeded;
 
     lastActionReceived = timeRunning;
+    idleClientWarningSent = false;
 
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.moderator_command_size() - 1; i >= 0; --i) {
@@ -310,6 +315,7 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
         return Response::RespLoginNeeded;
 
     lastActionReceived = timeRunning;
+    idleClientWarningSent = false;
 
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.admin_command_size() - 1; i >= 0; --i) {
@@ -383,20 +389,22 @@ void Server_ProtocolHandler::pingClockTimeout()
 
     if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
         prepareDestroy();
+ 
+    if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
+        if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent == true))
+            if (timeRunning - lastActionReceived > server->getIdleClientTimeout())
+                prepareDestroy();
 
     if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
-        if ((timeRunning - lastActionReceived) == round(server->getIdleClientTimout() *.9)) {
+        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() *.9)) && (idleClientWarningSent == false)) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::IDLEWARNING);
             SessionEvent *se = prepareSessionEvent(event);
             sendProtocolItem(*se);
             delete se;
+            idleClientWarningSent = true;
         }
 
-    if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
-        if (server->getIdleClientTimout() > 0)
-            if (timeRunning - lastActionReceived > server->getIdleClientTimout())
-                prepareDestroy();
     ++timeRunning;
 }
 

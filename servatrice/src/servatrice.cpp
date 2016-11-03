@@ -406,7 +406,7 @@ bool Servatrice::initServer()
     }
 #endif
 
-    qDebug() << "Idle client timeout value: " << getIdleClientTimout();
+    qDebug() << "Idle client timeout value: " << getIdleClientTimeout();
     setRequiredFeatures(getRequiredFeatures());
     return true;
 }
@@ -818,6 +818,6 @@ int Servatrice::getISLNetworkPort() const {
     return settingsCache->value("servernetwork/port", 14747).toInt();
 }
 
-int Servatrice::getIdleClientTimout() const {
+int Servatrice::getIdleClientTimeout() const {
     return settingsCache->value("server/idleclienttimeout", 3600).toInt();
 }

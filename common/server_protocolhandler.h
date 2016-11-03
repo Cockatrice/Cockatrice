@@ -54,6 +54,7 @@ protected:
     bool acceptsRoomListChanges;
     virtual void logDebugMessage(const QString & /* message */) { }
 private:
+    bool idleClientWarningSent;
     QList<int> messageSizeOverTime, messageCountOverTime, commandCountOverTime;
     int timeRunning, lastDataReceived, lastActionReceived;
     QTimer *pingClock;

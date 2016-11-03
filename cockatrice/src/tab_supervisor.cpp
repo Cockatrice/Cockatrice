@@ -583,6 +583,7 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 {
 
     switch ((Event_NotifyUser::NotificationType) event.type()) {
+        case Event_NotifyUser::UNKNOWN: QMessageBox::information(this, tr("Unknown Event"), tr("The server has sent you a message that your client does not understand.\nThis message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.\n\nTo update your client, go to Help -> Update Cockatrice.")); break;
         case Event_NotifyUser::IDLEWARNING: QMessageBox::information(this, tr("Idle Timeout"), tr("You are about to be logged out due to inactivity.")); break;
         case Event_NotifyUser::PROMOTED: QMessageBox::information(this, tr("Promotion"), tr("You have been promoted to moderator. Please log out and back in for changes to take effect.")); break;
         case Event_NotifyUser::WARNING: {
