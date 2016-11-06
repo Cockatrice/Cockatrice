@@ -86,6 +86,12 @@ signals:
     void idleTimerReset();
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
+    TabReplays *addGameReplaysTab();
+    TabServer *addServerTab();
+    TabUserLists *addUserListsTab();
+    TabDeckStorage *addDeckStorageTab();
+    TabAdmin *addAdminTab();
+    TabLog *addAdminLogTab();
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
 private slots:
@@ -103,6 +109,12 @@ private slots:
     void processUserJoined(const ServerInfo_User &userInfo);
     void talkLeft(TabMessage *tab);
     void deckEditorClosed(TabDeckEditor *tab);
+    void tabReplaysClosed(TabReplays *tab);
+    void tabServerClosed(TabServer *tab);
+    void tabUserListsClosed(TabUserLists *tab);
+    void tabDeckStorageClosed(TabDeckStorage *tab);
+    void tabAdminClosed(TabAdmin *tab);
+    void tabAdminLogsClosed(TabLog *tab);
     void tabUserEvent(bool globalEvent);
     void updateTabText(Tab *tab, const QString &newTabText);
     void processRoomEvent(const RoomEvent &event);

@@ -82,6 +82,16 @@ TabUserLists::TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_clien
     setCentralWidget(mainWidget);
 }
 
+TabUserLists::~TabUserLists()
+{
+    emit userListClosing(this);
+}
+
+void TabUserLists::closeRequest()
+{
+    deleteLater();
+}
+
 void TabUserLists::addToBuddyList()
 {
     QString userName = addBuddyEdit->text();

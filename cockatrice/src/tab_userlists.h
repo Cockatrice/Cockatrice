@@ -23,6 +23,7 @@ signals:
     void openMessageDialog(const QString &userName, bool focus);
     void userLeft(const QString &userName);
     void userJoined(const ServerInfo_User &userInfo);
+    void userListClosing(TabUserLists *tab);
 private slots:
     void processListUsersResponse(const Response &response);
     void processUserJoinedEvent(const Event_UserJoined &event);
@@ -44,11 +45,14 @@ private:
     void addToList(const std::string &listName, const QString &userName);
 public:
     TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo, QWidget *parent = 0);
+    ~TabUserLists();
     void retranslateUi();
     QString getTabText() const { return tr("Account"); }
     const UserList *getAllUsersList() const { return allUsersList; }
     const UserList *getBuddyList() const { return buddyList; }
     const UserList *getIgnoreList() const { return ignoreList; }
+public slots:
+        void closeRequest();
 };
 
 #endif

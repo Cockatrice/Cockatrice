@@ -43,10 +43,16 @@ private slots:
     void deleteRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer);
     
     void replayAddedEventReceived(const Event_ReplayAdded &event);
+
 signals:
     void openReplay(GameReplay *replay);
+    void replaysClosing(TabReplays *tab);
+
+public slots:
+    void closeRequest();
 public:
     TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client);
+    ~TabReplays();
     void retranslateUi();
     QString getTabText() const { return tr("Game replays"); }
 };

@@ -65,6 +65,12 @@ private slots:
     void actSinglePlayer();
     void actWatchReplay();
     void actDeckEditor();
+    void actGameReplays();
+    void actAdminTab();
+    void actAdminLogTab();
+    void actServers();
+    void actUserLists();
+    void actDeckStorage();
     void actFullScreen(bool checked);
     void actRegister();
     void actSettings();
@@ -107,9 +113,10 @@ private:
     inline QString getCardUpdaterBinaryName() { return "oracle"; };
 
     QList<QMenu *> tabMenus;
-    QMenu *cockatriceMenu, *dbMenu, *helpMenu;
-    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
+    QMenu *cockatriceMenu, *dbMenu, *helpMenu, *serverMenu;
+    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aGameReplays, *aAdminTab,
+            *aAdminLogTab, *aServerTab, *aDeckStorageTab, *aUsersListsTab, *aFullScreen, *aSettings, *aExit,
+            *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
     QAction *aEditSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
 

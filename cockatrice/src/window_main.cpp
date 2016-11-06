@@ -66,7 +66,6 @@
 #define GITHUB_ISSUES_URL "https://github.com/Cockatrice/Cockatrice/issues"
 #define GITHUB_TROUBLESHOOTING_URL "https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting"
 #define GITHUB_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions"
-
 #define DOWNLOAD_URL "https://dl.bintray.com/cockatrice/Cockatrice/"
 
 const QString MainWindow::appName = "Cockatrice";
@@ -257,6 +256,36 @@ void MainWindow::localGameEnded()
 void MainWindow::actDeckEditor()
 {
     tabSupervisor->addDeckEditorTab(0);
+}
+
+void MainWindow::actGameReplays()
+{
+    tabSupervisor->addGameReplaysTab();
+}
+
+void MainWindow::actAdminTab()
+{
+    tabSupervisor->addAdminTab();
+}
+
+void MainWindow::actAdminLogTab()
+{
+    tabSupervisor->addAdminLogTab();
+}
+
+void MainWindow::actServers()
+{
+    tabSupervisor->addServerTab();
+}
+
+void MainWindow::actDeckStorage()
+{
+    tabSupervisor->addDeckStorageTab();
+}
+
+void MainWindow::actUserLists()
+{
+    tabSupervisor->addUserListsTab();
 }
 
 void MainWindow::actFullScreen(bool checked)
@@ -527,6 +556,12 @@ void MainWindow::retranslateUi()
     aSinglePlayer->setText(tr("Start &local game..."));
     aWatchReplay->setText(tr("&Watch replay..."));
     aDeckEditor->setText(tr("&Deck editor"));
+    aGameReplays->setText(tr("Open game replay tab"));
+    aServerTab->setText(tr("Open server tab"));
+    aDeckStorageTab->setText(tr("Open deck storage tab"));
+    aAdminTab->setText(tr("Open administration tab"));
+    aAdminLogTab->setText(tr("Open log tab"));
+    aUsersListsTab->setText(tr("Open account tab"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
     aSettings->setText(tr("&Settings..."));
@@ -550,6 +585,7 @@ void MainWindow::retranslateUi()
     aUpdate->setText(tr("&Update Cockatrice"));
     aViewLog->setText(tr("View &debug log"));
     helpMenu->setTitle(tr("&Help"));
+	serverMenu->setTitle(tr("Server Options"));
     aCheckCardUpdates->setText(tr("Check for card updates..."));
     tabSupervisor->retranslateUi();
 }
@@ -567,6 +603,18 @@ void MainWindow::createActions()
     connect(aWatchReplay, SIGNAL(triggered()), this, SLOT(actWatchReplay()));
     aDeckEditor = new QAction(this);
     connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
+    aGameReplays = new QAction(this);
+    connect(aGameReplays, SIGNAL(triggered()), this, SLOT(actGameReplays()));
+    aAdminTab = new QAction(this);
+    connect(aAdminTab, SIGNAL(triggered()), this, SLOT(actAdminTab()));
+    aAdminLogTab = new QAction(this);
+    connect(aAdminLogTab, SIGNAL(triggered()), this, SLOT(actAdminLogTab()));
+    aServerTab = new QAction(this);
+    connect(aServerTab, SIGNAL(triggered()), this, SLOT(actServers()));
+    aDeckStorageTab = new QAction(this);
+    connect(aDeckStorageTab, SIGNAL(triggered()), this, SLOT(actDeckStorage()));
+    aUsersListsTab = new QAction(this);
+    connect(aUsersListsTab, SIGNAL(triggered()), this, SLOT(actUserLists()));
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
@@ -646,6 +694,18 @@ void MainWindow::createMenus()
     dbMenu->addAction(aOpenCustomsetsFolder);
 #endif
     dbMenu->addAction(aAddCustomSet);
+	
+	serverMenu = menuBar()->addMenu(QString());
+	serverMenu->addAction(aGameReplays);
+    serverMenu->addAction(aServerTab);
+    serverMenu->addAction(aDeckStorageTab);
+    //serverMenu->addAction(aUsersListsTab);
+
+    /* TODO: Find a way to limit this to mod/admin only */
+    if (true) {
+       serverMenu->addAction(aAdminTab);
+       serverMenu->addAction(aAdminLogTab);
+    }
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
@@ -689,6 +749,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(tabSupervisor, SIGNAL(showWindowIfHidden()), this, SLOT(showWindowIfHidden()));
     connect(tabSupervisor, SIGNAL(idleTimerReset()), this, SLOT(idleTimerReset()));
     tabSupervisor->addDeckEditorTab(0);
+
 
     setCentralWidget(tabSupervisor);
 

@@ -33,6 +33,7 @@ private:
     QPushButton *unlockButton, *lockButton;
 signals:
     void adminLockChanged(bool lock);
+    void closingTabAdmin(TabAdmin *tab);
 private slots:
     void actUpdateServerMessage();
     void actShutdownServer();
@@ -42,9 +43,14 @@ private slots:
     void actLock();
 public:
     TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _fullAdmin, QWidget *parent = 0);
+    ~TabAdmin();
     void retranslateUi();
     QString getTabText() const { return tr("Administration"); }
     bool getLocked() const { return locked; }
+
+public slots:
+    void closeRequest();
+
 };
 
 #endif

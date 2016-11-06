@@ -91,6 +91,16 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
     actUnlock();
 }
 
+TabAdmin::~TabAdmin()
+{
+    emit closingTabAdmin(this);
+}
+
+void TabAdmin::closeRequest()
+{
+    deleteLater();
+}
+
 void TabAdmin::retranslateUi()
 {
     updateServerMessageButton->setText(tr("Update server &message"));
