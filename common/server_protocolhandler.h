@@ -82,6 +82,8 @@ private:
     virtual Response::ResponseCode processExtendedModeratorCommand(int /* cmdType */, const ModeratorCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
     Response::ResponseCode processAdminCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
     virtual Response::ResponseCode processExtendedAdminCommand(int /* cmdType */, const AdminCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
+
+    void resetIdleTimer();
 private slots:
     void pingClockTimeout();
 public slots:

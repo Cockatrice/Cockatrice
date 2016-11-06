@@ -176,8 +176,7 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
     if (!room)
         return Response::RespNotInRoom;
 
-    lastActionReceived = timeRunning;
-    idleClientWarningSent = false;
+    resetIdleTimer();
 
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.room_command_size() - 1; i >= 0; --i) {
@@ -248,8 +247,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     if (!player)
         return Response::RespNotInRoom;
 
-    lastActionReceived = timeRunning;
-    idleClientWarningSent = false;
+    resetIdleTimer();
 
     int commandCountingInterval = server->getCommandCountingInterval();
     int maxCommandCountPerInterval = server->getMaxCommandCountPerInterval();
@@ -291,8 +289,7 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
     if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
         return Response::RespLoginNeeded;
 
-    lastActionReceived = timeRunning;
-    idleClientWarningSent = false;
+    resetIdleTimer();
 
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.moderator_command_size() - 1; i >= 0; --i) {
@@ -315,8 +312,7 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
     if (!(userInfo->user_level() & ServerInfo_User::IsAdmin))
         return Response::RespLoginNeeded;
 
-    lastActionReceived = timeRunning;
-    idleClientWarningSent = false;
+    resetIdleTimer();
 
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.admin_command_size() - 1; i >= 0; --i) {
@@ -390,14 +386,15 @@ void Server_ProtocolHandler::pingClockTimeout()
 
     if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
         prepareDestroy();
- 
-    if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
-        if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent == true))
-            if (timeRunning - lastActionReceived > server->getIdleClientTimeout())
-                prepareDestroy();
 
-    if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
-        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() *.9)) && (idleClientWarningSent == false)) {
+    if (QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
+        if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
+            if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
+                prepareDestroy();
+            }
+        }
+
+        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() *.9)) && (!idleClientWarningSent)) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::IDLEWARNING);
             SessionEvent *se = prepareSessionEvent(event);
@@ -405,6 +402,7 @@ void Server_ProtocolHandler::pingClockTimeout()
             delete se;
             idleClientWarningSent = true;
         }
+    }
 
     ++timeRunning;
 }
@@ -760,4 +758,10 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGam
         return Response::RespLoginNeeded;
 
     return room->processJoinGameCommand(cmd, rc, this);
+}
+
+void Server_ProtocolHandler::resetIdleTimer()
+{
+    lastActionReceived = timeRunning;
+    idleClientWarningSent = false;
 }
