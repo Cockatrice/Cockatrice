@@ -342,12 +342,10 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
     connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
     connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
     connect(tab, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
-    connect(tab, SIGNAL(notIdle()), this, SLOT(resetIdleTimer()));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     gameTabs.insert(event.game_info().game_id(), tab);
     setCurrentWidget(tab);
-    emit idleTimerReset();
 }
 
 void TabSupervisor::localGameJoined(const Event_GameJoined &event)
@@ -391,7 +389,6 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     roomTabs.insert(info.room_id(), tab);
     if (setCurrent)
         setCurrentWidget(tab);
-    emit idleTimerReset();
 }
 
 void TabSupervisor::roomLeft(TabRoom *tab)
@@ -444,7 +441,6 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     tab = new TabMessage(this, client, *userInfo, otherUser);
     connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
     connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));
-    connect(tab, SIGNAL(notIdle()), this, SLOT(resetIdleTimer()));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     messageTabs.insert(receiverName, tab);
@@ -594,9 +590,4 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
         default: ;
     }
 
-}
-
-void TabSupervisor::resetIdleTimer()
-{
-    emit idleTimerReset();
 }

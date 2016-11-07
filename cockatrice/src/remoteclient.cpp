@@ -30,11 +30,6 @@ RemoteClient::RemoteClient(QObject *parent)
     timer->setInterval(keepalive * 1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(ping()));
 
-    int idlekeepalive = settingsCache->getIdleKeepAlive();
-    idleTimer = new QTimer(this);
-    idleTimer->setInterval(idlekeepalive * 1000);
-    connect(idleTimer, SIGNAL(timeout()), this, SLOT(doIdleTimeOut()));
-    connect(this, SIGNAL(resetIdleTimerClock()), idleTimer, SLOT(start()));
    
     socket = new QTcpSocket(this);
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
@@ -66,7 +61,6 @@ void RemoteClient::slotConnected()
 {
     timeRunning = lastDataReceived = 0;
     timer->start();
-    idleTimer->start();
 
     // dirty hack to be compatible with v14 server
     sendCommandContainer(CommandContainer());
@@ -308,7 +302,6 @@ void RemoteClient::doActivateToServer(const QString &_token)
 void RemoteClient::doDisconnectFromServer()
 {
     timer->stop();
-    idleTimer->stop();
 
     messageInProgress = false;
     handshakeStarted = false;
@@ -386,18 +379,4 @@ QString RemoteClient::getSrvClientID(const QString _hostname)
     }
     QString uniqueServerClientID = QCryptographicHash::hash(srvClientID.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
     return uniqueServerClientID;
-}
-
-void RemoteClient::doIdleTimeOut()
-{
-    if (settingsCache->getIdleClientTimeOutEnabled()) {
-        doDisconnectFromServer();
-        emit idleTimeout();
-    }
- 
-}
-
-void RemoteClient::resetIdleTimer()
-{
-    emit resetIdleTimerClock();
 }

@@ -64,7 +64,6 @@ private:
     bool doubleClickToPlay;
     bool playToStack;
     bool annotateTokens;
-    bool idleClientTimeOutEnabled;
     QByteArray tabGameSplitterSizes;
     bool displayCardNames;
     bool horizontalHand;
@@ -105,8 +104,7 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
-    int keepalive;
-    int idlekeepalive;    
+    int keepalive;    
     void translateLegacySettings();
     QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
     QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
@@ -132,7 +130,6 @@ public:
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
     bool getNotifyAboutUpdates() const { return notifyAboutUpdates; }
-    bool getIdleClientTimeOutEnabled() const { return idleClientTimeOutEnabled;  }
 
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
@@ -183,7 +180,6 @@ public:
     bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
     bool getRememberGameSettings() const { return rememberGameSettings; }
     int getKeepAlive() const { return keepalive; }
-    int getIdleKeepAlive() const { return idlekeepalive; }
     void setClientID(QString clientID);
     QString getClientID() { return clientID; }
     ShortcutsSettings& shortcuts() const { return *shortcutsSettings; }
@@ -209,7 +205,6 @@ public slots:
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
     void setAnnotateTokens(int _annotateTokens);
-    void setIdleClientTimeOutEnabled(int _idleClientTimeOutEnabled);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setDisplayCardNames(int _displayCardNames);
     void setHorizontalHand(int _horizontalHand);

@@ -26,7 +26,6 @@ private:
 signals:
     void talkClosing(TabMessage *tab);
     void maximizeClient();
-    void notIdle();
 private slots:
     void sendMessage();
     void actLeave();
