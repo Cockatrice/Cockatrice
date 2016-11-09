@@ -387,7 +387,7 @@ void Server_ProtocolHandler::pingClockTimeout()
     if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
         prepareDestroy();
 
-    if (QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
+    if (!userInfo || QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
         if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
             if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
                 prepareDestroy();
@@ -472,7 +472,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     }
 
     // limit the number of non-privileged users that can connect to the server based on configuration settings
-    if (QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
+    if (!userInfo || QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
         if (server->getMaxUserLimitEnabled()) {
             if (server->getUsersCount() > server->getMaxUserTotal()) {
                 qDebug() << "Max Users Total Limit Reached, please increase the max_users_total setting.";
