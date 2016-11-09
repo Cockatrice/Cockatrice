@@ -52,10 +52,11 @@ protected:
     AuthenticationResult authState;
     bool acceptsUserListChanges;
     bool acceptsRoomListChanges;
+    bool idleClientWarningSent;
     virtual void logDebugMessage(const QString & /* message */) { }
 private:
     QList<int> messageSizeOverTime, messageCountOverTime, commandCountOverTime;
-    int timeRunning, lastDataReceived;
+    int timeRunning, lastDataReceived, lastActionReceived;
     QTimer *pingClock;
 
     virtual void transmitProtocolItem(const ServerMessage &item) = 0;
@@ -81,6 +82,8 @@ private:
     virtual Response::ResponseCode processExtendedModeratorCommand(int /* cmdType */, const ModeratorCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
     Response::ResponseCode processAdminCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
     virtual Response::ResponseCode processExtendedAdminCommand(int /* cmdType */, const AdminCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
+
+    void resetIdleTimer();
 private slots:
     void pingClockTimeout();
 public slots:

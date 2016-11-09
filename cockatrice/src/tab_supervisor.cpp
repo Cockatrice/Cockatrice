@@ -342,12 +342,10 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
     connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
     connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
     connect(tab, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
-    connect(tab, SIGNAL(notIdle()), this, SLOT(resetIdleTimer()));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     gameTabs.insert(event.game_info().game_id(), tab);
     setCurrentWidget(tab);
-    emit idleTimerReset();
 }
 
 void TabSupervisor::localGameJoined(const Event_GameJoined &event)
@@ -391,7 +389,6 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     roomTabs.insert(info.room_id(), tab);
     if (setCurrent)
         setCurrentWidget(tab);
-    emit idleTimerReset();
 }
 
 void TabSupervisor::roomLeft(TabRoom *tab)
@@ -444,7 +441,6 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     tab = new TabMessage(this, client, *userInfo, otherUser);
     connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
     connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));
-    connect(tab, SIGNAL(notIdle()), this, SLOT(resetIdleTimer()));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     messageTabs.insert(receiverName, tab);
@@ -583,6 +579,8 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 {
 
     switch ((Event_NotifyUser::NotificationType) event.type()) {
+        case Event_NotifyUser::UNKNOWN: QMessageBox::information(this, tr("Unknown Event"), tr("The server has sent you a message that your client does not understand.\nThis message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.\n\nTo update your client, go to Help -> Update Cockatrice.")); break;
+        case Event_NotifyUser::IDLEWARNING: QMessageBox::information(this, tr("Idle Timeout"), tr("You are about to be logged out due to inactivity.")); break;
         case Event_NotifyUser::PROMOTED: QMessageBox::information(this, tr("Promotion"), tr("You have been promoted to moderator. Please log out and back in for changes to take effect.")); break;
         case Event_NotifyUser::WARNING: {
             if (!QString::fromStdString(event.warning_reason()).simplified().isEmpty())
@@ -592,9 +590,4 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
         default: ;
     }
 
-}
-
-void TabSupervisor::resetIdleTimer()
-{
-    emit idleTimerReset();
 }

@@ -99,7 +99,6 @@ void TabMessage::sendMessage()
     client->sendCommand(pend);
     
     sayEdit->clear();
-    emit notIdle();
 }
 
 void TabMessage::messageSent(const Response &response)

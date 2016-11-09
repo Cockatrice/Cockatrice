@@ -398,16 +398,12 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     annotateTokensCheckBox.setChecked(settingsCache->getAnnotateTokens());
     connect(&annotateTokensCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setAnnotateTokens(int)));
 
-    idleClientTimeOutCheckBox.setChecked(settingsCache->getIdleClientTimeOutEnabled());
-    connect(&idleClientTimeOutCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIdleClientTimeOutEnabled(int)));
-
     QGridLayout *generalGrid = new QGridLayout;
     generalGrid->addWidget(&notificationsEnabledCheckBox, 0, 0);
     generalGrid->addWidget(&specNotificationsEnabledCheckBox, 1, 0);
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 2, 0);
     generalGrid->addWidget(&playToStackCheckBox, 3, 0);
     generalGrid->addWidget(&annotateTokensCheckBox, 4, 0);
-    generalGrid->addWidget(&idleClientTimeOutCheckBox, 5, 0);
     
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -442,7 +438,6 @@ void UserInterfaceSettingsPage::retranslateUi()
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
-    idleClientTimeOutCheckBox.setText(tr("Disconnect from server if idle for 1 hour"));
 }
 
 

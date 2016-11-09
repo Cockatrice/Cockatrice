@@ -405,6 +405,13 @@ bool Servatrice::initServer()
         }
     }
 #endif
+
+    if (getIdleClientTimeout() > 0) {
+        qDebug() << "Idle client timeout value: " << getIdleClientTimeout();
+        if (getIdleClientTimeout() < 300)
+            qDebug() << "WARNING: It is not recommended to set the IdleClientTimeout value very low.  Doing so will cause clients to very quickly be disconnected.  Many players when connected may be searching for card details outside the client in the middle of matches or possibly drafting outside the client and short time out values will remove these players.";
+    }
+
     setRequiredFeatures(getRequiredFeatures());
     return true;
 }
@@ -814,4 +821,8 @@ QString Servatrice::getISLNetworkSSLKeyFile() const {
 
 int Servatrice::getISLNetworkPort() const {
     return settingsCache->value("servernetwork/port", 14747).toInt();
+}
+
+int Servatrice::getIdleClientTimeout() const {
+    return settingsCache->value("server/idleclienttimeout", 3600).toInt();
 }
