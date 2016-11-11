@@ -86,6 +86,7 @@ private:
     QString picUrl;
     QString picUrlFallback;
     QString clientID;
+    QString knownMissingFeatures;
     int pixmapCacheSize;
     bool scaleCards;
     bool showMessagePopups;
@@ -181,7 +182,9 @@ public:
     bool getRememberGameSettings() const { return rememberGameSettings; }
     int getKeepAlive() const { return keepalive; }
     void setClientID(QString clientID);
+    void setKnownMissingFeatures(QString _knownMissingFeatures);
     QString getClientID() { return clientID; }
+    QString getKnownMissingFeatures() { return knownMissingFeatures; }
     ShortcutsSettings& shortcuts() const { return *shortcutsSettings; }
     CardDatabaseSettings& cardDatabase() const { return *cardDatabaseSettings; }
     ServersSettings& servers() const { return *serversSettings; }

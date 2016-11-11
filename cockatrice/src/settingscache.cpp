@@ -249,6 +249,12 @@ SettingsCache::SettingsCache()
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", "notset").toString();
+    knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
+}
+
+void SettingsCache::setKnownMissingFeatures(QString _knownMissingFeatures) {
+    knownMissingFeatures = _knownMissingFeatures;
+    settings->setValue("interface/knownmissingfeatures", knownMissingFeatures);
 }
 
 void SettingsCache::setCardInfoViewMode(const int _viewMode) {

@@ -45,6 +45,8 @@ private:
     QByteArray inputBuffer;
     bool messageInProgress;
     bool handshakeStarted;
+    bool newMissingFeatureFound(QString _serversMissingFeatures);
+    void clearNewClientFeatures();
     int messageLength;
     
     QTimer *timer;
