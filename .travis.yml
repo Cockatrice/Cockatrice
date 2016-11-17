@@ -2,18 +2,10 @@ language: cpp
 matrix:
   fast_finish: true
   include:
-    # linux debug build, trusty + gcc + qt5
-    - os: linux
-      dist: trusty
-      env: BUILDTYPE=Debug DIST=trusty
     # osx debug build, osx + clang + qt5
     - os: osx
       osx_image: xcode6.4
       env: BUILDTYPE=Debug
-    # linux trusty release build, precise + gcc + qt5
-    - os: linux
-      dist: trusty
-      env: BUILDTYPE=Release DIST=trusty
     # osx release build, osx + gcc + qt5
     - os: osx
       osx_image: xcode6.4
