@@ -23,3 +23,5 @@ else
 	cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=$BUILDTYPE $prefix
 	make package -j2
 fi
+
+set +e
