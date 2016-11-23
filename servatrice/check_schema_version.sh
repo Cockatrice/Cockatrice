@@ -31,3 +31,5 @@ if ! grep -q "$expected_define" servatrice/src/servatrice_database_interface.h; 
     echo "servatrice_database_interface.h does not contain expected #define: $expected_define"
     exit 1
 fi
+
+set +e
