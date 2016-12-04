@@ -826,3 +826,7 @@ int Servatrice::getISLNetworkPort() const {
 int Servatrice::getIdleClientTimeout() const {
     return settingsCache->value("server/idleclienttimeout", 3600).toInt();
 }
+
+bool Servatrice::getEnableLogQuery() const {
+    return settingsCache->value("logging/enablelogquery", false).toBool();
+}

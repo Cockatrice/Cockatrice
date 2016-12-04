@@ -288,6 +288,10 @@ command_counting_interval=10
 max_command_count_per_interval=20
 
 [logging]
+; Admin/Moderators can query the stored logs for information when looking up reports by various players. This
+; option can allow or disallow them from doing so. 
+; !!NOTE!! Enabling this feature puts a very high CPU and DISK load on the server, enable with caution.
+enablelogquery=false
 
 ; Servatrice can log user messages to the database table cockatrice_log.
 ; These messages can come from different sources; each source can be enabled separately.
