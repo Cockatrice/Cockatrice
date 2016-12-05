@@ -662,7 +662,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
         ServerInfo_ChatMessage chatMessage;
 
         //create dummy chat message for room tab in the event the query is for room messages (and possibly not others)
-        chatMessage.set_time(QString("Log Query Disabled, please contact server owner for details.").toStdString());
+        chatMessage.set_time(QString(tr("Log query disabled, please contact server owner for details.")).toStdString());
         chatMessage.set_sender_id(QString("").toStdString());
         chatMessage.set_sender_name(QString("").toStdString());
         chatMessage.set_sender_ip(QString("").toStdString());
@@ -673,7 +673,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
         messageList << chatMessage;
 
         //create dummy chat message for room tab in the event the query is for game messages (and possibly not others)
-        chatMessage.set_time(QString("Log Query Disabled, please contact server owner for details.").toStdString());
+        chatMessage.set_time(QString(tr("Log query disabled, please contact server owner for details.")).toStdString());
         chatMessage.set_sender_id(QString("").toStdString());
         chatMessage.set_sender_name(QString("").toStdString());
         chatMessage.set_sender_ip(QString("").toStdString());
@@ -684,7 +684,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
         messageList << chatMessage;
 
         //create dummy chat message for room tab in the event the query is for chat messages (and possibly not others)
-        chatMessage.set_time(QString("Log Query Disabled, please contact server owner for details.").toStdString());
+        chatMessage.set_time(QString(tr("Log query disabled, please contact server owner for details.")).toStdString());
         chatMessage.set_sender_id(QString("").toStdString());
         chatMessage.set_sender_name(QString("").toStdString());
         chatMessage.set_sender_ip(QString("").toStdString());
