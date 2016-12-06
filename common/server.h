@@ -64,6 +64,7 @@ public:
     virtual bool getClientIDRequiredEnabled() const { return false; }
     virtual bool getRegOnlyServerEnabled() const { return false; }
     virtual bool getMaxUserLimitEnabled() const { return false; }
+    virtual bool getEnableLogQuery() const { return false; }
     virtual int getIdleClientTimeout() const { return 0; }
     virtual int getClientKeepAlive() const { return 0; }
     virtual int getMaxGameInactivityTime() const { return 9999999; }
