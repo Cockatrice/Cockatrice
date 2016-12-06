@@ -96,10 +96,12 @@ public:
     QList<PlayerReference> getPersistentPlayerReferences(const QString &userName) const;
     int getUsersCount() const;
     int getGamesCount() const;
+    int getTCPUserCount() const { return tcpUserCount; }
+    int getWebSocketUserCount() const { return webSocketUserCount; }
 private:
     QMultiMap<QString, PlayerReference> persistentPlayers;
     mutable QReadWriteLock persistentPlayersLock;
-    int nextLocalGameId;
+    int nextLocalGameId, tcpUserCount, webSocketUserCount;
     QMutex nextLocalGameIdMutex;
 
 protected slots:
