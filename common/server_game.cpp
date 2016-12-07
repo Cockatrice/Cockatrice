@@ -153,8 +153,7 @@ void Server_Game::storeGameInformation()
     server->clientsLock.lockForRead();
     while (allUsersIterator.hasNext()) {
         Server_AbstractUserInterface *userHandler = server->findUser(allUsersIterator.next());
-        if (userHandler)
-            if (server->getStoreReplaysEnabled())
+        if (userHandler && server->getStoreReplaysEnabled())
                 userHandler->sendProtocolItem(*sessionEvent);
     }
     server->clientsLock.unlock();
