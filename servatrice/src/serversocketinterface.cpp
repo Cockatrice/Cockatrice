@@ -1259,7 +1259,7 @@ bool TcpServerSocketInterface::initTcpSession()
     bool enforceUserLimit = settingsCache->value("security/enable_max_user_limit", false).toBool();
     if (enforceUserLimit) {
         int userLimit = settingsCache->value("security/max_users_tcp", 500).toInt();
-        int playerCount = (databaseInterface->getActiveUserCount(getConnectionType()) + 1);
+        int playerCount = (server->getTCPUserCount() + 1);
         if (playerCount > userLimit){
             std::cerr << "Max Tcp Users Limit Reached, please increase the max_users_tcp setting." << std::endl;
             logger->logMessage(QString("Max Tcp Users Limit Reached, please increase the max_users_tcp setting."), this);
@@ -1313,7 +1313,7 @@ bool WebsocketServerSocketInterface::initWebsocketSession()
     bool enforceUserLimit = settingsCache->value("security/enable_max_user_limit", false).toBool();
     if (enforceUserLimit) {
         int userLimit = settingsCache->value("security/max_users_websocket", 500).toInt();
-        int playerCount = (databaseInterface->getActiveUserCount(getConnectionType()) + 1);
+        int playerCount = (server->getWebSocketUserCount() + 1);
         if (playerCount > userLimit){
             std::cerr << "Max Websocket Users Limit Reached, please increase the max_users_websocket setting." << std::endl;
             logger->logMessage(QString("Max Websocket Users Limit Reached, please increase the max_users_websocket setting."), this);
