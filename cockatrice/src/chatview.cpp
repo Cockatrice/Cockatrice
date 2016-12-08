@@ -146,7 +146,8 @@ void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, 
             (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
             senderFormat.setForeground(QBrush(getCustomMentionColor()));
             senderFormat.setFontWeight(QFont::Bold);
-        } else {
+        }
+        else {
             senderFormat.setForeground(QBrush(OTHER_USER_COLOR));
             if (playerBold)
                 senderFormat.setFontWeight(QFont::Bold);
@@ -155,12 +156,14 @@ void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, 
         senderFormat.setAnchorHref("user://" + QString::number(userLevel) + "_" + sender);
         if (sameSender) {
             cursor.insertText("    ");
-        } else {
+        }
+        else {
             if (!sender.isEmpty() && tabSupervisor->getUserListsTab()) {
                 const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
                 QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
-                cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel,
-                                                                            buddyList.contains(sender)).toImage());
+                QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
+                UserListTWI *vlu = userList.value(sender);
+                cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, buddyList.contains(sender), QString::fromStdString(vlu->getUserInfo().privlevel())).toImage());
                 cursor.insertText(" ");
             }
             cursor.setCharFormat(senderFormat);
