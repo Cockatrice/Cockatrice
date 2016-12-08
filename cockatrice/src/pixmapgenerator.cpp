@@ -133,13 +133,14 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
             levelString.append("_" + privLevel.toLower());
     } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
         levelString = "registered";
-        levelString.append("_" + privLevel.toLower());
+        if (privLevel.toLower() != "none")
+            levelString.append("_" + privLevel.toLower());
     } else
         levelString = "normal";
 
     if (isBuddy)
         levelString.append("_buddy");
-
+    
     QPixmap pixmap = QPixmap("theme:userlevels/" + levelString).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     pmCache.insert(key, pixmap);
     return pixmap;
