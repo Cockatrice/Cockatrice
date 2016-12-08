@@ -162,7 +162,6 @@ SettingsCache::SettingsCache()
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
-    idlekeepalive = settings->value("personal/idlekeepalive", 36000).toInt();
 
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
@@ -250,7 +249,12 @@ SettingsCache::SettingsCache()
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", "notset").toString();
-    idleClientTimeOutEnabled = settings->value("interface/idleClientTimeOutEnabled", true).toBool();
+    knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
+}
+
+void SettingsCache::setKnownMissingFeatures(QString _knownMissingFeatures) {
+    knownMissingFeatures = _knownMissingFeatures;
+    settings->setValue("interface/knownmissingfeatures", knownMissingFeatures);
 }
 
 void SettingsCache::setCardInfoViewMode(const int _viewMode) {
@@ -390,12 +394,6 @@ void SettingsCache::setAnnotateTokens(int _annotateTokens)
 {
     annotateTokens = _annotateTokens;
     settings->setValue("interface/annotatetokens", annotateTokens);
-}
-
-void SettingsCache::setIdleClientTimeOutEnabled(int _idleClientTimeOutEnabled)
-{
-    idleClientTimeOutEnabled = _idleClientTimeOutEnabled;
-    settings->setValue("interface/idleClientTimeOutEnabled", idleClientTimeOutEnabled);
 }
 
 void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes)

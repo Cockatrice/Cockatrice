@@ -11,8 +11,6 @@ class RemoteClient : public AbstractClient {
 signals:
     void maxPingTime(int seconds, int maxSeconds);
     void serverTimeout();
-    void idleTimeout();
-    void resetIdleTimerClock();
     void loginError(Response::ResponseCode resp, QString reasonStr, quint32 endTime, QList<QString> missingFeatures);
     void registerError(Response::ResponseCode resp, QString reasonStr, quint32 endTime);
     void activateError();
@@ -39,7 +37,6 @@ private slots:
     void doLogin();
     void doDisconnectFromServer();
     void doActivateToServer(const QString &_token);
-    void doIdleTimeOut();
 
 private:
     static const int maxTimeout = 10;
@@ -48,10 +45,11 @@ private:
     QByteArray inputBuffer;
     bool messageInProgress;
     bool handshakeStarted;
+    bool newMissingFeatureFound(QString _serversMissingFeatures);
+    void clearNewClientFeatures();
     int messageLength;
     
     QTimer *timer;
-    QTimer *idleTimer;
     QTcpSocket *socket;
     QString lastHostname;
     int lastPort;
@@ -66,7 +64,6 @@ public:
     void registerToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname);
     void activateToServer(const QString &_token);
     void disconnectFromServer();
-    void resetIdleTimer();
 };
 
 #endif

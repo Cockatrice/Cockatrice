@@ -199,7 +199,6 @@ void TabRoom::sendMessage()
         sendRoomCommand(pend);
         sayEdit->clear();
     }
-    emit notIdle();
 }
 
 void TabRoom::sayFinished(const Response &response)

@@ -96,7 +96,6 @@ Server_Game::~Server_Game()
 
     gameClosed = true;
     sendGameEventContainer(prepareGameEvent(Event_GameClosed(), -1));
-
     QMapIterator<int, Server_Player *> playerIterator(players);
     while (playerIterator.hasNext())
         playerIterator.next().value()->prepareDestroy();
@@ -108,7 +107,6 @@ Server_Game::~Server_Game()
 
     gameMutex.unlock();
     room->gamesLock.unlock();
-
     currentReplay->set_duration_seconds(secondsElapsed - startTimeOfThisGame);
     replayList.append(currentReplay);
     storeGameInformation();
@@ -155,13 +153,15 @@ void Server_Game::storeGameInformation()
     server->clientsLock.lockForRead();
     while (allUsersIterator.hasNext()) {
         Server_AbstractUserInterface *userHandler = server->findUser(allUsersIterator.next());
-        if (userHandler)
-            userHandler->sendProtocolItem(*sessionEvent);
+        if (userHandler && server->getStoreReplaysEnabled())
+                userHandler->sendProtocolItem(*sessionEvent);
     }
     server->clientsLock.unlock();
     delete sessionEvent;
 
-    server->getDatabaseInterface()->storeGameInformation(room->getName(), gameTypes, gameInfo, allPlayersEver, allSpectatorsEver, replayList);
+    if (server->getStoreReplaysEnabled())
+        server->getDatabaseInterface()->storeGameInformation(room->getName(), gameTypes, gameInfo, allPlayersEver, allSpectatorsEver, replayList);
+
 }
 
 void Server_Game::pingClockTimeout()

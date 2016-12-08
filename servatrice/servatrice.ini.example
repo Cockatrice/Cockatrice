@@ -71,6 +71,10 @@ requiredfeatures=""
 ; to choose from.  Example: "Flaming,Foul Language"
 officialwarnings="Flamming,Spamming,Causing Drama,Abusive Language"
 
+; Maximum time in seconds a player can stay connected but idle.  Default is 3600 (0 = disabled)
+; Clients will be notified at the 90% time period of pending disconnection if they do not take action.
+idleclienttimeout=3600
+
 [authentication]
 
 ; Servatrice can authenticate users connecting. It currently supports 3 different authentication methods:
@@ -284,6 +288,10 @@ command_counting_interval=10
 max_command_count_per_interval=20
 
 [logging]
+; Admin/Moderators can query the stored logs for information when looking up reports by various players. This
+; option can allow or disallow them from doing so. 
+; !!NOTE!! Enabling this feature puts a very high CPU and DISK load on the server, enable with caution.
+enablelogquery=false
 
 ; Servatrice can log user messages to the database table cockatrice_log.
 ; These messages can come from different sources; each source can be enabled separately.

@@ -228,6 +228,8 @@ QString PictureLoaderWorker::getPicUrl()
 
     picUrl.replace("!name!", QUrl::toPercentEncoding(card->getName()));
     picUrl.replace("!name_lower!", QUrl::toPercentEncoding(card->getName().toLower()));
+    picUrl.replace("!corrected_name!", QUrl::toPercentEncoding(card->getCorrectedName()));
+    picUrl.replace("!corrected_name_lower!", QUrl::toPercentEncoding(card->getCorrectedName().toLower()));
     picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
     if (set)
     {
@@ -244,6 +246,8 @@ QString PictureLoaderWorker::getPicUrl()
     if (
         picUrl.contains("!name!") ||
         picUrl.contains("!name_lower!") ||
+        picUrl.contains("!corrected_name!") ||
+        picUrl.contains("!corrected_name_lower!") ||
         picUrl.contains("!setnumber!") ||
         picUrl.contains("!setcode!") ||
         picUrl.contains("!setcode_lower!") ||

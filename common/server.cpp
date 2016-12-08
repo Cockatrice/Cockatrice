@@ -38,7 +38,7 @@
 #include <QDebug>
 
 Server::Server(QObject *parent)
-    : QObject(parent), nextLocalGameId(0)
+    : QObject(parent), nextLocalGameId(0), tcpUserCount(0), webSocketUserCount(0)
 {
     qRegisterMetaType<ServerInfo_Ban>("ServerInfo_Ban");
     qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
@@ -115,7 +115,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     } else if (authState == UnknownUser) {
         // Change user name so that no two users have the same names,
         // don't interfere with registered user names though.
-        if (getRegOnlyServer()) {
+        if (getRegOnlyServerEnabled()) {
             qDebug("Login denied: registration required");
             databaseInterface->unlockSessionTables();
             return RegistrationRequired;
@@ -155,7 +155,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
     if (clientid.isEmpty()){
         // client id is empty, either out dated client or client has been modified
-        if (getClientIdRequired())
+        if (getClientIDRequiredEnabled())
             return ClientIdRequired;
     }
     else {
@@ -202,12 +202,25 @@ Server_AbstractUserInterface *Server::findUser(const QString &userName) const
 
 void Server::addClient(Server_ProtocolHandler *client)
 {
+    if (client->getConnectionType() == "tcp")
+        tcpUserCount++;
+
+    if (client->getConnectionType() == "websocket")
+        webSocketUserCount++;
+
     QWriteLocker locker(&clientsLock);
     clients << client;
 }
 
 void Server::removeClient(Server_ProtocolHandler *client)
 {
+    
+    if (client->getConnectionType() == "tcp")
+        tcpUserCount--;
+
+    if (client->getConnectionType() == "websocket")
+        webSocketUserCount--;
+
     QWriteLocker locker(&clientsLock);
     clients.removeAt(clients.indexOf(client));
     ServerInfo_User *data = client->getUserInfo();

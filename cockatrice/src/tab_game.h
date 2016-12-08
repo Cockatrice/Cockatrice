@@ -65,7 +65,6 @@ private:
     bool state;
 signals:
     void stateChanged();
-    void notIdle();
 public:
     ToggleButton(QWidget *parent = 0);
     bool getState() const { return state; }

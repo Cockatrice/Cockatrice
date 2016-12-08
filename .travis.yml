@@ -8,6 +8,7 @@ matrix:
       env: BUILDTYPE=Debug DIST=trusty
     # osx debug build, osx + clang + qt5
     - os: osx
+      osx_image: xcode6.4
       env: BUILDTYPE=Debug
     # linux trusty release build, precise + gcc + qt5
     - os: linux
@@ -15,6 +16,7 @@ matrix:
       env: BUILDTYPE=Release DIST=trusty
     # osx release build, osx + gcc + qt5
     - os: osx
+      osx_image: xcode6.4
       env: BUILDTYPE=Release
 script: ./travis-compile.sh
 install: ./travis-dependencies.sh
