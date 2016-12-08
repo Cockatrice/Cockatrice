@@ -19,6 +19,7 @@
 #include <QSvgRenderer>
 #include <QThread>
 #include <QUrl>
+#include <QDirIterator>
 
 // never cache more than 300 cards at once for a single deck
 #define CACHED_CARD_PER_DECK_MAX 300
@@ -167,9 +168,18 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString & setName, QString & cor
     QImage image;
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
+    QList<QString> picsPaths = QList<QString>();
+    QDirIterator it(customPicsPath, QDirIterator::Subdirectories);
 
-    //The list of paths to the folders in which to search for images
-    QList<QString> picsPaths = QList<QString>() << customPicsPath + correctedCardname;
+    // Recursively check all subdirectories of the CUSTOM folder
+    while (it.hasNext())
+    {
+        QString thisPath(it.next());
+        QFileInfo thisFileInfo(thisPath);
+
+        if (thisFileInfo.isFile() && thisFileInfo.baseName() == correctedCardname)
+            picsPaths << thisPath; // Card found in the CUSTOM directory, somewhere
+    }
 
     if(!setName.isEmpty())
     {
