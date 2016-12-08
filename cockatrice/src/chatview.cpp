@@ -160,7 +160,7 @@ void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, 
                 const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
                 QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
                 cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel,
-                                                                            buddyList.contains(sender)).toImage(), QString::fromStdString(tabSupervisor->getUserInfo()->privlevel()));
+                                                                            buddyList.contains(sender)).toImage());
                 cursor.insertText(" ");
             }
             cursor.setCharFormat(senderFormat);
