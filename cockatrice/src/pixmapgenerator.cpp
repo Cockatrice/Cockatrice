@@ -112,21 +112,29 @@ QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countr
 
 QMap<QString, QPixmap> CountryPixmapGenerator::pmCache;
 
-QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy)
+QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel)
 {
-
-    int key = height * 10000 + (int) userLevel + (int) isBuddy;
+    int privkeysize = privLevel.size();
+    if (privLevel.size() == 0)
+        privkeysize = 1;
+    
+    int key = height * 10000 + (int)userLevel + (int)isBuddy + privkeysize;
     if (pmCache.contains(key))
         return pmCache.value(key);
 
     QString levelString;
-    if (userLevel.testFlag(ServerInfo_User::IsAdmin))
+    if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
         levelString = "admin";
-    else if (userLevel.testFlag(ServerInfo_User::IsModerator))
+        if (privLevel.toLower() == "vip")
+            levelString.append("_" + privLevel.toLower());
+    } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
         levelString = "moderator";
-    else if (userLevel.testFlag(ServerInfo_User::IsRegistered))
+        if (privLevel.toLower() == "vip")
+            levelString.append("_" + privLevel.toLower());
+    } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
         levelString = "registered";
-    else
+        levelString.append("_" + privLevel.toLower());
+    } else
         levelString = "normal";
 
     if (isBuddy)
