@@ -1,3 +1,4 @@
+syntax = "proto2";
 message AdminCommand {
     enum AdminCommandType {
         UPDATE_SERVER_MESSAGE = 1000;

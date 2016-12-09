@@ -1,3 +1,4 @@
+syntax = "proto2";
 message ServerInfo_CardCounter {
     optional sint32 id = 1;
     optional sint32 value = 2;

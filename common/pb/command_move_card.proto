@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "game_commands.proto";
 message CardToMove {
     optional sint32 card_id = 1 [default = -1];
