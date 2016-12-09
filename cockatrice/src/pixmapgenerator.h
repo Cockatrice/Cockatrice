@@ -48,9 +48,9 @@ public:
 
 class UserLevelPixmapGenerator {
 private:
-    static QMap<int, QPixmap> pmCache;
+    static QMap<QString, QPixmap> pmCache;
 public:
-    static QPixmap generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy);
+    static QPixmap generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel = "NONE");
     static void clear() { pmCache.clear(); }
 };
 

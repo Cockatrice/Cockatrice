@@ -276,7 +276,7 @@ void UserListTWI::setUserInfo(const ServerInfo_User &_userInfo)
     userInfo = _userInfo;
 
     setData(0, Qt::UserRole, userInfo.user_level());
-    setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(userInfo.user_level()), false)));
+    setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(userInfo.user_level()), false, QString::fromStdString(userInfo.privlevel()))));
     setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, QString::fromStdString(userInfo.country()))));
     setData(2, Qt::UserRole, QString::fromStdString(userInfo.name()));
     setData(2, Qt::DisplayRole, QString::fromStdString(userInfo.name()));
