@@ -120,9 +120,9 @@
      inkscape:window-height="811"
      id="namedview8"
      showgrid="false"
-     inkscape:zoom="4"
-     inkscape:cx="70.284188"
-     inkscape:cy="2.3446431"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="14.172797"
+     inkscape:cy="22.571527"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -139,11 +139,11 @@
      inkscape:connector-curvature="0"
      sodipodi:nodetypes="ccccccccccc" />
   <path
-     d="M 42.8885,38.41225 24.522534,23.468398 6.9196228,23.594276 50.046283,57.735494 Z"
+     d="M 42.8885,38.41225 47.483654,34.815953 26.16518,18.300484 24.522534,23.468398 9.7480499,23.417499 48.720458,53.846407 Z"
      id="path4-0"
-     style="fill:url(#linearGradient3756-9);fill-opacity:1.0"
+     style="fill:url(#linearGradient3756-9);fill-opacity:1"
      inkscape:connector-curvature="0"
-     sodipodi:nodetypes="ccccc"
+     sodipodi:nodetypes="ccccccc"
      inkscape:export-xdpi="90"
      inkscape:export-ydpi="90" />
 </svg>
