@@ -15,7 +15,10 @@
    inkscape:version="0.91 r13725"
    width="100%"
    height="100%"
-   sodipodi:docname="registered_vip_buddy.svg">
+   sodipodi:docname="registered_vip_buddy.svg"
+   inkscape:export-filename="C:\Users\tritoch\Desktop\gummies\sash overlap\registered_vip_buddy.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <metadata
      id="metadata12">
     <rdf:RDF>
@@ -95,13 +98,14 @@
     </linearGradient>
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient4153"
-       id="linearGradient4151"
-       x1="31.49786"
-       y1="-10.847458"
-       x2="31.612316"
-       y2="63.864407"
-       gradientUnits="userSpaceOnUse" />
+       xlink:href="#linearGradient3758-7"
+       id="linearGradient3756-9"
+       x1="31.010702"
+       y1="-17.559496"
+       x2="31.002058"
+       y2="37.515385"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.87626222,0,0,0.87626222,4.1743368,4.8555025)" />
   </defs>
   <sodipodi:namedview
      pagecolor="#ffffff"
@@ -116,9 +120,9 @@
      inkscape:window-height="811"
      id="namedview8"
      showgrid="false"
-     inkscape:zoom="7.375"
-     inkscape:cx="36.645687"
-     inkscape:cy="34.975297"
+     inkscape:zoom="4"
+     inkscape:cx="84.741771"
+     inkscape:cy="1.7265989"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -126,11 +130,20 @@
   <path
      d="M 61.442826,23.621762 38.532402,23.515555 31.556101,0.331013 24.578789,23.515555 1.6673502,23.621765 20.267785,38.422001 10.863888,63.668987 31.556101,47.626631 52.258426,63.668987 42.843404,38.422001 z"
      id="path4-9"
-     style="fill:url(#linearGradient4151);fill-opacity:1"
+     style="fill:#000000;fill-opacity:1"
      inkscape:connector-curvature="0" />
   <path
-     d="M 57.150089,25.064396 37.504323,24.973324 31.522122,5.092503 25.539054,24.973324 5.8924192,25.064399 21.842354,37.75565 13.778482,59.405024 31.522122,45.64865 49.274434,59.405024 41.201022,37.75565 z"
+     d="M 57.150089,25.064396 37.504323,24.973324 31.522122,5.092503 25.539054,24.971 5.8924192,25.064399 21.842354,37.75565 13.778482,59.405024 31.522122,45.64865 49.274434,59.405024 41.201022,37.75565 Z"
      id="path4"
      style="fill:url(#linearGradient3756);fill-opacity:1"
-     inkscape:connector-curvature="0" />
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="ccccccccccc" />
+  <path
+     d="M 42.8885,38.41225 24.522534,23.468398 13.57035,23.565592 46.957248,49.404392 Z"
+     id="path4-0"
+     style="fill:url(#linearGradient3756-9);fill-opacity:1"
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="ccccc"
+     inkscape:export-xdpi="90"
+     inkscape:export-ydpi="90" />
 </svg>
