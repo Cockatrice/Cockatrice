@@ -36,11 +36,11 @@
     <linearGradient
        id="linearGradient4153">
       <stop
-         style="stop-color:#ffec79;stop-opacity:1"
+         style="stop-color:#d29600;stop-opacity:1"
          offset="0"
          id="stop4155" />
       <stop
-         style="stop-color:#f2c15b;stop-opacity:1"
+         style="stop-color:#d45a00;stop-opacity:1"
          offset="1"
          id="stop4157" />
     </linearGradient>
@@ -98,12 +98,12 @@
     </linearGradient>
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient3758-7"
+       xlink:href="#linearGradient4153"
        id="linearGradient3756-9"
-       x1="31.010702"
-       y1="-17.559496"
-       x2="31.002058"
-       y2="37.515385"
+       x1="30.154795"
+       y1="20.100464"
+       x2="30.431452"
+       y2="60.624905"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(0.87626222,0,0,0.87626222,4.1743368,4.8555025)" />
   </defs>
@@ -121,7 +121,7 @@
      id="namedview8"
      showgrid="false"
      inkscape:zoom="4"
-     inkscape:cx="72.909188"
+     inkscape:cx="70.284188"
      inkscape:cy="2.3446431"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
@@ -141,7 +141,7 @@
   <path
      d="M 42.8885,38.41225 24.522534,23.468398 6.9196228,23.594276 50.046283,57.735494 Z"
      id="path4-0"
-     style="fill:url(#linearGradient3756-9);fill-opacity:1"
+     style="fill:url(#linearGradient3756-9);fill-opacity:1.0"
      inkscape:connector-curvature="0"
      sodipodi:nodetypes="ccccc"
      inkscape:export-xdpi="90"
