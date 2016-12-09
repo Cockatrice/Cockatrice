@@ -115,7 +115,7 @@ QMap<QString, QPixmap> CountryPixmapGenerator::pmCache;
 QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags userLevel, bool isBuddy, QString privLevel)
 {
     
-    QString key = QString::number(height * 10000 + (int)userLevel + (int)isBuddy) + privLevel;
+    QString key = QString::number(height * 10000) + ":" + (int)userLevel + ":" + (int)isBuddy + ":" + privLevel;
     if (pmCache.contains(key))
         return pmCache.value(key);
 
@@ -137,7 +137,7 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
 
     if (isBuddy)
         levelString.append("_buddy");
-    
+   
     QPixmap pixmap = QPixmap("theme:userlevels/" + levelString).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     pmCache.insert(key, pixmap);
     return pixmap;
