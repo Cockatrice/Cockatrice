@@ -3,7 +3,8 @@
 ; This is the main configuration file for Servatrice; while using a configuration is not mandatory,
 ; you may want to customize some aspects of your servatrice instance, like its name, port or the way
 ; users can authenticate to the server.
-
+;
+; Can be passed to servatrice with --config /path/to/servatrice.ini
 
 [server]
 
