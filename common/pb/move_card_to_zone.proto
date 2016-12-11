@@ -1,3 +1,4 @@
+syntax = "proto2";
 message MoveCard_ToZone {
     optional string card_name = 1;
     optional string start_zone = 2;

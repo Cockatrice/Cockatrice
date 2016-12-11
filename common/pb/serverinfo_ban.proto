@@ -1,3 +1,4 @@
+syntax = "proto2";
 /*
  * Historical ban information stored in the ban table
  */

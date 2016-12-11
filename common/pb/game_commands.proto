@@ -1,3 +1,4 @@
+syntax = "proto2";
 message GameCommand {
     enum GameCommandType {
         KICK_FROM_GAME = 1000;

@@ -1,3 +1,4 @@
+syntax = "proto2";
 message ModeratorCommand {
     enum ModeratorCommandType {
         BAN_FROM_SERVER = 1000;

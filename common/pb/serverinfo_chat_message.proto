@@ -1,3 +1,4 @@
+syntax = "proto2";
 /*
  * Chat communication of a user to a target.
  * Targets can be users or rooms.

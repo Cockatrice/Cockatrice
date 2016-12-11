@@ -1,3 +1,4 @@
+syntax = "proto2";
 message ServerInfo_Replay {
     optional sint32 replay_id = 1 [default = -1];
     optional string replay_name = 2;

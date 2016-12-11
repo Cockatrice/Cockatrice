@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "serverinfo_game.proto";
 import "serverinfo_user.proto";
 import "serverinfo_gametype.proto";

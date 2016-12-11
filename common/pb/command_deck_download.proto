@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "session_commands.proto";
 
 message Command_DeckDownload {
