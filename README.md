@@ -93,6 +93,13 @@ The following flags can be passed to `cmake`:
 - `-DTEST=1` Enable regression tests (default 0 = no). Note: needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```.
 
 
+# Running
+
+`cockatrice` is the game client    
+`oracle` fetches card data    
+`servatrice` is the server<br>
+
+
 #### Servatrice Docker container
 
 A Dockerfile is provided to run Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/what-docker).<br>
@@ -104,13 +111,6 @@ And then run it<br>
 
 Please note that running this command will expose the TCP port 4747 of the docker container to permit connections to the server.<br>
 More infos on how to use Servatrice with Docker can be found in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
-
-
-# Running
-
-`cockatrice` is the game client    
-`oracle` fetches card data    
-`servatrice` is the server<br>
 
 
 # License [![GPLv2 License](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING)
