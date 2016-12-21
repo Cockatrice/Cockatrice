@@ -394,7 +394,7 @@ void Server_ProtocolHandler::pingClockTimeout()
             }
         }
 
-        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() *.9)) && (!idleClientWarningSent)) {
+        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() *.9)) && (!idleClientWarningSent) && (server->getIdleClientTimeout() > 0)) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::IDLEWARNING);
             SessionEvent *se = prepareSessionEvent(event);
