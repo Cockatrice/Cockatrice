@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
-INSERT INTO cockatrice_schema_version VALUES(19);
+INSERT INTO cockatrice_schema_version VALUES(20);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `token` binary(16),
   `clientid` varchar(15) NOT NULL,
   `privlevel` enum("NONE","VIP","DONATOR") NOT NULL,
+  `privlevelStartDate` datetime NOT NULL,
+  `privlevelEndDate` datetime NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `token` (`token`),
