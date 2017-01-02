@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "game_commands.proto";
 import "move_card_to_zone.proto";
 

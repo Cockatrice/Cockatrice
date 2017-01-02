@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "game_commands.proto";
 message Command_ReadyStart {
     extend GameCommand {

@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "response.proto";
 import "session_event.proto";
 import "commands.proto";

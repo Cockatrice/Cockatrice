@@ -1,3 +1,4 @@
+syntax = "proto2";
 message ServerInfo_DeckStorage_File {
     optional uint32 creation_time = 1;
 }

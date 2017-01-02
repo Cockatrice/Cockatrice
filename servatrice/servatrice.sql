@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
-INSERT INTO cockatrice_schema_version VALUES(19);
+INSERT INTO cockatrice_schema_version VALUES(20);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `token` binary(16),
   `clientid` varchar(15) NOT NULL,
   `privlevel` enum("NONE","VIP","DONATOR") NOT NULL,
+  `privlevelStartDate` datetime NOT NULL,
+  `privlevelEndDate` datetime NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `token` (`token`),
@@ -244,3 +246,15 @@ CREATE TABLE IF NOT EXISTS `cockatrice_user_analytics` (
   PRIMARY KEY  (`id`),
   FOREIGN KEY(`id`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_donations` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `payment_pre_fee` double DEFAULT NULL,
+  `payment_post_fee` double DEFAULT NULL,
+  `term_length` int(11) DEFAULT NULL,
+  `date` varchar(255) DEFAULT NULL,
+  `pp_type` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
