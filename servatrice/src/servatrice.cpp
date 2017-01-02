@@ -242,6 +242,11 @@ bool Servatrice::initServer()
     if (getRegistrationEnabled()) {
         qDebug() << "Require email address to register: " << getRequireEmailForRegistrationEnabled();
         qDebug() << "Require email activation via token: " << getRequireEmailActivationEnabled();
+        qDebug() << "Enable Internal SMTP Client: " << getEnableInternalSMTPClient();
+        if (!getEnableInternalSMTPClient())
+        {
+            qDebug() << "WARNING: Registrations are enabled but internal SMTP client is disabled.  Users activation emails will not be automatically mailed to users!";
+        }
     }
 
     if (getDBTypeString() == "mysql") {
@@ -535,7 +540,7 @@ void Servatrice::statusUpdate()
     servatriceDatabaseInterface->execSqlQuery(query);
 
     // send activation emails
-    if (getRegistrationEnabled() && getRequireEmailActivationEnabled())
+    if (getRegistrationEnabled() && getRequireEmailActivationEnabled() && getEnableInternalSMTPClient())
     {
         QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
         if (!servatriceDatabaseInterface->execSqlQuery(query))
@@ -829,4 +834,8 @@ int Servatrice::getIdleClientTimeout() const {
 
 bool Servatrice::getEnableLogQuery() const {
     return settingsCache->value("logging/enablelogquery", false).toBool();
+}
+
+bool Servatrice::getEnableInternalSMTPClient() const {
+    return settingsCache->value("smtp/enableinternalsmtpclient", true).toBool();
 }
