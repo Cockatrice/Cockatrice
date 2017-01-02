@@ -140,6 +140,10 @@ disallowedregexp=""
 ; account activated. Default true.
 ;requireemailactivation=true
 
+; Set this number to the maximum number of accounts any one user can use to create new accounts with.
+; 0 = Unlimited number of accounts (default).
+;maxaccountsperemail=0 
+
 [smtp]
 
 ; Connectin type: currently supported method are "tcp" and "ssl"; tls is autodetected if available

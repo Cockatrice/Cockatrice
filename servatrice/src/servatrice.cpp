@@ -242,6 +242,7 @@ bool Servatrice::initServer()
     if (getRegistrationEnabled()) {
         qDebug() << "Require email address to register: " << getRequireEmailForRegistrationEnabled();
         qDebug() << "Require email activation via token: " << getRequireEmailActivationEnabled();
+        if (getMaxAccountsPerEmail()) { qDebug() << "Maximum number of accounts per email: " << getMaxAccountsPerEmail(); } else { qDebug() << "Maximum number of accounts per email: unlimited"; }
     }
 
     if (getDBTypeString() == "mysql") {
@@ -829,4 +830,8 @@ int Servatrice::getIdleClientTimeout() const {
 
 bool Servatrice::getEnableLogQuery() const {
     return settingsCache->value("logging/enablelogquery", false).toBool();
+}
+
+int Servatrice::getMaxAccountsPerEmail() const {
+    return settingsCache->value("registration/maxaccountsperemail", 0).toInt();
 }

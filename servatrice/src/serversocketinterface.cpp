@@ -906,6 +906,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     if(sqlInterface->userExists(userName))
         return Response::RespUserAlreadyExists;
 
+    if (servatrice->getMaxAccountsPerEmail() && !(sqlInterface->checkNumberOfUserAccounts(emailAddress) < servatrice->getMaxAccountsPerEmail()))
+    {
+        return Response::RespTooManyRequests;
+    }
+
     QString banReason;
     int banSecondsRemaining;
     if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining))
