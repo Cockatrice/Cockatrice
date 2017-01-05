@@ -1,0 +1,173 @@
+stages:
+  - rc # 'release mode'; stage will be autouploaded to bintray in future
+  - debug
+
+.artifacts: &artifacts
+  artifacts:
+    paths:
+      - build/
+
+.cache: &cache
+  cache:
+    key: "$CI_BUILD_NAME"
+    paths:
+      - cache/
+
+
+#================================ DEBIAN-BASED ================================
+
+.build_rc_package_deb: &build_rc_package_deb
+  stage: rc
+  script:
+    - mkdir build || true # allowed to fail
+    - cd build
+    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release -DPACKAGE_GENERATOR=DEB
+    - make package -j2
+
+.build_debug_package_deb: &build_debug_package_deb
+  stage: debug
+  script:
+    - mkdir build || true # allowed to fail
+    - cd build
+    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Debug -DPACKAGE_GENERATOR=DEB
+    - make package -j2
+
+.push_to_bintray_deb: &bintray_release_deb # currently unused; requires some config
+  after_script:
+    # if CI_BUILD_TAG is undefined, use git hash instead of version number
+    # otherwise, treat git tag as version number
+    - curl -T build/*.deb -u${BINTRAY_USER_NAME}:${BINTRAY_API_KEY} https://api.bintray.com/content/cockatrice/Cockatrice/Cockatrice/${CI_BUILD_REF}/Cockatrice_`test -z ${CI_BUILD_TAG+x} && echo git${CI_BUILD_REF} || echo ${CI_BUILD_TAG}`_${CI_BUILD_STAGE}_$(date +%F)_${PLATFORM}.deb
+
+#----------------------------------- UBUNTU -----------------------------------
+
+.requirements_16xx: &install_requirements_16xx
+  before_script:
+    - apt-get -o dir::cache::archives="cache" update
+    - apt-get -o dir::cache::archives="cache" install -y build-essential g++ cmake git
+    - apt-get -o dir::cache::archives="cache" install -y libprotobuf-dev protobuf-compiler
+    - apt-get -o dir::cache::archives="cache" install -y qt5-default qttools5-dev qttools5-dev-tools
+    - apt-get -o dir::cache::archives="cache" install -y qtmultimedia5-dev libqt5multimedia5-plugins
+    - apt-get -o dir::cache::archives="cache" install -y libqt5svg5-dev libqt5sql5-mysql
+    - apt-get -o dir::cache::archives="cache" install -y libqt5websockets5-dev
+
+.build_1604: &1604
+  image: ubuntu:16.04
+  tags:
+    - linux
+    - docker
+  <<: *install_requirements_16xx
+  <<: *artifacts
+  <<: *cache
+  # <<: *bintray_releases_deb
+
+.build_1610: &1610
+  image: ubuntu:16.10
+  tags:
+    - linux
+    - docker
+  <<: *install_requirements_16xx
+  <<: *artifacts
+  <<: *cache
+  # <<: *bintray_releases_deb
+
+build_rc_1604:
+  <<: *1604
+  <<: *build_rc_package_deb
+  when: always
+
+build_debug_1604:
+  <<: *1604
+  <<: *build_debug_package_deb
+  when: always
+
+build_rc_1610:
+  <<: *1610
+  <<: *build_rc_package_deb
+  when: always
+
+build_debug_1610:
+  <<: *1610
+  <<: *build_debug_package_deb
+  when: always
+
+#----------------------------------- DEBIAN -----------------------------------
+
+.requirements_stretch: &install_requirements_stretch
+  before_script:
+    - apt-get -o dir::cache::archives="cache" update
+    - apt-get -o dir::cache::archives="cache" install -y build-essential g++ cmake git
+    - apt-get -o dir::cache::archives="cache" install -y qt5-default qtbase5-dev-tools
+    - apt-get -o dir::cache::archives="cache" install -y qttools5-dev-tools libqt5svg5-dev qtmultimedia5-dev
+    - apt-get -o dir::cache::archives="cache" install -y libprotobuf-dev protobuf-compiler
+
+.build_stretch: &stretch
+  image: debian:stretch
+  tags:
+    - linux
+    - docker
+  <<: *install_requirements_stretch
+  <<: *artifacts
+  <<: *cache
+  # <<: *bintray_releases_deb
+
+build_rc_stretch:
+  <<: *stretch
+  <<: *build_rc_package_deb
+  when: always
+
+build_debug_stretch:
+  <<: *stretch
+  <<: *build_debug_package_deb
+  when: always
+
+
+#============================== REDHAT-BASED ==================================
+
+.build_rc_package_rpm: &build_rc_package_rpm
+  stage: rc
+  script:
+    - mkdir -p build || true
+    - cd build
+    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release -DPACKAGE_GENERATOR=RPM
+    - make package -j2
+
+.build_debug_package_rpm: &build_debug_package_rpm
+  stage: debug
+  script:
+    - mkdir -p build || true
+    - cd build
+    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Debug -DPACKAGE_GENERATOR=RPM
+    - make package -j2
+
+.push_to_bintray_rpm: &bintray_release_rpm # currently unused; requires some config
+  after_script:
+    # if CI_BUILD_TAG is undefined, use git hash instead of version number
+    # otherwise, treat git tag as version number
+    - curl -T build/*.rpm -u${BINTRAY_USER_NAME}:${BINTRAY_API_KEY} https://api.bintray.com/content/cockatrice/Cockatrice/Cockatrice/${CI_BUILD_REF}/Cockatrice_`test -z ${CI_BUILD_TAG+x} && echo git${CI_BUILD_REF} || echo ${CI_BUILD_TAG}`_${CI_BUILD_STAGE}_$(date +%F)_${PLATFORM}.rpm
+
+#--------------------------------- FEDORA -------------------------------------
+
+.requirements_fedora22: &install_requirements_fedora22
+  before_script:
+    - /usr/bin/dnf -y groupinstall "development tools"
+    - /usr/bin/dnf -y install wget qt5* cmake libgcrypt-devel dh-autoreconf gcc-c++
+    - /usr/bin/dnf -y install protobuf protobuf-devel
+
+.build_fedora22: &fedora22
+  image: fedora:22
+  tags:
+    - linux
+    - docker
+  <<: *install_requirements_fedora22
+  <<: *artifacts
+  <<: *cache
+
+build_rc_fedora22:
+  <<: *fedora22
+  <<: *build_rc_package_rpm
+  when: always
+
+build_debug_fedora22:
+  <<: *fedora22
+  <<: *build_debug_package_rpm
+  when: always
