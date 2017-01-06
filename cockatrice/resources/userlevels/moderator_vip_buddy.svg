@@ -13,10 +13,10 @@
    enable-background="new 0 0 64 64"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.5 r10040"
+   inkscape:version="0.91 r13725"
    width="100%"
    height="100%"
-   sodipodi:docname="moderator_buddy.svg">
+   sodipodi:docname="moderator_vip_buddy.svg">
   <metadata
      id="metadata12">
     <rdf:RDF>
@@ -25,11 +25,23 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <defs
      id="defs10">
+    <linearGradient
+       id="linearGradient4172">
+      <stop
+         style="stop-color:#ffec79;stop-opacity:1"
+         offset="0"
+         id="stop4174" />
+      <stop
+         style="stop-color:#f2c15b;stop-opacity:1"
+         offset="1"
+         id="stop4176" />
+    </linearGradient>
     <linearGradient
        id="linearGradient5225">
       <stop
@@ -91,6 +103,15 @@
          offset="1"
          style="stop-color:#ec8b00;stop-opacity:1;" />
     </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4172"
+       id="linearGradient4164"
+       x1="31.773321"
+       y1="-14.021866"
+       x2="32.295643"
+       y2="63.831791"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      pagecolor="#ffffff"
@@ -101,12 +122,12 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1028"
+     inkscape:window-width="1152"
+     inkscape:window-height="811"
      id="namedview8"
      showgrid="false"
      inkscape:zoom="5.2149125"
-     inkscape:cx="-26.445493"
+     inkscape:cx="51.091631"
      inkscape:cy="31.598459"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
@@ -115,7 +136,7 @@
   <path
      d="M 61.442826,23.621762 38.532402,23.515555 31.556101,0.331013 24.578789,23.515555 1.6673502,23.621765 20.267785,38.422001 10.863888,63.668987 31.556101,47.626631 52.258426,63.668987 42.843404,38.422001 z"
      id="path4-9"
-     style="fill:#000000;fill-opacity:1"
+     style="fill:url(#linearGradient4164);fill-opacity:1"
      inkscape:connector-curvature="0" />
   <path
      d="M 55.041981,25.814432 36.921945,25.730432 31.404334,7.3935963 25.885923,25.730432 7.7650846,25.814434 22.476316,37.520057 15.0387,57.488097 31.404334,44.800071 47.777965,57.488097 40.331551,37.520057 z"
