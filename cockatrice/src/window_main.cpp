@@ -374,7 +374,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
         case Response::RespAccountNotActivated: {
             bool ok = false;
-            QString token = QInputDialog::getText(this, tr("Account activation"), tr("Your account has not been activated yet.\nYou need to provide the activation token received in the activation email"), QLineEdit::Normal, QString(), &ok);
+            QString token = QInputDialog::getText(this, tr("Account activation"), tr("Your account has not been activated yet.\nYou need to provide the activation token received in the activation email."), QLineEdit::Normal, QString(), &ok);
             if(ok && !token.isEmpty())
             {
                 client->activateToServer(token);

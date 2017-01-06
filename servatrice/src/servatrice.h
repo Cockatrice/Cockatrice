@@ -162,6 +162,7 @@ private:
     int getServerWebSocketPort() const;
     int getISLNetworkPort() const;
     bool getISLNetworkEnabled() const;
+    bool getEnableInternalSMTPClient() const;
 
 public slots:
     void scheduleShutdown(const QString &reason, int minutes);

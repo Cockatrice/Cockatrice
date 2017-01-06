@@ -243,6 +243,11 @@ bool Servatrice::initServer()
         qDebug() << "Require email address to register: " << getRequireEmailForRegistrationEnabled();
         qDebug() << "Require email activation via token: " << getRequireEmailActivationEnabled();
         if (getMaxAccountsPerEmail()) { qDebug() << "Maximum number of accounts per email: " << getMaxAccountsPerEmail(); } else { qDebug() << "Maximum number of accounts per email: unlimited"; }
+        qDebug() << "Enable Internal SMTP Client: " << getEnableInternalSMTPClient();
+        if (!getEnableInternalSMTPClient())
+        {
+            qDebug() << "WARNING: Registrations are enabled but internal SMTP client is disabled.  Users activation emails will not be automatically mailed to users!";
+        }
     }
 
     if (getDBTypeString() == "mysql") {
@@ -536,7 +541,7 @@ void Servatrice::statusUpdate()
     servatriceDatabaseInterface->execSqlQuery(query);
 
     // send activation emails
-    if (getRegistrationEnabled() && getRequireEmailActivationEnabled())
+    if (getRegistrationEnabled() && getRequireEmailActivationEnabled() && getEnableInternalSMTPClient())
     {
         QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
         if (!servatriceDatabaseInterface->execSqlQuery(query))
@@ -834,4 +839,8 @@ bool Servatrice::getEnableLogQuery() const {
 
 int Servatrice::getMaxAccountsPerEmail() const {
     return settingsCache->value("registration/maxaccountsperemail", 0).toInt();
+}
+
+bool Servatrice::getEnableInternalSMTPClient() const {
+    return settingsCache->value("smtp/enableinternalsmtpclient", true).toBool();
 }
