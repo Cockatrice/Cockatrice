@@ -122,7 +122,7 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
     cursor.setCharFormat(oldFormat);
 }
 
-void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, QString sender, UserLevelFlags userLevel, bool playerBold)
+void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, QString sender, UserLevelFlags userLevel, QString UserPrivLevel, bool playerBold)
 {
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     bool sameSender = (sender == lastSender) && !lastSender.isEmpty();
@@ -159,9 +159,7 @@ void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, 
             if (!sender.isEmpty() && tabSupervisor->getUserListsTab()) {
                 const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
                 QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
-                QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
-                UserListTWI *vlu = userList.value(sender);
-                cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, buddyList.contains(sender), QString::fromStdString(vlu->getUserInfo().privlevel())).toImage());
+                cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, buddyList.contains(sender), UserPrivLevel).toImage());
                 cursor.insertText(" ");
             }
             cursor.setCharFormat(senderFormat);
