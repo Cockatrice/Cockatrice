@@ -144,6 +144,11 @@ disallowedregexp=""
 ; using the same email address. 0 = Unlimited number of accounts (default).
 ;maxaccountsperemail=0 
 
+; You can prevent users from using certain mail domains for registration.  This setting contains a
+; comma-seperated list of email provider domains that you would like to prevent users from using
+; during registration.  Example: "10minutemail.com,gmail.com,mail.com"
+emailblacklist=""
+
 [smtp]
 
 ; Enable the internal smtp client to send registration emails.  If you would like to
