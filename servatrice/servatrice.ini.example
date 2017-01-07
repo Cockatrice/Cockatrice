@@ -140,6 +140,10 @@ disallowedregexp=""
 ; account activated. Default true.
 ;requireemailactivation=true
 
+; Set this number to the maximum number of accounts any one user can use to create new accounts
+; using the same email address. 0 = Unlimited number of accounts (default).
+;maxaccountsperemail=0 
+
 [smtp]
 
 ; Enable the internal smtp client to send registration emails.  If you would like to
