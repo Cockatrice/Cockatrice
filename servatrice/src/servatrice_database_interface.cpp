@@ -1109,3 +1109,22 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
 
     return results;
 }
+
+int Servatrice_DatabaseInterface::checkNumberOfUserAccounts(const QString &email)
+{
+    if (!checkSql())
+        return 0;
+
+    QSqlQuery *query = prepareQuery("SELECT count(email) FROM {prefix}_users WHERE email = :user_email");
+    query->bindValue(":user_email", email);
+
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to identify the number of users accounts for users email address: SQL Error");
+        return 0;
+    }
+
+    if (query->next())
+        return query->value(0).toInt();
+
+    return 0;
+}
