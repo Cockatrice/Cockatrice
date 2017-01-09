@@ -60,7 +60,7 @@ public:
     void retranslateUi();
     void appendHtml(const QString &html);
     void appendHtmlServerMessage(const QString &html, bool optionalIsBold = false, QString optionalFontColor = QString());
-    void appendMessage(QString message, RoomMessageTypeFlags messageType = 0, QString sender = QString(), UserLevelFlags userLevel = UserLevelFlags(), bool playerBold = false);
+    void appendMessage(QString message, RoomMessageTypeFlags messageType = 0, QString sender = QString(), UserLevelFlags userLevel = UserLevelFlags(), QString UserPrivLevel = "NONE", bool playerBold = false);
     void clearChat();
 protected:
     void enterEvent(QEvent *event);

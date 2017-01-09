@@ -162,6 +162,7 @@ private:
     int getServerWebSocketPort() const;
     int getISLNetworkPort() const;
     bool getISLNetworkEnabled() const;
+    bool getEnableInternalSMTPClient() const;
 
 public slots:
     void scheduleShutdown(const QString &reason, int minutes);
@@ -206,6 +207,7 @@ public:
     int getMaxTcpUserLimit() const;
     int getMaxWebSocketUserLimit() const;
     int getUsersWithAddress(const QHostAddress &address) const;
+    int getMaxAccountsPerEmail() const;
     QList<AbstractServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
     void incTxBytes(quint64 num);
     void incRxBytes(quint64 num);

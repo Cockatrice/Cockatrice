@@ -26,6 +26,9 @@ CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _reve
     cardMenu = new QMenu;
     ptMenu = new QMenu;
     moveMenu = new QMenu;
+    addCounterMenu = new QMenu;
+    removeCounterMenu = new QMenu;
+    setCounterMenu = new QMenu;
     
     retranslateUi();
     emit updateCardMenu(this);
@@ -41,6 +44,9 @@ CardItem::~CardItem()
     delete cardMenu;
     delete ptMenu;
     delete moveMenu;
+    delete addCounterMenu;
+    delete removeCounterMenu;
+    delete setCounterMenu;
     
     deleteDragItem();
 }
@@ -82,6 +88,9 @@ void CardItem::retranslateUi()
 {
     moveMenu->setTitle(tr("&Move to"));
     ptMenu->setTitle(tr("&Power / toughness"));
+    addCounterMenu->setTitle(tr("Add Counter"));
+    removeCounterMenu->setTitle(tr("Remove Counter"));
+    setCounterMenu->setTitle(tr("Set Counters"));
 }
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
