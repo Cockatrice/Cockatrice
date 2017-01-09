@@ -69,7 +69,7 @@ public:
     bool userSessionExists(const QString &userName);
     bool usernameIsValid(const QString &user, QString & error);
     bool checkUserIsBanned(const QString &ipAddress, const QString &userName, const QString &clientId, QString &banReason, int &banSecondsRemaining);
-
+    int checkNumberOfUserAccounts(const QString &email);
     bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender,
         const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active = false);
     bool activateUser(const QString &userName, const QString &token);

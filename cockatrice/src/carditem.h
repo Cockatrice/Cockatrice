@@ -32,7 +32,7 @@ private:
     CardItem *attachedTo;
     QList<CardItem *> attachedCards;
     
-    QMenu *cardMenu, *ptMenu, *moveMenu;
+    QMenu *cardMenu, *ptMenu, *moveMenu, *addCounterMenu, *removeCounterMenu, *setCounterMenu;
 
     void prepareDelete();
 public slots:
@@ -75,6 +75,9 @@ public:
     QMenu *getCardMenu() const { return cardMenu; }
     QMenu *getPTMenu() const { return ptMenu; }
     QMenu *getMoveMenu() const { return moveMenu; }
+    QMenu *getAddCounterMenu() const { return addCounterMenu; }
+    QMenu *getRemoveCounterMenu() const { return removeCounterMenu; }
+    QMenu *getSetCounterMenu() const { return setCounterMenu; }
     
     bool animationEvent();
     CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);

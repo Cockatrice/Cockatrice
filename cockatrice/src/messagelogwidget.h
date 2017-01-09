@@ -53,7 +53,7 @@ public slots:
     void logGameStart();
     void logConnectionStateChanged(Player *player, bool connectionState);
     void logSay(Player *player, QString message);
-    void logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString message);
+    void logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString userPrivLevel, QString message);
     void logShuffle(Player *player, CardZone *zone);
     void logRollDie(Player *player, int sides, int roll);
     void logDrawCards(Player *player, int number);
