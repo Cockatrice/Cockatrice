@@ -140,7 +140,19 @@ disallowedregexp=""
 ; account activated. Default true.
 ;requireemailactivation=true
 
+; Set this number to the maximum number of accounts any one user can use to create new accounts
+; using the same email address. 0 = Unlimited number of accounts (default).
+;maxaccountsperemail=0 
+
 [smtp]
+
+; Enable the internal smtp client to send registration emails.  If you would like to
+; use some other method to send email activation tokens set this value to false. Otherwise
+; setting it to true (default) the server will send canned generated emails containing
+; activation tokens for you during update intervals. Setting this to false will require
+; you to either manually activate user accounts or manually send users the activation token
+; by whatever means.
+enableinternalsmtpclient=true
 
 ; Connectin type: currently supported method are "tcp" and "ssl"; tls is autodetected if available
 connection=tcp

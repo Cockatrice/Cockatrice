@@ -374,7 +374,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
         case Response::RespAccountNotActivated: {
             bool ok = false;
-            QString token = QInputDialog::getText(this, tr("Account activation"), tr("Your account has not been activated yet.\nYou need to provide the activation token received in the activation email"), QLineEdit::Normal, QString(), &ok);
+            QString token = QInputDialog::getText(this, tr("Account activation"), tr("Your account has not been activated yet.\nYou need to provide the activation token received in the activation email."), QLineEdit::Normal, QString(), &ok);
             if(ok && !token.isEmpty())
             {
                 client->activateToServer(token);
@@ -444,7 +444,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             QMessageBox::critical(this, tr("Registration denied"), tr("It's mandatory to specify a valid email address when registering."));
             break;
         case Response::RespTooManyRequests:
-            QMessageBox::critical(this, tr("Registration denied"), tr("Too many registration attempts from your IP address."));
+            QMessageBox::critical(this, tr("Registration denied"), tr("Too many registration attempts, please try again later or contact the server operator for further details."));
             break;
         case Response::RespPasswordTooShort:
             QMessageBox::critical(this, tr("Registration denied"), tr("Password too short."));
