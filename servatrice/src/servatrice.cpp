@@ -848,5 +848,5 @@ bool Servatrice::getEnableInternalSMTPClient() const {
 }
 
 QString Servatrice::getEmailBlackList() const {
-    return settingsCache->value("registration/emailblacklist").toString();
+    return settingsCache->value("registration/emailproviderblacklist").toString();
 }
