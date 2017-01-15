@@ -23,7 +23,9 @@ SET(oracle_SOURCES
     ../cockatrice/src/settings/layoutssettings.cpp
     ../cockatrice/src/thememanager.cpp 
     ../cockatrice/src/qt-json/json.cpp
- )
+    ../cockatrice/src/releasechannel.cpp
+     ${VERSION_STRING_CPP}
+)
 
 set(oracle_RESOURCES oracle.qrc)
 

@@ -63,6 +63,7 @@ private:
     QComboBox languageBox;
     QCheckBox picDownloadCheckBox;
     QCheckBox updateNotificationCheckBox;
+    QComboBox updateReleaseChannelBox;
     QLabel languageLabel;
     QLabel pixmapCacheLabel;
     QLabel deckPathLabel;
@@ -73,6 +74,7 @@ private:
     QLabel defaultUrlLabel;
     QLabel fallbackUrlLabel;
     QLabel urlLinkLabel;
+    QLabel updateReleaseChannelLabel;
     QPushButton clearDownloadedPicsButton;
     QPushButton defaultUrlRestoreButton;
     QPushButton fallbackUrlRestoreButton;

@@ -27,6 +27,7 @@
 #include "settingscache.h"
 #include "thememanager.h"
 #include "priceupdater.h"
+#include "releasechannel.h"
 #include "soundengine.h"
 #include "sequenceEdit/shortcutstab.h"
 
@@ -44,8 +45,18 @@ GeneralSettingsPage::GeneralSettingsPage()
     }
 
     picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
+
+    // updates
+    QList<ReleaseChannel*> channels = settingsCache->getUpdateReleaseChannels();
+    foreach(ReleaseChannel* chan, channels)
+    {
+        updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
+    }
+    updateReleaseChannelBox.setCurrentIndex(settingsCache->getUpdateReleaseChannel()->getIndex());
+
     updateNotificationCheckBox.setChecked(settingsCache->getNotifyAboutUpdates());
 
+    // pixmap cache
     pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
     // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
     pixmapCacheEdit.setMaximum(PIXMAPCACHE_SIZE_MAX);
@@ -60,6 +71,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
+    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), settingsCache, SLOT(setUpdateReleaseChannel(int)));
     connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotifyAboutUpdate(int)));
     connect(&picDownloadCheckBox, SIGNAL(clicked(bool)), this, SLOT(setEnabledStatus(bool)));
     connect(defaultUrlEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrl(QString)));
@@ -74,16 +86,18 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&languageBox, 0, 1);
     personalGrid->addWidget(&pixmapCacheLabel, 1, 0);
     personalGrid->addWidget(&pixmapCacheEdit, 1, 1);
-    personalGrid->addWidget(&updateNotificationCheckBox, 2, 0);
-    personalGrid->addWidget(&picDownloadCheckBox, 3, 0, 1, 3);
-    personalGrid->addWidget(&defaultUrlLabel, 4, 0, 1, 1);
-    personalGrid->addWidget(defaultUrlEdit, 4, 1, 1, 1);
-    personalGrid->addWidget(&defaultUrlRestoreButton, 4, 2, 1, 1);
-    personalGrid->addWidget(&fallbackUrlLabel, 5, 0, 1, 1);
-    personalGrid->addWidget(fallbackUrlEdit, 5, 1, 1, 1);
-    personalGrid->addWidget(&fallbackUrlRestoreButton, 5, 2, 1, 1);
-    personalGrid->addWidget(&urlLinkLabel, 6, 1, 1, 1);
-    personalGrid->addWidget(&clearDownloadedPicsButton, 7, 0, 1, 3);
+    personalGrid->addWidget(&updateReleaseChannelLabel, 2, 0);
+    personalGrid->addWidget(&updateReleaseChannelBox, 2, 1);
+    personalGrid->addWidget(&updateNotificationCheckBox, 3, 0);
+    personalGrid->addWidget(&picDownloadCheckBox, 4, 0, 1, 3);
+    personalGrid->addWidget(&defaultUrlLabel, 5, 0, 1, 1);
+    personalGrid->addWidget(defaultUrlEdit, 5, 1, 1, 1);
+    personalGrid->addWidget(&defaultUrlRestoreButton, 5, 2, 1, 1);
+    personalGrid->addWidget(&fallbackUrlLabel, 6, 0, 1, 1);
+    personalGrid->addWidget(fallbackUrlEdit, 6, 1, 1, 1);
+    personalGrid->addWidget(&fallbackUrlRestoreButton, 6, 2, 1, 1);
+    personalGrid->addWidget(&urlLinkLabel, 7, 1, 1, 1);
+    personalGrid->addWidget(&clearDownloadedPicsButton, 8, 0, 1, 3);
     
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     urlLinkLabel.setOpenExternalLinks(true);
@@ -269,8 +283,9 @@ void GeneralSettingsPage::retranslateUi()
     defaultUrlLabel.setText(tr("Primary download URL:"));
     fallbackUrlLabel.setText(tr("Fallback download URL:"));
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to set a custom picture url")));
-    clearDownloadedPicsButton.setText(tr("Reset/Clear Downloaded Pictures"));
-    updateNotificationCheckBox.setText(tr("Notify when new client features are available"));
+    clearDownloadedPicsButton.setText(tr("Reset/clear downloaded pictures"));
+    updateReleaseChannelLabel.setText(tr("Update channel"));
+    updateNotificationCheckBox.setText(tr("Notify when a new version is available"));
     defaultUrlRestoreButton.setText(tr("Reset"));
     fallbackUrlRestoreButton.setText(tr("Reset"));
 }

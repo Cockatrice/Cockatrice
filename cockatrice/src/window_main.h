@@ -29,7 +29,6 @@
 
 #include "abstractclient.h"
 #include "pb/response.pb.h"
-#include "update_checker.h"
 
 class TabSupervisor;
 class RemoteClient;
