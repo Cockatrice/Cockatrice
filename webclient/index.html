@@ -301,7 +301,23 @@ Loading cockatrice web client...
                   break;
                 case 'gender':
                   $('#userinfo').append('Gender: ' + decodeGender(value) + '<br/>');
-                  break;                  
+                  break;
+                case 'name':
+                  $('#userinfo').append('Name: ' + value + '<br/>');
+                  break;
+                case 'realName':
+                  $('#userinfo').append('Real name: ' + value + '<br/>');
+                  break;
+                case 'country':
+                  $('#userinfo').append('Country: ' + value + '<br/>');
+                  break;
+                case 'privlevel':
+                  $('#userinfo').append('Privilege: ' + value + '<br/>');
+                  break;
+                case 'id':
+                case 'serverId':
+                  // don't output these fields
+                  break;
                 default:
                   $('#userinfo').append(key + ': ' + value + '<br/>');
                   break;
