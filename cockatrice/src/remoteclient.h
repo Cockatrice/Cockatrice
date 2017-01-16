@@ -13,12 +13,14 @@ signals:
     void serverTimeout();
     void loginError(Response::ResponseCode resp, QString reasonStr, quint32 endTime, QList<QString> missingFeatures);
     void registerError(Response::ResponseCode resp, QString reasonStr, quint32 endTime);
+	void processForgotPassword(Response::ResponseCode resp);
     void activateError();
     void socketError(const QString &errorString);
     void protocolVersionMismatch(int clientVersion, int serverVersion);
     void protocolError();
     void sigConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
     void sigRegisterToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname);
+	void sigForgotPassword(const QString &hostname, unsigned int port, const QString &_userName, const QString &_email);
     void sigActivateToServer(const QString &_token);
     void sigDisconnectFromServer();
     void notifyUserAboutUpdate();
@@ -31,9 +33,11 @@ private slots:
     void processConnectionClosedEvent(const Event_ConnectionClosed &event);
     void loginResponse(const Response &response);
     void registerResponse(const Response &response);
+	void forgotPasswordResponse(const Response & response);
     void activateResponse(const Response &response);
     void doConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
     void doRegisterToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname);
+	void doForgotPassword(const QString &hostname, unsigned int port, const QString &_userName, const QString &_email);
     void doLogin();
     void doDisconnectFromServer();
     void doActivateToServer(const QString &_token);
@@ -62,6 +66,7 @@ public:
     QString peerName() const { return socket->peerName(); }
     void connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
     void registerToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname);
+	void ForgotPassword(const QString &hostname, unsigned int port, const QString &_userName, const QString &_email);
     void activateToServer(const QString &_token);
     void disconnectFromServer();
 };

@@ -35,6 +35,7 @@ enum ClientStatus {
     StatusActivating,
     StatusLoggingIn,
     StatusLoggedIn,
+	StatusForgotPassword,
 };
 
 class AbstractClient : public QObject {
