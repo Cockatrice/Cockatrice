@@ -987,7 +987,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 				return Response::RespInternalError;
 			}
 
-	// check if users email address or client id match known email in db
+	/* 
+	Check if users email address or client id match known email in db.  Note, if the users account
+	is set to inactive the userinformation database query does not return email or clientid infor
+	which results in a failure of the email user check.  The user account *must* be active for
+	forgot password functionality to properly function.
+	*/
+
 	if (servatrice->getForgotPasswordEmailReq() || servatrice->getForgotPasswordClientIDReq())
 	{
 		ServerInfo_User userInfo;
