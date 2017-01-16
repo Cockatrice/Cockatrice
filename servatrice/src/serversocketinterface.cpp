@@ -150,7 +150,7 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
         case SessionCommand::REPLAY_DELETE_MATCH: return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
         case SessionCommand::REGISTER: return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc); break;
         case SessionCommand::ACTIVATE: return cmdActivateAccount(cmd.GetExtension(Command_Activate::ext), rc); break;
-
+		case SessionCommand::FORGOT_PASSWORD: return cmdForgotPassword(cmd.GetExtension(Command_ForgotPassword::ext), rc); break;
         case SessionCommand::ACCOUNT_EDIT: return cmdAccountEdit(cmd.GetExtension(Command_AccountEdit::ext), rc);
         case SessionCommand::ACCOUNT_IMAGE: return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD: return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
@@ -956,6 +956,57 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     } else {
         return Response::RespRegistrationFailed;
     }
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Command_ForgotPassword &cmd, ResponseContainer &rc)
+{
+	/*
+	Since we do not want to give away any additional information for a user account to someone
+	that might try to exploit the forgot password functionality we return RespInternalError if the
+	reset request fails. Otherwise RespOk is returned.
+	*/
+	if (!servatrice->getForgotPasswordEnabled())
+		return Response::RespFunctionNotAllowed;
+
+	QString userName = QString::fromStdString(cmd.user_name());
+	QString clientEmail = QString::fromStdString(cmd.email());
+	QString clientId = QString::fromStdString(cmd.clientid());
+	qDebug() << "Got forgot password command: " << userName;
+
+	// check if user is banned
+	QString banReason; int banSecondsRemaining;
+	if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining))
+		return Response::RespInternalError;
+
+	// check if users IP matches last known used address (ignore check if coming from a trusted source)
+	QString trustedSources = settingsCache->value("security/trusted_sources", "127.0.0.1,::1").toString();
+	if (!trustedSources.contains(getAddress(), Qt::CaseInsensitive))
+		if (servatrice->getForgotPasswordIPReq())
+			if (this->getAddress() != databaseInterface->getUsersLastIP(userName)) {
+				qDebug() << "Forgot password request denied for user (" << userName << ") due to incorrect IP location.";
+				return Response::RespInternalError;
+			}
+
+	// check if users email address or client id match known email in db
+	if (servatrice->getForgotPasswordEmailReq() || servatrice->getForgotPasswordClientIDReq())
+	{
+		ServerInfo_User userInfo;
+		userInfo = databaseInterface->getUserData(userName);
+		if (clientEmail != QString::fromStdString(userInfo.email())) {
+			qDebug() << "Forgot password request denied for user (" << userName << ") due to incorrect email address.";
+			return Response::RespInternalError;
+		}
+
+		if (clientId != QString::fromStdString(userInfo.clientid())) {
+			qDebug() << "Forgot password request denied for user (" << userName << ") due to incorrect client id.";
+			return Response::RespInternalError;
+		}
+	}
+
+	qDebug() << "All user checks have passed, time to correct user info.";
+	// all checks have passed, lets update things accordingly
+
+	return Response::RespInternalError;
 }
 
 bool AbstractServerSocketInterface::tooManyRegistrationAttempts(const QString &ipAddress)

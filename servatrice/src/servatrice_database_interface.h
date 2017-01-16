@@ -53,10 +53,9 @@ public:
     bool isInBuddyList(const QString &whoseList, const QString &who);
     bool isInIgnoreList(const QString &whoseList, const QString &who);
     ServerInfo_User getUserData(const QString &name, bool withId = false);
-    void storeGameInformation(const QString &roomName, const QStringList &roomGameTypes, const ServerInfo_Game &gameInfo,
-        const QSet<QString> &allPlayersEver, const QSet<QString>&allSpectatorsEver, const QList<GameReplay *> &replayList);
+    void storeGameInformation(const QString &roomName, const QStringList &roomGameTypes, const ServerInfo_Game &gameInfo, const QSet<QString> &allPlayersEver, const QSet<QString>&allSpectatorsEver, const QList<GameReplay *> &replayList);
     DeckList *getDeckFromDatabase(int deckId, int userId);
-
+	QString getUsersLastIP(const QString &name);
     int getNextGameId();
     int getNextReplayId();
     int getActiveUserCount(QString connectionType = QString());

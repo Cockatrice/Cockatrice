@@ -191,6 +191,10 @@ public:
     bool getRequireEmailForRegistrationEnabled() const;
     bool getRequireEmailActivationEnabled() const;
     bool getEnableLogQuery() const;
+	bool getForgotPasswordEnabled() const;
+	bool getForgotPasswordClientIDReq() const;
+	bool getForgotPasswordEmailReq() const;
+	bool getForgotPasswordIPReq() const;
     int getIdleClientTimeout() const;
     int getServerID() const;
     int getMaxGameInactivityTime() const;

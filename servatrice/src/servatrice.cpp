@@ -250,6 +250,25 @@ bool Servatrice::initServer()
         }
     }
 
+	if (getForgotPasswordEnabled()) {
+		if (getDBTypeString() == "mysql") {
+			qDebug() << "Forgot password functionality enabled.";
+			qDebug() << "Require matching Email for forgot password functionality: " << getForgotPasswordEmailReq();
+			qDebug() << "Require matching ClientID for forgot password functionality: " << getForgotPasswordClientIDReq();
+			qDebug() << "Require matching IP information for forgot password functionality: " << getForgotPasswordIPReq();
+			if (getForgotPasswordIPReq()) {
+				qDebug() << "WARNING: Enabling IP information for forgot password functionality requires the session table in the DB to contain data!";
+			}
+		}
+		else {
+			qDebug() << "A database is required to enable forgot password functionality.";
+			return false;
+		}
+	}
+	else {
+		qDebug() << "Forgot password functionality disabled.";
+	}
+
     if (getDBTypeString() == "mysql") {
         databaseType = DatabaseMySql;
     } else {
@@ -843,4 +862,20 @@ int Servatrice::getMaxAccountsPerEmail() const {
 
 bool Servatrice::getEnableInternalSMTPClient() const {
     return settingsCache->value("smtp/enableinternalsmtpclient", true).toBool();
+}
+
+bool Servatrice::getForgotPasswordEnabled() const {
+	return settingsCache->value("forgotpassword/enabled", false).toBool();
+}
+
+bool Servatrice::getForgotPasswordClientIDReq() const {
+	return settingsCache->value("forgotpassword/requireclientidforforgotpassword", false).toBool();
+}
+
+bool Servatrice::getForgotPasswordEmailReq() const {
+	return settingsCache->value("forgotpassword/requireemailforforgotpassword", false).toBool();
+}
+
+bool Servatrice::getForgotPasswordIPReq() const {
+	return settingsCache->value("forgotpassword/requireipforforgotpassword", false).toBool();
 }

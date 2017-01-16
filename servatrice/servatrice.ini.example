@@ -144,6 +144,28 @@ disallowedregexp=""
 ; using the same email address. 0 = Unlimited number of accounts (default).
 ;maxaccountsperemail=0 
 
+[forgotpassword]
+; Servatrice can process forgot password requests to reset user account passwords if they forget.
+; Enable this feature? Default false.
+; enabled=false
+
+; Require users to include email address information when making the request.  If enabled
+; the inputed email address must match the email address for the user in the database or
+; password reset request will be denied.  Default true.
+; requireemailforforgotpassword=true
+
+; Require users client id's to match the last known client id they logged in with when making the
+; request.  If enabled if the client id does not match the last known client id the password reset
+; request will be denied. Default true.
+; requireclientidforforgotpassword=true
+
+; Require users ip address to match the last known ip address the user logged in with.  If enabled
+; if the last known client ip does not match the current client ip addres the password reset request
+; will be denied.  Please note, this particular functionality requires previous session information
+; inside the sessions table and it the table is cleared password reset requests will always be denied.
+; Default false;
+; requireipforforgotpassword=false
+
 [smtp]
 
 ; Enable the internal smtp client to send registration emails.  If you would like to

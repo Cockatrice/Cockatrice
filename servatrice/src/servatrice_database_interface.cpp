@@ -1128,3 +1128,22 @@ int Servatrice_DatabaseInterface::checkNumberOfUserAccounts(const QString &email
 
     return 0;
 }
+
+QString Servatrice_DatabaseInterface::getUsersLastIP(const QString &name)
+{
+	if (!checkSql())
+		return "";
+
+	QSqlQuery *query = prepareQuery("select ip_address from {prefix}_sessions where user_name = :user_name order by start_time desc");
+	query->bindValue(":user_name", name);
+
+	if (!execSqlQuery(query)) {
+		qDebug("Failed to query users last known IP address: SQL Error");
+		return "";
+	}
+
+	if (query->next())
+		return query->value(0).toString();
+
+	return "";
+}
