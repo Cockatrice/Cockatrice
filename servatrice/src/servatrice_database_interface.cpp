@@ -913,7 +913,7 @@ void Servatrice_DatabaseInterface::updateUsersLastLoginData(const QString &userN
     if (!checkSql())
         return;
 
-    int usersID;
+    int usersID=0;
 
     QSqlQuery *query = prepareQuery("select id from {prefix}_users where name = :user_name");
     query->bindValue(":user_name", userName);
