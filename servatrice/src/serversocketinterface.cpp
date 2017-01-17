@@ -150,7 +150,7 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
         case SessionCommand::REPLAY_DELETE_MATCH: return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
         case SessionCommand::REGISTER: return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc); break;
         case SessionCommand::ACTIVATE: return cmdActivateAccount(cmd.GetExtension(Command_Activate::ext), rc); break;
-		case SessionCommand::FORGOT_PASSWORD: return cmdForgotPassword(cmd.GetExtension(Command_ForgotPassword::ext), rc); break;
+		case SessionCommand::FORGOT_PASSWORD: return cmdForgotPassword(cmd.GetExtension(Command_ForgotPassword::ext)); break;
         case SessionCommand::ACCOUNT_EDIT: return cmdAccountEdit(cmd.GetExtension(Command_AccountEdit::ext), rc);
         case SessionCommand::ACCOUNT_IMAGE: return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD: return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
@@ -956,7 +956,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     }
 }
 
-Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Command_ForgotPassword &cmd, ResponseContainer &rc)
+Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Command_ForgotPassword &cmd)
 {
 	/*
 	Since we do not want to give away any additional information for a user account to someone

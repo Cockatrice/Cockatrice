@@ -103,7 +103,7 @@ private:
 	Response::ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc);
-	Response::ResponseCode cmdForgotPassword(const Command_ForgotPassword & cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdForgotPassword(const Command_ForgotPassword & cmd);
     Response::ResponseCode cmdActivateAccount(const Command_Activate &cmd, ResponseContainer & /* rc */);
     Response::ResponseCode cmdReloadConfig(const Command_ReloadConfig &/* cmd */, ResponseContainer & /*rc*/);
 	Response::ResponseCode cmdAdjustMod(const Command_AdjustMod &cmd, ResponseContainer & /*rc*/);
