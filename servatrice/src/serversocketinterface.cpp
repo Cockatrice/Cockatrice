@@ -937,16 +937,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     QString token;
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
-    bool regSucceeded = sqlInterface->registerUser(userName, realName, gender, password, emailAddress, country, token, !requireEmailActivation);
+    bool regSucceeded = sqlInterface->registerUser(userName, realName, gender, password, emailAddress, country, token, clientId, !requireEmailActivation);
 
     if(regSucceeded)
     {
         qDebug() << "Accepted register command for user: " << userName;
         if(requireEmailActivation)
         {
-            QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
-            query->bindValue(":name", userName);
-            if (!sqlInterface->execSqlQuery(query))
+            if (!sqlInterface->addEmailNotification(userName))
                 return Response::RespRegistrationFailed;
 
             return Response::RespRegistrationAcceptedNeedsActivation;
@@ -1009,8 +1007,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 		}
 	}
 
-	qDebug() << "All user checks have passed, time to correct user info.";
 	// all checks have passed, lets update things accordingly
+	qDebug() << "All user checks have passed, time to correct user info.";
+	if (sqlInterface->processForgotPassword(userName))
+		return Response::RespOk;
 
 	return Response::RespInternalError;
 }

@@ -167,7 +167,7 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
     return re.exactMatch(user);
 }
 
-bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active)
+bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, QString &token, const QString &clientid, bool active)
 {
     if (!checkSql())
         return false;
@@ -175,10 +175,10 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const Q
     QString passwordSha512 = PasswordHasher::computeHash(password, PasswordHasher::generateRandomSalt());
     token = active ? QString() : PasswordHasher::generateActivationToken();
 
-    QSqlQuery *query = prepareQuery("insert into {prefix}_users "
-            "(name, realname, gender, password_sha512, email, country, registrationDate, active, token) "
-            "values "
-            "(:userName, :realName, :gender, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active, :token)");
+	QSqlQuery *query = prepareQuery("insert into {prefix}_users "
+		"(admin, name, realname, gender, password_sha512, email, country, registrationDate, active, token, avatar_bmp, clientid) "
+		"values "
+		"(0, :userName, :realName, :gender, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active, :token, '', :clientid)");
     query->bindValue(":userName", userName);
     query->bindValue(":realName", realName);
     query->bindValue(":gender", getGenderChar(gender));
@@ -187,6 +187,7 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const Q
     query->bindValue(":country", country);
     query->bindValue(":active", active ? 1 : 0);
     query->bindValue(":token", token);
+	query->bindValue(":clientid", clientid);
 
     if (!execSqlQuery(query)) {
         qDebug() << "Failed to insert user: " << query->lastError() << " sql: " << query->lastQuery();
@@ -1146,4 +1147,45 @@ QString Servatrice_DatabaseInterface::getUsersLastIP(const QString &name)
 		return query->value(0).toString();
 
 	return "";
+}
+
+bool Servatrice_DatabaseInterface::processForgotPassword(const QString &name)
+{
+	if (!checkSql())
+		return false;
+
+	// generate new activation token and then use for new password
+	QString token = PasswordHasher::generateActivationToken();
+	QString passwordSha512 = PasswordHasher::computeHash(token, PasswordHasher::generateRandomSalt());
+
+	QSqlQuery *query = prepareQuery("update {prefix}_users set token = :token, password_sha512 = :password_sha512, active = 0 where name = :user_name");
+	query->bindValue(":user_name", name);
+	query->bindValue(":token", token);
+	query->bindValue(":password_sha512", passwordSha512);
+
+	if (execSqlQuery(query)) {
+		if (!addEmailNotification(name))
+			return false;
+	} else {
+		qDebug("Failed to reset users activation token and set users new password: SQL Error");
+		return false;
+	}
+
+	return true;
+}
+
+bool Servatrice_DatabaseInterface::addEmailNotification(const QString &name)
+{
+	if (!checkSql())
+		return false;
+
+	QSqlQuery *query = prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
+	query->bindValue(":name", name);
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to schedule email notification: SQL ERROR";
+		return false;
+	}
+
+	return true;
 }

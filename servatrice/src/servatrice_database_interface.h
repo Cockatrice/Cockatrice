@@ -56,6 +56,8 @@ public:
     void storeGameInformation(const QString &roomName, const QStringList &roomGameTypes, const ServerInfo_Game &gameInfo, const QSet<QString> &allPlayersEver, const QSet<QString>&allSpectatorsEver, const QList<GameReplay *> &replayList);
     DeckList *getDeckFromDatabase(int deckId, int userId);
 	QString getUsersLastIP(const QString &name);
+	bool processForgotPassword(const QString &name);
+	bool addEmailNotification(const QString &name);
     int getNextGameId();
     int getNextReplayId();
     int getActiveUserCount(QString connectionType = QString());
@@ -70,7 +72,7 @@ public:
     bool checkUserIsBanned(const QString &ipAddress, const QString &userName, const QString &clientId, QString &banReason, int &banSecondsRemaining);
     int checkNumberOfUserAccounts(const QString &email);
     bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender,
-        const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active = false);
+        const QString &password, const QString &emailAddress, const QString &country, QString &token, const QString &clientid, bool active = false);
     bool activateUser(const QString &userName, const QString &token);
     void updateUsersClientID(const QString &userName, const QString &userClientID);
     void updateUsersLastLoginData(const QString &userName, const QString &clientVersion);
