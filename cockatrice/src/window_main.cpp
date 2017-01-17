@@ -497,7 +497,7 @@ void MainWindow::processForgotPassword(Response::ResponseCode r)
 {
 	switch (r) {
 		case Response::RespOk:
-			QMessageBox::information(this, tr("Success"), tr("Password reset request successful."));
+			QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, please check your email for further instructions."));
 			break;
 		default:
 			QMessageBox::critical(this, tr("Error"), tr("Forgot password request failed, please contact the server operator to reset user account password."));

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
-INSERT INTO cockatrice_schema_version VALUES(20);
+INSERT INTO cockatrice_schema_version VALUES(21);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -235,6 +235,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_log` (
 
 CREATE TABLE IF NOT EXISTS `cockatrice_activation_emails` (
   `name` varchar(35) NOT NULL,
+  `privlevel` enum("REG","FORGOTPASS") NOT NULL,
   FOREIGN KEY(`name`) REFERENCES `cockatrice_users`(`name`)  ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 

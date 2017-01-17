@@ -1164,7 +1164,7 @@ bool Servatrice_DatabaseInterface::processForgotPassword(const QString &name)
 	query->bindValue(":password_sha512", passwordSha512);
 
 	if (execSqlQuery(query)) {
-		if (!addEmailNotification(name))
+		if (!addEmailNotification(name, "FORGOTPASS"))
 			return false;
 	} else {
 		qDebug("Failed to reset users activation token and set users new password: SQL Error");
@@ -1174,13 +1174,14 @@ bool Servatrice_DatabaseInterface::processForgotPassword(const QString &name)
 	return true;
 }
 
-bool Servatrice_DatabaseInterface::addEmailNotification(const QString &name)
+bool Servatrice_DatabaseInterface::addEmailNotification(const QString &name, const QString &type)
 {
 	if (!checkSql())
 		return false;
 
-	QSqlQuery *query = prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
+	QSqlQuery *query = prepareQuery("insert into {prefix}_activation_emails (name,type) values(:name,:type)");
 	query->bindValue(":name", name);
+	query->bindValue(":type", type);
 
 	if (!execSqlQuery(query)) {
 		qDebug() << "Failed to schedule email notification: SQL ERROR";

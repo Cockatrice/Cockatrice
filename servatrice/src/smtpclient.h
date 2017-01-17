@@ -14,7 +14,7 @@ public:
 protected:
 	QxtSmtp *smtp;
 public slots:
-	bool enqueueActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token);
+	bool enqueueActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token, const QString &type = "REG");
 	void sendAllEmails();
 protected slots:
 	void authenticated();

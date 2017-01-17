@@ -166,6 +166,14 @@ disallowedregexp=""
 ; Default false;
 ; requireipforforgotpassword=false
 
+; Forgot password email subject
+;subject="Cockatrice server forgot password"
+
+; Forgot password email body. You can use these tags here: %username %token
+; They will be substituted with the actual values in the forgot password email
+;body="Hi %username, sorry to hear you forgot your password on our Cockatrice server\r\nYour password and activation token have been reset to:\r\n\r\n%token\r\n\r\nHappy gaming!"
+
+
 [smtp]
 
 ; Enable the internal smtp client to send registration emails.  If you would like to

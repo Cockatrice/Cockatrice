@@ -559,14 +559,18 @@ void Servatrice::statusUpdate()
     query->bindValue(":rx", rx);
     servatriceDatabaseInterface->execSqlQuery(query);
 
-    // send activation emails
+    // send activation and forgot password emails
     if (getRegistrationEnabled() && getRequireEmailActivationEnabled() && getEnableInternalSMTPClient())
     {
-        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
-        if (!servatriceDatabaseInterface->execSqlQuery(query))
-            return;
+		// send activation emails
+        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name where type = :email_type");
+		query->bindValue(":email_type", "REG");
+		if (!servatriceDatabaseInterface->execSqlQuery(query)) {
+			qDebug() << "Failed to query users to send registration emails for: SQL Error";
+			return;
+		}
 
-        QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
+        QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name and type = :email_type");
 
         while (query->next()) {
             const QString userName = query->value(0).toString();
@@ -576,9 +580,37 @@ void Servatrice::statusUpdate()
             if(smtpClient->enqueueActivationTokenMail(userName, emailAddress, token))
             {
                 queryDelete->bindValue(":name", userName);
-                servatriceDatabaseInterface->execSqlQuery(queryDelete);
+				queryDelete->bindValue(":email_type", "REG");
+				if (!servatriceDatabaseInterface->execSqlQuery(queryDelete)) {
+					qDebug() << "Failed to remove users that registration emails have been sent to: SQL ERROR";
+				}
             }
         }
+
+		//send forgot password emails
+		query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name where type = :email_type");
+		query->bindValue(":email_type", "FORGOTPASS");
+		if (!servatriceDatabaseInterface->execSqlQuery(query)) {
+			qDebug() << "Failed to query users to send forgot password emails for: SQL Error";
+			return;
+		}
+
+		queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name and type = :email_type");
+
+		while (query->next()) {
+			const QString userName = query->value(0).toString();
+			const QString emailAddress = query->value(1).toString();
+			const QString token = query->value(2).toString();
+
+			if (smtpClient->enqueueActivationTokenMail(userName, emailAddress, token, "FORGOTPASS"))
+			{
+				queryDelete->bindValue(":name", userName);
+				queryDelete->bindValue(":email_type", "FORGOTPASS");
+				if (!servatriceDatabaseInterface->execSqlQuery(queryDelete)) {
+					qDebug() << "Failed to remove users that forgot password emails have been sent to: SQL ERROR";
+				}
+			}
+		}
 
         smtpClient->sendAllEmails();
     }

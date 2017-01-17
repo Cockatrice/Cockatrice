@@ -944,7 +944,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         qDebug() << "Accepted register command for user: " << userName;
         if(requireEmailActivation)
         {
-            if (!sqlInterface->addEmailNotification(userName))
+            if (!sqlInterface->addEmailNotification(userName, "REG"))
                 return Response::RespRegistrationFailed;
 
             return Response::RespRegistrationAcceptedNeedsActivation;
@@ -997,7 +997,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 		ServerInfo_User userInfo;
 		userInfo = databaseInterface->getUserData(userName);
 		if (clientEmail != QString::fromStdString(userInfo.email())) {
-			qDebug() << "Forgot password request denied for user (" << userName << ") due to incorrect email address.";
+			qDebug() << "Forgot password request denied for user (" << userName << ") due to incorrect email address. (This may also occur in the event the user sends more than a single forgot password request before properly activating their account.)";
 			return Response::RespInternalError;
 		}
 
