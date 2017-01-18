@@ -44,7 +44,7 @@ public:
     QSqlQuery * prepareQuery(const QString &queryText);
     bool execSqlQuery(QSqlQuery *query);
     const QSqlDatabase &getDatabase() { return sqlDatabase; }
-
+	bool addAudit(const QString &type, const QString &name, const QString &email, const QString &ipaddress, const bool &result, const QString &details);
     bool activeUserExists(const QString &user);
     bool userExists(const QString &user);
     int getUserIdInDB(const QString &name);

@@ -1190,3 +1190,24 @@ bool Servatrice_DatabaseInterface::addEmailNotification(const QString &name, con
 
 	return true;
 }
+
+bool Servatrice_DatabaseInterface::addAudit(const QString &type, const QString &name, const QString &email, const QString &ipaddress, const bool &result, const QString &details)
+{
+	if (!checkSql())
+		return false;
+
+	QSqlQuery *query = prepareQuery("insert into {prefix}_audit (type,user_name,user_email,ip_address,incidentDate,result,details) values(:type,:name,:email,:address,NOW(),:result,:details)");
+	query->bindValue(":type", type);
+	query->bindValue(":name", name);
+	query->bindValue(":email", email);
+	query->bindValue(":address", ipaddress);
+	query->bindValue(":result", result);
+	query->bindValue(":details", details);
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to add audit entry: SQL ERROR";
+		return false;
+	}
+
+	return true;
+}
