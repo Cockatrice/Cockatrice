@@ -433,57 +433,57 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
 
 void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime, QString customStr)
 {
-	qDebug() << "RECEIVED RESPONSE!";
-	QString titleStr = "Registration";
-	QString explinationStr = "";
+    qDebug() << "RECEIVED RESPONSE!";
+    QString titleStr = "Registration";
+    QString explinationStr = "";
     switch (r) {
         case Response::RespRegistrationDisabled:
-			titleStr = titleStr + " denied";
-			explinationStr = "Registration is currently disabled on this server";
+            titleStr = titleStr + " denied";
+            explinationStr = "Registration is currently disabled on this server";
             break;
         case Response::RespUserAlreadyExists:
-			titleStr = titleStr + " denied";
-			explinationStr = "There is already an existing account with the same user name.";
+            titleStr = titleStr + " denied";
+            explinationStr = "There is already an existing account with the same user name.";
             break;
         case Response::RespEmailRequiredToRegister:
-			titleStr = titleStr + " denied";
-			explinationStr = "It's mandatory to specify a valid email address when registering.";
+            titleStr = titleStr + " denied";
+            explinationStr = "It's mandatory to specify a valid email address when registering.";
             break;
         case Response::RespTooManyRequests:
-			titleStr = titleStr + " denied";
-			explinationStr = "Too many registration attempts, please try again later or contact the server operator for further details.";
+            titleStr = titleStr + " denied";
+            explinationStr = "Too many registration attempts, please try again later or contact the server operator for further details.";
             break;
         case Response::RespPasswordTooShort:
-			titleStr = titleStr + " denied";
-			QMessageBox::critical(this, tr("Registration denied"), tr("Password too short."));
+            titleStr = titleStr + " denied";
+            QMessageBox::critical(this, tr("Registration denied"), tr("Password too short."));
             break;
         case Response::RespUserIsBanned: {
-			titleStr = titleStr + " error";
+            titleStr = titleStr + " error";
             if (endTime)
-				explinationStr = tr("You are banned until %1.").arg(QDateTime::fromTime_t(endTime).toString());
+                explinationStr = tr("You are banned until %1.").arg(QDateTime::fromTime_t(endTime).toString());
             else
-				explinationStr = tr("You are banned indefinitely.");
+                explinationStr = tr("You are banned indefinitely.");
             if (!reasonStr.isEmpty())
-				explinationStr.append("\n\n" + reasonStr);
+                explinationStr.append("\n\n" + reasonStr);
             break;
         }
         case Response::RespUsernameInvalid: {
-			titleStr = titleStr + " error";
-			explinationStr = extractInvalidUsernameMessage(reasonStr);
+            titleStr = titleStr + " error";
+            explinationStr = extractInvalidUsernameMessage(reasonStr);
             break;
         }
         case Response::RespRegistrationFailed:
-			titleStr = titleStr + " error";
-			explinationStr = "Registration failed for a technical problem on the server.";
+            titleStr = titleStr + " error";
+            explinationStr = "Registration failed for a technical problem on the server.";
             break;
         default:
-			titleStr = titleStr + " error";
-			explinationStr = "Unknown registration error.\nThis usually means that your client version is out of date, and the server sent a reply your client doesn't understand." ;
+            titleStr = titleStr + " error";
+            explinationStr = "Unknown registration error.\nThis usually means that your client version is out of date, and the server sent a reply your client doesn't understand." ;
     }
-	if (!customStr.isEmpty())
-		explinationStr = explinationStr + "\n\n" + customStr;
+    if (!customStr.isEmpty())
+        explinationStr = explinationStr + "\n\n" + customStr;
 
-	QMessageBox::critical(this, tr("%1").arg(titleStr), tr("%1").arg(explinationStr));
+    QMessageBox::critical(this, tr("%1").arg(titleStr), tr("%1").arg(explinationStr));
     actRegister();
 }
 
@@ -680,7 +680,6 @@ MainWindow::MainWindow(QWidget *parent)
     clientThread = new QThread(this);
     client->moveToThread(clientThread);
     clientThread->start();
-
     createActions();
     createMenus();
 

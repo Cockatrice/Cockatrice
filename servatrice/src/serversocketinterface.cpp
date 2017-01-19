@@ -877,24 +877,24 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     QString clientId = QString::fromStdString(cmd.clientid());
     qDebug() << "Got register command: " << userName;
 
-	Response_Register *re = new Response_Register;
-	re->set_custom_reason_str(servatrice->getCustomRegErrorMessage().toStdString());
+    Response_Register *re = new Response_Register;
+    re->set_custom_reason_str(servatrice->getCustomRegErrorMessage().toStdString());
 
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
-	if (!registrationEnabled) {
-		rc.setResponseExtension(re);
-		return Response::RespRegistrationDisabled;
-	}
+    if (!registrationEnabled) {
+        rc.setResponseExtension(re);
+        return Response::RespRegistrationDisabled;
+    }
 
     QString emailAddress = QString::fromStdString(cmd.email());
     bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
     if (requireEmailForRegistration)
     {
         QRegExp rx("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}\\b");
-		if (emailAddress.isEmpty() || !rx.exactMatch(emailAddress)) {
-			rc.setResponseExtension(re);
-			return Response::RespEmailRequiredToRegister;
-		}
+        if (emailAddress.isEmpty() || !rx.exactMatch(emailAddress)) {
+            rc.setResponseExtension(re);
+            return Response::RespEmailRequiredToRegister;
+        }
     }
 
     // TODO: Move this method outside of the db interface
@@ -902,23 +902,23 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     if (!sqlInterface->usernameIsValid(userName, errorString))
     {
         re->set_denied_reason_str(errorString.toStdString());
-		rc.setResponseExtension(re);
+        rc.setResponseExtension(re);
         return Response::RespUsernameInvalid;
     }
 
-	if (userName.toLower().simplified() == "servatrice") {
-		rc.setResponseExtension(re);
-		return Response::RespUsernameInvalid;
-	}
+    if (userName.toLower().simplified() == "servatrice") {
+        rc.setResponseExtension(re);
+        return Response::RespUsernameInvalid;
+    }
 
-	if (sqlInterface->userExists(userName)) {
-		rc.setResponseExtension(re);
-		return Response::RespUserAlreadyExists;
-	}
+    if (sqlInterface->userExists(userName)) {
+        rc.setResponseExtension(re);
+        return Response::RespUserAlreadyExists;
+    }
 
     if (servatrice->getMaxAccountsPerEmail() && !(sqlInterface->checkNumberOfUserAccounts(emailAddress) < servatrice->getMaxAccountsPerEmail()))
     {
-		rc.setResponseExtension(re);
+        rc.setResponseExtension(re);
         return Response::RespTooManyRequests;
     }
 
@@ -929,14 +929,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         re->set_denied_reason_str(banReason.toStdString());
         if (banSecondsRemaining != 0)
             re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsRemaining).toTime_t());
-		rc.setResponseExtension(re);
+        rc.setResponseExtension(re);
         return Response::RespUserIsBanned;
     }
 
-	if (tooManyRegistrationAttempts(this->getAddress())) {
-		rc.setResponseExtension(re);
-		return Response::RespTooManyRequests;
-	}
+    if (tooManyRegistrationAttempts(this->getAddress())) {
+        rc.setResponseExtension(re);
+        return Response::RespTooManyRequests;
+    }
 
     QString realName = QString::fromStdString(cmd.real_name());
     ServerInfo_User_Gender gender = cmd.gender();
@@ -944,10 +944,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     QString password = QString::fromStdString(cmd.password());
 
     // TODO make this configurable?
-	if (password.length() < 6) {
-		rc.setResponseExtension(re);
-		return Response::RespPasswordTooShort;
-	}
+    if (password.length() < 6) {
+        rc.setResponseExtension(re);
+        return Response::RespPasswordTooShort;
+    }
 
     QString token;
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
@@ -960,21 +960,21 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         {
             QSqlQuery *query = sqlInterface->prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
             query->bindValue(":name", userName);
-			if (!sqlInterface->execSqlQuery(query)) {
-				rc.setResponseExtension(re);
-				return Response::RespRegistrationFailed;
-			}
+            if (!sqlInterface->execSqlQuery(query)) {
+                rc.setResponseExtension(re);
+                return Response::RespRegistrationFailed;
+            }
 
-			re->set_custom_reason_str(servatrice->getCustomRegSuccessMessage().toStdString());
-			rc.setResponseExtension(re);
+            re->set_custom_reason_str(servatrice->getCustomRegSuccessMessage().toStdString());
+            rc.setResponseExtension(re);
             return Response::RespRegistrationAcceptedNeedsActivation;
         } else {
-			re->set_custom_reason_str(servatrice->getCustomRegSuccessMessage().toStdString());
-			rc.setResponseExtension(re);
+            re->set_custom_reason_str(servatrice->getCustomRegSuccessMessage().toStdString());
+            rc.setResponseExtension(re);
             return Response::RespRegistrationAccepted;
         }
     } else {
-		rc.setResponseExtension(re);
+        rc.setResponseExtension(re);
         return Response::RespRegistrationFailed;
     }
 }
