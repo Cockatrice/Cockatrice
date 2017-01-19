@@ -144,6 +144,16 @@ disallowedregexp=""
 ; using the same email address. 0 = Unlimited number of accounts (default).
 ;maxaccountsperemail=0 
 
+; Populate this value with a custom message you would like appended to the response that is given
+; to clients that fail the registration process.  Leaving the value empty will not append anything
+; to the default messages presented to the client.  Default = "" 
+;customerrormessage=""
+
+; Populate this value with a custom message you would like appended to the response that is given
+; to clients that succeed the registration process.  Leaving the value empty will not append anything
+; to the default messages presented to the client.  Default = ""
+;customsuccessmessage=""
+
 [smtp]
 
 ; Enable the internal smtp client to send registration emails.  If you would like to

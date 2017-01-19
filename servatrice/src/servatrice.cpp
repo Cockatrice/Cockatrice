@@ -844,3 +844,11 @@ int Servatrice::getMaxAccountsPerEmail() const {
 bool Servatrice::getEnableInternalSMTPClient() const {
     return settingsCache->value("smtp/enableinternalsmtpclient", true).toBool();
 }
+
+QString Servatrice::getCustomRegErrorMessage() const {
+	return settingsCache->value("registration/customerrormessage", "").toString();
+}
+
+QString Servatrice::getCustomRegSuccessMessage() const {
+	return settingsCache->value("registration/customsuccessmessage", "").toString();
+}
