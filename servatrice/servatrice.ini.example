@@ -141,8 +141,8 @@ disallowedregexp=""
 ;requireemailactivation=true
 
 ; Set this number to the maximum number of accounts any one user can use to create new accounts
-; using the same email address. 0 = Unlimited number of accounts (default).
-;maxaccountsperemail=0 
+; using the same email address or clientid. 0 = Unlimited number of accounts (default).
+;maxaccountsperuser=0 
 
 [smtp]
 

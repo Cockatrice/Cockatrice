@@ -906,7 +906,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     if(sqlInterface->userExists(userName))
         return Response::RespUserAlreadyExists;
 
-    if (servatrice->getMaxAccountsPerEmail() && !(sqlInterface->checkNumberOfUserAccounts(emailAddress) < servatrice->getMaxAccountsPerEmail()))
+	if (servatrice->getMaxAccountsPerUser() && !(sqlInterface->checkNumberOfUserAccounts(emailAddress, clientId) < servatrice->getMaxAccountsPerUser()))
     {
         return Response::RespTooManyRequests;
     }
