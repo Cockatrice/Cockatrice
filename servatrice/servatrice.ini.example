@@ -145,6 +145,12 @@ disallowedregexp=""
 ;maxaccountsperemail=0 
 
 [forgotpassword]
+; When a user requests a forgot password the server will send back an "requesting server" address
+; informing the user which server they are to respond to for the forgot password request. Set
+; this variable value to the public name or public ip that users would use to connect to this
+; server with.
+; publicaddress=192.168.0.1
+
 ; Servatrice can process forgot password requests to reset user account passwords if they forget.
 ; Enable this feature? Default false.
 ; enabled=false

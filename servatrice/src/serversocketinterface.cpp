@@ -972,6 +972,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 	QString clientId = QString::fromStdString(cmd.clientid());
 	qDebug() << "Got forgot password command: " << userName;
 
+	// check if user exists
+	if (!sqlInterface->userExists(userName)) {
+		qDebug() << "Forgot password request denied for user (" << userName << ") due to user does not exist.";
+		sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), false, "USER DOES NOT EXIST");
+		return Response::RespInternalError;
+	}
+
 	// check if user is banned
 	QString banReason; int banSecondsRemaining;
 	if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining)) {
@@ -1001,25 +1008,31 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 	{
 		ServerInfo_User userInfo;
 		userInfo = databaseInterface->getUserData(userName);
-		if (clientEmail != QString::fromStdString(userInfo.email())) {
-			qDebug() << "Forgot password request denied for user (" << userName << ") due to incorrect email address. (This may also occur in the event the user sends more than a single forgot password request before properly activating their account.)";
-			sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), false, "INVALID EMAIL PROVIDED");
-			return Response::RespInternalError;
+		if (servatrice->getForgotPasswordEmailReq()) {
+			if (clientEmail != QString::fromStdString(userInfo.email())) {
+				qDebug() << "Forgot password request denied for user (" << userName << ") due to incorrect email address. (This may also occur in the event the user sends more than a single forgot password request before properly activating their account.)";
+				sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), false, "INVALID EMAIL PROVIDED");
+				return Response::RespInternalError;
+			}
 		}
-
-		if (clientId != QString::fromStdString(userInfo.clientid())) {
-			qDebug() << "Forgot password request denied for user (" << userName << ") due to incorrect client id.";
-			sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), false, "INVALID CLIENTID");
-			return Response::RespInternalError;
+		if (servatrice->getForgotPasswordClientIDReq()) {
+			if (clientId != QString::fromStdString(userInfo.clientid())) {
+				qDebug() << "Forgot password request denied for user (" << userName << ") due to incorrect client id.";
+				sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), false, "INVALID CLIENTID");
+				return Response::RespInternalError;
+			}
 		}
 	}
 
 	// all checks have passed, lets update things accordingly
 	qDebug() << "All user checks have passed, time to correct user info.";
-	sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), true, "");
-	if (sqlInterface->processForgotPassword(userName)) {
+	if (sqlInterface->resetUserToken(userName)) {
+		sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), true, "");
+		sqlInterface->addEmailNotification(userName, "FORGOTPASS");
 		Response_ForgotPasswordReset *re = new Response_ForgotPasswordReset;
-		re->set_requesting_server_name("testserver");
+		//re->set_requesting_server_name(servatrice->getServerAddress().toStdString());
+		//re->set_requesting_server_port(servatrice->getServerTCPPort());
+		re->set_requesting_server_name("127.0.0.1");
 		re->set_requesting_server_port(4747);
 		rc.setResponseExtension(re);
 		return Response::RespOk;

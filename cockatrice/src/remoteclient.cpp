@@ -212,7 +212,7 @@ void RemoteClient::registerResponse(const Response &response)
 void RemoteClient::forgotPasswordResponse(const Response &response)
 {
 	const Response_ForgotPasswordReset &resp = response.GetExtension(Response_ForgotPasswordReset::ext);
-	emit processForgotPassword(response.response_code(),QString::fromStdString(resp.requesting_server_name),resp.requesting_server_port);
+	emit processForgotPassword(response.response_code(), QString::fromStdString(resp.requesting_server_name()), resp.requesting_server_port());
 	setStatus(StatusDisconnecting);
 	doDisconnectFromServer();
 }

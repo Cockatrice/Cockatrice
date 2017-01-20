@@ -10,15 +10,15 @@
 #include "settingscache.h"
 #include "pb/serverinfo_user.pb.h"
 
-DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
+DlgForgotPasswordReset::DlgForgotPasswordReset(QString host, int port, QWidget *parent)
     : QDialog(parent)
 {
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit();
+    hostEdit = new QLineEdit(host);
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
-    portEdit = new QLineEdit();
+    portEdit = new QLineEdit(QString::number(port));
     portLabel->setBuddy(portEdit);
 
     tokenLabel = new QLabel(tr("Activation Token:"));
@@ -26,9 +26,11 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
     
     newpasswordLabel = new QLabel(tr("New Password:"));
     newpasswordEdit = new QLineEdit();
+	newpasswordEdit->setEchoMode(QLineEdit::Password);
 
     confirmnewpasswordLabel = new QLabel(tr("Confirm New Password:"));
     confirmnewpasswordEdit = new QLineEdit();
+	confirmnewpasswordEdit->setEchoMode(QLineEdit::Password);
     
 	QGridLayout *grid = new QGridLayout;
 	grid->addWidget(hostLabel, 0, 0);
@@ -58,6 +60,17 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
 
 void DlgForgotPasswordReset::actOk()
 {
+	
+    if (hostEdit->text().isEmpty())
+    {
+        QMessageBox::critical(this, tr("Warning"), tr("Host can't be empty."));
+        return;
+    }
+    if (portEdit->text().isEmpty())
+    {
+        QMessageBox::critical(this, tr("Warning"), tr("Port can't be empty."));
+        return;
+    }
     if (tokenEdit->text().isEmpty())
     {
         QMessageBox::critical(this, tr("Warning"), tr("Your activation token can't be empty."));

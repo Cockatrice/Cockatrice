@@ -56,7 +56,7 @@ public:
     void storeGameInformation(const QString &roomName, const QStringList &roomGameTypes, const ServerInfo_Game &gameInfo, const QSet<QString> &allPlayersEver, const QSet<QString>&allSpectatorsEver, const QList<GameReplay *> &replayList);
     DeckList *getDeckFromDatabase(int deckId, int userId);
 	QString getUsersLastIP(const QString &name);
-	bool processForgotPassword(const QString &name);
+	bool resetUserToken(const QString &name);
 	bool addEmailNotification(const QString &name, const QString &type);
     int getNextGameId();
     int getNextReplayId();

@@ -496,15 +496,14 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
 
 void MainWindow::processForgotPassword(Response::ResponseCode r, QString requestingSrv, int requestingSrvPort)
 {
-	qDebug() << "REQUESTING SERV: " << requestingSrv;
-	qDebug() << "REQUESTING SERV PORT: " << requestingSrvPort;
-	switch (r) {
-		case Response::RespOk:
-			QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, please check your email for further instructions."));
-			break;
-		default:
+	if (r == Response::RespOk) {
+			QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, please check your email for your forgot passowrd activation token."));
+			DlgForgotPasswordReset dlg(requestingSrv, requestingSrvPort, this);
+			if (dlg.exec()) {
+				qDebug() << "Executing Forgot Password Reset";
+			}
+	} else {
 			QMessageBox::critical(this, tr("Error"), tr("Forgot password request failed, please contact the server operator to reset user account password."));
-			break;
 	}
 }
 
@@ -701,7 +700,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
     connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
     connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
-	connect(client, SIGNAL(processForgotPassword(Response::ResponseCode),QString,int), this, SLOT(processForgotPassword(Response::ResponseCode),QString,int));
+	connect(client, SIGNAL(processForgotPassword(Response::ResponseCode,QString,int)), this, SLOT(processForgotPassword(Response::ResponseCode,QString,int)));
     connect(client, SIGNAL(activateAccepted()), this, SLOT(activateAccepted()));
     connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
 

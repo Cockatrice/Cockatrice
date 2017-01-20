@@ -1149,25 +1149,20 @@ QString Servatrice_DatabaseInterface::getUsersLastIP(const QString &name)
 	return "";
 }
 
-bool Servatrice_DatabaseInterface::processForgotPassword(const QString &name)
+bool Servatrice_DatabaseInterface::resetUserToken(const QString &name)
 {
 	if (!checkSql())
 		return false;
 
-	// generate new activation token and then use for new password
+	// generate new activation token
 	QString token = PasswordHasher::generateActivationToken();
-	QString passwordSha512 = PasswordHasher::computeHash(token, PasswordHasher::generateRandomSalt());
-
-	QSqlQuery *query = prepareQuery("update {prefix}_users set token = :token, password_sha512 = :password_sha512, active = 0 where name = :user_name");
+	
+	QSqlQuery *query = prepareQuery("update {prefix}_users set token = :token where name = :user_name");
 	query->bindValue(":user_name", name);
 	query->bindValue(":token", token);
-	query->bindValue(":password_sha512", passwordSha512);
 
-	if (execSqlQuery(query)) {
-		if (!addEmailNotification(name, "FORGOTPASS"))
-			return false;
-	} else {
-		qDebug("Failed to reset users activation token and set users new password: SQL Error");
+	if (!execSqlQuery(query)) {
+		qDebug("Failed to reset users activation token: SQL Error");
 		return false;
 	}
 
