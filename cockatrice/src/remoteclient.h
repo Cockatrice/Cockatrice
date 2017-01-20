@@ -13,7 +13,7 @@ signals:
     void serverTimeout();
     void loginError(Response::ResponseCode resp, QString reasonStr, quint32 endTime, QList<QString> missingFeatures);
     void registerError(Response::ResponseCode resp, QString reasonStr, quint32 endTime);
-	void processForgotPassword(Response::ResponseCode resp);
+	void processForgotPassword(Response::ResponseCode resp, QString requestingSrv, int requestingSrvPort);
     void activateError();
     void socketError(const QString &errorString);
     void protocolVersionMismatch(int clientVersion, int serverVersion);

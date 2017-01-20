@@ -13,6 +13,7 @@
 #include "pb/response_login.pb.h"
 #include "pb/response_register.pb.h"
 #include "pb/response_activate.pb.h"
+#include "pb/response_forgot_password_reset.pb.h"
 #include "pb/server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
 #include "settingscache.h"
@@ -210,10 +211,10 @@ void RemoteClient::registerResponse(const Response &response)
 
 void RemoteClient::forgotPasswordResponse(const Response &response)
 {
-	emit processForgotPassword(response.response_code());
+	const Response_ForgotPasswordReset &resp = response.GetExtension(Response_ForgotPasswordReset::ext);
+	emit processForgotPassword(response.response_code(),QString::fromStdString(resp.requesting_server_name),resp.requesting_server_port);
 	setStatus(StatusDisconnecting);
 	doDisconnectFromServer();
-
 }
 
 void RemoteClient::activateResponse(const Response &response)

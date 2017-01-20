@@ -62,6 +62,7 @@
 #include "pb/response_warn_history.pb.h"
 #include "pb/response_warn_list.pb.h"
 #include "pb/response_viewlog_history.pb.h"
+#include "pb/response_forgot_password_reset.pb.h"
 #include "pb/serverinfo_replay.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
@@ -150,7 +151,7 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
         case SessionCommand::REPLAY_DELETE_MATCH: return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
         case SessionCommand::REGISTER: return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc); break;
         case SessionCommand::ACTIVATE: return cmdActivateAccount(cmd.GetExtension(Command_Activate::ext), rc); break;
-		case SessionCommand::FORGOT_PASSWORD: return cmdForgotPassword(cmd.GetExtension(Command_ForgotPassword::ext)); break;
+		case SessionCommand::FORGOT_PASSWORD: return cmdForgotPassword(cmd.GetExtension(Command_ForgotPassword::ext), rc); break;
         case SessionCommand::ACCOUNT_EDIT: return cmdAccountEdit(cmd.GetExtension(Command_AccountEdit::ext), rc);
         case SessionCommand::ACCOUNT_IMAGE: return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD: return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
@@ -956,7 +957,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     }
 }
 
-Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Command_ForgotPassword &cmd)
+Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Command_ForgotPassword &cmd, ResponseContainer &rc)
 {
 	/*
 	Since we do not want to give away any additional information for a user account to someone
@@ -1016,8 +1017,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 	// all checks have passed, lets update things accordingly
 	qDebug() << "All user checks have passed, time to correct user info.";
 	sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), true, "");
-	if (sqlInterface->processForgotPassword(userName))
+	if (sqlInterface->processForgotPassword(userName)) {
+		Response_ForgotPasswordReset *re = new Response_ForgotPasswordReset;
+		re->set_requesting_server_name("testserver");
+		re->set_requesting_server_port(4747);
+		rc.setResponseExtension(re);
 		return Response::RespOk;
+	}
 
 	return Response::RespInternalError;
 }

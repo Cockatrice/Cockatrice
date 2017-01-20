@@ -25,6 +25,7 @@ message SessionCommand {
         ACCOUNT_IMAGE = 1019;
         ACCOUNT_PASSWORD = 1020;
 		FORGOT_PASSWORD = 1021;
+		FORGOT_PASSWORD_RESET = 1022;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
         REPLAY_MODIFY_MATCH = 1102;
@@ -168,5 +169,14 @@ message Command_ForgotPassword {
     }
     required string user_name = 1;
     optional string email = 2;
+    optional string clientid = 3;
+}
+
+message Command_ForgotPasswordReset {
+    extend SessionCommand {
+        optional Command_ForgotPasswordReset ext = 1022;
+    }
+    required string token = 1;
+    required string newpassword = 2;
     optional string clientid = 3;
 }

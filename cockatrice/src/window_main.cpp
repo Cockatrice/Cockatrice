@@ -38,6 +38,7 @@
 #include "dlg_connect.h"
 #include "dlg_register.h"
 #include "dlg_forgotpassword.h"
+#include "dlg_forgotpasswordreset.h"
 #include "dlg_settings.h"
 #include "dlg_update.h"
 #include "dlg_viewlog.h"
@@ -493,8 +494,10 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
     actRegister();
 }
 
-void MainWindow::processForgotPassword(Response::ResponseCode r)
+void MainWindow::processForgotPassword(Response::ResponseCode r, QString requestingSrv, int requestingSrvPort)
 {
+	qDebug() << "REQUESTING SERV: " << requestingSrv;
+	qDebug() << "REQUESTING SERV PORT: " << requestingSrvPort;
 	switch (r) {
 		case Response::RespOk:
 			QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, please check your email for further instructions."));
@@ -698,7 +701,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
     connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
     connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
-	connect(client, SIGNAL(processForgotPassword(Response::ResponseCode)), this, SLOT(processForgotPassword(Response::ResponseCode)));
+	connect(client, SIGNAL(processForgotPassword(Response::ResponseCode),QString,int), this, SLOT(processForgotPassword(Response::ResponseCode),QString,int));
     connect(client, SIGNAL(activateAccepted()), this, SLOT(activateAccepted()));
     connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
 
