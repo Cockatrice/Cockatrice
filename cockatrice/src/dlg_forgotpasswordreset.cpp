@@ -7,16 +7,23 @@
 
 #include "dlg_forgotpasswordreset.h"
 
-DlgForgotPasswordReset::DlgForgotPasswordReset(QString host, int port, QWidget *parent)
+DlgForgotPasswordReset::DlgForgotPasswordReset(QString host, int port, QString playerName, QWidget *parent)
     : QDialog(parent)
 {
     hostLabel = new QLabel(tr("Host:"));
     hostEdit = new QLineEdit(host);
-    hostLabel->setBuddy(hostEdit);
-
+	hostLabel->hide();
+	hostEdit->hide();
+	
     portLabel = new QLabel(tr("Port:"));
     portEdit = new QLineEdit(QString::number(port));
-    portLabel->setBuddy(portEdit);
+	portLabel->hide();
+	portEdit->hide();
+
+	playernameLabel = new QLabel(tr("Name:"));
+	playernameEdit = new QLineEdit(playerName);
+	playernameLabel->hide();
+	playernameEdit->hide();
 
     tokenLabel = new QLabel(tr("Activation Token:"));
     tokenEdit = new QLineEdit();
@@ -34,12 +41,14 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QString host, int port, QWidget *
 	grid->addWidget(hostEdit, 0, 1);
 	grid->addWidget(portLabel, 1, 0);
 	grid->addWidget(portEdit, 1, 1);
-	grid->addWidget(tokenLabel, 2, 0);
-	grid->addWidget(tokenEdit, 2, 1);
-	grid->addWidget(newpasswordLabel, 3, 0);
-	grid->addWidget(newpasswordEdit, 3, 1);
-    grid->addWidget(confirmnewpasswordLabel, 4, 0);
-    grid->addWidget(confirmnewpasswordEdit, 4, 1);
+	grid->addWidget(playernameLabel, 2, 0);
+	grid->addWidget(playernameEdit, 2, 1);
+	grid->addWidget(tokenLabel, 3, 0);
+	grid->addWidget(tokenEdit, 3, 1);
+	grid->addWidget(newpasswordLabel, 4, 0);
+	grid->addWidget(newpasswordEdit, 4, 1);
+    grid->addWidget(confirmnewpasswordLabel, 5, 0);
+    grid->addWidget(confirmnewpasswordEdit, 5, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));

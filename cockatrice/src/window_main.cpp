@@ -128,14 +128,12 @@ void MainWindow::statusChanged(ClientStatus _status)
             aSinglePlayer->setEnabled(true);
             aConnect->setEnabled(true);
             aRegister->setEnabled(true);
-			aForgotPassword->setEnabled(true);
             aDisconnect->setEnabled(false);
             break;
         case StatusLoggingIn:
             aSinglePlayer->setEnabled(false);
             aConnect->setEnabled(false);
             aRegister->setEnabled(false);
-			aForgotPassword->setEnabled(false);
             aDisconnect->setEnabled(true);
             break;
         case StatusConnecting:
@@ -170,9 +168,11 @@ void MainWindow::activateAccepted()
 
 void MainWindow::actConnect()
 {
-    DlgConnect dlg(this);
-    if (dlg.exec())
-        client->connectToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getPassword());
+    DlgConnect *dlg = new DlgConnect(this);
+	connect(dlg, SIGNAL(sigForgotPassword()), this, SLOT(actForgotPassword()));
+
+    if (dlg->exec())
+        client->connectToServer(dlg->getHost(), dlg->getPort(), dlg->getPlayerName(), dlg->getPassword());
 }
 
 void MainWindow::actRegister()
@@ -198,7 +198,7 @@ void MainWindow::actForgotPassword()
 	DlgForgotPassword dlg(this);
 	if (dlg.exec()) 
 	{
-		client->ForgotPassword(
+		client->forgotPassword(
 			dlg.getHost(),
 			dlg.getPort(),
 			dlg.getPlayerName(),
@@ -221,7 +221,6 @@ void MainWindow::actSinglePlayer()
 
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
-	aForgotPassword->setEnabled(false);
     aSinglePlayer->setEnabled(false);
 
     localServer = new LocalServer(this);
@@ -270,7 +269,6 @@ void MainWindow::localGameEnded()
 
     aConnect->setEnabled(true);
     aRegister->setEnabled(true);
-	aForgotPassword->setEnabled(true);
     aSinglePlayer->setEnabled(true);
 }
 
@@ -494,16 +492,31 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
     actRegister();
 }
 
-void MainWindow::processForgotPassword(Response::ResponseCode r, QString requestingSrv, int requestingSrvPort)
+void MainWindow::processForgotPassword(Response::ResponseCode r, QString requestingSrv, int requestingSrvPort, QString playerName)
 {
 	if (r == Response::RespOk) {
 			QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, please check your email for your forgot passowrd activation token."));
-			DlgForgotPasswordReset dlg(requestingSrv, requestingSrvPort, this);
+			DlgForgotPasswordReset dlg(requestingSrv, requestingSrvPort, playerName, this);
 			if (dlg.exec()) {
-				qDebug() << "Executing Forgot Password Reset";
+				client->forgotPasswordReset(
+					dlg.getHost(),
+					dlg.getPort(),
+					dlg.getPlayerName(),
+					dlg.getToken(),
+					dlg.getPassword()
+				);
 			}
 	} else {
 			QMessageBox::critical(this, tr("Error"), tr("Forgot password request failed, please contact the server operator to reset user account password."));
+	}
+}
+
+void MainWindow::processForgotPasswordReset(Response::ResponseCode r)
+{
+	if (r == Response::RespOk) {
+		QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, you may now login using your new credential information."));
+	} else {
+		QMessageBox::critical(this, tr("Error"), tr("Forgot password request failed, please contact the server operator to reset user account password."));
 	}
 }
 
@@ -553,7 +566,6 @@ void MainWindow::retranslateUi()
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
-	aForgotPassword->setText(tr("Forgot &password"));
     aSettings->setText(tr("&Settings..."));
     aSettings->setIcon(QPixmap("theme:icons/settings"));
     aExit->setText(tr("&Exit"));
@@ -597,8 +609,6 @@ void MainWindow::createActions()
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
     aRegister = new QAction(this);
     connect(aRegister, SIGNAL(triggered()), this, SLOT(actRegister()));
-	aForgotPassword = new QAction(this);
-	connect(aForgotPassword, SIGNAL(triggered()), this, SLOT(actForgotPassword()));
     aSettings = new QAction(this);
     connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
     aExit = new QAction(this);
@@ -651,7 +661,6 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aConnect);
     cockatriceMenu->addAction(aDisconnect);
     cockatriceMenu->addAction(aRegister);
-	cockatriceMenu->addAction(aForgotPassword);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
@@ -700,9 +709,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
     connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
     connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
-	connect(client, SIGNAL(processForgotPassword(Response::ResponseCode,QString,int)), this, SLOT(processForgotPassword(Response::ResponseCode,QString,int)));
+	connect(client, SIGNAL(processForgotPassword(Response::ResponseCode,QString,int,QString)), this, SLOT(processForgotPassword(Response::ResponseCode,QString,int,QString)));
+	connect(client, SIGNAL(processForgotPasswordReset(Response::ResponseCode)), this, SLOT(processForgotPasswordReset(Response::ResponseCode)));
     connect(client, SIGNAL(activateAccepted()), this, SLOT(activateAccepted()));
     connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
+	
 
     clientThread = new QThread(this);
     client->moveToThread(clientThread);

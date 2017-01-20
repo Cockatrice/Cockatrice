@@ -1030,10 +1030,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 		sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), true, "");
 		sqlInterface->addEmailNotification(userName, "FORGOTPASS");
 		Response_ForgotPasswordReset *re = new Response_ForgotPasswordReset;
-		//re->set_requesting_server_name(servatrice->getServerAddress().toStdString());
-		//re->set_requesting_server_port(servatrice->getServerTCPPort());
-		re->set_requesting_server_name("127.0.0.1");
-		re->set_requesting_server_port(4747);
+		re->set_requesting_server_name(servatrice->getServerAddress().toStdString());
+		re->set_requesting_server_port(servatrice->getServerTCPPort());
+		re->set_requesting_user_name(userName.toStdString());
 		rc.setResponseExtension(re);
 		return Response::RespOk;
 	}

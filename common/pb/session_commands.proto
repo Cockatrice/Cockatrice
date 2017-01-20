@@ -176,7 +176,8 @@ message Command_ForgotPasswordReset {
     extend SessionCommand {
         optional Command_ForgotPasswordReset ext = 1022;
     }
-    required string token = 1;
-    required string newpassword = 2;
-    optional string clientid = 3;
+	required string user_name = 1;
+    required string token = 2;
+    required string newpassword = 3;
+    optional string clientid = 4;
 }

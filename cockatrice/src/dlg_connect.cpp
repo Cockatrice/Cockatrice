@@ -9,9 +9,11 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include <QPushButton>
 #include <iostream>
 #include <QGroupBox>
 #include "dlg_connect.h"
+#include "dlg_forgotpassword.h"
 #include "settingscache.h"
 
 DlgConnect::DlgConnect(QWidget *parent)
@@ -69,6 +71,11 @@ DlgConnect::DlgConnect(QWidget *parent)
 
     connect(savePasswordCheckBox, SIGNAL(stateChanged(int)), this, SLOT(passwordSaved(int)));
 
+	forgotPassword = new QPushButton(tr("Forgot password"));
+	forgotPassword->setGeometry(QRect(QPoint(50, 50),QSize(50, 50)));
+	connect(forgotPassword, SIGNAL(released()), this, SLOT(forgotYourPassword()));
+
+
     QGridLayout *connectionLayout = new QGridLayout;
     connectionLayout->addWidget(previousHostButton, 0, 1);
     connectionLayout->addWidget(previousHosts, 1, 1);
@@ -103,6 +110,7 @@ DlgConnect::DlgConnect(QWidget *parent)
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
     mainLayout->addWidget(buttonBox);
+	mainLayout->addWidget(forgotPassword);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Connect to server"));
@@ -203,4 +211,9 @@ bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *o
         }
     }
     return QObject::eventFilter(obj, event);
+}
+
+void DlgConnect::forgotYourPassword()
+{
+	emit sigForgotPassword();
 }
