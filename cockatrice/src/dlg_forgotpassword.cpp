@@ -1,5 +1,4 @@
 #include <QLabel>
-#include <QCheckBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QDialogButtonBox>
@@ -7,27 +6,21 @@
 #include <QDebug>
 
 #include "dlg_forgotpassword.h"
-#include "settingscache.h"
-#include "pb/serverinfo_user.pb.h"
 
 DlgForgotPassword::DlgForgotPassword(QWidget *parent)
     : QDialog(parent)
 {
-    hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit(settingsCache->servers().getHostname("cockatrice.woogerworks.com"));
-    hostLabel->setBuddy(hostEdit);
+    hostLabel = new QLabel(tr("Host:"));
+    hostEdit = new QLineEdit();
 
-    portLabel = new QLabel(tr("&Port:"));
-    portEdit = new QLineEdit(settingsCache->servers().getPort("4747"));
-    portLabel->setBuddy(portEdit);
+    portLabel = new QLabel(tr("Port:"));
+    portEdit = new QLineEdit();
 
-    playernameLabel = new QLabel(tr("Player &name:"));
-    playernameEdit = new QLineEdit(settingsCache->servers().getPlayerName("Player"));
-    playernameLabel->setBuddy(playernameEdit);
+    playernameLabel = new QLabel(tr("Player Name:"));
+    playernameEdit = new QLineEdit();
 
     emailLabel = new QLabel(tr("Email:"));
     emailEdit = new QLineEdit();
-    emailLabel->setBuddy(emailEdit);
 
 	QGridLayout *grid = new QGridLayout;
 	grid->addWidget(hostLabel, 0, 0);

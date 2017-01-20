@@ -3,7 +3,6 @@
 
 #include <QDialog>
 #include <QLineEdit>
-#include <QComboBox>
 
 class QLabel;
 class QPushButton;
@@ -23,7 +22,6 @@ private slots:
 private:
     QLabel *hostLabel, *portLabel, *playernameLabel, *emailLabel;
     QLineEdit *hostEdit, *portEdit, *playernameEdit, *emailEdit;
-    QComboBox *countryEdit;
 };
 
 #endif

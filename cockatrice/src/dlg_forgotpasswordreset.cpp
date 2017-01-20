@@ -1,5 +1,4 @@
 #include <QLabel>
-#include <QCheckBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QDialogButtonBox>
@@ -7,17 +6,15 @@
 #include <QDebug>
 
 #include "dlg_forgotpasswordreset.h"
-#include "settingscache.h"
-#include "pb/serverinfo_user.pb.h"
 
 DlgForgotPasswordReset::DlgForgotPasswordReset(QString host, int port, QWidget *parent)
     : QDialog(parent)
 {
-    hostLabel = new QLabel(tr("&Host:"));
+    hostLabel = new QLabel(tr("Host:"));
     hostEdit = new QLineEdit(host);
     hostLabel->setBuddy(hostEdit);
 
-    portLabel = new QLabel(tr("&Port:"));
+    portLabel = new QLabel(tr("Port:"));
     portEdit = new QLineEdit(QString::number(port));
     portLabel->setBuddy(portEdit);
 
