@@ -1206,3 +1206,40 @@ bool Servatrice_DatabaseInterface::addAudit(const QString &type, const QString &
 
 	return true;
 }
+
+bool Servatrice_DatabaseInterface::clearUsersForgotPasswordFlag(const QString &name)
+{
+	if (!checkSql())
+		return false;
+
+	QSqlQuery *query = prepareQuery("update {prefix}_audit set details = '' where user_name = :user_name AND details = 'ACTIVE'");
+	query->bindValue(":user_name", name);
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to clear forgot password flag on users account: SQL ERROR";
+		return false;
+	}
+
+	return true;
+}
+
+bool Servatrice_DatabaseInterface::isAccountFlaggedForPasswordReset(const QString &name)
+{
+	if (!checkSql())
+		return false;
+	
+	QSqlQuery *query = prepareQuery("select count(user_name) from {prefix}_audit where user_name = :user_name and details = 'ACTIVE' AND incidentDate > (now() - interval :minutes minute)");
+	query->bindValue(":user_name", name);
+	query->bindValue(":minutes", "120");
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to locate if user account is flagged for password reset: SQL ERROR";
+		return false;
+	}
+
+	if (query->next())
+		if (query->value(0).toInt() > 0)
+			return true;
+
+	return false;
+}

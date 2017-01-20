@@ -152,6 +152,7 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
         case SessionCommand::REGISTER: return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc); break;
         case SessionCommand::ACTIVATE: return cmdActivateAccount(cmd.GetExtension(Command_Activate::ext), rc); break;
 		case SessionCommand::FORGOT_PASSWORD: return cmdForgotPassword(cmd.GetExtension(Command_ForgotPassword::ext), rc); break;
+		case SessionCommand::FORGOT_PASSWORD_RESET: return cmdForgotPasswordReset(cmd.GetExtension(Command_ForgotPasswordReset::ext)); break;
         case SessionCommand::ACCOUNT_EDIT: return cmdAccountEdit(cmd.GetExtension(Command_AccountEdit::ext), rc);
         case SessionCommand::ACCOUNT_IMAGE: return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD: return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
@@ -1025,9 +1026,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 	}
 
 	// all checks have passed, lets update things accordingly
-	qDebug() << "All user checks have passed, time to correct user info.";
 	if (sqlInterface->resetUserToken(userName)) {
-		sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), true, "");
+		sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), true, "ACTIVE");
 		sqlInterface->addEmailNotification(userName, "FORGOTPASS");
 		Response_ForgotPasswordReset *re = new Response_ForgotPasswordReset;
 		re->set_requesting_server_name(servatrice->getServerAddress().toStdString());
@@ -1036,6 +1036,35 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 		rc.setResponseExtension(re);
 		return Response::RespOk;
 	}
+
+	return Response::RespInternalError;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(const Command_ForgotPasswordReset &cmd)
+{
+	if (!servatrice->getForgotPasswordEnabled())
+		return Response::RespFunctionNotAllowed;
+
+	QString userName = QString::fromStdString(cmd.user_name());
+	QString newPassword = QString::fromStdString(cmd.newpassword());
+	QString clientToken = QString::fromStdString(cmd.token());
+	QString clientId = QString::fromStdString(cmd.clientid());
+
+	qDebug() << "Got forgot password reset command: " << userName;
+	qDebug() << "FPRC USER: " << userName;
+	qDebug() << "FPRC NEWPW: " << newPassword;
+	qDebug() << "FPRC TOKEN: " << clientToken;
+	qDebug() << "FPRC CLIENTID: " << clientId;
+
+	qDebug() << "ACCOUNT FLAGGED: " << sqlInterface->isAccountFlaggedForPasswordReset(userName);
+	sqlInterface->clearUsersForgotPasswordFlag(userName);
+	qDebug() << "ACCOUNT FLAGGED: " << sqlInterface->isAccountFlaggedForPasswordReset(userName);
+	// record audit of event
+	// check if user exists
+	// check if user is banned
+	// check if user account is flagged for forgot password
+	// reset password
+	// clear account flag for forgot password
 
 	return Response::RespInternalError;
 }

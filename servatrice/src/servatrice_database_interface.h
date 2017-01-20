@@ -58,6 +58,8 @@ public:
 	QString getUsersLastIP(const QString &name);
 	bool resetUserToken(const QString &name);
 	bool addEmailNotification(const QString &name, const QString &type);
+	bool clearUsersForgotPasswordFlag(const QString &name);
+	bool isAccountFlaggedForPasswordReset(const QString &name);
     int getNextGameId();
     int getNextReplayId();
     int getActiveUserCount(QString connectionType = QString());

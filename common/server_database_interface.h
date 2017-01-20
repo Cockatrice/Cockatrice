@@ -31,6 +31,8 @@ public:
     virtual int getNextReplayId() = 0;
     virtual int getActiveUserCount(QString connectionType = QString()) = 0;
 	virtual bool addAudit(const QString /* type */, const QString /* name */, const QString /* email */, const QString /* ipaddress */, const bool /* result */, const QString /* details */) { return false; }
+	virtual bool clearUsersForgotPasswordFlat(const QString /* name */) { return false; }
+	virtual bool isAccountFlaggedForPasswordReset(const QString /* name */) { return false; }
     virtual void clearSessionTables() { }
     virtual void lockSessionTables() { }
     virtual void unlockSessionTables() { }

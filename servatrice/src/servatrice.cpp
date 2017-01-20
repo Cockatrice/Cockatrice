@@ -253,6 +253,7 @@ bool Servatrice::initServer()
 	if (getForgotPasswordEnabled()) {
 		if (getDBTypeString() == "mysql") {
 			qDebug() << "Forgot password functionality enabled.";
+			qDebug() << "Forgot password token life: " << getForgotPasswordTokenLife() << " (minutes)";
 			qDebug() << "Public address set to: " << getServerAddress();
 			qDebug() << "Require matching Email for forgot password functionality: " << getForgotPasswordEmailReq();
 			qDebug() << "Require matching ClientID for forgot password functionality: " << getForgotPasswordClientIDReq();
@@ -915,4 +916,8 @@ bool Servatrice::getForgotPasswordIPReq() const {
 
 QString Servatrice::getServerAddress() const {
 	return settingsCache->value("forgotpassword/publicaddress", "").toString();
+}
+
+int Servatrice::getForgotPasswordTokenLife() const {
+	return settingsCache->value("forgotpassword/forgotpasswordtokenlife", 60).toInt();
 }
