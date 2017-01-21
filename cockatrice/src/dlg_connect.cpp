@@ -72,7 +72,7 @@ DlgConnect::DlgConnect(QWidget *parent)
     connect(savePasswordCheckBox, SIGNAL(stateChanged(int)), this, SLOT(passwordSaved(int)));
 
 	forgotPassword = new QPushButton(tr("Forgot password"));
-	forgotPassword->setGeometry(QRect(QPoint(50, 50),QSize(50, 50)));
+	forgotPassword->setFixedWidth(100);
 	connect(forgotPassword, SIGNAL(released()), this, SLOT(forgotYourPassword()));
 
 
@@ -109,8 +109,8 @@ DlgConnect::DlgConnect(QWidget *parent)
          
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
-    mainLayout->addWidget(buttonBox);
-	mainLayout->addWidget(forgotPassword);
+    mainLayout->addWidget(buttonBox,0,Qt::AlignCenter);
+	mainLayout->addWidget(forgotPassword,0,Qt::AlignCenter);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Connect to server"));
