@@ -30,9 +30,9 @@ public:
     virtual int getNextGameId() = 0;
     virtual int getNextReplayId() = 0;
     virtual int getActiveUserCount(QString connectionType = QString()) = 0;
-	virtual bool addAudit(const QString /* type */, const QString /* name */, const QString /* email */, const QString /* ipaddress */, const bool /* result */, const QString /* details */) { return false; }
-	virtual bool clearUsersForgotPasswordFlat(const QString /* name */) { return false; }
-	virtual bool isAccountFlaggedForPasswordReset(const QString /* name */) { return false; }
+	virtual bool addAudit(const QString & /* type */, const QString & /* name */, const QString & /* email */, const QString & /* ipaddress */, const bool & /* result */, const QString & /* details */) { return false; }
+	virtual bool clearUsersForgotPasswordFlag(const QString & /* name */) { return false; }
+	virtual bool isAccountFlaggedForPasswordReset(const QString & /* name */) { return false; }
     virtual void clearSessionTables() { }
     virtual void lockSessionTables() { }
     virtual void unlockSessionTables() { }
@@ -48,7 +48,8 @@ public:
     virtual void logMessage(const int /* senderId */, const QString & /* senderName */, const QString & /* senderIp */, const QString & /* logMessage */, LogMessage_TargetType /* targetType */, const int /* targetId */, const QString & /* targetName */) { };
     bool checkUserIsBanned(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining);
     virtual int checkNumberOfUserAccounts(const QString & /* email */) { return 0; };
-    virtual bool changeUserPassword(const QString & /* user */, const QString & /* oldPassword */, const QString & /* newPassword */) { return true; };
+    virtual bool changeUserPassword(const QString & /* user */, const QString & /* oldPassword */, const QString & /* newPassword */, bool /* force */) { return true; };
+	virtual bool isUserTokenCorrect(const QString /* name */, const QString /* token */) { return false; }
     virtual QChar getGenderChar(ServerInfo_User_Gender const & /* gender */) { return QChar('u'); };
 };
 

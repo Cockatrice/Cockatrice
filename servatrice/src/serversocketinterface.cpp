@@ -1025,9 +1025,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 		}
 	}
 
-	// all checks have passed, lets update things accordingly
-	if (sqlInterface->resetUserToken(userName)) {
-		sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), true, "ACTIVE");
+	// check if user account is already flagged for password reset
+	if (sqlInterface->isAccountFlaggedForPasswordReset(userName)) {
 		sqlInterface->addEmailNotification(userName, "FORGOTPASS");
 		Response_ForgotPasswordReset *re = new Response_ForgotPasswordReset;
 		re->set_requesting_server_name(servatrice->getServerAddress().toStdString());
@@ -1037,11 +1036,30 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 		return Response::RespOk;
 	}
 
+	// prepare account for password reset
+	if (sqlInterface->resetUserToken(userName)) {
+		sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), true, "PENDING TOKEN VERIFICATION");
+		sqlInterface->addEmailNotification(userName, "FORGOTPASS");
+		Response_ForgotPasswordReset *re = new Response_ForgotPasswordReset;
+		re->set_requesting_server_name(servatrice->getServerAddress().toStdString());
+		re->set_requesting_server_port(servatrice->getServerTCPPort());
+		re->set_requesting_user_name(userName.toStdString());
+		rc.setResponseExtension(re);
+		return Response::RespOk;
+	}
+
+	qDebug() << "Forgot password request denied for user (" << userName << ") due to unknown/internal error.";
+	sqlInterface->addAudit("FORGOTPASSWORD", userName, clientEmail, this->getAddress(), false, "INTERNAL ERROR");
 	return Response::RespInternalError;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(const Command_ForgotPasswordReset &cmd)
 {
+	/*
+	Since we do not want to give away any additional information for a user account to someone
+	that might try to exploit the forgot password functionality we return RespInternalError if the
+	reset request fails. Otherwise RespOk is returned.
+	*/
 	if (!servatrice->getForgotPasswordEnabled())
 		return Response::RespFunctionNotAllowed;
 
@@ -1051,21 +1069,45 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
 	QString clientId = QString::fromStdString(cmd.clientid());
 
 	qDebug() << "Got forgot password reset command: " << userName;
-	qDebug() << "FPRC USER: " << userName;
-	qDebug() << "FPRC NEWPW: " << newPassword;
-	qDebug() << "FPRC TOKEN: " << clientToken;
-	qDebug() << "FPRC CLIENTID: " << clientId;
 
-	qDebug() << "ACCOUNT FLAGGED: " << sqlInterface->isAccountFlaggedForPasswordReset(userName);
-	sqlInterface->clearUsersForgotPasswordFlag(userName);
-	qDebug() << "ACCOUNT FLAGGED: " << sqlInterface->isAccountFlaggedForPasswordReset(userName);
-	// record audit of event
 	// check if user exists
-	// check if user is banned
-	// check if user account is flagged for forgot password
-	// reset password
-	// clear account flag for forgot password
+	if (!sqlInterface->userExists(userName)) {
+		qDebug() << "Forgot password reset request denied for user (" << userName << ") due to user does not exist.";
+		sqlInterface->addAudit("FORGOTPASSWORDRESET", userName, "", this->getAddress(), false, "USER DOES NOT EXIST");
+		return Response::RespInternalError;
+	}
 
+	// check if user is banned
+	QString banReason; int banSecondsRemaining;
+	if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining)) {
+		qDebug() << "Forgot password request denied for user (" << userName << ") due to user being banned.";
+		sqlInterface->addAudit("FORGOTPASSWORDRESET", userName, "", this->getAddress(), false, "USER IS BANNED");
+		return Response::RespInternalError;
+	}
+
+	// check if user account is flagged for forgot password
+	if (!sqlInterface->isAccountFlaggedForPasswordReset(userName)) {
+		qDebug() << "Forgot password request denied for user (" << userName << ") due to user has not requested a password reset.";
+		sqlInterface->addAudit("FORGOTPASSWORDRESET", userName, "", this->getAddress(), false, "USER HAS NOT REQUESTED FORGOT PASSWORD RESET");
+		return Response::RespInternalError;
+	}
+
+	// reset password
+	if (sqlInterface->isUserTokenCorrect(userName, clientToken)) {
+		if (sqlInterface->changeUserPassword(userName, newPassword, newPassword, true)) {
+			qDebug() << "Forgot password request succeeded for user (" << userName << ").";
+			sqlInterface->addAudit("FORGOTPASSWORDRESET", userName, "", this->getAddress(), true, "");
+			sqlInterface->clearUsersForgotPasswordFlag(userName);
+			return Response::RespOk;
+		}
+	} else {
+		qDebug() << "Forgot password request denied for user (" << userName << ") due to incorrect token.";
+		sqlInterface->addAudit("FORGOTPASSWORDRESET", userName, "", this->getAddress(), false, "FAILED TO VALIDATE TOKEN");
+		return Response::RespInternalError;
+	}
+	
+	qDebug() << "Forgot password request denied for user (" << userName << ") due to unknown/internal error.";
+	sqlInterface->addAudit("FORGOTPASSWORDRESET", userName, "", this->getAddress(), false, "INTERNAL ERROR");
 	return Response::RespInternalError;
 }
 
@@ -1153,9 +1195,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
 
     QString userName = QString::fromStdString(userInfo->name());
 
-    bool changeFailed = databaseInterface->changeUserPassword(userName, oldPassword, newPassword);
-
-    if(changeFailed)
+    if(!databaseInterface->changeUserPassword(userName, oldPassword, newPassword, false))
         return Response::RespWrongPassword;
     
     return Response::RespOk;

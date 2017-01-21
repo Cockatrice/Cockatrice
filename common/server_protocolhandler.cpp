@@ -506,6 +506,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             re->add_missing_features(i.key().toStdString().c_str());
     }
 
+	databaseInterface->clearUsersForgotPasswordFlag(userName);
     joinPersistentGames(rc);
 
     rc.setResponseExtension(re);

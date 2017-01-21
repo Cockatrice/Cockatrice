@@ -60,6 +60,7 @@ public:
 	bool addEmailNotification(const QString &name, const QString &type);
 	bool clearUsersForgotPasswordFlag(const QString &name);
 	bool isAccountFlaggedForPasswordReset(const QString &name);
+	bool isUserTokenCorrect(const QString &name, const QString &token);
     int getNextGameId();
     int getNextReplayId();
     int getActiveUserCount(QString connectionType = QString());
@@ -80,7 +81,7 @@ public:
     void updateUsersLastLoginData(const QString &userName, const QString &clientVersion);
     void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage,
         LogMessage_TargetType targetType, const int targetId, const QString &targetName);
-    bool changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword);
+    bool changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword, bool force = false);
     QChar getGenderChar(ServerInfo_User_Gender const &gender);
     QList<ServerInfo_Ban> getUserBanHistory(const QString userName);
     bool addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID);

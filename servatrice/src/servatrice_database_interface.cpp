@@ -832,31 +832,35 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId, const QString 
     execSqlQuery(query);
 }
 
-bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword)
+bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword, bool force)
 {
     if(server->getAuthenticationMethod() != Servatrice::AuthenticationSql)
-        return true;
+        return false;
 
     if (!checkSql())
-        return true;
+        return false;
 
     QString error;
     if (!usernameIsValid(user, error))
-        return true;
+        return false;
 
-    QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name");
-    passwordQuery->bindValue(":name", user);
-    if (!execSqlQuery(passwordQuery)) {
-        qDebug("Change password denied: SQL error");
-        return true;
-    }
+	QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name");
+	passwordQuery->bindValue(":name", user);
 
-    if (!passwordQuery->next())
-        return true;
+	if (!force) {
+		
+		if (!execSqlQuery(passwordQuery)) {
+			qDebug("Change password denied: SQL error");
+			return false;
+		}
 
-    const QString correctPassword = passwordQuery->value(0).toString();
-    if (correctPassword != PasswordHasher::computeHash(oldPassword, correctPassword.left(16)))
-        return true;
+		if (!passwordQuery->next())
+			return false;
+
+		const QString correctPassword = passwordQuery->value(0).toString();
+		if (correctPassword != PasswordHasher::computeHash(oldPassword, correctPassword.left(16)))
+			return false;
+	}
 
     QString passwordSha512 = PasswordHasher::computeHash(newPassword, PasswordHasher::generateRandomSalt());
 
@@ -865,9 +869,9 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const
     passwordQuery->bindValue(":name", user);
     if (!execSqlQuery(passwordQuery)) {
         qDebug("Change password denied: SQL error");
-        return true;
+        return false;
     }
-    return false;
+    return true;
 }
 
 int Servatrice_DatabaseInterface::getActiveUserCount(QString connectionType)
@@ -1212,7 +1216,7 @@ bool Servatrice_DatabaseInterface::clearUsersForgotPasswordFlag(const QString &n
 	if (!checkSql())
 		return false;
 
-	QSqlQuery *query = prepareQuery("update {prefix}_audit set details = '' where user_name = :user_name AND details = 'ACTIVE'");
+	QSqlQuery *query = prepareQuery("update {prefix}_audit set details = '' where user_name = :user_name AND details = 'PENDING TOKEN VERIFICATION'");
 	query->bindValue(":user_name", name);
 
 	if (!execSqlQuery(query)) {
@@ -1228,9 +1232,9 @@ bool Servatrice_DatabaseInterface::isAccountFlaggedForPasswordReset(const QStrin
 	if (!checkSql())
 		return false;
 	
-	QSqlQuery *query = prepareQuery("select count(user_name) from {prefix}_audit where user_name = :user_name and details = 'ACTIVE' AND incidentDate > (now() - interval :minutes minute)");
+	QSqlQuery *query = prepareQuery("select count(user_name) from {prefix}_audit where user_name = :user_name and details = 'PENDING TOKEN VERIFICATION' AND incidentDate > (now() - interval :minutes minute)");
 	query->bindValue(":user_name", name);
-	query->bindValue(":minutes", "120");
+	query->bindValue(":minutes", QString::number(server->getForgotPasswordTokenLife()));
 
 	if (!execSqlQuery(query)) {
 		qDebug() << "Failed to locate if user account is flagged for password reset: SQL ERROR";
@@ -1239,6 +1243,26 @@ bool Servatrice_DatabaseInterface::isAccountFlaggedForPasswordReset(const QStrin
 
 	if (query->next())
 		if (query->value(0).toInt() > 0)
+			return true;
+
+	return false;
+}
+
+bool Servatrice_DatabaseInterface::isUserTokenCorrect(const QString &name, const QString &token)
+{
+	if (!checkSql())
+		return false;
+
+	QSqlQuery *query = prepareQuery("select token from {prefix}_users where name = :user_name");
+	query->bindValue(":user_name", name);
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to locate query users token in database: SQL ERROR";
+		return false;
+	}
+
+	if (query->next())
+		if (query->value(0).toString() == token)
 			return true;
 
 	return false;
