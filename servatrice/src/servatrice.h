@@ -195,6 +195,7 @@ public:
 	bool getForgotPasswordClientIDReq() const;
 	bool getForgotPasswordEmailReq() const;
 	bool getForgotPasswordIPReq() const;
+	bool getForgotPasswordLockPendingAccount() const;
 	int getForgotPasswordTokenLife() const;
     int getIdleClientTimeout() const;
     int getServerID() const;

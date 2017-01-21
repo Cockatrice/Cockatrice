@@ -253,14 +253,17 @@ bool Servatrice::initServer()
 	if (getForgotPasswordEnabled()) {
 		if (getDBTypeString() == "mysql") {
 			qDebug() << "Forgot password functionality enabled.";
+			qDebug() << "Deactivate pending forgot password accounts: " << getForgotPasswordLockPendingAccount();
 			qDebug() << "Forgot password token life: " << getForgotPasswordTokenLife() << " (minutes)";
 			qDebug() << "Public address set to: " << getServerAddress();
 			qDebug() << "Require matching Email for forgot password functionality: " << getForgotPasswordEmailReq();
 			qDebug() << "Require matching ClientID for forgot password functionality: " << getForgotPasswordClientIDReq();
 			qDebug() << "Require matching IP information for forgot password functionality: " << getForgotPasswordIPReq();
-			if (getForgotPasswordIPReq()) {
+			if (getForgotPasswordIPReq())
 				qDebug() << "WARNING: Enabling IP information for forgot password functionality requires the session table in the DB to contain data!";
-			}
+
+			if (!getForgotPasswordClientIDReq() && !getForgotPasswordEmailReq() && !getForgotPasswordIPReq() && getForgotPasswordLockPendingAccount())
+				qDebug() << "WARNING: Enabling lockout of pending forgot password accounts is not recommended without other internal information checks.  Doing so leaves account vulnerable to lockout by anyone.";
 		}
 		else {
 			qDebug() << "A database is required to enable forgot password functionality.";
@@ -920,4 +923,8 @@ QString Servatrice::getServerAddress() const {
 
 int Servatrice::getForgotPasswordTokenLife() const {
 	return settingsCache->value("forgotpassword/forgotpasswordtokenlife", 60).toInt();
+}
+
+bool Servatrice::getForgotPasswordLockPendingAccount() const {
+	return settingsCache->value("forgotpassword/lockpendingaccount", false).toBool();
 }

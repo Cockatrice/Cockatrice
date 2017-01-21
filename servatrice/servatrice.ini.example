@@ -169,8 +169,15 @@ disallowedregexp=""
 ; if the last known client ip does not match the current client ip addres the password reset request
 ; will be denied.  Please note, this particular functionality requires previous session information
 ; inside the sessions table and it the table is cleared password reset requests will always be denied.
-; Default false;
+; Default false.
 ; requireipforforgotpassword=false
+
+; Should the server deactivate the account when a user requests a forgot password reset? Default false.
+; !!NOTE!!
+; Be aware, enabling this option and leaving any of the requirement checks listed above this option
+; can result in any anonymous user locking any users account out.
+; !!NOTE!!
+; lockpendingaccount=false
 
 ; Number of minutes a forgot password activation token is valid for in minutes.  Default 60 minutes.
 ; forgotpasswordtokenlife=120
@@ -180,7 +187,7 @@ disallowedregexp=""
 
 ; Forgot password email body. You can use these tags here: %username %token
 ; They will be substituted with the actual values in the forgot password email
-; body="Hi %username, sorry to hear you forgot your password on our Cockatrice server\r\nYour forgot password activation token is:\r\n\r\n%token\r\n\r\nHappy gaming!"
+; body="Hi %username, sorry to hear you forgot your password on our Cockatrice server\r\nYour activation token is:\r\n\r\n%token\r\n\r\nHappy gaming!"
 
 
 [smtp]

@@ -1267,3 +1267,19 @@ bool Servatrice_DatabaseInterface::isUserTokenCorrect(const QString &name, const
 
 	return false;
 }
+
+bool Servatrice_DatabaseInterface::deactivateUserAccount(const QString &name)
+{
+	if (!checkSql())
+		return false;
+
+	QSqlQuery *query = prepareQuery("update {prefix}_users set active = 0 where name = :user_name");
+	query->bindValue(":user_name", name);
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to locate deactivate user account: SQL ERROR";
+		return false;
+	}
+
+	return true;
+}

@@ -1033,6 +1033,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 		re->set_requesting_server_port(servatrice->getServerTCPPort());
 		re->set_requesting_user_name(userName.toStdString());
 		rc.setResponseExtension(re);
+		if (servatrice->getForgotPasswordLockPendingAccount())
+			sqlInterface->deactivateUserAccount(userName);
 		return Response::RespOk;
 	}
 
@@ -1045,6 +1047,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPassword(const Co
 		re->set_requesting_server_port(servatrice->getServerTCPPort());
 		re->set_requesting_user_name(userName.toStdString());
 		rc.setResponseExtension(re);
+		if (servatrice->getForgotPasswordLockPendingAccount())
+			sqlInterface->deactivateUserAccount(userName);
 		return Response::RespOk;
 	}
 

@@ -33,6 +33,7 @@ public:
 	virtual bool addAudit(const QString & /* type */, const QString & /* name */, const QString & /* email */, const QString & /* ipaddress */, const bool & /* result */, const QString & /* details */) { return false; }
 	virtual bool clearUsersForgotPasswordFlag(const QString & /* name */) { return false; }
 	virtual bool isAccountFlaggedForPasswordReset(const QString & /* name */) { return false; }
+	virtual bool deactivateUserAccount(const QString & /* name */) { return true; }
     virtual void clearSessionTables() { }
     virtual void lockSessionTables() { }
     virtual void unlockSessionTables() { }

@@ -61,6 +61,7 @@ public:
 	bool clearUsersForgotPasswordFlag(const QString &name);
 	bool isAccountFlaggedForPasswordReset(const QString &name);
 	bool isUserTokenCorrect(const QString &name, const QString &token);
+	bool deactivateUserAccount(const QString &name);
     int getNextGameId();
     int getNextReplayId();
     int getActiveUserCount(QString connectionType = QString());
