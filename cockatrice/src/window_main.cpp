@@ -431,46 +431,59 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
     return out;
 }
 
-void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
+void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime, QString customStr)
 {
+    QString titleStr = "";
+    QString explinationStr = "";
     switch (r) {
         case Response::RespRegistrationDisabled:
-            QMessageBox::critical(this, tr("Registration denied"), tr("Registration is currently disabled on this server"));
+            titleStr = tr("Registration denied");
+            explinationStr = tr("Registration is currently disabled on this server");
             break;
         case Response::RespUserAlreadyExists:
-            QMessageBox::critical(this, tr("Registration denied"), tr("There is already an existing account with the same user name."));
+            titleStr = tr("Registration denied");
+            explinationStr = tr("There is already an existing account with the same user name.");
             break;
         case Response::RespEmailRequiredToRegister:
-            QMessageBox::critical(this, tr("Registration denied"), tr("It's mandatory to specify a valid email address when registering."));
+            titleStr = tr("Registration denied");
+            explinationStr = tr("It's mandatory to specify a valid email address when registering.");
             break;
         case Response::RespTooManyRequests:
-            QMessageBox::critical(this, tr("Registration denied"), tr("Too many registration attempts, please try again later or contact the server operator for further details."));
+            titleStr = tr("Registration denied");
+            explinationStr = tr("Too many registration attempts, please try again later or contact the server operator for further details.");
             break;
         case Response::RespPasswordTooShort:
+            titleStr = tr("Registration denied");
             QMessageBox::critical(this, tr("Registration denied"), tr("Password too short."));
             break;
         case Response::RespUserIsBanned: {
-            QString bannedStr;
+            titleStr = tr("Registration error");
             if (endTime)
-                bannedStr = tr("You are banned until %1.").arg(QDateTime::fromTime_t(endTime).toString());
+                explinationStr = tr("You are banned until %1.").arg(QDateTime::fromTime_t(endTime).toString());
             else
-                bannedStr = tr("You are banned indefinitely.");
+                explinationStr = tr("You are banned indefinitely.");
             if (!reasonStr.isEmpty())
-                bannedStr.append("\n\n" + reasonStr);
-
-            QMessageBox::critical(this, tr("Error"), bannedStr);
+                explinationStr.append("\n\n" + reasonStr);
             break;
         }
         case Response::RespUsernameInvalid: {
-            QMessageBox::critical(this, tr("Error"), extractInvalidUsernameMessage(reasonStr));
+            titleStr = tr("Registration error");
+            explinationStr = extractInvalidUsernameMessage(reasonStr);
             break;
         }
         case Response::RespRegistrationFailed:
-            QMessageBox::critical(this, tr("Error"), tr("Registration failed for a technical problem on the server."));
+            titleStr = tr("Registration error");
+            explinationStr = tr("Registration failed for a technical problem on the server.");
             break;
         default:
-            QMessageBox::critical(this, tr("Error"), tr("Unknown registration error: %1").arg(static_cast<int>(r)) + tr("\nThis usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
+            titleStr = tr("Registration error");
+            explinationStr = tr("Unknown registration error.\nThis usually means that your client version is out of date, and the server sent a reply your client doesn't understand.");
     }
+
+    if (!customStr.isEmpty())
+		explinationStr += "\n\n" + tr("Note from server: ") + customStr;
+
+    QMessageBox::critical(this, titleStr, explinationStr);
     actRegister();
 }
 
@@ -660,14 +673,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(notifyUserAboutUpdate()), this, SLOT(notifyUserAboutUpdate()));
     connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
     connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
-    connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
+    connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32, QString)), this, SLOT(registerError(Response::ResponseCode, QString, quint32, QString)));
     connect(client, SIGNAL(activateAccepted()), this, SLOT(activateAccepted()));
     connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
 
     clientThread = new QThread(this);
     client->moveToThread(clientThread);
     clientThread->start();
-
     createActions();
     createMenus();
 

@@ -187,7 +187,7 @@ void RemoteClient::registerResponse(const Response &response)
             doLogin();
             break;
         default:
-            emit registerError(response.response_code(), QString::fromStdString(resp.denied_reason_str()), resp.denied_end_time());
+            emit registerError(response.response_code(), QString::fromStdString(resp.denied_reason_str()), resp.denied_end_time(), QString::fromStdString(resp.custom_reason_str()));
             setStatus(StatusDisconnecting);
             doDisconnectFromServer();
             break;

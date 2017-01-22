@@ -47,7 +47,7 @@ private slots:
     void processServerShutdownEvent(const Event_ServerShutdown &event);
     void serverTimeout();
     void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime, QList<QString> missingFeatures);
-    void registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
+    void registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime, QString customStr);
     void activateError();
     void socketError(const QString &errorStr);
     void protocolVersionMismatch(int localVersion, int remoteVersion);

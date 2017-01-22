@@ -178,7 +178,9 @@ public:
     QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
     QString getRequiredFeatures() const;
     QString getAuthenticationMethodString() const;
-    QString getDBTypeString() const;
+	QString getDBTypeString() const;
+	QString getCustomRegErrorMessage() const;
+	QString getCustomRegSuccessMessage() const;
     QString getDbPrefix() const { return dbPrefix; }
     AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
     bool permitUnregisteredUsers() const { return authenticationMethod != AuthenticationNone; }
