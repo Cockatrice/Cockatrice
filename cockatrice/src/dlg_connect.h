@@ -43,7 +43,7 @@ private:
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;
     QRadioButton *newHostButton, *previousHostButton;
-	QPushButton *forgotPassword;
+	QPushButton *btnForgotPassword, *btnOk, *btnCancel;
 };
 
 #endif
