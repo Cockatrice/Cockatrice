@@ -22,7 +22,7 @@
     },
     "files": [
         { "includePattern": "build/(Cockatrice.*\\.deb)", "uploadPattern": "Ubuntu/$ENV{DIST}/$1" },
-        { "includePattern": "build/(Cockatrice.*\\.dmg)", "uploadPattern": "MacOSX/$1" }
+        { "includePattern": "build/(Cockatrice.*\\.dmg)", "uploadPattern": "macOS/$1" }
     ],
     "publish": true
 }
