@@ -22,15 +22,15 @@ DlgForgotPassword::DlgForgotPassword(QWidget *parent)
     emailLabel = new QLabel(tr("Email:"));
     emailEdit = new QLineEdit();
 
-	QGridLayout *grid = new QGridLayout;
-	grid->addWidget(hostLabel, 0, 0);
-	grid->addWidget(hostEdit, 0, 1);
-	grid->addWidget(portLabel, 1, 0);
-	grid->addWidget(portEdit, 1, 1);
-	grid->addWidget(playernameLabel, 2, 0);
-	grid->addWidget(playernameEdit, 2, 1);
-	grid->addWidget(emailLabel, 3, 0);
-	grid->addWidget(emailEdit, 3, 1);
+    QGridLayout *grid = new QGridLayout;
+    grid->addWidget(hostLabel, 0, 0);
+    grid->addWidget(hostEdit, 0, 1);
+    grid->addWidget(portLabel, 1, 0);
+    grid->addWidget(portEdit, 1, 1);
+    grid->addWidget(playernameLabel, 2, 0);
+    grid->addWidget(playernameEdit, 2, 1);
+    grid->addWidget(emailLabel, 3, 0);
+    grid->addWidget(emailEdit, 3, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));

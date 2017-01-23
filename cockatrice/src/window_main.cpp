@@ -169,7 +169,7 @@ void MainWindow::activateAccepted()
 void MainWindow::actConnect()
 {
     DlgConnect *dlg = new DlgConnect(this);
-	connect(dlg, SIGNAL(sigForgotPassword()), this, SLOT(actForgotPassword()));
+    connect(dlg, SIGNAL(sigForgotPassword()), this, SLOT(actForgotPassword()));
 
     if (dlg->exec())
         client->connectToServer(dlg->getHost(), dlg->getPort(), dlg->getPlayerName(), dlg->getPassword());
@@ -195,16 +195,16 @@ void MainWindow::actRegister()
 
 void MainWindow::actForgotPassword()
 {
-	DlgForgotPassword dlg(this);
-	if (dlg.exec()) 
-	{
-		client->forgotPassword(
-			dlg.getHost(),
-			dlg.getPort(),
-			dlg.getPlayerName(),
-			dlg.getEmail()
-		);
-	}
+    DlgForgotPassword dlg(this);
+    if (dlg.exec()) 
+    {
+        client->forgotPassword(
+            dlg.getHost(),
+            dlg.getPort(),
+            dlg.getPlayerName(),
+            dlg.getEmail()
+        );
+    }
 }
 
 void MainWindow::actDisconnect()
@@ -494,30 +494,30 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
 
 void MainWindow::processForgotPassword(Response::ResponseCode r, QString requestingSrv, int requestingSrvPort, QString playerName)
 {
-	if (r == Response::RespOk) {
-			QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, please check your email for your forgot passowrd activation token."));
-			DlgForgotPasswordReset dlg(requestingSrv, requestingSrvPort, playerName, this);
-			if (dlg.exec()) {
-				client->forgotPasswordReset(
-					dlg.getHost(),
-					dlg.getPort(),
-					dlg.getPlayerName(),
-					dlg.getToken(),
-					dlg.getPassword()
-				);
-			}
-	} else {
-			QMessageBox::critical(this, tr("Error"), tr("Forgot password request failed, please contact the server operator to reset user account password."));
-	}
+    if (r == Response::RespOk) {
+            QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, please check your email for your forgot password activation token."));
+            DlgForgotPasswordReset dlg(requestingSrv, requestingSrvPort, playerName, this);
+            if (dlg.exec()) {
+                client->forgotPasswordReset(
+                    dlg.getHost(),
+                    dlg.getPort(),
+                    dlg.getPlayerName(),
+                    dlg.getToken(),
+                    dlg.getPassword()
+                );
+            }
+    } else {
+            QMessageBox::critical(this, tr("Error"), tr("Forgot password request failed, please contact the server operator to reset user account password."));
+    }
 }
 
 void MainWindow::processForgotPasswordReset(Response::ResponseCode r)
 {
-	if (r == Response::RespOk) {
-		QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, you may now login using your new credential information."));
-	} else {
-		QMessageBox::critical(this, tr("Error"), tr("Forgot password request failed, please contact the server operator to reset user account password."));
-	}
+    if (r == Response::RespOk) {
+        QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, you may now login using your new credential information."));
+    } else {
+        QMessageBox::critical(this, tr("Error"), tr("Forgot password request failed, please contact the server operator to reset user account password."));
+    }
 }
 
 
@@ -547,7 +547,7 @@ void MainWindow::setClientStatusTitle()
     switch (client->getStatus()) {
         case StatusConnecting: setWindowTitle(appName + " - " + tr("Connecting to %1...").arg(client->peerName())); break;
         case StatusRegistering: setWindowTitle(appName + " - " + tr("Registering to %1 as %2...").arg(client->peerName()).arg(client->getUserName())); break;
-		case StatusForgotPassword: setWindowTitle(appName + " - " + tr("Requesting new password to %1 as %2...").arg(client->peerName()).arg(client->getUserName())); break;
+        case StatusForgotPassword: setWindowTitle(appName + " - " + tr("Requesting new password to %1 as %2...").arg(client->peerName()).arg(client->getUserName())); break;
         case StatusDisconnected: setWindowTitle(appName + " - " + tr("Disconnected")); break;
         case StatusLoggingIn: setWindowTitle(appName + " - " + tr("Connected, logging in at %1").arg(client->peerName())); break;
         case StatusLoggedIn: setWindowTitle(client->getUserName() + "@" + client->peerName()); break;
@@ -709,11 +709,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
     connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
     connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
-	connect(client, SIGNAL(processForgotPassword(Response::ResponseCode,QString,int,QString)), this, SLOT(processForgotPassword(Response::ResponseCode,QString,int,QString)));
-	connect(client, SIGNAL(processForgotPasswordReset(Response::ResponseCode)), this, SLOT(processForgotPasswordReset(Response::ResponseCode)));
+    connect(client, SIGNAL(processForgotPassword(Response::ResponseCode,QString,int,QString)), this, SLOT(processForgotPassword(Response::ResponseCode,QString,int,QString)));
+    connect(client, SIGNAL(processForgotPasswordReset(Response::ResponseCode)), this, SLOT(processForgotPasswordReset(Response::ResponseCode)));
     connect(client, SIGNAL(activateAccepted()), this, SLOT(activateAccepted()));
     connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
-	
+    
 
     clientThread = new QThread(this);
     client->moveToThread(clientThread);
