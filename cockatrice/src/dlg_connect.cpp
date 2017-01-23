@@ -75,7 +75,7 @@ DlgConnect::DlgConnect(QWidget *parent)
 	btnForgotPassword->setFixedWidth(100);
 	connect(btnForgotPassword, SIGNAL(released()), this, SLOT(forgotYourPassword()));
 
-	btnOk = new QPushButton(tr("Ok"));
+	btnOk = new QPushButton(tr("Connect"));
 	btnOk->setFixedWidth(100);
 	connect(btnOk, SIGNAL(released()), this, SLOT(actOk()));
 
