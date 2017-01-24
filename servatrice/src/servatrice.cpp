@@ -910,7 +910,7 @@ bool Servatrice::getForgotPasswordClientIDReq() const {
 }
 
 bool Servatrice::getForgotPasswordEmailReq() const {
-	return settingsCache->value("forgotpassword/requireemailforforgotpassword", false).toBool();
+	return settingsCache->value("forgotpassword/requireemailforforgotpassword", true).toBool();
 }
 
 bool Servatrice::getForgotPasswordIPReq() const {

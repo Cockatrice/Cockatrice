@@ -163,7 +163,7 @@ disallowedregexp=""
 ; Require users client id's to match the last known client id they logged in with when making the
 ; request.  If enabled if the client id does not match the last known client id the password reset
 ; request will be denied. Default true.
-; requireclientidforforgotpassword=true
+; requireclientidforforgotpassword=false
 
 ; Require users ip address to match the last known ip address the user logged in with.  If enabled
 ; if the last known client ip does not match the current client ip addres the password reset request
