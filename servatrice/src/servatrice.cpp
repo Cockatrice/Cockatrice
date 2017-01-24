@@ -250,6 +250,30 @@ bool Servatrice::initServer()
         }
     }
 
+	if (getForgotPasswordEnabled()) {
+		if (getDBTypeString() == "mysql") {
+			qDebug() << "Forgot password functionality enabled.";
+			qDebug() << "Deactivate pending forgot password accounts: " << getForgotPasswordLockPendingAccount();
+			qDebug() << "Forgot password token life: " << getForgotPasswordTokenLife() << " (minutes)";
+			qDebug() << "Public address set to: " << getServerAddress();
+			qDebug() << "Require matching Email for forgot password functionality: " << getForgotPasswordEmailReq();
+			qDebug() << "Require matching ClientID for forgot password functionality: " << getForgotPasswordClientIDReq();
+			qDebug() << "Require matching IP information for forgot password functionality: " << getForgotPasswordIPReq();
+			if (getForgotPasswordIPReq())
+				qDebug() << "WARNING: Enabling IP information for forgot password functionality requires the session table in the DB to contain data!";
+
+			if (!getForgotPasswordClientIDReq() && !getForgotPasswordEmailReq() && !getForgotPasswordIPReq() && getForgotPasswordLockPendingAccount())
+				qDebug() << "WARNING: Enabling lockout of pending forgot password accounts is not recommended without other internal information checks.  Doing so leaves account vulnerable to lockout by anyone.";
+		}
+		else {
+			qDebug() << "A database is required to enable forgot password functionality.";
+			return false;
+		}
+	}
+	else {
+		qDebug() << "Forgot password functionality disabled.";
+	}
+
     if (getDBTypeString() == "mysql") {
         databaseType = DatabaseMySql;
     } else {
@@ -540,14 +564,18 @@ void Servatrice::statusUpdate()
     query->bindValue(":rx", rx);
     servatriceDatabaseInterface->execSqlQuery(query);
 
-    // send activation emails
+    // send activation and forgot password emails
     if (getRegistrationEnabled() && getRequireEmailActivationEnabled() && getEnableInternalSMTPClient())
     {
-        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
-        if (!servatriceDatabaseInterface->execSqlQuery(query))
-            return;
+		// send activation emails
+        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name where type = :email_type");
+		query->bindValue(":email_type", "REG");
+		if (!servatriceDatabaseInterface->execSqlQuery(query)) {
+			qDebug() << "Failed to query users to send registration emails for: SQL Error";
+			return;
+		}
 
-        QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
+        QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name and type = :email_type");
 
         while (query->next()) {
             const QString userName = query->value(0).toString();
@@ -557,9 +585,37 @@ void Servatrice::statusUpdate()
             if(smtpClient->enqueueActivationTokenMail(userName, emailAddress, token))
             {
                 queryDelete->bindValue(":name", userName);
-                servatriceDatabaseInterface->execSqlQuery(queryDelete);
+				queryDelete->bindValue(":email_type", "REG");
+				if (!servatriceDatabaseInterface->execSqlQuery(queryDelete)) {
+					qDebug() << "Failed to remove users that registration emails have been sent to: SQL ERROR";
+				}
             }
         }
+
+		//send forgot password emails
+		query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name where type = :email_type");
+		query->bindValue(":email_type", "FORGOTPASS");
+		if (!servatriceDatabaseInterface->execSqlQuery(query)) {
+			qDebug() << "Failed to query users to send forgot password emails for: SQL Error";
+			return;
+		}
+
+		queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name and type = :email_type");
+
+		while (query->next()) {
+			const QString userName = query->value(0).toString();
+			const QString emailAddress = query->value(1).toString();
+			const QString token = query->value(2).toString();
+
+			if (smtpClient->enqueueActivationTokenMail(userName, emailAddress, token, "FORGOTPASS"))
+			{
+				queryDelete->bindValue(":name", userName);
+				queryDelete->bindValue(":email_type", "FORGOTPASS");
+				if (!servatriceDatabaseInterface->execSqlQuery(queryDelete)) {
+					qDebug() << "Failed to remove users that forgot password emails have been sent to: SQL ERROR";
+				}
+			}
+		}
 
         smtpClient->sendAllEmails();
     }
@@ -843,4 +899,32 @@ int Servatrice::getMaxAccountsPerEmail() const {
 
 bool Servatrice::getEnableInternalSMTPClient() const {
     return settingsCache->value("smtp/enableinternalsmtpclient", true).toBool();
+}
+
+bool Servatrice::getForgotPasswordEnabled() const {
+	return settingsCache->value("forgotpassword/enabled", false).toBool();
+}
+
+bool Servatrice::getForgotPasswordClientIDReq() const {
+	return settingsCache->value("forgotpassword/requireclientidforforgotpassword", false).toBool();
+}
+
+bool Servatrice::getForgotPasswordEmailReq() const {
+	return settingsCache->value("forgotpassword/requireemailforforgotpassword", true).toBool();
+}
+
+bool Servatrice::getForgotPasswordIPReq() const {
+	return settingsCache->value("forgotpassword/requireipforforgotpassword", false).toBool();
+}
+
+QString Servatrice::getServerAddress() const {
+	return settingsCache->value("forgotpassword/publicaddress", "").toString();
+}
+
+int Servatrice::getForgotPasswordTokenLife() const {
+	return settingsCache->value("forgotpassword/forgotpasswordtokenlife", 60).toInt();
+}
+
+bool Servatrice::getForgotPasswordLockPendingAccount() const {
+	return settingsCache->value("forgotpassword/lockpendingaccount", false).toBool();
 }

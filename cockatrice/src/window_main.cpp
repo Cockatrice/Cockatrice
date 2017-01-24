@@ -37,6 +37,8 @@
 #include "window_main.h"
 #include "dlg_connect.h"
 #include "dlg_register.h"
+#include "dlg_forgotpassword.h"
+#include "dlg_forgotpasswordreset.h"
 #include "dlg_settings.h"
 #include "dlg_update.h"
 #include "dlg_viewlog.h"
@@ -166,9 +168,11 @@ void MainWindow::activateAccepted()
 
 void MainWindow::actConnect()
 {
-    DlgConnect dlg(this);
-    if (dlg.exec())
-        client->connectToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getPassword());
+    DlgConnect *dlg = new DlgConnect(this);
+    connect(dlg, SIGNAL(sigForgotPassword()), this, SLOT(actForgotPassword()));
+
+    if (dlg->exec())
+        client->connectToServer(dlg->getHost(), dlg->getPort(), dlg->getPlayerName(), dlg->getPassword());
 }
 
 void MainWindow::actRegister()
@@ -185,6 +189,20 @@ void MainWindow::actRegister()
             dlg.getGender(),
             dlg.getCountry(),
             dlg.getRealName()
+        );
+    }
+}
+
+void MainWindow::actForgotPassword()
+{
+    DlgForgotPassword dlg(this);
+    if (dlg.exec()) 
+    {
+        client->forgotPassword(
+            dlg.getHost(),
+            dlg.getPort(),
+            dlg.getPlayerName(),
+            dlg.getEmail()
         );
     }
 }
@@ -474,6 +492,35 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
     actRegister();
 }
 
+void MainWindow::processForgotPassword(Response::ResponseCode r, QString requestingSrv, int requestingSrvPort, QString playerName)
+{
+    if (r == Response::RespOk) {
+            QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, please check your email for your forgot password activation token."));
+            DlgForgotPasswordReset dlg(requestingSrv, requestingSrvPort, playerName, this);
+            if (dlg.exec()) {
+                client->forgotPasswordReset(
+                    dlg.getHost(),
+                    dlg.getPort(),
+                    dlg.getPlayerName(),
+                    dlg.getToken(),
+                    dlg.getPassword()
+                );
+            }
+    } else {
+            QMessageBox::critical(this, tr("Error"), tr("Forgot password request failed, please contact the server operator to reset user account password."));
+    }
+}
+
+void MainWindow::processForgotPasswordReset(Response::ResponseCode r)
+{
+    if (r == Response::RespOk) {
+        QMessageBox::information(this, tr("Success"), tr("Forgot password request successful, you may now login using your new credential information."));
+    } else {
+        QMessageBox::critical(this, tr("Error"), tr("Forgot password request failed, please contact the server operator to reset user account password."));
+    }
+}
+
+
 void MainWindow::activateError()
 {
     QMessageBox::critical(this, tr("Error"), tr("Account activation failed"));
@@ -500,6 +547,7 @@ void MainWindow::setClientStatusTitle()
     switch (client->getStatus()) {
         case StatusConnecting: setWindowTitle(appName + " - " + tr("Connecting to %1...").arg(client->peerName())); break;
         case StatusRegistering: setWindowTitle(appName + " - " + tr("Registering to %1 as %2...").arg(client->peerName()).arg(client->getUserName())); break;
+        case StatusForgotPassword: setWindowTitle(appName + " - " + tr("Requesting new password to %1 as %2...").arg(client->peerName()).arg(client->getUserName())); break;
         case StatusDisconnected: setWindowTitle(appName + " - " + tr("Disconnected")); break;
         case StatusLoggingIn: setWindowTitle(appName + " - " + tr("Connected, logging in at %1").arg(client->peerName())); break;
         case StatusLoggedIn: setWindowTitle(client->getUserName() + "@" + client->peerName()); break;
@@ -661,8 +709,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
     connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
     connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
+    connect(client, SIGNAL(processForgotPassword(Response::ResponseCode,QString,int,QString)), this, SLOT(processForgotPassword(Response::ResponseCode,QString,int,QString)));
+    connect(client, SIGNAL(processForgotPasswordReset(Response::ResponseCode)), this, SLOT(processForgotPasswordReset(Response::ResponseCode)));
     connect(client, SIGNAL(activateAccepted()), this, SLOT(activateAccepted()));
     connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
+    
 
     clientThread = new QThread(this);
     client->moveToThread(clientThread);

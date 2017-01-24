@@ -40,6 +40,7 @@ class QThread;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
+
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
@@ -48,6 +49,8 @@ private slots:
     void serverTimeout();
     void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime, QList<QString> missingFeatures);
     void registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
+    void processForgotPassword(Response::ResponseCode r, QString requestingSrv, int requestingSrvPort, QString playerName);
+    void processForgotPasswordReset(Response::ResponseCode r);
     void activateError();
     void socketError(const QString &errorStr);
     void protocolVersionMismatch(int localVersion, int remoteVersion);
@@ -65,6 +68,7 @@ private slots:
     void actDeckEditor();
     void actFullScreen(bool checked);
     void actRegister();
+    void actForgotPassword();
     void actSettings();
     void actExit();
     
@@ -107,7 +111,7 @@ private:
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
+        *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog, *aForgotPassword;
     QAction *aEditSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
 

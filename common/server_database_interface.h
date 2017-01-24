@@ -21,7 +21,7 @@ public:
     virtual ServerInfo_User getUserData(const QString &name, bool withId = false) = 0;
     virtual void storeGameInformation(const QString & /* roomName */, const QStringList & /* roomGameTypes */, const ServerInfo_Game & /* gameInfo */, const QSet<QString> & /* allPlayersEver */, const QSet<QString> & /* allSpectatorsEver */, const QList<GameReplay *> & /* replayList */) { }
     virtual DeckList *getDeckFromDatabase(int /* deckId */, int /* userId */) { return 0; }
-    
+	virtual QString getUsersLastIP(const QString & /* name */) { return ""; }
     virtual qint64 startSession(const QString & /* userName */, const QString & /* address */, const QString & /* clientId */, const QString & /* connectionType */) { return 0; }
     virtual bool usernameIsValid(const QString & /*userName */, QString & /* error */) { return true; };
 public slots:
@@ -30,7 +30,10 @@ public:
     virtual int getNextGameId() = 0;
     virtual int getNextReplayId() = 0;
     virtual int getActiveUserCount(QString connectionType = QString()) = 0;
-    
+	virtual bool addAudit(const QString & /* type */, const QString & /* name */, const QString & /* email */, const QString & /* ipaddress */, const bool & /* result */, const QString & /* details */) { return false; }
+	virtual bool clearUsersForgotPasswordFlag(const QString & /* name */) { return false; }
+	virtual bool isAccountFlaggedForPasswordReset(const QString & /* name */) { return false; }
+	virtual bool deactivateUserAccount(const QString & /* name */) { return true; }
     virtual void clearSessionTables() { }
     virtual void lockSessionTables() { }
     virtual void unlockSessionTables() { }
@@ -46,7 +49,8 @@ public:
     virtual void logMessage(const int /* senderId */, const QString & /* senderName */, const QString & /* senderIp */, const QString & /* logMessage */, LogMessage_TargetType /* targetType */, const int /* targetId */, const QString & /* targetName */) { };
     bool checkUserIsBanned(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining);
     virtual int checkNumberOfUserAccounts(const QString & /* email */) { return 0; };
-    virtual bool changeUserPassword(const QString & /* user */, const QString & /* oldPassword */, const QString & /* newPassword */) { return true; };
+    virtual bool changeUserPassword(const QString & /* user */, const QString & /* oldPassword */, const QString & /* newPassword */, bool /* force */) { return true; };
+	virtual bool isUserTokenCorrect(const QString /* name */, const QString /* token */) { return false; }
     virtual QChar getGenderChar(ServerInfo_User_Gender const & /* gender */) { return QChar('u'); };
 };
 

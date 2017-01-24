@@ -167,7 +167,7 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
     return re.exactMatch(user);
 }
 
-bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active)
+bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, QString &token, const QString &clientid, bool active)
 {
     if (!checkSql())
         return false;
@@ -175,10 +175,10 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const Q
     QString passwordSha512 = PasswordHasher::computeHash(password, PasswordHasher::generateRandomSalt());
     token = active ? QString() : PasswordHasher::generateActivationToken();
 
-    QSqlQuery *query = prepareQuery("insert into {prefix}_users "
-            "(name, realname, gender, password_sha512, email, country, registrationDate, active, token) "
-            "values "
-            "(:userName, :realName, :gender, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active, :token)");
+	QSqlQuery *query = prepareQuery("insert into {prefix}_users "
+		"(admin, name, realname, gender, password_sha512, email, country, registrationDate, active, token, avatar_bmp, clientid) "
+		"values "
+		"(0, :userName, :realName, :gender, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active, :token, '', :clientid)");
     query->bindValue(":userName", userName);
     query->bindValue(":realName", realName);
     query->bindValue(":gender", getGenderChar(gender));
@@ -187,6 +187,7 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const Q
     query->bindValue(":country", country);
     query->bindValue(":active", active ? 1 : 0);
     query->bindValue(":token", token);
+	query->bindValue(":clientid", clientid);
 
     if (!execSqlQuery(query)) {
         qDebug() << "Failed to insert user: " << query->lastError() << " sql: " << query->lastQuery();
@@ -831,31 +832,35 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId, const QString 
     execSqlQuery(query);
 }
 
-bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword)
+bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword, bool force)
 {
     if(server->getAuthenticationMethod() != Servatrice::AuthenticationSql)
-        return true;
+        return false;
 
     if (!checkSql())
-        return true;
+        return false;
 
     QString error;
     if (!usernameIsValid(user, error))
-        return true;
+        return false;
 
-    QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name");
-    passwordQuery->bindValue(":name", user);
-    if (!execSqlQuery(passwordQuery)) {
-        qDebug("Change password denied: SQL error");
-        return true;
-    }
+	QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name");
+	passwordQuery->bindValue(":name", user);
 
-    if (!passwordQuery->next())
-        return true;
+	if (!force) {
+		
+		if (!execSqlQuery(passwordQuery)) {
+			qDebug("Change password denied: SQL error");
+			return false;
+		}
 
-    const QString correctPassword = passwordQuery->value(0).toString();
-    if (correctPassword != PasswordHasher::computeHash(oldPassword, correctPassword.left(16)))
-        return true;
+		if (!passwordQuery->next())
+			return false;
+
+		const QString correctPassword = passwordQuery->value(0).toString();
+		if (correctPassword != PasswordHasher::computeHash(oldPassword, correctPassword.left(16)))
+			return false;
+	}
 
     QString passwordSha512 = PasswordHasher::computeHash(newPassword, PasswordHasher::generateRandomSalt());
 
@@ -864,9 +869,9 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const
     passwordQuery->bindValue(":name", user);
     if (!execSqlQuery(passwordQuery)) {
         qDebug("Change password denied: SQL error");
-        return true;
+        return false;
     }
-    return false;
+    return true;
 }
 
 int Servatrice_DatabaseInterface::getActiveUserCount(QString connectionType)
@@ -1127,4 +1132,154 @@ int Servatrice_DatabaseInterface::checkNumberOfUserAccounts(const QString &email
         return query->value(0).toInt();
 
     return 0;
+}
+
+QString Servatrice_DatabaseInterface::getUsersLastIP(const QString &name)
+{
+	if (!checkSql())
+		return "";
+
+	QSqlQuery *query = prepareQuery("select ip_address from {prefix}_sessions where user_name = :user_name order by start_time desc");
+	query->bindValue(":user_name", name);
+
+	if (!execSqlQuery(query)) {
+		qDebug("Failed to query users last known IP address: SQL Error");
+		return "";
+	}
+
+	if (query->next())
+		return query->value(0).toString();
+
+	return "";
+}
+
+bool Servatrice_DatabaseInterface::resetUserToken(const QString &name)
+{
+	if (!checkSql())
+		return false;
+
+	// generate new activation token
+	QString token = PasswordHasher::generateActivationToken();
+	
+	QSqlQuery *query = prepareQuery("update {prefix}_users set token = :token where name = :user_name");
+	query->bindValue(":user_name", name);
+	query->bindValue(":token", token);
+
+	if (!execSqlQuery(query)) {
+		qDebug("Failed to reset users activation token: SQL Error");
+		return false;
+	}
+
+	return true;
+}
+
+bool Servatrice_DatabaseInterface::addEmailNotification(const QString &name, const QString &type)
+{
+	if (!checkSql())
+		return false;
+
+	QSqlQuery *query = prepareQuery("insert into {prefix}_activation_emails (name,type) values(:name,:type)");
+	query->bindValue(":name", name);
+	query->bindValue(":type", type);
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to schedule email notification: SQL ERROR";
+		return false;
+	}
+
+	return true;
+}
+
+bool Servatrice_DatabaseInterface::addAudit(const QString &type, const QString &name, const QString &email, const QString &ipaddress, const bool &result, const QString &details)
+{
+	if (!checkSql())
+		return false;
+
+	QSqlQuery *query = prepareQuery("insert into {prefix}_audit (type,user_name,user_email,ip_address,incidentDate,result,details) values(:type,:name,:email,:address,NOW(),:result,:details)");
+	query->bindValue(":type", type);
+	query->bindValue(":name", name);
+	query->bindValue(":email", email);
+	query->bindValue(":address", ipaddress);
+	query->bindValue(":result", result);
+	query->bindValue(":details", details);
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to add audit entry: SQL ERROR";
+		return false;
+	}
+
+	return true;
+}
+
+bool Servatrice_DatabaseInterface::clearUsersForgotPasswordFlag(const QString &name)
+{
+	if (!checkSql())
+		return false;
+
+	QSqlQuery *query = prepareQuery("update {prefix}_audit set details = '' where user_name = :user_name AND details = 'PENDING TOKEN VERIFICATION'");
+	query->bindValue(":user_name", name);
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to clear forgot password flag on users account: SQL ERROR";
+		return false;
+	}
+
+	return true;
+}
+
+bool Servatrice_DatabaseInterface::isAccountFlaggedForPasswordReset(const QString &name)
+{
+	if (!checkSql())
+		return false;
+	
+	QSqlQuery *query = prepareQuery("select count(user_name) from {prefix}_audit where user_name = :user_name and details = 'PENDING TOKEN VERIFICATION' AND incidentDate > (now() - interval :minutes minute)");
+	query->bindValue(":user_name", name);
+	query->bindValue(":minutes", QString::number(server->getForgotPasswordTokenLife()));
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to locate if user account is flagged for password reset: SQL ERROR";
+		return false;
+	}
+
+	if (query->next())
+		if (query->value(0).toInt() > 0)
+			return true;
+
+	return false;
+}
+
+bool Servatrice_DatabaseInterface::isUserTokenCorrect(const QString &name, const QString &token)
+{
+	if (!checkSql())
+		return false;
+
+	QSqlQuery *query = prepareQuery("select token from {prefix}_users where name = :user_name");
+	query->bindValue(":user_name", name);
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to locate query users token in database: SQL ERROR";
+		return false;
+	}
+
+	if (query->next())
+		if (query->value(0).toString() == token)
+			return true;
+
+	return false;
+}
+
+bool Servatrice_DatabaseInterface::deactivateUserAccount(const QString &name)
+{
+	if (!checkSql())
+		return false;
+
+	QSqlQuery *query = prepareQuery("update {prefix}_users set active = 0 where name = :user_name");
+	query->bindValue(":user_name", name);
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to locate deactivate user account: SQL ERROR";
+		return false;
+	}
+
+	return true;
 }

@@ -34,12 +34,17 @@ SmtpClient::~SmtpClient()
     
 }
 
-bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token)
+bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token, const QString &type)
 {
     QString email = settingsCache->value("smtp/email", "").toString();
     QString name = settingsCache->value("smtp/name", "").toString();
-    QString subject = settingsCache->value("smtp/subject", "").toString();
-    QString body = settingsCache->value("smtp/body", "").toString();
+	QString subject = settingsCache->value("smtp/subject", "").toString();
+	QString body = settingsCache->value("smtp/body", "").toString();
+
+	if (type.toLower() == "forgotpass") {
+		subject = settingsCache->value("forgotpassword/subject", "").toString();
+		body = settingsCache->value("forgotpassword/body", "").toString();
+	}
 
     if(email.isEmpty())
     {

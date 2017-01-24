@@ -18,6 +18,8 @@ SET(cockatrice_SOURCES
     src/dlg_register.cpp 
     src/dlg_update.cpp
     src/dlg_viewlog.cpp
+    src/dlg_forgotpassword.cpp
+    src/dlg_forgotpasswordreset.cpp
     src/abstractclient.cpp
     src/remoteclient.cpp 
     src/main.cpp 

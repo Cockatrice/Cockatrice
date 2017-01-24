@@ -157,7 +157,6 @@ private:
     
     int getServerStatusUpdateTime() const;
     int getNumberOfTCPPools() const;
-    int getServerTCPPort() const;
     int getNumberOfWebSocketPools() const;
     int getServerWebSocketPort() const;
     int getISLNetworkPort() const;
@@ -179,6 +178,7 @@ public:
     QString getRequiredFeatures() const;
     QString getAuthenticationMethodString() const;
     QString getDBTypeString() const;
+	QString getServerAddress() const;
     QString getDbPrefix() const { return dbPrefix; }
     AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
     bool permitUnregisteredUsers() const { return authenticationMethod != AuthenticationNone; }
@@ -191,8 +191,15 @@ public:
     bool getRequireEmailForRegistrationEnabled() const;
     bool getRequireEmailActivationEnabled() const;
     bool getEnableLogQuery() const;
+	bool getForgotPasswordEnabled() const;
+	bool getForgotPasswordClientIDReq() const;
+	bool getForgotPasswordEmailReq() const;
+	bool getForgotPasswordIPReq() const;
+	bool getForgotPasswordLockPendingAccount() const;
+	int getForgotPasswordTokenLife() const;
     int getIdleClientTimeout() const;
     int getServerID() const;
+	int getServerTCPPort() const;
     int getMaxGameInactivityTime() const;
     int getMaxPlayerInactivityTime() const;
     int getClientKeepAlive() const;
