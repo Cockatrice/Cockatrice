@@ -191,6 +191,7 @@ public:
     bool getRequireEmailForRegistrationEnabled() const;
     bool getRequireEmailActivationEnabled() const;
     bool getEnableLogQuery() const;
+	bool getEnableForgotPassword() const;
     int getIdleClientTimeout() const;
     int getServerID() const;
     int getMaxGameInactivityTime() const;

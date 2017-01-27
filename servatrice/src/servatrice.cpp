@@ -250,6 +250,8 @@ bool Servatrice::initServer()
         }
     }
 
+	qDebug() << "Forgot password enabled: " << getEnableForgotPassword();
+
     if (getDBTypeString() == "mysql") {
         databaseType = DatabaseMySql;
     } else {
@@ -843,4 +845,8 @@ int Servatrice::getMaxAccountsPerEmail() const {
 
 bool Servatrice::getEnableInternalSMTPClient() const {
     return settingsCache->value("smtp/enableinternalsmtpclient", true).toBool();
+}
+
+bool Servatrice::getEnableForgotPassword() const {
+	return settingsCache->value("forgotpassword/enable", false).toBool();
 }

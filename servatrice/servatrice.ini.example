@@ -142,7 +142,13 @@ disallowedregexp=""
 
 ; Set this number to the maximum number of accounts any one user can use to create new accounts
 ; using the same email address. 0 = Unlimited number of accounts (default).
-;maxaccountsperemail=0 
+;maxaccountsperemail=0
+
+[forgotpassword]
+
+; Servatrice can process forgot password requests allowing users to reset their account
+; passwords in the event they forget it.  Should this feature be enabld? Default false.
+; enable=false
 
 [smtp]
 

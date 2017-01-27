@@ -83,7 +83,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
 	{
 		Command_ForgotPasswordRequest cmdForgotPasswordRequest;
 		cmdForgotPasswordRequest.set_user_name(userName.toStdString());
-		cmdForgotPasswordRequest.set_clientid(getSrvClientID("setme").toStdString());
+		cmdForgotPasswordRequest.set_clientid(getSrvClientID(lastHostname).toStdString());
 		PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordRequest);
 		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(requestForgotPasswordResponse(Response)));
 		sendCommand(pend);
@@ -432,6 +432,9 @@ void RemoteClient::clearNewClientFeatures()
 
 void RemoteClient::requestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName)
 {
+	qDebug() << "HOST: " << hostname;
+	qDebug() << "PORT: " << port;
+	qDebug() << "USER: " << _userName;
 	emit sigRequestForgotPasswordToServer(hostname, port, _userName);
 }
 
@@ -440,6 +443,8 @@ void RemoteClient::doRequestForgotPasswordToServer(const QString &hostname, unsi
 	doDisconnectFromServer();
 
 	userName = _userName;
+	lastHostname = hostname;
+	lastPort = port;
 
 	socket->connectToHost(lastHostname, lastPort);
 	setStatus(StatusRequestingForgotPassword);

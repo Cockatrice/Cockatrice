@@ -1058,7 +1058,7 @@ void MainWindow::actEditTokens()
 
 void MainWindow::actForgotPasswordRequest()
 {
-	DlgForgotPasswordRequest dlg;
+	DlgForgotPasswordRequest dlg(this);
 	if (dlg.exec())
 		client->requestForgotPasswordToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName());
 }
