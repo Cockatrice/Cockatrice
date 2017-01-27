@@ -154,7 +154,6 @@ private:
     QString getRoomsMethodString() const;
     QString getISLNetworkSSLCertFile() const;
     QString getISLNetworkSSLKeyFile() const;
-    
     int getServerStatusUpdateTime() const;
     int getNumberOfTCPPools() const;
     int getServerTCPPort() const;
@@ -209,6 +208,7 @@ public:
     int getMaxWebSocketUserLimit() const;
     int getUsersWithAddress(const QHostAddress &address) const;
     int getMaxAccountsPerEmail() const;
+	int getForgotPasswordTokenLife() const;
     QList<AbstractServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
     void incTxBytes(quint64 num);
     void incRxBytes(quint64 num);

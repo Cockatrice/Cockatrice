@@ -147,8 +147,13 @@ disallowedregexp=""
 [forgotpassword]
 
 ; Servatrice can process forgot password requests allowing users to reset their account
-; passwords in the event they forget it.  Should this feature be enabld? Default false.
+; passwords in the event they forget it.  Should this feature be enabld? Default: false.
 ; enable=false
+
+; Forgot password request should not be allowed to stay valid forever.  This settings
+; informs servatrice how long a players forgot password reset token is valid for (in minutes).
+; Default: 60
+; tokenlife=60
 
 [smtp]
 

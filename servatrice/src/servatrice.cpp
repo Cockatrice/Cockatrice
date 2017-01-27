@@ -251,6 +251,8 @@ bool Servatrice::initServer()
     }
 
 	qDebug() << "Forgot password enabled: " << getEnableForgotPassword();
+	if (getEnableForgotPassword())
+		qDebug() << "Forgot password token life: " << getForgotPasswordTokenLife();
 
     if (getDBTypeString() == "mysql") {
         databaseType = DatabaseMySql;
@@ -849,4 +851,8 @@ bool Servatrice::getEnableInternalSMTPClient() const {
 
 bool Servatrice::getEnableForgotPassword() const {
 	return settingsCache->value("forgotpassword/enable", false).toBool();
+}
+
+int Servatrice::getForgotPasswordTokenLife() const {
+	return settingsCache->value("forgotpassword/tokenlife", 60).toInt();
 }

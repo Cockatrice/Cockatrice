@@ -62,6 +62,7 @@
 #include "pb/response_warn_history.pb.h"
 #include "pb/response_warn_list.pb.h"
 #include "pb/response_viewlog_history.pb.h"
+#include "pb/response_forgotpasswordrequest.pb.h"
 #include "pb/serverinfo_replay.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
@@ -1052,11 +1053,33 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
 
 Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReuest(const Command_ForgotPasswordRequest &cmd, ResponseContainer &rc)
 {
-	qDebug() << "RECIEVED FORGOT PASSWORD REQUST FROM " << QString::fromStdString(cmd.user_name());
+	qDebug() << "Received forgot password request from user: " << QString::fromStdString(cmd.user_name());
+
 	if (!servatrice->getEnableForgotPassword())
 		return Response::RespFunctionNotAllowed;
 
-	return Response::RespOk;
+	if (!sqlInterface->userExists(QString::fromStdString(cmd.user_name())))
+		return Response::RespFunctionNotAllowed;
+
+	if (sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name()))) {
+		Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
+		re->set_challenge_email(false);
+		rc.setResponseExtension(re);
+		return Response::RespOk;
+	}
+
+	QString banReason; int banTimeRemaining;
+	if (sqlInterface->checkUserIsBanned(this->getAddress(), QString::fromStdString(cmd.user_name()), QString::fromStdString(cmd.clientid()), banReason, banTimeRemaining))
+		return Response::RespFunctionNotAllowed;
+
+	if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name()))) {
+		Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
+		re->set_challenge_email(false);
+		rc.setResponseExtension(re);
+		return Response::RespOk;
+	}
+
+	return Response::RespFunctionNotAllowed;
 }
 
 // ADMIN FUNCTIONS.

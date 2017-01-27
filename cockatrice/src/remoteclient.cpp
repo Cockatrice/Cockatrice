@@ -455,7 +455,13 @@ void RemoteClient::requestForgotPasswordResponse(const Response &response)
 	const Response_ForgotPasswordRequest &resp = response.GetExtension(Response_ForgotPasswordRequest::ext);
 	if (response.response_code() == Response::RespOk)
 	{
-		emit sigForgotPasswordSuccess();
+		if (resp.challenge_email()) {
+			// PROMPT CHALLANGE DIALOG
+		}
+		else
+			// PROMPT RESET DIALOG
+			;
+		//emit sigForgotPasswordSuccess();
 	}
 	else
 		emit sigForgotPasswordError();

@@ -21,7 +21,7 @@ public:
     virtual ServerInfo_User getUserData(const QString &name, bool withId = false) = 0;
     virtual void storeGameInformation(const QString & /* roomName */, const QStringList & /* roomGameTypes */, const ServerInfo_Game & /* gameInfo */, const QSet<QString> & /* allPlayersEver */, const QSet<QString> & /* allSpectatorsEver */, const QList<GameReplay *> & /* replayList */) { }
     virtual DeckList *getDeckFromDatabase(int /* deckId */, int /* userId */) { return 0; }
-    
+	virtual bool removeForgotPassword(const QString & /* user */) { return false; }
     virtual qint64 startSession(const QString & /* userName */, const QString & /* address */, const QString & /* clientId */, const QString & /* connectionType */) { return 0; }
     virtual bool usernameIsValid(const QString & /*userName */, QString & /* error */) { return true; };
 public slots:

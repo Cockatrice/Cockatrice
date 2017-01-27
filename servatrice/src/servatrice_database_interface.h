@@ -9,7 +9,7 @@
 #include "server.h"
 #include "server_database_interface.h"
 
-#define DATABASE_SCHEMA_VERSION 20
+#define DATABASE_SCHEMA_VERSION 21
 
 class Servatrice;
 
@@ -70,19 +70,20 @@ public:
     bool usernameIsValid(const QString &user, QString & error);
     bool checkUserIsBanned(const QString &ipAddress, const QString &userName, const QString &clientId, QString &banReason, int &banSecondsRemaining);
     int checkNumberOfUserAccounts(const QString &email);
-    bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender,
-        const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active = false);
+    bool registerUser(const QString &userName, const QString &realName, ServerInfo_User_Gender const &gender, const QString &password, const QString &emailAddress, const QString &country, QString &token, bool active = false);
     bool activateUser(const QString &userName, const QString &token);
     void updateUsersClientID(const QString &userName, const QString &userClientID);
     void updateUsersLastLoginData(const QString &userName, const QString &clientVersion);
-    void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage,
-        LogMessage_TargetType targetType, const int targetId, const QString &targetName);
+    void logMessage(const int senderId, const QString &senderName, const QString &senderIp, const QString &logMessage, LogMessage_TargetType targetType, const int targetId, const QString &targetName);
     bool changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword);
     QChar getGenderChar(ServerInfo_User_Gender const &gender);
     QList<ServerInfo_Ban> getUserBanHistory(const QString userName);
     bool addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID);
     QList<ServerInfo_Warning> getUserWarnHistory(const QString userName);
     QList<ServerInfo_ChatMessage> getMessageLogHistory(const QString &user, const QString &ipaddress, const QString &gamename, const QString &gameid, const QString &message, bool &chat, bool &game, bool &room, int &range, int &maxresults);
+	bool addForgotPassword(const QString &user);
+	bool removeForgotPassword(const QString &user);
+	bool doesForgotPasswordExist(const QString &user);
 };
 
 #endif
