@@ -168,7 +168,7 @@ void MainWindow::activateAccepted()
 void MainWindow::actConnect()
 {
     DlgConnect *dlg = new DlgConnect(this);
-	connect(dlg, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT());
+	connect(dlg, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
     if (dlg->exec())
         client->connectToServer(dlg->getHost(), dlg->getPort(), dlg->getPlayerName(), dlg->getPassword());
 }
