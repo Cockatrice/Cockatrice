@@ -67,10 +67,12 @@ private slots:
     void actRegister();
     void actSettings();
     void actExit();
-    
+	void actForgotPasswordRequest();
     void actAbout();
     void actUpdate();
     void actViewLog();
+	void forgotPasswordSuccess();
+	void forgotPasswordError();
 
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
 

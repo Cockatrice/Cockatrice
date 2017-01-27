@@ -13,6 +13,7 @@
 #include "pb/response_login.pb.h"
 #include "pb/response_register.pb.h"
 #include "pb/response_activate.pb.h"
+#include "pb/response_forgotpasswordrequest.pb.h"
 #include "pb/server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
 #include "settingscache.h"
@@ -43,6 +44,7 @@ RemoteClient::RemoteClient(QObject *parent)
     connect(this, SIGNAL(sigDisconnectFromServer()), this, SLOT(doDisconnectFromServer()));
     connect(this, SIGNAL(sigRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)), this, SLOT(doRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)));
     connect(this, SIGNAL(sigActivateToServer(QString)), this, SLOT(doActivateToServer(QString)));
+	connect(this, SIGNAL(sigRequestForgotPasswordToServer(QString, unsigned int, QString)), this, SLOT(doRequestForgotPasswordToServer(QString, unsigned int, QString)));
 }
 
 RemoteClient::~RemoteClient()
@@ -76,6 +78,17 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         setStatus(StatusDisconnecting);
         return;
     }
+
+	if (getStatus() == StatusRequestingForgotPassword)
+	{
+		Command_ForgotPasswordRequest cmdForgotPasswordRequest;
+		cmdForgotPasswordRequest.set_user_name(userName.toStdString());
+		cmdForgotPasswordRequest.set_clientid(getSrvClientID("setme").toStdString());
+		PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordRequest);
+		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(requestForgotPasswordResponse(Response)));
+		sendCommand(pend);
+		return;
+	}
 
     if(getStatus() == StatusRegistering)
     {
@@ -415,4 +428,33 @@ void RemoteClient::clearNewClientFeatures()
         }
     }
     settingsCache->setKnownMissingFeatures(newKnownMissingFeatures);
+}
+
+void RemoteClient::requestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName)
+{
+	emit sigRequestForgotPasswordToServer(hostname, port, _userName);
+}
+
+void RemoteClient::doRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName)
+{
+	doDisconnectFromServer();
+
+	userName = _userName;
+
+	socket->connectToHost(lastHostname, lastPort);
+	setStatus(StatusRequestingForgotPassword);
+}
+
+void RemoteClient::requestForgotPasswordResponse(const Response &response)
+{
+	const Response_ForgotPasswordRequest &resp = response.GetExtension(Response_ForgotPasswordRequest::ext);
+	if (response.response_code() == Response::RespOk)
+	{
+		emit sigForgotPasswordSuccess();
+	}
+	else
+		emit sigForgotPasswordError();
+
+	setStatus(StatusDisconnecting);
+	doDisconnectFromServer();
 }

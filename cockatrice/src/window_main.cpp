@@ -36,6 +36,7 @@
 #include "main.h"
 #include "window_main.h"
 #include "dlg_connect.h"
+#include "dlg_forgotpasswordrequest.h"
 #include "dlg_register.h"
 #include "dlg_settings.h"
 #include "dlg_update.h"
@@ -166,9 +167,10 @@ void MainWindow::activateAccepted()
 
 void MainWindow::actConnect()
 {
-    DlgConnect dlg(this);
-    if (dlg.exec())
-        client->connectToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getPassword());
+    DlgConnect *dlg = new DlgConnect(this);
+	connect(dlg, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT());
+    if (dlg->exec())
+        client->connectToServer(dlg->getHost(), dlg->getPort(), dlg->getPlayerName(), dlg->getPassword());
 }
 
 void MainWindow::actRegister()
@@ -663,6 +665,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this, SLOT(registerError(Response::ResponseCode, QString, quint32)));
     connect(client, SIGNAL(activateAccepted()), this, SLOT(activateAccepted()));
     connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
+	connect(client, SIGNAL(sigForgotPasswordSuccess()), this, SLOT(forgotPasswordSuccess()));
+	connect(client, SIGNAL(sigForgotPasswordError()), this, SLOT(forgotPasswordError()));
 
     clientThread = new QThread(this);
     client->moveToThread(clientThread);
@@ -1050,4 +1054,21 @@ void MainWindow::actEditTokens()
     DlgEditTokens dlg;
     dlg.exec();
     db->saveCustomTokensToFile();
+}
+
+void MainWindow::actForgotPasswordRequest()
+{
+	DlgForgotPasswordRequest dlg;
+	if (dlg.exec())
+		client->requestForgotPasswordToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName());
+}
+
+void MainWindow::forgotPasswordSuccess()
+{
+	QMessageBox::information(this, tr("Forgot Password"), tr("Your password has been reset successfully, you now may  log in using the new credentials."));
+}
+
+void MainWindow::forgotPasswordError()
+{
+	QMessageBox::warning(this, tr("Forgot Password"), tr("Failed to reset user account password, please contact the server operator to reset your password."));
 }

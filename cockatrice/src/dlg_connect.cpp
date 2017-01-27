@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <iostream>
 #include <QGroupBox>
+#include <QPushButton>
 #include "dlg_connect.h"
 #include "settingscache.h"
 
@@ -69,6 +70,17 @@ DlgConnect::DlgConnect(QWidget *parent)
 
     connect(savePasswordCheckBox, SIGNAL(stateChanged(int)), this, SLOT(passwordSaved(int)));
 
+	btnForgotPassword = new QPushButton(tr("Forgot password"));
+	connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
+
+	btnOk = new QPushButton(tr("Connect"));
+	btnOk->setFixedWidth(100);
+	connect(btnOk, SIGNAL(released()), this, SLOT(actOk()));
+
+	btnCancel = new QPushButton(tr("Cancel"));
+	btnCancel->setFixedWidth(100);
+	connect(btnCancel, SIGNAL(released()), this, SLOT(actCancel()));
+
     QGridLayout *connectionLayout = new QGridLayout;
     connectionLayout->addWidget(previousHostButton, 0, 1);
     connectionLayout->addWidget(previousHosts, 1, 1);
@@ -78,6 +90,11 @@ DlgConnect::DlgConnect(QWidget *parent)
     connectionLayout->addWidget(portLabel, 4, 0);
     connectionLayout->addWidget(portEdit, 4, 1);
     connectionLayout->addWidget(autoConnectCheckBox, 5, 1);
+
+	QGridLayout *buttons = new QGridLayout;
+	buttons->addWidget(btnOk, 0, 0);
+	buttons->addWidget(btnForgotPassword, 0, 1);
+	buttons->addWidget(btnCancel, 0, 2);
 
     QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Server"));
     restrictionsGroupBox->setLayout(connectionLayout);
@@ -92,17 +109,16 @@ DlgConnect::DlgConnect(QWidget *parent)
     QGroupBox *loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
 
+	QGroupBox *btnGroupBox = new QGroupBox(tr(""));
+	btnGroupBox->setLayout(buttons);
+
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
     grid->addWidget(loginGroupBox, 1, 0);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
+	grid->addWidget(btnGroupBox, 2, 0);
          
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
-    mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Connect to server"));
@@ -203,4 +219,9 @@ bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *o
         }
     }
     return QObject::eventFilter(obj, event);
+}
+
+void DlgConnect::actForgotPassword()
+{
+	emit sigStartForgotPasswordRequest();
 }
