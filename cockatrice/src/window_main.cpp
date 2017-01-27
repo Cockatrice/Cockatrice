@@ -37,6 +37,7 @@
 #include "window_main.h"
 #include "dlg_connect.h"
 #include "dlg_forgotpasswordrequest.h"
+#include "dlg_forgotpasswordreset.h"
 #include "dlg_register.h"
 #include "dlg_settings.h"
 #include "dlg_update.h"
@@ -667,6 +668,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
 	connect(client, SIGNAL(sigForgotPasswordSuccess()), this, SLOT(forgotPasswordSuccess()));
 	connect(client, SIGNAL(sigForgotPasswordError()), this, SLOT(forgotPasswordError()));
+	connect(client, SIGNAL(sigPromptForForgotPasswordReset()), this, SLOT(promptForgotPasswordReset()));
 
     clientThread = new QThread(this);
     client->moveToThread(clientThread);
@@ -1066,9 +1068,22 @@ void MainWindow::actForgotPasswordRequest()
 void MainWindow::forgotPasswordSuccess()
 {
 	QMessageBox::information(this, tr("Forgot Password"), tr("Your password has been reset successfully, you now may  log in using the new credentials."));
+	settingsCache->servers().setFPHostName("");
+	settingsCache->servers().setFPPort("");
+	settingsCache->servers().setFPPlayerName("");
 }
 
 void MainWindow::forgotPasswordError()
 {
 	QMessageBox::warning(this, tr("Forgot Password"), tr("Failed to reset user account password, please contact the server operator to reset your password."));
+	settingsCache->servers().setFPHostName("");
+	settingsCache->servers().setFPPort("");
+	settingsCache->servers().setFPPlayerName("");
+}
+
+void MainWindow::promptForgotPasswordReset()
+{
+	DlgForgotPasswordReset dlg(this);
+	if (dlg.exec())
+		qDebug() << "WOW-ZA!";
 }

@@ -73,7 +73,7 @@ private slots:
     void actViewLog();
 	void forgotPasswordSuccess();
 	void forgotPasswordError();
-
+	void promptForgotPasswordReset();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
 
     void showWindowIfHidden();

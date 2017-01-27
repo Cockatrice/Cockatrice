@@ -12,16 +12,28 @@
 DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent)
     : QDialog(parent)
 {
+
+	QString lastfphost; QString lastfpport; QString lastfpplayername;
+	lastfphost = settingsCache->servers().getHostname("cockatrice.woogerworks.com");
+	lastfpport = settingsCache->servers().getPort("4747");
+	lastfpplayername = settingsCache->servers().getPlayerName("Player");
+
+	if (settingsCache->servers().getFPHostname().isEmpty() || settingsCache->servers().getFPPort().isEmpty() || settingsCache->servers().getFPPlayerName().isEmpty()) {
+		lastfphost = settingsCache->servers().getFPHostname();
+		lastfpport = settingsCache->servers().getFPPort();
+		lastfpplayername = settingsCache->servers().getFPPlayerName();
+	}
+
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit(settingsCache->servers().getHostname("cockatrice.woogerworks.com"));
+    hostEdit = new QLineEdit(lastfphost);
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
-    portEdit = new QLineEdit(settingsCache->servers().getPort("4747"));
+    portEdit = new QLineEdit(lastfpport);
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
-    playernameEdit = new QLineEdit(settingsCache->servers().getPlayerName("Player"));
+    playernameEdit = new QLineEdit(lastfpplayername);
     playernameLabel->setBuddy(playernameEdit);
 
     QGridLayout *grid = new QGridLayout;

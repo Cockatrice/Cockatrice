@@ -456,12 +456,10 @@ void RemoteClient::requestForgotPasswordResponse(const Response &response)
 	if (response.response_code() == Response::RespOk)
 	{
 		if (resp.challenge_email()) {
-			// PROMPT CHALLANGE DIALOG
+			// TODO: IMPLEMENT CHALLANGE QUESTION DIALOG
 		}
 		else
-			// PROMPT RESET DIALOG
-			;
-		//emit sigForgotPasswordSuccess();
+			emit sigPromptForForgotPasswordReset();
 	}
 	else
 		emit sigForgotPasswordError();

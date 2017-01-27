@@ -25,6 +25,7 @@ signals:
 	void sigRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
 	void sigForgotPasswordSuccess();
 	void sigForgotPasswordError();
+	void sigPromptForForgotPasswordReset();
 private slots:
     void slotConnected();
     void readData();
