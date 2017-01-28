@@ -1092,6 +1092,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 
 Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(const Command_ForgotPasswordReset &cmd, ResponseContainer &rc)
 {
+	Q_UNUSED(rc);
 	qDebug() << "Received forgot password reset from user: " << QString::fromStdString(cmd.user_name());
 
 	if (!sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name())))
@@ -1110,6 +1111,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
 
 Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd, ResponseContainer &rc)
 {
+	Q_UNUSED(rc);
 	qDebug() << "Received forgot password challenge from user: " << QString::fromStdString(cmd.user_name());
 
 	if (sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name())))
