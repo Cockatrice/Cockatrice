@@ -253,7 +253,7 @@ bool Servatrice::initServer()
 	qDebug() << "Forgot password enabled: " << getEnableForgotPassword();
 	if (getEnableForgotPassword()) {
 		qDebug() << "Forgot password token life: " << getForgotPasswordTokenLife();
-		qDebug() << "Forgot password challenge on: " << getForgotPasswordTokenLife();
+		qDebug() << "Forgot password challenge on: " << getEnableForgotPasswordChallenge();
 	}
 
     if (getDBTypeString() == "mysql") {
@@ -547,50 +547,52 @@ void Servatrice::statusUpdate()
     servatriceDatabaseInterface->execSqlQuery(query);
 
     // send activation emails
-    if (getRegistrationEnabled() && getRequireEmailActivationEnabled() && getEnableInternalSMTPClient())
+    if (getRegistrationEnabled() && getEnableInternalSMTPClient())
     {
-        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
-        if (!servatriceDatabaseInterface->execSqlQuery(query))
-            return;
+		if (getRequireEmailActivationEnabled())
+		{
+			QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
+			if (!servatriceDatabaseInterface->execSqlQuery(query))
+				return;
 
-        QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
+			QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
 
-        while (query->next()) {
-            const QString userName = query->value(0).toString();
-            const QString emailAddress = query->value(1).toString();
-            const QString token = query->value(2).toString();
+			while (query->next()) {
+				const QString userName = query->value(0).toString();
+				const QString emailAddress = query->value(1).toString();
+				const QString token = query->value(2).toString();
 
-            if(smtpClient->enqueueActivationTokenMail(userName, emailAddress, token))
-            {
-                queryDelete->bindValue(":name", userName);
-                servatriceDatabaseInterface->execSqlQuery(queryDelete);
-            }
-        }
-		smtpClient->sendAllEmails();
-    }
-
-	// send forgot password emails
-	if (getEnableForgotPassword() && getEnableInternalSMTPClient())
-	{
-		QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_forgot_password a left join {prefix}_users b on a.name = b.name where a.emailed = 0");
-		if (!servatriceDatabaseInterface->execSqlQuery(query))
-			return;
-
-		QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("update {prefix}_forgot_password set emailed = 1 where name = :name");
-
-		while (query->next()) {
-			const QString userName = query->value(0).toString();
-			const QString emailAddress = query->value(1).toString();
-			const QString token = query->value(2).toString();
-
-			if (smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token))
-			{
-				queryDelete->bindValue(":name", userName);
-				servatriceDatabaseInterface->execSqlQuery(queryDelete);
+				if (smtpClient->enqueueActivationTokenMail(userName, emailAddress, token))
+				{
+					queryDelete->bindValue(":name", userName);
+					servatriceDatabaseInterface->execSqlQuery(queryDelete);
+				}
 			}
 		}
+
+		if (getEnableForgotPassword())
+		{
+			QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_forgot_password a left join {prefix}_users b on a.name = b.name where a.emailed = 0");
+			if (!servatriceDatabaseInterface->execSqlQuery(query))
+				return;
+
+			QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("update {prefix}_forgot_password set emailed = 1 where name = :name");
+
+			while (query->next()) {
+				const QString userName = query->value(0).toString();
+				const QString emailAddress = query->value(1).toString();
+				const QString token = query->value(2).toString();
+
+				if (smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token))
+				{
+					queryDelete->bindValue(":name", userName);
+					servatriceDatabaseInterface->execSqlQuery(queryDelete);
+				}
+			}
+		}
+
 		smtpClient->sendAllEmails();
-	}
+    }
 }
 
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)

@@ -1136,7 +1136,6 @@ bool Servatrice_DatabaseInterface::addForgotPassword(const QString &user)
 	if (!checkSql())
 		return false;
 
-	qDebug() << PasswordHasher::generateActivationToken();
 	if (!updateUserToken(PasswordHasher::generateActivationToken(), user))
 		return false;
 

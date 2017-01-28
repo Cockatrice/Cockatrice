@@ -1095,6 +1095,7 @@ void MainWindow::forgotPasswordError()
 
 void MainWindow::promptForgotPasswordReset()
 {
+	QMessageBox::information(this, tr("Forgot Password"), tr("Activation request received, please check your email for an activation token."));
 	DlgForgotPasswordReset dlg(this);
 	if (dlg.exec())
 		client->submitForgotPasswordResetToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getToken(), dlg.getPassword());

@@ -1064,8 +1064,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 	if (sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name()))) {
 		Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
 		re->set_challenge_email(false);
-		if (servatrice->getEnableForgotPasswordChallenge())
-			re->set_challenge_email(true);
 		rc.setResponseExtension(re);
 		return Response::RespOk;
 	}
@@ -1074,13 +1072,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 	if (sqlInterface->checkUserIsBanned(this->getAddress(), QString::fromStdString(cmd.user_name()), QString::fromStdString(cmd.clientid()), banReason, banTimeRemaining))
 		return Response::RespFunctionNotAllowed;
 
-	if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name()))) {
+	if (servatrice->getEnableForgotPasswordChallenge()) {
 		Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
-		re->set_challenge_email(false);
-		if (servatrice->getEnableForgotPasswordChallenge())
-			re->set_challenge_email(true);
+		re->set_challenge_email(true);
 		rc.setResponseExtension(re);
 		return Response::RespOk;
+	}
+	else {
+		if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name()))) {
+			Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
+			re->set_challenge_email(false);
+			rc.setResponseExtension(re);
+			return Response::RespOk;
+		}
 	}
 
 	return Response::RespFunctionNotAllowed;
@@ -1108,14 +1112,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordChallenge
 {
 	qDebug() << "Received forgot password challenge from user: " << QString::fromStdString(cmd.user_name());
 
-	if (!sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name())))
-		return Response::RespFunctionNotAllowed;
-
-	if (!sqlInterface->validateUserEmail(QString::fromStdString(cmd.email()), QString::fromStdString(cmd.user_name())))
-		return Response::RespFunctionNotAllowed;
-
-	if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name())))
+	if (sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name())))
 		return Response::RespOk;
+
+	if (sqlInterface->validateUserEmail(QString::fromStdString(cmd.email()), QString::fromStdString(cmd.user_name())))
+		if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name())))
+			return Response::RespOk;
 
 	return Response::RespFunctionNotAllowed;
 }
