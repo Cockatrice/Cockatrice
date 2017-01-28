@@ -22,8 +22,8 @@ private slots:
     void actOk();
     void actCancel();
 private:
-	QLabel *hostLabel, *portLabel, *playernameLabel, *tokenLabel, *newpasswordLabel;
-	QLineEdit *hostEdit, *portEdit, *playernameEdit, *tokenEdit, *newpasswordEdit;
+	QLabel *hostLabel, *portLabel, *playernameLabel, *tokenLabel, *newpasswordLabel, *newpasswordverifyLabel;
+	QLineEdit *hostEdit, *portEdit, *playernameEdit, *tokenEdit, *newpasswordEdit, *newpasswordverifyEdit;
 };
 
 #endif

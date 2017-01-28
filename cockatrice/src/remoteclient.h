@@ -26,6 +26,7 @@ signals:
 	void sigForgotPasswordSuccess();
 	void sigForgotPasswordError();
 	void sigPromptForForgotPasswordReset();
+	void sigSubmitForgotPasswordResetToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_token, const QString &_newpassword);
 private slots:
     void slotConnected();
     void readData();
@@ -43,7 +44,8 @@ private slots:
     void doActivateToServer(const QString &_token);
 	void doRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
 	void requestForgotPasswordResponse(const Response &response);
-
+	void doSubmitForgotPasswordResetToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_token, const QString &_newpassword);
+	void submitForgotPasswordResetResponse(const Response &response);
 private:
     static const int maxTimeout = 10;
     int timeRunning, lastDataReceived;
@@ -71,6 +73,7 @@ public:
     void activateToServer(const QString &_token);
     void disconnectFromServer();
 	void requestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
+	void submitForgotPasswordResetToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_token, const QString &_newpassword);
 };
 
 #endif

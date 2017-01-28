@@ -46,7 +46,7 @@ public:
     virtual void logMessage(const int /* senderId */, const QString & /* senderName */, const QString & /* senderIp */, const QString & /* logMessage */, LogMessage_TargetType /* targetType */, const int /* targetId */, const QString & /* targetName */) { };
     bool checkUserIsBanned(Server_ProtocolHandler *session, QString &banReason, int &banSecondsRemaining);
     virtual int checkNumberOfUserAccounts(const QString & /* email */) { return 0; };
-    virtual bool changeUserPassword(const QString & /* user */, const QString & /* oldPassword */, const QString & /* newPassword */) { return true; };
+    virtual bool changeUserPassword(const QString & /* user */, const QString & /* oldPassword */, const QString & /* newPassword */, const bool & /* force */) { return false; };
     virtual QChar getGenderChar(ServerInfo_User_Gender const & /* gender */) { return QChar('u'); };
 };
 

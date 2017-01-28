@@ -831,41 +831,43 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId, const QString 
     execSqlQuery(query);
 }
 
-bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword)
+bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword, const bool &force = false)
 {
     if(server->getAuthenticationMethod() != Servatrice::AuthenticationSql)
-        return true;
+        return false;
 
     if (!checkSql())
-        return true;
+        return false;
 
     QString error;
     if (!usernameIsValid(user, error))
-        return true;
+        return false;
 
-    QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name");
-    passwordQuery->bindValue(":name", user);
-    if (!execSqlQuery(passwordQuery)) {
-        qDebug("Change password denied: SQL error");
-        return true;
-    }
+	QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name");
+	passwordQuery->bindValue(":name", user);
 
-    if (!passwordQuery->next())
-        return true;
+	if (!force) {
+		if (!execSqlQuery(passwordQuery)) {
+			qDebug("Change password denied: SQL error");
+			return false;
+		}
 
-    const QString correctPassword = passwordQuery->value(0).toString();
-    if (correctPassword != PasswordHasher::computeHash(oldPassword, correctPassword.left(16)))
-        return true;
+		if (!passwordQuery->next())
+			return false;
+
+		const QString correctPassword = passwordQuery->value(0).toString();
+		if (correctPassword != PasswordHasher::computeHash(oldPassword, correctPassword.left(16)))
+			return false;
+	}
 
     QString passwordSha512 = PasswordHasher::computeHash(newPassword, PasswordHasher::generateRandomSalt());
 
     passwordQuery = prepareQuery("update {prefix}_users set password_sha512=:password where name = :name");
     passwordQuery->bindValue(":password", passwordSha512);
     passwordQuery->bindValue(":name", user);
-    if (!execSqlQuery(passwordQuery)) {
-        qDebug("Change password denied: SQL error");
-        return true;
-    }
+	if (execSqlQuery(passwordQuery))
+		return true;
+
     return false;
 }
 
@@ -1134,6 +1136,10 @@ bool Servatrice_DatabaseInterface::addForgotPassword(const QString &user)
 	if (!checkSql())
 		return false;
 
+	qDebug() << PasswordHasher::generateActivationToken();
+	if (!updateUserToken(PasswordHasher::generateActivationToken(), user))
+		return false;
+
 	QSqlQuery *query = prepareQuery("insert into {prefix}_password_reset (user_name,requestDate) values (:username,NOW())");
 	query->bindValue(":username", user);
 	if (execSqlQuery(query))
@@ -1169,6 +1175,44 @@ bool Servatrice_DatabaseInterface::doesForgotPasswordExist(const QString &user)
 
 	if (query->next())
 		if (query->value("count(user_name)").toInt() > 0)
+			return true;
+
+	return false;
+}
+
+bool Servatrice_DatabaseInterface::updateUserToken(const QString & token, const QString &user)
+{
+	if (!checkSql())
+		return false;
+
+	if (token.isEmpty() || user.isEmpty())
+		return false;
+
+	QSqlQuery *query = prepareQuery("update {prefix}_users set token = :token where name = :user_name");
+	query->bindValue(":user_name", user);
+	query->bindValue(":token", token);
+
+	if (execSqlQuery(query))
+		return true;
+
+	return false;
+}
+
+bool Servatrice_DatabaseInterface::validateUserToken(const QString &token, const QString &user)
+{
+	if (!checkSql())
+		return false;
+
+	QSqlQuery *query = prepareQuery("select token from {prefix}_users where name = :user_name");
+	query->bindValue(":user_name", user);
+
+	if (!execSqlQuery(query)) {
+		qDebug() << "Failed to locate query users token in database: SQL ERROR";
+		return false;
+	}
+
+	if (query->next())
+		if (query->value(0).toString() == token)
 			return true;
 
 	return false;

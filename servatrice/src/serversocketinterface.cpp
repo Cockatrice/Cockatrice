@@ -151,7 +151,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
         case SessionCommand::REPLAY_DELETE_MATCH: return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
         case SessionCommand::REGISTER: return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc); break;
         case SessionCommand::ACTIVATE: return cmdActivateAccount(cmd.GetExtension(Command_Activate::ext), rc); break;
-		case SessionCommand::FORGOT_PASSWORD_REQUEST: return cmdForgotPasswordReuest(cmd.GetExtension(Command_ForgotPasswordRequest::ext), rc); break;
+		case SessionCommand::FORGOT_PASSWORD_REQUEST: return cmdForgotPasswordRequest(cmd.GetExtension(Command_ForgotPasswordRequest::ext), rc); break;
+		case SessionCommand::FORGOT_PASSWORD_RESET: return cmdForgotPasswordReset(cmd.GetExtension(Command_ForgotPasswordReset::ext), rc); break;
         case SessionCommand::ACCOUNT_EDIT: return cmdAccountEdit(cmd.GetExtension(Command_AccountEdit::ext), rc);
         case SessionCommand::ACCOUNT_IMAGE: return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD: return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
@@ -1043,15 +1044,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
 
     QString userName = QString::fromStdString(userInfo->name());
 
-    bool changeFailed = databaseInterface->changeUserPassword(userName, oldPassword, newPassword);
-
-    if(changeFailed)
+    if(!databaseInterface->changeUserPassword(userName, oldPassword, newPassword, false))
         return Response::RespWrongPassword;
     
     return Response::RespOk;
 }
 
-Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReuest(const Command_ForgotPasswordRequest &cmd, ResponseContainer &rc)
+Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(const Command_ForgotPasswordRequest &cmd, ResponseContainer &rc)
 {
 	qDebug() << "Received forgot password request from user: " << QString::fromStdString(cmd.user_name());
 
@@ -1078,6 +1077,25 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReuest(co
 		rc.setResponseExtension(re);
 		return Response::RespOk;
 	}
+
+	return Response::RespFunctionNotAllowed;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(const Command_ForgotPasswordReset &cmd, ResponseContainer &rc)
+{
+	qDebug() << "Received forgot password reset from user: " << QString::fromStdString(cmd.user_name());
+
+	if (!sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name())))
+		return Response::RespFunctionNotAllowed;
+	qDebug() << "USER HAS BEEN FLAGGED";
+	if (!sqlInterface->validateUserToken(QString::fromStdString(cmd.token()), QString::fromStdString(cmd.new_password())))
+		return Response::RespFunctionNotAllowed;
+	qDebug() << "VALIDATED TOKEN";
+	if (sqlInterface->changeUserPassword(QString::fromStdString(cmd.user_name()), "", QString::fromStdString(cmd.new_password()), true)) {
+		return Response::RespOk;
+	}
+	else
+		qDebug() << "FAILED TO RESET PASSWORD";
 
 	return Response::RespFunctionNotAllowed;
 }

@@ -18,7 +18,7 @@ DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent)
 	lastfpport = settingsCache->servers().getPort("4747");
 	lastfpplayername = settingsCache->servers().getPlayerName("Player");
 
-	if (settingsCache->servers().getFPHostname().isEmpty() || settingsCache->servers().getFPPort().isEmpty() || settingsCache->servers().getFPPlayerName().isEmpty()) {
+	if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() && !settingsCache->servers().getFPPlayerName().isEmpty()) {
 		lastfphost = settingsCache->servers().getFPHostname();
 		lastfpport = settingsCache->servers().getFPPort();
 		lastfpplayername = settingsCache->servers().getFPPlayerName();

@@ -1085,5 +1085,5 @@ void MainWindow::promptForgotPasswordReset()
 {
 	DlgForgotPasswordReset dlg(this);
 	if (dlg.exec())
-		qDebug() << "WOW-ZA!";
+		client->submitForgotPasswordResetToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getToken(), dlg.getPassword());
 }

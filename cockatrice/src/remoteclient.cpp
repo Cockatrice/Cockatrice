@@ -45,6 +45,7 @@ RemoteClient::RemoteClient(QObject *parent)
     connect(this, SIGNAL(sigRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)), this, SLOT(doRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)));
     connect(this, SIGNAL(sigActivateToServer(QString)), this, SLOT(doActivateToServer(QString)));
 	connect(this, SIGNAL(sigRequestForgotPasswordToServer(QString, unsigned int, QString)), this, SLOT(doRequestForgotPasswordToServer(QString, unsigned int, QString)));
+	connect(this, SIGNAL(sigSubmitForgotPasswordResetToServer(QString, unsigned int, QString, QString, QString)), this, SLOT(doSubmitForgotPasswordResetToServer(QString, unsigned int, QString, QString, QString)));
 }
 
 RemoteClient::~RemoteClient()
@@ -86,6 +87,19 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
 		cmdForgotPasswordRequest.set_clientid(getSrvClientID(lastHostname).toStdString());
 		PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordRequest);
 		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(requestForgotPasswordResponse(Response)));
+		sendCommand(pend);
+		return;
+	}
+
+	if (getStatus() == StatusSubmitForgotPasswordReset)
+	{
+		Command_ForgotPasswordReset cmdForgotPasswordReset;
+		cmdForgotPasswordReset.set_user_name(userName.toStdString());
+		cmdForgotPasswordReset.set_clientid(getSrvClientID(lastHostname).toStdString());
+		cmdForgotPasswordReset.set_token(token.toStdString());
+		cmdForgotPasswordReset.set_new_password(password.toStdString());
+		PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordReset);
+		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(submitForgotPasswordResetResponse(Response)));
 		sendCommand(pend);
 		return;
 	}
@@ -432,10 +446,12 @@ void RemoteClient::clearNewClientFeatures()
 
 void RemoteClient::requestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName)
 {
-	qDebug() << "HOST: " << hostname;
-	qDebug() << "PORT: " << port;
-	qDebug() << "USER: " << _userName;
 	emit sigRequestForgotPasswordToServer(hostname, port, _userName);
+}
+
+void RemoteClient::submitForgotPasswordResetToServer(const QString & hostname, unsigned int port, const QString & _userName, const QString & _token, const QString & _newpassword)
+{
+	emit sigSubmitForgotPasswordResetToServer(hostname, port, _userName, _token, _newpassword);
 }
 
 void RemoteClient::doRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName)
@@ -462,6 +478,31 @@ void RemoteClient::requestForgotPasswordResponse(const Response &response)
 			emit sigPromptForForgotPasswordReset();
 	}
 	else
+		emit sigForgotPasswordError();
+
+	setStatus(StatusDisconnecting);
+	doDisconnectFromServer();
+}
+
+void RemoteClient::doSubmitForgotPasswordResetToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_token, const QString &_newpassword)
+{
+	doDisconnectFromServer();
+
+	userName = _userName;
+	lastHostname = hostname;
+	lastPort = port;
+	token = _token;
+	password = _newpassword;
+
+	socket->connectToHost(lastHostname, lastPort);
+	setStatus(StatusSubmitForgotPasswordReset);
+}
+
+void RemoteClient::submitForgotPasswordResetResponse(const Response &response)
+{
+	if (response.response_code() == Response::RespOk) {
+		emit sigForgotPasswordSuccess();
+	} else
 		emit sigForgotPasswordError();
 
 	setStatus(StatusDisconnecting);
