@@ -153,6 +153,7 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
         case SessionCommand::ACTIVATE: return cmdActivateAccount(cmd.GetExtension(Command_Activate::ext), rc); break;
 		case SessionCommand::FORGOT_PASSWORD_REQUEST: return cmdForgotPasswordRequest(cmd.GetExtension(Command_ForgotPasswordRequest::ext), rc); break;
 		case SessionCommand::FORGOT_PASSWORD_RESET: return cmdForgotPasswordReset(cmd.GetExtension(Command_ForgotPasswordReset::ext), rc); break;
+		case SessionCommand::FORGOT_PASSWORD_CHALLENGE: return cmdForgotPasswordChallenge(cmd.GetExtension(Command_ForgotPasswordChallenge::ext), rc); break;
         case SessionCommand::ACCOUNT_EDIT: return cmdAccountEdit(cmd.GetExtension(Command_AccountEdit::ext), rc);
         case SessionCommand::ACCOUNT_IMAGE: return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD: return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
@@ -1063,6 +1064,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 	if (sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name()))) {
 		Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
 		re->set_challenge_email(false);
+		if (servatrice->getEnableForgotPasswordChallenge())
+			re->set_challenge_email(true);
 		rc.setResponseExtension(re);
 		return Response::RespOk;
 	}
@@ -1074,6 +1077,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 	if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name()))) {
 		Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
 		re->set_challenge_email(false);
+		if (servatrice->getEnableForgotPasswordChallenge())
+			re->set_challenge_email(true);
 		rc.setResponseExtension(re);
 		return Response::RespOk;
 	}
@@ -1098,6 +1103,23 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
 
 	return Response::RespFunctionNotAllowed;
 }
+
+Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd, ResponseContainer &rc)
+{
+	qDebug() << "Received forgot password challenge from user: " << QString::fromStdString(cmd.user_name());
+
+	if (!sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name())))
+		return Response::RespFunctionNotAllowed;
+
+	if (!sqlInterface->validateUserEmail(QString::fromStdString(cmd.email()), QString::fromStdString(cmd.user_name())))
+		return Response::RespFunctionNotAllowed;
+
+	if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name())))
+		return Response::RespOk;
+
+	return Response::RespFunctionNotAllowed;
+}
+
 
 // ADMIN FUNCTIONS.
 // Permission is checked by the calling function.

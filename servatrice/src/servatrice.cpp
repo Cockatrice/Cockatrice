@@ -251,8 +251,10 @@ bool Servatrice::initServer()
     }
 
 	qDebug() << "Forgot password enabled: " << getEnableForgotPassword();
-	if (getEnableForgotPassword())
+	if (getEnableForgotPassword()) {
 		qDebug() << "Forgot password token life: " << getForgotPasswordTokenLife();
+		qDebug() << "Forgot password challenge on: " << getForgotPasswordTokenLife();
+	}
 
     if (getDBTypeString() == "mysql") {
         databaseType = DatabaseMySql;
@@ -855,4 +857,8 @@ bool Servatrice::getEnableForgotPassword() const {
 
 int Servatrice::getForgotPasswordTokenLife() const {
 	return settingsCache->value("forgotpassword/tokenlife", 60).toInt();
+}
+
+bool Servatrice::getEnableForgotPasswordChallenge() const {
+	return settingsCache->value("forgotpassword/enablechallenge", false).toBool();
 }

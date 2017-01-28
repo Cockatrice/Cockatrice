@@ -108,6 +108,7 @@ private:
 	Response::ResponseCode cmdAdjustMod(const Command_AdjustMod &cmd, ResponseContainer & /*rc*/);
 	Response::ResponseCode cmdForgotPasswordRequest(const Command_ForgotPasswordRequest &cmd, ResponseContainer &rc);
 	Response::ResponseCode cmdForgotPasswordReset(const Command_ForgotPasswordReset &cmd, ResponseContainer &rc);
+	Response::ResponseCode cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd, ResponseContainer &rc);
 	Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
 	Response::ResponseCode processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
 	Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc);

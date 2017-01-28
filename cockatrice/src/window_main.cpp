@@ -38,6 +38,7 @@
 #include "dlg_connect.h"
 #include "dlg_forgotpasswordrequest.h"
 #include "dlg_forgotpasswordreset.h"
+#include "dlg_forgotpasswordchallenge.h"
 #include "dlg_register.h"
 #include "dlg_settings.h"
 #include "dlg_update.h"
@@ -506,6 +507,9 @@ void MainWindow::setClientStatusTitle()
         case StatusDisconnected: setWindowTitle(appName + " - " + tr("Disconnected")); break;
         case StatusLoggingIn: setWindowTitle(appName + " - " + tr("Connected, logging in at %1").arg(client->peerName())); break;
         case StatusLoggedIn: setWindowTitle(client->getUserName() + "@" + client->peerName()); break;
+		case StatusRequestingForgotPassword: setWindowTitle(appName + " - " + tr("Requesting forgot password to %1 as %2...").arg(client->peerName()).arg(client->getUserName())); break;
+		case StatusSubmitForgotPasswordChallenge: setWindowTitle(appName + " - " + tr("Requesting forgot password to %1 as %2...").arg(client->peerName()).arg(client->getUserName())); break;
+		case StatusSubmitForgotPasswordReset: setWindowTitle(appName + " - " + tr("Requesting forgot password to %1 as %2...").arg(client->peerName()).arg(client->getUserName())); break;
         default: setWindowTitle(appName);
     }
 }
@@ -669,6 +673,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(client, SIGNAL(sigForgotPasswordSuccess()), this, SLOT(forgotPasswordSuccess()));
 	connect(client, SIGNAL(sigForgotPasswordError()), this, SLOT(forgotPasswordError()));
 	connect(client, SIGNAL(sigPromptForForgotPasswordReset()), this, SLOT(promptForgotPasswordReset()));
+	connect(client, SIGNAL(sigPromptForForgotPasswordChallenge()), this, SLOT(promptForgotPasswordChallenge()));
 
     clientThread = new QThread(this);
     client->moveToThread(clientThread);
@@ -735,6 +740,13 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
             QApplication::setActiveWindow(this);
         }
     }
+}
+
+void MainWindow::promptForgotPasswordChallenge()
+{
+	DlgForgotPasswordChallenge dlg(this);
+	if (dlg.exec())
+		client->submitForgotPasswordChallengeToServer(dlg.getHost(),dlg.getPort(),dlg.getPlayerName(),dlg.getEmail());
 }
 
 

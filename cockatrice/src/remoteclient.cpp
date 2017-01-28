@@ -46,6 +46,7 @@ RemoteClient::RemoteClient(QObject *parent)
     connect(this, SIGNAL(sigActivateToServer(QString)), this, SLOT(doActivateToServer(QString)));
 	connect(this, SIGNAL(sigRequestForgotPasswordToServer(QString, unsigned int, QString)), this, SLOT(doRequestForgotPasswordToServer(QString, unsigned int, QString)));
 	connect(this, SIGNAL(sigSubmitForgotPasswordResetToServer(QString, unsigned int, QString, QString, QString)), this, SLOT(doSubmitForgotPasswordResetToServer(QString, unsigned int, QString, QString, QString)));
+	connect(this, SIGNAL(sigSubmitForgotPasswordChallengeToServer(QString, unsigned int, QString, QString)), this, SLOT(doSubmitForgotPasswordChallengeToServer(QString, unsigned int, QString, QString)));
 }
 
 RemoteClient::~RemoteClient()
@@ -100,6 +101,18 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
 		cmdForgotPasswordReset.set_new_password(password.toStdString());
 		PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordReset);
 		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(submitForgotPasswordResetResponse(Response)));
+		sendCommand(pend);
+		return;
+	}
+
+	if (getStatus() == StatusSubmitForgotPasswordChallenge)
+	{
+		Command_ForgotPasswordChallenge cmdForgotPasswordChallenge;
+		cmdForgotPasswordChallenge.set_user_name(userName.toStdString());
+		cmdForgotPasswordChallenge.set_clientid(getSrvClientID(lastHostname).toStdString());
+		cmdForgotPasswordChallenge.set_email(email.toStdString());
+		PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordChallenge);
+		connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(submitForgotPasswordChallengeResponse(Response)));
 		sendCommand(pend);
 		return;
 	}
@@ -472,7 +485,7 @@ void RemoteClient::requestForgotPasswordResponse(const Response &response)
 	if (response.response_code() == Response::RespOk)
 	{
 		if (resp.challenge_email()) {
-			// TODO: IMPLEMENT CHALLANGE QUESTION DIALOG
+			emit sigPromptForForgotPasswordChallenge();
 		}
 		else
 			emit sigPromptForForgotPasswordReset();
@@ -480,8 +493,8 @@ void RemoteClient::requestForgotPasswordResponse(const Response &response)
 	else
 		emit sigForgotPasswordError();
 
-	setStatus(StatusDisconnecting);
 	doDisconnectFromServer();
+
 }
 
 void RemoteClient::doSubmitForgotPasswordResetToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_token, const QString &_newpassword)
@@ -505,6 +518,34 @@ void RemoteClient::submitForgotPasswordResetResponse(const Response &response)
 	} else
 		emit sigForgotPasswordError();
 
-	setStatus(StatusDisconnecting);
+	doDisconnectFromServer();
+}
+
+void RemoteClient::submitForgotPasswordChallengeToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_email)
+{
+	emit sigSubmitForgotPasswordChallengeToServer(hostname, port, _userName, _email);
+}
+
+void RemoteClient::doSubmitForgotPasswordChallengeToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_email)
+{
+	doDisconnectFromServer();
+
+	userName = _userName;
+	lastHostname = hostname;
+	lastPort = port;
+	email = _email;
+
+	socket->connectToHost(lastHostname, lastPort);
+	setStatus(StatusSubmitForgotPasswordChallenge);
+}
+
+void RemoteClient::submitForgotPasswordChallengeResponse(const Response &response)
+{
+	if (response.response_code() == Response::RespOk) {
+		emit sigPromptForForgotPasswordReset();
+	}
+	else
+		emit sigForgotPasswordError();
+
 	doDisconnectFromServer();
 }

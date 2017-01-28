@@ -53,7 +53,7 @@ DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent)
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Send forgot password request"));
+    setWindowTitle(tr("Forgot Password Request"));
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 }
@@ -62,7 +62,7 @@ void DlgForgotPasswordRequest::actOk()
 {
     if(playernameEdit->text().isEmpty())
     {
-        QMessageBox::critical(this, tr("Forgot Password Warning"), tr("The player name can't be empty."));
+        QMessageBox::critical(this, tr("Forgot Password Request Warning"), tr("The player name can't be empty."));
         return;
     }
 

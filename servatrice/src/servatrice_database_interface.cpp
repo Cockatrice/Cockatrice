@@ -1218,3 +1218,24 @@ bool Servatrice_DatabaseInterface::validateUserToken(const QString &token, const
 
 	return false;
 }
+
+bool Servatrice_DatabaseInterface::validateUserEmail(const QString &email, const QString &user)
+{
+	if (!checkSql())
+		return false;
+
+	if (email.isEmpty() || user.isEmpty())
+		return false;
+
+	QSqlQuery *query = prepareQuery("select email from {prefix}_users where name = :user_name");
+	query->bindValue(":user_name", user);
+
+	if (!execSqlQuery(query))
+		return false;
+
+	if (query->next())
+		if (query->value("email").toString() == email)
+			return true;
+
+	return false;
+}

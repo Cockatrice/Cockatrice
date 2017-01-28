@@ -6,10 +6,10 @@
 #include <QMessageBox>
 #include <QDebug>
 
-#include "dlg_forgotpasswordreset.h"
+#include "dlg_forgotpasswordchallenge.h"
 #include "settingscache.h"
 
-DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
+DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent)
     : QDialog(parent)
 {
 
@@ -26,7 +26,7 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
 
 	if (settingsCache->servers().getFPHostname().isEmpty() && settingsCache->servers().getFPPort().isEmpty() && settingsCache->servers().getFPPlayerName().isEmpty())
 	{
-		QMessageBox::warning(this, tr("Forgot Password Reset Warning"), tr("Opps, looks like something has gone wrong.  Please re-start the forgot password process by using the forgot password button on the connection screen."));
+		QMessageBox::warning(this, tr("Forgot Password Challenge Warning"), tr("Opps, looks like something has gone wrong.  Please re-start the forgot password process by using the forgot password button on the connection screen."));
 		actCancel();
 	}
 
@@ -42,19 +42,9 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
     playernameEdit = new QLineEdit(lastfpplayername);
     playernameLabel->setBuddy(playernameEdit);
 
-	tokenLabel = new QLabel(tr("Token:"));
-	tokenEdit = new QLineEdit();
-	tokenLabel->setBuddy(tokenLabel);
-
-	newpasswordLabel = new QLabel(tr("New Password:"));
-	newpasswordEdit = new QLineEdit();
-	newpasswordLabel->setBuddy(newpasswordEdit);
-	newpasswordEdit->setEchoMode(QLineEdit::Password);
-
-	newpasswordverifyLabel = new QLabel(tr("New Password:"));
-	newpasswordverifyEdit = new QLineEdit();
-	newpasswordverifyLabel->setBuddy(newpasswordEdit);
-	newpasswordverifyEdit->setEchoMode(QLineEdit::Password);
+	emailLabel = new QLabel(tr("Email:"));
+	emailEdit = new QLineEdit();
+	emailLabel->setBuddy(emailLabel);
 
 	if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() && !settingsCache->servers().getFPPlayerName().isEmpty()) {
 		hostLabel->hide();
@@ -72,12 +62,8 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
     grid->addWidget(portEdit, 1, 1);
     grid->addWidget(playernameLabel, 2, 0);
     grid->addWidget(playernameEdit, 2, 1);
-	grid->addWidget(tokenLabel, 3, 0);
-	grid->addWidget(tokenEdit, 3, 1);
-	grid->addWidget(newpasswordLabel, 4, 0);
-	grid->addWidget(newpasswordEdit, 4, 1);
-	grid->addWidget(newpasswordverifyLabel, 5, 0);
-	grid->addWidget(newpasswordverifyEdit, 5, 1);
+	grid->addWidget(emailLabel, 3, 0);
+	grid->addWidget(emailEdit, 3, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
@@ -88,34 +74,16 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent)
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Forgot Password Reset"));
+    setWindowTitle(tr("Forgot Password Challenge"));
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 }
 
-void DlgForgotPasswordReset::actOk()
+void DlgForgotPasswordChallenge::actOk()
 {
-    if(playernameEdit->text().isEmpty())
-    {
-        QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The player name can't be empty."));
-        return;
-    }
-
-	if (tokenEdit->text().isEmpty())
+	if (emailEdit->text().isEmpty())
 	{
-		QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The token can't be empty."));
-		return;
-	}
-
-	if (newpasswordEdit->text().isEmpty())
-	{
-		QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The new password can't be empty."));
-		return;
-	}
-
-	if (newpasswordEdit->text() != newpasswordverifyEdit->text())
-	{
-		QMessageBox::critical(this, tr("Forgot Password Reset Warning"), tr("The passwords do not match."));
+		QMessageBox::critical(this, tr("Forgot Password Challenge Warning"), tr("The email address can't be empty."));
 		return;
 	}
 
@@ -126,7 +94,7 @@ void DlgForgotPasswordReset::actOk()
     accept();
 }
 
-void DlgForgotPasswordReset::actCancel()
+void DlgForgotPasswordChallenge::actCancel()
 {
     reject();
 }

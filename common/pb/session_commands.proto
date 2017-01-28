@@ -26,6 +26,7 @@ message SessionCommand {
         ACCOUNT_PASSWORD = 1020;
 		FORGOT_PASSWORD_REQUEST = 1021;
 		FORGOT_PASSWORD_RESET = 1022;
+		FORGOT_PASSWORD_CHALLENGE = 1023;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
         REPLAY_MODIFY_MATCH = 1102;
@@ -181,3 +182,11 @@ message Command_ForgotPasswordReset {
 	optional string new_password = 4;
 }
 
+message Command_ForgotPasswordChallenge {
+    extend SessionCommand {
+        optional Command_ForgotPasswordChallenge ext = 1023;
+    }
+    optional string user_name = 1;
+    optional string clientid = 2;
+	optional string email = 3;
+}

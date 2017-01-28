@@ -86,6 +86,7 @@ public:
 	bool doesForgotPasswordExist(const QString &user);
 	bool updateUserToken(const QString &token, const QString &user);
 	bool validateUserToken(const QString &token, const QString &user);
+	bool validateUserEmail(const QString &email, const QString &user);
 };
 
 #endif

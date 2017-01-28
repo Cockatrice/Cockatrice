@@ -75,7 +75,7 @@ private slots:
 	void forgotPasswordError();
 	void promptForgotPasswordReset();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-
+	void promptForgotPasswordChallenge();
     void showWindowIfHidden();
 
     void actCheckCardUpdates();

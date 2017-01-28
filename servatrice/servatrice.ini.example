@@ -155,6 +155,11 @@ disallowedregexp=""
 ; Default: 60
 ; tokenlife=60
 
+; Servatrice can challenge users that are making forgot password requests to answer
+; questions in regards to their account to help validate they are the true owner of the account.
+; Should this feature be enabled? Default: false
+; enablechallenge=false
+
 [smtp]
 
 ; Enable the internal smtp client to send registration emails.  If you would like to
