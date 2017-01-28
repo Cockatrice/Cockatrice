@@ -1140,7 +1140,7 @@ bool Servatrice_DatabaseInterface::addForgotPassword(const QString &user)
 	if (!updateUserToken(PasswordHasher::generateActivationToken(), user))
 		return false;
 
-	QSqlQuery *query = prepareQuery("insert into {prefix}_password_reset (user_name,requestDate) values (:username,NOW())");
+	QSqlQuery *query = prepareQuery("insert into {prefix}_forgot_password (name,requestDate) values (:username,NOW())");
 	query->bindValue(":username", user);
 	if (execSqlQuery(query))
 		return true;
@@ -1153,7 +1153,7 @@ bool Servatrice_DatabaseInterface::removeForgotPassword(const QString &user)
 	if (!checkSql())
 		return false;
 
-	QSqlQuery *query = prepareQuery("delete from {prefix}_password_reset where user_name = :username");
+	QSqlQuery *query = prepareQuery("delete from {prefix}_forgot_password where name = :username");
 	query->bindValue(":username", user);
 	if (execSqlQuery(query))
 		return true;
@@ -1166,7 +1166,7 @@ bool Servatrice_DatabaseInterface::doesForgotPasswordExist(const QString &user)
 	if (!checkSql())
 		return false;
 
-	QSqlQuery *query = prepareQuery("select count(user_name) from {prefix}_password_reset where user_name = :user_name AND requestDate > (now() - interval :minutes minute)");
+	QSqlQuery *query = prepareQuery("select count(name) from {prefix}_forgot_password where name = :user_name AND requestDate > (now() - interval :minutes minute)");
 	query->bindValue(":user_name", user);
 	query->bindValue(":minutes", QString::number(server->getForgotPasswordTokenLife()));
 
@@ -1174,7 +1174,7 @@ bool Servatrice_DatabaseInterface::doesForgotPasswordExist(const QString &user)
 		return false;
 
 	if (query->next())
-		if (query->value("count(user_name)").toInt() > 0)
+		if (query->value("count(name)").toInt() > 0)
 			return true;
 
 	return false;

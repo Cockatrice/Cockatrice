@@ -566,9 +566,31 @@ void Servatrice::statusUpdate()
                 servatriceDatabaseInterface->execSqlQuery(queryDelete);
             }
         }
-
-        smtpClient->sendAllEmails();
+		smtpClient->sendAllEmails();
     }
+
+	// send forgot password emails
+	if (getEnableForgotPassword() && getEnableInternalSMTPClient())
+	{
+		QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_forgot_password a left join {prefix}_users b on a.name = b.name where a.emailed = 0");
+		if (!servatriceDatabaseInterface->execSqlQuery(query))
+			return;
+
+		QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("update {prefix}_forgot_password set emailed = 1 where name = :name");
+
+		while (query->next()) {
+			const QString userName = query->value(0).toString();
+			const QString emailAddress = query->value(1).toString();
+			const QString token = query->value(2).toString();
+
+			if (smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token))
+			{
+				queryDelete->bindValue(":name", userName);
+				servatriceDatabaseInterface->execSqlQuery(queryDelete);
+			}
+		}
+		smtpClient->sendAllEmails();
+	}
 }
 
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)
