@@ -1087,15 +1087,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
 
 	if (!sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name())))
 		return Response::RespFunctionNotAllowed;
-	qDebug() << "USER HAS BEEN FLAGGED";
-	if (!sqlInterface->validateUserToken(QString::fromStdString(cmd.token()), QString::fromStdString(cmd.new_password())))
+
+	if (!sqlInterface->validateUserToken(QString::fromStdString(cmd.token()), QString::fromStdString(cmd.user_name())))
 		return Response::RespFunctionNotAllowed;
-	qDebug() << "VALIDATED TOKEN";
+
 	if (sqlInterface->changeUserPassword(QString::fromStdString(cmd.user_name()), "", QString::fromStdString(cmd.new_password()), true)) {
+		sqlInterface->removeForgotPassword(QString::fromStdString(cmd.user_name()));
 		return Response::RespOk;
 	}
-	else
-		qDebug() << "FAILED TO RESET PASSWORD";
 
 	return Response::RespFunctionNotAllowed;
 }

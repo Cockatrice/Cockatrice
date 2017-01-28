@@ -1202,17 +1202,18 @@ bool Servatrice_DatabaseInterface::validateUserToken(const QString &token, const
 {
 	if (!checkSql())
 		return false;
+	
+	if (token.isEmpty() || user.isEmpty())
+		return false;
 
 	QSqlQuery *query = prepareQuery("select token from {prefix}_users where name = :user_name");
 	query->bindValue(":user_name", user);
 
-	if (!execSqlQuery(query)) {
-		qDebug() << "Failed to locate query users token in database: SQL ERROR";
+	if (!execSqlQuery(query))
 		return false;
-	}
 
 	if (query->next())
-		if (query->value(0).toString() == token)
+		if (query->value("token").toString() == token)
 			return true;
 
 	return false;
