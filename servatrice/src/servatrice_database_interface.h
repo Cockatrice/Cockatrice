@@ -85,8 +85,7 @@ public:
 	bool removeForgotPassword(const QString &user);
 	bool doesForgotPasswordExist(const QString &user);
 	bool updateUserToken(const QString &token, const QString &user);
-	bool validateUserToken(const QString &token, const QString &user);
-	bool validateUserEmail(const QString &email, const QString &user);
+	bool validateTableColumnStringData(const QString &table, const QString &column, const QString &_user, const QString &_datatocheck);
 };
 
 #endif

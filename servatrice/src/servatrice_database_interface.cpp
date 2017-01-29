@@ -1197,43 +1197,23 @@ bool Servatrice_DatabaseInterface::updateUserToken(const QString & token, const 
 	return false;
 }
 
-bool Servatrice_DatabaseInterface::validateUserToken(const QString &token, const QString &user)
+bool Servatrice_DatabaseInterface::validateTableColumnStringData(const QString &table, const QString &column, const QString &_user, const QString &_datatocheck)
 {
 	if (!checkSql())
 		return false;
-	
-	if (token.isEmpty() || user.isEmpty())
+
+	if (table.isEmpty() || column.isEmpty() ||_user.isEmpty() || _datatocheck.isEmpty())
 		return false;
 
-	QSqlQuery *query = prepareQuery("select token from {prefix}_users where name = :user_name");
-	query->bindValue(":user_name", user);
+	QString formatedQuery = QString("select %1 from %2 where name = :user_name").arg(column).arg(table);
+	QSqlQuery *query = prepareQuery(formatedQuery);
+	query->bindValue(":user_name", _user);
 
 	if (!execSqlQuery(query))
 		return false;
 
 	if (query->next())
-		if (query->value("token").toString() == token)
-			return true;
-
-	return false;
-}
-
-bool Servatrice_DatabaseInterface::validateUserEmail(const QString &email, const QString &user)
-{
-	if (!checkSql())
-		return false;
-
-	if (email.isEmpty() || user.isEmpty())
-		return false;
-
-	QSqlQuery *query = prepareQuery("select email from {prefix}_users where name = :user_name");
-	query->bindValue(":user_name", user);
-
-	if (!execSqlQuery(query))
-		return false;
-
-	if (query->next())
-		if (query->value("email").toString() == email)
+		if (query->value(column).toString() == _datatocheck)
 			return true;
 
 	return false;

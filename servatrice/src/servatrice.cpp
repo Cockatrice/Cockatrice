@@ -252,7 +252,7 @@ bool Servatrice::initServer()
 
 	qDebug() << "Forgot password enabled: " << getEnableForgotPassword();
 	if (getEnableForgotPassword()) {
-		qDebug() << "Forgot password token life: " << getForgotPasswordTokenLife();
+		qDebug() << "Forgot password token life (in minutes): " << getForgotPasswordTokenLife();
 		qDebug() << "Forgot password challenge on: " << getEnableForgotPasswordChallenge();
 	}
 
