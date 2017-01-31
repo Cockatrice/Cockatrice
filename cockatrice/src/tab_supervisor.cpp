@@ -587,6 +587,20 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
                 QMessageBox::warning(this, tr("Warned"), tr("You have received a warning due to %1.\nPlease refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.").arg(QString::fromStdString(event.warning_reason()).simplified()));
             break;
         }
+		case Event_NotifyUser::CUSTOM: {
+			if (!QString::fromStdString(event.custom_title()).simplified().isEmpty() && !QString::fromStdString(event.custom_content()).simplified().isEmpty()) {
+				QMessageBox msgBox;
+				msgBox.setParent(this);
+				msgBox.setWindowFlags(Qt::Dialog);
+				msgBox.setIcon(QMessageBox::Information);
+				msgBox.setWindowTitle(QString::fromStdString(event.custom_title()).simplified());
+				msgBox.setText(tr("You have received the following message from the server.\n(custom messages like these could be untranslated)"));
+				msgBox.setDetailedText(QString::fromStdString(event.custom_content()).simplified());
+				msgBox.setMinimumWidth(200);
+				msgBox.exec();
+			}
+			break;
+		}
         default: ;
     }
 
