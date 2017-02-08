@@ -240,6 +240,8 @@ bool Servatrice::initServer()
     qDebug() << "Accept registered users only: " << getRegOnlyServerEnabled();
     qDebug() << "Registration enabled: " << getRegistrationEnabled();
     if (getRegistrationEnabled()) {
+        QStringList emailBlackListFilters = getEmailBlackList().split(",", QString::SkipEmptyParts);
+        qDebug() << "Email blacklist: " << emailBlackListFilters;
         qDebug() << "Require email address to register: " << getRequireEmailForRegistrationEnabled();
         qDebug() << "Require email activation via token: " << getRequireEmailActivationEnabled();
         if (getMaxAccountsPerEmail()) { qDebug() << "Maximum number of accounts per email: " << getMaxAccountsPerEmail(); } else { qDebug() << "Maximum number of accounts per email: unlimited"; }
@@ -885,4 +887,8 @@ int Servatrice::getForgotPasswordTokenLife() const {
 
 bool Servatrice::getEnableForgotPasswordChallenge() const {
 	return settingsCache->value("forgotpassword/enablechallenge", false).toBool();
+}
+  
+QString Servatrice::getEmailBlackList() const {
+    return settingsCache->value("registration/emailproviderblacklist").toString();
 }

@@ -884,7 +884,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     if (!registrationEnabled)
         return Response::RespRegistrationDisabled;
 
+    QString emailBlackList = servatrice->getEmailBlackList();
     QString emailAddress = QString::fromStdString(cmd.email());
+    QStringList emailBlackListFilters = emailBlackList.split(",", QString::SkipEmptyParts);
+
+    // verify that users email/provider is not blacklisted
+    if (!emailBlackList.trimmed().isEmpty()) {
+        foreach(QString blackListEmailAddress, emailBlackListFilters) {
+            if (emailAddress.contains(blackListEmailAddress, Qt::CaseInsensitive)) {
+                return Response::RespEmailBlackListed;
+            }
+        }
+    }
+
     bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
     if (requireEmailForRegistration)
     {
