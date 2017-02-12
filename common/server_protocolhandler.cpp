@@ -507,7 +507,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     }
 
     joinPersistentGames(rc);
-	databaseInterface->removeForgotPassword(userName);
+    databaseInterface->removeForgotPassword(userName);
     rc.setResponseExtension(re);
     return Response::RespOk;
 }
