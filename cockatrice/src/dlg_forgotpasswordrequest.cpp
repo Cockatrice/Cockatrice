@@ -13,16 +13,16 @@ DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent)
     : QDialog(parent)
 {
 
-	QString lastfphost; QString lastfpport; QString lastfpplayername;
-	lastfphost = settingsCache->servers().getHostname("cockatrice.woogerworks.com");
-	lastfpport = settingsCache->servers().getPort("4747");
-	lastfpplayername = settingsCache->servers().getPlayerName("Player");
+    QString lastfphost; QString lastfpport; QString lastfpplayername;
+    lastfphost = settingsCache->servers().getHostname("cockatrice.woogerworks.com");
+    lastfpport = settingsCache->servers().getPort("4747");
+    lastfpplayername = settingsCache->servers().getPlayerName("Player");
 
-	if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() && !settingsCache->servers().getFPPlayerName().isEmpty()) {
-		lastfphost = settingsCache->servers().getFPHostname();
-		lastfpport = settingsCache->servers().getFPPort();
-		lastfpplayername = settingsCache->servers().getFPPlayerName();
-	}
+    if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() && !settingsCache->servers().getFPPlayerName().isEmpty()) {
+        lastfphost = settingsCache->servers().getFPHostname();
+        lastfpport = settingsCache->servers().getFPPort();
+        lastfpplayername = settingsCache->servers().getFPPlayerName();
+    }
 
     hostLabel = new QLabel(tr("&Host:"));
     hostEdit = new QLineEdit(lastfphost);
