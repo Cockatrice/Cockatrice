@@ -70,16 +70,16 @@ DlgConnect::DlgConnect(QWidget *parent)
 
     connect(savePasswordCheckBox, SIGNAL(stateChanged(int)), this, SLOT(passwordSaved(int)));
 
-	btnForgotPassword = new QPushButton(tr("Forgot password"));
-	connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
+    btnForgotPassword = new QPushButton(tr("Forgot password"));
+    connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
 
-	btnOk = new QPushButton(tr("Connect"));
-	btnOk->setFixedWidth(100);
-	connect(btnOk, SIGNAL(released()), this, SLOT(actOk()));
+    btnOk = new QPushButton(tr("Connect"));
+    btnOk->setFixedWidth(100);
+    connect(btnOk, SIGNAL(released()), this, SLOT(actOk()));
 
-	btnCancel = new QPushButton(tr("Cancel"));
-	btnCancel->setFixedWidth(100);
-	connect(btnCancel, SIGNAL(released()), this, SLOT(actCancel()));
+    btnCancel = new QPushButton(tr("Cancel"));
+    btnCancel->setFixedWidth(100);
+    connect(btnCancel, SIGNAL(released()), this, SLOT(actCancel()));
 
     QGridLayout *connectionLayout = new QGridLayout;
     connectionLayout->addWidget(previousHostButton, 0, 1);
@@ -91,10 +91,10 @@ DlgConnect::DlgConnect(QWidget *parent)
     connectionLayout->addWidget(portEdit, 4, 1);
     connectionLayout->addWidget(autoConnectCheckBox, 5, 1);
 
-	QGridLayout *buttons = new QGridLayout;
-	buttons->addWidget(btnOk, 0, 0);
-	buttons->addWidget(btnForgotPassword, 0, 1);
-	buttons->addWidget(btnCancel, 0, 2);
+    QGridLayout *buttons = new QGridLayout;
+    buttons->addWidget(btnOk, 0, 0);
+    buttons->addWidget(btnForgotPassword, 0, 1);
+    buttons->addWidget(btnCancel, 0, 2);
 
     QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Server"));
     restrictionsGroupBox->setLayout(connectionLayout);
@@ -109,13 +109,13 @@ DlgConnect::DlgConnect(QWidget *parent)
     QGroupBox *loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
 
-	QGroupBox *btnGroupBox = new QGroupBox(tr(""));
-	btnGroupBox->setLayout(buttons);
+    QGroupBox *btnGroupBox = new QGroupBox(tr(""));
+    btnGroupBox->setLayout(buttons);
 
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
     grid->addWidget(loginGroupBox, 1, 0);
-	grid->addWidget(btnGroupBox, 2, 0);
+    grid->addWidget(btnGroupBox, 2, 0);
          
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -223,5 +223,5 @@ bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *o
 
 void DlgConnect::actForgotPassword()
 {
-	emit sigStartForgotPasswordRequest();
+    emit sigStartForgotPasswordRequest();
 }

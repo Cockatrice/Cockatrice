@@ -1110,9 +1110,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
 	if (!sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name())))
 		return Response::RespFunctionNotAllowed;
 
-	// if (!sqlInterface->validateUserToken(QString::fromStdString(cmd.token()), QString::fromStdString(cmd.user_name())))
-	//	return Response::RespFunctionNotAllowed;
-
 	if (!sqlInterface->validateTableColumnStringData("{prefix}_users","token", QString::fromStdString(cmd.user_name()),QString::fromStdString(cmd.token())))
 		return Response::RespFunctionNotAllowed;
 
@@ -1131,10 +1128,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordChallenge
 
 	if (sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name())))
 		return Response::RespOk;
-
-	//if (sqlInterface->validateUserEmail(QString::fromStdString(cmd.email()), QString::fromStdString(cmd.user_name())))
-	//	if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name())))
-	//		return Response::RespOk;
 
 	if (sqlInterface->validateTableColumnStringData("{prefix}_users","email", QString::fromStdString(cmd.user_name()), QString::fromStdString(cmd.email())))
 		if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name())))

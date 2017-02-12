@@ -548,7 +548,6 @@ void Servatrice::statusUpdate()
     query->bindValue(":rx", rx);
     servatriceDatabaseInterface->execSqlQuery(query);
 
-    // send activation emails
     if (getRegistrationEnabled() && getEnableInternalSMTPClient())
     {
 		if (getRequireEmailActivationEnabled())

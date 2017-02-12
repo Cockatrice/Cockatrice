@@ -21,7 +21,7 @@ protected:
 class DlgConnect : public QDialog {
     Q_OBJECT
 signals :
-	void sigStartForgotPasswordRequest();
+    void sigStartForgotPasswordRequest();
 public:
     DlgConnect(QWidget *parent = 0);
     QString getHost() const;
@@ -34,14 +34,14 @@ private slots:
     void passwordSaved(int state);
     void previousHostSelected(bool state);
     void newHostSelected(bool state);
-	void actForgotPassword();
+    void actForgotPassword();
 private:
     QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel;
     QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit;
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;
     QRadioButton *newHostButton, *previousHostButton;
-	QPushButton *btnOk, *btnCancel, *btnForgotPassword;
+    QPushButton *btnOk, *btnCancel, *btnForgotPassword;
 };
 
 #endif
