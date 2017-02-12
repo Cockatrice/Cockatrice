@@ -84,50 +84,50 @@ bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QStri
 
 bool SmtpClient::enqueueForgotPasswordTokenMail(const QString &nickname, const QString &recipient, const QString &token)
 {
-	QString email = settingsCache->value("forgotpassword/email", "").toString();
-	QString name = settingsCache->value("forgotpassword/name", "").toString();
-	QString subject = settingsCache->value("forgotpassword/subject", "").toString();
-	QString body = settingsCache->value("forgotpassword/body", "").toString();
+    QString email = settingsCache->value("forgotpassword/email", "").toString();
+    QString name = settingsCache->value("forgotpassword/name", "").toString();
+    QString subject = settingsCache->value("forgotpassword/subject", "").toString();
+    QString body = settingsCache->value("forgotpassword/body", "").toString();
 
-	if (email.isEmpty())
-	{
-		qDebug() << "[MAIL] Missing sender email in configuration";
-		return false;
-	}
+    if (email.isEmpty())
+    {
+        qDebug() << "[MAIL] Missing sender email in configuration";
+        return false;
+    }
 
-	if (subject.isEmpty())
-	{
-		qDebug() << "[MAIL] Missing subject field in configuration";
-		return false;
-	}
+    if (subject.isEmpty())
+    {
+        qDebug() << "[MAIL] Missing subject field in configuration";
+        return false;
+    }
 
-	if (body.isEmpty())
-	{
-		qDebug() << "[MAIL] Missing body field in configuration";
-		return false;
-	}
+    if (body.isEmpty())
+    {
+        qDebug() << "[MAIL] Missing body field in configuration";
+        return false;
+    }
 
-	if (recipient.isEmpty())
-	{
-		qDebug() << "[MAIL] Missing recipient field for user " << nickname;
-		return false;
-	}
+    if (recipient.isEmpty())
+    {
+        qDebug() << "[MAIL] Missing recipient field for user " << nickname;
+        return false;
+    }
 
-	if (token.isEmpty())
-	{
-		qDebug() << "[MAIL] Missing token field for user " << nickname;
-		return false;
-	}
+    if (token.isEmpty())
+    {
+        qDebug() << "[MAIL] Missing token field for user " << nickname;
+        return false;
+    }
 
-	QxtMailMessage message;
-	message.setSender(name + " <" + email + ">");
-	message.addRecipient(recipient);
-	message.setSubject(subject);
-	message.setBody(body.replace("%username", nickname).replace("%token", token));
+    QxtMailMessage message;
+    message.setSender(name + " <" + email + ">");
+    message.addRecipient(recipient);
+    message.setSubject(subject);
+    message.setBody(body.replace("%username", nickname).replace("%token", token));
 
-	int id = smtp->send(message);
-	qDebug() << "[MAIL] Enqueued mail to" << recipient << "as" << id;
-	return true;
+    int id = smtp->send(message);
+    qDebug() << "[MAIL] Enqueued mail to" << recipient << "as" << id;
+    return true;
 }
 
 void SmtpClient::sendAllEmails()

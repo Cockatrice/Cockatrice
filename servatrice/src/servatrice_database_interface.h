@@ -81,11 +81,11 @@ public:
     bool addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID);
     QList<ServerInfo_Warning> getUserWarnHistory(const QString userName);
     QList<ServerInfo_ChatMessage> getMessageLogHistory(const QString &user, const QString &ipaddress, const QString &gamename, const QString &gameid, const QString &message, bool &chat, bool &game, bool &room, int &range, int &maxresults);
-	bool addForgotPassword(const QString &user);
-	bool removeForgotPassword(const QString &user);
-	bool doesForgotPasswordExist(const QString &user);
-	bool updateUserToken(const QString &token, const QString &user);
-	bool validateTableColumnStringData(const QString &table, const QString &column, const QString &_user, const QString &_datatocheck);
+    bool addForgotPassword(const QString &user);
+    bool removeForgotPassword(const QString &user);
+    bool doesForgotPasswordExist(const QString &user);
+    bool updateUserToken(const QString &token, const QString &user);
+    bool validateTableColumnStringData(const QString &table, const QString &column, const QString &_user, const QString &_datatocheck);
 };
 
 #endif
