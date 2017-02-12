@@ -154,7 +154,7 @@ disallowedregexp=""
 [forgotpassword]
 
 ; Servatrice can process forgot password requests allowing users to reset their account
-; passwords in the event they forget it.  Should this feature be enabld? Default: false.
+; passwords in the event they forget it.  Should this feature be enabled? Default: false.
 ; enable=false
 
 ; Forgot password request should not be allowed to stay valid forever.  This settings
@@ -168,12 +168,12 @@ disallowedregexp=""
 ; enablechallenge=false
 
 ; Email subject for the forgot password emails
-subject="Cockatrice forgot password token"
+; subject="Cockatrice forgot password token"
 
 ; Forgot password email body. You can use these tags here: %username %token
 ; They will be substituted with the actual values in the email
 ;
-body="Hi %username, sorry to hear you forgot your password on our Cockatrice server\r\nHere's the token to use to reset your account password:\r\n\r\n%token\r\n\r\nHappy gaming!"
+; body="Hi %username, sorry to hear you forgot your password on our Cockatrice server\r\nHere's the token to use to reset your account password:\r\n\r\n%token\r\n\r\nHappy gaming!"
 
 
 [smtp]
