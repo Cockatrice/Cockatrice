@@ -84,8 +84,8 @@ bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QStri
 
 bool SmtpClient::enqueueForgotPasswordTokenMail(const QString &nickname, const QString &recipient, const QString &token)
 {
-    QString email = settingsCache->value("forgotpassword/email", "").toString();
-    QString name = settingsCache->value("forgotpassword/name", "").toString();
+    QString email = settingsCache->value("smtp/email", "").toString();
+    QString name = settingsCache->value("smtp/name", "").toString();
     QString subject = settingsCache->value("forgotpassword/subject", "").toString();
     QString body = settingsCache->value("forgotpassword/body", "").toString();
 
