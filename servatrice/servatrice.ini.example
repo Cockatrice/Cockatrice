@@ -141,8 +141,8 @@ disallowedregexp=""
 ;requireemailactivation=true
 
 ; Set this number to the maximum number of accounts any one user can use to create new accounts
-; using the same email address. 0 = Unlimited number of accounts (default).
-;maxaccountsperemail=0 
+; using the same email address or clientid. 0 = Unlimited number of accounts (default).
+;maxaccountsperuser=0 
 
 ; You can prevent users from using certain mail domains for registration.  This setting contains a
 ; comma-seperated list of email provider domains that you would like to prevent users from using

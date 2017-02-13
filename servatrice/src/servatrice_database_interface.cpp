@@ -1110,21 +1110,45 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
     return results;
 }
 
-int Servatrice_DatabaseInterface::checkNumberOfUserAccounts(const QString &email)
+int Servatrice_DatabaseInterface::checkNumberOfUserAccounts(const QString &email, const QString &clientid)
 {
     if (!checkSql())
         return 0;
+	
+	int emailAccountCount = 0;
+	int clientIDAccountCount = 0;
 
-    QSqlQuery *query = prepareQuery("SELECT count(email) FROM {prefix}_users WHERE email = :user_email");
-    query->bindValue(":user_email", email);
+	if (email != "") {
+		QSqlQuery *query = prepareQuery("SELECT count(email) FROM {prefix}_users WHERE email = :user_email");
+		query->bindValue(":user_email", email);
 
-    if (!execSqlQuery(query)) {
-        qDebug("Failed to identify the number of users accounts for users email address: SQL Error");
-        return 0;
-    }
+		if (!execSqlQuery(query)) {
+			qDebug("Failed to identify the number of users accounts for users email address: SQL Error");
+			return 0;
+		}
 
-    if (query->next())
-        return query->value(0).toInt();
+		if (query->next())
+			emailAccountCount = query->value(0).toInt();
+	}
+
+	if (clientid != "") {
+		QSqlQuery *query = prepareQuery("SELECT count(clientid) FROM {prefix}_users WHERE clientid = :clientid");
+		query->bindValue(":clientid", clientid);
+
+		if (!execSqlQuery(query)) {
+			qDebug("Failed to identify the number of users accounts for users client id: SQL Error");
+			return 0;
+		}
+
+		if (query->next())
+			clientIDAccountCount = query->value(0).toInt();
+	}
+
+	if (emailAccountCount > clientIDAccountCount) {
+		return emailAccountCount;
+	} else {
+		return clientIDAccountCount;
+	}
 
     return 0;
 }

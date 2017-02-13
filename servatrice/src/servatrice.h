@@ -208,7 +208,7 @@ public:
     int getMaxTcpUserLimit() const;
     int getMaxWebSocketUserLimit() const;
     int getUsersWithAddress(const QHostAddress &address) const;
-    int getMaxAccountsPerEmail() const;
+    int getMaxAccountsPerUser() const;
     QList<AbstractServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
     void incTxBytes(quint64 num);
     void incRxBytes(quint64 num);
