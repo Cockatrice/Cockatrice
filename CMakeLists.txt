@@ -77,12 +77,12 @@ endif()
 
 # Define proper compilation flags
 IF(MSVC)
-	# Visual Studio:
+    # Visual Studio:
     # Support from Windows XP
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS,5.01")
-	# Maximum optimization
+    # Maximum optimization
     set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
-	# Generate complete debugging information
+    # Generate complete debugging information
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
     # linux/gcc, bsd/gcc, windows/mingw
@@ -176,9 +176,9 @@ if(UNIX)
         # linux
         set(CPACK_GENERATOR DEB ${CPACK_GENERATOR})
         set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
-    	set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-    	set(CPACK_DEBIAN_PACKAGE_SECTION "games")
-    	set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+        set(CPACK_DEBIAN_PACKAGE_SECTION "games")
+        set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
         set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
     endif()
 elseif(WIN32)

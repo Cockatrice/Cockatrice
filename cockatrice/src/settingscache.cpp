@@ -63,6 +63,9 @@ void SettingsCache::translateLegacySettings()
     servers().setPassword(legacySetting.value("password").toString());
     servers().setSavePassword(legacySetting.value("save_password").toInt());
     servers().setAutoConnect(legacySetting.value("auto_connect").toInt());
+    servers().setFPHostName(legacySetting.value("fphostname").toString());
+    servers().setFPPort(legacySetting.value("fpport").toString());
+    servers().setFPPlayerName(legacySetting.value("fpplayername").toString());
     usedKeys.append(legacySetting.allKeys());
     QStringList allKeysServer = legacySetting.allKeys();
     for (int i = 0; i < allKeysServer.size(); ++i) {
