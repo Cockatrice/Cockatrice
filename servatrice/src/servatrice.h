@@ -180,6 +180,7 @@ public:
     QString getAuthenticationMethodString() const;
     QString getDBTypeString() const;
     QString getDbPrefix() const { return dbPrefix; }
+    QString getEmailBlackList() const;
     AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
     bool permitUnregisteredUsers() const { return authenticationMethod != AuthenticationNone; }
     bool getGameShouldPing() const { return true; }
