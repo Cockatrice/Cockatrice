@@ -100,3 +100,36 @@ int ServersSettings::getAutoConnect()
     QVariant autoconnect = getValue("auto_connect", "server");
     return autoconnect == QVariant() ? 0 : autoconnect.toInt();
 }
+
+void ServersSettings::setFPHostName(QString hostname)
+{
+    setValue(hostname, "fphostname", "server");
+}
+
+QString ServersSettings::getFPHostname(QString defaultHost)
+{
+    QVariant hostname = getValue("fphostname", "server");
+    return hostname == QVariant() ? defaultHost : hostname.toString();
+}
+
+void ServersSettings::setFPPort(QString port)
+{
+    setValue(port, "fpport", "server");
+}
+
+QString ServersSettings::getFPPort(QString defaultPort)
+{
+    QVariant port = getValue("fpport", "server");
+    return port == QVariant() ? defaultPort : port.toString();
+}
+
+void ServersSettings::setFPPlayerName(QString playerName)
+{
+    setValue(playerName, "fpplayername", "server");
+}
+
+QString ServersSettings::getFPPlayerName(QString defaultName)
+{
+    QVariant name = getValue("fpplayername", "server");
+    return name == QVariant() ? defaultName : name.toString();
+}
