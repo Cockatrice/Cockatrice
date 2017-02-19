@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
-INSERT INTO cockatrice_schema_version VALUES(20);
+INSERT INTO cockatrice_schema_version VALUES(21);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -258,3 +258,12 @@ CREATE TABLE IF NOT EXISTS `cockatrice_donations` (
   `pp_type` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_forgot_password` (
+  `id` int(7) unsigned zerofill NOT NULL auto_increment,
+  `name` varchar(35) NOT NULL,
+  `requestDate` datetime NOT NULL default '0000-00-00 00:00:00',
+  `emailed` tinyint(1) NOT NULL default 0,
+  PRIMARY KEY  (`id`),
+  KEY `user_name` (`name`)
+) ENGINE=INNODB  DEFAULT CHARSET=utf8;

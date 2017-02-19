@@ -119,6 +119,7 @@ SET(PROTO_FILES
     response_deck_list.proto
     response_deck_upload.proto
     response_dump_zone.proto
+    response_forgotpasswordrequest.proto
     response_get_games_of_user.proto
     response_get_user_info.proto
     response_join_room.proto

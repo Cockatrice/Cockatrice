@@ -16,6 +16,9 @@ public:
     QString getHostname(QString defaultHost = "");
     QString getPort(QString defaultPort = "");
     QString getPlayerName(QString defaultName = "");
+    QString getFPHostname(QString defaultHost = "");
+    QString getFPPort(QString defaultPort = "");
+    QString getFPPlayerName(QString defaultName = "");
     QString getPassword();
     int getSavePassword();
     int getAutoConnect();
@@ -29,6 +32,9 @@ public:
     void setPassword(QString password);
     void setSavePassword(int save);
     void setAutoConnect(int autoconnect);
+    void setFPHostName(QString hostname);
+    void setFPPort(QString port);
+    void setFPPlayerName(QString playerName);
 signals:
 
 public slots:

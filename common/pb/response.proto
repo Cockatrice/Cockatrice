@@ -39,6 +39,7 @@ message Response {
         RespClientIdRequired = 34; // Server requires client to generate and send its client id before allowing access
         RespClientUpdateRequired = 35; // Client is missing features that the server is requiring
         RespServerFull = 36; // Server user limit reached
+        RespEmailBlackListed = 37; // Server has blacklisted the email address provided for registration
     }
     enum ResponseType {
         JOIN_ROOM = 1000;
@@ -57,6 +58,7 @@ message Response {
         WARN_HISTORY = 1013;
         WARN_LIST = 1014;
         VIEW_LOG = 1015;
+        FORGOT_PASSWORD_REQUEST = 1016;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
     }
