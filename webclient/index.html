@@ -197,17 +197,6 @@ Loading cockatrice web client...
           return "Unregistered user";
     }
 
-    function decodeGender(id) {
-      var genders = WebClient.pb.ServerInfo_User.Gender;
-      for(var key in genders)
-      {
-          if(id == genders[key])
-            return key;
-      }
-
-      return "Unknown";
-    }
-
     $("#loginnow").click(connect);
     $("#port, #user, #pass").keydown(function(e) {
         if (e.keyCode == 13) { connect(); }
@@ -299,9 +288,22 @@ Loading cockatrice web client...
                 case 'userLevel':
                   $('#userinfo').append('User level: ' + decodeUserLevel(value) + '<br/>');
                   break;
-                case 'gender':
-                  $('#userinfo').append('Gender: ' + decodeGender(value) + '<br/>');
-                  break;                  
+                case 'name':
+                  $('#userinfo').append('Name: ' + value + '<br/>');
+                  break;
+                case 'realName':
+                  $('#userinfo').append('Real name: ' + value + '<br/>');
+                  break;
+                case 'country':
+                  $('#userinfo').append('Country: ' + value + '<br/>');
+                  break;
+                case 'privlevel':
+                  $('#userinfo').append('Privilege: ' + value + '<br/>');
+                  break;
+                case 'id':
+                case 'serverId':
+                  // don't output these fields
+                  break;
                 default:
                   $('#userinfo').append(key + ': ' + value + '<br/>');
                   break;
