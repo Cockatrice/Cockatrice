@@ -22,6 +22,13 @@ signals:
     void sigActivateToServer(const QString &_token);
     void sigDisconnectFromServer();
     void notifyUserAboutUpdate();
+    void sigRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
+    void sigForgotPasswordSuccess();
+    void sigForgotPasswordError();
+    void sigPromptForForgotPasswordReset();
+    void sigSubmitForgotPasswordResetToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_token, const QString &_newpassword);
+    void sigPromptForForgotPasswordChallenge();
+    void sigSubmitForgotPasswordChallengeToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_email);
 private slots:
     void slotConnected();
     void readData();
@@ -37,7 +44,12 @@ private slots:
     void doLogin();
     void doDisconnectFromServer();
     void doActivateToServer(const QString &_token);
-
+    void doRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
+    void requestForgotPasswordResponse(const Response &response);
+    void doSubmitForgotPasswordResetToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_token, const QString &_newpassword);
+    void submitForgotPasswordResetResponse(const Response &response);
+    void doSubmitForgotPasswordChallengeToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_email);
+    void submitForgotPasswordChallengeResponse(const Response &response);
 private:
     static const int maxTimeout = 10;
     int timeRunning, lastDataReceived;
@@ -64,6 +76,9 @@ public:
     void registerToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password, const QString &_email, const int _gender, const QString &_country, const QString &_realname);
     void activateToServer(const QString &_token);
     void disconnectFromServer();
+    void requestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
+    void submitForgotPasswordResetToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_token, const QString &_newpassword);
+    void submitForgotPasswordChallengeToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_email);
 };
 
 #endif

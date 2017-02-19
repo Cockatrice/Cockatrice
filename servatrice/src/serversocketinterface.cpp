@@ -62,6 +62,7 @@
 #include "pb/response_warn_history.pb.h"
 #include "pb/response_warn_list.pb.h"
 #include "pb/response_viewlog_history.pb.h"
+#include "pb/response_forgotpasswordrequest.pb.h"
 #include "pb/serverinfo_replay.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
@@ -150,7 +151,9 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
         case SessionCommand::REPLAY_DELETE_MATCH: return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
         case SessionCommand::REGISTER: return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc); break;
         case SessionCommand::ACTIVATE: return cmdActivateAccount(cmd.GetExtension(Command_Activate::ext), rc); break;
-
+        case SessionCommand::FORGOT_PASSWORD_REQUEST: return cmdForgotPasswordRequest(cmd.GetExtension(Command_ForgotPasswordRequest::ext), rc); break;
+        case SessionCommand::FORGOT_PASSWORD_RESET: return cmdForgotPasswordReset(cmd.GetExtension(Command_ForgotPasswordReset::ext), rc); break;
+        case SessionCommand::FORGOT_PASSWORD_CHALLENGE: return cmdForgotPasswordChallenge(cmd.GetExtension(Command_ForgotPasswordChallenge::ext), rc); break;
         case SessionCommand::ACCOUNT_EDIT: return cmdAccountEdit(cmd.GetExtension(Command_AccountEdit::ext), rc);
         case SessionCommand::ACCOUNT_IMAGE: return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD: return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
@@ -1054,13 +1057,85 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
 
     QString userName = QString::fromStdString(userInfo->name());
 
-    bool changeFailed = databaseInterface->changeUserPassword(userName, oldPassword, newPassword);
-
-    if(changeFailed)
+    if(!databaseInterface->changeUserPassword(userName, oldPassword, newPassword, false))
         return Response::RespWrongPassword;
     
     return Response::RespOk;
 }
+
+Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(const Command_ForgotPasswordRequest &cmd, ResponseContainer &rc)
+{
+    qDebug() << "Received forgot password request from user: " << QString::fromStdString(cmd.user_name());
+
+    if (!servatrice->getEnableForgotPassword())
+        return Response::RespFunctionNotAllowed;
+
+    if (!sqlInterface->userExists(QString::fromStdString(cmd.user_name())))
+        return Response::RespFunctionNotAllowed;
+
+    if (sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name()))) {
+        Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
+        re->set_challenge_email(false);
+        rc.setResponseExtension(re);
+        return Response::RespOk;
+    }
+
+    QString banReason; int banTimeRemaining;
+    if (sqlInterface->checkUserIsBanned(this->getAddress(), QString::fromStdString(cmd.user_name()), QString::fromStdString(cmd.clientid()), banReason, banTimeRemaining))
+        return Response::RespFunctionNotAllowed;
+
+    if (servatrice->getEnableForgotPasswordChallenge()) {
+        Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
+        re->set_challenge_email(true);
+        rc.setResponseExtension(re);
+        return Response::RespOk;
+    }
+    else {
+        if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name()))) {
+            Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
+            re->set_challenge_email(false);
+            rc.setResponseExtension(re);
+            return Response::RespOk;
+        }
+    }
+
+    return Response::RespFunctionNotAllowed;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(const Command_ForgotPasswordReset &cmd, ResponseContainer &rc)
+{
+    Q_UNUSED(rc);
+    qDebug() << "Received forgot password reset from user: " << QString::fromStdString(cmd.user_name());
+
+    if (!sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name())))
+        return Response::RespFunctionNotAllowed;
+
+    if (!sqlInterface->validateTableColumnStringData("{prefix}_users","token", QString::fromStdString(cmd.user_name()),QString::fromStdString(cmd.token())))
+        return Response::RespFunctionNotAllowed;
+
+    if (sqlInterface->changeUserPassword(QString::fromStdString(cmd.user_name()), "", QString::fromStdString(cmd.new_password()), true)) {
+        sqlInterface->removeForgotPassword(QString::fromStdString(cmd.user_name()));
+        return Response::RespOk;
+    }
+
+    return Response::RespFunctionNotAllowed;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd, ResponseContainer &rc)
+{
+    Q_UNUSED(rc);
+    qDebug() << "Received forgot password challenge from user: " << QString::fromStdString(cmd.user_name());
+
+    if (sqlInterface->doesForgotPasswordExist(QString::fromStdString(cmd.user_name())))
+        return Response::RespOk;
+
+    if (sqlInterface->validateTableColumnStringData("{prefix}_users","email", QString::fromStdString(cmd.user_name()), QString::fromStdString(cmd.email())))
+        if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name())))
+            return Response::RespOk;
+
+    return Response::RespFunctionNotAllowed;
+}
+
 
 // ADMIN FUNCTIONS.
 // Permission is checked by the calling function.
