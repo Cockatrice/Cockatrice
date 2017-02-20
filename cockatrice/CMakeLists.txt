@@ -2,7 +2,7 @@
 #
 # provides the cockatrice binary
 
-PROJECT(cockatrice)
+PROJECT(Cockatrice)
 
 SET(cockatrice_SOURCES
     src/abstractcounter.cpp 
@@ -232,19 +232,19 @@ if(UNIX)
         set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
         set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.cockatrice.${PROJECT_NAME}")
         set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}-${PROJECT_VERSION}")
-        set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+        set(MACOSX_BUNDLE_BUNDLE_NAME "Cockatrice")
         set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
         set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
         set_target_properties(cockatrice PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
         INSTALL(TARGETS cockatrice BUNDLE DESTINATION ./)
-        INSTALL(FILES ${cockatrice_QM} DESTINATION ./cockatrice.app/Contents/Resources/translations)
+        INSTALL(FILES ${cockatrice_QM} DESTINATION ./Cockatrice.app/Contents/Resources/translations)
     else()
         # Assume linux
         INSTALL(TARGETS cockatrice RUNTIME DESTINATION bin/)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
-        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION ${DESKTOPDIR})
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Cockatrice.desktop DESTINATION ${DESKTOPDIR})
         INSTALL(FILES ${cockatrice_QM} DESTINATION share/cockatrice/translations)
     endif()
 elseif(WIN32)
@@ -254,8 +254,8 @@ endif()
 
 if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
-    set(plugin_dest_dir cockatrice.app/Contents/Plugins)
-    set(qtconf_dest_dir cockatrice.app/Contents/Resources)
+    set(plugin_dest_dir Cockatrice.app/Contents/Plugins)
+    set(qtconf_dest_dir Cockatrice.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt5 plugins: audio, iconengines, imageformats, platforms, printsupport
@@ -275,7 +275,7 @@ Data = Resources\")
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
 endif()
 
@@ -300,7 +300,7 @@ Data = Resources\")
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Cockatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
 
     if(WIN32SSLRUNTIME_FOUND)

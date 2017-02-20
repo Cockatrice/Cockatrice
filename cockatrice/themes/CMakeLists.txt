@@ -12,7 +12,7 @@ SET(defthemes
 
 if(UNIX)
     if(APPLE)
-        INSTALL(DIRECTORY ${defthemes} DESTINATION cockatrice.app/Contents/Resources/themes/)
+        INSTALL(DIRECTORY ${defthemes} DESTINATION Cockatrice.app/Contents/Resources/themes/)
     else()
         # Assume linux
         INSTALL(DIRECTORY ${defthemes} DESTINATION share/cockatrice/themes/)
