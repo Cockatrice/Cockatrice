@@ -44,7 +44,7 @@ writelog=1
 ; [ex: C:\\Temp\\server.log ]
 logfile=server.log
 
-; You may want to log only certain messages the logfile. The default log level is extremely verbose. 
+; You may want to log only certain messages in the logfile. The default log level is extremely verbose. 
 ; This setting should contain a comma-separated list of strings that will be selectively logged.
 ; All other lines will be excluded from the log. Default is empty; example: "Registration,_Login,foobar"
 logfilters=""
