@@ -226,7 +226,7 @@ endif()
 option(WITH_ORACLE "build oracle" ON)
 if(WITH_ORACLE)
     add_subdirectory(oracle)
-    SET(CPACK_INSTALL_CMAKE_PROJECTS "release/Oracle.app;Oracle;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+    SET(CPACK_INSTALL_CMAKE_PROJECTS "Oracle;Oracle;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
 # Compile tests (default off)
