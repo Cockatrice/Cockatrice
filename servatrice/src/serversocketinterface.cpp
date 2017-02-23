@@ -1027,21 +1027,21 @@ Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const C
 {
     QString userName = QString::fromStdString(cmd.user_name());
     QString token = QString::fromStdString(cmd.token());
+	QString clientID = "UNKNOWN"; //TODO:  ADD CLIENT ID INTO ACTIVATION PROTOCOL COMPONENTS FOR AUDIT PURPOSES
 
-	//TODO:  ADD CLIENT ID INTO ACTIVATION PROTOCOL COMPONENTS FOR AUDIT PURPOSES
     if(sqlInterface->activateUser(userName, token))
     {
         qDebug() << "Accepted activation for user" << QString::fromStdString(cmd.user_name());
 
 		if (servatrice->getEnableRegistrationAudit())
-			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), "UNKNOWN", "ACTIVATE_ACCOUNT", "Successfully activated account", true);
+			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), clientID, "ACTIVATE_ACCOUNT", "Successfully activated account", true);
 
         return Response::RespActivationAccepted;
     } else {
         qDebug() << "Failed activation for user" << QString::fromStdString(cmd.user_name());
 
 		if (servatrice->getEnableRegistrationAudit())
-			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), "UNKNOWN", "ACTIVATE_ACCOUNT", "Failed to activate account, incorrect activation token", false);
+			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), clientID, "ACTIVATE_ACCOUNT", "Failed to activate account, incorrect activation token", false);
 
         return Response::RespActivationFailed;
     }
