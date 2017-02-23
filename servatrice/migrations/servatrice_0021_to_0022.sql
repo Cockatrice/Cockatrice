@@ -1,5 +1,4 @@
 
-
 CREATE TABLE IF NOT EXISTS `cockatrice_audit` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `id_server` tinyint(3) NOT NULL,
@@ -8,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_audit` (
   `clientid` varchar(15) NOT NULL,
   `requestDate` datetime NOT NULL default '0000-00-00 00:00:00',
   `action` varchar(35) NOT NULL,
-  `results` tinyint(1) NOT NULL,
+  `results` ENUM('fail', 'success') NOT NULL DEFAULT 'fail',
   `details` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `user_name` (`name`)
