@@ -86,6 +86,7 @@ public:
     bool doesForgotPasswordExist(const QString &user);
     bool updateUserToken(const QString &token, const QString &user);
     bool validateTableColumnStringData(const QString &table, const QString &column, const QString &_user, const QString &_datatocheck);
+	void addAuditRecord(const QString &user, const QString &ipaddress, const QString &clientid, const QString &action, const QString &details, const bool &results);
 };
 
 #endif

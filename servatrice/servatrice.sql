@@ -274,7 +274,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_audit` (
   `name` varchar(35) NOT NULL,
   `ip_address` varchar(255) NOT NULL,
   `clientid` varchar(15) NOT NULL,
-  `requestDate` datetime NOT NULL default '0000-00-00 00:00:00',
+  `incidentDate` datetime NOT NULL default '0000-00-00 00:00:00',
   `action` varchar(35) NOT NULL,
   `results` ENUM('fail', 'success') NOT NULL DEFAULT 'fail',
   `details` varchar(255) NOT NULL,

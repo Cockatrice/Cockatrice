@@ -1218,3 +1218,30 @@ bool Servatrice_DatabaseInterface::validateTableColumnStringData(const QString &
 
     return false;
 }
+
+void Servatrice_DatabaseInterface::addAuditRecord(const QString &user, const QString &ipaddress, const QString &clientid, const QString &action, const QString &details, const bool &results = false)
+{
+	if (!checkSql())
+		return;
+	
+	if (!server->getEnableAudit())
+		return;
+	
+	if (user.isEmpty() || ipaddress.isEmpty() || clientid.isEmpty() || action.isEmpty())
+		return;
+	
+	QSqlQuery *query = prepareQuery("insert into {prefix}_audit (id_server,name,ip_address,clientid,incidentDate,action,results,details) values (:idserver,:username,:ipaddress,:clientid,NOW(),:action,:results,:details)");
+	query->bindValue(":idserver", server->getServerID());
+	query->bindValue(":username", user);
+	query->bindValue(":ipaddress", ipaddress);
+	query->bindValue(":clientid", clientid);
+	query->bindValue(":action", action);
+	if (results) {
+		query->bindValue(":results", "success");
+	}
+	else
+		query->bindValue(":results", "fail");
+
+	query->bindValue(":details", details);
+	execSqlQuery(query);
+}

@@ -353,6 +353,22 @@ log_user_msg_chat=false
 ; Log user messages coming from other servers in the network
 log_user_msg_isl=false
 
+[audit]
+
+; Servatrice can record certain actions being performed in the database for server operators to better understand
+; if some one may be abusing application functionality.  Enabling auditing will allow servatrice to record any
+; of the below enabled audit functionality to be recorded.
+; Default: true
+enable_audit=true
+
+; Servatrice can record when users attempt a new account registration.  Should we enable auditing for this action?
+; Default: true
+enable_registration_audit=true
+
+; Servatrice can record when a users attempts to reset the account password.  Should we enable auditing for this action?
+; Default: true
+enable_forgotpassword_audit=true
+
 
 ; EXPERIMENTAL - NOT WORKING YET
 ; The following settings are relative to the server network functionality, that is not yet complete.

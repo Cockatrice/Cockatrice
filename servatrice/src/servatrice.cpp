@@ -258,6 +258,12 @@ bool Servatrice::initServer()
 		qDebug() << "Forgot password challenge on: " << getEnableForgotPasswordChallenge();
 	}
 
+	qDebug() << "Auditing enabled: " << getEnableAudit();
+	if (getEnableAudit()) {
+		qDebug() << "Audit registration attempts enabled: " << getEnableRegistrationAudit();
+		qDebug() << "Audit forgot password attepts enabled: " << getEnableForgotPasswordAudit();
+	}
+
     if (getDBTypeString() == "mysql") {
         databaseType = DatabaseMySql;
     } else {
@@ -890,4 +896,16 @@ bool Servatrice::getEnableForgotPasswordChallenge() const {
   
 QString Servatrice::getEmailBlackList() const {
     return settingsCache->value("registration/emailproviderblacklist").toString();
+}
+
+bool Servatrice::getEnableAudit() const {
+	return settingsCache->value("audit/enable_audit", true).toBool();
+}
+
+bool Servatrice::getEnableRegistrationAudit() const {
+	return settingsCache->value("audit/enable_registration_audit", true).toBool();
+}
+
+bool Servatrice::getEnableForgotPasswordAudit() const {
+	return settingsCache->value("audit/enable_forgotpassword_audit", true).toBool();
 }

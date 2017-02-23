@@ -193,6 +193,9 @@ public:
     bool getEnableLogQuery() const;
     bool getEnableForgotPassword() const;
     bool getEnableForgotPasswordChallenge() const;
+	bool getEnableAudit() const;
+	bool getEnableRegistrationAudit() const;
+	bool getEnableForgotPasswordAudit() const;
     int getIdleClientTimeout() const;
     int getServerID() const;
     int getMaxGameInactivityTime() const;
