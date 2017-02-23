@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
-INSERT INTO cockatrice_schema_version VALUES(21);
+INSERT INTO cockatrice_schema_version VALUES(22);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -264,6 +264,20 @@ CREATE TABLE IF NOT EXISTS `cockatrice_forgot_password` (
   `name` varchar(35) NOT NULL,
   `requestDate` datetime NOT NULL default '0000-00-00 00:00:00',
   `emailed` tinyint(1) NOT NULL default 0,
+  PRIMARY KEY  (`id`),
+  KEY `user_name` (`name`)
+) ENGINE=INNODB  DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_audit` (
+  `id` int(7) unsigned zerofill NOT NULL auto_increment,
+  `id_server` tinyint(3) NOT NULL,
+  `name` varchar(35) NOT NULL,
+  `ip_address` varchar(255) NOT NULL,
+  `clientid` varchar(15) NOT NULL,
+  `requestDate` datetime NOT NULL default '0000-00-00 00:00:00',
+  `action` varchar(35) NOT NULL,
+  `results` varchar(255) NOT NULL,
+  `details` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `user_name` (`name`)
 ) ENGINE=INNODB  DEFAULT CHARSET=utf8;
