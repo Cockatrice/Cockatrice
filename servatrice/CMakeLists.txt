@@ -137,7 +137,7 @@ if(UNIX)
 
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/servatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
         INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/servatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
-        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Servatrice.desktop DESTINATION ${DESKTOPDIR})
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.desktop DESTINATION ${DESKTOPDIR})
     endif()
 elseif(WIN32)
     INSTALL(TARGETS servatrice RUNTIME DESTINATION ./)
