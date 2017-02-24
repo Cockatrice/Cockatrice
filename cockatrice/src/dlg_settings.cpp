@@ -30,7 +30,7 @@
 #include "soundengine.h"
 #include "sequenceEdit/shortcutstab.h"
 
-#define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Download-URLs"
+#define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Picture-Download-URLs"
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
