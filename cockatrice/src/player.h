@@ -212,7 +212,7 @@ private:
     
     void setCardAttrHelper(const GameEventContext &context, CardItem *card, CardAttribute attribute, const QString &avalue, bool allCards);
     void createCard(const CardItem *sourceCard, const QString &dbCardName);
-    const QString dbNameFromTokenDisplayName(const QString &tokenName) const;
+    QString dbNameFromTokenDisplayName(const QString &tokenName);
 
     QRectF bRect;
 

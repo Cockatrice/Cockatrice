@@ -199,6 +199,8 @@ public:
     SequenceEdit *Player_aClone;
     QLabel *lbl_Player_aCreateToken;
     SequenceEdit *Player_aCreateToken;
+    QLabel *lbl_Player_aCreateRelatedTokens;
+    SequenceEdit *Player_aCreateRelatedTokens;
     QLabel *lbl_Player_aCreateAnotherToken;
     SequenceEdit *Player_aCreateAnotherToken;
     QLabel *lbl_Player_aSetAnnotation;
@@ -1080,25 +1082,35 @@ public:
 
         gridLayout_13->addWidget(Player_aCreateToken, 10, 1, 1, 1);
 
+        lbl_Player_aCreateRelatedTokens = new QLabel(groupBox_13);
+        lbl_Player_aCreateRelatedTokens->setObjectName("lbl_Player_aCreateRelatedTokens");
+
+        gridLayout_13->addWidget(lbl_Player_aCreateRelatedTokens, 11, 0, 1, 1);
+
+        Player_aCreateRelatedTokens = new SequenceEdit("Player/aCreateRelatedTokens",groupBox_13);
+        Player_aCreateRelatedTokens->setObjectName("Player_aCreateRelatedTokens");
+
+        gridLayout_13->addWidget(Player_aCreateRelatedTokens, 11, 1, 1, 1);
+
         lbl_Player_aCreateAnotherToken = new QLabel(groupBox_13);
         lbl_Player_aCreateAnotherToken->setObjectName("lbl_Player_aCreateAnotherToken");
 
-        gridLayout_13->addWidget(lbl_Player_aCreateAnotherToken, 11, 0, 1, 1);
+        gridLayout_13->addWidget(lbl_Player_aCreateAnotherToken, 12, 0, 1, 1);
 
         Player_aCreateAnotherToken = new SequenceEdit("Player/aCreateAnotherToken",groupBox_13);
         Player_aCreateAnotherToken->setObjectName("Player_aCreateAnotherToken");
 
-        gridLayout_13->addWidget(Player_aCreateAnotherToken, 11, 1, 1, 1);
+        gridLayout_13->addWidget(Player_aCreateAnotherToken, 12, 1, 1, 1);
 
         lbl_Player_aSetAnnotation = new QLabel(groupBox_13);
         lbl_Player_aSetAnnotation->setObjectName("lbl_Player_aSetAnnotation");
 
-        gridLayout_13->addWidget(lbl_Player_aSetAnnotation, 12, 0, 1, 1);
+        gridLayout_13->addWidget(lbl_Player_aSetAnnotation, 13, 0, 1, 1);
 
         Player_aSetAnnotation = new SequenceEdit("Player/aSetAnnotation",groupBox_13);
         Player_aSetAnnotation->setObjectName("Player_aSetAnnotation");
 
-        gridLayout_13->addWidget(Player_aSetAnnotation, 12, 1, 1, 1);
+        gridLayout_13->addWidget(Player_aSetAnnotation, 13, 1, 1, 1);
 
         gridLayout_17->addWidget(groupBox_13, 0, 2, 1, 1);
 
@@ -1543,6 +1555,7 @@ public:
         lbl_Player_aUnattach->setText(QApplication::translate("shortcutsTab", "Unattach card", 0));
         lbl_Player_aClone->setText(QApplication::translate("shortcutsTab", "Clone card", 0));
         lbl_Player_aCreateToken->setText(QApplication::translate("shortcutsTab", "Create token", 0));
+        lbl_Player_aCreateRelatedTokens->setText(QApplication::translate("shortcutsTab", "Create all related tokens", 0));
         lbl_Player_aCreateAnotherToken->setText(QApplication::translate("shortcutsTab", "Create another token", 0));
         lbl_Player_aSetAnnotation->setText(QApplication::translate("shortcutsTab", "Set annotation", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("shortcutsTab", "Phases | P/T | Playing Area", 0));

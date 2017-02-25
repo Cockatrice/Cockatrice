@@ -185,6 +185,7 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/aClone"] = parseSequenceString("Ctrl+J");
     defaultShortCuts["Player/aCreateAnotherToken"] = parseSequenceString("Ctrl+G");
     defaultShortCuts["Player/aCreateToken"] = parseSequenceString("Ctrl+T");
+    defaultShortCuts["Player/aCreateRelatedTokens"] = parseSequenceString("Ctrl+Shift+T");
     defaultShortCuts["Player/aDecP"] = parseSequenceString("Ctrl+-");
     defaultShortCuts["Player/aDecPT"] = parseSequenceString("Ctrl+Alt+-");
     defaultShortCuts["Player/aDecT"] = parseSequenceString("Alt+-");
