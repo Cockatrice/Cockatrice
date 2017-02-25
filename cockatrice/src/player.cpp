@@ -2355,9 +2355,11 @@ void Player::updateCardMenu(CardItem *card)
 
                 if(card->getInfo())
                 {
-                    QStringList relatedCards = card->getInfo()->getRelatedCards();
-                    QStringList reverserelatedCards2Me = card->getInfo()->getReverseRelatedCards2Me();
-                    if(relatedCards.size() || reverserelatedCards2Me.size())
+                    QStringList relatedCards = * new QStringList();
+                    relatedCards.append(card->getInfo()->getRelatedCards());
+                    relatedCards.append(card->getInfo()->getReverseRelatedCards2Me());
+
+                    if(!relatedCards.empty())
                     {
                         cardMenu->addSeparator();
                         for (int i = 0; i < relatedCards.size(); ++i) {
@@ -2366,11 +2368,6 @@ void Player::updateCardMenu(CardItem *card)
                             cardMenu->addAction(a);
                         }
 
-                        for (int i = 0; i < reverserelatedCards2Me.size(); ++i) {
-                            QAction *a = new QAction(tr("Token: ") + reverserelatedCards2Me.at(i), this);
-                            connect(a, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
-                            cardMenu->addAction(a);
-                        }
                     }
                 }
                 cardMenu->addSeparator();
