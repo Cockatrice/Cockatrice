@@ -9,7 +9,7 @@
 #include "server.h"
 #include "server_database_interface.h"
 
-#define DATABASE_SCHEMA_VERSION 21
+#define DATABASE_SCHEMA_VERSION 22
 
 class Servatrice;
 
@@ -86,6 +86,7 @@ public:
     bool doesForgotPasswordExist(const QString &user);
     bool updateUserToken(const QString &token, const QString &user);
     bool validateTableColumnStringData(const QString &table, const QString &column, const QString &_user, const QString &_datatocheck);
+    void addAuditRecord(const QString &user, const QString &ipaddress, const QString &clientid, const QString &action, const QString &details, const bool &results);
 };
 
 #endif

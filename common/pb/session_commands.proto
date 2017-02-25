@@ -137,6 +137,7 @@ message Command_Activate {
     required string user_name = 1;
     // Activation token
     required string token = 2;
+    optional string clientid = 3;
 }
 
 message Command_AccountEdit {
