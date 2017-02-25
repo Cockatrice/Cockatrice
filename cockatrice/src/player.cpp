@@ -2392,9 +2392,12 @@ void Player::updateCardMenu(CardItem *card)
                             cardMenu->addAction(a);
                         }
 
-                        QAction *a = new QAction(tr("Create all related tokens"), this);
-                        connect(a, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
-                        cardMenu->addAction(a);
+                        if (relatedCards.length() > 1)
+                        {
+                            QAction *a = new QAction(tr("Create all related tokens"), this);
+                            connect(a, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
+                            cardMenu->addAction(a);
+                        }
                     }
                 }
                 cardMenu->addSeparator();
