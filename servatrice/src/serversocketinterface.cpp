@@ -927,7 +927,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
 	if (userName.toLower().simplified() == "servatrice") {
 		if (servatrice->getEnableRegistrationAudit())
-			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "Username is invalide", false);
+			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "Username is invalid", false);
 
 		return Response::RespUsernameInvalid;
 	}
