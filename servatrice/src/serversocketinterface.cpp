@@ -1027,8 +1027,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const C
 {
     QString userName = QString::fromStdString(cmd.user_name());
     QString token = QString::fromStdString(cmd.token());
-	QString clientID = "UNKNOWN"; //TODO:  ADD CLIENT ID INTO ACTIVATION PROTOCOL COMPONENTS FOR AUDIT PURPOSES
-
+    QString clientID = QString::fromStdString(cmd.clientid());
+    
+    if (clientID.isEmpty())
+        clientID = "UNKNOWN";
+	
     if(sqlInterface->activateUser(userName, token))
     {
         qDebug() << "Accepted activation for user" << QString::fromStdString(cmd.user_name());

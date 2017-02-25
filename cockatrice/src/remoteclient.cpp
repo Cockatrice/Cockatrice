@@ -139,6 +139,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         Command_Activate cmdActivate;
         cmdActivate.set_user_name(userName.toStdString());
         cmdActivate.set_token(token.toStdString());
+        cmdActivate.set_clientid(getSrvClientID(lastHostname).toStdString());
 
         PendingCommand *pend = prepareSessionCommand(cmdActivate);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(activateResponse(Response)));
