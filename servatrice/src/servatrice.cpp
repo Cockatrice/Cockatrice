@@ -252,17 +252,17 @@ bool Servatrice::initServer()
         }
     }
 
-	qDebug() << "Forgot password enabled: " << getEnableForgotPassword();
-	if (getEnableForgotPassword()) {
-		qDebug() << "Forgot password token life (in minutes): " << getForgotPasswordTokenLife();
-		qDebug() << "Forgot password challenge on: " << getEnableForgotPasswordChallenge();
-	}
+    qDebug() << "Forgot password enabled: " << getEnableForgotPassword();
+    if (getEnableForgotPassword()) {
+        qDebug() << "Forgot password token life (in minutes): " << getForgotPasswordTokenLife();
+        qDebug() << "Forgot password challenge on: " << getEnableForgotPasswordChallenge();
+    }
 
-	qDebug() << "Auditing enabled: " << getEnableAudit();
-	if (getEnableAudit()) {
-		qDebug() << "Audit registration attempts enabled: " << getEnableRegistrationAudit();
-		qDebug() << "Audit forgot password attepts enabled: " << getEnableForgotPasswordAudit();
-	}
+    qDebug() << "Auditing enabled: " << getEnableAudit();
+    if (getEnableAudit()) {
+        qDebug() << "Audit registration attempts enabled: " << getEnableRegistrationAudit();
+        qDebug() << "Audit forgot password attepts enabled: " << getEnableForgotPasswordAudit();
+    }
 
     if (getDBTypeString() == "mysql") {
         databaseType = DatabaseMySql;
@@ -556,49 +556,49 @@ void Servatrice::statusUpdate()
 
     if (getRegistrationEnabled() && getEnableInternalSMTPClient())
     {
-		if (getRequireEmailActivationEnabled())
-		{
-			QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
-			if (!servatriceDatabaseInterface->execSqlQuery(query))
-				return;
+        if (getRequireEmailActivationEnabled())
+        {
+            QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
+            if (!servatriceDatabaseInterface->execSqlQuery(query))
+                return;
 
-			QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
+            QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
 
-			while (query->next()) {
-				const QString userName = query->value(0).toString();
-				const QString emailAddress = query->value(1).toString();
-				const QString token = query->value(2).toString();
+            while (query->next()) {
+                const QString userName = query->value(0).toString();
+                const QString emailAddress = query->value(1).toString();
+                const QString token = query->value(2).toString();
 
-				if (smtpClient->enqueueActivationTokenMail(userName, emailAddress, token))
-				{
-					queryDelete->bindValue(":name", userName);
-					servatriceDatabaseInterface->execSqlQuery(queryDelete);
-				}
-			}
-		}
+                if (smtpClient->enqueueActivationTokenMail(userName, emailAddress, token))
+                {
+                    queryDelete->bindValue(":name", userName);
+                    servatriceDatabaseInterface->execSqlQuery(queryDelete);
+                }
+            }
+        }
 
-		if (getEnableForgotPassword())
-		{
-			QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_forgot_password a left join {prefix}_users b on a.name = b.name where a.emailed = 0");
-			if (!servatriceDatabaseInterface->execSqlQuery(query))
-				return;
+        if (getEnableForgotPassword())
+        {
+            QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_forgot_password a left join {prefix}_users b on a.name = b.name where a.emailed = 0");
+            if (!servatriceDatabaseInterface->execSqlQuery(query))
+                return;
 
-			QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("update {prefix}_forgot_password set emailed = 1 where name = :name");
+            QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("update {prefix}_forgot_password set emailed = 1 where name = :name");
 
-			while (query->next()) {
-				const QString userName = query->value(0).toString();
-				const QString emailAddress = query->value(1).toString();
-				const QString token = query->value(2).toString();
+            while (query->next()) {
+                const QString userName = query->value(0).toString();
+                const QString emailAddress = query->value(1).toString();
+                const QString token = query->value(2).toString();
 
-				if (smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token))
-				{
-					queryDelete->bindValue(":name", userName);
-					servatriceDatabaseInterface->execSqlQuery(queryDelete);
-				}
-			}
-		}
+                if (smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token))
+                {
+                    queryDelete->bindValue(":name", userName);
+                    servatriceDatabaseInterface->execSqlQuery(queryDelete);
+                }
+            }
+        }
 
-		smtpClient->sendAllEmails();
+        smtpClient->sendAllEmails();
     }
 }
 
@@ -883,15 +883,15 @@ bool Servatrice::getEnableInternalSMTPClient() const {
 }
 
 bool Servatrice::getEnableForgotPassword() const {
-	return settingsCache->value("forgotpassword/enable", false).toBool();
+    return settingsCache->value("forgotpassword/enable", false).toBool();
 }
 
 int Servatrice::getForgotPasswordTokenLife() const {
-	return settingsCache->value("forgotpassword/tokenlife", 60).toInt();
+    return settingsCache->value("forgotpassword/tokenlife", 60).toInt();
 }
 
 bool Servatrice::getEnableForgotPasswordChallenge() const {
-	return settingsCache->value("forgotpassword/enablechallenge", false).toBool();
+    return settingsCache->value("forgotpassword/enablechallenge", false).toBool();
 }
   
 QString Servatrice::getEmailBlackList() const {
@@ -899,13 +899,13 @@ QString Servatrice::getEmailBlackList() const {
 }
 
 bool Servatrice::getEnableAudit() const {
-	return settingsCache->value("audit/enable_audit", true).toBool();
+    return settingsCache->value("audit/enable_audit", true).toBool();
 }
 
 bool Servatrice::getEnableRegistrationAudit() const {
-	return settingsCache->value("audit/enable_registration_audit", true).toBool();
+    return settingsCache->value("audit/enable_registration_audit", true).toBool();
 }
 
 bool Servatrice::getEnableForgotPasswordAudit() const {
-	return settingsCache->value("audit/enable_forgotpassword_audit", true).toBool();
+    return settingsCache->value("audit/enable_forgotpassword_audit", true).toBool();
 }
