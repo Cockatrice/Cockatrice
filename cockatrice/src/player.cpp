@@ -1103,9 +1103,14 @@ void Player::actCreateRelatedCard()
     // get the target card name
     QAction *action = static_cast<QAction *>(sender());
 
+    const QString &cardName = action->text();
+    createCard(sourceCard, cardName);
+}
+
+void Player::createCard(const CardItem *sourceCard, const QString &cardName) {
     // removes p/t from tokens (and leading space))
     // Added split for "Token:" due to change in PR fixing #2317
-    QStringList spaces = action->text().split(tr("Token: "))[1].split(" ");
+    QStringList spaces = cardName.split(tr("Token: "))[1].split(" ");;
     if (spaces.at(0).indexOf("/") != -1) // Strip space from creatures
         spaces.removeFirst();
     CardInfo *cardInfo = db->getCard(spaces.join(" "));
