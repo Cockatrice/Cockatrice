@@ -1236,11 +1236,7 @@ void Servatrice_DatabaseInterface::addAuditRecord(const QString &user, const QSt
 	query->bindValue(":ipaddress", ipaddress);
 	query->bindValue(":clientid", clientid);
 	query->bindValue(":action", action);
-	if (results) {
-		query->bindValue(":results", "success");
-	}
-	else
-		query->bindValue(":results", "fail");
+    query->bindValue(":results", results ? "success" : "fail");
 
 	query->bindValue(":details", details);
 	execSqlQuery(query);
