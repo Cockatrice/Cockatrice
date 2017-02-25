@@ -942,7 +942,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     if (servatrice->getMaxAccountsPerEmail() && !(sqlInterface->checkNumberOfUserAccounts(emailAddress) < servatrice->getMaxAccountsPerEmail()))
     {
 		if (servatrice->getEnableRegistrationAudit())
-			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "To many usernames registered with this email address", false);
+			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "Too many usernames registered with this email address", false);
 
         return Response::RespTooManyRequests;
     }
@@ -964,7 +964,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
 	if (tooManyRegistrationAttempts(this->getAddress())) {
 		if (servatrice->getEnableRegistrationAudit())
-			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "To many registration attempts from this ip address", false);
+			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "Too many registration attempts from this ip address", false);
 
 		return Response::RespTooManyRequests;
 	}
@@ -977,7 +977,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     // TODO make this configurable?
 	if (password.length() < 6) {
 		if (servatrice->getEnableRegistrationAudit())
-			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "Password is to short", false);
+			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "Password is too short", false);
 
 		return Response::RespPasswordTooShort;
 	}
@@ -997,13 +997,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
                 return Response::RespRegistrationFailed;
 
 			if (servatrice->getEnableRegistrationAudit())
-				sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "Successfully registered, verification required", true);
+				sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "", true);
 
             return Response::RespRegistrationAcceptedNeedsActivation;
         } else {
 
 			if (servatrice->getEnableRegistrationAudit())
-				sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "Successfully registered, no verification required", true);
+				sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT", "", true);
 
             return Response::RespRegistrationAccepted;
         }
@@ -1037,7 +1037,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const C
         qDebug() << "Accepted activation for user" << QString::fromStdString(cmd.user_name());
 
 		if (servatrice->getEnableRegistrationAudit())
-			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), clientID, "ACTIVATE_ACCOUNT", "Successfully activated account", true);
+			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), clientID, "ACTIVATE_ACCOUNT", "", true);
 
         return Response::RespActivationAccepted;
     } else {
@@ -1168,7 +1168,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
         if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name()))) {
 
 			if (servatrice->getEnableForgotPasswordAudit())
-				sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET_REQUEST", "Request does not exist, challange not requested", true);
+				sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET_REQUEST", "Request does not exist, challenge not requested", true);
 
             Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
             re->set_challenge_email(false);
@@ -1201,7 +1201,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
 
     if (sqlInterface->changeUserPassword(QString::fromStdString(cmd.user_name()), "", QString::fromStdString(cmd.new_password()), true)) {
 		if (servatrice->getEnableForgotPasswordAudit())
-			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET", "Success", true);
+			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET", "", true);
 
         sqlInterface->removeForgotPassword(QString::fromStdString(cmd.user_name()));
         return Response::RespOk;
@@ -1224,14 +1224,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordChallenge
 
 	if (sqlInterface->validateTableColumnStringData("{prefix}_users", "email", QString::fromStdString(cmd.user_name()), QString::fromStdString(cmd.email()))) {
 		if (servatrice->getEnableForgotPasswordAudit())
-			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET_CHALLANGE", "Correctly answered email challange question", true);
+			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET_CHALLANGE", "", true);
 
 		if (sqlInterface->addForgotPassword(QString::fromStdString(cmd.user_name())))
 			return Response::RespOk;
 	}
 	else {
 		if (servatrice->getEnableForgotPasswordAudit())
-			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET_CHALLANGE", "Failed to answere email challange question", false);
+			sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(), QString::fromStdString(cmd.clientid()).simplified(), "PASSWORD_RESET_CHALLANGE", "Failed to answer email challenge question", false);
 	}
 
     return Response::RespFunctionNotAllowed;
