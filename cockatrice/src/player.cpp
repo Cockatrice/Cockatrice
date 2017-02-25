@@ -1095,25 +1095,34 @@ void Player::actCreatePredefinedToken()
 
 void Player::actCreateRelatedCard()
 {
-    // get the clicked card
     CardItem * sourceCard = game->getActiveCard();
     if(!sourceCard)
         return;
 
-    // get the target card name
     QAction *action = static_cast<QAction *>(sender());
-
-    const QString &cardName = action->text();
-    createCard(sourceCard, cardName);
+    const QString &actionDisplayName = action->text();
+    createCard(sourceCard, dbNameFromTokenDisplayName(actionDisplayName));
 }
 
-void Player::createCard(const CardItem *sourceCard, const QString &cardName) {
-    // removes p/t from tokens (and leading space))
-    // Added split for "Token:" due to change in PR fixing #2317
-    QStringList spaces = cardName.split(tr("Token: "))[1].split(" ");;
-    if (spaces.at(0).indexOf("/") != -1) // Strip space from creatures
-        spaces.removeFirst();
-    CardInfo *cardInfo = db->getCard(spaces.join(" "));
+void Player::actCreateAllRelatedCards()
+{
+    CardItem * sourceCard = game->getActiveCard();
+    if(!sourceCard)
+        return;
+
+    QStringList relatedCards = * new QStringList();
+    relatedCards.append(sourceCard->getInfo()->getRelatedCards());
+    relatedCards.append(sourceCard->getInfo()->getReverseRelatedCards2Me());
+
+    for (int i = 0; i < relatedCards.size(); i++)
+    {
+        const QString &tokenName = relatedCards.at(i);
+        createCard(sourceCard, dbNameFromTokenDisplayName(tokenName));
+    }
+}
+
+void Player::createCard(const CardItem *sourceCard, const QString &dbCardName) {
+    CardInfo *cardInfo = db->getCard(dbCardName);
     if(!cardInfo)
         return;
 
@@ -1179,6 +1188,21 @@ void Player::setCardAttrHelper(const GameEventContext &context, CardItem *card, 
             card->setPT(avalue);
             break;
         }
+    }
+}
+
+// tokenName should take the form of "<Prefix> <Power>/<Toughness> <Card Name>   ".
+// dbName for tokens should take the form of "<Card Name>   ".
+// trailing space is significant; it is used to differentiate tokens with the same name
+const QString Player::dbNameFromTokenDisplayName(const QString &tokenName) const {
+    QRegExp tokenNamePattern(".*/\\S+\\s+(.*)");
+    tokenNamePattern.indexIn(tokenName);
+    tokenNamePattern.capturedTexts();
+    if (tokenNamePattern.capturedTexts().isEmpty())
+    {
+        return tokenName;
+    } else {
+        return tokenNamePattern.capturedTexts()[1];
     }
 }
 
@@ -2368,6 +2392,9 @@ void Player::updateCardMenu(CardItem *card)
                             cardMenu->addAction(a);
                         }
 
+                        QAction *a = new QAction(tr("Create all related tokens"), this);
+                        connect(a, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
+                        cardMenu->addAction(a);
                     }
                 }
                 cardMenu->addSeparator();

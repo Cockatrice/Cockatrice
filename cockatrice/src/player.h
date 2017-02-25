@@ -4,6 +4,7 @@
 #include <QInputDialog>
 #include <QPoint>
 #include <QMap>
+#include <QRegExp>
 #include "abstractgraphicsitem.h"
 #include "pb/game_event.pb.h"
 #include "pb/card_attributes.pb.h"
@@ -141,6 +142,7 @@ private slots:
     void actOpenDeckInDeckEditor();
     void actCreatePredefinedToken();
     void actCreateRelatedCard();
+    void actCreateAllRelatedCards();
     void cardMenuAction();
     void actCardCounterTrigger();
     void actAttach();
@@ -209,6 +211,8 @@ private:
     PlayerTarget *playerTarget;
     
     void setCardAttrHelper(const GameEventContext &context, CardItem *card, CardAttribute attribute, const QString &avalue, bool allCards);
+    void createCard(const CardItem *sourceCard, const QString &dbCardName);
+    const QString dbNameFromTokenDisplayName(const QString &tokenName) const;
 
     QRectF bRect;
 
@@ -307,7 +311,6 @@ public:
     void sendGameCommand(PendingCommand *pend);
     void sendGameCommand(const google::protobuf::Message &command);
 
-    void createCard(const CardItem *sourceCard, const QString &cardName);
 };
 
 #endif
