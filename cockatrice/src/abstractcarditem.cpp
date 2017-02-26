@@ -80,8 +80,6 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
     int fontSize = round(translatedSize.height() / 8);
     if (fontSize < 9)
         fontSize = 9;
-    if (fontSize > 10)
-        fontSize = 10;
     f.setPixelSize(fontSize);
 
     painter->setFont(f);
