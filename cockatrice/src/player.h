@@ -211,6 +211,7 @@ private:
     PlayerTarget *playerTarget;
     
     void setCardAttrHelper(const GameEventContext &context, CardItem *card, CardAttribute attribute, const QString &avalue, bool allCards);
+    void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
     void createCard(const CardItem *sourceCard, const QString &dbCardName);
     QString dbNameFromTokenDisplayName(const QString &tokenName);
 
