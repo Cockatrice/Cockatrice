@@ -1114,9 +1114,8 @@ void Player::actCreateAllRelatedCards()
     relatedCards.append(sourceCard->getInfo()->getRelatedCards());
     relatedCards.append(sourceCard->getInfo()->getReverseRelatedCards2Me());
 
-    for (int i = 0; i < relatedCards.size(); i++)
+    foreach (const QString &tokenName, relatedCards)
     {
-        const QString &tokenName = relatedCards.at(i);
         createCard(sourceCard, dbNameFromTokenDisplayName(tokenName));
     }
 }
@@ -2318,14 +2317,14 @@ void Player::refreshShortcuts()
     {
         setShortcutsActive();
 
-        for (int i = 0; i < table->getCards().size(); ++i) {
-            CardItem *const &card = table->getCards().at(i);
-            updateCardMenu(card);
+        foreach (const CardItem *cardItem, table->getCards())
+        {
+            updateCardMenu(cardItem);
         }
     }
 }
 
-void Player::updateCardMenu(CardItem *card)
+void Player::updateCardMenu(const CardItem *card)
 {
     QMenu *cardMenu = card->getCardMenu();
     QMenu *ptMenu = card->getPTMenu();

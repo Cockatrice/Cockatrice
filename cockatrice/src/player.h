@@ -286,7 +286,7 @@ public:
     const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
     void setCardMenu(QMenu *menu);
     QMenu *getCardMenu() const;
-    void updateCardMenu(CardItem *card);
+    void updateCardMenu(const CardItem *card);
     bool getActive() const { return active; }
     void setActive(bool _active);
     void setShortcutsActive();
