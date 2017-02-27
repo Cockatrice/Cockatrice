@@ -24,6 +24,7 @@
 #include <QPainter>
 #include <QMenu>
 #include <QDebug>
+#include <QRegExp>
 
 #include "pb/command_change_zone_properties.pb.h"
 #include "pb/command_reveal_cards.pb.h"

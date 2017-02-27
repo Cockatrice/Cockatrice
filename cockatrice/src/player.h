@@ -4,7 +4,6 @@
 #include <QInputDialog>
 #include <QPoint>
 #include <QMap>
-#include <QRegExp>
 #include "abstractgraphicsitem.h"
 #include "pb/game_event.pb.h"
 #include "pb/card_attributes.pb.h"
