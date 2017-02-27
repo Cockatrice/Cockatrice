@@ -141,6 +141,7 @@ private slots:
     void actOpenDeckInDeckEditor();
     void actCreatePredefinedToken();
     void actCreateRelatedCard();
+    void actCreateAllRelatedCards();
     void cardMenuAction();
     void actCardCounterTrigger();
     void actAttach();
@@ -209,6 +210,9 @@ private:
     PlayerTarget *playerTarget;
     
     void setCardAttrHelper(const GameEventContext &context, CardItem *card, CardAttribute attribute, const QString &avalue, bool allCards);
+    void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
+    void createCard(const CardItem *sourceCard, const QString &dbCardName);
+    QString dbNameFromTokenDisplayName(const QString &tokenName);
 
     QRectF bRect;
 
@@ -281,7 +285,7 @@ public:
     const QMap<int, ArrowItem *> &getArrows() const { return arrows; }
     void setCardMenu(QMenu *menu);
     QMenu *getCardMenu() const;
-    void updateCardMenu(CardItem *card);
+    void updateCardMenu(const CardItem *card);
     bool getActive() const { return active; }
     void setActive(bool _active);
     void setShortcutsActive();
@@ -306,6 +310,7 @@ public:
     PendingCommand *prepareGameCommand(const QList< const ::google::protobuf::Message * > &cmdList);
     void sendGameCommand(PendingCommand *pend);
     void sendGameCommand(const google::protobuf::Message &command);
+
 };
 
 #endif
