@@ -51,7 +51,6 @@
 #include "settingscache.h"
 #include "tab_game.h"
 #include "version_string.h"
-#include "update_checker.h"
 #include "carddatabase.h"
 #include "window_sets.h"
 #include "dlg_edit_tokens.h"

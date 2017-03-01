@@ -11,6 +11,8 @@
 #include "settings/gamefilterssettings.h"
 #include "settings/layoutssettings.h"
 
+class ReleaseChannel;
+
 // the falbacks are used for cards without a muid
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
 #define PIC_URL_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"
@@ -58,6 +60,7 @@ private:
     QString lang;
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
+    int updateReleaseChannel;
     bool picDownload;
     bool notificationsEnabled;
     bool spectatorNotificationsEnabled;
@@ -110,6 +113,7 @@ private:
     QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
     QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
     bool rememberGameSettings;
+    QList<ReleaseChannel*> releaseChannels;
 
 public:
     SettingsCache();
@@ -131,6 +135,8 @@ public:
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
     bool getNotifyAboutUpdates() const { return notifyAboutUpdates; }
+    ReleaseChannel * getUpdateReleaseChannel() const { return releaseChannels.at(updateReleaseChannel); }
+    QList<ReleaseChannel*> getUpdateReleaseChannels() const { return releaseChannels; }
 
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
@@ -249,6 +255,7 @@ public slots:
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(int _notifyaboutupdate);
+    void setUpdateReleaseChannel(int _updateReleaseChannel);
 };
 
 extern SettingsCache *settingsCache;

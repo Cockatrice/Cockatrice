@@ -1,4 +1,6 @@
 #include "settingscache.h"
+#include "releasechannel.h"
+
 #include <QSettings>
 #include <QFile>
 #include <QDir>
@@ -162,7 +164,13 @@ SettingsCache::SettingsCache()
     if(!QFile(settingsPath+"global.ini").exists())
         translateLegacySettings();
 
+    // updates - don't reorder them or their index in the settings won't match
+    releaseChannels << new StableReleaseChannel()
+        << new DevReleaseChannel();
+
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
+    updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
+
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
 
@@ -642,4 +650,10 @@ void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
     notifyAboutUpdates = _notifyaboutupdate;
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
+{
+    updateReleaseChannel = _updateReleaseChannel;
+    settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
 }

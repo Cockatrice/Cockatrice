@@ -4,8 +4,8 @@
 #include <QtNetwork>
 #include <QProgressDialog>
 
-#include "update_checker.h"
 #include "update_downloader.h"
+class Release;
 
 class DlgUpdate : public QDialog {
 Q_OBJECT
@@ -13,7 +13,7 @@ public:
     DlgUpdate(QWidget *parent);
 
 private slots:
-    void finishedUpdateCheck(bool needToUpdate, bool isCompatible, QVariantMap *build);
+    void finishedUpdateCheck(bool needToUpdate, bool isCompatible, Release *release);
     void gotoDownloadPage();
     void downloadUpdate();
     void updateCheckError(QString errorString);
@@ -27,11 +27,10 @@ private:
     void enableOkButton(bool enable);
     void beginUpdateCheck();
     void setLabel(QString text);
-    QLabel *text;
+    QLabel *statusLabel, *descriptionLabel;
     QProgressBar *progress;
     QPushButton *manualDownload, *gotoDownload, *ok;
     QPushButton *cancel;
-    UpdateChecker *uChecker;
     UpdateDownloader *uDownloader;
 };
 
