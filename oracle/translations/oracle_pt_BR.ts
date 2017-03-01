@@ -10,7 +10,8 @@
         <location filename="../src/oraclewizard.cpp" line="167"/>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
 You will need to specify a URL or a filename that will be used as a source.</source>
-        <translation type="unfinished"/>
+        <translation>Este assistente irá importar a lista de expansões, cartas e fichas que serão usadas pelo Cockatrice.
+Você irá precisar especificar a URL ou o nome do arquivo que será usado como fonte.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="171"/>
@@ -28,7 +29,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="220"/>
         <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor especifique a fonte para a lista de expansões e cartas. Você pode especificar um endereço URL que será baixado ou use um arquivo existente em seu computador.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="224"/>
@@ -151,7 +152,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="579"/>
         <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor especifique a fonte para a lista de fichas. Você pode especificar um endereço URL que será baixada ou use um arquivo existente em seu computador.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="583"/>
@@ -287,7 +288,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="699"/>
         <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
-        <translation type="unfinished"/>
+        <translation>As fichas foram importadas. Pressione &quot;Salvar&quot; para salvar as fichas importadas na base de dados de fichas do Cockatrice</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="702"/>
@@ -302,7 +303,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="710"/>
         <source>XML; token database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; banco de dados de fichas (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="731"/>
@@ -313,7 +314,8 @@ You will need to specify a URL or a filename that will be used as a source.</sou
         <location filename="../src/oraclewizard.cpp" line="732"/>
         <source>The token database has been saved successfully to
 %1</source>
-        <translation type="unfinished"/>
+        <translation>O banco de dados de fichas foi salvo com sucesso em
+%1</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="734"/>
@@ -470,7 +472,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../../cockatrice/src/settingscache.cpp" line="147"/>
+        <location filename="../../cockatrice/src/settingscache.cpp" line="152"/>
         <source>English</source>
         <translation>Português do Brasil (Brazilian Portuguese)</translation>
     </message>

@@ -472,7 +472,7 @@ Necesitarás especificar la URL o el nombre de archivo que será usado como orig
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../../cockatrice/src/settingscache.cpp" line="147"/>
+        <location filename="../../cockatrice/src/settingscache.cpp" line="152"/>
         <source>English</source>
         <translation>Español (Spanish)</translation>
     </message>

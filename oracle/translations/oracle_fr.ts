@@ -471,7 +471,7 @@ Vous devrez spécifier une URL ou un fichier qui sera utilisé comme source.</tr
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../../cockatrice/src/settingscache.cpp" line="147"/>
+        <location filename="../../cockatrice/src/settingscache.cpp" line="152"/>
         <source>English</source>
         <translation>Français (French)</translation>
     </message>
