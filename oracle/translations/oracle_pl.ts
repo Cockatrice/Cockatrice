@@ -10,7 +10,7 @@
         <location filename="../src/oraclewizard.cpp" line="167"/>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.
 You will need to specify a URL or a filename that will be used as a source.</source>
-        <translation type="unfinished"/>
+        <translation>Ten kreator zaimportuje listę wszystkich dodatków oraz kart, których będzie można użyć w Cockatrice. Należy wyszczególnić plik lub jego adres url, który posłuży za źródło, a następnie wybrać pożądane dodatki z listy dostępnych.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="171"/>
@@ -28,12 +28,12 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="220"/>
         <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Proszę podać źródło listy edycji i kart. Można podać adres URL, z którego zostanie pobrana, lub istniejący plik na komputerze.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="224"/>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Pobierz URL</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="225"/>
@@ -43,7 +43,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="226"/>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Przywróć domyślny URL</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="227"/>
@@ -78,7 +78,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="267"/>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>Podano nieprawidłowy URL.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="271"/>
@@ -93,7 +93,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="292"/>
         <source>Cannot open file &apos;%1&apos;.</source>
-        <translation>Nie można otworzyć pliku ‚%1’.</translation>
+        <translation>Nie można otworzyć pliku &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="322"/>
@@ -146,22 +146,22 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="578"/>
         <source>Tokens source selection</source>
-        <translation type="unfinished"/>
+        <translation>Wybór źródła tokenów</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="579"/>
         <source>Please specify a source for the list of tokens. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Proszę podać źródło listy tokenów. Można podać adres URL, z którego zostanie pobrana, lub istniejący plik na komputerze.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="583"/>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Pobierz odnośnik:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="584"/>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Przywróć domyślny URL</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="601"/>
@@ -172,22 +172,22 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="601"/>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>Podano nieprawidłowy URL.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="605"/>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>Pobieranie (0 MB)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="637"/>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>Pobieranie (%1 MB)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="646"/>
         <source>Network error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Błąd połączenia: %1.</translation>
     </message>
 </context>
 <context>
@@ -282,27 +282,27 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="698"/>
         <source>Tokens imported</source>
-        <translation type="unfinished"/>
+        <translation>Zaimportowano tokeny</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="699"/>
         <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
-        <translation type="unfinished"/>
+        <translation>Zaimportowano tokeny. Kliknij &quot;Zapisz&quot; by je zapisać w bazie tokenów programu Cockatrice.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="702"/>
         <source>Save to the default path (recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz w domyślnej ścieżce (zalecane)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="709"/>
         <source>Save token database</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz bazę danych tokenów.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="710"/>
         <source>XML; token database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; baza danych tokenów (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="731"/>
@@ -313,7 +313,8 @@ You will need to specify a URL or a filename that will be used as a source.</sou
         <location filename="../src/oraclewizard.cpp" line="732"/>
         <source>The token database has been saved successfully to
 %1</source>
-        <translation type="unfinished"/>
+        <translation>Pomyślnie zapisano bazę tokenów w:
+%1</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="734"/>
@@ -323,7 +324,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../src/oraclewizard.cpp" line="734"/>
         <source>The file could not be saved to %1</source>
-        <translation type="unfinished"/>
+        <translation>Nie można zapisać pliku w %1</translation>
     </message>
 </context>
 <context>
@@ -470,7 +471,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../../cockatrice/src/settingscache.cpp" line="147"/>
+        <location filename="../../cockatrice/src/settingscache.cpp" line="152"/>
         <source>English</source>
         <translation>Polski (Polish)</translation>
     </message>
