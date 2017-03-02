@@ -230,7 +230,7 @@ GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
     ownUser(_ownUser),
     unavailableGamesVisible(false),
     showPasswordProtectedGames(true),
-    setShowBuddiesOnlyGames(false),
+    showBuddiesOnlyGames(false),
     maxPlayersFilterMin(-1),
     maxPlayersFilterMax(-1)
 {
