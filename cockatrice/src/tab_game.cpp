@@ -421,6 +421,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 
     this->installEventFilter(this);
     QTimer::singleShot(0, this, SLOT(loadLayout()));
+	
+	playerCountInRoom = gameInfo.player_count();
 }
 
 void TabGame::addMentionTag(QString value) {
@@ -449,7 +451,7 @@ TabGame::~TabGame()
 void TabGame::retranslateUi()
 {
     QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
-    QString userCountInfo = QString(" %1/%2").arg(gameInfo.player_count()).arg(gameInfo.max_players());
+    QString userCountInfo = QString(" %1/%2").arg(playerCountInRoom).arg(gameInfo.max_players());
     qDebug() << "User Count Info: " << userCountInfo;
 
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
@@ -1032,9 +1034,11 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
     } else {
         Player *newPlayer = addPlayer(playerId, playerInfo.user_info());
         messageLog->logJoin(newPlayer);
+		playerCountInRoom++;
     }
     playerListWidget->addPlayer(playerInfo);
-    qDebug() << "eventJoin retranslate w/ count = " << gameInfo.player_count();
+	
+    qDebug() << "eventJoin retranslate w/ count = " << playerCountInRoom;
     retranslateUi();
     emitUserEvent();
 
@@ -1045,6 +1049,15 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     Player *player = players.value(eventPlayerId, 0);
     if (!player)
         return;
+	
+	if (spectators.contains(eventPlayerId))
+	{
+		qDebug() << "Spectator leaving";
+	}
+	else
+	{
+		playerCountInRoom--;
+	}
 
     QString playerName = "@" + player->getName();
     if(sayEdit && autocompleteUserList.removeOne(playerName))
@@ -1062,7 +1075,8 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     while (playerIterator.hasNext())
         playerIterator.next().value()->updateZones();
 
-    qDebug() << "eventLeave retranslate w/ count = " << gameInfo.player_count();
+	
+    qDebug() << "eventLeave retranslate w/ count = " << playerCountInRoom;
     retranslateUi();
     emitUserEvent();
 }
@@ -1078,8 +1092,9 @@ void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/,
     msgBox.setText(tr("You have been kicked out of the game."));
     msgBox.setIcon(QMessageBox::Information);
     msgBox.exec();
-
-    qDebug() << "eventKicked retranslate w/ count = " << gameInfo.player_count();
+	
+	playerCountInRoom--;
+    qDebug() << "eventKicked retranslate w/ count = " << playerCountInRoom;
     retranslateUi();
     emitUserEvent();
 }

@@ -127,6 +127,7 @@ private:
     QCompleter *completer;
     QStringList autocompleteUserList;
     QStackedWidget * mainWidget;
+	int playerCountInRoom = 0;
     
     // Replay related members
     GameReplay *replay;
