@@ -301,7 +301,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
     bool anotherUser = userName != QString::fromStdString(tabSupervisor->getUserInfo()->name());
     aDetails->setEnabled(true);
     aChat->setEnabled(anotherUser && online);
-    aShowGames->setEnabled(anotherUser);
+    aShowGames->setEnabled(online);
     aAddToBuddyList->setEnabled(anotherUser);
     aRemoveFromBuddyList->setEnabled(anotherUser);
     aAddToIgnoreList->setEnabled(anotherUser);
