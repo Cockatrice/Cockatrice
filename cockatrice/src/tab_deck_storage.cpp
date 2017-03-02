@@ -270,8 +270,10 @@ void TabDeckStorage::actNewFolder()
     QString folderName = QInputDialog::getText(this, tr("New folder"), tr("Name of new folder:"));
     if (folderName.isEmpty())
         return;
+
+	// '/' isn't a valid filename character on *nix so we're choosing to replace it with a different arbitrary character.
     std::string folder = folderName.toStdString();
-    std::replace(folder.begin(), folder.end(), '/', '\\'); // Fix #2429
+    std::replace(folder.begin(), folder.end(), '/', '-');
 
     QString targetPath;
     RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
