@@ -448,9 +448,10 @@ TabGame::~TabGame()
 void TabGame::retranslateUi()
 {
     QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
+    QString userCountInfo = " " + QString::number(gameInfo.player_count()) + "/" + QString::number(gameInfo.max_players());
 
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
-    playerListDock->setWindowTitle(tr("Player List") + (playerListDock->isWindow() ? tabText : QString()));
+    playerListDock->setWindowTitle(tr("Player List") + userCountInfo + (playerListDock->isWindow() ? tabText : QString()));
     messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
     if(replayDock)
         replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
