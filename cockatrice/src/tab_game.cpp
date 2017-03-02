@@ -69,6 +69,7 @@
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_ping_changed.pb.h"
 #include "get_pb_extension.h"
+#include "pb/serverinfo_game.pb.h"
 
 ToggleButton::ToggleButton(QWidget *parent)
         : QPushButton(parent), state(false)
@@ -448,7 +449,8 @@ TabGame::~TabGame()
 void TabGame::retranslateUi()
 {
     QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
-    QString userCountInfo = " " + QString::number(gameInfo.player_count()) + "/" + QString::number(gameInfo.max_players());
+    QString userCountInfo = QString(" %1/%2").arg(gameInfo.player_count()).arg(gameInfo.max_players());
+    qDebug() << "User Count Info: " << userCountInfo;
 
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
     playerListDock->setWindowTitle(tr("Player List") + userCountInfo + (playerListDock->isWindow() ? tabText : QString()));
@@ -1032,7 +1034,10 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
         messageLog->logJoin(newPlayer);
     }
     playerListWidget->addPlayer(playerInfo);
+    qDebug() << "eventJoin retranslate w/ count = " << gameInfo.player_count();
+    retranslateUi();
     emitUserEvent();
+
 }
 
 void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
@@ -1057,6 +1062,8 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     while (playerIterator.hasNext())
         playerIterator.next().value()->updateZones();
 
+    qDebug() << "eventLeave retranslate w/ count = " << gameInfo.player_count();
+    retranslateUi();
     emitUserEvent();
 }
 
@@ -1072,6 +1079,8 @@ void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/,
     msgBox.setIcon(QMessageBox::Information);
     msgBox.exec();
 
+    qDebug() << "eventKicked retranslate w/ count = " << gameInfo.player_count();
+    retranslateUi();
     emitUserEvent();
 }
 

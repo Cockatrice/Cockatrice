@@ -46,6 +46,7 @@ public:
     void updatePlayerProperties(const ServerInfo_PlayerProperties &prop, int playerId = -1);
     void setGameStarted(bool _gameStarted, bool resuming);
     void showContextMenu(const QPoint &pos, const QModelIndex &index);
+	int getPlayerCount() { return players.size(); }
 };
 
 #endif
