@@ -25,7 +25,6 @@ DlgConnect::DlgConnect(QWidget *parent)
     QStringList previousHostList = settingsCache->servers().getPreviousHostList();
     if (previousHostList.isEmpty()) {
         previousHostList << "cockatrice.woogerworks.com";
-        previousHostList << "vps.poixen.com";
         previousHostList << "chickatrice.net";
         previousHostList << "mtg.tetrarch.co";
         previousHostList << "cockatric.es";
