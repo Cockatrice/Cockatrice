@@ -270,6 +270,8 @@ void TabDeckStorage::actNewFolder()
     QString folderName = QInputDialog::getText(this, tr("New folder"), tr("Name of new folder:"));
     if (folderName.isEmpty())
         return;
+    std::string folder = folderName.toStdString();
+    std::replace(folder.begin(), folder.end(), '/', '\\'); // Fix #2429
 
     QString targetPath;
     RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
@@ -282,8 +284,8 @@ void TabDeckStorage::actNewFolder()
     
     Command_DeckNewDir cmd;
     cmd.set_path(targetPath.toStdString());
-    cmd.set_dir_name(folderName.toStdString());
-    
+    cmd.set_dir_name(folder);
+
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(newFolderFinished(Response, CommandContainer)));
     client->sendCommand(pend);
