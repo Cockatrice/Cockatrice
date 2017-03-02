@@ -271,7 +271,7 @@ void TabDeckStorage::actNewFolder()
     if (folderName.isEmpty())
         return;
 
-	// '/' isn't a valid filename character on *nix so we're choosing to replace it with a different arbitrary character.
+    // '/' isn't a valid filename character on *nix so we're choosing to replace it with a different arbitrary character.
     std::string folder = folderName.toStdString();
     std::replace(folder.begin(), folder.end(), '/', '-');
 
