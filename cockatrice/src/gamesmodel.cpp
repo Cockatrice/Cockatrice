@@ -228,9 +228,9 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
 GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
     : QSortFilterProxyModel(parent),
     ownUser(_ownUser),
+    showBuddiesOnlyGames(false),
     unavailableGamesVisible(false),
     showPasswordProtectedGames(true),
-    showBuddiesOnlyGames(false),
     maxPlayersFilterMin(-1),
     maxPlayersFilterMax(-1)
 {
