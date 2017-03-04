@@ -141,8 +141,13 @@ Loading cockatrice web client...
       $(div).find("[href]").each(function() {
         var attributeValue = $(this).attr('href');
         for(var protocol in hrefWhitelist)
-          if(attributeValue.indexOf(hrefWhitelist[protocol]) == 0)
-            return;
+        {
+            if(attributeValue.indexOf(hrefWhitelist[protocol]) == 0)
+            {
+                $(this).setAttribute('target', '_blank');
+                return;
+            }
+        }
 
         $(this).removeAttr('href');        
       });
