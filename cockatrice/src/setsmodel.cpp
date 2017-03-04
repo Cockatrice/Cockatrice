@@ -135,7 +135,7 @@ void SetsModel::toggleRow(int row, bool enable)
 bool SetsModel::getToggleStatus(int row)
 {
     CardSet *temp = sets.at(row);
-    return enabledSets.contains(temp) ? true : false;
+    return enabledSets.contains(temp);
 }
 
 void SetsModel::toggleAll(bool enable)
