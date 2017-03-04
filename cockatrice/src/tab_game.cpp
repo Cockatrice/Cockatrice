@@ -1047,7 +1047,7 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     Player *player = players.value(eventPlayerId, 0);
     if (!player)
         return;
-    
+
     QString playerName = "@" + player->getName();
     if(sayEdit && autocompleteUserList.removeOne(playerName))
         sayEdit->setCompletionList(autocompleteUserList);
@@ -1078,7 +1078,7 @@ void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/,
     msgBox.setText(tr("You have been kicked out of the game."));
     msgBox.setIcon(QMessageBox::Information);
     msgBox.exec();
-    
+
     emitUserEvent();
 }
 
