@@ -69,7 +69,6 @@
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_ping_changed.pb.h"
 #include "get_pb_extension.h"
-#include "pb/serverinfo_game.pb.h"
 
 ToggleButton::ToggleButton(QWidget *parent)
         : QPushButton(parent), state(false)
@@ -421,10 +420,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
 
     this->installEventFilter(this);
     QTimer::singleShot(0, this, SLOT(loadLayout()));
-    
-    playerCountInRoom = playerListWidget->getPlayersCount() + 1;
-	if (playerCountInRoom == 1)
-		playerCountInRoom = gameInfo.player_count();
 }
 
 void TabGame::addMentionTag(QString value) {
@@ -435,6 +430,7 @@ void TabGame::addMentionTag(QString value) {
 void TabGame::emitUserEvent() {
     bool globalEvent = !spectator || settingsCache->getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
+    updatePlayerListDockTitle();
 }
 
 TabGame::~TabGame()
@@ -450,14 +446,19 @@ TabGame::~TabGame()
     emit gameClosing(this);
 }
 
+void TabGame::updatePlayerListDockTitle()
+{
+    QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
+    QString userCountInfo = QString(" %1/%2").arg(players.size()).arg(gameInfo.max_players());
+    playerListDock->setWindowTitle(tr("Player List") + userCountInfo + (playerListDock->isWindow() ? tabText : QString()));
+}
+
 void TabGame::retranslateUi()
 {
     QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
-    QString userCountInfo = QString(" %1/%2").arg(playerCountInRoom).arg(gameInfo.max_players());
-    qDebug() << "User Count Info: " << userCountInfo;
 
+    updatePlayerListDockTitle();
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
-    playerListDock->setWindowTitle(tr("Player List") + userCountInfo + (playerListDock->isWindow() ? tabText : QString()));
     messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
     if(replayDock)
         replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
@@ -1036,14 +1037,9 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
     } else {
         Player *newPlayer = addPlayer(playerId, playerInfo.user_info());
         messageLog->logJoin(newPlayer);
-        playerCountInRoom++;
     }
     playerListWidget->addPlayer(playerInfo);
-    
-    qDebug() << "eventJoin retranslate w/ count = " << playerCountInRoom;
-    retranslateUi();
     emitUserEvent();
-
 }
 
 void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
@@ -1052,15 +1048,6 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     if (!player)
         return;
     
-    if (spectators.contains(eventPlayerId))
-    {
-        qDebug() << "Spectator leaving";
-    }
-    else
-    {
-        playerCountInRoom--;
-    }
-
     QString playerName = "@" + player->getName();
     if(sayEdit && autocompleteUserList.removeOne(playerName))
         sayEdit->setCompletionList(autocompleteUserList);
@@ -1077,9 +1064,6 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     while (playerIterator.hasNext())
         playerIterator.next().value()->updateZones();
 
-    
-    qDebug() << "eventLeave retranslate w/ count = " << playerCountInRoom;
-    retranslateUi();
     emitUserEvent();
 }
 
@@ -1095,9 +1079,6 @@ void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/,
     msgBox.setIcon(QMessageBox::Information);
     msgBox.exec();
     
-    //playerCountInRoom--;
-    qDebug() << "eventKicked retranslate w/ count = " << playerCountInRoom;
-    retranslateUi();
     emitUserEvent();
 }
 
