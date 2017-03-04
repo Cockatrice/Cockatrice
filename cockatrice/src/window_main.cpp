@@ -1030,7 +1030,8 @@ void MainWindow::actAddCustomSet()
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Selected file cannot be found."));
         return;
     }
-    else if (QFileInfo(fileName).suffix() != "xml") { // fileName = *.xml
+
+    if (QFileInfo(fileName).suffix() != "xml") { // fileName = *.xml
         QMessageBox::warning(this, tr("Load sets/cards"), tr("You can only import XML databases at this time."));
         return;
     }
