@@ -144,7 +144,7 @@ Loading cockatrice web client...
         {
             if(attributeValue.indexOf(hrefWhitelist[protocol]) == 0)
             {
-                $(this).setAttribute('target', '_blank');
+                $(this).attr('target', '_blank');
                 return;
             }
         }
@@ -316,7 +316,6 @@ Loading cockatrice web client...
 
             $('#buddies').empty();
             $.each(data.buddyList, function(key, value) {
-              debugger;
               $('#buddies').append('<li>' + value.name + '</li>');
             });
             $("#buddies").selectable();
