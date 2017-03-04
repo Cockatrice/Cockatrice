@@ -47,6 +47,7 @@ public:
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
     void save(CardDatabase *db);
     void restore(CardDatabase *db);
+    bool getToggleStatus(int row);
 };
 
 #endif

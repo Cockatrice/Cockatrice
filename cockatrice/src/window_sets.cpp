@@ -64,6 +64,7 @@ WndSets::WndSets(QWidget *parent)
     view->setSortingEnabled(true);
     view->setSelectionMode(QAbstractItemView::SingleSelection);
     view->setSelectionBehavior(QAbstractItemView::SelectRows);
+    view->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     view->setDragEnabled(true);
     view->setAcceptDrops(true);
@@ -82,11 +83,10 @@ WndSets::WndSets(QWidget *parent)
         this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
 
     // bottom buttons
-    enableAllButton = new QPushButton(tr("Enable all sets"));
-    connect(enableAllButton, SIGNAL(clicked()), this, SLOT(actEnableAll()));
-    disableAllButton = new QPushButton(tr("Disable all sets"));
-    connect(disableAllButton, SIGNAL(clicked()), this, SLOT(actDisableAll()));
-
+    toggleAllButton = new QPushButton(tr("Toggle all sets"));
+    connect(toggleAllButton, SIGNAL(clicked()), this, SLOT(actToggleAll()));
+    toggleSelectedButton = new QPushButton(tr("Toggle selected sets"));
+    connect(toggleSelectedButton, SIGNAL(clicked()), this, SLOT(actToggle()));
 
     QLabel *labNotes = new QLabel;
     labNotes->setText("<b>" + tr("hints:") + "</b>" + "<ul><li>" + tr("Enable the sets that you want to have available in the deck editor") + "</li><li>" + tr("Move sets around to change their order, or click on a column header to sort sets on that field") + "</li><li>" + tr("Sets order decides the source that will be used when loading images for a specific card") + "</li><li>" + tr("Disabled sets will be used for loading images only if all the enabled sets failed") + "</li></ul>");
@@ -98,8 +98,8 @@ WndSets::WndSets(QWidget *parent)
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(setsEditToolBar, 0, 0, 1, 1);
     mainLayout->addWidget(view, 0, 1, 1, 2);
-    mainLayout->addWidget(enableAllButton, 1, 1, 1, 1);
-    mainLayout->addWidget(disableAllButton, 1, 2, 1, 1);
+    mainLayout->addWidget(toggleAllButton, 1, 1, 1, 1);
+    mainLayout->addWidget(toggleSelectedButton, 1, 2, 1, 1);
     mainLayout->addWidget(labNotes, 2, 1, 1, 2);
     mainLayout->addWidget(buttonBox, 3, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
@@ -147,32 +147,18 @@ void WndSets::selectRow(int row)
     view->scrollTo(idx, QAbstractItemView::EnsureVisible);
 }
 
-void WndSets::actEnable()
+void WndSets::actToggle()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    if(rows.empty())
-        return;
 
-    model->toggleRow(rows.first().row(), true);
+    foreach(QModelIndex i, rows)
+        model->toggleRow(i.row(), !model->getToggleStatus(i.row()));
 }
 
-void WndSets::actDisable()
+void WndSets::actToggleAll()
 {
-    QModelIndexList rows = view->selectionModel()->selectedRows();
-    if(rows.empty())
-        return;
-
-    model->toggleRow(rows.first().row(), false);
-}
-
-void WndSets::actEnableAll()
-{
-    model->toggleAll(true);
-}
-
-void WndSets::actDisableAll()
-{
-    model->toggleAll(false);
+    QModelIndex i = view->model()->index(0, 0);
+    model->toggleAll(!model->getToggleStatus(i.row()));
 }
 
 void WndSets::actUp()
