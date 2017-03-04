@@ -6,9 +6,10 @@ Fixes
 
 
 
-## How does this solve the issue?
-
+## What will change with this Pull Request?
+- this
+- and this
 
 
 ## Screenshots
-(drag & drop image files directly to the description!)
+*(drag & drop image files directly to the description!)*
