@@ -1,15 +1,12 @@
 ## Related Ticket(s)
-Fixes 
-
+- Fixes #IssueNumber
 
 ## Short roundup of the initial problem
-
 
 
 ## What will change with this Pull Request?
 - this
 - and this
 
-
 ## Screenshots
-*(drag & drop image files directly to the description!)*
+*(simply drag & drop image files directly into this description!)*
