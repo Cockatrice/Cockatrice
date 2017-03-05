@@ -58,7 +58,6 @@ void SettingsCache::translateLegacySettings()
     legacySetting.beginGroup("server");
     servers().setPreviousHostLogin(legacySetting.value("previoushostlogin").toInt());
     servers().setPreviousHostList(legacySetting.value("previoushosts").toStringList());
-    servers().setPrevioushostindex(legacySetting.value("previoushostindex").toInt());
     servers().setHostName(legacySetting.value("hostname").toString());
     servers().setPort(legacySetting.value("port").toString());
     servers().setPlayerName(legacySetting.value("playername").toString());

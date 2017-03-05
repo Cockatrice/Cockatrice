@@ -14,6 +14,7 @@
 #include <QPushButton>
 #include "dlg_connect.h"
 #include "settingscache.h"
+#include "userconnection_information.h"
 
 DlgConnect::DlgConnect(QWidget *parent)
     : QDialog(parent)
@@ -22,21 +23,16 @@ DlgConnect::DlgConnect(QWidget *parent)
     previousHosts = new QComboBox(this);
     previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
 
-    QStringList previousHostList = settingsCache->servers().getPreviousHostList();
-    if (previousHostList.isEmpty()) {
-        previousHostList << "cockatrice.woogerworks.com";
-        previousHostList << "chickatrice.net";
-        previousHostList << "mtg.tetrarch.co";
-        previousHostList << "cockatric.es";
-    }
-    previousHosts->addItems(previousHostList);
-    previousHosts->setCurrentIndex(settingsCache->servers().getPrevioushostindex());
+    rebuildComboBoxList();
 
     newHostButton = new QRadioButton(tr("New Host"), this);
     
+    saveLabel = new QLabel(tr("Menu Name:"));
+    saveEdit = new QLineEdit(settingsCache->servers().getSaveName());
+    saveLabel->setBuddy(saveEdit);
+
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit();
-    hostEdit->setPlaceholderText(tr("Enter host name"));
+    hostEdit = new QLineEdit(settingsCache->servers().getHostname());
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
@@ -58,11 +54,13 @@ DlgConnect::DlgConnect(QWidget *parent)
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
     autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
 
-    if(savePasswordCheckBox->isChecked())
+    if (savePasswordCheckBox->isChecked())
     {
         autoConnectCheckBox->setChecked(settingsCache->servers().getAutoConnect());
         autoConnectCheckBox->setEnabled(true);
-    } else {
+    }
+    else
+    {
         settingsCache->servers().setAutoConnect(0);
         autoConnectCheckBox->setChecked(0);
         autoConnectCheckBox->setEnabled(false);
@@ -85,11 +83,13 @@ DlgConnect::DlgConnect(QWidget *parent)
     connectionLayout->addWidget(previousHostButton, 0, 1);
     connectionLayout->addWidget(previousHosts, 1, 1);
     connectionLayout->addWidget(newHostButton, 2, 1);
-    connectionLayout->addWidget(hostLabel, 3, 0);
-    connectionLayout->addWidget(hostEdit, 3, 1);
-    connectionLayout->addWidget(portLabel, 4, 0);
-    connectionLayout->addWidget(portEdit, 4, 1);
-    connectionLayout->addWidget(autoConnectCheckBox, 5, 1);
+    connectionLayout->addWidget(saveLabel, 3, 0);
+    connectionLayout->addWidget(saveEdit, 3, 1);
+    connectionLayout->addWidget(hostLabel, 4, 0);
+    connectionLayout->addWidget(hostEdit, 4, 1);
+    connectionLayout->addWidget(portLabel, 5, 0);
+    connectionLayout->addWidget(portEdit, 5, 1);
+    connectionLayout->addWidget(autoConnectCheckBox, 6, 1);
 
     QGridLayout *buttons = new QGridLayout;
     buttons->addWidget(btnOk, 0, 0);
@@ -132,24 +132,85 @@ DlgConnect::DlgConnect(QWidget *parent)
         previousHostButton->setChecked(true);
     else
         newHostButton->setChecked(true);
+    
+    connect(previousHosts, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(updateDisplayInfo(const QString &)));
 
     playernameEdit->setFocus();
+}
+
+void DlgConnect::actSaveConfig()
+{
+    if (!settingsCache->servers().updateExistingServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked()))
+        settingsCache->servers().addNewServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
+
+    rebuildComboBoxList();
+}
+
+void DlgConnect::rebuildComboBoxList()
+{
+    previousHosts->clear();
+
+    UserConnection_Information uci;
+    savedHostList = uci.getServerInfo();
+
+    if (savedHostList.size() == 1)
+    {
+        settingsCache->servers().addNewServer("Woogerworks Cockatrice", "cockatrice.woogerworks.com", "4747", "", "", false);
+        settingsCache->servers().addNewServer("Chickatrice Cockatrice", "chickatrice.net", "4747", "", "", false);
+        settingsCache->servers().addNewServer("Cockatric.es Cockatrice", "cockatric.es", "4747", "", "", false);
+        settingsCache->servers().addNewServer("Tetrarch Cockatrice", "mtg.tetrarch.co", "4747", "", "", false);
+    }
+    savedHostList = uci.getServerInfo();
+
+    int i = 0;
+    foreach (UserConnection_Information tmp, savedHostList)
+    {
+        QString saveName = tmp.getSaveName();
+        if (saveName.size())
+        {
+            previousHosts->addItem(saveName);
+            
+            if (settingsCache->servers().getPrevioushostName() == saveName)
+                previousHosts->setCurrentIndex(i);
+            
+            i++;
+        }
+    }
 }
 
 
 void DlgConnect::previousHostSelected(bool state) {
     if (state) {
-        hostLabel->setDisabled(true);
-        hostEdit->setDisabled(true);
         previousHosts->setDisabled(false);
     }
 }
 
+void DlgConnect::updateDisplayInfo(const QString &saveName)
+{
+    UserConnection_Information uci;
+    QStringList data = uci.getServerInfo(saveName);
+
+    if (saveEdit == NULL)
+        return;
+    
+    saveEdit->setText(data.at(0));
+    hostEdit->setText(data.at(1));
+    portEdit->setText(data.at(2));
+    playernameEdit->setText(data.at(3));
+    passwordEdit->setText(data.at(4));
+    savePasswordCheckBox->setChecked(data.at(5) == "1" ? true : false);
+}
+
 void DlgConnect::newHostSelected(bool state) {
-    if (state) {
-        hostEdit->setDisabled(false);
-        hostLabel->setDisabled(false);
+    if (state)
+    {
         previousHosts->setDisabled(true);
+        saveEdit->clear();
+        saveEdit->setPlaceholderText("New Menu Name");
+    }
+    else
+    {
+        rebuildComboBoxList();
     }
 }
 
@@ -167,26 +228,13 @@ void DlgConnect::passwordSaved(int state)
 
 void DlgConnect::actOk()
 {
-    settingsCache->servers().setPort(portEdit->text());
-    settingsCache->servers().setPlayerName(playernameEdit->text());
-    settingsCache->servers().setPassword(savePasswordCheckBox->isChecked() ? passwordEdit->text() : QString());
-    settingsCache->servers().setSavePassword(savePasswordCheckBox->isChecked() ? 1 : 0);
-    settingsCache->servers().setAutoConnect(autoConnectCheckBox->isChecked() ? 1 : 0);
-    settingsCache->servers().setPreviousHostLogin(previousHostButton->isChecked() ? 1 : 0);
-    
-    QStringList hostList;
     if (newHostButton->isChecked())
-        if (!hostEdit->text().trimmed().isEmpty())
-            hostList << hostEdit->text();
-    
-    for (int i = 0; i < previousHosts->count(); i++)
-        if(!previousHosts->itemText(i).trimmed().isEmpty())
-            hostList << previousHosts->itemText(i);
-    
-    settingsCache->servers().setPreviousHostList(hostList);
-    settingsCache->servers().setPrevioushostindex(previousHosts->currentIndex());
+        settingsCache->servers().addNewServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
+    else
+        settingsCache->servers().updateExistingServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
+    settingsCache->servers().setPrevioushostName(saveEdit->text());
 
-    if(playernameEdit->text().isEmpty())
+    if (playernameEdit->text().isEmpty())
     {
         QMessageBox::critical(this, tr("Connect Warning"), tr("The player name can't be empty."));
         return;
@@ -197,7 +245,7 @@ void DlgConnect::actOk()
 
 
 QString DlgConnect::getHost() const {
-    return previousHostButton->isChecked() ? previousHosts->currentText() : hostEdit->text();
+    return hostEdit->text();
 }
 
 void DlgConnect::actCancel()
@@ -226,3 +274,4 @@ void DlgConnect::actForgotPassword()
     emit sigStartForgotPasswordRequest();
     reject();
 }
+
