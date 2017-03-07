@@ -152,13 +152,13 @@ void WndSets::actToggle()
     QModelIndexList rows = view->selectionModel()->selectedRows();
 
     foreach(QModelIndex i, rows)
-        model->toggleRow(i.row(), !model->getToggleStatus(i.row()));
+        model->toggleRow(i.row());
 }
 
 void WndSets::actToggleAll()
 {
     QModelIndex i = view->model()->index(0, 0);
-    model->toggleAll(!model->getToggleStatus(i.row()));
+    model->toggleAll(i.row());
 }
 
 void WndSets::actUp()

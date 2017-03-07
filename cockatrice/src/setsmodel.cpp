@@ -124,7 +124,7 @@ void SetsModel::toggleRow(int row, bool enable)
 {
     CardSet *temp = sets.at(row);
 
-    if(enable)
+    if (enable)
         enabledSets.insert(temp);
     else
         enabledSets.remove(temp);
@@ -132,20 +132,31 @@ void SetsModel::toggleRow(int row, bool enable)
     emit dataChanged(index(row, EnabledCol), index(row, EnabledCol));
 }
 
-bool SetsModel::getToggleStatus(int row)
+void SetsModel::toggleRow(int row)
 {
-    CardSet *temp = sets.at(row);
-    return enabledSets.contains(temp);
+    CardSet *tmp = sets.at(row);
+
+    if (enabledSets.contains(tmp))
+        enabledSets.remove(tmp);
+    else
+        enabledSets.insert(tmp);
+
+    emit dataChanged(index(row, EnabledCol), index(row, EnabledCol));
 }
 
-void SetsModel::toggleAll(bool enable)
+void SetsModel::toggleAll(int row)
 {
+    bool enabled = true;
+    CardSet *tmp = sets.at(row);
+
+    if (enabledSets.contains(tmp))
+        enabled = false;
+
     enabledSets.clear();
-    if(enable)
-    {
+
+    if (enabled)
         foreach(CardSet *set, sets)
             enabledSets.insert(set);
-    }
 
     emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
 }
