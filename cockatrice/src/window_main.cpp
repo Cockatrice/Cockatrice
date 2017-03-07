@@ -1031,6 +1031,11 @@ void MainWindow::actAddCustomSet()
         return;
     }
 
+    if (QFileInfo(fileName).suffix() != "xml") { // fileName = *.xml
+        QMessageBox::warning(this, tr("Load sets/cards"), tr("You can only import XML databases at this time."));
+        return;
+    }
+
     QDir dir = settingsCache->getCustomCardDatabasePath();
     int nextPrefix = getNextCustomSetPrefix(dir);
 
