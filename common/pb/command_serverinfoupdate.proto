@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+message Command_UpdateGameHost {
+
+    optional sint32 player_id = 1 [default = -1];
+}
+
