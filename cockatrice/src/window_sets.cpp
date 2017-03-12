@@ -83,7 +83,7 @@ WndSets::WndSets(QWidget *parent)
         this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
 
     // bottom buttons
-    toggleAllButton = new QPushButton(tr("Toggle all sets"));
+    toggleAllButton = new QPushButton(tr("Enable/Disable all sets"));
     connect(toggleAllButton, SIGNAL(clicked()), this, SLOT(actToggleAll()));
     toggleSelectedButton = new QPushButton(tr("Toggle selected sets"));
     connect(toggleSelectedButton, SIGNAL(clicked()), this, SLOT(actToggle()));
