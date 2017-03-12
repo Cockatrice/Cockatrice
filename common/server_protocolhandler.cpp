@@ -637,6 +637,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
                 return Response::RespUserLevelTooLow;
         }
 
+        // TODO: POSSIBLY EXTEND THE ROOM OBJECT TO HAVE PRIV LEVEL SETTINGS AND COMPARE TO USER PRIVLEVEL ?
+
         if (roomPermission == "vip") {
             if (!(userInfo->user_level() & ServerInfo_User::IsRegistered))
                 return Response::RespUserLevelTooLow;
