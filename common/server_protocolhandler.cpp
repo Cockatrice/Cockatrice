@@ -645,6 +645,15 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
                 if (QString::fromStdString(userInfo->privlevel()).toLower() != "vip")
                     return Response::RespUserLevelTooLow;
         }
+
+        if (roomPermission == "donator") {
+            if (!(userInfo->user_level() & ServerInfo_User::IsRegistered))
+                return Response::RespUserLevelTooLow;
+
+            if (!((userInfo->user_level() & ServerInfo_User::IsAdmin) && (userInfo->user_level() & ServerInfo_User::IsModerator)))
+                if (QString::fromStdString(userInfo->privlevel()).toLower() != "donator")
+                    return Response::RespUserLevelTooLow;
+        }
 }
 
     r->addClient(this);
