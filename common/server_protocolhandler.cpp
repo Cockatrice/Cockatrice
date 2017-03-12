@@ -536,7 +536,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
     rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, se);
 
     databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()), QString::fromStdString(cmd.message()), Server_DatabaseInterface::MessageTargetChat, userInterface->getUserInfo()->id(), receiver);
-
+    resetIdleTimer();
     return Response::RespOk;
 }
 
