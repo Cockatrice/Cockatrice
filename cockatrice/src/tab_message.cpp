@@ -104,7 +104,7 @@ void TabMessage::sendMessage()
 void TabMessage::messageSent(const Response &response)
 {
     if (response.response_code() == Response::RespInIgnoreList)
-        chatView->appendMessage(tr("This user is ignoring you."));
+        chatView->appendMessage(tr("This user is ignoring you, they cannot see your messages in main chat and you cannot join their games."));
 }
 
 void TabMessage::actLeave()
