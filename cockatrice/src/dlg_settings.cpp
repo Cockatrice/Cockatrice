@@ -285,7 +285,7 @@ void GeneralSettingsPage::retranslateUi()
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to set a custom picture url")));
     clearDownloadedPicsButton.setText(tr("Reset/clear downloaded pictures"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
-    updateNotificationCheckBox.setText(tr("Notify when a new version is available"));
+    updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     defaultUrlRestoreButton.setText(tr("Reset"));
     fallbackUrlRestoreButton.setText(tr("Reset"));
 }
