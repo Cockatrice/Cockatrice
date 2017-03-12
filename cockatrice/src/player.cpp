@@ -1083,13 +1083,7 @@ void Player::actCreatePredefinedToken()
     if(!cardInfo)
         return;
 
-    lastTokenName = cardInfo->getName();
-    lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first().toLower();
-    lastTokenPT = cardInfo->getPowTough();
-    lastTokenAnnotation = settingsCache->getAnnotateTokens() ? cardInfo->getText() : "";
-    lastTokenTableRow = table->clampValidTableRow(2 - cardInfo->getTableRow());
-    lastTokenDestroy = true;
-    aCreateAnotherToken->setEnabled(true);
+    setLastToken(cardInfo);
 
     actCreateAnotherToken();
 }
@@ -1103,6 +1097,13 @@ void Player::actCreateRelatedCard()
     QAction *action = static_cast<QAction *>(sender());
     const QString &actionDisplayName = action->text();
     createCard(sourceCard, dbNameFromTokenDisplayName(actionDisplayName));
+
+   /*
+    * If we made a token via "Token: TokenName"
+    * then lets allow it to be created via create another
+    */
+    CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(actionDisplayName));
+    setLastToken(cardInfo);
 }
 
 void Player::actCreateAllRelatedCards()
@@ -1118,6 +1119,16 @@ void Player::actCreateAllRelatedCards()
     foreach (const QString &tokenName, relatedCards)
     {
         createCard(sourceCard, dbNameFromTokenDisplayName(tokenName));
+    }
+
+    /*
+     * If we made a token via "Token: TokenName"
+     * then lets allow it to be created via create another
+     */
+    if (relatedCards.length() == 1)
+    {
+        CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(relatedCards.at(0)));
+        setLastToken(cardInfo);
     }
 }
 
@@ -2520,4 +2531,15 @@ void Player::processSceneSizeChange(int newPlayerWidth)
 
     table->setWidth(tableWidth);
     hand->setWidth(tableWidth + stack->boundingRect().width());
+}
+
+void Player::setLastToken(CardInfo *cardInfo)
+{
+    lastTokenName = cardInfo->getName();
+    lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first().toLower();
+    lastTokenPT = cardInfo->getPowTough();
+    lastTokenAnnotation = settingsCache->getAnnotateTokens() ? cardInfo->getText() : "";
+    lastTokenTableRow = table->clampValidTableRow(2 - cardInfo->getTableRow());
+    lastTokenDestroy = true;
+    aCreateAnotherToken->setEnabled(true);
 }

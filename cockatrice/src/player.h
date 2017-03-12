@@ -5,6 +5,7 @@
 #include <QPoint>
 #include <QMap>
 #include "abstractgraphicsitem.h"
+#include "carddatabase.h"
 #include "pb/game_event.pb.h"
 #include "pb/card_attributes.pb.h"
 
@@ -311,6 +312,7 @@ public:
     void sendGameCommand(PendingCommand *pend);
     void sendGameCommand(const google::protobuf::Message &command);
 
+    void setLastToken(CardInfo *cardInfo);
 };
 
 #endif
