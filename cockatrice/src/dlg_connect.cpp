@@ -224,4 +224,5 @@ bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *o
 void DlgConnect::actForgotPassword()
 {
     emit sigStartForgotPasswordRequest();
+    reject();
 }
