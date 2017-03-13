@@ -166,8 +166,9 @@ SettingsCache::SettingsCache()
         translateLegacySettings();
 
     // updates - don't reorder them or their index in the settings won't match
-    releaseChannels << new StableReleaseChannel()
-        << new DevReleaseChannel();
+    // append channels one by one, or msvc will add them in the wrong order.
+    releaseChannels << new StableReleaseChannel();
+    releaseChannels << new DevReleaseChannel();
 
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
