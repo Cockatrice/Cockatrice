@@ -474,7 +474,7 @@ Sie müssen eine URL oder einen Dateinamen als Quelle angeben.</translation>
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../../cockatrice/src/settingscache.cpp" line="152"/>
+        <location filename="../../cockatrice/src/settingscache.cpp" line="153"/>
         <source>English</source>
         <translation>Deutsch (German)</translation>
     </message>

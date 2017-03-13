@@ -270,29 +270,14 @@ Se almacenará unicamente para moderadores y no podrá ser visto por la persona 
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="../src/carditem.cpp" line="89"/>
+        <location filename="../src/carditem.cpp" line="83"/>
         <source>&amp;Move to</source>
         <translation>&amp;Mover a</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="90"/>
+        <location filename="../src/carditem.cpp" line="84"/>
         <source>&amp;Power / toughness</source>
         <translation>Fuerza / resistencia (&amp;P)</translation>
-    </message>
-    <message>
-        <location filename="../src/carditem.cpp" line="91"/>
-        <source>Add Counter</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/carditem.cpp" line="92"/>
-        <source>Remove Counter</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/carditem.cpp" line="93"/>
-        <source>Set Counters</source>
-        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -509,24 +494,24 @@ Se almacenará unicamente para moderadores y no podrá ser visto por la persona 
 <context>
     <name>DevReleaseChannel</name>
     <message>
-        <location filename="../src/releasechannel.cpp" line="221"/>
+        <location filename="../src/releasechannel.cpp" line="222"/>
         <source>Development snapshots</source>
-        <translation type="unfinished"/>
+        <translation>Capturas de desarrollo</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="239"/>
+        <location filename="../src/releasechannel.cpp" line="240"/>
         <source>No reply received from the release update server.</source>
-        <translation type="unfinished"/>
+        <translation>No se recibe respuesta del servidor de lanzamiento de actualizaciones.</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="249"/>
+        <location filename="../src/releasechannel.cpp" line="250"/>
         <source>Invalid reply received from the release update server.</source>
-        <translation type="unfinished"/>
+        <translation>Respuesta invalida del servidor de lanzamiento de actualizaciones.</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="282"/>
+        <location filename="../src/releasechannel.cpp" line="287"/>
         <source>No reply received from the file update server.</source>
-        <translation type="unfinished"/>
+        <translation>No se recibe respuesta del servidor de archivos de actualizaciones.</translation>
     </message>
 </context>
 <context>
@@ -537,87 +522,87 @@ Se almacenará unicamente para moderadores y no podrá ser visto por la persona 
         <translation>Dirección anterior</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="36"/>
+        <location filename="../src/dlg_connect.cpp" line="35"/>
         <source>New Host</source>
         <translation>Nueva dirección</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="38"/>
+        <location filename="../src/dlg_connect.cpp" line="37"/>
         <source>&amp;Host:</source>
         <translation>&amp;Dirección:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="40"/>
+        <location filename="../src/dlg_connect.cpp" line="39"/>
         <source>Enter host name</source>
         <translation>Introduce la dirección</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="43"/>
+        <location filename="../src/dlg_connect.cpp" line="42"/>
         <source>&amp;Port:</source>
         <translation>&amp;Puerto:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="47"/>
+        <location filename="../src/dlg_connect.cpp" line="46"/>
         <source>Player &amp;name:</source>
         <translation>&amp;Nombre del jugador:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="51"/>
+        <location filename="../src/dlg_connect.cpp" line="50"/>
         <source>P&amp;assword:</source>
         <translation>&amp;Contraseña:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="56"/>
+        <location filename="../src/dlg_connect.cpp" line="55"/>
         <source>&amp;Save password</source>
         <translation>&amp;Guardar contraseña</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="59"/>
+        <location filename="../src/dlg_connect.cpp" line="58"/>
         <source>A&amp;uto connect</source>
         <translation>Conectarse a&amp;utomáticamente</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="60"/>
+        <location filename="../src/dlg_connect.cpp" line="59"/>
         <source>Automatically connect to the most recent login when Cockatrice opens</source>
         <translation>Conectar automáticamente al servidor más reciente cuando se inicie Cockatrice</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="74"/>
+        <location filename="../src/dlg_connect.cpp" line="73"/>
         <source>Forgot password</source>
-        <translation type="unfinished"/>
+        <translation>Contraseña olvidada</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="77"/>
+        <location filename="../src/dlg_connect.cpp" line="76"/>
         <source>Connect</source>
-        <translation type="unfinished"/>
+        <translation>Conectar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="81"/>
+        <location filename="../src/dlg_connect.cpp" line="80"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="100"/>
+        <location filename="../src/dlg_connect.cpp" line="99"/>
         <source>Server</source>
         <translation>Servidor</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="110"/>
+        <location filename="../src/dlg_connect.cpp" line="109"/>
         <source>Login</source>
         <translation>Iniciar sesión</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="125"/>
+        <location filename="../src/dlg_connect.cpp" line="124"/>
         <source>Connect to server</source>
         <translation>Conectar al servidor</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="192"/>
+        <location filename="../src/dlg_connect.cpp" line="191"/>
         <source>Connect Warning</source>
         <translation>Advertencia de conexión</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="192"/>
+        <location filename="../src/dlg_connect.cpp" line="191"/>
         <source>The player name can&apos;t be empty.</source>
         <translation>El nombre del jugador no puede estar vacío.</translation>
     </message>
@@ -1070,42 +1055,42 @@ Asegúrate de activar el &apos;set de tokens&apos; en el menú &apos;Editar sets
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="29"/>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="86"/>
         <source>Forgot Password Challenge Warning</source>
-        <translation type="unfinished"/>
+        <translation>Advertencia de reinicio de contraseña olvidada</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="29"/>
         <source>Oops, looks like something has gone wrong.  Please restart the forgot password process by using the forgot password button on the connection screen.</source>
-        <translation type="unfinished"/>
+        <translation>Ups, parece que algo salió mal. Por favor, reinicia el proceso de contraseña olvidada usando el botón de contraseña olvidada en la pantalla de conexión.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="33"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dirección:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="37"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Puerto:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="41"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Nombre del jugador:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="45"/>
         <source>Email:</source>
-        <translation type="unfinished"/>
+        <translation>Email:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="77"/>
         <source>Forgot Password Challenge</source>
-        <translation type="unfinished"/>
+        <translation>Reinicio de conraseña olvidada</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="86"/>
         <source>The email address can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>El email no puede estar vacío.</translation>
     </message>
 </context>
 <context>
@@ -1113,32 +1098,32 @@ Asegúrate de activar el &apos;set de tokens&apos; en el menú &apos;Editar sets
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="27"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dirección:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="31"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Puerto:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="35"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Nombre del jugador:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="56"/>
         <source>Forgot Password Request</source>
-        <translation type="unfinished"/>
+        <translation>Petición de conraseña olvidada</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="65"/>
         <source>Forgot Password Request Warning</source>
-        <translation type="unfinished"/>
+        <translation>Advertencia de petición de contraseña olvidada</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="65"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>El nombre del jugador no puede estar vacío.</translation>
     </message>
 </context>
 <context>
@@ -1150,63 +1135,63 @@ Asegúrate de activar el &apos;set de tokens&apos; en el menú &apos;Editar sets
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="112"/>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="118"/>
         <source>Forgot Password Reset Warning</source>
-        <translation type="unfinished"/>
+        <translation>Advertencia de reinicio de contraseña olvidada</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="29"/>
         <source>Opps, looks like something has gone wrong.  Please re-start the forgot password process by using the forgot password button on the connection screen.</source>
-        <translation type="unfinished"/>
+        <translation>Ups, parece que algo salió mal. Por favor, reinicia el proceso de contraseña olvidada usando el botón de contraseña olvidada en la pantalla de conexión.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="33"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dirección:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="37"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Puerto:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="41"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Nombre del jugador:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="45"/>
         <source>Token:</source>
-        <translation type="unfinished"/>
+        <translation>Ficha:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="49"/>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="54"/>
         <source>New Password:</source>
-        <translation type="unfinished"/>
+        <translation>Nueva contraseña:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="91"/>
         <source>Forgot Password Reset</source>
-        <translation type="unfinished"/>
+        <translation>Reinicio de conraseña olvidada</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="100"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>El nombre del jugador no puede estar vacío.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="106"/>
         <source>The token can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>La ficha no puede estar vacía.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="112"/>
         <source>The new password can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>La nueva contraseña no puede estar vacía.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="118"/>
         <source>The passwords do not match.</source>
-        <translation type="unfinished"/>
+        <translation>Las contraseñas no coinciden.</translation>
     </message>
 </context>
 <context>
@@ -1469,14 +1454,14 @@ Por favor, abre una incidencia en http://github.com/Cockatrice/Cockatrice/issues
     <name>DlgUpdate</name>
     <message>
         <location filename="../src/dlg_update.cpp" line="48"/>
-        <location filename="../src/dlg_update.cpp" line="154"/>
-        <location filename="../src/dlg_update.cpp" line="167"/>
+        <location filename="../src/dlg_update.cpp" line="155"/>
+        <location filename="../src/dlg_update.cpp" line="168"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="110"/>
-        <location filename="../src/dlg_update.cpp" line="128"/>
+        <location filename="../src/dlg_update.cpp" line="129"/>
         <source>Cockatrice Update</source>
         <translation>Actualización de Cockatrice</translation>
     </message>
@@ -1488,7 +1473,7 @@ Por favor, abre una incidencia en http://github.com/Cockatrice/Cockatrice/issues
     <message>
         <location filename="../src/dlg_update.cpp" line="21"/>
         <source>Current release channel:</source>
-        <translation type="unfinished"/>
+        <translation>Canal de lanzamiento actual:</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="28"/>
@@ -1498,7 +1483,7 @@ Por favor, abre una incidencia en http://github.com/Cockatrice/Cockatrice/issues
     <message>
         <location filename="../src/dlg_update.cpp" line="49"/>
         <source>Cockatrice was not built with SSL support, so you cannot download updates automatically! Please visit the download page to update manually.</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice no fue creado con soporte para SSL, por lo que no se pueden descargar actualizaciones! Por favor visita la página de descargas y actualízalo manualmente.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="82"/>
@@ -1521,41 +1506,41 @@ Por favor, abre una incidencia en http://github.com/Cockatrice/Cockatrice/issues
         <translation>Tu version de Cockatrice esta actualizada</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="120"/>
+        <location filename="../src/dlg_update.cpp" line="121"/>
         <source>A new version is available:&lt;br/&gt;%1&lt;br/&gt;published on %2 .&lt;br/&gt;More informations are available on the &lt;a href=&quot;%3&quot;&gt;release changelog&lt;/a&gt;&lt;br/&gt;Do you want to update now?</source>
-        <translation type="unfinished"/>
+        <translation>Una nueva versión está disponible:&lt;br/&gt;%1&lt;br/&gt;publicada en %2 .&lt;br/&gt;Más información disponible en &lt;a href=&quot;%3&quot;&gt;release changelog&lt;/a&gt;&lt;br/&gt;Quieres actualizar ahora?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="129"/>
+        <location filename="../src/dlg_update.cpp" line="130"/>
         <source>A new version is available:&lt;br/&gt;%1&lt;br/&gt;published on %2 .&lt;br/&gt;More informations are available on the &lt;a href=&quot;%3&quot;&gt;release changelog&lt;/a&gt;&lt;br/&gt;Unfortunately there are no packages available for your operating system. You may have to use a developer build or build from source yourself. Please visit the download page.</source>
-        <translation type="unfinished"/>
+        <translation>Una nueva versión está disponible:&lt;br/&gt;%1&lt;br/&gt;publicada en %2 .&lt;br/&gt;Más información disponible en &lt;a href=&quot;%3&quot;&gt;release changelog&lt;/a&gt;&lt;br/&gt;Desgraciadamente no hay paquetes disponibles para tu sistema operativo. Puede que tengas que usar una build de desarrollador. Por favor, visita la página de descargas.</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="150"/>
-        <location filename="../src/dlg_update.cpp" line="156"/>
-        <location filename="../src/dlg_update.cpp" line="168"/>
+        <location filename="../src/dlg_update.cpp" line="151"/>
+        <location filename="../src/dlg_update.cpp" line="157"/>
+        <location filename="../src/dlg_update.cpp" line="169"/>
         <source>Update Error</source>
         <translation>Error en la actualización</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="150"/>
+        <location filename="../src/dlg_update.cpp" line="151"/>
         <source>An error occurred while checking for updates: </source>
         <translation>Un error a ocurrido mientras se buscaban actualizaciones:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="156"/>
+        <location filename="../src/dlg_update.cpp" line="157"/>
         <source>An error occurred while downloading an update: </source>
         <translation>Un error a ocurrido mientras se descargaba una actualización:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="160"/>
+        <location filename="../src/dlg_update.cpp" line="161"/>
         <source>Installing...</source>
         <translation>Instalando...</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="169"/>
+        <location filename="../src/dlg_update.cpp" line="170"/>
         <source>Unable to open the installer. You might be able to manually update by closing Cockatrice and running the installer at %1.</source>
-        <translation type="unfinished"/>
+        <translation>No se pudo abrir el instalador. Actualiza manualmente cerrando Cockatrice y ejecutando el instalador%1.</translation>
     </message>
 </context>
 <context>
@@ -1850,16 +1835,16 @@ Por favor, abre una incidencia en http://github.com/Cockatrice/Cockatrice/issues
     <message>
         <location filename="../src/dlg_settings.cpp" line="286"/>
         <source>Reset/clear downloaded pictures</source>
-        <translation type="unfinished"/>
+        <translation>Reinicializar/Borrar imágenes descargadas</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="287"/>
         <source>Update channel</source>
-        <translation type="unfinished"/>
+        <translation>Actualizar canal</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="288"/>
-        <source>Notify when a new version is available</source>
+        <source>Notify if a feature supported by the server is missing in my client</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -2240,23 +2225,24 @@ Esto suele ser debido a que tu versión del cliente está desfasada y el servido
     <message>
         <location filename="../src/window_main.cpp" line="340"/>
         <source>Your client seems to be missing features this server requires for connection.</source>
-        <translation type="unfinished"/>
+        <translation>Tu cliente parece no tener las características requeridas para la conexión de este servidor.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="380"/>
         <source>Your account has not been activated yet.
 You need to provide the activation token received in the activation email.</source>
-        <translation type="unfinished"/>
+        <translation>Tu cuenta aún no ha sido activada.
+Tienes que proporcionar el código recibido en el email de activación</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="450"/>
         <source>The email address provider used during registration has been blacklisted for use on this server.</source>
-        <translation type="unfinished"/>
+        <translation>El email proporcionado durante el registro ha sido puesto en la lista negra en este servidor.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="453"/>
         <source>Too many registration attempts, please try again later or contact the server operator for further details.</source>
-        <translation type="unfinished"/>
+        <translation>Demasiados intentos de registro, por favor inténtelo más tarde o contacte con el operador del servidor para más detalles.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="456"/>
@@ -2322,7 +2308,7 @@ La versión local es %1, la versión remota es %2.</translation>
         <location filename="../src/window_main.cpp" line="513"/>
         <location filename="../src/window_main.cpp" line="514"/>
         <source>Requesting forgot password to %1 as %2...</source>
-        <translation type="unfinished"/>
+        <translation>Solicitando contraseña perdida de %1 como %2...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="523"/>
@@ -2562,35 +2548,43 @@ Cockatrice está recargando la base de datos de cartas.</translation>
 This is most likely not a problem, but this message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.
 
 To update your client, go to Help -&gt; Update Cockatrice.</source>
+        <translation>Este servidor soporta características adicionales que tu cliente no tiene.
+Esto no debería ser un problema, pero este mensaje podría significar que hay una nueva versión de Cockatrice disponible o este servidor está usando una versión personalizada o de prelanzamiento.
+Para actualizar tu cliente, ve a Ayuda -&gt; Actualizar Cockatrice.</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="1035"/>
+        <source>You can only import XML databases at this time.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1087"/>
-        <location filename="../src/window_main.cpp" line="1095"/>
-        <location filename="../src/window_main.cpp" line="1103"/>
+        <location filename="../src/window_main.cpp" line="1092"/>
+        <location filename="../src/window_main.cpp" line="1100"/>
+        <location filename="../src/window_main.cpp" line="1108"/>
         <source>Forgot Password</source>
-        <translation type="unfinished"/>
+        <translation>Contraseña olvidada</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1087"/>
+        <location filename="../src/window_main.cpp" line="1092"/>
         <source>Your password has been reset successfully, you now may  log in using the new credentials.</source>
-        <translation type="unfinished"/>
+        <translation>Tu contraseña se ha reiniciado con éxito, ahora puedes conectarte las nuevas credenciales.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1095"/>
+        <location filename="../src/window_main.cpp" line="1100"/>
         <source>Failed to reset user account password, please contact the server operator to reset your password.</source>
-        <translation type="unfinished"/>
+        <translation>No se pudo reiniciar la contraseña, por favor contacte con el operador del servidor para reiniciar su contraseña.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1103"/>
+        <location filename="../src/window_main.cpp" line="1108"/>
         <source>Activation request received, please check your email for an activation token.</source>
-        <translation type="unfinished"/>
+        <translation>Petición de activación recibida, por favor comprueba tu email para el código de activación.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1022"/>
         <location filename="../src/window_main.cpp" line="1030"/>
-        <location filename="../src/window_main.cpp" line="1043"/>
-        <location filename="../src/window_main.cpp" line="1046"/>
+        <location filename="../src/window_main.cpp" line="1035"/>
+        <location filename="../src/window_main.cpp" line="1048"/>
+        <location filename="../src/window_main.cpp" line="1051"/>
         <source>Load sets/cards</source>
         <translation>Cargar ediciones/cartas</translation>
     </message>
@@ -2600,14 +2594,14 @@ To update your client, go to Help -&gt; Update Cockatrice.</source>
         <translation>El archivo seleccionado no fue encontrado.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1043"/>
+        <location filename="../src/window_main.cpp" line="1048"/>
         <source>The new sets/cards have been added successfully.
 Cockatrice will now reload the card database.</source>
         <translation>Las nuevas ediciones/cartas se han agregado correctamente.
 Cockatrice está recargando la base de datos de cartas.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1046"/>
+        <location filename="../src/window_main.cpp" line="1051"/>
         <source>Sets/cards failed to import.</source>
         <translation>Las ediciones/cartas fallaron al ser importadas.</translation>
     </message>
@@ -3658,31 +3652,35 @@ Cockatrice está recargando la base de datos de cartas.</translation>
         <translation>Verde</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="702"/>
-        <location filename="../src/player.cpp" line="705"/>
-        <source>%1</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="708"/>
-        <source>%1...</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="2442"/>
-        <location filename="../src/player.cpp" line="2454"/>
-        <source>Token: </source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
+        <location filename="../src/player.cpp" line="2446"/>
         <location filename="../src/player.cpp" line="2458"/>
+        <source>Token: </source>
+        <translation>Ficha:</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="2462"/>
         <source>All tokens</source>
-        <translation type="unfinished"/>
+        <translation>Todas las fichas</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="865"/>
         <source>View top cards of library</source>
         <translation>Ver cartas de la parte superior de la biblioteca</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="702"/>
+        <source>&amp;Add counter (%1)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="705"/>
+        <source>&amp;Remove counter (%1)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="708"/>
+        <source>&amp;Set counters (%1)...</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="865"/>
@@ -3698,7 +3696,7 @@ Cockatrice está recargando la base de datos de cartas.</translation>
         <location filename="../src/player.cpp" line="920"/>
         <location filename="../src/player.cpp" line="935"/>
         <location filename="../src/player.cpp" line="958"/>
-        <location filename="../src/player.cpp" line="2266"/>
+        <location filename="../src/player.cpp" line="2277"/>
         <source>Number:</source>
         <translation>Número:</translation>
     </message>
@@ -3723,27 +3721,27 @@ Cockatrice está recargando la base de datos de cartas.</translation>
         <translation>Número de caras:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2109"/>
+        <location filename="../src/player.cpp" line="2120"/>
         <source>Set power/toughness</source>
         <translation>Establecer fuerza/resistencia</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2109"/>
+        <location filename="../src/player.cpp" line="2120"/>
         <source>Please enter the new PT:</source>
         <translation>Por favor, introduzca la nueva F/R:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2184"/>
+        <location filename="../src/player.cpp" line="2195"/>
         <source>Set annotation</source>
         <translation>Escribir anotación</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2184"/>
+        <location filename="../src/player.cpp" line="2195"/>
         <source>Please enter the new annotation:</source>
         <translation>Por favor, introduza la nueva anotación:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2266"/>
+        <location filename="../src/player.cpp" line="2277"/>
         <source>Set counters</source>
         <translation>Establecer contadores</translation>
     </message>
@@ -4022,34 +4020,34 @@ Cockatrice está recargando la base de datos de cartas.</translation>
 <context>
     <name>StableReleaseChannel</name>
     <message>
-        <location filename="../src/releasechannel.cpp" line="89"/>
+        <location filename="../src/releasechannel.cpp" line="90"/>
         <source>Stable releases</source>
-        <translation type="unfinished"/>
+        <translation>Versiones estables</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="107"/>
+        <location filename="../src/releasechannel.cpp" line="108"/>
         <source>No reply received from the release update server.</source>
-        <translation type="unfinished"/>
+        <translation>No se recibe respuesta del servidor de lanzamiento de actualizaciones.</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="116"/>
+        <location filename="../src/releasechannel.cpp" line="117"/>
         <source>Invalid reply received from the release update server.</source>
-        <translation type="unfinished"/>
+        <translation>Respuesta invalida del servidor de lanzamiento de actualizaciones.</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="148"/>
+        <location filename="../src/releasechannel.cpp" line="149"/>
         <source>No reply received from the tag update server.</source>
-        <translation type="unfinished"/>
+        <translation>No se recibe respuesta del servidor de etiquetas de actualizaciones.</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="155"/>
+        <location filename="../src/releasechannel.cpp" line="156"/>
         <source>Invalid reply received from the tag update server.</source>
-        <translation type="unfinished"/>
+        <translation>Respuesta invalida del servidor de etiquetas de actualizaciones.</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="178"/>
+        <location filename="../src/releasechannel.cpp" line="179"/>
         <source>No reply received from the file update server.</source>
-        <translation type="unfinished"/>
+        <translation>No se recibe respuesta del servidor de archivos de actualizaciones.</translation>
     </message>
 </context>
 <context>
@@ -4351,8 +4349,8 @@ Por favor, introduce un nombre:</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="195"/>
-        <location filename="../src/tab_deck_storage.cpp" line="312"/>
-        <location filename="../src/tab_deck_storage.cpp" line="320"/>
+        <location filename="../src/tab_deck_storage.cpp" line="316"/>
+        <location filename="../src/tab_deck_storage.cpp" line="324"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
         <translation>¿Estás seguro de que quieres borrar &quot;%1&quot;?</translation>
     </message>
@@ -4362,12 +4360,12 @@ Por favor, introduce un nombre:</translation>
         <translation>Nombre de la nueva carpeta:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="312"/>
+        <location filename="../src/tab_deck_storage.cpp" line="316"/>
         <source>Delete remote folder</source>
         <translation>Borrar carpeta remota</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="320"/>
+        <location filename="../src/tab_deck_storage.cpp" line="324"/>
         <source>Delete remote deck</source>
         <translation>Borrar mazo remoto</translation>
     </message>
@@ -4375,153 +4373,155 @@ Por favor, introduce un nombre:</translation>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="450"/>
-        <location filename="../src/tab_game.cpp" line="1175"/>
+        <location filename="../src/tab_game.cpp" line="451"/>
+        <location filename="../src/tab_game.cpp" line="458"/>
+        <location filename="../src/tab_game.cpp" line="1183"/>
         <source>Replay</source>
         <translation>Repetir</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="450"/>
+        <location filename="../src/tab_game.cpp" line="451"/>
+        <location filename="../src/tab_game.cpp" line="458"/>
         <source>Game</source>
         <translation>Partida</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="452"/>
-        <location filename="../src/tab_game.cpp" line="496"/>
+        <location filename="../src/tab_game.cpp" line="461"/>
+        <location filename="../src/tab_game.cpp" line="504"/>
         <source>Card Info</source>
         <translation>Información de la carta</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="453"/>
-        <location filename="../src/tab_game.cpp" line="498"/>
+        <location filename="../src/tab_game.cpp" line="506"/>
         <source>Player List</source>
         <translation>Lista de jugadores</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="454"/>
-        <location filename="../src/tab_game.cpp" line="497"/>
+        <location filename="../src/tab_game.cpp" line="462"/>
+        <location filename="../src/tab_game.cpp" line="505"/>
         <source>Messages</source>
         <translation>Mensajes</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="456"/>
-        <location filename="../src/tab_game.cpp" line="511"/>
+        <location filename="../src/tab_game.cpp" line="464"/>
+        <location filename="../src/tab_game.cpp" line="519"/>
         <source>Replay Timeline</source>
         <translation>Historial de partidas</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="461"/>
+        <location filename="../src/tab_game.cpp" line="469"/>
         <source>&amp;Phases</source>
         <translation>&amp;Fases</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="464"/>
+        <location filename="../src/tab_game.cpp" line="472"/>
         <source>&amp;Game</source>
         <translation>&amp;Partida</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="466"/>
+        <location filename="../src/tab_game.cpp" line="474"/>
         <source>Next &amp;phase</source>
         <translation>Próxima &amp;fase</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="469"/>
+        <location filename="../src/tab_game.cpp" line="477"/>
         <source>Next &amp;turn</source>
         <translation>Próximo &amp;turno</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="472"/>
+        <location filename="../src/tab_game.cpp" line="480"/>
         <source>&amp;Remove all local arrows</source>
         <translation>&amp;Retirar todas las flechas locales</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="475"/>
+        <location filename="../src/tab_game.cpp" line="483"/>
         <source>Rotate View Cl&amp;ockwise</source>
         <translation>Girar en sentido horario</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="478"/>
+        <location filename="../src/tab_game.cpp" line="486"/>
         <source>Rotate View Co&amp;unterclockwise</source>
         <translation>Girar en sentido antih&amp;orario (&amp;U)</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="481"/>
+        <location filename="../src/tab_game.cpp" line="489"/>
         <source>Game &amp;information</source>
         <translation>&amp;Información de la partida</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="483"/>
+        <location filename="../src/tab_game.cpp" line="491"/>
         <source>&amp;Concede</source>
         <translation>&amp;Conceder</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="486"/>
+        <location filename="../src/tab_game.cpp" line="494"/>
         <source>&amp;Leave game</source>
         <translation>&amp;Abandonar la partida</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="489"/>
+        <location filename="../src/tab_game.cpp" line="497"/>
         <source>C&amp;lose replay</source>
         <translation>&amp;Cerrar repetición</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="492"/>
+        <location filename="../src/tab_game.cpp" line="500"/>
         <source>&amp;Say:</source>
         <translation>&amp;Decir:</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="495"/>
+        <location filename="../src/tab_game.cpp" line="503"/>
         <source>&amp;View</source>
         <translation>&amp;Ver</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="500"/>
-        <location filename="../src/tab_game.cpp" line="503"/>
-        <location filename="../src/tab_game.cpp" line="506"/>
-        <location filename="../src/tab_game.cpp" line="512"/>
+        <location filename="../src/tab_game.cpp" line="508"/>
+        <location filename="../src/tab_game.cpp" line="511"/>
+        <location filename="../src/tab_game.cpp" line="514"/>
+        <location filename="../src/tab_game.cpp" line="520"/>
         <source>Visible</source>
         <translation>Visible</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="501"/>
-        <location filename="../src/tab_game.cpp" line="504"/>
-        <location filename="../src/tab_game.cpp" line="507"/>
-        <location filename="../src/tab_game.cpp" line="513"/>
+        <location filename="../src/tab_game.cpp" line="509"/>
+        <location filename="../src/tab_game.cpp" line="512"/>
+        <location filename="../src/tab_game.cpp" line="515"/>
+        <location filename="../src/tab_game.cpp" line="521"/>
         <source>Floating</source>
         <translation>Flotante</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="516"/>
+        <location filename="../src/tab_game.cpp" line="524"/>
         <source>Reset layout</source>
         <translation>Resetear la distribución </translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="597"/>
+        <location filename="../src/tab_game.cpp" line="605"/>
         <source>Concede</source>
         <translation>Conceder</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="597"/>
+        <location filename="../src/tab_game.cpp" line="605"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>¿Estás seguro de que quieres conceder esta partida?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="607"/>
+        <location filename="../src/tab_game.cpp" line="615"/>
         <source>Leave game</source>
         <translation>Abandonar la partida</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="607"/>
+        <location filename="../src/tab_game.cpp" line="615"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>¿Estás seguro de que quieres abandonar la partida?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="803"/>
+        <location filename="../src/tab_game.cpp" line="811"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
         <translation>Estás saturando la partida. Por favor, espera unos minutos.</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1070"/>
+        <location filename="../src/tab_game.cpp" line="1078"/>
         <source>You have been kicked out of the game.</source>
         <translation>Has sido expulsado de la partida.</translation>
     </message>
@@ -4704,21 +4704,21 @@ Cuando más información introduzcas, más específicos serán los resultados.</
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="107"/>
-        <source>This user is ignoring you.</source>
-        <translation>Este usuario está ignorandote.</translation>
+        <source>This user is ignoring you, they cannot see your messages in main chat and you cannot join their games.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="137"/>
+        <location filename="../src/tab_message.cpp" line="140"/>
         <source>Private message from </source>
         <translation>Mensaje privado de </translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="154"/>
+        <location filename="../src/tab_message.cpp" line="157"/>
         <source>%1 has left the server.</source>
         <translation>%1 ha abandonado el servidor.</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="160"/>
+        <location filename="../src/tab_message.cpp" line="163"/>
         <source>%1 has joined the server.</source>
         <translation>%1 se ha unido al servidor.</translation>
     </message>
@@ -4773,12 +4773,22 @@ Cuando más información introduzcas, más específicos serán los resultados.</
         <translation>¿Estás seguro de que quieres borrar &quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="254"/>
+        <location filename="../src/tab_replays.cpp" line="196"/>
+        <source>Downloading Replays</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_replays.cpp" line="196"/>
+        <source>You cannot download replay folders at this time</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_replays.cpp" line="259"/>
         <source>Delete remote replay</source>
         <translation>Borrar repetición remota</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="254"/>
+        <location filename="../src/tab_replays.cpp" line="259"/>
         <source>Are you sure you want to delete the replay of game %1?</source>
         <translation>¿Estás seguro de que quieres borrar la repetición de la partida %1?</translation>
     </message>
@@ -4882,7 +4892,7 @@ Cuando más información introduzcas, más específicos serán los resultados.</
     <message>
         <location filename="../src/tab_supervisor.cpp" line="582"/>
         <source>Unknown Event</source>
-        <translation type="unfinished"/>
+        <translation>Evento desconocido</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="582"/>
@@ -4890,17 +4900,19 @@ Cuando más información introduzcas, más específicos serán los resultados.</
 This message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.
 
 To update your client, go to Help -&gt; Update Cockatrice.</source>
-        <translation type="unfinished"/>
+        <translation>Este servidor te ha enviado un mensaje que tu cliente no entiende.
+Este mensaje podría significar que hay una nueva versión de Cockatrice disponible o este servidor está usando una versión personalizada o de prelanzamiento.
+Para actualizar tu cliente, ve a Ayuda -&gt; Actualizar Cockatrice.</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="583"/>
         <source>Idle Timeout</source>
-        <translation type="unfinished"/>
+        <translation>Tiempo de ausencia agotado</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="583"/>
         <source>You are about to be logged out due to inactivity.</source>
-        <translation type="unfinished"/>
+        <translation>Va a ser desconectado por inactividad.</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="584"/>
@@ -4928,7 +4940,8 @@ Por favor, absténgase de realizar de nuevo esta actividad o se tomarán medidas
         <location filename="../src/tab_supervisor.cpp" line="597"/>
         <source>You have received the following message from the server.
 (custom messages like these could be untranslated)</source>
-        <translation type="unfinished"/>
+        <translation>Ha recibido los siguientes mensajes del servidor.
+(los mensajes como estos pueden aparecer en el idioma original)</translation>
     </message>
 </context>
 <context>
@@ -5191,7 +5204,7 @@ Por favor, absténgase de realizar de nuevo esta actividad o se tomarán medidas
     <message>
         <location filename="../src/userinfobox.cpp" line="115"/>
         <source>%1</source>
-        <translation type="unfinished"/>
+        <translation>%1</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="123"/>
@@ -5493,7 +5506,7 @@ Por favor, absténgase de realizar de nuevo esta actividad o se tomarán medidas
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../src/settingscache.cpp" line="152"/>
+        <location filename="../src/settingscache.cpp" line="153"/>
         <source>English</source>
         <translation>Español (Spanish)</translation>
     </message>
@@ -5890,7 +5903,7 @@ Por favor, absténgase de realizar de nuevo esta actividad o se tomarán medidas
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1558"/>
         <source>Create all related tokens</source>
-        <translation type="unfinished"/>
+        <translation>Crear todas las fichas relacionadas.</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1559"/>

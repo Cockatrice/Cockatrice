@@ -469,7 +469,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../../cockatrice/src/settingscache.cpp" line="152"/>
+        <location filename="../../cockatrice/src/settingscache.cpp" line="153"/>
         <source>English</source>
         <translation>Svenska (Swedish)</translation>
     </message>
