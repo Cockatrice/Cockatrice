@@ -472,7 +472,7 @@ Voer een URL of bestandsnaam in als bron, en selecteer vervolgens uit de lijst v
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../../cockatrice/src/settingscache.cpp" line="152"/>
+        <location filename="../../cockatrice/src/settingscache.cpp" line="153"/>
         <source>English</source>
         <translation>Nederlands (Dutch)</translation>
     </message>
