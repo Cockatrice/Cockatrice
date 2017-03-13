@@ -111,10 +111,10 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         return;
     }
 
+    publishDate = release->getPublishDate().toString(Qt::DefaultLocaleLongDate);
     if (isCompatible) {
         //If there is an update, save its URL and work out its name
         updateUrl = release->getDownloadUrl();
-        publishDate = release->getPublishDate().toString(Qt::DefaultLocaleLongDate);
 
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Update Available",
