@@ -108,6 +108,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         //If there's no need to update, tell them that. However we still allow them to run the
         //downloader themselves if there's a compatible build
         QMessageBox::information(this, tr("Cockatrice Update"), tr("Your version of Cockatrice is up to date."));
+        return;
     }
 
     if (isCompatible) {
