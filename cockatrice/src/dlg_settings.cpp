@@ -71,7 +71,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
-    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), settingsCache, SLOT(setUpdateReleaseChannel(int)));
+    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(const QString &)), settingsCache, SLOT(setUpdateReleaseChannel(const QString &)));
     connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotifyAboutUpdate(int)));
     connect(&picDownloadCheckBox, SIGNAL(clicked(bool)), this, SLOT(setEnabledStatus(bool)));
     connect(defaultUrlEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrl(QString)));
