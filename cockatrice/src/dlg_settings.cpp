@@ -752,6 +752,9 @@ void SoundSettingsPage::retranslateUi() {
 DlgSettings::DlgSettings(QWidget *parent)
     : QDialog(parent)
 {
+    this->setMinimumSize(500,500);
+    this->adjustSize();
+
     connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
     
     contentsWidget = new QListWidget;
