@@ -140,7 +140,7 @@ void WndSets::actToggleButtons(const QItemSelection & selected, const QItemSelec
     aBottom->setDisabled(disabled);
 }
 
-void WndSets::selectRows(QList<int> rows)
+void WndSets::selectRows(QSet<int> rows)
 {
     foreach (int i, rows)
     {
@@ -167,7 +167,7 @@ void WndSets::actToggleAll()
 void WndSets::actUp()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    QList<int> newRows;
+    QSet<int> newRows;
 
     if (rows.empty())
         return;
@@ -180,7 +180,7 @@ void WndSets::actUp()
             continue;
 
         model->swapRows(oldRow, newRow);
-        newRows.append(newRow);
+        newRows.insert(newRow);
     }
 
     selectRows(newRows);
@@ -189,7 +189,7 @@ void WndSets::actUp()
 void WndSets::actDown()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    QList<int> newRows;
+    QSet<int> newRows;
 
     if (rows.empty())
         return;
@@ -202,7 +202,7 @@ void WndSets::actDown()
             continue;
 
         model->swapRows(oldRow, newRow);
-        newRows.append(newRow);
+        newRows.insert(newRow);
     }
 
     selectRows(newRows);
@@ -211,7 +211,7 @@ void WndSets::actDown()
 void WndSets::actTop()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    QList<int> newRows;
+    QSet<int> newRows;
 
     if (rows.empty())
         return;
@@ -224,7 +224,7 @@ void WndSets::actTop()
             continue;
 
         model->swapRows(oldRow, newRow);
-        newRows.append(newRow);
+        newRows.insert(newRow);
     }
 
     selectRows(newRows);
@@ -233,7 +233,7 @@ void WndSets::actTop()
 void WndSets::actBottom()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    QList<int> newRows;
+    QSet<int> newRows;
 
     if (rows.empty())
         return;
@@ -246,7 +246,7 @@ void WndSets::actBottom()
             continue;
 
         model->swapRows(oldRow, newRow);
-        newRows.append(newRow);
+        newRows.insert(newRow);
     }
 
     selectRows(newRows);
