@@ -285,7 +285,7 @@ bool Servatrice::initServer()
     }
 
     if (getRoomsMethodString() == "sql") {
-        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, permissionlevel, auto_join, join_message, chat_history_size from {prefix}_rooms where id_server = :id_server order by id asc");
+        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, permissionlevel, privlevel, auto_join, join_message, chat_history_size from {prefix}_rooms where id_server = :id_server order by id asc");
         query->bindValue(":id_server", serverId);
         servatriceDatabaseInterface->execSqlQuery(query);
         while (query->next()) {
@@ -301,8 +301,9 @@ bool Servatrice::initServer()
                                     query->value(1).toString(),
                                     query->value(2).toString(),
                                     query->value(3).toString().toLower(),
-                                    query->value(4).toInt(),
-                                    query->value(5).toString(),
+                                    query->value(4).toString().toLower(),
+                                    query->value(5).toInt(),
+                                    query->value(6).toString(),
                                     gameTypes,
                                     this));
         }
@@ -317,13 +318,13 @@ bool Servatrice::initServer()
                 gameTypes.append(settingsCache->value("name").toString());
             }
             settingsCache->endArray();
-            Server_Room *newRoom = new Server_Room(i,settingsCache->value("chathistorysize").toInt(),settingsCache->value("name").toString(),settingsCache->value("description").toString(),settingsCache->value("permissionlevel").toString().toLower(),settingsCache->value("autojoin").toBool(),settingsCache->value("joinmessage").toString(),gameTypes,this);
+            Server_Room *newRoom = new Server_Room(i,settingsCache->value("chathistorysize").toInt(),settingsCache->value("name").toString(),settingsCache->value("description").toString(),settingsCache->value("permissionlevel").toString().toLower(),settingsCache->value("privilegelevel").toString().toLower(),settingsCache->value("autojoin").toBool(),settingsCache->value("joinmessage").toString(),gameTypes,this);
             addRoom(newRoom);
         }
 
         if(size==0) {
             // no room defined in config, add a dummy one
-            Server_Room *newRoom = new Server_Room(0,100,"General room","Play anything here.","none",true,"",QStringList("Standard"),this);
+            Server_Room *newRoom = new Server_Room(0,100,"General room","Play anything here.","none","none",true,"",QStringList("Standard"),this);
             addRoom(newRoom);
         }
 
