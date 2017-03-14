@@ -140,11 +140,14 @@ void WndSets::actToggleButtons(const QItemSelection & selected, const QItemSelec
     aBottom->setDisabled(disabled);
 }
 
-void WndSets::selectRow(int row)
+void WndSets::selectRows(QList<int> rows)
 {
-    QModelIndex idx = model->index(row, 0);
-    view->selectionModel()->select(idx, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-    view->scrollTo(idx, QAbstractItemView::EnsureVisible);
+    foreach (int i, rows)
+    {
+        QModelIndex idx = model->index(i, 0);
+        view->selectionModel()->select(idx, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+        view->scrollTo(idx, QAbstractItemView::EnsureVisible);
+    }
 }
 
 void WndSets::actToggle()
@@ -164,63 +167,87 @@ void WndSets::actToggleAll()
 void WndSets::actUp()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    if(rows.empty())
+    QList<int> newRows;
+
+    if (rows.empty())
         return;
 
-    QModelIndex selectedRow = rows.first();
-    int oldRow = selectedRow.row();
-    int newRow = oldRow - 1;
-    if(oldRow <= 0)
-        return;
+    foreach (QModelIndex i, rows)
+    {
+        int oldRow = i.row();
+        int newRow = oldRow - 1;
+        if (oldRow <= 0)
+            continue;
 
-    model->swapRows(oldRow, newRow);
-    selectRow(newRow);
+        model->swapRows(oldRow, newRow);
+        newRows.append(newRow);
+    }
+
+    selectRows(newRows);
 }
 
 void WndSets::actDown()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    if(rows.empty())
+    QList<int> newRows;
+
+    if (rows.empty())
         return;
 
-    QModelIndex selectedRow = rows.first();
-    int oldRow = selectedRow.row();
-    int newRow = oldRow + 1;
-    if(oldRow >= model->rowCount() - 1)
-        return;
+    foreach (QModelIndex i, rows)
+    {
+        int oldRow = i.row();
+        int newRow = oldRow + 1;
+        if (oldRow >= model->rowCount() - 1)
+            continue;
 
-    model->swapRows(oldRow, newRow);
-    selectRow(newRow);
+        model->swapRows(oldRow, newRow);
+        newRows.append(newRow);
+    }
+
+    selectRows(newRows);
 }
 
 void WndSets::actTop()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    if(rows.empty())
+    QList<int> newRows;
+
+    if (rows.empty())
         return;
 
-    QModelIndex selectedRow = rows.first();
-    int oldRow = selectedRow.row();
-    int newRow = 0;
-    if(oldRow <= 0)
-        return;
+    foreach (QModelIndex i, rows)
+    {
+        int oldRow = i.row();
+        int newRow = 0;
+        if (oldRow <= 0)
+            continue;
 
-    model->swapRows(oldRow, newRow);
-    selectRow(newRow);
+        model->swapRows(oldRow, newRow);
+        newRows.append(newRow);
+    }
+
+    selectRows(newRows);
 }
 
 void WndSets::actBottom()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    if(rows.empty())
+    QList<int> newRows;
+
+    if (rows.empty())
         return;
 
-    QModelIndex selectedRow = rows.first();
-    int oldRow = selectedRow.row();
-    int newRow = model->rowCount() - 1;
-    if(oldRow >= newRow)
-        return;
+    foreach (QModelIndex i, rows)
+    {
+        int oldRow = i.row();
+        int newRow = model->rowCount() - 1;
+        if (oldRow >= newRow)
+            continue;
 
-    model->swapRows(oldRow, newRow);
-    selectRow(newRow);
+        model->swapRows(oldRow, newRow);
+        newRows.append(newRow);
+    }
+
+    selectRows(newRows);
 }

@@ -2,6 +2,7 @@
 #define WINDOW_SETS_H
 
 #include <QMainWindow>
+#include <QList>
 
 class SetsModel;
 class SetsProxyModel;
@@ -21,7 +22,7 @@ public:
     WndSets(QWidget *parent = 0);
     ~WndSets();
 protected:
-    void selectRow(int row);
+    void selectRows(QList<int> rows);
 private slots:
     void actToggle();
     void actToggleAll();
