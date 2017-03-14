@@ -190,7 +190,7 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     UserConnection_Information uci;
     QStringList data = uci.getServerInfo(saveName);
 
-    if (saveEdit == NULL)
+    if (saveEdit == nullptr)
         return;
     
     saveEdit->setText(data.at(0));
@@ -232,7 +232,9 @@ void DlgConnect::actOk()
         settingsCache->servers().addNewServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
     else
         settingsCache->servers().updateExistingServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
+
     settingsCache->servers().setPrevioushostName(saveEdit->text());
+    settingsCache->servers().setAutoConnect(autoConnectCheckBox->isChecked() ? 1 : 0);
 
     if (playernameEdit->text().isEmpty())
     {
