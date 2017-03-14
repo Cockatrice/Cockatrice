@@ -136,6 +136,9 @@ void SetsModel::toggleRow(int row)
 {
     CardSet *tmp = sets.at(row);
 
+    if (tmp == nullptr)
+        return;
+
     if (enabledSets.contains(tmp))
         enabledSets.remove(tmp);
     else
@@ -148,6 +151,9 @@ void SetsModel::toggleAll(int row)
 {
     bool enabled = true;
     CardSet *tmp = sets.at(row);
+
+    if (tmp == nullptr)
+        return;
 
     if (enabledSets.contains(tmp))
         enabled = false;
