@@ -27,7 +27,7 @@ DlgConnect::DlgConnect(QWidget *parent)
 
     newHostButton = new QRadioButton(tr("New Host"), this);
     
-    saveLabel = new QLabel(tr("Menu Name:"));
+    saveLabel = new QLabel(tr("Name:"));
     saveEdit = new QLineEdit(settingsCache->servers().getSaveName());
     saveLabel->setBuddy(saveEdit);
 
