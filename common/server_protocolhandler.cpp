@@ -766,9 +766,12 @@ bool Server_ProtocolHandler::isUserPermittedToJoinRoom(const QString roomPermiss
         {
             if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
                 return false;
-        } else
+        } 
+        else
+        {
             if (roomPrivilegeLevel.toLower() != QString::fromStdString(userInfo->privlevel()).toLower())
                 return false;
+        }
     }
     return true;
 }
