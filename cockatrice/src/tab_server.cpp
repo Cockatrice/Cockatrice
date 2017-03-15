@@ -74,7 +74,8 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
         QString roomPermissionDisplay = QString::fromStdString(room.privilegelevel()).toLower();
         if (QString::fromStdString(room.permissionlevel()).toLower() != "none" && QString::fromStdString(room.privilegelevel()).toLower() == "none")
             roomPermissionDisplay = QString::fromStdString(room.permissionlevel()).toLower();
-       
+        if (roomPermissionDisplay == "")
+            roomPermissionDisplay = QString::fromStdString(room.permissionlevel()).toLower();
         for (int j = 0; j < roomList->topLevelItemCount(); ++j) {
               QTreeWidgetItem *twi = roomList->topLevelItem(j);
             if (twi->data(0, Qt::UserRole).toInt() == room.room_id()) {
