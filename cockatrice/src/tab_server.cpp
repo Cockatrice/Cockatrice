@@ -71,7 +71,10 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
     const int roomListSize = event.room_list_size();
     for (int i = 0; i < roomListSize; ++i) {
         const ServerInfo_Room &room = event.room_list(i);
-        
+        QString roomPermissionDisplay = QString::fromStdString(room.privilegelevel()).toLower();
+        if (QString::fromStdString(room.permissionlevel()).toLower() != "none" && QString::fromStdString(room.privilegelevel()).toLower() == "none")
+            roomPermissionDisplay = QString::fromStdString(room.permissionlevel()).toLower();
+       
         for (int j = 0; j < roomList->topLevelItemCount(); ++j) {
               QTreeWidgetItem *twi = roomList->topLevelItem(j);
             if (twi->data(0, Qt::UserRole).toInt() == room.room_id()) {
@@ -80,7 +83,7 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
                 if (room.has_description())
                     twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
                 if (room.has_permissionlevel())
-                    twi->setData(2, Qt::DisplayRole, QString::fromStdString(room.permissionlevel()).toLower());
+                    twi->setData(2, Qt::DisplayRole, roomPermissionDisplay);
                 if (room.has_player_count())
                     twi->setData(3, Qt::DisplayRole, room.player_count());
                 if (room.has_game_count())
@@ -95,7 +98,7 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
         if (room.has_description())
             twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
         if (room.has_permissionlevel())
-            twi->setData(2, Qt::DisplayRole, QString::fromStdString(room.permissionlevel()).toLower());
+            twi->setData(2, Qt::DisplayRole, roomPermissionDisplay);
         twi->setData(3, Qt::DisplayRole, room.player_count());
         twi->setData(4, Qt::DisplayRole, room.game_count());
         twi->setTextAlignment(2, Qt::AlignRight);
