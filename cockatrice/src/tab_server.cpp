@@ -71,11 +71,18 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
     const int roomListSize = event.room_list_size();
     for (int i = 0; i < roomListSize; ++i) {
         const ServerInfo_Room &room = event.room_list(i);
+
+        /*
+        * A room can have a permission level and a privilege level. How ever we want to display only the necessary information 
+        * on the server tab needed to inform users of required permissions to enter a room. If the room has a privilege level
+        * the server tab will display the privilege level in the "permissions" column in the row however if the room contains
+        * a permissions level for the room the permissions level defined for the room will be displayed.
+        */
+
         QString roomPermissionDisplay = QString::fromStdString(room.privilegelevel()).toLower();
-        if (QString::fromStdString(room.permissionlevel()).toLower() != "none" && QString::fromStdString(room.privilegelevel()).toLower() == "none")
+        if (QString::fromStdString(room.permissionlevel()).toLower() != "none" || roomPermissionDisplay == "")
             roomPermissionDisplay = QString::fromStdString(room.permissionlevel()).toLower();
-        if (roomPermissionDisplay == "")
-            roomPermissionDisplay = QString::fromStdString(room.permissionlevel()).toLower();
+
         for (int j = 0; j < roomList->topLevelItemCount(); ++j) {
               QTreeWidgetItem *twi = roomList->topLevelItem(j);
             if (twi->data(0, Qt::UserRole).toInt() == room.room_id()) {
