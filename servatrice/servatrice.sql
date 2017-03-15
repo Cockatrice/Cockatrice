@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
   `id` int(7) unsigned NOT NULL auto_increment,
   `name` varchar(50) NOT NULL,
   `descr` varchar(255) NOT NULL,
-  `permissionlevel` varchar(20) NOT NULL,
+  `permissionlevel` enum('NONE','REGISTERED','MODERATOR','ADMINISTRATOR') NOT NULL,
   `privlevel` enum("NONE","PRIVILEGED","VIP","DONATOR") NOT NULL,
   `auto_join` tinyint(1) default 0,
   `join_message` varchar(255) NOT NULL,

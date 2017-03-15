@@ -36,6 +36,37 @@ Server_Room::~Server_Room()
     usersLock.unlock();
 }
 
+bool Server_Room::userMayJoin(const ServerInfo_User & userInfo)
+{
+    qDebug() << "USERPRIV: " << QString::fromStdString(userInfo.privlevel());
+
+    ServerInfo_Room roomInfo;
+
+    qDebug() << "ROOMPERM: " << permissionLevel.toLower();
+    qDebug() << "ROOMPRIV: " << privilegeLevel.toLower();
+
+    if (permissionLevel.toLower() == "administrator" || permissionLevel.toLower() == "moderator")
+        return false;
+
+    if (permissionLevel.toLower() == "registered" && !(userInfo.user_level() & ServerInfo_User::IsRegistered))
+        return false;
+
+    if (privilegeLevel.toLower() != "none")
+    {
+        if (privilegeLevel.toLower() == "privileged")
+        {
+            if (privilegeLevel.toLower() == "none")
+                return false;
+        }
+        else
+        {
+            if (privilegeLevel.toLower() != QString::fromStdString(userInfo.privlevel()).toLower())
+                return false;
+        }
+    }
+    return true;
+}
+
 Server *Server_Room::getServer() const
 {
     return static_cast<Server *>(parent());

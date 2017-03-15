@@ -58,6 +58,7 @@ public:
     QString getRoomPermission() const { return permissionLevel; }
     QString getRoomPrivilege() const { return privilegeLevel; }
     bool getAutoJoin() const { return autoJoin; }
+    bool userMayJoin(const ServerInfo_User &userInfo);
     QString getJoinMessage() const { return joinMessage; }
     const QStringList &getGameTypes() const { return gameTypes; }
     const QMap<int, Server_Game *> &getGames() const { return games; }

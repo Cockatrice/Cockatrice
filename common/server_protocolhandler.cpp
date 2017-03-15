@@ -621,7 +621,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
         return Response::RespNameNotFound;
 
     if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
-        if (!(isUserPermittedToJoinRoom(r->getRoomPermission(), r->getRoomPrivilege())))
+        if (!(r->userMayJoin(*userInfo)))
             return Response::RespUserLevelTooLow;
 
     r->addClient(this);
@@ -750,28 +750,4 @@ void Server_ProtocolHandler::resetIdleTimer()
 {
     lastActionReceived = timeRunning;
     idleClientWarningSent = false;
-}
-
-bool Server_ProtocolHandler::isUserPermittedToJoinRoom(const QString roomPermission, const QString roomPrivilegeLevel)
-{
-    if (roomPermission.toLower() == "administrator" || roomPermission.toLower() == "moderator")
-        return false;
-
-    if (roomPermission.toLower() == "registered" && !(userInfo->user_level() & ServerInfo_User::IsRegistered))
-        return false;
-
-    if (roomPrivilegeLevel.toLower() != "none")
-    {
-        if (roomPrivilegeLevel.toLower() == "privileged")
-        {
-            if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
-                return false;
-        } 
-        else
-        {
-            if (roomPrivilegeLevel.toLower() != QString::fromStdString(userInfo->privlevel()).toLower())
-                return false;
-        }
-    }
-    return true;
 }

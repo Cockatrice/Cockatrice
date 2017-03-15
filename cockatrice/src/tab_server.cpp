@@ -72,19 +72,6 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
     for (int i = 0; i < roomListSize; ++i) {
         const ServerInfo_Room &room = event.room_list(i);
 
-        /*
-        * A room can have a permission level and a privilege level. How ever we want to display only the necessary information 
-        * on the server tab needed to inform users of required permissions to enter a room. If the room has a privilege level
-        * the server tab will display the privilege level in the "permissions" column in the row however if the room contains
-        * a permissions level for the room the permissions level defined for the room will be displayed.
-        */
-
-        QString roomPermissionDisplay = QString::fromStdString(room.privilegelevel()).toLower();
-        if (QString::fromStdString(room.permissionlevel()).toLower() != "none")
-            roomPermissionDisplay = QString::fromStdString(room.permissionlevel()).toLower();
-        if (roomPermissionDisplay == "")    // catch all for misconfigured .ini room definitions 
-            roomPermissionDisplay = "none";
-
         for (int j = 0; j < roomList->topLevelItemCount(); ++j) {
               QTreeWidgetItem *twi = roomList->topLevelItem(j);
             if (twi->data(0, Qt::UserRole).toInt() == room.room_id()) {
@@ -93,7 +80,7 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
                 if (room.has_description())
                     twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
                 if (room.has_permissionlevel())
-                    twi->setData(2, Qt::DisplayRole, roomPermissionDisplay);
+                    twi->setData(2, Qt::DisplayRole, getRoomPermissionDisplay(room));
                 if (room.has_player_count())
                     twi->setData(3, Qt::DisplayRole, room.player_count());
                 if (room.has_game_count())
@@ -108,7 +95,7 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
         if (room.has_description())
             twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
         if (room.has_permissionlevel())
-            twi->setData(2, Qt::DisplayRole, roomPermissionDisplay);
+            twi->setData(2, Qt::DisplayRole, getRoomPermissionDisplay(room));
         twi->setData(3, Qt::DisplayRole, room.player_count());
         twi->setData(4, Qt::DisplayRole, room.game_count());
         twi->setTextAlignment(2, Qt::AlignRight);
@@ -120,6 +107,24 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
             if (room.auto_join())
                 emit joinRoomRequest(room.room_id(), false);
     }
+}
+
+QString RoomSelector::getRoomPermissionDisplay(const ServerInfo_Room & room)
+{
+    /*
+    * A room can have a permission level and a privilege level. How ever we want to display only the necessary information
+    * on the server tab needed to inform users of required permissions to enter a room. If the room has a privilege level
+    * the server tab will display the privilege level in the "permissions" column in the row however if the room contains
+    * a permissions level for the room the permissions level defined for the room will be displayed.
+    */
+
+    QString roomPermissionDisplay = QString::fromStdString(room.privilegelevel()).toLower();
+    if (QString::fromStdString(room.permissionlevel()).toLower() != "none")
+        roomPermissionDisplay = QString::fromStdString(room.permissionlevel()).toLower();
+    if (roomPermissionDisplay == "")    // catch all for misconfigured .ini room definitions 
+        roomPermissionDisplay = "none";
+
+    return roomPermissionDisplay;
 }
 
 void RoomSelector::joinClicked()
