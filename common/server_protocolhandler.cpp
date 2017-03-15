@@ -620,52 +620,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     if (!r)
         return Response::RespNameNotFound;
 
-    QString roomPermission = r->getRoomPermission().toLower();
-    if (roomPermission != "none"){
-        if (roomPermission == "registered") {
-            if (!(userInfo->user_level() & ServerInfo_User::IsRegistered))
-                return Response::RespUserLevelTooLow;
-        }
-
-        if (roomPermission == "moderator") {
-            if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
-                return Response::RespUserLevelTooLow;
-        }
-
-        if (roomPermission == "administrator") {
-            if (!(userInfo->user_level() & ServerInfo_User::IsAdmin))
-                return Response::RespUserLevelTooLow;
-        }
-
-        // TODO: POSSIBLY EXTEND THE ROOM OBJECT TO HAVE PRIV LEVEL SETTINGS AND COMPARE TO USER PRIVLEVEL ?
-
-        if (roomPermission == "privileged") {
-            if (!(userInfo->user_level() & ServerInfo_User::IsRegistered))
-                return Response::RespUserLevelTooLow;
-
-            if (!((userInfo->user_level() & ServerInfo_User::IsAdmin) || (userInfo->user_level() & ServerInfo_User::IsModerator)))
-                if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
-                    return Response::RespUserLevelTooLow;
-        }
-
-        if (roomPermission == "vip") {
-            if (!(userInfo->user_level() & ServerInfo_User::IsRegistered))
-                return Response::RespUserLevelTooLow;
-            
-            if (!((userInfo->user_level() & ServerInfo_User::IsAdmin) || (userInfo->user_level() & ServerInfo_User::IsModerator)))
-                if (QString::fromStdString(userInfo->privlevel()).toLower() != "vip")
-                    return Response::RespUserLevelTooLow;
-        }
-
-        if (roomPermission == "donator") {
-            if (!(userInfo->user_level() & ServerInfo_User::IsRegistered))
-                return Response::RespUserLevelTooLow;
-
-            if (!((userInfo->user_level() & ServerInfo_User::IsAdmin) || (userInfo->user_level() & ServerInfo_User::IsModerator)))
-                if (QString::fromStdString(userInfo->privlevel()).toLower() != "donator")
-                    return Response::RespUserLevelTooLow;
-        }
-}
+    if (!(userInfo->user_level() & ServerInfo_User::IsModerator || userInfo->user_level() & ServerInfo_User::IsModerator))
+        if (!(isUserPermittedToJoinRoom(r->getRoomPermission(), r->getRoomPrivilege())))
+            return Response::RespUserLevelTooLow;
 
     r->addClient(this);
     rooms.insert(r->getId(), r);
@@ -793,4 +750,25 @@ void Server_ProtocolHandler::resetIdleTimer()
 {
     lastActionReceived = timeRunning;
     idleClientWarningSent = false;
+}
+
+bool Server_ProtocolHandler::isUserPermittedToJoinRoom(const QString roomPermission, const QString roomPrivilegeLevel)
+{
+    if (roomPermission.toLower() == "administrator" || roomPermission.toLower() == "moderator")
+        return false;
+
+    if (roomPermission.toLower() == "registered" && !(userInfo->user_level() & ServerInfo_User::IsRegistered))
+        return false;
+
+    if (roomPrivilegeLevel.toLower() != "none")
+    {
+        if (roomPrivilegeLevel.toLower() == "privileged")
+        {
+            if (QString::fromStdString(userInfo->privlevel()).toLower() == "none")
+                return false;
+        } else
+            if (roomPrivilegeLevel.toLower() != QString::fromStdString(userInfo->privlevel()).toLower())
+                return false;
+    }
+    return true;
 }

@@ -56,6 +56,7 @@ public:
     QString getName() const { return name; }
     QString getDescription() const { return description; }
     QString getRoomPermission() const { return permissionLevel; }
+    QString getRoomPrivilege() const { return privilegeLevel; }
     bool getAutoJoin() const { return autoJoin; }
     QString getJoinMessage() const { return joinMessage; }
     const QStringList &getGameTypes() const { return gameTypes; }
