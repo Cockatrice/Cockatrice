@@ -620,7 +620,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     if (!r)
         return Response::RespNameNotFound;
 
-    if (!(userInfo->user_level() & ServerInfo_User::IsModerator || userInfo->user_level() & ServerInfo_User::IsModerator))
+    if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
         if (!(isUserPermittedToJoinRoom(r->getRoomPermission(), r->getRoomPrivilege())))
             return Response::RespUserLevelTooLow;
 
