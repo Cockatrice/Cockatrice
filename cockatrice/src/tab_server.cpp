@@ -80,8 +80,10 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
         */
 
         QString roomPermissionDisplay = QString::fromStdString(room.privilegelevel()).toLower();
-        if (QString::fromStdString(room.permissionlevel()).toLower() != "none" || roomPermissionDisplay == "")
+        if (QString::fromStdString(room.permissionlevel()).toLower() != "none")
             roomPermissionDisplay = QString::fromStdString(room.permissionlevel()).toLower();
+        if (roomPermissionDisplay == "")    // catch all for misconfigured .ini room definitions 
+            roomPermissionDisplay = "none";
 
         for (int j = 0; j < roomList->topLevelItemCount(); ++j) {
               QTreeWidgetItem *twi = roomList->topLevelItem(j);
