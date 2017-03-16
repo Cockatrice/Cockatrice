@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
   `name` varchar(50) NOT NULL,
   `descr` varchar(255) NOT NULL,
   `permissionlevel` enum('NONE','REGISTERED','MODERATOR','ADMINISTRATOR') NOT NULL,
-  `privlevel` enum("NONE","PRIVILEGED","VIP","DONATOR") NOT NULL,
+  `privlevel` enum('NONE','PRIVILEGED','VIP','DONATOR') NOT NULL,
   `auto_join` tinyint(1) default 0,
   `join_message` varchar(255) NOT NULL,
   `chat_history_size` int(4) NOT NULL,

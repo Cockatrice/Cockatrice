@@ -38,12 +38,8 @@ Server_Room::~Server_Room()
 
 bool Server_Room::userMayJoin(const ServerInfo_User & userInfo)
 {
-    qDebug() << "USERPRIV: " << QString::fromStdString(userInfo.privlevel());
-
+    
     ServerInfo_Room roomInfo;
-
-    qDebug() << "ROOMPERM: " << permissionLevel.toLower();
-    qDebug() << "ROOMPRIV: " << privilegeLevel.toLower();
 
     if (permissionLevel.toLower() == "administrator" || permissionLevel.toLower() == "moderator")
         return false;
