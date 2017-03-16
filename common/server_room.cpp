@@ -38,8 +38,6 @@ Server_Room::~Server_Room()
 
 bool Server_Room::userMayJoin(const ServerInfo_User & userInfo)
 {
-    
-    ServerInfo_Room roomInfo;
 
     if (permissionLevel.toLower() == "administrator" || permissionLevel.toLower() == "moderator")
         return false;
