@@ -22,7 +22,7 @@ public:
     QString getFPPlayerName(QString defaultName = "");
     QString getPassword();
     QString getSaveName(QString defaultname = "");
-    int getSavePassword();
+    bool getSavePassword();
     int getAutoConnect();
 
     void setPreviousHostLogin(int previous);

@@ -109,11 +109,11 @@ void ServersSettings::setSavePassword(int save)
     setValue(save, "save_password", "server");
 }
 
-int ServersSettings::getSavePassword()
+bool ServersSettings::getSavePassword()
 {
     int index = getPrevioushostindex(getPrevioushostName());
-    QVariant save = getValue(QString("savePassword%1").arg(index), "server", "server_details");
-    return save == QVariant() ? 1 : save.toInt();
+    bool save = getValue(QString("savePassword%1").arg(index), "server", "server_details").toBool();
+    return save;
 }
 
 void ServersSettings::setAutoConnect(int autoconnect)
