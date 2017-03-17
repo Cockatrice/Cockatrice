@@ -658,3 +658,9 @@ void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
     updateReleaseChannel = _updateReleaseChannel;
     settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
 }
+
+void SettingsCache::setMaxFontSize(int _max)
+{
+    maxFontSize = _max;
+    settings->setValue("game/maxfontsize", maxFontSize);
+}
