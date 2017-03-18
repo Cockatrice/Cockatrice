@@ -1,6 +1,7 @@
 #include "logger.h"
 
 #include <QDateTime>
+#include <iostream>
 
 #define LOGGER_MAX_ENTRIES 128
 #define LOGGER_FILENAME "qdebug.txt"
@@ -55,8 +56,10 @@ void Logger::log(QtMsgType /* type */, const QMessageLogContext & /* ctx */, con
 
     emit logEntryAdded(message);
 
-    if(logToFileEnabled)
-    {
-        fileStream << message << endl;
-    }
+    std::cerr << message.toStdString() << std::endl; // Print to stdout
+
+    if (logToFileEnabled)
+        fileStream << message << endl; // Print to fileStream
+
+
 }
