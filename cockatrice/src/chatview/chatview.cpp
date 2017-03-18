@@ -4,32 +4,27 @@
 #include <QMouseEvent>
 #include <QDesktopServices>
 #include <QApplication>
-#include <QDebug>
 #include "chatview.h"
 #include "user_level.h"
-#include "user_context_menu.h"
-#include "pixmapgenerator.h"
-#include "settingscache.h"
-#include "tab_userlists.h"
-#include "soundengine.h"
-#include "room_message_type.h"
+#include "../user_context_menu.h"
+#include "../pixmapgenerator.h"
+#include "../settingscache.h"
+#include "../tab_userlists.h"
+#include "../soundengine.h"
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
 const QColor OTHER_USER_COLOR = QColor(0, 65, 255); // dark blue
 const QString SERVER_MESSAGE_COLOR = "#851515";
 
-ChatView::ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent)
-    : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game), evenNumber(true), showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
+ChatView::ChatView(const TabSupervisor *_tabSupervisor, const UserlistProxy *_userlistProxy, TabGame *_game, bool _showTimestamps, QWidget *parent)
+    : QTextBrowser(parent), tabSupervisor(_tabSupervisor), userlistProxy(_userlistProxy), game(_game), evenNumber(true), showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
 {
     document()->setDefaultStyleSheet("a { text-decoration: none; color: blue; }");
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
-    
-    if(tabSupervisor->getUserInfo())
-    {
-        userName = QString::fromStdString(tabSupervisor->getUserInfo()->name());
-        mention = "@" + userName;
-    }
+
+    userName = userlistProxy->getOwnUsername();
+    mention = "@" + userName;
 
     mentionFormat.setFontWeight(QFont::Bold);
 
@@ -142,8 +137,7 @@ void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, 
     // nickname
     if (sender.toLower() != "servatrice") {
         QTextCharFormat senderFormat;
-        if (tabSupervisor && tabSupervisor->getUserInfo() &&
-            (sender == QString::fromStdString(tabSupervisor->getUserInfo()->name()))) {
+        if (sender == userName) {
             senderFormat.setForeground(QBrush(getCustomMentionColor()));
             senderFormat.setFontWeight(QFont::Bold);
         } else {
@@ -156,10 +150,10 @@ void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, 
         if (sameSender) {
             cursor.insertText("    ");
         } else {
-            if (!sender.isEmpty() && tabSupervisor->getUserListsTab()) {
+            if (!sender.isEmpty()) {
                 const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
-                QMap<QString, UserListTWI *> buddyList = tabSupervisor->getUserListsTab()->getBuddyList()->getUsers();
-                cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, buddyList.contains(sender), UserPrivLevel).toImage());
+                bool isBuddy = userlistProxy->isUserBuddy(sender);
+                cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, isBuddy, UserPrivLevel).toImage());
                 cursor.insertText(" ");
             }
             cursor.setCharFormat(senderFormat);
@@ -231,6 +225,7 @@ void ChatView::appendMessage(QString message, RoomMessageTypeFlags messageType, 
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
 
+
 void ChatView::checkTag(QTextCursor &cursor, QString &message)
 {
     if (message.startsWith("[card]"))
@@ -287,11 +282,10 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, QString &send
     QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
     QString mentionIntact = fullMentionUpToSpaceOrEnd;
 
-    QMap<QString, UserListTWI *> userList = tabSupervisor->getUserListsTab()->getAllUsersList()->getUsers();
-
     while (fullMentionUpToSpaceOrEnd.size())
     {
-        if (isFullMentionAValidUser(userList, fullMentionUpToSpaceOrEnd)) // Is there a user online named this?
+        const ServerInfo_User *onlineUser = userlistProxy->getOnlineUser(fullMentionUpToSpaceOrEnd);
+        if (onlineUser) // Is there a user online named this?
         {
             if (userName.toLower() == fullMentionUpToSpaceOrEnd.toLower()) // Is this user you?
             {
@@ -301,16 +295,10 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, QString &send
                 mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
                 cursor.insertText(mention, mentionFormat);
                 message = message.mid(mention.size());
-                QApplication::alert(this);
-                if (settingsCache->getShowMentionPopup() && shouldShowSystemPopup())
-                {
-                    QString ref = sender.left(sender.length() - 2);
-                    showSystemPopup(ref);
-                }
+                showSystemPopup(sender);
             } else {
-                QString correctUserName = getNameFromUserList(userList, fullMentionUpToSpaceOrEnd);
-                UserListTWI *vlu = userList.value(correctUserName);
-                mentionFormatOtherUser.setAnchorHref("user://" + QString::number(vlu->getUserInfo().user_level()) + "_" + correctUserName);
+                QString correctUserName = QString::fromStdString(onlineUser->name());
+                mentionFormatOtherUser.setAnchorHref("user://" + QString::number(onlineUser->user_level()) + "_" + correctUserName);
                 cursor.insertText("@" + correctUserName, mentionFormatOtherUser);
 
                 message = message.mid(correctUserName.size() + 1);
@@ -327,12 +315,7 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, QString &send
             mentionFormat.setForeground(settingsCache->getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
             cursor.insertText("@" + fullMentionUpToSpaceOrEnd, mentionFormat);
             message = message.mid(fullMentionUpToSpaceOrEnd.size() + 1);
-            QApplication::alert(this);
-            if (settingsCache->getShowMentionPopup() && shouldShowSystemPopup())
-            {
-                QString ref = sender.left(sender.length() - 2);
-                showSystemPopup(ref);
-            }
+            showSystemPopup(sender);
 
             cursor.setCharFormat(defaultFormat);
             return;
@@ -406,7 +389,7 @@ QString ChatView::extractNextWord(QString &message, QString &rest)
         message = message.mid(firstSpace);
     }
 
-    // remove any punctution from the end and pass it separately
+    // remove any punctuation from the end and pass it separately
     for (int len = word.size() - 1; len >= 0; --len)
     {
         if(word.at(len).isLetterOrNumber())
@@ -428,22 +411,22 @@ bool ChatView::isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> u
     QStringList getAttentionList;
     getAttentionList << "/all"; // Send a message to all users
 
-    if (getAttentionList.contains(message) && (userLevel & ServerInfo_User::IsModerator || userLevel & ServerInfo_User::IsAdmin))
-        return true;
+    return (getAttentionList.contains(message)
+            && (userLevel & ServerInfo_User::IsModerator
+                || userLevel & ServerInfo_User::IsAdmin));
 
-    return false;
 }
 
 void ChatView::actMessageClicked() {
     emit messageClickedSignal();
 }
 
-bool ChatView::shouldShowSystemPopup() {
-    return QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0 ||tabSupervisor->currentIndex() != tabSupervisor->indexOf(this);
-}
-
 void ChatView::showSystemPopup(QString &sender) {
-    emit showMentionPopup(sender);
+    QApplication::alert(this);
+    if (settingsCache->getShowMentionPopup()) {
+        QString ref = sender.left(sender.length() - 2);
+        emit showMentionPopup(ref);
+    }
 }
 
 QColor ChatView::getCustomMentionColor() {
@@ -456,32 +439,6 @@ QColor ChatView::getCustomHighlightColor() {
     QColor customColor;
     customColor.setNamedColor("#" + settingsCache->getChatHighlightColor());
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
-}
-
-/**
-   Returns the correct case version of the provided username, if no correct casing version
-   was found then the provided name is not available and will return an empty QString.
- */
-QString ChatView::getNameFromUserList(QMap<QString, UserListTWI *> &userList, QString &userName) {
-    QMap<QString, UserListTWI *>::iterator i;
-    QString lowerUserName = userName.toLower();
-    for (i = userList.begin(); i != userList.end(); ++i) {
-        if (i.key().toLower() == lowerUserName)
-            return i.key();
-    }
-    return QString();
-}
-
-bool ChatView::isFullMentionAValidUser(QMap<QString, UserListTWI *> &userList, QString userNameToMatch)
-{
-    QString userNameToMatchLower = userNameToMatch.toLower();
-    QMap<QString, UserListTWI *>::iterator i;
-    
-    for (i = userList.begin(); i != userList.end(); ++i)
-        if (i.key().toLower() == userNameToMatchLower)
-            return true;
-
-    return false;
 }
 
 void ChatView::clearChat() {

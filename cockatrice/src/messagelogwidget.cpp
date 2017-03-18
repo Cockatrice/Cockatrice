@@ -636,7 +636,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
     connect(player, SIGNAL(logAlwaysRevealTopCard(Player *, CardZone *, bool)), this, SLOT(logAlwaysRevealTopCard(Player *, CardZone *, bool)));
 }
 
-MessageLogWidget::MessageLogWidget(const TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent)
-    : ChatView(_tabSupervisor, _game, true, parent), currentContext(MessageContext_None)
+MessageLogWidget::MessageLogWidget(const TabSupervisor *_tabSupervisor, const UserlistProxy *_userlistProxy, TabGame *_game, QWidget *parent)
+    : ChatView(_tabSupervisor, _userlistProxy, _game, true, parent), currentContext(MessageContext_None)
 {
 }

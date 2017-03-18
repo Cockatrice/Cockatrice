@@ -605,3 +605,33 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
     }
 
 }
+const QString TabSupervisor::getOwnUsername() const
+{
+    return QString::fromStdString(userInfo->name());
+}
+
+bool TabSupervisor::isUserBuddy(const QString &userName) const
+{
+    if (!getUserListsTab()) return false;
+    if (!getUserListsTab()->getBuddyList()) return false;
+    QMap<QString, UserListTWI *> buddyList = getUserListsTab()->getBuddyList()->getUsers();
+    bool senderIsBuddy = buddyList.contains(userName);
+    return senderIsBuddy;
+}
+
+const ServerInfo_User * TabSupervisor::getOnlineUser(const QString &userName) const
+{
+    if (!getUserListsTab()) return nullptr;
+    if (!getUserListsTab()->getAllUsersList()) return nullptr;
+    QMap<QString, UserListTWI *> userList = getUserListsTab()->getAllUsersList()->getUsers();
+    const QString &userNameToMatchLower = userName.toLower();
+    QMap<QString, UserListTWI *>::iterator i;
+
+    for (i = userList.begin(); i != userList.end(); ++i)
+        if (i.key().toLower() == userNameToMatchLower) {
+            const ServerInfo_User &userInfo = i.value()->getUserInfo();
+            return &userInfo;
+        }
+
+    return nullptr;
+};
