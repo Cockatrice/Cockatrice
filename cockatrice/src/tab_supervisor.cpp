@@ -605,6 +605,12 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
     }
 
 }
+
+const bool TabSupervisor::isOwnUserRegistered() const
+{
+    return (bool) getUserInfo()->user_level() & ServerInfo_User::IsRegistered;
+}
+
 const QString TabSupervisor::getOwnUsername() const
 {
     return QString::fromStdString(userInfo->name());
@@ -615,6 +621,15 @@ bool TabSupervisor::isUserBuddy(const QString &userName) const
     if (!getUserListsTab()) return false;
     if (!getUserListsTab()->getBuddyList()) return false;
     QMap<QString, UserListTWI *> buddyList = getUserListsTab()->getBuddyList()->getUsers();
+    bool senderIsBuddy = buddyList.contains(userName);
+    return senderIsBuddy;
+}
+
+bool TabSupervisor::isUserIgnored(const QString &userName) const
+{
+    if (!getUserListsTab()) return false;
+    if (!getUserListsTab()->getIgnoreList()) return false;
+    QMap<QString, UserListTWI *> buddyList = getUserListsTab()->getIgnoreList()->getUsers();
     bool senderIsBuddy = buddyList.contains(userName);
     return senderIsBuddy;
 }
