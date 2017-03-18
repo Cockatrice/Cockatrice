@@ -1063,6 +1063,9 @@ void Player::actCreateToken()
 
 void Player::actCreateAnotherToken()
 {
+    if (lastTokenName.isEmpty())
+        return;
+
     Command_CreateToken cmd;
     cmd.set_zone("table");
     cmd.set_card_name(lastTokenName.toStdString());
