@@ -59,7 +59,7 @@ bool ReleaseChannel::downloadMatchesCurrentOS(QVariantMap build)
 
     if (wordSize == "llp64") {
         arch = "win64";
-        debugEnd = "-x86_64_qt5"
+        debugEnd = "-x86_64_qt5";
     } else if (wordSize == "ilp32") {
         arch = "win32";
         debugEnd = "-x86_qt5";
