@@ -1,3 +1,7 @@
+[Style Guide](#style-guide) | [Translations](#translations) | [Release Management](#release-management)
+
+----
+
 # Style Guide #
 
 ### Compatibility ###
@@ -141,7 +145,9 @@ The migration file should include the sql statements needed to migrate the datab
 Cockatrice and Servatrice exchange data using binary messages. The syntax of these messages is defined in the `proto` files in the `common/pb` folder. These files defines the way data contained in each message is serialized using Google's [protocol buffer](https://developers.google.com/protocol-buffers/).
 Any change to the `proto` file should be taken with caution and tested intensively before being merged, becaus a change to the protocol could make new clients incompatible to the old server and vice versa.
 
-### Translations: introduction ###
+# Translations #
+
+### Introduction ###
 
 Basic workflow for translations:
  1. developer adds a `tr("foo")` string in the code;
@@ -216,3 +222,24 @@ from Transifex to the source code and vice versa.
 ### Translations (for translators) ###
 
 Please have a look at the specific [FAQ for translators](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
+
+
+# Release Management #
+
+### ToDo list around new main releases ###
+
+ - write a `Release Draft` on github with all changes since last main release
+ - build newest strings and upload them to transifex
+ - give translators some time --> pull newest translations from transifex and PR them back in
+ - **Final commit:** push a PR which adds the `Release Name` and `Version Number` in the `About` window
+ - release on github (aka remove the `Draft` label and append builds for all platforms)
+ <br>
+ 
+ - push a PR which immediately removes the `Release Name` and `Version Number` again to not have them in continous development builds
+ - update link on our official gh page (https://github.com/Cockatrice/cockatrice.github.io) to the new binary files (hosted on github releases)
+ - announce the new build on reddit/twitter etc.
+ <br>
+ 
+ - create a new milestone & project for the next followup release
+
+ 
