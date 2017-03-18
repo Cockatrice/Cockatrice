@@ -95,18 +95,22 @@ QString ServersSettings::getPlayerName(QString defaultName)
 
 void ServersSettings::setPassword(QString password)
 {
-    setValue(password, "password", "server");
+
 }
 
 QString ServersSettings::getPassword()
 {
     int index = getPrevioushostindex(getPrevioushostName());
-    return getValue(QString("password%1").arg(index), "server", "server_details").toString();
+
+    if (getSavePassword())
+        return getValue(QString("password%1").arg(index), "server", "server_details").toString();
+
+    return QString();
 }
 
 void ServersSettings::setSavePassword(int save)
 {
-    setValue(save, "save_password", "server");
+
 }
 
 bool ServersSettings::getSavePassword()
@@ -171,9 +175,9 @@ void ServersSettings::addNewServer(QString saveName, QString serv, QString port,
     setValue(serv, QString("server%1").arg(index), "server", "server_details");
     setValue(port, QString("port%1").arg(index), "server", "server_details");
     setValue(username, QString("username%1").arg(index), "server", "server_details");
-    setValue(password, QString("password%1").arg(index), "server", "server_details");
     setValue(savePassword, QString("savePassword%1").arg(index), "server", "server_details");
     setValue(index, "totalServers", "server", "server_details");
+    setValue(password, QString("password%1").arg(index), "server", "server_details");
     
 }
 
@@ -188,8 +192,8 @@ bool ServersSettings::updateExistingServer(QString saveName, QString serv, QStri
             setValue(serv, QString("server%1").arg(i), "server", "server_details");
             setValue(port, QString("port%1").arg(i), "server", "server_details");
             setValue(username, QString("username%1").arg(i), "server", "server_details");
-            setValue(password, QString("password%1").arg(i), "server", "server_details");
             setValue(savePassword, QString("savePassword%1").arg(i), "server", "server_details");
+            setValue(password, QString("password%1").arg(i), "server", "server_details");
             return true;
         }
     }

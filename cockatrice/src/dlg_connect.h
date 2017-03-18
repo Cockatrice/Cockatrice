@@ -48,5 +48,4 @@ private:
     QPushButton *btnOk, *btnCancel, *btnForgotPassword;
     QMap<QString, UserConnection_Information> savedHostList;
 };
-
 #endif

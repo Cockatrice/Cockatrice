@@ -3,13 +3,11 @@
 #include <QComboBox>
 #include <QRadioButton>
 #include <QGridLayout>
-#include <QHBoxLayout>
 #include <QDialogButtonBox>
 #include <QDebug>
 #include <QEvent>
 #include <QKeyEvent>
 #include <QMessageBox>
-#include <iostream>
 #include <QGroupBox>
 #include <QPushButton>
 #include "dlg_connect.h"
@@ -155,10 +153,10 @@ void DlgConnect::rebuildComboBoxList()
 
     if (savedHostList.size() == 1)
     {
-        settingsCache->servers().addNewServer("Woogerworks Cockatrice", "cockatrice.woogerworks.com", "4747", "", "", false);
-        settingsCache->servers().addNewServer("Chickatrice Cockatrice", "chickatrice.net", "4747", "", "", false);
-        settingsCache->servers().addNewServer("Cockatric.es Cockatrice", "cockatric.es", "4747", "", "", false);
-        settingsCache->servers().addNewServer("Tetrarch Cockatrice", "mtg.tetrarch.co", "4747", "", "", false);
+        settingsCache->servers().addNewServer("Woogerworks", "cockatrice.woogerworks.com", "4747", "", "", false);
+        settingsCache->servers().addNewServer("Chickatrice", "chickatrice.net", "4747", "", "", false);
+        settingsCache->servers().addNewServer("Cockatric.es", "cockatric.es", "4747", "", "", false);
+        settingsCache->servers().addNewServer("Tetrarch", "mtg.tetrarch.co", "4747", "", "", false);
     }
     savedHostList = uci.getServerInfo();
 
@@ -181,6 +179,7 @@ void DlgConnect::rebuildComboBoxList()
 
 void DlgConnect::previousHostSelected(bool state) {
     if (state) {
+        saveEdit->setDisabled(true);
         previousHosts->setDisabled(false);
     }
 }
@@ -192,13 +191,17 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
 
     if (saveEdit == nullptr)
         return;
+
+    bool savePasswordStatus = data.at(5) == "1";
     
     saveEdit->setText(data.at(0));
     hostEdit->setText(data.at(1));
     portEdit->setText(data.at(2));
     playernameEdit->setText(data.at(3));
-    passwordEdit->setText(data.at(4));
-    savePasswordCheckBox->setChecked(data.at(5) == "1" ? true : false);
+    savePasswordCheckBox->setChecked(savePasswordStatus);
+
+    if (savePasswordStatus)
+        passwordEdit->setText(data.at(4));
 }
 
 void DlgConnect::newHostSelected(bool state) {
@@ -207,6 +210,7 @@ void DlgConnect::newHostSelected(bool state) {
         previousHosts->setDisabled(true);
         saveEdit->clear();
         saveEdit->setPlaceholderText("New Menu Name");
+        saveEdit->setDisabled(false);
     }
     else
     {
@@ -229,7 +233,15 @@ void DlgConnect::passwordSaved(int state)
 void DlgConnect::actOk()
 {
     if (newHostButton->isChecked())
+    {
+        if (saveEdit->text().isEmpty())
+        {
+            QMessageBox::critical(this, tr("Connection Warning"), tr("You need to name your new connection profile."));
+            return;
+        }
+
         settingsCache->servers().addNewServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
+    }
     else
         settingsCache->servers().updateExistingServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
 
@@ -257,7 +269,6 @@ void DlgConnect::actCancel()
     reject();
 }
 
-
 bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {
@@ -276,4 +287,3 @@ void DlgConnect::actForgotPassword()
     emit sigStartForgotPasswordRequest();
     reject();
 }
-
