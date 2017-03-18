@@ -300,8 +300,9 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
 
 QModelIndex DeckListModel::nodeToIndex(AbstractDecklistNode *node) const
 {
-    if (node == root)
+    if (node == nullptr || node == root)
         return QModelIndex();
+
     return createIndex(node->getParent()->indexOf(node), 0, node);
 }
 
