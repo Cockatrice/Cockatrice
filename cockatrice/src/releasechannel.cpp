@@ -55,10 +55,14 @@ bool ReleaseChannel::downloadMatchesCurrentOS(QVariantMap build)
 {
     QString wordSize = QSysInfo::buildAbi().split('-')[2];
     QString arch;
+    QString devSnapshotEnd;
+
     if (wordSize == "llp64") {
         arch = "win64";
+        devSnapshotEnd = "-x86_64_qt5";
     } else if (wordSize == "ilp32") {
         arch = "win32";
+        devSnapshotEnd = "-x86_qt5";
     } else {
         qWarning() << "Error checking for upgrade version: wordSize is" << wordSize;
         return false;
@@ -68,7 +72,10 @@ bool ReleaseChannel::downloadMatchesCurrentOS(QVariantMap build)
     // Checking for .zip is a workaround for the May 6th 2016 release
     auto zipName = arch + ".zip";
     auto exeName = arch + ".exe";
-    return fileName.endsWith(exeName) || fileName.endsWith(zipName);
+    auto zipDebugName = devSnapshotEnd + ".zip";
+    auto exeDebugName = devSnapshotEnd + ".exe";
+    return (fileName.endsWith(exeName) || fileName.endsWith(zipName) ||
+        fileName.endsWith(exeDebugName) || fileName.endsWith(zipDebugName));
 }
 #else
 
