@@ -69,13 +69,9 @@ bool ReleaseChannel::downloadMatchesCurrentOS(QVariantMap build)
     }
 
     auto fileName = build["name"].toString();
-    // Checking for .zip is a workaround for the May 6th 2016 release
-    auto zipName = arch + ".zip";
     auto exeName = arch + ".exe";
-    auto zipDebugName = devSnapshotEnd + ".zip";
-    auto exeDebugName = devSnapshotEnd + ".exe";
-    return (fileName.endsWith(exeName) || fileName.endsWith(zipName) ||
-        fileName.endsWith(exeDebugName) || fileName.endsWith(zipDebugName));
+    auto exeName = devSnapshotEnd + ".exe";
+    return (fileName.endsWith(exeName) || fileName.endsWith(exeDebugName);
 }
 #else
 
