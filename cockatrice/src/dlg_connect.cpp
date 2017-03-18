@@ -14,6 +14,8 @@
 #include "settingscache.h"
 #include "userconnection_information.h"
 
+#define PUBLIC_SERVERS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers"
+
 DlgConnect::DlgConnect(QWidget *parent)
     : QDialog(parent)
 {
@@ -52,6 +54,14 @@ DlgConnect::DlgConnect(QWidget *parent)
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
     autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
 
+    publicServersLabel = new QLabel(tr("Looking for a list of public servers? <a href=\"%1\">Click here</a>!").arg(PUBLIC_SERVERS_URL));
+    publicServersLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+    publicServersLabel->setWordWrap(true);
+    publicServersLabel->setTextFormat(Qt::RichText);
+    publicServersLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    publicServersLabel->setOpenExternalLinks(true);
+    publicServersLabel->setAlignment(Qt::AlignCenter);
+
     if (savePasswordCheckBox->isChecked())
     {
         autoConnectCheckBox->setChecked(settingsCache->servers().getAutoConnect());
@@ -78,16 +88,18 @@ DlgConnect::DlgConnect(QWidget *parent)
     connect(btnCancel, SIGNAL(released()), this, SLOT(actCancel()));
 
     QGridLayout *connectionLayout = new QGridLayout;
-    connectionLayout->addWidget(previousHostButton, 0, 1);
-    connectionLayout->addWidget(previousHosts, 1, 1);
-    connectionLayout->addWidget(newHostButton, 2, 1);
-    connectionLayout->addWidget(saveLabel, 3, 0);
-    connectionLayout->addWidget(saveEdit, 3, 1);
-    connectionLayout->addWidget(hostLabel, 4, 0);
-    connectionLayout->addWidget(hostEdit, 4, 1);
-    connectionLayout->addWidget(portLabel, 5, 0);
-    connectionLayout->addWidget(portEdit, 5, 1);
-    connectionLayout->addWidget(autoConnectCheckBox, 6, 1);
+    connectionLayout->addWidget(publicServersLabel, 0, 0, 1, 2);
+    connectionLayout->addWidget(previousHostButton, 1, 1);
+    connectionLayout->addWidget(previousHosts, 2, 1);
+    connectionLayout->addWidget(newHostButton, 3, 1);
+    connectionLayout->addWidget(saveLabel, 4, 0);
+    connectionLayout->addWidget(saveEdit, 4, 1);
+    connectionLayout->addWidget(hostLabel, 5, 0);
+    connectionLayout->addWidget(hostEdit, 5, 1);
+    connectionLayout->addWidget(portLabel, 6, 0);
+    connectionLayout->addWidget(portEdit, 6, 1);
+    connectionLayout->addWidget(autoConnectCheckBox, 7, 1);
+
 
     QGridLayout *buttons = new QGridLayout;
     buttons->addWidget(btnOk, 0, 0);
@@ -155,7 +167,7 @@ void DlgConnect::rebuildComboBoxList()
     {
         settingsCache->servers().addNewServer("Woogerworks", "cockatrice.woogerworks.com", "4747", "", "", false);
         settingsCache->servers().addNewServer("Chickatrice", "chickatrice.net", "4747", "", "", false);
-        settingsCache->servers().addNewServer("Cockatric.es", "cockatric.es", "4747", "", "", false);
+        settingsCache->servers().addNewServer("cockatric.es", "cockatric.es", "4747", "", "", false);
         settingsCache->servers().addNewServer("Tetrarch", "mtg.tetrarch.co", "4747", "", "", false);
     }
     savedHostList = uci.getServerInfo();
@@ -208,6 +220,11 @@ void DlgConnect::newHostSelected(bool state) {
     if (state)
     {
         previousHosts->setDisabled(true);
+        hostEdit->clear();
+        portEdit->clear();
+        playernameEdit->clear();
+        passwordEdit->clear();
+        savePasswordCheckBox->setChecked(false);
         saveEdit->clear();
         saveEdit->setPlaceholderText("New Menu Name");
         saveEdit->setDisabled(false);

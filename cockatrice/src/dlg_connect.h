@@ -40,7 +40,7 @@ private slots:
     void updateDisplayInfo(const QString &saveName);
     void rebuildComboBoxList();
 private:
-    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel;
+    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel, *publicServersLabel;
     QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *saveEdit;
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;
