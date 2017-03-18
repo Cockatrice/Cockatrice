@@ -104,7 +104,7 @@ void TabMessage::sendMessage()
 void TabMessage::messageSent(const Response &response)
 {
     if (response.response_code() == Response::RespInIgnoreList)
-        chatView->appendMessage(tr("This user is ignoring you."));
+        chatView->appendMessage(tr("This user is ignoring you, they cannot see your messages in main chat and you cannot join their games."));
 }
 
 void TabMessage::actLeave()
@@ -114,8 +114,11 @@ void TabMessage::actLeave()
 
 void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 {
-    const UserLevelFlags userLevel(event.sender_name() == otherUserInfo->name() ? otherUserInfo->user_level() : ownUserInfo->user_level());
-    chatView->appendMessage(QString::fromStdString(event.message()), 0,QString::fromStdString(event.sender_name()), userLevel, QString::fromStdString(otherUserInfo->privlevel()), true);
+    auto userInfo = event.sender_name() == otherUserInfo->name() ? otherUserInfo : ownUserInfo;
+    const UserLevelFlags userLevel(userInfo->user_level());
+    const QString userPriv = QString::fromStdString(userInfo->privlevel());
+
+    chatView->appendMessage(QString::fromStdString(event.message()), 0,QString::fromStdString(event.sender_name()), userLevel, userPriv, true);
     if (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this))
         soundEngine->playSound("private_message");
     if (settingsCache->getShowMessagePopup() && shouldShowSystemPopup(event))

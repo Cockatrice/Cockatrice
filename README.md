@@ -35,6 +35,8 @@ Downloads are hosted on [BinTray](https://bintray.com/cockatrice/Cockatrice).
 
 If you'd like to contribute code to the project, we maintain a tag for "easy" changes on our issue tracker. Issues tagged in this way provide a simple way to get started. [Issues tagged as Easy Changes](https://github.com/Cockatrice/Cockatrice/issues?q=is%3Aopen+is%3Aissue+label%3A%22Easy+Change%22)
 
+We try to be very responsive to new issues. We'll try to give you advice on how a feature should be implemented / advice on places the codebase is doing something similar before you get too far along with a PR.
+
 
 # Community Resources
 - [Cockatrice Official Site](https://cockatrice.github.io)

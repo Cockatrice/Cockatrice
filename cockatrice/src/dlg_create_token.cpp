@@ -20,6 +20,9 @@
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     : QDialog(parent), predefinedTokens(_predefinedTokens)
 {
+    this->setMinimumSize(200,200);
+    this->adjustSize();
+
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit(tr("Token"));
     nameEdit->selectAll();

@@ -16,6 +16,7 @@
 #define DEVFILES_URL "https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice-git/files"
 #define DEVDOWNLOAD_URL "https://dl.bintray.com/cockatrice/Cockatrice/"
 #define DEVMANUALDOWNLOAD_URL "https://bintray.com/cockatrice/Cockatrice/Cockatrice-git/_latestVersion#files"
+#define DEVRELEASE_DESCURL "https://github.com/Cockatrice/Cockatrice/compare/%1...%2"
 #define GIT_SHORT_HASH_LEN 7
 
 int ReleaseChannel::sharedIndex = 0;
@@ -253,11 +254,15 @@ void DevReleaseChannel::releaseListFinished()
     if(!lastRelease)
         lastRelease = new Release;
 
-    lastRelease->setName("Commit " + resultMap["sha"].toString());
-    lastRelease->setDescriptionUrl(resultMap["html_url"].toString());
+    
     lastRelease->setCommitHash(resultMap["sha"].toString());
     lastRelease->setPublishDate(resultMap["commit"].toMap()["author"].toMap()["date"].toDate());
 
+    QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
+    lastRelease->setName("Commit " + shortHash);
+
+    lastRelease->setDescriptionUrl(QString(DEVRELEASE_DESCURL).arg(VERSION_COMMIT, shortHash));
+    
     qDebug() << "Got reply from release server, size=" << tmp.size()
         << "name=" << lastRelease->getName()
         << "desc=" << lastRelease->getDescriptionUrl()

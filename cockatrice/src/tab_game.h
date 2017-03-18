@@ -237,6 +237,7 @@ public:
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
     ~TabGame();
     void retranslateUi();
+    void updatePlayerListDockTitle();
     void closeRequest();
     const QMap<int, Player *> &getPlayers() const { return players; }
     CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;

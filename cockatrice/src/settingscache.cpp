@@ -58,7 +58,6 @@ void SettingsCache::translateLegacySettings()
     legacySetting.beginGroup("server");
     servers().setPreviousHostLogin(legacySetting.value("previoushostlogin").toInt());
     servers().setPreviousHostList(legacySetting.value("previoushosts").toStringList());
-    servers().setPrevioushostindex(legacySetting.value("previoushostindex").toInt());
     servers().setHostName(legacySetting.value("hostname").toString());
     servers().setPort(legacySetting.value("port").toString());
     servers().setPlayerName(legacySetting.value("playername").toString());
@@ -97,6 +96,7 @@ void SettingsCache::translateLegacySettings()
     gameFilters().setUnavailableGamesVisible(legacySetting.value("unavailable_games_visible").toBool());
     gameFilters().setShowPasswordProtectedGames(legacySetting.value("show_password_protected_games").toBool());
     gameFilters().setGameNameFilter(legacySetting.value("game_name_filter").toString());
+    gameFilters().setShowBuddiesOnlyGames(legacySetting.value("show_buddies_only_games").toBool());
     gameFilters().setMinPlayers(legacySetting.value("min_players").toInt());
 
     if (legacySetting.value("max_players").toInt() > 1)
@@ -165,8 +165,9 @@ SettingsCache::SettingsCache()
         translateLegacySettings();
 
     // updates - don't reorder them or their index in the settings won't match
-    releaseChannels << new StableReleaseChannel()
-        << new DevReleaseChannel();
+    // append channels one by one, or msvc will add them in the wrong order.
+    releaseChannels << new StableReleaseChannel();
+    releaseChannels << new DevReleaseChannel();
 
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();

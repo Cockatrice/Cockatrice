@@ -115,6 +115,7 @@ SET(cockatrice_SOURCES
     src/update_downloader.cpp
     src/logger.cpp
     src/releasechannel.cpp
+    src/userconnection_information.cpp
     ${VERSION_STRING_CPP}
 )
 
