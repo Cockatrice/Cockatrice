@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QApplication>
+#include <version_string.h>
 
 #include "dlg_update.h"
 #include "releasechannel.h"
@@ -18,12 +19,14 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent) {
 
     //Handle layout
     statusLabel = new QLabel(this);
+    statusLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+    statusLabel->setWordWrap(true);
     descriptionLabel = new QLabel(tr("Current release channel:") + " " + tr(settingsCache->getUpdateReleaseChannel()->getName().toUtf8()), this);
     progress = new QProgressBar(this);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
     ok = new QPushButton("Close", this);
-    manualDownload = new QPushButton(tr("Download Anyway"), this);
+    manualDownload = new QPushButton(tr("Reinstall"), this);
     enableUpdateButton(false); //Unless we know there's an update available, you can't install
     gotoDownload = new QPushButton(tr("Open Download Page"), this);
     buttonBox->addButton(manualDownload, QDialogButtonBox::ActionRole);
@@ -108,6 +111,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         //If there's no need to update, tell them that. However we still allow them to run the
         //downloader themselves if there's a compatible build
         QMessageBox::information(this, tr("Cockatrice Update"), tr("Your version of Cockatrice is up to date."));
+        setLabel(tr("You are already running the latest %1 release - %2").arg(tr(settingsCache->getUpdateReleaseChannel()->getName().toUtf8())).arg(VERSION_STRING));
         return;
     }
 
