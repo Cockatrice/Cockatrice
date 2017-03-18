@@ -22,8 +22,8 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent) {
     progress = new QProgressBar(this);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
-    ok = new QPushButton("Ok", this);
-    manualDownload = new QPushButton(tr("Update Anyway"), this);
+    ok = new QPushButton("Close", this);
+    manualDownload = new QPushButton(tr("Download Anyway"), this);
     enableUpdateButton(false); //Unless we know there's an update available, you can't install
     gotoDownload = new QPushButton(tr("Open Download Page"), this);
     buttonBox->addButton(manualDownload, QDialogButtonBox::ActionRole);
