@@ -1212,7 +1212,13 @@ QString Player::dbNameFromTokenDisplayName(const QString &tokenName) {
     if (index != -1)
     {
         return tokenNamePattern.capturedTexts()[1];
-    } else {
+    }
+    else if (tokenName.indexOf(tr("Token: ")) != -1)
+    {
+        return tokenName.mid(tr("Token: ").length());
+    }
+    else
+    {
         return tokenName;
     }
 }
@@ -2535,6 +2541,9 @@ void Player::processSceneSizeChange(int newPlayerWidth)
 
 void Player::setLastToken(CardInfo *cardInfo)
 {
+    if (cardInfo == nullptr)
+        return;
+
     lastTokenName = cardInfo->getName();
     lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first().toLower();
     lastTokenPT = cardInfo->getPowTough();
