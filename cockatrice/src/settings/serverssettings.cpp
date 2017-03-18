@@ -110,6 +110,16 @@ bool ServersSettings::getSavePassword()
     return save;
 }
 
+void ServersSettings::setPassword(QString password)
+{
+    setValue(password, "password", "server");
+}
+
+void ServersSettings::setSavePassword(int save)
+{
+    setValue(save, "save_password", "server");
+}
+
 void ServersSettings::setAutoConnect(int autoconnect)
 {
     setValue(autoconnect, "auto_connect", "server");
