@@ -353,6 +353,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
     maxFontSizeForCardsEdit.setMinimum(10);
+    maxFontSizeForCardsEdit.setMaximum(100);
     maxFontSizeForCardsEdit.setValue(settingsCache->getMaxFontSize());
     connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMaxFontSize(int)));
     maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
@@ -399,7 +400,7 @@ void AppearanceSettingsPage::retranslateUi()
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
-    maxFontSizeForCardsLabel.setText(tr("Maximum size font for displaying card attributes"));
+    maxFontSizeForCardsLabel.setText(tr("Maximum font size for information displayed on cards"));
 }
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
