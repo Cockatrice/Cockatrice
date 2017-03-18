@@ -93,11 +93,6 @@ QString ServersSettings::getPlayerName(QString defaultName)
     return name == QVariant() ? defaultName : name.toString();
 }
 
-void ServersSettings::setPassword(QString password)
-{
-
-}
-
 QString ServersSettings::getPassword()
 {
     int index = getPrevioushostindex(getPrevioushostName());
@@ -106,11 +101,6 @@ QString ServersSettings::getPassword()
         return getValue(QString("password%1").arg(index), "server", "server_details").toString();
 
     return QString();
-}
-
-void ServersSettings::setSavePassword(int save)
-{
-
 }
 
 bool ServersSettings::getSavePassword()
