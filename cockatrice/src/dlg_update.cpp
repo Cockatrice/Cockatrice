@@ -163,6 +163,7 @@ void DlgUpdate::downloadSuccessful(QUrl filepath) {
     if (QDesktopServices::openUrl(filepath))
     {
         QMetaObject::invokeMethod((MainWindow*) parent(), "close", Qt::QueuedConnection);
+        qInfo() << "Opened downloaded update file successfully - closing Cockatrice";
         close();
     } else {
         setLabel(tr("Error"));
