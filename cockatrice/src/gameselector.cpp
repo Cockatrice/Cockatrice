@@ -25,7 +25,8 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     gameListModel = new GamesModel(_rooms, _gameTypes, this);
     if(showfilters)
     {
-        gameListProxyModel = new GamesProxyModel(this, tabSupervisor->getUserInfo());
+        bool ownUserIsRegistered = (bool)(tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsRegistered);
+        gameListProxyModel = new GamesProxyModel(this, ownUserIsRegistered);
         gameListProxyModel->setSourceModel(gameListModel);
         gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         gameListView->setModel(gameListProxyModel);
