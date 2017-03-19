@@ -96,7 +96,6 @@ build_script:
             "X-Bintray-Override" = 1;
         }
         $url = "https://api.bintray.com/content/cockatrice/Cockatrice/$env:bintray_path/$new_name"
-    
-       # $result = Invoke-WebRequest -Uri $url -Credential $bt_credentials -Method PUT -Headers $bt_headers -InFile "$exe"
-       # Write-Host $result
+        $result = Invoke-WebRequest -Uri $url -Credential $bt_credentials -Method PUT -Headers $bt_headers -InFile "$exe"
+        Write-Host $result
 test: off
