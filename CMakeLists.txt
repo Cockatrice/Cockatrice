@@ -199,12 +199,6 @@ elseif(WIN32)
     )
 endif()
 
-# Configure file with build deployment data for travis
-configure_file(
-    ${CMAKE_MODULE_PATH}/bintray_deploy.json.in
-    ${PROJECT_BINARY_DIR}/bintray_deploy.json
-)
-
 include(CPack)
 
 # Compile servatrice (default off)
