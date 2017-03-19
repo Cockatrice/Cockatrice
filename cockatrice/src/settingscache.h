@@ -190,7 +190,7 @@ public:
     bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
     bool getRememberGameSettings() const { return rememberGameSettings; }
     int getKeepAlive() const { return keepalive; }
-    int getMaxFontSize() const { return (maxFontSize > 1) ? maxFontSize : DEFAULT_FONT_SIZE; }
+    int getMaxFontSize() const { return maxFontSize; }
     void setClientID(QString clientID);
     void setKnownMissingFeatures(QString _knownMissingFeatures);
     QString getClientID() { return clientID; }
