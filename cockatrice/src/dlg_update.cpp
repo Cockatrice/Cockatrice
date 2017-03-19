@@ -8,7 +8,6 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QApplication>
-#include <QtGlobal>
 
 #include "dlg_update.h"
 #include "releasechannel.h"
@@ -164,7 +163,7 @@ void DlgUpdate::downloadSuccessful(QUrl filepath) {
     if (QDesktopServices::openUrl(filepath))
     {
         QMetaObject::invokeMethod((MainWindow*) parent(), "close", Qt::QueuedConnection);
-        qInfo() << "Opened downloaded update file successfully - closing Cockatrice";
+        qDebug() << "Opened downloaded update file successfully - closing Cockatrice";
         close();
     } else {
         setLabel(tr("Error"));
