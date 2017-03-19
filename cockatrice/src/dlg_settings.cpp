@@ -352,10 +352,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMinPlayersForMultiColumnLayout(int)));
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
+    connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMaxFontSize(int)));
     maxFontSizeForCardsEdit.setMinimum(9);
     maxFontSizeForCardsEdit.setMaximum(100);
     maxFontSizeForCardsEdit.setValue(settingsCache->getMaxFontSize());
-    connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMaxFontSize(int)));
     maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
 
     QGridLayout *tableGrid = new QGridLayout;
