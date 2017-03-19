@@ -131,7 +131,7 @@ void GameSelector::actClearFilter()
 void GameSelector::actCreate()
 {
     if (room == nullptr) {
-        qDebug() << "Attempted to create game, error caught!";
+        qWarning() << "Attempted to create game, but the room was null";
         return;
     }
 
