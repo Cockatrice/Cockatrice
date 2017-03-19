@@ -88,6 +88,7 @@ private:
     QLabel themeLabel;
     QComboBox themeBox;
     QLabel minPlayersForMultiColumnLayoutLabel;
+    QLabel maxFontSizeForCardsLabel;
     QCheckBox displayCardNamesCheckBox;
     QCheckBox cardScalingCheckBox;
     QCheckBox horizontalHandCheckBox;
@@ -98,6 +99,7 @@ private:
     QGroupBox *handGroupBox;
     QGroupBox *tableGroupBox;
     QSpinBox minPlayersForMultiColumnLayoutEdit;
+    QSpinBox maxFontSizeForCardsEdit;
 public:
     AppearanceSettingsPage();
     void retranslateUi();
