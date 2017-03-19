@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QApplication>
+#include <QtGlobal>
 
 #include "dlg_update.h"
 #include "releasechannel.h"
