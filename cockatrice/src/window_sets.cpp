@@ -105,10 +105,15 @@ WndSets::WndSets(QWidget *parent)
     mainLayout->addWidget(view, 0, 1, 1, 2);
     mainLayout->addWidget(enableAllButton, 1, 1);
     mainLayout->addWidget(disableAllButton, 1, 2);
+    mainLayout->addWidget(enableSomeButton, 1, 1);
+    mainLayout->addWidget(disableSomeButton, 1, 2);
     mainLayout->addWidget(labNotes, 2, 1, 1, 2);
     mainLayout->addWidget(buttonBox, 3, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
     mainLayout->setColumnStretch(2, 1);
+
+    enableSomeButton->hide();
+    disableSomeButton->hide();
 
     QWidget *centralWidget = new QWidget;
     centralWidget->setLayout(mainLayout);
@@ -130,13 +135,17 @@ void WndSets::rebuildMainLayout(int actionToTake)
     switch (actionToTake)
     {
         case NO_SETS_SELECTED:
-            mainLayout->replaceWidget(enableSomeButton, enableAllButton);
-            mainLayout->replaceWidget(disableSomeButton, disableAllButton);
+            enableAllButton->show();
+            disableAllButton->show();
+            enableSomeButton->hide();
+            disableSomeButton->hide();
             break;
 
         case SOME_SETS_SELECTED:
-            mainLayout->replaceWidget(enableAllButton, enableSomeButton);
-            mainLayout->replaceWidget(disableAllButton, disableSomeButton);
+            enableAllButton->hide();
+            disableAllButton->hide();
+            enableSomeButton->show();
+            disableSomeButton->show();
             break;
     }
 }
