@@ -129,6 +129,11 @@ void GameSelector::actClearFilter()
 
 void GameSelector::actCreate()
 {
+    if (room == nullptr) {
+        qDebug() << "Attempted to create game, error caught!";
+        return;
+    }
+
     DlgCreateGame dlg(room, room->getGameTypes(), this);
     dlg.exec();
 }
