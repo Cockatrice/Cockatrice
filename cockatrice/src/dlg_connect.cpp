@@ -19,7 +19,7 @@
 DlgConnect::DlgConnect(QWidget *parent)
     : QDialog(parent)
 {
-    previousHostButton = new QRadioButton(tr("Previous Host"), this);
+    previousHostButton = new QRadioButton(tr("Known Hosts"), this);
     previousHosts = new QComboBox(this);
     previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
 
@@ -54,7 +54,7 @@ DlgConnect::DlgConnect(QWidget *parent)
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
     autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
 
-    publicServersLabel = new QLabel(tr("Looking for a list of public servers? <a href=\"%1\">Click here</a>!").arg(PUBLIC_SERVERS_URL));
+    publicServersLabel = new QLabel(tr("(<a href=\"%1\">Public Servers</a>)").arg(PUBLIC_SERVERS_URL));
     publicServersLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
     publicServersLabel->setWordWrap(true);
     publicServersLabel->setTextFormat(Qt::RichText);
@@ -87,19 +87,21 @@ DlgConnect::DlgConnect(QWidget *parent)
     btnCancel->setFixedWidth(100);
     connect(btnCancel, SIGNAL(released()), this, SLOT(actCancel()));
 
-    QGridLayout *connectionLayout = new QGridLayout;
-    connectionLayout->addWidget(publicServersLabel, 0, 0, 1, 2);
-    connectionLayout->addWidget(previousHostButton, 1, 1);
-    connectionLayout->addWidget(previousHosts, 2, 1);
-    connectionLayout->addWidget(newHostButton, 3, 1);
-    connectionLayout->addWidget(saveLabel, 4, 0);
-    connectionLayout->addWidget(saveEdit, 4, 1);
-    connectionLayout->addWidget(hostLabel, 5, 0);
-    connectionLayout->addWidget(hostEdit, 5, 1);
-    connectionLayout->addWidget(portLabel, 6, 0);
-    connectionLayout->addWidget(portEdit, 6, 1);
-    connectionLayout->addWidget(autoConnectCheckBox, 7, 1);
+    QGridLayout *newHostLayout = new QGridLayout;
+    newHostLayout->addWidget(newHostButton, 0, 1);
+    newHostLayout->addWidget(publicServersLabel, 0, 2);
 
+    QGridLayout *connectionLayout = new QGridLayout;
+    connectionLayout->addWidget(previousHostButton, 0, 1);
+    connectionLayout->addWidget(previousHosts, 1, 1);
+    connectionLayout->addLayout(newHostLayout, 2, 1, 1, 2);
+    connectionLayout->addWidget(saveLabel, 3, 0);
+    connectionLayout->addWidget(saveEdit, 3, 1);
+    connectionLayout->addWidget(hostLabel, 4, 0);
+    connectionLayout->addWidget(hostEdit, 4, 1);
+    connectionLayout->addWidget(portLabel, 5, 0);
+    connectionLayout->addWidget(portEdit, 5, 1);
+    connectionLayout->addWidget(autoConnectCheckBox, 6, 1);
 
     QGridLayout *buttons = new QGridLayout;
     buttons->addWidget(btnOk, 0, 0);
