@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QDebug>
 #include "tab_supervisor.h"
 #include "dlg_creategame.h"
 #include "dlg_filter_games.h"
