@@ -54,7 +54,8 @@ void Logger::log(QtMsgType /* type */, const QMessageLogContext & /* ctx */, con
     if(logBuffer.size() > LOGGER_MAX_ENTRIES)
         logBuffer.removeFirst();
 
-    emit logEntryAdded(message);
+    if (message.size() > 0)
+        emit logEntryAdded(message);
 
     std::cerr << message.toStdString() << std::endl; // Print to stdout
 
