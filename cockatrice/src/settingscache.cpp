@@ -653,8 +653,22 @@ void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
 }
 
-void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
+void SettingsCache::setUpdateReleaseChannel(const QString &_updateReleaseChannel)
 {
-    updateReleaseChannel = _updateReleaseChannel;
+    /*
+     * This fixes an issue on windows with out of order indexes
+     * To be re-addressed before the next major release
+     * along with all settings in the dialogs so they update
+     * only when you close dialog
+     */
+    if (_updateReleaseChannel == tr("Stable releases"))
+        updateReleaseChannel = 0;
+    else if (_updateReleaseChannel == tr("Development snapshots"))
+        updateReleaseChannel = 1;
+    else
+        updateReleaseChannel = 2;
+    
+    qDebug() << "setUpdateReleaseChannel changed to = " << _updateReleaseChannel;
+
     settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
 }

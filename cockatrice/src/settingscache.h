@@ -255,7 +255,7 @@ public slots:
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(int _notifyaboutupdate);
-    void setUpdateReleaseChannel(int _updateReleaseChannel);
+    void setUpdateReleaseChannel(const QString &_updateReleaseChannel);
 };
 
 extern SettingsCache *settingsCache;
