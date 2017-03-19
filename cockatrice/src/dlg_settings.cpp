@@ -35,6 +35,7 @@
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
+    this->setStyleSheet("QLineEdit, QComboBox, QLabel, QCheckBox, QSpinBox { min-height: 21px }");
     QString setLanguage = settingsCache->getLang();
     QStringList qmFiles = findQmFiles();
     for (int i = 0; i < qmFiles.size(); i++) {
@@ -84,10 +85,10 @@ GeneralSettingsPage::GeneralSettingsPage()
     QGridLayout *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
     personalGrid->addWidget(&languageBox, 0, 1);
-    personalGrid->addWidget(&pixmapCacheLabel, 1, 0);
-    personalGrid->addWidget(&pixmapCacheEdit, 1, 1);
-    personalGrid->addWidget(&updateReleaseChannelLabel, 2, 0);
-    personalGrid->addWidget(&updateReleaseChannelBox, 2, 1);
+    personalGrid->addWidget(&updateReleaseChannelLabel, 1, 0);
+    personalGrid->addWidget(&updateReleaseChannelBox, 1, 1);
+    personalGrid->addWidget(&pixmapCacheLabel, 2, 0);
+    personalGrid->addWidget(&pixmapCacheEdit, 2, 1);
     personalGrid->addWidget(&updateNotificationCheckBox, 3, 0);
     personalGrid->addWidget(&picDownloadCheckBox, 4, 0, 1, 3);
     personalGrid->addWidget(&defaultUrlLabel, 5, 0, 1, 1);
@@ -103,6 +104,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     urlLinkLabel.setOpenExternalLinks(true);
 
     personalGroupBox = new QGroupBox;
+    personalGroupBox->setMinimumSize(500, 250);
     personalGroupBox->setLayout(personalGrid);
 
     deckPathEdit = new QLineEdit(settingsCache->getDeckPath());
@@ -147,9 +149,11 @@ GeneralSettingsPage::GeneralSettingsPage()
     pathsGrid->addWidget(tokenDatabasePathEdit, 4, 1);
     pathsGrid->addWidget(tokenDatabasePathButton, 4, 2);
     pathsGroupBox = new QGroupBox;
+    pathsGroupBox->setMinimumSize(500, 150);
     pathsGroupBox->setLayout(pathsGrid);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setSizeConstraint(QLayout::SetMinimumSize);
     mainLayout->addWidget(personalGroupBox);
     mainLayout->addWidget(pathsGroupBox);
     
