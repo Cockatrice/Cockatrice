@@ -188,7 +188,7 @@ public:
     bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
     bool getRememberGameSettings() const { return rememberGameSettings; }
     int getKeepAlive() const { return keepalive; }
-    int getMaxFontSize() const { return maxFontSize; }
+    int getMaxFontSize() const { return (maxFontSize > 1) ? maxFontSize : 9; }
     void setClientID(QString clientID);
     void setKnownMissingFeatures(QString _knownMissingFeatures);
     QString getClientID() { return clientID; }

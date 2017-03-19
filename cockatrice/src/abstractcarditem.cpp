@@ -68,7 +68,7 @@ QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
 void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
     const int MAX_FONT_SIZE = settingsCache->getMaxFontSize();
-    const int fontSize = std::max(9, std::min<int>(MAX_FONT_SIZE, round(translatedSize.height() / 8)));
+    const int fontSize = std::max(9, MAX_FONT_SIZE);
 
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
     
