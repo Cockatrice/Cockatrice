@@ -15,12 +15,13 @@
 #include <QToolBar>
 #include <QAction>
 #include <QLabel>
+#include <QDebug>
 
 WndSets::WndSets(QWidget *parent)
     : QMainWindow(parent)
 {
     // left toolbar
-    QToolBar *setsEditToolBar = new QToolBar;
+    setsEditToolBar = new QToolBar;
     setsEditToolBar->setOrientation(Qt::Vertical);
     setsEditToolBar->setIconSize(QSize(24, 24));
     setsEditToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -79,27 +80,31 @@ WndSets::WndSets(QWidget *parent)
     view->setColumnHidden(SetsModel::IsKnownCol, true);
     view->setRootIsDecorated(false);
 
-    connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-        this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
-
     // bottom buttons
-    toggleAllButton = new QPushButton(tr("Enable/Disable all sets"));
-    connect(toggleAllButton, SIGNAL(clicked()), this, SLOT(actToggleAll()));
-    toggleSelectedButton = new QPushButton(tr("Toggle selected sets"));
-    connect(toggleSelectedButton, SIGNAL(clicked()), this, SLOT(actToggle()));
+    enableAllButton = new QPushButton(tr("Enable all sets"));
+    disableAllButton = new QPushButton(tr("Disable all sets"));
+    enableSomeButton = new QPushButton(tr("Enable selected set(s)"));
+    disableSomeButton = new QPushButton(tr("Disable selected set(s)"));
 
-    QLabel *labNotes = new QLabel;
+    connect(enableAllButton, SIGNAL(clicked()), this, SLOT(actEnableAll()));
+    connect(disableAllButton, SIGNAL(clicked()), this, SLOT(actDisableAll()));
+    connect(enableSomeButton, SIGNAL(clicked()), this, SLOT(actEnableSome()));
+    connect(disableSomeButton, SIGNAL(clicked()), this, SLOT(actDisableSome()));
+    connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+            this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
+
+    labNotes = new QLabel;
     labNotes->setText("<b>" + tr("hints:") + "</b>" + "<ul><li>" + tr("Enable the sets that you want to have available in the deck editor") + "</li><li>" + tr("Move sets around to change their order, or click on a column header to sort sets on that field") + "</li><li>" + tr("Sets order decides the source that will be used when loading images for a specific card") + "</li><li>" + tr("Disabled sets will be used for loading images only if all the enabled sets failed") + "</li></ul>");
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actRestore()));
 
-    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout = new QGridLayout;
     mainLayout->addWidget(setsEditToolBar, 0, 0, 1, 1);
     mainLayout->addWidget(view, 0, 1, 1, 2);
-    mainLayout->addWidget(toggleAllButton, 1, 1, 1, 1);
-    mainLayout->addWidget(toggleSelectedButton, 1, 2, 1, 1);
+    mainLayout->addWidget(enableAllButton, 1, 1);
+    mainLayout->addWidget(disableAllButton, 1, 2);
     mainLayout->addWidget(labNotes, 2, 1, 1, 2);
     mainLayout->addWidget(buttonBox, 3, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
@@ -115,6 +120,25 @@ WndSets::WndSets(QWidget *parent)
 
 WndSets::~WndSets()
 {
+}
+
+void WndSets::rebuildMainLayout(int actionToTake)
+{
+    if (mainLayout == nullptr)
+        return;
+
+    switch (actionToTake)
+    {
+        case NO_SETS_SELECTED:
+            mainLayout->replaceWidget(enableSomeButton, enableAllButton);
+            mainLayout->replaceWidget(disableSomeButton, disableAllButton);
+            break;
+
+        case SOME_SETS_SELECTED:
+            mainLayout->replaceWidget(enableAllButton, enableSomeButton);
+            mainLayout->replaceWidget(disableAllButton, disableSomeButton);
+            break;
+    }
 }
 
 void WndSets::actSave()
@@ -138,6 +162,10 @@ void WndSets::actToggleButtons(const QItemSelection & selected, const QItemSelec
     aUp->setDisabled(disabled);
     aDown->setDisabled(disabled);
     aBottom->setDisabled(disabled);
+
+    int rows = view->selectionModel()->selectedRows().size();
+    rebuildMainLayout((rows > 1) ? SOME_SETS_SELECTED : NO_SETS_SELECTED);
+
 }
 
 void WndSets::selectRows(QSet<int> rows)
@@ -150,18 +178,33 @@ void WndSets::selectRows(QSet<int> rows)
     }
 }
 
-void WndSets::actToggle()
+
+void WndSets::actEnableAll()
+{
+    model->toggleAll(true);
+
+}
+
+void WndSets::actDisableAll()
+{
+    model->toggleAll(false);
+}
+
+void WndSets::actEnableSome()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
 
     foreach(QModelIndex i, rows)
-        model->toggleRow(i.row());
+        model->toggleRow(i.row(), true);
+
 }
 
-void WndSets::actToggleAll()
+void WndSets::actDisableSome()
 {
-    QModelIndex i = view->model()->index(0, 0);
-    model->toggleAll(i.row());
+    QModelIndexList rows = view->selectionModel()->selectedRows();
+
+    foreach(QModelIndex i, rows)
+        model->toggleRow(i.row(), false);
 }
 
 void WndSets::actUp()
