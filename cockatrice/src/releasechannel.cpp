@@ -150,7 +150,7 @@ void StableReleaseChannel::releaseListFinished()
     QString myHash = QString(VERSION_COMMIT);
     qDebug() << "Current hash=" << myHash << "update hash=" << shortHash;
 
-    qInfo() << "Got reply from release server, size=" << tmp.size()
+    qDebug() << "Got reply from release server, size=" << tmp.size()
         << "name=" << lastRelease->getName()
         << "desc=" << lastRelease->getDescriptionUrl()
         << "date=" << lastRelease->getPublishDate()
