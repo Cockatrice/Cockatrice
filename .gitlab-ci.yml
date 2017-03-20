@@ -1,6 +1,6 @@
 stages:
-  - rc # 'release mode'; stage will be autouploaded to bintray in future
-  - debug
+  - build
+  - deploy
 
 .artifacts: &artifacts
   artifacts:
@@ -17,32 +17,33 @@ stages:
 #================================ DEBIAN-BASED ================================
 
 .build_rc_package_deb: &build_rc_package_deb
-  stage: rc
+  stage: build
   script:
     - mkdir build || true # allowed to fail
     - cd build
-    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release -DPACKAGE_GENERATOR=DEB
+    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release -DCPACK_GENERATOR=DEB
     - make package -j2
 
 .build_debug_package_deb: &build_debug_package_deb
-  stage: debug
+  stage: build
   script:
     - mkdir build || true # allowed to fail
     - cd build
-    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Debug -DPACKAGE_GENERATOR=DEB
+    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Debug -DCPACK_GENERATOR=DEB
     - make package -j2
 
-.push_to_bintray_deb: &bintray_release_deb # currently unused; requires some config
-  after_script:
-    # if CI_BUILD_TAG is undefined, use git hash instead of version number
-    # otherwise, treat git tag as version number
-    - curl -T build/*.deb -u${BINTRAY_USER_NAME}:${BINTRAY_API_KEY} https://api.bintray.com/content/cockatrice/Cockatrice/Cockatrice/${CI_BUILD_REF}/Cockatrice_`test -z ${CI_BUILD_TAG+x} && echo git${CI_BUILD_REF} || echo ${CI_BUILD_TAG}`_${CI_BUILD_STAGE}_$(date +%F)_${PLATFORM}.deb
+.deb-artifacts: &artifacts_deb
+  artifacts:
+    paths:
+      - build/*.deb
+      - build/CMakeFiles/*.log
+    when: always
 
 #----------------------------------- UBUNTU -----------------------------------
 
 .requirements_16xx: &install_requirements_16xx
   before_script:
-    - apt-get -o dir::cache::archives="cache" update
+    - apt-get -o dir::cache::archives="cache" update -qq
     - apt-get -o dir::cache::archives="cache" install -y build-essential g++ cmake git
     - apt-get -o dir::cache::archives="cache" install -y libprotobuf-dev protobuf-compiler
     - apt-get -o dir::cache::archives="cache" install -y qt5-default qttools5-dev qttools5-dev-tools
@@ -56,7 +57,7 @@ stages:
     - linux
     - docker
   <<: *install_requirements_16xx
-  <<: *artifacts
+  <<: *artifacts_deb
   <<: *cache
   # <<: *bintray_releases_deb
 
@@ -66,7 +67,7 @@ stages:
     - linux
     - docker
   <<: *install_requirements_16xx
-  <<: *artifacts
+  <<: *artifacts_deb
   <<: *cache
   # <<: *bintray_releases_deb
 
@@ -89,15 +90,17 @@ build_debug_1610:
   <<: *1610
   <<: *build_debug_package_deb
   when: always
+  allow_failure: true
 
 #----------------------------------- DEBIAN -----------------------------------
 
 .requirements_stretch: &install_requirements_stretch
   before_script:
-    - apt-get -o dir::cache::archives="cache" update
+    - apt-get -o dir::cache::archives="cache" update -qq
     - apt-get -o dir::cache::archives="cache" install -y build-essential g++ cmake git
     - apt-get -o dir::cache::archives="cache" install -y qt5-default qtbase5-dev-tools
-    - apt-get -o dir::cache::archives="cache" install -y qttools5-dev-tools libqt5svg5-dev qtmultimedia5-dev
+    - apt-get -o dir::cache::archives="cache" install -y qttools5-dev-tools qtmultimedia5-dev
+    - apt-get -o dir::cache::archives="cache" install -y libqt5svg5-dev libqt5websockets5-dev
     - apt-get -o dir::cache::archives="cache" install -y libprotobuf-dev protobuf-compiler
 
 .build_stretch: &stretch
@@ -106,7 +109,7 @@ build_debug_1610:
     - linux
     - docker
   <<: *install_requirements_stretch
-  <<: *artifacts
+  <<: *artifacts_deb
   <<: *cache
   # <<: *bintray_releases_deb
 
@@ -119,25 +122,33 @@ build_debug_stretch:
   <<: *stretch
   <<: *build_debug_package_deb
   when: always
+  allow_failure: true
 
 
 #============================== REDHAT-BASED ==================================
 
 .build_rc_package_rpm: &build_rc_package_rpm
-  stage: rc
+  stage: build
   script:
     - mkdir -p build || true
     - cd build
-    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release -DPACKAGE_GENERATOR=RPM
+    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release -DCPACK_GENERATOR=RPM
     - make package -j2
 
 .build_debug_package_rpm: &build_debug_package_rpm
-  stage: debug
+  stage: build
   script:
     - mkdir -p build || true
     - cd build
-    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Debug -DPACKAGE_GENERATOR=RPM
+    - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Debug -DCPACK_GENERATOR=RPM
     - make package -j2
+
+.rpm-artifacts: &artifacts_rpm
+  artifacts:
+    paths:
+      - build/*.rpm
+      - build/CMakeFiles/*.log
+    when: always
 
 .push_to_bintray_rpm: &bintray_release_rpm # currently unused; requires some config
   after_script:
@@ -151,7 +162,7 @@ build_debug_stretch:
   before_script:
     - /usr/bin/dnf -y groupinstall "development tools"
     - /usr/bin/dnf -y install wget qt5* cmake libgcrypt-devel dh-autoreconf gcc-c++
-    - /usr/bin/dnf -y install protobuf protobuf-devel
+    - /usr/bin/dnf -y install protobuf protobuf-devel rpm-build
 
 .build_fedora22: &fedora22
   image: fedora:22
@@ -159,7 +170,7 @@ build_debug_stretch:
     - linux
     - docker
   <<: *install_requirements_fedora22
-  <<: *artifacts
+  <<: *artifacts_rpm
   <<: *cache
 
 build_rc_fedora22:
@@ -171,3 +182,22 @@ build_debug_fedora22:
   <<: *fedora22
   <<: *build_debug_package_rpm
   when: always
+
+#=================================== DEPLOY ===================================
+
+# deploy_to_bintray: # currently unused; requires some config
+#   stage: deploy
+#   script:
+#     # if CI_BUILD_TAG is undefined, use git hash instead of version number
+#     # otherwise, treat git tag as version number
+#     - curl -T build/*.deb -u${BINTRAY_USER_NAME}:${BINTRAY_API_KEY} https://api.bintray.com/content/cockatrice/Cockatrice/Cockatrice/${CI_BUILD_REF}/Cockatrice_`test -z ${CI_BUILD_TAG+x} && echo git${CI_BUILD_REF} || echo ${CI_BUILD_TAG}`_${CI_BUILD_STAGE}_$(date +%F)_${PLATFORM}.deb
+#     - curl -T build/*.rpm -u${BINTRAY_USER_NAME}:${BINTRAY_API_KEY} https://api.bintray.com/content/cockatrice/Cockatrice/Cockatrice/${CI_BUILD_REF}/Cockatrice_`test -z ${CI_BUILD_TAG+x} && echo git${CI_BUILD_REF} || echo ${CI_BUILD_TAG}`_${CI_BUILD_STAGE}_$(date +%F)_${PLATFORM}.rpm
+#   when: manual
+#
+# deploy_to_s3: # currently unused; requires some config
+#   stage: deploy
+#   script:
+#     # if CI_BUILD_TAG is undefined, use git hash instead of version number
+#     # otherwise, treat git tag as version number
+#     -
+#   when: on_success
