@@ -140,11 +140,8 @@ DlgConnect::DlgConnect(QWidget *parent)
     connect(previousHostButton, SIGNAL(toggled(bool)), this, SLOT(previousHostSelected(bool)));
     connect(newHostButton, SIGNAL(toggled(bool)), this, SLOT(newHostSelected(bool)));
 
-    if (settingsCache->servers().getPreviousHostLogin())
-        previousHostButton->setChecked(true);
-    else
-        newHostButton->setChecked(true);
-    
+    previousHostButton->setChecked(true);
+
     connect(previousHosts, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(updateDisplayInfo(const QString &)));
 
     playernameEdit->setFocus();
@@ -262,8 +259,9 @@ void DlgConnect::actOk()
         settingsCache->servers().addNewServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
     }
     else
+    {
         settingsCache->servers().updateExistingServer(saveEdit->text(), hostEdit->text(), portEdit->text(), playernameEdit->text(), passwordEdit->text(), savePasswordCheckBox->isChecked());
-
+    }
     settingsCache->servers().setPrevioushostName(saveEdit->text());
     settingsCache->servers().setAutoConnect(autoConnectCheckBox->isChecked() ? 1 : 0);
 
