@@ -264,6 +264,7 @@ void WndSets::actTop()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
     QSet<int> newRows;
+    int rowToSave = 0;
 
     if (rows.empty())
         return;
@@ -276,7 +277,7 @@ void WndSets::actTop()
             continue;
 
         model->swapRows(oldRow, newRow);
-        newRows.insert(newRow);
+        newRows.insert(rowToSave++);
     }
 
     selectRows(newRows);
@@ -286,6 +287,7 @@ void WndSets::actBottom()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
     QSet<int> newRows;
+    int rowToSave = model->rowCount() - 1;
 
     if (rows.empty())
         return;
@@ -298,7 +300,7 @@ void WndSets::actBottom()
             continue;
 
         model->swapRows(oldRow, newRow);
-        newRows.insert(newRow);
+        newRows.insert(rowToSave--);
     }
 
     selectRows(newRows);
