@@ -19,7 +19,7 @@ stages:
 .build_rc_package_deb: &build_rc_package_deb
   stage: build
   script:
-    - mkdir build || true # allowed to fail
+    - mkdir -p build
     - cd build
     - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release -DCPACK_GENERATOR=DEB
     - make package -j2
@@ -27,7 +27,7 @@ stages:
 .build_debug_package_deb: &build_debug_package_deb
   stage: build
   script:
-    - mkdir build || true # allowed to fail
+    - mkdir -p build
     - cd build
     - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Debug -DCPACK_GENERATOR=DEB
     - make package -j2
@@ -127,7 +127,7 @@ build_debug_stretch:
 .build_rc_package_rpm: &build_rc_package_rpm
   stage: build
   script:
-    - mkdir -p build || true
+    - mkdir -p build
     - cd build
     - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release -DCPACK_GENERATOR=RPM
     - make package -j2
@@ -135,7 +135,7 @@ build_debug_stretch:
 .build_debug_package_rpm: &build_debug_package_rpm
   stage: build
   script:
-    - mkdir -p build || true
+    - mkdir -p build
     - cd build
     - cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Debug -DCPACK_GENERATOR=RPM
     - make package -j2
@@ -177,19 +177,10 @@ build_debug_fedora22:
 
 #=================================== DEPLOY ===================================
 
-# deploy_to_bintray: # currently unused; requires some config
-#   stage: deploy
-#   script:
-#     # if CI_BUILD_TAG is undefined, use git hash instead of version number
-#     # otherwise, treat git tag as version number
-#     - curl -T build/*.deb -u${BINTRAY_USER_NAME}:${BINTRAY_API_KEY} https://api.bintray.com/content/cockatrice/Cockatrice/Cockatrice/${CI_BUILD_REF}/Cockatrice_`test -z ${CI_BUILD_TAG+x} && echo git${CI_BUILD_REF} || echo ${CI_BUILD_TAG}`_${CI_BUILD_STAGE}_$(date +%F)_${PLATFORM}.deb
-#     - curl -T build/*.rpm -u${BINTRAY_USER_NAME}:${BINTRAY_API_KEY} https://api.bintray.com/content/cockatrice/Cockatrice/Cockatrice/${CI_BUILD_REF}/Cockatrice_`test -z ${CI_BUILD_TAG+x} && echo git${CI_BUILD_REF} || echo ${CI_BUILD_TAG}`_${CI_BUILD_STAGE}_$(date +%F)_${PLATFORM}.rpm
-#   when: manual
-#
 # deploy_to_s3: # currently unused; requires some config
 #   stage: deploy
 #   script:
 #     # if CI_BUILD_TAG is undefined, use git hash instead of version number
 #     # otherwise, treat git tag as version number
-#     -
+#     # TODO: add deploy commands
 #   when: on_success
