@@ -44,9 +44,8 @@ install:
         } else {
            nuget install zlib -OutputDirectory c:\zlib
         }
-    # install mysql connector
-    - curl -kLO %MYSQL_DRIVER_URL%
-    - 7z x %MYSQL_DRIVER_ARCHIVE% -oc:\ >nul
+services:
+    - mysql
 build_script:
     - mkdir build
     - cd build
@@ -65,8 +64,8 @@ build_script:
         $protolib = c:\cygwin\bin\cygpath -m $protolib
         $protoc = c:\cygwin\bin\find /cygdrive/c/protoc/ -name "protoc.exe"
         $protoc = c:\cygwin\bin\cygpath -m $protoc
-        $mysqldll = c:\cygwin\bin\find /cygdrive/c/$env:MYSQL_DRIVER_NAME -name "libmysql.dll"
-        $mysqldll = c:\cygwin\bin\cygpath -m $mysqldll
+        $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
+        $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
         Write-Output "ZLIBINC  = $zlibinc"
         Write-Output "ZLIBLIB  = $zliblib"
         Write-Output "PROTOINC = $protoinc"
