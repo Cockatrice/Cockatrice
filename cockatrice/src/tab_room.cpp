@@ -185,12 +185,12 @@ QString TabRoom::sanitizeHtml(QString dirty) const
 
 void TabRoom::sendMessage()
 {
-    if (sayEdit->text().isEmpty()){
+    if (sayEdit->text().isEmpty()) {
         return;
-    }else if (completer->popup()->isVisible()){
+    } else if (completer->popup()->isVisible()) {
         completer->popup()->hide();
         return;
-    }else{
+    } else {
         Command_RoomSay cmd;
         cmd.set_message(sayEdit->text().toStdString());
 

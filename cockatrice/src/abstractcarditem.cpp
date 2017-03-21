@@ -3,6 +3,7 @@
 #include <QCursor>
 #include <QGraphicsSceneMouseEvent>
 #include <cmath>
+#include <algorithm>
 #ifdef _WIN32
 #include "round.h"
 #endif /* _WIN32 */
@@ -66,6 +67,9 @@ QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
 
 void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
+    const int MAX_FONT_SIZE = settingsCache->getMaxFontSize();
+    const int fontSize = std::max(9, MAX_FONT_SIZE);
+
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
     
     painter->resetTransform();
@@ -77,9 +81,6 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
     painter->setTransform(pixmapTransform);
 
     QFont f;
-    int fontSize = round(translatedSize.height() / 8);
-    if (fontSize < 9)
-        fontSize = 9;
     f.setPixelSize(fontSize);
 
     painter->setFont(f);

@@ -351,11 +351,19 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     minPlayersForMultiColumnLayoutEdit.setValue(settingsCache->getMinPlayersForMultiColumnLayout());
     connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMinPlayersForMultiColumnLayout(int)));
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
-    
+
+    connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMaxFontSize(int)));
+    maxFontSizeForCardsEdit.setValue(settingsCache->getMaxFontSize());
+    maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
+    maxFontSizeForCardsEdit.setMinimum(9);
+    maxFontSizeForCardsEdit.setMaximum(100);
+
     QGridLayout *tableGrid = new QGridLayout;
     tableGrid->addWidget(&invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
     tableGrid->addWidget(&minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
     tableGrid->addWidget(&minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
+    tableGrid->addWidget(&maxFontSizeForCardsLabel, 2, 0, 1, 1);
+    tableGrid->addWidget(&maxFontSizeForCardsEdit, 2, 1, 1, 1);
     
     tableGroupBox = new QGroupBox;
     tableGroupBox->setLayout(tableGrid);
@@ -392,6 +400,7 @@ void AppearanceSettingsPage::retranslateUi()
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
+    maxFontSizeForCardsLabel.setText(tr("Maximum font size for information displayed on cards"));
 }
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
