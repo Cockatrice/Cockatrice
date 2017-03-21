@@ -44,9 +44,8 @@ install:
         } else {
            nuget install zlib -OutputDirectory c:\zlib
         }
-    # install mysql connector
-    - curl -kLO %MYSQL_DRIVER_URL%
-    - 7z x %MYSQL_DRIVER_ARCHIVE% -oc:\ >nul
+services:
+    - mysql
 build_script:
     - mkdir build
     - cd build
