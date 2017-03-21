@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QDebug>
 #include "tab_supervisor.h"
 #include "dlg_creategame.h"
 #include "dlg_filter_games.h"
@@ -129,6 +130,11 @@ void GameSelector::actClearFilter()
 
 void GameSelector::actCreate()
 {
+    if (room == nullptr) {
+        qWarning() << "Attempted to create game, but the room was null";
+        return;
+    }
+
     DlgCreateGame dlg(room, room->getGameTypes(), this);
     dlg.exec();
 }

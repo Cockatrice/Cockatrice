@@ -198,7 +198,7 @@ Qt::ItemFlags RemoteDeckList_TreeModel::flags(const QModelIndex &index) const
 
 QModelIndex RemoteDeckList_TreeModel::nodeToIndex(Node *node) const
 {
-    if (node == root)
+    if (node == nullptr || node == root)
         return QModelIndex();
     return createIndex(node->getParent()->indexOf(node), 0, node);
 }

@@ -481,8 +481,9 @@ void Player::clear()
 
 void Player::addPlayer(Player *player)
 {
-    if (player == this)
+    if (player == nullptr || player == this)
         return;
+
     for (int i = 0; i < playerLists.size(); ++i) {
         QAction *newAction = playerLists[i]->addAction(player->getName());
         newAction->setData(player->getId());
@@ -492,6 +493,9 @@ void Player::addPlayer(Player *player)
 
 void Player::removePlayer(Player *player)
 {
+    if (player == nullptr)
+        return;
+
     for (int i = 0; i < playerLists.size(); ++i) {
         QList<QAction *> actionList = playerLists[i]->actions();
         for (int j = 0; j < actionList.size(); ++j)
@@ -1063,6 +1067,9 @@ void Player::actCreateToken()
 
 void Player::actCreateAnotherToken()
 {
+    if (lastTokenName.isEmpty())
+        return;
+
     Command_CreateToken cmd;
     cmd.set_zone("table");
     cmd.set_card_name(lastTokenName.toStdString());
@@ -1134,7 +1141,8 @@ void Player::actCreateAllRelatedCards()
 
 void Player::createCard(const CardItem *sourceCard, const QString &dbCardName) {
     CardInfo *cardInfo = db->getCard(dbCardName);
-    if(!cardInfo)
+
+    if (cardInfo == nullptr || sourceCard == nullptr)
         return;
 
     // get the target token's location
@@ -1169,6 +1177,9 @@ void Player::actSayMessage()
 
 void Player::setCardAttrHelper(const GameEventContext &context, CardItem *card, CardAttribute attribute, const QString &avalue, bool allCards)
 {
+    if (card == nullptr)
+        return;
+
     bool moveCardContext = context.HasExtension(Context_MoveCard::ext);
     switch (attribute) {
         case AttrTapped: {
@@ -1212,7 +1223,13 @@ QString Player::dbNameFromTokenDisplayName(const QString &tokenName) {
     if (index != -1)
     {
         return tokenNamePattern.capturedTexts()[1];
-    } else {
+    }
+    else if (tokenName.indexOf(tr("Token: ")) != -1)
+    {
+        return tokenName.mid(tr("Token: ").length());
+    }
+    else
+    {
         return tokenName;
     }
 }
@@ -1719,6 +1736,9 @@ void Player::processCardAttachment(const ServerInfo_Player &info)
 
 void Player::playCard(CardItem *c, bool faceDown, bool tapped)
 {
+    if (c == nullptr)
+        return;
+
     Command_MoveCard cmd;
     cmd.set_start_player_id(c->getZone()->getPlayer()->getId());
     cmd.set_start_zone(c->getZone()->getName().toStdString());
@@ -2338,6 +2358,9 @@ void Player::refreshShortcuts()
 
 void Player::updateCardMenu(const CardItem *card)
 {
+    if (card == nullptr)
+        return;
+
     QMenu *cardMenu = card->getCardMenu();
     QMenu *ptMenu = card->getPTMenu();
     QMenu *moveMenu = card->getMoveMenu();
@@ -2429,10 +2452,8 @@ void Player::updateCardMenu(const CardItem *card)
 }
 
 void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu) {
-    if (!card || !cardMenu || !card->getInfo())
-    {
+    if (card == nullptr || cardMenu == nullptr || card->getInfo() == nullptr)
         return;
-    }
 
     QStringList relatedCards = *new QStringList();
     relatedCards.append(card->getInfo()->getRelatedCards());
@@ -2535,6 +2556,9 @@ void Player::processSceneSizeChange(int newPlayerWidth)
 
 void Player::setLastToken(CardInfo *cardInfo)
 {
+    if (cardInfo == nullptr)
+        return;
+
     lastTokenName = cardInfo->getName();
     lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first().toLower();
     lastTokenPT = cardInfo->getPowTough();

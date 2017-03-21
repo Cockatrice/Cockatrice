@@ -58,7 +58,6 @@ void SettingsCache::translateLegacySettings()
     legacySetting.beginGroup("server");
     servers().setPreviousHostLogin(legacySetting.value("previoushostlogin").toInt());
     servers().setPreviousHostList(legacySetting.value("previoushosts").toStringList());
-    servers().setPrevioushostindex(legacySetting.value("previoushostindex").toInt());
     servers().setHostName(legacySetting.value("hostname").toString());
     servers().setPort(legacySetting.value("port").toString());
     servers().setPlayerName(legacySetting.value("playername").toString());
@@ -166,8 +165,9 @@ SettingsCache::SettingsCache()
         translateLegacySettings();
 
     // updates - don't reorder them or their index in the settings won't match
-    releaseChannels << new StableReleaseChannel()
-        << new DevReleaseChannel();
+    // append channels one by one, or msvc will add them in the wrong order.
+    releaseChannels << new StableReleaseChannel();
+    releaseChannels << new DevReleaseChannel();
 
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
@@ -232,6 +232,8 @@ SettingsCache::SettingsCache()
 
     soundEnabled = settings->value("sound/enabled", false).toBool();
     soundThemeName = settings->value("sound/theme").toString();
+
+    maxFontSize = settings->value("game/maxfontsize", DEFAULT_FONT_SIZE).toInt();
 
     priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
     priceTagSource = settings->value("deckeditor/pricetagsource", 0).toInt();
@@ -657,4 +659,10 @@ void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
 {
     updateReleaseChannel = _updateReleaseChannel;
     settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
+}
+
+void SettingsCache::setMaxFontSize(int _max)
+{
+    maxFontSize = _max;
+    settings->setValue("game/maxfontsize", maxFontSize);
 }

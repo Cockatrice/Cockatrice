@@ -1,4 +1,5 @@
 #include "serverssettings.h"
+#include <QDebug>
 
 ServersSettings::ServersSettings(QString settingPath, QObject *parent)
     : SettingsManager(settingPath+"servers.ini", parent)
@@ -26,14 +27,32 @@ QStringList ServersSettings::getPreviousHostList()
     return getValue("previoushosts", "server").toStringList();
 }
 
-void ServersSettings::setPrevioushostindex(int index)
+void ServersSettings::setPrevioushostName(const QString &name)
 {
-    setValue(index, "previoushostindex", "server");
+    setValue(name, "previoushostName", "server");
 }
 
-int ServersSettings::getPrevioushostindex()
+QString ServersSettings::getSaveName(QString defaultname)
 {
-    return getValue("previoushostindex", "server").toInt();
+    int index = getPrevioushostindex(getPrevioushostName());
+    QVariant saveName = getValue(QString("saveName%1").arg(index), "server", "server_details");
+    return saveName == QVariant() ? defaultname : saveName.toString();
+}
+
+QString ServersSettings::getPrevioushostName()
+{
+    return getValue("previoushostName", "server").toString();
+}
+
+int ServersSettings::getPrevioushostindex(const QString &saveName)
+{
+    int size = getValue("totalServers", "server", "server_details").toInt() + 1;
+
+    for (int i = 0; i < size; i++)
+        if (saveName == getValue(QString("saveName%1").arg(i), "server", "server_details").toString())
+            return i;
+
+    return -1;
 }
 
 void ServersSettings::setHostName(QString hostname)
@@ -43,7 +62,8 @@ void ServersSettings::setHostName(QString hostname)
 
 QString ServersSettings::getHostname(QString defaultHost)
 {
-    QVariant hostname = getValue("hostname","server");
+    int index = getPrevioushostindex(getPrevioushostName());
+    QVariant hostname = getValue(QString("server%1").arg(index), "server", "server_details");
     return hostname == QVariant() ? defaultHost : hostname.toString();
 }
 
@@ -54,7 +74,9 @@ void ServersSettings::setPort(QString port)
 
 QString ServersSettings::getPort(QString defaultPort)
 {
-    QVariant port = getValue("port","server");
+    int index = getPrevioushostindex(getPrevioushostName());
+    QVariant port = getValue(QString("port%1").arg(index), "server", "server_details");
+    qDebug() << "getPort() index = " << index << " port.val = " << port.toString();
     return port == QVariant() ? defaultPort : port.toString();
 }
 
@@ -65,8 +87,27 @@ void ServersSettings::setPlayerName(QString playerName)
 
 QString ServersSettings::getPlayerName(QString defaultName)
 {
-    QVariant name = getValue("playername", "server");
+    int index = getPrevioushostindex(getPrevioushostName());
+    QVariant name = getValue(QString("username%1").arg(index), "server", "server_details");
+    qDebug() << "getPlayerName() index = " << index << " name.val = " << name.toString();
     return name == QVariant() ? defaultName : name.toString();
+}
+
+QString ServersSettings::getPassword()
+{
+    int index = getPrevioushostindex(getPrevioushostName());
+
+    if (getSavePassword())
+        return getValue(QString("password%1").arg(index), "server", "server_details").toString();
+
+    return QString();
+}
+
+bool ServersSettings::getSavePassword()
+{
+    int index = getPrevioushostindex(getPrevioushostName());
+    bool save = getValue(QString("savePassword%1").arg(index), "server", "server_details").toBool();
+    return save;
 }
 
 void ServersSettings::setPassword(QString password)
@@ -74,20 +115,9 @@ void ServersSettings::setPassword(QString password)
     setValue(password, "password", "server");
 }
 
-QString ServersSettings::getPassword()
-{
-    return getValue("password", "server").toString();
-}
-
 void ServersSettings::setSavePassword(int save)
 {
     setValue(save, "save_password", "server");
-}
-
-int ServersSettings::getSavePassword()
-{
-    QVariant save = getValue("save_password", "server");
-    return save == QVariant() ? 1 : save.toInt();
 }
 
 void ServersSettings::setAutoConnect(int autoconnect)
@@ -132,4 +162,40 @@ QString ServersSettings::getFPPlayerName(QString defaultName)
 {
     QVariant name = getValue("fpplayername", "server");
     return name == QVariant() ? defaultName : name.toString();
+}
+
+void ServersSettings::addNewServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword)
+{
+    if (updateExistingServer(saveName, serv, port, username, password, savePassword))
+        return;
+
+    int index = getValue("totalServers", "server", "server_details").toInt() + 1;
+
+    setValue(saveName, QString("saveName%1").arg(index), "server", "server_details");
+    setValue(serv, QString("server%1").arg(index), "server", "server_details");
+    setValue(port, QString("port%1").arg(index), "server", "server_details");
+    setValue(username, QString("username%1").arg(index), "server", "server_details");
+    setValue(savePassword, QString("savePassword%1").arg(index), "server", "server_details");
+    setValue(index, "totalServers", "server", "server_details");
+    setValue(password, QString("password%1").arg(index), "server", "server_details");
+    
+}
+
+bool ServersSettings::updateExistingServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword)
+{
+    int size = getValue("totalServers", "server", "server_details").toInt() + 1;
+
+    for (int i = 0; i < size; i++)
+    {
+        if (saveName == getValue(QString("saveName%1").arg(i), "server", "server_details").toString())
+        {
+            setValue(serv, QString("server%1").arg(i), "server", "server_details");
+            setValue(port, QString("port%1").arg(i), "server", "server_details");
+            setValue(username, QString("username%1").arg(i), "server", "server_details");
+            setValue(savePassword, QString("savePassword%1").arg(i), "server", "server_details");
+            setValue(password, QString("password%1").arg(i), "server", "server_details");
+            return true;
+        }
+    }
+    return false;
 }

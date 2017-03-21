@@ -270,29 +270,14 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardItem</name>
     <message>
-        <location filename="../src/carditem.cpp" line="89"/>
+        <location filename="../src/carditem.cpp" line="83"/>
         <source>&amp;Move to</source>
         <translation>移动到</translation>
     </message>
     <message>
-        <location filename="../src/carditem.cpp" line="90"/>
+        <location filename="../src/carditem.cpp" line="84"/>
         <source>&amp;Power / toughness</source>
         <translation>力量/防御力</translation>
-    </message>
-    <message>
-        <location filename="../src/carditem.cpp" line="91"/>
-        <source>Add Counter</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/carditem.cpp" line="92"/>
-        <source>Remove Counter</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/carditem.cpp" line="93"/>
-        <source>Set Counters</source>
-        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -509,24 +494,24 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DevReleaseChannel</name>
     <message>
-        <location filename="../src/releasechannel.cpp" line="221"/>
+        <location filename="../src/releasechannel.cpp" line="222"/>
         <source>Development snapshots</source>
-        <translation type="unfinished"/>
+        <translation>开发快照</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="239"/>
+        <location filename="../src/releasechannel.cpp" line="240"/>
         <source>No reply received from the release update server.</source>
-        <translation type="unfinished"/>
+        <translation>未收到更新服务器的响应。</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="249"/>
+        <location filename="../src/releasechannel.cpp" line="250"/>
         <source>Invalid reply received from the release update server.</source>
-        <translation type="unfinished"/>
+        <translation>收到更新服务器的无效响应。</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="282"/>
+        <location filename="../src/releasechannel.cpp" line="287"/>
         <source>No reply received from the file update server.</source>
-        <translation type="unfinished"/>
+        <translation>未收到文件更新服务器的响应。</translation>
     </message>
 </context>
 <context>
@@ -537,87 +522,87 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation>已知主机</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="36"/>
+        <location filename="../src/dlg_connect.cpp" line="35"/>
         <source>New Host</source>
         <translation>新主机</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="38"/>
+        <location filename="../src/dlg_connect.cpp" line="37"/>
         <source>&amp;Host:</source>
         <translation>主机:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="40"/>
+        <location filename="../src/dlg_connect.cpp" line="39"/>
         <source>Enter host name</source>
         <translation>输入主机名称</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="43"/>
+        <location filename="../src/dlg_connect.cpp" line="42"/>
         <source>&amp;Port:</source>
         <translation>端口:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="47"/>
+        <location filename="../src/dlg_connect.cpp" line="46"/>
         <source>Player &amp;name:</source>
         <translation>玩家名字:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="51"/>
+        <location filename="../src/dlg_connect.cpp" line="50"/>
         <source>P&amp;assword:</source>
         <translation>密码:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="56"/>
+        <location filename="../src/dlg_connect.cpp" line="55"/>
         <source>&amp;Save password</source>
         <translation>记住密码</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="59"/>
+        <location filename="../src/dlg_connect.cpp" line="58"/>
         <source>A&amp;uto connect</source>
         <translation>自动连接</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="60"/>
+        <location filename="../src/dlg_connect.cpp" line="59"/>
         <source>Automatically connect to the most recent login when Cockatrice opens</source>
         <translation>当Cockatrice启动时自动连接到最近的登录</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="74"/>
+        <location filename="../src/dlg_connect.cpp" line="73"/>
         <source>Forgot password</source>
-        <translation type="unfinished"/>
+        <translation>忘记密码</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="77"/>
+        <location filename="../src/dlg_connect.cpp" line="76"/>
         <source>Connect</source>
-        <translation type="unfinished"/>
+        <translation>连接</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="81"/>
+        <location filename="../src/dlg_connect.cpp" line="80"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>取消</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="100"/>
+        <location filename="../src/dlg_connect.cpp" line="99"/>
         <source>Server</source>
         <translation>服务器</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="110"/>
+        <location filename="../src/dlg_connect.cpp" line="109"/>
         <source>Login</source>
         <translation>登录</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="125"/>
+        <location filename="../src/dlg_connect.cpp" line="124"/>
         <source>Connect to server</source>
         <translation>连接服务器</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="192"/>
+        <location filename="../src/dlg_connect.cpp" line="191"/>
         <source>Connect Warning</source>
         <translation>连接警告</translation>
     </message>
     <message>
-        <location filename="../src/dlg_connect.cpp" line="192"/>
+        <location filename="../src/dlg_connect.cpp" line="191"/>
         <source>The player name can&apos;t be empty.</source>
         <translation>玩家名称不能为空</translation>
     </message>
@@ -1070,12 +1055,12 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="29"/>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="86"/>
         <source>Forgot Password Challenge Warning</source>
-        <translation type="unfinished"/>
+        <translation>忘记密码验证警告</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="29"/>
         <source>Oops, looks like something has gone wrong.  Please restart the forgot password process by using the forgot password button on the connection screen.</source>
-        <translation type="unfinished"/>
+        <translation>啊哦！好像除了点问题。请点击忘记密码按钮以重新启动忘记密码流程。</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="33"/>
@@ -1090,22 +1075,22 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="41"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>玩家名字:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="45"/>
         <source>Email:</source>
-        <translation type="unfinished"/>
+        <translation>电子邮箱：</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="77"/>
         <source>Forgot Password Challenge</source>
-        <translation type="unfinished"/>
+        <translation>忘记密码验证</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="86"/>
         <source>The email address can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>电子邮箱不能为空</translation>
     </message>
 </context>
 <context>
@@ -1123,22 +1108,22 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="35"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>玩家名字:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="56"/>
         <source>Forgot Password Request</source>
-        <translation type="unfinished"/>
+        <translation>忘记密码请求</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="65"/>
         <source>Forgot Password Request Warning</source>
-        <translation type="unfinished"/>
+        <translation>忘记密码请求警告</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="65"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>玩家名称不能为空</translation>
     </message>
 </context>
 <context>
@@ -1150,12 +1135,12 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="112"/>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="118"/>
         <source>Forgot Password Reset Warning</source>
-        <translation type="unfinished"/>
+        <translation>忘记密码重置警告</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="29"/>
         <source>Opps, looks like something has gone wrong.  Please re-start the forgot password process by using the forgot password button on the connection screen.</source>
-        <translation type="unfinished"/>
+        <translation>啊哦！好像除了点问题。请点击忘记密码按钮以重新启动忘记密码流程。</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="33"/>
@@ -1170,43 +1155,43 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="41"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>玩家名字:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="45"/>
         <source>Token:</source>
-        <translation type="unfinished"/>
+        <translation>验证码</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="49"/>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="54"/>
         <source>New Password:</source>
-        <translation type="unfinished"/>
+        <translation>新密码：</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="91"/>
         <source>Forgot Password Reset</source>
-        <translation type="unfinished"/>
+        <translation>忘记密码重置</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="100"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>玩家名称不能为空</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="106"/>
         <source>The token can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>验证码不能为空</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="112"/>
         <source>The new password can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>新密码不能为空</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="118"/>
         <source>The passwords do not match.</source>
-        <translation type="unfinished"/>
+        <translation>密码不一致</translation>
     </message>
 </context>
 <context>
@@ -1467,14 +1452,14 @@ Would you like to change your database location setting?</source>
     <name>DlgUpdate</name>
     <message>
         <location filename="../src/dlg_update.cpp" line="48"/>
-        <location filename="../src/dlg_update.cpp" line="154"/>
-        <location filename="../src/dlg_update.cpp" line="167"/>
+        <location filename="../src/dlg_update.cpp" line="155"/>
+        <location filename="../src/dlg_update.cpp" line="168"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="110"/>
-        <location filename="../src/dlg_update.cpp" line="128"/>
+        <location filename="../src/dlg_update.cpp" line="129"/>
         <source>Cockatrice Update</source>
         <translation>Cockatrice鸡蛇更新</translation>
     </message>
@@ -1496,7 +1481,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="49"/>
         <source>Cockatrice was not built with SSL support, so you cannot download updates automatically! Please visit the download page to update manually.</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice不支持SSL，所以无法自动下载更新。请访问下载页面手动更新。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="82"/>
@@ -1519,41 +1504,41 @@ Would you like to change your database location setting?</source>
         <translation>您的Cockatrice鸡蛇已经是最新版本。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="120"/>
+        <location filename="../src/dlg_update.cpp" line="121"/>
         <source>A new version is available:&lt;br/&gt;%1&lt;br/&gt;published on %2 .&lt;br/&gt;More informations are available on the &lt;a href=&quot;%3&quot;&gt;release changelog&lt;/a&gt;&lt;br/&gt;Do you want to update now?</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="129"/>
+        <location filename="../src/dlg_update.cpp" line="130"/>
         <source>A new version is available:&lt;br/&gt;%1&lt;br/&gt;published on %2 .&lt;br/&gt;More informations are available on the &lt;a href=&quot;%3&quot;&gt;release changelog&lt;/a&gt;&lt;br/&gt;Unfortunately there are no packages available for your operating system. You may have to use a developer build or build from source yourself. Please visit the download page.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="150"/>
-        <location filename="../src/dlg_update.cpp" line="156"/>
-        <location filename="../src/dlg_update.cpp" line="168"/>
+        <location filename="../src/dlg_update.cpp" line="151"/>
+        <location filename="../src/dlg_update.cpp" line="157"/>
+        <location filename="../src/dlg_update.cpp" line="169"/>
         <source>Update Error</source>
         <translation>更新错误</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="150"/>
+        <location filename="../src/dlg_update.cpp" line="151"/>
         <source>An error occurred while checking for updates: </source>
         <translation>检查更新时发生错误：</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="156"/>
+        <location filename="../src/dlg_update.cpp" line="157"/>
         <source>An error occurred while downloading an update: </source>
         <translation>下载更新时发生错误：</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="160"/>
+        <location filename="../src/dlg_update.cpp" line="161"/>
         <source>Installing...</source>
         <translation>正在安装...</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="169"/>
+        <location filename="../src/dlg_update.cpp" line="170"/>
         <source>Unable to open the installer. You might be able to manually update by closing Cockatrice and running the installer at %1.</source>
-        <translation type="unfinished"/>
+        <translation>无法打开安装程序。你可以手动更新，关闭Cockatrice并运行%1 的安装程序</translation>
     </message>
 </context>
 <context>
@@ -1848,7 +1833,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="286"/>
         <source>Reset/clear downloaded pictures</source>
-        <translation type="unfinished"/>
+        <translation>重置/清除 已下载的图片</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="287"/>
@@ -1857,7 +1842,7 @@ Would you like to change your database location setting?</source>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="288"/>
-        <source>Notify when a new version is available</source>
+        <source>Notify if a feature supported by the server is missing in my client</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -2236,13 +2221,14 @@ This usually means that your client version is out of date, and the server sent 
     <message>
         <location filename="../src/window_main.cpp" line="340"/>
         <source>Your client seems to be missing features this server requires for connection.</source>
-        <translation type="unfinished"/>
+        <translation>你的客户端缺少连接这个服务器所需要的要素</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="380"/>
         <source>Your account has not been activated yet.
 You need to provide the activation token received in the activation email.</source>
-        <translation type="unfinished"/>
+        <translation>你的账号还未激活。
+请提供激活邮件中的验证码。</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="450"/>
@@ -2252,7 +2238,7 @@ You need to provide the activation token received in the activation email.</sour
     <message>
         <location filename="../src/window_main.cpp" line="453"/>
         <source>Too many registration attempts, please try again later or contact the server operator for further details.</source>
-        <translation type="unfinished"/>
+        <translation>注册尝试过多，请稍后再试或联系服务器管理员获取更多信息。</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="456"/>
@@ -2563,32 +2549,38 @@ To update your client, go to Help -&gt; Update Cockatrice.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1087"/>
-        <location filename="../src/window_main.cpp" line="1095"/>
-        <location filename="../src/window_main.cpp" line="1103"/>
+        <location filename="../src/window_main.cpp" line="1035"/>
+        <source>You can only import XML databases at this time.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="1092"/>
+        <location filename="../src/window_main.cpp" line="1100"/>
+        <location filename="../src/window_main.cpp" line="1108"/>
         <source>Forgot Password</source>
-        <translation type="unfinished"/>
+        <translation>忘记密码</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1087"/>
+        <location filename="../src/window_main.cpp" line="1092"/>
         <source>Your password has been reset successfully, you now may  log in using the new credentials.</source>
-        <translation type="unfinished"/>
+        <translation>你的密码已重置，现在你可以使用新密码登录了。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1095"/>
+        <location filename="../src/window_main.cpp" line="1100"/>
         <source>Failed to reset user account password, please contact the server operator to reset your password.</source>
-        <translation type="unfinished"/>
+        <translation>重置密码失败，请联系服务器管理员重置密码。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1103"/>
+        <location filename="../src/window_main.cpp" line="1108"/>
         <source>Activation request received, please check your email for an activation token.</source>
-        <translation type="unfinished"/>
+        <translation>激活请求已收到，请查看你的电子邮箱获取激活验证码。</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1022"/>
         <location filename="../src/window_main.cpp" line="1030"/>
-        <location filename="../src/window_main.cpp" line="1043"/>
-        <location filename="../src/window_main.cpp" line="1046"/>
+        <location filename="../src/window_main.cpp" line="1035"/>
+        <location filename="../src/window_main.cpp" line="1048"/>
+        <location filename="../src/window_main.cpp" line="1051"/>
         <source>Load sets/cards</source>
         <translation>载入系列/卡牌</translation>
     </message>
@@ -2598,14 +2590,14 @@ To update your client, go to Help -&gt; Update Cockatrice.</source>
         <translation>找不到选择的文件。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1043"/>
+        <location filename="../src/window_main.cpp" line="1048"/>
         <source>The new sets/cards have been added successfully.
 Cockatrice will now reload the card database.</source>
         <translation>新的系列/卡牌已添加成功。 
 Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1046"/>
+        <location filename="../src/window_main.cpp" line="1051"/>
         <source>Sets/cards failed to import.</source>
         <translation>系列/卡牌导入失败。</translation>
     </message>
@@ -3655,24 +3647,13 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>绿</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="702"/>
-        <location filename="../src/player.cpp" line="705"/>
-        <source>%1</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="708"/>
-        <source>%1...</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/player.cpp" line="2442"/>
-        <location filename="../src/player.cpp" line="2454"/>
+        <location filename="../src/player.cpp" line="2446"/>
+        <location filename="../src/player.cpp" line="2458"/>
         <source>Token: </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2458"/>
+        <location filename="../src/player.cpp" line="2462"/>
         <source>All tokens</source>
         <translation type="unfinished"/>
     </message>
@@ -3680,6 +3661,21 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <location filename="../src/player.cpp" line="865"/>
         <source>View top cards of library</source>
         <translation>查看卡组顶端的卡</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="702"/>
+        <source>&amp;Add counter (%1)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="705"/>
+        <source>&amp;Remove counter (%1)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="708"/>
+        <source>&amp;Set counters (%1)...</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="865"/>
@@ -3695,7 +3691,7 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <location filename="../src/player.cpp" line="920"/>
         <location filename="../src/player.cpp" line="935"/>
         <location filename="../src/player.cpp" line="958"/>
-        <location filename="../src/player.cpp" line="2266"/>
+        <location filename="../src/player.cpp" line="2277"/>
         <source>Number:</source>
         <translation>数值:</translation>
     </message>
@@ -3720,27 +3716,27 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>面数:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2109"/>
+        <location filename="../src/player.cpp" line="2120"/>
         <source>Set power/toughness</source>
         <translation>设置力量和防御</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2109"/>
+        <location filename="../src/player.cpp" line="2120"/>
         <source>Please enter the new PT:</source>
         <translation>请输入力量和防御值:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2184"/>
+        <location filename="../src/player.cpp" line="2195"/>
         <source>Set annotation</source>
         <translation>设置注释</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2184"/>
+        <location filename="../src/player.cpp" line="2195"/>
         <source>Please enter the new annotation:</source>
         <translation>请输入注释:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2266"/>
+        <location filename="../src/player.cpp" line="2277"/>
         <source>Set counters</source>
         <translation>设置数值</translation>
     </message>
@@ -4019,32 +4015,32 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>StableReleaseChannel</name>
     <message>
-        <location filename="../src/releasechannel.cpp" line="89"/>
+        <location filename="../src/releasechannel.cpp" line="90"/>
         <source>Stable releases</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="107"/>
+        <location filename="../src/releasechannel.cpp" line="108"/>
         <source>No reply received from the release update server.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="116"/>
+        <location filename="../src/releasechannel.cpp" line="117"/>
         <source>Invalid reply received from the release update server.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="148"/>
+        <location filename="../src/releasechannel.cpp" line="149"/>
         <source>No reply received from the tag update server.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="155"/>
+        <location filename="../src/releasechannel.cpp" line="156"/>
         <source>Invalid reply received from the tag update server.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="178"/>
+        <location filename="../src/releasechannel.cpp" line="179"/>
         <source>No reply received from the file update server.</source>
         <translation type="unfinished"/>
     </message>
@@ -4348,8 +4344,8 @@ Please enter a name:</source>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="195"/>
-        <location filename="../src/tab_deck_storage.cpp" line="312"/>
-        <location filename="../src/tab_deck_storage.cpp" line="320"/>
+        <location filename="../src/tab_deck_storage.cpp" line="316"/>
+        <location filename="../src/tab_deck_storage.cpp" line="324"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
         <translation>你确定要删除&quot;%1&quot; 吗?</translation>
     </message>
@@ -4359,12 +4355,12 @@ Please enter a name:</source>
         <translation>新建文件夹的名称:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="312"/>
+        <location filename="../src/tab_deck_storage.cpp" line="316"/>
         <source>Delete remote folder</source>
         <translation>删除服务器文件夹</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_storage.cpp" line="320"/>
+        <location filename="../src/tab_deck_storage.cpp" line="324"/>
         <source>Delete remote deck</source>
         <translation>删除服务器上的套牌</translation>
     </message>
@@ -4372,153 +4368,155 @@ Please enter a name:</source>
 <context>
     <name>TabGame</name>
     <message>
-        <location filename="../src/tab_game.cpp" line="450"/>
-        <location filename="../src/tab_game.cpp" line="1175"/>
+        <location filename="../src/tab_game.cpp" line="451"/>
+        <location filename="../src/tab_game.cpp" line="458"/>
+        <location filename="../src/tab_game.cpp" line="1183"/>
         <source>Replay</source>
         <translation>录像</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="450"/>
+        <location filename="../src/tab_game.cpp" line="451"/>
+        <location filename="../src/tab_game.cpp" line="458"/>
         <source>Game</source>
         <translation>游戏</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="452"/>
-        <location filename="../src/tab_game.cpp" line="496"/>
+        <location filename="../src/tab_game.cpp" line="461"/>
+        <location filename="../src/tab_game.cpp" line="504"/>
         <source>Card Info</source>
         <translation>卡牌信息</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="453"/>
-        <location filename="../src/tab_game.cpp" line="498"/>
+        <location filename="../src/tab_game.cpp" line="506"/>
         <source>Player List</source>
         <translation>玩家列表</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="454"/>
-        <location filename="../src/tab_game.cpp" line="497"/>
+        <location filename="../src/tab_game.cpp" line="462"/>
+        <location filename="../src/tab_game.cpp" line="505"/>
         <source>Messages</source>
         <translation>消息</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="456"/>
-        <location filename="../src/tab_game.cpp" line="511"/>
+        <location filename="../src/tab_game.cpp" line="464"/>
+        <location filename="../src/tab_game.cpp" line="519"/>
         <source>Replay Timeline</source>
         <translation>录像时间线</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="461"/>
+        <location filename="../src/tab_game.cpp" line="469"/>
         <source>&amp;Phases</source>
         <translation>阶段</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="464"/>
+        <location filename="../src/tab_game.cpp" line="472"/>
         <source>&amp;Game</source>
         <translation>游戏</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="466"/>
+        <location filename="../src/tab_game.cpp" line="474"/>
         <source>Next &amp;phase</source>
         <translation>下个阶段</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="469"/>
+        <location filename="../src/tab_game.cpp" line="477"/>
         <source>Next &amp;turn</source>
         <translation>下个回合</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="472"/>
+        <location filename="../src/tab_game.cpp" line="480"/>
         <source>&amp;Remove all local arrows</source>
         <translation>重置所有箭头</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="475"/>
+        <location filename="../src/tab_game.cpp" line="483"/>
         <source>Rotate View Cl&amp;ockwise</source>
         <translation>顺时针旋转视角</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="478"/>
+        <location filename="../src/tab_game.cpp" line="486"/>
         <source>Rotate View Co&amp;unterclockwise</source>
         <translation>逆时针旋转视角</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="481"/>
+        <location filename="../src/tab_game.cpp" line="489"/>
         <source>Game &amp;information</source>
         <translation>游戏信息</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="483"/>
+        <location filename="../src/tab_game.cpp" line="491"/>
         <source>&amp;Concede</source>
         <translation>放弃游戏</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="486"/>
+        <location filename="../src/tab_game.cpp" line="494"/>
         <source>&amp;Leave game</source>
         <translation>离开游戏</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="489"/>
+        <location filename="../src/tab_game.cpp" line="497"/>
         <source>C&amp;lose replay</source>
         <translation>关闭游戏录像</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="492"/>
+        <location filename="../src/tab_game.cpp" line="500"/>
         <source>&amp;Say:</source>
         <translation>说:</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="495"/>
+        <location filename="../src/tab_game.cpp" line="503"/>
         <source>&amp;View</source>
         <translation>查看</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="500"/>
-        <location filename="../src/tab_game.cpp" line="503"/>
-        <location filename="../src/tab_game.cpp" line="506"/>
-        <location filename="../src/tab_game.cpp" line="512"/>
+        <location filename="../src/tab_game.cpp" line="508"/>
+        <location filename="../src/tab_game.cpp" line="511"/>
+        <location filename="../src/tab_game.cpp" line="514"/>
+        <location filename="../src/tab_game.cpp" line="520"/>
         <source>Visible</source>
         <translation>可见</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="501"/>
-        <location filename="../src/tab_game.cpp" line="504"/>
-        <location filename="../src/tab_game.cpp" line="507"/>
-        <location filename="../src/tab_game.cpp" line="513"/>
+        <location filename="../src/tab_game.cpp" line="509"/>
+        <location filename="../src/tab_game.cpp" line="512"/>
+        <location filename="../src/tab_game.cpp" line="515"/>
+        <location filename="../src/tab_game.cpp" line="521"/>
         <source>Floating</source>
         <translation>移动窗口</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="516"/>
+        <location filename="../src/tab_game.cpp" line="524"/>
         <source>Reset layout</source>
         <translation>重置界面</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="597"/>
+        <location filename="../src/tab_game.cpp" line="605"/>
         <source>Concede</source>
         <translation>放弃游戏</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="597"/>
+        <location filename="../src/tab_game.cpp" line="605"/>
         <source>Are you sure you want to concede this game?</source>
         <translation>你确定放弃这个游戏?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="607"/>
+        <location filename="../src/tab_game.cpp" line="615"/>
         <source>Leave game</source>
         <translation>离开游戏</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="607"/>
+        <location filename="../src/tab_game.cpp" line="615"/>
         <source>Are you sure you want to leave this game?</source>
         <translation>你确定离开这这个游戏?</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="803"/>
+        <location filename="../src/tab_game.cpp" line="811"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
         <translation>您正在刷屏。请稍等几秒钟。</translation>
     </message>
     <message>
-        <location filename="../src/tab_game.cpp" line="1070"/>
+        <location filename="../src/tab_game.cpp" line="1078"/>
         <source>You have been kicked out of the game.</source>
         <translation>你已被踢出游戏。</translation>
     </message>
@@ -4701,21 +4699,21 @@ The more information you put in, the more specific your results will be.</source
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="107"/>
-        <source>This user is ignoring you.</source>
-        <translation>这个用户屏蔽你.</translation>
+        <source>This user is ignoring you, they cannot see your messages in main chat and you cannot join their games.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="137"/>
+        <location filename="../src/tab_message.cpp" line="140"/>
         <source>Private message from </source>
         <translation>私人消息来自</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="154"/>
+        <location filename="../src/tab_message.cpp" line="157"/>
         <source>%1 has left the server.</source>
         <translation>%1 已经离开了服务器.</translation>
     </message>
     <message>
-        <location filename="../src/tab_message.cpp" line="160"/>
+        <location filename="../src/tab_message.cpp" line="163"/>
         <source>%1 has joined the server.</source>
         <translation>%1 已经加入了服务器.</translation>
     </message>
@@ -4770,12 +4768,22 @@ The more information you put in, the more specific your results will be.</source
         <translation>你确定想要删除&quot;%1&quot;?</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="254"/>
+        <location filename="../src/tab_replays.cpp" line="196"/>
+        <source>Downloading Replays</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_replays.cpp" line="196"/>
+        <source>You cannot download replay folders at this time</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/tab_replays.cpp" line="259"/>
         <source>Delete remote replay</source>
         <translation>删除服务器上的录像</translation>
     </message>
     <message>
-        <location filename="../src/tab_replays.cpp" line="254"/>
+        <location filename="../src/tab_replays.cpp" line="259"/>
         <source>Are you sure you want to delete the replay of game %1?</source>
         <translation>你确定要删除这这个游戏的录像吗 %1?</translation>
     </message>
@@ -4897,7 +4905,7 @@ To update your client, go to Help -&gt; Update Cockatrice.</source>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="583"/>
         <source>You are about to be logged out due to inactivity.</source>
-        <translation type="unfinished"/>
+        <translation>你即将因为长时间未操作而被退出。</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="584"/>
@@ -5188,7 +5196,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="115"/>
         <source>%1</source>
-        <translation type="unfinished"/>
+        <translation>%1</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="123"/>
@@ -5490,7 +5498,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../src/settingscache.cpp" line="152"/>
+        <location filename="../src/settingscache.cpp" line="153"/>
         <source>English</source>
         <translation>简体中文 (Chinese Simplified)</translation>
     </message>
