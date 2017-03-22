@@ -261,6 +261,10 @@ roomlist\1\description="Play anything here."
 ; Default is none.
 roomlist\1\permissionlevel=none
 
+; Rooms can restrict the permission level of users that can join, Currnetly supported options are none, privileged, vip, and donator.
+; Default is none.
+roomlist\1\privilegelevel=none
+
 ; Wether to make users autojoin this room when connected to the server
 roomlist\1\autojoin=true
 

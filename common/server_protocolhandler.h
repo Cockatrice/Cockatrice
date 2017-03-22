@@ -84,6 +84,7 @@ private:
     virtual Response::ResponseCode processExtendedAdminCommand(int /* cmdType */, const AdminCommand & /* cmd */, ResponseContainer & /* rc */) { return Response::RespFunctionNotAllowed; }
 
     void resetIdleTimer();
+    bool isUserPermittedToJoinRoom(const QString roomPermission, const QString roomPrivilegeLevel);
 private slots:
     void pingClockTimeout();
 public slots:
