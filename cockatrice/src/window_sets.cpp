@@ -219,6 +219,7 @@ void WndSets::actDisableSome()
 void WndSets::actUp()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
+    qSort(rows.begin(), rows.end(), qLess<QModelIndex>());
     QSet<int> newRows;
 
     if (rows.empty())
@@ -241,6 +242,7 @@ void WndSets::actUp()
 void WndSets::actDown()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
+    qSort(rows.begin(), rows.end(), qGreater<QModelIndex>());
     QSet<int> newRows;
 
     if (rows.empty())
@@ -263,21 +265,24 @@ void WndSets::actDown()
 void WndSets::actTop()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
+    qSort(rows.begin(), rows.end(), qLess<QModelIndex>());
     QSet<int> newRows;
-    int rowToSave = 0;
+    int newRow = 0;
 
     if (rows.empty())
         return;
 
-    foreach (QModelIndex i, rows)
+    for (int i = 0; i < rows.length(); i++)
     {
-        int oldRow = i.row();
-        int newRow = 0;
-        if (oldRow <= 0)
-            continue;
+        int oldRow = rows.at(i).row();
 
-        model->swapRows(oldRow, newRow);
-        newRows.insert(rowToSave++);
+        if (oldRow <= 0) {
+            newRow++;
+            continue;
+        }
+
+        newRows.insert(newRow);
+        model->swapRows(oldRow, newRow++);
     }
 
     selectRows(newRows);
@@ -286,21 +291,24 @@ void WndSets::actTop()
 void WndSets::actBottom()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
+    qSort(rows.begin(), rows.end(), qGreater<QModelIndex>());
     QSet<int> newRows;
-    int rowToSave = model->rowCount() - 1;
+    int newRow = model->rowCount() - 1;
 
     if (rows.empty())
         return;
 
-    foreach (QModelIndex i, rows)
+    for (int i = 0; i < rows.length(); i++)
     {
-        int oldRow = i.row();
-        int newRow = model->rowCount() - 1;
-        if (oldRow >= newRow)
-            continue;
+        int oldRow = rows.at(i).row();
 
-        model->swapRows(oldRow, newRow);
-        newRows.insert(rowToSave--);
+        if (oldRow >= newRow) {
+            newRow--;
+            continue;
+        }
+
+        newRows.insert(newRow);
+        model->swapRows(oldRow, newRow--);
     }
 
     selectRows(newRows);
