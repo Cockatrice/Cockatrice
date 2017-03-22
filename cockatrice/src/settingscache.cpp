@@ -233,6 +233,8 @@ SettingsCache::SettingsCache()
     soundEnabled = settings->value("sound/enabled", false).toBool();
     soundThemeName = settings->value("sound/theme").toString();
 
+    maxFontSize = settings->value("game/maxfontsize", DEFAULT_FONT_SIZE).toInt();
+
     priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
     priceTagSource = settings->value("deckeditor/pricetagsource", 0).toInt();
 
@@ -657,4 +659,10 @@ void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
 {
     updateReleaseChannel = _updateReleaseChannel;
     settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
+}
+
+void SettingsCache::setMaxFontSize(int _max)
+{
+    maxFontSize = _max;
+    settings->setValue("game/maxfontsize", maxFontSize);
 }

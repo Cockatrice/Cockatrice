@@ -43,7 +43,8 @@ public:
     QStringList mimeTypes() const;
     void swapRows(int oldRow, int newRow);
     void toggleRow(int row, bool enable);
-    void toggleAll(bool enable);
+    void toggleRow(int row);
+    void toggleAll(bool);
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
     void save(CardDatabase *db);
     void restore(CardDatabase *db);
