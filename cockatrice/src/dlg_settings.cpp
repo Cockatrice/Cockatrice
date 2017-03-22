@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QSlider>
 #include <QSpinBox>
+#include <QDesktopWidget>
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "main.h"
@@ -36,6 +37,10 @@
 GeneralSettingsPage::GeneralSettingsPage()
 {
     this->setStyleSheet("QLineEdit, QComboBox, QLabel, QCheckBox, QSpinBox { min-height: 21px }");
+
+    QRect rec = QApplication::desktop()->availableGeometry();
+    this->setMaximumSize(rec.width(), rec.height());
+
     QString setLanguage = settingsCache->getLang();
     QStringList qmFiles = findQmFiles();
     for (int i = 0; i < qmFiles.size(); i++) {
