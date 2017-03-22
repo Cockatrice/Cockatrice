@@ -12,11 +12,15 @@
 #include <QFileDialog>
 #include <QToolBar>
 #include <QTranslator>
+#include <QAction>
 #include <QApplication>
 #include <QInputDialog>
 #include <QSpinBox>
 #include <QDialogButtonBox>
+#include <QRadioButton>
 #include <QDebug>
+#include <QSlider>
+#include <QSpinBox>
 #include <QDesktopWidget>
 #include "carddatabase.h"
 #include "dlg_settings.h"
