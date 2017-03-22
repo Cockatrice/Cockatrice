@@ -32,8 +32,6 @@
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
-    //this->setStyleSheet("QLineEdit, QComboBox, QLabel, QCheckBox, QSpinBox { min-height: 21px }");
-
     QString setLanguage = settingsCache->getLang();
     QStringList qmFiles = findQmFiles();
     for (int i = 0; i < qmFiles.size(); i++) {
