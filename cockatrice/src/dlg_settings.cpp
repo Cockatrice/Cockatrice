@@ -12,15 +12,11 @@
 #include <QFileDialog>
 #include <QToolBar>
 #include <QTranslator>
-#include <QAction>
 #include <QApplication>
 #include <QInputDialog>
 #include <QSpinBox>
 #include <QDialogButtonBox>
-#include <QRadioButton>
 #include <QDebug>
-#include <QSlider>
-#include <QSpinBox>
 #include <QDesktopWidget>
 #include "carddatabase.h"
 #include "dlg_settings.h"
@@ -36,10 +32,7 @@
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
-    this->setStyleSheet("QLineEdit, QComboBox, QLabel, QCheckBox, QSpinBox { min-height: 21px }");
-
-    QRect rec = QApplication::desktop()->availableGeometry();
-    this->setMaximumSize(rec.width(), rec.height());
+    //this->setStyleSheet("QLineEdit, QComboBox, QLabel, QCheckBox, QSpinBox { min-height: 21px }");
 
     QString setLanguage = settingsCache->getLang();
     QStringList qmFiles = findQmFiles();
@@ -109,7 +102,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     urlLinkLabel.setOpenExternalLinks(true);
 
     personalGroupBox = new QGroupBox;
-    personalGroupBox->setMinimumSize(500, 250);
     personalGroupBox->setLayout(personalGrid);
 
     deckPathEdit = new QLineEdit(settingsCache->getDeckPath());
@@ -154,11 +146,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     pathsGrid->addWidget(tokenDatabasePathEdit, 4, 1);
     pathsGrid->addWidget(tokenDatabasePathButton, 4, 2);
     pathsGroupBox = new QGroupBox;
-    pathsGroupBox->setMinimumSize(500, 150);
     pathsGroupBox->setLayout(pathsGrid);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setSizeConstraint(QLayout::SetMinimumSize);
     mainLayout->addWidget(personalGroupBox);
     mainLayout->addWidget(pathsGroupBox);
     
@@ -409,7 +399,7 @@ void AppearanceSettingsPage::retranslateUi()
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
-    maxFontSizeForCardsLabel.setText(tr("Maximum font size for information displayed on cards"));
+    maxFontSizeForCardsLabel.setText(tr("Maximum font size for information displayed on cards:"));
 }
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
@@ -770,8 +760,9 @@ void SoundSettingsPage::retranslateUi() {
 DlgSettings::DlgSettings(QWidget *parent)
     : QDialog(parent)
 {
-    this->setMinimumSize(500,500);
-    this->adjustSize();
+    QRect rec = QApplication::desktop()->availableGeometry();
+    this->setMinimumSize(rec.width() / 2, rec.height() - 100);
+    this->setBaseSize(rec.width(), rec.height());
 
     connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
     
