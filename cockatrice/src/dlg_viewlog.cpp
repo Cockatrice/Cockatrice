@@ -24,7 +24,7 @@ DlgViewLog::DlgViewLog(QWidget *parent)
 
 void DlgViewLog::loadInitialLogBuffer()
 {
-    QVector<QString> logBuffer = Logger::getInstance().getLogBuffer();
+    QList<QString> logBuffer = Logger::getInstance().getLogBuffer();
     foreach(QString message, logBuffer)
         logEntryAdded(message);
 }
