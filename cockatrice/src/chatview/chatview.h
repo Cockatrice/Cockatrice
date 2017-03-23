@@ -6,10 +6,11 @@
 #include <QTextCursor>
 #include <QColor>
 #include <QAction>
-#include "userlist.h"
+#include "../userlist.h"
 #include "user_level.h"
 #include "room_message_type.h"
-#include "tab_supervisor.h"
+#include "../tab_supervisor.h"
+#include "userlistProxy.h"
 
 class QTextTable;
 class QMouseEvent;
@@ -23,6 +24,7 @@ protected:
     TabGame * const game;
 private:
     enum HoveredItemType { HoveredNothing, HoveredUrl, HoveredCard, HoveredUser };
+    const UserlistProxy * const userlistProxy;
     UserContextMenu *userContextMenu;
     QString lastSender;
     QString userName;
@@ -41,11 +43,8 @@ private:
     QTextCursor prepareBlock(bool same = false);
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
-    QString getNameFromUserList(QMap<QString, UserListTWI *> &userList, QString &userName);
-    bool isFullMentionAValidUser(QMap<QString, UserListTWI *> &userList, QString userNameToMatch);
     QColor getCustomMentionColor();
     QColor getCustomHighlightColor();
-    bool shouldShowSystemPopup();
     void showSystemPopup(QString &sender);
     bool isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message);
     void checkTag(QTextCursor &cursor, QString &message);
@@ -56,7 +55,7 @@ private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();
 public:
-    ChatView(const TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent = 0);
+    ChatView(const TabSupervisor *_tabSupervisor, const UserlistProxy *_userlistProxy, TabGame *_game, bool _showTimestamps, QWidget *parent = 0);
     void retranslateUi();
     void appendHtml(const QString &html);
     void appendHtmlServerMessage(const QString &html, bool optionalIsBold = false, QString optionalFontColor = QString());

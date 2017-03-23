@@ -83,7 +83,8 @@ SET(cockatrice_SOURCES
     src/replay_timeline_widget.cpp
     src/deckstats_interface.cpp
     src/tappedout_interface.cpp
-    src/chatview.cpp 
+    src/chatview/chatview.cpp
+    src/chatview/userlistProxy.h
     src/userlist.cpp 
     src/userinfobox.cpp 
     src/user_context_menu.cpp

@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QAbstractButton>
 #include "deck_loader.h"
+#include "chatview/userlistProxy.h"
 
 class QMenu;
 class AbstractClient;
@@ -41,7 +42,7 @@ protected:
     void paintEvent(QPaintEvent *event);
 };
 
-class TabSupervisor : public QTabWidget {
+class TabSupervisor : public QTabWidget, public UserlistProxy {
     Q_OBJECT
 private:
     ServerInfo_User *userInfo;
@@ -78,6 +79,11 @@ public:
     const QMap<int, TabRoom *> &getRoomTabs() const { return roomTabs; }
     bool getAdminLocked() const;
     bool closeRequest();
+    bool isOwnUserRegistered() const;
+    QString getOwnUsername() const;
+    bool isUserBuddy(const QString &userName) const;
+    bool isUserIgnored(const QString &userName) const;
+    const ServerInfo_User* getOnlineUser(const QString &userName) const;
 signals:
     void setMenu(const QList<QMenu *> &newMenuList = QList<QMenu *>());
     void localGameEnded();
