@@ -9,8 +9,8 @@ class ServerInfo_User;
  */
 class UserlistProxy {
 public:
-    virtual const bool isOwnUserRegistered() const = 0;
-    virtual const QString getOwnUsername() const = 0;
+    virtual bool isOwnUserRegistered() const = 0;
+    virtual QString getOwnUsername() const = 0;
     virtual bool isUserBuddy(const QString &userName) const = 0;
     virtual bool isUserIgnored(const QString &userName) const = 0;
     virtual const ServerInfo_User* getOnlineUser(const QString &userName) const = 0; // Can return nullptr
