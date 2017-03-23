@@ -124,12 +124,12 @@ void MessageLogWidget::logConnectionStateChanged(Player *player, bool connection
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-    appendMessage(message, 0, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()), true);
+    appendMessage(message, 0, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()), QString::fromStdString(player->getUserInfo()->privlevel()), true);
 }
 
-void MessageLogWidget::logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString message)
+void MessageLogWidget::logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString userPrivLevel, QString message)
 {
-    appendMessage(message, 0, spectatorName, spectatorUserLevel, false);
+    appendMessage(message, 0, spectatorName, spectatorUserLevel, userPrivLevel, false);
 }
 
 void MessageLogWidget::logShuffle(Player *player, CardZone *zone)

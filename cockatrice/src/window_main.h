@@ -29,7 +29,6 @@
 
 #include "abstractclient.h"
 #include "pb/response.pb.h"
-#include "update_checker.h"
 
 class TabSupervisor;
 class RemoteClient;
@@ -67,13 +66,15 @@ private slots:
     void actRegister();
     void actSettings();
     void actExit();
-    
+    void actForgotPasswordRequest();
     void actAbout();
     void actUpdate();
     void actViewLog();
-
+    void forgotPasswordSuccess();
+    void forgotPasswordError();
+    void promptForgotPasswordReset();
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-
+    void promptForgotPasswordChallenge();
     void showWindowIfHidden();
 
     void actCheckCardUpdates();

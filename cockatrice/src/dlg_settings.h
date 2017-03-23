@@ -63,6 +63,7 @@ private:
     QComboBox languageBox;
     QCheckBox picDownloadCheckBox;
     QCheckBox updateNotificationCheckBox;
+    QComboBox updateReleaseChannelBox;
     QLabel languageLabel;
     QLabel pixmapCacheLabel;
     QLabel deckPathLabel;
@@ -73,6 +74,7 @@ private:
     QLabel defaultUrlLabel;
     QLabel fallbackUrlLabel;
     QLabel urlLinkLabel;
+    QLabel updateReleaseChannelLabel;
     QPushButton clearDownloadedPicsButton;
     QPushButton defaultUrlRestoreButton;
     QPushButton fallbackUrlRestoreButton;
@@ -86,6 +88,7 @@ private:
     QLabel themeLabel;
     QComboBox themeBox;
     QLabel minPlayersForMultiColumnLayoutLabel;
+    QLabel maxFontSizeForCardsLabel;
     QCheckBox displayCardNamesCheckBox;
     QCheckBox cardScalingCheckBox;
     QCheckBox horizontalHandCheckBox;
@@ -96,6 +99,7 @@ private:
     QGroupBox *handGroupBox;
     QGroupBox *tableGroupBox;
     QSpinBox minPlayersForMultiColumnLayoutEdit;
+    QSpinBox maxFontSizeForCardsEdit;
 public:
     AppearanceSettingsPage();
     void retranslateUi();

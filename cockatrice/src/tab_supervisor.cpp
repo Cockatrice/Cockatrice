@@ -579,12 +579,26 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 {
 
     switch ((Event_NotifyUser::NotificationType) event.type()) {
-        case Event_NotifyUser::UNKNOWN: QMessageBox::information(this, tr("Unknown Event"), tr("The server has sent you a message that your client does not understand.\nThis message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.\n\nTo update your client, go to Help -> Update Cockatrice.")); break;
+        case Event_NotifyUser::UNKNOWN: QMessageBox::information(this, tr("Unknown Event"), tr("The server has sent you a message that your client does not understand.\nThis message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.\n\nTo update your client, go to Help -> Check for Updates.")); break;
         case Event_NotifyUser::IDLEWARNING: QMessageBox::information(this, tr("Idle Timeout"), tr("You are about to be logged out due to inactivity.")); break;
         case Event_NotifyUser::PROMOTED: QMessageBox::information(this, tr("Promotion"), tr("You have been promoted to moderator. Please log out and back in for changes to take effect.")); break;
         case Event_NotifyUser::WARNING: {
             if (!QString::fromStdString(event.warning_reason()).simplified().isEmpty())
                 QMessageBox::warning(this, tr("Warned"), tr("You have received a warning due to %1.\nPlease refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.").arg(QString::fromStdString(event.warning_reason()).simplified()));
+            break;
+        }
+        case Event_NotifyUser::CUSTOM: {
+            if (!QString::fromStdString(event.custom_title()).simplified().isEmpty() && !QString::fromStdString(event.custom_content()).simplified().isEmpty()) {
+                QMessageBox msgBox;
+                msgBox.setParent(this);
+                msgBox.setWindowFlags(Qt::Dialog);
+                msgBox.setIcon(QMessageBox::Information);
+                msgBox.setWindowTitle(QString::fromStdString(event.custom_title()).simplified());
+                msgBox.setText(tr("You have received the following message from the server.\n(custom messages like these could be untranslated)"));
+                msgBox.setDetailedText(QString::fromStdString(event.custom_content()).simplified());
+                msgBox.setMinimumWidth(200);
+                msgBox.exec();
+            }
             break;
         }
         default: ;

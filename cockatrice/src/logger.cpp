@@ -1,6 +1,7 @@
 #include "logger.h"
 
 #include <QDateTime>
+#include <iostream>
 
 #define LOGGER_MAX_ENTRIES 128
 #define LOGGER_FILENAME "qdebug.txt"
@@ -50,13 +51,18 @@ void Logger::closeLogfileSession()
 void Logger::log(QtMsgType /* type */, const QMessageLogContext & /* ctx */, const QString &message)
 {
     logBuffer.append(message);
-    if(logBuffer.size() > LOGGER_MAX_ENTRIES)
-        logBuffer.removeFirst();
+    if (logBuffer.size() > LOGGER_MAX_ENTRIES)
+        logBuffer.clear();
 
-    emit logEntryAdded(message);
+    if (message.size() > 0) {
+        emit logEntryAdded(message);
+        std::cerr << message.toStdString() << std::endl; // Print to stdout
 
-    if(logToFileEnabled)
-    {
-        fileStream << message << endl;
+        if (logToFileEnabled)
+            fileStream << message << endl; // Print to fileStream
     }
+
+
+
+
 }

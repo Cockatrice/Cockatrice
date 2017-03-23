@@ -1,6 +1,7 @@
 #ifndef DLG_CONNECT_H
 #define DLG_CONNECT_H
 
+#include "userconnection_information.h"
 #include <QDialog>
 #include <QLineEdit>
 
@@ -20,6 +21,8 @@ protected:
 
 class DlgConnect : public QDialog {
     Q_OBJECT
+signals :
+    void sigStartForgotPasswordRequest();
 public:
     DlgConnect(QWidget *parent = 0);
     QString getHost() const;
@@ -29,15 +32,20 @@ public:
 private slots:
     void actOk();
     void actCancel();
+    void actSaveConfig();
     void passwordSaved(int state);
     void previousHostSelected(bool state);
     void newHostSelected(bool state);
+    void actForgotPassword();
+    void updateDisplayInfo(const QString &saveName);
+    void rebuildComboBoxList();
 private:
-    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel;
-    QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit;
+    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel, *publicServersLabel;
+    QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *saveEdit;
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;
     QRadioButton *newHostButton, *previousHostButton;
+    QPushButton *btnOk, *btnCancel, *btnForgotPassword;
+    QMap<QString, UserConnection_Information> savedHostList;
 };
-
 #endif

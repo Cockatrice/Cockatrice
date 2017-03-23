@@ -1,4 +1,6 @@
 #include "settingscache.h"
+#include "releasechannel.h"
+
 #include <QSettings>
 #include <QFile>
 #include <QDir>
@@ -56,13 +58,15 @@ void SettingsCache::translateLegacySettings()
     legacySetting.beginGroup("server");
     servers().setPreviousHostLogin(legacySetting.value("previoushostlogin").toInt());
     servers().setPreviousHostList(legacySetting.value("previoushosts").toStringList());
-    servers().setPrevioushostindex(legacySetting.value("previoushostindex").toInt());
     servers().setHostName(legacySetting.value("hostname").toString());
     servers().setPort(legacySetting.value("port").toString());
     servers().setPlayerName(legacySetting.value("playername").toString());
     servers().setPassword(legacySetting.value("password").toString());
     servers().setSavePassword(legacySetting.value("save_password").toInt());
     servers().setAutoConnect(legacySetting.value("auto_connect").toInt());
+    servers().setFPHostName(legacySetting.value("fphostname").toString());
+    servers().setFPPort(legacySetting.value("fpport").toString());
+    servers().setFPPlayerName(legacySetting.value("fpplayername").toString());
     usedKeys.append(legacySetting.allKeys());
     QStringList allKeysServer = legacySetting.allKeys();
     for (int i = 0; i < allKeysServer.size(); ++i) {
@@ -92,6 +96,7 @@ void SettingsCache::translateLegacySettings()
     gameFilters().setUnavailableGamesVisible(legacySetting.value("unavailable_games_visible").toBool());
     gameFilters().setShowPasswordProtectedGames(legacySetting.value("show_password_protected_games").toBool());
     gameFilters().setGameNameFilter(legacySetting.value("game_name_filter").toString());
+    gameFilters().setShowBuddiesOnlyGames(legacySetting.value("show_buddies_only_games").toBool());
     gameFilters().setMinPlayers(legacySetting.value("min_players").toInt());
 
     if (legacySetting.value("max_players").toInt() > 1)
@@ -159,7 +164,14 @@ SettingsCache::SettingsCache()
     if(!QFile(settingsPath+"global.ini").exists())
         translateLegacySettings();
 
+    // updates - don't reorder them or their index in the settings won't match
+    // append channels one by one, or msvc will add them in the wrong order.
+    releaseChannels << new StableReleaseChannel();
+    releaseChannels << new DevReleaseChannel();
+
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
+    updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
+
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
 
@@ -220,6 +232,8 @@ SettingsCache::SettingsCache()
 
     soundEnabled = settings->value("sound/enabled", false).toBool();
     soundThemeName = settings->value("sound/theme").toString();
+
+    maxFontSize = settings->value("game/maxfontsize", DEFAULT_FONT_SIZE).toInt();
 
     priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
     priceTagSource = settings->value("deckeditor/pricetagsource", 0).toInt();
@@ -639,4 +653,16 @@ void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
     notifyAboutUpdates = _notifyaboutupdate;
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
+{
+    updateReleaseChannel = _updateReleaseChannel;
+    settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
+}
+
+void SettingsCache::setMaxFontSize(int _max)
+{
+    maxFontSize = _max;
+    settings->setValue("game/maxfontsize", maxFontSize);
 }

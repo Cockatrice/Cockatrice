@@ -92,7 +92,6 @@ Loading cockatrice web client...
     source: [
       // add custom servers here
       "cockatrice.woogerworks.com",
-      "vps.poixen.com",
       "chickatrice.net",
       "127.0.0.1"
     ]
@@ -142,8 +141,13 @@ Loading cockatrice web client...
       $(div).find("[href]").each(function() {
         var attributeValue = $(this).attr('href');
         for(var protocol in hrefWhitelist)
-          if(attributeValue.indexOf(hrefWhitelist[protocol]) == 0)
-            return;
+        {
+            if(attributeValue.indexOf(hrefWhitelist[protocol]) == 0)
+            {
+                $(this).attr('target', '_blank');
+                return;
+            }
+        }
 
         $(this).removeAttr('href');        
       });
@@ -195,17 +199,6 @@ Loading cockatrice web client...
           return "Registered user";
       else
           return "Unregistered user";
-    }
-
-    function decodeGender(id) {
-      var genders = WebClient.pb.ServerInfo_User.Gender;
-      for(var key in genders)
-      {
-          if(id == genders[key])
-            return key;
-      }
-
-      return "Unknown";
     }
 
     $("#loginnow").click(connect);
@@ -299,9 +292,22 @@ Loading cockatrice web client...
                 case 'userLevel':
                   $('#userinfo').append('User level: ' + decodeUserLevel(value) + '<br/>');
                   break;
-                case 'gender':
-                  $('#userinfo').append('Gender: ' + decodeGender(value) + '<br/>');
-                  break;                  
+                case 'name':
+                  $('#userinfo').append('Name: ' + value + '<br/>');
+                  break;
+                case 'realName':
+                  $('#userinfo').append('Real name: ' + value + '<br/>');
+                  break;
+                case 'country':
+                  $('#userinfo').append('Country: ' + value + '<br/>');
+                  break;
+                case 'privlevel':
+                  $('#userinfo').append('Privilege: ' + value + '<br/>');
+                  break;
+                case 'id':
+                case 'serverId':
+                  // don't output these fields
+                  break;
                 default:
                   $('#userinfo').append(key + ': ' + value + '<br/>');
                   break;
@@ -310,7 +316,6 @@ Loading cockatrice web client...
 
             $('#buddies').empty();
             $.each(data.buddyList, function(key, value) {
-              debugger;
               $('#buddies').append('<li>' + value.name + '</li>');
             });
             $("#buddies").selectable();

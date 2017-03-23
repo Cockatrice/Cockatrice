@@ -44,9 +44,9 @@ writelog=1
 ; [ex: C:\\Temp\\server.log ]
 logfile=server.log
 
-; You may want to silence some commonly recurring messages in the logfile. This setting can contain a
-; comma-separed list of words; if any message that is about to be logged contains at least one of these words,
-; it won't be logged. Default is empty; example: "kittens,ponies,faires"
+; You may want to log only certain messages in the logfile. The default log level is extremely verbose. 
+; This setting should contain a comma-separated list of strings that will be selectively logged.
+; All other lines will be excluded from the log. Default is empty; example: "Registration,_Login,foobar"
 logfilters=""
 
 ; Set the time interval in seconds that servatrice will use to communicate with each connected client
@@ -140,7 +140,51 @@ disallowedregexp=""
 ; account activated. Default true.
 ;requireemailactivation=true
 
+; Set this number to the maximum number of accounts any one user can use to create new accounts
+; using the same email address. 0 = Unlimited number of accounts (default).
+;maxaccountsperemail=0
+
+; You can prevent users from using certain mail domains for registration.  This setting contains a
+; comma-seperated list of email provider domains that you would like to prevent users from using
+; during registration. Comparison's are implicit, so placing an entry such as mail.com will also
+; prevent users from registering accounts with providers such as gmail.com and hotmail.com  
+; Example: "10minutemail.com,gmail.com"
+;emailproviderblacklist=""
+
+[forgotpassword]
+
+; Servatrice can process forgot password requests allowing users to reset their account
+; passwords in the event they forget it.  Should this feature be enabled? Default: false.
+; enable=false
+
+; Forgot password request should not be allowed to stay valid forever.  This settings
+; informs servatrice how long a players forgot password reset token is valid for (in minutes).
+; Default: 60
+; tokenlife=60
+
+; Servatrice can challenge users that are making forgot password requests to answer
+; questions in regards to their account to help validate they are the true owner of the account.
+; Should this feature be enabled? Default: false
+; enablechallenge=false
+
+; Email subject for the forgot password emails
+; subject="Cockatrice forgot password token"
+
+; Forgot password email body. You can use these tags here: %username %token
+; They will be substituted with the actual values in the email
+;
+; body="Hi %username, sorry to hear you forgot your password on our Cockatrice server\r\nHere's the token to use to reset your account password:\r\n\r\n%token\r\n\r\nHappy gaming!"
+
+
 [smtp]
+
+; Enable the internal smtp client to send registration emails.  If you would like to
+; use some other method to send email activation tokens set this value to false. Otherwise
+; setting it to true (default) the server will send canned generated emails containing
+; activation tokens for you during update intervals. Setting this to false will require
+; you to either manually activate user accounts or manually send users the activation token
+; by whatever means.
+enableinternalsmtpclient=true
 
 ; Connectin type: currently supported method are "tcp" and "ssl"; tls is autodetected if available
 connection=tcp
@@ -308,6 +352,22 @@ log_user_msg_chat=false
 
 ; Log user messages coming from other servers in the network
 log_user_msg_isl=false
+
+[audit]
+
+; Servatrice can record certain actions being performed in the database for server operators to better understand
+; if some one may be abusing application functionality.  Enabling auditing will allow servatrice to record any
+; of the below enabled audit functionality to be recorded.
+; Default: true
+enable_audit=true
+
+; Servatrice can record when users attempt a new account registration.  Should we enable auditing for this action?
+; Default: true
+enable_registration_audit=true
+
+; Servatrice can record when a users attempts to reset the account password.  Should we enable auditing for this action?
+; Default: true
+enable_forgotpassword_audit=true
 
 
 ; EXPERIMENTAL - NOT WORKING YET

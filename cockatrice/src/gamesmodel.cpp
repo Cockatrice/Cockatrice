@@ -152,7 +152,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                     {
                         result.append(" (").append(tr("can see hands")).append(")");
                     }
-					
+                    
                     return result;
                 }
                 return QVariant(tr("not allowed"));
@@ -228,6 +228,7 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
 GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
     : QSortFilterProxyModel(parent),
     ownUser(_ownUser),
+    showBuddiesOnlyGames(false),
     unavailableGamesVisible(false),
     showPasswordProtectedGames(true),
     maxPlayersFilterMin(-1),
