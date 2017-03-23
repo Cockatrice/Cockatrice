@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
-INSERT INTO cockatrice_schema_version VALUES(22);
+INSERT INTO cockatrice_schema_version VALUES(23);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -89,7 +89,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
   `id` int(7) unsigned NOT NULL auto_increment,
   `name` varchar(50) NOT NULL,
   `descr` varchar(255) NOT NULL,
-  `permissionlevel` varchar(20) NOT NULL,
+  `permissionlevel` enum('NONE','REGISTERED','MODERATOR','ADMINISTRATOR') NOT NULL,
+  `privlevel` enum('NONE','PRIVILEGED','VIP','DONATOR') NOT NULL,
   `auto_join` tinyint(1) default 0,
   `join_message` varchar(255) NOT NULL,
   `chat_history_size` int(4) NOT NULL,

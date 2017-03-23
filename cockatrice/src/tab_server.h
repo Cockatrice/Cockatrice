@@ -24,6 +24,7 @@ private:
     QTreeWidget *roomList;
     QPushButton *joinButton;
     AbstractClient *client;
+    QString getRoomPermissionDisplay(const ServerInfo_Room &room);
 private slots:
     void processListRoomsEvent(const Event_ListRooms &event);
     void joinClicked();
