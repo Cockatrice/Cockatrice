@@ -51,16 +51,18 @@ void Logger::closeLogfileSession()
 void Logger::log(QtMsgType /* type */, const QMessageLogContext & /* ctx */, const QString &message)
 {
     logBuffer.append(message);
-    if(logBuffer.size() > LOGGER_MAX_ENTRIES)
-        logBuffer.removeFirst();
+    if (logBuffer.size() > LOGGER_MAX_ENTRIES)
+        logBuffer.clear();
 
-    if (message.size() > 0)
+    if (message.size() > 0) {
         emit logEntryAdded(message);
+        std::cerr << message.toStdString() << std::endl; // Print to stdout
 
-    std::cerr << message.toStdString() << std::endl; // Print to stdout
+        if (logToFileEnabled)
+            fileStream << message << endl; // Print to fileStream
+    }
 
-    if (logToFileEnabled)
-        fileStream << message << endl; // Print to fileStream
+
 
 
 }
