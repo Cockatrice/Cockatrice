@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QSlider>
 #include <QSpinBox>
+#include <QDesktopWidget>
 #include "carddatabase.h"
 #include "dlg_settings.h"
 #include "main.h"
@@ -84,10 +85,10 @@ GeneralSettingsPage::GeneralSettingsPage()
     QGridLayout *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
     personalGrid->addWidget(&languageBox, 0, 1);
-    personalGrid->addWidget(&pixmapCacheLabel, 1, 0);
-    personalGrid->addWidget(&pixmapCacheEdit, 1, 1);
-    personalGrid->addWidget(&updateReleaseChannelLabel, 2, 0);
-    personalGrid->addWidget(&updateReleaseChannelBox, 2, 1);
+    personalGrid->addWidget(&updateReleaseChannelLabel, 1, 0);
+    personalGrid->addWidget(&updateReleaseChannelBox, 1, 1);
+    personalGrid->addWidget(&pixmapCacheLabel, 2, 0);
+    personalGrid->addWidget(&pixmapCacheEdit, 2, 1);
     personalGrid->addWidget(&updateNotificationCheckBox, 3, 0);
     personalGrid->addWidget(&picDownloadCheckBox, 4, 0, 1, 3);
     personalGrid->addWidget(&defaultUrlLabel, 5, 0, 1, 1);
@@ -400,7 +401,7 @@ void AppearanceSettingsPage::retranslateUi()
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
-    maxFontSizeForCardsLabel.setText(tr("Maximum font size for information displayed on cards"));
+    maxFontSizeForCardsLabel.setText(tr("Maximum font size for information displayed on cards:"));
 }
 
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
@@ -761,8 +762,9 @@ void SoundSettingsPage::retranslateUi() {
 DlgSettings::DlgSettings(QWidget *parent)
     : QDialog(parent)
 {
-    this->setMinimumSize(500,500);
-    this->adjustSize();
+    QRect rec = QApplication::desktop()->availableGeometry();
+    this->setMinimumSize(rec.width() / 2, rec.height() - 100);
+    this->setBaseSize(rec.width(), rec.height());
 
     connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
     
