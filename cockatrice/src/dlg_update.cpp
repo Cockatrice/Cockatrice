@@ -3,7 +3,7 @@
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QVBoxLayout>
-#include <QDialogButtonBox>
+
 #include <QPushButton>
 #include <QLabel>
 #include <QProgressBar>
@@ -24,17 +24,21 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent) {
     descriptionLabel = new QLabel(tr("Current release channel:") + " " + tr(settingsCache->getUpdateReleaseChannel()->getName().toUtf8()), this);
     progress = new QProgressBar(this);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
+    buttonBox = new QDialogButtonBox(this);
+    buttonBox->setFixedWidth(350);
+
     ok = new QPushButton("Close", this);
     manualDownload = new QPushButton(tr("Reinstall"), this);
-    enableUpdateButton(false); //Unless we know there's an update available, you can't install
+    stopDownload = new QPushButton(tr("Stop Download"), this);
     gotoDownload = new QPushButton(tr("Open Download Page"), this);
-    buttonBox->addButton(manualDownload, QDialogButtonBox::ActionRole);
-    buttonBox->addButton(gotoDownload, QDialogButtonBox::ActionRole);
+
+    addStopDownloadAndRemoveOthers(false); // Add all buttons to box
+    enableUpdateButton(false); //Unless we know there's an update available, you can't install
     buttonBox->addButton(ok, QDialogButtonBox::AcceptRole);
 
     connect(gotoDownload, SIGNAL(clicked()), this, SLOT(gotoDownloadPage()));
     connect(manualDownload, SIGNAL(clicked()), this, SLOT(downloadUpdate()));
+    connect(stopDownload, SIGNAL(clicked()), this, SLOT(cancelDownload()));
     connect(ok, SIGNAL(clicked()), this, SLOT(closeDialog()));
 
     QVBoxLayout *parentLayout = new QVBoxLayout(this);
@@ -56,21 +60,16 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent) {
     //Initialize the checker and downloader class
     uDownloader = new UpdateDownloader(this);
     connect(uDownloader, SIGNAL(downloadSuccessful(QUrl)), this, SLOT(downloadSuccessful(QUrl)));
-    connect(uDownloader, SIGNAL(progressMade(qint64, qint64)),
-            this, SLOT(downloadProgressMade(qint64, qint64)));
-    connect(uDownloader, SIGNAL(error(QString)),
-            this, SLOT(downloadError(QString)));
+    connect(uDownloader, SIGNAL(progressMade(qint64, qint64)), this, SLOT(downloadProgressMade(qint64, qint64)));
+    connect(uDownloader, SIGNAL(error(QString)), this, SLOT(downloadError(QString)));
 
     ReleaseChannel * channel = settingsCache->getUpdateReleaseChannel();
-    connect(channel, SIGNAL(finishedCheck(bool, bool, Release * )),
-            this, SLOT(finishedUpdateCheck(bool, bool, Release * )));
-    connect(channel, SIGNAL(error(QString)),
-            this, SLOT(updateCheckError(QString)));
+    connect(channel, SIGNAL(finishedCheck(bool, bool, Release *)), this, SLOT(finishedUpdateCheck(bool, bool, Release *)));
+    connect(channel, SIGNAL(error(QString)), this, SLOT(updateCheckError(QString)));
 
     //Check for updates
     beginUpdateCheck();
 }
-
 
 void DlgUpdate::closeDialog() {
     accept();
@@ -83,9 +82,15 @@ void DlgUpdate::gotoDownloadPage() {
 
 void DlgUpdate::downloadUpdate() {
     setLabel(tr("Downloading update..."));
-    enableOkButton(false);
-    enableUpdateButton(false);
+    addStopDownloadAndRemoveOthers(true); // Will remove all other buttons
     uDownloader->beginDownload(updateUrl);
+}
+
+void DlgUpdate::cancelDownload() {
+    emit uDownloader->stopDownload();
+    setLabel("Download Canceled");
+    addStopDownloadAndRemoveOthers(false);
+    downloadProgressMade(0, 1);
 }
 
 void DlgUpdate::beginUpdateCheck() {
@@ -140,6 +145,12 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
 
 void DlgUpdate::enableUpdateButton(bool enable) {
     manualDownload->setEnabled(enable);
+}
+
+void DlgUpdate::addStopDownloadAndRemoveOthers(bool enable) {
+    enable ? buttonBox->addButton(stopDownload, QDialogButtonBox::ActionRole) : buttonBox->removeButton(stopDownload);
+    enable ? buttonBox->removeButton(manualDownload) : buttonBox->addButton(manualDownload, QDialogButtonBox::ActionRole);
+    enable ? buttonBox->removeButton(gotoDownload) : buttonBox->addButton(gotoDownload, QDialogButtonBox::ActionRole);
 }
 
 void DlgUpdate::enableOkButton(bool enable) {
