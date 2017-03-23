@@ -17,7 +17,7 @@ const QColor OTHER_USER_COLOR = QColor(0, 65, 255); // dark blue
 const QString SERVER_MESSAGE_COLOR = "#851515";
 
 ChatView::ChatView(const TabSupervisor *_tabSupervisor, const UserlistProxy *_userlistProxy, TabGame *_game, bool _showTimestamps, QWidget *parent)
-    : QTextBrowser(parent), tabSupervisor(_tabSupervisor), userlistProxy(_userlistProxy), game(_game), evenNumber(true), showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
+    : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game), userlistProxy(_userlistProxy), evenNumber(true), showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
 {
     document()->setDefaultStyleSheet("a { text-decoration: none; color: blue; }");
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
