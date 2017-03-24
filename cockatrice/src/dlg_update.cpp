@@ -29,7 +29,7 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent) {
 
     ok = new QPushButton("Close", this);
     manualDownload = new QPushButton(tr("Reinstall"), this);
-    stopDownload = new QPushButton(tr("Stop Download"), this);
+    stopDownload = new QPushButton(tr("Cancel Download"), this);
     gotoDownload = new QPushButton(tr("Open Download Page"), this);
 
     addStopDownloadAndRemoveOthers(false); // Add all buttons to box
@@ -148,9 +148,16 @@ void DlgUpdate::enableUpdateButton(bool enable) {
 }
 
 void DlgUpdate::addStopDownloadAndRemoveOthers(bool enable) {
-    enable ? buttonBox->addButton(stopDownload, QDialogButtonBox::ActionRole) : buttonBox->removeButton(stopDownload);
-    enable ? buttonBox->removeButton(manualDownload) : buttonBox->addButton(manualDownload, QDialogButtonBox::ActionRole);
-    enable ? buttonBox->removeButton(gotoDownload) : buttonBox->addButton(gotoDownload, QDialogButtonBox::ActionRole);
+    if (enable) {
+        buttonBox->addButton(stopDownload, QDialogButtonBox::ActionRole);
+        buttonBox->removeButton(manualDownload);
+        buttonBox->removeButton(gotoDownload);
+    }
+    else {
+        buttonBox->removeButton(stopDownload);
+        buttonBox->addButton(manualDownload, QDialogButtonBox::ActionRole);
+        buttonBox->addButton(gotoDownload, QDialogButtonBox::ActionRole);
+    }
 }
 
 void DlgUpdate::enableOkButton(bool enable) {

@@ -15,7 +15,6 @@ void UpdateDownloader::beginDownload(QUrl downloadUrl) {
     response = netMan->get(QNetworkRequest(downloadUrl));
     connect(response, SIGNAL(finished()), this, SLOT(fileFinished()));
     connect(response, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(downloadProgress(qint64, qint64)));
-    connect(response, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(downloadError(QNetworkReply::NetworkError)));
     connect(this, SIGNAL(stopDownload()), response, SLOT(abort()));
 }
 
