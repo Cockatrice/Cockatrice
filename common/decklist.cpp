@@ -173,11 +173,11 @@ float InnerDecklistNode::recursivePrice(bool countTotalCards) const
 bool InnerDecklistNode::compare(AbstractDecklistNode *other) const
 {
     switch (sortMethod) {
-        case 0:
+        case ByNumber:
             return compareNumber(other);
-        case 1:
+        case ByName:
             return compareName(other);
-        case 2:
+        case ByPrice:
             return comparePrice(other);
     }
     return 0;
