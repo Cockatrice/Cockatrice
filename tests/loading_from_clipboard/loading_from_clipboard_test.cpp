@@ -14,16 +14,19 @@ DeckList *fromClipboard(QString *clipboard) {
 
 struct AssertDeckList {
     QList<QString> expectedCards;
-    int actualDecklistSize = 0;
+    QList<QString> actualCards;
 
     AssertDeckList(QList<QString> _expectedCards) : expectedCards(_expectedCards) {}
 
-    void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) {
-        actualDecklistSize += card->getNumber();
+    void operator()(const InnerDecklistNode * _, const DecklistCardNode *card) {
+        for (int i = 0; i < card->getNumber(); i++) {
+            actualCards.append(card->getName());
+        }
     }
 
     void assertSizeIsCorrect() {
-        ASSERT_EQ(expectedCards.size(), actualDecklistSize);
+        ASSERT_EQ(expectedCards.size(), actualCards.size());
+        ASSERT_EQ(expectedCards, actualCards);
     }
 };
 
