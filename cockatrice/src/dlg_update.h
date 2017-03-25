@@ -3,6 +3,7 @@
 
 #include <QtNetwork>
 #include <QProgressDialog>
+#include <QDialogButtonBox>
 
 #include "update_downloader.h"
 class Release;
@@ -16,6 +17,7 @@ private slots:
     void finishedUpdateCheck(bool needToUpdate, bool isCompatible, Release *release);
     void gotoDownloadPage();
     void downloadUpdate();
+    void cancelDownload();
     void updateCheckError(QString errorString);
     void downloadSuccessful(QUrl filepath);
     void downloadProgressMade(qint64 bytesRead, qint64 totalBytes);
@@ -25,13 +27,15 @@ private:
     QUrl updateUrl;
     void enableUpdateButton(bool enable);
     void enableOkButton(bool enable);
+    void addStopDownloadAndRemoveOthers(bool enable);
     void beginUpdateCheck();
     void setLabel(QString text);
     QLabel *statusLabel, *descriptionLabel;
     QProgressBar *progress;
-    QPushButton *manualDownload, *gotoDownload, *ok;
+    QPushButton *manualDownload, *gotoDownload, *ok, *stopDownload;
     QPushButton *cancel;
     UpdateDownloader *uDownloader;
+    QDialogButtonBox *buttonBox;
 };
 
 #endif
