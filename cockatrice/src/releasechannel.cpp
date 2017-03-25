@@ -7,7 +7,7 @@
 
 #define STABLERELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases/latest"
 #define STABLETAG_URL "https://api.github.com/repos/Cockatrice/Cockatrice/git/refs/tags/"
-#define STABLEMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases"
+#define STABLEMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/latest"
 
 #define DEVRELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/commits/master"
 #define DEVFILES_URL "https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice-git/files"
