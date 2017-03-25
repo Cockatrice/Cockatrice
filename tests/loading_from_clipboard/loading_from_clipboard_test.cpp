@@ -18,13 +18,13 @@ struct AssertDeckList {
 
     AssertDeckList(QList<QString> _expectedCards) : expectedCards(_expectedCards) {}
 
-    void operator()(const InnerDecklistNode * _, const DecklistCardNode *card) {
+    void operator()(const InnerDecklistNode *, const DecklistCardNode *card) {
         for (int i = 0; i < card->getNumber(); i++) {
             actualCards.append(card->getName());
         }
     }
 
-    void assertSizeIsCorrect() {
+    void makeAssertions() {
         ASSERT_EQ(expectedCards.size(), actualCards.size());
         ASSERT_EQ(expectedCards, actualCards);
     }
@@ -56,7 +56,7 @@ namespace {
 
         deckList->forEachCard(assertDeckList);
 
-        assertDeckList.assertSizeIsCorrect();
+        assertDeckList.makeAssertions();
     }
 }
 
