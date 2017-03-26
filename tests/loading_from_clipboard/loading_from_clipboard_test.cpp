@@ -4,7 +4,6 @@
 #include "../../common/decklist.h"
 
 DeckList *fromClipboard(QString *clipboard);
-
 DeckList *fromClipboard(QString *clipboard) {
     DeckList *deckList = new DeckList;
     QTextStream *stream = new QTextStream(clipboard);
@@ -12,19 +11,13 @@ DeckList *fromClipboard(QString *clipboard) {
     return deckList;
 }
 
-using Cardrows = QMap<QString, int>;
+using CardRows = QMap<QString, int>;
 
-struct AssertDeckList {
-    Cardrows expectedMainboard;
-    Cardrows expectedSideboard;
+struct DecklistBuilder {
+    CardRows actualMainboard;
+    CardRows actualSideboard;
 
-    Cardrows actualMainboard;
-    Cardrows actualSideboard;
-
-    AssertDeckList(Cardrows _expectedMainboardMap, Cardrows _expectedSideboard) :
-            expectedMainboard(_expectedMainboardMap), expectedSideboard(_expectedSideboard) {}
-
-    AssertDeckList(Cardrows _expectedMainboardMap) : AssertDeckList(_expectedMainboardMap, Cardrows({})) {}
+    DecklistBuilder() : actualMainboard({}), actualSideboard({}) {}
 
     void operator()(const InnerDecklistNode *innerDecklistNode, const DecklistCardNode *card) {
         if (innerDecklistNode->getName() == "main") {
@@ -36,9 +29,12 @@ struct AssertDeckList {
         }
     }
 
-    void makeAssertions() {
-        ASSERT_EQ(expectedSideboard, actualSideboard);
-        ASSERT_EQ(expectedMainboard, actualMainboard);
+    CardRows mainboard() {
+        return actualMainboard;
+    }
+
+    CardRows sideboard() {
+        return actualSideboard;
     }
 };
 
@@ -59,14 +55,15 @@ namespace {
         clipboard->append("2x Island\n");
         DeckList *deckList = fromClipboard(clipboard);
 
-        Cardrows expectedMainboard = Cardrows({{"Mountain", 1},
+        CardRows expectedMainboard = CardRows({{"Mountain", 1},
                                                {"Island",   2}});
-        AssertDeckList assertDeckList(expectedMainboard);
+        DecklistBuilder decklistBuilder = DecklistBuilder();
 
         SCOPED_TRACE("");
-        deckList->forEachCard(assertDeckList);
+        deckList->forEachCard(decklistBuilder);
 
-        assertDeckList.makeAssertions();
+        ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
+        ASSERT_EQ(CardRows({}), decklistBuilder.sideboard());
     }
 
     TEST(LoadingFromClipboardTest, CommentsAreIgnoed) {
@@ -76,13 +73,14 @@ namespace {
         // TODO: Sideboard comments are ignored
         DeckList *deckList = fromClipboard(clipboard);
 
-        Cardrows expectedMainboard = Cardrows({});
-        AssertDeckList assertDeckList(expectedMainboard);
+        CardRows expectedMainboard = CardRows({});
+        DecklistBuilder decklistBuilder = DecklistBuilder();
 
         SCOPED_TRACE("");
-        deckList->forEachCard(assertDeckList);
+        deckList->forEachCard(decklistBuilder);
 
-        assertDeckList.makeAssertions();
+        ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
+        ASSERT_EQ(CardRows({}), decklistBuilder.sideboard());
     }
 
     TEST(LoadingFromClipboardTest, SideboardPrefix) {
@@ -92,16 +90,17 @@ namespace {
         clipboard->append("SB: 2x Island\n");
         DeckList *deckList = fromClipboard(clipboard);
 
-        Cardrows expectedMainboard = Cardrows({{"Mountain", 1}});
-        Cardrows expectedSideboard = Cardrows({{"Mountain", 1},
+        CardRows expectedMainboard = CardRows({{"Mountain", 1}});
+        CardRows expectedSideboard = CardRows({{"Mountain", 1},
                                                {"Island",   2}});
 
-        AssertDeckList assertDeckList(expectedMainboard, expectedSideboard);
+        DecklistBuilder decklistBuilder = DecklistBuilder();
 
         SCOPED_TRACE("");
-        deckList->forEachCard(assertDeckList);
+        deckList->forEachCard(decklistBuilder);
 
-        assertDeckList.makeAssertions();
+        ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
+        ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
     }
 }
 
