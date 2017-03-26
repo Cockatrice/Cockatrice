@@ -17,7 +17,7 @@ struct DecklistBuilder {
     CardRows actualMainboard;
     CardRows actualSideboard;
 
-    DecklistBuilder() : actualMainboard({}), actualSideboard({}) {}
+    explicit DecklistBuilder() : actualMainboard({}), actualSideboard({}) {}
 
     void operator()(const InnerDecklistNode *innerDecklistNode, const DecklistCardNode *card) {
         if (innerDecklistNode->getName() == "main") {
