@@ -50,9 +50,10 @@ namespace {
     }
 
     TEST(LoadingFromClipboardTest, QuantityPrefixed) {
-        QString *clipboard = new QString("");
-        clipboard->append("1 Mountain\n");
-        clipboard->append("2x Island\n");
+        QString *clipboard = new QString(
+                "1 Mountain\n"
+                "2x Island\n"
+        );
         DeckList *deckList = fromClipboard(clipboard);
 
         DecklistBuilder decklistBuilder = DecklistBuilder();
@@ -67,10 +68,11 @@ namespace {
     }
 
     TEST(LoadingFromClipboardTest, CommentsAreIgnored) {
-        QString *clipboard = new QString("");
-        clipboard->append("//1 Mountain\n");
-        clipboard->append("//2x Island\n");
-        clipboard->append("//SB:2x Island\n");
+        QString *clipboard = new QString(
+                "//1 Mountain\n"
+                "//2x Island\n"
+                "//SB:2x Island\n"
+        );
 
         DeckList *deckList = fromClipboard(clipboard);
 
@@ -85,10 +87,11 @@ namespace {
     }
 
     TEST(LoadingFromClipboardTest, SideboardPrefix) {
-        QString *clipboard = new QString("");
-        clipboard->append("1 Mountain\n");
-        clipboard->append("SB: 1 Mountain\n");
-        clipboard->append("SB: 2x Island\n");
+        QString *clipboard = new QString(
+                "1 Mountain\n"
+                "SB: 1 Mountain\n"
+                "SB: 2x Island\n"
+        );
         DeckList *deckList = fromClipboard(clipboard);
 
         DecklistBuilder decklistBuilder = DecklistBuilder();
@@ -103,8 +106,9 @@ namespace {
     }
 
     TEST(LoadingFromClipboardTest, UnknownCardsAreNotDiscarded) {
-        QString *clipboard = new QString("");
-        clipboard->append("1 CardThatDoesNotExistInCardsXml\n");
+        QString *clipboard = new QString(
+                "1 CardThatDoesNotExistInCardsXml\n"
+        );
         DeckList *deckList = fromClipboard(clipboard);
 
         DecklistBuilder decklistBuilder = DecklistBuilder();
