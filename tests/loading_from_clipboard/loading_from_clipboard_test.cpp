@@ -101,6 +101,21 @@ namespace {
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
         ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
     }
+
+    TEST(LoadingFromClipboardTest, UnknownCardsAreNotDiscarded) {
+        QString *clipboard = new QString("");
+        clipboard->append("1 CardThatDoesNotExistInCardsXml\n");
+        DeckList *deckList = fromClipboard(clipboard);
+
+        DecklistBuilder decklistBuilder = DecklistBuilder();
+        deckList->forEachCard(decklistBuilder);
+
+        CardRows expectedMainboard = CardRows({{"CardThatDoesNotExistInCardsXml", 1}});
+        CardRows expectedSideboard = CardRows({});
+
+        ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
+        ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+    }
 }
 
 int main(int argc, char **argv) {
