@@ -66,11 +66,12 @@ namespace {
         ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
     }
 
-    TEST(LoadingFromClipboardTest, CommentsAreIgnoed) {
+    TEST(LoadingFromClipboardTest, CommentsAreIgnored) {
         QString *clipboard = new QString("");
-        clipboard->append("// 1 Mountain\n");
-        clipboard->append("// 2x Island\n");
-        // TODO: Sideboard comments are ignored
+        clipboard->append("//1 Mountain\n");
+        clipboard->append("//2x Island\n");
+        clipboard->append("//SB:2x Island\n");
+
         DeckList *deckList = fromClipboard(clipboard);
 
         DecklistBuilder decklistBuilder = DecklistBuilder();
