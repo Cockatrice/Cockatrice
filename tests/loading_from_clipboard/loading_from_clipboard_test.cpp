@@ -59,7 +59,6 @@ namespace {
                                                {"Island",   2}});
         DecklistBuilder decklistBuilder = DecklistBuilder();
 
-        SCOPED_TRACE("");
         deckList->forEachCard(decklistBuilder);
 
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
@@ -76,7 +75,6 @@ namespace {
         CardRows expectedMainboard = CardRows({});
         DecklistBuilder decklistBuilder = DecklistBuilder();
 
-        SCOPED_TRACE("");
         deckList->forEachCard(decklistBuilder);
 
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
@@ -96,7 +94,6 @@ namespace {
 
         DecklistBuilder decklistBuilder = DecklistBuilder();
 
-        SCOPED_TRACE("");
         deckList->forEachCard(decklistBuilder);
 
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
