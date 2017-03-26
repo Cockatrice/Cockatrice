@@ -55,14 +55,15 @@ namespace {
         clipboard->append("2x Island\n");
         DeckList *deckList = fromClipboard(clipboard);
 
-        CardRows expectedMainboard = CardRows({{"Mountain", 1},
-                                               {"Island",   2}});
         DecklistBuilder decklistBuilder = DecklistBuilder();
-
         deckList->forEachCard(decklistBuilder);
 
+        CardRows expectedMainboard = CardRows({{"Mountain", 1},
+                                               {"Island",   2}});
+        CardRows expectedSideboard = CardRows({});
+
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
-        ASSERT_EQ(CardRows({}), decklistBuilder.sideboard());
+        ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
     }
 
     TEST(LoadingFromClipboardTest, CommentsAreIgnoed) {
@@ -72,13 +73,14 @@ namespace {
         // TODO: Sideboard comments are ignored
         DeckList *deckList = fromClipboard(clipboard);
 
-        CardRows expectedMainboard = CardRows({});
         DecklistBuilder decklistBuilder = DecklistBuilder();
-
         deckList->forEachCard(decklistBuilder);
 
+        CardRows expectedMainboard = CardRows({});
+        CardRows expectedSideboard = CardRows({});
+
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
-        ASSERT_EQ(CardRows({}), decklistBuilder.sideboard());
+        ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
     }
 
     TEST(LoadingFromClipboardTest, SideboardPrefix) {
@@ -88,13 +90,12 @@ namespace {
         clipboard->append("SB: 2x Island\n");
         DeckList *deckList = fromClipboard(clipboard);
 
+        DecklistBuilder decklistBuilder = DecklistBuilder();
+        deckList->forEachCard(decklistBuilder);
+
         CardRows expectedMainboard = CardRows({{"Mountain", 1}});
         CardRows expectedSideboard = CardRows({{"Mountain", 1},
                                                {"Island",   2}});
-
-        DecklistBuilder decklistBuilder = DecklistBuilder();
-
-        deckList->forEachCard(decklistBuilder);
 
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
         ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
