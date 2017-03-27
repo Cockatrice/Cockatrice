@@ -112,7 +112,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         userLevelText = tr("Unregistered user");
 
     if (user.has_privlevel() && user.privlevel() != "NONE") {
-        userLevelText += " | " + tr("%1").arg(user.privlevel().c_str());
+        userLevelText += " | " + QString("%1").arg(user.privlevel().c_str());
     }
 
     userLevelLabel3.setText(userLevelText);
