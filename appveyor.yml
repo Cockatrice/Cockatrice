@@ -90,7 +90,7 @@ deploy:
   description: "Dev build of Cockatrice"
   provider: GitHub
   auth_token:
-    secure: JHNaVdd4Hdig2aF8q268OM33TbyHtoya0Pui9IBMAVZigwL4PHhTr921ZpSxlqlt
+    secure: "IoXBu2oO6SoChKgdp63QhpXoLXrRvJOr2aj9NiiIHQ8s4aHBjxwN4i/S/H8K8ttR"
   artifact: /.*\.exe/
   draft: false
   prerelease: true
