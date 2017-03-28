@@ -273,11 +273,11 @@ QModelIndex DeckListModel::findCard(const QString &cardName, const QString &zone
 
 QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneName)
 {
-    InnerDecklistNode *zoneNode = createNodeIfNeeded(zoneName, root);
-
     CardInfo *info = db->getCard(cardName);
-    if(!info)
+    if (info == nullptr)
         return QModelIndex();
+
+    InnerDecklistNode *zoneNode = createNodeIfNeeded(zoneName, root);
 
     QString cardType = info->getMainCardType();
     InnerDecklistNode *cardTypeNode = createNodeIfNeeded(cardType, zoneNode);
