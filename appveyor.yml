@@ -86,3 +86,14 @@ build_script:
         Push-AppveyorArtifact "latest-$env:target_arch"
         $version = $matches['content']
 test: off
+deploy:
+  description: "Dev build of Cockatrice"
+  provider: GitHub
+  auth_token:
+    secure: JHNaVdd4Hdig2aF8q268OM33TbyHtoya0Pui9IBMAVZigwL4PHhTr921ZpSxlqlt
+  artifact: /.*\.exe/
+  draft: false
+  prerelease: true
+  force_update: true
+  on:
+    appveyor_repo_tag: true
