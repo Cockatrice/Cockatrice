@@ -3,9 +3,9 @@
 
 <b>Cockatrice version:</b>
 *Put your Cockatrice version number & build date here! For example: "2d53ce9 (2016-02-18)"
-You find them inside the app under `Help → About Cockatrice` (Window & Linux), or `Cockatrice → About Cockatrice` (macOS).*
+You find them inside the app under `Help → About Cockatrice` (Windows & Linux), or `Cockatrice → About Cockatrice` (macOS).*
 
 __________
 
 
-*Explain your Issue/Request/Suggestion in detail here!*
+*Explain your issue/request/suggestion in detail here!*
