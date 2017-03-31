@@ -238,7 +238,7 @@ void DevReleaseChannel::releaseListFinished()
      */
     QVariantMap resultMap = array.at(0).toObject().toVariantMap();
 
-    if (resultMap.size() == 0) {
+    if (array.size() == 0 || resultMap.size() == 0) {
         qWarning() << "No reply received from the release update server:" << QString(jsonData);
         emit error(tr("No reply received from the release update server."));
         return;
