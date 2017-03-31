@@ -51,7 +51,7 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 #include <QSysInfo>
 
 bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
-{VERSION_STRING_NUMS
+{
     QString wordSize = QSysInfo::buildAbi().split('-')[2];
     QString arch;
     QString devSnapshotEnd;
