@@ -273,10 +273,10 @@ void DevReleaseChannel::releaseListFinished()
         << "commit=" << lastRelease->getCommitHash()
         << "date=" << lastRelease->getPublishDate();
 
-    QString devbuilddownload_url = resultMap["assets_url"].toString();
+    QString devBuildDownloadUrl = resultMap["assets_url"].toString();
 
-    qDebug() << "Searching for a corresponding file on the dev channel: " << devbuilddownload_url;
-    response = netMan->get(QNetworkRequest(devbuilddownload_url));
+    qDebug() << "Searching for a corresponding file on the dev channel: " << devBuildDownloadUrl;
+    response = netMan->get(QNetworkRequest(devBuildDownloadUrl));
     connect(response, SIGNAL(finished()), this, SLOT(fileListFinished()));
 }
 
