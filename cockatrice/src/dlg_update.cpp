@@ -125,7 +125,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         //If there is an update, save its URL and work out its name
         updateUrl = release->getDownloadUrl();
 
-        QMessageBox::StandardButton reply;
+        int reply;
         reply = QMessageBox::question(this, "Update Available",
             tr("A new version is available:<br/>%1<br/>published on %2 ."
             "<br/>More informations are available on the <a href=\"%3\">release changelog</a>"
