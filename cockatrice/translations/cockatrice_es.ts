@@ -4,7 +4,7 @@
     <message>
         <location filename="../src/abstractcounter.cpp" line="62"/>
         <source>&amp;Set counter...</source>
-        <translation>Establecer &amp;contador...</translation>
+        <translation>&amp;Establecer contador...</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="148"/>
@@ -1845,7 +1845,7 @@ Por favor, abre una incidencia en http://github.com/Cockatrice/Cockatrice/issues
     <message>
         <location filename="../src/dlg_settings.cpp" line="288"/>
         <source>Notify if a feature supported by the server is missing in my client</source>
-        <translation type="unfinished"/>
+        <translation>Notificar si hace falta en mi cliente alguna característica soportada por el servidor</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="289"/>
@@ -2555,7 +2555,7 @@ Para actualizar tu cliente, ve a Ayuda -&gt; Actualizar Cockatrice.</translation
     <message>
         <location filename="../src/window_main.cpp" line="1035"/>
         <source>You can only import XML databases at this time.</source>
-        <translation type="unfinished"/>
+        <translation>Solo puedes importar bases de datos en XML en este momento.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1092"/>
@@ -3670,17 +3670,17 @@ Cockatrice está recargando la base de datos de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="702"/>
         <source>&amp;Add counter (%1)</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Añadir contador (%1)</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="705"/>
         <source>&amp;Remove counter (%1)</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Eliminar contador (%1)</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="708"/>
         <source>&amp;Set counters (%1)...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Establecer contadores (%1)</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="865"/>
@@ -4705,7 +4705,7 @@ Cuando más información introduzcas, más específicos serán los resultados.</
     <message>
         <location filename="../src/tab_message.cpp" line="107"/>
         <source>This user is ignoring you, they cannot see your messages in main chat and you cannot join their games.</source>
-        <translation type="unfinished"/>
+        <translation>El usuario te esta ignorando, los usuarios no podrán ver tus mensajes en el chat principal y no podrás unirte a sus partidas.</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="140"/>
@@ -4775,12 +4775,12 @@ Cuando más información introduzcas, más específicos serán los resultados.</
     <message>
         <location filename="../src/tab_replays.cpp" line="196"/>
         <source>Downloading Replays</source>
-        <translation type="unfinished"/>
+        <translation>Descargando Repeticiones</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="196"/>
         <source>You cannot download replay folders at this time</source>
-        <translation type="unfinished"/>
+        <translation>No puedes descargar repeticiones de partidas por el momento</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="259"/>
