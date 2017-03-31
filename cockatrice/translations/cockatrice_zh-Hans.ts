@@ -1065,12 +1065,12 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="33"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>主机:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="37"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>端口:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="41"/>
@@ -1098,12 +1098,12 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="27"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>主机:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="31"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>端口:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="35"/>
@@ -1145,12 +1145,12 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="33"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>主机:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="37"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>端口:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="41"/>
