@@ -257,14 +257,14 @@ void DevReleaseChannel::releaseListFinished()
         return;
     }
 
-    if (!lastRelease)
+    if (lastRelease == nullptr)
         lastRelease = new Release;
 
     lastRelease->setCommitHash(resultMap["target_commitish"].toString());
     lastRelease->setPublishDate(resultMap["created_at"].toDate());
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    lastRelease->setName(resultMap["tag_name"].toString());
+    lastRelease->setName(QString("%1 (%2)").arg(resultMap["tag_name"].toString()).arg(shortHash));
     lastRelease->setDescriptionUrl(QString(DEVRELEASE_DESCURL).arg(VERSION_COMMIT, shortHash));
     
     qDebug() << "Got reply from release server, size=" << resultMap.size()
@@ -304,10 +304,6 @@ void DevReleaseChannel::fileListFinished()
     foreach(QVariant file, resultList)
     {
         QVariantMap map = file.toMap();
-
-        // File name _MUST_ contain the build hash
-        if (!map["name"].toString().contains(shortHash))
-            continue;
 
         QString url = map["browser_download_url"].toString();
 
