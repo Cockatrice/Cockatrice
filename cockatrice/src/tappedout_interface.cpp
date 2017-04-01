@@ -47,13 +47,12 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
         QRegExp rx("<div class=\"alert alert-danger.*<ul>(.*)</ul>");
         rx.setMinimal(true);
         int found = rx.indexIn(data);
-        if(found >= 0)
+        if (found >= 0)
         {
             QString errors = rx.cap(1);
             QRegExp rx2("<li>(.*)</li>");
             rx2.setMinimal(true);
 
-            found = rx2.indexIn(errors);
             int captures = rx2.captureCount();
             for(int i = 1; i <= captures; i++)
             {
