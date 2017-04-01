@@ -43,11 +43,11 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone 
     int x = -1;
     if (settingsCache->getHorizontalHand()) {
         for (x = 0; x < cards.size(); x++)
-            if (point.x() < ((CardItem *) cards.at(x))->scenePos().x())
+            if (point.x() < static_cast<CardItem *>(cards.at(x))->scenePos().x())
                 break;
     } else {
         for (x = 0; x < cards.size(); x++)
-            if (point.y() < ((CardItem *) cards.at(x))->scenePos().y())
+            if (point.y() < static_cast<CardItem *>(cards.at(x))->scenePos().y())
                 break;
     }
     
