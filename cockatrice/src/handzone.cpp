@@ -112,7 +112,7 @@ void HandZone::reorganizeCards()
         
             for (int i = 0; i < cardCount; i++) {
                 CardItem *c = cards.at(i);
-                qreal x = i % 2 ? x2 : x1;
+                qreal x = (i % 2) ? x2 : x1;
                 // If the total height of the cards is smaller than the available height,
                 // the cards do not need to overlap and are displayed in the center of the area.
                 if (cardHeight * cardCount > totalHeight)
