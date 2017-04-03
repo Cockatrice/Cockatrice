@@ -269,7 +269,8 @@ QVariant Json::parseObject(const QString &json, int &index, bool &success)
         Json::nextToken(json, index);
 
         //Loop through all of the key/value pairs of the object
-        while(true)
+        bool done = false;
+        while(!done)
         {
                 //Get the upcoming token
                 token = Json::lookAhead(json, index);
