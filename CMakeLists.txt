@@ -29,7 +29,7 @@ set(PROJECT_VERSION_MAJOR "2")
 set(PROJECT_VERSION_MINOR "3")
 set(PROJECT_VERSION_PATCH "15")
 # Set to true to append git commit hash to version number
-set(PROJECT_IS_PRERELEASE false)
+set(PROJECT_IS_PRERELEASE True)
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
