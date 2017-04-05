@@ -25,9 +25,7 @@ int FilterTreeBranch<T>::childIndex(const FilterTreeNode *node) const
     FilterTreeNode *unconst;
     T downcasted;
 
-    /* to do the dynamic cast to T we will lose const'ness, but we can
-     * trust QList::indexOf */
-    unconst = (FilterTreeNode *) node;
+    unconst = const_cast<FilterTreeNode *>(node);
     downcasted = dynamic_cast<T>(unconst);
     if (downcasted == NULL)
         return -1;
