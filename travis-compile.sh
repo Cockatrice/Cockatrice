@@ -4,7 +4,7 @@ set -e
 
 ./servatrice/check_schema_version.sh
 
-mkdir build
+mkdir -p build
 cd build
 prefix=""
 if [[ $TRAVIS_OS_NAME == "osx" ]]; then
