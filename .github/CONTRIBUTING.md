@@ -216,3 +216,36 @@ from Transifex to the source code and vice versa.
 ### Translations (for translators) ###
 
 Please have a look at the specific [FAQ for translators](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
+
+### Publish A New Development Snapshot
+
+TravisCI and Appveyor have been configured to upload files to GitHub whenever a tag is pushed. Usually, tags are created through publishing a full release, but there's a way around that.
+
+To trigger TravisCI and Appveyor, simply do the following:
+```bash
+cd $COCKATRICE_REPO
+git checkout master
+git remote update -p
+git pull
+git tag $TAG_NAME
+git push upstream $TAG_NAME 
+```
+You should define the variables as such:
+```
+upstream - git@github.com:Cockatrice/Cockatrice.git
+$COCKATRICE_REPO - /Location/of/repository/cockatrice.git
+$TAG_NAME
+  - If full release, YYYY-MM-DD-Release-MAJ.MIN.PATCH
+  - If dev snapshot, cockatrice-MAJ.MIN.PATCH-beta###
+        - MAJ.MIN.PATCH will be the NEXT release version
+```
+
+This will cause a tag release to be established on the GitHub repository, which will then lead to the upload of binaries. If you use this method, the tags (releases) that you create will be marked as a "pre-release" build. The `/latest` URL will not be impacted (For stable branch downloads) so that's good.
+
+If you accidentally push a tag incorrectly (the tag is outdated (you didn't pull in the latest branch accidentally), you named the tag wrong, etc) you can revoke the tag by doing the following:
+```bash
+git push --delete upstream $TAG_NAME
+git tag -d $TAG_NAME
+```
+
+**NOTE:** Unfortunately, due to the method of how TravisCI and Appveyor work, to publish a full release you will need to make a copy of the release notes locally and then paste them into the GitHub GUI once the binaries have been uploaded. These build sites will automatically change the name of the release (to $TAG_NAME from whatever it was), the status of the release (to pre-release), and the body (to "Dev build of Cockatrice").
