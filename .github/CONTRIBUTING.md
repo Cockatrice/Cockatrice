@@ -230,7 +230,15 @@ git pull
 git tag $TAG_NAME
 git push upstream $TAG_NAME 
 ```
-where 'upstream' is defined as `git@github.com:Cockatrice/Cockatrice.git`
+You should define the variables as such:
+```
+upstream - git@github.com:Cockatrice/Cockatrice.git
+$COCKATRICE_REPO - /Location/of/repository/cockatrice.git
+$TAG_NAME
+  - If full release, YYYY-MM-DD-Release-MAJ.MIN.PATCH
+  - If dev snapshot, cockatrice-MAJ.MIN.PATCH-beta###
+        - MAJ.MIN.PATCH will be the NEXT release version
+```
 
 This will cause a tag release to be established on the GitHub repository, which will then lead to the upload of binaries. If you use this method, the tags (releases) that you create will be marked as a "pre-release" build. The `/latest` URL will not be impacted (For stable branch downloads) so that's good.
 
