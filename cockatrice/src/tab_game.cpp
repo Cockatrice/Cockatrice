@@ -790,6 +790,8 @@ void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
     if (!client)
         return;
 
+    sayEdit->clearFocus();
+
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(commandFinished(const Response &)));
     client->sendCommand(pend);
 }
@@ -799,6 +801,8 @@ void TabGame::sendGameCommand(const google::protobuf::Message &command, int play
     AbstractClient *client = getClientForPlayer(playerId);
     if (!client)
         return;
+
+    sayEdit->clearFocus();
 
     PendingCommand *pend = prepareGameCommand(command);
     connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(commandFinished(const Response &)));
