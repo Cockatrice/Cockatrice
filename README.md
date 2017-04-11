@@ -23,7 +23,7 @@ We offer downloads for all full releases (recommended) and the latest developmen
 
 - Latest full release (**recommended**): [Download from GitHub](https://github.com/cockatrice/cockatrice/releases/latest)<br>
 
-- Latest development version: [Download from GitHub](https://github.com/cockatrice/cockatrice/releases/TBD)
+- Latest development version: [Download from GitHub](https://github.com/Cockatrice/Cockatrice/releases)
    - Development builds may not be stable and/or contain several bugs.
    - If you'd like to be a Cockatrice Beta Tester, use this version.
    - More information can be [found here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)
