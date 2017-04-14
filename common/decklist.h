@@ -13,7 +13,7 @@
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
 
-#include "pb/move_card_to_zone.pb.h"
+#include <common/pb/move_card_to_zone.pb.h>
 
 class CardDatabase;
 class QIODevice;

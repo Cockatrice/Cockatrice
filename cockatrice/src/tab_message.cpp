@@ -1,14 +1,12 @@
 #include <QLineEdit>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QMenu>
-#include <QAction>
 #include <QSystemTrayIcon>
 #include <QApplication>
 #include <QDebug>
 #include "tab_message.h"
 #include "abstractclient.h"
-#include "chatview.h"
+#include "chatview/chatview.h"
 #include "main.h"
 #include "settingscache.h"
 #include "soundengine.h"
@@ -21,7 +19,7 @@
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &_ownUserInfo, const ServerInfo_User &_otherUserInfo)
     : Tab(_tabSupervisor), client(_client), ownUserInfo(new ServerInfo_User(_ownUserInfo)), otherUserInfo(new ServerInfo_User(_otherUserInfo)), userOnline(true)
 {
-    chatView = new ChatView(tabSupervisor, 0, true);
+    chatView = new ChatView(tabSupervisor, tabSupervisor, 0, true);
     connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));

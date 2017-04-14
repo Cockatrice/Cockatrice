@@ -25,11 +25,11 @@ private:
     QTextStream fileStream;
     QFile fileHandle;
 
-    QVector<QString> logBuffer;
+    QList<QString> logBuffer;
 public:
 	void logToFile(bool enabled);
     void log(QtMsgType type, const QMessageLogContext &ctx, const QString &message);
-    QVector<QString> getLogBuffer() { return logBuffer; }
+    QList<QString> getLogBuffer() { return logBuffer; }
 protected:
     void openLogfileSession();
     void closeLogfileSession();

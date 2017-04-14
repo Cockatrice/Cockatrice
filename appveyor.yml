@@ -44,9 +44,8 @@ install:
         } else {
            nuget install zlib -OutputDirectory c:\zlib
         }
-    # install mysql connector
-    - curl -kLO %MYSQL_DRIVER_URL%
-    - 7z x %MYSQL_DRIVER_ARCHIVE% -oc:\ >nul
+services:
+    - mysql
 build_script:
     - mkdir build
     - cd build
@@ -65,8 +64,8 @@ build_script:
         $protolib = c:\cygwin\bin\cygpath -m $protolib
         $protoc = c:\cygwin\bin\find /cygdrive/c/protoc/ -name "protoc.exe"
         $protoc = c:\cygwin\bin\cygpath -m $protoc
-        $mysqldll = c:\cygwin\bin\find /cygdrive/c/$env:MYSQL_DRIVER_NAME -name "libmysql.dll"
-        $mysqldll = c:\cygwin\bin\cygpath -m $mysqldll
+        $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
+        $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
         Write-Output "ZLIBINC  = $zlibinc"
         Write-Output "ZLIBLIB  = $zliblib"
         Write-Output "PROTOINC = $protoinc"
@@ -85,17 +84,16 @@ build_script:
         $json = New-Object PSObject
         (New-Object PSObject | Add-Member -PassThru NoteProperty bin $new_name | Add-Member -PassThru NoteProperty cmake $cmake_name | Add-Member -PassThru NoteProperty commit $env:APPVEYOR_REPO_COMMIT) | ConvertTo-JSON | Out-File -FilePath "latest-$env:target_arch" -Encoding ASCII
         Push-AppveyorArtifact "latest-$env:target_arch"
-        $bt_password = ConvertTo-SecureString $Env:BINTRAY_APIKEY -AsPlainText -Force
-        $bt_credentials = New-Object System.Management.Automation.PSCredential ($Env:BINTRAY_USER, $bt_password)
-        $exe -match "Cockatrice-(?<content>.*)\.exe"
         $version = $matches['content']
-        $bt_headers = @{
-            "X-Bintray-Package" = "Cockatrice-git";
-            "X-Bintray-Version" = $version;
-            "X-Bintray-Publish" = 1;
-            "X-Bintray-Override" = 1;
-        }
-        $url = "https://api.bintray.com/content/cockatrice/Cockatrice/$env:bintray_path/$new_name"
-        $result = Invoke-WebRequest -Uri $url -Credential $bt_credentials -Method PUT -Headers $bt_headers -InFile "$exe"
-        Write-Host $result
 test: off
+deploy:
+  description: "Dev build of Cockatrice"
+  provider: GitHub
+  auth_token:
+    secure: p+7wPVry2XEa6TBm9XH8IaQZbBmXQ/J2ldbGmcIxUZD3NkkPrSRRlmE7Of1CBBIO
+  artifact: /.*\.exe/
+  draft: false
+  prerelease: true
+  force_update: true
+  on:
+    appveyor_repo_tag: true

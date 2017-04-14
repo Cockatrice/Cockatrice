@@ -46,7 +46,7 @@ class ServerInfo_User;
 class GamesProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
 private:
-    ServerInfo_User *ownUser;
+    bool ownUserIsRegistered;
     bool showBuddiesOnlyGames;
     bool unavailableGamesVisible;
     bool showPasswordProtectedGames;
@@ -56,7 +56,7 @@ private:
 
     static const int DEFAULT_MAX_PLAYERS_MAX = 99;   
 public:
-    GamesProxyModel(QObject *parent = 0, ServerInfo_User *_ownUser = 0);
+    GamesProxyModel(QObject *parent = 0, bool _ownUserIsRegistered = false);
 
     bool getShowBuddiesOnlyGames() const {return showBuddiesOnlyGames; }
     void setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames);

@@ -24,6 +24,8 @@ class ReleaseChannel;
 #define DEFAULT_LANG_CODE "en"
 #define DEFAULT_LANG_NAME "English"
 
+#define DEFAULT_FONT_SIZE 12
+
 class QSettings;
 
 class SettingsCache : public QObject {
@@ -61,6 +63,7 @@ private:
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     int updateReleaseChannel;
+    int maxFontSize;
     bool picDownload;
     bool notificationsEnabled;
     bool spectatorNotificationsEnabled;
@@ -187,6 +190,7 @@ public:
     bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
     bool getRememberGameSettings() const { return rememberGameSettings; }
     int getKeepAlive() const { return keepalive; }
+    int getMaxFontSize() const { return maxFontSize; }
     void setClientID(QString clientID);
     void setKnownMissingFeatures(QString _knownMissingFeatures);
     QString getClientID() { return clientID; }
@@ -256,6 +260,7 @@ public slots:
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(int _notifyaboutupdate);
     void setUpdateReleaseChannel(int _updateReleaseChannel);
+    void setMaxFontSize(int _max);
 };
 
 extern SettingsCache *settingsCache;

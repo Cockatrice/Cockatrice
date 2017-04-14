@@ -28,15 +28,14 @@ public:
     void setPreviousHostLogin(int previous);
     void setPrevioushostName(const QString &);
     void setPreviousHostList(QStringList list);
-    void setPrevioushostindex(int index);
     void setHostName(QString hostname);
     void setPort(QString port);
     void setPlayerName(QString playerName);
-    void setPassword(QString password);
-    void setSavePassword(int save);
     void setAutoConnect(int autoconnect);
     void setFPHostName(QString hostname);
+    void setPassword(QString password);
     void setFPPort(QString port);
+    void setSavePassword(int save);
     void setFPPlayerName(QString playerName);
     void addNewServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword);
     bool updateExistingServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword);

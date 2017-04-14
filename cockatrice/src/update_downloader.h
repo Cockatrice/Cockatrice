@@ -19,6 +19,7 @@ signals:
     void downloadSuccessful(QUrl filepath);
     void progressMade(qint64 bytesRead, qint64 totalBytes);
     void error(QString errorString);
+    void stopDownload();
 private:
     QUrl originalUrl;
     QNetworkAccessManager *netMan;

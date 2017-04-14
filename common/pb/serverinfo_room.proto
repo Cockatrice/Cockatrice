@@ -14,4 +14,5 @@ message ServerInfo_Room {
     repeated ServerInfo_User user_list = 8;
     repeated ServerInfo_GameType gametype_list = 9;
     optional string permissionlevel = 10;
+    optional string privilegelevel = 11;
 }

@@ -1,7 +1,7 @@
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H
 
-#include "chatview.h"
+#include "chatview/chatview.h"
 #include "translation.h"
 #include "user_level.h"
 
@@ -83,7 +83,7 @@ public slots:
     void containerProcessingDone();
 public:
     void connectToPlayer(Player *player);
-    MessageLogWidget(const TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent = 0);
+    MessageLogWidget(const TabSupervisor *_tabSupervisor, const UserlistProxy *_userlistProxy, TabGame *_game, QWidget *parent = 0);
 };
 
 #endif

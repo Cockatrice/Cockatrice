@@ -3,20 +3,19 @@
 #include "version_string.h"
 
 #include <QNetworkReply>
-#include <QNetworkAccessManager>
 #include <QMessageBox>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 #define STABLERELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases/latest"
 #define STABLETAG_URL "https://api.github.com/repos/Cockatrice/Cockatrice/git/refs/tags/"
-#define STABLEFILES_URL "https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice/files"
-#define STABLEDOWNLOAD_URL "https://dl.bintray.com/cockatrice/Cockatrice/"
-#define STABLEMANUALDOWNLOAD_URL "https://bintray.com/cockatrice/Cockatrice/Cockatrice/_latestVersion#files"
+#define STABLEMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/latest"
 
-#define DEVRELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/commits/master"
-#define DEVFILES_URL "https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice-git/files"
-#define DEVDOWNLOAD_URL "https://dl.bintray.com/cockatrice/Cockatrice/"
-#define DEVMANUALDOWNLOAD_URL "https://bintray.com/cockatrice/Cockatrice/Cockatrice-git/_latestVersion#files"
+#define DEVRELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases"
+#define DEVMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/"
 #define DEVRELEASE_DESCURL "https://github.com/Cockatrice/Cockatrice/compare/%1...%2"
+
 #define GIT_SHORT_HASH_LEN 7
 
 int ReleaseChannel::sharedIndex = 0;
@@ -42,37 +41,39 @@ void ReleaseChannel::checkForUpdates()
 }
 
 #if defined(Q_OS_OSX)
-bool ReleaseChannel::downloadMatchesCurrentOS(QVariantMap build)
+bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
-    return build["name"].toString().endsWith(".dmg");
+    return fileName.endsWith(".dmg");
 }
 
 #elif defined(Q_OS_WIN)
 
 #include <QSysInfo>
 
-bool ReleaseChannel::downloadMatchesCurrentOS(QVariantMap build)
+bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
     QString wordSize = QSysInfo::buildAbi().split('-')[2];
     QString arch;
+    QString devSnapshotEnd;
+
     if (wordSize == "llp64") {
         arch = "win64";
+        devSnapshotEnd = "-x86_64_qt5";
     } else if (wordSize == "ilp32") {
         arch = "win32";
+        devSnapshotEnd = "-x86_qt5";
     } else {
         qWarning() << "Error checking for upgrade version: wordSize is" << wordSize;
         return false;
     }
 
-    auto fileName = build["name"].toString();
-    // Checking for .zip is a workaround for the May 6th 2016 release
-    auto zipName = arch + ".zip";
     auto exeName = arch + ".exe";
-    return fileName.endsWith(exeName) || fileName.endsWith(zipName);
+    auto exeDevName = devSnapshotEnd + ".exe";
+    return (fileName.endsWith(exeName) || fileName.endsWith(exeDevName));
 }
 #else
 
-bool ReleaseChannel::downloadMatchesCurrentOS(QVariantMap)
+bool ReleaseChannel::downloadMatchesCurrentOS(const QString &)
 {
     //If the OS doesn't fit one of the above #defines, then it will never match
     return false;
@@ -118,20 +119,48 @@ void StableReleaseChannel::releaseListFinished()
         return;
     }
 
-    if(!lastRelease)
+    if (!lastRelease)
         lastRelease = new Release;
 
     lastRelease->setName(resultMap["name"].toString());
     lastRelease->setDescriptionUrl(resultMap["html_url"].toString());
     lastRelease->setPublishDate(resultMap["published_at"].toDate());
 
+    if (resultMap.contains("assets")) {
+        auto rawAssets = resultMap["assets"].toList();
+        // [(name, url)]
+        QVector<std::pair<QString, QString>> assets;
+        std::transform(rawAssets.begin(), rawAssets.end(), std::back_inserter(assets), [](QVariant _asset) {
+            QVariantMap asset = _asset.toMap();
+            QString name = asset["name"].toString();
+            QString url = asset["browser_download_url"].toString();
+            return std::make_pair(name, url);
+        });
+
+        auto _releaseAsset = std::find_if(assets.begin(), assets.end(), [](std::pair<QString, QString> nameAndUrl) {
+           return downloadMatchesCurrentOS(nameAndUrl.first);
+        });
+
+        if (_releaseAsset != assets.end()) {
+            std::pair<QString, QString> releaseAsset = *_releaseAsset;
+            auto releaseUrl = releaseAsset.second;
+            lastRelease->setDownloadUrl(releaseUrl);
+        }
+    }
+
+    QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
+    QString myHash = QString(VERSION_COMMIT);
+    qDebug() << "Current hash=" << myHash << "update hash=" << shortHash;
+
     qDebug() << "Got reply from release server, size=" << tmp.size()
         << "name=" << lastRelease->getName()
         << "desc=" << lastRelease->getDescriptionUrl()
-        << "date=" << lastRelease->getPublishDate();
+        << "date=" << lastRelease->getPublishDate()
+        << "url=" << lastRelease->getDownloadUrl();
 
-    QString url = QString(STABLETAG_URL) + resultMap["tag_name"].toString();
-    qDebug() << "Searching for a corresponding tag on the stable channel: " << url;
+    const QString &tagName = resultMap["tag_name"].toString();
+    QString url = QString(STABLETAG_URL) + tagName;
+    qDebug() << "Searching for commit hash corresponding to stable channel tag: " << tagName;
     response = netMan->get(QNetworkRequest(url));
     connect(response, SIGNAL(finished()), this, SLOT(tagListFinished()));
 }
@@ -161,55 +190,20 @@ void StableReleaseChannel::tagListFinished()
     qDebug() << "Got reply from tag server, size=" << tmp.size()
         << "commit=" << lastRelease->getCommitHash();
 
-    qDebug() << "Searching for a corresponding file on the stable channel: " << QString(STABLEFILES_URL);
-    response = netMan->get(QNetworkRequest(QString(STABLEFILES_URL)));
-    connect(response, SIGNAL(finished()), this, SLOT(fileListFinished()));
-}
-
-void StableReleaseChannel::fileListFinished()
-{
-    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
-    bool ok;
-    QString tmp = QString(reply->readAll());
-    reply->deleteLater();
-
-    QVariantList resultList = QtJson::Json::parse(tmp, ok).toList();
-    if (!ok) {
-        qWarning() << "No reply received from the file update server:" << tmp;
-        emit error(tr("No reply received from the file update server."));
-        return;
-    }
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
     QString myHash = QString(VERSION_COMMIT);
     qDebug() << "Current hash=" << myHash << "update hash=" << shortHash;
+    const bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
 
-    bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
-    bool compatibleVersion = false;
 
-    foreach(QVariant file, resultList)
-    {
-        QVariantMap map = file.toMap();
-        // TODO: map github version to bintray version
-        /*
-        if(!map.contains("version"))
-            continue;
-        if(!map["version"].toString().endsWith(shortHash))
-            continue;
-        */
+    emit finishedCheck(needToUpdate, lastRelease->isCompatibleVersionFound(), lastRelease);
+}
 
-        if(!downloadMatchesCurrentOS(map))
-            continue;
-
-        compatibleVersion = true;
-
-        QString url = QString(STABLEDOWNLOAD_URL) + map["path"].toString();
-        lastRelease->setDownloadUrl(url);
-        qDebug() << "Found compatible version url=" << url;
-        break;
-    }
-    
-    emit finishedCheck(needToUpdate, compatibleVersion, lastRelease);
+void StableReleaseChannel::fileListFinished()
+{
+    // Only implemented to satisfy interface
+    return;
 }
 
 QString DevReleaseChannel::getManualDownloadUrl() const
@@ -227,63 +221,75 @@ QString DevReleaseChannel::getReleaseChannelUrl() const
     return QString(DEVRELEASE_URL);
 }
 
+
 void DevReleaseChannel::releaseListFinished()
 {
     QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
-    bool ok;
-    QString tmp = QString(reply->readAll());
+    QByteArray jsonData = reply->readAll();
     reply->deleteLater();
 
-    QVariantMap resultMap = QtJson::Json::parse(tmp, ok).toMap();
-    if (!ok) {
-        qWarning() << "No reply received from the release update server:" << tmp;
+    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
+    QJsonArray array = doc.array();
+
+    /*
+     * Get the latest release on GitHub
+     * This can be either a pre-release or a published release
+     * depending on timing. Both are acceptable.
+     */
+    QVariantMap resultMap = array.at(0).toObject().toVariantMap();
+
+    if (array.size() == 0 || resultMap.size() == 0) {
+        qWarning() << "No reply received from the release update server:" << QString(jsonData);
         emit error(tr("No reply received from the release update server."));
         return;
     }
 
-    if(!(resultMap.contains("commit") && 
-        resultMap.contains("html_url") && 
-        resultMap.contains("sha") &&
-        resultMap["commit"].toMap().contains("author") &&
-        resultMap["commit"].toMap()["author"].toMap().contains("date"))) {
-        qWarning() << "Invalid received from the release update server:" << tmp;
+    // Make sure resultMap has all elements we'll need
+    if (!resultMap.contains("assets") ||
+        !resultMap.contains("author") ||
+        !resultMap.contains("tag_name") ||
+        !resultMap.contains("target_commitish") ||
+        !resultMap.contains("assets_url") ||
+        !resultMap.contains("created_at"))
+    {
+        qWarning() << "Invalid received from the release update server:" << resultMap;
         emit error(tr("Invalid reply received from the release update server."));
         return;
     }
 
-    if(!lastRelease)
+    if (lastRelease == nullptr)
         lastRelease = new Release;
 
-    
-    lastRelease->setCommitHash(resultMap["sha"].toString());
-    lastRelease->setPublishDate(resultMap["commit"].toMap()["author"].toMap()["date"].toDate());
+    lastRelease->setCommitHash(resultMap["target_commitish"].toString());
+    lastRelease->setPublishDate(resultMap["created_at"].toDate());
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    lastRelease->setName("Commit " + shortHash);
-
+    lastRelease->setName(QString("%1 (%2)").arg(resultMap["tag_name"].toString()).arg(shortHash));
     lastRelease->setDescriptionUrl(QString(DEVRELEASE_DESCURL).arg(VERSION_COMMIT, shortHash));
     
-    qDebug() << "Got reply from release server, size=" << tmp.size()
+    qDebug() << "Got reply from release server, size=" << resultMap.size()
         << "name=" << lastRelease->getName()
         << "desc=" << lastRelease->getDescriptionUrl()
         << "commit=" << lastRelease->getCommitHash()
         << "date=" << lastRelease->getPublishDate();
 
-    qDebug() << "Searching for a corresponding file on the dev channel: " << QString(DEVFILES_URL);
-    response = netMan->get(QNetworkRequest(QString(DEVFILES_URL)));
+    QString devBuildDownloadUrl = resultMap["assets_url"].toString();
+
+    qDebug() << "Searching for a corresponding file on the dev channel: " << devBuildDownloadUrl;
+    response = netMan->get(QNetworkRequest(devBuildDownloadUrl));
     connect(response, SIGNAL(finished()), this, SLOT(fileListFinished()));
 }
 
 void DevReleaseChannel::fileListFinished()
 {
     QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
-    bool ok;
-    QString tmp = QString(reply->readAll());
+    QByteArray jsonData = reply->readAll();
     reply->deleteLater();
+    bool ok;
 
-    QVariantList resultList = QtJson::Json::parse(tmp, ok).toList();
+    QVariantList resultList = QtJson::Json::parse(jsonData, ok).toList();
     if (!ok) {
-        qWarning() << "No reply received from the file update server:" << tmp;
+        qWarning() << "No reply received from the file update server:" << QString(jsonData);
         emit error(tr("No reply received from the file update server."));
         return;
     }
@@ -298,16 +304,13 @@ void DevReleaseChannel::fileListFinished()
     foreach(QVariant file, resultList)
     {
         QVariantMap map = file.toMap();
-        if(!map.contains("version"))
-            continue;
-        if(!map["version"].toString().endsWith(shortHash))
-            continue;
 
-        if(!downloadMatchesCurrentOS(map))
+        QString url = map["browser_download_url"].toString();
+
+        if (!downloadMatchesCurrentOS(url))
             continue;
 
         compatibleVersion = true;
-        QString url = QString(DEVDOWNLOAD_URL) + map["path"].toString();
         lastRelease->setDownloadUrl(url);
         qDebug() << "Found compatible version url=" << url;
         break;

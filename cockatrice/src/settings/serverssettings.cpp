@@ -93,20 +93,14 @@ QString ServersSettings::getPlayerName(QString defaultName)
     return name == QVariant() ? defaultName : name.toString();
 }
 
-void ServersSettings::setPassword(QString password)
-{
-    setValue(password, "password", "server");
-}
-
 QString ServersSettings::getPassword()
 {
     int index = getPrevioushostindex(getPrevioushostName());
-    return getValue(QString("password%1").arg(index), "server", "server_details").toString();
-}
 
-void ServersSettings::setSavePassword(int save)
-{
-    setValue(save, "save_password", "server");
+    if (getSavePassword())
+        return getValue(QString("password%1").arg(index), "server", "server_details").toString();
+
+    return QString();
 }
 
 bool ServersSettings::getSavePassword()
@@ -114,6 +108,16 @@ bool ServersSettings::getSavePassword()
     int index = getPrevioushostindex(getPrevioushostName());
     bool save = getValue(QString("savePassword%1").arg(index), "server", "server_details").toBool();
     return save;
+}
+
+void ServersSettings::setPassword(QString password)
+{
+    setValue(password, "password", "server");
+}
+
+void ServersSettings::setSavePassword(int save)
+{
+    setValue(save, "save_password", "server");
 }
 
 void ServersSettings::setAutoConnect(int autoconnect)
@@ -171,9 +175,9 @@ void ServersSettings::addNewServer(QString saveName, QString serv, QString port,
     setValue(serv, QString("server%1").arg(index), "server", "server_details");
     setValue(port, QString("port%1").arg(index), "server", "server_details");
     setValue(username, QString("username%1").arg(index), "server", "server_details");
-    setValue(password, QString("password%1").arg(index), "server", "server_details");
     setValue(savePassword, QString("savePassword%1").arg(index), "server", "server_details");
     setValue(index, "totalServers", "server", "server_details");
+    setValue(password, QString("password%1").arg(index), "server", "server_details");
     
 }
 
@@ -188,8 +192,8 @@ bool ServersSettings::updateExistingServer(QString saveName, QString serv, QStri
             setValue(serv, QString("server%1").arg(i), "server", "server_details");
             setValue(port, QString("port%1").arg(i), "server", "server_details");
             setValue(username, QString("username%1").arg(i), "server", "server_details");
-            setValue(password, QString("password%1").arg(i), "server", "server_details");
             setValue(savePassword, QString("savePassword%1").arg(i), "server", "server_details");
+            setValue(password, QString("password%1").arg(i), "server", "server_details");
             return true;
         }
     }

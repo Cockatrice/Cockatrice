@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QDebug>
 #include "tab_supervisor.h"
 #include "dlg_creategame.h"
 #include "dlg_filter_games.h"
@@ -24,7 +25,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     gameListModel = new GamesModel(_rooms, _gameTypes, this);
     if(showfilters)
     {
-        gameListProxyModel = new GamesProxyModel(this, tabSupervisor->getUserInfo());
+        gameListProxyModel = new GamesProxyModel(this, tabSupervisor->isOwnUserRegistered());
         gameListProxyModel->setSourceModel(gameListModel);
         gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         gameListView->setModel(gameListProxyModel);
@@ -129,6 +130,11 @@ void GameSelector::actClearFilter()
 
 void GameSelector::actCreate()
 {
+    if (room == nullptr) {
+        qWarning() << "Attempted to create game, but the room was null";
+        return;
+    }
+
     DlgCreateGame dlg(room, room->getGameTypes(), this);
     dlg.exec();
 }

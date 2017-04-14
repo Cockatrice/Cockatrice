@@ -43,11 +43,11 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone 
     int x = -1;
     if (settingsCache->getHorizontalHand()) {
         for (x = 0; x < cards.size(); x++)
-            if (point.x() < ((CardItem *) cards.at(x))->scenePos().x())
+            if (point.x() < static_cast<CardItem *>(cards.at(x))->scenePos().x())
                 break;
     } else {
         for (x = 0; x < cards.size(); x++)
-            if (point.y() < ((CardItem *) cards.at(x))->scenePos().y())
+            if (point.y() < static_cast<CardItem *>(cards.at(x))->scenePos().y())
                 break;
     }
     
@@ -112,7 +112,7 @@ void HandZone::reorganizeCards()
         
             for (int i = 0; i < cardCount; i++) {
                 CardItem *c = cards.at(i);
-                qreal x = i % 2 ? x2 : x1;
+                qreal x = (i % 2) ? x2 : x1;
                 // If the total height of the cards is smaller than the available height,
                 // the cards do not need to overlap and are displayed in the center of the area.
                 if (cardHeight * cardCount > totalHeight)

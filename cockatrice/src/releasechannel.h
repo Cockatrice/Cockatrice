@@ -18,10 +18,11 @@ public:
 private:
     QString name, descriptionUrl, downloadUrl, commitHash;
     QDate publishDate;
+    bool compatibleVersionFound = false;
 protected:
     void setName(QString _name) { name = _name; }
     void setDescriptionUrl(QString _descriptionUrl) { descriptionUrl = _descriptionUrl; }
-    void setDownloadUrl(QString _downloadUrl) { downloadUrl = _downloadUrl; }
+    void setDownloadUrl(QString _downloadUrl) { downloadUrl = _downloadUrl; compatibleVersionFound = true; }
     void setCommitHash(QString _commitHash) { commitHash = _commitHash; }
     void setPublishDate(QDate _publishDate) { publishDate = _publishDate; }
 public:
@@ -30,6 +31,7 @@ public:
     QString getDownloadUrl() const { return downloadUrl; }
     QString getCommitHash() const { return commitHash; }
     QDate getPublishDate() const { return publishDate; }
+    bool isCompatibleVersionFound() const { return compatibleVersionFound; }
 };
 
 class ReleaseChannel: public QObject {
@@ -45,7 +47,7 @@ protected:
     QNetworkReply *response;
     Release * lastRelease;
 protected:
-    static bool downloadMatchesCurrentOS(QVariantMap build);
+    static bool downloadMatchesCurrentOS(const QString &fileName);
     virtual QString getReleaseChannelUrl() const = 0;
 public:
     int getIndex() const { return index; }

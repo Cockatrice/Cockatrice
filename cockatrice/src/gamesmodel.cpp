@@ -225,9 +225,9 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
     endInsertRows();
 }
 
-GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
+GamesProxyModel::GamesProxyModel(QObject *parent, bool _ownUserIsRegistered)
     : QSortFilterProxyModel(parent),
-    ownUser(_ownUser),
+    ownUserIsRegistered(_ownUserIsRegistered),
     showBuddiesOnlyGames(false),
     unavailableGamesVisible(false),
     showPasswordProtectedGames(true),
@@ -348,7 +348,7 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
             return false;
         if (game.started())
             return false;
-        if (!(ownUser->user_level() & ServerInfo_User::IsRegistered))
+        if (!ownUserIsRegistered)
             if (game.only_registered())
                 return false;
     }

@@ -2,7 +2,8 @@
 
 if [[ $TRAVIS_OS_NAME == "osx" ]] ; then
   brew update > /dev/null
-  brew install qt5 protobuf > /dev/null
+  brew install --force qt
+  brew install protobuf
 else
   # common prerequisites
   sudo add-apt-repository -y ppa:smspillaz/cmake-master
