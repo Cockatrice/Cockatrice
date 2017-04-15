@@ -754,7 +754,10 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
                 case GameEvent::GAME_HOST_CHANGED: eventGameHostChanged(event.GetExtension(Event_GameHostChanged::ext), playerId, context); break;
                 case GameEvent::GAME_CLOSED: eventGameClosed(event.GetExtension(Event_GameClosed::ext), playerId, context); break;
                 case GameEvent::SET_ACTIVE_PLAYER: eventSetActivePlayer(event.GetExtension(Event_SetActivePlayer::ext), playerId, context); break;
-                case GameEvent::SET_ACTIVE_PHASE: eventSetActivePhase(event.GetExtension(Event_SetActivePhase::ext), playerId, context); break;
+                case GameEvent::SET_ACTIVE_PHASE:
+                    sayEdit->clearFocus();
+                    eventSetActivePhase(event.GetExtension(Event_SetActivePhase::ext), playerId, context);
+                    break;
 
                 default: {
                     Player *player = players.value(playerId, 0);
