@@ -10,8 +10,8 @@ class SetToDownload {
 private:
     QString shortName, longName;
     QVariant cards;
-    QDate releaseDate;
     QString setType;
+    QDate releaseDate;
 public:
     const QString &getShortName() const { return shortName; }
     const QString &getLongName() const { return longName; }

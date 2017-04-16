@@ -2,6 +2,7 @@
 #define PRICEUPDATER_H
 
 #include <QNetworkAccessManager>
+#include <QWidget>
 #include "decklist.h"
 
 class QNetworkAccessManager;
