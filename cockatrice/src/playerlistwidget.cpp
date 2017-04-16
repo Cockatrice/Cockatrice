@@ -74,6 +74,7 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient
     setColumnWidth(2, 20);
     setColumnWidth(3, 20);
     setColumnWidth(5, 20);
+    setTextElideMode(Qt::ElideNone);
     setHeaderHidden(true);
     setRootIsDecorated(false);
     setUniformRowHeights(true);
@@ -123,6 +124,7 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
         if (!country.isEmpty())
             player->setIcon(4, QIcon(CountryPixmapGenerator::generatePixmap(12, country)));
         player->setData(4, Qt::UserRole, QString::fromStdString(prop.user_info().name()));
+	resizeColumnToContents(4);
     }
     if (prop.has_player_id())
         player->setData(4, Qt::UserRole + 1, prop.player_id());
