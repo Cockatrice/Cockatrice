@@ -1,0 +1,12 @@
+Source: cockatrice
+Maintainer: Marc Brinkmann <git@marcbrinkmann.de>
+Section: games
+Priority: optional
+Standards-Version: 3.9.4
+Build-Depends: debhelper (>= 9), cmake, libqt4-dev, libprotobuf-dev, build-essential, git, qtmobility-dev, protobuf-compiler, libgcrypt-dev
+
+Package: cockatrice
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Play CCGs online.
+ Allows you to connect to a cockatrice server to play collectible card games online. Includes client and server.
