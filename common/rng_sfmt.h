@@ -3,6 +3,8 @@
 
 #include <climits>
 #include <QMutex>
+// TODO: when c++11 support will be enabled, use <random> to seed the RNG 
+// #include <random>
 #include "sfmt/SFMT.h"
 #include "rng_abstract.h"
 
@@ -30,6 +32,8 @@ class RNG_SFMT : public RNG_Abstract {
 private:
     QMutex mutex;
     sfmt_t sfmt;
+    // TODO: when c++11 support will be enabled, use <random> to seed the RNG 
+    // std::random_device rd;
     // The discrete cumulative distribution function for the RNG
     unsigned int cdf(unsigned int min, unsigned int max);
 public:
