@@ -25,11 +25,10 @@ if(POLICY CMP0064)
 endif()
 
 set(PROJECT_NAME "Cockatrice")
+# Can be overriden by git tags, see cmake/getversion.cmake
 set(PROJECT_VERSION_MAJOR "2")
 set(PROJECT_VERSION_MINOR "3")
 set(PROJECT_VERSION_PATCH "15")
-# Set to true to append git commit hash to version number
-set(PROJECT_IS_PRERELEASE True)
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
@@ -167,7 +166,7 @@ set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION_FILENAME}")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_VERSION_FILENAME}")
 
 if(UNIX)
     if(APPLE)
