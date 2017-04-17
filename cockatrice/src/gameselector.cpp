@@ -53,7 +53,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
         gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
 
     if (showfilters && restoresettings)
-    	gameListProxyModel->loadFilterParameters(gameTypeMap);
+        gameListProxyModel->loadFilterParameters(gameTypeMap);
 
     gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
@@ -200,12 +200,20 @@ void GameSelector::actJoin()
 void GameSelector::retranslateUi()
 {
     setTitle(tr("Games"));
-    filterButton->setText(tr("&Filter games"));
-    clearFilterButton->setText(tr("C&lear filter"));
+    filterButton->setText(tr("Filter games"));
+    filterButton->setShortcut(QKeySequence("Ctrl+F"));
+    clearFilterButton->setText(tr("Clear filter"));
+    clearFilterButton->setShortcut(QKeySequence("Ctrl+D"));
     if (createButton)
-        createButton->setText(tr("C&reate"));
-    joinButton->setText(tr("&Join"));
+    {
+        createButton->setText(tr("Create"));
+        createButton->setShortcut(QKeySequence("Ctrl+N"));
+    }
+
+    joinButton->setText(tr("Join"));
+    joinButton->setShortcut(QKeySequence("Ctrl+J"));
     spectateButton->setText(tr("J&oin as spectator"));
+    spectateButton->setShortcut(QKeySequence("Ctrl+S"));
 }
 
 void GameSelector::processGameInfo(const ServerInfo_Game &info)
