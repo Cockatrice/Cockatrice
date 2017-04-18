@@ -285,7 +285,7 @@ void MainWindow::actAbout()
 {
     QMessageBox mb(QMessageBox::NoIcon, tr("About Cockatrice"), QString(
         "<font size=\"8\"><b>Cockatrice</b></font><br>"
-        + tr("Version %1").arg(VERSION_STRING)
+        + tr("Version<br>%1").arg(VERSION_STRING)
         + "<br><br><b><a href='" + GITHUB_PAGES_URL + "'>" + tr("Cockatrice Webpage") + "</a></b><br>"
         + "<br><br><b>" + tr("Project Manager:") + "</b><br>Gavin Bisesi<br><br>"
         + "<b>" + tr("Past Project Managers:") + "</b><br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>"
