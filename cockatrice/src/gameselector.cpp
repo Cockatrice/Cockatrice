@@ -98,6 +98,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
 
     connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
     connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
+    connect(gameListView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(updateButtonChoices(const QModelIndex &)));
     connect(gameListView, SIGNAL(activated(const QModelIndex &)), this, SLOT(actJoin()));
 }
 
@@ -144,7 +145,7 @@ void GameSelector::checkResponse(const Response &response)
     if (createButton)
         createButton->setEnabled(true);
     joinButton->setEnabled(true);
-    spectateButton->setEnabled(true);
+
 
     switch (response.response_code()) {
         case Response::RespNotInRoom: QMessageBox::critical(this, tr("Error"), tr("Please join the appropriate room first.")); break;
@@ -157,6 +158,9 @@ void GameSelector::checkResponse(const Response &response)
         case Response::RespInIgnoreList: QMessageBox::critical(this, tr("Error"), tr("You are being ignored by the creator of this game.")); break;
         default: ;
     }
+
+    if (response.response_code() != Response::RespSpectatorsNotAllowed)
+        spectateButton->setEnabled(true);
 }
 
 void GameSelector::actJoin()
@@ -211,4 +215,18 @@ void GameSelector::retranslateUi()
 void GameSelector::processGameInfo(const ServerInfo_Game &info)
 {
     gameListModel->updateGameList(info);
+}
+
+void GameSelector::updateButtonChoices(const QModelIndex &index)
+{
+    if (!index.isValid())
+        return;
+
+    const ServerInfo_Game &game = gameListModel->getGame(index.data(Qt::UserRole).toInt());
+    bool overrideRestrictions = !tabSupervisor->getAdminLocked();
+
+    if (game.spectators_allowed() || overrideRestrictions)
+        spectateButton->setEnabled(true);
+    else
+        spectateButton->setEnabled(false);
 }

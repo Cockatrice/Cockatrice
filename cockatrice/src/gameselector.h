@@ -23,6 +23,7 @@ private slots:
     void actCreate();
     void actJoin();
     void checkResponse(const Response &response);
+    void updateButtonChoices(const QModelIndex &);
 signals:
     void gameJoined(int gameId);
 private:
