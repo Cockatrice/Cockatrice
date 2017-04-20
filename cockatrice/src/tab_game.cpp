@@ -755,7 +755,8 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
                 case GameEvent::GAME_CLOSED: eventGameClosed(event.GetExtension(Event_GameClosed::ext), playerId, context); break;
                 case GameEvent::SET_ACTIVE_PLAYER: eventSetActivePlayer(event.GetExtension(Event_SetActivePlayer::ext), playerId, context); break;
                 case GameEvent::SET_ACTIVE_PHASE:
-                    sayEdit->clearFocus();
+                    if (sayEdit && sayEdit->text().isEmpty())
+                        sayEdit->clearFocus();
                     eventSetActivePhase(event.GetExtension(Event_SetActivePhase::ext), playerId, context);
                     break;
 
