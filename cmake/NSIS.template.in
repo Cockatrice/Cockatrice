@@ -3,7 +3,7 @@
 !include "FileFunc.nsh"
 
 Name "@CPACK_PACKAGE_NAME@"
-BrandingText "@CPACK_PACKAGE_NAME@-@CPACK_PACKAGE_VERSION_MAJOR@"
+BrandingText "@CPACK_PACKAGE_FILE_NAME@"
 OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 SetCompressor /SOLID lzma
 InstallDir "$PROGRAMFILES\Cockatrice"
