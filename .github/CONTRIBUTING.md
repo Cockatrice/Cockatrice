@@ -254,5 +254,5 @@ git tag -d $TAG_NAME
 The preferred flow of operations is:
  * just before a release, update the version number in CMakeLists.txt to "next release version";
  * tag the release following the previously described syntax in order to get it built by CI;
- * wait for CI upload the binaries, double check if everything is in order
- * after the release is complete, update again the version number to "next development version", typically increasing `PROJECT_VERSION_PATCH` by one.
+ * wait for CI to upload the binaries, double check if everything is in order
+ * after the release is complete, update the version number again to "next development version", typically increasing `PROJECT_VERSION_PATCH` by one.
