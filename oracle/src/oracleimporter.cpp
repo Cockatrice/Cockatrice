@@ -165,7 +165,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
         if(layout == "token")
             continue;
 
-        if(layout == "split")
+        if(layout == "split" || layout == "aftermath")
         {
             // Enqueue split card for later handling
             cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
