@@ -10,18 +10,20 @@
 #include <QTreeView>
 #include <QRadioButton>
 #include <QHeaderView>
+#include <QCloseEvent>
 
 #include "decklist.h"
 #include "dlg_create_token.h"
 #include "carddatabasemodel.h"
 #include "main.h"
 #include "settingscache.h"
+#include "cardinfopicture.h"
 
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     : QDialog(parent), predefinedTokens(_predefinedTokens)
 {
-    this->setMinimumSize(200,200);
-    this->adjustSize();
+    pic = new CardInfoPicture();
+    pic->setObjectName("pic");
 
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit(tr("Token"));
@@ -105,19 +107,16 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     
     QGroupBox *tokenChooseGroupBox = new QGroupBox(tr("Choose token from list"));
     tokenChooseGroupBox->setLayout(tokenChooseLayout);
-    
-    QVBoxLayout *leftVBox = new QVBoxLayout;
-    leftVBox->addWidget(tokenDataGroupBox);
-    leftVBox->addStretch();
 
     QGridLayout *hbox = new QGridLayout;
-    hbox->addLayout(leftVBox, 0, 0);
-    hbox->addWidget(tokenChooseGroupBox, 0, 1);
+    hbox->addWidget(pic, 0, 0, 1, 1);
+    hbox->addWidget(tokenDataGroupBox, 1, 0, 1, 1);
+    hbox->addWidget(tokenChooseGroupBox, 0, 1, 2, 1);
     hbox->setColumnStretch(1, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actReject()));
     
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(hbox);
@@ -125,14 +124,21 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     setLayout(mainLayout);
 
     setWindowTitle(tr("Create token"));
-    setFixedHeight(sizeHint().height());
-    setFixedWidth(width());
+
+    resize(450, 500);
+    restoreGeometry(settingsCache->getTokenDialogGeometry());
+}
+
+void DlgCreateToken::closeEvent(QCloseEvent *event)
+{
+    event->accept();
+    settingsCache->setTokenDialogGeometry(saveGeometry());
 }
 
 void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
-    const CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : 0;
+    CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : 0;
     
     if(cardInfo)
     {
@@ -148,6 +154,8 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         ptEdit->setText("");
         annotationEdit->setText("");
     }
+
+    pic->setCard(cardInfo);
 }
 
 void DlgCreateToken::updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const {
@@ -175,7 +183,14 @@ void DlgCreateToken::actChooseTokenFromDeck(bool checked)
 
 void DlgCreateToken::actOk()
 {
+    settingsCache->setTokenDialogGeometry(saveGeometry());
     accept();
+}
+
+void DlgCreateToken::actReject()
+{
+    settingsCache->setTokenDialogGeometry(saveGeometry());
+    reject();
 }
 
 QString DlgCreateToken::getName() const
