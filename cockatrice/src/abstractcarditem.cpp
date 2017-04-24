@@ -95,7 +95,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     if(facedown)
     {
         // never reveal card color, always paint the card back
-        PictureLoader::getPixmap(translatedPixmap, nullptr, translatedSize.toSize());
+        PictureLoader::getCardBackPixmap(translatedPixmap, translatedSize.toSize());
     } else {
         // don't even spend time trying to load the picture if our size is too small
         if(translatedSize.width() > 10)
