@@ -94,12 +94,12 @@ WndSets::WndSets(QWidget *parent)
             this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
 
     labNotes = new QLabel;
-    labNotes->setText("<b>" + tr("Enable the sets that you want to have available in the deck editor") + "</b>" 
-                      + "<br><b>" + tr("Card Art") + ":" + "</b>" 
+    labNotes->setText("<b>" + tr("Enable the sets that you want to have available in the deck editor") + "</b><br><br>" 
+                      + "<b>" + tr("Card Art") + ":" + "</b>" 
                       + "<ul><li>" + tr("Sets order decides the source that will be used when loading images for a specific card") 
                       + "</li><li>" + tr("Disabled sets will only be used for loading images if all the enabled sets failed") 
-                      + "</li></ul><br><br>"
-                      + "<b>" + tr("Hint") + "</b>" + ": " + tr("Move sets around to change their order, or click on a column header to sort sets on that field")
+                      + "</li></ul><br>"
+                      + "<b>" + tr("Hint") + ": " + "</b>" + tr("Move sets around to change their order, or click on a column header to sort sets on that field")
                      );
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
