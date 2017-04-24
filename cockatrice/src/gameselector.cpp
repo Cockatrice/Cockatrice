@@ -98,7 +98,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
 
     connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
     connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
-    connect(gameListView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(updateButtonChoices(const QModelIndex &)));
+    connect(gameListView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(actSelectedGameChanged(const QModelIndex &, const QModelIndex &)));
     connect(gameListView, SIGNAL(activated(const QModelIndex &)), this, SLOT(actJoin()));
 }
 
@@ -145,7 +145,6 @@ void GameSelector::checkResponse(const Response &response)
     if (createButton)
         createButton->setEnabled(true);
     joinButton->setEnabled(true);
-
 
     switch (response.response_code()) {
         case Response::RespNotInRoom: QMessageBox::critical(this, tr("Error"), tr("Please join the appropriate room first.")); break;
@@ -217,16 +216,14 @@ void GameSelector::processGameInfo(const ServerInfo_Game &info)
     gameListModel->updateGameList(info);
 }
 
-void GameSelector::updateButtonChoices(const QModelIndex &index)
+void GameSelector::actSelectedGameChanged(const QModelIndex &current, const QModelIndex & /* previous */)
 {
-    if (!index.isValid())
+    if (!current.isValid())
         return;
 
-    const ServerInfo_Game &game = gameListModel->getGame(index.data(Qt::UserRole).toInt());
+    const ServerInfo_Game &game = gameListModel->getGame(current.data(Qt::UserRole).toInt());
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
 
-    if (game.spectators_allowed() || overrideRestrictions)
-        spectateButton->setEnabled(true);
-    else
-        spectateButton->setEnabled(false);
+    spectateButton->setEnabled(game.spectators_allowed() || overrideRestrictions);
+    joinButton->setEnabled( game.player_count() < game.max_players() || overrideRestrictions);
 }
