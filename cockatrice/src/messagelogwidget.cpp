@@ -42,10 +42,10 @@ void MessageLogWidget::logJoin(Player *player)
     appendHtmlServerMessage(tr("%1 has joined the game.").arg(sanitizeHtml(player->getName())));
 }
 
-void MessageLogWidget::logLeave(Player *player)
+void MessageLogWidget::logLeave(Player *player, QString reason)
 {
     soundEngine->playSound("player_leave");
-    appendHtmlServerMessage(tr("%1 has left the game.").arg(sanitizeHtml(player->getName())));
+    appendHtmlServerMessage(tr("%1 has left the game (%2).").arg(sanitizeHtml(player->getName()), sanitizeHtml(reason)));
 }
 
 void MessageLogWidget::logGameClosed()
@@ -64,10 +64,10 @@ void MessageLogWidget::logJoinSpectator(QString name)
     appendHtmlServerMessage(tr("%1 is now watching the game.").arg(sanitizeHtml(name)));
 }
 
-void MessageLogWidget::logLeaveSpectator(QString name)
+void MessageLogWidget::logLeaveSpectator(QString name, QString reason)
 {
     soundEngine->playSound("spectator_leave");
-    appendHtmlServerMessage(tr("%1 is not watching the game any more.").arg(sanitizeHtml(name)));
+    appendHtmlServerMessage(tr("%1 is not watching the game any more (%2).").arg(sanitizeHtml(name), sanitizeHtml(reason)));
 }
 
 void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideboardSize)

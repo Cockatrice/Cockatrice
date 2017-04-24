@@ -891,12 +891,12 @@ void TabGame::eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, c
     messageLog->logSpectatorSay(QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()), QString::fromStdString(userInfo.privlevel()), QString::fromStdString(event.message()));
 }
 
-void TabGame::eventSpectatorLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
+void TabGame::eventSpectatorLeave(const Event_Leave & event, int eventPlayerId, const GameEventContext & /*context*/)
 {
     QString playerName = "@" + QString::fromStdString(spectators.value(eventPlayerId).name());
     if (sayEdit && autocompleteUserList.removeOne(playerName))
         sayEdit->setCompletionList(autocompleteUserList);
-    messageLog->logLeaveSpectator(QString::fromStdString(spectators.value(eventPlayerId).name()));
+    messageLog->logLeaveSpectator(QString::fromStdString(spectators.value(eventPlayerId).name()), getLeaveReason(event.reason()));
     playerListWidget->removePlayer(eventPlayerId);
     spectators.remove(eventPlayerId);
 
@@ -1042,7 +1042,26 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
     emitUserEvent();
 }
 
-void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
+QString TabGame::getLeaveReason(Event_Leave::LeaveReason reason)
+{
+    switch(reason)
+    {
+        case Event_Leave::USER_KICKED:
+            return tr("kicked by game host or moderator");
+            break;
+        case Event_Leave::USER_LEFT:
+            return tr("player left the game");
+            break;
+        case Event_Leave::USER_DISCONNECTED:
+            return tr("player disconnected from server");
+            break;
+        case Event_Leave::OTHER:
+        default:
+            return tr("reason unknown");
+            break;
+    }
+}
+void TabGame::eventLeave(const Event_Leave & event, int eventPlayerId, const GameEventContext & /*context*/)
 {
     Player *player = players.value(eventPlayerId, 0);
     if (!player)
@@ -1052,7 +1071,7 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     if(sayEdit && autocompleteUserList.removeOne(playerName))
         sayEdit->setCompletionList(autocompleteUserList);
 
-    messageLog->logLeave(player);
+    messageLog->logLeave(player, getLeaveReason(event.reason()));
     playerListWidget->removePlayer(eventPlayerId);
     players.remove(eventPlayerId);
     emit playerRemoved(player);
