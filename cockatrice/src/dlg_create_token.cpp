@@ -125,7 +125,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 
     setWindowTitle(tr("Create token"));
 
-    resize(450, 500);
+    resize(600, 500);
     restoreGeometry(settingsCache->getTokenDialogGeometry());
 }
 
