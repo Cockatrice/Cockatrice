@@ -98,8 +98,9 @@ WndSets::WndSets(QWidget *parent)
                       + "<br><b>" + tr("Card Art") + ":" + "</b>" 
                       + "<ul><li>" + tr("Sets order decides the source that will be used when loading images for a specific card") 
                       + "</li><li>" + tr("Disabled sets will only be used for loading images if all the enabled sets failed") 
-                      + "</li></ul><br>"
-                      + "<b>" + tr("Hint") + ":" + tr("Move sets around to change their order, or click on a column header to sort sets on that field") + "</b>");
+                      + "</li></ul><br><br>"
+                      + "<b>" + tr("Hint") + "</b>" + ": " + tr("Move sets around to change their order, or click on a column header to sort sets on that field")
+                     );
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
