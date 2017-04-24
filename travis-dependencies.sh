@@ -2,7 +2,7 @@
 
 if [[ $TRAVIS_OS_NAME == "osx" ]] ; then
   brew update > /dev/null
-  brew install --force qt
+  brew install --force qt@5.7
   brew install protobuf
 else
   # common prerequisites
