@@ -94,8 +94,8 @@ WndSets::WndSets(QWidget *parent)
             this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
 
     labNotes = new QLabel;
-    labNotes->setText("<b>" + tr("Enable the sets that you want to have available in the deck editor") + "</b><br><br>" 
-                      + "<b>" + tr("Card Art") + ": " + "</b>" + tr("Set image priority is decided by enabled sets first (top to bottom), then disabled sets (top to bottom)") + "<br>"
+    labNotes->setText("<br><b>" + tr("Enable all sets that you want to have available in the deck editor") + "</b><br><br>" 
+                      + "<b>" + tr("Card Art") + ": " + "</b>" + tr("Image priority is decided by enabled sets first (top to bottom), then disabled sets (top to bottom)") + "<br>"
                      );
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
