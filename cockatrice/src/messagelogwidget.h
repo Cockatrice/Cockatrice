@@ -40,11 +40,11 @@ public slots:
     void logGameJoined(int gameId);
     void logReplayStarted(int gameId);
     void logJoin(Player *player);
-    void logLeave(Player *player);
+    void logLeave(Player *player, QString reason);
     void logGameClosed();
     void logKicked();
     void logJoinSpectator(QString name);
-    void logLeaveSpectator(QString name);
+    void logLeaveSpectator(QString name, QString reason);
     void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
     void logReadyStart(Player *player);
     void logNotReadyStart(Player *player);

@@ -6,6 +6,7 @@
 #include <QCompleter>
 #include "tab.h"
 #include "pb/serverinfo_game.pb.h"
+#include "pb/event_leave.pb.h"
 
 class AbstractClient;
 class CardDatabase;
@@ -186,6 +187,7 @@ private:
     void createPlayAreaWidget(bool bReplay=false);
     void createDeckViewContainerWidget(bool bReplay=false);
     void createReplayDock();
+    QString getLeaveReason(Event_Leave::LeaveReason reason);
 signals:
     void gameClosing(TabGame *tab);
     void playerAdded(Player *player);

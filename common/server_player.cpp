@@ -616,7 +616,7 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, c
 
 Response::ResponseCode Server_Player::cmdLeaveGame(const Command_LeaveGame & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage & /*ges*/)
 {
-    game->removePlayer(this);
+    game->removePlayer(this, Event_Leave::USER_LEAVED);
     return Response::RespOk;
 }
 
@@ -1715,7 +1715,7 @@ void Server_Player::setUserInterface(Server_AbstractUserInterface *_userInterfac
 void Server_Player::disconnectClient()
 {
     if (!(userInfo->user_level() & ServerInfo_User::IsRegistered) || spectator)
-        game->removePlayer(this);
+        game->removePlayer(this, Event_Leave::USER_DISCONNECTED);
     else
         setUserInterface(0);
 }
