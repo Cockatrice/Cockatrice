@@ -8,7 +8,7 @@ message Event_Leave {
     enum LeaveReason {
         OTHER = 1;
         USER_KICKED = 2;
-        USER_LEAVED = 3;
+        USER_LEFT = 3;
         USER_DISCONNECTED = 4;
     }
     optional LeaveReason reason = 1;

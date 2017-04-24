@@ -616,7 +616,7 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, c
 
 Response::ResponseCode Server_Player::cmdLeaveGame(const Command_LeaveGame & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage & /*ges*/)
 {
-    game->removePlayer(this, Event_Leave::USER_LEAVED);
+    game->removePlayer(this, Event_Leave::USER_LEFT);
     return Response::RespOk;
 }
 

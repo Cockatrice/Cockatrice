@@ -1047,13 +1047,13 @@ QString TabGame::getLeaveReason(Event_Leave::LeaveReason reason)
     switch(reason)
     {
         case Event_Leave::USER_KICKED:
-            return tr("kicked");
+            return tr("kicked by game host or moderator");
             break;
-        case Event_Leave::USER_LEAVED:
-            return tr("player leaved the game");
+        case Event_Leave::USER_LEFT:
+            return tr("player left the game");
             break;
         case Event_Leave::USER_DISCONNECTED:
-            return tr("disconnected");
+            return tr("player disconnected from server");
             break;
         case Event_Leave::OTHER:
         default:
