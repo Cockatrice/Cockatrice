@@ -208,6 +208,7 @@ SettingsCache::SettingsCache()
     picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
+    tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
@@ -542,6 +543,12 @@ void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)
 {
     mainWindowGeometry = _mainWindowGeometry;
     settings->setValue("interface/main_window_geometry", mainWindowGeometry);
+}
+
+void SettingsCache::setTokenDialogGeometry(const QByteArray &_tokenDialogGeometry)
+{
+    tokenDialogGeometry = _tokenDialogGeometry;
+    settings->setValue("interface/token_dialog_geometry", tokenDialogGeometry);
 }
 
 void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)

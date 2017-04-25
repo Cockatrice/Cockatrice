@@ -59,6 +59,7 @@ private:
     LayoutsSettings *layoutsSettings;
 
     QByteArray mainWindowGeometry;
+    QByteArray tokenDialogGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
@@ -123,6 +124,7 @@ public:
     QString getDataPath();
     QString getSettingsPath();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
+    const QByteArray &getTokenDialogGeometry() const { return tokenDialogGeometry; }
     QString getLang() const { return lang; }
     QString getDeckPath() const { return deckPath; }
     QString getReplaysPath() const { return replaysPath; }
@@ -203,6 +205,7 @@ public:
     LayoutsSettings& layouts() const { return *layoutsSettings; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
+    void setTokenDialogGeometry(const QByteArray &_tokenDialog);
     void setLang(const QString &_lang);
     void setDeckPath(const QString &_deckPath);
     void setReplaysPath(const QString &_replaysPath);
