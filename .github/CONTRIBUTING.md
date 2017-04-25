@@ -228,19 +228,20 @@ Please have a look at the specific [FAQ for translators](https://github.com/Cock
 
 ### ToDo list around new main releases ###
 
- - Write a `Release Draft` on github with all changes since last main release
- - Build newest strings and upload them to transifex
- - Give translators some time --> pull newest translations from transifex and PR them back in
+ - [Write a `Release Draft`](https://github.com/Cockatrice/Cockatrice/releases/new) on github with all changes since the last main release
+ - [Build newest strings](#step-2-updating-_ents-files) and upload them to transifex --> Give translators some time to update them
+ - [Fetch newest translations](#step-5-fetch-new-translations-from-transifex) from transifex and create a PR for them
+ 
  - **Final commit:** push a PR which adds the `Release Name` and `Version Number` in the `About` window
  - Release on github (aka remove the `Draft` label and append builds for all platforms)
- <br>
- 
  - Push a PR which immediately removes the `Release Name` and `Version Number` again to not have them in continous development builds
- - Check if the download links on the official gh page (https://github.com/Cockatrice/cockatrice.github.io) are automatically updated to the new binary files
- - Announce the new build on reddit/twitter etc.
  <br>
  
- - create a new milestone & project for the next followup release
+ - Check if the download links on our official [website](https://cockatrice.github.io) are automatically updated
+ - Announce the new release (reddit, twitter...)
+ <br>
+ 
+ - Create a new milestone & project for the next followup release
 
 ### Publish A New Development Snapshot
 
