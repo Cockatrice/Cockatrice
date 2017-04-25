@@ -613,7 +613,7 @@ bool TabSupervisor::isOwnUserRegistered() const
 
 QString TabSupervisor::getOwnUsername() const
 {
-    return QString::fromStdString(userInfo->name());
+    return userInfo ? QString::fromStdString(userInfo->name()) : QString();
 }
 
 bool TabSupervisor::isUserBuddy(const QString &userName) const
