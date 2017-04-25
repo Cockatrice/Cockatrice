@@ -83,7 +83,6 @@ private:
     qreal optimalAspectRatio;
     void clearContents();
     void rebuildTree();
-    void applySideboardPlan(const QList<MoveCard_ToZone> &plan);
 public:
     DeckViewScene(QObject *parent = 0);
     ~DeckViewScene();
@@ -95,6 +94,7 @@ public:
     void updateContents();
     QList<MoveCard_ToZone> getSideboardPlan() const;
     void resetSideboardPlan();
+    void applySideboardPlan(const QList<MoveCard_ToZone> &plan);
 };
 
 class DeckView : public QGraphicsView {
@@ -113,6 +113,7 @@ public:
     void setDeck(const DeckList &_deck);
     void setLocked(bool _locked) { deckViewScene->setLocked(_locked); }
     QList<MoveCard_ToZone> getSideboardPlan() const { return deckViewScene->getSideboardPlan(); }
+    void mouseDoubleClickEvent(QMouseEvent *event);
     void resetSideboardPlan();
 };
 
