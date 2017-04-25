@@ -729,7 +729,6 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
     const int eventListSize = cont.event_list_size();
     for (int i = 0; i < eventListSize; ++i) {
         const GameEvent &event = cont.event_list(i);
-qDebug() << "[REPLAY]" << QString::fromStdString(event.ShortDebugString());
         const int playerId = event.player_id();
         const GameEvent::GameEventType eventType = static_cast<GameEvent::GameEventType>(getPbExtension(event));
         if (spectators.contains(playerId)) {
