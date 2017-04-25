@@ -67,7 +67,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     QGroupBox *tokenDataGroupBox = new QGroupBox(tr("Token data"));
     tokenDataGroupBox->setLayout(grid);
     
-    cardDatabaseModel = new CardDatabaseModel(db, this);
+    cardDatabaseModel = new CardDatabaseModel(db, false, this);
     cardDatabaseDisplayModel = new TokenDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
     

@@ -60,7 +60,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent)
     QGroupBox *tokenDataGroupBox = new QGroupBox(tr("Token data"));
     tokenDataGroupBox->setLayout(grid);
 
-    databaseModel = new CardDatabaseModel(db, this);
+    databaseModel = new CardDatabaseModel(db, false, this);
     databaseModel->setObjectName("databaseModel");
     cardDatabaseDisplayModel = new TokenDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(databaseModel);
