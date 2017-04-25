@@ -92,7 +92,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     QPixmap translatedPixmap;
     bool paintImage = true;
 
-    if(facedown)
+    if(facedown || name.isEmpty())
     {
         // never reveal card color, always paint the card back
         PictureLoader::getCardBackPixmap(translatedPixmap, translatedSize.toSize());
