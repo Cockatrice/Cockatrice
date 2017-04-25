@@ -523,12 +523,12 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
             
             ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
             ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
-            
+
             if (thisCardProperties->tapped())
-                setCardAttrHelper(ges, targetzone->getName(), card->getId(), AttrTapped, "1");
+                setCardAttrHelper(ges, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), card->getId(), AttrTapped, "1");
             QString ptString = QString::fromStdString(thisCardProperties->pt());
             if (!ptString.isEmpty() && !faceDown)
-                setCardAttrHelper(ges, targetzone->getName(), card->getId(), AttrPT, ptString);
+                setCardAttrHelper(ges, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), card->getId(), AttrPT, ptString);
         }
         if (startzone->getAlwaysRevealTopCard() && !startzone->getCards().isEmpty() && (originalPosition == 0)) {
             Event_RevealCards revealEvent;
@@ -578,7 +578,7 @@ void Server_Player::unattachCard(GameEventStorage &ges, Server_Card *card)
         parentCard->getZone()->updateCardCoordinates(parentCard, parentCard->getX(), parentCard->getY());
 }
 
-Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, const QString &zoneName, int cardId, CardAttribute attribute, const QString &attrValue)
+Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, int targetPlayerId, const QString &zoneName, int cardId, CardAttribute attribute, const QString &attrValue)
 {
     Server_CardZone *zone = getZones().value(zoneName);
     if (!zone)
@@ -609,7 +609,7 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges, c
         event.set_card_id(cardId);
     event.set_attribute(attribute);
     event.set_attr_value(result.toStdString());
-    ges.enqueueGameEvent(event, playerId);
+    ges.enqueueGameEvent(event, targetPlayerId);
     
     return Response::RespOk;
 }
@@ -1224,7 +1224,7 @@ Response::ResponseCode Server_Player::cmdSetCardAttr(const Command_SetCardAttr &
     if (conceded)
         return Response::RespContextError;
     
-    return setCardAttrHelper(ges, QString::fromStdString(cmd.zone()), cmd.card_id(), cmd.attribute(), QString::fromStdString(cmd.attr_value()));
+    return setCardAttrHelper(ges, playerId, QString::fromStdString(cmd.zone()), cmd.card_id(), cmd.attribute(), QString::fromStdString(cmd.attr_value()));
 }
 
 Response::ResponseCode Server_Player::cmdSetCardCounter(const Command_SetCardCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
