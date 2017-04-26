@@ -287,6 +287,15 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 
     graveMenu = playerMenu->addMenu(QString());
     graveMenu->addAction(aViewGraveyard);
+
+    if (local) {
+        mRevealRandomGraveyardCard = graveMenu->addMenu(QString());
+        QAction *newAction = mRevealRandomGraveyardCard->addAction(QString());
+        newAction->setData(-1);
+        connect(newAction, SIGNAL(triggered()), this, SLOT(actRevealRandomGraveyardCard()));
+        allPlayersActions.append(newAction);
+        mRevealRandomGraveyardCard->addSeparator();
+    }
     grave->setMenu(graveMenu, aViewGraveyard);
 
     rfgMenu = playerMenu->addMenu(QString());
@@ -655,6 +664,7 @@ void Player::retranslateUi()
         handMenu->setTitle(tr("&Hand"));
         mRevealHand->setTitle(tr("&Reveal hand to..."));
         mRevealRandomHandCard->setTitle(tr("Reveal r&andom card to..."));
+        mRevealRandomGraveyardCard->setTitle(tr("Reveal random card to..."));
         sbMenu->setTitle(tr("&Sideboard"));
         libraryMenu->setTitle(tr("&Library"));
         countersMenu->setTitle(tr("&Counters"));
@@ -890,6 +900,18 @@ void Player::actOpenDeckInDeckEditor()
 void Player::actViewGraveyard()
 {
     static_cast<GameScene *>(scene())->toggleZoneView(this, "grave", -1);
+}
+
+void Player::actRevealRandomGraveyardCard()
+{
+    Command_RevealCards cmd;
+    QAction *action = static_cast<QAction *>(sender());
+    const int otherPlayerId = action->data().toInt();
+    if (otherPlayerId != -1)
+        cmd.set_player_id(otherPlayerId);
+    cmd.set_zone_name("grave");
+    cmd.set_card_id(-2);
+    sendGameCommand(cmd);
 }
 
 void Player::actViewRfg()
