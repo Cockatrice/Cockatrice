@@ -707,7 +707,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(tabSupervisor, SIGNAL(showWindowIfHidden()), this, SLOT(showWindowIfHidden()));
     tabSupervisor->addDeckEditorTab(0);
 
-
     setCentralWidget(tabSupervisor);
 
     retranslateUi();
