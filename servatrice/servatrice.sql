@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
-INSERT INTO cockatrice_schema_version VALUES(18);
+INSERT INTO cockatrice_schema_version VALUES(23);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `token` binary(16),
   `clientid` varchar(15) NOT NULL,
   `privlevel` enum("NONE","VIP","DONATOR") NOT NULL,
+  `privlevelStartDate` datetime NOT NULL,
+  `privlevelEndDate` datetime NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `token` (`token`),
@@ -87,7 +89,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_rooms` (
   `id` int(7) unsigned NOT NULL auto_increment,
   `name` varchar(50) NOT NULL,
   `descr` varchar(255) NOT NULL,
-  `permissionlevel` varchar(20) NOT NULL,
+  `permissionlevel` enum('NONE','REGISTERED','MODERATOR','ADMINISTRATOR') NOT NULL,
+  `privlevel` enum('NONE','PRIVILEGED','VIP','DONATOR') NOT NULL,
   `auto_join` tinyint(1) default 0,
   `join_message` varchar(255) NOT NULL,
   `chat_history_size` int(4) NOT NULL,
@@ -176,9 +179,9 @@ CREATE TABLE IF NOT EXISTS `cockatrice_servermessages` (
 
 CREATE TABLE IF NOT EXISTS `cockatrice_sessions` (
   `id` int(9) NOT NULL AUTO_INCREMENT,
-  `user_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `user_name` varchar(35) NOT NULL,
   `id_server` tinyint(3) NOT NULL,
-  `ip_address` char(15) COLLATE utf8_unicode_ci NOT NULL,
+  `ip_address` varchar(255) NOT NULL,
   `start_time` datetime NOT NULL,
   `end_time` datetime DEFAULT NULL,
   `clientid` varchar(15) NOT NULL,
@@ -244,3 +247,38 @@ CREATE TABLE IF NOT EXISTS `cockatrice_user_analytics` (
   PRIMARY KEY  (`id`),
   FOREIGN KEY(`id`) REFERENCES `cockatrice_users`(`id`)  ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_donations` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `payment_pre_fee` double DEFAULT NULL,
+  `payment_post_fee` double DEFAULT NULL,
+  `term_length` int(11) DEFAULT NULL,
+  `date` varchar(255) DEFAULT NULL,
+  `pp_type` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_forgot_password` (
+  `id` int(7) unsigned zerofill NOT NULL auto_increment,
+  `name` varchar(35) NOT NULL,
+  `requestDate` datetime NOT NULL default '0000-00-00 00:00:00',
+  `emailed` tinyint(1) NOT NULL default 0,
+  PRIMARY KEY  (`id`),
+  KEY `user_name` (`name`)
+) ENGINE=INNODB  DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_audit` (
+  `id` int(7) unsigned zerofill NOT NULL auto_increment,
+  `id_server` tinyint(3) NOT NULL,
+  `name` varchar(35) NOT NULL,
+  `ip_address` varchar(255) NOT NULL,
+  `clientid` varchar(15) NOT NULL,
+  `incidentDate` datetime NOT NULL default '0000-00-00 00:00:00',
+  `action` varchar(35) NOT NULL,
+  `results` ENUM('fail', 'success') NOT NULL DEFAULT 'fail',
+  `details` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `user_name` (`name`)
+) ENGINE=INNODB  DEFAULT CHARSET=utf8;

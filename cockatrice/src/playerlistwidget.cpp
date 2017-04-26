@@ -117,7 +117,7 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
         player->setIcon(2, gameStarted ? (prop.conceded() ? concededIcon : QIcon()) : (prop.ready_start() ? readyIcon : notReadyIcon));
     if (prop.has_user_info()) {
         player->setData(3, Qt::UserRole, prop.user_info().user_level());
-        player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(prop.user_info().user_level()), false)));
+        player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(prop.user_info().user_level()), false, QString::fromStdString(prop.user_info().privlevel()))));
         player->setText(4, QString::fromStdString(prop.user_info().name()));
         const QString country = QString::fromStdString(prop.user_info().country());
         if (!country.isEmpty())

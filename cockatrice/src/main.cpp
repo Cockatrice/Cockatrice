@@ -120,7 +120,6 @@ int main(int argc, char *argv[])
     installNewTranslator();
 
     qsrand(QDateTime::currentDateTime().toTime_t());
-
     qDebug("main(): starting main program");
 
     MainWindow ui;

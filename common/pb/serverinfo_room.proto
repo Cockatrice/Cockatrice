@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "serverinfo_game.proto";
 import "serverinfo_user.proto";
 import "serverinfo_gametype.proto";
@@ -13,4 +14,5 @@ message ServerInfo_Room {
     repeated ServerInfo_User user_list = 8;
     repeated ServerInfo_GameType gametype_list = 9;
     optional string permissionlevel = 10;
+    optional string privilegelevel = 11;
 }

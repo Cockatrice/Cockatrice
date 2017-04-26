@@ -1,3 +1,4 @@
+syntax = "proto2";
 message RoomEvent {
     enum RoomEventType {
         LEAVE_ROOM = 1000;

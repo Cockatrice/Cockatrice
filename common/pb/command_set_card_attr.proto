@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "game_commands.proto";
 import "card_attributes.proto";
 

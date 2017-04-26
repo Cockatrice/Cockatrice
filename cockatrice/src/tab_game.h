@@ -6,6 +6,7 @@
 #include <QCompleter>
 #include "tab.h"
 #include "pb/serverinfo_game.pb.h"
+#include "pb/event_leave.pb.h"
 
 class AbstractClient;
 class CardDatabase;
@@ -65,7 +66,6 @@ private:
     bool state;
 signals:
     void stateChanged();
-    void notIdle();
 public:
     ToggleButton(QWidget *parent = 0);
     bool getState() const { return state; }
@@ -187,6 +187,7 @@ private:
     void createPlayAreaWidget(bool bReplay=false);
     void createDeckViewContainerWidget(bool bReplay=false);
     void createReplayDock();
+    QString getLeaveReason(Event_Leave::LeaveReason reason);
 signals:
     void gameClosing(TabGame *tab);
     void playerAdded(Player *player);
@@ -238,6 +239,7 @@ public:
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
     ~TabGame();
     void retranslateUi();
+    void updatePlayerListDockTitle();
     void closeRequest();
     const QMap<int, Player *> &getPlayers() const { return players; }
     CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;

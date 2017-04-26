@@ -11,6 +11,8 @@
 #include "settings/gamefilterssettings.h"
 #include "settings/layoutssettings.h"
 
+class ReleaseChannel;
+
 // the falbacks are used for cards without a muid
 #define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
 #define PIC_URL_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"
@@ -21,6 +23,8 @@
 
 #define DEFAULT_LANG_CODE "en"
 #define DEFAULT_LANG_NAME "English"
+
+#define DEFAULT_FONT_SIZE 12
 
 class QSettings;
 
@@ -55,16 +59,18 @@ private:
     LayoutsSettings *layoutsSettings;
 
     QByteArray mainWindowGeometry;
+    QByteArray tokenDialogGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
+    int updateReleaseChannel;
+    int maxFontSize;
     bool picDownload;
     bool notificationsEnabled;
     bool spectatorNotificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
     bool annotateTokens;
-    bool idleClientTimeOutEnabled;
     QByteArray tabGameSplitterSizes;
     bool displayCardNames;
     bool horizontalHand;
@@ -87,6 +93,7 @@ private:
     QString picUrl;
     QString picUrlFallback;
     QString clientID;
+    QString knownMissingFeatures;
     int pixmapCacheSize;
     bool scaleCards;
     bool showMessagePopups;
@@ -105,18 +112,19 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
-    int keepalive;
-    int idlekeepalive;    
+    int keepalive;    
     void translateLegacySettings();
     QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
     QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
     bool rememberGameSettings;
+    QList<ReleaseChannel*> releaseChannels;
 
 public:
     SettingsCache();
     QString getDataPath();
     QString getSettingsPath();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
+    const QByteArray &getTokenDialogGeometry() const { return tokenDialogGeometry; }
     QString getLang() const { return lang; }
     QString getDeckPath() const { return deckPath; }
     QString getReplaysPath() const { return replaysPath; }
@@ -132,7 +140,8 @@ public:
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
     bool getNotifyAboutUpdates() const { return notifyAboutUpdates; }
-    bool getIdleClientTimeOutEnabled() const { return idleClientTimeOutEnabled;  }
+    ReleaseChannel * getUpdateReleaseChannel() const { return releaseChannels.at(updateReleaseChannel); }
+    QList<ReleaseChannel*> getUpdateReleaseChannels() const { return releaseChannels; }
 
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
@@ -183,9 +192,11 @@ public:
     bool getSpectatorsCanSeeEverything() const { return spectatorsCanSeeEverything; }
     bool getRememberGameSettings() const { return rememberGameSettings; }
     int getKeepAlive() const { return keepalive; }
-    int getIdleKeepAlive() const { return idlekeepalive; }
+    int getMaxFontSize() const { return maxFontSize; }
     void setClientID(QString clientID);
+    void setKnownMissingFeatures(QString _knownMissingFeatures);
     QString getClientID() { return clientID; }
+    QString getKnownMissingFeatures() { return knownMissingFeatures; }
     ShortcutsSettings& shortcuts() const { return *shortcutsSettings; }
     CardDatabaseSettings& cardDatabase() const { return *cardDatabaseSettings; }
     ServersSettings& servers() const { return *serversSettings; }
@@ -194,6 +205,7 @@ public:
     LayoutsSettings& layouts() const { return *layoutsSettings; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
+    void setTokenDialogGeometry(const QByteArray &_tokenDialog);
     void setLang(const QString &_lang);
     void setDeckPath(const QString &_deckPath);
     void setReplaysPath(const QString &_replaysPath);
@@ -209,7 +221,6 @@ public slots:
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
     void setAnnotateTokens(int _annotateTokens);
-    void setIdleClientTimeOutEnabled(int _idleClientTimeOutEnabled);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setDisplayCardNames(int _displayCardNames);
     void setHorizontalHand(int _horizontalHand);
@@ -251,6 +262,8 @@ public slots:
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(int _notifyaboutupdate);
+    void setUpdateReleaseChannel(int _updateReleaseChannel);
+    void setMaxFontSize(int _max);
 };
 
 extern SettingsCache *settingsCache;

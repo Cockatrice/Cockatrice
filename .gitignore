@@ -5,3 +5,5 @@ build*
 mysql.cnf
 .DS_Store
 .idea/
+*.aps
+cmake-build-debug/

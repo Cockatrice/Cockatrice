@@ -1,7 +1,7 @@
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H
 
-#include "chatview.h"
+#include "chatview/chatview.h"
 #include "translation.h"
 #include "user_level.h"
 
@@ -40,11 +40,11 @@ public slots:
     void logGameJoined(int gameId);
     void logReplayStarted(int gameId);
     void logJoin(Player *player);
-    void logLeave(Player *player);
+    void logLeave(Player *player, QString reason);
     void logGameClosed();
     void logKicked();
     void logJoinSpectator(QString name);
-    void logLeaveSpectator(QString name);
+    void logLeaveSpectator(QString name, QString reason);
     void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
     void logReadyStart(Player *player);
     void logNotReadyStart(Player *player);
@@ -53,7 +53,7 @@ public slots:
     void logGameStart();
     void logConnectionStateChanged(Player *player, bool connectionState);
     void logSay(Player *player, QString message);
-    void logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString message);
+    void logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString userPrivLevel, QString message);
     void logShuffle(Player *player, CardZone *zone);
     void logRollDie(Player *player, int sides, int roll);
     void logDrawCards(Player *player, int number);
@@ -83,7 +83,7 @@ public slots:
     void containerProcessingDone();
 public:
     void connectToPlayer(Player *player);
-    MessageLogWidget(const TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent = 0);
+    MessageLogWidget(const TabSupervisor *_tabSupervisor, const UserlistProxy *_userlistProxy, TabGame *_game, QWidget *parent = 0);
 };
 
 #endif

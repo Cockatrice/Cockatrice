@@ -1,3 +1,4 @@
+syntax = "proto2";
 message GameEventContext {
     enum ContextType {
         READY_START = 1000;

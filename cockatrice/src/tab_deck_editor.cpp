@@ -324,7 +324,7 @@ void TabDeckEditor::createCentralFrame()
     connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));    
 
-    databaseModel = new CardDatabaseModel(db, this);
+    databaseModel = new CardDatabaseModel(db, true, this);
     databaseModel->setObjectName("databaseModel");
     databaseDisplayModel = new CardDatabaseDisplayModel(this);
     databaseDisplayModel->setSourceModel(databaseModel);
@@ -719,7 +719,7 @@ bool TabDeckEditor::actSaveDeckAs()
     dialog.setConfirmOverwrite(true);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::fileNameFilters);
-    dialog.selectFile(deckModel->getDeckList()->getName());
+    dialog.selectFile(deckModel->getDeckList()->getName().trimmed());
     if (!dialog.exec())
         return false;
 

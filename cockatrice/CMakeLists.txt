@@ -2,7 +2,7 @@
 #
 # provides the cockatrice binary
 
-PROJECT(cockatrice)
+PROJECT(Cockatrice)
 
 SET(cockatrice_SOURCES
     src/abstractcounter.cpp 
@@ -15,6 +15,9 @@ SET(cockatrice_SOURCES
     src/dlg_edit_password.cpp
     src/dlg_edit_tokens.cpp
     src/dlg_edit_user.cpp
+    src/dlg_forgotpasswordrequest.cpp
+    src/dlg_forgotpasswordreset.cpp
+    src/dlg_forgotpasswordchallenge.cpp
     src/dlg_register.cpp 
     src/dlg_update.cpp
     src/dlg_viewlog.cpp
@@ -80,7 +83,8 @@ SET(cockatrice_SOURCES
     src/replay_timeline_widget.cpp
     src/deckstats_interface.cpp
     src/tappedout_interface.cpp
-    src/chatview.cpp 
+    src/chatview/chatview.cpp
+    src/chatview/userlistProxy.h
     src/userlist.cpp 
     src/userinfobox.cpp 
     src/user_context_menu.cpp
@@ -109,9 +113,10 @@ SET(cockatrice_SOURCES
     src/settings/messagesettings.cpp
     src/settings/gamefilterssettings.cpp
     src/settings/layoutssettings.cpp
-    src/update_checker.cpp
     src/update_downloader.cpp
     src/logger.cpp
+    src/releasechannel.cpp
+    src/userconnection_information.cpp
     ${VERSION_STRING_CPP}
 )
 
@@ -229,13 +234,13 @@ if(UNIX)
         set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
         set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.cockatrice.${PROJECT_NAME}")
         set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}-${PROJECT_VERSION}")
-        set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+        set(MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}")
         set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
         set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
         set_target_properties(cockatrice PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
         INSTALL(TARGETS cockatrice BUNDLE DESTINATION ./)
-        INSTALL(FILES ${cockatrice_QM} DESTINATION ./cockatrice.app/Contents/Resources/translations)
+        INSTALL(FILES ${cockatrice_QM} DESTINATION ./Cockatrice.app/Contents/Resources/translations)
     else()
         # Assume linux
         INSTALL(TARGETS cockatrice RUNTIME DESTINATION bin/)
@@ -251,8 +256,8 @@ endif()
 
 if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
-    set(plugin_dest_dir cockatrice.app/Contents/Plugins)
-    set(qtconf_dest_dir cockatrice.app/Contents/Resources)
+    set(plugin_dest_dir Cockatrice.app/Contents/Plugins)
+    set(qtconf_dest_dir Cockatrice.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt5 plugins: audio, iconengines, imageformats, platforms, printsupport
@@ -272,7 +277,7 @@ Data = Resources\")
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
 endif()
 
@@ -297,7 +302,7 @@ Data = Resources\")
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Cockatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
 
     if(WIN32SSLRUNTIME_FOUND)

@@ -14,8 +14,8 @@
 #include "pb/serverinfo_chat_message.pb.h"
 #include <google/protobuf/descriptor.h>
 
-Server_Room::Server_Room(int _id, int _chatHistorySize, const QString &_name, const QString &_description, const QString &_permissionLevel, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
-    : QObject(parent), id(_id), chatHistorySize(_chatHistorySize), name(_name), description(_description), permissionLevel(_permissionLevel), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), gamesLock(QReadWriteLock::Recursive)
+Server_Room::Server_Room(int _id, int _chatHistorySize, const QString &_name, const QString &_description, const QString &_permissionLevel, const QString &_privilegeLevel, bool _autoJoin, const QString &_joinMessage, const QStringList &_gameTypes, Server *parent)
+    : QObject(parent), id(_id), chatHistorySize(_chatHistorySize), name(_name), description(_description), permissionLevel(_permissionLevel), privilegeLevel(_privilegeLevel), autoJoin(_autoJoin), joinMessage(_joinMessage), gameTypes(_gameTypes), gamesLock(QReadWriteLock::Recursive)
 {
     connect(this, SIGNAL(gameListChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)), Qt::QueuedConnection);
 }
@@ -36,6 +36,31 @@ Server_Room::~Server_Room()
     usersLock.unlock();
 }
 
+bool Server_Room::userMayJoin(const ServerInfo_User & userInfo)
+{
+
+    if (permissionLevel.toLower() == "administrator" || permissionLevel.toLower() == "moderator")
+        return false;
+
+    if (permissionLevel.toLower() == "registered" && !(userInfo.user_level() & ServerInfo_User::IsRegistered))
+        return false;
+
+    if (privilegeLevel.toLower() != "none")
+    {
+        if (privilegeLevel.toLower() == "privileged")
+        {
+            if (privilegeLevel.toLower() == "none")
+                return false;
+        }
+        else
+        {
+            if (privilegeLevel.toLower() != QString::fromStdString(userInfo.privlevel()).toLower())
+                return false;
+        }
+    }
+    return true;
+}
+
 Server *Server_Room::getServer() const
 {
     return static_cast<Server *>(parent());
@@ -44,11 +69,11 @@ Server *Server_Room::getServer() const
 const ServerInfo_Room &Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes, bool includeExternalData) const
 {
     result.set_room_id(id);
-    
     result.set_name(name.toStdString());
     result.set_description(description.toStdString());
     result.set_auto_join(autoJoin);
     result.set_permissionlevel(permissionLevel.toStdString());
+    result.set_privilegelevel(privilegeLevel.toStdString());
     
     gamesLock.lockForRead();
     result.set_game_count(games.size() + externalGames.size());

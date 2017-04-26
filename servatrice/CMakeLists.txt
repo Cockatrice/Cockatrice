@@ -2,7 +2,7 @@
 #
 # provides the servatrice binary
 
-PROJECT(servatrice)
+PROJECT(Servatrice)
 
 SET(servatrice_SOURCES
     src/main.cpp
@@ -127,8 +127,8 @@ if(UNIX)
         set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
 
         INSTALL(TARGETS servatrice BUNDLE DESTINATION ./)
-        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./servatrice.app/Contents/Resources/)
-        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./servatrice.app/Contents/Resources/)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./Servatrice.app/Contents/Resources/)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./Servatrice.app/Contents/Resources/)
     else()
         # Assume linux
         INSTALL(TARGETS servatrice RUNTIME DESTINATION bin/)
@@ -147,8 +147,8 @@ endif()
 
 if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
-    set(plugin_dest_dir servatrice.app/Contents/Plugins)
-    set(qtconf_dest_dir servatrice.app/Contents/Resources)
+    set(plugin_dest_dir Servatrice.app/Contents/Plugins)
+    set(qtconf_dest_dir Servatrice.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt5 plugins: platforms, sqldrivers/mysql
@@ -167,7 +167,7 @@ Translations = Resources/translations\")
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
     set(BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
     " COMPONENT Runtime)
 endif()
 
@@ -192,7 +192,7 @@ Translations = Resources/translations\")
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
     set(BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Servatrice.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
     " COMPONENT Runtime)
 endif()
 #Compile a portable version, default off

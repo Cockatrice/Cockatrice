@@ -176,9 +176,9 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const Q
     token = active ? QString() : PasswordHasher::generateActivationToken();
 
     QSqlQuery *query = prepareQuery("insert into {prefix}_users "
-            "(name, realname, gender, password_sha512, email, country, registrationDate, active, token) "
-            "values "
-            "(:userName, :realName, :gender, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active, :token)");
+        "(name, realname, gender, password_sha512, email, country, registrationDate, active, token, admin, avatar_bmp, clientid, privlevel, privlevelStartDate, privlevelEndDate) "
+        "values "
+        "(:userName, :realName, :gender, :password_sha512, :email, :country, UTC_TIMESTAMP(), :active, :token, 0, '', '', 'NONE', UTC_TIMESTAMP(), UTC_TIMESTAMP())");
     query->bindValue(":userName", userName);
     query->bindValue(":realName", realName);
     query->bindValue(":gender", getGenderChar(gender));
@@ -505,38 +505,38 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
     if (!country.isEmpty())
         result.set_country(country.toStdString());
 
+    const QString privlevel = query->value(4).toString();
+    if (!privlevel.isEmpty())
+        result.set_privlevel(privlevel.toStdString());
+
     if (complete) {
-        const QString genderStr = query->value(4).toString();
+        const QString genderStr = query->value(5).toString();
         if (genderStr == "m")
             result.set_gender(ServerInfo_User::Male);
         else if (genderStr == "f")
             result.set_gender(ServerInfo_User::Female);
 
-        const QString realName = query->value(5).toString();
+        const QString realName = query->value(6).toString();
         if (!realName.isEmpty())
             result.set_real_name(realName.toStdString());
 
-        const QByteArray avatarBmp = query->value(6).toByteArray();
+        const QByteArray avatarBmp = query->value(7).toByteArray();
         if (avatarBmp.size())
             result.set_avatar_bmp(avatarBmp.data(), avatarBmp.size());
 
-        const QDateTime regDate = query->value(7).toDateTime();
-        if(!regDate.toString(Qt::ISODate).isEmpty()) {
+        const QDateTime regDate = query->value(8).toDateTime();
+        if (!regDate.toString(Qt::ISODate).isEmpty()) {
             qint64 accountAgeInSeconds = regDate.secsTo(QDateTime::currentDateTime());
             result.set_accountage_secs(accountAgeInSeconds);
         }
 
-        const QString email = query->value(8).toString();
+        const QString email = query->value(9).toString();
         if (!email.isEmpty())
             result.set_email(email.toStdString());
 
-        const QString clientid = query->value(9).toString();
+        const QString clientid = query->value(10).toString();
         if (!clientid.isEmpty())
             result.set_clientid(clientid.toStdString());
-
-        const QString privlevel = query->value(10).toString();
-        if (!privlevel.isEmpty())
-            result.set_privlevel(privlevel.toStdString());
     }
     return result;
 }
@@ -551,7 +551,7 @@ ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, b
         if (!checkSql())
             return result;
 
-        QSqlQuery *query = prepareQuery("select id, name, admin, country, gender, realname, avatar_bmp, registrationDate, email, clientid, privlevel from {prefix}_users where name = :name and active = 1");
+        QSqlQuery *query = prepareQuery("select id, name, admin, country, privlevel, gender, realname, avatar_bmp, registrationDate, email, clientid from {prefix}_users where name = :name and active = 1");
         query->bindValue(":name", name);
         if (!execSqlQuery(query))
             return result;
@@ -560,7 +560,8 @@ ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, b
             return evalUserQueryResult(query, true, withId);
         else
             return result;
-    } else
+    }
+    else
         return result;
 }
 
@@ -641,7 +642,7 @@ QMap<QString, ServerInfo_User> Servatrice_DatabaseInterface::getBuddyList(const 
     if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         checkSql();
 
-        QSqlQuery *query = prepareQuery("select a.id, a.name, a.admin, a.country from {prefix}_users a left join {prefix}_buddylist b on a.id = b.id_user2 left join {prefix}_users c on b.id_user1 = c.id where c.name = :name");
+        QSqlQuery *query = prepareQuery("select a.id, a.name, a.admin, a.country, a.privlevel from {prefix}_users a left join {prefix}_buddylist b on a.id = b.id_user2 left join {prefix}_users c on b.id_user1 = c.id where c.name = :name");
         query->bindValue(":name", name);
         if (!execSqlQuery(query))
             return result;
@@ -661,7 +662,7 @@ QMap<QString, ServerInfo_User> Servatrice_DatabaseInterface::getIgnoreList(const
     if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         checkSql();
 
-        QSqlQuery *query = prepareQuery("select a.id, a.name, a.admin, a.country from {prefix}_users a left join {prefix}_ignorelist b on a.id = b.id_user2 left join {prefix}_users c on b.id_user1 = c.id where c.name = :name");
+        QSqlQuery *query = prepareQuery("select a.id, a.name, a.admin, a.country, a.privlevel from {prefix}_users a left join {prefix}_ignorelist b on a.id = b.id_user2 left join {prefix}_users c on b.id_user1 = c.id where c.name = :name");
         query->bindValue(":name", name);
         if (!execSqlQuery(query))
             return result;
@@ -830,41 +831,43 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId, const QString 
     execSqlQuery(query);
 }
 
-bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword)
+bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user, const QString &oldPassword, const QString &newPassword, const bool &force = false)
 {
     if(server->getAuthenticationMethod() != Servatrice::AuthenticationSql)
-        return true;
+        return false;
 
     if (!checkSql())
-        return true;
+        return false;
 
     QString error;
     if (!usernameIsValid(user, error))
-        return true;
+        return false;
 
     QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name");
     passwordQuery->bindValue(":name", user);
-    if (!execSqlQuery(passwordQuery)) {
-        qDebug("Change password denied: SQL error");
-        return true;
+
+    if (!force) {
+        if (!execSqlQuery(passwordQuery)) {
+            qDebug("Change password denied: SQL error");
+            return false;
+        }
+
+        if (!passwordQuery->next())
+            return false;
+
+        const QString correctPassword = passwordQuery->value(0).toString();
+        if (correctPassword != PasswordHasher::computeHash(oldPassword, correctPassword.left(16)))
+            return false;
     }
-
-    if (!passwordQuery->next())
-        return true;
-
-    const QString correctPassword = passwordQuery->value(0).toString();
-    if (correctPassword != PasswordHasher::computeHash(oldPassword, correctPassword.left(16)))
-        return true;
 
     QString passwordSha512 = PasswordHasher::computeHash(newPassword, PasswordHasher::generateRandomSalt());
 
     passwordQuery = prepareQuery("update {prefix}_users set password_sha512=:password where name = :name");
     passwordQuery->bindValue(":password", passwordSha512);
     passwordQuery->bindValue(":name", user);
-    if (!execSqlQuery(passwordQuery)) {
-        qDebug("Change password denied: SQL error");
+    if (execSqlQuery(passwordQuery))
         return true;
-    }
+
     return false;
 }
 
@@ -911,7 +914,7 @@ void Servatrice_DatabaseInterface::updateUsersLastLoginData(const QString &userN
     if (!checkSql())
         return;
 
-    int usersID;
+    int usersID=0;
 
     QSqlQuery *query = prepareQuery("select id from {prefix}_users where name = :user_name");
     query->bindValue(":user_name", userName);
@@ -1107,4 +1110,134 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
     }
 
     return results;
+}
+
+int Servatrice_DatabaseInterface::checkNumberOfUserAccounts(const QString &email)
+{
+    if (!checkSql())
+        return 0;
+
+    QSqlQuery *query = prepareQuery("SELECT count(email) FROM {prefix}_users WHERE email = :user_email");
+    query->bindValue(":user_email", email);
+
+    if (!execSqlQuery(query)) {
+        qDebug("Failed to identify the number of users accounts for users email address: SQL Error");
+        return 0;
+    }
+
+    if (query->next())
+        return query->value(0).toInt();
+
+    return 0;
+}
+
+bool Servatrice_DatabaseInterface::addForgotPassword(const QString &user)
+{
+    if (!checkSql())
+        return false;
+
+    if (!updateUserToken(PasswordHasher::generateActivationToken(), user))
+        return false;
+
+    QSqlQuery *query = prepareQuery("insert into {prefix}_forgot_password (name,requestDate) values (:username,NOW())");
+    query->bindValue(":username", user);
+    if (execSqlQuery(query))
+        return true;
+
+    return false;
+}
+
+bool Servatrice_DatabaseInterface::removeForgotPassword(const QString &user)
+{
+    if (!checkSql())
+        return false;
+
+    QSqlQuery *query = prepareQuery("delete from {prefix}_forgot_password where name = :username");
+    query->bindValue(":username", user);
+    if (execSqlQuery(query))
+        return true;
+
+    return false;
+}
+
+bool Servatrice_DatabaseInterface::doesForgotPasswordExist(const QString &user)
+{
+    if (!checkSql())
+        return false;
+
+    QSqlQuery *query = prepareQuery("select count(name) from {prefix}_forgot_password where name = :user_name AND requestDate > (now() - interval :minutes minute)");
+    query->bindValue(":user_name", user);
+    query->bindValue(":minutes", QString::number(server->getForgotPasswordTokenLife()));
+
+    if (!execSqlQuery(query))
+        return false;
+
+    if (query->next())
+        if (query->value("count(name)").toInt() > 0)
+            return true;
+
+    return false;
+}
+
+bool Servatrice_DatabaseInterface::updateUserToken(const QString & token, const QString &user)
+{
+    if (!checkSql())
+        return false;
+
+    if (token.isEmpty() || user.isEmpty())
+        return false;
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set token = :token where name = :user_name");
+    query->bindValue(":user_name", user);
+    query->bindValue(":token", token);
+
+    if (execSqlQuery(query))
+        return true;
+
+    return false;
+}
+
+bool Servatrice_DatabaseInterface::validateTableColumnStringData(const QString &table, const QString &column, const QString &_user, const QString &_datatocheck)
+{
+    if (!checkSql())
+        return false;
+
+    if (table.isEmpty() || column.isEmpty() ||_user.isEmpty() || _datatocheck.isEmpty())
+        return false;
+
+    QString formatedQuery = QString("select %1 from %2 where name = :user_name").arg(column).arg(table);
+    QSqlQuery *query = prepareQuery(formatedQuery);
+    query->bindValue(":user_name", _user);
+
+    if (!execSqlQuery(query))
+        return false;
+
+    if (query->next())
+        if (query->value(column).toString() == _datatocheck)
+            return true;
+
+    return false;
+}
+
+void Servatrice_DatabaseInterface::addAuditRecord(const QString &user, const QString &ipaddress, const QString &clientid, const QString &action, const QString &details, const bool &results = false)
+{
+    if (!checkSql())
+        return;
+    
+    if (!server->getEnableAudit())
+        return;
+    
+    if (user.isEmpty() || ipaddress.isEmpty() || clientid.isEmpty() || action.isEmpty())
+        return;
+    
+    QSqlQuery *query = prepareQuery("insert into {prefix}_audit (id_server,name,ip_address,clientid,incidentDate,action,results,details) values (:idserver,:username,:ipaddress,:clientid,NOW(),:action,:results,:details)");
+    query->bindValue(":idserver", server->getServerID());
+    query->bindValue(":username", user);
+    query->bindValue(":ipaddress", ipaddress);
+    query->bindValue(":clientid", clientid);
+    query->bindValue(":action", action);
+    query->bindValue(":results", results ? "success" : "fail");
+
+    query->bindValue(":details", details);
+    execSqlQuery(query);
 }

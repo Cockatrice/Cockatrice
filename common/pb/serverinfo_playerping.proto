@@ -1,3 +1,4 @@
+syntax = "proto2";
 message ServerInfo_PlayerPing {
     optional sint32 player_id = 1;
     optional sint32 ping_time = 2;

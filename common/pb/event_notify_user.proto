@@ -1,10 +1,14 @@
+syntax = "proto2";
 import "session_event.proto";
 
 message Event_NotifyUser {
 
     enum NotificationType {
+        UNKNOWN = 0;  // Default enum value if no "type" is defined when used
         PROMOTED = 1;
         WARNING = 2;
+        IDLEWARNING = 3;
+        CUSTOM = 4;
     }
 
     extend SessionEvent {
@@ -12,5 +16,7 @@ message Event_NotifyUser {
     }
     optional NotificationType type = 1;
     optional string warning_reason = 2;
+    optional string custom_title = 3;
+    optional string custom_content = 4;
 
 }

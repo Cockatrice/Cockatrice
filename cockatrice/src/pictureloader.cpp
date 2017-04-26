@@ -19,6 +19,7 @@
 #include <QSvgRenderer>
 #include <QThread>
 #include <QUrl>
+#include <QDirIterator>
 
 // never cache more than 300 cards at once for a single deck
 #define CACHED_CARD_PER_DECK_MAX 300
@@ -167,9 +168,18 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString & setName, QString & cor
     QImage image;
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
+    QList<QString> picsPaths = QList<QString>();
+    QDirIterator it(customPicsPath, QDirIterator::Subdirectories);
 
-    //The list of paths to the folders in which to search for images
-    QList<QString> picsPaths = QList<QString>() << customPicsPath + correctedCardname;
+    // Recursively check all subdirectories of the CUSTOM folder
+    while (it.hasNext())
+    {
+        QString thisPath(it.next());
+        QFileInfo thisFileInfo(thisPath);
+
+        if (thisFileInfo.isFile() && thisFileInfo.baseName() == correctedCardname)
+            picsPaths << thisPath; // Card found in the CUSTOM directory, somewhere
+    }
 
     if(!setName.isEmpty())
     {
@@ -412,7 +422,7 @@ PictureLoader::~PictureLoader()
     worker->deleteLater();
 }
 
-void PictureLoader::internalGetCardBackPixmap(QPixmap &pixmap, QSize size)
+void PictureLoader::getCardBackPixmap(QPixmap &pixmap, QSize size)
 {
     QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + QString::number(size.height());
     if(!QPixmapCache::find(backCacheKey, &pixmap))
@@ -425,29 +435,26 @@ void PictureLoader::internalGetCardBackPixmap(QPixmap &pixmap, QSize size)
 
 void PictureLoader::getPixmap(QPixmap &pixmap, CardInfo *card, QSize size)
 {
-    if(card)
-    {    
-        // search for an exact size copy of the picure in cache
-        QString key = card->getPixmapCacheKey();
-        QString sizekey = key + QLatin1Char('_') + QString::number(size.width()) + QString::number(size.height());
-        if(QPixmapCache::find(sizekey, &pixmap))
-            return;
+    if(card == nullptr)
+        return;
 
-        // load the image and create a copy of the correct size
-        QPixmap bigPixmap;
-        if(QPixmapCache::find(key, &bigPixmap))
-        {
-            pixmap = bigPixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-            QPixmapCache::insert(sizekey, pixmap);
-            return;
-        }
+    // search for an exact size copy of the picure in cache
+    QString key = card->getPixmapCacheKey();
+    QString sizekey = key + QLatin1Char('_') + QString::number(size.width()) + QString::number(size.height());
+    if(QPixmapCache::find(sizekey, &pixmap))
+        return;
 
-        // add the card to the load queue
-        getInstance().worker->enqueueImageLoad(card);
-    } else {
-        // requesting the image for a null card is a shortcut to get the card background image
-        internalGetCardBackPixmap(pixmap, size);
+    // load the image and create a copy of the correct size
+    QPixmap bigPixmap;
+    if(QPixmapCache::find(key, &bigPixmap))
+    {
+        pixmap = bigPixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        QPixmapCache::insert(sizekey, pixmap);
+        return;
     }
+
+    // add the card to the load queue
+    getInstance().worker->enqueueImageLoad(card);
 }
 
 void PictureLoader::imageLoaded(CardInfo *card, const QImage &image)

@@ -1,39 +1,40 @@
 language: cpp
+sudo: required
 matrix:
   fast_finish: true
   include:
-    # linux debug build, trusty + gcc + qt5
-    - os: linux
-      dist: trusty
-      env: BUILDTYPE=Debug DIST=trusty
-    # osx debug build, osx + clang + qt5
-    - os: osx
-      osx_image: xcode6.4
-      env: BUILDTYPE=Debug
-    # linux trusty release build, precise + gcc + qt5
-    - os: linux
-      dist: trusty
-      env: BUILDTYPE=Release DIST=trusty
-    # osx release build, osx + gcc + qt5
-    - os: osx
-      osx_image: xcode6.4
-      env: BUILDTYPE=Release
-script: ./travis-compile.sh
-install: ./travis-dependencies.sh
+  - os: linux
+    dist: trusty
+    env: BUILDTYPE=Debug DIST=trusty
+  - os: linux
+    dist: trusty
+    env: BUILDTYPE=Release DIST=trusty
+  - os: osx
+    osx_image: xcode6.4
+    env: BUILDTYPE=Debug
+  - os: osx
+    osx_image: xcode6.4
+    env: BUILDTYPE=Release
+script: "./travis-compile.sh"
+install: "./travis-dependencies.sh"
 cache: apt
 notifications:
-  slack: cockatrice:dNA81maCU8SAHB7pYrCWiQg9
   webhooks:
     urls:
-      - https://webhooks.gitter.im/e/d94969c3b01b22cbdcb7
+    - https://webhooks.gitter.im/e/d94969c3b01b22cbdcb7
     on_success: change
     on_failure: change
     on_start: never
 deploy:
-  provider: bintray
-  file: "build/bintray_deploy.json"
-  user: "ctrlaltca"
-  key:
-    secure: DtVeeLoi5fZG/RvLTecRnRQGW9fVNS4Oa5iut2vJa14PdKBAJiXACQ0EzcRJFsbtby7MyMc2IVtT5skpvsaSqkpaxoBaL1YtKwJ4CTkYcm2MDWHS7UlijuxxTjI6BnaL3lcCCIeG+NHBZa3dV2YNJ1sWv6Xmiiix1ujPPW8VtnM=
+  provider: releases
+  api_key:
+    secure: "mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU="
+  file_glob: true
+  file: "build/Cockatrice-*"
+  prerelease: true
+  skip_cleanup: true
+  overwrite: true
   on:
+    tags: true
+    repo: Cockatrice/Cockatrice
     condition: $BUILDTYPE = Release

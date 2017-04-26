@@ -200,8 +200,13 @@ void TabReplays::actDownload()
     }
 
     ServerInfo_Replay const *curRight = serverDirView->getCurrentReplay();
+
     if (!curRight)
+    {
+        QMessageBox::information(this, tr("Downloading Replays"), tr("You cannot download replay folders at this time"));
         return;
+    }
+
     filePath += QString("/replay_%1.cor").arg(curRight->replay_id());
     
     Command_ReplayDownload cmd;

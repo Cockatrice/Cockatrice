@@ -1,44 +1,49 @@
-#define HUMAN_DOWNLOAD_URL "https://bintray.com/cockatrice/Cockatrice/Cockatrice/_latestVersion"
-#define API_DOWNLOAD_BASE_URL "https://dl.bintray.com/cockatrice/Cockatrice/"
-#define DATE_LENGTH 10
-#define MAX_DATE_LENGTH 100
-#define SHORT_SHA1_HASH_LENGTH 7
-
 #include <QtNetwork>
 #include <QProgressDialog>
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QVBoxLayout>
-#include <QDialogButtonBox>
+
 #include <QPushButton>
 #include <QLabel>
 #include <QProgressBar>
 #include <QApplication>
+#include <version_string.h>
 
 #include "dlg_update.h"
+#include "releasechannel.h"
+#include "settingscache.h"
 #include "window_main.h"
 
 DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent) {
 
     //Handle layout
-    text = new QLabel(this);
+    statusLabel = new QLabel(this);
+    statusLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+    statusLabel->setWordWrap(true);
+    descriptionLabel = new QLabel(tr("Current release channel:") + " " + tr(settingsCache->getUpdateReleaseChannel()->getName().toUtf8()), this);
     progress = new QProgressBar(this);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
-    ok = new QPushButton("Ok", this);
-    manualDownload = new QPushButton(tr("Update Anyway"), this);
-    enableUpdateButton(false); //Unless we know there's an update available, you can't install
+    buttonBox = new QDialogButtonBox(this);
+    buttonBox->setFixedWidth(350);
+
+    ok = new QPushButton("Close", this);
+    manualDownload = new QPushButton(tr("Reinstall"), this);
+    stopDownload = new QPushButton(tr("Cancel Download"), this);
     gotoDownload = new QPushButton(tr("Open Download Page"), this);
-    buttonBox->addButton(manualDownload, QDialogButtonBox::ActionRole);
-    buttonBox->addButton(gotoDownload, QDialogButtonBox::ActionRole);
+
+    addStopDownloadAndRemoveOthers(false); // Add all buttons to box
+    enableUpdateButton(false); //Unless we know there's an update available, you can't install
     buttonBox->addButton(ok, QDialogButtonBox::AcceptRole);
 
     connect(gotoDownload, SIGNAL(clicked()), this, SLOT(gotoDownloadPage()));
     connect(manualDownload, SIGNAL(clicked()), this, SLOT(downloadUpdate()));
+    connect(stopDownload, SIGNAL(clicked()), this, SLOT(cancelDownload()));
     connect(ok, SIGNAL(clicked()), this, SLOT(closeDialog()));
 
     QVBoxLayout *parentLayout = new QVBoxLayout(this);
-    parentLayout->addWidget(text);
+    parentLayout->addWidget(descriptionLabel);
+    parentLayout->addWidget(statusLabel);
     parentLayout->addWidget(progress);
     parentLayout->addWidget(buttonBox);
 
@@ -47,31 +52,24 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent) {
     //Check for SSL (this probably isn't necessary)
     if (!QSslSocket::supportsSsl()) {
         enableUpdateButton(false);
-        QMessageBox::critical(
-                this,
-                tr("Error"),
-                tr("Cockatrice was not built with SSL support, so cannot download updates! "
-                           "Please visit the download page and update manually."));
+        QMessageBox::critical(this, tr("Error"),
+            tr("Cockatrice was not built with SSL support, so you cannot download updates automatically! "
+            "Please visit the download page to update manually."));
     }
 
     //Initialize the checker and downloader class
     uDownloader = new UpdateDownloader(this);
     connect(uDownloader, SIGNAL(downloadSuccessful(QUrl)), this, SLOT(downloadSuccessful(QUrl)));
-    connect(uDownloader, SIGNAL(progressMade(qint64, qint64)),
-            this, SLOT(downloadProgressMade(qint64, qint64)));
-    connect(uDownloader, SIGNAL(error(QString)),
-            this, SLOT(downloadError(QString)));
+    connect(uDownloader, SIGNAL(progressMade(qint64, qint64)), this, SLOT(downloadProgressMade(qint64, qint64)));
+    connect(uDownloader, SIGNAL(error(QString)), this, SLOT(downloadError(QString)));
 
-    uChecker = new UpdateChecker(this);
-    connect(uChecker, SIGNAL(finishedCheck(bool, bool, QVariantMap * )),
-            this, SLOT(finishedUpdateCheck(bool, bool, QVariantMap * )));
-    connect(uChecker, SIGNAL(error(QString)),
-            this, SLOT(updateCheckError(QString)));
+    ReleaseChannel * channel = settingsCache->getUpdateReleaseChannel();
+    connect(channel, SIGNAL(finishedCheck(bool, bool, Release *)), this, SLOT(finishedUpdateCheck(bool, bool, Release *)));
+    connect(channel, SIGNAL(error(QString)), this, SLOT(updateCheckError(QString)));
 
     //Check for updates
     beginUpdateCheck();
 }
-
 
 void DlgUpdate::closeDialog() {
     accept();
@@ -79,27 +77,32 @@ void DlgUpdate::closeDialog() {
 
 
 void DlgUpdate::gotoDownloadPage() {
-    QUrl openUrl(HUMAN_DOWNLOAD_URL);
-    QDesktopServices::openUrl(openUrl);
+    QDesktopServices::openUrl(settingsCache->getUpdateReleaseChannel()->getManualDownloadUrl());
 }
 
 void DlgUpdate::downloadUpdate() {
     setLabel(tr("Downloading update..."));
-    enableOkButton(false);
-    enableUpdateButton(false);
+    addStopDownloadAndRemoveOthers(true); // Will remove all other buttons
     uDownloader->beginDownload(updateUrl);
+}
+
+void DlgUpdate::cancelDownload() {
+    emit uDownloader->stopDownload();
+    setLabel("Download Canceled");
+    addStopDownloadAndRemoveOthers(false);
+    downloadProgressMade(0, 1);
 }
 
 void DlgUpdate::beginUpdateCheck() {
     progress->setMinimum(0);
     progress->setMaximum(0);
     setLabel(tr("Checking for updates..."));
-    uChecker->check();
+    settingsCache->getUpdateReleaseChannel()->checkForUpdates();
 }
 
-void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, QVariantMap *build) {
+void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Release *release) {
 
-    QString commitHash, commitDate;
+    QString publishDate, versionName;
 
     //Update the UI to say we've finished
     progress->setMaximum(100);
@@ -108,44 +111,53 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, QVaria
     //If there are no available builds, then they can't auto update.
     enableUpdateButton(isCompatible);
 
-    //If there is an update, save its URL and work out its name
-    if (isCompatible) {
-        QString endUrl = (*build)["path"].toString();
-        updateUrl = API_DOWNLOAD_BASE_URL + endUrl;
-        commitHash = (*build)["sha1"].toString().left(SHORT_SHA1_HASH_LENGTH);
-        commitDate = (*build)["created"].toString().remove(DATE_LENGTH, MAX_DATE_LENGTH);
-    }
-
     //Give the user the appropriate message
-    if (needToUpdate) {
-        if (isCompatible) {
-
-            QMessageBox::StandardButton reply;
-            reply = QMessageBox::question(this, "Update Available",
-                                          "A new build (commit " + commitHash + ") from " + commitDate +
-                                          " is available. Download?",
-                                          QMessageBox::Yes | QMessageBox::No);
-            if (reply == QMessageBox::Yes)
-                downloadUpdate();
-        }
-        else
-        {
-            QMessageBox::information(this, tr("Cockatrice Update"),
-                                     tr("Your version of Cockatrice is out of date, but there are no packages"
-                                                " available for your operating system. You may have to use a developer build or build from source"
-                                                " yourself. Please visit the download page."));
-        }
-    }
-    else {
+    if (!needToUpdate) {
         //If there's no need to update, tell them that. However we still allow them to run the
         //downloader themselves if there's a compatible build
         QMessageBox::information(this, tr("Cockatrice Update"), tr("Your version of Cockatrice is up to date."));
+        setLabel(tr("You are already running the latest %1 release - %2").arg(tr(settingsCache->getUpdateReleaseChannel()->getName().toUtf8())).arg(VERSION_STRING));
+        return;
     }
 
+    publishDate = release->getPublishDate().toString(Qt::DefaultLocaleLongDate);
+    if (isCompatible) {
+        //If there is an update, save its URL and work out its name
+        updateUrl = release->getDownloadUrl();
+
+        int reply;
+        reply = QMessageBox::question(this, "Update Available",
+            tr("A new version is available:<br/>%1<br/>published on %2 ."
+            "<br/>More informations are available on the <a href=\"%3\">release changelog</a>"
+            "<br/>Do you want to update now?").arg(release->getName(), publishDate, release->getDescriptionUrl()),
+            QMessageBox::Yes | QMessageBox::No);
+
+        if (reply == QMessageBox::Yes)
+            downloadUpdate();
+    } else {
+        QMessageBox::information(this, tr("Cockatrice Update"),
+            tr("A new version is available:<br/>%1<br/>published on %2 ."
+            "<br/>More informations are available on the <a href=\"%3\">release changelog</a>"
+            "<br/>Unfortunately there are no packages available for your operating system. "
+            "You may have to use a developer build or build from source yourself. Please visit the download page.").arg(release->getName(), publishDate, release->getDescriptionUrl()));
+    }
 }
 
 void DlgUpdate::enableUpdateButton(bool enable) {
     manualDownload->setEnabled(enable);
+}
+
+void DlgUpdate::addStopDownloadAndRemoveOthers(bool enable) {
+    if (enable) {
+        buttonBox->addButton(stopDownload, QDialogButtonBox::ActionRole);
+        buttonBox->removeButton(manualDownload);
+        buttonBox->removeButton(gotoDownload);
+    }
+    else {
+        buttonBox->removeButton(stopDownload);
+        buttonBox->addButton(manualDownload, QDialogButtonBox::ActionRole);
+        buttonBox->addButton(gotoDownload, QDialogButtonBox::ActionRole);
+    }
 }
 
 void DlgUpdate::enableOkButton(bool enable) {
@@ -153,7 +165,7 @@ void DlgUpdate::enableOkButton(bool enable) {
 }
 
 void DlgUpdate::setLabel(QString newText) {
-    text->setText(newText);
+    statusLabel->setText(newText);
 }
 
 void DlgUpdate::updateCheckError(QString errorString) {
@@ -172,12 +184,13 @@ void DlgUpdate::downloadSuccessful(QUrl filepath) {
     //Try to open the installer. If it opens, quit Cockatrice
     if (QDesktopServices::openUrl(filepath))
     {
-        QMetaObject::invokeMethod((MainWindow*) parent(), "close", Qt::QueuedConnection);
+        QMetaObject::invokeMethod(static_cast<MainWindow *>(parent()), "close", Qt::QueuedConnection);
+        qDebug() << "Opened downloaded update file successfully - closing Cockatrice";
         close();
     } else {
         setLabel(tr("Error"));
-        QMessageBox::critical(this, tr("Update Error"), "Unable to open the installer. You might be able to manually update"
-                " by closing Cockatrice and running the installer at " + filepath.toLocalFile() + ".");
+        QMessageBox::critical(this, tr("Update Error"),
+            tr("Unable to open the installer. You might be able to manually update by closing Cockatrice and running the installer at %1.").arg(filepath.toLocalFile()));
     }
 }
 

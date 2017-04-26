@@ -1,7 +1,15 @@
+syntax = "proto2";
 import "game_event.proto";
 
 message Event_Leave {
     extend GameEvent {
         optional Event_Leave ext = 1001;
     }
+    enum LeaveReason {
+        OTHER = 1;
+        USER_KICKED = 2;
+        USER_LEFT = 3;
+        USER_DISCONNECTED = 4;
+    }
+    optional LeaveReason reason = 1;
 }

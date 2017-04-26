@@ -30,10 +30,21 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
 
     CardSet *set = sets[index.row()];
 
-    if ( role == Qt::CheckStateRole && index.column() == EnabledCol )
-        return static_cast< int >( enabledSets.contains(set) ? Qt::Checked : Qt::Unchecked );
+    if (index.column() == EnabledCol)
+    {
+        switch(role)
+        {
+            case SortRole:
+               return enabledSets.contains(set) ? "1" : "0";
+            case Qt::CheckStateRole:
+                return static_cast< int >( enabledSets.contains(set) ? Qt::Checked : Qt::Unchecked );
+            case Qt::DisplayRole:
+            default:
+               return QVariant();
+        }
+    }
 
-    if (role != Qt::DisplayRole)
+    if (role != Qt::DisplayRole && role != SortRole)
         return QVariant();
 
     switch (index.column()) {
@@ -124,7 +135,7 @@ void SetsModel::toggleRow(int row, bool enable)
 {
     CardSet *temp = sets.at(row);
 
-    if(enable)
+    if (enable)
         enabledSets.insert(temp);
     else
         enabledSets.remove(temp);
@@ -132,14 +143,28 @@ void SetsModel::toggleRow(int row, bool enable)
     emit dataChanged(index(row, EnabledCol), index(row, EnabledCol));
 }
 
-void SetsModel::toggleAll(bool enable)
+void SetsModel::toggleRow(int row)
+{
+    CardSet *tmp = sets.at(row);
+
+    if (tmp == nullptr)
+        return;
+
+    if (enabledSets.contains(tmp))
+        enabledSets.remove(tmp);
+    else
+        enabledSets.insert(tmp);
+
+    emit dataChanged(index(row, EnabledCol), index(row, EnabledCol));
+}
+
+void SetsModel::toggleAll(bool enabled)
 {
     enabledSets.clear();
-    if(enable)
-    {
+
+    if (enabled)
         foreach(CardSet *set, sets)
             enabledSets.insert(set);
-    }
 
     emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
 }
@@ -164,7 +189,7 @@ void SetsModel::sort(int column, Qt::SortOrder order)
     int row;
 
     for(row = 0; row < numRows; ++row)
-        setMap.insertMulti(index(row, column).data().toString(), sets.at(row));
+        setMap.insertMulti(index(row, column).data(SetsModel::SortRole).toString(), sets.at(row));
     
     QList<CardSet *> tmp = setMap.values();
     sets.clear();

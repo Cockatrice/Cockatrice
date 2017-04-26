@@ -96,7 +96,6 @@ Server_Game::~Server_Game()
 
     gameClosed = true;
     sendGameEventContainer(prepareGameEvent(Event_GameClosed(), -1));
-
     QMapIterator<int, Server_Player *> playerIterator(players);
     while (playerIterator.hasNext())
         playerIterator.next().value()->prepareDestroy();
@@ -108,7 +107,6 @@ Server_Game::~Server_Game()
 
     gameMutex.unlock();
     room->gamesLock.unlock();
-
     currentReplay->set_duration_seconds(secondsElapsed - startTimeOfThisGame);
     replayList.append(currentReplay);
     storeGameInformation();
@@ -155,13 +153,15 @@ void Server_Game::storeGameInformation()
     server->clientsLock.lockForRead();
     while (allUsersIterator.hasNext()) {
         Server_AbstractUserInterface *userHandler = server->findUser(allUsersIterator.next());
-        if (userHandler)
-            userHandler->sendProtocolItem(*sessionEvent);
+        if (userHandler && server->getStoreReplaysEnabled())
+                userHandler->sendProtocolItem(*sessionEvent);
     }
     server->clientsLock.unlock();
     delete sessionEvent;
 
-    server->getDatabaseInterface()->storeGameInformation(room->getName(), gameTypes, gameInfo, allPlayersEver, allSpectatorsEver, replayList);
+    if (server->getStoreReplaysEnabled())
+        server->getDatabaseInterface()->storeGameInformation(room->getName(), gameTypes, gameInfo, allPlayersEver, allSpectatorsEver, replayList);
+
 }
 
 void Server_Game::pingClockTimeout()
@@ -471,7 +471,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface, Respons
     createGameJoinedEvent(newPlayer, rc, false);
 }
 
-void Server_Game::removePlayer(Server_Player *player)
+void Server_Game::removePlayer(Server_Player *player, Event_Leave::LeaveReason reason)
 {
     room->getServer()->removePersistentPlayer(QString::fromStdString(player->getUserInfo()->name()), room->getId(), gameId, player->getPlayerId());
     players.remove(player->getPlayerId());
@@ -479,7 +479,10 @@ void Server_Game::removePlayer(Server_Player *player)
     GameEventStorage ges;
     removeArrowsRelatedToPlayer(ges, player);
     unattachCards(ges, player);
-    ges.enqueueGameEvent(Event_Leave(), player->getPlayerId());
+
+    Event_Leave event;
+    event.set_reason(reason);
+    ges.enqueueGameEvent(event, player->getPlayerId());
     ges.sendToGame(this);
 
     bool playerActive = activePlayer == player->getPlayerId();
@@ -585,7 +588,7 @@ bool Server_Game::kickPlayer(int playerId)
     playerToKick->sendGameEvent(*gec);
     delete gec;
 
-    removePlayer(playerToKick);
+    removePlayer(playerToKick, Event_Leave::USER_KICKED);
 
     return true;
 }

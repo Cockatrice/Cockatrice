@@ -3,8 +3,10 @@ set(VERSION_STRING_H "${PROJECT_BINARY_DIR}/version_string.h")
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})
 
 set( hstring "extern const char *VERSION_STRING\;
+extern const char *VERSION_COMMIT\;
 extern const char *VERSION_DATE\;\n" )
 set( cppstring "const char *VERSION_STRING = \"${PROJECT_VERSION_FRIENDLY}\"\;
+const char *VERSION_COMMIT = \"${GIT_COMMIT_ID}\"\;
 const char *VERSION_DATE = \"${GIT_COMMIT_DATE_FRIENDLY}\"\;\n")
 
 file(WRITE ${PROJECT_BINARY_DIR}/version_string.cpp.txt ${cppstring} )

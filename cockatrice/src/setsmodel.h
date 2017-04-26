@@ -27,6 +27,7 @@ private:
     QSet<CardSet *> enabledSets;
 public:
     enum SetsColumns { SortKeyCol, IsKnownCol, EnabledCol, LongNameCol, ShortNameCol, SetTypeCol, ReleaseDateCol };
+    enum Role { SortRole=Qt::UserRole };
 
     SetsModel(CardDatabase *_db, QObject *parent = 0);
     ~SetsModel();
@@ -43,7 +44,8 @@ public:
     QStringList mimeTypes() const;
     void swapRows(int oldRow, int newRow);
     void toggleRow(int row, bool enable);
-    void toggleAll(bool enable);
+    void toggleRow(int row);
+    void toggleAll(bool);
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
     void save(CardDatabase *db);
     void restore(CardDatabase *db);

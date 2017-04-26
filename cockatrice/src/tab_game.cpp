@@ -277,7 +277,7 @@ void DeckViewContainer::sideboardPlanChanged()
     Command_SetSideboardPlan cmd;
     const QList<MoveCard_ToZone> &newPlan = deckView->getSideboardPlan();
     for (int i = 0; i < newPlan.size(); ++i)
-        cmd.add_move_list()->CopyFrom(newPlan[i]);
+        cmd.add_move_list()->CopyFrom(newPlan.at(i));
     parentGame->sendGameCommand(cmd, playerId);
 }
 
@@ -430,6 +430,7 @@ void TabGame::addMentionTag(QString value) {
 void TabGame::emitUserEvent() {
     bool globalEvent = !spectator || settingsCache->getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
+    updatePlayerListDockTitle();
 }
 
 TabGame::~TabGame()
@@ -445,12 +446,19 @@ TabGame::~TabGame()
     emit gameClosing(this);
 }
 
+void TabGame::updatePlayerListDockTitle()
+{
+    QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
+    QString userCountInfo = QString(" %1/%2").arg(players.size()).arg(gameInfo.max_players());
+    playerListDock->setWindowTitle(tr("Player List") + userCountInfo + (playerListDock->isWindow() ? tabText : QString()));
+}
+
 void TabGame::retranslateUi()
 {
     QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
 
+    updatePlayerListDockTitle();
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
-    playerListDock->setWindowTitle(tr("Player List") + (playerListDock->isWindow() ? tabText : QString()));
     messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
     if(replayDock)
         replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
@@ -547,7 +555,6 @@ void TabGame::replayFinished()
 
 void TabGame::replayStartButtonClicked()
 {
-    emit notIdle();
     replayStartButton->setEnabled(false);
     replayPauseButton->setEnabled(true);
     replayFastForwardButton->setEnabled(true);
@@ -557,7 +564,6 @@ void TabGame::replayStartButtonClicked()
 
 void TabGame::replayPauseButtonClicked()
 {
-    emit notIdle();
     replayStartButton->setEnabled(true);
     replayPauseButton->setEnabled(false);
     replayFastForwardButton->setEnabled(false);
@@ -567,7 +573,6 @@ void TabGame::replayPauseButtonClicked()
 
 void TabGame::replayFastForwardButtonToggled(bool checked)
 {
-    emit notIdle();
     timelineWidget->setTimeScaleFactor(checked ? 10.0 : 1.0);
 }
 
@@ -597,7 +602,6 @@ void TabGame::actGameInfo()
 
 void TabGame::actConcede()
 {
-    emit notIdle();
     if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
         return;
 
@@ -606,7 +610,6 @@ void TabGame::actConcede()
 
 void TabGame::actLeaveGame()
 {
-    emit notIdle();
     if (!gameClosed) {
         if (!spectator)
         if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
@@ -630,7 +633,6 @@ void TabGame::actSay()
         sendGameCommand(cmd);
         sayEdit->clear();
     }
-    emit notIdle();
 }
 
 void TabGame::actPhaseAction()
@@ -784,7 +786,6 @@ AbstractClient *TabGame::getClientForPlayer(int playerId) const
 
 void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
 {
-    emit notIdle();
     AbstractClient *client = getClientForPlayer(playerId);
     if (!client)
         return;
@@ -795,7 +796,6 @@ void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
 
 void TabGame::sendGameCommand(const google::protobuf::Message &command, int playerId)
 {
-    emit notIdle();
     AbstractClient *client = getClientForPlayer(playerId);
     if (!client)
         return;
@@ -888,15 +888,15 @@ void TabGame::closeGame()
 void TabGame::eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext & /*context*/)
 {
     const ServerInfo_User &userInfo = spectators.value(eventPlayerId);
-    messageLog->logSpectatorSay(QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()), QString::fromStdString(event.message()));
+    messageLog->logSpectatorSay(QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()), QString::fromStdString(userInfo.privlevel()), QString::fromStdString(event.message()));
 }
 
-void TabGame::eventSpectatorLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
+void TabGame::eventSpectatorLeave(const Event_Leave & event, int eventPlayerId, const GameEventContext & /*context*/)
 {
     QString playerName = "@" + QString::fromStdString(spectators.value(eventPlayerId).name());
     if (sayEdit && autocompleteUserList.removeOne(playerName))
         sayEdit->setCompletionList(autocompleteUserList);
-    messageLog->logLeaveSpectator(QString::fromStdString(spectators.value(eventPlayerId).name()));
+    messageLog->logLeaveSpectator(QString::fromStdString(spectators.value(eventPlayerId).name()), getLeaveReason(event.reason()));
     playerListWidget->removePlayer(eventPlayerId);
     spectators.remove(eventPlayerId);
 
@@ -1042,7 +1042,26 @@ void TabGame::eventJoin(const Event_Join &event, int /*eventPlayerId*/, const Ga
     emitUserEvent();
 }
 
-void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
+QString TabGame::getLeaveReason(Event_Leave::LeaveReason reason)
+{
+    switch(reason)
+    {
+        case Event_Leave::USER_KICKED:
+            return tr("kicked by game host or moderator");
+            break;
+        case Event_Leave::USER_LEFT:
+            return tr("player left the game");
+            break;
+        case Event_Leave::USER_DISCONNECTED:
+            return tr("player disconnected from server");
+            break;
+        case Event_Leave::OTHER:
+        default:
+            return tr("reason unknown");
+            break;
+    }
+}
+void TabGame::eventLeave(const Event_Leave & event, int eventPlayerId, const GameEventContext & /*context*/)
 {
     Player *player = players.value(eventPlayerId, 0);
     if (!player)
@@ -1052,7 +1071,7 @@ void TabGame::eventLeave(const Event_Leave & /*event*/, int eventPlayerId, const
     if(sayEdit && autocompleteUserList.removeOne(playerName))
         sayEdit->setCompletionList(autocompleteUserList);
 
-    messageLog->logLeave(player);
+    messageLog->logLeave(player, getLeaveReason(event.reason()));
     playerListWidget->removePlayer(eventPlayerId);
     players.remove(eventPlayerId);
     emit playerRemoved(player);
@@ -1574,7 +1593,7 @@ void TabGame::createPlayerListDock(bool bReplay)
 
 void TabGame::createMessageDock(bool bReplay)
 {
-    messageLog = new MessageLogWidget(tabSupervisor, this);
+    messageLog = new MessageLogWidget(tabSupervisor, tabSupervisor, this);
     connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfo, SLOT(setCard(QString)));
     connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));

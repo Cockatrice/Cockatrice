@@ -64,6 +64,9 @@ public:
     virtual bool getClientIDRequiredEnabled() const { return false; }
     virtual bool getRegOnlyServerEnabled() const { return false; }
     virtual bool getMaxUserLimitEnabled() const { return false; }
+    virtual bool getEnableLogQuery() const { return false; }
+    virtual bool getStoreReplaysEnabled() const { return true; }
+    virtual int getIdleClientTimeout() const { return 0; }
     virtual int getClientKeepAlive() const { return 0; }
     virtual int getMaxGameInactivityTime() const { return 9999999; }
     virtual int getMaxPlayerInactivityTime() const { return 9999999; }
@@ -95,10 +98,12 @@ public:
     QList<PlayerReference> getPersistentPlayerReferences(const QString &userName) const;
     int getUsersCount() const;
     int getGamesCount() const;
+    int getTCPUserCount() const { return tcpUserCount; }
+    int getWebSocketUserCount() const { return webSocketUserCount; }
 private:
     QMultiMap<QString, PlayerReference> persistentPlayers;
     mutable QReadWriteLock persistentPlayersLock;
-    int nextLocalGameId;
+    int nextLocalGameId, tcpUserCount, webSocketUserCount;
     QMutex nextLocalGameIdMutex;
 
 protected slots:

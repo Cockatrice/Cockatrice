@@ -82,7 +82,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     QPixmap avatarPixmap;
     const std::string bmp = user.avatar_bmp();
     if (!avatarPixmap.loadFromData((const uchar *) bmp.data(), bmp.size()))
-        avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel, false);
+        avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel, false, QString::fromStdString(user.privlevel()));
     avatarLabel.setPixmap(avatarPixmap.scaled(avatarLabel.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     nameLabel.setText(QString::fromStdString(user.name()));
@@ -100,7 +100,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         countryLabel3.setText("");
     }
 
-    userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, false));
+    userLevelLabel2.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, false, QString::fromStdString(user.privlevel())));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
         userLevelText = tr("Administrator");
@@ -110,6 +110,11 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         userLevelText = tr("Registered user");
     else
         userLevelText = tr("Unregistered user");
+
+    if (user.has_privlevel() && user.privlevel() != "NONE") {
+        userLevelText += " | " + QString("%1").arg(user.privlevel().c_str());
+    }
+
     userLevelLabel3.setText(userLevelText);
 
     QString accountAgeString = tr("Unregistered user");

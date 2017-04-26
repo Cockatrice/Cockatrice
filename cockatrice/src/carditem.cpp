@@ -307,7 +307,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         QList<QGraphicsItem *> sel = scene()->selectedItems();
         int j = 0;
         for (int i = 0; i < sel.size(); i++) {
-            CardItem *c = (CardItem *) sel.at(i);
+            CardItem *c = static_cast<CardItem *>(sel.at(i));
             if ((c == this) || (c->getZone() != zone))
                 continue;
             ++j;

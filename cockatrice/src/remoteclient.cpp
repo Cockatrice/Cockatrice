@@ -13,6 +13,7 @@
 #include "pb/response_login.pb.h"
 #include "pb/response_register.pb.h"
 #include "pb/response_activate.pb.h"
+#include "pb/response_forgotpasswordrequest.pb.h"
 #include "pb/server_message.pb.h"
 #include "pb/event_server_identification.pb.h"
 #include "settingscache.h"
@@ -25,16 +26,12 @@ RemoteClient::RemoteClient(QObject *parent)
     : AbstractClient(parent), timeRunning(0), lastDataReceived(0), messageInProgress(false), handshakeStarted(false), messageLength(0)
 {
 
+    clearNewClientFeatures();
     int keepalive = settingsCache->getKeepAlive();
     timer = new QTimer(this);
     timer->setInterval(keepalive * 1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(ping()));
 
-    int idlekeepalive = settingsCache->getIdleKeepAlive();
-    idleTimer = new QTimer(this);
-    idleTimer->setInterval(idlekeepalive * 1000);
-    connect(idleTimer, SIGNAL(timeout()), this, SLOT(doIdleTimeOut()));
-    connect(this, SIGNAL(resetIdleTimerClock()), idleTimer, SLOT(start()));
    
     socket = new QTcpSocket(this);
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
@@ -47,6 +44,9 @@ RemoteClient::RemoteClient(QObject *parent)
     connect(this, SIGNAL(sigDisconnectFromServer()), this, SLOT(doDisconnectFromServer()));
     connect(this, SIGNAL(sigRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)), this, SLOT(doRegisterToServer(QString, unsigned int, QString, QString, QString, int, QString, QString)));
     connect(this, SIGNAL(sigActivateToServer(QString)), this, SLOT(doActivateToServer(QString)));
+    connect(this, SIGNAL(sigRequestForgotPasswordToServer(QString, unsigned int, QString)), this, SLOT(doRequestForgotPasswordToServer(QString, unsigned int, QString)));
+    connect(this, SIGNAL(sigSubmitForgotPasswordResetToServer(QString, unsigned int, QString, QString, QString)), this, SLOT(doSubmitForgotPasswordResetToServer(QString, unsigned int, QString, QString, QString)));
+    connect(this, SIGNAL(sigSubmitForgotPasswordChallengeToServer(QString, unsigned int, QString, QString)), this, SLOT(doSubmitForgotPasswordChallengeToServer(QString, unsigned int, QString, QString)));
 }
 
 RemoteClient::~RemoteClient()
@@ -66,7 +66,6 @@ void RemoteClient::slotConnected()
 {
     timeRunning = lastDataReceived = 0;
     timer->start();
-    idleTimer->start();
 
     // dirty hack to be compatible with v14 server
     sendCommandContainer(CommandContainer());
@@ -79,6 +78,42 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
     if (event.protocol_version() != protocolVersion) {
         emit protocolVersionMismatch(protocolVersion, event.protocol_version());
         setStatus(StatusDisconnecting);
+        return;
+    }
+
+    if (getStatus() == StatusRequestingForgotPassword)
+    {
+        Command_ForgotPasswordRequest cmdForgotPasswordRequest;
+        cmdForgotPasswordRequest.set_user_name(userName.toStdString());
+        cmdForgotPasswordRequest.set_clientid(getSrvClientID(lastHostname).toStdString());
+        PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordRequest);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(requestForgotPasswordResponse(Response)));
+        sendCommand(pend);
+        return;
+    }
+
+    if (getStatus() == StatusSubmitForgotPasswordReset)
+    {
+        Command_ForgotPasswordReset cmdForgotPasswordReset;
+        cmdForgotPasswordReset.set_user_name(userName.toStdString());
+        cmdForgotPasswordReset.set_clientid(getSrvClientID(lastHostname).toStdString());
+        cmdForgotPasswordReset.set_token(token.toStdString());
+        cmdForgotPasswordReset.set_new_password(password.toStdString());
+        PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordReset);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(submitForgotPasswordResetResponse(Response)));
+        sendCommand(pend);
+        return;
+    }
+
+    if (getStatus() == StatusSubmitForgotPasswordChallenge)
+    {
+        Command_ForgotPasswordChallenge cmdForgotPasswordChallenge;
+        cmdForgotPasswordChallenge.set_user_name(userName.toStdString());
+        cmdForgotPasswordChallenge.set_clientid(getSrvClientID(lastHostname).toStdString());
+        cmdForgotPasswordChallenge.set_email(email.toStdString());
+        PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordChallenge);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(submitForgotPasswordChallengeResponse(Response)));
+        sendCommand(pend);
         return;
     }
 
@@ -104,6 +139,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         Command_Activate cmdActivate;
         cmdActivate.set_user_name(userName.toStdString());
         cmdActivate.set_token(token.toStdString());
+        cmdActivate.set_clientid(getSrvClientID(lastHostname).toStdString());
 
         PendingCommand *pend = prepareSessionCommand(cmdActivate);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(activateResponse(Response)));
@@ -141,6 +177,13 @@ void RemoteClient::processConnectionClosedEvent(const Event_ConnectionClosed & /
 void RemoteClient::loginResponse(const Response &response)
 {
     const Response_Login &resp = response.GetExtension(Response_Login::ext);
+    
+    QString possibleMissingFeatures;
+    if (resp.missing_features_size() > 0) {
+        for (int i = 0; i < resp.missing_features_size(); ++i)
+            possibleMissingFeatures.append("," + QString::fromStdString(resp.missing_features(i)));
+    }
+
     if (response.response_code() == Response::RespOk) {
         setStatus(StatusLoggedIn);
         emit userInfoChanged(resp.user_info());
@@ -155,8 +198,10 @@ void RemoteClient::loginResponse(const Response &response)
             ignoreList.append(resp.ignore_list(i));
         emit ignoreListReceived(ignoreList);
 
-        if (resp.missing_features_size() > 0 && settingsCache->getNotifyAboutUpdates())
-                emit notifyUserAboutUpdate();
+        if (newMissingFeatureFound(possibleMissingFeatures) && resp.missing_features_size() > 0 && settingsCache->getNotifyAboutUpdates()) {
+            settingsCache->setKnownMissingFeatures(possibleMissingFeatures);
+            emit notifyUserAboutUpdate();
+        }
 
     } else if (response.response_code() != Response::RespNotConnected) {
         QList<QString> missingFeatures;
@@ -238,7 +283,7 @@ void RemoteClient::readData()
 #ifdef QT_DEBUG
         qDebug() << "IN" << messageLength << QString::fromStdString(newServerMessage.ShortDebugString());
 #endif
-        inputBuffer.remove(0, messageLength);
+        qDebug() << inputBuffer.remove(0, messageLength);
         messageInProgress = false;
 
         processProtocolItem(newServerMessage);
@@ -308,7 +353,6 @@ void RemoteClient::doActivateToServer(const QString &_token)
 void RemoteClient::doDisconnectFromServer()
 {
     timer->stop();
-    idleTimer->stop();
 
     messageInProgress = false;
     handshakeStarted = false;
@@ -388,16 +432,121 @@ QString RemoteClient::getSrvClientID(const QString _hostname)
     return uniqueServerClientID;
 }
 
-void RemoteClient::doIdleTimeOut()
+bool RemoteClient::newMissingFeatureFound(QString _serversMissingFeatures)
 {
-    if (settingsCache->getIdleClientTimeOutEnabled()) {
-        doDisconnectFromServer();
-        emit idleTimeout();
+    bool newMissingFeature = false;
+    QStringList serversMissingFeaturesList = _serversMissingFeatures.split(",");
+    foreach(const QString &feature, serversMissingFeaturesList) {
+        if (!feature.isEmpty()) {
+            if (!settingsCache->getKnownMissingFeatures().contains(feature))
+                return true;
+        }
     }
- 
+    return newMissingFeature;
 }
 
-void RemoteClient::resetIdleTimer()
+void RemoteClient::clearNewClientFeatures()
 {
-    emit resetIdleTimerClock();
+    QString newKnownMissingFeatures;
+    QStringList existingKnownMissingFeatures = settingsCache->getKnownMissingFeatures().split(",");
+    foreach(const QString &existingKnownFeature, existingKnownMissingFeatures) {
+        if (!existingKnownFeature.isEmpty()) {
+            if (!clientFeatures.contains(existingKnownFeature))
+                newKnownMissingFeatures.append("," + existingKnownFeature);
+        }
+    }
+    settingsCache->setKnownMissingFeatures(newKnownMissingFeatures);
+}
+
+void RemoteClient::requestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName)
+{
+    emit sigRequestForgotPasswordToServer(hostname, port, _userName);
+}
+
+void RemoteClient::submitForgotPasswordResetToServer(const QString & hostname, unsigned int port, const QString & _userName, const QString & _token, const QString & _newpassword)
+{
+    emit sigSubmitForgotPasswordResetToServer(hostname, port, _userName, _token, _newpassword);
+}
+
+void RemoteClient::doRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName)
+{
+    doDisconnectFromServer();
+
+    userName = _userName;
+    lastHostname = hostname;
+    lastPort = port;
+
+    socket->connectToHost(lastHostname, lastPort);
+    setStatus(StatusRequestingForgotPassword);
+}
+
+void RemoteClient::requestForgotPasswordResponse(const Response &response)
+{
+    const Response_ForgotPasswordRequest &resp = response.GetExtension(Response_ForgotPasswordRequest::ext);
+    if (response.response_code() == Response::RespOk)
+    {
+        if (resp.challenge_email()) {
+            emit sigPromptForForgotPasswordChallenge();
+        }
+        else
+            emit sigPromptForForgotPasswordReset();
+    }
+    else
+        emit sigForgotPasswordError();
+
+    doDisconnectFromServer();
+
+}
+
+void RemoteClient::doSubmitForgotPasswordResetToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_token, const QString &_newpassword)
+{
+    doDisconnectFromServer();
+
+    userName = _userName;
+    lastHostname = hostname;
+    lastPort = port;
+    token = _token;
+    password = _newpassword;
+
+    socket->connectToHost(lastHostname, lastPort);
+    setStatus(StatusSubmitForgotPasswordReset);
+}
+
+void RemoteClient::submitForgotPasswordResetResponse(const Response &response)
+{
+    if (response.response_code() == Response::RespOk) {
+        emit sigForgotPasswordSuccess();
+    } else
+        emit sigForgotPasswordError();
+
+    doDisconnectFromServer();
+}
+
+void RemoteClient::submitForgotPasswordChallengeToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_email)
+{
+    emit sigSubmitForgotPasswordChallengeToServer(hostname, port, _userName, _email);
+}
+
+void RemoteClient::doSubmitForgotPasswordChallengeToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_email)
+{
+    doDisconnectFromServer();
+
+    userName = _userName;
+    lastHostname = hostname;
+    lastPort = port;
+    email = _email;
+
+    socket->connectToHost(lastHostname, lastPort);
+    setStatus(StatusSubmitForgotPasswordChallenge);
+}
+
+void RemoteClient::submitForgotPasswordChallengeResponse(const Response &response)
+{
+    if (response.response_code() == Response::RespOk) {
+        emit sigPromptForForgotPasswordReset();
+    }
+    else
+        emit sigForgotPasswordError();
+
+    doDisconnectFromServer();
 }

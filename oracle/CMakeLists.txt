@@ -2,7 +2,7 @@
 #
 # provides the oracle binary
 
-PROJECT(oracle)
+PROJECT(Oracle)
 
 # paths
 set(DESKTOPDIR share/applications CACHE STRING "path to .desktop files")
@@ -23,7 +23,9 @@ SET(oracle_SOURCES
     ../cockatrice/src/settings/layoutssettings.cpp
     ../cockatrice/src/thememanager.cpp 
     ../cockatrice/src/qt-json/json.cpp
- )
+    ../cockatrice/src/releasechannel.cpp
+     ${VERSION_STRING_CPP}
+)
 
 set(oracle_RESOURCES oracle.qrc)
 
@@ -129,7 +131,7 @@ if(UNIX)
         set_target_properties(oracle PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
         INSTALL(TARGETS oracle BUNDLE DESTINATION ./)
-        INSTALL(FILES ${oracle_QM} DESTINATION ./oracle.app/Contents/Resources/translations)
+        INSTALL(FILES ${oracle_QM} DESTINATION ./Oracle.app/Contents/Resources/translations)
     else()
         # Assume linux
         INSTALL(TARGETS oracle RUNTIME DESTINATION bin/)
@@ -148,8 +150,8 @@ ENDIF (NOT WIN32 AND NOT APPLE)
 
 if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
-    set(plugin_dest_dir oracle.app/Contents/Plugins)
-    set(qtconf_dest_dir oracle.app/Contents/Resources)
+    set(plugin_dest_dir Oracle.app/Contents/Plugins)
+    set(qtconf_dest_dir Oracle.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt5 plugins: iconengines, platforms
@@ -168,7 +170,7 @@ Translations = Resources/translations\")
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
 endif()
 
@@ -202,7 +204,7 @@ Translations = Resources/translations\")
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
         " COMPONENT Runtime)
 endif() 
 #Compile a portable version, default off

@@ -216,3 +216,43 @@ from Transifex to the source code and vice versa.
 ### Translations (for translators) ###
 
 Please have a look at the specific [FAQ for translators](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
+
+### Publish A New Development Snapshot
+
+TravisCI and Appveyor have been configured to upload files to GitHub whenever a tag is pushed. Usually, tags are created through publishing a full release, but there's a way around that.
+
+To trigger TravisCI and Appveyor, simply do the following:
+```bash
+cd $COCKATRICE_REPO
+git checkout master
+git remote update -p
+git pull
+git tag $TAG_NAME
+git push upstream $TAG_NAME 
+```
+You should define the variables as such:
+```
+upstream - git@github.com:Cockatrice/Cockatrice.git
+$COCKATRICE_REPO - /Location/of/repository/cockatrice.git
+$TAG_NAME
+  - If full release, YYYY-MM-DD-Release-MAJ.MIN.PATCH
+  - If dev snapshot, YYYY-MM-DD-Development-MAJ.MIN.PATCH-betaXYZ
+        - MAJ.MIN.PATCH will be the NEXT release version
+```
+
+This will cause a tag release to be established on the GitHub repository, which will then lead to the upload of binaries. If you use this method, the tags (releases) that you create will be marked as a "pre-release" build. The `/latest` URL will not be impacted (For stable branch downloads) so that's good.
+
+If you accidentally push a tag incorrectly (the tag is outdated (you didn't pull in the latest branch accidentally), you named the tag wrong, etc) you can revoke the tag by doing the following:
+```bash
+git push --delete upstream $TAG_NAME
+git tag -d $TAG_NAME
+```
+
+**NOTE:** Unfortunately, due to the method of how TravisCI and Appveyor work, to publish a full release you will need to make a copy of the release notes locally and then paste them into the GitHub GUI once the binaries have been uploaded. These build sites will automatically change the name of the release (to $TAG_NAME from whatever it was), the status of the release (to pre-release), and the body (to "Dev build of Cockatrice").
+
+**NOTE 2:** In the first lines of https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt there's an hardcoded version number used when compiling custom (not tagged) versions. While on tagged versions these numbers are overriden by the version numbers coming from the tag title, it's a good practice to keep them aligned with the real ones.
+The preferred flow of operations is:
+ * just before a release, update the version number in CMakeLists.txt to "next release version";
+ * tag the release following the previously described syntax in order to get it built by CI;
+ * wait for CI to upload the binaries, double check if everything is in order
+ * after the release is complete, update the version number again to "next development version", typically increasing `PROJECT_VERSION_PATCH` by one.

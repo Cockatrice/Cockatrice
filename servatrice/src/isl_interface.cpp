@@ -407,7 +407,7 @@ void IslInterface::processMessage(const IslMessage &item)
 			break;
 		}
 		case IslMessage::ROOM_EVENT: {
-			processRoomEvent(item.room_event()); break;
+			processRoomEvent(item.room_event());
 			break;
 		}
 		default: ;

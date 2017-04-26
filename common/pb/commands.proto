@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "session_commands.proto";
 import "game_commands.proto";
 import "room_commands.proto";

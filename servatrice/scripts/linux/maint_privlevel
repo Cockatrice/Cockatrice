@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# SCHEDULE WITH CRONTAB TO RUN ON A REGULAR BASIS
+
+DBNAME="servatrice"					#set this to the database name used
+TABLEPREFIX="cockatrice"			#set this to the prefix used for the table names in the database (do not inclue the _)
+SQLCONFFILE="./mysql.cnf" 			#set this to the path that contains the mysql.cnf file
+mysql --defaults-file=$SQLCONFFILE -h localhost -e "update ""$DBNAME"".""$TABLEPREFIX""_users set privlevel = 'NONE' where privelevel != 'NONE" AND privlevelEndDate < NOW()"

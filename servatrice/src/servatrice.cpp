@@ -240,8 +240,28 @@ bool Servatrice::initServer()
     qDebug() << "Accept registered users only: " << getRegOnlyServerEnabled();
     qDebug() << "Registration enabled: " << getRegistrationEnabled();
     if (getRegistrationEnabled()) {
+        QStringList emailBlackListFilters = getEmailBlackList().split(",", QString::SkipEmptyParts);
+        qDebug() << "Email blacklist: " << emailBlackListFilters;
         qDebug() << "Require email address to register: " << getRequireEmailForRegistrationEnabled();
         qDebug() << "Require email activation via token: " << getRequireEmailActivationEnabled();
+        if (getMaxAccountsPerEmail()) { qDebug() << "Maximum number of accounts per email: " << getMaxAccountsPerEmail(); } else { qDebug() << "Maximum number of accounts per email: unlimited"; }
+        qDebug() << "Enable Internal SMTP Client: " << getEnableInternalSMTPClient();
+        if (!getEnableInternalSMTPClient())
+        {
+            qDebug() << "WARNING: Registrations are enabled but internal SMTP client is disabled.  Users activation emails will not be automatically mailed to users!";
+        }
+    }
+
+    qDebug() << "Forgot password enabled: " << getEnableForgotPassword();
+    if (getEnableForgotPassword()) {
+        qDebug() << "Forgot password token life (in minutes): " << getForgotPasswordTokenLife();
+        qDebug() << "Forgot password challenge on: " << getEnableForgotPasswordChallenge();
+    }
+
+    qDebug() << "Auditing enabled: " << getEnableAudit();
+    if (getEnableAudit()) {
+        qDebug() << "Audit registration attempts enabled: " << getEnableRegistrationAudit();
+        qDebug() << "Audit forgot password attepts enabled: " << getEnableForgotPasswordAudit();
     }
 
     if (getDBTypeString() == "mysql") {
@@ -265,7 +285,7 @@ bool Servatrice::initServer()
     }
 
     if (getRoomsMethodString() == "sql") {
-        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, permissionlevel, auto_join, join_message, chat_history_size from {prefix}_rooms where id_server = :id_server order by id asc");
+        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select id, name, descr, permissionlevel, privlevel, auto_join, join_message, chat_history_size from {prefix}_rooms where id_server = :id_server order by id asc");
         query->bindValue(":id_server", serverId);
         servatriceDatabaseInterface->execSqlQuery(query);
         while (query->next()) {
@@ -281,8 +301,9 @@ bool Servatrice::initServer()
                                     query->value(1).toString(),
                                     query->value(2).toString(),
                                     query->value(3).toString().toLower(),
-                                    query->value(4).toInt(),
-                                    query->value(5).toString(),
+                                    query->value(4).toString().toLower(),
+                                    query->value(5).toInt(),
+                                    query->value(6).toString(),
                                     gameTypes,
                                     this));
         }
@@ -297,13 +318,13 @@ bool Servatrice::initServer()
                 gameTypes.append(settingsCache->value("name").toString());
             }
             settingsCache->endArray();
-            Server_Room *newRoom = new Server_Room(i,settingsCache->value("chathistorysize").toInt(),settingsCache->value("name").toString(),settingsCache->value("description").toString(),settingsCache->value("permissionlevel").toString().toLower(),settingsCache->value("autojoin").toBool(),settingsCache->value("joinmessage").toString(),gameTypes,this);
+            Server_Room *newRoom = new Server_Room(i,settingsCache->value("chathistorysize").toInt(),settingsCache->value("name").toString(),settingsCache->value("description").toString(),settingsCache->value("permissionlevel").toString().toLower(),settingsCache->value("privilegelevel").toString().toLower(),settingsCache->value("autojoin").toBool(),settingsCache->value("joinmessage").toString(),gameTypes,this);
             addRoom(newRoom);
         }
 
         if(size==0) {
             // no room defined in config, add a dummy one
-            Server_Room *newRoom = new Server_Room(0,100,"General room","Play anything here.","none",true,"",QStringList("Standard"),this);
+            Server_Room *newRoom = new Server_Room(0,100,"General room","Play anything here.","none","none",true,"",QStringList("Standard"),this);
             addRoom(newRoom);
         }
 
@@ -405,6 +426,13 @@ bool Servatrice::initServer()
         }
     }
 #endif
+
+    if (getIdleClientTimeout() > 0) {
+        qDebug() << "Idle client timeout value: " << getIdleClientTimeout();
+        if (getIdleClientTimeout() < 300)
+            qDebug() << "WARNING: It is not recommended to set the IdleClientTimeout value very low.  Doing so will cause clients to very quickly be disconnected.  Many players when connected may be searching for card details outside the client in the middle of matches or possibly drafting outside the client and short time out values will remove these players.";
+    }
+
     setRequiredFeatures(getRequiredFeatures());
     return true;
 }
@@ -527,24 +555,47 @@ void Servatrice::statusUpdate()
     query->bindValue(":rx", rx);
     servatriceDatabaseInterface->execSqlQuery(query);
 
-    // send activation emails
-    if (getRegistrationEnabled() && getRequireEmailActivationEnabled())
+    if (getRegistrationEnabled() && getEnableInternalSMTPClient())
     {
-        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
-        if (!servatriceDatabaseInterface->execSqlQuery(query))
-            return;
+        if (getRequireEmailActivationEnabled())
+        {
+            QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_activation_emails a left join {prefix}_users b on a.name = b.name");
+            if (!servatriceDatabaseInterface->execSqlQuery(query))
+                return;
 
-        QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
+            QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
 
-        while (query->next()) {
-            const QString userName = query->value(0).toString();
-            const QString emailAddress = query->value(1).toString();
-            const QString token = query->value(2).toString();
+            while (query->next()) {
+                const QString userName = query->value(0).toString();
+                const QString emailAddress = query->value(1).toString();
+                const QString token = query->value(2).toString();
 
-            if(smtpClient->enqueueActivationTokenMail(userName, emailAddress, token))
-            {
-                queryDelete->bindValue(":name", userName);
-                servatriceDatabaseInterface->execSqlQuery(queryDelete);
+                if (smtpClient->enqueueActivationTokenMail(userName, emailAddress, token))
+                {
+                    queryDelete->bindValue(":name", userName);
+                    servatriceDatabaseInterface->execSqlQuery(queryDelete);
+                }
+            }
+        }
+
+        if (getEnableForgotPassword())
+        {
+            QSqlQuery *query = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from {prefix}_forgot_password a left join {prefix}_users b on a.name = b.name where a.emailed = 0");
+            if (!servatriceDatabaseInterface->execSqlQuery(query))
+                return;
+
+            QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery("update {prefix}_forgot_password set emailed = 1 where name = :name");
+
+            while (query->next()) {
+                const QString userName = query->value(0).toString();
+                const QString emailAddress = query->value(1).toString();
+                const QString token = query->value(2).toString();
+
+                if (smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token))
+                {
+                    queryDelete->bindValue(":name", userName);
+                    servatriceDatabaseInterface->execSqlQuery(queryDelete);
+                }
             }
         }
 
@@ -814,4 +865,48 @@ QString Servatrice::getISLNetworkSSLKeyFile() const {
 
 int Servatrice::getISLNetworkPort() const {
     return settingsCache->value("servernetwork/port", 14747).toInt();
+}
+
+int Servatrice::getIdleClientTimeout() const {
+    return settingsCache->value("server/idleclienttimeout", 3600).toInt();
+}
+
+bool Servatrice::getEnableLogQuery() const {
+    return settingsCache->value("logging/enablelogquery", false).toBool();
+}
+
+int Servatrice::getMaxAccountsPerEmail() const {
+    return settingsCache->value("registration/maxaccountsperemail", 0).toInt();
+}
+
+bool Servatrice::getEnableInternalSMTPClient() const {
+    return settingsCache->value("smtp/enableinternalsmtpclient", true).toBool();
+}
+
+bool Servatrice::getEnableForgotPassword() const {
+    return settingsCache->value("forgotpassword/enable", false).toBool();
+}
+
+int Servatrice::getForgotPasswordTokenLife() const {
+    return settingsCache->value("forgotpassword/tokenlife", 60).toInt();
+}
+
+bool Servatrice::getEnableForgotPasswordChallenge() const {
+    return settingsCache->value("forgotpassword/enablechallenge", false).toBool();
+}
+  
+QString Servatrice::getEmailBlackList() const {
+    return settingsCache->value("registration/emailproviderblacklist").toString();
+}
+
+bool Servatrice::getEnableAudit() const {
+    return settingsCache->value("audit/enable_audit", true).toBool();
+}
+
+bool Servatrice::getEnableRegistrationAudit() const {
+    return settingsCache->value("audit/enable_registration_audit", true).toBool();
+}
+
+bool Servatrice::getEnableForgotPasswordAudit() const {
+    return settingsCache->value("audit/enable_forgotpassword_audit", true).toBool();
 }

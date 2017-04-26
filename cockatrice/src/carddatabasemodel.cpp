@@ -3,8 +3,8 @@
 
 #define CARDDBMODEL_COLUMNS 6
 
-CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, QObject *parent)
-    : QAbstractListModel(parent), db(_db)
+CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromEnabledSets, QObject *parent)
+    : QAbstractListModel(parent), db(_db), showOnlyCardsFromEnabledSets(_showOnlyCardsFromEnabledSets)
 {
     connect(db, SIGNAL(cardAdded(CardInfo *)), this, SLOT(cardAdded(CardInfo *)));
     connect(db, SIGNAL(cardRemoved(CardInfo *)), this, SLOT(cardRemoved(CardInfo *)));
@@ -77,6 +77,9 @@ void CardDatabaseModel::cardInfoChanged(CardInfo *card)
 
 bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfo *card)
 {
+    if(!showOnlyCardsFromEnabledSets)
+        return true;
+
     foreach(CardSet * set, card->getSets())
     {
         if(set->getEnabled())

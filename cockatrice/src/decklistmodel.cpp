@@ -79,7 +79,7 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
 //    debugIndexInfo("data", index);
     if (!index.isValid())
         return QVariant();
-        if (index.column() >= columnCount())
+    if (index.column() >= columnCount())
         return QVariant();
 
     AbstractDecklistNode *temp = static_cast<AbstractDecklistNode *>(index.internalPointer());
@@ -136,7 +136,7 @@ QVariant DeckListModel::headerData(int section, Qt::Orientation orientation, int
 {
     if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
         return QVariant();
-        if (section >= columnCount())
+    if (section >= columnCount())
         return QVariant();
     switch (section) {
                 case 0: return tr("Number");
@@ -273,11 +273,11 @@ QModelIndex DeckListModel::findCard(const QString &cardName, const QString &zone
 
 QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneName)
 {
-    InnerDecklistNode *zoneNode = createNodeIfNeeded(zoneName, root);
-
     CardInfo *info = db->getCard(cardName);
-    if(!info)
+    if (info == nullptr)
         return QModelIndex();
+
+    InnerDecklistNode *zoneNode = createNodeIfNeeded(zoneName, root);
 
     QString cardType = info->getMainCardType();
     InnerDecklistNode *cardTypeNode = createNodeIfNeeded(cardType, zoneNode);
@@ -300,8 +300,9 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
 
 QModelIndex DeckListModel::nodeToIndex(AbstractDecklistNode *node) const
 {
-    if (node == root)
+    if (node == nullptr || node == root)
         return QModelIndex();
+
     return createIndex(node->getParent()->indexOf(node), 0, node);
 }
 
@@ -310,7 +311,7 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
     // Sort children of node and save the information needed to
     // update the list of persistent indexes.
     QVector<QPair<int, int> > sortResult = node->sort(order);
-    
+
     QModelIndexList from, to;
     int columns = columnCount();
     for (int i = sortResult.size() - 1; i >= 0; --i) {

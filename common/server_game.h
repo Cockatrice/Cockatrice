@@ -29,6 +29,7 @@
 #include "server_response_containers.h"
 #include "pb/response.pb.h"
 #include "pb/serverinfo_game.pb.h"
+#include "pb/event_leave.pb.h"
 
 class QTimer;
 class GameEventContainer;
@@ -103,7 +104,7 @@ public:
     Response::ResponseCode checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions);
     bool containsUser(const QString &userName) const;
     void addPlayer(Server_AbstractUserInterface *userInterface, ResponseContainer &rc, bool spectator, bool broadcastUpdate = true);
-    void removePlayer(Server_Player *player);
+    void removePlayer(Server_Player *player, Event_Leave::LeaveReason reason);
     void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Player *player);
     void unattachCards(GameEventStorage &ges, Server_Player *player);
     bool kickPlayer(int playerId);

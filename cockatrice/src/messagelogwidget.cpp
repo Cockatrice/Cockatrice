@@ -42,10 +42,10 @@ void MessageLogWidget::logJoin(Player *player)
     appendHtmlServerMessage(tr("%1 has joined the game.").arg(sanitizeHtml(player->getName())));
 }
 
-void MessageLogWidget::logLeave(Player *player)
+void MessageLogWidget::logLeave(Player *player, QString reason)
 {
     soundEngine->playSound("player_leave");
-    appendHtmlServerMessage(tr("%1 has left the game.").arg(sanitizeHtml(player->getName())));
+    appendHtmlServerMessage(tr("%1 has left the game (%2).").arg(sanitizeHtml(player->getName()), sanitizeHtml(reason)));
 }
 
 void MessageLogWidget::logGameClosed()
@@ -64,10 +64,10 @@ void MessageLogWidget::logJoinSpectator(QString name)
     appendHtmlServerMessage(tr("%1 is now watching the game.").arg(sanitizeHtml(name)));
 }
 
-void MessageLogWidget::logLeaveSpectator(QString name)
+void MessageLogWidget::logLeaveSpectator(QString name, QString reason)
 {
     soundEngine->playSound("spectator_leave");
-    appendHtmlServerMessage(tr("%1 is not watching the game any more.").arg(sanitizeHtml(name)));
+    appendHtmlServerMessage(tr("%1 is not watching the game any more (%2).").arg(sanitizeHtml(name), sanitizeHtml(reason)));
 }
 
 void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideboardSize)
@@ -124,12 +124,12 @@ void MessageLogWidget::logConnectionStateChanged(Player *player, bool connection
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-    appendMessage(message, 0, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()), true);
+    appendMessage(message, 0, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()), QString::fromStdString(player->getUserInfo()->privlevel()), true);
 }
 
-void MessageLogWidget::logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString message)
+void MessageLogWidget::logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString userPrivLevel, QString message)
 {
-    appendMessage(message, 0, spectatorName, spectatorUserLevel, false);
+    appendMessage(message, 0, spectatorName, spectatorUserLevel, userPrivLevel, false);
 }
 
 void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
@@ -636,7 +636,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
     connect(player, SIGNAL(logAlwaysRevealTopCard(Player *, CardZone *, bool)), this, SLOT(logAlwaysRevealTopCard(Player *, CardZone *, bool)));
 }
 
-MessageLogWidget::MessageLogWidget(const TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent)
-    : ChatView(_tabSupervisor, _game, true, parent), currentContext(MessageContext_None)
+MessageLogWidget::MessageLogWidget(const TabSupervisor *_tabSupervisor, const UserlistProxy *_userlistProxy, TabGame *_game, QWidget *parent)
+    : ChatView(_tabSupervisor, _userlistProxy, _game, true, parent), currentContext(MessageContext_None)
 {
 }

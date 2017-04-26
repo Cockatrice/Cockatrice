@@ -1,29 +1,24 @@
 #include <QLineEdit>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QMenu>
-#include <QAction>
 #include <QPushButton>
 #include <QMessageBox>
-#include <QCheckBox>
 #include <QLabel>
 #include <QToolButton>
 #include <QSplitter>
 #include <QApplication>
 #include <QSystemTrayIcon>
 #include <QCompleter>
-#include <QWidget>
 #include <QtCore/qdatetime.h>
 #include "tab_supervisor.h"
 #include "tab_room.h"
 #include "tab_userlists.h"
 #include "userlist.h"
 #include "abstractclient.h"
-#include "chatview.h"
+#include "chatview/chatview.h"
 #include "gameselector.h"
 #include "settingscache.h"
 #include "main.h"
-#include "lineeditcompleter.h"
 #include "get_pb_extension.h"
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_room.pb.h"
@@ -48,7 +43,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerI
     userList = new UserList(tabSupervisor, client, UserList::RoomList);
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this, SIGNAL(openMessageDialog(const QString &, bool)));
 
-    chatView = new ChatView(tabSupervisor, 0, true);
+    chatView = new ChatView(tabSupervisor, tabSupervisor, 0, true);
     connect(chatView, SIGNAL(showMentionPopup(QString&)), this, SLOT(actShowMentionPopup(QString&)));
     connect(chatView, SIGNAL(messageClickedSignal()), this, SLOT(focusTab()));
     connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
@@ -156,8 +151,11 @@ void TabRoom::focusTab() {
 }
 
 void TabRoom::actShowMentionPopup(QString &sender) {
-    if (trayIcon && (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this) || QApplication::activeWindow() == 0
-        || QApplication::focusWidget() == 0)) {
+    if (trayIcon
+        && (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this)
+            || QApplication::activeWindow() == 0
+            || QApplication::focusWidget() == 0)
+            ) {
         disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
         trayIcon->showMessage(sender + tr(" mentioned you."), tr("Click to view"));
         connect(trayIcon, SIGNAL(messageClicked()), chatView, SLOT(actMessageClicked()));
@@ -185,12 +183,12 @@ QString TabRoom::sanitizeHtml(QString dirty) const
 
 void TabRoom::sendMessage()
 {
-    if (sayEdit->text().isEmpty()){
+    if (sayEdit->text().isEmpty()) {
         return;
-    }else if (completer->popup()->isVisible()){
+    } else if (completer->popup()->isVisible()) {
         completer->popup()->hide();
         return;
-    }else{
+    } else {
         Command_RoomSay cmd;
         cmd.set_message(sayEdit->text().toStdString());
 
@@ -199,7 +197,6 @@ void TabRoom::sendMessage()
         sendRoomCommand(pend);
         sayEdit->clear();
     }
-    emit notIdle();
 }
 
 void TabRoom::sayFinished(const Response &response)
@@ -274,8 +271,10 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
 
     UserListTWI *twi = userList->getUsers().value(senderName);
     UserLevelFlags userLevel;
+    QString userPrivLevel;
     if (twi) {
         userLevel = UserLevelFlags(twi->getUserInfo().user_level());
+        userPrivLevel = QString::fromStdString(twi->getUserInfo().privlevel());
         if (settingsCache->getIgnoreUnregisteredUsers() && !userLevel.testFlag(ServerInfo_User::IsRegistered))
             return;
     }
@@ -287,7 +286,7 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
         message = "[" + QString(QDateTime::fromMSecsSinceEpoch(event.time_of()).toLocalTime().toString("d MMM yyyy HH:mm:ss")) + "] " + message;
 
 
-    chatView->appendMessage(message, event.message_type(), senderName, userLevel, true);
+    chatView->appendMessage(message, event.message_type(), senderName, userLevel, userPrivLevel, true);
     emit userEvent(false);
 }
 

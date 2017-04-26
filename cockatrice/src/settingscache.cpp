@@ -1,4 +1,6 @@
 #include "settingscache.h"
+#include "releasechannel.h"
+
 #include <QSettings>
 #include <QFile>
 #include <QDir>
@@ -56,13 +58,15 @@ void SettingsCache::translateLegacySettings()
     legacySetting.beginGroup("server");
     servers().setPreviousHostLogin(legacySetting.value("previoushostlogin").toInt());
     servers().setPreviousHostList(legacySetting.value("previoushosts").toStringList());
-    servers().setPrevioushostindex(legacySetting.value("previoushostindex").toInt());
     servers().setHostName(legacySetting.value("hostname").toString());
     servers().setPort(legacySetting.value("port").toString());
     servers().setPlayerName(legacySetting.value("playername").toString());
     servers().setPassword(legacySetting.value("password").toString());
     servers().setSavePassword(legacySetting.value("save_password").toInt());
     servers().setAutoConnect(legacySetting.value("auto_connect").toInt());
+    servers().setFPHostName(legacySetting.value("fphostname").toString());
+    servers().setFPPort(legacySetting.value("fpport").toString());
+    servers().setFPPlayerName(legacySetting.value("fpplayername").toString());
     usedKeys.append(legacySetting.allKeys());
     QStringList allKeysServer = legacySetting.allKeys();
     for (int i = 0; i < allKeysServer.size(); ++i) {
@@ -92,6 +96,7 @@ void SettingsCache::translateLegacySettings()
     gameFilters().setUnavailableGamesVisible(legacySetting.value("unavailable_games_visible").toBool());
     gameFilters().setShowPasswordProtectedGames(legacySetting.value("show_password_protected_games").toBool());
     gameFilters().setGameNameFilter(legacySetting.value("game_name_filter").toString());
+    gameFilters().setShowBuddiesOnlyGames(legacySetting.value("show_buddies_only_games").toBool());
     gameFilters().setMinPlayers(legacySetting.value("min_players").toInt());
 
     if (legacySetting.value("max_players").toInt() > 1)
@@ -159,10 +164,16 @@ SettingsCache::SettingsCache()
     if(!QFile(settingsPath+"global.ini").exists())
         translateLegacySettings();
 
+    // updates - don't reorder them or their index in the settings won't match
+    // append channels one by one, or msvc will add them in the wrong order.
+    releaseChannels << new StableReleaseChannel();
+    releaseChannels << new DevReleaseChannel();
+
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
+    updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
+
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
-    idlekeepalive = settings->value("personal/idlekeepalive", 3600).toInt();
 
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
@@ -197,6 +208,7 @@ SettingsCache::SettingsCache()
     picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
+    tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
@@ -221,6 +233,8 @@ SettingsCache::SettingsCache()
 
     soundEnabled = settings->value("sound/enabled", false).toBool();
     soundThemeName = settings->value("sound/theme").toString();
+
+    maxFontSize = settings->value("game/maxfontsize", DEFAULT_FONT_SIZE).toInt();
 
     priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
     priceTagSource = settings->value("deckeditor/pricetagsource", 0).toInt();
@@ -250,7 +264,12 @@ SettingsCache::SettingsCache()
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", "notset").toString();
-    idleClientTimeOutEnabled = settings->value("interface/idleClientTimeOutEnabled", true).toBool();
+    knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
+}
+
+void SettingsCache::setKnownMissingFeatures(QString _knownMissingFeatures) {
+    knownMissingFeatures = _knownMissingFeatures;
+    settings->setValue("interface/knownmissingfeatures", knownMissingFeatures);
 }
 
 void SettingsCache::setCardInfoViewMode(const int _viewMode) {
@@ -392,12 +411,6 @@ void SettingsCache::setAnnotateTokens(int _annotateTokens)
     settings->setValue("interface/annotatetokens", annotateTokens);
 }
 
-void SettingsCache::setIdleClientTimeOutEnabled(int _idleClientTimeOutEnabled)
-{
-    idleClientTimeOutEnabled = _idleClientTimeOutEnabled;
-    settings->setValue("interface/idleClientTimeOutEnabled", idleClientTimeOutEnabled);
-}
-
 void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes)
 {
     tabGameSplitterSizes = _tabGameSplitterSizes;
@@ -532,6 +545,12 @@ void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)
     settings->setValue("interface/main_window_geometry", mainWindowGeometry);
 }
 
+void SettingsCache::setTokenDialogGeometry(const QByteArray &_tokenDialogGeometry)
+{
+    tokenDialogGeometry = _tokenDialogGeometry;
+    settings->setValue("interface/token_dialog_geometry", tokenDialogGeometry);
+}
+
 void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
 {
     pixmapCacheSize = _pixmapCacheSize;
@@ -641,4 +660,16 @@ void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
     notifyAboutUpdates = _notifyaboutupdate;
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
+{
+    updateReleaseChannel = _updateReleaseChannel;
+    settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
+}
+
+void SettingsCache::setMaxFontSize(int _max)
+{
+    maxFontSize = _max;
+    settings->setValue("game/maxfontsize", maxFontSize);
 }

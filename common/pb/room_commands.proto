@@ -1,3 +1,4 @@
+syntax = "proto2";
 message RoomCommand {
     enum RoomCommandType {
         LEAVE_ROOM = 1000;

@@ -2,7 +2,7 @@
 
 ---
 
-**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads) | [Get Involved] (#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [License](#license-)
+**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads) | [Get Involved](#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [License](#license-)
 
 ---
 
@@ -20,12 +20,13 @@ Cockatrice is an open-source multiplatform supported program for playing tableto
 # Downloads
 
 We offer downloads for all full releases (recommended) and the latest development versions. Full releases are checkpoints with major feature or UI enhancements between them, but currently we don't have a set schedule for releasing new updates. The development version contains the most recently added features and bugfixes, but can be more unstable. Downloads for development versions are updated automatically with every change.
-Downloads are hosted on [BinTray](https://bintray.com/cockatrice/Cockatrice).
 
-- Latest full release (**recommended**): [ ![Download](https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice/images/download.svg) ](https://bintray.com/cockatrice/Cockatrice/Cockatrice/_latestVersion#files)<br>
+- Latest full release (**recommended**): [Download from GitHub](https://github.com/cockatrice/cockatrice/releases/latest)<br>
 
-- Latest development version: [ ![Download](https://api.bintray.com/packages/cockatrice/Cockatrice/Cockatrice-git/images/download.svg) ](https://bintray.com/cockatrice/Cockatrice/Cockatrice-git/_latestVersion#files)<br>
-*Development builds may not be stable or contain several bugs. Especially if from a branch other than `master`!*
+- Latest development version: [Download from GitHub](https://github.com/Cockatrice/Cockatrice/releases)
+   - Development builds may not be stable and/or contain several bugs.
+   - If you'd like to be a Cockatrice Beta Tester, use this version.
+   - More information can be [found here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)
 
 
 
@@ -33,7 +34,10 @@ Downloads are hosted on [BinTray](https://bintray.com/cockatrice/Cockatrice).
 
 [Chat](https://gitter.im/Cockatrice/Cockatrice) with the Cockatrice developers on Gitter. Come here to talk about the application, features, or just to hang out. For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
 
-If you'd like to contribute code to the project, we maintain a tag for "easy" changes on our issue tracker. Issues tagged in this way provide a simple way to get started. [Issues tagged as Easy Changes](https://github.com/Cockatrice/Cockatrice/issues?q=is%3Aopen+is%3Aissue+label%3A%22Easy+Change%22)
+If you'd like to contribute code to the project, please review [the guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md).
+We maintain a tag for "easy" changes on our issue tracker: issues tagged in this way provide a simple way to get started. [Issues tagged as Easy Changes](https://github.com/Cockatrice/Cockatrice/issues?q=is%3Aopen+is%3Aissue+label%3A%22Easy+Change%22)
+
+We try to be very responsive to new issues. We'll try to give you advice on how a feature should be implemented / advice on places the codebase is doing something similar before you get too far along with a PR.
 
 
 # Community Resources
@@ -93,6 +97,13 @@ The following flags can be passed to `cmake`:
 - `-DTEST=1` Enable regression tests (default 0 = no). Note: needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```.
 
 
+# Running
+
+`cockatrice` is the game client    
+`oracle` fetches card data    
+`servatrice` is the server<br>
+
+
 #### Servatrice Docker container
 
 A Dockerfile is provided to run Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/what-docker).<br>
@@ -104,13 +115,6 @@ And then run it<br>
 
 Please note that running this command will expose the TCP port 4747 of the docker container to permit connections to the server.<br>
 More infos on how to use Servatrice with Docker can be found in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
-
-
-# Running
-
-`cockatrice` is the game client    
-`oracle` fetches card data    
-`servatrice` is the server<br>
 
 
 # License [![GPLv2 License](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING)

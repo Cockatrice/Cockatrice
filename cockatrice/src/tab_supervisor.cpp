@@ -354,12 +354,10 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
     connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
     connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
     connect(tab, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
-    connect(tab, SIGNAL(notIdle()), this, SLOT(resetIdleTimer()));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     gameTabs.insert(event.game_info().game_id(), tab);
     setCurrentWidget(tab);
-    emit idleTimerReset();
 }
 
 void TabSupervisor::localGameJoined(const Event_GameJoined &event)
@@ -403,7 +401,6 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     roomTabs.insert(info.room_id(), tab);
     if (setCurrent)
         setCurrentWidget(tab);
-    emit idleTimerReset();
 }
 
 void TabSupervisor::roomLeft(TabRoom *tab)
@@ -456,7 +453,6 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     tab = new TabMessage(this, client, *userInfo, otherUser);
     connect(tab, SIGNAL(talkClosing(TabMessage *)), this, SLOT(talkLeft(TabMessage *)));
     connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));
-    connect(tab, SIGNAL(notIdle()), this, SLOT(resetIdleTimer()));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     messageTabs.insert(receiverName, tab);
@@ -711,10 +707,26 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 {
 
     switch ((Event_NotifyUser::NotificationType) event.type()) {
+        case Event_NotifyUser::UNKNOWN: QMessageBox::information(this, tr("Unknown Event"), tr("The server has sent you a message that your client does not understand.\nThis message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.\n\nTo update your client, go to Help -> Check for Updates.")); break;
+        case Event_NotifyUser::IDLEWARNING: QMessageBox::information(this, tr("Idle Timeout"), tr("You are about to be logged out due to inactivity.")); break;
         case Event_NotifyUser::PROMOTED: QMessageBox::information(this, tr("Promotion"), tr("You have been promoted to moderator. Please log out and back in for changes to take effect.")); break;
         case Event_NotifyUser::WARNING: {
             if (!QString::fromStdString(event.warning_reason()).simplified().isEmpty())
                 QMessageBox::warning(this, tr("Warned"), tr("You have received a warning due to %1.\nPlease refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.").arg(QString::fromStdString(event.warning_reason()).simplified()));
+            break;
+        }
+        case Event_NotifyUser::CUSTOM: {
+            if (!QString::fromStdString(event.custom_title()).simplified().isEmpty() && !QString::fromStdString(event.custom_content()).simplified().isEmpty()) {
+                QMessageBox msgBox;
+                msgBox.setParent(this);
+                msgBox.setWindowFlags(Qt::Dialog);
+                msgBox.setIcon(QMessageBox::Information);
+                msgBox.setWindowTitle(QString::fromStdString(event.custom_title()).simplified());
+                msgBox.setText(tr("You have received the following message from the server.\n(custom messages like these could be untranslated)"));
+                msgBox.setDetailedText(QString::fromStdString(event.custom_content()).simplified());
+                msgBox.setMinimumWidth(200);
+                msgBox.exec();
+            }
             break;
         }
         default: ;
@@ -722,7 +734,47 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 
 }
 
-void TabSupervisor::resetIdleTimer()
+bool TabSupervisor::isOwnUserRegistered() const
 {
-    emit idleTimerReset();
+    return static_cast<bool>(getUserInfo()->user_level() & ServerInfo_User::IsRegistered);
 }
+
+QString TabSupervisor::getOwnUsername() const
+{
+    return userInfo ? QString::fromStdString(userInfo->name()) : QString();
+}
+
+bool TabSupervisor::isUserBuddy(const QString &userName) const
+{
+    if (!getUserListsTab()) return false;
+    if (!getUserListsTab()->getBuddyList()) return false;
+    QMap<QString, UserListTWI *> buddyList = getUserListsTab()->getBuddyList()->getUsers();
+    bool senderIsBuddy = buddyList.contains(userName);
+    return senderIsBuddy;
+}
+
+bool TabSupervisor::isUserIgnored(const QString &userName) const
+{
+    if (!getUserListsTab()) return false;
+    if (!getUserListsTab()->getIgnoreList()) return false;
+    QMap<QString, UserListTWI *> buddyList = getUserListsTab()->getIgnoreList()->getUsers();
+    bool senderIsBuddy = buddyList.contains(userName);
+    return senderIsBuddy;
+}
+
+const ServerInfo_User * TabSupervisor::getOnlineUser(const QString &userName) const
+{
+    if (!getUserListsTab()) return nullptr;
+    if (!getUserListsTab()->getAllUsersList()) return nullptr;
+    QMap<QString, UserListTWI *> userList = getUserListsTab()->getAllUsersList()->getUsers();
+    const QString &userNameToMatchLower = userName.toLower();
+    QMap<QString, UserListTWI *>::iterator i;
+
+    for (i = userList.begin(); i != userList.end(); ++i)
+        if (i.key().toLower() == userNameToMatchLower) {
+            const ServerInfo_User &userInfo = i.value()->getUserInfo();
+            return &userInfo;
+        }
+
+    return nullptr;
+};

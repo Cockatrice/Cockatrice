@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QDateTime>
+#include <math.h>
 #include "server_protocolhandler.h"
 #include "server_database_interface.h"
 #include "server_room.h"
@@ -19,6 +20,7 @@
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_room_say.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "pb/event_notify_user.pb.h"
 #include <google/protobuf/descriptor.h>
 #include "featureset.h"
 
@@ -31,8 +33,11 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, Server_DatabaseI
       authState(NotLoggedIn),
       acceptsUserListChanges(false),
       acceptsRoomListChanges(false),
+      idleClientWarningSent(false),
       timeRunning(0),
-      lastDataReceived(0)
+      lastDataReceived(0),
+      lastActionReceived(0)
+      
 {
     connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -171,6 +176,8 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
     if (!room)
         return Response::RespNotInRoom;
 
+    resetIdleTimer();
+
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.room_command_size() - 1; i >= 0; --i) {
         Response::ResponseCode resp = Response::RespInvalidCommand;
@@ -240,6 +247,8 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     if (!player)
         return Response::RespNotInRoom;
 
+    resetIdleTimer();
+
     int commandCountingInterval = server->getCommandCountingInterval();
     int maxCommandCountPerInterval = server->getMaxCommandCountPerInterval();
     GameEventStorage ges;
@@ -280,6 +289,8 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
     if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
         return Response::RespLoginNeeded;
 
+    resetIdleTimer();
+
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.moderator_command_size() - 1; i >= 0; --i) {
         Response::ResponseCode resp = Response::RespInvalidCommand;
@@ -300,6 +311,8 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
         return Response::RespLoginNeeded;
     if (!(userInfo->user_level() & ServerInfo_User::IsAdmin))
         return Response::RespLoginNeeded;
+
+    resetIdleTimer();
 
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.admin_command_size() - 1; i >= 0; --i) {
@@ -373,6 +386,24 @@ void Server_ProtocolHandler::pingClockTimeout()
 
     if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
         prepareDestroy();
+
+    if (!userInfo || QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
+        if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
+            if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
+                prepareDestroy();
+            }
+        }
+
+        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() *.9)) && (!idleClientWarningSent) && (server->getIdleClientTimeout() > 0)) {
+            Event_NotifyUser event;
+            event.set_type(Event_NotifyUser::IDLEWARNING);
+            SessionEvent *se = prepareSessionEvent(event);
+            sendProtocolItem(*se);
+            delete se;
+            idleClientWarningSent = true;
+        }
+    }
+
     ++timeRunning;
 }
 
@@ -441,7 +472,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     }
 
     // limit the number of non-privileged users that can connect to the server based on configuration settings
-    if (QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
+    if (!userInfo || QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
         if (server->getMaxUserLimitEnabled()) {
             if (server->getUsersCount() > server->getMaxUserTotal()) {
                 qDebug() << "Max Users Total Limit Reached, please increase the max_users_total setting.";
@@ -476,7 +507,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     }
 
     joinPersistentGames(rc);
-
+    databaseInterface->removeForgotPassword(userName);
     rc.setResponseExtension(re);
     return Response::RespOk;
 }
@@ -505,7 +536,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
     rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, se);
 
     databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()), QString::fromStdString(cmd.message()), Server_DatabaseInterface::MessageTargetChat, userInterface->getUserInfo()->id(), receiver);
-
+    resetIdleTimer();
     return Response::RespOk;
 }
 
@@ -589,23 +620,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     if (!r)
         return Response::RespNameNotFound;
 
-    QString roomPermission = r->getRoomPermission().toLower();
-    if (roomPermission != "none"){
-        if (roomPermission == "registered") {
-            if (!(userInfo->user_level() & ServerInfo_User::IsRegistered))
-                return Response::RespUserLevelTooLow;
-        }
-
-        if (roomPermission == "moderator"){
-            if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
-                return Response::RespUserLevelTooLow;
-        }
-
-        if (roomPermission == "administrator"){
-            if (!(userInfo->user_level() & ServerInfo_User::IsAdmin))
-                return Response::RespUserLevelTooLow;
-        }
-    }
+    if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
+        if (!(r->userMayJoin(*userInfo)))
+            return Response::RespUserLevelTooLow;
 
     r->addClient(this);
     rooms.insert(r->getId(), r);
@@ -727,4 +744,10 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGam
         return Response::RespLoginNeeded;
 
     return room->processJoinGameCommand(cmd, rc, this);
+}
+
+void Server_ProtocolHandler::resetIdleTimer()
+{
+    lastActionReceived = timeRunning;
+    idleClientWarningSent = false;
 }

@@ -78,7 +78,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             case Qt::DisplayRole:
                 return QString::fromStdString(g.creator_info().name());
             case Qt::DecorationRole: {
-                    QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)g.creator_info().user_level(), false);
+                    QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)g.creator_info().user_level(), false, QString::fromStdString(g.creator_info().privlevel()));
                     return QIcon(avatarPixmap);
                 }
             default:
@@ -152,7 +152,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                     {
                         result.append(" (").append(tr("can see hands")).append(")");
                     }
-					
+                    
                     return result;
                 }
                 return QVariant(tr("not allowed"));
@@ -225,9 +225,10 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
     endInsertRows();
 }
 
-GamesProxyModel::GamesProxyModel(QObject *parent, ServerInfo_User *_ownUser)
+GamesProxyModel::GamesProxyModel(QObject *parent, bool _ownUserIsRegistered)
     : QSortFilterProxyModel(parent),
-    ownUser(_ownUser),
+    ownUserIsRegistered(_ownUserIsRegistered),
+    showBuddiesOnlyGames(false),
     unavailableGamesVisible(false),
     showPasswordProtectedGames(true),
     maxPlayersFilterMin(-1),
@@ -347,7 +348,7 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &/*sourc
             return false;
         if (game.started())
             return false;
-        if (!(ownUser->user_level() & ServerInfo_User::IsRegistered))
+        if (!ownUserIsRegistered)
             if (game.only_registered())
                 return false;
     }

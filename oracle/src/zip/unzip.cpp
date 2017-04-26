@@ -288,11 +288,8 @@ UnZip::ErrorCode UnzipPrivate::parseLocalHeaderRecord(const QString& path, const
   immediately following the compressed data."
  */
     bool hasDataDescriptor = entry.hasDataDescriptor();
+    bool checkFailed = entry.compMethod != getUShort(uBuffer, UNZIP_LH_OFF_CMETHOD);
 
-    bool checkFailed = false;
-
-    if (!checkFailed)
-        checkFailed = entry.compMethod != getUShort(uBuffer, UNZIP_LH_OFF_CMETHOD);
     if (!checkFailed)
         checkFailed = entry.gpFlag[0] != uBuffer[UNZIP_LH_OFF_GPFLAG];
     if (!checkFailed)

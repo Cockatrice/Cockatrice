@@ -3,6 +3,7 @@
 #include <QCursor>
 #include <QGraphicsSceneMouseEvent>
 #include <cmath>
+#include <algorithm>
 #ifdef _WIN32
 #include "round.h"
 #endif /* _WIN32 */
@@ -66,6 +67,9 @@ QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
 
 void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
+    const int MAX_FONT_SIZE = settingsCache->getMaxFontSize();
+    const int fontSize = std::max(9, MAX_FONT_SIZE);
+
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
     
     painter->resetTransform();
@@ -77,11 +81,6 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
     painter->setTransform(pixmapTransform);
 
     QFont f;
-    int fontSize = round(translatedSize.height() / 8);
-    if (fontSize < 9)
-        fontSize = 9;
-    if (fontSize > 10)
-        fontSize = 10;
     f.setPixelSize(fontSize);
 
     painter->setFont(f);
@@ -93,10 +92,10 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     QPixmap translatedPixmap;
     bool paintImage = true;
 
-    if(facedown)
+    if(facedown || name.isEmpty())
     {
         // never reveal card color, always paint the card back
-        PictureLoader::getPixmap(translatedPixmap, nullptr, translatedSize.toSize());
+        PictureLoader::getCardBackPixmap(translatedPixmap, translatedSize.toSize());
     } else {
         // don't even spend time trying to load the picture if our size is too small
         if(translatedSize.width() > 10)

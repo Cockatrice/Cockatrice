@@ -1,3 +1,4 @@
+syntax = "proto2";
 import "session_event.proto";
 
 message Event_ServerMessage {
