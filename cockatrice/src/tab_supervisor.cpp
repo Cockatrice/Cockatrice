@@ -191,13 +191,13 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo) {
 
     tabServer = new TabServer(this, client);
     connect(tabServer, SIGNAL(roomJoined(const ServerInfo_Room &, bool)), this, SLOT(addRoomTab(const ServerInfo_Room &, bool)));
-    int serv_tabIndex = myAddTab(tabServer);
+    myAddTab(tabServer);
 
     tabUserLists = new TabUserLists(this, client, *userInfo);
     connect(tabUserLists, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
     connect(tabUserLists, SIGNAL(userJoined(ServerInfo_User)), this, SLOT(processUserJoined(ServerInfo_User)));
     connect(tabUserLists, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
-    int userlist_tabIndex = myAddTab(tabUserLists);
+    myAddTab(tabUserLists);
 
     updatePingTime(0, -1);
 
