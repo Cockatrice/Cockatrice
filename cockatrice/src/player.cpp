@@ -542,7 +542,7 @@ void Player::playerListActionTriggered()
         cmd.set_zone_name("hand");
     else if (menu == mRevealRandomHandCard) {
         cmd.set_zone_name("hand");
-        cmd.set_card_id(-2);
+        cmd.set_card_id(RANDOM_CARD_FROM_ZONE);
     } else
         return;
 
@@ -910,7 +910,7 @@ void Player::actRevealRandomGraveyardCard()
     if (otherPlayerId != -1)
         cmd.set_player_id(otherPlayerId);
     cmd.set_zone_name("grave");
-    cmd.set_card_id(-2);
+    cmd.set_card_id(RANDOM_CARD_FROM_ZONE);
     sendGameCommand(cmd);
 }
 

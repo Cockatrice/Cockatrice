@@ -248,7 +248,8 @@ private:
 public:
     static const int counterAreaWidth = 55;
     enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToHand, cmMoveToGraveyard, cmMoveToExile };
-    
+    enum CardsToReveal {RANDOM_CARD_FROM_ZONE = -2};
+
     enum { Type = typeOther };
     int type() const { return Type; }
     QRectF boundingRect() const;
