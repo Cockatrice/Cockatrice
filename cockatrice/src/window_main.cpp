@@ -314,8 +314,13 @@ void MainWindow::actUpdate()
 
 void MainWindow::actViewLog()
 {
-    DlgViewLog dlg(this);
-    dlg.exec();
+    if (logviewDialog == nullptr) {
+        logviewDialog = new DlgViewLog(this);
+    }
+
+    logviewDialog->show();
+    logviewDialog->raise();
+    logviewDialog->activateWindow();
 }
 
 void MainWindow::serverTimeout()
@@ -652,7 +657,7 @@ void MainWindow::createMenus()
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), localServer(0), bHasActivated(false), cardUpdateProcess(0)
+    : QMainWindow(parent), localServer(0), bHasActivated(false), cardUpdateProcess(0), logviewDialog(0)
 {
     connect(settingsCache, SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
     pixmapCacheSizeChanged(settingsCache->getPixmapCacheSize());

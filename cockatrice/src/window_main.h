@@ -36,6 +36,7 @@ class LocalClient;
 class LocalServer;
 class ServerInfo_User;
 class QThread;
+class DlgViewLog;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -125,6 +126,7 @@ private:
     QMessageBox serverShutdownMessageBox;
     QProcess * cardUpdateProcess;
 
+    DlgViewLog * logviewDialog;
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();

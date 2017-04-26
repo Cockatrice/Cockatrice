@@ -48,21 +48,24 @@ void Logger::closeLogfileSession()
 }
 
 
-void Logger::log(QtMsgType /* type */, const QMessageLogContext & /* ctx */, const QString &message)
+void Logger::log(QtMsgType /* type */, const QMessageLogContext & /* ctx */, const QString message)
 {
+    QMetaObject::invokeMethod(this, "internalLog", Qt::QueuedConnection,
+        Q_ARG(const QString &, message)
+    );
+}
+
+void Logger::internalLog(const QString message)
+{
+    QMutexLocker locker(&mutex);
+
     logBuffer.append(message);
     if (logBuffer.size() > LOGGER_MAX_ENTRIES)
-        logBuffer.clear();
+        logBuffer.removeFirst();
 
-    if (message.size() > 0) {
-        emit logEntryAdded(message);
-        std::cerr << message.toStdString() << std::endl; // Print to stdout
+    emit logEntryAdded(message);
+    std::cerr << message.toStdString() << std::endl; // Print to stdout
 
-        if (logToFileEnabled)
-            fileStream << message << endl; // Print to fileStream
-    }
-
-
-
-
+    if (logToFileEnabled)
+        fileStream << message << endl; // Print to fileStream
 }
