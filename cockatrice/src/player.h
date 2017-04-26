@@ -127,6 +127,7 @@ public slots:
     void actViewTopCards();
     void actAlwaysRevealTopCard();
     void actViewGraveyard();
+    void actRevealRandomGraveyardCard();
     void actViewRfg();
     void actViewSideboard();
     
@@ -165,7 +166,7 @@ private slots:
 private:
     TabGame *game;
     QMenu *playerMenu, *handMenu, *moveHandMenu, *graveMenu, *moveGraveMenu, *rfgMenu, *moveRfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu,
-        *mRevealLibrary, *mRevealTopCard, *mRevealHand, *mRevealRandomHandCard;
+        *mRevealLibrary, *mRevealTopCard, *mRevealHand, *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
@@ -247,7 +248,8 @@ private:
 public:
     static const int counterAreaWidth = 55;
     enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToHand, cmMoveToGraveyard, cmMoveToExile };
-    
+    enum CardsToReveal {RANDOM_CARD_FROM_ZONE = -2};
+
     enum { Type = typeOther };
     int type() const { return Type; }
     QRectF boundingRect() const;
