@@ -306,6 +306,9 @@ void TabDeckEditor::createCentralFrame()
 {
     searchEdit = new SearchLineEdit;
     searchEdit->setObjectName("searchEdit");
+#if QT_VERSION >= 0x050200
+    searchEdit->setClearButtonEnabled(true);
+#endif
 #if QT_VERSION >= 0x050300
     searchEdit->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
 #endif
