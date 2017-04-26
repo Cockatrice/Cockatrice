@@ -51,7 +51,6 @@ TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *
 
 TabLog::~TabLog()
 {
-    qDebug() << "TABLOG CLOSE REQUEST";
     emit closingTabLogs(this);
 }
 

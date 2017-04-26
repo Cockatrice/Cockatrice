@@ -43,7 +43,6 @@ private slots:
     void deleteRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer);
     
     void replayAddedEventReceived(const Event_ReplayAdded &event);
-
 signals:
     void openReplay(GameReplay *replay);
     void replaysClosing(TabReplays *tab);

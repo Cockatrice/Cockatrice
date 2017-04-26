@@ -367,7 +367,6 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));   
     connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
     connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
-    connect(tab, SIGNAL(notIdle()), this, SLOT(resetIdleTimer()));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     roomTabs.insert(info.room_id(), tab);
@@ -469,56 +468,10 @@ TabReplays *TabSupervisor::addGameReplaysTab()
     return tab;
 }
 
-TabServer *TabSupervisor::addServerTab()
-{
-    TabServer *tab = new TabServer(this, client);
-    connect(tab, SIGNAL(serversClosing(TabServer *)), this, SLOT(tabServerClosed(TabServer *)));
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
-    setCurrentWidget(tab);
-    return tab;
-}
-
 TabDeckStorage *TabSupervisor::addDeckStorageTab()
 {
     TabDeckStorage *tab = new TabDeckStorage(this, client);
     connect(tab, SIGNAL(deckStorageClosing(TabDeckStorage *)), this, SLOT(tabDeckStorageClosed(TabDeckStorage *)));
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
-    setCurrentWidget(tab);
-    return tab;
-}
-
-TabUserLists *TabSupervisor::addUserListsTab()
-{
-    TabUserLists *tab = new TabUserLists(this, client, *userInfo);
-    connect(tab, SIGNAL(userListsClosing(TabUserLists *)), this, SLOT(tabUserListsClosed(TabUserLists *)));
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
-    setCurrentWidget(tab);
-    return tab;
-}
-
-TabAdmin *TabSupervisor::addAdminTab()
-{
-    if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
-        return nullptr;
-
-    TabAdmin *tab = new TabAdmin(this, client, static_cast<bool>(userInfo->user_level() & ServerInfo_User::IsAdmin));
-    connect(tab, SIGNAL(closingTabAdmin(TabAdmin *)), this, SLOT(tabAdminClosed(TabAdmin *)));
-    int tabIndex = myAddTab(tab);
-    addCloseButtonToTab(tab, tabIndex);
-    setCurrentWidget(tab);
-    return tab;
-}
-
-TabLog *TabSupervisor::addAdminLogTab()
-{
-    if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
-        return nullptr;
-
-    TabLog *tab = new TabLog(this, client);
-    connect(tab, SIGNAL(closingTabLogs(TabLog *)), this, SLOT(tabAdminLogsClosed(TabLog *)));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     setCurrentWidget(tab);
@@ -544,24 +497,6 @@ void TabSupervisor::tabReplaysClosed(TabReplays *tab)
 
 void TabSupervisor::tabDeckStorageClosed(TabDeckStorage *tab)
 {
-    if (tab == currentWidget())
-        emit setMenu();
-
-    removeTab(indexOf(tab));
-}
-
-void TabSupervisor::tabAdminClosed(TabAdmin *tab)
-{
-    if (tab == currentWidget())
-        emit setMenu();
-
-    removeTab(indexOf(tab));
-}
-
-void TabSupervisor::tabAdminLogsClosed(TabLog *tab)
-{
-    qDebug() << "TABLOG REMOVING";
-
     if (tab == currentWidget())
         emit setMenu();
 

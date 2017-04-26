@@ -266,29 +266,9 @@ void MainWindow::actGameReplays()
     tabSupervisor->addGameReplaysTab();
 }
 
-void MainWindow::actAdminTab()
-{
-    tabSupervisor->addAdminTab();
-}
-
-void MainWindow::actAdminLogTab()
-{
-    tabSupervisor->addAdminLogTab();
-}
-
-void MainWindow::actServers()
-{
-    tabSupervisor->addServerTab();
-}
-
 void MainWindow::actDeckStorage()
 {
     tabSupervisor->addDeckStorageTab();
-}
-
-void MainWindow::actUserLists()
-{
-    tabSupervisor->addUserListsTab();
 }
 
 void MainWindow::actFullScreen(bool checked)
@@ -556,8 +536,6 @@ void MainWindow::retranslateUi()
     aDeckEditor->setText(tr("&Deck editor"));
     aGameReplays->setText(tr("Game replays"));
     aDeckStorageTab->setText(tr("Deck storage"));
-    aAdminTab->setText(tr("Open administration tab"));
-    aAdminLogTab->setText(tr("Open log tab"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
     aSettings->setText(tr("&Settings..."));
@@ -600,10 +578,6 @@ void MainWindow::createActions()
     connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
     aGameReplays = new QAction(this);
     connect(aGameReplays, SIGNAL(triggered()), this, SLOT(actGameReplays()));
-    aAdminTab = new QAction(this);
-    connect(aAdminTab, SIGNAL(triggered()), this, SLOT(actAdminTab()));
-    aAdminLogTab = new QAction(this);
-    connect(aAdminLogTab, SIGNAL(triggered()), this, SLOT(actAdminLogTab()));
     aDeckStorageTab = new QAction(this);
     connect(aDeckStorageTab, SIGNAL(triggered()), this, SLOT(actDeckStorage()));
     aFullScreen = new QAction(this);

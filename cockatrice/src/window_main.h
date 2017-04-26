@@ -63,10 +63,6 @@ private slots:
     void actWatchReplay();
     void actDeckEditor();
     void actGameReplays();
-    void actAdminTab();
-    void actAdminLogTab();
-    void actServers();
-    void actUserLists();
     void actDeckStorage();
     void actFullScreen(bool checked);
     void actRegister();
@@ -113,9 +109,8 @@ private:
 
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu;
-    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aGameReplays, *aAdminTab,
-            *aAdminLogTab, *aDeckStorageTab, *aFullScreen, *aSettings, *aExit,
-            *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
+    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aGameReplays, *aDeckStorageTab,
+            *aFullScreen, *aSettings, *aExit, *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
     QAction *aEditSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
 
