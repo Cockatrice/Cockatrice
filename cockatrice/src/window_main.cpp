@@ -554,12 +554,10 @@ void MainWindow::retranslateUi()
     aSinglePlayer->setText(tr("Start &local game..."));
     aWatchReplay->setText(tr("&Watch replay..."));
     aDeckEditor->setText(tr("&Deck editor"));
-    aGameReplays->setText(tr("Open game replay tab"));
-    aServerTab->setText(tr("Open server tab"));
-    aDeckStorageTab->setText(tr("Open deck storage tab"));
+    aGameReplays->setText(tr("Game replays"));
+    aDeckStorageTab->setText(tr("Deck storage"));
     aAdminTab->setText(tr("Open administration tab"));
     aAdminLogTab->setText(tr("Open log tab"));
-    aUsersListsTab->setText(tr("Open account tab"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
     aSettings->setText(tr("&Settings..."));
@@ -583,7 +581,6 @@ void MainWindow::retranslateUi()
     aUpdate->setText(tr("Check for Updates"));
     aViewLog->setText(tr("View &debug log"));
     helpMenu->setTitle(tr("&Help"));
-	serverMenu->setTitle(tr("Server Options"));
     aCheckCardUpdates->setText(tr("Check for card updates..."));
     tabSupervisor->retranslateUi();
 }
@@ -607,12 +604,8 @@ void MainWindow::createActions()
     connect(aAdminTab, SIGNAL(triggered()), this, SLOT(actAdminTab()));
     aAdminLogTab = new QAction(this);
     connect(aAdminLogTab, SIGNAL(triggered()), this, SLOT(actAdminLogTab()));
-    aServerTab = new QAction(this);
-    connect(aServerTab, SIGNAL(triggered()), this, SLOT(actServers()));
     aDeckStorageTab = new QAction(this);
     connect(aDeckStorageTab, SIGNAL(triggered()), this, SLOT(actDeckStorage()));
-    aUsersListsTab = new QAction(this);
-    connect(aUsersListsTab, SIGNAL(triggered()), this, SLOT(actUserLists()));
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
@@ -675,6 +668,8 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aWatchReplay);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aDeckEditor);
+    cockatriceMenu->addAction(aGameReplays);
+    cockatriceMenu->addAction(aDeckStorageTab);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aFullScreen);
     cockatriceMenu->addSeparator();
@@ -692,18 +687,6 @@ void MainWindow::createMenus()
     dbMenu->addAction(aOpenCustomsetsFolder);
 #endif
     dbMenu->addAction(aAddCustomSet);
-	
-	serverMenu = menuBar()->addMenu(QString());
-	serverMenu->addAction(aGameReplays);
-    serverMenu->addAction(aServerTab);
-    serverMenu->addAction(aDeckStorageTab);
-    //serverMenu->addAction(aUsersListsTab);
-
-    /* TODO: Find a way to limit this to mod/admin only */
-    if (true) {
-       serverMenu->addAction(aAdminTab);
-       serverMenu->addAction(aAdminLogTab);
-    }
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);

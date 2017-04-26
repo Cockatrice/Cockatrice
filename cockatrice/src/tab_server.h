@@ -39,7 +39,6 @@ class TabServer : public Tab {
     Q_OBJECT
 signals:
     void roomJoined(const ServerInfo_Room &info, bool setCurrent);
-    void serversClosing(TabServer *tab);
 private slots:
     void processServerMessageEvent(const Event_ServerMessage &event);
     void joinRoom(int id, bool setCurrent);
@@ -50,11 +49,8 @@ private:
     QTextBrowser *serverInfoBox;
 public:
     TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = 0);
-    ~TabServer();
     void retranslateUi();
     QString getTabText() const { return tr("Server"); }
-public slots:
-    void closeRequest();
 };
 
 #endif

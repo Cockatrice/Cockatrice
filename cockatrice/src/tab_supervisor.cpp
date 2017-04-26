@@ -190,32 +190,20 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo) {
     userInfo = new ServerInfo_User(_userInfo);
 
     tabServer = new TabServer(this, client);
-    connect(tabServer, SIGNAL(roomJoined(
-                                      const ServerInfo_Room &, bool)), this, SLOT(addRoomTab(
-                                                                                          const ServerInfo_Room &, bool)));
+    connect(tabServer, SIGNAL(roomJoined(const ServerInfo_Room &, bool)), this, SLOT(addRoomTab(const ServerInfo_Room &, bool)));
     int serv_tabIndex = myAddTab(tabServer);
-    addCloseButtonToTab(tabServer, serv_tabIndex);
 
     tabUserLists = new TabUserLists(this, client, *userInfo);
-    connect(tabUserLists, SIGNAL(openMessageDialog(
-                                         const QString &, bool)), this, SLOT(addMessageTab(
-                                                                                     const QString &, bool)));
+    connect(tabUserLists, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
     connect(tabUserLists, SIGNAL(userJoined(ServerInfo_User)), this, SLOT(processUserJoined(ServerInfo_User)));
-    connect(tabUserLists, SIGNAL(userLeft(
-                                         const QString &)), this, SLOT(processUserLeft(
-                                                                               const QString &)));
+    connect(tabUserLists, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
     int userlist_tabIndex = myAddTab(tabUserLists);
-    /* DO NOT DELETE -- Called upon in TabSupervisor::processUserMessageEvent for some reason
-    addCloseButtonToTab(tabUserLists, userlist_tabIndex);
-    */
 
     updatePingTime(0, -1);
 
     if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
         tabDeckStorage = new TabDeckStorage(this, client);
-        connect(tabDeckStorage, SIGNAL(openDeckEditor(
-                                               const DeckLoader *)), this, SLOT(addDeckEditorTab(
-                                                                                        const DeckLoader *)));
+        connect(tabDeckStorage, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
         int ind = myAddTab(tabDeckStorage);
         addCloseButtonToTab(tabDeckStorage, ind);
 
@@ -229,7 +217,7 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo) {
     }
 
     if (userInfo->user_level() & ServerInfo_User::IsModerator) {
-        tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
+        tabAdmin = new TabAdmin(this, client, static_cast<bool>(userInfo->user_level() & ServerInfo_User::IsAdmin));
         connect(tabAdmin, SIGNAL(adminLockChanged(bool)), this, SIGNAL(adminLockChanged(bool)));
         int tab_index = myAddTab(tabAdmin);
         addCloseButtonToTab(tabAdmin, tab_index);
@@ -272,22 +260,6 @@ void TabSupervisor::stop()
         localClients.clear();
         
         emit localGameEnded();
-    } else {
-
-/*  This causes a crash on close, maybe there's another way similar to the QMapIterators below?
-        if (tabUserLists)
-            tabUserLists->deleteLater();
-        if (tabServer)
-            tabServer->deleteLater();
-        if (tabDeckStorage)
-            tabDeckStorage->deleteLater();
-        if (tabReplays)
-            tabReplays->deleteLater();
-        if (tabAdmin)
-            tabAdmin->deleteLater();
-        if (tabLog)
-            tabLog->deleteLater();
-*/
     }
     tabUserLists = 0;
     tabServer = 0;
@@ -532,7 +504,7 @@ TabAdmin *TabSupervisor::addAdminTab()
     if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
         return nullptr;
 
-    TabAdmin *tab = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
+    TabAdmin *tab = new TabAdmin(this, client, static_cast<bool>(userInfo->user_level() & ServerInfo_User::IsAdmin));
     connect(tab, SIGNAL(closingTabAdmin(TabAdmin *)), this, SLOT(tabAdminClosed(TabAdmin *)));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
@@ -570,23 +542,7 @@ void TabSupervisor::tabReplaysClosed(TabReplays *tab)
     removeTab(indexOf(tab));
 }
 
-void TabSupervisor::tabServerClosed(TabServer *tab)
-{
-    if (tab == currentWidget())
-        emit setMenu();
-
-    removeTab(indexOf(tab));
-}
-
 void TabSupervisor::tabDeckStorageClosed(TabDeckStorage *tab)
-{
-    if (tab == currentWidget())
-        emit setMenu();
-
-    removeTab(indexOf(tab));
-}
-
-void TabSupervisor::tabUserListsClosed(TabUserLists *tab)
 {
     if (tab == currentWidget())
         emit setMenu();

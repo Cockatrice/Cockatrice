@@ -115,8 +115,6 @@ private slots:
     void talkLeft(TabMessage *tab);
     void deckEditorClosed(TabDeckEditor *tab);
     void tabReplaysClosed(TabReplays *tab);
-    void tabServerClosed(TabServer *tab);
-    void tabUserListsClosed(TabUserLists *tab);
     void tabDeckStorageClosed(TabDeckStorage *tab);
     void tabAdminClosed(TabAdmin *tab);
     void tabAdminLogsClosed(TabLog *tab);

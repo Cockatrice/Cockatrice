@@ -112,9 +112,9 @@ private:
     inline QString getCardUpdaterBinaryName() { return "oracle"; };
 
     QList<QMenu *> tabMenus;
-    QMenu *cockatriceMenu, *dbMenu, *helpMenu, *serverMenu;
+    QMenu *cockatriceMenu, *dbMenu, *helpMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aGameReplays, *aAdminTab,
-            *aAdminLogTab, *aServerTab, *aDeckStorageTab, *aUsersListsTab, *aFullScreen, *aSettings, *aExit,
+            *aAdminLogTab, *aDeckStorageTab, *aFullScreen, *aSettings, *aExit,
             *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
     QAction *aEditSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;

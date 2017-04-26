@@ -160,16 +160,6 @@ TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWi
     setCentralWidget(mainWidget);
 }
 
-TabServer::~TabServer()
-{
-    emit serversClosing(this);
-}
-
-void TabServer::closeRequest()
-{
-    deleteLater();
-}
-
 void TabServer::retranslateUi()
 {
     roomSelector->retranslateUi();
