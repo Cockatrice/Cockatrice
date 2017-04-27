@@ -277,8 +277,10 @@ void MessageLogWidget::doMoveCard(LogMoveCard &attributes)
             finalStr = tr("%1 puts %2%3 on bottom of their library.");
         else if (attributes.newX == 0)
             finalStr = tr("%1 puts %2%3 on top of their library.");
-        else
-            finalStr = tr("%1 puts %2%3 into their library at position %4.");
+        else {
+            attributes.newX++;
+            finalStr = tr("%1 puts %2%3 into their library %4 cards from the top.");
+        }
     } else if (targetName == "sb")
         finalStr = tr("%1 moves %2%3 to sideboard.");
     else if (targetName == "stack") {

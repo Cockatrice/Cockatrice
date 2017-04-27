@@ -341,7 +341,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges, Server_Car
     if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) && (startzone->getPlayer() != targetzone->getPlayer()))
         return Response::RespContextError;
     
-    if (!targetzone->hasCoords() && (x == -1))
+    if (!targetzone->hasCoords() && (x <= -1))
         x = targetzone->getCards().size();
     
     QList<QPair<Server_Card *, int> > cardsToMove;
