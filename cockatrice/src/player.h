@@ -145,6 +145,7 @@ private slots:
     void actCreateRelatedCard();
     void actCreateAllRelatedCards();
     void cardMenuAction();
+    void actMoveCardXCardsFromTop();
     void actCardCounterTrigger();
     void actAttach();
     void actUnattach();
@@ -182,10 +183,11 @@ private:
     QAction *aPlay, *aPlayFacedown,
         *aHide,
         *aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
-        *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile;
+        *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile, *aMoveToXfromTopOfLibrary;
 
     bool shortcutsActive;
     int defaultNumberTopCards;
+    int defaultNumberTopCardsToPlaceBelow;
     QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
     bool lastTokenDestroy;
     int lastTokenTableRow;
