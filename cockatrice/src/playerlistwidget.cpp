@@ -169,6 +169,11 @@ void PlayerListWidget::setGameStarted(bool _gameStarted, bool resuming)
     QMapIterator<int, QTreeWidgetItem *> i(players);
     while (i.hasNext()) {
         QTreeWidgetItem *twi = i.next().value();
+
+        bool isPlayer = twi->data(1, Qt::UserRole).toBool();
+        if(!isPlayer)
+            continue;
+
         if (gameStarted) {
             if (resuming)
                 twi->setIcon(2, twi->data(2, Qt::UserRole).toBool() ? concededIcon : QIcon());
@@ -176,8 +181,9 @@ void PlayerListWidget::setGameStarted(bool _gameStarted, bool resuming)
                 twi->setData(2, Qt::UserRole, false);
                 twi->setIcon(2, QIcon());
             }
-        } else
+        } else {
             twi->setIcon(2, notReadyIcon);
+        }
     }
 }
 
