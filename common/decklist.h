@@ -21,6 +21,10 @@ class QTextStream;
 
 class InnerDecklistNode;
 
+#define DECK_ZONE_MAIN "main"
+#define DECK_ZONE_SIDE "side"
+#define DECK_ZONE_TOKENS "tokens"
+
 class SideboardPlan {
 private:
     QString name;
@@ -107,17 +111,16 @@ class DecklistCardNode : public AbstractDecklistCardNode {
 private:
     QString name;
     int number;
-        float price;
+    float price;
 public:
-        DecklistCardNode(const QString &_name = QString(), int _number = 1, float _price = 0, InnerDecklistNode *_parent = 0) : AbstractDecklistCardNode(_parent), name(_name), number(_number), price(_price) { }
+    DecklistCardNode(const QString &_name = QString(), int _number = 1, float _price = 0, InnerDecklistNode *_parent = 0) : AbstractDecklistCardNode(_parent), name(_name), number(_number), price(_price) { }
     DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
     int getNumber() const { return number; }
     void setNumber(int _number) { number = _number; }
     QString getName() const { return name; }
     void setName(const QString &_name) { name = _name; }
-        float getPrice() const { return price; }
-
-        void setPrice(const float _price) { price = _price; }
+    float getPrice() const { return price; }
+    void setPrice(const float _price) { price = _price; }
 };
 
 class DeckList : public QObject {
@@ -128,6 +131,9 @@ private:
     QMap<QString, SideboardPlan *> sideboardPlans;
     InnerDecklistNode *root;
     void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
+    InnerDecklistNode *getZoneObjFromName(const QString  zoneName);
+protected:
+    virtual QString getCardZoneFromName(QString /* cardName */, QString currentZoneName) { return currentZoneName; };
 signals:
     void deckHashChanged();
 public slots:

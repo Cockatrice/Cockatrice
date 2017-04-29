@@ -857,7 +857,7 @@ void Player::setDeck(const DeckLoader &_deck)
 
     createPredefinedTokenMenu->clear();
     predefinedTokens.clear();
-    InnerDecklistNode *tokenZone = dynamic_cast<InnerDecklistNode *>(deck->getRoot()->findChild("tokens"));
+    InnerDecklistNode *tokenZone = dynamic_cast<InnerDecklistNode *>(deck->getRoot()->findChild(DECK_ZONE_TOKENS));
 
     if (tokenZone)
         for (int i = 0; i < tokenZone->size(); ++i) {

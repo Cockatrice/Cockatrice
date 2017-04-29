@@ -821,7 +821,7 @@ void TabDeckEditor::addCardHelper(QString zoneName)
     if(!info)
         return;
     if (info->getIsToken())
-        zoneName = "tokens";
+        zoneName = DECK_ZONE_TOKENS;
 
     QModelIndex newCardIndex = deckModel->addCard(info->getName(), zoneName);
     recursiveExpand(newCardIndex);
@@ -843,7 +843,7 @@ void TabDeckEditor::actSwapCard()
     const QString zoneName = gparent.sibling(gparent.row(), 1).data().toString();
     actDecrement();
 
-    const QString otherZoneName = zoneName == "Maindeck" ? "side" : "main";
+    const QString otherZoneName = zoneName == "Maindeck" ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
     QModelIndex newCardIndex = deckModel->addCard(cardName, otherZoneName);
     recursiveExpand(newCardIndex);
@@ -856,12 +856,12 @@ void TabDeckEditor::actAddCard()
     if(QApplication::keyboardModifiers() & Qt::ControlModifier)
         actAddCardToSideboard();
     else
-        addCardHelper("main");
+        addCardHelper(DECK_ZONE_MAIN);
 }
 
 void TabDeckEditor::actAddCardToSideboard()
 {
-    addCardHelper("side");
+    addCardHelper(DECK_ZONE_SIDE);
 }
 
 void TabDeckEditor::actRemoveCard()
@@ -898,7 +898,7 @@ void TabDeckEditor::decrementCardHelper(QString zoneName)
     if(!info)
         return;
     if (info->getIsToken())
-        zoneName = "tokens";
+        zoneName = DECK_ZONE_TOKENS;
 
     idx = deckModel->findCard(info->getName(), zoneName);
     offsetCountAtIndex(idx, -1);
@@ -906,12 +906,12 @@ void TabDeckEditor::decrementCardHelper(QString zoneName)
 
 void TabDeckEditor::actDecrementCard()
 {
-    decrementCardHelper("main");
+    decrementCardHelper(DECK_ZONE_MAIN);
 }
 
 void TabDeckEditor::actDecrementCardFromSideboard()
 {
-    decrementCardHelper("side");
+    decrementCardHelper(DECK_ZONE_SIDE);
 }
 
 void TabDeckEditor::actIncrement()

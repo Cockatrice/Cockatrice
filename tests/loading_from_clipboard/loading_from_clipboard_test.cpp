@@ -20,9 +20,9 @@ struct DecklistBuilder {
     explicit DecklistBuilder() : actualMainboard({}), actualSideboard({}) {}
 
     void operator()(const InnerDecklistNode *innerDecklistNode, const DecklistCardNode *card) {
-        if (innerDecklistNode->getName() == "main") {
+        if (innerDecklistNode->getName() == DECK_ZONE_MAIN) {
             actualMainboard[card->getName()] += card->getNumber();
-        } else if (innerDecklistNode->getName() == "side") {
+        } else if (innerDecklistNode->getName() == DECK_ZONE_SIDE) {
             actualSideboard[card->getName()] += card->getNumber();
         } else {
             FAIL();

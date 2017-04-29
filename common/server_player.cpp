@@ -170,9 +170,9 @@ void Server_Player::setupZones()
     for (int i = 0; i < listRoot->size(); ++i) {
         InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
         Server_CardZone *z;
-        if (currentZone->getName() == "main")
+        if (currentZone->getName() == DECK_ZONE_MAIN)
             z = deckZone;
-        else if (currentZone->getName() == "side")
+        else if (currentZone->getName() == DECK_ZONE_SIDE)
             z = sbZone;
         else
             continue;
@@ -193,15 +193,15 @@ void Server_Player::setupZones()
         const QString targetZone = QString::fromStdString(m.target_zone());
         
         Server_CardZone *start, *target;
-        if (startZone == "main")
+        if (startZone == DECK_ZONE_MAIN)
             start = deckZone;
-        else if (startZone == "side")
+        else if (startZone == DECK_ZONE_SIDE)
             start = sbZone;
         else
             continue;
-        if (targetZone == "main")
+        if (targetZone == DECK_ZONE_MAIN)
             target = deckZone;
-        else if (targetZone == "side")
+        else if (targetZone == DECK_ZONE_SIDE)
             target = sbZone;
         else
             continue;
