@@ -31,7 +31,6 @@
 #include "dlg_load_deck_from_clipboard.h"
 #include "main.h"
 #include "settingscache.h"
-#include "priceupdater.h"
 #include "tab_supervisor.h"
 #include "deckstats_interface.h"
 #include "tappedout_interface.h"
@@ -536,9 +535,6 @@ void TabDeckEditor::retranslateUi()
     nameLabel->setText(tr("Deck &name:"));
     commentsLabel->setText(tr("&Comments:"));
     hashLabel1->setText(tr("Hash:"));
-    
-    //aUpdatePrices->setText(tr("&Update prices"));
-    //aUpdatePrices->setShortcut(QKeySequence("Ctrl+U"));
 
     aNewDeck->setText(tr("&New deck"));
     aLoadDeck->setText(tr("&Load deck..."));
@@ -926,38 +922,6 @@ void TabDeckEditor::actDecrement()
     offsetCountAtIndex(currentIndex, -1);
 }
 
-void TabDeckEditor::setPriceTagFeatureEnabled(int /* enabled */)
-{
-    //aUpdatePrices->setVisible(enabled);
-    deckModel->pricesUpdated();
-}
-
-/*
-void TabDeckEditor::actUpdatePrices()
-{
-    aUpdatePrices->setDisabled(true);
-    AbstractPriceUpdater *up;
-
-    switch(settingsCache->getPriceTagSource())
-    {
-        case AbstractPriceUpdater::DBPriceSource:
-        default:
-            up = new DBPriceUpdater(deckModel->getDeckList());
-            break;
-    }
-     
-    connect(up, SIGNAL(finishedUpdate()), this, SLOT(finishedUpdatingPrices()));
-    up->updatePrices();
-}
-*/
-
-
-void TabDeckEditor::finishedUpdatingPrices()
-{
-    //deckModel->pricesUpdated();
-    //setModified(true);
-    //aUpdatePrices->setDisabled(false);
-}
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)
 {

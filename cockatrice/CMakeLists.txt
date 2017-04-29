@@ -97,8 +97,7 @@ SET(cockatrice_SOURCES
     src/thememanager.cpp 
     src/localserver.cpp 
     src/localserverinterface.cpp 
-    src/localclient.cpp 
-    src/priceupdater.cpp 
+    src/localclient.cpp
     src/qt-json/json.cpp
     src/soundengine.cpp
     src/pending_command.cpp

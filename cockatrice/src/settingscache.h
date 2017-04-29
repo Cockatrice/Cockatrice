@@ -43,7 +43,6 @@ signals:
     void minPlayersForMultiColumnLayoutChanged();
     void soundEnabledChanged();
     void soundThemeChanged();
-    void priceTagFeatureChanged(int enabled);
     void ignoreUnregisteredUsersChanged();
     void ignoreUnregisteredUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
@@ -86,8 +85,6 @@ private:
     bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
     bool soundEnabled;
     QString soundThemeName;
-    bool priceTagFeature;
-    int priceTagSource;
     bool ignoreUnregisteredUsers;
     bool ignoreUnregisteredUserMessages;
     QString picUrl;
@@ -165,8 +162,6 @@ public:
     bool getZoneViewPileView() const { return zoneViewPileView; }
     bool getSoundEnabled() const { return soundEnabled; }
     QString getSoundThemeName() const { return soundThemeName; }
-    bool getPriceTagFeature() const { return false; /* #859; priceTagFeature;*/ }
-    int getPriceTagSource() const { return priceTagSource; }
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
     bool getIgnoreUnregisteredUserMessages() const { return ignoreUnregisteredUserMessages; }
     QString getPicUrl() const { return picUrl; }
@@ -236,8 +231,6 @@ public slots:
     void setZoneViewPileView(int _zoneViewPileView);
     void setSoundEnabled(int _soundEnabled);
     void setSoundThemeName(const QString &_soundThemeName);
-    void setPriceTagFeature(int _priceTagFeature);
-    void setPriceTagSource(int _priceTagSource);
     void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
     void setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages);
     void setPicUrl(const QString &_picUrl);

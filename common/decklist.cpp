@@ -125,7 +125,7 @@ void InnerDecklistNode::clearTree()
 }
 
 DecklistCardNode::DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent)
-    : AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber()), price(other->getPrice())
+    : AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber())
 {
 }
 
@@ -157,19 +157,6 @@ int InnerDecklistNode::recursiveCount(bool countTotalCards) const
     return result;
 }
 
-float InnerDecklistNode::recursivePrice(bool countTotalCards) const
-{
-        float result = 0;
-        for (int i = 0; i < size(); i++) {
-                InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(at(i));
-                if (node)
-                        result += node->recursivePrice(countTotalCards);
-                else if (countTotalCards)
-                        result += dynamic_cast<AbstractDecklistCardNode *>(at(i))->getTotalPrice();
-        }
-        return result;
-}
-
 bool InnerDecklistNode::compare(AbstractDecklistNode *other) const
 {
     switch (sortMethod) {
@@ -177,8 +164,6 @@ bool InnerDecklistNode::compare(AbstractDecklistNode *other) const
             return compareNumber(other);
         case ByName:
             return compareName(other);
-        case ByPrice:
-            return comparePrice(other);
     }
     return 0;
 }
@@ -205,18 +190,6 @@ bool InnerDecklistNode::compareName(AbstractDecklistNode *other) const
     }
 }
 
-bool InnerDecklistNode::comparePrice(AbstractDecklistNode *other) const
-{
-    InnerDecklistNode *other2 = dynamic_cast<InnerDecklistNode *>(other);
-    if (other2) {
-        int p1 = 100*recursivePrice(true);
-        int p2 = 100*other2->recursivePrice(true);
-        return (p1 != p2) ? (p1 > p2) : compareName(other);
-    } else {
-        return false;
-    }
-}
-
 bool AbstractDecklistCardNode::compare(AbstractDecklistNode *other) const
 {
     switch (sortMethod) {
@@ -224,8 +197,6 @@ bool AbstractDecklistCardNode::compare(AbstractDecklistNode *other) const
             return compareNumber(other);
         case ByName:
             return compareName(other);
-        case ByPrice:
-            return compareTotalPrice(other);
     }
     return 0;
 }
@@ -252,18 +223,6 @@ bool AbstractDecklistCardNode::compareName(AbstractDecklistNode *other) const
     }
 }
 
-bool AbstractDecklistCardNode::compareTotalPrice(AbstractDecklistNode *other) const
-{
-    AbstractDecklistCardNode *other2 = dynamic_cast<AbstractDecklistCardNode *>(other);
-    if (other2) {
-        int p1 = 100*getTotalPrice();
-        int p2 = 100*other2->getTotalPrice();
-        return (p1 != p2) ? (p1 > p2) : compareName(other);
-    } else {
-        return true;
-    }
-}
-
 class InnerDecklistNode::compareFunctor {
 private:
     Qt::SortOrder order;
@@ -285,8 +244,7 @@ bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
                 InnerDecklistNode *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
                 newZone->readElement(xml);
             } else if (childName == "card") {
-                float price = (xml->attributes().value("price") != NULL) ? xml->attributes().value("price").toString().toFloat() : 0;
-                DecklistCardNode *newCard = new DecklistCardNode(xml->attributes().value("name").toString(), xml->attributes().value("number").toString().toInt(), price, this);
+                DecklistCardNode *newCard = new DecklistCardNode(xml->attributes().value("name").toString(), xml->attributes().value("number").toString().toInt(), this);
                 newCard->readElement(xml);
             }
         } else if (xml->isEndElement() && (childName == "zone"))
@@ -318,7 +276,6 @@ void AbstractDecklistCardNode::writeElement(QXmlStreamWriter *xml)
 {
     xml->writeEmptyElement("card");
     xml->writeAttribute("number", QString::number(getNumber()));
-        xml->writeAttribute("price", QString::number(getPrice()));
     xml->writeAttribute("name", getName());
 }
 
@@ -592,7 +549,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         QString zoneName = getCardZoneFromName(cardName, isSideboard ? DECK_ZONE_SIDE: DECK_ZONE_MAIN);
 
         ++okRows;
-        new DecklistCardNode(cardName, number, 0, getZoneObjFromName(zoneName));
+        new DecklistCardNode(cardName, number, getZoneObjFromName(zoneName));
     }
     updateDeckHash();
     return (okRows > 0);
@@ -705,7 +662,7 @@ DecklistCardNode *DeckList::addCard(const QString &cardName, const QString &zone
     if (!zoneNode)
         zoneNode = new InnerDecklistNode(zoneName, root);
 
-    DecklistCardNode *node = new DecklistCardNode(cardName, 1, 0, zoneNode);
+    DecklistCardNode *node = new DecklistCardNode(cardName, 1, zoneNode);
     updateDeckHash();
     return node;
 }

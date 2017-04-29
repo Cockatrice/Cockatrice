@@ -236,9 +236,6 @@ SettingsCache::SettingsCache()
 
     maxFontSize = settings->value("game/maxfontsize", DEFAULT_FONT_SIZE).toInt();
 
-    priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
-    priceTagSource = settings->value("deckeditor/pricetagsource", 0).toInt();
-
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
     ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
 
@@ -512,19 +509,6 @@ void SettingsCache::setSoundThemeName(const QString &_soundThemeName)
     soundThemeName = _soundThemeName;
     settings->setValue("sound/theme", soundThemeName);
     emit soundThemeChanged();
-}
-
-void SettingsCache::setPriceTagFeature(int _priceTagFeature)
-{
-    priceTagFeature = _priceTagFeature;
-    settings->setValue("deckeditor/pricetags", priceTagFeature);
-    emit priceTagFeatureChanged(priceTagFeature);
-}
-
-void SettingsCache::setPriceTagSource(int _priceTagSource)
-{
-    priceTagSource = _priceTagSource;
-    settings->setValue("deckeditor/pricetagsource", priceTagSource);
 }
 
 void SettingsCache::setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers)
