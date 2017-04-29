@@ -53,8 +53,7 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent) {
     if (!QSslSocket::supportsSsl()) {
         enableUpdateButton(false);
         QMessageBox::critical(this, tr("Error"),
-            tr("Cockatrice was not built with SSL support, so you cannot download updates automatically! "
-            "Please visit the download page to update manually."));
+            tr("Cockatrice was not built with SSL support, therefore you cannot download updates automatically! \nPlease visit the download page to update manually."));
     }
 
     //Initialize the checker and downloader class
@@ -115,8 +114,11 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
     if (!needToUpdate) {
         //If there's no need to update, tell them that. However we still allow them to run the
         //downloader themselves if there's a compatible build
-        QMessageBox::information(this, tr("Cockatrice Update"), tr("Your version of Cockatrice is up to date."));
-        setLabel(tr("You are already running the latest %1 release - %2").arg(tr(settingsCache->getUpdateReleaseChannel()->getName().toUtf8())).arg(VERSION_STRING));
+        QMessageBox::information(this, tr("Cockatrice Update"),
+                 tr("Cockatrice is up to date!") + QString ("<br><br>")
+                 + tr("You are already running the latest version available in the chosen release channel.") + QString("<br>")
+                 + tr("Current version") + QString(": %2<br>")
+                 + tr("Current release channel") + QString(": %1").arg(settingsCache->getUpdateReleaseChannel()->getName().toUtf8()).arg(VERSION_STRING));
         return;
     }
 
@@ -126,20 +128,22 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         updateUrl = release->getDownloadUrl();
 
         int reply;
-        reply = QMessageBox::question(this, "Update Available",
-            tr("A new version is available:<br/>%1<br/>published on %2 ."
-            "<br/>More informations are available on the <a href=\"%3\">release changelog</a>"
-            "<br/>Do you want to update now?").arg(release->getName(), publishDate, release->getDescriptionUrl()),
+        reply = QMessageBox::question(this, tr("Update Available"),
+            tr("A new version of Cockatrice is available!") + QString("<br><br>")
+            + tr("New version") + QString(": %1<br>")
+            + tr("Publishing date") + QString(": %2 <a href=\"%3\">(") + tr("Changelog") + QString(")</a><br><br>") 
+            + tr("Do you want to update now?").arg(release->getName(), publishDate, release->getDescriptionUrl()),
             QMessageBox::Yes | QMessageBox::No);
 
         if (reply == QMessageBox::Yes)
             downloadUpdate();
     } else {
         QMessageBox::information(this, tr("Cockatrice Update"),
-            tr("A new version is available:<br/>%1<br/>published on %2 ."
-            "<br/>More informations are available on the <a href=\"%3\">release changelog</a>"
-            "<br/>Unfortunately there are no packages available for your operating system. "
-            "You may have to use a developer build or build from source yourself. Please visit the download page.").arg(release->getName(), publishDate, release->getDescriptionUrl()));
+            tr("A new version of Cockatrice is available!") + Qstring("<br><br>")
+            + tr("New version") + QString(": %1<br>")
+            + tr("Publishing date") + QString(": %2 <a href=\"%3\">(") + tr("Changelog") + QString(")</a><br><br>")
+            + tr("Unfortunately there are no download packages available for your operating system. \nYou may have to build from source yourself.") + QString("<br><br>")
+            + tr("Please check the download page manually and visit the wiki for instructions on compiling.").arg(release->getName(), publishDate, release->getDescriptionUrl()));
     }
 }
 
@@ -190,7 +194,8 @@ void DlgUpdate::downloadSuccessful(QUrl filepath) {
     } else {
         setLabel(tr("Error"));
         QMessageBox::critical(this, tr("Update Error"),
-            tr("Unable to open the installer. You might be able to manually update by closing Cockatrice and running the installer at %1.").arg(filepath.toLocalFile()));
+            tr("Unable to open the installer.") + QString("<br><br>")
+            + tr("You might be able to manually update by closing Cockatrice and running the installer downloaded to \n%1.").arg(filepath.toLocalFile()));
     }
 }
 
