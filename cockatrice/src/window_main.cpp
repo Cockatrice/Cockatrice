@@ -550,7 +550,7 @@ void MainWindow::retranslateUi()
     aEditTokens->setText(tr("Edit &tokens..."));
 
     aAbout->setText(tr("&About Cockatrice"));
-    aUpdate->setText(tr("Check for Updates"));
+    aUpdate->setText(tr("Check for Client Updates"));
     aViewLog->setText(tr("View &debug log"));
     helpMenu->setTitle(tr("&Help"));
     aCheckCardUpdates->setText(tr("Check for card updates..."));
