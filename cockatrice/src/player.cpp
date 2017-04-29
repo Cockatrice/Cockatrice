@@ -726,7 +726,7 @@ void Player::retranslateUi()
     }
 
     aMoveToTopLibrary->setText(tr("&Top of library"));
-    aMoveToXfromTopOfLibrary->setText(tr("X cards from the top..."));
+    aMoveToXfromTopOfLibrary->setText(tr("X cards from the top of library..."));
     aMoveToBottomLibrary->setText(tr("&Bottom of library"));
     aMoveToHand->setText(tr("&Hand"));
     aMoveToGraveyard->setText(tr("&Graveyard"));
@@ -1979,7 +1979,7 @@ bool Player::clearCardsToDelete()
 void Player::actMoveCardXCardsFromTop()
 {
     bool ok;
-    int number = QInputDialog::getInt(0, tr("Place card X cards from top library"), tr("How many cards from the top of the deck should this card be placed:"), defaultNumberTopCardsToPlaceBelow, 1, 2000000000, 1, &ok);
+    int number = QInputDialog::getInt(0, tr("Place card X cards from top of library"), tr("How many cards from the top of the deck should this card be placed:"), defaultNumberTopCardsToPlaceBelow, 1, 2000000000, 1, &ok);
     number--;
 
     if (!ok)
