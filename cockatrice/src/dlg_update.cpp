@@ -117,8 +117,8 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         QMessageBox::information(this, tr("Cockatrice Update"),
                  tr("Cockatrice is up to date!") + "<br><br>"
                  + tr("You are already running the latest version available in the chosen release channel.") + "<br>"
-                 + tr("Current version") + ": %2<br>"
-                 + tr("Current release channel") + ": %1").arg(settingsCache->getUpdateReleaseChannel()->getName().toUtf8()).arg(VERSION_STRING);
+                 + tr("Current version") + QString(": %1<br>").arg(settingsCache->getUpdateReleaseChannel()->getName().toUtf8())
+                 + tr("Current release channel") + QString(": %1").arg(VERSION_STRING));
         return;
     }
 
@@ -130,9 +130,9 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         int reply;
         reply = QMessageBox::question(this, tr("Update Available"),
             tr("A new version of Cockatrice is available!") + "<br><br>"
-            + tr("New version") + ": %1<br>"
-            + tr("Publishing date") + ": %2 <a href=\"%3\">(" + tr("Changelog") + ")</a><br><br>"
-            + tr("Do you want to update now?")).arg(release->getName(), publishDate, release->getDescriptionUrl(),
+            + tr("New version") + QString(": %1<br>").arg(release->getName())
+            + tr("Publishing date") + QString(": %2 <a href=\"%3\">(").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") + ")</a><br><br>"
+            + tr("Do you want to update now?"),
             QMessageBox::Yes | QMessageBox::No);
 
         if (reply == QMessageBox::Yes)
