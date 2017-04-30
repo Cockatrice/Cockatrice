@@ -21,7 +21,7 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent) {
     statusLabel = new QLabel(this);
     statusLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
     statusLabel->setWordWrap(true);
-    descriptionLabel = new QLabel(tr("Current release channel") + QString(": %1").arg(settingsCache->getUpdateReleaseChannel()->getName().toUtf8()), this);
+    descriptionLabel = new QLabel(tr("Current release channel") + QString(": %1").arg(tr(settingsCache->getUpdateReleaseChannel()->getName().toUtf8())), this);
     progress = new QProgressBar(this);
 
     buttonBox = new QDialogButtonBox(this);
