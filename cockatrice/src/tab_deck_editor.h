@@ -67,13 +67,9 @@ class TabDeckEditor : public Tab {
             void actDecrementCard();
             void actDecrementCardFromSideboard();
 
-            //void actUpdatePrices();
-
-            void finishedUpdatingPrices();
             void saveDeckRemoteFinished(const Response &r);
             void filterViewCustomContextMenu(const QPoint &point);
             void filterRemove(QAction *action);
-            void setPriceTagFeatureEnabled(int enabled);
 
             void loadLayout();
             void restartLayout();
@@ -116,7 +112,7 @@ private:
     QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *analyzeDeckMenu;
     QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aClose;
     QAction *aClearFilterAll, *aClearFilterOne;
-    QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;// *aUpdatePrices;
+    QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
     QAction *aResetLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating, *aFilterDockVisible, *aFilterDockFloating;
 

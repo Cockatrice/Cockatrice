@@ -27,7 +27,6 @@
 #include "main.h"
 #include "settingscache.h"
 #include "thememanager.h"
-#include "priceupdater.h"
 #include "releasechannel.h"
 #include "soundengine.h"
 #include "sequenceEdit/shortcutstab.h"
@@ -468,13 +467,7 @@ void UserInterfaceSettingsPage::retranslateUi()
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
-    //priceTagsCheckBox.setChecked(settingsCache->getPriceTagFeature());
-    //connect(&priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
-
-    //connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
-
     QGridLayout *generalGrid = new QGridLayout;
-    //generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
     
     generalGrid->addWidget(new QLabel(tr("Nothing is here... yet")), 0, 0);
     
@@ -489,20 +482,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
 void DeckEditorSettingsPage::retranslateUi()
 {
-    //priceTagsCheckBox.setText(tr("Enable &price tag feature from deckbrew.com"));
     generalGroupBox->setTitle(tr("General"));
 }
-
-/*
-void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
-{
-    if(!checked)
-        return;
-
-    int source=AbstractPriceUpdater::DBPriceSource;
-    emit priceTagSourceChanged(source);
-}
-*/
 
 MessagesSettingsPage::MessagesSettingsPage()
 {

@@ -82,7 +82,7 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     QPen pen;
     pen.setWidth(3);
     pen.setJoinStyle(Qt::MiterJoin);
-    pen.setColor(originZone == "main" ? Qt::green : Qt::red);
+    pen.setColor(originZone == DECK_ZONE_MAIN ? Qt::green : Qt::red);
     painter->setPen(pen);
     painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2.5));
     painter->restore();
@@ -134,10 +134,10 @@ void DeckView::mouseDoubleClickEvent(QMouseEvent *event)
             m.set_card_name(c->getName().toStdString());
             m.set_start_zone(zone->getName().toStdString());
 
-            if (zone->getName() == "main")
-                m.set_target_zone("side");
-            else if (zone->getName() == "side")
-                m.set_target_zone("main");
+            if (zone->getName() == DECK_ZONE_MAIN)
+                m.set_target_zone(DECK_ZONE_SIDE);
+            else if (zone->getName() == DECK_ZONE_SIDE)
+                m.set_target_zone(DECK_ZONE_MAIN);
             else // Trying to move from another zone
                 m.set_target_zone(zone->getName().toStdString());
 
