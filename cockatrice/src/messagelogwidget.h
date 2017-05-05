@@ -78,7 +78,7 @@ public slots:
     void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown);
     void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
     void logSetActivePlayer(Player *player);
-    void logSetActivePhase(int phase);
+    void logSetActivePhase(int phase, Player *player);
     void containerProcessingStarted(const GameEventContext &context);
     void containerProcessingDone();
 public:

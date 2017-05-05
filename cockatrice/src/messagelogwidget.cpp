@@ -560,11 +560,11 @@ void MessageLogWidget::logSetActivePlayer(Player *player)
 {
 
     QString str;
-        str = tr("It is now %1's turn.");
+        str = tr("%1's turn.");
     appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + str.arg(player->getName()) + "</b></font><br>");
 }
 
-void MessageLogWidget::logSetActivePhase(int phase)
+void MessageLogWidget::logSetActivePhase(int phase, Player *player)
 {
     QString phaseName;
     switch (phase) {
@@ -580,7 +580,7 @@ void MessageLogWidget::logSetActivePhase(int phase)
         case 9: phaseName = tr("second main phase"); soundEngine->playSound("main_2"); break;
         case 10: phaseName = tr("ending phase"); soundEngine->playSound("end_step"); break;
     }
-    appendHtml("<font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + tr("It is now the %1.").arg(phaseName) + "</b></font>");
+    appendHtml("<font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + tr("%2's %1.").arg(phaseName).arg(player->getName()) + "</b></font>");
 }
 
 void MessageLogWidget::containerProcessingStarted(const GameEventContext &_context)

@@ -1159,7 +1159,7 @@ void TabGame::eventSetActivePhase(const Event_SetActivePhase &event, int /*event
 {
     const int phase = event.phase();
     if (currentPhase != phase)
-        messageLog->logSetActivePhase(phase);
+        messageLog->logSetActivePhase(phase, event.active_player_id());
     setActivePhase(phase);
     emitUserEvent();
 }
