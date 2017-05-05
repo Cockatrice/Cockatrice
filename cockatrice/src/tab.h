@@ -33,6 +33,7 @@ public:
     virtual void retranslateUi() = 0;
     virtual void closeRequest() { }
     virtual void tabActivated() { }
+    virtual bool updateIcon() { return true; }
 };
 
 #endif

@@ -96,7 +96,6 @@ public slots:
 private slots:
     void closeButtonPressed();
     void updateCurrent(int index);
-    void updatePingTime(int value, int max);
     void gameJoined(const Event_GameJoined &event);
     void localGameJoined(const Event_GameJoined &event);
     void gameLeft(TabGame *tab);
