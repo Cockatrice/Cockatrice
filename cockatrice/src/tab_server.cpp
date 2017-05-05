@@ -168,7 +168,12 @@ void TabServer::retranslateUi()
 void TabServer::processServerMessageEvent(const Event_ServerMessage &event)
 {
     serverInfoBox->setHtml(QString::fromStdString(event.message()));
-    emit userEvent();
+    if (shouldEmitUpdate) {
+        // prevent the initial server message from taking attention from ping icon
+        emit userEvent();
+    } else {
+        shouldEmitUpdate = true;
+    }
 }
 
 void TabServer::joinRoom(int id, bool setCurrent)
