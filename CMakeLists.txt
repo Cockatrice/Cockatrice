@@ -28,7 +28,7 @@ set(PROJECT_NAME "Cockatrice")
 # Can be overriden by git tags, see cmake/getversion.cmake
 set(PROJECT_VERSION_MAJOR "2")
 set(PROJECT_VERSION_MINOR "3")
-set(PROJECT_VERSION_PATCH "17")
+set(PROJECT_VERSION_PATCH "18")
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
