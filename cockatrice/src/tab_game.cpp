@@ -125,8 +125,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
 
     QVBoxLayout *deckViewLayout = new QVBoxLayout;
-    deckViewLayout->addLayout(buttonHBox);
     deckViewLayout->addWidget(deckView);
+    deckViewLayout->addLayout(buttonHBox);
     deckViewLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(deckViewLayout);
 
