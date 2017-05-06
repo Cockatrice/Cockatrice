@@ -183,7 +183,7 @@ private:
     QAction *aPlay, *aPlayFacedown,
         *aHide,
         *aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
-        *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile, *aMoveToXfromTopOfLibrary;
+        *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToBottomLibraryRandomly, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile, *aMoveToXfromTopOfLibrary;
 
     bool shortcutsActive;
     int defaultNumberTopCards;
@@ -249,7 +249,7 @@ private:
     void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
 public:
     static const int counterAreaWidth = 55;
-    enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToHand, cmMoveToGraveyard, cmMoveToExile };
+    enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToBottomLibraryRandomly, cmMoveToHand, cmMoveToGraveyard, cmMoveToExile };
     enum CardsToReveal {RANDOM_CARD_FROM_ZONE = -2};
 
     enum { Type = typeOther };

@@ -418,6 +418,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     aMoveToTopLibrary->setData(cmMoveToTopLibrary);
     aMoveToBottomLibrary = new QAction(this);
     aMoveToBottomLibrary->setData(cmMoveToBottomLibrary);
+    aMoveToBottomLibraryRandomly = new QAction(this);
+    aMoveToBottomLibraryRandomly->setData(cmMoveToBottomLibraryRandomly);
     aMoveToXfromTopOfLibrary = new QAction(this);
     aMoveToGraveyard = new QAction(this);
     aMoveToHand = new QAction(this);
@@ -427,6 +429,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     aMoveToExile->setData(cmMoveToExile);
     connect(aMoveToTopLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     connect(aMoveToBottomLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    connect(aMoveToBottomLibraryRandomly, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     connect(aMoveToXfromTopOfLibrary, SIGNAL(triggered()), this, SLOT(actMoveCardXCardsFromTop()));
     connect(aMoveToHand, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     connect(aMoveToGraveyard, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
@@ -728,6 +731,7 @@ void Player::retranslateUi()
     aMoveToTopLibrary->setText(tr("&Top of library"));
     aMoveToXfromTopOfLibrary->setText(tr("X cards from the top of library..."));
     aMoveToBottomLibrary->setText(tr("&Bottom of library"));
+    aMoveToBottomLibraryRandomly->setText(tr("Bottom of library randomly"));
     aMoveToHand->setText(tr("&Hand"));
     aMoveToGraveyard->setText(tr("&Graveyard"));
     aMoveToExile->setText(tr("&Exile"));
@@ -2125,6 +2129,24 @@ void Player::cardMenuAction()
                 commandList.append(cmd);
                 break;
             }
+            case cmMoveToBottomLibraryRandomly: {
+                Command_MoveCard *cmd = new Command_MoveCard;
+                cmd->set_start_player_id(startPlayerId);
+                cmd->set_start_zone(startZone.toStdString());
+
+                idList.clear_card();
+                std::random_shuffle(cardList.begin(), cardList.end());
+                for (int i = 0; i < cardList.size(); ++i)
+                    idList.add_card()->set_card_id(cardList[i]->getId());
+
+                cmd->mutable_cards_to_move()->CopyFrom(idList);
+                cmd->set_target_player_id(getId());
+                cmd->set_target_zone("deck");
+                cmd->set_x(-1);
+                cmd->set_y(0);
+                commandList.append(cmd);
+                break;
+            }
             case cmMoveToHand: {
                 Command_MoveCard *cmd = new Command_MoveCard;
                 cmd->set_start_player_id(startPlayerId);
@@ -2455,6 +2477,7 @@ void Player::updateCardMenu(const CardItem *card)
             moveMenu->addAction(aMoveToTopLibrary);
             moveMenu->addAction(aMoveToXfromTopOfLibrary);
             moveMenu->addAction(aMoveToBottomLibrary);
+            moveMenu->addAction(aMoveToBottomLibraryRandomly);
             moveMenu->addSeparator();
             moveMenu->addAction(aMoveToHand);
             moveMenu->addSeparator();
