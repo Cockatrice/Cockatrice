@@ -560,27 +560,32 @@ void MessageLogWidget::logSetActivePlayer(Player *player)
 {
 
     QString str;
-        str = tr("It is now %1's turn.");
+        str = tr("%1's turn.");
     appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + str.arg(player->getName()) + "</b></font><br>");
 }
 
 void MessageLogWidget::logSetActivePhase(int phase)
 {
     QString phaseName;
+    QString color = "green";
     switch (phase) {
-        case 0: phaseName = tr("untap step"); soundEngine->playSound("untap_step"); break;
-        case 1: phaseName = tr("upkeep step"); soundEngine->playSound("upkeep_step"); break;
-        case 2: phaseName = tr("draw step"); soundEngine->playSound("draw_step"); break;
-        case 3: phaseName = tr("first main phase"); soundEngine->playSound("main_1"); break;
-        case 4: phaseName = tr("beginning of combat step"); soundEngine->playSound("start_combat"); break;
-        case 5: phaseName = tr("declare attackers step"); soundEngine->playSound("attack_step"); break;
-        case 6: phaseName = tr("declare blockers step"); soundEngine->playSound("block_step"); break;
-        case 7: phaseName = tr("combat damage step"); soundEngine->playSound("damage_step"); break;
-        case 8: phaseName = tr("end of combat step"); soundEngine->playSound("end_combat"); break;
-        case 9: phaseName = tr("second main phase"); soundEngine->playSound("main_2"); break;
-        case 10: phaseName = tr("ending phase"); soundEngine->playSound("end_step"); break;
+        case 0: phaseName = tr("Untap"); soundEngine->playSound("untap_step"); break;
+        case 1: phaseName = tr("Upkeep"); soundEngine->playSound("upkeep_step"); break;
+        case 2: phaseName = tr("Draw"); soundEngine->playSound("draw_step"); break;
+        case 3: phaseName = tr("First Main"); soundEngine->playSound("main_1"); color="blue"; break;
+        case 4: phaseName = tr("Beginning of Combat"); soundEngine->playSound("start_combat"); color="red"; break;
+        case 5: phaseName = tr("Declare Attackers"); soundEngine->playSound("attack_step"); color="red"; break;
+        case 6: phaseName = tr("Declare Blockers"); soundEngine->playSound("block_step"); color="red"; break;
+        case 7: phaseName = tr("Combat Damage"); soundEngine->playSound("damage_step"); color="red"; break;
+        case 8: phaseName = tr("End of Combat"); soundEngine->playSound("end_combat"); color="red"; break;
+        case 9: phaseName = tr("Second Main"); soundEngine->playSound("main_2"); color="blue"; break;
+        case 10: phaseName = tr("End/Cleanup"); soundEngine->playSound("end_step"); break;
+        default: phaseName = tr("Unknown Phase"); break;
     }
-    appendHtml("<font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + tr("It is now the %1.").arg(phaseName) + "</b></font>");
+    appendHtml("<font color=\"" + color + "\"><b>"
+               + QDateTime::currentDateTime().toString("[hh:mm:ss] ")
+               + QString("%1").arg(phaseName)
+               + "</b></font>");
 }
 
 void MessageLogWidget::containerProcessingStarted(const GameEventContext &_context)
