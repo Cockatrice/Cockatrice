@@ -21,9 +21,9 @@ Cockatrice is an open-source multiplatform supported program for playing tableto
 
 We offer downloads for all full releases (recommended) and the latest development versions. Full releases are checkpoints with major feature or UI enhancements between them, but currently we don't have a set schedule for releasing new updates. The development version contains the most recently added features and bugfixes, but can be more unstable. Downloads for development versions are updated automatically with every change.
 
-- Latest full release (**recommended**): [Download from GitHub](https://github.com/cockatrice/cockatrice/releases/latest)<br>
+- Latest full release (**recommended**): [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest)<br>
 
-- Latest development version: [Download from GitHub](https://github.com/Cockatrice/Cockatrice/releases)
+- Latest development version: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases)
    - Development builds may not be stable and/or contain several bugs.
    - If you'd like to be a Cockatrice Beta Tester, use this version.
    - More information can be [found here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)
@@ -117,7 +117,7 @@ Please note that running this command will expose the TCP port 4747 of the docke
 More infos on how to use Servatrice with Docker can be found in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
 
 
-# License [![GPLv2 License](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING)
+# License [![GPLv2 License](https://img.shields.io/badge/license-GPLv2-blue.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING)
 
 Cockatrice is free software, licensed under the [GPLv2](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING).
 
