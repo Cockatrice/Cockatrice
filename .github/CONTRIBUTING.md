@@ -226,7 +226,7 @@ Please have a look at the specific [FAQ for translators](https://github.com/Cock
 
 # Release Management #
 
-### ToDo list around new main releases ###
+### TODO list around new main releases ###
 
  - [Write a `Release Draft`](https://github.com/Cockatrice/Cockatrice/releases/new) on github with all changes since the last main release
  - [Build newest strings](#step-2-updating-_ents-files) and upload them to transifex --> Give translators some time to update them
