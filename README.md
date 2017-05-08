@@ -29,8 +29,7 @@ We offer downloads for all full releases (recommended) and the latest developmen
    - More information can be [found here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)
 
 
-
-# Get Involved [![Gitter Chat](https://badges.gitter.im/Cockatrice/Cockatrice.png)](https://gitter.im/Cockatrice/Cockatrice)
+# Get Involved [![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice.svg)](https://gitter.im/Cockatrice/Cockatrice)
 
 [Chat](https://gitter.im/Cockatrice/Cockatrice) with the Cockatrice developers on Gitter. Come here to talk about the application, features, or just to hang out. For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
 
@@ -41,6 +40,7 @@ We try to be very responsive to new issues. We'll try to give you advice on how 
 
 
 # Community Resources
+
 - [Cockatrice Official Site](https://cockatrice.github.io)
 - [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
@@ -117,7 +117,7 @@ Please note that running this command will expose the TCP port 4747 of the docke
 More infos on how to use Servatrice with Docker can be found in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
 
 
-# License [![GPLv2 License](https://img.shields.io/badge/license-GPLv2-blue.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING)
+# License [![GPLv2 License](https://img.shields.io/github/license/Cockatrice/Cockatrice.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING)
 
 Cockatrice is free software, licensed under the [GPLv2](https://github.com/Cockatrice/Cockatrice/blob/master/COPYING).
 
