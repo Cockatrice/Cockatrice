@@ -47,6 +47,7 @@ private:
     AbstractClient *client;
     RoomSelector *roomSelector;
     QTextBrowser *serverInfoBox;
+    bool shouldEmitUpdate = false;
 public:
     TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = 0);
     void retranslateUi();
