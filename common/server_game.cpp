@@ -109,7 +109,9 @@ Server_Game::~Server_Game()
     room->gamesLock.unlock();
     currentReplay->set_duration_seconds(secondsElapsed - startTimeOfThisGame);
     replayList.append(currentReplay);
-    storeGameInformation();
+    Server *server = room->getServer();
+    if (server->getStoreReplaysEnabled())
+        storeGameInformation();
 
     for (int i = 0; i < replayList.size(); ++i)
         delete replayList[i];
