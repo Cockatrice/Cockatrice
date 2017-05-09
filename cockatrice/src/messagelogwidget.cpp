@@ -508,7 +508,7 @@ void MessageLogWidget::logRevealCards(
 
     if (cardId == -1) {
         if (otherPlayer)
-            appendHtmlServerMessage(QString(tr("%1 reveals %2 to %3."))
+            appendHtmlServerMessage(tr("%1 reveals %2 to %3.")
                                             .arg(sanitizeHtml(player->getName()))
                                             .arg(zone->getTranslatedName(true, CaseRevealZone))
                                             .arg(sanitizeHtml(otherPlayer->getName())));
@@ -518,7 +518,7 @@ void MessageLogWidget::logRevealCards(
                                             .arg(zone->getTranslatedName(true, CaseRevealZone)));
     } else if (cardId == -2) {
         if (otherPlayer)
-            appendHtmlServerMessage(QString(tr("%1 randomly reveals %2%3 to %4."))
+            appendHtmlServerMessage(tr("%1 randomly reveals %2%3 to %4.")
                                             .arg(sanitizeHtml(player->getName()))
                                             .arg(cardStr)
                                             .arg(fromStr)
@@ -531,16 +531,16 @@ void MessageLogWidget::logRevealCards(
     } else {
         if (faceDown && player == otherPlayer) {
             if (cardName.isEmpty())
-                appendHtmlServerMessage(QString(tr("%1 peeks at face down card #%2."))
+                appendHtmlServerMessage(tr("%1 peeks at face down card #%2.")
                                                 .arg(sanitizeHtml(player->getName()))
                                                 .arg(cardId));
             else
-                appendHtmlServerMessage(QString(tr("%1 peeks at face down card #%2: %3."))
+                appendHtmlServerMessage(tr("%1 peeks at face down card #%2: %3.")
                                                 .arg(sanitizeHtml(player->getName()))
                                                 .arg(cardId)
                                                 .arg(cardStr));
         } else if (otherPlayer)
-            appendHtmlServerMessage(QString(tr("%1 reveals %2%3 to %4."))
+            appendHtmlServerMessage(tr("%1 reveals %2%3 to %4.")
                                             .arg(sanitizeHtml(player->getName()))
                                             .arg(cardStr)
                                             .arg(fromStr)
@@ -727,7 +727,7 @@ void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
     if (currentContext == MessageContext_MoveCard)
         moveCardPT.insert(card, newPT);
     else
-        appendHtmlServerMessage(QString(tr("%1 sets PT of %2 to %3."))
+        appendHtmlServerMessage(tr("%1 sets PT of %2 to %3.")
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg(cardLink(card->getName()))
                                         .arg(QString("<font color=\"blue\">%1</font>")
