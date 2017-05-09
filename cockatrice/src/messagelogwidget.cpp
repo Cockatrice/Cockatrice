@@ -291,8 +291,7 @@ void MessageLogWidget::logDoMoveCard(LogMoveCard &lmc)
     // do not log if moved within the same zone
     if ((startZone == tableConstant() && targetZone == tableConstant() && !ownerChanged)
             || (startZone == handConstant() && targetZone == handConstant())
-               || (startZone == exileConstant() && targetZone == exileConstant())
-                  || (startZone == graveyardConstant() && targetZone == graveyardConstant()))
+               || (startZone == exileConstant() && targetZone == exileConstant()))
         return;
 
     QString cardName = lmc.cardName;
