@@ -52,15 +52,19 @@ namespace {
     TEST(LoadingFromClipboardTest, QuantityPrefixed) {
         QString *clipboard = new QString(
                 "1 Mountain\n"
-                "2x Island\n"
+                        "2x Island\n"
+                        "3X FOREST\n"
         );
         DeckList *deckList = fromClipboard(clipboard);
 
         DecklistBuilder decklistBuilder = DecklistBuilder();
         deckList->forEachCard(decklistBuilder);
 
-        CardRows expectedMainboard = CardRows({{"Mountain", 1},
-                                               {"Island",   2}});
+        CardRows expectedMainboard = CardRows({
+                                                      {"mountain", 1},
+                                                      {"island", 2},
+                                                      {"forest", 3}
+                                              });
         CardRows expectedSideboard = CardRows({});
 
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
@@ -70,8 +74,8 @@ namespace {
     TEST(LoadingFromClipboardTest, CommentsAreIgnored) {
         QString *clipboard = new QString(
                 "//1 Mountain\n"
-                "//2x Island\n"
-                "//SB:2x Island\n"
+                        "//2x Island\n"
+                        "//SB:2x Island\n"
         );
 
         DeckList *deckList = fromClipboard(clipboard);
@@ -89,17 +93,21 @@ namespace {
     TEST(LoadingFromClipboardTest, SideboardPrefix) {
         QString *clipboard = new QString(
                 "1 Mountain\n"
-                "SB: 1 Mountain\n"
-                "SB: 2x Island\n"
+                        "SB: 1 Mountain\n"
+                        "SB: 2x Island\n"
         );
         DeckList *deckList = fromClipboard(clipboard);
 
         DecklistBuilder decklistBuilder = DecklistBuilder();
         deckList->forEachCard(decklistBuilder);
 
-        CardRows expectedMainboard = CardRows({{"Mountain", 1}});
-        CardRows expectedSideboard = CardRows({{"Mountain", 1},
-                                               {"Island",   2}});
+        CardRows expectedMainboard = CardRows({
+                                                      {"mountain", 1}
+                                              });
+        CardRows expectedSideboard = CardRows({
+                                                      {"mountain", 1},
+                                                      {"island",   2}
+                                              });
 
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
         ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
@@ -114,7 +122,89 @@ namespace {
         DecklistBuilder decklistBuilder = DecklistBuilder();
         deckList->forEachCard(decklistBuilder);
 
-        CardRows expectedMainboard = CardRows({{"CardThatDoesNotExistInCardsXml", 1}});
+        CardRows expectedMainboard = CardRows({
+                                                      {"cardthatdoesnotexistincardsxml", 1}
+                                              });
+        CardRows expectedSideboard = CardRows({});
+
+        ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
+        ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+    }
+
+    TEST(LoadingFromClipboardTest, RemoveBlankEntriesFromBeginningAndEnd) {
+        QString *clipboard = new QString(
+                "\n"
+                        "\n"
+                        "\n"
+                        "1x Algae Gharial\n"
+                        "3x CardThatDoesNotExistInCardsXml\n"
+                        "2x Phelddagrif\n"
+                        "\n"
+                        "\n"
+        );
+
+        DeckList *deckList = fromClipboard(clipboard);
+
+        DecklistBuilder decklistBuilder = DecklistBuilder();
+        deckList->forEachCard(decklistBuilder);
+
+        CardRows expectedMainboard = CardRows({
+                                                      {"algae gharial", 1},
+                                                      {"cardthatdoesnotexistincardsxml", 3},
+                                                      {"phelddagrif", 2}
+                                              });
+        CardRows expectedSideboard = CardRows({});
+
+        ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
+        ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+    }
+
+    TEST(LoadingFromClipboardTest, UseFirstBlankIfOnlyOneBlankToSplitSideboard) {
+        QString *clipboard = new QString(
+                "1x Algae Gharial\n"
+                        "3x CardThatDoesNotExistInCardsXml\n"
+                        "\n"
+                        "2x Phelddagrif\n"
+        );
+
+        DeckList *deckList = fromClipboard(clipboard);
+
+        DecklistBuilder decklistBuilder = DecklistBuilder();
+        deckList->forEachCard(decklistBuilder);
+
+        CardRows expectedMainboard = CardRows({
+                                                      {"algae gharial",                  1},
+                                                      {"cardthatdoesnotexistincardsxml", 3}
+                                              });
+        CardRows expectedSideboard = CardRows({
+                                                      {"phelddagrif", 2}
+                                              });
+
+        ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
+        ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+    }
+
+    TEST(LoadingFromClipboardTest, IfMultipleScatteredBlanksAllMainBoard) {
+        QString *clipboard = new QString(
+                "1x Algae Gharial\n"
+                        "3x CardThatDoesNotExistInCardsXml\n"
+                        "\n"
+                        "2x Phelddagrif\n"
+                        "\n"
+                        "3 Giant Growth\n"
+        );
+
+        DeckList *deckList = fromClipboard(clipboard);
+
+        DecklistBuilder decklistBuilder = DecklistBuilder();
+        deckList->forEachCard(decklistBuilder);
+
+        CardRows expectedMainboard = CardRows({
+                                                      {"algae gharial",                  1},
+                                                      {"cardthatdoesnotexistincardsxml", 3},
+                                                      {"phelddagrif", 2},
+                                                      {"giant growth", 3}
+                                              });
         CardRows expectedSideboard = CardRows({});
 
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
