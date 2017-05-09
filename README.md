@@ -21,7 +21,7 @@ Cockatrice is an open-source multiplatform supported program for playing tableto
 
 We offer downloads for all full releases (recommended) and the latest development versions. Full releases are checkpoints with major feature or UI enhancements between them, but currently we don't have a set schedule for releasing new updates. The development version contains the most recently added features and bugfixes, but can be more unstable. Downloads for development versions are updated automatically with every change.
 
-- Latest full release (**recommended**): [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest)[![Download Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg)](https://somsubhra.github.io/github-release-stats/?username=cockatrice&repository=cockatrice)<br>
+- Latest full release (**recommended**): [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest) [![Download Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg)](https://somsubhra.github.io/github-release-stats/?username=cockatrice&repository=cockatrice)<br>
 
 - Latest development version: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases)
    - Development builds may not be stable and/or contain several bugs.
