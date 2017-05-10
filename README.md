@@ -2,7 +2,7 @@
 
 ---
 
-**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads) | [Get Involved](#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [License](#license-)
+**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads-) | [Get Involved](#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [License](#license-)
 
 ---
 
@@ -17,17 +17,16 @@
 Cockatrice is an open-source multiplatform supported program for playing tabletop card games over a network. The program's server design prevents any kind of client modifications to gain an unfair advantage in a game. The client also has a built in single-player mode where you can brew without being connected to a server. This project is written in C++ and is using the Qt5 libraries.<br>
 
 
-# Downloads
+# Downloads [![Cockatrice Eternal Download Count](https://img.shields.io/github/downloads/cockatrice/cockatrice/total.svg)](https://somsubhra.github.io/github-release-stats/?username=cockatrice&repository=cockatrice)
 
 We offer downloads for all full releases (recommended) and the latest development versions. Full releases are checkpoints with major feature or UI enhancements between them, but currently we don't have a set schedule for releasing new updates. The development version contains the most recently added features and bugfixes, but can be more unstable. Downloads for development versions are updated automatically with every change.
 
-- Latest full release (**recommended**): [Download from GitHub](https://github.com/cockatrice/cockatrice/releases/latest)<br>
+- Latest full release (**recommended**): [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest) [![Download Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg)](https://somsubhra.github.io/github-release-stats/?username=cockatrice&repository=cockatrice)<br>
 
-- Latest development version: [Download from GitHub](https://github.com/Cockatrice/Cockatrice/releases)
+- Latest development version: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases)
    - Development builds may not be stable and/or contain several bugs.
    - If you'd like to be a Cockatrice Beta Tester, use this version.
    - More information can be [found here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)
-
 
 
 # Get Involved [![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice.svg)](https://gitter.im/Cockatrice/Cockatrice)
