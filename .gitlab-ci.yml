@@ -13,6 +13,15 @@ stages:
     paths:
       - cache/
 
+.branches: &branches
+  only:
+    - master
+
+.tags: &tags
+  tags:
+    - linux
+    - docker
+
 
 #================================ DEBIAN-BASED ================================
 
@@ -53,18 +62,16 @@ stages:
 
 .build_1604: &1604
   image: ubuntu:16.04
-  tags:
-    - linux
-    - docker
+  <<: *tags
+  <<: *branches
   <<: *install_requirements_16xx
   <<: *artifacts_deb
   <<: *cache
 
 .build_1610: &1610
   image: ubuntu:16.10
-  tags:
-    - linux
-    - docker
+  <<: *tags
+  <<: *branches
   <<: *install_requirements_16xx
   <<: *artifacts_deb
   <<: *cache
@@ -103,9 +110,8 @@ build_debug_1610:
 
 .build_stretch: &stretch
   image: debian:stretch
-  tags:
-    - linux
-    - docker
+  <<: *tags
+  <<: *branches
   <<: *install_requirements_stretch
   <<: *artifacts_deb
   <<: *cache
@@ -157,9 +163,8 @@ build_debug_stretch:
 
 .build_fedora22: &fedora22
   image: fedora:22
-  tags:
-    - linux
-    - docker
+  <<: *tags
+  <<: *branches
   <<: *install_requirements_fedora22
   <<: *artifacts_rpm
   <<: *cache
