@@ -297,7 +297,7 @@ bool Servatrice::initServer()
             while (query2->next())
                 gameTypes.append(query2->value(0).toString());
                 addRoom(new Server_Room(query->value(0).toInt(),
-                                    query->value(6).toInt(),
+                                    query->value(7).toInt(),
                                     query->value(1).toString(),
                                     query->value(2).toString(),
                                     query->value(3).toString().toLower(),
