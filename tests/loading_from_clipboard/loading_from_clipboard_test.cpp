@@ -210,6 +210,54 @@ namespace {
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
         ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
     }
+
+    TEST(LoadingFromClipboardTest, LotsOfStuffInBulkTesting) {
+        QString *clipboard = new QString(
+                "\n"
+                        "\n"
+                        "\n"
+                        "1x test1"
+                        "testNoValueMB"
+                        "2x test2"
+                        "SB: 10 testSB"
+                        "3 test3"
+                        "4X test4"
+                        "\n"
+                        "\n"
+                        "\n"
+                        "\n"
+                        "5x test5"
+                        "6X test6"
+                        "testNoValueSB"
+                        "\n"
+                        "\n"
+                        "\n"
+                        "\n"
+        );
+
+        DeckList *deckList = fromClipboard(clipboard);
+
+        DecklistBuilder decklistBuilder = DecklistBuilder();
+        deckList->forEachCard(decklistBuilder);
+
+        CardRows expectedMainboard = CardRows({
+                                                      {"test1", 1},
+                                                      {"testnovaluemb", 1},
+                                                      {"test2", 2},
+                                                      {"test3", 3},
+                                                      {"test4", 4}
+
+                                      });
+        CardRows expectedSideboard = CardRows({
+                                                      {"testsb", 10},
+                                                      {"test5", 5},
+                                                      {"test6", 6},
+                                                      {"testnovaluesb", 1}
+                                              });
+
+        ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
+        ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+    }
 }
 
 int main(int argc, char **argv) {
