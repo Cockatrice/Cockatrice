@@ -41,12 +41,12 @@ struct DecklistBuilder {
 namespace {
     TEST(LoadingFromClipboardTest, EmptyDeck) {
         DeckList *deckList = fromClipboard(new QString(""));
-        ASSERT_TRUE(deckList->getCardList().isEmpty()) << "Deck should be empty";
+        ASSERT_TRUE(deckList->getCardList().isEmpty());
     }
 
     TEST(LoadingFromClipboardTest, EmptySideboard) {
         DeckList *deckList = fromClipboard(new QString("Sideboard"));
-        ASSERT_TRUE(deckList->getCardList().isEmpty()) << "Deck should be empty";
+        ASSERT_TRUE(deckList->getCardList().isEmpty());
     }
 
     TEST(LoadingFromClipboardTest, QuantityPrefixed) {

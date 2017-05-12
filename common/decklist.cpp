@@ -465,63 +465,56 @@ bool DeckList::saveToFile_Native(QIODevice *device)
     return true;
 }
 
-void DeckList::removeEmptyLinesFromStart(QVector<QString> &inputs)
-{
-    // https://stackoverflow.com/questions/4642339/trimming-a-vector-of-strings
-    inputs.erase(inputs.begin(), std::find_if(inputs.begin(), inputs.end(), [](const QString& s) {return !s.isEmpty();}));
-}
-
 bool DeckList::loadFromStream_Plain(QTextStream &in)
 {
     cleanList();
-    bool inSideboard = false, titleFound = false, isSideboard;
-    int okRows = 0, blankLines = 0;
-    QVector<QString> inputs;
+    QVector<QString> inputs; // QTextStream -> QVector
 
-    // Lets convert input QTextStream => QVector
+    bool priorEntryIsBlank = true, isAtBeginning = true;
+    int blankLines = 0;
     while (!in.atEnd())
-        inputs.push_back(in.readLine().simplified().toLower());
+    {
+        QString line = in.readLine().simplified().toLower();
 
-    // "Trim" the inputs of all blank lines at the start & end of paste
-    removeEmptyLinesFromStart(inputs);
-    std::reverse(inputs.begin(), inputs.end()); // Reverse vector (to remove blanks from end)
-    removeEmptyLinesFromStart(inputs);
-    std::reverse(inputs.begin(), inputs.end()); // Vector now in correct order
+        /*
+         * Removes all blank lines at start of inputs
+         * Ex: ("", "", "", "Card1", "Card2") => ("Card1", "Card2")
+         *
+         * This will also concise multiple blank lines in a row to just one blank
+         * Ex: ("Card1", "Card2", "", "", "", "Card3") => ("Card1", "Card2", "", "Card3")
+         */
+        if (line == QString()) {
+            if (priorEntryIsBlank || isAtBeginning)
+                continue;
 
-    // This will "trim" multiple blank lines in a row to just one blank
-    // Ex: ("Card1", "Card2", "", "", "", "Card3") => ("Card1", "Card2", "", "Card3")
-    while (true) {
-        auto i1 = std::adjacent_find(inputs.begin(), inputs.end());
-
-        if (i1 != inputs.end()) {
-            if (i1 != QString()) {
-                // So we have a duplicate row like (..., "1 card1", "3 card1", ...)
-                // To deal with this, we will combine these rows together to form (..., "4 card1", ...)
-                // And replace the newest row (aka we'd edit "3 card1" in our example) with the new value
-                int combinedTotal = (*i1).mid(0,1).toInt() + (*i1+1).mid(0,1).toInt();
-                inputs.replace(static_cast<int>(std::distance(inputs.begin(), i1+1)), QString::number(combinedTotal) + (*(i1+1)).mid(1));
-            }
-
-            inputs.erase(inputs.begin() + std::distance(inputs.begin(), i1));
-        }
-        else
-            break;
-    }
-
-    // See if sideboard is split by a single blank line
-    // Or if the word "Sideboard" appears, then we just skip this check
-    for (auto iter = inputs.begin(); iter != inputs.end(); iter++) {
-        QString line = *iter;
-
-        if (line.isEmpty())
+            priorEntryIsBlank = true;
             blankLines++;
-
-        if (line.contains("Sideboard", Qt::CaseInsensitive)) {
-            blankLines = -1;
-            break;
+        } else {
+            isAtBeginning = false;
+            priorEntryIsBlank = false;
         }
+
+        inputs.push_back(line);
     }
 
+    /*
+     * Removes all blank lines at end of inputs
+     * Ex: ("Card1", "Card2", "", "", "") => ("Card1", "Card2")
+     */
+     for (auto iter = inputs.end()-1; iter > inputs.begin(); iter--)
+     {
+         if (*iter == QString())
+             inputs.erase(iter);
+         else
+             break;
+     }
+
+    // If "Sideboard" line appears, then blank lines mean nothing
+    if (inputs.contains("sideboard"))
+        blankLines = 2;
+
+    bool inSideboard = false, titleFound = false, isSideboard;
+    int okRows = 0;
     for (auto iter = inputs.begin(); iter != inputs.end(); iter++)
     {
         QString line = *iter;
@@ -542,7 +535,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         // Then we assume it means to start the sideboard section of the paste.
         // If we have the word "Sideboard" appear on any line, then that will
         // also indicate the start of the sideboard.
-        if ((line.isEmpty() && blankLines == 1) || line.startsWith("Sideboard", Qt::CaseInsensitive)) {
+        if ((line.isEmpty() && blankLines == 1) || line.startsWith("sideboard")) {
             inSideboard = true;
             continue;
         }

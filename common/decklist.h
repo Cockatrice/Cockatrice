@@ -123,7 +123,6 @@ private:
     InnerDecklistNode *root;
     void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
     InnerDecklistNode *getZoneObjFromName(const QString  zoneName);
-    void removeEmptyLinesFromStart(QVector<QString> &inputs);
 protected:
     virtual QString getCardZoneFromName(QString /* cardName */, QString currentZoneName) { return currentZoneName; };
     virtual QString getCompleteCardName(const QString cardName) const { return cardName; };
