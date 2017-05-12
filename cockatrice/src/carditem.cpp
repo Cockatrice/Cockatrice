@@ -341,8 +341,10 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
         if (cardMenu)
-            if (!cardMenu->isEmpty())
+            if (!cardMenu->isEmpty()) {
+                owner->updateCardMenu(this);
                 cardMenu->exec(event->screenPos());
+            }
     } else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay()) {
         
         bool hideCard = false;
