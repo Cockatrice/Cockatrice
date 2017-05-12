@@ -498,18 +498,18 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     }
 
     /*
-     * Removes all blank lines at end of inputs
-     * Ex: ("Card1", "Card2", "", "", "") => ("Card1", "Card2")
+     * Removes  blank line at end of inputs (if applicable)
+     * Ex: ("Card1", "Card2", "") => ("Card1", "Card2")
+     * NOTE: Any duplicates were taken care of above, so there can be
+     * at most one blank line at the very end
      */
-     for (auto iter = inputs.end()-1; iter > inputs.begin(); iter--)
-     {
-         if (*iter == QString())
-             inputs.erase(iter);
-         else
-             break;
-     }
+    if (inputs.last() == QString())
+    {
+        blankLines--;
+        inputs.erase(inputs.end() - 1);
+    }
 
-    // If "Sideboard" line appears, then blank lines mean nothing
+    // If "Sideboard" line appears in inputs, then blank lines mean nothing
     if (inputs.contains("sideboard"))
         blankLines = 2;
 
@@ -537,7 +537,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         // also indicate the start of the sideboard.
         if ((line.isEmpty() && blankLines == 1) || line.startsWith("sideboard")) {
             inSideboard = true;
-            continue;
+            continue; // The line isn't actually a card
         }
 
         isSideboard = inSideboard;
@@ -569,7 +569,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         bool ok;
         int number = line.left(i).toInt(&ok);
         if (!ok)
-            continue;
+            number = 1; // If input is "cardName" assume it's "1x cardName"
 
         QString cardName = line.mid(cardNameStart);
 
