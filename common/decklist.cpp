@@ -503,7 +503,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
      * NOTE: Any duplicates were taken care of above, so there can be
      * at most one blank line at the very end
      */
-    if (inputs.last() == QString())
+    if (inputs.size() && inputs.last() == QString())
     {
         blankLines--;
         inputs.erase(inputs.end() - 1);
@@ -546,6 +546,9 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
             line = line.mid(3).trimmed();
             isSideboard = true;
         }
+
+        if (line.trimmed().isEmpty())
+            continue; // The line was "    " instead of "\n"
 
         // Filter out MWS edition symbols and basic land extras
         QRegExp rx("\\[.*\\]");

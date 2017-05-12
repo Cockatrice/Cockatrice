@@ -39,7 +39,8 @@ struct DecklistBuilder {
 };
 
 namespace {
-    TEST(LoadingFromClipboardTest, EmptyDeck) {
+    TEST(LoadingFromClipboardTest, EmptyDeck)
+    {
         DeckList *deckList = fromClipboard(new QString(""));
         ASSERT_TRUE(deckList->getCardList().isEmpty());
     }
@@ -216,19 +217,19 @@ namespace {
                 "\n"
                         "\n"
                         "\n"
-                        "1x test1"
-                        "testNoValueMB"
-                        "2x test2"
-                        "SB: 10 testSB"
-                        "3 test3"
-                        "4X test4"
+                        "1x test1\n"
+                        "testNoValueMB\n"
+                        "2x test2\n"
+                        "SB: 10 testSB\n"
+                        "3 test3\n"
+                        "4X test4\n"
                         "\n"
                         "\n"
                         "\n"
                         "\n"
-                        "5x test5"
-                        "6X test6"
-                        "testNoValueSB"
+                        "5x test5\n"
+                        "6X test6\n"
+                        "testNoValueSB\n"
                         "\n"
                         "\n"
                         "\n"
@@ -242,10 +243,10 @@ namespace {
 
         CardRows expectedMainboard = CardRows({
                                                       {"test1", 1},
-                                                      {"testnovaluemb", 1},
                                                       {"test2", 2},
                                                       {"test3", 3},
-                                                      {"test4", 4}
+                                                      {"test4", 4},
+                                                      {"testnovaluemb", 1}
 
                                       });
         CardRows expectedSideboard = CardRows({
@@ -253,8 +254,8 @@ namespace {
                                                       {"test5", 5},
                                                       {"test6", 6},
                                                       {"testnovaluesb", 1}
-                                              });
 
+                                              });
         ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
         ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
     }
