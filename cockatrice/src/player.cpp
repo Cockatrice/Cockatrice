@@ -2502,7 +2502,8 @@ void Player::updateCardMenu(const CardItem *card)
                 for (int i = 0; i < aAddCounter.size(); ++i) {
                     cardMenu->addSeparator();
                     cardMenu->addAction(aAddCounter[i]);
-                    cardMenu->addAction(aRemoveCounter[i]);
+                    if (card->getCounters().contains(i))
+                        cardMenu->addAction(aRemoveCounter[i]);
                     cardMenu->addAction(aSetCounter[i]);
                 }
                 cardMenu->addSeparator();
