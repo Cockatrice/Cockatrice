@@ -3,8 +3,6 @@
 #include <QVariant>
 #include <QCryptographicHash>
 #include <QDebug>
-#include <QVector>
-#include <algorithm>
 #include "decklist.h"
 
 SideboardPlan::SideboardPlan(const QString &_name, const QList<MoveCard_ToZone> &_moveList)
