@@ -483,7 +483,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
          * This will also concise multiple blank lines in a row to just one blank
          * Ex: ("Card1", "Card2", "", "", "", "Card3") => ("Card1", "Card2", "", "Card3")
          */
-        if (line == QString()) {
+        if (line.isEmpty()) {
             if (priorEntryIsBlank || isAtBeginning)
                 continue;
 
@@ -503,7 +503,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
      * NOTE: Any duplicates were taken care of above, so there can be
      * at most one blank line at the very end
      */
-    if (inputs.size() && inputs.last() == QString())
+    if (inputs.size() && inputs.last().isEmpty())
     {
         blankLines--;
         inputs.erase(inputs.end() - 1);
@@ -515,10 +515,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 
     bool inSideboard = false, titleFound = false, isSideboard;
     int okRows = 0;
-    for (auto iter = inputs.begin(); iter != inputs.end(); iter++)
-    {
-        QString line = *iter;
-
+    foreach(QString line, inputs) {
         // This is a comment line, ignore it
         if (line.startsWith("//"))
         {
@@ -542,7 +539,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 
         isSideboard = inSideboard;
 
-        if (line.startsWith("SB:", Qt::CaseInsensitive)) {
+        if (line.startsWith("sb:")) {
             line = line.mid(3).trimmed();
             isSideboard = true;
         }
@@ -559,7 +556,6 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         // Filter out post card name editions
         rx.setPattern("\\|.*$");
         line.remove(rx);
-        line = line.simplified().toLower();
 
         int i = line.indexOf(' ');
         int cardNameStart = i + 1;
