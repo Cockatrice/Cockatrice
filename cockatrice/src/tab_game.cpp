@@ -412,7 +412,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_client
     retranslateUi();
     connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
     refreshShortcuts();
-    messageLog->logGameJoined(gameInfo.game_id());
 
     // append game to rooms game list for others to see
     for (int i = gameInfo.game_types_size() - 1; i >= 0; i--)
