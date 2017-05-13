@@ -131,7 +131,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         reply = QMessageBox::question(this, tr("Update Available"),
             tr("A new version of Cockatrice is available!") + "<br><br>"
             + "<b>" + tr("New version") + QString(":</b> %1<br>").arg(release->getName())
-            + "<b>" + tr("Published") + QString(":</b> %1 <a href=\"%2\">(").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") + ")</a><br><br>"
+            + "<b>" + tr("Released") + QString(":</b> %1 <a href=\"%2\">(").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") + ")</a><br><br>"
             + tr("Do you want to update now?"),
             QMessageBox::Yes | QMessageBox::No);
 
@@ -141,7 +141,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         QMessageBox::information(this, tr("Update Available"),
             tr("A new version of Cockatrice is available!") + "<br><br>"
             + "<b>" + tr("New version") + QString(":</b> %1<br>").arg(release->getName())
-            + "<b>" + tr("Published") + QString(":</b> %1 <a href=\"%2\">(").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") + ")</a><br><br>"
+            + "<b>" + tr("Released") + QString(":</b> %1 <a href=\"%2\">(").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") + ")</a><br><br>"
             + tr("Unfortunately there are no download packages available for your operating system. \nYou may have to build from source yourself.") + "<br><br>"
             + tr("Please check the download page manually and visit the wiki for instructions on compiling."));
     }
