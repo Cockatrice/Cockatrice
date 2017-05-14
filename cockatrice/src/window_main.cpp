@@ -480,7 +480,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             QMessageBox::critical(this, tr("Error"), tr("Registration failed for a technical problem on the server."));
             break;
         default:
-            QMessageBox::critical(this, tr("Error"), tr("Unknown registration error: %1").arg(static_cast<int>(r)) + QString("<br>") + tr("This usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
+            QMessageBox::critical(this, tr("Error"), tr("Unknown registration error:") + QString(" %1<br>").arg(static_cast<int>(r)) + tr("This usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
     }
     actRegister();
 }
@@ -494,7 +494,7 @@ void MainWindow::activateError()
 
 void MainWindow::socketError(const QString &errorStr)
 {
-    QMessageBox::critical(this, tr("Error"), tr("Socket error: %1").arg(errorStr));
+    QMessageBox::critical(this, tr("Error"), tr("Socket error:") + QString(" %1").arg(errorStr));
     actConnect();
 }
 
