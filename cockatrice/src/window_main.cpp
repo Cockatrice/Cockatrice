@@ -337,7 +337,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             formattedMissingFeatures = "Missing Features: ";
             for (int i = 0; i < missingFeatures.size(); ++i)
                 formattedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i)   );
-            formattedMissingFeatures.append("\nTo update your client, go to Help -> Check for Updates.");
+            formattedMissingFeatures.append(QString("<br>") + tr("To update your client, go to Help -> Check for Client Updates.");
 
             QMessageBox msgBox;
             msgBox.setIcon(QMessageBox::Critical);
@@ -396,7 +396,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
         }
         default:
-            QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)) + tr("\nThis usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
+            QMessageBox::critical(this, tr("Error"), tr("Unknown login error: %1").arg(static_cast<int>(r)) + QString ("<br>") + tr("This usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
             break;
     }
     actConnect();
@@ -404,7 +404,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
 
 QString MainWindow::extractInvalidUsernameMessage(QString & in)
 {
-    QString out = tr("Invalid username.") + "<br/>";
+    QString out = tr("Invalid username.") + "<br>";
     QStringList rules = in.split(QChar('|'));
     if (rules.size() == 7 || rules.size() == 9)
     {
