@@ -1,7 +1,6 @@
 #include <QApplication>
 #include <QPainter>
 #include <QMenu>
-#include <QAction>
 #include <QGraphicsSceneMouseEvent>
 #include "gamescene.h"
 #include "carditem.h"
