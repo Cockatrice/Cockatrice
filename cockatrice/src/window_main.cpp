@@ -95,7 +95,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
         case Event_ConnectionClosed::BANNED: {
             reasonStr = tr("Banned by moderator");
             if (event.has_end_time())
-                reasonStr.append("\n" + tr("Expected end time: %1").arg(QDateTime::fromTime_t(event.end_time()).toString()));
+                reasonStr.append("\n" + tr("Expected end time:" + QString(" %1").arg(QDateTime::fromTime_t(event.end_time()).toString()));
             else
                 reasonStr.append("\n" + tr("This ban lasts indefinitely."));
             if (event.has_reason_str())
@@ -107,12 +107,14 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
         case Event_ConnectionClosed::LOGGEDINELSEWERE: reasonStr = tr("You have been logged out due to logging in at another location."); break;
         default: reasonStr = QString::fromStdString(event.reason_str());
     }
-    QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.\nReason: %1").arg(reasonStr));
+    QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.") + QString("<br>")
+                                                        +tr ("Reason:") + QString(" %1").arg(reasonStr));
 }
 
 void MainWindow::processServerShutdownEvent(const Event_ServerShutdown &event)
 {
-    serverShutdownMessageBox.setInformativeText(tr("The server is going to be restarted in %n minute(s).\nAll running games will be lost.\nReason for shutdown: %1", "", event.minutes()).arg(QString::fromStdString(event.reason())));
+    serverShutdownMessageBox.setInformativeText(tr("The server is going to be restarted. All running games will be lost.", "", event.minutes()) + QString("<br>")
+                                                + tr("Reason for shutdown:") + QString(" %1").arg(QString::fromStdString(event.reason())));
     serverShutdownMessageBox.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64));
     serverShutdownMessageBox.setText(tr("Scheduled server shutdown"));
     serverShutdownMessageBox.setWindowModality(Qt::ApplicationModal);
@@ -210,13 +212,13 @@ void MainWindow::actSinglePlayer()
 
     localServer = new LocalServer(this);
     LocalServerInterface *mainLsi = localServer->newConnection();
-    LocalClient *mainClient = new LocalClient(mainLsi, tr("Player %1").arg(1), settingsCache->getClientID(), this);
+    LocalClient *mainClient = new LocalClient(mainLsi, tr("Player") + QString(" %1").arg(1), settingsCache->getClientID(), this);
     QList<AbstractClient *> localClients;
     localClients.append(mainClient);
 
     for (int i = 0; i < numberPlayers - 1; ++i) {
         LocalServerInterface *slaveLsi = localServer->newConnection();
-        LocalClient *slaveClient = new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), settingsCache->getClientID(), this);
+        LocalClient *slaveClient = new LocalClient(slaveLsi, tr("Player") + QString(" %1").arg(i + 2), settingsCache->getClientID(), this);
         localClients.append(slaveClient);
     }
     tabSupervisor->startLocal(localClients);
@@ -337,7 +339,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             formattedMissingFeatures = "Missing Features: ";
             for (int i = 0; i < missingFeatures.size(); ++i)
                 formattedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i)   );
-            formattedMissingFeatures.append(QString("<br>") + tr("To update your client, go to Help -> Check for Client Updates."));
+            formattedMissingFeatures.append(QString("<br>") + tr("To update your client, go to \"Help -> Check for Client Updates\"."));
 
             QMessageBox msgBox;
             msgBox.setIcon(QMessageBox::Critical);
@@ -375,10 +377,12 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             }
             break;
         case Response::RespClientIdRequired:
-            QMessageBox::critical(this, tr("Error"), tr("This server requires client ID's. Your client is either failing to generate an ID or you are running a modified client.\nPlease close and reopen your client to try again."));
+            QMessageBox::critical(this, tr("Error"), tr("This server requires client ID's. Your client is either failing to generate an ID or you are running a modified client.\n"
+                                                        "Please close and reopen your client to try again."));
             break;
         case Response::RespContextError:
-            QMessageBox::critical(this, tr("Error"), tr("An internal error has occurred, please try closing and reopening your client and try again. If the error persists try updating your client to the most recent build and if need be contact your software provider."));
+            QMessageBox::critical(this, tr("Error"), tr("An internal error has occurred, please try closing and reopening your client and try again.\n"
+                                                        "If the error persists try updating your client to the most recent build and if need be contact your software provider."));
             break;
         case Response::RespAccountNotActivated: {
             bool ok = false;
@@ -410,30 +414,30 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
     {
         out += tr("Your username must respect these rules:") + "<ul>";
 
-        out += "<li>" + tr("is %1 - %2 characters long").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
+        out += "<li>" + tr("number of characters:") + QString("%1 - %2").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
         out += "<li>" + tr("can %1 contain lowercase characters").arg((rules.at(2).toInt() > 0) ? "" : tr("NOT")) + "</li>";
         out += "<li>" + tr("can %1 contain uppercase characters").arg((rules.at(3).toInt() > 0) ? "" : tr("NOT")) + "</li>";
         out += "<li>" + tr("can %1 contain numeric characters").arg((rules.at(4).toInt() > 0) ? "" : tr("NOT")) + "</li>";
 
         if (rules.at(6).size() > 0)
-            out += "<li>" + tr("can contain the following punctuation: %1").arg(rules.at(6).toHtmlEscaped()) + "</li>";
+            out += "<li>" + tr("can contain the following punctuation:") + QString(" %1").arg(rules.at(6).toHtmlEscaped()) + "</li>";
 
         out += "<li>" + tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) + "</li>";
 
         if (rules.size() == 9)
         {
             if (rules.at(7).size() > 0)
-                out += "<li>" + tr("can not contain any of the following words: %1").arg(rules.at(7).toHtmlEscaped()) + "</li>";
+                out += "<li>" + tr("can not contain any of the following words:") + QString(" %1").arg(rules.at(7).toHtmlEscaped()) + "</li>";
 
             if (rules.at(8).size() > 0)
-                out += "<li>" + tr("can not match any of the following expressions: %1").arg(rules.at(8).toHtmlEscaped()) + "</li>";
+                out += "<li>" + tr("can not match any of the following expressions:") + QString(" %1").arg(rules.at(8).toHtmlEscaped()) + "</li>";
         }
 
         out += "</ul>";
     }
     else
     {
-        out += tr("You may only use A-Z, a-z, 0-9, _, ., and - in your username.");
+        out += tr("You may only use this characters in your username:") + QString("\"A-Z\", \"a-z\", \"0-9\", \"_\", \".\", \"-\"");
     }
 
     return out;
@@ -501,9 +505,13 @@ void MainWindow::socketError(const QString &errorStr)
 void MainWindow::protocolVersionMismatch(int localVersion, int remoteVersion)
 {
     if (localVersion > remoteVersion)
-        QMessageBox::critical(this, tr("Error"), tr("You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.\nLocal version is %1, remote version is %2.").arg(localVersion).arg(remoteVersion));
+        QMessageBox::critical(this, tr("Error"), tr("You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server." + QString("<br>")
+                                                    + tr("Local version:") + QString(" %1<br>").arg(localVersion)
+                                                    + tr("Remote version:") + QString(" %1").arg(remoteVersion));
     else
-        QMessageBox::critical(this, tr("Error"), tr("Your Cockatrice client is obsolete. Please update your Cockatrice version.\nLocal version is %1, remote version is %2.").arg(localVersion).arg(remoteVersion));
+        QMessageBox::critical(this, tr("Error"), tr("Your Cockatrice client is obsolete. Please update your Cockatrice version." + QString("<br>")
+                                                    + tr("Local version:") + QString(" %1<br>").arg(localVersion)
+                                                    + tr("Remote version:") + QString(" %1").arg(remoteVersion));
 }
 
 void MainWindow::setClientStatusTitle()
@@ -824,7 +832,7 @@ void MainWindow::cardDatabaseLoadingFailed()
     msgBox.setIcon(QMessageBox::Question);
     msgBox.setText(tr("Cockatrice is unable to load the card database.\n"
         "Do you want to update your card database now?\n"
-        "If unsure or first time user, choose \"Yes\""));
+        "If unsure or first time user, choose \"Yes\"."));
 
     QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
     msgBox.addButton(tr("No"), QMessageBox::NoRole);
@@ -846,10 +854,9 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
     msgBox.setWindowTitle(tr("New sets found"));
     msgBox.setIcon(QMessageBox::Question);
     msgBox.setText(
-        tr("%1 new set(s) found in the card database\n"
-        "Set code(s): %2\n"
-        "Do you want to enable it/them?"
-        ).arg(numUnknownSets).arg(unknownSetsNames.join(", ")));
+        tr("New set(s) found in the card database:") QString(" %1<br>").arg(numUnknownSets)
+        + tr("Set code(s):") + QString(" %1<br><br>").arg(unknownSetsNames.join(", "))
+        + tr("Do you want to enable it/them?"));
 
     QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
     QPushButton *noButton = msgBox.addButton(tr("No"), QMessageBox::NoRole);
@@ -870,7 +877,9 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
 
 void MainWindow::cardDatabaseAllNewSetsEnabled()
 {
-    QMessageBox::information(this, tr("Welcome"), tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the card database have been enabled.\nRead more about changing the set order or disabling specific sets and consequent effects in the \"Edit Sets\" window."));
+    QMessageBox::information(this, tr("Welcome"), tr("Hi! It seems like you're running this version of Cockatrice for the first time.\n"
+                                                     "All the sets in the card database have been enabled.\n"
+                                                     "Read more about changing the set order or disabling specific sets and consequent effects in the \"Edit Sets\" window."));
     actEditSets();
 }
 
@@ -914,7 +923,7 @@ void MainWindow::actCheckCardUpdates()
 
     if(updaterCmd.isEmpty())
     {
-        QMessageBox::warning(this, tr("Error"), tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
+        QMessageBox::warning(this, tr("Error"), tr("Unable to run the card database updater:") + " " + dir.absoluteFilePath(binaryName));
         return;
     }
 
@@ -950,7 +959,7 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = 0;
 
-    QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error: %1").arg(error));
+    QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:" + QString(" %1").arg(error));
 }
 
 void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
@@ -982,7 +991,9 @@ void MainWindow::refreshShortcuts()
 
 void MainWindow::notifyUserAboutUpdate()
 {
-    QMessageBox::information(this, tr("Information"), tr("This server supports additional features that your client doesn't have.\nThis is most likely not a problem, but this message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.\n\nTo update your client, go to Help -> Check for Updates."));
+    QMessageBox::information(this, tr("Information"), tr("This server supports additional features that your client doesn't have.\n"
+                                                         "This is most likely not a problem, but this message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.") + QString("<br><br>")
+                             +tr("To update your client, go to \"Help -> Check for Client Updates\"."));
 }
 
 void MainWindow::actOpenCustomFolder()
@@ -1094,7 +1105,7 @@ void MainWindow::actForgotPasswordRequest()
 
 void MainWindow::forgotPasswordSuccess()
 {
-    QMessageBox::information(this, tr("Forgot Password"), tr("Your password has been reset successfully, you now may  log in using the new credentials."));
+    QMessageBox::information(this, tr("Forgot Password"), tr("Your password has been reset successfully, you now may log in using the new credentials."));
     settingsCache->servers().setFPHostName("");
     settingsCache->servers().setFPPort("");
     settingsCache->servers().setFPPlayerName("");
