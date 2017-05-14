@@ -113,8 +113,9 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
 
 void MainWindow::processServerShutdownEvent(const Event_ServerShutdown &event)
 {
-    serverShutdownMessageBox.setInformativeText(tr("The server is going to be restarted. All running games will be lost.", "", event.minutes()) + QString("<br>")
-                                                + tr("Reason for shutdown:") + QString(" %1").arg(QString::fromStdString(event.reason())));
+    serverShutdownMessageBox.setInformativeText(tr("The server is going to be restarted. All running games will be lost.") + QString("<br><br>")
+                                                + tr("Reason for shutdown:") + QString(" %1<br>").arg(QString::fromStdString(event.reason()))
+                                                + tr("Time until shutdown:") + QString(" %n ", "", event.minutes()) + tr("minutes"));
     serverShutdownMessageBox.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64));
     serverShutdownMessageBox.setText(tr("Scheduled server shutdown"));
     serverShutdownMessageBox.setWindowModality(Qt::ApplicationModal);
