@@ -108,7 +108,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
         default: reasonStr = QString::fromStdString(event.reason_str());
     }
     QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.") + QString("<br>")
-                                                        +tr ("Reason:") + QString(" %1").arg(reasonStr));
+                                                        +tr ("Reason:") + " " + reasonStr);
 }
 
 void MainWindow::processServerShutdownEvent(const Event_ServerShutdown &event)
@@ -337,7 +337,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
     switch (r) {
         case Response::RespClientUpdateRequired: {
             QString formattedMissingFeatures;
-            formattedMissingFeatures = "Missing Features: ";
+            formattedMissingFeatures = "tr("Missing Features:") + QString:(" ")";
             for (int i = 0; i < missingFeatures.size(); ++i)
                 formattedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i)   );
             formattedMissingFeatures.append(QString("<br>") + tr("To update your client, go to \"Help -> Check for Client Updates\"."));
@@ -438,7 +438,7 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
     }
     else
     {
-        out += tr("You may only use this characters in your username:") + QString("\"A-Z\", \"a-z\", \"0-9\", \"_\", \".\", \"-\"");
+        out += tr("You may only use these characters in your username:") + QString("\"A-Z\", \"a-z\", \"0-9\", \"_\", \".\", \"-\"");
     }
 
     return out;
@@ -499,7 +499,7 @@ void MainWindow::activateError()
 
 void MainWindow::socketError(const QString &errorStr)
 {
-    QMessageBox::critical(this, tr("Error"), tr("Socket error:") + QString(" %1").arg(errorStr));
+    QMessageBox::critical(this, tr("Error"), tr("Socket error:") + " " + errorStr);
     actConnect();
 }
 
