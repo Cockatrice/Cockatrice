@@ -95,7 +95,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
         case Event_ConnectionClosed::BANNED: {
             reasonStr = tr("Banned by moderator");
             if (event.has_end_time())
-                reasonStr.append("\n" + tr("Expected end time:" + QString(" %1").arg(QDateTime::fromTime_t(event.end_time()).toString()));
+                reasonStr.append("\n" + tr("Expected end time:" + QString(" ") + QDateTime::fromTime_t(event.end_time()).toString());
             else
                 reasonStr.append("\n" + tr("This ban lasts indefinitely."));
             if (event.has_reason_str())
@@ -421,17 +421,18 @@ QString MainWindow::extractInvalidUsernameMessage(QString & in)
         out += "<li>" + tr("can %1 contain numeric characters").arg((rules.at(4).toInt() > 0) ? "" : tr("NOT")) + "</li>";
 
         if (rules.at(6).size() > 0)
-            out += "<li>" + tr("can contain the following punctuation:") + QString(" %1").arg(rules.at(6).toHtmlEscaped()) + "</li>";
+            out += "<li>" + tr("can contain the following punctuation:") + " " + rules.at(6).toHtmlEscaped() + "</li>";
+        
 
         out += "<li>" + tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) + "</li>";
 
         if (rules.size() == 9)
         {
             if (rules.at(7).size() > 0)
-                out += "<li>" + tr("can not contain any of the following words:") + QString(" %1").arg(rules.at(7).toHtmlEscaped()) + "</li>";
+                out += "<li>" + tr("can not contain any of the following words:") + " " + rules.at(7).toHtmlEscaped() + "</li>";
 
             if (rules.at(8).size() > 0)
-                out += "<li>" + tr("can not match any of the following expressions:") + QString(" %1").arg(rules.at(8).toHtmlEscaped()) + "</li>";
+                out += "<li>" + tr("can not match any of the following expressions:") + " " + rules.at(8).toHtmlEscaped() + "</li>";
         }
 
         out += "</ul>";
