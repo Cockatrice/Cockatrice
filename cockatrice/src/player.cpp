@@ -2079,7 +2079,7 @@ void Player::cardMenuAction()
                 }
                 case cmClone: {
                     Command_CreateToken *cmd = new Command_CreateToken;
-                    cmd->set_zone(card->getZone()->getName().toStdString());
+                    cmd->set_zone("table");
                     cmd->set_card_name(card->getName().toStdString());
                     cmd->set_color(card->getColor().toStdString());
                     cmd->set_pt(card->getPT().toStdString());
@@ -2519,6 +2519,13 @@ void Player::updateCardMenu(const CardItem *card)
             }
         } else
             cardMenu->addMenu(moveMenu);
+    } else {
+        if (card->getZone()
+            && card->getZone()->getName() != "hand") {
+            cardMenu->addAction(aDrawArrow);
+            cardMenu->addSeparator();
+            cardMenu->addAction(aClone);
+        }
     }
 }
 
