@@ -337,7 +337,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
     switch (r) {
         case Response::RespClientUpdateRequired: {
             QString formattedMissingFeatures;
-            formattedMissingFeatures = tr("Missing Features:") + QString:(" ");
+            formattedMissingFeatures = tr("Missing Features:") + QString(" ");
             for (int i = 0; i < missingFeatures.size(); ++i)
                 formattedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i)   );
             formattedMissingFeatures.append(QString("<br>") + tr("To update your client, go to \"Help -> Check for Client Updates\"."));
@@ -507,11 +507,11 @@ void MainWindow::socketError(const QString &errorStr)
 void MainWindow::protocolVersionMismatch(int localVersion, int remoteVersion)
 {
     if (localVersion > remoteVersion)
-        QMessageBox::critical(this, tr("Error"), tr("You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server." + QString("<br>")
+        QMessageBox::critical(this, tr("Error"), tr("You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.") + QString("<br>")
                                                     + tr("Local version:") + QString(" %1\n").arg(localVersion)
                                                     + tr("Remote version:") + QString(" %1").arg(remoteVersion));
     else
-        QMessageBox::critical(this, tr("Error"), tr("Your Cockatrice client is obsolete. Please update your Cockatrice version." + QString("<br>")
+        QMessageBox::critical(this, tr("Error"), tr("Your Cockatrice client is obsolete. Please update your Cockatrice version.") + QString("<br>")
                                                     + tr("Local version:") + QString(" %1\n").arg(localVersion)
                                                     + tr("Remote version:") + QString(" %1").arg(remoteVersion));
 }
@@ -855,8 +855,7 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("New sets found"));
     msgBox.setIcon(QMessageBox::Question);
-    msgBox.setText(
-        tr("New set(s) found in the card database:") QString(" %1\n").arg(numUnknownSets)
+    msgBox.setText(tr("New set(s) found in the card database:") + QString(" %1\n").arg(numUnknownSets)
         + tr("Set code(s):") + QString(" %1\n\n").arg(unknownSetsNames.join(", "))
         + tr("Do you want to enable it/them?"));
 
@@ -961,7 +960,7 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = 0;
 
-    QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:" + QString(" %1").arg(error));
+    QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:") + QString(" %1").arg(error));
 }
 
 void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
