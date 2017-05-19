@@ -95,7 +95,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
         case Event_ConnectionClosed::BANNED: {
             reasonStr = tr("Banned by moderator");
             if (event.has_end_time())
-                reasonStr.append("\n" + tr("Expected end time:" + QString(" ") + QDateTime::fromTime_t(event.end_time()).toString());
+                reasonStr.append("\n" + tr("Expected end time:") + QString(" ") + QDateTime::fromTime_t(event.end_time()).toString());
             else
                 reasonStr.append("\n" + tr("This ban lasts indefinitely."));
             if (event.has_reason_str())
@@ -114,7 +114,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
 void MainWindow::processServerShutdownEvent(const Event_ServerShutdown &event)
 {
     serverShutdownMessageBox.setInformativeText(tr("The server is going to be restarted. All running games will be lost.") + QString("<br><br>")
-                                                + tr("Reason for shutdown:") + QString(" %1<br>").arg(QString::fromStdString(event.reason()))
+                                                + tr("Reason for shutdown:") + QString(" %1\n").arg(QString::fromStdString(event.reason()))
                                                 + tr("Time until shutdown:") + QString(" %1 ").arg(event.minutes()) + tr("minute(s)"));
     serverShutdownMessageBox.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64));
     serverShutdownMessageBox.setText(tr("Scheduled server shutdown"));
@@ -401,7 +401,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
             break;
         }
         default:
-            QMessageBox::critical(this, tr("Error"), tr("Unknown login error:") + QString(" %1<br>").arg(static_cast<int>(r)) + tr("This usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
+            QMessageBox::critical(this, tr("Error"), tr("Unknown login error:") + QString(" %1\n").arg(static_cast<int>(r)) + tr("This usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
             break;
     }
     actConnect();
@@ -486,7 +486,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             QMessageBox::critical(this, tr("Error"), tr("Registration failed for a technical problem on the server."));
             break;
         default:
-            QMessageBox::critical(this, tr("Error"), tr("Unknown registration error:") + QString(" %1<br>").arg(static_cast<int>(r)) + tr("This usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
+            QMessageBox::critical(this, tr("Error"), tr("Unknown registration error:") + QString(" %1\n").arg(static_cast<int>(r)) + tr("This usually means that your client version is out of date, and the server sent a reply your client doesn't understand."));
     }
     actRegister();
 }
@@ -508,11 +508,11 @@ void MainWindow::protocolVersionMismatch(int localVersion, int remoteVersion)
 {
     if (localVersion > remoteVersion)
         QMessageBox::critical(this, tr("Error"), tr("You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server." + QString("<br>")
-                                                    + tr("Local version:") + QString(" %1<br>").arg(localVersion)
+                                                    + tr("Local version:") + QString(" %1\n").arg(localVersion)
                                                     + tr("Remote version:") + QString(" %1").arg(remoteVersion));
     else
         QMessageBox::critical(this, tr("Error"), tr("Your Cockatrice client is obsolete. Please update your Cockatrice version." + QString("<br>")
-                                                    + tr("Local version:") + QString(" %1<br>").arg(localVersion)
+                                                    + tr("Local version:") + QString(" %1\n").arg(localVersion)
                                                     + tr("Remote version:") + QString(" %1").arg(remoteVersion));
 }
 
@@ -856,8 +856,8 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
     msgBox.setWindowTitle(tr("New sets found"));
     msgBox.setIcon(QMessageBox::Question);
     msgBox.setText(
-        tr("New set(s) found in the card database:") QString(" %1<br>").arg(numUnknownSets)
-        + tr("Set code(s):") + QString(" %1<br><br>").arg(unknownSetsNames.join(", "))
+        tr("New set(s) found in the card database:") QString(" %1\n").arg(numUnknownSets)
+        + tr("Set code(s):") + QString(" %1\n\n").arg(unknownSetsNames.join(", "))
         + tr("Do you want to enable it/them?"));
 
     QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
