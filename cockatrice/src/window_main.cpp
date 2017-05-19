@@ -337,7 +337,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
     switch (r) {
         case Response::RespClientUpdateRequired: {
             QString formattedMissingFeatures;
-            formattedMissingFeatures = "tr("Missing Features:") + QString:(" ")";
+            formattedMissingFeatures = tr("Missing Features:") + QString:(" ");
             for (int i = 0; i < missingFeatures.size(); ++i)
                 formattedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " + missingFeatures.value(i)   );
             formattedMissingFeatures.append(QString("<br>") + tr("To update your client, go to \"Help -> Check for Client Updates\"."));
