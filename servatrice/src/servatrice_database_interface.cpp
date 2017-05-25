@@ -173,7 +173,7 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName, const Q
         return false;
 
     QString passwordSha512 = PasswordHasher::computeHash(password, PasswordHasher::generateRandomSalt());
-    token = active ? QString() : PasswordHasher::generateActivationToken();
+    token = active ? QString("") : PasswordHasher::generateActivationToken();
 
     QSqlQuery *query = prepareQuery("insert into {prefix}_users "
         "(name, realname, gender, password_sha512, email, country, registrationDate, active, token, admin, avatar_bmp, clientid, privlevel, privlevelStartDate, privlevelEndDate) "
