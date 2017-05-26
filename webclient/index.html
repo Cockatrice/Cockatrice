@@ -3,7 +3,7 @@
 <head>
   <title>Cockatrice web client</title>
   <link rel="shortcut icon" href="imgs/cockatrice.png" />
-  <link rel="stylesheet" href="js/jquery-ui-1.11.4.css">
+  <link rel="stylesheet" href="js/jquery-ui-1.12.1.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -75,11 +75,9 @@ Loading cockatrice web client...
 
 </div>
 
-<script src="js/jquery-1.11.3.js"></script>
-<script src="js/jquery-ui-1.11.4.js"></script>
-<script src="js/long.js"></script>
-<script src="js/bytebuffer.js"></script>
-<script src="js/protobuf.js"></script>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/jquery-ui-1.12.1.min.js"></script>
+<script src="js/protobuf-6.7.0.min.js"></script>
 <script src="webclient.js"></script>
 
 <script>
@@ -216,7 +214,7 @@ Loading cockatrice web client...
       }
 
       var options = {
-        "debug": true,
+        "debug": false,
         "autojoinrooms" : true,
         "host": host,
         "port": port,
@@ -284,7 +282,7 @@ Loading cockatrice web client...
               switch(key)
               {
                 case 'avatarBmp':
-                  $('#userinfo').prepend("<img id='avatar' src='data:image/JPEG;base64," + value.toBase64() + "' /><br/>");
+                  $('#userinfo').prepend("<img id='avatar' src='data:image/JPEG;base64," + btoa(String.fromCharCode.apply(null, value)) + "' /><br/>");
                   break;
                 case 'accountageSecs':
                   $('#userinfo').append('Registered since: ' + timeAgoToInterval(value) + '<br/>');
