@@ -31,6 +31,8 @@ CardInfoText::CardInfoText(QWidget *parent)
     powtoughLabel2->setTextInteractionFlags(Qt::TextBrowserInteraction);
     loyaltyLabel1 = new QLabel;
     loyaltyLabel2 = new QLabel;
+    setLabel1 = new QLabel;
+    setLabel2 = new QLabel;
     loyaltyLabel1->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
     textLabel = new QTextEdit();
@@ -40,6 +42,8 @@ CardInfoText::CardInfoText(QWidget *parent)
     int row = 0;
     grid->addWidget(nameLabel1, row, 0);
     grid->addWidget(nameLabel2, row++, 1);
+    grid->addWidget(setLabel1, row, 0);
+    grid->addWidget(setLabel2, row++, 1);
     grid->addWidget(manacostLabel1, row, 0);
     grid->addWidget(manacostLabel2, row++, 1);
     grid->addWidget(colorLabel1, row, 0);
@@ -68,6 +72,8 @@ void CardInfoText::setCard(CardInfo *card)
         powtoughLabel2->setText(card->getPowTough());
         loyaltyLabel2->setText(card->getLoyalty() > 0 ? QString::number(card->getLoyalty()) : QString());
         textLabel->setText(card->getText());
+        setLabel2->setText(card->getSetsNames());
+        setLabel2->setWordWrap(true);
     } else {
         nameLabel2->setText("");
         manacostLabel2->setText("");
@@ -76,6 +82,7 @@ void CardInfoText::setCard(CardInfo *card)
         powtoughLabel2->setText("");
         loyaltyLabel2->setText("");
         textLabel->setText("");
+        setLabel2->setText("");
     }
 }
 
@@ -87,4 +94,5 @@ void CardInfoText::retranslateUi()
     cardtypeLabel1->setText(tr("Card type:"));
     powtoughLabel1->setText(tr("P / T:"));
     loyaltyLabel1->setText(tr("Loyalty:"));
+    setLabel1->setText(tr("Sets:"));
 }
