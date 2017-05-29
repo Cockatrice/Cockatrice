@@ -385,6 +385,8 @@ Loading cockatrice web client...
         },
         "roomMessageCallback" : function(roomId, message) {
           var text;
+          var out = $("#tab-room-" + roomId + " .output")[0];
+          var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
           switch(message["messageType"])
           {
             case WebClient.pb.Event_RoomSay.RoomMessageType.Welcome:
@@ -398,6 +400,8 @@ Loading cockatrice web client...
               break;
           }
           $("#tab-room-" + roomId + " .output").append(text + '<br/>');
+          if(isScrolledToBottom)
+            out.scrollTop = out.scrollHeight - out.clientHeight;
         },
         "roomJoinCallback" : function(roomId, message) {
           $("#tab-room-" + roomId + " .userlist").append('<li>' + message['userInfo'].name + '</li>');
