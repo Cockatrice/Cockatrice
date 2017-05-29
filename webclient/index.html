@@ -199,6 +199,15 @@ Loading cockatrice web client...
           return "Unregistered user";
     }
 
+    function sortUserlist(list) {
+      var li = $(list + ' li');
+      li.sort(function(a, b) {
+        return $(a).text().toLowerCase().localeCompare($(b).text().toLowerCase());
+      });
+      $(list).empty().html(li);
+      $(list).selectable();
+    }
+
     $("#loginnow").click(connect);
     $("#port, #user, #pass").keydown(function(e) {
         if (e.keyCode == 13) { connect(); }
@@ -359,7 +368,7 @@ Loading cockatrice web client...
           $.each(room["userList"], function(key, value) {
             $("#tab-room-" + room["roomId"] + " .userlist").append('<li>' + value.name + '</li>');
           });
-          $("#tab-room-" + room["roomId"] + " .userlist").selectable();
+          sortUserlist("#tab-room-" + room["roomId"] + " .userlist");
 
           $("#tab-room-" + room["roomId"] + " .say").click(function() {
             var msg = $("#tab-room-" + room["roomId"] + " .input").val();
@@ -390,6 +399,20 @@ Loading cockatrice web client...
           }
           $("#tab-room-" + roomId + " .output").append(text + '<br/>');
         },
+        "roomJoinCallback" : function(roomId, message) {
+          $("#tab-room-" + roomId + " .userlist").append('<li>' + message['userInfo'].name + '</li>');
+          sortUserlist("#tab-room-" + roomId + " .userlist");
+        },
+        "roomLeaveCallback" : function(roomId, message) {
+          var name = message['name'];
+          $("#tab-room-" + roomId + " .userlist li").filter(function() {
+            return $.text([this]) === name;
+          }).remove();
+          sortUserlist("#tab-room-" + roomId + " .userlist");
+        },
+        "roomListGamesCallback" : function(roomId, message) {
+          // TBD
+        }
       };
 
       $(this).prop("disabled", true);
