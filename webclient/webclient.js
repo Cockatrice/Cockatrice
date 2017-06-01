@@ -46,17 +46,20 @@ var WebClient = {
     "pb/response_join_room.proto",
     "pb/room_event.proto",
     "pb/event_room_say.proto",
-    "pb/serverinfo_user.proto"
+    "pb/event_join_room.proto",
+    "pb/event_leave_room.proto",
+    "pb/event_list_games.proto",
+    "pb/serverinfo_user.proto",
+    "pb/serverinfo_game.proto"
   ],
 
   initialize : function()
   {
-    this.pb = new protobuf.Root({
-        convertFieldsToCamelCase: true,
-    });
+    this.pb = new protobuf.Root();
 
-    this.pb.load(this.pbfiles, {
-      keepCase: false
+    this.pb.load(this.pbfiles, { keepCase: false }, function(err, root) {
+    if (err)
+        throw err;
     });
 
     this.initialized=true;
@@ -340,12 +343,29 @@ var WebClient = {
 
   processRoomEvent : function (raw)
   {
+    if(raw[".Event_ListGames.ext"]) {
+      if(this.options.roomListGamesCallback)
+        this.options.roomListGamesCallback(raw["roomId"], raw[".Event_ListGames.ext"]);
+      return;
+    }
+
+    if(raw[".Event_JoinRoom.ext"]) {
+      if(this.options.roomJoinCallback)
+        this.options.roomJoinCallback(raw["roomId"], raw[".Event_JoinRoom.ext"]);
+      return;
+    }
+
+    if(raw[".Event_LeaveRoom.ext"]) {
+      if(this.options.roomLeaveCallback)
+        this.options.roomLeaveCallback(raw["roomId"], raw[".Event_LeaveRoom.ext"]);
+      return;
+    }
+
     if(raw[".Event_RoomSay.ext"]) {
       if(this.options.roomMessageCallback)
         this.options.roomMessageCallback(raw["roomId"], raw[".Event_RoomSay.ext"]);
       return;
     }
-
   },
 
   processJoinRoom : function(raw)
