@@ -2448,9 +2448,9 @@ void Player::updateCardMenu(const CardItem *card)
         }
     }
 
-    if (revealedCard)
+    if (revealedCard) {
         cardMenu->addAction(aHide);
-    else if (writeableCard) {
+    } else if (writeableCard) {
         if (moveMenu->isEmpty()) {
             moveMenu->addAction(aMoveToTopLibrary);
             moveMenu->addAction(aMoveToXfromTopOfLibrary);
@@ -2463,7 +2463,7 @@ void Player::updateCardMenu(const CardItem *card)
             moveMenu->addAction(aMoveToExile);
         }
 
-        if (card->getZone()) {
+        if (card->getZone()){
             if (card->getZone()->getName() == "table") {
                 if (ptMenu->isEmpty()) {
                     ptMenu->addAction(aIncP);
@@ -2520,9 +2520,10 @@ void Player::updateCardMenu(const CardItem *card)
         } else
             cardMenu->addMenu(moveMenu);
     } else {
-        if (card->getZone()
-            && card->getZone()->getName() != "hand") {
+        if (card->getZone() && card->getZone()->getName() != "hand") {
             cardMenu->addAction(aDrawArrow);
+            cardMenu->addSeparator();
+            addRelatedCardActions(card, cardMenu);
             cardMenu->addSeparator();
             cardMenu->addAction(aClone);
         }
@@ -2634,7 +2635,7 @@ void Player::processSceneSizeChange(int newPlayerWidth)
 
 void Player::setLastToken(CardInfo *cardInfo)
 {
-    if (cardInfo == nullptr)
+    if (cardInfo == nullptr || aCreateAnotherToken == nullptr)
         return;
 
     lastTokenName = cardInfo->getName();
