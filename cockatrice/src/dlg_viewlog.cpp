@@ -37,4 +37,5 @@ void DlgViewLog::logEntryAdded(QString message)
 void DlgViewLog::closeEvent(QCloseEvent * /* event */)
 {
     logArea->clear();
+    logArea->appendPlainText(Logger::getInstance().getClientVersion());
 }
