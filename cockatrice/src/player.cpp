@@ -2434,6 +2434,9 @@ void Player::updateCardMenu(const CardItem *card)
     QMenu *ptMenu = card->getPTMenu();
     QMenu *moveMenu = card->getMoveMenu();
 
+    if (cardMenu == nullptr || ptMenu == nullptr || moveMenu == nullptr)
+        return;
+
     cardMenu->clear();
 
     bool revealedCard = false;
