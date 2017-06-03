@@ -108,7 +108,7 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
         default: reasonStr = QString::fromStdString(event.reason_str());
     }
     QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.") + QString("<br>")
-                                                        +tr ("Reason:") + " " + reasonStr);
+                                                        +tr("Reason:") + " " + reasonStr);
 }
 
 void MainWindow::processServerShutdownEvent(const Event_ServerShutdown &event)
