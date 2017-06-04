@@ -8,8 +8,7 @@ class LayoutsSettings : public SettingsManager
 {
     Q_OBJECT
     friend class SettingsCache;
-public:    
-
+public:
     void setDeckEditorLayoutState(const QByteArray &value);
     void setDeckEditorGeometry(const QByteArray &value);
     void setDeckEditorCardSize(const QSize &value);

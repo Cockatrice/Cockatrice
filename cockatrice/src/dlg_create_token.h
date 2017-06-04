@@ -11,6 +11,7 @@ class QCheckBox;
 class QPushButton;
 class QRadioButton;
 class QCloseEvent;
+class QTreeView;
 class DeckList;
 class CardDatabaseModel;
 class TokenDisplayModel;
@@ -44,6 +45,7 @@ private:
     QCheckBox *destroyCheckBox;
     QRadioButton *chooseTokenFromAllRadioButton, *chooseTokenFromDeckRadioButton;
     CardInfoPicture *pic;
+    QTreeView *chooseTokenView;
 
     void updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const;
 };
