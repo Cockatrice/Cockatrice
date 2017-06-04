@@ -190,45 +190,42 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo) {
     userInfo = new ServerInfo_User(_userInfo);
 
     tabServer = new TabServer(this, client);
-    connect(tabServer, SIGNAL(roomJoined(
-                                      const ServerInfo_Room &, bool)), this, SLOT(addRoomTab(
-                                                                                          const ServerInfo_Room &, bool)));
+    connect(tabServer, SIGNAL(roomJoined(const ServerInfo_Room &, bool)), this, SLOT(addRoomTab(const ServerInfo_Room &, bool)));
     myAddTab(tabServer);
 
     tabUserLists = new TabUserLists(this, client, *userInfo);
-    connect(tabUserLists, SIGNAL(openMessageDialog(
-                                         const QString &, bool)), this, SLOT(addMessageTab(
-                                                                                     const QString &, bool)));
+    connect(tabUserLists, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
     connect(tabUserLists, SIGNAL(userJoined(ServerInfo_User)), this, SLOT(processUserJoined(ServerInfo_User)));
-    connect(tabUserLists, SIGNAL(userLeft(
-                                         const QString &)), this, SLOT(processUserLeft(
-                                                                               const QString &)));
+    connect(tabUserLists, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
     myAddTab(tabUserLists);
 
     updatePingTime(0, -1);
 
     if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
         tabDeckStorage = new TabDeckStorage(this, client);
-        connect(tabDeckStorage, SIGNAL(openDeckEditor(
-                                               const DeckLoader *)), this, SLOT(addDeckEditorTab(
-                                                                                        const DeckLoader *)));
-        myAddTab(tabDeckStorage);
+        connect(tabDeckStorage, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
+        int ind = myAddTab(tabDeckStorage);
+        addCloseButtonToTab(tabDeckStorage, ind);
 
         tabReplays = new TabReplays(this, client);
         connect(tabReplays, SIGNAL(openReplay(GameReplay * )), this, SLOT(openReplay(GameReplay * )));
-        myAddTab(tabReplays);
+        int tabIndex = myAddTab(tabReplays);
+        addCloseButtonToTab(tabReplays, tabIndex);
     } else {
         tabDeckStorage = 0;
         tabReplays = 0;
     }
 
     if (userInfo->user_level() & ServerInfo_User::IsModerator) {
-        tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
+        tabAdmin = new TabAdmin(this, client, static_cast<bool>(userInfo->user_level() & ServerInfo_User::IsAdmin));
         connect(tabAdmin, SIGNAL(adminLockChanged(bool)), this, SIGNAL(adminLockChanged(bool)));
-        myAddTab(tabAdmin);
+        int tab_index = myAddTab(tabAdmin);
+        addCloseButtonToTab(tabAdmin, tab_index);
 
         tabLog = new TabLog(this, client);
-        myAddTab(tabLog);
+        int tablog_index = myAddTab(tabLog);
+        addCloseButtonToTab(tabLog, tablog_index);
+
     } else {
         tabAdmin = 0;
         tabLog = 0;
@@ -263,19 +260,6 @@ void TabSupervisor::stop()
         localClients.clear();
         
         emit localGameEnded();
-    } else {
-        if (tabUserLists)
-            tabUserLists->deleteLater();
-        if (tabServer)
-            tabServer->deleteLater();
-        if (tabDeckStorage)
-            tabDeckStorage->deleteLater();
-        if (tabReplays)
-            tabReplays->deleteLater();
-        if (tabAdmin)
-            tabAdmin->deleteLater();
-        if (tabLog)
-            tabLog->deleteLater();
     }
     tabUserLists = 0;
     tabServer = 0;
@@ -474,12 +458,48 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     return tab;
 }
 
+TabReplays *TabSupervisor::addGameReplaysTab()
+{
+    TabReplays *tab = new TabReplays(this, client);
+    connect(tab, SIGNAL(replaysClosing(TabReplays *)), this, SLOT(tabReplaysClosed(TabReplays *)));
+    int tabIndex = myAddTab(tab);
+    addCloseButtonToTab(tab, tabIndex);
+    setCurrentWidget(tab);
+    return tab;
+}
+
+TabDeckStorage *TabSupervisor::addDeckStorageTab()
+{
+    TabDeckStorage *tab = new TabDeckStorage(this, client);
+    connect(tab, SIGNAL(deckStorageClosing(TabDeckStorage *)), this, SLOT(tabDeckStorageClosed(TabDeckStorage *)));
+    int tabIndex = myAddTab(tab);
+    addCloseButtonToTab(tab, tabIndex);
+    setCurrentWidget(tab);
+    return tab;
+}
+
 void TabSupervisor::deckEditorClosed(TabDeckEditor *tab)
 {
     if (tab == currentWidget())
         emit setMenu();
     
     deckEditorTabs.removeAt(deckEditorTabs.indexOf(tab));
+    removeTab(indexOf(tab));
+}
+
+void TabSupervisor::tabReplaysClosed(TabReplays *tab)
+{
+    if (tab == currentWidget())
+        emit setMenu();
+
+    removeTab(indexOf(tab));
+}
+
+void TabSupervisor::tabDeckStorageClosed(TabDeckStorage *tab)
+{
+    if (tab == currentWidget())
+        emit setMenu();
+
     removeTab(indexOf(tab));
 }
 

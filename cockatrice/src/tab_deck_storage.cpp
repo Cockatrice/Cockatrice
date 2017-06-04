@@ -112,6 +112,16 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_c
     setCentralWidget(mainWidget);
 }
 
+TabDeckStorage::~TabDeckStorage()
+{
+    emit deckStorageClosing(this);
+}
+
+void TabDeckStorage::closeRequest()
+{
+    deleteLater();
+}
+
 void TabDeckStorage::retranslateUi()
 {
     leftGroupBox->setTitle(tr("Local file system"));

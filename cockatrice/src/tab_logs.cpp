@@ -51,7 +51,12 @@ TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *
 
 TabLog::~TabLog()
 {
+    emit closingTabLogs(this);
+}
 
+void TabLog::closeRequest()
+{
+    deleteLater();
 }
 
 void TabLog::retranslateUi()

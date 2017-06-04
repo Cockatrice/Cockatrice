@@ -48,10 +48,15 @@ private slots:
     void deleteDeckFinished(const Response &response, const CommandContainer &commandContainer);
 public:
     TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client);
+    ~TabDeckStorage();
     void retranslateUi();
     QString getTabText() const { return tr("Deck storage"); }
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);
+    void deckStorageClosing(TabDeckStorage *tab);
+
+public slots:
+        void closeRequest();
 };
 
 #endif

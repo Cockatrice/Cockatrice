@@ -68,7 +68,6 @@
 #define GITHUB_ISSUES_URL "https://github.com/Cockatrice/Cockatrice/issues"
 #define GITHUB_TROUBLESHOOTING_URL "https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting"
 #define GITHUB_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions"
-
 #define DOWNLOAD_URL "https://dl.bintray.com/cockatrice/Cockatrice/"
 
 const QString MainWindow::appName = "Cockatrice";
@@ -260,6 +259,16 @@ void MainWindow::localGameEnded()
 void MainWindow::actDeckEditor()
 {
     tabSupervisor->addDeckEditorTab(0);
+}
+
+void MainWindow::actGameReplays()
+{
+    tabSupervisor->addGameReplaysTab();
+}
+
+void MainWindow::actDeckStorage()
+{
+    tabSupervisor->addDeckStorageTab();
 }
 
 void MainWindow::actFullScreen(bool checked)
@@ -530,6 +539,8 @@ void MainWindow::retranslateUi()
     aSinglePlayer->setText(tr("Start &local game..."));
     aWatchReplay->setText(tr("&Watch replay..."));
     aDeckEditor->setText(tr("&Deck editor"));
+    aGameReplays->setText(tr("Game replays"));
+    aDeckStorageTab->setText(tr("Deck storage"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
     aSettings->setText(tr("&Settings..."));
@@ -570,6 +581,10 @@ void MainWindow::createActions()
     connect(aWatchReplay, SIGNAL(triggered()), this, SLOT(actWatchReplay()));
     aDeckEditor = new QAction(this);
     connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
+    aGameReplays = new QAction(this);
+    connect(aGameReplays, SIGNAL(triggered()), this, SLOT(actGameReplays()));
+    aDeckStorageTab = new QAction(this);
+    connect(aDeckStorageTab, SIGNAL(triggered()), this, SLOT(actDeckStorage()));
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
@@ -632,6 +647,8 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aWatchReplay);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aDeckEditor);
+    cockatriceMenu->addAction(aGameReplays);
+    cockatriceMenu->addAction(aDeckStorageTab);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aFullScreen);
     cockatriceMenu->addSeparator();

@@ -91,6 +91,8 @@ signals:
     void showWindowIfHidden();
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
+    TabReplays *addGameReplaysTab();
+    TabDeckStorage *addDeckStorageTab();
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
 private slots:
@@ -108,6 +110,8 @@ private slots:
     void processUserJoined(const ServerInfo_User &userInfo);
     void talkLeft(TabMessage *tab);
     void deckEditorClosed(TabDeckEditor *tab);
+    void tabReplaysClosed(TabReplays *tab);
+    void tabDeckStorageClosed(TabDeckStorage *tab);
     void tabUserEvent(bool globalEvent);
     void updateTabText(Tab *tab, const QString &newTabText);
     void processRoomEvent(const RoomEvent &event);

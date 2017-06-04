@@ -110,6 +110,16 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client)
     connect(client, SIGNAL(replayAddedEventReceived(const Event_ReplayAdded &)), this, SLOT(replayAddedEventReceived(const Event_ReplayAdded &)));
 }
 
+TabReplays::~TabReplays()
+{
+    emit replaysClosing(this);
+}
+
+void TabReplays::closeRequest()
+{
+    deleteLater();
+}
+
 void TabReplays::retranslateUi()
 {
     leftGroupBox->setTitle(tr("Local file system"));

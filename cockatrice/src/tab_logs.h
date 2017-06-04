@@ -40,12 +40,14 @@ private:
 
     void createDock();
 signals:
+    void closingTabLogs(TabLog *tab);
 
 private slots:
     void getClicked();
     void clearClicked();
     void viewLogHistory_processResponse(const Response &resp);
     void restartLayout();
+    void closeRequest();
 
 public:
     TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = 0);
