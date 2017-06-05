@@ -52,6 +52,7 @@ public:
     TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = 0);
     void retranslateUi();
     QString getTabText() const { return tr("Server"); }
+    bool updateIcon() { return false; }
 };
 
 #endif

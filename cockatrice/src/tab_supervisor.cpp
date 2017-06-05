@@ -91,7 +91,6 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
     connect(client, SIGNAL(gameEventContainerReceived(const GameEventContainer &)), this, SLOT(processGameEventContainer(const GameEventContainer &)));
     connect(client, SIGNAL(gameJoinedEventReceived(const Event_GameJoined &)), this, SLOT(gameJoined(const Event_GameJoined &)));
     connect(client, SIGNAL(userMessageEventReceived(const Event_UserMessage &)), this, SLOT(processUserMessageEvent(const Event_UserMessage &)));
-    connect(client, SIGNAL(maxPingTime(int, int)), this, SLOT(updatePingTime(int, int)));
     connect(client, SIGNAL(notifyUserEventReceived(const Event_NotifyUser &)), this, SLOT(processNotifyUserEvent(const Event_NotifyUser &)));
     
     retranslateUi();
@@ -205,8 +204,6 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo) {
                                                                                const QString &)));
     myAddTab(tabUserLists);
 
-    updatePingTime(0, -1);
-
     if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
         tabDeckStorage = new TabDeckStorage(this, client);
         connect(tabDeckStorage, SIGNAL(openDeckEditor(
@@ -301,16 +298,6 @@ void TabSupervisor::stop()
 
     delete userInfo;
     userInfo = 0;
-}
-
-void TabSupervisor::updatePingTime(int value, int max)
-{
-    if (!tabServer)
-        return;
-    if (tabServer->getContentsChanged())
-        return;
-    
-    setTabIcon(indexOf(tabServer), QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
 }
 
 void TabSupervisor::closeButtonPressed()
@@ -488,7 +475,9 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
     Tab *tab = static_cast<Tab *>(sender());
     if (tab != currentWidget()) {
         tab->setContentsChanged(true);
-        setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
+        if (tab->updateIcon()) {
+            setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
+        }
     }
     if (globalEvent && settingsCache->getNotificationsEnabled())
         QApplication::alert(this);
