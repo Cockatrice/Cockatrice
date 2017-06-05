@@ -107,13 +107,13 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
         case Event_ConnectionClosed::LOGGEDINELSEWERE: reasonStr = tr("You have been logged out due to logging in at another location."); break;
         default: reasonStr = QString::fromStdString(event.reason_str());
     }
-    QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.") + QString("<br>")
+    QMessageBox::critical(this, tr("Connection closed"), tr("The server has terminated your connection.") + QString("\n")
                                                         +tr("Reason:") + " " + reasonStr);
 }
 
 void MainWindow::processServerShutdownEvent(const Event_ServerShutdown &event)
 {
-    serverShutdownMessageBox.setInformativeText(tr("The server is going to be restarted. All running games will be lost.") + QString("<br><br>")
+    serverShutdownMessageBox.setInformativeText(tr("The server is going to be restarted. All running games will be lost.") + QString("\n\n")
                                                 + tr("Reason for shutdown:") + QString(" %1\n").arg(QString::fromStdString(event.reason()))
                                                 + tr("Time until shutdown:") + QString(" %1 ").arg(event.minutes()) + tr("minute(s)"));
     serverShutdownMessageBox.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64));
@@ -409,7 +409,7 @@ void MainWindow::loginError(Response::ResponseCode r, QString reasonStr, quint32
 
 QString MainWindow::extractInvalidUsernameMessage(QString & in)
 {
-    QString out = tr("Invalid username.") + "<br>";
+    QString out = tr("Invalid username.") + "\n";
     QStringList rules = in.split(QChar('|'));
     if (rules.size() == 7 || rules.size() == 9)
     {
@@ -507,11 +507,11 @@ void MainWindow::socketError(const QString &errorStr)
 void MainWindow::protocolVersionMismatch(int localVersion, int remoteVersion)
 {
     if (localVersion > remoteVersion)
-        QMessageBox::critical(this, tr("Error"), tr("You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.") + QString("<br>")
+        QMessageBox::critical(this, tr("Error"), tr("You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.") + QString("\n")
                                                     + tr("Local version:") + QString(" %1\n").arg(localVersion)
                                                     + tr("Remote version:") + QString(" %1").arg(remoteVersion));
     else
-        QMessageBox::critical(this, tr("Error"), tr("Your Cockatrice client is obsolete. Please update your Cockatrice version.") + QString("<br>")
+        QMessageBox::critical(this, tr("Error"), tr("Your Cockatrice client is obsolete. Please update your Cockatrice version.") + QString("\n")
                                                     + tr("Local version:") + QString(" %1\n").arg(localVersion)
                                                     + tr("Remote version:") + QString(" %1").arg(remoteVersion));
 }
@@ -993,7 +993,7 @@ void MainWindow::refreshShortcuts()
 void MainWindow::notifyUserAboutUpdate()
 {
     QMessageBox::information(this, tr("Information"), tr("This server supports additional features that your client doesn't have.\n"
-                                                         "This is most likely not a problem, but this message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.") + QString("<br><br>")
+                                                         "This is most likely not a problem, but this message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.") + QString("\n\n")
                              +tr("To update your client, go to \"Help -> Check for Client Updates\"."));
 }
 
