@@ -69,8 +69,6 @@
 #define GITHUB_TROUBLESHOOTING_URL "https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting"
 #define GITHUB_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions"
 
-#define DOWNLOAD_URL "https://dl.bintray.com/cockatrice/Cockatrice/"
-
 const QString MainWindow::appName = "Cockatrice";
 const QStringList MainWindow::fileNameFilters = QStringList()
     << QObject::tr("Cockatrice card database (*.xml)")
