@@ -455,7 +455,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             QMessageBox::critical(this, tr("Registration denied"), tr("The email address provider used during registration has been blacklisted for use on this server."));
             break;
         case Response::RespTooManyRequests:
-            QMessageBox::critical(this, tr("Registration denied"), tr("It appears you are attempting to register a new account on this server yet you already have an account registered and the server restricts the number of accounts a user can register.  Please contact the server operator for further assistance or to obtain your credential information."));
+            QMessageBox::critical(this, tr("Registration denied"), tr("It appears you are attempting to register a new account on this server yet you already have an account registered with the email provided. This server restricts the number of accounts a user can register per address.  Please contact the server operator for further assistance or to obtain your credential information."));
             break;
         case Response::RespPasswordTooShort:
             QMessageBox::critical(this, tr("Registration denied"), tr("Password too short."));
