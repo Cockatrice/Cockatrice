@@ -939,6 +939,10 @@ void TabDeckEditor::setDeck(DeckLoader *_deck)
     PictureLoader::cacheCardPixmaps(db->getCards(deckModel->getDeckList()->getCardList()));
     deckView->expandAll();
     setModified(false);
+
+    // If they load a deck, make the deck list appear
+    aDeckDockVisible->setChecked(true);
+    deckDock->setVisible(aDeckDockVisible->isChecked());
 }
 
 void TabDeckEditor::setModified(bool _modified)
