@@ -46,6 +46,8 @@ CardItem::~CardItem()
 
 void CardItem::prepareDelete()
 {
+    disconnect(this, 0, 0, 0);
+
     if (owner) {
         if (owner->getCardMenu() == cardMenu) {
             owner->setCardMenu(0);
