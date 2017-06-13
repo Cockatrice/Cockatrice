@@ -67,7 +67,7 @@ Dependencies:
 - [CMake](https://www.cmake.org/)
 
 Oracle can optionally use zlib to load zipped files:
-- [zlib](http://www.zlib.net/) (no https!)
+- [zlib](https://www.zlib.net/)
 
 To compile:
 
@@ -99,9 +99,9 @@ The following flags can be passed to `cmake`:
 
 # Running
 
-`cockatrice` is the game client    
-`oracle` fetches card data    
-`servatrice` is the server<br>
+`Cockatrice` is the game client    
+`Oracle` fetches card data    
+`Servatrice` is the server<br>
 
 
 #### Servatrice Docker container
@@ -113,7 +113,9 @@ You just need to create an image from the Dockerfile<br>
 And then run it<br>
 `docker run -i -p 4747:4747/tcp -t servatrice:latest`<br>
 
-Please note that running this command will expose the TCP port 4747 of the docker container to permit connections to the server.<br>
+>Please note that running this command will expose the TCP port 4747 of the docker container<br>
+to permit connections to the server.
+
 More infos on how to use Servatrice with Docker can be found in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
 
 
