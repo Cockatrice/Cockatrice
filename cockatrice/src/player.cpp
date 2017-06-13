@@ -110,6 +110,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     userInfo = new ServerInfo_User;
     userInfo->CopyFrom(info);
 
+
+
     connect(settingsCache, SIGNAL(horizontalHandChanged()), this, SLOT(rearrangeZones()));
     connect(settingsCache, SIGNAL(handJustificationChanged()), this, SLOT(rearrangeZones()));
 
@@ -2427,8 +2429,11 @@ void Player::refreshShortcuts()
 
 void Player::updateCardMenu(const CardItem *card)
 {
-    if (card == nullptr)
+    // If bad card OR is a spectator (as spectators don't need card menus), return
+    if (card == nullptr || game->isSpectator())
+    {
         return;
+    }
 
     QMenu *cardMenu = card->getCardMenu();
     QMenu *ptMenu = card->getPTMenu();
@@ -2438,20 +2443,30 @@ void Player::updateCardMenu(const CardItem *card)
 
     bool revealedCard = false;
     bool writeableCard = getLocal();
-    if (card->getZone() && card->getZone()->getIsView()) {
+    if (card->getZone() && card->getZone()->getIsView())
+    {
         ZoneViewZone *view = static_cast<ZoneViewZone *>(card->getZone());
-        if (view->getRevealZone()) {
+        if (view->getRevealZone())
+        {
             if (view->getWriteableRevealZone())
+            {
                 writeableCard = true;
+            }
             else
+            {
                 revealedCard = true;
+            }
         }
     }
 
-    if (revealedCard) {
+    if (revealedCard)
+    {
         cardMenu->addAction(aHide);
-    } else if (writeableCard) {
-        if (moveMenu->isEmpty()) {
+    }
+    else if (writeableCard)
+    {
+        if (moveMenu->isEmpty())
+        {
             moveMenu->addAction(aMoveToTopLibrary);
             moveMenu->addAction(aMoveToXfromTopOfLibrary);
             moveMenu->addAction(aMoveToBottomLibrary);
@@ -2463,9 +2478,12 @@ void Player::updateCardMenu(const CardItem *card)
             moveMenu->addAction(aMoveToExile);
         }
 
-        if (card->getZone()){
-            if (card->getZone()->getName() == "table") {
-                if (ptMenu->isEmpty()) {
+        if (card->getZone())
+        {
+            if (card->getZone()->getName() == "table")
+            {
+                if (ptMenu->isEmpty())
+                {
                     ptMenu->addAction(aIncP);
                     ptMenu->addAction(aDecP);
                     ptMenu->addSeparator();
@@ -2483,14 +2501,18 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addAction(aDoesntUntap);
                 cardMenu->addAction(aFlip);
                 if (card->getFaceDown())
+                {
                     cardMenu->addAction(aPeek);
+                }
 
                 addRelatedCardActions(card, cardMenu);
 
                 cardMenu->addSeparator();
                 cardMenu->addAction(aAttach);
                 if (card->getAttachedTo())
+                {
                     cardMenu->addAction(aUnattach);
+                }
                 cardMenu->addAction(aDrawArrow);
                 cardMenu->addSeparator();
                 cardMenu->addMenu(ptMenu);
@@ -2499,28 +2521,41 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
 
-                for (int i = 0; i < aAddCounter.size(); ++i) {
+                for (int i = 0; i < aAddCounter.size(); ++i)
+                {
                     cardMenu->addSeparator();
                     cardMenu->addAction(aAddCounter[i]);
                     if (card->getCounters().contains(i))
+                    {
                         cardMenu->addAction(aRemoveCounter[i]);
+                    }
                     cardMenu->addAction(aSetCounter[i]);
                 }
                 cardMenu->addSeparator();
-            } else if (card->getZone()->getName() == "stack") {
+            }
+            else if (card->getZone()->getName() == "stack")
+            {
                 cardMenu->addAction(aDrawArrow);
                 cardMenu->addMenu(moveMenu);
 
                 addRelatedCardActions(card, cardMenu);
-            } else {
+            }
+            else
+            {
                 cardMenu->addAction(aPlay);
                 cardMenu->addAction(aPlayFacedown);
                 cardMenu->addMenu(moveMenu);
             }
-        } else
+        }
+        else
+        {
             cardMenu->addMenu(moveMenu);
-    } else {
-        if (card->getZone() && card->getZone()->getName() != "hand") {
+        }
+    }
+    else
+    {
+        if (card->getZone() && card->getZone()->getName() != "hand")
+        {
             cardMenu->addAction(aDrawArrow);
             cardMenu->addSeparator();
             addRelatedCardActions(card, cardMenu);
