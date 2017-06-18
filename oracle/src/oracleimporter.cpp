@@ -64,8 +64,8 @@ CardInfo *OracleImporter::addCard(const QString &setName,
                                   int cardLoyalty,
                                   const QString &cardText,
                                   const QStringList & colors,
-                                  const QStringList & relatedCards,
-                                  const QStringList & reverseRelatedCards,
+                                  const QList<CardRelation *> & relatedCards,
+                                  const QList<CardRelation *> & reverseRelatedCards,
                                   bool upsideDown,
                                   QString &rarity
                                   )
@@ -147,8 +147,8 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
     QString cardPT;
     QString cardText;
     QStringList colors;
-    QStringList relatedCards;
-    QStringList reverseRelatedCards; // dummy
+    QList<CardRelation *> relatedCards;
+    QList<CardRelation *> reverseRelatedCards; // dummy
     int cardId;
     QString setNumber;
     QString rarity;
@@ -185,8 +185,12 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
         setNumber = map.contains("number") ? map.value("number").toString() : QString("");
         rarity = map.contains("rarity") ? map.value("rarity").toString() : QString("");
         cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toInt() : 0;
-        relatedCards = map.contains("names") ? map.value("names").toStringList() : QStringList();
-        relatedCards.removeAll(cardName);
+        relatedCards = QList<CardRelation *>();
+        if(map.contains("names"))
+            foreach(const QString & name, map.value("names").toStringList()) {
+                if(name != cardName)
+                    relatedCards.append(new CardRelation(name, true));
+            }
 
         if(0 == QString::compare(map.value("layout").toString(), QString("flip"), Qt::CaseInsensitive)) 
         {
@@ -289,8 +293,9 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
         }
 
         colors.removeDuplicates();
-        relatedCards = QStringList();
-        reverseRelatedCards = QStringList();
+        //Fortunately, there are no split cards that flip, transform or meld.
+        relatedCards = QList<CardRelation *>();
+        reverseRelatedCards = QList<CardRelation *>();
         upsideDown = false;
 
         // add the card

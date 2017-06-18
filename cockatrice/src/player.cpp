@@ -1087,7 +1087,7 @@ void Player::actCreateToken()
     lastTokenAnnotation = dlg.getAnnotation();
     lastTokenDestroy = dlg.getDestroy();
     aCreateAnotherToken->setEnabled(true);
-
+    aCreateAnotherToken->setText(tr("C&reate another %1 token").arg(lastTokenName));
     actCreateAnotherToken();
 }
 
@@ -1126,46 +1126,175 @@ void Player::actCreateRelatedCard()
     CardItem * sourceCard = game->getActiveCard();
     if(!sourceCard)
         return;
-
     QAction *action = static_cast<QAction *>(sender());
-    const QString &actionDisplayName = action->text();
-    createCard(sourceCard, dbNameFromTokenDisplayName(actionDisplayName));
+    //If there is a better way of passing a CardRelation through a QAction, please add it here.
+    QList<CardRelation *> relatedCards = QList<CardRelation *>();
+    relatedCards.append(sourceCard->getInfo()->getRelatedCards());
+    relatedCards.append(sourceCard->getInfo()->getReverseRelatedCards2Me());
+    CardRelation * cardRelation = relatedCards.at(action->data().toInt());
+
+    const QString &displayName = cardRelation->getName();
+    QString dbName = dbNameFromTokenDisplayName(displayName);
+    if(cardRelation->getIsVariable()) {
+        bool ok;
+        dialogSemaphore = true;
+        int count = QInputDialog::getInt(0, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1, MAX_TOKENS_PER_DIALOG, 1, &ok);
+        dialogSemaphore = false;
+        if (!ok)
+            return;
+        for (int i = 0; i < count; i++) {
+            createCard(sourceCard, dbName);
+        }
+    } else if(cardRelation->getDefaultCount() > 1) {
+        for (int i = 0; i < cardRelation->getDefaultCount(); i++) {
+            createCard(sourceCard, dbName);
+        }
+    } else {
+        if (cardRelation->getDoesAttach()) {
+            createAttachedCard(sourceCard, dbName);
+        } else {
+            createCard(sourceCard, dbName);
+        }
+    }
 
    /*
     * If we made a token via "Token: TokenName"
     * then lets allow it to be created via create another
     */
-    CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(actionDisplayName));
-    setLastToken(cardInfo);
+    if (cardRelation->getCanCreateAnother()) {
+        CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(displayName));
+        setLastToken(cardInfo);
+    }
 }
 
+/**
+ *
+ */
 void Player::actCreateAllRelatedCards()
 {
     CardItem * sourceCard = game->getActiveCard();
     if(!sourceCard)
         return;
 
-    QStringList relatedCards = * new QStringList();
+    QList<CardRelation *> relatedCards = QList<CardRelation *>();
     relatedCards.append(sourceCard->getInfo()->getRelatedCards());
     relatedCards.append(sourceCard->getInfo()->getReverseRelatedCards2Me());
 
-    foreach (const QString &tokenName, relatedCards)
-    {
-        createCard(sourceCard, dbNameFromTokenDisplayName(tokenName));
+    QList<CardRelation *> nonExcludedRelatedCards = QList<CardRelation *>();
+    QString dbName;
+    CardRelation * cardRelation = nullptr;
+    int tokensTypesCreated = 0;
+
+    switch(relatedCards.length()) { //Is an if/elseif/else pattern better?
+        case 0: //if (relatedCards.length() == 0)
+            return;
+        case 1: //else if (relatedCards.length() == 1)
+            cardRelation = relatedCards.at(0);
+            tokensTypesCreated++;
+            dbName = dbNameFromTokenDisplayName(cardRelation->getName());
+            if(cardRelation->getIsVariable()) {
+                bool ok;
+                dialogSemaphore = true;
+                int count = QInputDialog::getInt(0, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1, MAX_TOKENS_PER_DIALOG, 1, &ok);
+                dialogSemaphore = false;
+                if (!ok)
+                    return;
+                for (int i = 0; i < count; i++) {
+                    createCard(sourceCard, dbName);
+                }
+            } else if (cardRelation->getDefaultCount() > 1) {
+                for (int i = 0; i < cardRelation->getDefaultCount(); i++) {
+                    createCard(sourceCard, dbName);
+                }
+            } else {
+                if (cardRelation->getDoesAttach()) {
+                    createAttachedCard(sourceCard, dbName);
+                } else {
+                    createCard(sourceCard, dbName);
+                }
+            }
+            break;
+        default: //else
+            foreach (CardRelation * cardRelationTemp, relatedCards) {
+                if(!cardRelationTemp->getIsCreateAllExclusion() && !cardRelationTemp->getDoesAttach()) {
+                    nonExcludedRelatedCards.append(cardRelationTemp);
+                }
+            }
+            switch(nonExcludedRelatedCards.length()) {
+                case 1: //if nonExcludedRelatedCards == 1
+                    cardRelation = nonExcludedRelatedCards.at(0);
+                    tokensTypesCreated++;
+                    dbName = dbNameFromTokenDisplayName(cardRelation->getName());
+                    if(cardRelation->getIsVariable()) {
+                        bool ok;
+                        dialogSemaphore = true;
+                        int count = QInputDialog::getInt(0, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1, MAX_TOKENS_PER_DIALOG, 1, &ok);
+                        dialogSemaphore = false;
+                        if (!ok)
+                            return;
+                        for (int i = 0; i < count; i++) {
+                            createCard(sourceCard, dbName);
+                        }
+                    } else if (cardRelation->getDefaultCount() > 1) {
+                        for (int i = 0; i < cardRelation->getDefaultCount(); i++) {
+                            createCard(sourceCard, dbName);
+                        }
+                    } else {
+                        if (cardRelation->getDoesAttach()) {
+                            createAttachedCard(sourceCard, dbName);
+                        } else {
+                            createCard(sourceCard, dbName);
+                        }
+                    }
+                    break;
+                //If all are marked "Exclude", then treat the situation as if none of them are.
+                //We won't accept "garbage in, garbage out", here.
+                case 0: //else if nonExcludedRelatedCards == 0
+                    foreach (CardRelation * cardRelationAll, relatedCards) {
+                        if (!cardRelationAll->getDoesAttach() && !cardRelationAll->getIsVariable()) {
+                            dbName = dbNameFromTokenDisplayName(cardRelationAll->getName());
+                            for (int i = 0; i < cardRelationAll->getDefaultCount(); i++) {
+                                createCard(sourceCard, dbName);
+                            }
+                            tokensTypesCreated++;
+                            if(tokensTypesCreated == 1) {
+                                cardRelation = cardRelationAll;
+                            }
+                        }
+                    }
+                    break;
+                default: //else
+                    foreach (CardRelation * cardRelationNotExcluded, nonExcludedRelatedCards) {
+                        if (!cardRelationNotExcluded->getDoesAttach() && !cardRelationNotExcluded->getIsVariable()) {
+                            dbName = dbNameFromTokenDisplayName(cardRelationNotExcluded->getName());
+                            for (int i = 0; i < cardRelationNotExcluded->getDefaultCount(); i++) {
+                                createCard(sourceCard, dbName);
+                            }
+                            tokensTypesCreated++;
+                            if(tokensTypesCreated == 1) {
+                                cardRelation = cardRelationNotExcluded;
+                            }
+                        }
+                    }
+                    break;
+            }
+            break;
     }
 
+
     /*
-     * If we made a token via "Token: TokenName"
-     * then lets allow it to be created via create another
+     * If we made at least one token via "Create All Tokens"
+     * then assign the first to the "Create another" shortcut.
      */
-    if (relatedCards.length() == 1)
+    if (cardRelation != nullptr && cardRelation->getCanCreateAnother())
     {
-        CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(relatedCards.at(0)));
+        CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(cardRelation->getName()));
         setLastToken(cardInfo);
     }
 }
 
-void Player::createCard(const CardItem *sourceCard, const QString &dbCardName) {
+void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach)
+{
     CardInfo *cardInfo = db->getCard(dbCardName);
 
     if (cardInfo == nullptr || sourceCard == nullptr)
@@ -1179,7 +1308,10 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName) {
     Command_CreateToken cmd;
     cmd.set_zone("table");
     cmd.set_card_name(cardInfo->getName().toStdString());
-    cmd.set_color(cardInfo->getColors().isEmpty() ? QString().toStdString() : cardInfo->getColors().first().toLower().toStdString());
+    if(cardInfo->getColors().length() > 1) //Multicoloured
+        cmd.set_color("m");
+    else
+        cmd.set_color(cardInfo->getColors().isEmpty() ? QString().toStdString() : cardInfo->getColors().first().toLower().toStdString());
     cmd.set_pt(cardInfo->getPowTough().toStdString());
     cmd.set_annotation(settingsCache->getAnnotateTokens() ? cardInfo->getText().toStdString() : QString().toStdString());
     cmd.set_destroy_on_zone_change(true);
@@ -1187,10 +1319,15 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName) {
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
 
-    if(!cardInfo->getIsToken())
+    if(attach)
         cmd.set_target_card_id(sourceCard->getId());
 
     sendGameCommand(cmd);
+}
+
+void Player::createAttachedCard(const CardItem *sourceCard, const QString &dbCardName)
+{
+    createCard(sourceCard, dbCardName, true);
 }
 
 void Player::actSayMessage()
@@ -2533,7 +2670,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu) {
     if (card == nullptr || cardMenu == nullptr || card->getInfo() == nullptr)
         return;
 
-    QStringList relatedCards = *new QStringList();
+    QList<CardRelation *> relatedCards = QList<CardRelation *>();
     relatedCards.append(card->getInfo()->getRelatedCards());
     relatedCards.append(card->getInfo()->getReverseRelatedCards2Me());
 
@@ -2542,7 +2679,11 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu) {
             break;
         case 1: {
             cardMenu->addSeparator();
-            QAction *createRelatedCards = new QAction(tr("Token: ") + relatedCards.at(0), this);
+            QAction *createRelatedCards;
+            if (relatedCards.at(0)->getDoesAttach()) {
+                createRelatedCards = new QAction(tr("Token: ") + tr("Attach to ") + relatedCards.at(0)->getName(), this);
+            } else
+                createRelatedCards = new QAction(tr("Token: ") + (relatedCards.at(0)->getIsVariable() ? "X " : QString(relatedCards.at(0)->getDefaultCount() == 1 ? QString() : QString::number(relatedCards.at(0)->getDefaultCount()) + " ")) + relatedCards.at(0)->getName(), this);
             connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
             if (shortcutsActive) {
                 createRelatedCards->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
@@ -2552,11 +2693,19 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu) {
         }
         default: {
             cardMenu->addSeparator();
-            foreach (QString cardName, relatedCards)
+            int i = 0;
+            foreach (CardRelation * cardRelation, relatedCards)
             {
-                QAction *createRelated = new QAction(tr("Token: ") + cardName, this);
+                QString cardName = cardRelation->getName();
+                QAction *createRelated;
+                if (cardRelation->getDoesAttach())
+                    createRelated = new QAction(tr("Token: ") + tr("Attach to ") + cardName, this);
+                else
+                    createRelated = new QAction(tr("Token: ") + (cardRelation->getIsVariable() ? "X " : QString(cardRelation->getDefaultCount() == 1 ? QString() : QString::number(cardRelation->getDefaultCount()) + " ")) + cardName, this);
+                createRelated->setData(QVariant(i));
                 connect(createRelated, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
                 cardMenu->addAction(createRelated);
+                i++;
             }
             QAction *createRelatedCards = new QAction(tr("All tokens"), this);
             connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
@@ -2643,5 +2792,6 @@ void Player::setLastToken(CardInfo *cardInfo)
     lastTokenAnnotation = settingsCache->getAnnotateTokens() ? cardInfo->getText() : "";
     lastTokenTableRow = table->clampValidTableRow(2 - cardInfo->getTableRow());
     lastTokenDestroy = true;
+    aCreateAnotherToken->setText(tr("C&reate another %1 token").arg(lastTokenName));
     aCreateAnotherToken->setEnabled(true);
 }
