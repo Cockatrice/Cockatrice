@@ -1133,43 +1133,16 @@ void Player::actCreateRelatedCard()
     relatedCards.append(sourceCard->getInfo()->getReverseRelatedCards2Me());
     CardRelation * cardRelation = relatedCards.at(action->data().toInt());
 
-    const QString &displayName = cardRelation->getName();
-    QString dbName = dbNameFromTokenDisplayName(displayName);
-    if(cardRelation->getIsVariable()) {
-        bool ok;
-        dialogSemaphore = true;
-        int count = QInputDialog::getInt(0, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1, MAX_TOKENS_PER_DIALOG, 1, &ok);
-        dialogSemaphore = false;
-        if (!ok)
-            return;
-        for (int i = 0; i < count; i++) {
-            createCard(sourceCard, dbName);
-        }
-    } else if(cardRelation->getDefaultCount() > 1) {
-        for (int i = 0; i < cardRelation->getDefaultCount(); i++) {
-            createCard(sourceCard, dbName);
-        }
-    } else {
-        if (cardRelation->getDoesAttach()) {
-            createAttachedCard(sourceCard, dbName);
-        } else {
-            createCard(sourceCard, dbName);
-        }
-    }
-
    /*
-    * If we made a token via "Token: TokenName"
-    * then lets allow it to be created via create another
+    * If we make a token via "Token: TokenName"
+    * then let's allow it to be created via "create another token"
     */
-    if (cardRelation->getCanCreateAnother()) {
-        CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(displayName));
+    if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
+        CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(cardRelation->getName()));
         setLastToken(cardInfo);
     }
 }
 
-/**
- *
- */
 void Player::actCreateAllRelatedCards()
 {
     CardItem * sourceCard = game->getActiveCard();
@@ -1190,29 +1163,8 @@ void Player::actCreateAllRelatedCards()
             return;
         case 1: //else if (relatedCards.length() == 1)
             cardRelation = relatedCards.at(0);
-            tokensTypesCreated++;
-            dbName = dbNameFromTokenDisplayName(cardRelation->getName());
-            if(cardRelation->getIsVariable()) {
-                bool ok;
-                dialogSemaphore = true;
-                int count = QInputDialog::getInt(0, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1, MAX_TOKENS_PER_DIALOG, 1, &ok);
-                dialogSemaphore = false;
-                if (!ok)
-                    return;
-                for (int i = 0; i < count; i++) {
-                    createCard(sourceCard, dbName);
-                }
-            } else if (cardRelation->getDefaultCount() > 1) {
-                for (int i = 0; i < cardRelation->getDefaultCount(); i++) {
-                    createCard(sourceCard, dbName);
-                }
-            } else {
-                if (cardRelation->getDoesAttach()) {
-                    createAttachedCard(sourceCard, dbName);
-                } else {
-                    createCard(sourceCard, dbName);
-                }
-            }
+            if (createRelatedFromRelation(sourceCard, cardRelation))
+                tokensTypesCreated++;
             break;
         default: //else
             foreach (CardRelation * cardRelationTemp, relatedCards) {
@@ -1223,29 +1175,8 @@ void Player::actCreateAllRelatedCards()
             switch(nonExcludedRelatedCards.length()) {
                 case 1: //if nonExcludedRelatedCards == 1
                     cardRelation = nonExcludedRelatedCards.at(0);
-                    tokensTypesCreated++;
-                    dbName = dbNameFromTokenDisplayName(cardRelation->getName());
-                    if(cardRelation->getIsVariable()) {
-                        bool ok;
-                        dialogSemaphore = true;
-                        int count = QInputDialog::getInt(0, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1, MAX_TOKENS_PER_DIALOG, 1, &ok);
-                        dialogSemaphore = false;
-                        if (!ok)
-                            return;
-                        for (int i = 0; i < count; i++) {
-                            createCard(sourceCard, dbName);
-                        }
-                    } else if (cardRelation->getDefaultCount() > 1) {
-                        for (int i = 0; i < cardRelation->getDefaultCount(); i++) {
-                            createCard(sourceCard, dbName);
-                        }
-                    } else {
-                        if (cardRelation->getDoesAttach()) {
-                            createAttachedCard(sourceCard, dbName);
-                        } else {
-                            createCard(sourceCard, dbName);
-                        }
-                    }
+                    if (createRelatedFromRelation(sourceCard, cardRelation))
+                        tokensTypesCreated++;
                     break;
                 //If all are marked "Exclude", then treat the situation as if none of them are.
                 //We won't accept "garbage in, garbage out", here.
@@ -1281,7 +1212,6 @@ void Player::actCreateAllRelatedCards()
             break;
     }
 
-
     /*
      * If we made at least one token via "Create All Tokens"
      * then assign the first to the "Create another" shortcut.
@@ -1291,6 +1221,35 @@ void Player::actCreateAllRelatedCards()
         CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(cardRelation->getName()));
         setLastToken(cardInfo);
     }
+}
+
+bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation)
+{
+    if (sourceCard == nullptr || cardRelation == nullptr)
+        return false;
+    QString dbName = dbNameFromTokenDisplayName(cardRelation->getName());
+    if(cardRelation->getIsVariable()) {
+        bool ok;
+        dialogSemaphore = true;
+        int count = QInputDialog::getInt(0, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1, MAX_TOKENS_PER_DIALOG, 1, &ok);
+        dialogSemaphore = false;
+        if (!ok)
+            return false;
+        for (int i = 0; i < count; i++) {
+            createCard(sourceCard, dbName);
+        }
+    } else if (cardRelation->getDefaultCount() > 1) {
+        for (int i = 0; i < cardRelation->getDefaultCount(); i++) {
+            createCard(sourceCard, dbName);
+        }
+    } else {
+        if (cardRelation->getDoesAttach()) {
+            createAttachedCard(sourceCard, dbName);
+        } else {
+            createCard(sourceCard, dbName);
+        }
+    }
+    return true;
 }
 
 void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach)

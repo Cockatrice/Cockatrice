@@ -903,7 +903,7 @@ bool CardDatabase::saveCustomTokensToFile()
 }
 
 CardRelation::CardRelation(const QString &_name,
-		bool _doesAttach,
+        bool _doesAttach,
         bool _isCreateAllExclusion,
         bool _isVariableCount,
         int _defaultCount
