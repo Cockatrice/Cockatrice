@@ -43,8 +43,8 @@ private:
         int cardLoyalty,
         const QString &cardText,
         const QStringList & colors,
-        const QStringList & relatedCards,
-        const QStringList & reverseRelatedCards,
+        const QList<CardRelation *> & relatedCards,
+        const QList<CardRelation *> & reverseRelatedCards,
         bool upsideDown,
         QString &rarity
     );
