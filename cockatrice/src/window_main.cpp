@@ -1042,11 +1042,22 @@ void MainWindow::actAddCustomSet()
     QDir dir = settingsCache->getCustomCardDatabasePath();
     int nextPrefix = getNextCustomSetPrefix(dir);
 
-    bool res = QFile::copy(
-        fileName, dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") +
-        QString::number(nextPrefix) + "." + QFileInfo(fileName).fileName()
-    );
-
+    bool res = false;
+    if (fileName.indexOf("spoiler.xml") != -1) {
+        if (QFile::exists(dir.absolutePath() + "/spoiler.xml"))
+        {
+            QFile::remove(dir.absolutePath() + "/spoiler.xml");
+        }
+        res = QFile::copy(
+            fileName, dir.absolutePath() + "/spoiler.xml"
+        );
+    }
+    else {
+        res = QFile::copy(
+            fileName, dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") +
+            QString::number(nextPrefix) + "." + QFileInfo(fileName).fileName()
+        );
+    }
     if (res) {
         QMessageBox::information(this, tr("Load sets/cards"), tr("The new sets/cards have been added successfully.\nCockatrice will now reload the card database."));
         QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
