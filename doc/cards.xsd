@@ -44,7 +44,7 @@
                                 <xs:element type="xs:integer" name="tablerow" maxOccurs="1" />
                                 <xs:element type="xs:string" name="text" maxOccurs="1" />
                                 <xs:element type="xs:boolean" name="cipt" minOccurs="0" maxOccurs="1" />
-                                <xs:element type="xs:integer" name="loyalty" minOccurs="0"  maxOccurs="1" />
+                                <xs:element type="xs:string" name="loyalty" minOccurs="0"  maxOccurs="1" />
                                 <xs:element type="xs:string" name="cmc" minOccurs="1" maxOccurs="1" />
                                 <xs:element type="xs:boolean" name="upsidedown" minOccurs="0" maxOccurs="1" />
                                 <xs:element type="xs:boolean" name="token" minOccurs="0" maxOccurs="1" />
