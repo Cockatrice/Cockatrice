@@ -1043,25 +1043,35 @@ void MainWindow::actAddCustomSet()
     int nextPrefix = getNextCustomSetPrefix(dir);
 
     bool res = false;
-    if (fileName.indexOf("spoiler.xml") != -1) {
+    if (fileName.compare("spoiler.xml", Qt::CaseInsensitive) == 0)
+    {
+        /*
+         * If the file being added is "spoiler.xml"
+         * then we'll want to overwrite the old version
+         * and replace it with the new one
+         */
         if (QFile::exists(dir.absolutePath() + "/spoiler.xml"))
         {
             QFile::remove(dir.absolutePath() + "/spoiler.xml");
         }
+
+        res = QFile::copy(fileName, dir.absolutePath() + "/spoiler.xml");
+    }
+    else
+    {
         res = QFile::copy(
-            fileName, dir.absolutePath() + "/spoiler.xml"
+                fileName,
+                dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") + QString::number(nextPrefix) + "." + QFileInfo(fileName).fileName()
         );
     }
-    else {
-        res = QFile::copy(
-            fileName, dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") +
-            QString::number(nextPrefix) + "." + QFileInfo(fileName).fileName()
-        );
-    }
-    if (res) {
+
+    if (res)
+    {
         QMessageBox::information(this, tr("Load sets/cards"), tr("The new sets/cards have been added successfully.\nCockatrice will now reload the card database."));
         QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
-    } else {
+    }
+    else
+    {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Sets/cards failed to import."));
     }
 }
