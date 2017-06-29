@@ -1027,14 +1027,14 @@ void MainWindow::actAddCustomSet()
     if (!dialog.exec())
         return;
 
-    QString fileName = dialog.selectedFiles().at(0);
+    QString fullFilePath = dialog.selectedFiles().at(0);
 
-    if (!QFile::exists(fileName)) {
+    if (!QFile::exists(fullFilePath)) {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Selected file cannot be found."));
         return;
     }
 
-    if (QFileInfo(fileName).suffix() != "xml") { // fileName = *.xml
+    if (QFileInfo(fullFilePath).suffix() != "xml") { // fileName = *.xml
         QMessageBox::warning(this, tr("Load sets/cards"), tr("You can only import XML databases at this time."));
         return;
     }
@@ -1043,6 +1043,8 @@ void MainWindow::actAddCustomSet()
     int nextPrefix = getNextCustomSetPrefix(dir);
 
     bool res = false;
+
+    QString fileName = QFileInfo(fullFilePath).fileName();
     if (fileName.compare("spoiler.xml", Qt::CaseInsensitive) == 0)
     {
         /*
@@ -1055,13 +1057,13 @@ void MainWindow::actAddCustomSet()
             QFile::remove(dir.absolutePath() + "/spoiler.xml");
         }
 
-        res = QFile::copy(fileName, dir.absolutePath() + "/spoiler.xml");
+        res = QFile::copy(fullFilePath, dir.absolutePath() + "/spoiler.xml");
     }
     else
     {
         res = QFile::copy(
-                fileName,
-                dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") + QString::number(nextPrefix) + "." + QFileInfo(fileName).fileName()
+                fullFilePath,
+                dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") + QString::number(nextPrefix) + "." + fileName
         );
     }
 
