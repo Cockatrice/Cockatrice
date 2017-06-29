@@ -249,9 +249,10 @@ public:
     QString getTabText() const;
     bool getSpectator() const { return spectator; }
     bool getSpectatorsSeeEverything() const { return gameInfo.spectators_omniscient(); }
+    bool isSpectator();
     Player *getActiveLocalPlayer() const;
     AbstractClient *getClientForPlayer(int playerId) const;
-    
+
     void setActiveCard(CardItem *_card) { activeCard = _card; }
     CardItem *getActiveCard() const { return activeCard; }
 

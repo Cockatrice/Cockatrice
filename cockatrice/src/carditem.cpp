@@ -366,23 +366,22 @@ void CardItem::playCard(bool faceDown)
 void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
-        if (cardMenu)
-            if (!cardMenu->isEmpty()) {
-                owner->updateCardMenu(this);
-                cardMenu->exec(event->screenPos());
-            }
+        if (cardMenu && !cardMenu->isEmpty() && owner) {
+            owner->updateCardMenu(this);
+            cardMenu->exec(event->screenPos());
+        }
     } else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay()) {
-        
         bool hideCard = false;
-        if (zone->getIsView()) {
+        if (zone && zone->getIsView()) {
             ZoneViewZone *view = static_cast<ZoneViewZone *>(zone);
             if (view->getRevealZone() && !view->getWriteableRevealZone())
                 hideCard = true;
         }
-        if (hideCard)
+        if (zone && hideCard) {
             zone->removeCard(this);
-        else
+        } else {
             playCard(event->modifiers().testFlag(Qt::ShiftModifier));
+        }
     }
 
     setCursor(Qt::OpenHandCursor);
