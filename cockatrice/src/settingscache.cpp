@@ -146,7 +146,8 @@ QString SettingsCache::getSafeConfigFilePath(QString configEntry, QString defaul
 SettingsCache::SettingsCache()
 {
     // first, figure out if we are running in portable mode
-    if(isPortableBuild = QFile::exists(qApp->applicationDirPath() + "/portable.dat"))
+    isPortableBuild = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
+    if(isPortableBuild)
         qDebug() << "Portable mode enabled";
 
     // define a dummy context that will be used where needed
