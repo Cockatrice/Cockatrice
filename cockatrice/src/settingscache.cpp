@@ -169,6 +169,14 @@ SettingsCache::SettingsCache()
     releaseChannels << new StableReleaseChannel();
     releaseChannels << new DevReleaseChannel();
 
+    // Add the times for the options to re-check for new spoilers
+    manDownloadSpoilerTimeIntervals.insert(30,    tr("30 minutes"));
+    manDownloadSpoilerTimeIntervals.insert(60,    tr("1 hour"));
+    manDownloadSpoilerTimeIntervals.insert(60*6,  tr("6 hours"));
+    manDownloadSpoilerTimeIntervals.insert(60*12, tr("12 hours"));
+    manDownloadSpoilerTimeIntervals.insert(60*24, tr("1 day"));
+    manDownloadSpoilerTimeIntervals.insert(60*48, tr("2 days"));
+
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
 
@@ -185,6 +193,7 @@ SettingsCache::SettingsCache()
 
     cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
     tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
+    msSpoilerSavePath = getSafeConfigFilePath("paths/spoilers", dataPath + "/spoilers.xml");
 
     themeName = settings->value("theme/name").toString();
 
@@ -210,6 +219,10 @@ SettingsCache::SettingsCache()
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
+    mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
+    mnDownloadSpoilersTimeIndex = settings->value("personal/downloadspoilerstimeindex", -1).toInt();
+    msDownloadSpoilersTimeMinutes = settings->value("personal/downloadspoilerstimeMinutes", 24*60).toInt();
+    mnDownloadSpoilerLastUpdateTime = settings->value("personal/downloadspoilerslastupdatetime", -1).toLongLong();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     playToStack = settings->value("interface/playtostack", true).toBool();
@@ -286,28 +299,28 @@ void SettingsCache::setMasterVolume(int _masterVolume) {
 }
 
 void SettingsCache::setLeftJustified(const int _leftJustified) {
-    leftJustified = _leftJustified;
+    leftJustified = static_cast<bool>(_leftJustified);
     settings->setValue("interface/leftjustified", leftJustified);
     emit handJustificationChanged();
 }
 
 void SettingsCache::setCardScaling(const int _scaleCards) {
-    scaleCards = _scaleCards;
+    scaleCards = static_cast<bool>(_scaleCards);
     settings->setValue("cards/scaleCards", scaleCards);
 }
 
 void SettingsCache::setShowMessagePopups(const int _showMessagePopups) {
-    showMessagePopups = _showMessagePopups;
+    showMessagePopups = static_cast<bool>(_showMessagePopups);
     settings->setValue("chat/showmessagepopups", showMessagePopups);
 }
 
 void SettingsCache::setShowMentionPopups(const int _showMentionPopus) {
-    showMentionPopups = _showMentionPopus;
+    showMentionPopups = static_cast<bool>(_showMentionPopus);
     settings->setValue("chat/showmentionpopups", showMentionPopups);
 }
 
 void SettingsCache::setRoomHistory(const int _roomHistory) {
-    roomHistory = _roomHistory;
+    roomHistory = static_cast<bool>(_roomHistory);
     settings->setValue("chat/roomhistory", roomHistory);
 }
 
@@ -322,6 +335,12 @@ void SettingsCache::setDeckPath(const QString &_deckPath)
 {
     deckPath = _deckPath;
     settings->setValue("paths/decks", deckPath);
+}
+
+void SettingsCache::setSpoilerSavePath(const QString &_asSpoilerSavePath)
+{
+    msSpoilerSavePath = _asSpoilerSavePath;
+    settings->setValue("paths/spoilers", msSpoilerSavePath);
 }
 
 void SettingsCache::setReplaysPath(const QString &_replaysPath)
@@ -362,7 +381,7 @@ void SettingsCache::setThemeName(const QString &_themeName)
 
 void SettingsCache::setPicDownload(int _picDownload)
 {
-    picDownload = _picDownload;
+    picDownload = static_cast<bool>(_picDownload);
     settings->setValue("personal/picturedownload", picDownload);
     emit picDownloadChanged();
 }
@@ -381,30 +400,30 @@ void SettingsCache::setPicUrlFallback(const QString &_picUrlFallback)
 
 void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
 {
-    notificationsEnabled = _notificationsEnabled;
+    notificationsEnabled = static_cast<bool>(_notificationsEnabled);
     settings->setValue("interface/notificationsenabled", notificationsEnabled);
 }
 
 void SettingsCache::setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled) {
-    spectatorNotificationsEnabled = _spectatorNotificationsEnabled;
+    spectatorNotificationsEnabled = static_cast<bool>(_spectatorNotificationsEnabled);
     settings->setValue("interface/specnotificationsenabled", spectatorNotificationsEnabled);
 }
 
 void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
 {
-    doubleClickToPlay = _doubleClickToPlay;
+    doubleClickToPlay = static_cast<bool>(_doubleClickToPlay);
     settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
 }
 
 void SettingsCache::setPlayToStack(int _playToStack)
 {
-    playToStack = _playToStack;
+    playToStack = static_cast<bool>(_playToStack);
     settings->setValue("interface/playtostack", playToStack);
 }
 
 void SettingsCache::setAnnotateTokens(int _annotateTokens)
 {
-    annotateTokens = _annotateTokens;
+    annotateTokens = static_cast<bool>(_annotateTokens);
     settings->setValue("interface/annotatetokens", annotateTokens);
 }
 
@@ -416,21 +435,21 @@ void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSi
 
 void SettingsCache::setDisplayCardNames(int _displayCardNames)
 {
-    displayCardNames = _displayCardNames;
+    displayCardNames = static_cast<bool>(_displayCardNames);
     settings->setValue("cards/displaycardnames", displayCardNames);
     emit displayCardNamesChanged();
 }
 
 void SettingsCache::setHorizontalHand(int _horizontalHand)
 {
-    horizontalHand = _horizontalHand;
+    horizontalHand = static_cast<bool>(_horizontalHand);
     settings->setValue("hand/horizontal", horizontalHand);
     emit horizontalHandChanged();
 }
 
 void SettingsCache::setInvertVerticalCoordinate(int _invertVerticalCoordinate)
 {
-    invertVerticalCoordinate = _invertVerticalCoordinate;
+    invertVerticalCoordinate = static_cast<bool>(_invertVerticalCoordinate);
     settings->setValue("table/invert_vertical", invertVerticalCoordinate);
     emit invertVerticalCoordinateChanged();
 }
@@ -444,29 +463,29 @@ void SettingsCache::setMinPlayersForMultiColumnLayout(int _minPlayersForMultiCol
 
 void SettingsCache::setTapAnimation(int _tapAnimation)
 {
-    tapAnimation = _tapAnimation;
+    tapAnimation = static_cast<bool>(_tapAnimation);
     settings->setValue("cards/tapanimation", tapAnimation);
 }
 
 void SettingsCache::setChatMention(int _chatMention) {
-    chatMention = _chatMention;
+    chatMention = static_cast<bool>(_chatMention);
     settings->setValue("chat/mention", chatMention);
 }
 
 void SettingsCache::setChatMentionCompleter(const int _enableMentionCompleter)
 {
-    chatMentionCompleter = _enableMentionCompleter;
+    chatMentionCompleter = static_cast<bool>(_enableMentionCompleter);
     settings->setValue("chat/mentioncompleter", chatMentionCompleter);
     emit chatMentionCompleterChanged();
 }
 
 void SettingsCache::setChatMentionForeground(int _chatMentionForeground) {
-    chatMentionForeground = _chatMentionForeground;
+    chatMentionForeground = static_cast<bool>(_chatMentionForeground);
     settings->setValue("chat/mentionforeground", chatMentionForeground);
 }
 
 void SettingsCache::setChatHighlightForeground(int _chatHighlightForeground) {
-    chatHighlightForeground = _chatHighlightForeground;
+    chatHighlightForeground = static_cast<bool>(_chatHighlightForeground);
     settings->setValue("chat/highlightforeground", chatHighlightForeground);
 }
 
@@ -482,24 +501,24 @@ void SettingsCache::setChatHighlightColor(const QString &_chatHighlightColor) {
 
 void SettingsCache::setZoneViewSortByName(int _zoneViewSortByName)
 {
-    zoneViewSortByName = _zoneViewSortByName;
+    zoneViewSortByName = static_cast<bool>(_zoneViewSortByName);
     settings->setValue("zoneview/sortbyname", zoneViewSortByName);
 }
 
 void SettingsCache::setZoneViewSortByType(int _zoneViewSortByType)
 {
-    zoneViewSortByType = _zoneViewSortByType;
+    zoneViewSortByType = static_cast<bool>(_zoneViewSortByType);
     settings->setValue("zoneview/sortbytype", zoneViewSortByType);
 }
 
 void SettingsCache::setZoneViewPileView(int _zoneViewPileView){
-    zoneViewPileView = _zoneViewPileView;
+    zoneViewPileView = static_cast<bool>(_zoneViewPileView);
     settings->setValue("zoneview/pileview", zoneViewPileView);
 }
 
 void SettingsCache::setSoundEnabled(int _soundEnabled)
 {
-    soundEnabled = _soundEnabled;
+    soundEnabled = static_cast<bool>(_soundEnabled);
     settings->setValue("sound/enabled", soundEnabled);
     emit soundEnabledChanged();
 }
@@ -513,13 +532,13 @@ void SettingsCache::setSoundThemeName(const QString &_soundThemeName)
 
 void SettingsCache::setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers)
 {
-    ignoreUnregisteredUsers = _ignoreUnregisteredUsers;
+    ignoreUnregisteredUsers = static_cast<bool>(_ignoreUnregisteredUsers);
     settings->setValue("chat/ignore_unregistered", ignoreUnregisteredUsers);
 }
 
 void SettingsCache::setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages)
 {
-    ignoreUnregisteredUserMessages = _ignoreUnregisteredUserMessages;
+    ignoreUnregisteredUserMessages = static_cast<bool>(_ignoreUnregisteredUserMessages);
     settings->setValue("chat/ignore_unregistered_messages", ignoreUnregisteredUserMessages);
 }
 
@@ -642,14 +661,41 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 
 void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
-    notifyAboutUpdates = _notifyaboutupdate;
+    notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+void SettingsCache::setDownloadSpoilerStatus(int _spoilerStatus)
+{
+    mbDownloadSpoilers = static_cast<bool>(_spoilerStatus);
+    settings->setValue("personal/downloadspoilers", mbDownloadSpoilers);
+    emit downloadSpoilerStatusChanged();
 }
 
 void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
 {
     updateReleaseChannel = _updateReleaseChannel;
     settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
+}
+
+void SettingsCache::setDownloadSpoilerTimeIndex(int _index)
+{
+    // Update index and emit that the index was changed for the timer thread
+    mnDownloadSpoilersTimeIndex = _index;
+    settings->setValue("personal/downloadspoilerstimeindex", mnDownloadSpoilersTimeIndex);
+    emit downloadSpoilerTimeIndexChanged();
+}
+
+void SettingsCache::setDownloadSpoilerTimeMinutes(float _lnTimeInterval)
+{
+    msDownloadSpoilersTimeMinutes = _lnTimeInterval;
+    settings->setValue("personal/downloadspoilerstimeMinutes", msDownloadSpoilersTimeMinutes);
+}
+
+void SettingsCache::setDownloadSpoilerLastUpdateTime(long long _timestamp)
+{
+    mnDownloadSpoilerLastUpdateTime = _timestamp;
+    settings->setValue("personal/downloadspoilerslastupdatetime", mnDownloadSpoilerLastUpdateTime);
 }
 
 void SettingsCache::setMaxFontSize(int _max)

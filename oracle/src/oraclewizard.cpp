@@ -316,8 +316,8 @@ void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
 {
     if(total > 0)
     {
-        progressBar->setMaximum(total);
-        progressBar->setValue(received);
+        progressBar->setMaximum(static_cast<int>(total));
+        progressBar->setValue(static_cast<int>(received));
     }
     progressLabel->setText(tr("Downloading (%1MB)").arg((int) received / (1024 * 1024)));
 }

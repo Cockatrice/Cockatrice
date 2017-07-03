@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include <QMenu>
 #include <QAction>
+#include <iostream>
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QMenuBar>
@@ -59,6 +60,7 @@
 #include "pb/room_commands.pb.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_shutdown.pb.h"
+#include "SpoilerBackgroundUpdaterThread.h"
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
@@ -699,7 +701,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     resize(900, 700);
     restoreGeometry(settingsCache->getMainWindowGeometry());
-    aFullScreen->setChecked(windowState() & Qt::WindowFullScreen);
+    aFullScreen->setChecked(static_cast<bool>(windowState() & Qt::WindowFullScreen));
 
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
         createTrayActions();

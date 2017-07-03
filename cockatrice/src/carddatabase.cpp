@@ -723,8 +723,10 @@ bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
 LoadStatus CardDatabase::loadCardDatabase(const QString &path)
 {
     LoadStatus tempLoadStatus = NotLoaded;
-    if (!path.isEmpty())
+    if (! path.isEmpty())
+    {
         tempLoadStatus = loadFromFile(path);
+    }
 
     qDebug() << "[CardDatabase] loadCardDatabase(): Path =" << path << "Status =" << tempLoadStatus << "Cards =" << cards.size() << "Sets=" << sets.size();
 
@@ -734,12 +736,12 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
 LoadStatus CardDatabase::loadCardDatabases()
 {
     qDebug() << "CardDatabase::loadCardDatabases start";
-    // clean old db
-    clear();
-    // load main card database
-    loadStatus = loadCardDatabase(settingsCache->getCardDatabasePath());
-    // laod tokens database
-    loadCardDatabase(settingsCache->getTokenDatabasePath());
+
+    clear(); // remove old db
+    loadStatus = loadCardDatabase(settingsCache->getCardDatabasePath()); // load main card database
+    loadCardDatabase(settingsCache->getTokenDatabasePath()); // load tokens database
+    loadCardDatabase(settingsCache->getSpoilerSavePath()); // load spoilers database
+
     // load custom card databases
     QDir dir(settingsCache->getCustomCardDatabasePath());
     foreach(QString fileName, dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase))

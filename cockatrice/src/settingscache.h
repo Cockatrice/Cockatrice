@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSize>
 #include <QStringList>
+#include <QTimer>
 #include "shortcutssettings.h"
 #include "settings/carddatabasesettings.h"
 #include "settings/serverssettings.h"
@@ -48,6 +49,8 @@ signals:
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void masterVolumeChanged(int value);
     void chatMentionCompleterChanged();
+    void downloadSpoilerTimeIndexChanged();
+    void downloadSpoilerStatusChanged();
 private:
     QSettings *settings;
     ShortcutsSettings *shortcutsSettings;
@@ -61,11 +64,16 @@ private:
     QByteArray tokenDialogGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, tokenDatabasePath, themeName;
+    QString msSpoilerSavePath;
     bool notifyAboutUpdates;
     int updateReleaseChannel;
+    int mnDownloadSpoilersTimeIndex;
+    float msDownloadSpoilersTimeMinutes;
+    long long mnDownloadSpoilerLastUpdateTime;
     int maxFontSize;
     bool picDownload;
     bool notificationsEnabled;
+    bool mbDownloadSpoilers;
     bool spectatorNotificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
@@ -115,6 +123,7 @@ private:
     QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
     bool rememberGameSettings;
     QList<ReleaseChannel*> releaseChannels;
+    QMap<int, QString> manDownloadSpoilerTimeIntervals;
 
 public:
     SettingsCache();
@@ -133,12 +142,18 @@ public:
     QString getThemeName() const { return themeName; }
     QString getChatMentionColor() const { return chatMentionColor; }
     QString getChatHighlightColor() const { return chatHighlightColor; }
+    QString getSpoilerSavePath() const { return msSpoilerSavePath; }
     bool getPicDownload() const { return picDownload; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
+    bool getDownloadSpoilersStatus() const { return mbDownloadSpoilers; }
     bool getSpectatorNotificationsEnabled() const { return spectatorNotificationsEnabled; }
     bool getNotifyAboutUpdates() const { return notifyAboutUpdates; }
     ReleaseChannel * getUpdateReleaseChannel() const { return releaseChannels.at(updateReleaseChannel); }
     QList<ReleaseChannel*> getUpdateReleaseChannels() const { return releaseChannels; }
+    int getDownloadSpoilerTimeIndex() const { return mnDownloadSpoilersTimeIndex; }
+    float getDownloadSpoilerTimeMinutes() const { return msDownloadSpoilersTimeMinutes; }
+    QMap<int, QString> getDownloadSpoilerTimeIntervals() const { return manDownloadSpoilerTimeIntervals; }
+    long getDownloadSpoilerLastUpdateTime() const { return mnDownloadSpoilerLastUpdateTime; }
 
     bool getDoubleClickToPlay() const { return doubleClickToPlay; }
     bool getPlayToStack() const { return playToStack; }
@@ -210,8 +225,10 @@ public slots:
     void setThemeName(const QString &_themeName);
     void setChatMentionColor(const QString &_chatMentionColor);
     void setChatHighlightColor(const QString &_chatHighlightColor);
+    void setSpoilerSavePath(const QString &_asSpoilerSavePath);
     void setPicDownload(int _picDownload);
     void setNotificationsEnabled(int _notificationsEnabled);
+    void setDownloadSpoilerStatus(int _spoilerStatus);
     void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
@@ -256,6 +273,9 @@ public slots:
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(int _notifyaboutupdate);
     void setUpdateReleaseChannel(int _updateReleaseChannel);
+    void setDownloadSpoilerTimeIndex(int _index);
+    void setDownloadSpoilerLastUpdateTime(long long _timestamp);
+    void setDownloadSpoilerTimeMinutes(float _lnTimeInterval);
     void setMaxFontSize(int _max);
 };
 

@@ -464,25 +464,157 @@ void UserInterfaceSettingsPage::retranslateUi()
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
 }
 
-
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
-    QGridLayout *generalGrid = new QGridLayout;
-    
-    generalGrid->addWidget(new QLabel(tr("Nothing is here... yet")), 0, 0);
-    
-    generalGroupBox = new QGroupBox;
-    generalGroupBox->setLayout(generalGrid);
-    
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(generalGroupBox);
-    
-    setLayout(mainLayout);
+    QGridLayout *lpGeneralGrid = new QGridLayout;
+    QGridLayout *lpSpoilerGrid = new QGridLayout;
+
+    // Get all the update options and put them into the Combo Box
+    QMap<int, QString> lacSettingTimes = settingsCache->getDownloadSpoilerTimeIntervals();
+    int lnIndexToInsert = 0;
+    for (auto lIterator = lacSettingTimes.begin(); lIterator != lacSettingTimes.end(); lIterator++, lnIndexToInsert++)
+    {
+        msDownloadSpoilersTimeIntervalComboBox.insertItem(lnIndexToInsert, lIterator.value());
+    }
+
+    // Set the combo box's selected() to the one from settingsCache && If we have spoilers enabled/not
+    int lnComboBoxIndex = settingsCache->getDownloadSpoilerTimeIndex();
+    if (lnComboBoxIndex == -1)
+    {
+        settingsCache->setDownloadSpoilerTimeMinutes(60*12); // 12 hours
+        settingsCache->setDownloadSpoilerTimeIndex(3); // 12 hours is @ index 3
+        msDownloadSpoilersTimeIntervalComboBox.setCurrentIndex(3); // Make the combo box show 12 hours
+    }
+    else
+    {
+        msDownloadSpoilersTimeIntervalComboBox.setCurrentIndex(lnComboBoxIndex);
+    }
+
+
+
+    mcDownloadSpoilersCheckBox.setChecked(settingsCache->getDownloadSpoilersStatus());
+
+    mpSpoilerSavePathLineEdit = new QLineEdit(settingsCache->getSpoilerSavePath());
+    mpSpoilerSavePathLineEdit->setReadOnly(true);
+    mpSpoilerPathButton = new QPushButton("...");
+    connect(mpSpoilerPathButton, SIGNAL(clicked()), this, SLOT(spoilerPathButtonClicked()));
+
+    // Update the GUI depending on if the box is ticked or not
+    setSpoilersEnabled(mcDownloadSpoilersCheckBox.isChecked());
+
+    // Create the layout
+    lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
+    lpSpoilerGrid->addWidget(&msDownloadSpoilersLabel, 0, 1);
+    lpSpoilerGrid->addWidget(&msDownloadSpoilersTimeIntervalComboBox, 0, 2);
+    lpSpoilerGrid->addWidget(&mcSpoilerSaveLabel, 1, 0);
+    lpSpoilerGrid->addWidget(mpSpoilerSavePathLineEdit, 1, 1);
+    lpSpoilerGrid->addWidget(mpSpoilerPathButton, 1, 2);
+    lpSpoilerGrid->addWidget(&mcNextUpdateTimeToolTipLabel, 2, 0);
+    lpSpoilerGrid->addWidget(&mcNextUpdateTimeLabel, 2, 1);
+
+    lpSpoilerGrid->setColumnStretch(0, 2);
+    lpSpoilerGrid->setColumnStretch(1, 4);
+    lpSpoilerGrid->setColumnStretch(2, 1);
+
+    lpGeneralGrid->addWidget(&mcGeneralMessageLabel, 0, 0);
+
+    // On a change to the check box, hide/unhide the other fields
+    // On a change to the combo box, send a signal to the timer threads
+    connect(&mcDownloadSpoilersCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDownloadSpoilerStatus(int)));
+    connect(&mcDownloadSpoilersCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setSpoilersEnabled(int)));
+    connect(&msDownloadSpoilersTimeIntervalComboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(setDownloadSpoilerTime(QString)));
+
+    mpGeneralGroupBox = new QGroupBox;
+    mpGeneralGroupBox->setLayout(lpGeneralGrid);
+
+    mpSpoilerGroupBox = new QGroupBox;
+    mpSpoilerGroupBox->setLayout(lpSpoilerGrid);
+
+    QVBoxLayout *lpMainLayout = new QVBoxLayout;
+    lpMainLayout->addWidget(mpGeneralGroupBox);
+    lpMainLayout->addWidget(mpSpoilerGroupBox);
+
+    setLayout(lpMainLayout);
+}
+
+void DeckEditorSettingsPage::spoilerPathButtonClicked()
+{
+    QString lsPath = QFileDialog::getExistingDirectory(this, tr("Choose path"));
+    if (! lsPath.isEmpty())
+    {
+        mpSpoilerSavePathLineEdit->setText(lsPath + "/spoiler.xml");
+        settingsCache->setSpoilerSavePath(lsPath + "/spoiler.xml");
+    }
+}
+
+void DeckEditorSettingsPage::setDownloadSpoilerTime(QString asValue)
+{
+    // Sets the downloadspoilerstimeHours field (stored in HOURS (float))
+    QMap<int, QString> lacSettingTimes = settingsCache->getDownloadSpoilerTimeIntervals();
+    float lnHoursToReload = lacSettingTimes.key(asValue);
+
+    // Update settings cache downloadspoilerstimeMinutes
+    settingsCache->setDownloadSpoilerTimeMinutes(lnHoursToReload);
+
+    // Update settings cache downloadspoilerstimeindex
+    settingsCache->setDownloadSpoilerTimeIndex(msDownloadSpoilersTimeIntervalComboBox.currentIndex());
+
+    // Update the GUI display
+    updateDownloadTimer();
+}
+
+void DeckEditorSettingsPage::setSpoilersEnabled(int anInput)
+{
+    bool lbVisibility = (anInput != 0);
+
+    msDownloadSpoilersLabel.setEnabled(lbVisibility);
+    msDownloadSpoilersTimeIntervalComboBox.setEnabled(lbVisibility);
+    mcSpoilerSaveLabel.setEnabled(lbVisibility);
+    mpSpoilerSavePathLineEdit->setEnabled(lbVisibility);
+    mpSpoilerPathButton->setEnabled(lbVisibility);
+    updateDownloadTimer(lbVisibility);
+}
+
+void DeckEditorSettingsPage::updateDownloadTimer(bool abIsEnabled)
+{
+    // Update the display so the user sees when the next download time is or nothing if disabled
+    if (abIsEnabled)
+    {
+        long lnTimeUntilNextUpdate = QDateTime::currentMSecsSinceEpoch() - settingsCache->getDownloadSpoilerLastUpdateTime();
+        float lnTimeToWaitBetween = settingsCache->getDownloadSpoilerTimeMinutes() * 60000;
+
+        QDateTime lTimeNow(QDateTime::currentDateTime());
+
+        // If not defaulted
+        if (settingsCache->getDownloadSpoilerLastUpdateTime() != -1)
+        {
+            mcNextUpdateTimeLabel.setText(lTimeNow.addMSecs(static_cast<long>(lnTimeToWaitBetween - lnTimeUntilNextUpdate)).toString());
+        }
+        else
+        {
+            // Value not set in config, so just show how long until the update based on what we know
+            mcNextUpdateTimeLabel.setText(lTimeNow.addMSecs(static_cast<long>(lnTimeToWaitBetween)).toString());
+        }
+    }
+    else
+    {
+        mcNextUpdateTimeLabel.setText(tr("Never"));
+    }
+
+    mcNextUpdateTimeToolTipLabel.setEnabled(abIsEnabled);
+    mcNextUpdateTimeLabel.setEnabled(abIsEnabled);
 }
 
 void DeckEditorSettingsPage::retranslateUi()
 {
-    generalGroupBox->setTitle(tr("General"));
+    mpGeneralGroupBox->setTitle(tr("General"));
+    mpSpoilerGroupBox->setTitle(tr("Spoilers"));
+    mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
+    mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
+    msDownloadSpoilersLabel.setText(tr("Check for Updates Every"));
+    msDownloadSpoilersLabel.setAlignment(Qt::AlignRight);
+    mcGeneralMessageLabel.setText(tr("Hey, something's here finally!"));
+    mcNextUpdateTimeToolTipLabel.setText(tr("Next Download At:"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
