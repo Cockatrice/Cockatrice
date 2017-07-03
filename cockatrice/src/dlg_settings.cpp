@@ -130,6 +130,15 @@ GeneralSettingsPage::GeneralSettingsPage()
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
     
+    if(settingsCache->getIsPortableBuild())
+    {
+        deckPathButton->setVisible(false);
+        replaysPathButton->setVisible(false);
+        picsPathButton->setVisible(false);
+        cardDatabasePathButton->setVisible(false);
+        tokenDatabasePathButton->setVisible(false);
+    }
+
     QGridLayout *pathsGrid = new QGridLayout;
     pathsGrid->addWidget(&deckPathLabel, 0, 0);
     pathsGrid->addWidget(deckPathEdit, 0, 1);

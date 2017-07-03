@@ -91,7 +91,6 @@ The following flags can be passed to `cmake`:
 - `-DWITH_SERVER=1` Whether to build the server (default 0 = no).
 - `-DWITH_CLIENT=0` Whether to build the client (default 1 = yes).
 - `-DWITH_ORACLE=0` Whether to build oracle (default 1 = yes).
-- `-DPORTABLE=1` Build portable versions of client & oracle (default 0 = no).
 - `-DCMAKE_BUILD_TYPE=Debug` Compile in debug mode. Enables extra logging output, debug symbols, and much more verbose compiler warnings (default `Release`).
 - `-DUPDATE_TRANSLATIONS=1` Configure `make` to update the translation .ts files for new strings in the source code. Note: Running `make clean` will remove the .ts files (default 0 = no).
 - `-DTEST=1` Enable regression tests (default 0 = no). Note: needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```.
