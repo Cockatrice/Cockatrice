@@ -168,7 +168,7 @@ void SpoilerBackgroundUpdaterThread::actDownloadFinishedSpoilersFile()
 {
     QNetworkReply *lpNetworkReply = static_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError leErrorCode = lpNetworkReply->error();
-    QString lsSpoilerSavePath = settingsCache->getSpoilerSavePath();
+    QString lsSpoilerSavePath = settingsCache->getSpoilerDatabasePath();
     
     if (leErrorCode != QNetworkReply::NoError)
     {
@@ -208,7 +208,7 @@ void SpoilerBackgroundUpdaterThread::actSeeIfSpoilerSeasonIsActive()
 {
     QNetworkReply *lpNetworkReply = static_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError leErrorCode = lpNetworkReply->error();
-    QString lsSpoilerSavePath = settingsCache->getSpoilerSavePath();
+    QString lsSpoilerSavePath = settingsCache->getSpoilerDatabasePath();
 
     if (leErrorCode != QNetworkReply::NoError)
     {

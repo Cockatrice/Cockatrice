@@ -740,7 +740,7 @@ LoadStatus CardDatabase::loadCardDatabases()
     clear(); // remove old db
     loadStatus = loadCardDatabase(settingsCache->getCardDatabasePath()); // load main card database
     loadCardDatabase(settingsCache->getTokenDatabasePath()); // load tokens database
-    loadCardDatabase(settingsCache->getSpoilerSavePath()); // load spoilers database
+    loadCardDatabase(settingsCache->getSpoilerDatabasePath()); // load spoilers database
 
     // load custom card databases
     QDir dir(settingsCache->getCustomCardDatabasePath());

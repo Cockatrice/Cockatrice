@@ -494,7 +494,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     mcDownloadSpoilersCheckBox.setChecked(settingsCache->getDownloadSpoilersStatus());
 
-    mpSpoilerSavePathLineEdit = new QLineEdit(settingsCache->getSpoilerSavePath());
+    mpSpoilerSavePathLineEdit = new QLineEdit(settingsCache->getSpoilerDatabasePath());
     mpSpoilerSavePathLineEdit->setReadOnly(true);
     mpSpoilerPathButton = new QPushButton("...");
     connect(mpSpoilerPathButton, SIGNAL(clicked()), this, SLOT(spoilerPathButtonClicked()));
@@ -543,13 +543,13 @@ void DeckEditorSettingsPage::spoilerPathButtonClicked()
     if (! lsPath.isEmpty())
     {
         mpSpoilerSavePathLineEdit->setText(lsPath + "/spoiler.xml");
-        settingsCache->setSpoilerSavePath(lsPath + "/spoiler.xml");
+        settingsCache->setSpoilerDatabasePath(lsPath + "/spoiler.xml");
     }
 }
 
 void DeckEditorSettingsPage::setDownloadSpoilerTime(QString asValue)
 {
-    // Sets the downloadspoilerstimeHours field (stored in HOURS (float))
+    // Sets the downloadspoilerstimeMinutes field (stored in MINUTES (int))
     QMap<int, QString> lacSettingTimes = settingsCache->getDownloadSpoilerTimeIntervals();
     int lnMinutesToReload = lacSettingTimes.key(asValue);
 

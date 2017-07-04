@@ -64,7 +64,7 @@ private:
     QByteArray tokenDialogGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, tokenDatabasePath, themeName;
-    QString msSpoilerSavePath;
+    QString msSpoilerDatabasePath;
     bool notifyAboutUpdates;
     int updateReleaseChannel;
     int msDownloadSpoilersTimeMinutes;
@@ -141,7 +141,7 @@ public:
     QString getThemeName() const { return themeName; }
     QString getChatMentionColor() const { return chatMentionColor; }
     QString getChatHighlightColor() const { return chatHighlightColor; }
-    QString getSpoilerSavePath() const { return msSpoilerSavePath; }
+    QString getSpoilerDatabasePath() const { return msSpoilerDatabasePath; }
     bool getPicDownload() const { return picDownload; }
     bool getNotificationsEnabled() const { return notificationsEnabled; }
     bool getDownloadSpoilersStatus() const { return mbDownloadSpoilers; }
@@ -223,7 +223,7 @@ public slots:
     void setThemeName(const QString &_themeName);
     void setChatMentionColor(const QString &_chatMentionColor);
     void setChatHighlightColor(const QString &_chatHighlightColor);
-    void setSpoilerSavePath(const QString &_asSpoilerSavePath);
+    void setSpoilerDatabasePath(const QString &_asSpoilerDatabasePath);
     void setPicDownload(int _picDownload);
     void setNotificationsEnabled(int _notificationsEnabled);
     void setDownloadSpoilerStatus(int _spoilerStatus);

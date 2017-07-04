@@ -193,7 +193,7 @@ SettingsCache::SettingsCache()
 
     cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
     tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
-    msSpoilerSavePath = getSafeConfigFilePath("paths/spoilers", dataPath + "/spoilers.xml");
+    msSpoilerDatabasePath = getSafeConfigFilePath("paths/spoilerdatabase", dataPath + "/spoilers.xml");
 
     themeName = settings->value("theme/name").toString();
 
@@ -337,10 +337,10 @@ void SettingsCache::setDeckPath(const QString &_deckPath)
     settings->setValue("paths/decks", deckPath);
 }
 
-void SettingsCache::setSpoilerSavePath(const QString &_asSpoilerSavePath)
+void SettingsCache::setSpoilerDatabasePath(const QString &_asSpoilerDatabasePath)
 {
-    msSpoilerSavePath = _asSpoilerSavePath;
-    settings->setValue("paths/spoilers", msSpoilerSavePath);
+    msSpoilerDatabasePath = _asSpoilerDatabasePath;
+    settings->setValue("paths/spoilerdatabase", msSpoilerDatabasePath);
 }
 
 void SettingsCache::setReplaysPath(const QString &_replaysPath)
@@ -661,13 +661,13 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 
 void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
-    notifyAboutUpdates = _notifyaboutupdate;
+    notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
 }
 
 void SettingsCache::setDownloadSpoilerStatus(int _spoilerStatus)
 {
-    mbDownloadSpoilers = _spoilerStatus;
+    mbDownloadSpoilers = static_cast<bool>(_spoilerStatus);
     settings->setValue("personal/downloadspoilers", mbDownloadSpoilers);
     emit downloadSpoilerStatusChanged();
 }

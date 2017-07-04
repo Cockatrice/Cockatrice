@@ -60,7 +60,6 @@
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_shutdown.pb.h"
 
-
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
 #define GITHUB_CONTRIBUTE_URL "https://github.com/Cockatrice/Cockatrice#cockatrice"
