@@ -661,13 +661,13 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 
 void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
-    notifyAboutUpdates = _notifyaboutupdate);
+    notifyAboutUpdates = _notifyaboutupdate;
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
 }
 
 void SettingsCache::setDownloadSpoilerStatus(int _spoilerStatus)
 {
-    mbDownloadSpoilers = _spoilerStatus);
+    mbDownloadSpoilers = _spoilerStatus;
     settings->setValue("personal/downloadspoilers", mbDownloadSpoilers);
     emit downloadSpoilerStatusChanged();
 }
