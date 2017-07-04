@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include <QMenu>
 #include <QAction>
-#include <iostream>
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QMenuBar>
@@ -60,7 +59,7 @@
 #include "pb/room_commands.pb.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_shutdown.pb.h"
-#include "SpoilerBackgroundUpdaterThread.h"
+
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"

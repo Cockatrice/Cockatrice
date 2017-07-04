@@ -471,26 +471,26 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     // Get all the update options and put them into the Combo Box
     QMap<int, QString> lacSettingTimes = settingsCache->getDownloadSpoilerTimeIntervals();
+    bool lbCurrentIndexDefaulted = true;
     int lnIndexToInsert = 0;
     for (auto lIterator = lacSettingTimes.begin(); lIterator != lacSettingTimes.end(); lIterator++, lnIndexToInsert++)
     {
         msDownloadSpoilersTimeIntervalComboBox.insertItem(lnIndexToInsert, lIterator.value());
+
+        // If this is the saved value, we can mark it off it
+        if (lIterator.key() == settingsCache->getDownloadSpoilerTimeMinutes())
+        {
+            msDownloadSpoilersTimeIntervalComboBox.setCurrentIndex(lnIndexToInsert);
+            lbCurrentIndexDefaulted = false;
+        }
     }
 
-    // Set the combo box's selected() to the one from settingsCache && If we have spoilers enabled/not
-    int lnComboBoxIndex = settingsCache->getDownloadSpoilerTimeIndex();
-    if (lnComboBoxIndex == -1)
+    // Set the combo box's selected if we don't have a setting in the settingsCache
+    if (lbCurrentIndexDefaulted)
     {
-        settingsCache->setDownloadSpoilerTimeMinutes(60*12); // 12 hours
-        settingsCache->setDownloadSpoilerTimeIndex(3); // 12 hours is @ index 3
-        msDownloadSpoilersTimeIntervalComboBox.setCurrentIndex(3); // Make the combo box show 12 hours
+        settingsCache->setDownloadSpoilerTimeMinutes(lacSettingTimes.keys().last()); // greatest value
+        msDownloadSpoilersTimeIntervalComboBox.setCurrentIndex(lacSettingTimes.size() - 1);
     }
-    else
-    {
-        msDownloadSpoilersTimeIntervalComboBox.setCurrentIndex(lnComboBoxIndex);
-    }
-
-
 
     mcDownloadSpoilersCheckBox.setChecked(settingsCache->getDownloadSpoilersStatus());
 
@@ -551,13 +551,10 @@ void DeckEditorSettingsPage::setDownloadSpoilerTime(QString asValue)
 {
     // Sets the downloadspoilerstimeHours field (stored in HOURS (float))
     QMap<int, QString> lacSettingTimes = settingsCache->getDownloadSpoilerTimeIntervals();
-    float lnHoursToReload = lacSettingTimes.key(asValue);
+    int lnMinutesToReload = lacSettingTimes.key(asValue);
 
     // Update settings cache downloadspoilerstimeMinutes
-    settingsCache->setDownloadSpoilerTimeMinutes(lnHoursToReload);
-
-    // Update settings cache downloadspoilerstimeindex
-    settingsCache->setDownloadSpoilerTimeIndex(msDownloadSpoilersTimeIntervalComboBox.currentIndex());
+    settingsCache->setDownloadSpoilerTimeMinutes(lnMinutesToReload);
 
     // Update the GUI display
     updateDownloadTimer();

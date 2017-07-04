@@ -220,8 +220,8 @@ SettingsCache::SettingsCache()
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
-    mnDownloadSpoilersTimeIndex = settings->value("personal/downloadspoilerstimeindex", -1).toInt();
-    msDownloadSpoilersTimeMinutes = settings->value("personal/downloadspoilerstimeMinutes", 24*60).toInt();
+    //mnDownloadSpoilersTimeIndex = settings->value("personal/downloadspoilerstimeindex", -1).toInt();
+    msDownloadSpoilersTimeMinutes = settings->value("personal/downloadspoilerstimeMinutes", -1).toInt();
     mnDownloadSpoilerLastUpdateTime = settings->value("personal/downloadspoilerslastupdatetime", -1).toLongLong();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
@@ -678,15 +678,7 @@ void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
     settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
 }
 
-void SettingsCache::setDownloadSpoilerTimeIndex(int _index)
-{
-    // Update index and emit that the index was changed for the timer thread
-    mnDownloadSpoilersTimeIndex = _index;
-    settings->setValue("personal/downloadspoilerstimeindex", mnDownloadSpoilersTimeIndex);
-    emit downloadSpoilerTimeIndexChanged();
-}
-
-void SettingsCache::setDownloadSpoilerTimeMinutes(float _lnTimeInterval)
+void SettingsCache::setDownloadSpoilerTimeMinutes(int _lnTimeInterval)
 {
     msDownloadSpoilersTimeMinutes = _lnTimeInterval;
     settings->setValue("personal/downloadspoilerstimeMinutes", msDownloadSpoilersTimeMinutes);

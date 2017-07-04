@@ -20,7 +20,7 @@ public slots:
     void handleNewTimeInterval();
 
 private slots:
-    void actDownloadFinishedTokensFile();
+    void actDownloadFinishedSpoilersFile();
     void actSeeIfSpoilerSeasonIsActive();
     void changeActiveStatus();
 

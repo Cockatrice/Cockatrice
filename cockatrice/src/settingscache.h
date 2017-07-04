@@ -67,8 +67,7 @@ private:
     QString msSpoilerSavePath;
     bool notifyAboutUpdates;
     int updateReleaseChannel;
-    int mnDownloadSpoilersTimeIndex;
-    float msDownloadSpoilersTimeMinutes;
+    int msDownloadSpoilersTimeMinutes;
     long long mnDownloadSpoilerLastUpdateTime;
     int maxFontSize;
     bool picDownload;
@@ -150,8 +149,7 @@ public:
     bool getNotifyAboutUpdates() const { return notifyAboutUpdates; }
     ReleaseChannel * getUpdateReleaseChannel() const { return releaseChannels.at(updateReleaseChannel); }
     QList<ReleaseChannel*> getUpdateReleaseChannels() const { return releaseChannels; }
-    int getDownloadSpoilerTimeIndex() const { return mnDownloadSpoilersTimeIndex; }
-    float getDownloadSpoilerTimeMinutes() const { return msDownloadSpoilersTimeMinutes; }
+    int getDownloadSpoilerTimeMinutes() const { return msDownloadSpoilersTimeMinutes; }
     QMap<int, QString> getDownloadSpoilerTimeIntervals() const { return manDownloadSpoilerTimeIntervals; }
     long getDownloadSpoilerLastUpdateTime() const { return mnDownloadSpoilerLastUpdateTime; }
 
@@ -273,9 +271,8 @@ public slots:
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(int _notifyaboutupdate);
     void setUpdateReleaseChannel(int _updateReleaseChannel);
-    void setDownloadSpoilerTimeIndex(int _index);
     void setDownloadSpoilerLastUpdateTime(long long _timestamp);
-    void setDownloadSpoilerTimeMinutes(float _lnTimeInterval);
+    void setDownloadSpoilerTimeMinutes(int _lnTimeInterval);
     void setMaxFontSize(int _max);
 };
 

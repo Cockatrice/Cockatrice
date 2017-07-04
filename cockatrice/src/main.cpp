@@ -42,7 +42,7 @@
 #include "soundengine.h"
 #include "featureset.h"
 #include "logger.h"
-#include "SpoilerBackgroundUpdaterThread.h"
+#include "spoilerbackgroundupdaterthread.h"
 
 CardDatabase *db;
 QTranslator *translator, *qtTranslator;
