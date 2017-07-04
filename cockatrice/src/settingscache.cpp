@@ -220,7 +220,6 @@ SettingsCache::SettingsCache()
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
-    //mnDownloadSpoilersTimeIndex = settings->value("personal/downloadspoilerstimeindex", -1).toInt();
     msDownloadSpoilersTimeMinutes = settings->value("personal/downloadspoilerstimeMinutes", -1).toInt();
     mnDownloadSpoilerLastUpdateTime = settings->value("personal/downloadspoilerslastupdatetime", -1).toLongLong();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
