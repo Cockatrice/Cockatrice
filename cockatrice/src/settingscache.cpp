@@ -299,28 +299,28 @@ void SettingsCache::setMasterVolume(int _masterVolume) {
 }
 
 void SettingsCache::setLeftJustified(const int _leftJustified) {
-    leftJustified = static_cast<bool>(_leftJustified);
+    leftJustified = _leftJustified;
     settings->setValue("interface/leftjustified", leftJustified);
     emit handJustificationChanged();
 }
 
 void SettingsCache::setCardScaling(const int _scaleCards) {
-    scaleCards = static_cast<bool>(_scaleCards);
+    scaleCards = _scaleCards;
     settings->setValue("cards/scaleCards", scaleCards);
 }
 
 void SettingsCache::setShowMessagePopups(const int _showMessagePopups) {
-    showMessagePopups = static_cast<bool>(_showMessagePopups);
+    showMessagePopups = _showMessagePopups;
     settings->setValue("chat/showmessagepopups", showMessagePopups);
 }
 
 void SettingsCache::setShowMentionPopups(const int _showMentionPopus) {
-    showMentionPopups = static_cast<bool>(_showMentionPopus);
+    showMentionPopups = _showMentionPopus;
     settings->setValue("chat/showmentionpopups", showMentionPopups);
 }
 
 void SettingsCache::setRoomHistory(const int _roomHistory) {
-    roomHistory = static_cast<bool>(_roomHistory);
+    roomHistory = _roomHistory;
     settings->setValue("chat/roomhistory", roomHistory);
 }
 
@@ -381,7 +381,7 @@ void SettingsCache::setThemeName(const QString &_themeName)
 
 void SettingsCache::setPicDownload(int _picDownload)
 {
-    picDownload = static_cast<bool>(_picDownload);
+    picDownload = _picDownload;
     settings->setValue("personal/picturedownload", picDownload);
     emit picDownloadChanged();
 }
@@ -400,30 +400,30 @@ void SettingsCache::setPicUrlFallback(const QString &_picUrlFallback)
 
 void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
 {
-    notificationsEnabled = static_cast<bool>(_notificationsEnabled);
+    notificationsEnabled = _notificationsEnabled;
     settings->setValue("interface/notificationsenabled", notificationsEnabled);
 }
 
 void SettingsCache::setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled) {
-    spectatorNotificationsEnabled = static_cast<bool>(_spectatorNotificationsEnabled);
+    spectatorNotificationsEnabled = _spectatorNotificationsEnabled;
     settings->setValue("interface/specnotificationsenabled", spectatorNotificationsEnabled);
 }
 
 void SettingsCache::setDoubleClickToPlay(int _doubleClickToPlay)
 {
-    doubleClickToPlay = static_cast<bool>(_doubleClickToPlay);
+    doubleClickToPlay = _doubleClickToPlay;
     settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
 }
 
 void SettingsCache::setPlayToStack(int _playToStack)
 {
-    playToStack = static_cast<bool>(_playToStack);
+    playToStack = _playToStack;
     settings->setValue("interface/playtostack", playToStack);
 }
 
 void SettingsCache::setAnnotateTokens(int _annotateTokens)
 {
-    annotateTokens = static_cast<bool>(_annotateTokens);
+    annotateTokens = _annotateTokens;
     settings->setValue("interface/annotatetokens", annotateTokens);
 }
 
@@ -435,21 +435,21 @@ void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSi
 
 void SettingsCache::setDisplayCardNames(int _displayCardNames)
 {
-    displayCardNames = static_cast<bool>(_displayCardNames);
+    displayCardNames = _displayCardNames;
     settings->setValue("cards/displaycardnames", displayCardNames);
     emit displayCardNamesChanged();
 }
 
 void SettingsCache::setHorizontalHand(int _horizontalHand)
 {
-    horizontalHand = static_cast<bool>(_horizontalHand);
+    horizontalHand = _horizontalHand;
     settings->setValue("hand/horizontal", horizontalHand);
     emit horizontalHandChanged();
 }
 
 void SettingsCache::setInvertVerticalCoordinate(int _invertVerticalCoordinate)
 {
-    invertVerticalCoordinate = static_cast<bool>(_invertVerticalCoordinate);
+    invertVerticalCoordinate = _invertVerticalCoordinate;
     settings->setValue("table/invert_vertical", invertVerticalCoordinate);
     emit invertVerticalCoordinateChanged();
 }
@@ -463,29 +463,29 @@ void SettingsCache::setMinPlayersForMultiColumnLayout(int _minPlayersForMultiCol
 
 void SettingsCache::setTapAnimation(int _tapAnimation)
 {
-    tapAnimation = static_cast<bool>(_tapAnimation);
+    tapAnimation = _tapAnimation;
     settings->setValue("cards/tapanimation", tapAnimation);
 }
 
 void SettingsCache::setChatMention(int _chatMention) {
-    chatMention = static_cast<bool>(_chatMention);
+    chatMention = _chatMention;
     settings->setValue("chat/mention", chatMention);
 }
 
 void SettingsCache::setChatMentionCompleter(const int _enableMentionCompleter)
 {
-    chatMentionCompleter = static_cast<bool>(_enableMentionCompleter);
+    chatMentionCompleter = _enableMentionCompleter;
     settings->setValue("chat/mentioncompleter", chatMentionCompleter);
     emit chatMentionCompleterChanged();
 }
 
 void SettingsCache::setChatMentionForeground(int _chatMentionForeground) {
-    chatMentionForeground = static_cast<bool>(_chatMentionForeground);
+    chatMentionForeground = _chatMentionForeground;
     settings->setValue("chat/mentionforeground", chatMentionForeground);
 }
 
 void SettingsCache::setChatHighlightForeground(int _chatHighlightForeground) {
-    chatHighlightForeground = static_cast<bool>(_chatHighlightForeground);
+    chatHighlightForeground = _chatHighlightForeground;
     settings->setValue("chat/highlightforeground", chatHighlightForeground);
 }
 
@@ -501,24 +501,24 @@ void SettingsCache::setChatHighlightColor(const QString &_chatHighlightColor) {
 
 void SettingsCache::setZoneViewSortByName(int _zoneViewSortByName)
 {
-    zoneViewSortByName = static_cast<bool>(_zoneViewSortByName);
+    zoneViewSortByName = _zoneViewSortByName;
     settings->setValue("zoneview/sortbyname", zoneViewSortByName);
 }
 
 void SettingsCache::setZoneViewSortByType(int _zoneViewSortByType)
 {
-    zoneViewSortByType = static_cast<bool>(_zoneViewSortByType);
+    zoneViewSortByType = _zoneViewSortByType;
     settings->setValue("zoneview/sortbytype", zoneViewSortByType);
 }
 
 void SettingsCache::setZoneViewPileView(int _zoneViewPileView){
-    zoneViewPileView = static_cast<bool>(_zoneViewPileView);
+    zoneViewPileView = _zoneViewPileView;
     settings->setValue("zoneview/pileview", zoneViewPileView);
 }
 
 void SettingsCache::setSoundEnabled(int _soundEnabled)
 {
-    soundEnabled = static_cast<bool>(_soundEnabled);
+    soundEnabled = _soundEnabled;
     settings->setValue("sound/enabled", soundEnabled);
     emit soundEnabledChanged();
 }
@@ -532,13 +532,13 @@ void SettingsCache::setSoundThemeName(const QString &_soundThemeName)
 
 void SettingsCache::setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers)
 {
-    ignoreUnregisteredUsers = static_cast<bool>(_ignoreUnregisteredUsers);
+    ignoreUnregisteredUsers = _ignoreUnregisteredUsers;
     settings->setValue("chat/ignore_unregistered", ignoreUnregisteredUsers);
 }
 
 void SettingsCache::setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages)
 {
-    ignoreUnregisteredUserMessages = static_cast<bool>(_ignoreUnregisteredUserMessages);
+    ignoreUnregisteredUserMessages = _ignoreUnregisteredUserMessages;
     settings->setValue("chat/ignore_unregistered_messages", ignoreUnregisteredUserMessages);
 }
 
@@ -661,13 +661,13 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 
 void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
-    notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
+    notifyAboutUpdates = _notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
 }
 
 void SettingsCache::setDownloadSpoilerStatus(int _spoilerStatus)
 {
-    mbDownloadSpoilers = static_cast<bool>(_spoilerStatus);
+    mbDownloadSpoilers = _spoilerStatus);
     settings->setValue("personal/downloadspoilers", mbDownloadSpoilers);
     emit downloadSpoilerStatusChanged();
 }

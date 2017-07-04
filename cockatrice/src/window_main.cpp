@@ -701,7 +701,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     resize(900, 700);
     restoreGeometry(settingsCache->getMainWindowGeometry());
-    aFullScreen->setChecked(static_cast<bool>(windowState() & Qt::WindowFullScreen));
+    aFullScreen->setChecked(windowState() & Qt::WindowFullScreen);
 
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
         createTrayActions();
