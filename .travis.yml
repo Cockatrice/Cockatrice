@@ -17,7 +17,7 @@ matrix:
     env: BUILDTYPE=Release
 script: "./travis-compile.sh"
 install: "./travis-dependencies.sh"
-cache: apt
+cache: ccache
 notifications:
   webhooks:
     urls:
