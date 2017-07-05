@@ -16,6 +16,7 @@ matrix:
     env: BUILDTYPE=Debug
     cache:
       ccache: true
+      branch: no-md5deep
       directories:
         - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
   - os: osx
@@ -23,6 +24,7 @@ matrix:
     env: BUILDTYPE=Release
     cache:
       ccache: true
+      branch: no-md5deep
       directories:
         - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
 
