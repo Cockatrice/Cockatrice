@@ -5,7 +5,7 @@ OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 
 !define UNINSTKEY "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
 !define DEFAULTNORMALDESTINATON "$ProgramFiles\Cockatrice"
-!define DEFAULTPORTABLEDESTINATON "$Desktop\Cockatrice"
+!define DEFAULTPORTABLEDESTINATON "$Desktop\CockatricePortable"
 !define INST_DIR "@CPACK_TEMPORARY_DIRECTORY@"
 
 RequestExecutionlevel highest
