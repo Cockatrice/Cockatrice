@@ -1,5 +1,7 @@
+sudo: required   # forces legacy build infrastructure
+
 language: cpp
-sudo: required
+
 matrix:
   fast_finish: true
   include:
@@ -12,19 +14,22 @@ matrix:
   - os: osx
     osx_image: xcode6.4
     env: BUILDTYPE=Debug
+    cache:
+      directories:
+        - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
   - os: osx
     osx_image: xcode6.4
     env: BUILDTYPE=Release
-script: "./travis-compile.sh"
-install: "./travis-dependencies.sh"
+    cache:
+      directories:
+        - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
+
 cache: ccache
-notifications:
-  webhooks:
-    urls:
-    - https://webhooks.gitter.im/e/d94969c3b01b22cbdcb7
-    on_success: change
-    on_failure: change
-    on_start: never
+
+install: "./travis-dependencies.sh"
+
+script: "./travis-compile.sh"
+
 deploy:
   provider: releases
   api_key:
@@ -38,3 +43,12 @@ deploy:
     tags: true
     repo: Cockatrice/Cockatrice
     condition: $BUILDTYPE = Release
+
+notifications:
+  webhooks:
+    urls:
+    - https://webhooks.gitter.im/e/d94969c3b01b22cbdcb7
+    on_success: change
+    on_failure: change
+    on_start: never
+    
