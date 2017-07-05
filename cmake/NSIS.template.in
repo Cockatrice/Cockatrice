@@ -159,6 +159,30 @@ Section "Application" SecApplication
 SetShellVarContext all
 SetOutPath "$INSTDIR"
 
+${If} $PortableMode = 1
+${AndIf} ${FileExists} "$INSTDIR\portable.dat"
+	; upgrade portable mode
+	RMDir /r "$INSTDIR\plugins"
+	RMDir /r "$INSTDIR\sounds"
+	RMDir /r "$INSTDIR\themes"
+	RMDir /r "$INSTDIR\translations"
+	Delete "$INSTDIR\uninstall.exe"
+	Delete "$INSTDIR\cockatrice.exe"
+	Delete "$INSTDIR\oracle.exe"
+	Delete "$INSTDIR\servatrice.exe"
+	Delete "$INSTDIR\Qt*.dll"
+	Delete "$INSTDIR\libmysql.dll"
+	Delete "$INSTDIR\icu*.dll"
+	Delete "$INSTDIR\libeay32.dll"
+	Delete "$INSTDIR\ssleay32.dll"
+	Delete "$INSTDIR\qt.conf"
+	Delete "$INSTDIR\qdebug.txt"
+	Delete "$INSTDIR\servatrice.sql"
+	Delete "$INSTDIR\servatrice.ini.example"
+	Delete "$INSTDIR\zlib*.dll"
+	RMDir "$INSTDIR"
+${EndIf}
+
 @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
 @CPACK_NSIS_FULL_INSTALL@
 
