@@ -111,9 +111,9 @@ nsDialogs::Create 1018
 Pop $0
 ${NSD_CreateLabel} 0 10u 100% 24u "Select install mode:"
 Pop $0
-${NSD_CreateRadioButton} 30u 50u -30u 8u "Normal install"
+${NSD_CreateRadioButton} 30u 50u -30u 8u "Normal installation"
 Pop $1
-${NSD_CreateRadioButton} 30u 70u -30u 8u "Portable (all files in a single folder)"
+${NSD_CreateRadioButton} 30u 70u -30u 8u "Portable mode (all files in a single folder)"
 Pop $2
 ${If} $PortableMode = 0
     SendMessage $1 ${BM_SETCHECK} ${BST_CHECKED} 0
