@@ -16,6 +16,7 @@ matrix:
     env: BUILDTYPE=Debug
     cache:
       ccache: true
+      timeout: 360 # 6min timeout for cache uploading instead default 3
       directories:
         - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
   - os: osx
@@ -23,6 +24,7 @@ matrix:
     env: BUILDTYPE=Release
     cache:
       ccache: true
+      timeout: 360 # 6min timeout for cache uploading instead default 3
       directories:
         - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
 
