@@ -15,12 +15,14 @@ matrix:
     osx_image: xcode6.4
     env: BUILDTYPE=Debug
     cache:
+      ccache: true
       directories:
         - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
   - os: osx
     osx_image: xcode6.4
     env: BUILDTYPE=Release
     cache:
+      ccache: true
       directories:
         - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
 
