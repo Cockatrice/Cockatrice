@@ -43,6 +43,8 @@ public:
     void setEnabled(bool _enabled);
     bool getIsKnown() const { return isknown; }
     void setIsKnown(bool _isknown);
+    //Determine incomplete sets.
+    bool getIsKnownIgnored() const { return longName.length() + setType.length() + releaseDate.toString().length() == 0 ; }
 };
 
 class SetList : public QList<CardSet *> {
