@@ -38,13 +38,7 @@ QStringMap & ThemeManager::getAvailableThemes()
     availableThemes.clear();
 
     // load themes from user profile dir
-    dir =
-#ifdef PORTABLE_BUILD
-        qApp->applicationDirPath() +
-#else
-        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first() +
-#endif
-        "/themes";
+    dir = settingsCache->getDataPath() + "/themes";
 
     foreach(QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
     {
