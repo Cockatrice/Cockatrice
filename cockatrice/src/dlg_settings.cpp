@@ -520,8 +520,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     // On a change to the check box, hide/unhide the other fields
     // On a change to the combo box, send a signal to the timer threads
-    connect(&mcDownloadSpoilersCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDownloadSpoilerStatus(int)));
-    connect(&mcDownloadSpoilersCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setSpoilersEnabled(int)));
+    connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), settingsCache, SLOT(setDownloadSpoilerStatus(bool)));
+    connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
     connect(&msDownloadSpoilersTimeIntervalComboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(setDownloadSpoilerTime(QString)));
 
     mpGeneralGroupBox = new QGroupBox;
@@ -560,16 +560,14 @@ void DeckEditorSettingsPage::setDownloadSpoilerTime(QString asValue)
     updateDownloadTimer();
 }
 
-void DeckEditorSettingsPage::setSpoilersEnabled(int anInput)
+void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
 {
-    bool lbVisibility = (anInput != 0);
-
-    msDownloadSpoilersLabel.setEnabled(lbVisibility);
-    msDownloadSpoilersTimeIntervalComboBox.setEnabled(lbVisibility);
-    mcSpoilerSaveLabel.setEnabled(lbVisibility);
-    mpSpoilerSavePathLineEdit->setEnabled(lbVisibility);
-    mpSpoilerPathButton->setEnabled(lbVisibility);
-    updateDownloadTimer(lbVisibility);
+    msDownloadSpoilersLabel.setEnabled(anInput);
+    msDownloadSpoilersTimeIntervalComboBox.setEnabled(anInput);
+    mcSpoilerSaveLabel.setEnabled(anInput);
+    mpSpoilerSavePathLineEdit->setEnabled(anInput);
+    mpSpoilerPathButton->setEnabled(anInput);
+    updateDownloadTimer(anInput);
 }
 
 void DeckEditorSettingsPage::updateDownloadTimer(bool abIsEnabled)
@@ -578,19 +576,19 @@ void DeckEditorSettingsPage::updateDownloadTimer(bool abIsEnabled)
     if (abIsEnabled)
     {
         long lnTimeUntilNextUpdate = QDateTime::currentMSecsSinceEpoch() - settingsCache->getDownloadSpoilerLastUpdateTime();
-        float lnTimeToWaitBetween = settingsCache->getDownloadSpoilerTimeMinutes() * 60000;
+        long lnTimeToWaitBetween = settingsCache->getDownloadSpoilerTimeMinutes() * 60000;
 
         QDateTime lTimeNow(QDateTime::currentDateTime());
 
         // If not defaulted
         if (settingsCache->getDownloadSpoilerLastUpdateTime() != -1)
         {
-            mcNextUpdateTimeLabel.setText(lTimeNow.addMSecs(static_cast<long>(lnTimeToWaitBetween - lnTimeUntilNextUpdate)).toString());
+            mcNextUpdateTimeLabel.setText(lTimeNow.addMSecs(lnTimeToWaitBetween - lnTimeUntilNextUpdate).toString());
         }
         else
         {
             // Value not set in config, so just show how long until the update based on what we know
-            mcNextUpdateTimeLabel.setText(lTimeNow.addMSecs(static_cast<long>(lnTimeToWaitBetween)).toString());
+            mcNextUpdateTimeLabel.setText(lTimeNow.addMSecs(lnTimeToWaitBetween).toString());
         }
     }
     else

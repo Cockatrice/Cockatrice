@@ -116,7 +116,7 @@ SET(cockatrice_SOURCES
     src/logger.cpp
     src/releasechannel.cpp
     src/userconnection_information.cpp
-    src/spoilerbackgroundupdaterthread.cpp
+    src/spoilerbackgroundupdater.cpp
     ${VERSION_STRING_CPP}
 )
 

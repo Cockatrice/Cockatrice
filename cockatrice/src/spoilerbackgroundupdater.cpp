@@ -5,21 +5,17 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QtConcurrent>
-#include "spoilerbackgroundupdaterthread.h"
+#include "spoilerbackgroundupdater.h"
 #include "settingscache.h"
 #include "carddatabase.h"
 #include "main.h"
 
-SpoilerBackgroundUpdaterThread::SpoilerBackgroundUpdaterThread(QObject *apParent) : QObject(apParent)
+SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(apParent)
 {
     // User doesn't want to download spoilers... for now :)
     mbIsActiveThread = settingsCache->getDownloadSpoilersStatus();
     connect(settingsCache, SIGNAL(downloadSpoilerStatusChanged()), this, SLOT(changeActiveStatus()));
-
-    // When timer ends, cause download of Spoilers XML file
-    connect(mpTimerForSpoilers, SIGNAL(timeout()), this, SLOT(timeoutOccurredTimeToDownloadSpoilers()));
 
     // If there is a change in the settings, update the timer so we know when to update correctly
     connect(settingsCache, SIGNAL(downloadSpoilerTimeIndexChanged()), this, SLOT(handleNewTimeInterval()));
@@ -30,18 +26,10 @@ SpoilerBackgroundUpdaterThread::SpoilerBackgroundUpdaterThread(QObject *apParent
     }
 
     // User wants spoilers, so lets see if we're in spoiler season or not.
-    downloadSpoilerSeasonStatusFile();
-    if (! mbIsActiveSpoilerSeason)
-    {
-        qDebug() << "Spoiler Timer disabled. NOT Spoilers Season";
-        return;
-    }
-
-    // Start the timer sequence and the domino effects
-    runTimer();
+    downloadSpoilerSeasonStatusFileAndStartTimer();
 }
 
-SpoilerBackgroundUpdaterThread::~SpoilerBackgroundUpdaterThread()
+SpoilerBackgroundUpdater::~SpoilerBackgroundUpdater()
 {
     delete mpTimerForSpoilers;
 
@@ -51,7 +39,7 @@ SpoilerBackgroundUpdaterThread::~SpoilerBackgroundUpdaterThread()
     }
 }
 
-void SpoilerBackgroundUpdaterThread::changeActiveStatus()
+void SpoilerBackgroundUpdater::changeActiveStatus()
 {
     mbIsActiveThread = (settingsCache->getDownloadSpoilersStatus());
     qDebug() << "Spoiler Timer running status has been changed to" << mbIsActiveThread;
@@ -59,7 +47,7 @@ void SpoilerBackgroundUpdaterThread::changeActiveStatus()
     // If they enable spoilers, auto-download the file (aka timer expired) and restart the timer
     if (mbIsActiveThread)
     {
-        downloadSpoilerSeasonStatusFile();
+        downloadSpoilerSeasonStatusFileAndStartTimer();
         if (mbIsActiveSpoilerSeason)
         {
             timeoutOccurredTimeToDownloadSpoilers();
@@ -67,7 +55,7 @@ void SpoilerBackgroundUpdaterThread::changeActiveStatus()
     }
 }
 
-void SpoilerBackgroundUpdaterThread::timeoutOccurredTimeToDownloadSpoilers()
+void SpoilerBackgroundUpdater::timeoutOccurredTimeToDownloadSpoilers()
 {
     qDebug() << "Spoiler Timer has finished";
 
@@ -85,19 +73,21 @@ void SpoilerBackgroundUpdaterThread::timeoutOccurredTimeToDownloadSpoilers()
     runTimer(true);
 }
 
-void SpoilerBackgroundUpdaterThread::handleNewTimeInterval()
+void SpoilerBackgroundUpdater::handleNewTimeInterval()
 {
     // Cause the timer to stop then restart w/ new interval
     qDebug() << "Spoiler Timer has new time interval established";
     runTimer(true);
 }
 
-void SpoilerBackgroundUpdaterThread::runTimer(bool lbStopAndRestart)
+void SpoilerBackgroundUpdater::runTimer(bool lbStopAndRestart)
 {
     // If the timer doesn't exist (user ticked checkbox, for example, as an override, create it)
     if (mpTimerForSpoilers == nullptr)
     {
+        // When timer ends, cause download of Spoilers XML file
         mpTimerForSpoilers = new QTimer(this);
+        connect(mpTimerForSpoilers, SIGNAL(timeout()), this, SLOT(timeoutOccurredTimeToDownloadSpoilers()));
     }
 
     // Cause a restart of the timer as if we just restart via start() a timeout() will be
@@ -133,7 +123,7 @@ void SpoilerBackgroundUpdaterThread::runTimer(bool lbStopAndRestart)
     qDebug() << "Spoiler Timer has started and will finish in" << mpTimerForSpoilers->interval()/60000. << "minutes";
 }
 
-void SpoilerBackgroundUpdaterThread::downloadSpoilersFile(QUrl acUrl)
+void SpoilerBackgroundUpdater::downloadSpoilersFile(QUrl acUrl)
 {
     qDebug() << "Starting to download spoiler on NAM";
     if (mpNetworkAccessManager == nullptr)
@@ -146,7 +136,7 @@ void SpoilerBackgroundUpdaterThread::downloadSpoilersFile(QUrl acUrl)
     connect(lpNetworkReply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSpoilersFile()));
 }
 
-void SpoilerBackgroundUpdaterThread::downloadSpoilerSeasonStatusFile()
+void SpoilerBackgroundUpdater::downloadSpoilerSeasonStatusFileAndStartTimer()
 {
     qDebug() << "Checking spoiler season status";
     if (mpNetworkAccessManager == nullptr)
@@ -158,13 +148,10 @@ void SpoilerBackgroundUpdaterThread::downloadSpoilerSeasonStatusFile()
 
     // Force the calling of actSeeIfSpoilerSeasonIsActive() in sequence instead of parallel
     // as we need to get that result before we start this timer thread up.
-    QEventLoop lcSubLoop;
     connect(lpNetworkReply, SIGNAL(finished()), this, SLOT(actSeeIfSpoilerSeasonIsActive()));
-    connect(lpNetworkReply, SIGNAL(finished()), &lcSubLoop, SLOT(quit()));
-    lcSubLoop.exec();
 }
 
-void SpoilerBackgroundUpdaterThread::actDownloadFinishedSpoilersFile()
+void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
 {
     QNetworkReply *lpNetworkReply = static_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError leErrorCode = lpNetworkReply->error();
@@ -173,38 +160,38 @@ void SpoilerBackgroundUpdaterThread::actDownloadFinishedSpoilersFile()
     if (leErrorCode != QNetworkReply::NoError)
     {
         QMessageBox::critical(nullptr, tr("Error"), tr("Network error: %1.").arg(lpNetworkReply->errorString()));
+        lpNetworkReply->deleteLater();
+        return;
+    }
+
+    int lnStatusCode = lpNetworkReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if (lnStatusCode == 301 || lnStatusCode == 302)
+    {
+        // Was a redirect, will need to start over!
+        QUrl lcRedirectUrl = lpNetworkReply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        downloadSpoilersFile(lcRedirectUrl);
     }
     else
     {
-        int lnStatusCode = lpNetworkReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-        if (lnStatusCode == 301 || lnStatusCode == 302)
+        // Read downloaded file into buffer
+        mcDownloadedFileData = lpNetworkReply->readAll();
+
+        if (saveSpoilersToFile(lsSpoilerSavePath))
         {
-            // Was a redirect, will need to start over!
-            QUrl lcRedirectUrl = lpNetworkReply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
-            downloadSpoilersFile(lcRedirectUrl);
+            // Reload the card database to import the spoilers
+            QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+            QMessageBox::information(nullptr, tr("Success"), tr("Spoiler database updated and saved successfully to\n%1").arg(lsSpoilerSavePath));
         }
         else
         {
-            // Read downloaded file into buffer
-            mcDownloadedFileData = lpNetworkReply->readAll();
-
-            if (saveSpoilersToFile(lsSpoilerSavePath))
-            {
-                // Reload the card database to import the spoilers
-                QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
-                QMessageBox::information(nullptr, tr("Success"), tr("Spoiler database updated and saved successfully to\n%1").arg(lsSpoilerSavePath));
-            }
-            else
-            {
-                QMessageBox::critical(nullptr, tr("Error"), tr("Spoiler database updated but could not be saved to %1").arg(lsSpoilerSavePath));
-            }
+            QMessageBox::critical(nullptr, tr("Error"), tr("Spoiler database updated but could not be saved to %1").arg(lsSpoilerSavePath));
         }
     }
 
     lpNetworkReply->deleteLater();
 }
 
-void SpoilerBackgroundUpdaterThread::actSeeIfSpoilerSeasonIsActive()
+void SpoilerBackgroundUpdater::actSeeIfSpoilerSeasonIsActive()
 {
     QNetworkReply *lpNetworkReply = static_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError leErrorCode = lpNetworkReply->error();
@@ -223,12 +210,17 @@ void SpoilerBackgroundUpdaterThread::actSeeIfSpoilerSeasonIsActive()
         QByteArray laFileData = lpNetworkReply->readAll();
         mbIsActiveSpoilerSeason = QString(laFileData).contains("enabled", Qt::CaseInsensitive);
 
-        // Start the timer for spoilers downloads
-        mpTimerForSpoilers = new QTimer(this);
+        if (mbIsActiveSpoilerSeason)
+        {
+            // Start the timer for spoilers downloads
+            mpTimerForSpoilers = new QTimer(this);
+            connect(mpTimerForSpoilers, SIGNAL(timeout()), this, SLOT(timeoutOccurredTimeToDownloadSpoilers()));
+            runTimer();
+        }
     }
 }
 
-bool SpoilerBackgroundUpdaterThread::saveSpoilersToFile(const QString &asFileName)
+bool SpoilerBackgroundUpdater::saveSpoilersToFile(const QString &asFileName)
 {
     QFile lcFileToWriteTo(asFileName);
     bool lbRetVal = true;

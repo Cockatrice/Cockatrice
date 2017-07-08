@@ -226,7 +226,7 @@ public slots:
     void setSpoilerDatabasePath(const QString &_asSpoilerDatabasePath);
     void setPicDownload(int _picDownload);
     void setNotificationsEnabled(int _notificationsEnabled);
-    void setDownloadSpoilerStatus(int _spoilerStatus);
+    void setDownloadSpoilerStatus(bool _spoilerStatus);
     void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);

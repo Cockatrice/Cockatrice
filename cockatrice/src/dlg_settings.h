@@ -130,7 +130,7 @@ public:
     DeckEditorSettingsPage();
     void retranslateUi();
 private slots:
-    void setSpoilersEnabled(int);
+    void setSpoilersEnabled(bool);
     void setDownloadSpoilerTime(QString);
     void spoilerPathButtonClicked();
 signals:
