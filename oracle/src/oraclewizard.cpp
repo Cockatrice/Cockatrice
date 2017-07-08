@@ -490,9 +490,6 @@ void SaveSetsPage::retranslateUi()
                    "Press \"Save\" to save the imported cards to the Cockatrice database."));
 
     defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
-    #ifdef PORTABLE_BUILD
-    defaultPathCheckBox->setEnabled(false);
-    #endif
 }
 
 void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, const QString &setName)

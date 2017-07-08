@@ -99,7 +99,7 @@ int SetList::getUnknownSetsNum()
     for (int i = 0; i < size(); ++i)
     {
         CardSet *set = at(i);
-        if(!set->getIsKnown())
+        if(!set->getIsKnown() && !set->getIsKnownIgnored())
             ++num;
     }
     return num;
@@ -111,7 +111,7 @@ QStringList SetList::getUnknownSetsNames()
     for (int i = 0; i < size(); ++i)
     {
         CardSet *set = at(i);
-        if(!set->getIsKnown())
+        if(!set->getIsKnown() && !set->getIsKnownIgnored())
             sets << set->getShortName();
     }
     return sets;
@@ -122,9 +122,13 @@ void SetList::enableAllUnknown()
     for (int i = 0; i < size(); ++i)
     {
         CardSet *set = at(i);
-        if(!set->getIsKnown())
+        if(!set->getIsKnown() && !set->getIsKnownIgnored())
         {
             set->setIsKnown(true);
+            set->setEnabled(true);
+        }
+        else if (set->getIsKnownIgnored() && !set->getEnabled())
+        {
             set->setEnabled(true);
         }
     }
@@ -135,7 +139,8 @@ void SetList::enableAll()
     for (int i = 0; i < size(); ++i)
     {
         CardSet *set = at(i);
-        set->setIsKnown(true);
+        if(!set->getIsKnownIgnored())
+            set->setIsKnown(true);
         set->setEnabled(true);
     }
 }
@@ -145,9 +150,14 @@ void SetList::markAllAsKnown()
     for (int i = 0; i < size(); ++i)
     {
         CardSet *set = at(i);
-        if(!set->getIsKnown())
+        if(!set->getIsKnown() && !set->getIsKnownIgnored())
         {
             set->setIsKnown(true);
+            set->setEnabled(false);
+        }
+        else if (set->getIsKnownIgnored() && !set->getEnabled())
+        {
+            set->setEnabled(true);
         }
     }
 }
@@ -842,6 +852,8 @@ void CardDatabase::checkUnknownSets()
         QStringList unknownSetNames = sets.getUnknownSetsNames();
         if(numUnknownSets > 0)
             emit cardDatabaseNewSetsFound(numUnknownSets, unknownSetNames);
+        else
+            sets.markAllAsKnown();
     } else {
         // No set enabled. Probably this is the first time running trice
         sets.guessSortKeys();
