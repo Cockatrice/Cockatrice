@@ -31,7 +31,10 @@ SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(
 
 SpoilerBackgroundUpdater::~SpoilerBackgroundUpdater()
 {
-    delete mpTimerForSpoilers;
+    if (mpTimerForSpoilers)
+    {
+        delete mpTimerForSpoilers;
+    }
 
     if (mpNetworkAccessManager)
     {
@@ -213,8 +216,6 @@ void SpoilerBackgroundUpdater::actSeeIfSpoilerSeasonIsActive()
         if (mbIsActiveSpoilerSeason)
         {
             // Start the timer for spoilers downloads
-            mpTimerForSpoilers = new QTimer(this);
-            connect(mpTimerForSpoilers, SIGNAL(timeout()), this, SLOT(timeoutOccurredTimeToDownloadSpoilers()));
             runTimer();
         }
     }

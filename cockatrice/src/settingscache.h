@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QSize>
 #include <QStringList>
-#include <QTimer>
 #include "shortcutssettings.h"
 #include "settings/carddatabasesettings.h"
 #include "settings/serverssettings.h"
