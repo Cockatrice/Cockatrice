@@ -30,9 +30,9 @@ matrix:
 
 cache: ccache
 
-install: "./travis-dependencies.sh"
+install: "./.travis/travis-dependencies.sh"
 
-script: "./travis-compile.sh"
+script: "./.travis/travis-compile.sh"
 
 deploy:
   provider: releases
