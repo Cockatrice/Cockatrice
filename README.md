@@ -108,6 +108,7 @@ The following flags can be passed to `cmake`:
 A Dockerfile is provided to run Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/what-docker).<br>
 
 You just need to create an image from the Dockerfile<br>
+`cd /path/to/Cockatrice-Repo/`
 `docker build -t servatrice .`<br>
 And then run it<br>
 `docker run -i -p 4747:4747/tcp -t servatrice:latest`<br>
