@@ -2636,6 +2636,14 @@ void Player::updateCardMenu(const CardItem *card)
 
                 addRelatedCardActions(card, cardMenu);
             }
+			else if (card->getZone()->getName() == "rfg" || card->getZone()->getName() == "grave")
+			{
+				cardMenu->addAction(aPlay);
+				cardMenu->addAction(aPlayFacedown);
+				cardMenu->addSeparator();
+				cardMenu->addAction(aClone);
+				cardMenu->addMenu(moveMenu);
+			}
             else
             {
                 cardMenu->addAction(aPlay);
