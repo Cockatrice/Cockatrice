@@ -95,6 +95,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     chooseTokenView->header()->hideSection(2); // Mana Cost
     chooseTokenView->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents); // Color(s)
     connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
+	connect(chooseTokenView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(actOk()));
     
     if (predefinedTokens.isEmpty())
     {
