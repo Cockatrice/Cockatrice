@@ -135,10 +135,17 @@ void SetsModel::toggleRow(int row, bool enable)
 {
     CardSet *temp = sets.at(row);
 
-    if (enable)
+    int numRows = rowCount();
+
+    if (enable) {
         enabledSets.insert(temp);
-    else
+        swapRows(row, 0);
+    } else {
         enabledSets.remove(temp);
+        swapRows(row, numRows);
+    }
+
+
 
     emit dataChanged(index(row, EnabledCol), index(row, EnabledCol));
 }
@@ -147,13 +154,18 @@ void SetsModel::toggleRow(int row)
 {
     CardSet *tmp = sets.at(row);
 
+    int numRows = rowCount();
+
     if (tmp == nullptr)
         return;
 
-    if (enabledSets.contains(tmp))
+    if (enabledSets.contains(tmp)) {
         enabledSets.remove(tmp);
-    else
+        swapRows(row, numRows);
+    } else {
         enabledSets.insert(tmp);
+        swapRows(row, 0);
+    }
 
     emit dataChanged(index(row, EnabledCol), index(row, EnabledCol));
 }
@@ -190,7 +202,7 @@ void SetsModel::sort(int column, Qt::SortOrder order)
 
     for(row = 0; row < numRows; ++row)
         setMap.insertMulti(index(row, column).data(SetsModel::SortRole).toString(), sets.at(row));
-    
+
     QList<CardSet *> tmp = setMap.values();
     sets.clear();
     if(order == Qt::AscendingOrder)

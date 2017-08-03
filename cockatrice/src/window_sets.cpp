@@ -211,16 +211,13 @@ void WndSets::actDisableAll()
 void WndSets::actEnableSome()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-
     foreach(QModelIndex i, rows)
         model->toggleRow(i.row(), true);
-
 }
 
 void WndSets::actDisableSome()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-
     foreach(QModelIndex i, rows)
         model->toggleRow(i.row(), false);
 }
