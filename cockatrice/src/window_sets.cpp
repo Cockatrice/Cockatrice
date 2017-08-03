@@ -214,6 +214,7 @@ void WndSets::actEnableSome()
 
     foreach(QModelIndex i, rows)
         model->toggleRow(i.row(), true);
+
 }
 
 void WndSets::actDisableSome()
