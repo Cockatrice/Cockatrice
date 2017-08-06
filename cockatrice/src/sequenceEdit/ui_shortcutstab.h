@@ -818,7 +818,7 @@ public:
         Player_aDecCStorm->setObjectName("Player_aDecCStorm");
         gridLayout_Storm->addWidget(Player_aDecCStorm, 2, 1, 1, 1);
 
-        counterLayout->addWidget(groupBox_counterStorm, 0, 4, 1, 1);
+        counterLayout->addWidget(groupBox_counterStorm, 1, 0, 1, 1);
 
         groupBox_counterW = new QGroupBox(groupBox_3);
         groupBox_counterW->setObjectName("groupBox_counterW");
@@ -845,7 +845,7 @@ public:
         Player_aDecCW->setObjectName("Player_aDecCW");
         gridLayout_W->addWidget(Player_aDecCW, 2, 1, 1, 1);
 
-        counterLayout->addWidget(groupBox_counterW, 1, 0, 1, 1);
+        counterLayout->addWidget(groupBox_counterW, 1, 1, 1, 1);
 
         groupBox_counterU = new QGroupBox(groupBox_3);
         groupBox_counterU->setObjectName("groupBox_counterU");
@@ -872,7 +872,7 @@ public:
         Player_aDecCU->setObjectName("Player_aDecCU");
         gridLayout_U->addWidget(Player_aDecCU, 2, 1, 1, 1);
 
-        counterLayout->addWidget(groupBox_counterU, 1, 1, 1, 1);
+        counterLayout->addWidget(groupBox_counterU, 1, 2, 1, 1);
 
         groupBox_counterB = new QGroupBox(groupBox_3);
         groupBox_counterB->setObjectName("groupBox_counterB");
@@ -899,7 +899,7 @@ public:
         Player_aDecCB->setObjectName("Player_aDecCB");
         gridLayout_B->addWidget(Player_aDecCB, 2, 1, 1, 1);
 
-        counterLayout->addWidget(groupBox_counterB, 1, 2, 1, 1);
+        counterLayout->addWidget(groupBox_counterB, 1, 3, 1, 1);
 
         groupBox_counterR = new QGroupBox(groupBox_3);
         groupBox_counterR->setObjectName("groupBox_counterR");
@@ -926,7 +926,7 @@ public:
         Player_aDecCR->setObjectName("Player_aDecCR");
         gridLayout_R->addWidget(Player_aDecCR, 2, 1, 1, 1);
 
-        counterLayout->addWidget(groupBox_counterR, 1, 3, 1, 1);
+        counterLayout->addWidget(groupBox_counterR, 2, 0, 1, 1);
 
         groupBox_counterG = new QGroupBox(groupBox_3);
         groupBox_counterG->setObjectName("groupBox_counterG");
@@ -953,7 +953,7 @@ public:
         Player_aDecCG->setObjectName("Player_aDecCG");
         gridLayout_G->addWidget(Player_aDecCG, 2, 1, 1, 1);
 
-        counterLayout->addWidget(groupBox_counterG, 1, 4, 1, 1);
+        counterLayout->addWidget(groupBox_counterG, 2, 1, 1, 1);
 
         groupBox_counterX = new QGroupBox(groupBox_3);
         groupBox_counterX->setObjectName("groupBox_counterX");
@@ -980,7 +980,7 @@ public:
         Player_aDecCX->setObjectName("Player_aDecCX");
         gridLayout_X->addWidget(Player_aDecCX, 2, 1, 1, 1);
 
-        counterLayout->addWidget(groupBox_counterX, 2, 0, 1, 1);
+        counterLayout->addWidget(groupBox_counterX, 2, 2, 1, 1);
 
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
