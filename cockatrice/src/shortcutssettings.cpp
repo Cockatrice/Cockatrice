@@ -244,33 +244,33 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/phase9"] = parseSequenceString("F9");
 
 
-    defaultShortCuts["Player/aIncCounterW"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounterW"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounterW"] = parseSequenceString("");
+    defaultShortCuts["Player/aIncCounter_w"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounter_w"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounter_w"] = parseSequenceString("");
 
-    defaultShortCuts["Player/aIncCounterU"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounterU"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounterU"] = parseSequenceString("");
+    defaultShortCuts["Player/aIncCounter_u"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounter_u"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounter_u"] = parseSequenceString("");
 
-    defaultShortCuts["Player/aIncCounterB"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounterB"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounterB"] = parseSequenceString("");
+    defaultShortCuts["Player/aIncCounter_b"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounter_b"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounter_b"] = parseSequenceString("");
 
-    defaultShortCuts["Player/aIncCounterR"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounterR"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounterR"] = parseSequenceString("");
+    defaultShortCuts["Player/aIncCounter_r"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounter_r"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounter_r"] = parseSequenceString("");
 
-    defaultShortCuts["Player/aIncCounterG"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounterG"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounterG"] = parseSequenceString("");
+    defaultShortCuts["Player/aIncCounter_g"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounter_g"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounter_g"] = parseSequenceString("");
 
-    defaultShortCuts["Player/aIncCounterX"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounterX"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounterX"] = parseSequenceString("");
+    defaultShortCuts["Player/aIncCounter_x"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounter_x"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounter_x"] = parseSequenceString("");
 
-    defaultShortCuts["Player/aIncCounterStorm"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounterStorm"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounterStorm"] = parseSequenceString("");
+    defaultShortCuts["Player/aIncCounter_storm"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounter_storm"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounter_storm"] = parseSequenceString("");
 
     defaultShortCuts["tab_room/aClearChat"] = parseSequenceString("F12");
     defaultShortCuts["DlgLoadDeckFromClipboard/refreshButton"] = parseSequenceString("F5");

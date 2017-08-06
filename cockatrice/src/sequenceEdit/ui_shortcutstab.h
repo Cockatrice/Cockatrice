@@ -800,21 +800,21 @@ public:
         lbl_Player_aSetCStorm = new QLabel(groupBox_counterStorm);
         lbl_Player_aSetCStorm->setObjectName("lbl_Player_aSetCStorm");
         gridLayout_Storm->addWidget(lbl_Player_aSetCStorm, 0, 0, 1, 1);
-        Player_aSetCStorm = new SequenceEdit("Player/aSetCounterStorm", groupBox_counterStorm);
+        Player_aSetCStorm = new SequenceEdit("Player/aSetCounter_storm", groupBox_counterStorm);
         Player_aSetCStorm->setObjectName("Player_aSetCStorm");
         gridLayout_Storm->addWidget(Player_aSetCStorm, 0, 1, 1, 1);
 
         lbl_Player_aIncCStorm = new QLabel(groupBox_counterStorm);
         lbl_Player_aIncCStorm->setObjectName("lbl_Player_aIncCStorm");
         gridLayout_Storm->addWidget(lbl_Player_aIncCStorm, 1, 0, 1, 1);
-        Player_aIncCStorm = new SequenceEdit("Player/aIncCounterStorm", groupBox_counterStorm);
+        Player_aIncCStorm = new SequenceEdit("Player/aIncCounter_storm", groupBox_counterStorm);
         Player_aIncCStorm->setObjectName("Player_aIncCStorm");
         gridLayout_Storm->addWidget(Player_aIncCStorm, 1, 1, 1, 1);
 
         lbl_Player_aDecCStorm = new QLabel(groupBox_counterStorm);
         lbl_Player_aDecCStorm->setObjectName("lbl_Player_aDecCStorm");
         gridLayout_Storm->addWidget(lbl_Player_aDecCStorm, 2, 0, 1, 1);
-        Player_aDecCStorm = new SequenceEdit("Player/aDecCounterStorm", groupBox_counterStorm);
+        Player_aDecCStorm = new SequenceEdit("Player/aDecCounter_storm", groupBox_counterStorm);
         Player_aDecCStorm->setObjectName("Player_aDecCStorm");
         gridLayout_Storm->addWidget(Player_aDecCStorm, 2, 1, 1, 1);
 
@@ -827,21 +827,21 @@ public:
         lbl_Player_aSetCW = new QLabel(groupBox_counterW);
         lbl_Player_aSetCW->setObjectName("lbl_Player_aSetCW");
         gridLayout_W->addWidget(lbl_Player_aSetCW, 0, 0, 1, 1);
-        Player_aSetCW = new SequenceEdit("Player/aSetCounterW", groupBox_counterW);
+        Player_aSetCW = new SequenceEdit("Player/aSetCounter_w", groupBox_counterW);
         Player_aSetCW->setObjectName("Player_aSetCW");
         gridLayout_W->addWidget(Player_aSetCW, 0, 1, 1, 1);
 
         lbl_Player_aIncCW = new QLabel(groupBox_counterW);
         lbl_Player_aIncCW->setObjectName("lbl_Player_aIncCW");
         gridLayout_W->addWidget(lbl_Player_aIncCW, 1, 0, 1, 1);
-        Player_aIncCW = new SequenceEdit("Player/aIncCounterW", groupBox_counterW);
+        Player_aIncCW = new SequenceEdit("Player/aIncCounter_w", groupBox_counterW);
         Player_aIncCW->setObjectName("Player_aIncCW");
         gridLayout_W->addWidget(Player_aIncCW, 1, 1, 1, 1);
 
         lbl_Player_aDecCW = new QLabel(groupBox_counterW);
         lbl_Player_aDecCW->setObjectName("lbl_Player_aDecCW");
         gridLayout_W->addWidget(lbl_Player_aDecCW, 2, 0, 1, 1);
-        Player_aDecCW = new SequenceEdit("Player/aDecCounterW", groupBox_counterW);
+        Player_aDecCW = new SequenceEdit("Player/aDecCounter_w", groupBox_counterW);
         Player_aDecCW->setObjectName("Player_aDecCW");
         gridLayout_W->addWidget(Player_aDecCW, 2, 1, 1, 1);
 
@@ -854,21 +854,21 @@ public:
         lbl_Player_aSetCU = new QLabel(groupBox_counterU);
         lbl_Player_aSetCU->setObjectName("lbl_Player_aSetCU");
         gridLayout_U->addWidget(lbl_Player_aSetCU, 0, 0, 1, 1);
-        Player_aSetCU = new SequenceEdit("Player/aSetCounterU", groupBox_counterU);
+        Player_aSetCU = new SequenceEdit("Player/aSetCounter_u", groupBox_counterU);
         Player_aSetCU->setObjectName("Player_aSetCU");
         gridLayout_U->addWidget(Player_aSetCU, 0, 1, 1, 1);
 
         lbl_Player_aIncCU = new QLabel(groupBox_counterU);
         lbl_Player_aIncCU->setObjectName("lbl_Player_aIncCU");
         gridLayout_U->addWidget(lbl_Player_aIncCU, 1, 0, 1, 1);
-        Player_aIncCU = new SequenceEdit("Player/aIncCounterU", groupBox_counterU);
+        Player_aIncCU = new SequenceEdit("Player/aIncCounter_u", groupBox_counterU);
         Player_aIncCU->setObjectName("Player_aIncCU");
         gridLayout_U->addWidget(Player_aIncCU, 1, 1, 1, 1);
 
         lbl_Player_aDecCU = new QLabel(groupBox_counterU);
         lbl_Player_aDecCU->setObjectName("lbl_Player_aDecCU");
         gridLayout_U->addWidget(lbl_Player_aDecCU, 2, 0, 1, 1);
-        Player_aDecCU = new SequenceEdit("Player/aDecCounterU", groupBox_counterU);
+        Player_aDecCU = new SequenceEdit("Player/aDecCounter_u", groupBox_counterU);
         Player_aDecCU->setObjectName("Player_aDecCU");
         gridLayout_U->addWidget(Player_aDecCU, 2, 1, 1, 1);
 
@@ -881,21 +881,21 @@ public:
         lbl_Player_aSetCB = new QLabel(groupBox_counterB);
         lbl_Player_aSetCB->setObjectName("lbl_Player_aSetCB");
         gridLayout_B->addWidget(lbl_Player_aSetCB, 0, 0, 1, 1);
-        Player_aSetCB = new SequenceEdit("Player/aSetCounterB", groupBox_counterB);
+        Player_aSetCB = new SequenceEdit("Player/aSetCounter_b", groupBox_counterB);
         Player_aSetCB->setObjectName("Player_aSetCB");
         gridLayout_B->addWidget(Player_aSetCB, 0, 1, 1, 1);
 
         lbl_Player_aIncCB = new QLabel(groupBox_counterB);
         lbl_Player_aIncCB->setObjectName("lbl_Player_aIncCB");
         gridLayout_B->addWidget(lbl_Player_aIncCB, 1, 0, 1, 1);
-        Player_aIncCB = new SequenceEdit("Player/aIncCounterB", groupBox_counterB);
+        Player_aIncCB = new SequenceEdit("Player/aIncCounter_b", groupBox_counterB);
         Player_aIncCB->setObjectName("Player_aIncCB");
         gridLayout_B->addWidget(Player_aIncCB, 1, 1, 1, 1);
 
         lbl_Player_aDecCB = new QLabel(groupBox_counterB);
         lbl_Player_aDecCB->setObjectName("lbl_Player_aDecCB");
         gridLayout_B->addWidget(lbl_Player_aDecCB, 2, 0, 1, 1);
-        Player_aDecCB = new SequenceEdit("Player/aDecCounterB", groupBox_counterB);
+        Player_aDecCB = new SequenceEdit("Player/aDecCounter_b", groupBox_counterB);
         Player_aDecCB->setObjectName("Player_aDecCB");
         gridLayout_B->addWidget(Player_aDecCB, 2, 1, 1, 1);
 
@@ -908,21 +908,21 @@ public:
         lbl_Player_aSetCR = new QLabel(groupBox_counterR);
         lbl_Player_aSetCR->setObjectName("lbl_Player_aSetCR");
         gridLayout_R->addWidget(lbl_Player_aSetCR, 0, 0, 1, 1);
-        Player_aSetCR = new SequenceEdit("Player/aSetCounterR", groupBox_counterR);
+        Player_aSetCR = new SequenceEdit("Player/aSetCounter_r", groupBox_counterR);
         Player_aSetCR->setObjectName("Player_aSetCR");
         gridLayout_R->addWidget(Player_aSetCR, 0, 1, 1, 1);
 
         lbl_Player_aIncCR = new QLabel(groupBox_counterR);
         lbl_Player_aIncCR->setObjectName("lbl_Player_aIncCR");
         gridLayout_R->addWidget(lbl_Player_aIncCR, 1, 0, 1, 1);
-        Player_aIncCR = new SequenceEdit("Player/aIncCounterR", groupBox_counterR);
+        Player_aIncCR = new SequenceEdit("Player/aIncCounter_r", groupBox_counterR);
         Player_aIncCR->setObjectName("Player_aIncCR");
         gridLayout_R->addWidget(Player_aIncCR, 1, 1, 1, 1);
 
         lbl_Player_aDecCR = new QLabel(groupBox_counterR);
         lbl_Player_aDecCR->setObjectName("lbl_Player_aDecCR");
         gridLayout_R->addWidget(lbl_Player_aDecCR, 2, 0, 1, 1);
-        Player_aDecCR = new SequenceEdit("Player/aDecCounterR", groupBox_counterR);
+        Player_aDecCR = new SequenceEdit("Player/aDecCounter_r", groupBox_counterR);
         Player_aDecCR->setObjectName("Player_aDecCR");
         gridLayout_R->addWidget(Player_aDecCR, 2, 1, 1, 1);
 
@@ -935,21 +935,21 @@ public:
         lbl_Player_aSetCG = new QLabel(groupBox_counterG);
         lbl_Player_aSetCG->setObjectName("lbl_Player_aSetCG");
         gridLayout_G->addWidget(lbl_Player_aSetCG, 0, 0, 1, 1);
-        Player_aSetCG = new SequenceEdit("Player/aSetCounterG", groupBox_counterG);
+        Player_aSetCG = new SequenceEdit("Player/aSetCounter_g", groupBox_counterG);
         Player_aSetCG->setObjectName("Player_aSetCG");
         gridLayout_G->addWidget(Player_aSetCG, 0, 1, 1, 1);
 
         lbl_Player_aIncCG = new QLabel(groupBox_counterG);
         lbl_Player_aIncCG->setObjectName("lbl_Player_aIncCG");
         gridLayout_G->addWidget(lbl_Player_aIncCG, 1, 0, 1, 1);
-        Player_aIncCG = new SequenceEdit("Player/aIncCounterG", groupBox_counterG);
+        Player_aIncCG = new SequenceEdit("Player/aIncCounter_g", groupBox_counterG);
         Player_aIncCG->setObjectName("Player_aIncCG");
         gridLayout_G->addWidget(Player_aIncCG, 1, 1, 1, 1);
 
         lbl_Player_aDecCG = new QLabel(groupBox_counterG);
         lbl_Player_aDecCG->setObjectName("lbl_Player_aDecCG");
         gridLayout_G->addWidget(lbl_Player_aDecCG, 2, 0, 1, 1);
-        Player_aDecCG = new SequenceEdit("Player/aDecCounterG", groupBox_counterG);
+        Player_aDecCG = new SequenceEdit("Player/aDecCounter_g", groupBox_counterG);
         Player_aDecCG->setObjectName("Player_aDecCG");
         gridLayout_G->addWidget(Player_aDecCG, 2, 1, 1, 1);
 
@@ -962,21 +962,21 @@ public:
         lbl_Player_aSetCX = new QLabel(groupBox_counterX);
         lbl_Player_aSetCX->setObjectName("lbl_Player_aSetCX");
         gridLayout_X->addWidget(lbl_Player_aSetCX, 0, 0, 1, 1);
-        Player_aSetCX = new SequenceEdit("Player/aSetCounterX", groupBox_counterX);
+        Player_aSetCX = new SequenceEdit("Player/aSetCounter_x", groupBox_counterX);
         Player_aSetCX->setObjectName("Player_aSetCX");
         gridLayout_X->addWidget(Player_aSetCX, 0, 1, 1, 1);
 
         lbl_Player_aIncCX = new QLabel(groupBox_counterX);
         lbl_Player_aIncCX->setObjectName("lbl_Player_aIncCX");
         gridLayout_X->addWidget(lbl_Player_aIncCX, 1, 0, 1, 1);
-        Player_aIncCX = new SequenceEdit("Player/aIncCounterX", groupBox_counterX);
+        Player_aIncCX = new SequenceEdit("Player/aIncCounter_x", groupBox_counterX);
         Player_aIncCX->setObjectName("Player_aIncCX");
         gridLayout_X->addWidget(Player_aIncCX, 1, 1, 1, 1);
 
         lbl_Player_aDecCX = new QLabel(groupBox_counterX);
         lbl_Player_aDecCX->setObjectName("lbl_Player_aDecCX");
         gridLayout_X->addWidget(lbl_Player_aDecCX, 2, 0, 1, 1);
-        Player_aDecCX = new SequenceEdit("Player/aDecCounterX", groupBox_counterX);
+        Player_aDecCX = new SequenceEdit("Player/aDecCounter_x", groupBox_counterX);
         Player_aDecCX->setObjectName("Player_aDecCX");
         gridLayout_X->addWidget(Player_aDecCX, 2, 1, 1, 1);
 

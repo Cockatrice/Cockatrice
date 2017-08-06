@@ -9,8 +9,8 @@
 #include "pb/command_inc_counter.pb.h"
 #include "pb/command_set_counter.pb.h"
 
-AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name, bool _shownInCounterArea, int _value, QGraphicsItem *parent)
-    : QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value), hovered(false), aDec(0), aInc(0), dialogSemaphore(false), deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
+AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name, bool _shownInCounterArea, int _value, bool _useNameForShortcut, QGraphicsItem *parent)
+    : QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value), useNameForShortcut(_useNameForShortcut), hovered(false), aDec(0), aInc(0), dialogSemaphore(false), deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
 {
     setAcceptHoverEvents(true);
 
@@ -23,9 +23,9 @@ AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name,
         menu->addAction(aSet);
         menu->addSeparator();
         for (int i = 10; i >= -10; --i)
-            if (i == 0)
+            if (i == 0) {
                 menu->addSeparator();
-            else {
+            } else {
                 QAction *aIncrement = new QAction(QString(i < 0 ? "%1" : "+%1").arg(i), this);
                 if (i == -1)
                     aDec = aIncrement;
@@ -36,7 +36,7 @@ AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name,
                 menu->addAction(aIncrement);
             }
     } else
-        menu = 0;
+        menu = nullptr;
     
     connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
     refreshShortcuts();
@@ -70,49 +70,18 @@ void AbstractCounter::setShortcutsActive()
         aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSet"));
         aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDec"));
         aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aInc"));
-    } else if (name == "storm") {
+    } else if (useNameForShortcut) {
         shortcutActive = true;
-        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterStorm"));
-        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterStorm"));
-        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterStorm"));
-    } else if (name == "w") {
-        shortcutActive = true;
-        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterW"));
-        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterW"));
-        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterW"));
-    } else if (name == "u") {
-        shortcutActive = true;
-        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterU"));
-        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterU"));
-        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterU"));
-    } else if (name == "b") {
-        shortcutActive = true;
-        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterB"));
-        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterB"));
-        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterB"));
-    } else if (name == "r") {
-        shortcutActive = true;
-        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterR"));
-        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterR"));
-        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterR"));
-    } else if (name == "g") {
-        shortcutActive = true;
-        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterG"));
-        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterG"));
-        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterG"));
-    } else if (name == "x") {
-        shortcutActive = true;
-        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterX"));
-        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterX"));
-        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterX"));
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounter_" + name));
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounter_" + name));
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounter_" + name));
     }
 }
 
 void AbstractCounter::setShortcutsInactive()
 {
     shortcutActive = false;
-    if (name == "life" || name == "storm" || name == "w" || name == "u" 
-        || name == "b" || name == "r" || name == "g" || name == "x") {
+    if (name == "life" || useNameForShortcut) {
         aSet->setShortcut(QKeySequence());
         aDec->setShortcut(QKeySequence());
         aInc->setShortcut(QKeySequence());
