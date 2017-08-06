@@ -242,6 +242,36 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/phase7"] = parseSequenceString("");
     defaultShortCuts["Player/phase8"] = parseSequenceString("");
     defaultShortCuts["Player/phase9"] = parseSequenceString("F9");
+
+
+    defaultShortCuts["Player/aIncCounterW"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounterW"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounterW"] = parseSequenceString("");
+
+    defaultShortCuts["Player/aIncCounterU"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounterU"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounterU"] = parseSequenceString("");
+
+    defaultShortCuts["Player/aIncCounterB"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounterB"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounterB"] = parseSequenceString("");
+
+    defaultShortCuts["Player/aIncCounterR"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounterR"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounterR"] = parseSequenceString("");
+
+    defaultShortCuts["Player/aIncCounterG"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounterG"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounterG"] = parseSequenceString("");
+
+    defaultShortCuts["Player/aIncCounterX"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounterX"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounterX"] = parseSequenceString("");
+
+    defaultShortCuts["Player/aIncCounterStorm"] = parseSequenceString("");
+    defaultShortCuts["Player/aDecCounterStorm"] = parseSequenceString("");
+    defaultShortCuts["Player/aSetCounterStorm"] = parseSequenceString("");
+
     defaultShortCuts["tab_room/aClearChat"] = parseSequenceString("F12");
     defaultShortCuts["DlgLoadDeckFromClipboard/refreshButton"] = parseSequenceString("F5");
     defaultShortCuts["Player/aResetLayout"] = parseSequenceString("");

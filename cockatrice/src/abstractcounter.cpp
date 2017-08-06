@@ -70,13 +70,49 @@ void AbstractCounter::setShortcutsActive()
         aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSet"));
         aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDec"));
         aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aInc"));
+    } else if (name == "storm") {
+        shortcutActive = true;
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterStorm"));
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterStorm"));
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterStorm"));
+    } else if (name == "w") {
+        shortcutActive = true;
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterW"));
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterW"));
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterW"));
+    } else if (name == "u") {
+        shortcutActive = true;
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterU"));
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterU"));
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterU"));
+    } else if (name == "b") {
+        shortcutActive = true;
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterB"));
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterB"));
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterB"));
+    } else if (name == "r") {
+        shortcutActive = true;
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterR"));
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterR"));
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterR"));
+    } else if (name == "g") {
+        shortcutActive = true;
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterG"));
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterG"));
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterG"));
+    } else if (name == "x") {
+        shortcutActive = true;
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounterX"));
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounterX"));
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounterX"));
     }
 }
 
 void AbstractCounter::setShortcutsInactive()
 {
     shortcutActive = false;
-    if (name == "life") {
+    if (name == "life" || name == "storm" || name == "w" || name == "u" 
+        || name == "b" || name == "r" || name == "g" || name == "x") {
         aSet->setShortcut(QKeySequence());
         aDec->setShortcut(QKeySequence());
         aInc->setShortcut(QKeySequence());
