@@ -2619,6 +2619,8 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addSeparator();
             } else if (card->getZone()->getName() == "stack") {
                 cardMenu->addAction(aDrawArrow);
+                cardMenu->addSeparator();
+                cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
 
                 addRelatedCardActions(card, cardMenu);
