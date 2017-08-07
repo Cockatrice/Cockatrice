@@ -172,7 +172,7 @@ void IntroPage::retranslateUi()
                       "\nYou will need to specify a URL or a filename that "
                       "will be used as a source."));
     languageLabel->setText(tr("Language:"));
-    versionLabel->setText(tr("Version: %1").arg(VERSION_STRING));
+    versionLabel->setText(tr("Version:") + QString(" %1").arg(VERSION_STRING));
 }
 
 LoadSetsPage::LoadSetsPage(QWidget *parent)
