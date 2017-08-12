@@ -30,7 +30,7 @@ Var PortableMode
 !define MUI_FINISHPAGE_RUN_TEXT "Run 'Cockatrice' now"
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "${NSIS_SOURCE_PATH}\COPYING"
+!insertmacro MUI_PAGE_LICENSE "${NSIS_SOURCE_PATH}\LICENSE"
 Page Custom PortableModePageCreate PortableModePageLeave
 !define MUI_PAGE_CUSTOMFUNCTION_PRE componentsPagePre
 !insertmacro MUI_PAGE_COMPONENTS
