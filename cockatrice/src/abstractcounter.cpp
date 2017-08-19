@@ -65,6 +65,9 @@ void AbstractCounter::retranslateUi()
 
 void AbstractCounter::setShortcutsActive()
 {
+    if (!player->getLocal()) {
+        return;
+    }
     if (name == "life") {
         shortcutActive = true;
         aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSet"));
@@ -102,7 +105,7 @@ void AbstractCounter::setValue(int _value)
 
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (isUnderMouse()) {
+    if (isUnderMouse() && player->getLocal()) {
         if (event->button() == Qt::LeftButton) {
             Command_IncCounter cmd;
             cmd.set_counter_id(id);
