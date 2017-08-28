@@ -387,14 +387,14 @@ void Server_ProtocolHandler::pingClockTimeout()
     if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
         prepareDestroy();
 
-    if (!userInfo || QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
-        if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
+    if ((!userInfo || QString::fromStdString(userInfo->privlevel()).toLower() == "none") && (server->getIdleClientTimeout() > 0)) {
+        if (idleClientWarningSent) {
             if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
                 prepareDestroy();
             }
         }
 
-        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() *.9)) && (!idleClientWarningSent) && (server->getIdleClientTimeout() > 0)) {
+        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() *.9)) && (!idleClientWarningSent)) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::IDLEWARNING);
             SessionEvent *se = prepareSessionEvent(event);
