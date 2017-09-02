@@ -1926,7 +1926,7 @@ AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor c
     if (name == "life")
         c = playerTarget->addCounter(counterId, name, value);
     else
-        c = new GeneralCounter(this, counterId, name, color, radius, value, this);
+        c = new GeneralCounter(this, counterId, name, color, radius, value, true, this);
     counters.insert(counterId, c);
     if (countersMenu)
         countersMenu->addMenu(c->getMenu());
@@ -2619,6 +2619,8 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addSeparator();
             } else if (card->getZone()->getName() == "stack") {
                 cardMenu->addAction(aDrawArrow);
+                cardMenu->addSeparator();
+                cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
 
                 addRelatedCardActions(card, cardMenu);

@@ -9,8 +9,8 @@
 #include "pb/command_inc_counter.pb.h"
 #include "pb/command_set_counter.pb.h"
 
-AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name, bool _shownInCounterArea, int _value, QGraphicsItem *parent)
-    : QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value), hovered(false), aDec(0), aInc(0), dialogSemaphore(false), deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
+AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name, bool _shownInCounterArea, int _value, bool _useNameForShortcut, QGraphicsItem *parent)
+    : QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value), useNameForShortcut(_useNameForShortcut), hovered(false), aDec(0), aInc(0), dialogSemaphore(false), deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
 {
     setAcceptHoverEvents(true);
 
@@ -23,9 +23,9 @@ AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name,
         menu->addAction(aSet);
         menu->addSeparator();
         for (int i = 10; i >= -10; --i)
-            if (i == 0)
+            if (i == 0) {
                 menu->addSeparator();
-            else {
+            } else {
                 QAction *aIncrement = new QAction(QString(i < 0 ? "%1" : "+%1").arg(i), this);
                 if (i == -1)
                     aDec = aIncrement;
@@ -36,7 +36,7 @@ AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name,
                 menu->addAction(aIncrement);
             }
     } else
-        menu = 0;
+        menu = nullptr;
     
     connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
     refreshShortcuts();
@@ -65,18 +65,26 @@ void AbstractCounter::retranslateUi()
 
 void AbstractCounter::setShortcutsActive()
 {
+    if (!player->getLocal()) {
+        return;
+    }
     if (name == "life") {
         shortcutActive = true;
         aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSet"));
         aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDec"));
         aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aInc"));
+    } else if (useNameForShortcut) {
+        shortcutActive = true;
+        aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounter_" + name));
+        aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounter_" + name));
+        aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncCounter_" + name));
     }
 }
 
 void AbstractCounter::setShortcutsInactive()
 {
     shortcutActive = false;
-    if (name == "life") {
+    if (name == "life" || useNameForShortcut) {
         aSet->setShortcut(QKeySequence());
         aDec->setShortcut(QKeySequence());
         aInc->setShortcut(QKeySequence());
@@ -97,7 +105,7 @@ void AbstractCounter::setValue(int _value)
 
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (isUnderMouse()) {
+    if (isUnderMouse() && player->getLocal()) {
         if (event->button() == Qt::LeftButton) {
             Command_IncCounter cmd;
             cmd.set_counter_id(id);
