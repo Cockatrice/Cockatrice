@@ -369,8 +369,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
             playerLists[i]->addSeparator();
         }
 
-        AMoveTopOneCardToGrave = new QAction(this);
-        connect(AMoveTopOneCardToGrave, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToGrave(false)));
+        aMoveTopOneCardToGrave = new QAction(this);
+        connect(aMoveTopOneCardToGrave, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToGrave(false)));
         aMoveTopOneCardToExile = new QAction(this);
         connect(aMoveTopOneCardToExile, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToExile(false)));
 
@@ -819,7 +819,7 @@ void Player::setShortcutsActive()
     aAlwaysRevealTopCard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aAlwaysRevealTopCard"));
 
     aMoveTopOneCardToExile->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopToExile"));
-    AMoveTopOneCardToGrave->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopToGrave"));
+    aMoveTopOneCardToGrave->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopToGrave"));
 }
 
 void Player::setShortcutsInactive()

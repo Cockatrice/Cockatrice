@@ -175,7 +175,7 @@ private:
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
         *aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg,
         *aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
-        *aViewLibrary, *aViewTopCards, *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardsToGrave, *AMoveTopOneCardToGrave, *aMoveTopCardsToExile, *aMoveTopOneCardToExile, *aMoveTopCardToBottom,
+        *aViewLibrary, *aViewTopCards, *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardsToGrave, *aMoveTopOneCardToGrave, *aMoveTopCardsToExile, *aMoveTopOneCardToExile, *aMoveTopCardToBottom,
         *aViewGraveyard, *aViewRfg, *aViewSideboard,
                 *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlayFaceDown,
         *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
