@@ -840,6 +840,8 @@ void Player::setShortcutsInactive()
     aCreateToken->setShortcut(QKeySequence());
     aCreateAnotherToken->setShortcut(QKeySequence());
     aAlwaysRevealTopCard->setShortcut(QKeySequence());
+    aMoveTopOneCardToExile->setShortcut(QKeySequence());
+    aMoveTopOneCardToGrave->setShortcut(QKeySequence());
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
     while (counterIterator.hasNext())
