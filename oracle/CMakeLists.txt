@@ -111,9 +111,6 @@ ENDIF()
 # Build oracle binary and link it
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
 
-if(MSVC)
-    TARGET_LINK_LIBRARIES(oracle Qt5::WinMain)
-endif()
 qt5_use_modules(oracle ${ORACLE_LIBS})
 
 IF(ZLIB_FOUND)
