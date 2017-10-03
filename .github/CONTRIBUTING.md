@@ -236,7 +236,7 @@ upstream - git@github.com:Cockatrice/Cockatrice.git
 $COCKATRICE_REPO - /Location/of/repository/cockatrice.git
 $TAG_NAME
   - If full release, YYYY-MM-DD-Release-MAJ.MIN.PATCH
-  - If dev snapshot, YYYY-MM-DD-Development-MAJ.MIN.PATCH-betaXYZ
+  - If dev snapshot, YYYY-MM-DD-Development-MAJ.MIN.PATCH-betaX
         - MAJ.MIN.PATCH will be the NEXT release version
 ```
 
