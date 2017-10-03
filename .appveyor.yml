@@ -1,44 +1,33 @@
-version: 0.0.1-branch-{branch}-build-{build}
+version: 2.3.18-branch-{branch}-build-{build}
+image: Visual Studio 2015
 cache:
-    - c:\protobuf
-    - c:\protoc
+    - c:\protobuf-release
     - c:\zlib
 environment:
     matrix:
-        - vc_arch: amd64
-          choco_arch:
-          nuget_arch: x64
+        - nuget_arch: x64
           target_arch: x86_64
-          qt_ver: 5.6\msvc2013_64
-          bintray_path: Win64
-          MYSQL_DRIVER_URL: https://dev.mysql.com/get/Downloads/Connector-C/mysql-connector-c-6.1.6-winx64.zip
-          MYSQL_DRIVER_ARCHIVE: mysql-connector-c-6.1.6-winx64.zip
-          MYSQL_DRIVER_NAME: mysql-connector-c-6.1.6-winx64
-        - vc_arch: amd64_x86  # cross-compile from amd64 to x86
-          choco_arch: --x86
-          nuget_arch: Win32
+          qt_ver: 5.9\msvc2015_64
+          protobuf_ver: 3.4.1
+          cmake_generator: Visual Studio 14 2015 Win64
+          cmake_toolset: v140,host=x64
+        - nuget_arch: Win32
           target_arch: x86
-          qt_ver: 5.6\msvc2013
-          bintray_path: Win32
-          MYSQL_DRIVER_URL: https://dev.mysql.com/get/Downloads/Connector-C/mysql-connector-c-6.1.6-win32.zip
-          MYSQL_DRIVER_ARCHIVE: mysql-connector-c-6.1.6-win32.zip
-          MYSQL_DRIVER_NAME: mysql-connector-c-6.1.6-win32
+          qt_ver: 5.9\msvc2015
+          protobuf_ver: 3.4.1
+          cmake_generator: Visual Studio 14 2015
+          cmake_toolset: v140_xp
 install:
-    - systeminfo
     - ps: |
-        if (Test-Path c:\protoc) {
-            echo "using protoc from cache"
-        } else {
-            Invoke-WebRequest "https://github.com/google/protobuf/releases/download/v2.6.1/protoc-2.6.1-win32.zip" -OutFile c:\protoc-2.6.1-win32.zip
-            c:\cygwin\bin\bash -lc "cd /cygdrive/c; 7z x -y protoc-2.6.1-win32.zip -oc:\protoc"
-        }
-    - ps: |
-        if (Test-Path c:\protobuf) {
+        if (Test-Path c:\protobuf-release) {
             echo "using protobuf from cache"
         } else {
-           nuget install protobuf-v120 -OutputDirectory c:\protobuf
+            Invoke-WebRequest "https://github.com/google/protobuf/releases/download/v$env:protobuf_ver/protobuf-cpp-$env:protobuf_ver.zip" -OutFile c:\protobuf-cpp-$env:protobuf_ver.zip
+            Expand-Archive -Path c:\protobuf-cpp-$env:protobuf_ver.zip -DestinationPath c:\
+            Set-Location -Path C:\protobuf-$env:protobuf_ver\cmake
+            cmake . -G "$env:cmake_generator" -T "$env:cmake_toolset" -Dprotobuf_BUILD_TESTS=0 -Dprotobuf_MSVC_STATIC_RUNTIME=0 -DCMAKE_INSTALL_PREFIX=c:/protobuf-release $env:cmake_params
+            msbuild INSTALL.vcxproj /p:Configuration=Release
         }
-    - ps: |
         if (Test-Path c:\zlib) {
             echo "using zlib from cache"
         } else {
@@ -47,34 +36,21 @@ install:
 services:
     - mysql
 build_script:
-    - mkdir build
-    - cd build
-    - '"c:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/vcvarsall" %vc_arch%'
-    - path
     - ps: |
-        $zlibinc = c:\cygwin\bin\find /cygdrive/c/zlib/ -path '*v120*/zlib.h'
+        New-Item -ItemType directory -Path C:\projects\cockatrice\build
+        Set-Location -Path C:\projects\cockatrice\build
+        $zlibinc = c:\cygwin\bin\find /cygdrive/c/zlib/ -path '*v140*/zlib.h'
         $zlibinc = c:\cygwin\bin\dirname $zlibinc
         $zlibinc = c:\cygwin\bin\cygpath -m $zlibinc
-        $zliblib = c:\cygwin\bin\find /cygdrive/c/zlib/ -path "*v120*/$env:nuget_arch/Release/zlib.lib"
+        $zliblib = c:\cygwin\bin\find /cygdrive/c/zlib/ -path "*v140*/$env:nuget_arch/Release/zlib.lib"
         $zliblib = c:\cygwin\bin\cygpath -m $zliblib
-        $protoinc = c:\cygwin\bin\find /cygdrive/c/protobuf/ -name 'google'
-        $protoinc = c:\cygwin\bin\dirname $protoinc
-        $protoinc = c:\cygwin\bin\cygpath -m $protoinc
-        $protolib = c:\cygwin\bin\find /cygdrive/c/protobuf/ -path "*/lib/$env:nuget_arch/v120/Release/libprotobuf.lib"
-        $protolib = c:\cygwin\bin\cygpath -m $protolib
-        $protoc = c:\cygwin\bin\find /cygdrive/c/protoc/ -name "protoc.exe"
-        $protoc = c:\cygwin\bin\cygpath -m $protoc
-        $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
-        $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
         Write-Output "ZLIBINC  = $zlibinc"
         Write-Output "ZLIBLIB  = $zliblib"
-        Write-Output "PROTOINC = $protoinc"
-        Write-Output "PROTOLIB = $protolib"
-        Write-Output "PROTOC   = $protoc"
-        Write-Output "MYSQLDLL   = $mysqldll"
-        cmake .. "-GNMake Makefiles" "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver" "-DWITH_SERVER=1" "-DZLIB_INCLUDE_DIR=$zlibinc" "-DZLIB_LIBRARY=$zliblib" "-DPROTOBUF_INCLUDE_DIR=$protoinc" "-DPROTOBUF_LIBRARIES=$protolib" "-DPROTOBUF_LIBRARIES=$protolib" "-DPROTOBUF_LIBRARY=$protolib" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
-    - nmake package
-    - c:\cygwin\bin\ls -l
+        $protodir = "c:\protobuf-release"
+        $protoc = "c:\protobuf-release\bin\protoc.exe"
+        $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
+        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir" "-DWITH_SERVER=1" "-DZLIB_INCLUDE_DIR=$zlibinc" "-DZLIB_LIBRARY=$zliblib" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
+    - msbuild PACKAGE.vcxproj /p:Configuration=Release
     - ps: |
         $exe = dir -name *.exe
         $new_name = $exe.Replace(".exe", "-${env:target_arch}_qt5.exe")
