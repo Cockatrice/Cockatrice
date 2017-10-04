@@ -2,21 +2,21 @@ version: 2.3.18-branch-{branch}-build-{build}
 image: Visual Studio 2015
 cache:
     - c:\protobuf-release
-    - c:\zlib
+    - c:\zlib-release
 environment:
     matrix:
-        - nuget_arch: x64
-          target_arch: x86_64
-          qt_ver: 5.9\msvc2015_64
+        - qt_ver: 5.9\msvc2015_64
           protobuf_ver: 3.4.1
+          zlib_ver: 1.2.11
           cmake_generator: Visual Studio 14 2015 Win64
           cmake_toolset: v140,host=x64
-        - nuget_arch: Win32
-          target_arch: x86
-          qt_ver: 5.9\msvc2015
+          target_arch: x86_64
+        - qt_ver: 5.6\msvc2015 # last version compatible with Windows XP, Vista
           protobuf_ver: 3.4.1
+          zlib_ver: 1.2.11
           cmake_generator: Visual Studio 14 2015
-          cmake_toolset: v140_xp
+          cmake_toolset: v140_xp # use the windows XP compatible toolset
+          target_arch: x86
 install:
     - ps: |
         if (Test-Path c:\protobuf-release) {
@@ -25,13 +25,17 @@ install:
             Invoke-WebRequest "https://github.com/google/protobuf/releases/download/v$env:protobuf_ver/protobuf-cpp-$env:protobuf_ver.zip" -OutFile c:\protobuf-cpp-$env:protobuf_ver.zip
             Expand-Archive -Path c:\protobuf-cpp-$env:protobuf_ver.zip -DestinationPath c:\
             Set-Location -Path C:\protobuf-$env:protobuf_ver\cmake
-            cmake . -G "$env:cmake_generator" -T "$env:cmake_toolset" -Dprotobuf_BUILD_TESTS=0 -Dprotobuf_MSVC_STATIC_RUNTIME=0 -DCMAKE_INSTALL_PREFIX=c:/protobuf-release $env:cmake_params
+            cmake . -G "$env:cmake_generator" -T "$env:cmake_toolset" -Dprotobuf_BUILD_TESTS=0 -Dprotobuf_MSVC_STATIC_RUNTIME=0 -DCMAKE_INSTALL_PREFIX=c:/protobuf-release
             msbuild INSTALL.vcxproj /p:Configuration=Release
         }
-        if (Test-Path c:\zlib) {
+        if (Test-Path c:\zlib-release) {
             echo "using zlib from cache"
         } else {
-           nuget install zlib -OutputDirectory c:\zlib
+            Invoke-WebRequest "https://github.com/madler/zlib/archive/v$env:zlib_ver.zip" -OutFile c:\zlib-$env:zlib_ver.zip
+            Expand-Archive -Path c:\zlib-$env:zlib_ver.zip -DestinationPath c:\
+            Set-Location -Path C:\zlib-$env:zlib_ver
+            cmake . -G "$env:cmake_generator" -T "$env:cmake_toolset" -DCMAKE_INSTALL_PREFIX=c:/zlib-release
+            msbuild INSTALL.vcxproj /p:Configuration=Release
         }
 services:
     - mysql
@@ -39,17 +43,11 @@ build_script:
     - ps: |
         New-Item -ItemType directory -Path C:\projects\cockatrice\build
         Set-Location -Path C:\projects\cockatrice\build
-        $zlibinc = c:\cygwin\bin\find /cygdrive/c/zlib/ -path '*v140*/zlib.h'
-        $zlibinc = c:\cygwin\bin\dirname $zlibinc
-        $zlibinc = c:\cygwin\bin\cygpath -m $zlibinc
-        $zliblib = c:\cygwin\bin\find /cygdrive/c/zlib/ -path "*v140*/$env:nuget_arch/Release/zlib.lib"
-        $zliblib = c:\cygwin\bin\cygpath -m $zliblib
-        Write-Output "ZLIBINC  = $zlibinc"
-        Write-Output "ZLIBLIB  = $zliblib"
+        $zlibdir = "c:\zlib-release"
         $protodir = "c:\protobuf-release"
         $protoc = "c:\protobuf-release\bin\protoc.exe"
         $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
-        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir" "-DWITH_SERVER=1" "-DZLIB_INCLUDE_DIR=$zlibinc" "-DZLIB_LIBRARY=$zliblib" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
+        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir;$zlibdir" "-DWITH_SERVER=1" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
     - msbuild PACKAGE.vcxproj /p:Configuration=Release
     - ps: |
         $exe = dir -name *.exe
