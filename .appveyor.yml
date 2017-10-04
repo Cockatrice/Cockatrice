@@ -41,8 +41,8 @@ services:
     - mysql
 build_script:
     - ps: |
-        New-Item -ItemType directory -Path C:\projects\cockatrice\build
-        Set-Location -Path C:\projects\cockatrice\build
+        New-Item -ItemType directory -Path $env:APPVEYOR_BUILD_FOLDER\build
+        Set-Location -Path $env:APPVEYOR_BUILD_FOLDER\build
         $zlibdir = "c:\zlib-release"
         $protodir = "c:\protobuf-release"
         $protoc = "c:\protobuf-release\bin\protoc.exe"
