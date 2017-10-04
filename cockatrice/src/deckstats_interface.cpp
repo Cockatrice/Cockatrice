@@ -60,7 +60,7 @@ void DeckStatsInterface::analyzeDeck(DeckList *deck)
     QByteArray data;
     getAnalyzeRequestData(deck, &data);
     
-    QNetworkRequest request(QUrl("http://deckstats.net/index.php"));
+    QNetworkRequest request(QUrl("https://deckstats.net/index.php"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     
     manager->post(request, data);
