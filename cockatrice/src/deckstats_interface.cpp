@@ -28,8 +28,8 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
         
     QString data(reply->readAll());
     reply->deleteLater();
-    
-    QRegExp rx("<meta property=\"og:url\" content=\"([^\"]+)\"/>");
+
+    QRegExp rx("<meta property=\"og:url\" content=\"([^\"]+)\"");
     if (-1 == rx.indexIn(data)) {
         QMessageBox::critical(0, tr("Error"), tr("The reply from the server could not be parsed."));
         deleteLater();
