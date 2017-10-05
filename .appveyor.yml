@@ -3,9 +3,9 @@ version: 2.3.18-branch-{branch}-build-{build}
 # Skipping commits affecting specific files (GitHub only). More details here: /docs/appveyor-yml
 skip_commits:
   files:
-    - .github/*
-    - .travis/*
-    - .tx/*
+    - '.github/*'
+    - '.travis/*'
+    - '.tx/*'
     - webclient/*
     - .*ignore
     - .gitlab-ci.yml
