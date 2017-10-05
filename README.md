@@ -23,7 +23,7 @@ We offer downloads for all full releases (recommended) and the latest developmen
 
 - Latest full release (**recommended**): [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest) [![Download Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)<br>
 
-- Latest development version: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases)
+- Latest development version: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases) 
    - Development builds may not be stable and/or contain several bugs.
    - If you'd like to be a Cockatrice Beta Tester, use this version.
    - More information can be [found here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)
