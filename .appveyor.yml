@@ -1,6 +1,6 @@
 version: 2.3.18-branch-{branch}-build-{build}
 
-# Skipping commits affecting specific files (GitHub only). More details here: /docs/appveyor-yml
+# Skipping commits affecting specific files (GitHub only). More details here: https://www.appveyor.com/docs/appveyor-yml
 skip_commits:
   files:
     - .github/*
