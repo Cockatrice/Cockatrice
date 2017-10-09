@@ -12,6 +12,8 @@ skip_commits:
     - .gitlab-ci.yml
     - .travis.yml
     - '*.md'
+    - Dockerfile
+    - LICENSE
     
 image: Visual Studio 2015
 
