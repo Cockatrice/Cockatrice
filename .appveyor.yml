@@ -8,6 +8,7 @@ skip_commits:
     - .tx/*
     - webclient/*
     - .*ignore
+    - .codacy.yml
     - .gitlab-ci.yml
     - .travis.yml
     - '*.md'
