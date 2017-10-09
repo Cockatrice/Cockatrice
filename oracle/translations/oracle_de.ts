@@ -21,7 +21,7 @@ Sie müssen eine URL oder einen Dateinamen als Quelle angeben.</translation>
     <message>
         <location filename="../src/oraclewizard.cpp" line="175"/>
         <source>Version:</source>
-        <translation type="unfinished"/>
+        <translation>Version:</translation>
     </message>
 </context>
 <context>
