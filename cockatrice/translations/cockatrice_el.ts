@@ -1,20 +1,20 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="nl" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="el" version="2.1">
 <context>
     <name>AbstractCounter</name>
     <message>
         <location filename="../src/abstractcounter.cpp" line="62"/>
         <source>&amp;Set counter...</source>
-        <translation>&amp;Teller instellen...</translation>
+        <translation>&amp;Ρύθμιση μετρητή...</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="156"/>
         <source>Set counter</source>
-        <translation>Teller instellen</translation>
+        <translation>Ρύθμιση μετρητή</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="156"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation>Nieuwe waarde van teller &apos;%1&apos;:</translation>
+        <translation>Νέα τιμή για τον μετρητή &apos;%1&apos;:</translation>
     </message>
 </context>
 <context>
@@ -22,62 +22,62 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="411"/>
         <source>Theme settings</source>
-        <translation>Thema opties</translation>
+        <translation>Ρυθμίσεις θέματος</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="412"/>
         <source>Current theme:</source>
-        <translation>Huidige thema:</translation>
+        <translation>Τρέχον θέμα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="414"/>
         <source>Card rendering</source>
-        <translation>Kaartweergave</translation>
+        <translation>Απόδοση κάρτας</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="415"/>
         <source>Display card names on cards having a picture</source>
-        <translation>Kaartnamen altijd weergeven</translation>
+        <translation>Εμφανίστε τα ονόματα καρτών σε κάρτες με εικόνα</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="416"/>
         <source>Scale cards on mouse over</source>
-        <translation>Kaarten schalen met de muis</translation>
+        <translation>Αύξηση της κλίμακας των καρτών με την επιλογή του ποντικιού</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="418"/>
         <source>Hand layout</source>
-        <translation>Handweergave</translation>
+        <translation>Διάταξη χειρός</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="419"/>
         <source>Display hand horizontally (wastes space)</source>
-        <translation>Hand horizontaal weergeven (gebruikt extra ruimte)</translation>
+        <translation>Εμφάνιση χεριού οριζόντια (σπατάλη χώρου)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="420"/>
         <source>Enable left justification</source>
-        <translation type="unfinished"/>
+        <translation>Ενεργοποιήστε την αριστερή αιτιολόγηση</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="422"/>
         <source>Table grid layout</source>
-        <translation>Tafelindeling</translation>
+        <translation>Διάταξη πλέγματος πίνακα</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="423"/>
         <source>Invert vertical coordinate</source>
-        <translation>Verticale coördinaat omkeren</translation>
+        <translation>Ανατροπή κάθετης συντεταγμένης</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="424"/>
         <source>Minimum player count for multi-column layout:</source>
-        <translation>Minimaal aantal spelers voor kolommenindeling:</translation>
+        <translation>Ελάχιστος αριθμός παικτών για διάταξη πολλαπλών στηλών:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="425"/>
         <source>Maximum font size for information displayed on cards:</source>
-        <translation type="unfinished"/>
+        <translation>Μέγιστο μέγεθος γραμματοσειράς για πληροφορίες που εμφανίζονται στις κάρτες:</translation>
     </message>
 </context>
 <context>
@@ -85,79 +85,79 @@
     <message>
         <location filename="../src/userlist.cpp" line="32"/>
         <source>ban &amp;user name</source>
-        <translation>ban &amp;gebruikersnaam</translation>
+        <translation>απαγόρευση και όνομα χρήστη</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="35"/>
         <source>ban &amp;IP address</source>
-        <translation>ban &amp;IP-adres</translation>
+        <translation>απαγόρευση &amp; διεύθυνση IP</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="38"/>
         <source>ban client I&amp;D</source>
-        <translation>ban gebruiker I&amp;D</translation>
+        <translation>απαγόρευση εξυπηρετητή I&amp;D</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="51"/>
         <source>Ban type</source>
-        <translation>Ban type</translation>
+        <translation>Τύπος απαγόρευσης</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="54"/>
         <source>&amp;permanent ban</source>
-        <translation>&amp;definitieve ban</translation>
+        <translation>&amp;μόνιμη απαγόρευση</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="55"/>
         <source>&amp;temporary ban</source>
-        <translation>&amp;tijdelijke ban</translation>
+        <translation>&amp;προσωρινή απαγόρευση</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="58"/>
         <source>&amp;Days:</source>
-        <translation>&amp;Dagen:</translation>
+        <translation>&amp;Μέρες:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="64"/>
         <source>&amp;Hours:</source>
-        <translation>&amp;Uur:</translation>
+        <translation>&amp;Ώρες:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="70"/>
         <source>&amp;Minutes:</source>
-        <translation>&amp;Minuten:</translation>
+        <translation>&amp;Λεπτά:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="85"/>
         <source>Duration of the ban</source>
-        <translation>Duur van de ban</translation>
+        <translation>Διάρκεια της απαγόρευσης</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="88"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
-        <translation>Voer een reden voor de ban in.
-Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de gebannen persoon.</translation>
+        <translation>Παρακαλώ καταχωρίστε τον λόγο της απαγόρευσης.
+Αυτό αποθηκεύεται μόνο για τους επόπτες και δεν μπορεί να το δει το αποκλεισμένο άτομο.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="91"/>
         <source>Please enter the reason for the ban that will be visible to the banned person.</source>
-        <translation>Voer een reden in die zichtbaar zal zijn voor de gebannen persoon.</translation>
+        <translation>Παρακαλώ καταχωρίστε τον λόγο της απαγόρευσης που θα είναι ορατή στο αποκλεισμένο άτομο.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="94"/>
         <source>&amp;OK</source>
-        <translation>&amp;OK</translation>
+        <translation>&amp;Εντάξει</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="97"/>
         <source>&amp;Cancel</source>
-        <translation>&amp;Annuleren</translation>
+        <translation>&amp;Άκυρο</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="115"/>
         <source>Ban user from server</source>
-        <translation>Ban gebruiker van server</translation>
+        <translation>Απαγόρευση χρήστη από τον διακομιστή</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="186"/>
@@ -165,27 +165,27 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
         <location filename="../src/userlist.cpp" line="198"/>
         <location filename="../src/userlist.cpp" line="204"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="186"/>
         <source>You have to select a name-based, IP-based, clientId based, or some combination of the three to place a ban.</source>
-        <translation>U moet een ban gebaseerd op IP, naam, gebruikers ID of een combinatie van de drie.</translation>
+        <translation>Για την απαγόρευση πρέπει να επιλέξετε ένα όνομα, μία IP, ένα clientId, ή κάποιο συνδυασμό των τριών.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="192"/>
         <source>You must have a value in the name ban when selecting the name ban checkbox.</source>
-        <translation>U moet een naam meegeven als u een naam gebaseerde ban wilt uitvoeren.</translation>
+        <translation>Πρέπει να έχετε μια τιμή στην απαγόρευση ονόματος όταν επιλέγετε το πλαίσιο ελέγχου απαγόρευσης ονόματος.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="198"/>
         <source>You must have a value in the ip ban when selecting the ip ban checkbox.</source>
-        <translation>U moet een IP meegeven als u een IP gebaseerde ban wilt uitvoeren.</translation>
+        <translation>Πρέπει να έχετε μια τιμή στην απαγόρευση ip όταν επιλέγετε το πλαίσιο ελέγχου απαγόρευσης ip.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="204"/>
         <source>You must have a value in the clientid ban when selecting the clientid ban checkbox.</source>
-        <translation>U moet een gebruikers ID meegeven als u een gebruikers ID gebaseerde ban wilt uitvoeren.</translation>
+        <translation>Πρέπει να έχετε μια τιμή στην απαγόρευση clientid όταν επιλέγετε το πλαίσιο ελέγχου απαγόρευσης clientid.</translation>
     </message>
 </context>
 <context>
@@ -193,22 +193,22 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="59"/>
         <source>Name</source>
-        <translation>Naam</translation>
+        <translation>Όνομα</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="60"/>
         <source>Sets</source>
-        <translation>Sets</translation>
+        <translation>Σετς</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="61"/>
         <source>Mana cost</source>
-        <translation>Manakosten</translation>
+        <translation>Το κόστος του Μάνα</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="62"/>
         <source>Card type</source>
-        <translation>Kaarttype</translation>
+        <translation>Είδος κάρτας</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="63"/>
@@ -218,7 +218,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="64"/>
         <source>Color(s)</source>
-        <translation type="unfinished"/>
+        <translation>Χρώμα(τα)</translation>
     </message>
 </context>
 <context>
@@ -226,17 +226,17 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/cardframe.cpp" line="65"/>
         <source>Image</source>
-        <translation>Plaatje</translation>
+        <translation>Εικόνα</translation>
     </message>
     <message>
         <location filename="../src/cardframe.cpp" line="66"/>
         <source>Description</source>
-        <translation>Omschrijving</translation>
+        <translation>Περιγραφή</translation>
     </message>
     <message>
         <location filename="../src/cardframe.cpp" line="67"/>
         <source>Both</source>
-        <translation>Beide</translation>
+        <translation>Και τα δύο</translation>
     </message>
 </context>
 <context>
@@ -244,22 +244,22 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/cardinfotext.cpp" line="84"/>
         <source>Name:</source>
-        <translation>Naam:</translation>
+        <translation>Όνομα:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="85"/>
         <source>Mana cost:</source>
-        <translation>Manakosten:</translation>
+        <translation>Το κόστος του Μάνα:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="86"/>
         <source>Color(s):</source>
-        <translation>Kleur(en):</translation>
+        <translation>Χρώμα(τα):</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="87"/>
         <source>Card type:</source>
-        <translation>Kaarttype:</translation>
+        <translation>Είδος κάρτας:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="88"/>
@@ -269,7 +269,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/cardinfotext.cpp" line="89"/>
         <source>Loyalty:</source>
-        <translation>Loyaliteit:</translation>
+        <translation>Αφοσίωση:</translation>
     </message>
 </context>
 <context>
@@ -277,12 +277,12 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/carditem.cpp" line="82"/>
         <source>&amp;Move to</source>
-        <translation>&amp;Verplaatsen naar</translation>
+        <translation>&amp;Μετακίνηση σε</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="83"/>
         <source>&amp;Power / toughness</source>
-        <translation>&amp;Power / toughness</translation>
+        <translation>&amp;Επίθεση / άμυνα</translation>
     </message>
 </context>
 <context>
@@ -291,31 +291,31 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
         <location filename="../src/cardzone.cpp" line="52"/>
         <source>their hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>το χέρι τους</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="53"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1&apos;s χέρι</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="59"/>
         <source>their library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>η βιβλιοθήκη τους</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="60"/>
         <source>%1&apos;s library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>%1&apos;s βιβλιοθήκη</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="64"/>
         <source>of their library</source>
         <comment>top cards of zone,</comment>
-        <translation type="unfinished"/>
+        <translation>της βιβλιοθήκης τους</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
@@ -327,7 +327,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
         <location filename="../src/cardzone.cpp" line="69"/>
         <source>their library</source>
         <comment>reveal zone</comment>
-        <translation type="unfinished"/>
+        <translation>η βιβλιοθήκη τους</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="70"/>
@@ -339,7 +339,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
         <location filename="../src/cardzone.cpp" line="74"/>
         <source>their library</source>
         <comment>shuffle</comment>
-        <translation type="unfinished"/>
+        <translation>η βιβλιοθήκη τους</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="75"/>
@@ -351,7 +351,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
         <location filename="../src/cardzone.cpp" line="79"/>
         <source>their library</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>η βιβλιοθήκη τους</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="80"/>
@@ -363,7 +363,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
         <location filename="../src/cardzone.cpp" line="85"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>το νεκροταφείο τους</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="86"/>
@@ -375,7 +375,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
         <location filename="../src/cardzone.cpp" line="90"/>
         <source>their exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>η εξορία τους</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="91"/>
@@ -387,7 +387,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
         <location filename="../src/cardzone.cpp" line="97"/>
         <source>their sideboard</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>το sideboard τους</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="98"/>
@@ -399,13 +399,13 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
         <location filename="../src/cardzone.cpp" line="102"/>
         <source>their sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>το sideboard τους</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="103"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1&apos;s sideboard</translation>
     </message>
 </context>
 <context>
@@ -413,12 +413,12 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/dlg_settings.cpp" line="494"/>
         <source>Nothing is here... yet</source>
-        <translation>Er is hier nog niks.</translation>
+        <translation>Τίποτα δεν είναι εδώ ... ακόμα</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="507"/>
         <source>General</source>
-        <translation>Algemeen</translation>
+        <translation>Γενικά</translation>
     </message>
 </context>
 <context>
@@ -426,12 +426,12 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/decklistmodel.cpp" line="137"/>
         <source>Number</source>
-        <translation>Nummer</translation>
+        <translation>Αριθμός</translation>
     </message>
     <message>
         <location filename="../src/decklistmodel.cpp" line="138"/>
         <source>Card</source>
-        <translation>Kaart</translation>
+        <translation>Κάρτα</translation>
     </message>
 </context>
 <context>
@@ -440,12 +440,12 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
         <location filename="../src/deckstats_interface.cpp" line="23"/>
         <location filename="../src/deckstats_interface.cpp" line="34"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/deckstats_interface.cpp" line="34"/>
         <source>The reply from the server could not be parsed.</source>
-        <translation>Het antwoord van de server kon niet geparset worden.</translation>
+        <translation>Δεν ήταν δυνατή η ανάλυση της απάντησης από το διακομιστή.</translation>
     </message>
 </context>
 <context>
@@ -453,42 +453,42 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/tab_game.cpp" line="140"/>
         <source>Load deck...</source>
-        <translation type="unfinished"/>
+        <translation>Φόρτωση deck...</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="141"/>
         <source>Load remote deck...</source>
-        <translation type="unfinished"/>
+        <translation>Φόρτωση απομακρυσμένου deck...</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="142"/>
         <source>Ready to s&amp;tart</source>
-        <translation>Klaar om te s&amp;tarten</translation>
+        <translation>Ετοιμαστείτε να ξεκινήσετε</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="157"/>
         <source>S&amp;ideboard unlocked</source>
-        <translation>S&amp;ideboard ontgrendeld</translation>
+        <translation>Το Sideboard είναι ξεκλείδωτο</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="159"/>
         <source>S&amp;ideboard locked</source>
-        <translation>S&amp;ideboard vergrendeld</translation>
+        <translation>Το Sideboard είναι κλειδωμένο</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="219"/>
         <source>Load deck</source>
-        <translation>Laad deck</translation>
+        <translation>Φόρτωση deck</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="229"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="229"/>
         <source>The selected file could not be loaded.</source>
-        <translation>Het geselecteerde bestand kon niet geladen worden.</translation>
+        <translation>Δεν ήταν δυνατή η φόρτωση του επιλεγμένου αρχείου.</translation>
     </message>
 </context>
 <context>
@@ -496,22 +496,22 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/releasechannel.cpp" line="216"/>
         <source>Development snapshots</source>
-        <translation type="unfinished"/>
+        <translation>Στιγμιότυπα ανάπτυξης</translation>
     </message>
     <message>
         <location filename="../src/releasechannel.cpp" line="243"/>
         <source>No reply received from the release update server.</source>
-        <translation type="unfinished"/>
+        <translation>Δεν ελήφθη απάντηση από τον διακομιστή ενημέρωσης.</translation>
     </message>
     <message>
         <location filename="../src/releasechannel.cpp" line="256"/>
         <source>Invalid reply received from the release update server.</source>
-        <translation type="unfinished"/>
+        <translation>Ελήφθη μη έγκυρη απάντηση από τον διακομιστή ενημέρωσης.</translation>
     </message>
     <message>
         <location filename="../src/releasechannel.cpp" line="293"/>
         <source>No reply received from the file update server.</source>
-        <translation type="unfinished"/>
+        <translation>Δεν ελήφθη απάντηση από το διακομιστή ενημέρωσης αρχείων.</translation>
     </message>
 </context>
 <context>
@@ -519,52 +519,52 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/dlg_connect.cpp" line="28"/>
         <source>New Host</source>
-        <translation>Nieuwe Eigenaar</translation>
+        <translation>Νέος Host</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="34"/>
         <source>&amp;Host:</source>
-        <translation>&amp;Gastheer</translation>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="22"/>
         <source>Known Hosts</source>
-        <translation type="unfinished"/>
+        <translation>Γνωστοί Hosts</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="30"/>
         <source>Name:</source>
-        <translation type="unfinished"/>
+        <translation>Όνομα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="38"/>
         <source>&amp;Port:</source>
-        <translation>&amp;Poort</translation>
+        <translation>&amp;Θύρα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="42"/>
         <source>Player &amp;name:</source>
-        <translation>Spelers&amp;naam:</translation>
+        <translation>Όνομα &amp;παίχτη:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="46"/>
         <source>P&amp;assword:</source>
-        <translation>W&amp;achtwoord:</translation>
+        <translation>Κωδικός:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="51"/>
         <source>&amp;Save password</source>
-        <translation>Wachtwoord &amp;Opslaan</translation>
+        <translation>&amp;Αποθήκευση Κωδικού</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="54"/>
         <source>A&amp;uto connect</source>
-        <translation type="unfinished"/>
+        <translation>Α&amp;υτόματη σύνδεση</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="55"/>
         <source>Automatically connect to the most recent login when Cockatrice opens</source>
-        <translation type="unfinished"/>
+        <translation>Συνδεθείτε αυτόματα στην πιο πρόσφατη σύνδεση όταν ανοίγει το Cockatrice</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="57"/>
@@ -574,52 +574,52 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/dlg_connect.cpp" line="79"/>
         <source>Forgot password</source>
-        <translation type="unfinished"/>
+        <translation>Ξεχάσατε τον κωδικό</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="82"/>
         <source>Connect</source>
-        <translation type="unfinished"/>
+        <translation>Σύνδεση</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="86"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Ακύρωση</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="111"/>
         <source>Server</source>
-        <translation type="unfinished"/>
+        <translation>Διακομιστής</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="121"/>
         <source>Login</source>
-        <translation type="unfinished"/>
+        <translation>Σύνδεση</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="136"/>
         <source>Connect to server</source>
-        <translation>Verbinden met server</translation>
+        <translation>Σύνδεση στον διακομιστή</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="255"/>
         <source>Connection Warning</source>
-        <translation type="unfinished"/>
+        <translation>Προειδοποίηση σύνδεσης</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="255"/>
         <source>You need to name your new connection profile.</source>
-        <translation type="unfinished"/>
+        <translation>Πρέπει να ονομάσετε το νέο προφίλ σύνδεσης.</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="270"/>
         <source>Connect Warning</source>
-        <translation type="unfinished"/>
+        <translation>Προειδοποίηση σύνδεσης</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="270"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Το όνομα παίκτη δεν μπορεί να είναι άδειο.</translation>
     </message>
 </context>
 <context>
@@ -627,92 +627,92 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/dlg_creategame.cpp" line="21"/>
         <source>Re&amp;member settings</source>
-        <translation>Instellingen &amp;Onthouden</translation>
+        <translation>Θυ&amp;μηθείτε τις ρυθμίσεις</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="22"/>
         <source>&amp;Description:</source>
-        <translation>&amp;Omschrijving:</translation>
+        <translation>&amp;Περιγραφή:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="27"/>
         <source>P&amp;layers:</source>
-        <translation>Spe&amp;lers:</translation>
+        <translation>Π&amp;αίχτες:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="51"/>
         <source>Game type</source>
-        <translation>Spel type</translation>
+        <translation>Είδος παιχνιδιού</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="54"/>
         <source>&amp;Password:</source>
-        <translation>&amp;Wachtwoord:</translation>
+        <translation>&amp;Κωδικός:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="58"/>
         <source>Only &amp;buddies can join</source>
-        <translation>Alleen &amp;vrienden kunnen meedoen</translation>
+        <translation>Μόνο &amp;φίλοι μπορούν να συμμετάσχουν</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="59"/>
         <source>Only &amp;registered users can join</source>
-        <translation>Alleen ge&amp;registreerde gebruikers kunnen meedoen</translation>
+        <translation>Μόνο &amp;εγγεγραμμένοι χρήστες μπορούν να συμμετάσχουν</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="73"/>
         <source>Joining restrictions</source>
-        <translation>Restricties voor meedoen</translation>
+        <translation>Περιορισμοί συμμετοχής</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="76"/>
         <source>&amp;Spectators can watch</source>
-        <translation>Toe&amp;schouwers kunnen meekijken</translation>
+        <translation>Οι &amp;θεατές μπορούν να παρακολουθήσουν</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="79"/>
         <source>Spectators &amp;need a password to watch</source>
-        <translation>Toeschouwers hebben een wachtwoord &amp;nodig om mee te kijken</translation>
+        <translation>Οι θεατές &amp;χρειάζονται κωδικό για να παρακολουθήσουν</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="80"/>
         <source>Spectators can &amp;chat</source>
-        <translation>Toeschouwers kunnen &amp;chatten</translation>
+        <translation>Οι θεατές μπορούν να &amp;συζητήσουν</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="81"/>
         <source>Spectators can see &amp;hands</source>
-        <translation>Toeschouwers kunnen &amp;handen zien</translation>
+        <translation>Οι θεατές μπορούν να δουν τα &amp;χέρια</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="87"/>
         <source>Spectators</source>
-        <translation>Toeschouwers</translation>
+        <translation>Θεατές</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="132"/>
         <source>&amp;Clear</source>
-        <translation>&amp;Opschonen</translation>
+        <translation>&amp;Καθάρισε</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="138"/>
         <source>Create game</source>
-        <translation>Spel aanmaken</translation>
+        <translation>Δημιουργία παιχνιδιού</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="180"/>
         <source>Game information</source>
-        <translation>Spel informatie</translation>
+        <translation>Πληροφορίες παιχνιδιού</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="256"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="256"/>
         <source>Server error.</source>
-        <translation>Server Fout</translation>
+        <translation>Σφάλμα Διακομιστή.</translation>
     </message>
 </context>
 <context>
@@ -720,7 +720,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/dlg_create_token.cpp" line="28"/>
         <source>&amp;Name:</source>
-        <translation>&amp;Naam:</translation>
+        <translation>&amp;Όνομα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="29"/>
@@ -730,42 +730,42 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/dlg_create_token.cpp" line="34"/>
         <source>C&amp;olor:</source>
-        <translation>Kle&amp;ur:</translation>
+        <translation>Χ&amp;ρώμα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="36"/>
         <source>white</source>
-        <translation>wit</translation>
+        <translation>άσπρο</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="37"/>
         <source>blue</source>
-        <translation>blauw</translation>
+        <translation>μπλε</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="38"/>
         <source>black</source>
-        <translation>zwart</translation>
+        <translation>μαύρο</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="39"/>
         <source>red</source>
-        <translation>rood</translation>
+        <translation>κόκκινο</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="40"/>
         <source>green</source>
-        <translation>groen</translation>
+        <translation>πράσινο</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="41"/>
         <source>multicolor</source>
-        <translation>veelkleurig</translation>
+        <translation>πολύχρωμο</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="42"/>
         <source>colorless</source>
-        <translation>kleurloos</translation>
+        <translation>άχρωμο</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="45"/>
@@ -775,37 +775,37 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/dlg_create_token.cpp" line="49"/>
         <source>&amp;Annotation:</source>
-        <translation>&amp;Annotatie:</translation>
+        <translation>&amp;Σχόλιο:</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="53"/>
         <source>&amp;Destroy token when it leaves the table</source>
-        <translation>&amp;Vernietig token als het de tafel verlaat</translation>
+        <translation>&amp;κατέστρεψε το token όταν φύγει από το τραπέζι</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="67"/>
         <source>Token data</source>
-        <translation>Token data</translation>
+        <translation>Στοιχεία token</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="74"/>
         <source>Show &amp;all tokens</source>
-        <translation>Laat &amp;alle tokens zien</translation>
+        <translation>Εμφάνισε &amp;όλα τα tokens</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="76"/>
         <source>Show tokens from this &amp;deck</source>
-        <translation>Laat tokens van dit &amp;dek zien</translation>
+        <translation>Εμφάνιση tokens από αυτό το &amp;deck</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="116"/>
         <source>Choose token from list</source>
-        <translation>Kies token uit lijst</translation>
+        <translation>Επέλεξε token από τη λίστα</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="134"/>
         <source>Create token</source>
-        <translation>Maak token</translation>
+        <translation>Δημιουργία token</translation>
     </message>
 </context>
 <context>
@@ -814,39 +814,39 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
         <location filename="../src/dlg_edit_avatar.cpp" line="16"/>
         <location filename="../src/dlg_edit_avatar.cpp" line="59"/>
         <source>No image chosen.</source>
-        <translation>Geen plaatje gekozen.</translation>
+        <translation>Δεν έχει επιλεγεί εικόνα.</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="21"/>
         <source>To change your avatar, choose a new image.
 To remove your current avatar, confirm without choosing a new image.</source>
-        <translation>Om uw icoon te veranderen, kies een nieuw plaatje.
-Om uw Icoon te verwijderen, accepteer zonder een nieuw plaatje te kiezen.</translation>
+        <translation>Για να αλλάξετε το avatar σας, επιλέξτε μια νέα εικόνα
+Για να καταργήσετε το τρέχον avatar, επιβεβαιώστε χωρίς να επιλέξετε μια νέα εικόνα.</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="22"/>
         <source>Browse...</source>
-        <translation>Zoeken...</translation>
+        <translation>Εξέτασε...</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="39"/>
         <source>Change avatar</source>
-        <translation>Verander Icoon</translation>
+        <translation>Αλλαγή avatar</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="56"/>
         <source>Open Image</source>
-        <translation>Plaatje openen</translation>
+        <translation>Άνοιγμα εικόνας</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="56"/>
         <source>Image Files (*.png *.jpg *.bmp)</source>
-        <translation>Plaatjes (*.png *.jpg *.bmp)</translation>
+        <translation>Αρχεία εικόνας (*.png *.jpg *.bmp)</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="70"/>
         <source>Invalid image chosen.</source>
-        <translation>Geen geldig plaatje gekozen</translation>
+        <translation>Επιλέχθηκε μη έγκυρη εικόνα.</translation>
     </message>
 </context>
 <context>
@@ -854,32 +854,32 @@ Om uw Icoon te verwijderen, accepteer zonder een nieuw plaatje te kiezen.</trans
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="14"/>
         <source>Old password:</source>
-        <translation>Oud wachtwoord:</translation>
+        <translation>Παλιός κωδικός:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="23"/>
         <source>New password:</source>
-        <translation>Nieuw wachtwoord:</translation>
+        <translation>Νέος κωδικός:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="28"/>
         <source>Confirm new password:</source>
-        <translation>Herhaal nieuw wachtwoord:</translation>
+        <translation>Επιβεβαιώστε τον καινούριο σας κωδικό:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="50"/>
         <source>Change password</source>
-        <translation>Verander wachtwoord</translation>
+        <translation>Αλλαγή κωδικού</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="59"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="59"/>
         <source>The new passwords don&apos;t match.</source>
-        <translation>Nieuwe wachtwoorden komen niet overeen.</translation>
+        <translation>Οι νέοι κωδικοί πρόσβασης δεν ταιριάζουν.</translation>
     </message>
 </context>
 <context>
@@ -887,47 +887,47 @@ Om uw Icoon te verwijderen, accepteer zonder een nieuw plaatje te kiezen.</trans
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="23"/>
         <source>&amp;Name:</source>
-        <translation>&amp;Naam:</translation>
+        <translation>&amp;Όνομα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="28"/>
         <source>C&amp;olor:</source>
-        <translation>Kle&amp;ur:</translation>
+        <translation>Χ&amp;ρώμα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="30"/>
         <source>white</source>
-        <translation>wit</translation>
+        <translation>άσπρο</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="31"/>
         <source>blue</source>
-        <translation>blauw</translation>
+        <translation>μπλε</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="32"/>
         <source>black</source>
-        <translation>zwart</translation>
+        <translation>μαύρο</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="33"/>
         <source>red</source>
-        <translation>rood</translation>
+        <translation>κόκκινο</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="34"/>
         <source>green</source>
-        <translation>groen</translation>
+        <translation>πράσινο</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="35"/>
         <source>multicolor</source>
-        <translation>veelkleurig</translation>
+        <translation>πολύχρωμο</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="36"/>
         <source>colorless</source>
-        <translation>kleurloos</translation>
+        <translation>άχρωμο</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="40"/>
@@ -937,45 +937,45 @@ Om uw Icoon te verwijderen, accepteer zonder een nieuw plaatje te kiezen.</trans
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="45"/>
         <source>&amp;Annotation:</source>
-        <translation>&amp;Annotatie:</translation>
+        <translation>&amp;Σχόλιο:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="60"/>
         <source>Token data</source>
-        <translation>Token data</translation>
+        <translation>Στοιχεία token</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="85"/>
         <location filename="../src/dlg_edit_tokens.cpp" line="141"/>
         <source>Add token</source>
-        <translation>Voeg token toe</translation>
+        <translation>Προσθήκη token</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="88"/>
         <source>Remove token</source>
-        <translation>Verwijder token</translation>
+        <translation>Αφαίρεση token</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="113"/>
         <source>Edit tokens</source>
-        <translation>Bewerk tokens</translation>
+        <translation>Επεξεργασία tokens</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="141"/>
         <source>Please enter the name of the token:</source>
-        <translation>Gelieve de naam van de token in te voeren:</translation>
+        <translation>Παρακαλώ εισάγετε το όνομα του token:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="145"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="145"/>
         <source>The chosen name conflicts with an existing card or token.
 Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; dialog to display them correctly.</source>
-        <translation>De gekozen naam komt overeen met een bestaande kaart of token.
-Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te kunnen zien.</translation>
+        <translation>Το επιλεγμένο όνομα έρχεται σε αντίθεση με μια υπάρχουσα κάρτα ή ένα token
+Βεβαιωθείτε ότι έχετε ενεργοποιήσει το &apos;token σετ&apos; στο παράθυρο διαλόγου &apos;Επεξεργασία σετς ...&apos; για να τις εμφανίσετε σωστά.</translation>
     </message>
 </context>
 <context>
@@ -988,22 +988,22 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="18"/>
         <source>Country:</source>
-        <translation>Land:</translation>
+        <translation>Χώρα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="21"/>
         <source>Undefined</source>
-        <translation>Onbekend</translation>
+        <translation>Απροσδιόριστο</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="35"/>
         <source>Real name:</source>
-        <translation>Echte naam:</translation>
+        <translation>Πραγματικό όνομα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="57"/>
         <source>Edit user profile</source>
-        <translation>Gebruikers profiel aanpassen</translation>
+        <translation>Επεξεργασία προφίλ χρήστη</translation>
     </message>
 </context>
 <context>
@@ -1011,57 +1011,57 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="19"/>
         <source>Show &apos;&amp;buddies only&apos; games</source>
-        <translation type="unfinished"/>
+        <translation>Εμφάνιση παιχνιδιών &quot;Μόνο φίλοι&quot;</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="22"/>
         <source>Show &amp;unavailable games</source>
-        <translation>Laat niet &amp;beschikbare spellen zien</translation>
+        <translation>Εμφάνιση &amp;μη διαθέσιμων παιχνιδιών</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="25"/>
         <source>Show &amp;password protected games</source>
-        <translation>Laat &amp;wachtwoord zien van gesloten spellen</translation>
+        <translation>Εμφάνιση παιχνιδιών με &amp;κωδικό πρόσβασης</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="30"/>
         <source>Game &amp;description:</source>
-        <translation>Spel &amp;omschrijving:</translation>
+        <translation>Παιχνίδι και &amp;περιγραφή:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="35"/>
         <source>&amp;Creator name:</source>
-        <translation>Naam van &amp;maker:</translation>
+        <translation>&amp;Όνομα δημιουργού:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="51"/>
         <source>&amp;Game types</source>
-        <translation>&amp;Spel types</translation>
+        <translation>&amp;Είδη παιχνιδιού</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="56"/>
         <source>at &amp;least:</source>
-        <translation>ten&amp;minste:</translation>
+        <translation>το &amp;λιγότερο:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="63"/>
         <source>at &amp;most:</source>
-        <translation>op zijn &amp;hoogst:</translation>
+        <translation>το &amp;περισσότερο:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="76"/>
         <source>Maximum player count</source>
-        <translation>Maximale aantal spelers</translation>
+        <translation>Μέγιστος αριθμός παικτών</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="84"/>
         <source>Restrictions</source>
-        <translation type="unfinished"/>
+        <translation>Περιορισμοί</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="117"/>
         <source>Filter games</source>
-        <translation>Spellen filteren</translation>
+        <translation>Φίλτρο παιχνιδιών</translation>
     </message>
 </context>
 <context>
@@ -1080,22 +1080,22 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="33"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="37"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Θύρα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="41"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>Όνομα &amp;παίχτη:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="45"/>
         <source>Email:</source>
-        <translation type="unfinished"/>
+        <translation>Email:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="77"/>
@@ -1113,17 +1113,17 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="27"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="31"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Θύρα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="35"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>Όνομα &amp;παίχτη:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="56"/>
@@ -1138,7 +1138,7 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="65"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Το όνομα παίκτη δεν μπορεί να είναι άδειο.</translation>
     </message>
 </context>
 <context>
@@ -1160,28 +1160,28 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="33"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="37"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Θύρα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="41"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>Όνομα &amp;παίχτη:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="45"/>
         <source>Token:</source>
-        <translation type="unfinished"/>
+        <translation>Token:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="49"/>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="54"/>
         <source>New Password:</source>
-        <translation type="unfinished"/>
+        <translation>Νέος κωδικός:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="91"/>
@@ -1191,7 +1191,7 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="100"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Το όνομα παίκτη δεν μπορεί να είναι άδειο.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="106"/>
@@ -1206,7 +1206,7 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="118"/>
         <source>The passwords do not match.</source>
-        <translation type="unfinished"/>
+        <translation>Οι κωδικοί πρόσβασης δεν ταιριάζουν.</translation>
     </message>
 </context>
 <context>
@@ -1214,24 +1214,24 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="20"/>
         <source>&amp;Refresh</source>
-        <translation>&amp;Verversen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="34"/>
         <source>Load deck from clipboard</source>
-        <translation>Laad dek van klembord</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="67"/>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="75"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="67"/>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="75"/>
         <source>Invalid deck list.</source>
-        <translation>Niet geldige deck lijst.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1239,7 +1239,7 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_load_remote_deck.cpp" line="25"/>
         <source>Load deck</source>
-        <translation>Laad dek</translation>
+        <translation>Φόρτωση deck</translation>
     </message>
 </context>
 <context>
@@ -1247,27 +1247,27 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_register.cpp" line="16"/>
         <source>&amp;Host:</source>
-        <translation>&amp;Eigenaar:</translation>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="20"/>
         <source>&amp;Port:</source>
-        <translation>&amp;Poort:</translation>
+        <translation>&amp;Θύρα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="24"/>
         <source>Player &amp;name:</source>
-        <translation>&amp;Naam van speler:</translation>
+        <translation>Όνομα &amp;παίχτη:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="28"/>
         <source>P&amp;assword:</source>
-        <translation>W&amp;achtwoord:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="33"/>
         <source>Password (again):</source>
-        <translation>Wachtwoord (opnieuw):</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="38"/>
@@ -1277,49 +1277,49 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_register.cpp" line="42"/>
         <source>Email (again):</source>
-        <translation>Email (opnieuw):</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="46"/>
         <source>Country:</source>
-        <translation>Land:</translation>
+        <translation>Χώρα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="49"/>
         <source>Undefined</source>
-        <translation>Onbekend</translation>
+        <translation>Απροσδιόριστο</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="304"/>
         <source>Real name:</source>
-        <translation>Echte naam:</translation>
+        <translation>Πραγματικό όνομα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="337"/>
         <source>Register to server</source>
-        <translation>Registreer op server</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="346"/>
         <location filename="../src/dlg_register.cpp" line="351"/>
         <location filename="../src/dlg_register.cpp" line="356"/>
         <source>Registration Warning</source>
-        <translation>Registratie Waarschuwing</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="346"/>
         <source>Your passwords do not match, please try again.</source>
-        <translation>Uw wachtwoorden komen niet overeen, probeer opnieuw.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="351"/>
         <source>Your email addresses do not match, please try again.</source>
-        <translation>Uw email adressen komen niet overeen, probeer opnieuw.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="356"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation>Spelersnaam kan niet leeg zijn.</translation>
+        <translation>Το όνομα παίκτη δεν μπορεί να είναι άδειο.</translation>
     </message>
 </context>
 <context>
@@ -1327,7 +1327,7 @@ Zet de &apos;token set&apos; aan in de &apos;Sets aanpassen&apos; menu om hem te
     <message>
         <location filename="../src/dlg_settings.cpp" line="883"/>
         <source>Unknown Error loading card database</source>
-        <translation>Onbekende Fout in het lezen van de kaart database</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="892"/>
@@ -1338,13 +1338,7 @@ Cockatrice may not function correctly with an invalid database
 You may need to rerun oracle to update your card database.
 
 Would you like to change your database location setting?</source>
-        <translation>Uw kaar database is niet geldig.
-
-Cockatrice kan niet correct functioneren zonder een geldige database
-
-U zou oracle moeten herstarten om uw database te updaten.
-
-Zou u de locatie van uw database willen veranderen?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="899"/>
@@ -1355,13 +1349,7 @@ This can cause problems loading card information or images
 Usually this can be fixed by rerunning oracle to to update your card database.
 
 Would you like to change your database location setting?</source>
-        <translation>Uw kaart database versie is te oud.
-
-Dit kan problemen veroorzaken tijdens het laden van kaart informatie of plaatjes.
-
-Dit zou opgelost kunnen worden door oracle opnieuw te starten en uw kaart database te updaten.
-
-Zou u de locatie van uw database willen veranderen?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="906"/>
@@ -1370,29 +1358,21 @@ Zou u de locatie van uw database willen veranderen?</translation>
 Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
 
 Would you like to change your database location setting?</source>
-        <translation>Uw kaart database was niet klaar met laden
-
-Plaats een klacht op http://github.com/Cockatrice/Cockatrice/issues met uw cards.xml als bijlage alstublieft.
-
-Wilt u uw database lokatie aanpassen?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="912"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
-        <translation>Bestands fout laden van kaart database.
-
-Wilt u uw database lokatie aanpassen?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="917"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
-        <translation>Uw kaart database was geladen maar bevat geen kaarten.
-
-Wilt u uw database lokatie aanpassen?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="922"/>
@@ -1401,68 +1381,64 @@ Wilt u uw database lokatie aanpassen?</translation>
 Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues
 
 Would you like to change your database location setting?</source>
-        <translation>Onbekende kaart database laad status
-
-Plaats een klacht op http://github.com/Cockatrice/Cockatrice/issues asltublieft.
-
-Wilt u uw database lokatie aanpassen?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="929"/>
         <location filename="../src/dlg_settings.cpp" line="935"/>
         <location filename="../src/dlg_settings.cpp" line="941"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="935"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation>Het pad naar uw deck map is niet geldig. Wilt u terug gaan en de correcte pad invullen?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="941"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation>Het pad naar uw kaart plaatjes map is niet geldig. Wilt u terug gaan en de correcte pad invullen?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="950"/>
         <source>Settings</source>
-        <translation>Instellingen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="952"/>
         <source>General</source>
-        <translation>Algemeen</translation>
+        <translation>Γενικά</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="953"/>
         <source>Appearance</source>
-        <translation>Weergave</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="954"/>
         <source>User Interface</source>
-        <translation>Gebruikersomgeving</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="955"/>
         <source>Deck Editor</source>
-        <translation>Deck Editor</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="956"/>
         <source>Chat</source>
-        <translation>Chat</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="957"/>
         <source>Sound</source>
-        <translation>Geluid</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="958"/>
         <source>Shortcuts</source>
-        <translation>Sneltoetsen</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1473,7 +1449,7 @@ Wilt u uw database lokatie aanpassen?</translation>
         <location filename="../src/dlg_update.cpp" line="182"/>
         <location filename="../src/dlg_update.cpp" line="197"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="24"/>
@@ -1646,7 +1622,7 @@ You may have to build from source yourself.</source>
         <location filename="../src/gameselector.cpp" line="157"/>
         <location filename="../src/gameselector.cpp" line="189"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="150"/>
@@ -1656,17 +1632,17 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gameselector.cpp" line="151"/>
         <source>Wrong password.</source>
-        <translation>Verkeerd wachtwoord.</translation>
+        <translation>Λάθος κωδικός.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="152"/>
         <source>Spectators are not allowed in this game.</source>
-        <translation>Toeschouwers zijn niet toegelaten in dit spel.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="153"/>
         <source>The game is already full.</source>
-        <translation>Dit spel is reeds vol.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="154"/>
@@ -1696,7 +1672,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gameselector.cpp" line="176"/>
         <source>Password:</source>
-        <translation>Wachtwoord:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="189"/>
@@ -1706,7 +1682,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gameselector.cpp" line="205"/>
         <source>Games</source>
-        <translation>Spellen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="206"/>
@@ -1744,43 +1720,43 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gamesmodel.cpp" line="109"/>
         <source>password</source>
-        <translation>wachtwoord</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="111"/>
         <source>buddies only</source>
-        <translation>enkel vrienden</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="113"/>
         <source>reg. users only</source>
-        <translation>enkel geregistreerde gebruikers</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="145"/>
         <location filename="../src/gamesmodel.cpp" line="149"/>
         <source>can chat</source>
-        <translation>kan praten</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="145"/>
         <source>see hands</source>
-        <translation>zie handen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="153"/>
         <source>can see hands</source>
-        <translation>kan handen zien</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="158"/>
         <source>not allowed</source>
-        <translation>niet toegelaten</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="174"/>
         <source>Room</source>
-        <translation>Kamer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="178"/>
@@ -1795,7 +1771,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gamesmodel.cpp" line="183"/>
         <source>Description</source>
-        <translation>Omschrijving</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="184"/>
@@ -1805,17 +1781,17 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gamesmodel.cpp" line="186"/>
         <source>Restrictions</source>
-        <translation>Restricties</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="190"/>
         <source>Players</source>
-        <translation>Spelers</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="195"/>
         <source>Spectators</source>
-        <translation>Toeschouwers</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1827,12 +1803,12 @@ You may have to build from source yourself.</source>
         <location filename="../src/dlg_settings.cpp" line="263"/>
         <location filename="../src/dlg_settings.cpp" line="273"/>
         <source>Choose path</source>
-        <translation>Kies pad</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="256"/>
         <source>Success</source>
-        <translation>Succesvol</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="256"/>
@@ -1842,7 +1818,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="258"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="258"/>
@@ -1852,12 +1828,12 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="288"/>
         <source>Personal settings</source>
-        <translation>Persoonlijke instellingen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="289"/>
         <source>Language:</source>
-        <translation>Taal:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="290"/>
@@ -1872,7 +1848,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="296"/>
         <source>Paths</source>
-        <translation>Paden</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="299"/>
@@ -1938,7 +1914,7 @@ You may have to build from source yourself.</source>
         <location filename="../src/dlg_settings.cpp" line="311"/>
         <location filename="../src/dlg_settings.cpp" line="312"/>
         <source>Reset</source>
-        <translation>Resetten</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1957,7 +1933,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/window_main.cpp" line="94"/>
         <source>Banned by moderator</source>
-        <translation>Verbannen door moderator</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="96"/>
@@ -1967,7 +1943,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/window_main.cpp" line="98"/>
         <source>This ban lasts indefinitely.</source>
-        <translation>Deze verbanning duurt voor onbepaalde tijd.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="103"/>
@@ -1978,7 +1954,7 @@ You may have to build from source yourself.</source>
         <location filename="../src/window_main.cpp" line="104"/>
         <location filename="../src/window_main.cpp" line="405"/>
         <source>Invalid username.</source>
-        <translation>Ongeldige spelersnaam.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="105"/>
@@ -1988,7 +1964,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/window_main.cpp" line="108"/>
         <source>Connection closed</source>
-        <translation>Connectie verbroken</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="108"/>
@@ -2006,13 +1982,13 @@ Reason for shutdown: %1</source>
     <message>
         <location filename="../src/window_main.cpp" line="115"/>
         <source>Scheduled server shutdown</source>
-        <translation>Geplande stillegging server</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="152"/>
         <location filename="../src/window_main.cpp" line="162"/>
         <source>Success</source>
-        <translation>Succesvol</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="152"/>
@@ -2040,17 +2016,17 @@ Will now login.</source>
         <location filename="../src/window_main.cpp" line="211"/>
         <location filename="../src/window_main.cpp" line="217"/>
         <source>Player %1</source>
-        <translation>Speler %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="229"/>
         <source>Load replay</source>
-        <translation>Laad replay</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="284"/>
         <source>About Cockatrice</source>
-        <translation>Over Cockatrice</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="287"/>
@@ -2070,7 +2046,7 @@ Will now login.</source>
     <message>
         <location filename="../src/window_main.cpp" line="290"/>
         <source>Developers:</source>
-        <translation>Ontwikkelaars:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="291"/>
@@ -2085,17 +2061,17 @@ Will now login.</source>
     <message>
         <location filename="../src/window_main.cpp" line="293"/>
         <source>Translators:</source>
-        <translation>Vertalers:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="295"/>
         <source>Help Translate!</source>
-        <translation>Help Vertalen!</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="296"/>
         <source>Support:</source>
-        <translation>Steun:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="297"/>
@@ -2133,7 +2109,7 @@ Will now login.</source>
         <location filename="../src/window_main.cpp" line="915"/>
         <location filename="../src/window_main.cpp" line="951"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="326"/>
@@ -2143,7 +2119,7 @@ Will now login.</source>
     <message>
         <location filename="../src/window_main.cpp" line="342"/>
         <source>Failed Login</source>
-        <translation>Gefaalde Login</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="349"/>
@@ -3306,57 +3282,57 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="151"/>
         <source>Untap step</source>
-        <translation>Untap fase</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="152"/>
         <source>Upkeep step</source>
-        <translation>Upkeep fase</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="153"/>
         <source>Draw step</source>
-        <translation>Draw fase</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="154"/>
         <source>First main phase</source>
-        <translation>Eerste hoofdfase</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="155"/>
         <source>Beginning of combat step</source>
-        <translation>Begin vechtfase</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="156"/>
         <source>Declare attackers step</source>
-        <translation>Aanvallers aangeven fase</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="157"/>
         <source>Declare blockers step</source>
-        <translation>Verdedigers aangeven fase</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="158"/>
         <source>Combat damage step</source>
-        <translation>Gevechtsschade fase</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="159"/>
         <source>End of combat step</source>
-        <translation>Einde vechtfase</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="160"/>
         <source>Second main phase</source>
-        <translation>Tweede hoofdfase</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/phasestoolbar.cpp" line="161"/>
         <source>End of turn step</source>
-        <translation>Einde van de beurt fase</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3444,7 +3420,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="651"/>
         <source>&amp;View library</source>
-        <translation>&amp;Bekijk library</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/player.cpp" line="652"/>
@@ -3991,7 +3967,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_server.cpp" line="60"/>
         <source>Description</source>
-        <translation>Omschrijving</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="61"/>
@@ -4265,17 +4241,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="558"/>
         <source>&amp;Remove row</source>
-        <translation>Verwijder rij</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="560"/>
         <source>&amp;Increment number</source>
-        <translation>Verhoog getal</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="562"/>
         <source>&amp;Decrement number</source>
-        <translation>Verlaag getal</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="564"/>
@@ -4286,7 +4262,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/tab_deck_editor.cpp" line="566"/>
         <location filename="../src/tab_deck_editor.cpp" line="571"/>
         <source>Card Info</source>
-        <translation>Kaart info</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="567"/>
@@ -4303,73 +4279,71 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="570"/>
         <source>&amp;View</source>
-        <translation>&amp;Bekijk</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="575"/>
         <location filename="../src/tab_deck_editor.cpp" line="578"/>
         <location filename="../src/tab_deck_editor.cpp" line="581"/>
         <source>Visible</source>
-        <translation>Zichtbaar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="576"/>
         <location filename="../src/tab_deck_editor.cpp" line="579"/>
         <location filename="../src/tab_deck_editor.cpp" line="582"/>
         <source>Floating</source>
-        <translation>Zwevend</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="584"/>
         <source>Reset layout</source>
-        <translation>Layout resetten</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="589"/>
         <source>Deck: %1</source>
-        <translation>Dek: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="637"/>
         <source>Are you sure?</source>
-        <translation>Ben je zeker?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="638"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
-        <translation>De deklijst is gewijzigd.
-Wil je de wijzigingen opslaan?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="668"/>
         <source>Load deck</source>
-        <translation>Laad dek</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="687"/>
         <location filename="../src/tab_deck_editor.cpp" line="711"/>
         <location filename="../src/tab_deck_editor.cpp" line="731"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="687"/>
         <source>The deck could not be saved.</source>
-        <translation>Het dek kon niet opslagen worden.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="711"/>
         <location filename="../src/tab_deck_editor.cpp" line="731"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
-        <translation>Het dek kon niet opgeslagen worden.
-Kijk a.u.b. na of je schrijfrechten op de folder hebt, en probeer opnieuw.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="717"/>
         <source>Save deck</source>
-        <translation>Deck opslaan</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4377,88 +4351,88 @@ Kijk a.u.b. na of je schrijfrechten op de folder hebt, en probeer opnieuw.</tran
     <message>
         <location filename="../src/tab_deck_storage.h" line="52"/>
         <source>Deck storage</source>
-        <translation>Dekopslag</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="117"/>
         <source>Local file system</source>
-        <translation>Lokaal bestandssysteem</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="118"/>
         <source>Server deck storage</source>
-        <translation>Dekopslag op de server</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="120"/>
         <location filename="../src/tab_deck_storage.cpp" line="122"/>
         <source>Open in deck editor</source>
-        <translation>Open dek in editor</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="121"/>
         <source>Upload deck</source>
-        <translation>Upload dek</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="123"/>
         <source>Download deck</source>
-        <translation>Download dek</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="124"/>
         <location filename="../src/tab_deck_storage.cpp" line="270"/>
         <source>New folder</source>
-        <translation>Nieuwe folder</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="125"/>
         <location filename="../src/tab_deck_storage.cpp" line="126"/>
         <source>Delete</source>
-        <translation>Verwijder</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="156"/>
         <source>Enter deck name</source>
-        <translation>Geeft dek naam in</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="156"/>
         <source>This decklist does not have a name.
 Please enter a name:</source>
-        <translation>De deklijst heeft geen naam. Geef een naam in aub.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="160"/>
         <source>Unnamed deck</source>
-        <translation>Onbenoemd dek</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="195"/>
         <source>Delete local file</source>
-        <translation>Verwijder lokaal bestand</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="195"/>
         <location filename="../src/tab_deck_storage.cpp" line="316"/>
         <location filename="../src/tab_deck_storage.cpp" line="324"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
-        <translation>Ben je zeker dat je &quot;%1&quot; wilt verwijderen?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="270"/>
         <source>Name of new folder:</source>
-        <translation>Naam van de folder:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="316"/>
         <source>Delete remote folder</source>
-        <translation>Verwijder folder van server</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="324"/>
         <source>Delete remote deck</source>
-        <translation>Verwijder dek van server</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4503,27 +4477,27 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="468"/>
         <source>&amp;Phases</source>
-        <translation>Fases</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="471"/>
         <source>&amp;Game</source>
-        <translation>Spel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="473"/>
         <source>Next &amp;phase</source>
-        <translation>Volgende fase</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="476"/>
         <source>Next &amp;turn</source>
-        <translation>Volgende beurt</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="479"/>
         <source>&amp;Remove all local arrows</source>
-        <translation>Verwijder alle lokale pijlen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="482"/>
@@ -4538,27 +4512,27 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="488"/>
         <source>Game &amp;information</source>
-        <translation>Spelinformatie</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="490"/>
         <source>&amp;Concede</source>
-        <translation>Geef op</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="493"/>
         <source>&amp;Leave game</source>
-        <translation>Verlaat spel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="496"/>
         <source>C&amp;lose replay</source>
-        <translation>Sluit opgeslagen spel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="499"/>
         <source>&amp;Say:</source>
-        <translation>Zeg:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="502"/>
@@ -4589,27 +4563,27 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="609"/>
         <source>Concede</source>
-        <translation>Opgeven</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="609"/>
         <source>Are you sure you want to concede this game?</source>
-        <translation>Ben je zeker dat je wilt opgeven voor dit spel?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="619"/>
         <source>Leave game</source>
-        <translation>Verlaat spel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="619"/>
         <source>Are you sure you want to leave this game?</source>
-        <translation>Ben je zeker dat je dit spel wilt verlaten?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="815"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
-        <translation>Je bent het spel aan het overstelpen. Wacht enkele seconden aub.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1054"/>
@@ -4634,7 +4608,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="1101"/>
         <source>You have been kicked out of the game.</source>
-        <translation>Je bent uit het spel gegooid.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4800,17 +4774,17 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="61"/>
         <source>Private &amp;chat</source>
-        <translation>Privaat gesprek</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="62"/>
         <source>&amp;Leave</source>
-        <translation>Verlaat</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="78"/>
         <source>%1 - Private chat</source>
-        <translation>%1 - Privaat gesprek</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="105"/>
@@ -4820,17 +4794,17 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="138"/>
         <source>Private message from </source>
-        <translation>Private boodschap van</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="155"/>
         <source>%1 has left the server.</source>
-        <translation>%1 heeft zich afgemeld van de server.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="161"/>
         <source>%1 has joined the server.</source>
-        <translation>%1 heeft zich aangemeld op de server</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4838,49 +4812,49 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_replays.h" line="51"/>
         <source>Game replays</source>
-        <translation>Spellen opnieuw afspelen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="115"/>
         <source>Local file system</source>
-        <translation>Lokaal bestandssysteem</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="116"/>
         <source>Server replay storage</source>
-        <translation>Opslag gespeelde spellen op server</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="118"/>
         <location filename="../src/tab_replays.cpp" line="120"/>
         <source>Watch replay</source>
-        <translation>Bekijk opgeslagen spel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="119"/>
         <location filename="../src/tab_replays.cpp" line="123"/>
         <source>Delete</source>
-        <translation>Verwijder</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="121"/>
         <source>Download replay</source>
-        <translation>Download opgeslagen spel.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="122"/>
         <source>Toggle expiration lock</source>
-        <translation>Schakel expiratieslot om</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="148"/>
         <source>Delete local file</source>
-        <translation>Verwijder lokaal opgeslagen spel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="148"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
-        <translation>Ben je zeker dat je &quot;%1&quot; wilt verwijderen?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="196"/>
@@ -4895,12 +4869,12 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_replays.cpp" line="259"/>
         <source>Delete remote replay</source>
-        <translation>Verwijder op server opgeslagen spel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="259"/>
         <source>Are you sure you want to delete the replay of game %1?</source>
-        <translation>Ben je zeker dat je het opgeslagen spel %1 wilt verwijderen?</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4908,32 +4882,32 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_room.cpp" line="139"/>
         <source>&amp;Say:</source>
-        <translation>Zeg:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="140"/>
         <source>Chat</source>
-        <translation>Gesprek</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="141"/>
         <source>&amp;Room</source>
-        <translation>Kamer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="142"/>
         <source>&amp;Leave room</source>
-        <translation>Verlaat kamer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="143"/>
         <source>&amp;Clear chat</source>
-        <translation>Maak gespreksgeschiedenis leeg</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="144"/>
         <source>Chat Settings...</source>
-        <translation>Gespreksinstellingen...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_room.cpp" line="160"/>
@@ -4948,7 +4922,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_room.cpp" line="205"/>
         <source>You are flooding the chat. Please wait a couple of seconds.</source>
-        <translation>Je bent de chat aan het overstelpen. Wacht enkele seconden a.u.b.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -4956,7 +4930,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_server.h" line="54"/>
         <source>Server</source>
-        <translation>Server</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="206"/>
@@ -4992,12 +4966,12 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_supervisor.cpp" line="143"/>
         <source>Are you sure?</source>
-        <translation>Ben je zeker?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="143"/>
         <source>There are still open games. Are you sure you want to quit?</source>
-        <translation>Er staan nog spellen open. Ben je zeker dat je wilt afsluiten?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="581"/>
@@ -5060,12 +5034,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/tab_userlists.cpp" line="49"/>
         <source>Add to Buddy List</source>
-        <translation>Voeg toe aan vriendenlijst</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="58"/>
         <source>Add to Ignore List</source>
-        <translation>Voeg toe aan negatielijst</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5095,42 +5069,42 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/user_context_menu.cpp" line="53"/>
         <source>User &amp;details</source>
-        <translation>Gebruikersdetails</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="54"/>
         <source>Private &amp;chat</source>
-        <translation>Privaat gesprek</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="55"/>
         <source>Show this user&apos;s &amp;games</source>
-        <translation>Toon spellen van deze gebruiker</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="56"/>
         <source>Add to &amp;buddy list</source>
-        <translation>Voeg toe aan vriendenlijst</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="57"/>
         <source>Remove from &amp;buddy list</source>
-        <translation>Verwijder uit vriendenlijst</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="58"/>
         <source>Add to &amp;ignore list</source>
-        <translation>Voeg toe aan negatielijst</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="59"/>
         <source>Remove from &amp;ignore list</source>
-        <translation>Verwijder uit negatielijst</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="60"/>
         <source>Kick from &amp;game</source>
-        <translation>Gooi uit spel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="61"/>
@@ -5145,7 +5119,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/user_context_menu.cpp" line="63"/>
         <source>Ban from &amp;server</source>
-        <translation>Verban van de &amp;server</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="64"/>
@@ -5165,7 +5139,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/user_context_menu.cpp" line="94"/>
         <source>%1&apos;s games</source>
-        <translation>%s&apos;s spellen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="149"/>
@@ -5215,7 +5189,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/user_context_menu.cpp" line="215"/>
         <location filename="../src/user_context_menu.cpp" line="217"/>
         <source>Success</source>
-        <translation>Succesvol</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="215"/>
@@ -5249,27 +5223,27 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="61"/>
         <source>User information</source>
-        <translation>Gebruikersinformatie</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="68"/>
         <source>Real name:</source>
-        <translation>Echte naam:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="69"/>
         <source>Location:</source>
-        <translation>Locatie:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="70"/>
         <source>User level:</source>
-        <translation>Gebruikersniveau:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="71"/>
         <source>Account Age:</source>
-        <translation>Leeftijd lidmaatschap</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="73"/>
@@ -5279,58 +5253,58 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="74"/>
         <source>Change password</source>
-        <translation>Verander wachtwoord</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="75"/>
         <source>Change avatar</source>
-        <translation>Verander Icoon</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="106"/>
         <source>Administrator</source>
-        <translation>Administrator</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="108"/>
         <source>Moderator</source>
-        <translation>Moderator</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="110"/>
         <source>Registered user</source>
-        <translation>Geregistreerde gebruiker</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="112"/>
         <location filename="../src/userinfobox.cpp" line="120"/>
         <source>Unregistered user</source>
-        <translation>Ongeregistreerde gebruiker</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="123"/>
         <source>Unknown</source>
-        <translation>Onbekend</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="136"/>
         <source>Year</source>
-        <translation>Jaar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="136"/>
         <source>Years</source>
-        <translation>Jaren</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="142"/>
         <source>Day</source>
-        <translation>Dag</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="142"/>
         <source>Days</source>
-        <translation>Dagen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="238"/>
@@ -5354,7 +5328,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/userinfobox.cpp" line="280"/>
         <location filename="../src/userinfobox.cpp" line="284"/>
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="241"/>
@@ -5408,27 +5382,27 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/dlg_settings.cpp" line="479"/>
         <source>General interface settings</source>
-        <translation>Algemene weergave-instellingen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="480"/>
         <source>Enable notifications in taskbar</source>
-        <translation>Activeer meldingen in de taakbalk</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="481"/>
         <source>Notify in the taskbar for game events while you are spectating</source>
-        <translation>Meld spelgebeurtenissen in de taakbalk terwijl je toekijkt</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="482"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
-        <translation>Dubbel-klik op kaarten om ze te spelen (in plaats van enkele klik)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="483"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
-        <translation>Speel standaard alle niet-landen op de stapel (niet op het slagveld)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="484"/>
@@ -5438,12 +5412,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/dlg_settings.cpp" line="485"/>
         <source>Animation settings</source>
-        <translation>Animatie-instellingen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="486"/>
         <source>&amp;Tap/untap animation</source>
-        <translation>&amp;Tap/Untap animatie</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5456,17 +5430,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userlist.cpp" line="335"/>
         <source>Users in this room: %1</source>
-        <translation>Gebruikers in de kamer: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="336"/>
         <source>Buddies online: %1 / %2</source>
-        <translation>Vrienden on-line: %1 / %2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="337"/>
         <source>Ignored users online: %1 / %2</source>
-        <translation>Genegeerde gebruikers on-line: %1 / %2</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5518,12 +5492,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/window_sets.cpp" line="38"/>
         <source>Move selected set up</source>
-        <translation>Verplaats de geselecteerde set naar boven</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="45"/>
         <source>Move selected set down</source>
-        <translation>Verplaats de geselecteerde set naar beneden</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="52"/>
@@ -5593,17 +5567,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/window_sets.cpp" line="131"/>
         <source>Edit sets</source>
-        <translation>Bewerk sets</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="166"/>
         <source>Success</source>
-        <translation>Succesvol</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="166"/>
         <source>The sets database has been saved successfully.</source>
-        <translation>De sets databank is succesvol opgeslagen.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5611,22 +5585,22 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="131"/>
         <source>sort by name</source>
-        <translation>Sorteer op naam</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="132"/>
         <source>sort by type</source>
-        <translation>Sorteer op type</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="133"/>
         <source>shuffle when closing</source>
-        <translation>Schudden bij afsluiten</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/zoneviewwidget.cpp" line="134"/>
         <source>pile view</source>
-        <translation>Stapelweergave</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5634,7 +5608,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/settingscache.cpp" line="154"/>
         <source>English</source>
-        <translation>Nederlands (Dutch)</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5642,7 +5616,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1726"/>
         <source>Main Window</source>
-        <translation>Hoofdscherm</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1727"/>
@@ -5657,32 +5631,32 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1729"/>
         <source>Watch replay</source>
-        <translation>Bekijk replay</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1730"/>
         <source>Connect</source>
-        <translation>Verbinden</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1731"/>
         <source>Register</source>
-        <translation>Registreer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1732"/>
         <source>Full screen</source>
-        <translation>Volledig scherm</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1733"/>
         <source>Settings</source>
-        <translation>Instellingen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1734"/>
         <source>Check for card updates</source>
-        <translation>Controleer voor kaart-updates</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1735"/>
@@ -5692,12 +5666,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1736"/>
         <source>Exit</source>
-        <translation>Verlaten</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1737"/>
         <source>Deck Editor</source>
-        <translation>Deck Editor</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1738"/>
@@ -6175,7 +6149,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1863"/>
         <source>Load local deck</source>
-        <translation>Lokale deck laden.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1864"/>
