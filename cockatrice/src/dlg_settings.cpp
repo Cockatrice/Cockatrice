@@ -291,7 +291,7 @@ void GeneralSettingsPage::retranslateUi()
 
     if(settingsCache->getIsPortableBuild())
     {
-        pathsGroupBox->setTitle(tr("Paths") + QString("(") + tr("editing disabled in portable mode") + QString(")"));
+        pathsGroupBox->setTitle(tr("Paths") + " (" + tr("editing disabled in portable mode") + ")");
     } else {
         pathsGroupBox->setTitle(tr("Paths"));
     }
