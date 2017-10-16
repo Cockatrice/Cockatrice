@@ -142,8 +142,8 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
             tr("A new version of Cockatrice is available!") + "<br><br>"
             + "<b>" + tr("New version") + QString(":</b> %1<br>").arg(release->getName())
             + "<b>" + tr("Released") + QString(":</b> %1 <a href=\"%2\">(").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") + ")</a><br><br>"
-            + tr("Unfortunately there are no download packages available for your operating system. \nYou may have to build from source yourself.") + "<br><br>"
-            + tr("Please check the download page manually and visit the wiki for instructions on compiling."));
+            + tr("Unfortunately there could no download package for your operating system be found. Please check the download page manually.") + "<br><br>"
+            + tr("In case you may have to build from source yourself, there are instructions on compiling available in our wiki."));		
     }
 }
 
