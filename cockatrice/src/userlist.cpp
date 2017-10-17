@@ -331,10 +331,10 @@ void UserList::retranslateUi()
 {
     userContextMenu->retranslateUi();
     switch (type) {
-        case AllUsersList: titleStr = tr("Users connected to server:") + QString(" %1"); break;
-        case RoomList: titleStr = tr("Users in this room:") + QString(" %1"); break;
-        case BuddyList: titleStr = tr("Buddies online:") + QString(" %1 / %2"); break;
-        case IgnoreList: titleStr = tr("Ignored users online:") + QString(" %1 / %2"); break;
+        case AllUsersList: titleStr = tr("Users connected to server:") + " %1"; break;
+        case RoomList: titleStr = tr("Users in this room:") + " %1"; break;
+        case BuddyList: titleStr = tr("Buddies online:") + " %1 / %2"; break;
+        case IgnoreList: titleStr = tr("Ignored users online:") + " %1 / %2"; break;
     }
     updateCount();
 }

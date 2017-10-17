@@ -116,8 +116,8 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         //downloader themselves if there's a compatible build
         QMessageBox::information(this, tr("No Update Available"),
                  tr("Cockatrice is up to date!") + "<br><br>"
-                 + tr("You are already running the latest version available in the chosen release channel.") + "\n"
-                 + "<b>" + tr("Current version") + QString(":</b> %1\n").arg(VERSION_STRING)
+                 + tr("You are already running the latest version available in the chosen release channel.") + "<br>"
+                 + "<b>" + tr("Current version") + QString(":</b> %1").arg(VERSION_STRING) + "<br>"
                  + "<b>" + tr("Selected release channel") + QString(":</b> %1").arg(tr(settingsCache->getUpdateReleaseChannel()->getName().toUtf8())));
         return;
     }
