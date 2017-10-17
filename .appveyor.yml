@@ -94,3 +94,6 @@ deploy:
   force_update: true
   on:
     appveyor_repo_tag: true
+
+# official validator for ".appveyor.yml" config file: https://ci.appveyor.com/tools/validate-yaml
+# appveyor config documentation: https://www.appveyor.com/docs/build-configuration/
