@@ -34,7 +34,11 @@ We offer downloads for all full releases (recommended) and the latest developmen
 [Chat](https://gitter.im/Cockatrice/Cockatrice) with the Cockatrice developers on Gitter. Come here to talk about the application, features, or just to hang out. For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
 
 If you'd like to contribute code to the project, please review [the guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md).
-We maintain a tag for "easy" changes on our issue tracker: issues tagged in this way provide a simple way to get started. [Issues tagged as Easy Changes](https://github.com/Cockatrice/Cockatrice/issues?q=is%3Aopen+is%3Aissue+label%3A%22Easy+Change%22)
+We maintain two tags for contributors to find issues to work on:
+- [Good first issue](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Good%20first%20issue%22%20): issues tagged in this way provide a simple way to get started. They don't require much experience to be worked on.
+- [Help wanted](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Help%20Wanted%22%20): This tag is used for issues that we are looking for a contributor to work on. Often this is for feature suggestions we are willing to accept, but don't have the time to work on ourselves.
+
+For both tags, we're willing to provide help to contributors in showing them where and how they can make changes, as well as code review for changes they submit.
 
 Check our long-term project **roadmap** with some visions [here](https://docs.google.com/document/d/1Ewe5uSaRE2nR2pNPMaGmP6gVZdqgFbBgwSscGqIr4W0/edit).
 
