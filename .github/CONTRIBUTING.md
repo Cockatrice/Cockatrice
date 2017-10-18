@@ -1,6 +1,8 @@
-[Style Guide](#style-guide) | [Translations](#translations) | [Release Management](#release-management)
+&nbsp; [Style Guide](#style-guide) | [Translations](#translations) | [Release Management](#release-management)
 
 ----
+
+<br>
 
 # Style Guide #
 
@@ -231,6 +233,7 @@ Please have a look at the specific [FAQ for translators](https://github.com/Cock
  - [Write a `Release Draft`](https://github.com/Cockatrice/Cockatrice/releases/new) on GitHub with all changes since the last main release
  - [Build newest strings](#step-2-updating-_ents-files) and upload them to transifex --> Give translators some time to update them
  - [Fetch newest translations](#step-5-fetch-new-translations-from-transifex) from transifex and create a PR for them
+ <br>
  
  - **Final commit:** push a PR which adds the `Release Name` in the `About` window
  - Release on GitHub (aka remove the `Draft` label and append builds for all platforms)
@@ -239,6 +242,7 @@ Please have a look at the specific [FAQ for translators](https://github.com/Cock
   
  - Check if the download links on our official [website](https://cockatrice.github.io) are automatically updated
  - Announce the new release ([reddit](https://www.reddit.com/r/Cockatrice/), twitter...)
+ - Delete former `beta` releases from [GitHub Releases](https://github.com/Cockatrice/Cockatrice/releases)
  <br>
  
  - Create a new milestone & project for the next followup release
