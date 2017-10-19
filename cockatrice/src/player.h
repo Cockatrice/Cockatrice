@@ -57,6 +57,8 @@ class Event_RevealCards;
 class Event_ChangeZoneProperties;
 class PendingCommand;
 
+const int MAX_TOKENS_PER_DIALOG = 99;
+
 class PlayerArea : public QObject, public QGraphicsItem {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
@@ -127,6 +129,7 @@ public slots:
     void actViewTopCards();
     void actAlwaysRevealTopCard();
     void actViewGraveyard();
+    void actRevealRandomGraveyardCard();
     void actViewRfg();
     void actViewSideboard();
     
@@ -144,6 +147,7 @@ private slots:
     void actCreateRelatedCard();
     void actCreateAllRelatedCards();
     void cardMenuAction();
+    void actMoveCardXCardsFromTop();
     void actCardCounterTrigger();
     void actAttach();
     void actUnattach();
@@ -165,7 +169,7 @@ private slots:
 private:
     TabGame *game;
     QMenu *playerMenu, *handMenu, *moveHandMenu, *graveMenu, *moveGraveMenu, *rfgMenu, *moveRfgMenu, *libraryMenu, *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu,
-        *mRevealLibrary, *mRevealTopCard, *mRevealHand, *mRevealRandomHandCard;
+        *mRevealLibrary, *mRevealTopCard, *mRevealHand, *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
@@ -181,10 +185,11 @@ private:
     QAction *aPlay, *aPlayFacedown,
         *aHide,
         *aTap, *aUntap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
-        *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile;
+        *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile, *aMoveToXfromTopOfLibrary;
 
     bool shortcutsActive;
     int defaultNumberTopCards;
+    int defaultNumberTopCardsToPlaceBelow;
     QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
     bool lastTokenDestroy;
     int lastTokenTableRow;
@@ -212,7 +217,9 @@ private:
     
     void setCardAttrHelper(const GameEventContext &context, CardItem *card, CardAttribute attribute, const QString &avalue, bool allCards);
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
-    void createCard(const CardItem *sourceCard, const QString &dbCardName);
+    void createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false);
+    void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName);
+    bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
     QString dbNameFromTokenDisplayName(const QString &tokenName);
 
     QRectF bRect;
@@ -247,7 +254,8 @@ private:
 public:
     static const int counterAreaWidth = 55;
     enum CardMenuActionType { cmTap, cmUntap, cmDoesntUntap, cmFlip, cmPeek, cmClone, cmMoveToTopLibrary, cmMoveToBottomLibrary, cmMoveToHand, cmMoveToGraveyard, cmMoveToExile };
-    
+    enum CardsToReveal {RANDOM_CARD_FROM_ZONE = -2};
+
     enum { Type = typeOther };
     int type() const { return Type; }
     QRectF boundingRect() const;

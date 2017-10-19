@@ -283,7 +283,7 @@ void RemoteClient::readData()
 #ifdef QT_DEBUG
         qDebug() << "IN" << messageLength << QString::fromStdString(newServerMessage.ShortDebugString());
 #endif
-        qDebug() << inputBuffer.remove(0, messageLength);
+        inputBuffer.remove(0, messageLength);
         messageInProgress = false;
 
         processProtocolItem(newServerMessage);

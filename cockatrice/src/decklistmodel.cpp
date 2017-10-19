@@ -68,9 +68,6 @@ int DeckListModel::rowCount(const QModelIndex &parent) const
 
 int DeckListModel::columnCount(const QModelIndex &/*parent*/) const
 {
-    if (settingsCache->getPriceTagFeature())
-        return 3;
-    else
         return 2;
 }
 
@@ -97,7 +94,6 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                 switch (index.column()) {
                                         case 0: return node->recursiveCount(true);
                                         case 1: return node->getVisibleName();
-                                        case 2: return QString().sprintf("$%.2f", node->recursivePrice(true));
                     default: return QVariant();
                 }
             case Qt::BackgroundRole: {
@@ -116,7 +112,6 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                 switch (index.column()) {
                                         case 0: return card->getNumber();
                                         case 1: return card->getName();
-                                        case 2: return QString().sprintf("$%.2f", card->getTotalPrice());
                     default: return QVariant();
                 }
             }
@@ -141,7 +136,6 @@ QVariant DeckListModel::headerData(int section, Qt::Orientation orientation, int
     switch (section) {
                 case 0: return tr("Number");
                 case 1: return tr("Card");
-                case 2: return tr("Price");
         default: return QVariant();
     }
 }
@@ -195,7 +189,6 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, int
     switch (index.column()) {
                 case 0: node->setNumber(value.toInt()); break;
                 case 1: node->setName(value.toString()); break;
-                case 2: node->setPrice(value.toFloat()); break;
         default: return false;
     }
     emitRecursiveUpdates(index);
@@ -347,9 +340,6 @@ void DeckListModel::sort(int column, Qt::SortOrder order)
     case 1:
         sortMethod = ByName;
         break;
-    case 2:
-        sortMethod = ByPrice;
-        break;
     default:
         sortMethod = ByName;
     }
@@ -374,7 +364,7 @@ void DeckListModel::setDeckList(DeckLoader *_deck)
 
 void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
 {
-    const int totalColumns = settingsCache->getPriceTagFeature() ? 3 : 2;
+    const int totalColumns = 2;
 
     if (node->height() == 1) {
         QTextBlockFormat blockFormat;
@@ -382,10 +372,6 @@ void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *no
         charFormat.setFontPointSize(11);
         charFormat.setFontWeight(QFont::Bold);
         cursor->insertBlock(blockFormat, charFormat);
-        QString priceStr;
-        if (settingsCache->getPriceTagFeature())
-            priceStr = QString().sprintf(": $%.2f", node->recursivePrice(true));
-                cursor->insertText(QString("%1: %2").arg(node->getVisibleName()).arg(node->recursiveCount(true)).append(priceStr));
 
         QTextTableFormat tableFormat;
         tableFormat.setCellPadding(0);
@@ -408,12 +394,6 @@ void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *no
             cellCursor = cell.firstCursorPosition();
             cellCursor.insertText(card->getName());
 
-            if (settingsCache->getPriceTagFeature()) {
-                            cell = table->cellAt(i, 2);
-                            cell.setFormat(cellCharFormat);
-                            cellCursor = cell.firstCursorPosition();
-                            cellCursor.insertText(QString().sprintf("$%.2f ", card->getTotalPrice()));
-            }
         }
     } else if (node->height() == 2) {
         QTextBlockFormat blockFormat;
@@ -422,10 +402,6 @@ void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *no
         charFormat.setFontWeight(QFont::Bold);
 
         cursor->insertBlock(blockFormat, charFormat);
-        QString priceStr;
-        if (settingsCache->getPriceTagFeature())
-            priceStr = QString().sprintf(": $%.2f", node->recursivePrice(true));
-                cursor->insertText(QString("%1: %2").arg(node->getVisibleName()).arg(node->recursiveCount(true)).append(priceStr));
 
         QTextTableFormat tableFormat;
         tableFormat.setCellPadding(10);
@@ -477,9 +453,4 @@ void DeckListModel::printDeckList(QPrinter *printer)
     }
 
     doc.print(printer);
-}
-
-void DeckListModel::pricesUpdated()
-{
-    emit layoutChanged();
 }

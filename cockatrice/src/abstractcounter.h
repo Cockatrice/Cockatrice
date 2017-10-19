@@ -15,7 +15,7 @@ protected:
     int id;
     QString name;
     int value;
-    bool hovered;
+    bool useNameForShortcut, hovered;
     
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
@@ -30,7 +30,7 @@ private slots:
     void incrementCounter();
     void setCounter();
 public:
-    AbstractCounter(Player *_player, int _id, const QString &_name, bool _shownInCounterArea, int _value, QGraphicsItem *parent = 0);
+    AbstractCounter(Player *_player, int _id, const QString &_name, bool _shownInCounterArea, int _value, bool _useNameForShortcut = false, QGraphicsItem *parent = 0);
     ~AbstractCounter();
     
     QMenu *getMenu() const { return menu; }
@@ -42,7 +42,7 @@ public:
     int getValue() const { return value; }
     void setValue(int _value);
     void delCounter();
-    
+
     void setShortcutsActive();
     void setShortcutsInactive();
     bool shortcutActive;

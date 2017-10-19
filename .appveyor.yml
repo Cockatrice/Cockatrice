@@ -1,0 +1,96 @@
+version: 2.3.18-branch-{branch}-build-{build}
+
+# Skipping commits affecting specific files (GitHub only). More details here: https://www.appveyor.com/docs/appveyor-yml
+skip_commits:
+  files:
+    - .github/*
+    - .travis/*
+    - .tx/*
+    - webclient/*
+    - .*ignore
+    - .codacy.yml
+    - .gitlab-ci.yml
+    - .travis.yml
+    - '*.md'
+    - Dockerfile
+    - LICENSE
+    
+image: Visual Studio 2015
+
+cache:
+    - c:\protobuf-release
+    - c:\zlib-release
+    
+environment:
+    matrix:
+        - qt_ver: 5.9\msvc2015_64
+          protobuf_ver: 3.4.1
+          zlib_ver: 1.2.11
+          cmake_generator: Visual Studio 14 2015 Win64
+          cmake_toolset: v140,host=x64
+          target_arch: x86_64
+        - qt_ver: 5.6\msvc2015 # last version compatible with Windows XP, Vista
+          protobuf_ver: 3.4.1
+          zlib_ver: 1.2.11
+          cmake_generator: Visual Studio 14 2015
+          cmake_toolset: v140_xp # use the windows XP compatible toolset
+          target_arch: x86
+          
+install:
+    - ps: |
+        if (Test-Path c:\protobuf-release) {
+            echo "using protobuf from cache"
+        } else {
+            Invoke-WebRequest "https://github.com/google/protobuf/releases/download/v$env:protobuf_ver/protobuf-cpp-$env:protobuf_ver.zip" -OutFile c:\protobuf-cpp-$env:protobuf_ver.zip
+            Expand-Archive -Path c:\protobuf-cpp-$env:protobuf_ver.zip -DestinationPath c:\
+            Set-Location -Path C:\protobuf-$env:protobuf_ver\cmake
+            cmake . -G "$env:cmake_generator" -T "$env:cmake_toolset" -Dprotobuf_BUILD_TESTS=0 -Dprotobuf_MSVC_STATIC_RUNTIME=0 -DCMAKE_INSTALL_PREFIX=c:/protobuf-release
+            msbuild INSTALL.vcxproj /p:Configuration=Release
+        }
+        if (Test-Path c:\zlib-release) {
+            echo "using zlib from cache"
+        } else {
+            Invoke-WebRequest "https://github.com/madler/zlib/archive/v$env:zlib_ver.zip" -OutFile c:\zlib-$env:zlib_ver.zip
+            Expand-Archive -Path c:\zlib-$env:zlib_ver.zip -DestinationPath c:\
+            Set-Location -Path C:\zlib-$env:zlib_ver
+            cmake . -G "$env:cmake_generator" -T "$env:cmake_toolset" -DCMAKE_INSTALL_PREFIX=c:/zlib-release
+            msbuild INSTALL.vcxproj /p:Configuration=Release
+        }
+        
+services:
+    - mysql
+    
+build_script:
+    - ps: |
+        New-Item -ItemType directory -Path $env:APPVEYOR_BUILD_FOLDER\build
+        Set-Location -Path $env:APPVEYOR_BUILD_FOLDER\build
+        $zlibdir = "c:\zlib-release"
+        $protodir = "c:\protobuf-release"
+        $protoc = "c:\protobuf-release\bin\protoc.exe"
+        $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
+        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir;$zlibdir" "-DWITH_SERVER=1" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
+    - msbuild PACKAGE.vcxproj /p:Configuration=Release
+    - ps: |
+        $exe = dir -name *.exe
+        $new_name = $exe.Replace(".exe", "-${env:target_arch}_qt5.exe")
+        Push-AppveyorArtifact $exe -FileName $new_name
+        $cmake_name = $exe.Replace(".exe", "-${env:target_arch}_qt5.cmake.txt")
+        Push-AppveyorArtifact CMakeCache.txt -FileName $cmake_name
+        $json = New-Object PSObject
+        (New-Object PSObject | Add-Member -PassThru NoteProperty bin $new_name | Add-Member -PassThru NoteProperty cmake $cmake_name | Add-Member -PassThru NoteProperty commit $env:APPVEYOR_REPO_COMMIT) | ConvertTo-JSON | Out-File -FilePath "latest-$env:target_arch" -Encoding ASCII
+        Push-AppveyorArtifact "latest-$env:target_arch"
+        $version = $matches['content']
+        
+test: off
+
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: p+7wPVry2XEa6TBm9XH8IaQZbBmXQ/J2ldbGmcIxUZD3NkkPrSRRlmE7Of1CBBIO
+  description: "Dev build of Cockatrice"
+  artifact: /.*\.exe/
+  draft: false
+  prerelease: true
+  force_update: true
+  on:
+    appveyor_repo_tag: true

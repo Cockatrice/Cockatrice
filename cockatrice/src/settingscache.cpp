@@ -10,12 +10,10 @@
 
 QString SettingsCache::getDataPath()
 {
-    return 
-#ifdef PORTABLE_BUILD
-    qApp->applicationDirPath() + "/data/";
-#else
-    QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-#endif
+    if(isPortableBuild)
+        return qApp->applicationDirPath() + "/data/";
+    else
+        return QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 }
 
 QString SettingsCache::getSettingsPath()
@@ -25,9 +23,8 @@ QString SettingsCache::getSettingsPath()
 
 void SettingsCache::translateLegacySettings()
 {
-#ifdef PORTABLE_BUILD
-    return;
-#endif
+    if(isPortableBuild)
+        return;
 
     //Layouts
     QFile layoutFile(getSettingsPath()+"layouts/deckLayout.ini");
@@ -148,6 +145,11 @@ QString SettingsCache::getSafeConfigFilePath(QString configEntry, QString defaul
 }
 SettingsCache::SettingsCache()
 {
+    // first, figure out if we are running in portable mode
+    isPortableBuild = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
+    if(isPortableBuild)
+        qDebug() << "Portable mode enabled";
+
     // define a dummy context that will be used where needed
     QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
 
@@ -208,6 +210,7 @@ SettingsCache::SettingsCache()
     picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
+    tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
@@ -234,9 +237,6 @@ SettingsCache::SettingsCache()
     soundThemeName = settings->value("sound/theme").toString();
 
     maxFontSize = settings->value("game/maxfontsize", DEFAULT_FONT_SIZE).toInt();
-
-    priceTagFeature = settings->value("deckeditor/pricetags", false).toBool();
-    priceTagSource = settings->value("deckeditor/pricetagsource", 0).toInt();
 
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
     ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
@@ -513,19 +513,6 @@ void SettingsCache::setSoundThemeName(const QString &_soundThemeName)
     emit soundThemeChanged();
 }
 
-void SettingsCache::setPriceTagFeature(int _priceTagFeature)
-{
-    priceTagFeature = _priceTagFeature;
-    settings->setValue("deckeditor/pricetags", priceTagFeature);
-    emit priceTagFeatureChanged(priceTagFeature);
-}
-
-void SettingsCache::setPriceTagSource(int _priceTagSource)
-{
-    priceTagSource = _priceTagSource;
-    settings->setValue("deckeditor/pricetagsource", priceTagSource);
-}
-
 void SettingsCache::setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers)
 {
     ignoreUnregisteredUsers = _ignoreUnregisteredUsers;
@@ -542,6 +529,12 @@ void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)
 {
     mainWindowGeometry = _mainWindowGeometry;
     settings->setValue("interface/main_window_geometry", mainWindowGeometry);
+}
+
+void SettingsCache::setTokenDialogGeometry(const QByteArray &_tokenDialogGeometry)
+{
+    tokenDialogGeometry = _tokenDialogGeometry;
+    settings->setValue("interface/token_dialog_geometry", tokenDialogGeometry);
 }
 
 void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)

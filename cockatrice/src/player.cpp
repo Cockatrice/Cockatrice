@@ -95,6 +95,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
       game(_parent),
       shortcutsActive(false),
       defaultNumberTopCards(1),
+      defaultNumberTopCardsToPlaceBelow(1),
       lastTokenDestroy(true),
       lastTokenTableRow(0),
       id(_id),
@@ -108,6 +109,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 {
     userInfo = new ServerInfo_User;
     userInfo->CopyFrom(info);
+
+
 
     connect(settingsCache, SIGNAL(horizontalHandChanged()), this, SLOT(rearrangeZones()));
     connect(settingsCache, SIGNAL(handJustificationChanged()), this, SLOT(rearrangeZones()));
@@ -287,6 +290,15 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 
     graveMenu = playerMenu->addMenu(QString());
     graveMenu->addAction(aViewGraveyard);
+
+    if (local) {
+        mRevealRandomGraveyardCard = graveMenu->addMenu(QString());
+        QAction *newAction = mRevealRandomGraveyardCard->addAction(QString());
+        newAction->setData(-1);
+        connect(newAction, SIGNAL(triggered()), this, SLOT(actRevealRandomGraveyardCard()));
+        allPlayersActions.append(newAction);
+        mRevealRandomGraveyardCard->addSeparator();
+    }
     grave->setMenu(graveMenu, aViewGraveyard);
 
     rfgMenu = playerMenu->addMenu(QString());
@@ -408,6 +420,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     aMoveToTopLibrary->setData(cmMoveToTopLibrary);
     aMoveToBottomLibrary = new QAction(this);
     aMoveToBottomLibrary->setData(cmMoveToBottomLibrary);
+    aMoveToXfromTopOfLibrary = new QAction(this);
     aMoveToGraveyard = new QAction(this);
     aMoveToHand = new QAction(this);
     aMoveToHand->setData(cmMoveToHand);
@@ -416,6 +429,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     aMoveToExile->setData(cmMoveToExile);
     connect(aMoveToTopLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     connect(aMoveToBottomLibrary, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    connect(aMoveToXfromTopOfLibrary, SIGNAL(triggered()), this, SLOT(actMoveCardXCardsFromTop()));
     connect(aMoveToHand, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     connect(aMoveToGraveyard, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     connect(aMoveToExile, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
@@ -533,7 +547,7 @@ void Player::playerListActionTriggered()
         cmd.set_zone_name("hand");
     else if (menu == mRevealRandomHandCard) {
         cmd.set_zone_name("hand");
-        cmd.set_card_id(-2);
+        cmd.set_card_id(RANDOM_CARD_FROM_ZONE);
     } else
         return;
 
@@ -655,6 +669,7 @@ void Player::retranslateUi()
         handMenu->setTitle(tr("&Hand"));
         mRevealHand->setTitle(tr("&Reveal hand to..."));
         mRevealRandomHandCard->setTitle(tr("Reveal r&andom card to..."));
+        mRevealRandomGraveyardCard->setTitle(tr("Reveal random card to..."));
         sbMenu->setTitle(tr("&Sideboard"));
         libraryMenu->setTitle(tr("&Library"));
         countersMenu->setTitle(tr("&Counters"));
@@ -713,6 +728,7 @@ void Player::retranslateUi()
     }
 
     aMoveToTopLibrary->setText(tr("&Top of library"));
+    aMoveToXfromTopOfLibrary->setText(tr("X cards from the top of library..."));
     aMoveToBottomLibrary->setText(tr("&Bottom of library"));
     aMoveToHand->setText(tr("&Hand"));
     aMoveToGraveyard->setText(tr("&Graveyard"));
@@ -843,7 +859,7 @@ void Player::setDeck(const DeckLoader &_deck)
 
     createPredefinedTokenMenu->clear();
     predefinedTokens.clear();
-    InnerDecklistNode *tokenZone = dynamic_cast<InnerDecklistNode *>(deck->getRoot()->findChild("tokens"));
+    InnerDecklistNode *tokenZone = dynamic_cast<InnerDecklistNode *>(deck->getRoot()->findChild(DECK_ZONE_TOKENS));
 
     if (tokenZone)
         for (int i = 0; i < tokenZone->size(); ++i) {
@@ -890,6 +906,18 @@ void Player::actOpenDeckInDeckEditor()
 void Player::actViewGraveyard()
 {
     static_cast<GameScene *>(scene())->toggleZoneView(this, "grave", -1);
+}
+
+void Player::actRevealRandomGraveyardCard()
+{
+    Command_RevealCards cmd;
+    QAction *action = static_cast<QAction *>(sender());
+    const int otherPlayerId = action->data().toInt();
+    if (otherPlayerId != -1)
+        cmd.set_player_id(otherPlayerId);
+    cmd.set_zone_name("grave");
+    cmd.set_card_id(RANDOM_CARD_FROM_ZONE);
+    sendGameCommand(cmd);
 }
 
 void Player::actViewRfg()
@@ -1061,7 +1089,7 @@ void Player::actCreateToken()
     lastTokenAnnotation = dlg.getAnnotation();
     lastTokenDestroy = dlg.getDestroy();
     aCreateAnotherToken->setEnabled(true);
-
+    aCreateAnotherToken->setText(tr("C&reate another %1 token").arg(lastTokenName));
     actCreateAnotherToken();
 }
 
@@ -1100,17 +1128,21 @@ void Player::actCreateRelatedCard()
     CardItem * sourceCard = game->getActiveCard();
     if(!sourceCard)
         return;
-
     QAction *action = static_cast<QAction *>(sender());
-    const QString &actionDisplayName = action->text();
-    createCard(sourceCard, dbNameFromTokenDisplayName(actionDisplayName));
+    //If there is a better way of passing a CardRelation through a QAction, please add it here.
+    QList<CardRelation *> relatedCards = QList<CardRelation *>();
+    relatedCards.append(sourceCard->getInfo()->getRelatedCards());
+    relatedCards.append(sourceCard->getInfo()->getReverseRelatedCards2Me());
+    CardRelation * cardRelation = relatedCards.at(action->data().toInt());
 
    /*
-    * If we made a token via "Token: TokenName"
-    * then lets allow it to be created via create another
+    * If we make a token via "Token: TokenName"
+    * then let's allow it to be created via "create another token"
     */
-    CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(actionDisplayName));
-    setLastToken(cardInfo);
+    if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
+        CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(cardRelation->getName()));
+        setLastToken(cardInfo);
+    }
 }
 
 void Player::actCreateAllRelatedCards()
@@ -1119,27 +1151,111 @@ void Player::actCreateAllRelatedCards()
     if(!sourceCard)
         return;
 
-    QStringList relatedCards = * new QStringList();
+    QList<CardRelation *> relatedCards = QList<CardRelation *>();
     relatedCards.append(sourceCard->getInfo()->getRelatedCards());
     relatedCards.append(sourceCard->getInfo()->getReverseRelatedCards2Me());
 
-    foreach (const QString &tokenName, relatedCards)
-    {
-        createCard(sourceCard, dbNameFromTokenDisplayName(tokenName));
+    QList<CardRelation *> nonExcludedRelatedCards = QList<CardRelation *>();
+    QString dbName;
+    CardRelation * cardRelation = nullptr;
+    int tokensTypesCreated = 0;
+
+    switch(relatedCards.length()) { //Is an if/elseif/else pattern better?
+        case 0: //if (relatedCards.length() == 0)
+            return;
+        case 1: //else if (relatedCards.length() == 1)
+            cardRelation = relatedCards.at(0);
+            if (createRelatedFromRelation(sourceCard, cardRelation))
+                tokensTypesCreated++;
+            break;
+        default: //else
+            foreach (CardRelation * cardRelationTemp, relatedCards) {
+                if(!cardRelationTemp->getIsCreateAllExclusion() && !cardRelationTemp->getDoesAttach()) {
+                    nonExcludedRelatedCards.append(cardRelationTemp);
+                }
+            }
+            switch(nonExcludedRelatedCards.length()) {
+                case 1: //if nonExcludedRelatedCards == 1
+                    cardRelation = nonExcludedRelatedCards.at(0);
+                    if (createRelatedFromRelation(sourceCard, cardRelation))
+                        tokensTypesCreated++;
+                    break;
+                //If all are marked "Exclude", then treat the situation as if none of them are.
+                //We won't accept "garbage in, garbage out", here.
+                case 0: //else if nonExcludedRelatedCards == 0
+                    foreach (CardRelation * cardRelationAll, relatedCards) {
+                        if (!cardRelationAll->getDoesAttach() && !cardRelationAll->getIsVariable()) {
+                            dbName = dbNameFromTokenDisplayName(cardRelationAll->getName());
+                            for (int i = 0; i < cardRelationAll->getDefaultCount(); i++) {
+                                createCard(sourceCard, dbName);
+                            }
+                            tokensTypesCreated++;
+                            if(tokensTypesCreated == 1) {
+                                cardRelation = cardRelationAll;
+                            }
+                        }
+                    }
+                    break;
+                default: //else
+                    foreach (CardRelation * cardRelationNotExcluded, nonExcludedRelatedCards) {
+                        if (!cardRelationNotExcluded->getDoesAttach() && !cardRelationNotExcluded->getIsVariable()) {
+                            dbName = dbNameFromTokenDisplayName(cardRelationNotExcluded->getName());
+                            for (int i = 0; i < cardRelationNotExcluded->getDefaultCount(); i++) {
+                                createCard(sourceCard, dbName);
+                            }
+                            tokensTypesCreated++;
+                            if(tokensTypesCreated == 1) {
+                                cardRelation = cardRelationNotExcluded;
+                            }
+                        }
+                    }
+                    break;
+            }
+            break;
     }
 
     /*
-     * If we made a token via "Token: TokenName"
-     * then lets allow it to be created via create another
+     * If we made at least one token via "Create All Tokens"
+     * then assign the first to the "Create another" shortcut.
      */
-    if (relatedCards.length() == 1)
+    if (cardRelation != nullptr && cardRelation->getCanCreateAnother())
     {
-        CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(relatedCards.at(0)));
+        CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(cardRelation->getName()));
         setLastToken(cardInfo);
     }
 }
 
-void Player::createCard(const CardItem *sourceCard, const QString &dbCardName) {
+bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation)
+{
+    if (sourceCard == nullptr || cardRelation == nullptr)
+        return false;
+    QString dbName = dbNameFromTokenDisplayName(cardRelation->getName());
+    if(cardRelation->getIsVariable()) {
+        bool ok;
+        dialogSemaphore = true;
+        int count = QInputDialog::getInt(0, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1, MAX_TOKENS_PER_DIALOG, 1, &ok);
+        dialogSemaphore = false;
+        if (!ok)
+            return false;
+        for (int i = 0; i < count; i++) {
+            createCard(sourceCard, dbName);
+        }
+    } else if (cardRelation->getDefaultCount() > 1) {
+        for (int i = 0; i < cardRelation->getDefaultCount(); i++) {
+            createCard(sourceCard, dbName);
+        }
+    } else {
+        if (cardRelation->getDoesAttach()) {
+            createAttachedCard(sourceCard, dbName);
+        } else {
+            createCard(sourceCard, dbName);
+        }
+    }
+    return true;
+}
+
+void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach)
+{
     CardInfo *cardInfo = db->getCard(dbCardName);
 
     if (cardInfo == nullptr || sourceCard == nullptr)
@@ -1153,7 +1269,10 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName) {
     Command_CreateToken cmd;
     cmd.set_zone("table");
     cmd.set_card_name(cardInfo->getName().toStdString());
-    cmd.set_color(cardInfo->getColors().isEmpty() ? QString().toStdString() : cardInfo->getColors().first().toLower().toStdString());
+    if(cardInfo->getColors().length() > 1) //Multicoloured
+        cmd.set_color("m");
+    else
+        cmd.set_color(cardInfo->getColors().isEmpty() ? QString().toStdString() : cardInfo->getColors().first().toLower().toStdString());
     cmd.set_pt(cardInfo->getPowTough().toStdString());
     cmd.set_annotation(settingsCache->getAnnotateTokens() ? cardInfo->getText().toStdString() : QString().toStdString());
     cmd.set_destroy_on_zone_change(true);
@@ -1161,10 +1280,15 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName) {
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
 
-    if(!cardInfo->getIsToken())
+    if(attach)
         cmd.set_target_card_id(sourceCard->getId());
 
     sendGameCommand(cmd);
+}
+
+void Player::createAttachedCard(const CardItem *sourceCard, const QString &dbCardName)
+{
+    createCard(sourceCard, dbCardName, true);
 }
 
 void Player::actSayMessage()
@@ -1644,7 +1768,7 @@ void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &ev
         case GameEvent::REVEAL_CARDS: eventRevealCards(event.GetExtension(Event_RevealCards::ext)); break;
         case GameEvent::CHANGE_ZONE_PROPERTIES: eventChangeZoneProperties(event.GetExtension(Event_ChangeZoneProperties::ext)); break;
         default: {
-            qDebug() << "unhandled game event";
+            qDebug() << "unhandled game event" << type;
         }
     }
 }
@@ -1802,7 +1926,7 @@ AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor c
     if (name == "life")
         c = playerTarget->addCounter(counterId, name, value);
     else
-        c = new GeneralCounter(this, counterId, name, color, radius, value, this);
+        c = new GeneralCounter(this, counterId, name, color, radius, value, true, this);
     counters.insert(counterId, c);
     if (countersMenu)
         countersMenu->addMenu(c->getMenu());
@@ -1950,6 +2074,49 @@ bool Player::clearCardsToDelete()
     return true;
 }
 
+void Player::actMoveCardXCardsFromTop()
+{
+    bool ok;
+    int number = QInputDialog::getInt(0, tr("Place card X cards from top of library"), tr("How many cards from the top of the deck should this card be placed:"), defaultNumberTopCardsToPlaceBelow, 1, 2000000000, 1, &ok);
+    number--;
+
+    if (!ok)
+        return;
+
+    defaultNumberTopCardsToPlaceBelow = number;
+
+    QList<QGraphicsItem *> sel = scene()->selectedItems();
+    QList<CardItem *> cardList;
+    while (!sel.isEmpty())
+        cardList.append(qgraphicsitem_cast<CardItem *>(sel.takeFirst()));
+
+    QList< const ::google::protobuf::Message * > commandList;
+    ListOfCardsToMove idList;
+    for (int i = 0; i < cardList.size(); ++i)
+        idList.add_card()->set_card_id(cardList[i]->getId());
+
+    if (cardList.isEmpty())
+        return;
+
+    int startPlayerId = cardList[0]->getZone()->getPlayer()->getId();
+    QString startZone = cardList[0]->getZone()->getName();
+
+    Command_MoveCard *cmd = new Command_MoveCard;
+    cmd->set_start_player_id(startPlayerId);
+    cmd->set_start_zone(startZone.toStdString());
+    cmd->mutable_cards_to_move()->CopyFrom(idList);
+    cmd->set_target_player_id(getId());
+    cmd->set_target_zone("deck");
+    cmd->set_x(number);
+    cmd->set_y(0);
+    commandList.append(cmd);
+
+    if (local)
+        sendGameCommand(prepareGameCommand(commandList));
+    else
+        game->sendGameCommand(prepareGameCommand(commandList));
+}
+
 void Player::cardMenuAction()
 {
     QAction *a = static_cast<QAction *>(sender());
@@ -2010,7 +2177,7 @@ void Player::cardMenuAction()
                 }
                 case cmClone: {
                     Command_CreateToken *cmd = new Command_CreateToken;
-                    cmd->set_zone(card->getZone()->getName().toStdString());
+                    cmd->set_zone("table");
                     cmd->set_card_name(card->getName().toStdString());
                     cmd->set_color(card->getColor().toStdString());
                     cmd->set_pt(card->getPT().toStdString());
@@ -2358,8 +2525,11 @@ void Player::refreshShortcuts()
 
 void Player::updateCardMenu(const CardItem *card)
 {
-    if (card == nullptr)
+    // If bad card OR is a spectator (as spectators don't need card menus), return
+    if (card == nullptr || game->isSpectator())
+    {
         return;
+    }
 
     QMenu *cardMenu = card->getCardMenu();
     QMenu *ptMenu = card->getPTMenu();
@@ -2369,21 +2539,28 @@ void Player::updateCardMenu(const CardItem *card)
 
     bool revealedCard = false;
     bool writeableCard = getLocal();
-    if (card->getZone() && card->getZone()->getIsView()) {
+    if (card->getZone() && card->getZone()->getIsView())
+    {
         ZoneViewZone *view = static_cast<ZoneViewZone *>(card->getZone());
-        if (view->getRevealZone()) {
+        if (view->getRevealZone())
+        {
             if (view->getWriteableRevealZone())
+            {
                 writeableCard = true;
+            }
             else
+            {
                 revealedCard = true;
+            }
         }
     }
 
-    if (revealedCard)
+    if (revealedCard) {
         cardMenu->addAction(aHide);
-    else if (writeableCard) {
+    } else if (writeableCard) {
         if (moveMenu->isEmpty()) {
             moveMenu->addAction(aMoveToTopLibrary);
+            moveMenu->addAction(aMoveToXfromTopOfLibrary);
             moveMenu->addAction(aMoveToBottomLibrary);
             moveMenu->addSeparator();
             moveMenu->addAction(aMoveToHand);
@@ -2412,15 +2589,17 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addAction(aUntap);
                 cardMenu->addAction(aDoesntUntap);
                 cardMenu->addAction(aFlip);
-                if (card->getFaceDown())
+                if (card->getFaceDown()) {
                     cardMenu->addAction(aPeek);
+                }
 
                 addRelatedCardActions(card, cardMenu);
 
                 cardMenu->addSeparator();
                 cardMenu->addAction(aAttach);
-                if (card->getAttachedTo())
+                if (card->getAttachedTo()) {
                     cardMenu->addAction(aUnattach);
+                }
                 cardMenu->addAction(aDrawArrow);
                 cardMenu->addSeparator();
                 cardMenu->addMenu(ptMenu);
@@ -2432,22 +2611,41 @@ void Player::updateCardMenu(const CardItem *card)
                 for (int i = 0; i < aAddCounter.size(); ++i) {
                     cardMenu->addSeparator();
                     cardMenu->addAction(aAddCounter[i]);
-                    cardMenu->addAction(aRemoveCounter[i]);
+                    if (card->getCounters().contains(i)) {
+                        cardMenu->addAction(aRemoveCounter[i]);
+                    }
                     cardMenu->addAction(aSetCounter[i]);
                 }
                 cardMenu->addSeparator();
             } else if (card->getZone()->getName() == "stack") {
                 cardMenu->addAction(aDrawArrow);
+                cardMenu->addSeparator();
+                cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
 
                 addRelatedCardActions(card, cardMenu);
-            } else {
+            } else if (card->getZone()->getName() == "rfg" || card->getZone()->getName() == "grave") {
+				cardMenu->addAction(aPlay);
+				cardMenu->addAction(aPlayFacedown);
+				cardMenu->addSeparator();
+				cardMenu->addAction(aClone);
+				cardMenu->addMenu(moveMenu);
+			} else {
                 cardMenu->addAction(aPlay);
                 cardMenu->addAction(aPlayFacedown);
                 cardMenu->addMenu(moveMenu);
             }
-        } else
+        } else {
             cardMenu->addMenu(moveMenu);
+        }
+    } else {
+        if (card->getZone() && card->getZone()->getName() != "hand") {
+            cardMenu->addAction(aDrawArrow);
+            cardMenu->addSeparator();
+            addRelatedCardActions(card, cardMenu);
+            cardMenu->addSeparator();
+            cardMenu->addAction(aClone);
+        }
     }
 }
 
@@ -2455,7 +2653,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu) {
     if (card == nullptr || cardMenu == nullptr || card->getInfo() == nullptr)
         return;
 
-    QStringList relatedCards = *new QStringList();
+    QList<CardRelation *> relatedCards = QList<CardRelation *>();
     relatedCards.append(card->getInfo()->getRelatedCards());
     relatedCards.append(card->getInfo()->getReverseRelatedCards2Me());
 
@@ -2464,7 +2662,11 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu) {
             break;
         case 1: {
             cardMenu->addSeparator();
-            QAction *createRelatedCards = new QAction(tr("Token: ") + relatedCards.at(0), this);
+            QAction *createRelatedCards;
+            if (relatedCards.at(0)->getDoesAttach()) {
+                createRelatedCards = new QAction(tr("Token: ") + tr("Attach to ") + relatedCards.at(0)->getName(), this);
+            } else
+                createRelatedCards = new QAction(tr("Token: ") + (relatedCards.at(0)->getIsVariable() ? "X " : QString(relatedCards.at(0)->getDefaultCount() == 1 ? QString() : QString::number(relatedCards.at(0)->getDefaultCount()) + " ")) + relatedCards.at(0)->getName(), this);
             connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
             if (shortcutsActive) {
                 createRelatedCards->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
@@ -2474,11 +2676,19 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu) {
         }
         default: {
             cardMenu->addSeparator();
-            foreach (QString cardName, relatedCards)
+            int i = 0;
+            foreach (CardRelation * cardRelation, relatedCards)
             {
-                QAction *createRelated = new QAction(tr("Token: ") + cardName, this);
+                QString cardName = cardRelation->getName();
+                QAction *createRelated;
+                if (cardRelation->getDoesAttach())
+                    createRelated = new QAction(tr("Token: ") + tr("Attach to ") + cardName, this);
+                else
+                    createRelated = new QAction(tr("Token: ") + (cardRelation->getIsVariable() ? "X " : QString(cardRelation->getDefaultCount() == 1 ? QString() : QString::number(cardRelation->getDefaultCount()) + " ")) + cardName, this);
+                createRelated->setData(QVariant(i));
                 connect(createRelated, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
                 cardMenu->addAction(createRelated);
+                i++;
             }
             QAction *createRelatedCards = new QAction(tr("All tokens"), this);
             connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
@@ -2556,7 +2766,7 @@ void Player::processSceneSizeChange(int newPlayerWidth)
 
 void Player::setLastToken(CardInfo *cardInfo)
 {
-    if (cardInfo == nullptr)
+    if (cardInfo == nullptr || aCreateAnotherToken == nullptr)
         return;
 
     lastTokenName = cardInfo->getName();
@@ -2565,5 +2775,6 @@ void Player::setLastToken(CardInfo *cardInfo)
     lastTokenAnnotation = settingsCache->getAnnotateTokens() ? cardInfo->getText() : "";
     lastTokenTableRow = table->clampValidTableRow(2 - cardInfo->getTableRow());
     lastTokenDestroy = true;
+    aCreateAnotherToken->setText(tr("C&reate another %1 token").arg(lastTokenName));
     aCreateAnotherToken->setEnabled(true);
 }

@@ -97,8 +97,7 @@ SET(cockatrice_SOURCES
     src/thememanager.cpp 
     src/localserver.cpp 
     src/localserverinterface.cpp 
-    src/localclient.cpp 
-    src/priceupdater.cpp 
+    src/localclient.cpp
     src/qt-json/json.cpp
     src/soundengine.cpp
     src/pending_command.cpp
@@ -222,11 +221,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build cockatrice binary and link it
 ADD_EXECUTABLE(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS})
 
-if(MSVC)
-    TARGET_LINK_LIBRARIES(cockatrice cockatrice_common Qt5::WinMain)
-else()
-    TARGET_LINK_LIBRARIES(cockatrice cockatrice_common)
-endif()
+TARGET_LINK_LIBRARIES(cockatrice cockatrice_common)
 qt5_use_modules(cockatrice ${COCKATRICE_LIBS})
 
 if(UNIX)
@@ -308,9 +303,4 @@ Data = Resources\")
     if(WIN32SSLRUNTIME_FOUND)
         install(FILES ${WIN32SSLRUNTIME_LIBRARIES} DESTINATION ./)
     endif()
-endif()
-#Compile a portable version, default off
-option(PORTABLE "portable build" OFF)
-IF(PORTABLE)
-add_definitions(-DPORTABLE_BUILD)
 endif()

@@ -31,7 +31,6 @@
 #include "dlg_load_deck_from_clipboard.h"
 #include "main.h"
 #include "settingscache.h"
-#include "priceupdater.h"
 #include "tab_supervisor.h"
 #include "deckstats_interface.h"
 #include "tappedout_interface.h"
@@ -306,6 +305,9 @@ void TabDeckEditor::createCentralFrame()
 {
     searchEdit = new SearchLineEdit;
     searchEdit->setObjectName("searchEdit");
+#if QT_VERSION >= 0x050200
+    searchEdit->setClearButtonEnabled(true);
+#endif
 #if QT_VERSION >= 0x050300
     searchEdit->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
 #endif
@@ -324,7 +326,7 @@ void TabDeckEditor::createCentralFrame()
     connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));    
 
-    databaseModel = new CardDatabaseModel(db, this);
+    databaseModel = new CardDatabaseModel(db, true, this);
     databaseModel->setObjectName("databaseModel");
     databaseDisplayModel = new CardDatabaseDisplayModel(this);
     databaseDisplayModel->setSourceModel(databaseModel);
@@ -343,11 +345,13 @@ void TabDeckEditor::createCentralFrame()
     connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
 
     QByteArray dbHeaderState = settingsCache->layouts().getDeckEditorDbHeaderState();
-    if(dbHeaderState.isNull())
+    if (dbHeaderState.isNull())
     {
         // first run
         databaseView->setColumnWidth(0, 200);
-    } else {
+    }
+    else
+    {
         databaseView->header()->restoreState(dbHeaderState);
     }
     connect(databaseView->header(), SIGNAL(geometriesChanged()), this, SLOT(saveDbHeaderState()));
@@ -533,9 +537,6 @@ void TabDeckEditor::retranslateUi()
     nameLabel->setText(tr("Deck &name:"));
     commentsLabel->setText(tr("&Comments:"));
     hashLabel1->setText(tr("Hash:"));
-    
-    //aUpdatePrices->setText(tr("&Update prices"));
-    //aUpdatePrices->setShortcut(QKeySequence("Ctrl+U"));
 
     aNewDeck->setText(tr("&New deck"));
     aLoadDeck->setText(tr("&Load deck..."));
@@ -719,7 +720,7 @@ bool TabDeckEditor::actSaveDeckAs()
     dialog.setConfirmOverwrite(true);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::fileNameFilters);
-    dialog.selectFile(deckModel->getDeckList()->getName());
+    dialog.selectFile(deckModel->getDeckList()->getName().trimmed());
     if (!dialog.exec())
         return false;
 
@@ -818,7 +819,7 @@ void TabDeckEditor::addCardHelper(QString zoneName)
     if(!info)
         return;
     if (info->getIsToken())
-        zoneName = "tokens";
+        zoneName = DECK_ZONE_TOKENS;
 
     QModelIndex newCardIndex = deckModel->addCard(info->getName(), zoneName);
     recursiveExpand(newCardIndex);
@@ -840,7 +841,7 @@ void TabDeckEditor::actSwapCard()
     const QString zoneName = gparent.sibling(gparent.row(), 1).data().toString();
     actDecrement();
 
-    const QString otherZoneName = zoneName == "Maindeck" ? "side" : "main";
+    const QString otherZoneName = zoneName == "Maindeck" ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
     QModelIndex newCardIndex = deckModel->addCard(cardName, otherZoneName);
     recursiveExpand(newCardIndex);
@@ -853,12 +854,12 @@ void TabDeckEditor::actAddCard()
     if(QApplication::keyboardModifiers() & Qt::ControlModifier)
         actAddCardToSideboard();
     else
-        addCardHelper("main");
+        addCardHelper(DECK_ZONE_MAIN);
 }
 
 void TabDeckEditor::actAddCardToSideboard()
 {
-    addCardHelper("side");
+    addCardHelper(DECK_ZONE_SIDE);
 }
 
 void TabDeckEditor::actRemoveCard()
@@ -895,7 +896,7 @@ void TabDeckEditor::decrementCardHelper(QString zoneName)
     if(!info)
         return;
     if (info->getIsToken())
-        zoneName = "tokens";
+        zoneName = DECK_ZONE_TOKENS;
 
     idx = deckModel->findCard(info->getName(), zoneName);
     offsetCountAtIndex(idx, -1);
@@ -903,12 +904,12 @@ void TabDeckEditor::decrementCardHelper(QString zoneName)
 
 void TabDeckEditor::actDecrementCard()
 {
-    decrementCardHelper("main");
+    decrementCardHelper(DECK_ZONE_MAIN);
 }
 
 void TabDeckEditor::actDecrementCardFromSideboard()
 {
-    decrementCardHelper("side");
+    decrementCardHelper(DECK_ZONE_SIDE);
 }
 
 void TabDeckEditor::actIncrement()
@@ -923,38 +924,6 @@ void TabDeckEditor::actDecrement()
     offsetCountAtIndex(currentIndex, -1);
 }
 
-void TabDeckEditor::setPriceTagFeatureEnabled(int /* enabled */)
-{
-    //aUpdatePrices->setVisible(enabled);
-    deckModel->pricesUpdated();
-}
-
-/*
-void TabDeckEditor::actUpdatePrices()
-{
-    aUpdatePrices->setDisabled(true);
-    AbstractPriceUpdater *up;
-
-    switch(settingsCache->getPriceTagSource())
-    {
-        case AbstractPriceUpdater::DBPriceSource:
-        default:
-            up = new DBPriceUpdater(deckModel->getDeckList());
-            break;
-    }
-     
-    connect(up, SIGNAL(finishedUpdate()), this, SLOT(finishedUpdatingPrices()));
-    up->updatePrices();
-}
-*/
-
-
-void TabDeckEditor::finishedUpdatingPrices()
-{
-    //deckModel->pricesUpdated();
-    //setModified(true);
-    //aUpdatePrices->setDisabled(false);
-}
 
 void TabDeckEditor::setDeck(DeckLoader *_deck)
 {
@@ -970,6 +939,10 @@ void TabDeckEditor::setDeck(DeckLoader *_deck)
     PictureLoader::cacheCardPixmaps(db->getCards(deckModel->getDeckList()->getCardList()));
     deckView->expandAll();
     setModified(false);
+
+    // If they load a deck, make the deck list appear
+    aDeckDockVisible->setChecked(true);
+    deckDock->setVisible(aDeckDockVisible->isChecked());
 }
 
 void TabDeckEditor::setModified(bool _modified)

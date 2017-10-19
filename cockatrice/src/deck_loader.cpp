@@ -190,9 +190,29 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out, const InnerDecklis
     {
         DecklistCardNode* card = cards[i];
 
-        if (zoneNode->getName() == "side")
+        if (zoneNode->getName() == DECK_ZONE_SIDE)
             out << "SB: ";
 
        out << card->getNumber() << " " << card->getName() << "\n";
     }
+}
+
+QString DeckLoader::getCardZoneFromName(QString cardName, QString currentZoneName)
+{
+    CardInfo *card = db->getCard(cardName);
+    if (card && card->getIsToken())
+        return DECK_ZONE_TOKENS;
+
+    return currentZoneName;
+}
+
+QString DeckLoader::getCompleteCardName(const QString cardName) const
+{
+    if (db) {
+        CardInfo *temp = db->getCardBySimpleName(cardName);
+        if (temp)
+            return temp->getName();
+    }
+
+    return cardName;
 }
