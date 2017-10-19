@@ -162,6 +162,8 @@ someone from the development team will take care of extracing all the new string
 adding them to the english translation files and making them available to
 translators on Transifex.
 
+Help on how to write source code with translations can be found [here](http://doc.qt.io/qt-5/i18n-source-translation.html).
+
 ### Translations (for maintainers) ###
 
 #### Step 2: updating *_en.ts files ####
