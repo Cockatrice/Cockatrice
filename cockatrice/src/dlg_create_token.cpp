@@ -75,7 +75,9 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     connect(chooseTokenFromAllRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromAll(bool)));
     chooseTokenFromDeckRadioButton = new QRadioButton(tr("Show tokens from this &deck"));
     connect(chooseTokenFromDeckRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromDeck(bool)));
-    QTreeView *chooseTokenView = new QTreeView;
+
+    QByteArray deckHeaderState = settingsCache->layouts().getDeckEditorDbHeaderState();
+    chooseTokenView = new QTreeView;
     chooseTokenView->setModel(cardDatabaseDisplayModel);
     chooseTokenView->setUniformRowHeights(true);
     chooseTokenView->setRootIsDecorated(false);
@@ -83,19 +85,25 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     chooseTokenView->setSortingEnabled(true);
     chooseTokenView->sortByColumn(0, Qt::AscendingOrder);
     chooseTokenView->resizeColumnToContents(0);
-    chooseTokenView->header()->setStretchLastSection(false);
-    chooseTokenView->header()->hideSection(1);
-    chooseTokenView->header()->hideSection(2);
     chooseTokenView->setWordWrap(true);
-    chooseTokenView->setColumnWidth(0, 130);
-    chooseTokenView->setColumnWidth(3, 178);
-    chooseTokenView->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
 
+    if (!deckHeaderState.isNull())
+        chooseTokenView->header()->restoreState(deckHeaderState);
+
+    chooseTokenView->header()->setStretchLastSection(false);
+    chooseTokenView->header()->hideSection(1); // Sets
+    chooseTokenView->header()->hideSection(2); // Mana Cost
+    chooseTokenView->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents); // Color(s)
     connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
+    connect(chooseTokenView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(actOk()));
     
     if (predefinedTokens.isEmpty())
+    {
         chooseTokenFromAllRadioButton->setChecked(true);
-    else {
+        chooseTokenFromDeckRadioButton->setDisabled(true); // No tokens in deck = no need for option
+    }
+    else
+    {
         chooseTokenFromDeckRadioButton->setChecked(true);
         cardDatabaseDisplayModel->setCardNameSet(QSet<QString>::fromList(predefinedTokens));
     }

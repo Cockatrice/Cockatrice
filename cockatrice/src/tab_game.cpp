@@ -593,6 +593,11 @@ void TabGame::adminLockChanged(bool lock)
     sayEdit->setVisible(v);
 }
 
+bool TabGame::isSpectator()
+{
+    return spectator;
+}
+
 void TabGame::actGameInfo()
 {
     DlgCreateGame dlg(gameInfo, roomGameTypes);
@@ -735,7 +740,7 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
                 case GameEvent::GAME_SAY: eventSpectatorSay(event.GetExtension(Event_GameSay::ext), playerId, context); break;
                 case GameEvent::LEAVE: eventSpectatorLeave(event.GetExtension(Event_Leave::ext), playerId, context); break;
                 default: {
-                    qDebug() << "unhandled spectator game event";
+                    qDebug() << "unhandled spectator game event" << eventType;
                     break;
                 }
             }

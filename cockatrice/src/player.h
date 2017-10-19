@@ -57,6 +57,8 @@ class Event_RevealCards;
 class Event_ChangeZoneProperties;
 class PendingCommand;
 
+const int MAX_TOKENS_PER_DIALOG = 99;
+
 class PlayerArea : public QObject, public QGraphicsItem {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
@@ -215,7 +217,9 @@ private:
     
     void setCardAttrHelper(const GameEventContext &context, CardItem *card, CardAttribute attribute, const QString &avalue, bool allCards);
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
-    void createCard(const CardItem *sourceCard, const QString &dbCardName);
+    void createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false);
+    void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName);
+    bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
     QString dbNameFromTokenDisplayName(const QString &tokenName);
 
     QRectF bRect;
