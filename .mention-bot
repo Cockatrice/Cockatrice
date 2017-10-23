@@ -1,0 +1,5 @@
+{
+  "message": "@pullRequester, thanks for contributing! @reviewers are the best people to review the changes.",
+  "fileBlacklist": ["*.md"],
+  "userBlacklist": ["@mbruker", "@Psithief"],
+}

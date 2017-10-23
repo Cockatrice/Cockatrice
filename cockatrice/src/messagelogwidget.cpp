@@ -317,7 +317,6 @@ void MessageLogWidget::logDoMoveCard(LogMoveCard &lmc)
     }
 
     QString finalStr;
-    bool usesNewX = false;
     if (targetZone == tableConstant()) {
         soundEngine->playSound("play_card");
         if (moveCardTapped.value(lmc.card))
@@ -339,7 +338,6 @@ void MessageLogWidget::logDoMoveCard(LogMoveCard &lmc)
             finalStr = tr("%1 puts %2%3 on top of their library.");
         else {
             lmc.newX++;
-            usesNewX = true;
             finalStr = tr("%1 puts %2%3 into their library %4 cards from the top.");
         }
     } else if (targetZone == sideboardConstant())
@@ -349,19 +347,11 @@ void MessageLogWidget::logDoMoveCard(LogMoveCard &lmc)
         finalStr = tr("%1 plays %2%3.");
     }
 
-    if (usesNewX) {
-        appendHtmlServerMessage(
-                finalStr.arg(sanitizeHtml(lmc.player->getName()))
-                        .arg(cardStr)
-                        .arg(nameFrom.second)
-                        .arg(lmc.newX));
-    } else {
-        appendHtmlServerMessage(
+    appendHtmlServerMessage(
             finalStr.arg(sanitizeHtml(lmc.player->getName()))
-            .arg(cardStr)
-            .arg(nameFrom.second));
-    }
-
+                    .arg(cardStr)
+                    .arg(nameFrom.second)
+                    .arg(lmc.newX));
 }
 
 void MessageLogWidget::logDrawCards(Player *player, int number)

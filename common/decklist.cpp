@@ -282,18 +282,18 @@ void AbstractDecklistCardNode::writeElement(QXmlStreamWriter *xml)
 QVector<QPair<int, int> > InnerDecklistNode::sort(Qt::SortOrder order)
 {
     QVector<QPair<int, int> > result(size());
-
+    
     // Initialize temporary list with contents of current list
     QVector<QPair<int, AbstractDecklistNode *> > tempList(size());
     for (int i = size() - 1; i >= 0; --i) {
         tempList[i].first = i;
         tempList[i].second = at(i);
     }
-
+    
     // Sort temporary list
     compareFunctor cmp(order);
     qSort(tempList.begin(), tempList.end(), cmp);
-
+    
     // Map old indexes to new indexes and
     // copy temporary list to the current one
     for (int i = size() - 1; i >= 0; --i) {
@@ -318,7 +318,7 @@ DeckList::DeckList(const DeckList &other)
       deckHash(other.deckHash)
 {
     root = new InnerDecklistNode(other.getRoot());
-
+    
     QMapIterator<QString, SideboardPlan *> spIterator(other.getSideboardPlans());
     while (spIterator.hasNext()) {
         spIterator.next();
@@ -336,7 +336,7 @@ DeckList::DeckList(const QString &nativeString)
 DeckList::~DeckList()
 {
     delete root;
-
+    
     QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
     while (i.hasNext())
         delete i.next().value();
@@ -358,7 +358,7 @@ void DeckList::setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan)
         current = new SideboardPlan;
         sideboardPlans.insert(QString(), current);
     }
-
+    
     current->setMoveList(plan);
 }
 
@@ -394,7 +394,7 @@ void DeckList::write(QXmlStreamWriter *xml)
 
     for (int i = 0; i < root->size(); i++)
         root->at(i)->writeElement(xml);
-
+    
     QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
     while (i.hasNext())
         i.next().value()->write(xml);
@@ -466,111 +466,66 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 bool DeckList::loadFromStream_Plain(QTextStream &in)
 {
     cleanList();
-    QVector<QString> inputs; // QTextStream -> QVector
 
-    bool priorEntryIsBlank = true, isAtBeginning = true;
-    int blankLines = 0;
-    while (!in.atEnd())
-    {
-        QString line = in.readLine().simplified().toLower();
+    bool inSideboard = false, isSideboard = false;
 
-        /*
-         * Removes all blank lines at start of inputs
-         * Ex: ("", "", "", "Card1", "Card2") => ("Card1", "Card2")
-         *
-         * This will also concise multiple blank lines in a row to just one blank
-         * Ex: ("Card1", "Card2", "", "", "", "Card3") => ("Card1", "Card2", "", "Card3")
-         */
-        if (line.isEmpty()) {
-            if (priorEntryIsBlank || isAtBeginning)
-                continue;
-
-            priorEntryIsBlank = true;
-            blankLines++;
-        } else {
-            isAtBeginning = false;
-            priorEntryIsBlank = false;
-        }
-
-        inputs.push_back(line);
-    }
-
-    /*
-     * Removes  blank line at end of inputs (if applicable)
-     * Ex: ("Card1", "Card2", "") => ("Card1", "Card2")
-     * NOTE: Any duplicates were taken care of above, so there can be
-     * at most one blank line at the very end
-     */
-    if (inputs.size() && inputs.last().isEmpty())
-    {
-        blankLines--;
-        inputs.erase(inputs.end() - 1);
-    }
-
-    // If "Sideboard" line appears in inputs, then blank lines mean nothing
-    if (inputs.contains("sideboard"))
-        blankLines = 2;
-
-    bool inSideboard = false, titleFound = false, isSideboard;
     int okRows = 0;
-    foreach(QString line, inputs) {
-        // This is a comment line, ignore it
+    bool titleFound = false;
+    while (!in.atEnd()) {
+        QString line = in.readLine().simplified();
+
+        // skip comments
         if (line.startsWith("//"))
         {
-            if (!titleFound) { // Set the title to the first comment
+            if(!titleFound)
+            {
                 name = line.mid(2).trimmed();
                 titleFound = true;
-            } else if (okRows == 0) { // We haven't processed any cards yet
+            } else if(okRows == 0) {
                 comments += line.mid(2).trimmed() + "\n";
             }
             continue;
         }
 
-        // If we have a blank line and it's the _ONLY_ blank line in the paste
-        // Then we assume it means to start the sideboard section of the paste.
-        // If we have the word "Sideboard" appear on any line, then that will
-        // also indicate the start of the sideboard.
-        if ((line.isEmpty() && blankLines == 1) || line.startsWith("sideboard")) {
+        // check for sideboard prefix
+        if (line.startsWith("Sideboard", Qt::CaseInsensitive)) {
             inSideboard = true;
-            continue; // The line isn't actually a card
+            continue;
         }
 
         isSideboard = inSideboard;
 
-        if (line.startsWith("sb:")) {
+        if (line.startsWith("SB:", Qt::CaseInsensitive)) {
             line = line.mid(3).trimmed();
             isSideboard = true;
         }
-
-        if (line.trimmed().isEmpty())
-            continue; // The line was "    " instead of "\n"
 
         // Filter out MWS edition symbols and basic land extras
         QRegExp rx("\\[.*\\]");
         line.remove(rx);
         rx.setPattern("\\(.*\\)");
         line.remove(rx);
-
-        // Filter out post card name editions
+        //Filter out post card name editions
         rx.setPattern("\\|.*$");
         line.remove(rx);
+        line = line.simplified();
 
         int i = line.indexOf(' ');
         int cardNameStart = i + 1;
 
         // If the count ends with an 'x', ignore it. For example,
         // "4x Storm Crow" will count 4 correctly.
-        if (i > 0 && line[i - 1] == 'x')
+        if (i > 0 && line[i - 1] == 'x') {
             i--;
+        }
 
         bool ok;
         int number = line.left(i).toInt(&ok);
         if (!ok)
-            number = 1; // If input is "cardName" assume it's "1x cardName"
+            continue;
 
         QString cardName = line.mid(cardNameStart);
-
-        // Common differences between Cockatrice's card names
+        // Common differences between cockatrice's card names
         // and what's commonly used in decklists
         rx.setPattern("’");
         cardName.replace(rx, "'");
@@ -582,26 +537,20 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         // Replace only if the ampersand is preceded by a non-capital letter,
         // as would happen with acronyms. So 'Fire & Ice' is replaced but not
         // 'R&D' or 'R & D'.
-        // Qt regexes don't support lookbehind so we capture and replace instead.
+        //
+        // Qt regexes don't support lookbehind so we capture and replace
+        // instead.
         rx.setPattern("([^A-Z])\\s*&\\s*");
-        if (rx.indexIn(cardName) != -1)
+        if (rx.indexIn(cardName) != -1) {
             cardName.replace(rx, QString("%1 // ").arg(rx.cap(1)));
+        }
 
-        // We need to get the name of the card from the database,
-        // but we can't do that until we get the "real" name
-        // (name stored in database for the card)
-        // and establish a card info that is of the card, then it's
-        // a simple getting the _real_ name of the card
-        // (i.e. "STOrm, CrOW" => "Storm Crow")
-        cardName = getCompleteCardName(cardName);
+        // Look for the correct card zone
+        QString zoneName = getCardZoneFromName(cardName, isSideboard ? DECK_ZONE_SIDE: DECK_ZONE_MAIN);
 
-        // Look for the correct card zone of where to place the new card
-        QString zoneName = getCardZoneFromName(cardName, isSideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN);
-
-        okRows++;
+        ++okRows;
         new DecklistCardNode(cardName, number, getZoneObjFromName(zoneName));
     }
-
     updateDeckHash();
     return (okRows > 0);
 }
@@ -727,7 +676,7 @@ bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNod
         rootNode = root;
         updateHash = true;
     }
-
+    
     int index = rootNode->indexOf(node);
     if (index != -1) {
         delete rootNode->takeAt(index);
@@ -783,6 +732,6 @@ void DeckList::updateDeckHash()
                     + (((quint64) (unsigned char) deckHashArray[3]) << 8)
                     + (quint64) (unsigned char) deckHashArray[4];
     deckHash = (isValidDeckList) ? QString::number(number, 32).rightJustified(8, '0') : "INVALID";
-
+    
     emit deckHashChanged();
 }

@@ -69,6 +69,8 @@
 #define GITHUB_TROUBLESHOOTING_URL "https://github.com/Cockatrice/Cockatrice/wiki/Troubleshooting"
 #define GITHUB_FAQ_URL "https://github.com/Cockatrice/Cockatrice/wiki/Frequently-Asked-Questions"
 
+#define DOWNLOAD_URL "https://dl.bintray.com/cockatrice/Cockatrice/"
+
 const QString MainWindow::appName = "Cockatrice";
 const QStringList MainWindow::fileNameFilters = QStringList()
     << QObject::tr("Cockatrice card database (*.xml)")
@@ -459,7 +461,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             QMessageBox::critical(this, tr("Registration denied"), tr("The email address provider used during registration has been blacklisted for use on this server."));
             break;
         case Response::RespTooManyRequests:
-            QMessageBox::critical(this, tr("Registration denied"), tr("It appears you are attempting to register a new account on this server yet you already have an account registered with the email provided. This server restricts the number of accounts a user can register per address.  Please contact the server operator for further assistance or to obtain your credential information."));
+            QMessageBox::critical(this, tr("Registration denied"), tr("Too many registration attempts, please try again later or contact the server operator for further details."));
             break;
         case Response::RespPasswordTooShort:
             QMessageBox::critical(this, tr("Registration denied"), tr("Password too short."));
@@ -1039,14 +1041,14 @@ void MainWindow::actAddCustomSet()
     if (!dialog.exec())
         return;
 
-    QString fullFilePath = dialog.selectedFiles().at(0);
+    QString fileName = dialog.selectedFiles().at(0);
 
-    if (!QFile::exists(fullFilePath)) {
+    if (!QFile::exists(fileName)) {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Selected file cannot be found."));
         return;
     }
 
-    if (QFileInfo(fullFilePath).suffix() != "xml") { // fileName = *.xml
+    if (QFileInfo(fileName).suffix() != "xml") { // fileName = *.xml
         QMessageBox::warning(this, tr("Load sets/cards"), tr("You can only import XML databases at this time."));
         return;
     }
@@ -1054,38 +1056,15 @@ void MainWindow::actAddCustomSet()
     QDir dir = settingsCache->getCustomCardDatabasePath();
     int nextPrefix = getNextCustomSetPrefix(dir);
 
-    bool res = false;
+    bool res = QFile::copy(
+        fileName, dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") +
+        QString::number(nextPrefix) + "." + QFileInfo(fileName).fileName()
+    );
 
-    QString fileName = QFileInfo(fullFilePath).fileName();
-    if (fileName.compare("spoiler.xml", Qt::CaseInsensitive) == 0)
-    {
-        /*
-         * If the file being added is "spoiler.xml"
-         * then we'll want to overwrite the old version
-         * and replace it with the new one
-         */
-        if (QFile::exists(dir.absolutePath() + "/spoiler.xml"))
-        {
-            QFile::remove(dir.absolutePath() + "/spoiler.xml");
-        }
-
-        res = QFile::copy(fullFilePath, dir.absolutePath() + "/spoiler.xml");
-    }
-    else
-    {
-        res = QFile::copy(
-                fullFilePath,
-                dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") + QString::number(nextPrefix) + "." + fileName
-        );
-    }
-
-    if (res)
-    {
+    if (res) {
         QMessageBox::information(this, tr("Load sets/cards"), tr("The new sets/cards have been added successfully.\nCockatrice will now reload the card database."));
         QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
-    }
-    else
-    {
+    } else {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Sets/cards failed to import."));
     }
 }

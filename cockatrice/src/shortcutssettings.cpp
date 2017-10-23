@@ -242,36 +242,6 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/phase7"] = parseSequenceString("");
     defaultShortCuts["Player/phase8"] = parseSequenceString("");
     defaultShortCuts["Player/phase9"] = parseSequenceString("F9");
-
-
-    defaultShortCuts["Player/aIncCounter_w"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounter_w"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounter_w"] = parseSequenceString("");
-
-    defaultShortCuts["Player/aIncCounter_u"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounter_u"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounter_u"] = parseSequenceString("");
-
-    defaultShortCuts["Player/aIncCounter_b"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounter_b"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounter_b"] = parseSequenceString("");
-
-    defaultShortCuts["Player/aIncCounter_r"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounter_r"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounter_r"] = parseSequenceString("");
-
-    defaultShortCuts["Player/aIncCounter_g"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounter_g"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounter_g"] = parseSequenceString("");
-
-    defaultShortCuts["Player/aIncCounter_x"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounter_x"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounter_x"] = parseSequenceString("");
-
-    defaultShortCuts["Player/aIncCounter_storm"] = parseSequenceString("");
-    defaultShortCuts["Player/aDecCounter_storm"] = parseSequenceString("");
-    defaultShortCuts["Player/aSetCounter_storm"] = parseSequenceString("");
-
     defaultShortCuts["tab_room/aClearChat"] = parseSequenceString("F12");
     defaultShortCuts["DlgLoadDeckFromClipboard/refreshButton"] = parseSequenceString("F5");
     defaultShortCuts["Player/aResetLayout"] = parseSequenceString("");

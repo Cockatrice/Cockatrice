@@ -125,7 +125,6 @@ private:
     InnerDecklistNode *getZoneObjFromName(const QString  zoneName);
 protected:
     virtual QString getCardZoneFromName(QString /* cardName */, QString currentZoneName) { return currentZoneName; };
-    virtual QString getCompleteCardName(const QString cardName) const { return cardName; };
 signals:
     void deckHashChanged();
 public slots:

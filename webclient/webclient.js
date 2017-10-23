@@ -26,6 +26,8 @@ var WebClient = {
     keepalive: 5000
   },
 
+  protobuf : null,
+  builder : null,
   pb : null,
   pbfiles : [
     // commands
@@ -46,21 +48,19 @@ var WebClient = {
     "pb/response_join_room.proto",
     "pb/room_event.proto",
     "pb/event_room_say.proto",
-    "pb/event_join_room.proto",
-    "pb/event_leave_room.proto",
-    "pb/event_list_games.proto",
-    "pb/serverinfo_user.proto",
-    "pb/serverinfo_game.proto"
+    "pb/serverinfo_user.proto"
   ],
 
   initialize : function()
   {
-    this.pb = new protobuf.Root();
+    this.protobuf = dcodeIO.ProtoBuf;
+    this.builder = this.protobuf.newBuilder({ convertFieldsToCamelCase: true });
 
-    this.pb.load(this.pbfiles, { keepCase: false }, function(err, root) {
-    if (err)
-        throw err;
+    $.each(this.pbfiles, function(index, fileName) {
+      WebClient.protobuf.loadProtoFile(fileName, WebClient.builder);
     });
+    
+    this.pb = this.builder.build();
 
     this.initialized=true;
   },
@@ -96,7 +96,7 @@ var WebClient = {
     this.pendingCommands[this.cmdId] = callback;
 
     if (this.socket.readyState == WebSocket.OPEN) {
-        this.socket.send(WebClient.pb.CommandContainer.encode(cmd).finish());
+        this.socket.send(cmd.toArrayBuffer());
         if(this.options.debug)
           console.log("Sent: " + cmd.toString());
     } else {
@@ -107,7 +107,7 @@ var WebClient = {
 
   sendRoomCommand : function(roomId, roomCmd, callback)
   {
-    var cmd = WebClient.pb.CommandContainer.create({
+    var cmd = new WebClient.pb.CommandContainer({
       "roomId" : roomId,
       "roomCommand" : [ roomCmd ]
     });
@@ -116,7 +116,7 @@ var WebClient = {
 
   sendSessionCommand : function(ses, callback)
   {
-    var cmd = WebClient.pb.CommandContainer.create({
+    var cmd = new WebClient.pb.CommandContainer({
       "sessionCommand" : [ ses ]
     });
     WebClient.sendCommand(cmd, callback);
@@ -141,9 +141,9 @@ var WebClient = {
       }
 
       // send a ping
-      var CmdPing = WebClient.pb.Command_Ping.create();
+      var CmdPing = new WebClient.pb.Command_Ping();
 
-      var sc = WebClient.pb.SessionCommand.create({
+      var sc = new WebClient.pb.SessionCommand({
       ".Command_Ping.ext" : CmdPing
       });
 
@@ -157,26 +157,21 @@ var WebClient = {
 
   doLogin : function()
   {
-    var CmdLogin = WebClient.pb.Command_Login.create({
+    var CmdLogin = new WebClient.pb.Command_Login({
       "userName" : this.options.user,
       "password" : this.options.pass,
       "clientid" : this.guid(),
-      "clientver" : "webclient-0.3 (2017-05-26)",
+      "clientver" : "webclient-0.2 (2016-08-03)",
       "clientfeatures" : [
         "client_id",
         "client_ver",
         "feature_set",
         "room_chat_history",
-        "client_warnings",
-        /* unimplemented features */
-        "forgot_password",
-        "idle_client",
-        "mod_log_lookup",
-        "user_ban_history"
+        "client_warnings"
       ]
     });
 
-    var sc = WebClient.pb.SessionCommand.create({
+    var sc = new WebClient.pb.SessionCommand({
       ".Command_Login.ext" : CmdLogin
     });
 
@@ -232,9 +227,9 @@ var WebClient = {
 
   doListRooms : function()
   {
-    var CmdListRooms = WebClient.pb.Command_ListRooms.create();
+    var CmdListRooms = new WebClient.pb.Command_ListRooms();
 
-    var sc = WebClient.pb.SessionCommand.create({
+    var sc = new WebClient.pb.SessionCommand({
       ".Command_ListRooms.ext" : CmdListRooms
     });
 
@@ -294,11 +289,11 @@ var WebClient = {
         $.each(roomsList, function(index, room) {
           if(room.autoJoin)
           {
-            var CmdJoinRoom = WebClient.pb.Command_JoinRoom.create({
+            var CmdJoinRoom = new WebClient.pb.Command_JoinRoom({
               "roomId" : room.roomId
             });
 
-            var sc = WebClient.pb.SessionCommand.create({
+            var sc = new WebClient.pb.SessionCommand({
               ".Command_JoinRoom.ext" : CmdJoinRoom
             });
 
@@ -343,29 +338,12 @@ var WebClient = {
 
   processRoomEvent : function (raw)
   {
-    if(raw[".Event_ListGames.ext"]) {
-      if(this.options.roomListGamesCallback)
-        this.options.roomListGamesCallback(raw["roomId"], raw[".Event_ListGames.ext"]);
-      return;
-    }
-
-    if(raw[".Event_JoinRoom.ext"]) {
-      if(this.options.roomJoinCallback)
-        this.options.roomJoinCallback(raw["roomId"], raw[".Event_JoinRoom.ext"]);
-      return;
-    }
-
-    if(raw[".Event_LeaveRoom.ext"]) {
-      if(this.options.roomLeaveCallback)
-        this.options.roomLeaveCallback(raw["roomId"], raw[".Event_LeaveRoom.ext"]);
-      return;
-    }
-
     if(raw[".Event_RoomSay.ext"]) {
       if(this.options.roomMessageCallback)
         this.options.roomMessageCallback(raw["roomId"], raw[".Event_RoomSay.ext"]);
       return;
     }
+
   },
 
   processJoinRoom : function(raw)
@@ -417,19 +395,19 @@ var WebClient = {
     this.socket.onmessage = function(event) {
       //console.log("Received " + event.data.byteLength + " bytes");
 
-      var uint8msg = new Uint8Array(event.data);
       try {
-        var msg = WebClient.pb.ServerMessage.decode(uint8msg);
+        var msg = WebClient.pb.ServerMessage.decode(event.data);
         if(WebClient.options.debug)
           console.log(msg);
       } catch (err) {
         console.log("Processing failed:", err);
         if(WebClient.options.debug)
         {
+          var view = new Uint8Array(event.data);
           var str = "";
-          for(var i = 0; i < uint8msg.length; i++)
+          for(var i = 0; i < view.length; i++)
           {
-            str += String.fromCharCode(uint8msg[i]);
+            str += String.fromCharCode(view[i]);
           }
           console.log(str);          
         }
@@ -464,11 +442,11 @@ var WebClient = {
   },
 
   roomSay : function(roomId, msg) {
-    var CmdRoomSay = WebClient.pb.Command_RoomSay.create({
+    var CmdRoomSay = new WebClient.pb.Command_RoomSay({
       "message" : msg
     });
 
-    var sc = WebClient.pb.RoomCommand.create({
+    var sc = new WebClient.pb.RoomCommand({
       ".Command_RoomSay.ext" : CmdRoomSay
     });
 

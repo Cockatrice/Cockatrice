@@ -130,21 +130,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
     
-    if(settingsCache->getIsPortableBuild())
-    {
-        deckPathEdit->setEnabled(false);
-        replaysPathEdit->setEnabled(false);
-        picsPathEdit->setEnabled(false);
-        cardDatabasePathEdit->setEnabled(false);
-        tokenDatabasePathEdit->setEnabled(false);
-
-        deckPathButton->setVisible(false);
-        replaysPathButton->setVisible(false);
-        picsPathButton->setVisible(false);
-        cardDatabasePathButton->setVisible(false);
-        tokenDatabasePathButton->setVisible(false);
-    }
-
     QGridLayout *pathsGrid = new QGridLayout;
     pathsGrid->addWidget(&deckPathLabel, 0, 0);
     pathsGrid->addWidget(deckPathEdit, 0, 1);
@@ -288,14 +273,7 @@ void GeneralSettingsPage::retranslateUi()
     personalGroupBox->setTitle(tr("Personal settings"));
     languageLabel.setText(tr("Language:"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
-
-    if(settingsCache->getIsPortableBuild())
-    {
-        pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
-    } else {
-        pathsGroupBox->setTitle(tr("Paths"));
-    }
-
+    pathsGroupBox->setTitle(tr("Paths"));
     deckPathLabel.setText(tr("Decks directory:"));
     replaysPathLabel.setText(tr("Replays directory:"));
     picsPathLabel.setText(tr("Pictures directory:"));

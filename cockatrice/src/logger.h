@@ -30,7 +30,6 @@ private:
 public:
 	void logToFile(bool enabled);
     void log(QtMsgType type, const QMessageLogContext &ctx, const QString message);
-    QString getClientVersion();
     QList<QString> getLogBuffer() { return logBuffer; }
 protected:
     void openLogfileSession();

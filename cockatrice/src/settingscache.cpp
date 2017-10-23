@@ -10,10 +10,12 @@
 
 QString SettingsCache::getDataPath()
 {
-    if(isPortableBuild)
-        return qApp->applicationDirPath() + "/data/";
-    else
-        return QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    return 
+#ifdef PORTABLE_BUILD
+    qApp->applicationDirPath() + "/data/";
+#else
+    QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#endif
 }
 
 QString SettingsCache::getSettingsPath()
@@ -23,8 +25,9 @@ QString SettingsCache::getSettingsPath()
 
 void SettingsCache::translateLegacySettings()
 {
-    if(isPortableBuild)
-        return;
+#ifdef PORTABLE_BUILD
+    return;
+#endif
 
     //Layouts
     QFile layoutFile(getSettingsPath()+"layouts/deckLayout.ini");
@@ -145,11 +148,6 @@ QString SettingsCache::getSafeConfigFilePath(QString configEntry, QString defaul
 }
 SettingsCache::SettingsCache()
 {
-    // first, figure out if we are running in portable mode
-    isPortableBuild = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
-    if(isPortableBuild)
-        qDebug() << "Portable mode enabled";
-
     // define a dummy context that will be used where needed
     QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
 
