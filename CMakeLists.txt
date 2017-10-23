@@ -8,27 +8,9 @@
 # Cmake 3.1 is required to enable C++11 support correctly
 cmake_minimum_required(VERSION 3.1)
 
-if(POLICY CMP0020)
-    cmake_policy(SET CMP0020 OLD)
-endif()
-
-if(POLICY CMP0043)
-    cmake_policy(SET CMP0043 OLD)
-endif()
-
-if(POLICY CMP0048)
-    cmake_policy(SET CMP0048 OLD)
-endif()
-
 if(POLICY CMP0064)
-    cmake_policy(SET CMP0064 OLD)
+    cmake_policy(SET CMP0064 NEW)
 endif()
-
-set(PROJECT_NAME "Cockatrice")
-# Can be overriden by git tags, see cmake/getversion.cmake
-set(PROJECT_VERSION_MAJOR "2")
-set(PROJECT_VERSION_MINOR "3")
-set(PROJECT_VERSION_PATCH "18")
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
@@ -39,7 +21,8 @@ ELSE()
 ENDIF()
 
 # A project name is needed for CPack
-PROJECT("${PROJECT_NAME}")
+# Version can be overriden by git tags, see cmake/getversion.cmake
+PROJECT("Cockatrice" VERSION 2.3.18)
 
 # Use c++11 for all targets
 set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ ISO Standard")

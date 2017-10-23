@@ -23,7 +23,7 @@ We offer downloads for all full releases (recommended) and the latest developmen
 
 - Latest full release (**recommended**): [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest) [![Download Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)<br>
 
-- Latest development version: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases)
+- Latest development version: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases) 
    - Development builds may not be stable and/or contain several bugs.
    - If you'd like to be a Cockatrice Beta Tester, use this version.
    - More information can be [found here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)
@@ -35,6 +35,8 @@ We offer downloads for all full releases (recommended) and the latest developmen
 
 If you'd like to contribute code to the project, please review [the guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md).
 We maintain a tag for "easy" changes on our issue tracker: issues tagged in this way provide a simple way to get started. [Issues tagged as Easy Changes](https://github.com/Cockatrice/Cockatrice/issues?q=is%3Aopen+is%3Aissue+label%3A%22Easy+Change%22)
+
+Check our long-term project **roadmap** with some visions [here](https://docs.google.com/document/d/1Ewe5uSaRE2nR2pNPMaGmP6gVZdqgFbBgwSscGqIr4W0/edit).
 
 We try to be very responsive to new issues. We'll try to give you advice on how a feature should be implemented / advice on places the codebase is doing something similar before you get too far along with a PR.
 

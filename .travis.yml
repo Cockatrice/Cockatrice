@@ -56,3 +56,5 @@ notifications:
     on_failure: change
     on_start: never
     
+# official validator for travis.yml config files: https://yaml.travis-ci.org
+# travis documentation: https://docs.travis-ci.com/user/customizing-the-build

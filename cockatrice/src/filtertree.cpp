@@ -178,7 +178,7 @@ bool FilterItem::acceptColor(const CardInfo *info) const
     converted_term.replace(QString("wht"), QString("w"), Qt::CaseInsensitive);
     converted_term.replace(QString(" "), QString(""), Qt::CaseInsensitive);
     
-    if (converted_term.toLower() == "none" || converted_term.toLower() == "colorless" || converted_term.toLower() == "c") {
+    if (converted_term.toLower() == "none" || converted_term.toLower() == "colorless" || converted_term.toLower() == "c" || converted_term.toLower() == "colourless") {    
         if (info->getColors().length() < 1) {
             return true;
         }
