@@ -181,9 +181,90 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
         if (isRightType && (!isLeftType || rightString.size() == cardName.size()))
             return false;
     }
+    else if (right.column() == CardDatabaseModel::PTColumn && left.column() == CardDatabaseModel::PTColumn) {
+        QStringList leftList = leftString.split("/");
+        QStringList rightList = rightString.split("/");
+
+        if (leftList.size() == 2 && rightList.size() == 2) {
+
+            //cool, have both P/T in list now
+            bool equal;
+            bool lessThanNum = lessThanNumerically(leftList.at(0), rightList.at(0), &equal);
+            if (!equal) {
+                return lessThanNum;
+            }
+            else {
+                //power equal, check toughness
+                return lessThanNumerically(leftList.at(1), rightList.at(1), &equal);
+            }
+        }
+    }
     return QString::localeAwareCompare(leftString, rightString) < 0;
 }
 
+bool CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QString&right, bool *equal) const {
+    if (left == right) {
+        *equal = true;
+        return false;
+    }
+    *equal = false;
+
+    bool okLeft;
+    bool okRight;
+    float leftNum = left.toFloat(&okLeft);
+    float rightNum = right.toFloat(&okRight);
+
+    if (okLeft && okRight) {
+        return leftNum > rightNum;
+    }
+    //try and parsing again, for weird ones like "1+*"
+    int leftNumIndex = 0;
+    int rightNumIndex = 0;
+    QString leftAfterNum = "";
+    QString rightAfterNum = "";
+    if (!okLeft) {
+        for (; leftNumIndex < left.length(); leftNumIndex++) {
+            if (!left.at(leftNumIndex).isDigit()) {
+                break;
+            }
+        }
+        if (leftNumIndex != 0) {
+            leftNum = left.left(leftNumIndex).toFloat(&okLeft);
+            leftAfterNum = left.right(leftNumIndex);
+        }
+    }
+    if (!okRight) {
+        for (; rightNumIndex < right.length(); rightNumIndex++) {
+            if (!right.at(rightNumIndex).isDigit()) {
+                break;
+            }
+        }
+        if (rightNumIndex != 0) {
+            rightNum = right.left(rightNumIndex).toFloat(&okRight);
+            rightAfterNum = right.right(rightNumIndex);
+        }
+    }
+    if (okLeft && okRight) {
+        
+        if (leftNum != rightNum) {
+            //both parsed as numbers, but different number
+            return leftNum > rightNum;
+        }
+        else {
+            //both parsed, same number, but at least one has something else
+            //so use compare the part after the number
+            return QString::localeAwareCompare(leftAfterNum, rightAfterNum) < 0;
+        }
+    }
+    else if (okLeft) {
+        return false;
+    }
+    else if (okRight) {
+        return true;
+    }
+    //couldn't parse it, just return String comparison 
+    return QString::localeAwareCompare(left, right) < 0;
+}
 bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
     CardInfo const *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
