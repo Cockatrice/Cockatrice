@@ -209,8 +209,8 @@ bool CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QS
     }
     *equal = false;
 
-    bool okLeft;
-    bool okRight;
+    bool okLeft, okRight;
+
     float leftNum = left.toFloat(&okLeft);
     float rightNum = right.toFloat(&okRight);
 
@@ -252,8 +252,8 @@ bool CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QS
         }
         else {
             //both parsed, same number, but at least one has something else
-            //so use compare the part after the number
-            return QString::localeAwareCompare(leftAfterNum, rightAfterNum) < 0;
+            //so compare the part after the number - prefer nothing
+            return QString::localeAwareCompare(leftAfterNum, rightAfterNum) > 0;
         }
     }
     else if (okLeft) {
