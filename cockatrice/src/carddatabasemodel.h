@@ -61,6 +61,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+    bool lessThanNumerically(const QString &left, const QString&right, bool *equal) const;
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
     bool rowMatchesCardName(CardInfo const *info) const;
     bool canFetchMore(const QModelIndex &parent) const;
