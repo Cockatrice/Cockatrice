@@ -218,11 +218,10 @@ bool CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QS
         return leftNum > rightNum;
     }
     //try and parsing again, for weird ones like "1+*"
-    int leftNumIndex = 0;
-    int rightNumIndex = 0;
     QString leftAfterNum = "";
     QString rightAfterNum = "";
     if (!okLeft) {
+        int leftNumIndex = 0;
         for (; leftNumIndex < left.length(); leftNumIndex++) {
             if (!left.at(leftNumIndex).isDigit()) {
                 break;
@@ -234,6 +233,7 @@ bool CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QS
         }
     }
     if (!okRight) {
+        int rightNumIndex = 0;
         for (; rightNumIndex < right.length(); rightNumIndex++) {
             if (!right.at(rightNumIndex).isDigit()) {
                 break;
