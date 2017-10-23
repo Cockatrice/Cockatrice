@@ -105,19 +105,16 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
     if (!player)
         return;
     
-    bool isSpectator = prop.has_spectator() && prop.spectator();
-    player->setIcon(1, isSpectator ? spectatorIcon : playerIcon);
-    player->setData(1, Qt::UserRole, !isSpectator);
-
-    if(!isSpectator)
-    {
-        if (prop.has_conceded())
-            player->setData(2, Qt::UserRole, prop.conceded());
-        if (prop.has_ready_start())
-            player->setData(2, Qt::UserRole + 1, prop.ready_start());
-        if (prop.has_conceded() || prop.has_ready_start())
-            player->setIcon(2, gameStarted ? (prop.conceded() ? concededIcon : QIcon()) : (prop.ready_start() ? readyIcon : notReadyIcon));
+    if (prop.has_spectator()) {
+        player->setIcon(1, prop.spectator() ? spectatorIcon : playerIcon);
+        player->setData(1, Qt::UserRole, !prop.spectator());
     }
+    if (prop.has_conceded())
+        player->setData(2, Qt::UserRole, prop.conceded());
+    if (prop.has_ready_start())
+        player->setData(2, Qt::UserRole + 1, prop.ready_start());
+    if (prop.has_conceded() || prop.has_ready_start())
+        player->setIcon(2, gameStarted ? (prop.conceded() ? concededIcon : QIcon()) : (prop.ready_start() ? readyIcon : notReadyIcon));
     if (prop.has_user_info()) {
         player->setData(3, Qt::UserRole, prop.user_info().user_level());
         player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(prop.user_info().user_level()), false, QString::fromStdString(prop.user_info().privlevel()))));
@@ -127,18 +124,13 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
             player->setIcon(4, QIcon(CountryPixmapGenerator::generatePixmap(12, country)));
         player->setData(4, Qt::UserRole, QString::fromStdString(prop.user_info().name()));
     }
-
     if (prop.has_player_id())
         player->setData(4, Qt::UserRole + 1, prop.player_id());
-
-    if(!isSpectator)
-    {
-        if (prop.has_deck_hash()) {
-            player->setText(5, QString::fromStdString(prop.deck_hash()));
-        }
-        if (prop.has_sideboard_locked())
-            player->setIcon(5, prop.sideboard_locked() ? lockIcon : QIcon());
+    if (prop.has_deck_hash()) {
+        player->setText(5, QString::fromStdString(prop.deck_hash()));
     }
+    if (prop.has_sideboard_locked())
+        player->setIcon(5, prop.sideboard_locked() ? lockIcon : QIcon());
     if (prop.has_ping_seconds())
         player->setIcon(0, QIcon(PingPixmapGenerator::generatePixmap(12, prop.ping_seconds(), 10)));
 }
@@ -169,11 +161,6 @@ void PlayerListWidget::setGameStarted(bool _gameStarted, bool resuming)
     QMapIterator<int, QTreeWidgetItem *> i(players);
     while (i.hasNext()) {
         QTreeWidgetItem *twi = i.next().value();
-
-        bool isPlayer = twi->data(1, Qt::UserRole).toBool();
-        if(!isPlayer)
-            continue;
-
         if (gameStarted) {
             if (resuming)
                 twi->setIcon(2, twi->data(2, Qt::UserRole).toBool() ? concededIcon : QIcon());
@@ -181,9 +168,8 @@ void PlayerListWidget::setGameStarted(bool _gameStarted, bool resuming)
                 twi->setData(2, Qt::UserRole, false);
                 twi->setIcon(2, QIcon());
             }
-        } else {
+        } else
             twi->setIcon(2, notReadyIcon);
-        }
     }
 }
 

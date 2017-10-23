@@ -30,21 +30,10 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
 
     CardSet *set = sets[index.row()];
 
-    if (index.column() == EnabledCol)
-    {
-        switch(role)
-        {
-            case SortRole:
-               return enabledSets.contains(set) ? "1" : "0";
-            case Qt::CheckStateRole:
-                return static_cast< int >( enabledSets.contains(set) ? Qt::Checked : Qt::Unchecked );
-            case Qt::DisplayRole:
-            default:
-               return QVariant();
-        }
-    }
+    if ( role == Qt::CheckStateRole && index.column() == EnabledCol )
+        return static_cast< int >( enabledSets.contains(set) ? Qt::Checked : Qt::Unchecked );
 
-    if (role != Qt::DisplayRole && role != SortRole)
+    if (role != Qt::DisplayRole)
         return QVariant();
 
     switch (index.column()) {
@@ -189,7 +178,7 @@ void SetsModel::sort(int column, Qt::SortOrder order)
     int row;
 
     for(row = 0; row < numRows; ++row)
-        setMap.insertMulti(index(row, column).data(SetsModel::SortRole).toString(), sets.at(row));
+        setMap.insertMulti(index(row, column).data().toString(), sets.at(row));
     
     QList<CardSet *> tmp = setMap.values();
     sets.clear();

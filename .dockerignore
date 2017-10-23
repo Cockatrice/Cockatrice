@@ -1,9 +1,11 @@
 .git/
+CONTRIBUTING.md
+Dockerfile
+TODO.md
 build/
-.github/
-.travis/
-.tx/
 cockatrice/
 doc/
 oracle/
-Dockerfile
+sounds/
+travis-compile.sh
+travis-dependencies.sh

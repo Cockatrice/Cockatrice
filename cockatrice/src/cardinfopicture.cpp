@@ -41,10 +41,7 @@ void CardInfoPicture::updatePixmap()
 
 void CardInfoPicture::loadPixmap()
 {
-    if(info)
-        PictureLoader::getPixmap(resizedPixmap, info, size());
-    else
-        PictureLoader::getCardBackPixmap(resizedPixmap, size());
+    PictureLoader::getPixmap(resizedPixmap, info, size());
 }
 
 void CardInfoPicture::paintEvent(QPaintEvent *)

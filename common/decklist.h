@@ -21,10 +21,6 @@ class QTextStream;
 
 class InnerDecklistNode;
 
-#define DECK_ZONE_MAIN "main"
-#define DECK_ZONE_SIDE "side"
-#define DECK_ZONE_TOKENS "tokens"
-
 class SideboardPlan {
 private:
     QString name;
@@ -39,7 +35,7 @@ public:
     void setMoveList(const QList<MoveCard_ToZone> &_moveList);
 };
 
-enum DeckSortMethod { ByNumber, ByName };
+enum DeckSortMethod { ByNumber, ByName, ByPrice };
 
 class AbstractDecklistNode {
 protected:
@@ -76,9 +72,11 @@ public:
     AbstractDecklistNode *findChild(const QString &name);
     int height() const;
     int recursiveCount(bool countTotalCards = false) const;
+        float recursivePrice(bool countTotalCards = false) const;
     bool compare(AbstractDecklistNode *other) const;
     bool compareNumber(AbstractDecklistNode *other) const;
     bool compareName(AbstractDecklistNode *other) const;
+    bool comparePrice(AbstractDecklistNode *other) const;
     QVector<QPair<int, int> > sort(Qt::SortOrder order = Qt::AscendingOrder);
 
     bool readElement(QXmlStreamReader *xml);
@@ -92,10 +90,14 @@ public:
     virtual void setNumber(int _number) = 0;
     virtual QString getName() const = 0;
     virtual void setName(const QString &_name) = 0;
+        virtual float getPrice() const = 0;
+        virtual void setPrice(const float _price) = 0;
+        float getTotalPrice() const { return getNumber() * getPrice(); }
     int height() const { return 0; }
     bool compare(AbstractDecklistNode *other) const;
     bool compareNumber(AbstractDecklistNode *other) const;
     bool compareName(AbstractDecklistNode *other) const;
+    bool compareTotalPrice(AbstractDecklistNode *other) const;
 
     bool readElement(QXmlStreamReader *xml);
     void writeElement(QXmlStreamWriter *xml);
@@ -105,13 +107,17 @@ class DecklistCardNode : public AbstractDecklistCardNode {
 private:
     QString name;
     int number;
+        float price;
 public:
-    DecklistCardNode(const QString &_name = QString(), int _number = 1, InnerDecklistNode *_parent = 0) : AbstractDecklistCardNode(_parent), name(_name), number(_number) { }
+        DecklistCardNode(const QString &_name = QString(), int _number = 1, float _price = 0, InnerDecklistNode *_parent = 0) : AbstractDecklistCardNode(_parent), name(_name), number(_number), price(_price) { }
     DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
     int getNumber() const { return number; }
     void setNumber(int _number) { number = _number; }
     QString getName() const { return name; }
     void setName(const QString &_name) { name = _name; }
+        float getPrice() const { return price; }
+
+        void setPrice(const float _price) { price = _price; }
 };
 
 class DeckList : public QObject {
@@ -122,10 +128,6 @@ private:
     QMap<QString, SideboardPlan *> sideboardPlans;
     InnerDecklistNode *root;
     void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
-    InnerDecklistNode *getZoneObjFromName(const QString  zoneName);
-protected:
-    virtual QString getCardZoneFromName(QString /* cardName */, QString currentZoneName) { return currentZoneName; };
-    virtual QString getCompleteCardName(const QString cardName) const { return cardName; };
 signals:
     void deckHashChanged();
 public slots:

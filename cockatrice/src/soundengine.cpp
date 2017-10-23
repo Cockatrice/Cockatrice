@@ -106,8 +106,13 @@ QStringMap & SoundEngine::getAvailableThemes()
     availableThemes.clear();
 
     // load themes from user profile dir
-
-    dir = settingsCache->getDataPath() +  "/sounds";
+    dir =
+#ifdef PORTABLE_BUILD
+        qApp->applicationDirPath() +
+#else
+        QStandardPaths::standardLocations(QStandardPaths::DataLocation).first() +
+#endif
+        "/sounds";
 
     foreach(QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
     {

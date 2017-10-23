@@ -24,7 +24,6 @@
 #include "oracleimporter.h"
 #include "main.h"
 #include "settingscache.h"
-#include "version_string.h"
 
 #define ZIP_SIGNATURE "PK"
 #define ALLSETS_URL_FALLBACK "https://mtgjson.com/json/AllSets.json"
@@ -119,7 +118,6 @@ IntroPage::IntroPage(QWidget *parent)
     label->setWordWrap(true);
 
     languageLabel = new QLabel(this);
-    versionLabel = new QLabel(this);
     languageBox = new QComboBox(this);
     QString setLanguage = settingsCache->getLang();
     QStringList qmFiles = findQmFiles();
@@ -135,7 +133,6 @@ IntroPage::IntroPage(QWidget *parent)
     layout->addWidget(label, 0, 0, 1, 2);
     layout->addWidget(languageLabel, 1, 0);
     layout->addWidget(languageBox, 1, 1);
-    layout->addWidget(versionLabel, 4, 0);
 
     setLayout(layout);
 }
@@ -172,7 +169,6 @@ void IntroPage::retranslateUi()
                       "\nYou will need to specify a URL or a filename that "
                       "will be used as a source."));
     languageLabel->setText(tr("Language:"));
-    versionLabel->setText(tr("Version:") + QString(" %1").arg(VERSION_STRING));
 }
 
 LoadSetsPage::LoadSetsPage(QWidget *parent)
@@ -494,6 +490,9 @@ void SaveSetsPage::retranslateUi()
                    "Press \"Save\" to save the imported cards to the Cockatrice database."));
 
     defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
+    #ifdef PORTABLE_BUILD
+    defaultPathCheckBox->setEnabled(false);
+    #endif
 }
 
 void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, const QString &setName)

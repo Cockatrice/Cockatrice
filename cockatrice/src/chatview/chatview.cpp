@@ -93,7 +93,7 @@ void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
     anchorFormat.setAnchor(true);
     anchorFormat.setAnchorHref("card://" + cardName);
     anchorFormat.setFontItalic(true);
-
+    
     cursor.setCharFormat(anchorFormat);
     cursor.insertText(cardName);
     cursor.setCharFormat(oldFormat);

@@ -177,16 +177,9 @@ bool FilterItem::acceptColor(const CardInfo *info) const
     converted_term.replace(QString("white"), QString("w"), Qt::CaseInsensitive);
     converted_term.replace(QString("wht"), QString("w"), Qt::CaseInsensitive);
     converted_term.replace(QString(" "), QString(""), Qt::CaseInsensitive);
-    
-    if (converted_term.toLower() == "none" || converted_term.toLower() == "colorless" || converted_term.toLower() == "c" || converted_term.toLower() == "colourless") {    
-        if (info->getColors().length() < 1) {
-            return true;
-        }
-    }
 
     /* This is a tricky part, if the filter has multiple colors in it, like UGW,
        then we should match all of them to the card's colors */
-    
     match_count = 0;
     for (it = converted_term.begin(); it != converted_term.end(); it++) {
         for (i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++)

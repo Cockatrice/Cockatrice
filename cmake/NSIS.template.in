@@ -1,23 +1,13 @@
 !include ..\..\..\NSIS.definitions.nsh
+!include "MUI2.nsh"
+!include "FileFunc.nsh"
+
 Name "@CPACK_PACKAGE_NAME@"
-BrandingText "@CPACK_PACKAGE_FILE_NAME@"
+BrandingText "@CPACK_PACKAGE_NAME@-@CPACK_PACKAGE_VERSION_MAJOR@"
 OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
-
-!define UNINSTKEY "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
-!define DEFAULTNORMALDESTINATON "$ProgramFiles\Cockatrice"
-!define DEFAULTPORTABLEDESTINATON "$Desktop\CockatricePortable"
+SetCompressor /SOLID lzma
+InstallDir "$PROGRAMFILES\Cockatrice"
 !define INST_DIR "@CPACK_TEMPORARY_DIRECTORY@"
-
-RequestExecutionlevel highest
-SetCompressor LZMA
-
-Var NormalDestDir
-Var PortableDestDir
-Var PortableMode
-
-!include LogicLib.nsh
-!include FileFunc.nsh
-!include MUI2.nsh
 
 !define MUI_ABORTWARNING
 !define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\leftimage.bmp"
@@ -30,9 +20,7 @@ Var PortableMode
 !define MUI_FINISHPAGE_RUN_TEXT "Run 'Cockatrice' now"
 
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "${NSIS_SOURCE_PATH}\LICENSE"
-Page Custom PortableModePageCreate PortableModePageLeave
-!define MUI_PAGE_CUSTOMFUNCTION_PRE componentsPagePre
+!insertmacro MUI_PAGE_LICENSE "${NSIS_SOURCE_PATH}\COPYING"
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -43,150 +31,15 @@ Page Custom PortableModePageCreate PortableModePageLeave
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
 
-!insertmacro MUI_LANGUAGE English
-
-Function .onInit
-StrCpy $NormalDestDir "${DEFAULTNORMALDESTINATON}"
-StrCpy $PortableDestDir "${DEFAULTPORTABLEDESTINATON}"
-
-${GetParameters} $9
-
-ClearErrors
-${GetOptions} $9 "/?" $8
-${IfNot} ${Errors}
-    MessageBox MB_ICONINFORMATION|MB_SETFOREGROUND "\
-      /PORTABLE : Install in portable mode$\n\
-      /S : Silent install$\n\
-      /D=%directory% : Specify destination directory$\n"
-    Quit
-${EndIf}
-
-ClearErrors
-${GetOptions} $9 "/PORTABLE" $8
-${IfNot} ${Errors}
-    StrCpy $PortableMode 1
-    StrCpy $0 $PortableDestDir
-${Else}
-    StrCpy $PortableMode 0
-    StrCpy $0 $NormalDestDir
-    ${If} ${Silent}
-        Call RequireAdmin
-    ${EndIf}
-${EndIf}
-
-${If} $InstDir == ""
-    ; User did not use /D to specify a directory, 
-    ; we need to set a default based on the install mode
-    StrCpy $InstDir $0
-${EndIf}
-Call SetModeDestinationFromInstdir
-
-FunctionEnd
-
-
-Function RequireAdmin
-UserInfo::GetAccountType
-Pop $8
-${If} $8 != "admin"
-    MessageBox MB_ICONSTOP "You need administrator rights to install Cockatrice"
-    SetErrorLevel 740 ;ERROR_ELEVATION_REQUIRED
-    Abort
-${EndIf}
-FunctionEnd
-
-
-Function SetModeDestinationFromInstdir
-${If} $PortableMode = 0
-    StrCpy $NormalDestDir $InstDir
-${Else}
-    StrCpy $PortableDestDir $InstDir
-${EndIf}
-FunctionEnd
-
-
-Function PortableModePageCreate
-Call SetModeDestinationFromInstdir ; If the user clicks BACK on the directory page we will remember their mode specific directory
-!insertmacro MUI_HEADER_TEXT "Install Mode" "Choose how you want to install Cockatrice."
-nsDialogs::Create 1018
-Pop $0
-${NSD_CreateLabel} 0 10u 100% 24u "Select install mode:"
-Pop $0
-${NSD_CreateRadioButton} 30u 50u -30u 8u "Normal installation"
-Pop $1
-${NSD_CreateRadioButton} 30u 70u -30u 8u "Portable mode (all files in a single folder)"
-Pop $2
-${If} $PortableMode = 0
-    SendMessage $1 ${BM_SETCHECK} ${BST_CHECKED} 0
-${Else}
-    SendMessage $2 ${BM_SETCHECK} ${BST_CHECKED} 0
-${EndIf}
-nsDialogs::Show
-FunctionEnd
-
-Function PortableModePageLeave
-${NSD_GetState} $1 $0
-${If} $0 <> ${BST_UNCHECKED}
-    StrCpy $PortableMode 0
-    StrCpy $InstDir $NormalDestDir
-    Call RequireAdmin
-${Else}
-    StrCpy $PortableMode 1
-    StrCpy $InstDir $PortableDestDir
-${EndIf}
-FunctionEnd
-
-Function componentsPagePre
-${If} $PortableMode = 0
-    SetShellVarContext all
-    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
-    StrCmp $R0 "" done
-
-    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst
-    Abort
-
-    uninst:
-    ClearErrors
-    ExecWait "$R0"
-
-	done:
-${Else}
-    Abort
-${EndIf}
-FunctionEnd
+!insertmacro MUI_LANGUAGE "English"
 
 Section "Application" SecApplication
+	SetShellVarContext all
+	SetOutPath "$INSTDIR"
 
-SetShellVarContext all
-SetOutPath "$INSTDIR"
+    @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
+    @CPACK_NSIS_FULL_INSTALL@
 
-${If} $PortableMode = 1
-${AndIf} ${FileExists} "$INSTDIR\portable.dat"
-	; upgrade portable mode
-	RMDir /r "$INSTDIR\plugins"
-	RMDir /r "$INSTDIR\sounds"
-	RMDir /r "$INSTDIR\themes"
-	RMDir /r "$INSTDIR\translations"
-	Delete "$INSTDIR\uninstall.exe"
-	Delete "$INSTDIR\cockatrice.exe"
-	Delete "$INSTDIR\oracle.exe"
-	Delete "$INSTDIR\servatrice.exe"
-	Delete "$INSTDIR\Qt*.dll"
-	Delete "$INSTDIR\libmysql.dll"
-	Delete "$INSTDIR\icu*.dll"
-	Delete "$INSTDIR\libeay32.dll"
-	Delete "$INSTDIR\ssleay32.dll"
-	Delete "$INSTDIR\qt.conf"
-	Delete "$INSTDIR\qdebug.txt"
-	Delete "$INSTDIR\servatrice.sql"
-	Delete "$INSTDIR\servatrice.ini.example"
-	Delete "$INSTDIR\zlib*.dll"
-	RMDir "$INSTDIR"
-${EndIf}
-
-@CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
-@CPACK_NSIS_FULL_INSTALL@
-
-${If} $PortableMode = 0
 	WriteUninstaller "$INSTDIR\uninstall.exe"
 	${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
 	IntFmt $0 "0x%08X" $0
@@ -196,22 +49,24 @@ ${If} $PortableMode = 0
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "InstallLocation" "$INSTDIR"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayIcon" "$INSTDIR\cockatrice.exe"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "EstimatedSize" "$0"
-${Else}
-    ; Create the file the application uses to detect portable mode
-    FileOpen $0 "$INSTDIR\portable.dat" w
-    FileWrite $0 "PORTABLE"
-    FileClose $0
-${EndIf}
+SectionEnd
+
+Section "Update configuration" SecUpdateConfig
+	SetShellVarContext current
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "carddatabase" "$LOCALAPPDATA\Cockatrice\cards.xml"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "tokendatabase" "$LOCALAPPDATA\Cockatrice\tokens.xml"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "decks" "$LOCALAPPDATA\Cockatrice\decks"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\paths" "pics" "$LOCALAPPDATA\Cockatrice\pics"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\replays" "pics" "$LOCALAPPDATA\Cockatrice\replays"
+	WriteRegStr HKCU "Software\Cockatrice\Cockatrice\sound" "path" "$INSTDIR\sounds"
 SectionEnd
 
 Section "Start menu item" SecStartMenu
-${If} $PortableMode = 0
 	SetShellVarContext all
 	createDirectory "$SMPROGRAMS\Cockatrice"
 	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
 	createShortCut "$SMPROGRAMS\Cockatrice\Servatrice.lnk" "$INSTDIR\servatrice.exe"
-${EndIf}
 SectionEnd
 
 Section "un.Application" UnSecApplication
@@ -250,9 +105,11 @@ Section /o "un.Configurations, decks, cards, pics" UnSecConfiguration
 SectionEnd
 
 LangString DESC_SecApplication ${LANG_ENGLISH} "Cockatrice program files"
+LangString DESC_SecUpdateConfig ${LANG_ENGLISH} "Update the paths in the application settings according to the installation paths."
 LangString DESC_SecStartMenu ${LANG_ENGLISH} "Create start menu items for Cockatrice and Oracle."
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 	!insertmacro MUI_DESCRIPTION_TEXT ${SecApplication} $(DESC_SecApplication)
+	!insertmacro MUI_DESCRIPTION_TEXT ${SecUpdateConfig} $(DESC_SecUpdateConfig)
 	!insertmacro MUI_DESCRIPTION_TEXT ${SecStartMenu} $(DESC_SecStartMenu)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -262,3 +119,20 @@ LangString DESC_UnSecConfiguration ${LANG_ENGLISH} "Configurations, decks, card 
 	!insertmacro MUI_DESCRIPTION_TEXT ${UnSecApplication} $(DESC_UnSecApplication)
 	!insertmacro MUI_DESCRIPTION_TEXT ${UnSecConfiguration} $(DESC_UnSecConfiguration)
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_END
+
+
+Function .onInit
+    SetShellVarContext all
+    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
+    StrCmp $R0 "" done
+
+    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst
+    Abort
+
+uninst:
+    ClearErrors
+    ExecWait "$R0"
+
+done:
+
+FunctionEnd

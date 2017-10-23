@@ -8,9 +8,23 @@
 # Cmake 3.1 is required to enable C++11 support correctly
 cmake_minimum_required(VERSION 3.1)
 
-if(POLICY CMP0064)
-    cmake_policy(SET CMP0064 NEW)
+if(POLICY CMP0020)
+    cmake_policy(SET CMP0020 OLD)
 endif()
+
+if(POLICY CMP0043)
+    cmake_policy(SET CMP0043 OLD)
+endif()
+
+if(POLICY CMP0048)
+    cmake_policy(SET CMP0048 OLD)
+endif()
+
+if(POLICY CMP0064)
+    cmake_policy(SET CMP0064 OLD)
+endif()
+
+set(PROJECT_NAME "Cockatrice")
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
@@ -21,8 +35,7 @@ ELSE()
 ENDIF()
 
 # A project name is needed for CPack
-# Version can be overriden by git tags, see cmake/getversion.cmake
-PROJECT("Cockatrice" VERSION 2.3.18)
+PROJECT("${PROJECT_NAME}")
 
 # Use c++11 for all targets
 set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ ISO Standard")
@@ -145,11 +158,10 @@ set(CPACK_PACKAGE_CONTACT "Gavin Bisesi <Daenyth+github@gmail.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_NAME})
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
-set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_VERSION_FILENAME}")
 
 if(UNIX)
     if(APPLE)
@@ -158,6 +170,7 @@ if(UNIX)
         set(CPACK_DMG_FORMAT "UDBZ")
         set(CPACK_DMG_VOLUME_NAME "${PROJECT_NAME}")
         set(CPACK_SYSTEM_NAME "OSX")
+        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
         set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/cockatrice/resources/appicon.icns")
     else()
         # linux
@@ -173,9 +186,11 @@ if(UNIX)
             set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
             set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
         ENDIF()
+        set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
     endif()
 elseif(WIN32)
     set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
+    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
 
     # Configure file with custom definitions for NSIS.
     configure_file(

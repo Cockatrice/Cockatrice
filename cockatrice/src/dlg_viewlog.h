@@ -4,14 +4,11 @@
 #include <QDialog>
 
 class QPlainTextEdit;
-class QCloseEvent;
 
 class DlgViewLog : public QDialog {
 Q_OBJECT
 public:
     DlgViewLog(QWidget *parent);
-protected:
-    void closeEvent(QCloseEvent *event);
 private:
 	QPlainTextEdit *logArea;
 

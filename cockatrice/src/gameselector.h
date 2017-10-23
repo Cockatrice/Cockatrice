@@ -22,7 +22,6 @@ private slots:
     void actClearFilter();
     void actCreate();
     void actJoin();
-    void actSelectedGameChanged(const QModelIndex &current, const QModelIndex &previous);
     void checkResponse(const Response &response);
 signals:
     void gameJoined(int gameId);

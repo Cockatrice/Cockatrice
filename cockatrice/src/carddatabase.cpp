@@ -33,7 +33,7 @@ CardSet::CardSet(const QString &_shortName, const QString &_longName, const QStr
 
 QString CardSet::getCorrectedShortName() const
 {
-    // For Windows machines.
+    // Because windows is horrible.
     QSet<QString> invalidFileNames;
     invalidFileNames << "CON" << "PRN" << "AUX" << "NUL" << "COM1" << "COM2" <<
         "COM3" << "COM4" << "COM5" << "COM6" << "COM7" << "COM8" << "COM9" <<
@@ -99,7 +99,7 @@ int SetList::getUnknownSetsNum()
     for (int i = 0; i < size(); ++i)
     {
         CardSet *set = at(i);
-        if(!set->getIsKnown() && !set->getIsKnownIgnored())
+        if(!set->getIsKnown())
             ++num;
     }
     return num;
@@ -111,7 +111,7 @@ QStringList SetList::getUnknownSetsNames()
     for (int i = 0; i < size(); ++i)
     {
         CardSet *set = at(i);
-        if(!set->getIsKnown() && !set->getIsKnownIgnored())
+        if(!set->getIsKnown())
             sets << set->getShortName();
     }
     return sets;
@@ -122,13 +122,9 @@ void SetList::enableAllUnknown()
     for (int i = 0; i < size(); ++i)
     {
         CardSet *set = at(i);
-        if(!set->getIsKnown() && !set->getIsKnownIgnored())
+        if(!set->getIsKnown())
         {
             set->setIsKnown(true);
-            set->setEnabled(true);
-        }
-        else if (set->getIsKnownIgnored() && !set->getEnabled())
-        {
             set->setEnabled(true);
         }
     }
@@ -139,8 +135,7 @@ void SetList::enableAll()
     for (int i = 0; i < size(); ++i)
     {
         CardSet *set = at(i);
-        if(!set->getIsKnownIgnored())
-            set->setIsKnown(true);
+        set->setIsKnown(true);
         set->setEnabled(true);
     }
 }
@@ -150,14 +145,9 @@ void SetList::markAllAsKnown()
     for (int i = 0; i < size(); ++i)
     {
         CardSet *set = at(i);
-        if(!set->getIsKnown() && !set->getIsKnownIgnored())
+        if(!set->getIsKnown())
         {
             set->setIsKnown(true);
-            set->setEnabled(false);
-        }
-        else if (set->getIsKnownIgnored() && !set->getEnabled())
-        {
-            set->setEnabled(true);
         }
     }
 }
@@ -186,8 +176,8 @@ CardInfo::CardInfo(const QString &_name,
                    const QString &_powtough,
                    const QString &_text,
                    const QStringList &_colors,
-                   const QList<CardRelation *> &_relatedCards,
-                   const QList<CardRelation *> &_reverseRelatedCards,
+                   const QStringList &_relatedCards,
+                   const QStringList &_reverseRelatedCards,
                    bool _upsideDownArt,
                    int _loyalty,
                    bool _cipt,
@@ -358,45 +348,14 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
     for (int i = 0; i < colors.size(); i++)
         xml.writeTextElement("color", colors[i]);
 
-    const QList<CardRelation *> related = info->getRelatedCards();
-    for (int i = 0; i < related.size(); i++) {
+    const QStringList &related = info->getRelatedCards();
+    for (int i = 0; i < related.size(); i++)
+        xml.writeTextElement("related", related[i]);
 
-        xml.writeStartElement("related");
-        if (related[i]->getDoesAttach())
-            xml.writeAttribute("attach", "attach");
-        if (related[i]->getIsCreateAllExclusion())
-            xml.writeAttribute("exclude", "exclude");
-        if (related[i]->getIsVariable()) {
-            if (1 == related[i]->getDefaultCount())
-                xml.writeAttribute("count", "x");
-            else
-                xml.writeAttribute("count", "x=" + QString::number(related[i]->getDefaultCount()));
-        }
-        else if (1 != related[i]->getDefaultCount()) {
-            xml.writeAttribute("count", QString::number(related[i]->getDefaultCount()));
-        }
-        xml.writeCharacters(related[i]->getName());
-        xml.writeEndElement();
-    }
-    const QList<CardRelation *> reverseRelated = info->getReverseRelatedCards();
-    for (int i = 0; i < reverseRelated.size(); i++) {
-        xml.writeStartElement("reverse-related");
-        if (reverseRelated[i]->getDoesAttach())
-            xml.writeAttribute("attach", "attach");
-        if (reverseRelated[i]->getIsCreateAllExclusion())
-            xml.writeAttribute("exclude", "exclude");
-        if (reverseRelated[i]->getIsVariable()) {
-            if (1 == reverseRelated[i]->getDefaultCount())
-                xml.writeAttribute("count", "x");
-            else
-                xml.writeAttribute("count", "x=" + QString::number(reverseRelated[i]->getDefaultCount()));
-        }
-        else if (1 != reverseRelated[i]->getDefaultCount()) {
-            xml.writeAttribute("count", QString::number(reverseRelated[i]->getDefaultCount()));
-        }
-        xml.writeCharacters(reverseRelated[i]->getName());
-        xml.writeEndElement();
-    }
+    const QStringList &reverseRelated = info->getReverseRelatedCards();
+    for (int i = 0; i < reverseRelated.size(); i++)
+        xml.writeTextElement("reverse-related", reverseRelated[i]);
+
     xml.writeTextElement("manacost", info->getManaCost());
     xml.writeTextElement("cmc", info->getCmc());
     xml.writeTextElement("type", info->getCardType());
@@ -460,13 +419,6 @@ void CardDatabase::addCard(CardInfo *card)
 
 void CardDatabase::removeCard(CardInfo *card)
 {
-    foreach(CardRelation * cardRelation, card->getRelatedCards())
-        cardRelation->deleteLater();
-    foreach(CardRelation * cardRelation, card->getReverseRelatedCards())
-        cardRelation->deleteLater();
-    foreach(CardRelation * cardRelation, card->getReverseRelatedCards2Me())
-        cardRelation->deleteLater();
-
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
     emit cardRemoved(card);
@@ -553,8 +505,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
             break;
         if (xml.name() == "card") {
             QString name, manacost, cmc, type, pt, text;
-            QStringList colors;
-            QList<CardRelation *> relatedCards, reverseRelatedCards;
+            QStringList colors, relatedCards, reverseRelatedCards;
             QStringMap customPicURLs;
             MuidMap muids;
             QStringMap collectorNumbers, rarities;
@@ -597,38 +548,11 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                     }
                 } else if (xml.name() == "color")
                     colors << xml.readElementText();
-                else if (xml.name() == "related" || xml.name() == "reverse-related") {
-                    bool attach = false;
-                    bool exclude = false;
-                    bool variable = false;
-                    int count = 1;
-                    QXmlStreamAttributes attrs = xml.attributes();
-                    QString cardName = xml.readElementText();
-                    if (attrs.hasAttribute("count")) {
-                        if (attrs.value("count").toString().indexOf("x=") == 0) {
-                            variable = true;
-                            count = attrs.value("count").toString().remove(0, 2).toInt();
-                        }
-                        else if (attrs.value("count").toString().indexOf("x") == 0)
-                            variable = true;
-                        else
-                            count = attrs.value("count").toString().toInt();
-                        if (count < 1)
-                            count = 1;
-                    }
-                    if (attrs.hasAttribute("attach")) {
-                        attach = true;
-                    }
-                    if (attrs.hasAttribute("exclude")) {
-                        exclude = true;
-                    }
-                    CardRelation * relation = new CardRelation(cardName, attach, exclude, variable, count);
-                    if (xml.name() == "reverse-related") {
-                        reverseRelatedCards << relation;
-                    } else {
-                        relatedCards << relation;
-                    }
-                } else if (xml.name() == "tablerow")
+                else if (xml.name() == "related")
+                    relatedCards << xml.readElementText();
+                else if (xml.name() == "reverse-related")
+                    reverseRelatedCards << xml.readElementText();
+                else if (xml.name() == "tablerow")
                     tableRow = xml.readElementText().toInt();
                 else if (xml.name() == "cipt")
                     cipt = (xml.readElementText() == "1");
@@ -801,16 +725,12 @@ void CardDatabase::refreshCachedReverseRelatedCards()
         else
             relatedCardName = card->getName(); // "name"
 
-        foreach(CardRelation * cardRelation, card->getReverseRelatedCards())
+        foreach(QString targetCard, card->getReverseRelatedCards())
         {
-            const QString & targetCard = cardRelation->getName();
             if (!cards.contains(targetCard))
                 continue;
-            CardRelation *newCardRelation = new CardRelation(relatedCardName, cardRelation->getDoesAttach(),
-                    cardRelation->getIsCreateAllExclusion(),
-                    cardRelation->getIsVariable(),
-                    cardRelation->getDefaultCount());
-            cards.value(targetCard)->addReverseRelatedCards2Me(newCardRelation);
+
+            cards.value(targetCard)->addReverseRelatedCards2Me(relatedCardName);
         }
     }
 }
@@ -850,8 +770,6 @@ void CardDatabase::checkUnknownSets()
         QStringList unknownSetNames = sets.getUnknownSetsNames();
         if(numUnknownSets > 0)
             emit cardDatabaseNewSetsFound(numUnknownSets, unknownSetNames);
-        else
-            sets.markAllAsKnown();
     } else {
         // No set enabled. Probably this is the first time running trice
         sets.guessSortKeys();
@@ -912,26 +830,4 @@ bool CardDatabase::saveCustomTokensToFile()
     xml.writeEndDocument();
 
     return true;
-}
-
-CardRelation::CardRelation(const QString &_name,
-        bool _doesAttach,
-        bool _isCreateAllExclusion,
-        bool _isVariableCount,
-        int _defaultCount
-        )
-    : name(_name),
-      doesAttach(_doesAttach),
-      isCreateAllExclusion(_isCreateAllExclusion),
-      isVariableCount(_isVariableCount),
-      defaultCount(_defaultCount)
-{
-
-}
-
-void CardInfo::resetReverseRelatedCards2Me() {
-    foreach(CardRelation * cardRelation, this->getReverseRelatedCards2Me()) {
-        cardRelation->deleteLater();
-    }
-    reverseRelatedCardsToMe = QList<CardRelation *>();
 }

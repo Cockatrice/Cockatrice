@@ -383,6 +383,7 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));   
     connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
     connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
+    connect(tab, SIGNAL(notIdle()), this, SLOT(resetIdleTimer()));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
     roomTabs.insert(info.room_id(), tab);
@@ -612,7 +613,7 @@ bool TabSupervisor::isOwnUserRegistered() const
 
 QString TabSupervisor::getOwnUsername() const
 {
-    return userInfo ? QString::fromStdString(userInfo->name()) : QString();
+    return QString::fromStdString(userInfo->name());
 }
 
 bool TabSupervisor::isUserBuddy(const QString &userName) const
