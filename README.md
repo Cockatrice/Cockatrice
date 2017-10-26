@@ -52,7 +52,7 @@ We try to be responsive to new issues. We'll provide advice on how best to imple
 
 # Translation Status [![Cockatrice on Transiflex](https://tx-assets.scdn5.secure.raxcdn.com/static/charts/images/tx-logo-micro.c5603f91c780.png)](https://www.transifex.com/projects/p/cockatrice/)
 
-Cockatrice uses Transifex for translations. You can help us bring Cockatrice and Oracle to your language or just edit single wordings right from within your browser by simly visiting our [Transifex project page](https://www.transifex.com/projects/p/cockatrice/).<br>
+Cockatrice uses Transifex for translations. You can help us bring Cockatrice and Oracle to your language or just edit single wordings right from within your browser by visiting our [Transifex project page](https://www.transifex.com/projects/p/cockatrice/).<br>
 
 | Cockatrice | Oracle |
 |:-:|:-:|
@@ -116,7 +116,7 @@ Find more information on how to use Servatrice with Docker in our [wiki](https:/
 
 # ReadMe Style Guide and Documentation Process
 
-This ReadMe uses the [Google Developer Documentation Style Guide] to ensure consistent writing across the ReadMe.
+This ReadMe uses the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent writing across the ReadMe.
 
 # License [![GPLv2 License](https://img.shields.io/github/license/Cockatrice/Cockatrice.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/LICENSE)
 
