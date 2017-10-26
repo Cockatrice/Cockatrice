@@ -2,7 +2,7 @@
 
 ---
 
-**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads-) | [Get Involved](#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [ReadMe Style Guide](#style-) | [License](#license-)
+**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads-) | [Get Involved](#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [ReadMe Style Guide](#readme-) | [License](#license-)
 
 ---
 
