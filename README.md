@@ -2,43 +2,45 @@
 
 ---
 
-**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads-) | [Get Involved](#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [License](#license-)
+**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads-) | [Get Involved](#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [ReadMe Style Guide](#style-) | [License](#license-)
 
 ---
 
 <br><pre>
-<b>If you're getting started &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
-<b>If you're trying to get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket))</b>
+<b>To get started, &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
+<b>To get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket))</b>
 </pre><br>
 
 
 # Cockatrice
 
-Cockatrice is an open-source multiplatform supported program for playing tabletop card games over a network. The program's server design prevents any kind of client modifications to gain an unfair advantage in a game. The client also has a built in single-player mode where you can brew without being connected to a server. This project is written in C++ and is using the Qt5 libraries.<br>
+Cockatrice is an open-source, multiplatform program for playing tabletop card games over a network. The program's server design prevents users from manipulating the game for unfair advantage. The client also provides a single-player mode, which allows users to brew while offline. This project uses C++ and the Qt5 libraries.<br>
 
 
 # Downloads [![Cockatrice Eternal Download Count](https://img.shields.io/github/downloads/cockatrice/cockatrice/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)
 
-We offer downloads for all full releases (recommended) and the latest development versions. Full releases are checkpoints with major feature or UI enhancements between them, but currently we don't have a set schedule for releasing new updates. The development version contains the most recently added features and bugfixes, but can be more unstable. Downloads for development versions are updated automatically with every change.
+Downloads are available for all full releases (recommended) and the current development versions. Full releases are checkpoints featuring major feature or UI enhancements. There is no current schedule for future full releases.
+
+The development version contains the most recently added features and bugfixes, but can be unstable. The download for the development version updates automatically with every change.
 
 - Latest full release (**recommended**): [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest) [![Download Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)<br>
 
 - Latest development version: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases) 
-   - Development builds may not be stable and/or contain several bugs.
-   - If you'd like to be a Cockatrice Beta Tester, use this version.
-   - More information can be [found here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)
+   - Development builds may be unstable and contain bugs.
+   - To be a Cockatrice Beta Tester, use this version.
+   - Find more information on the development build [here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)
 
 
 # Get Involved [![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice.svg)](https://gitter.im/Cockatrice/Cockatrice)
 
 [Chat](https://gitter.im/Cockatrice/Cockatrice) with the Cockatrice developers on Gitter. Come here to talk about the application, features, or just to hang out. For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
 
-If you'd like to contribute code to the project, please review [the guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md).
-We maintain a tag for "easy" changes on our issue tracker: issues tagged in this way provide a simple way to get started. [Issues tagged as Easy Changes](https://github.com/Cockatrice/Cockatrice/issues?q=is%3Aopen+is%3Aissue+label%3A%22Easy+Change%22)
+To contribute code to the project, please review [the guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md).
+We maintain a tag for "easy" changes on our issue tracker. Issues with this tag provide a simple way to get started. [Issues tagged as Easy Changes](https://github.com/Cockatrice/Cockatrice/issues?q=is%3Aopen+is%3Aissue+label%3A%22Easy+Change%22)
 
-Check our long-term project **roadmap** with some visions [here](https://docs.google.com/document/d/1Ewe5uSaRE2nR2pNPMaGmP6gVZdqgFbBgwSscGqIr4W0/edit).
+Read the long-term project **roadmap** to see planned edits and milestones [here](https://docs.google.com/document/d/1Ewe5uSaRE2nR2pNPMaGmP6gVZdqgFbBgwSscGqIr4W0/edit).
 
-We try to be very responsive to new issues. We'll try to give you advice on how a feature should be implemented / advice on places the codebase is doing something similar before you get too far along with a PR.
+We try to be responsive to new issues. We'll provide advice on how best to implement a feature; alternately, we can show you where a contributor is already doing something similar in the codebase.
 
 
 # Community Resources
@@ -50,7 +52,7 @@ We try to be very responsive to new issues. We'll try to give you advice on how 
 
 # Translation Status [![Cockatrice on Transiflex](https://tx-assets.scdn5.secure.raxcdn.com/static/charts/images/tx-logo-micro.c5603f91c780.png)](https://www.transifex.com/projects/p/cockatrice/)
 
-Cockatrice uses Transifex for translations. You can help us bring Cockatrice and Oracle to your language or just edit single wordings right from within your browser by simply visiting our [Transifex project page](https://www.transifex.com/projects/p/cockatrice/).<br>
+Cockatrice uses Transifex for translations. You can help us bring Cockatrice and Oracle to your language or just edit single wordings right from within your browser by simly visiting our [Transifex project page](https://www.transifex.com/projects/p/cockatrice/).<br>
 
 | Cockatrice | Oracle |
 |:-:|:-:|
@@ -78,14 +80,6 @@ To compile:
     cmake ..
     make
 
-You can then run
-
-    make install
-
-to get a cockatrice installation inside the `release` folder, or:
-
-    make package
-
 to create a system-specific installation package.
 
 The following flags can be passed to `cmake`:
@@ -107,21 +101,23 @@ The following flags can be passed to `cmake`:
 
 #### Servatrice Docker container
 
-A Dockerfile is provided to run Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/what-docker).<br>
+Use [Docker](https://www.docker.com/what-docker) to run Servatrice (the Cockatrice server) using the Cockatrice Dockerfile.<br>
 
-You just need to create an image from the Dockerfile<br>
+First, create an image from the Dockerfile<br>
 `cd /path/to/Cockatrice-Repo/`
 `docker build -t servatrice .`<br>
 And then run it<br>
 `docker run -i -p 4747:4747/tcp -t servatrice:latest`<br>
 
->Please note that running this command will expose the TCP port 4747 of the docker container<br>
+>Note: Running this command exposes the TCP port 4747 of the docker container<br>
 to permit connections to the server.
 
-More infos on how to use Servatrice with Docker can be found in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
+Find more information on how to use Servatrice with Docker in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
 
+# ReadMe Style Guide and Documentation Process
+
+This ReadMe uses the [Google Developer Documentation Style Guide] to ensure consistent writing across the ReadMe.
 
 # License [![GPLv2 License](https://img.shields.io/github/license/Cockatrice/Cockatrice.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/LICENSE)
 
 Cockatrice is free software, licensed under the [GPLv2](https://github.com/Cockatrice/Cockatrice/blob/master/LICENSE).
-
