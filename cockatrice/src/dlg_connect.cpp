@@ -121,7 +121,7 @@ DlgConnect::DlgConnect(QWidget *parent)
     QGroupBox *loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
 
-    QGroupBox *btnGroupBox = new QGroupBox(tr(""));
+    QGroupBox *btnGroupBox = new QGroupBox();
     btnGroupBox->setLayout(buttons);
 
     QGridLayout *grid = new QGridLayout;
