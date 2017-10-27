@@ -43,6 +43,8 @@ Read the long-term project **roadmap** to see planned edits and milestones [here
 
 We try to be responsive to new issues. We'll provide advice on how best to implement a feature; alternately, we can show you where the codebase is doing something similar before you get too far along.
 
+Cockatrice uses the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
+
 
 # Community Resources
 
@@ -122,8 +124,6 @@ And then run it<br>
 to permit connections to the server.
 
 Find more information on how to use Servatrice with Docker in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
-
-This ReadMe uses the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent writing across the ReadMe.
 
 # License [![GPLv2 License](https://img.shields.io/github/license/Cockatrice/Cockatrice.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/LICENSE)
 
