@@ -9,6 +9,7 @@
 <br><pre>
 <b>To get started, &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
 <b>To get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket))</b>
+<b>To help with development, see how to [get involved](#get-involved-)</b>
 </pre><br>
 
 
@@ -40,7 +41,7 @@ We maintain a tag for "easy" changes on our issue tracker. Issues with this tag 
 
 Read the long-term project **roadmap** to see planned edits and milestones [here](https://docs.google.com/document/d/1Ewe5uSaRE2nR2pNPMaGmP6gVZdqgFbBgwSscGqIr4W0/edit).
 
-We try to be responsive to new issues. We'll provide advice on how best to implement a feature; alternately, we can show you where a contributor is already doing something similar in the codebase.
+We try to be responsive to new issues. We'll provide advice on how best to implement a feature; alternately, we can show you where the codebase is doing something similar before you get too far along.
 
 
 # Community Resources
@@ -109,7 +110,7 @@ The following flags can be passed to `cmake`:
 
 #### Servatrice Docker container
 
-Run Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/what-docker) and the Cockatrice Dockerfile.<br>
+You can run an instance of Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/what-docker) and the Cockatrice Dockerfile.<br>
 
 First, create an image from the Dockerfile<br>
 `cd /path/to/Cockatrice-Repo/`
