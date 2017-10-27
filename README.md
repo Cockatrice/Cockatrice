@@ -2,7 +2,7 @@
 
 ---
 
-**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads-) | [Get Involved](#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [ReadMe Style Guide](#readme-) | [License](#license-)
+**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads-) | [Get Involved](#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [License](#license-)
 
 ---
 
@@ -79,6 +79,14 @@ To compile:
     cd build
     cmake ..
     make
+    
+You can then run
+
+    make install
+
+to get a cockatrice installation inside the `release` folder, or:
+
+    make package
 
 to create a system-specific installation package.
 
@@ -101,7 +109,7 @@ The following flags can be passed to `cmake`:
 
 #### Servatrice Docker container
 
-Use [Docker](https://www.docker.com/what-docker) to run Servatrice (the Cockatrice server) using the Cockatrice Dockerfile.<br>
+Run Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/what-docker) and the Cockatrice Dockerfile.<br>
 
 First, create an image from the Dockerfile<br>
 `cd /path/to/Cockatrice-Repo/`
@@ -113,8 +121,6 @@ And then run it<br>
 to permit connections to the server.
 
 Find more information on how to use Servatrice with Docker in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
-
-# ReadMe Style Guide and Documentation Process
 
 This ReadMe uses the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent writing across the ReadMe.
 
