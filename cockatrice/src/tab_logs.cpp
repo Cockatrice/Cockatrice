@@ -221,14 +221,14 @@ void TabLog::createDock()
     descriptionGrid = new QGridLayout;
     descriptionGrid->addWidget(labelDescription, 0, 0);
 
-    descriptionGroupBox = new QGroupBox(tr(""));
+    descriptionGroupBox = new QGroupBox();
     descriptionGroupBox->setLayout(descriptionGrid);
 
     buttonGrid = new QGridLayout;
     buttonGrid->addWidget(getButton, 0, 0);
     buttonGrid->addWidget(clearButton, 0, 1);
 
-    buttonGroupBox = new QGroupBox(tr(""));
+    buttonGroupBox = new QGroupBox();
     buttonGroupBox->setLayout(buttonGrid);
 
     mainLayout = new QVBoxLayout(this);
