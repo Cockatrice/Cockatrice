@@ -211,7 +211,6 @@ int CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QSt
     float rightNum = right.toFloat(&okRight);
 
     if (okLeft && okRight) {
-        //return leftNum - rightNum;
         if (leftNum < rightNum) {
             return -1;
         }
@@ -253,7 +252,6 @@ int CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QSt
         
         if (leftNum != rightNum) {
             //both parsed as numbers, but different number
-            //return leftNum - rightNum;
             if (leftNum < rightNum) {
                 return -1;
             }
