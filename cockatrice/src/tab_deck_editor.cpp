@@ -720,7 +720,7 @@ bool TabDeckEditor::actSaveDeckAs()
     dialog.setConfirmOverwrite(true);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::fileNameFilters);
-    dialog.selectFile(deckModel->getDeckList()->getName().trimmed());
+    dialog.selectFile(deckModel->getDeckList()->getName().trimmed() + ".cod");
     if (!dialog.exec())
         return false;
 
