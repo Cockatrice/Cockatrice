@@ -20,9 +20,10 @@ Cockatrice is an open-source, multiplatform program for playing tabletop card ga
 
 # Downloads [![Cockatrice Eternal Download Count](https://img.shields.io/github/downloads/cockatrice/cockatrice/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)
 
-Downloads are available for all full releases (recommended) and the current development versions. Full releases are checkpoints featuring major feature or UI enhancements. There is no current schedule for future full releases.
+Downloads are available for full releases and the current development version.<br>
+Full releases are checkpoints featuring major feature or UI enhancements - we recommend to use those. There is no strict schedule for new full releases.
 
-The development version contains the most recently added features and bugfixes, but can be unstable. The download for the development version updates automatically with every change.
+The development version contains the most recently added features and bugfixes, but can be unstable. They are released as we feel need.
 
 - Latest full release (**recommended**): [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest) [![Download Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)<br>
 
