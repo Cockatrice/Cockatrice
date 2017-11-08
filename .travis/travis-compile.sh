@@ -8,7 +8,8 @@ mkdir -p build
 cd build
 prefix=""
 if [[ $TRAVIS_OS_NAME == "osx" ]]; then
-  prefix="-DCMAKE_PREFIX_PATH=$(echo /usr/local/Cellar/qt/5.*/)"
+  export PATH="/usr/local/opt/ccache/libexec:$PATH"
+  prefix="-DCMAKE_PREFIX_PATH=$(echo /usr/local/opt/qt*/)"
 fi
 if [[ $TRAVIS_OS_NAME == "linux" ]]; then
   prefix="-DCMAKE_PREFIX_PATH=$(echo /opt/qt5*/lib/cmake/)"

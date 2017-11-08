@@ -121,7 +121,7 @@ public:
     Response::ResponseCode drawCards(GameEventStorage &ges, int number);
     Response::ResponseCode moveCard(GameEventStorage &ges, Server_CardZone *startzone, const QList<const CardToMove *> &_cards, Server_CardZone *targetzone, int x, int y, bool fixFreeSpaces = true, bool undoingDraw = false);
     void unattachCard(GameEventStorage &ges, Server_Card *card);
-    Response::ResponseCode setCardAttrHelper(GameEventStorage &ges, const QString &zone, int cardId, CardAttribute attribute, const QString &attrValue);
+    Response::ResponseCode setCardAttrHelper(GameEventStorage &ges, int targetPlayerId, const QString &zone, int cardId, CardAttribute attribute, const QString &attrValue);
 
     Response::ResponseCode cmdLeaveGame(const Command_LeaveGame &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdKickFromGame(const Command_KickFromGame &cmd, ResponseContainer &rc, GameEventStorage &ges);

@@ -14,7 +14,7 @@ class CardDatabaseModel : public QAbstractListModel {
 public:
     enum Columns { NameColumn, SetListColumn, ManaCostColumn, PTColumn, CardTypeColumn, ColorColumn };
     enum Role { SortRole=Qt::UserRole };
-    CardDatabaseModel(CardDatabase *_db, QObject *parent = 0);
+    CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromEnabledSets, QObject *parent = 0);
     ~CardDatabaseModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -25,6 +25,7 @@ public:
 private:
     QList<CardInfo *> cardList;
     CardDatabase *db;
+    bool showOnlyCardsFromEnabledSets;
 
     inline bool checkCardHasAtLeastOneEnabledSet(CardInfo *card);
 private slots:
@@ -60,6 +61,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+    static int lessThanNumerically(const QString &left, const QString&right);
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
     bool rowMatchesCardName(CardInfo const *info) const;
     bool canFetchMore(const QModelIndex &parent) const;

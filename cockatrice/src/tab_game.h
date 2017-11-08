@@ -6,6 +6,7 @@
 #include <QCompleter>
 #include "tab.h"
 #include "pb/serverinfo_game.pb.h"
+#include "pb/event_leave.pb.h"
 
 class AbstractClient;
 class CardDatabase;
@@ -186,6 +187,7 @@ private:
     void createPlayAreaWidget(bool bReplay=false);
     void createDeckViewContainerWidget(bool bReplay=false);
     void createReplayDock();
+    QString getLeaveReason(Event_Leave::LeaveReason reason);
 signals:
     void gameClosing(TabGame *tab);
     void playerAdded(Player *player);
@@ -247,9 +249,10 @@ public:
     QString getTabText() const;
     bool getSpectator() const { return spectator; }
     bool getSpectatorsSeeEverything() const { return gameInfo.spectators_omniscient(); }
+    bool isSpectator();
     Player *getActiveLocalPlayer() const;
     AbstractClient *getClientForPlayer(int playerId) const;
-    
+
     void setActiveCard(CardItem *_card) { activeCard = _card; }
     CardItem *getActiveCard() const { return activeCard; }
 

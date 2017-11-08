@@ -6,8 +6,9 @@ message Event_RoomSay {
         optional Event_RoomSay ext = 1002;
     }
     enum RoomMessageType {
-        Welcome = 1;    // rooms welcome message
-        ChatHistory = 2;    // rooms chat history message
+        UserMessage = 0; // user message
+        Welcome = 1;     // rooms welcome message
+        ChatHistory = 2; // rooms chat history message
     }
     optional string name = 1;
     optional string message = 2;

@@ -64,7 +64,7 @@ private:
     QStringList findQmFiles();
     QString languageName(const QString &qmFile);
 private:
-     QLabel *label, *languageLabel;
+     QLabel *label, *languageLabel, *versionLabel;
      QComboBox *languageBox;
 private slots:
     void languageBoxChanged(int index);

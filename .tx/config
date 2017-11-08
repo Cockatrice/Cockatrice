@@ -10,4 +10,3 @@ source_lang = en
 file_filter = oracle/translations/oracle_<lang>.ts
 source_file = oracle/translations/oracle_en.ts
 source_lang = en
-

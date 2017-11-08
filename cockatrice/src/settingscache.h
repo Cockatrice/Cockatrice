@@ -43,7 +43,6 @@ signals:
     void minPlayersForMultiColumnLayoutChanged();
     void soundEnabledChanged();
     void soundThemeChanged();
-    void priceTagFeatureChanged(int enabled);
     void ignoreUnregisteredUsersChanged();
     void ignoreUnregisteredUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
@@ -59,6 +58,7 @@ private:
     LayoutsSettings *layoutsSettings;
 
     QByteArray mainWindowGeometry;
+    QByteArray tokenDialogGeometry;
     QString lang;
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
@@ -85,8 +85,6 @@ private:
     bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
     bool soundEnabled;
     QString soundThemeName;
-    bool priceTagFeature;
-    int priceTagSource;
     bool ignoreUnregisteredUsers;
     bool ignoreUnregisteredUserMessages;
     QString picUrl;
@@ -117,12 +115,14 @@ private:
     QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
     bool rememberGameSettings;
     QList<ReleaseChannel*> releaseChannels;
+    bool isPortableBuild;
 
 public:
     SettingsCache();
     QString getDataPath();
     QString getSettingsPath();
     const QByteArray &getMainWindowGeometry() const { return mainWindowGeometry; }
+    const QByteArray &getTokenDialogGeometry() const { return tokenDialogGeometry; }
     QString getLang() const { return lang; }
     QString getDeckPath() const { return deckPath; }
     QString getReplaysPath() const { return replaysPath; }
@@ -163,8 +163,6 @@ public:
     bool getZoneViewPileView() const { return zoneViewPileView; }
     bool getSoundEnabled() const { return soundEnabled; }
     QString getSoundThemeName() const { return soundThemeName; }
-    bool getPriceTagFeature() const { return false; /* #859; priceTagFeature;*/ }
-    int getPriceTagSource() const { return priceTagSource; }
     bool getIgnoreUnregisteredUsers() const { return ignoreUnregisteredUsers; }
     bool getIgnoreUnregisteredUserMessages() const { return ignoreUnregisteredUserMessages; }
     QString getPicUrl() const { return picUrl; }
@@ -201,8 +199,10 @@ public:
     MessageSettings& messages() const { return *messageSettings; }
     GameFiltersSettings& gameFilters() const { return *gameFiltersSettings; }
     LayoutsSettings& layouts() const { return *layoutsSettings; }
+    bool getIsPortableBuild() const { return isPortableBuild; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
+    void setTokenDialogGeometry(const QByteArray &_tokenDialog);
     void setLang(const QString &_lang);
     void setDeckPath(const QString &_deckPath);
     void setReplaysPath(const QString &_replaysPath);
@@ -233,8 +233,6 @@ public slots:
     void setZoneViewPileView(int _zoneViewPileView);
     void setSoundEnabled(int _soundEnabled);
     void setSoundThemeName(const QString &_soundThemeName);
-    void setPriceTagFeature(int _priceTagFeature);
-    void setPriceTagSource(int _priceTagSource);
     void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
     void setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages);
     void setPicUrl(const QString &_picUrl);

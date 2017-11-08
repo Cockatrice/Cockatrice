@@ -3,7 +3,7 @@
 <head>
   <title>Cockatrice web client</title>
   <link rel="shortcut icon" href="imgs/cockatrice.png" />
-  <link rel="stylesheet" href="js/jquery-ui-1.11.4.css">
+  <link rel="stylesheet" href="js/jquery-ui-1.12.1.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -75,11 +75,9 @@ Loading cockatrice web client...
 
 </div>
 
-<script src="js/jquery-1.11.3.js"></script>
-<script src="js/jquery-ui-1.11.4.js"></script>
-<script src="js/long.js"></script>
-<script src="js/bytebuffer.js"></script>
-<script src="js/protobuf.js"></script>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/jquery-ui-1.12.1.min.js"></script>
+<script src="js/protobuf-6.7.0.min.js"></script>
 <script src="webclient.js"></script>
 
 <script>
@@ -201,6 +199,15 @@ Loading cockatrice web client...
           return "Unregistered user";
     }
 
+    function sortUserlist(list) {
+      var li = $(list + ' li');
+      li.sort(function(a, b) {
+        return $(a).text().toLowerCase().localeCompare($(b).text().toLowerCase());
+      });
+      $(list).empty().html(li);
+      $(list).selectable();
+    }
+
     $("#loginnow").click(connect);
     $("#port, #user, #pass").keydown(function(e) {
         if (e.keyCode == 13) { connect(); }
@@ -216,7 +223,7 @@ Loading cockatrice web client...
       }
 
       var options = {
-        "debug": true,
+        "debug": false,
         "autojoinrooms" : true,
         "host": host,
         "port": port,
@@ -284,7 +291,7 @@ Loading cockatrice web client...
               switch(key)
               {
                 case 'avatarBmp':
-                  $('#userinfo').prepend("<img id='avatar' src='data:image/JPEG;base64," + value.toBase64() + "' /><br/>");
+                  $('#userinfo').prepend("<img id='avatar' src='data:image/JPEG;base64," + btoa(String.fromCharCode.apply(null, value)) + "' /><br/>");
                   break;
                 case 'accountageSecs':
                   $('#userinfo').append('Registered since: ' + timeAgoToInterval(value) + '<br/>');
@@ -361,7 +368,7 @@ Loading cockatrice web client...
           $.each(room["userList"], function(key, value) {
             $("#tab-room-" + room["roomId"] + " .userlist").append('<li>' + value.name + '</li>');
           });
-          $("#tab-room-" + room["roomId"] + " .userlist").selectable();
+          sortUserlist("#tab-room-" + room["roomId"] + " .userlist");
 
           $("#tab-room-" + room["roomId"] + " .say").click(function() {
             var msg = $("#tab-room-" + room["roomId"] + " .input").val();
@@ -378,6 +385,8 @@ Loading cockatrice web client...
         },
         "roomMessageCallback" : function(roomId, message) {
           var text;
+          var out = $("#tab-room-" + roomId + " .output")[0];
+          var isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
           switch(message["messageType"])
           {
             case WebClient.pb.Event_RoomSay.RoomMessageType.Welcome:
@@ -391,7 +400,23 @@ Loading cockatrice web client...
               break;
           }
           $("#tab-room-" + roomId + " .output").append(text + '<br/>');
+          if(isScrolledToBottom)
+            out.scrollTop = out.scrollHeight - out.clientHeight;
         },
+        "roomJoinCallback" : function(roomId, message) {
+          $("#tab-room-" + roomId + " .userlist").append('<li>' + message['userInfo'].name + '</li>');
+          sortUserlist("#tab-room-" + roomId + " .userlist");
+        },
+        "roomLeaveCallback" : function(roomId, message) {
+          var name = message['name'];
+          $("#tab-room-" + roomId + " .userlist li").filter(function() {
+            return $.text([this]) === name;
+          }).remove();
+          sortUserlist("#tab-room-" + roomId + " .userlist");
+        },
+        "roomListGamesCallback" : function(roomId, message) {
+          // TBD
+        }
       };
 
       $(this).prop("disabled", true);

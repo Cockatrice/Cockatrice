@@ -18,8 +18,6 @@ public:
     DecklistModelCardNode(DecklistCardNode *_dataNode, InnerDecklistNode *_parent) : AbstractDecklistCardNode(_parent), dataNode(_dataNode) { }
     int getNumber() const { return dataNode->getNumber(); }
     void setNumber(int _number) { dataNode->setNumber(_number); }
-        float getPrice() const { return dataNode->getPrice(); }
-    void setPrice(const float _price) { dataNode->setPrice(_price); }
     QString getName() const { return dataNode->getName(); }
     void setName(const QString &_name) { dataNode->setName(_name); }
     DecklistCardNode *getDataNode() const { return dataNode; }
@@ -51,7 +49,6 @@ public:
     void cleanList();
     DeckLoader *getDeckList() const { return deckList; }
     void setDeckList(DeckLoader *_deck);
-    void pricesUpdated();
 private:
     DeckLoader *deckList;
     InnerDecklistNode *root;
