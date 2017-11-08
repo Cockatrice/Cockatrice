@@ -201,6 +201,12 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString & setName, QString & cor
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
+        imgReader.setFileName(picsPaths.at(i) + ".xlhq");
+        if (imgReader.read(&image)) {
+            qDebug() << "Picture.xlhq found on disk (set: " << setName << " file: " << correctedCardname << ")";
+            imageLoaded(cardBeingLoaded.getCard(), image);
+            return true;
+        }
     }
 
     return false;

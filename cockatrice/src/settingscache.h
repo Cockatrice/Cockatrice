@@ -115,6 +115,7 @@ private:
     QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
     bool rememberGameSettings;
     QList<ReleaseChannel*> releaseChannels;
+    bool isPortableBuild;
 
 public:
     SettingsCache();
@@ -198,6 +199,7 @@ public:
     MessageSettings& messages() const { return *messageSettings; }
     GameFiltersSettings& gameFilters() const { return *gameFiltersSettings; }
     LayoutsSettings& layouts() const { return *layoutsSettings; }
+    bool getIsPortableBuild() const { return isPortableBuild; }
 public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setTokenDialogGeometry(const QByteArray &_tokenDialog);

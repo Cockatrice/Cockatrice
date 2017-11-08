@@ -2,8 +2,8 @@
 
 ### Compatibility ###
 
-Cockatrice is compiled on all platform using C++11, even if the majority of the
-code is written in C++03.
+Cockatrice is compiled on all platform using <kbd>C++11</kbd>, even if the majority of the
+code is written in <kbd>C++03</kbd>.
 
 For consistency, use Qt data structures where possible, such as `QString` over
 `std::string` or `QList` over `std::vector`.
@@ -236,7 +236,7 @@ upstream - git@github.com:Cockatrice/Cockatrice.git
 $COCKATRICE_REPO - /Location/of/repository/cockatrice.git
 $TAG_NAME
   - If full release, YYYY-MM-DD-Release-MAJ.MIN.PATCH
-  - If dev snapshot, YYYY-MM-DD-Development-MAJ.MIN.PATCH-betaXYZ
+  - If dev snapshot, YYYY-MM-DD-Development-MAJ.MIN.PATCH-betaX
         - MAJ.MIN.PATCH will be the NEXT release version
 ```
 

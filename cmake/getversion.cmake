@@ -80,7 +80,7 @@ function(get_tag_name commit)
 
 	# Extract information from tag:
 	# YYYY-MM-DD-Release-MAJ.MIN.PATCH
-	# YYYY-MM-DD-Development-MAJ.MIN.PATCH-betaXYZ
+	# YYYY-MM-DD-Development-MAJ.MIN.PATCH-betaX
 	string(REPLACE "-" ";" GIT_TAG_EXPLODED "${GIT_TAG}")
 	string(REPLACE "." ";" GIT_TAG_EXPLODED "${GIT_TAG_EXPLODED}")
 

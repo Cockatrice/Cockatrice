@@ -250,7 +250,7 @@ void DevReleaseChannel::releaseListFinished()
         !resultMap.contains("tag_name") ||
         !resultMap.contains("target_commitish") ||
         !resultMap.contains("assets_url") ||
-        !resultMap.contains("created_at"))
+        !resultMap.contains("published_at"))
     {
         qWarning() << "Invalid received from the release update server:" << resultMap;
         emit error(tr("Invalid reply received from the release update server."));
@@ -261,7 +261,7 @@ void DevReleaseChannel::releaseListFinished()
         lastRelease = new Release;
 
     lastRelease->setCommitHash(resultMap["target_commitish"].toString());
-    lastRelease->setPublishDate(resultMap["created_at"].toDate());
+    lastRelease->setPublishDate(resultMap["published_at"].toDate());
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
     lastRelease->setName(QString("%1 (%2)").arg(resultMap["tag_name"].toString()).arg(shortHash));

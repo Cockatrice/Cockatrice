@@ -345,11 +345,13 @@ void TabDeckEditor::createCentralFrame()
     connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
 
     QByteArray dbHeaderState = settingsCache->layouts().getDeckEditorDbHeaderState();
-    if(dbHeaderState.isNull())
+    if (dbHeaderState.isNull())
     {
         // first run
         databaseView->setColumnWidth(0, 200);
-    } else {
+    }
+    else
+    {
         databaseView->header()->restoreState(dbHeaderState);
     }
     connect(databaseView->header(), SIGNAL(geometriesChanged()), this, SLOT(saveDbHeaderState()));
@@ -718,7 +720,7 @@ bool TabDeckEditor::actSaveDeckAs()
     dialog.setConfirmOverwrite(true);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::fileNameFilters);
-    dialog.selectFile(deckModel->getDeckList()->getName().trimmed());
+    dialog.selectFile(deckModel->getDeckList()->getName().trimmed() + ".cod");
     if (!dialog.exec())
         return false;
 
@@ -937,6 +939,10 @@ void TabDeckEditor::setDeck(DeckLoader *_deck)
     PictureLoader::cacheCardPixmaps(db->getCards(deckModel->getDeckList()->getCardList()));
     deckView->expandAll();
     setModified(false);
+
+    // If they load a deck, make the deck list appear
+    aDeckDockVisible->setChecked(true);
+    deckDock->setVisible(aDeckDockVisible->isChecked());
 }
 
 void TabDeckEditor::setModified(bool _modified)
