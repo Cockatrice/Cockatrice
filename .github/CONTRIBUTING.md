@@ -8,8 +8,8 @@
 
 ### Compatibility ###
 
-Cockatrice is compiled on all platform using C++11, even if the majority of the
-code is written in C++03.
+Cockatrice is compiled on all platform using <kbd>C++11</kbd>, even if the majority of the
+code is written in <kbd>C++03</kbd>.
 
 For consistency, use Qt data structures where possible, such as `QString` over
 `std::string` or `QList` over `std::vector`.
@@ -266,7 +266,7 @@ upstream - git@github.com:Cockatrice/Cockatrice.git
 $COCKATRICE_REPO - /Location/of/repository/cockatrice.git
 $TAG_NAME
   - If full release, YYYY-MM-DD-Release-MAJ.MIN.PATCH
-  - If dev snapshot, cockatrice-MAJ.MIN.PATCH-beta###
+  - If dev snapshot, YYYY-MM-DD-Development-MAJ.MIN.PATCH-betaX
         - MAJ.MIN.PATCH will be the NEXT release version
 ```
 
@@ -279,3 +279,10 @@ git tag -d $TAG_NAME
 ```
 
 **NOTE:** Unfortunately, due to the method of how TravisCI and Appveyor work, to publish a full release you will need to make a copy of the release notes locally and then paste them into the GitHub GUI once the binaries have been uploaded. These build sites will automatically change the name of the release (to $TAG_NAME from whatever it was), the status of the release (to pre-release), and the body (to "Dev build of Cockatrice").
+
+**NOTE 2:** In the first lines of https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt there's an hardcoded version number used when compiling custom (not tagged) versions. While on tagged versions these numbers are overriden by the version numbers coming from the tag title, it's a good practice to keep them aligned with the real ones.
+The preferred flow of operations is:
+ * just before a release, update the version number in CMakeLists.txt to "next release version";
+ * tag the release following the previously described syntax in order to get it built by CI;
+ * wait for CI to upload the binaries, double check if everything is in order
+ * after the release is complete, update the version number again to "next development version", typically increasing `PROJECT_VERSION_PATCH` by one.

@@ -3,9 +3,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QCheckBox>
 #include <QLabel>
-#include <QPushButton>
 #include <QPainter>
-#include <QPalette>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
@@ -15,7 +13,6 @@
 #include "player.h"
 #include "gamescene.h"
 #include "settingscache.h"
-#include "gamescene.h"
 
 #include "pb/command_stop_dump_zone.pb.h"
 #include "pb/command_shuffle.pb.h"
@@ -78,7 +75,8 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
 
     scrollBar = new QScrollBar(Qt::Vertical);
     scrollBar->setMinimum(0);
-    scrollBar->setSingleStep(50);
+    scrollBar->setSingleStep(20);
+    scrollBar->setPageStep(200);
     connect(scrollBar, SIGNAL(valueChanged(int)), this, SLOT(handleScrollBarChange(int)));
     QGraphicsProxyWidget *scrollBarProxy = new QGraphicsProxyWidget;
     scrollBarProxy->setWidget(scrollBar);

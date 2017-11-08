@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
+#include <QMouseEvent>
 #include <math.h>
 #include "deckview.h"
 #include "decklist.h"
@@ -81,7 +82,7 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     QPen pen;
     pen.setWidth(3);
     pen.setJoinStyle(Qt::MiterJoin);
-    pen.setColor(originZone == "main" ? Qt::green : Qt::red);
+    pen.setColor(originZone == DECK_ZONE_MAIN ? Qt::green : Qt::red);
     painter->setPen(pen);
     painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 2.5));
     painter->restore();
@@ -114,6 +115,39 @@ void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         scene()->addItem(drag);
     }
     setCursor(Qt::OpenHandCursor);
+}
+
+void DeckView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (static_cast<DeckViewScene *>(scene())->getLocked())
+        return;
+
+    if (event->button() == Qt::LeftButton)
+    {
+        QList<MoveCard_ToZone> result;
+        QList<QGraphicsItem *> sel = scene()->selectedItems();
+
+        for (int i = 0; i < sel.size(); i++) {
+            DeckViewCard *c = static_cast<DeckViewCard *>(sel.at(i));
+            DeckViewCardContainer *zone = static_cast<DeckViewCardContainer *>(c->parentItem());
+            MoveCard_ToZone m;
+            m.set_card_name(c->getName().toStdString());
+            m.set_start_zone(zone->getName().toStdString());
+
+            if (zone->getName() == DECK_ZONE_MAIN)
+                m.set_target_zone(DECK_ZONE_SIDE);
+            else if (zone->getName() == DECK_ZONE_SIDE)
+                m.set_target_zone(DECK_ZONE_MAIN);
+            else // Trying to move from another zone
+                m.set_target_zone(zone->getName().toStdString());
+
+            result.append(m);
+        }
+
+        deckViewScene->applySideboardPlan(result);
+        deckViewScene->rearrangeItems();
+        emit deckViewScene->sideboardPlanChanged();
+    }
 }
 
 void DeckViewCard::hoverEnterEvent(QGraphicsSceneHoverEvent *event)

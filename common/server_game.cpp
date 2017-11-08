@@ -471,7 +471,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface, Respons
     createGameJoinedEvent(newPlayer, rc, false);
 }
 
-void Server_Game::removePlayer(Server_Player *player)
+void Server_Game::removePlayer(Server_Player *player, Event_Leave::LeaveReason reason)
 {
     room->getServer()->removePersistentPlayer(QString::fromStdString(player->getUserInfo()->name()), room->getId(), gameId, player->getPlayerId());
     players.remove(player->getPlayerId());
@@ -479,7 +479,10 @@ void Server_Game::removePlayer(Server_Player *player)
     GameEventStorage ges;
     removeArrowsRelatedToPlayer(ges, player);
     unattachCards(ges, player);
-    ges.enqueueGameEvent(Event_Leave(), player->getPlayerId());
+
+    Event_Leave event;
+    event.set_reason(reason);
+    ges.enqueueGameEvent(event, player->getPlayerId());
     ges.sendToGame(this);
 
     bool playerActive = activePlayer == player->getPlayerId();
@@ -585,7 +588,7 @@ bool Server_Game::kickPlayer(int playerId)
     playerToKick->sendGameEvent(*gec);
     delete gec;
 
-    removePlayer(playerToKick);
+    removePlayer(playerToKick, Event_Leave::USER_KICKED);
 
     return true;
 }

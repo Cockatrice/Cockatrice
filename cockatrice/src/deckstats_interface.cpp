@@ -28,8 +28,8 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
         
     QString data(reply->readAll());
     reply->deleteLater();
-    
-    QRegExp rx("<meta property=\"og:url\" content=\"([^\"]+)\"/>");
+
+    QRegExp rx("<meta property=\"og:url\" content=\"([^\"]+)\"");
     if (-1 == rx.indexIn(data)) {
         QMessageBox::critical(0, tr("Error"), tr("The reply from the server could not be parsed."));
         deleteLater();
@@ -60,7 +60,7 @@ void DeckStatsInterface::analyzeDeck(DeckList *deck)
     QByteArray data;
     getAnalyzeRequestData(deck, &data);
     
-    QNetworkRequest request(QUrl("http://deckstats.net/index.php"));
+    QNetworkRequest request(QUrl("https://deckstats.net/index.php"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     
     manager->post(request, data);

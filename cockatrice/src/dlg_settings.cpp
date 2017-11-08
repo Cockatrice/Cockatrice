@@ -27,7 +27,6 @@
 #include "main.h"
 #include "settingscache.h"
 #include "thememanager.h"
-#include "priceupdater.h"
 #include "releasechannel.h"
 #include "soundengine.h"
 #include "sequenceEdit/shortcutstab.h"
@@ -131,6 +130,21 @@ GeneralSettingsPage::GeneralSettingsPage()
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
     
+    if(settingsCache->getIsPortableBuild())
+    {
+        deckPathEdit->setEnabled(false);
+        replaysPathEdit->setEnabled(false);
+        picsPathEdit->setEnabled(false);
+        cardDatabasePathEdit->setEnabled(false);
+        tokenDatabasePathEdit->setEnabled(false);
+
+        deckPathButton->setVisible(false);
+        replaysPathButton->setVisible(false);
+        picsPathButton->setVisible(false);
+        cardDatabasePathButton->setVisible(false);
+        tokenDatabasePathButton->setVisible(false);
+    }
+
     QGridLayout *pathsGrid = new QGridLayout;
     pathsGrid->addWidget(&deckPathLabel, 0, 0);
     pathsGrid->addWidget(deckPathEdit, 0, 1);
@@ -274,7 +288,14 @@ void GeneralSettingsPage::retranslateUi()
     personalGroupBox->setTitle(tr("Personal settings"));
     languageLabel.setText(tr("Language:"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
-    pathsGroupBox->setTitle(tr("Paths"));
+
+    if(settingsCache->getIsPortableBuild())
+    {
+        pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
+    } else {
+        pathsGroupBox->setTitle(tr("Paths"));
+    }
+
     deckPathLabel.setText(tr("Decks directory:"));
     replaysPathLabel.setText(tr("Replays directory:"));
     picsPathLabel.setText(tr("Pictures directory:"));
@@ -468,13 +489,7 @@ void UserInterfaceSettingsPage::retranslateUi()
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
-    //priceTagsCheckBox.setChecked(settingsCache->getPriceTagFeature());
-    //connect(&priceTagsCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPriceTagFeature(int)));
-
-    //connect(this, SIGNAL(priceTagSourceChanged(int)), settingsCache, SLOT(setPriceTagSource(int)));
-
     QGridLayout *generalGrid = new QGridLayout;
-    //generalGrid->addWidget(&priceTagsCheckBox, 0, 0);
     
     generalGrid->addWidget(new QLabel(tr("Nothing is here... yet")), 0, 0);
     
@@ -489,20 +504,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
 void DeckEditorSettingsPage::retranslateUi()
 {
-    //priceTagsCheckBox.setText(tr("Enable &price tag feature from deckbrew.com"));
     generalGroupBox->setTitle(tr("General"));
 }
-
-/*
-void DeckEditorSettingsPage::radioPriceTagSourceClicked(bool checked)
-{
-    if(!checked)
-        return;
-
-    int source=AbstractPriceUpdater::DBPriceSource;
-    emit priceTagSourceChanged(source);
-}
-*/
 
 MessagesSettingsPage::MessagesSettingsPage()
 {
