@@ -130,8 +130,11 @@ public:
     DeckEditorSettingsPage();
     void retranslateUi();
 private slots:
+    //void radioPriceTagSourceClicked(bool checked);
 signals:
+    //void priceTagSourceChanged(int _priceTagSource);
 private:
+    //QCheckBox priceTagsCheckBox;
     QGroupBox *generalGroupBox;
 };
 

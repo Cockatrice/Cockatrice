@@ -1213,7 +1213,7 @@ bool Servatrice_DatabaseInterface::validateTableColumnStringData(const QString &
         return false;
 
     if (query->next())
-        if (query->value(column).toString().toLower() == _datatocheck.toLower())
+        if (query->value(column).toString() == _datatocheck)
             return true;
 
     return false;

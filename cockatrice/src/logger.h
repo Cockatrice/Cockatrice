@@ -5,7 +5,6 @@
 #include <QFile>
 #include <QVector>
 #include <QString>
-#include <QMutex>
 
 class Logger : public QObject {
 Q_OBJECT
@@ -25,18 +24,15 @@ private:
     bool logToFileEnabled;
     QTextStream fileStream;
     QFile fileHandle;
+
     QList<QString> logBuffer;
-    QMutex mutex;
 public:
 	void logToFile(bool enabled);
-    void log(QtMsgType type, const QMessageLogContext &ctx, const QString message);
-    QString getClientVersion();
+    void log(QtMsgType type, const QMessageLogContext &ctx, const QString &message);
     QList<QString> getLogBuffer() { return logBuffer; }
 protected:
     void openLogfileSession();
     void closeLogfileSession();
-protected slots:
-    void internalLog(const QString message);
 signals:
     void logEntryAdded(QString message);
 };

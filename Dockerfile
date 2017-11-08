@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y\
 ENV dir /home/servatrice/code
 WORKDIR $dir
 RUN mkdir oracle
-COPY LICENSE LICENSE
+COPY COPYING COPYING
 COPY CMakeLists.txt CMakeLists.txt
 COPY cmake/ cmake/
 COPY common/ common/

@@ -109,7 +109,7 @@ struct CopyMainOrSide {
             return;
 
         DecklistCardNode *addedCard;
-        if(node->getName() == DECK_ZONE_SIDE)
+        if(node->getName() == "side")
             addedCard = sideboard.addCard(card->getName(), node->getName());
         else
             addedCard = mainboard.addCard(card->getName(), node->getName());

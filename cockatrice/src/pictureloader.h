@@ -82,10 +82,11 @@ private:
     PictureLoaderWorker * worker;
 public:
     static void getPixmap(QPixmap &pixmap, CardInfo *card, QSize size);
-    static void getCardBackPixmap(QPixmap &pixmap, QSize size);
     static void clearPixmapCache(CardInfo *card);
     static void clearPixmapCache();
     static void cacheCardPixmaps(QList<CardInfo *> cards);
+protected:
+    static void internalGetCardBackPixmap(QPixmap &pixmap, QSize size);
 private slots:
     void picDownloadChanged();
     void picsPathChanged();

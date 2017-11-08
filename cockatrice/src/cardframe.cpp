@@ -102,7 +102,7 @@ void CardFrame::setCard(CardInfo *card)
 
 void CardFrame::setCard(const QString &cardName)
 {
-    setCard(db->getCardBySimpleName(cardName));
+    setCard(db->getCard(cardName));
 }
 
 void CardFrame::setCard(AbstractCardItem *card)

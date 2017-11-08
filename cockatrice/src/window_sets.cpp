@@ -94,16 +94,7 @@ WndSets::WndSets(QWidget *parent)
             this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
 
     labNotes = new QLabel;
-    labNotes->setWordWrap(true);
-    labNotes->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    labNotes->setOpenExternalLinks(true);
-    labNotes->setText(
-    "<b>" + tr("Deck Editor") + ":</b> "
-    + tr("Only cards in enabled sets will appear in the deck editor card list")
-    + "<br><b>" + tr("Card Art") + ":</b> " + tr("Image priority is decided in the following order")
-    + "<ol><li>" + tr("The") + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Custom-Cards-%26-Sets#to-add-custom-art-for-cards-the-easiest-way-is-to-use-the-custom-folder'> "
-    + tr("CUSTOM Folder") + "</a></li><li>" + tr("Enabled Sets (Top to Bottom)") + "</li><li>" + tr("Disabled Sets (Top to Bottom)") + "</li></ol>"
-    );
+    labNotes->setText("<b>" + tr("hints:") + "</b>" + "<ul><li>" + tr("Enable the sets that you want to have available in the deck editor") + "</li><li>" + tr("Move sets around to change their order, or click on a column header to sort sets on that field") + "</li><li>" + tr("Sets order decides the source that will be used when loading images for a specific card") + "</li><li>" + tr("Disabled sets will be used for loading images only if all the enabled sets failed") + "</li></ul>");
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));

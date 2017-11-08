@@ -1,7 +1,5 @@
-sudo: required   # forces legacy build infrastructure
-
 language: cpp
-
+sudo: required
 matrix:
   fast_finish: true
   include:
@@ -12,28 +10,21 @@ matrix:
     dist: trusty
     env: BUILDTYPE=Release DIST=trusty
   - os: osx
-    osx_image: xcode7.3
+    osx_image: xcode6.4
     env: BUILDTYPE=Debug
-    cache:
-      ccache: true
-      timeout: 360 # 6min timeout for cache uploading instead default 3
-      directories:
-        - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
   - os: osx
-    osx_image: xcode7.3
+    osx_image: xcode6.4
     env: BUILDTYPE=Release
-    cache:
-      ccache: true
-      timeout: 360 # 6min timeout for cache uploading instead default 3
-      directories:
-        - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
-
-cache: ccache
-
-install: bash ./.travis/travis-dependencies.sh
-
-script: bash ./.travis/travis-compile.sh
-
+script: "./travis-compile.sh"
+install: "./travis-dependencies.sh"
+cache: apt
+notifications:
+  webhooks:
+    urls:
+    - https://webhooks.gitter.im/e/d94969c3b01b22cbdcb7
+    on_success: change
+    on_failure: change
+    on_start: never
 deploy:
   provider: releases
   api_key:
@@ -47,14 +38,3 @@ deploy:
     tags: true
     repo: Cockatrice/Cockatrice
     condition: $BUILDTYPE = Release
-
-notifications:
-  webhooks:
-    urls:
-    - https://webhooks.gitter.im/e/d94969c3b01b22cbdcb7
-    on_success: change
-    on_failure: change
-    on_start: never
-    
-# official validator for ".travis.yml" config file: https://yaml.travis-ci.org
-# travis config documentation: https://docs.travis-ci.com/user/customizing-the-build

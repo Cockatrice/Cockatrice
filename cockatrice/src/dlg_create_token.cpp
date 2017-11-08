@@ -10,20 +10,18 @@
 #include <QTreeView>
 #include <QRadioButton>
 #include <QHeaderView>
-#include <QCloseEvent>
 
 #include "decklist.h"
 #include "dlg_create_token.h"
 #include "carddatabasemodel.h"
 #include "main.h"
 #include "settingscache.h"
-#include "cardinfopicture.h"
 
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     : QDialog(parent), predefinedTokens(_predefinedTokens)
 {
-    pic = new CardInfoPicture();
-    pic->setObjectName("pic");
+    this->setMinimumSize(200,200);
+    this->adjustSize();
 
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit(tr("Token"));
@@ -67,7 +65,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     QGroupBox *tokenDataGroupBox = new QGroupBox(tr("Token data"));
     tokenDataGroupBox->setLayout(grid);
     
-    cardDatabaseModel = new CardDatabaseModel(db, false, this);
+    cardDatabaseModel = new CardDatabaseModel(db, this);
     cardDatabaseDisplayModel = new TokenDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
     
@@ -75,9 +73,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     connect(chooseTokenFromAllRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromAll(bool)));
     chooseTokenFromDeckRadioButton = new QRadioButton(tr("Show tokens from this &deck"));
     connect(chooseTokenFromDeckRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromDeck(bool)));
-
-    QByteArray deckHeaderState = settingsCache->layouts().getDeckEditorDbHeaderState();
-    chooseTokenView = new QTreeView;
+    QTreeView *chooseTokenView = new QTreeView;
     chooseTokenView->setModel(cardDatabaseDisplayModel);
     chooseTokenView->setUniformRowHeights(true);
     chooseTokenView->setRootIsDecorated(false);
@@ -85,25 +81,19 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     chooseTokenView->setSortingEnabled(true);
     chooseTokenView->sortByColumn(0, Qt::AscendingOrder);
     chooseTokenView->resizeColumnToContents(0);
-    chooseTokenView->setWordWrap(true);
-
-    if (!deckHeaderState.isNull())
-        chooseTokenView->header()->restoreState(deckHeaderState);
-
     chooseTokenView->header()->setStretchLastSection(false);
-    chooseTokenView->header()->hideSection(1); // Sets
-    chooseTokenView->header()->hideSection(2); // Mana Cost
-    chooseTokenView->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents); // Color(s)
+    chooseTokenView->header()->hideSection(1);
+    chooseTokenView->header()->hideSection(2);
+    chooseTokenView->setWordWrap(true);
+    chooseTokenView->setColumnWidth(0, 130);
+    chooseTokenView->setColumnWidth(3, 178);
+    chooseTokenView->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+
     connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
-    connect(chooseTokenView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(actOk()));
     
     if (predefinedTokens.isEmpty())
-    {
         chooseTokenFromAllRadioButton->setChecked(true);
-        chooseTokenFromDeckRadioButton->setDisabled(true); // No tokens in deck = no need for option
-    }
-    else
-    {
+    else {
         chooseTokenFromDeckRadioButton->setChecked(true);
         cardDatabaseDisplayModel->setCardNameSet(QSet<QString>::fromList(predefinedTokens));
     }
@@ -115,16 +105,19 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     
     QGroupBox *tokenChooseGroupBox = new QGroupBox(tr("Choose token from list"));
     tokenChooseGroupBox->setLayout(tokenChooseLayout);
+    
+    QVBoxLayout *leftVBox = new QVBoxLayout;
+    leftVBox->addWidget(tokenDataGroupBox);
+    leftVBox->addStretch();
 
     QGridLayout *hbox = new QGridLayout;
-    hbox->addWidget(pic, 0, 0, 1, 1);
-    hbox->addWidget(tokenDataGroupBox, 1, 0, 1, 1);
-    hbox->addWidget(tokenChooseGroupBox, 0, 1, 2, 1);
+    hbox->addLayout(leftVBox, 0, 0);
+    hbox->addWidget(tokenChooseGroupBox, 0, 1);
     hbox->setColumnStretch(1, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actReject()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
     
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(hbox);
@@ -132,21 +125,14 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     setLayout(mainLayout);
 
     setWindowTitle(tr("Create token"));
-
-    resize(600, 500);
-    restoreGeometry(settingsCache->getTokenDialogGeometry());
-}
-
-void DlgCreateToken::closeEvent(QCloseEvent *event)
-{
-    event->accept();
-    settingsCache->setTokenDialogGeometry(saveGeometry());
+    setFixedHeight(sizeHint().height());
+    setFixedWidth(width());
 }
 
 void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
-    CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : 0;
+    const CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : 0;
     
     if(cardInfo)
     {
@@ -162,8 +148,6 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         ptEdit->setText("");
         annotationEdit->setText("");
     }
-
-    pic->setCard(cardInfo);
 }
 
 void DlgCreateToken::updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const {
@@ -191,14 +175,7 @@ void DlgCreateToken::actChooseTokenFromDeck(bool checked)
 
 void DlgCreateToken::actOk()
 {
-    settingsCache->setTokenDialogGeometry(saveGeometry());
     accept();
-}
-
-void DlgCreateToken::actReject()
-{
-    settingsCache->setTokenDialogGeometry(saveGeometry());
-    reject();
 }
 
 QString DlgCreateToken::getName() const

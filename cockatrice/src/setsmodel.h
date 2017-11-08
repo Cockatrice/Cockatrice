@@ -27,7 +27,6 @@ private:
     QSet<CardSet *> enabledSets;
 public:
     enum SetsColumns { SortKeyCol, IsKnownCol, EnabledCol, LongNameCol, ShortNameCol, SetTypeCol, ReleaseDateCol };
-    enum Role { SortRole=Qt::UserRole };
 
     SetsModel(CardDatabase *_db, QObject *parent = 0);
     ~SetsModel();
