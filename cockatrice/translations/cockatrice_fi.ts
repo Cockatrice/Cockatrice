@@ -4,17 +4,17 @@
     <message>
         <location filename="../src/abstractcounter.cpp" line="62"/>
         <source>&amp;Set counter...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Lisää countteri... </translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="156"/>
         <source>Set counter</source>
-        <translation type="unfinished"/>
+        <translation>Lisää countteri</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="156"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation type="unfinished"/>
+        <translation>Countterin uusi arvo &apos;%1&apos;:</translation>
     </message>
 </context>
 <context>
@@ -62,22 +62,22 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="422"/>
         <source>Table grid layout</source>
-        <translation type="unfinished"/>
+        <translation>Pöydän grid layout</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="423"/>
         <source>Invert vertical coordinate</source>
-        <translation type="unfinished"/>
+        <translation>Käänteiset pystykoordinaatit</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="424"/>
         <source>Minimum player count for multi-column layout:</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajien vähimmäismäärä moniosaisessa layoutissa:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="425"/>
         <source>Maximum font size for information displayed on cards:</source>
-        <translation type="unfinished"/>
+        <translation>Suurin fonttikoko korteissa näkyville infoteksteille:</translation>
     </message>
 </context>
 <context>
@@ -85,78 +85,79 @@
     <message>
         <location filename="../src/userlist.cpp" line="32"/>
         <source>ban &amp;user name</source>
-        <translation>Bännää &amp;user name</translation>
+        <translation>Bännää &amp;käyttäjä</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="35"/>
         <source>ban &amp;IP address</source>
-        <translation>Bännää &amp;IP address</translation>
+        <translation>Bännää &amp;IP osoite </translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="38"/>
         <source>ban client I&amp;D</source>
-        <translation type="unfinished"/>
+        <translation>Bännää client I&amp;D</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="51"/>
         <source>Ban type</source>
-        <translation type="unfinished"/>
+        <translation>Bännäyksen tyyppi</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="54"/>
         <source>&amp;permanent ban</source>
-        <translation type="unfinished"/>
+        <translation>Bännätty pysyvästi</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="55"/>
         <source>&amp;temporary ban</source>
-        <translation type="unfinished"/>
+        <translation>Bännätty väliaikaisesti</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="58"/>
         <source>&amp;Days:</source>
-        <translation type="unfinished"/>
+        <translation>Päivät:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="64"/>
         <source>&amp;Hours:</source>
-        <translation type="unfinished"/>
+        <translation>Tunnit:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="70"/>
         <source>&amp;Minutes:</source>
-        <translation type="unfinished"/>
+        <translation>Minuutit:</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="85"/>
         <source>Duration of the ban</source>
-        <translation type="unfinished"/>
+        <translation>Bännin kesto</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="88"/>
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
-        <translation type="unfinished"/>
+        <translation>Kerro bännäyksen syy. 
+Tallennetaan moderaattoreita varten. Bännätty henkilö ei näe tätä. </translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="91"/>
         <source>Please enter the reason for the ban that will be visible to the banned person.</source>
-        <translation type="unfinished"/>
+        <translation>Kerro bännäyksen syy. Tämä näkyy bännätylle henkilölle. </translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="94"/>
         <source>&amp;OK</source>
-        <translation type="unfinished"/>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="97"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Peruuta</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="115"/>
         <source>Ban user from server</source>
-        <translation type="unfinished"/>
+        <translation>Bännää pelaaja serveriltä</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="186"/>
@@ -169,7 +170,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/userlist.cpp" line="186"/>
         <source>You have to select a name-based, IP-based, clientId based, or some combination of the three to place a ban.</source>
-        <translation type="unfinished"/>
+        <translation>Valitse nimi, IP -osoite, clientid tai joku näiden yhdistelmä asettaaksesi bännin. </translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="192"/>
@@ -192,32 +193,32 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="59"/>
         <source>Name</source>
-        <translation type="unfinished"/>
+        <translation>Nimi</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="60"/>
         <source>Sets</source>
-        <translation type="unfinished"/>
+        <translation>Setit</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="61"/>
         <source>Mana cost</source>
-        <translation type="unfinished"/>
+        <translation>Mana cost</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="62"/>
         <source>Card type</source>
-        <translation type="unfinished"/>
+        <translation>Korttityyppi</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="63"/>
         <source>P/T</source>
-        <translation type="unfinished"/>
+        <translation>P/T</translation>
     </message>
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="64"/>
         <source>Color(s)</source>
-        <translation type="unfinished"/>
+        <translation>Väri(t) </translation>
     </message>
 </context>
 <context>
@@ -225,17 +226,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardframe.cpp" line="65"/>
         <source>Image</source>
-        <translation type="unfinished"/>
+        <translation>Kuva</translation>
     </message>
     <message>
         <location filename="../src/cardframe.cpp" line="66"/>
         <source>Description</source>
-        <translation type="unfinished"/>
+        <translation>Kuvaus</translation>
     </message>
     <message>
         <location filename="../src/cardframe.cpp" line="67"/>
         <source>Both</source>
-        <translation type="unfinished"/>
+        <translation>Molemmat</translation>
     </message>
 </context>
 <context>
@@ -243,32 +244,32 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfotext.cpp" line="84"/>
         <source>Name:</source>
-        <translation type="unfinished"/>
+        <translation>Nimi:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="85"/>
         <source>Mana cost:</source>
-        <translation type="unfinished"/>
+        <translation>Mana cost</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="86"/>
         <source>Color(s):</source>
-        <translation type="unfinished"/>
+        <translation>Väri(t):</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="87"/>
         <source>Card type:</source>
-        <translation type="unfinished"/>
+        <translation>Korttityyppi:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="88"/>
         <source>P / T:</source>
-        <translation type="unfinished"/>
+        <translation>P / T:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="89"/>
         <source>Loyalty:</source>
-        <translation type="unfinished"/>
+        <translation>Loyalty:</translation>
     </message>
 </context>
 <context>
@@ -276,12 +277,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/carditem.cpp" line="82"/>
         <source>&amp;Move to</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Siirrä</translation>
     </message>
     <message>
         <location filename="../src/carditem.cpp" line="83"/>
         <source>&amp;Power / toughness</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Power / toughness</translation>
     </message>
 </context>
 <context>
@@ -290,121 +291,121 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/cardzone.cpp" line="52"/>
         <source>their hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>heidän kätensä</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="53"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1n käsi</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="59"/>
         <source>their library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>heidän pakkansa</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="60"/>
         <source>%1&apos;s library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>%1n pakka</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="64"/>
         <source>of their library</source>
         <comment>top cards of zone,</comment>
-        <translation type="unfinished"/>
+        <translation>heidän pakastaan</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
         <source>of %1&apos;s library</source>
         <comment>top cards of zone</comment>
-        <translation type="unfinished"/>
+        <translation>%1n pakasta</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="69"/>
         <source>their library</source>
         <comment>reveal zone</comment>
-        <translation type="unfinished"/>
+        <translation>heidän pakkansa</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="70"/>
         <source>%1&apos;s library</source>
         <comment>reveal zone</comment>
-        <translation type="unfinished"/>
+        <translation>%1n pakka</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="74"/>
         <source>their library</source>
         <comment>shuffle</comment>
-        <translation type="unfinished"/>
+        <translation>heidän pakkansa</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="75"/>
         <source>%1&apos;s library</source>
         <comment>shuffle</comment>
-        <translation type="unfinished"/>
+        <translation>%1n pakka</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="79"/>
         <source>their library</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>heidän pakkansa</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="80"/>
         <source>%1&apos;s library</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1n pakka</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="85"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>Heidän hautansa</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="86"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1n hauta</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="90"/>
         <source>their exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>heidän exilensä</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="91"/>
         <source>%1&apos;s exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1n exile</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="97"/>
         <source>their sideboard</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>heidän sideboardinsa</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="98"/>
         <source>%1&apos;s sideboard</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>%1n sideboard</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="102"/>
         <source>their sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>heidän sideboardinsa</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="103"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1n sideboard</translation>
     </message>
 </context>
 <context>
@@ -412,12 +413,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_settings.cpp" line="494"/>
         <source>Nothing is here... yet</source>
-        <translation type="unfinished"/>
+        <translation>Täällä ei ole mitään... Vielä</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="507"/>
         <source>General</source>
-        <translation type="unfinished"/>
+        <translation>Yleinen</translation>
     </message>
 </context>
 <context>
@@ -425,12 +426,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/decklistmodel.cpp" line="137"/>
         <source>Number</source>
-        <translation type="unfinished"/>
+        <translation>Numero</translation>
     </message>
     <message>
         <location filename="../src/decklistmodel.cpp" line="138"/>
         <source>Card</source>
-        <translation type="unfinished"/>
+        <translation>Kortti</translation>
     </message>
 </context>
 <context>
@@ -439,12 +440,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/deckstats_interface.cpp" line="23"/>
         <location filename="../src/deckstats_interface.cpp" line="34"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/deckstats_interface.cpp" line="34"/>
         <source>The reply from the server could not be parsed.</source>
-        <translation type="unfinished"/>
+        <translation>Serverin vastausta ei pystytty selvittämään.</translation>
     </message>
 </context>
 <context>
@@ -452,42 +453,42 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/tab_game.cpp" line="140"/>
         <source>Load deck...</source>
-        <translation type="unfinished"/>
+        <translation>Lataa pakka... </translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="141"/>
         <source>Load remote deck...</source>
-        <translation type="unfinished"/>
+        <translation>Lataa remote pakka... </translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="142"/>
         <source>Ready to s&amp;tart</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Valmis aloittamaan</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="157"/>
         <source>S&amp;ideboard unlocked</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Sideboard avattu</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="159"/>
         <source>S&amp;ideboard locked</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Sideboard lukittu</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="219"/>
         <source>Load deck</source>
-        <translation type="unfinished"/>
+        <translation>Lataa pakka</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="229"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="229"/>
         <source>The selected file could not be loaded.</source>
-        <translation type="unfinished"/>
+        <translation>Valittua tiedostoa ei voi avata. </translation>
     </message>
 </context>
 <context>
@@ -518,107 +519,107 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_connect.cpp" line="28"/>
         <source>New Host</source>
-        <translation type="unfinished"/>
+        <translation>Uusi Host</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="34"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="22"/>
         <source>Known Hosts</source>
-        <translation type="unfinished"/>
+        <translation>Tunnetut Hostit</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="30"/>
         <source>Name:</source>
-        <translation type="unfinished"/>
+        <translation>Nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="38"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Portti:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="42"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajan &amp;nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="46"/>
         <source>P&amp;assword:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Salasana:</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="51"/>
         <source>&amp;Save password</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Tallenna salasana</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="54"/>
         <source>A&amp;uto connect</source>
-        <translation type="unfinished"/>
+        <translation>Yhdistä &amp;Automaattisesti</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="55"/>
         <source>Automatically connect to the most recent login when Cockatrice opens</source>
-        <translation type="unfinished"/>
+        <translation>Kirjaudu sisään automaattisesti kun Cockatrice käynnistyy </translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="57"/>
         <source>Public Servers</source>
-        <translation type="unfinished"/>
+        <translation>Julkiset Serverit</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="79"/>
         <source>Forgot password</source>
-        <translation type="unfinished"/>
+        <translation>Unohdin salasanani</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="82"/>
         <source>Connect</source>
-        <translation type="unfinished"/>
+        <translation>Yhdistä</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="86"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="111"/>
         <source>Server</source>
-        <translation type="unfinished"/>
+        <translation>Serveri</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="121"/>
         <source>Login</source>
-        <translation type="unfinished"/>
+        <translation>Kirjaudu sisään</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="136"/>
         <source>Connect to server</source>
-        <translation type="unfinished"/>
+        <translation>Yhdistä serveriin</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="255"/>
         <source>Connection Warning</source>
-        <translation type="unfinished"/>
+        <translation>Yhteysvaroitus</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="255"/>
         <source>You need to name your new connection profile.</source>
-        <translation type="unfinished"/>
+        <translation>Anna nimi uudelle yhteysprofiilillesi</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="270"/>
         <source>Connect Warning</source>
-        <translation type="unfinished"/>
+        <translation>Yhdistämisvaroitus</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="270"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajan nimi ei voi olla tyhjä. </translation>
     </message>
 </context>
 <context>
@@ -626,92 +627,92 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_creategame.cpp" line="21"/>
         <source>Re&amp;member settings</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Muista asetukset</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="22"/>
         <source>&amp;Description:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Kuvaus:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="27"/>
         <source>P&amp;layers:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Pelaajat:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="51"/>
         <source>Game type</source>
-        <translation type="unfinished"/>
+        <translation>Pelimuoto</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="54"/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Salasana:</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="58"/>
         <source>Only &amp;buddies can join</source>
-        <translation type="unfinished"/>
+        <translation>Vain &amp;Kaverit voivat liittyä</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="59"/>
         <source>Only &amp;registered users can join</source>
-        <translation type="unfinished"/>
+        <translation>Vain &amp;Rekisteröityneet käyttäjät voivat liittyä</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="73"/>
         <source>Joining restrictions</source>
-        <translation type="unfinished"/>
+        <translation>Liittymisehdot</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="76"/>
         <source>&amp;Spectators can watch</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Salli katsojat</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="79"/>
         <source>Spectators &amp;need a password to watch</source>
-        <translation type="unfinished"/>
+        <translation>Katsojilta &amp;vaaditaan salasana</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="80"/>
         <source>Spectators can &amp;chat</source>
-        <translation type="unfinished"/>
+        <translation>Katsojat voivat &amp;keskustella</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="81"/>
         <source>Spectators can see &amp;hands</source>
-        <translation type="unfinished"/>
+        <translation>Katsojat &amp;näkevät käsikortit</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="87"/>
         <source>Spectators</source>
-        <translation type="unfinished"/>
+        <translation>Katsojat</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="132"/>
         <source>&amp;Clear</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Tyhjennä</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="138"/>
         <source>Create game</source>
-        <translation type="unfinished"/>
+        <translation>Luo peli</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="180"/>
         <source>Game information</source>
-        <translation type="unfinished"/>
+        <translation>Tietoa pelistä</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="256"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="256"/>
         <source>Server error.</source>
-        <translation type="unfinished"/>
+        <translation>Serverivirhe.</translation>
     </message>
 </context>
 <context>
@@ -719,92 +720,92 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_create_token.cpp" line="28"/>
         <source>&amp;Name:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="29"/>
         <source>Token</source>
-        <translation type="unfinished"/>
+        <translation>Tokeni</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="34"/>
         <source>C&amp;olor:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Väri</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="36"/>
         <source>white</source>
-        <translation type="unfinished"/>
+        <translation>valkoinen</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="37"/>
         <source>blue</source>
-        <translation type="unfinished"/>
+        <translation>sininen</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="38"/>
         <source>black</source>
-        <translation type="unfinished"/>
+        <translation>musta</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="39"/>
         <source>red</source>
-        <translation type="unfinished"/>
+        <translation>punainen</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="40"/>
         <source>green</source>
-        <translation type="unfinished"/>
+        <translation>vihreä</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="41"/>
         <source>multicolor</source>
-        <translation type="unfinished"/>
+        <translation>monivärinen</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="42"/>
         <source>colorless</source>
-        <translation type="unfinished"/>
+        <translation>väritön</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="45"/>
         <source>&amp;P/T:</source>
-        <translation type="unfinished"/>
+        <translation>P/T:</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="49"/>
         <source>&amp;Annotation:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Kommentti:</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="53"/>
         <source>&amp;Destroy token when it leaves the table</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Tuhoa tokeni kun se lähtee pöydästä</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="67"/>
         <source>Token data</source>
-        <translation type="unfinished"/>
+        <translation>Tokenin  data</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="74"/>
         <source>Show &amp;all tokens</source>
-        <translation type="unfinished"/>
+        <translation>Näytä &amp;kaikki tokenit</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="76"/>
         <source>Show tokens from this &amp;deck</source>
-        <translation type="unfinished"/>
+        <translation>Näytä kaikki tämän &amp;pakan tokenit</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="116"/>
         <source>Choose token from list</source>
-        <translation type="unfinished"/>
+        <translation>Valitse tokeni listasta</translation>
     </message>
     <message>
         <location filename="../src/dlg_create_token.cpp" line="134"/>
         <source>Create token</source>
-        <translation type="unfinished"/>
+        <translation>Luo token</translation>
     </message>
 </context>
 <context>
@@ -813,7 +814,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="../src/dlg_edit_avatar.cpp" line="16"/>
         <location filename="../src/dlg_edit_avatar.cpp" line="59"/>
         <source>No image chosen.</source>
-        <translation type="unfinished"/>
+        <translation>Ei valittua kuvaa.</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="21"/>
@@ -824,22 +825,22 @@ To remove your current avatar, confirm without choosing a new image.</source>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="22"/>
         <source>Browse...</source>
-        <translation type="unfinished"/>
+        <translation>Selaa...</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="39"/>
         <source>Change avatar</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda avatar</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="56"/>
         <source>Open Image</source>
-        <translation type="unfinished"/>
+        <translation>Avaa Kuva</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="56"/>
         <source>Image Files (*.png *.jpg *.bmp)</source>
-        <translation type="unfinished"/>
+        <translation>Kuvatiedostot (*.png *.jpg *.bmp)</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="70"/>
@@ -852,32 +853,32 @@ To remove your current avatar, confirm without choosing a new image.</source>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="14"/>
         <source>Old password:</source>
-        <translation type="unfinished"/>
+        <translation>Vanha salasana:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="23"/>
         <source>New password:</source>
-        <translation type="unfinished"/>
+        <translation>Uusi salasana:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="28"/>
         <source>Confirm new password:</source>
-        <translation type="unfinished"/>
+        <translation>Vahvista uusi salasana:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="50"/>
         <source>Change password</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda salasana</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="59"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_password.cpp" line="59"/>
         <source>The new passwords don&apos;t match.</source>
-        <translation type="unfinished"/>
+        <translation>Uusi salasana ei täsmää</translation>
     </message>
 </context>
 <context>
@@ -885,88 +886,88 @@ To remove your current avatar, confirm without choosing a new image.</source>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="23"/>
         <source>&amp;Name:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="28"/>
         <source>C&amp;olor:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Väri</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="30"/>
         <source>white</source>
-        <translation type="unfinished"/>
+        <translation>valkoinen</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="31"/>
         <source>blue</source>
-        <translation type="unfinished"/>
+        <translation>sininen</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="32"/>
         <source>black</source>
-        <translation type="unfinished"/>
+        <translation>musta</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="33"/>
         <source>red</source>
-        <translation type="unfinished"/>
+        <translation>punainen</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="34"/>
         <source>green</source>
-        <translation type="unfinished"/>
+        <translation>vihreä</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="35"/>
         <source>multicolor</source>
-        <translation type="unfinished"/>
+        <translation>monivärinen</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="36"/>
         <source>colorless</source>
-        <translation type="unfinished"/>
+        <translation>väritön</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="40"/>
         <source>&amp;P/T:</source>
-        <translation type="unfinished"/>
+        <translation>P/T:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="45"/>
         <source>&amp;Annotation:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Kommentti:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="60"/>
         <source>Token data</source>
-        <translation type="unfinished"/>
+        <translation>Tokenin  data</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="85"/>
         <location filename="../src/dlg_edit_tokens.cpp" line="141"/>
         <source>Add token</source>
-        <translation type="unfinished"/>
+        <translation>Lisää token</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="88"/>
         <source>Remove token</source>
-        <translation type="unfinished"/>
+        <translation>Poista token</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="113"/>
         <source>Edit tokens</source>
-        <translation type="unfinished"/>
+        <translation>Muokkaa tokeneita</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="141"/>
         <source>Please enter the name of the token:</source>
-        <translation type="unfinished"/>
+        <translation>Anna tokenin nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="145"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="145"/>
@@ -980,27 +981,27 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="13"/>
         <source>Email:</source>
-        <translation type="unfinished"/>
+        <translation>Email:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="18"/>
         <source>Country:</source>
-        <translation type="unfinished"/>
+        <translation>Maa:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="21"/>
         <source>Undefined</source>
-        <translation type="unfinished"/>
+        <translation>Ei määritelty</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="35"/>
         <source>Real name:</source>
-        <translation type="unfinished"/>
+        <translation>Oikea nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_user.cpp" line="57"/>
         <source>Edit user profile</source>
-        <translation type="unfinished"/>
+        <translation>Muokkaa käyttäjäprofiilia</translation>
     </message>
 </context>
 <context>
@@ -1008,57 +1009,57 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="19"/>
         <source>Show &apos;&amp;buddies only&apos; games</source>
-        <translation type="unfinished"/>
+        <translation>Näytä pelkästään &amp;kavereiden pelit</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="22"/>
         <source>Show &amp;unavailable games</source>
-        <translation type="unfinished"/>
+        <translation>Näytä pelit jotka eivät ole &amp;saatavilla</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="25"/>
         <source>Show &amp;password protected games</source>
-        <translation type="unfinished"/>
+        <translation>Näytä &amp;salasanasuojatut pelit</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="30"/>
         <source>Game &amp;description:</source>
-        <translation type="unfinished"/>
+        <translation>Pelin &amp;kuvaus:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="35"/>
         <source>&amp;Creator name:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Tekijän nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="51"/>
         <source>&amp;Game types</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Pelimuodot</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="56"/>
         <source>at &amp;least:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;vähintään:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="63"/>
         <source>at &amp;most:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;enintään:</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="76"/>
         <source>Maximum player count</source>
-        <translation type="unfinished"/>
+        <translation>Suurin pelaajamäärä</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="84"/>
         <source>Restrictions</source>
-        <translation type="unfinished"/>
+        <translation>Ehdot</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="117"/>
         <source>Filter games</source>
-        <translation type="unfinished"/>
+        <translation>Suodata pelit</translation>
     </message>
 </context>
 <context>
@@ -1072,27 +1073,27 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="29"/>
         <source>Oops, looks like something has gone wrong.  Please restart the forgot password process by using the forgot password button on the connection screen.</source>
-        <translation type="unfinished"/>
+        <translation>Hups! Jotain meni pieleen. Aloita uuden salasanan määritys uudelleen käyttämällä unohdin salasanani -nappia.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="33"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="37"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Portti:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="41"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajan &amp;nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="45"/>
         <source>Email:</source>
-        <translation type="unfinished"/>
+        <translation>Email:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="77"/>
@@ -1102,7 +1103,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="86"/>
         <source>The email address can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Email -osoite ei voi olla tyhjä</translation>
     </message>
 </context>
 <context>
@@ -1110,17 +1111,17 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="27"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="31"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Portti:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="35"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajan &amp;nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="56"/>
@@ -1135,7 +1136,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordrequest.cpp" line="65"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajan nimi ei voi olla tyhjä. </translation>
     </message>
 </context>
 <context>
@@ -1152,33 +1153,33 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="29"/>
         <source>Opps, looks like something has gone wrong.  Please re-start the forgot password process by using the forgot password button on the connection screen.</source>
-        <translation type="unfinished"/>
+        <translation>Hups! Jotain meni pieleen. Aloita uuden salasanan määritys uudelleen käyttämällä unohdin salasanani -nappia.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="33"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="37"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Portti:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="41"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajan &amp;nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="45"/>
         <source>Token:</source>
-        <translation type="unfinished"/>
+        <translation>Tokeni</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="49"/>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="54"/>
         <source>New Password:</source>
-        <translation type="unfinished"/>
+        <translation>Uusi Salasana:</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="91"/>
@@ -1188,22 +1189,22 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="100"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajan nimi ei voi olla tyhjä. </translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="106"/>
         <source>The token can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Tokeni ei voi olla tyhjä</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="112"/>
         <source>The new password can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Uusi salasana ei voi olla tyhjä</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="118"/>
         <source>The passwords do not match.</source>
-        <translation type="unfinished"/>
+        <translation>Salasanat eivät täsmää</translation>
     </message>
 </context>
 <context>
@@ -1211,18 +1212,18 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="20"/>
         <source>&amp;Refresh</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Päivitä</translation>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="34"/>
         <source>Load deck from clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Avaa pakka leikepöydältä</translation>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="67"/>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="75"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="67"/>
@@ -1236,7 +1237,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_load_remote_deck.cpp" line="25"/>
         <source>Load deck</source>
-        <translation type="unfinished"/>
+        <translation>Lataa pakka</translation>
     </message>
 </context>
 <context>
@@ -1244,79 +1245,79 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_register.cpp" line="16"/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="20"/>
         <source>&amp;Port:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Portti:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="24"/>
         <source>Player &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajan &amp;nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="28"/>
         <source>P&amp;assword:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Salasana:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="33"/>
         <source>Password (again):</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Salasana (uudelleen):</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="38"/>
         <source>Email:</source>
-        <translation type="unfinished"/>
+        <translation>Email:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="42"/>
         <source>Email (again):</source>
-        <translation type="unfinished"/>
+        <translation>Email (uudelleen):</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="46"/>
         <source>Country:</source>
-        <translation type="unfinished"/>
+        <translation>Maa:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="49"/>
         <source>Undefined</source>
-        <translation type="unfinished"/>
+        <translation>Ei määritelty</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="304"/>
         <source>Real name:</source>
-        <translation type="unfinished"/>
+        <translation>Oikea nimi:</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="337"/>
         <source>Register to server</source>
-        <translation type="unfinished"/>
+        <translation>Rekisteröidy serverille</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="346"/>
         <location filename="../src/dlg_register.cpp" line="351"/>
         <location filename="../src/dlg_register.cpp" line="356"/>
         <source>Registration Warning</source>
-        <translation type="unfinished"/>
+        <translation>Rekisteröintivaroitus</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="346"/>
         <source>Your passwords do not match, please try again.</source>
-        <translation type="unfinished"/>
+        <translation>Salasanat eivät täsmää, yritä uudelleen</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="351"/>
         <source>Your email addresses do not match, please try again.</source>
-        <translation type="unfinished"/>
+        <translation>Sähköpostiosoitteet eivät täsmää, yritä uudelleen.</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="356"/>
         <source>The player name can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajan nimi ei voi olla tyhjä. </translation>
     </message>
 </context>
 <context>
@@ -1324,7 +1325,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_settings.cpp" line="883"/>
         <source>Unknown Error loading card database</source>
-        <translation type="unfinished"/>
+        <translation>Tuntematon virhe ladattaessa korttitietokantaa</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="892"/>
@@ -1335,7 +1336,13 @@ Cockatrice may not function correctly with an invalid database
 You may need to rerun oracle to update your card database.
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>Korttitietokantasi on virheellinen
+
+Cockatrice ei välttämättä toimi kunnolla virheellisellä tietokannalla
+
+Voit joutua ajamaan Oraclen ja päivittämään korttitietokannan uudelleen
+
+Haluatko vaihtaa tietokantasi sijaintia?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="899"/>
@@ -1346,7 +1353,13 @@ This can cause problems loading card information or images
 Usually this can be fixed by rerunning oracle to to update your card database.
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>Tietokantasi versio on liian vanha
+
+Tästä voi seurata ongelmia korttien tietoja tai kuvia ladattaessa
+
+Yleensä tämä voidaan korjata palaamalla oracleen päivittämään korttitietokanta.
+
+Haluatko vaihtaa tietokantasi sijaintia?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="906"/>
@@ -1385,7 +1398,7 @@ Would you like to change your database location setting?</source>
         <location filename="../src/dlg_settings.cpp" line="935"/>
         <location filename="../src/dlg_settings.cpp" line="941"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="935"/>
@@ -1400,42 +1413,42 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="950"/>
         <source>Settings</source>
-        <translation type="unfinished"/>
+        <translation>Asetukset</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="952"/>
         <source>General</source>
-        <translation type="unfinished"/>
+        <translation>Yleinen</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="953"/>
         <source>Appearance</source>
-        <translation type="unfinished"/>
+        <translation>Ulkonäkö</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="954"/>
         <source>User Interface</source>
-        <translation type="unfinished"/>
+        <translation>Käyttöliittymä</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="955"/>
         <source>Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Pakkaeditori</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="956"/>
         <source>Chat</source>
-        <translation type="unfinished"/>
+        <translation>Chat</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="957"/>
         <source>Sound</source>
-        <translation type="unfinished"/>
+        <translation>Äänet</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="958"/>
         <source>Shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Pikanäppäimet</translation>
     </message>
 </context>
 <context>
@@ -1446,7 +1459,7 @@ Would you like to change your database location setting?</source>
         <location filename="../src/dlg_update.cpp" line="182"/>
         <location filename="../src/dlg_update.cpp" line="197"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="24"/>
@@ -1456,17 +1469,17 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="31"/>
         <source>Reinstall</source>
-        <translation type="unfinished"/>
+        <translation>Asenna uudelleen</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="32"/>
         <source>Cancel Download</source>
-        <translation type="unfinished"/>
+        <translation>Peruuta Lataus</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="33"/>
         <source>Open Download Page</source>
-        <translation type="unfinished"/>
+        <translation>Avaa Lataussivu</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="56"/>
@@ -1477,17 +1490,17 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="108"/>
         <source>Finished checking for updates</source>
-        <translation type="unfinished"/>
+        <translation>Päivitysten haku on päättynyt</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="117"/>
         <source>No Update Available</source>
-        <translation type="unfinished"/>
+        <translation>Ei uusia päivityksiä</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="118"/>
         <source>Cockatrice is up to date!</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice on ajan tasalla!</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="119"/>
@@ -1497,7 +1510,7 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="120"/>
         <source>Current version</source>
-        <translation type="unfinished"/>
+        <translation>Nykyinen versio</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="121"/>
@@ -1508,36 +1521,36 @@ Please visit the download page to update manually.</source>
         <location filename="../src/dlg_update.cpp" line="131"/>
         <location filename="../src/dlg_update.cpp" line="141"/>
         <source>Update Available</source>
-        <translation type="unfinished"/>
+        <translation>Päivitys Saatavilla</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="132"/>
         <location filename="../src/dlg_update.cpp" line="142"/>
         <source>A new version of Cockatrice is available!</source>
-        <translation type="unfinished"/>
+        <translation>Uusi versio Cockatricesta on saatavilla!</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="133"/>
         <location filename="../src/dlg_update.cpp" line="143"/>
         <source>New version</source>
-        <translation type="unfinished"/>
+        <translation>Uusi versio</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="134"/>
         <location filename="../src/dlg_update.cpp" line="144"/>
         <source>Released</source>
-        <translation type="unfinished"/>
+        <translation>Julkaistu</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="134"/>
         <location filename="../src/dlg_update.cpp" line="144"/>
         <source>Changelog</source>
-        <translation type="unfinished"/>
+        <translation>Muutosloki</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="135"/>
         <source>Do you want to update now?</source>
-        <translation type="unfinished"/>
+        <translation>Haluatko päivittää nyt?</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="145"/>
@@ -1578,24 +1591,24 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="83"/>
         <source>Downloading update...</source>
-        <translation type="unfinished"/>
+        <translation>Ladataan päivitystä...</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="98"/>
         <source>Checking for updates...</source>
-        <translation type="unfinished"/>
+        <translation>Etsitään päivityksiä...</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="177"/>
         <location filename="../src/dlg_update.cpp" line="184"/>
         <location filename="../src/dlg_update.cpp" line="198"/>
         <source>Update Error</source>
-        <translation type="unfinished"/>
+        <translation>Päivitysvirhe</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="189"/>
         <source>Installing...</source>
-        <translation type="unfinished"/>
+        <translation>Asennetaan...</translation>
     </message>
 </context>
 <context>
@@ -1603,7 +1616,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_viewlog.cpp" line="18"/>
         <source>Debug Log</source>
-        <translation type="unfinished"/>
+        <translation>Debug loki</translation>
     </message>
 </context>
 <context>
@@ -1619,7 +1632,7 @@ You may have to build from source yourself.</source>
         <location filename="../src/gameselector.cpp" line="157"/>
         <location filename="../src/gameselector.cpp" line="189"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="150"/>
@@ -1629,32 +1642,32 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gameselector.cpp" line="151"/>
         <source>Wrong password.</source>
-        <translation type="unfinished"/>
+        <translation>Väärä salasana.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="152"/>
         <source>Spectators are not allowed in this game.</source>
-        <translation type="unfinished"/>
+        <translation>Tähän peliin ei päästetä katsojia.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="153"/>
         <source>The game is already full.</source>
-        <translation type="unfinished"/>
+        <translation>Peli on jo täynnä.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="154"/>
         <source>The game does not exist any more.</source>
-        <translation type="unfinished"/>
+        <translation>Peliä ei enää ole.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="155"/>
         <source>This game is only open to registered users.</source>
-        <translation type="unfinished"/>
+        <translation>Peli on tarkoitettu vain rekisteröityneille käyttäjille.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="156"/>
         <source>This game is only open to its creator&apos;s buddies.</source>
-        <translation type="unfinished"/>
+        <translation>Peli on tarkoitettu vain sen tekijän kavereille.</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="157"/>
@@ -1664,12 +1677,12 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gameselector.cpp" line="176"/>
         <source>Join game</source>
-        <translation type="unfinished"/>
+        <translation>Liity peliin</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="176"/>
         <source>Password:</source>
-        <translation type="unfinished"/>
+        <translation>Salasana:</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="189"/>
@@ -1679,32 +1692,32 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gameselector.cpp" line="205"/>
         <source>Games</source>
-        <translation type="unfinished"/>
+        <translation>Pelit</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="206"/>
         <source>&amp;Filter games</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Suodata pelit</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="207"/>
         <source>C&amp;lear filter</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Poista suodattimet</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="209"/>
         <source>C&amp;reate</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Luo</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="210"/>
         <source>&amp;Join</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Liity</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="211"/>
         <source>J&amp;oin as spectator</source>
-        <translation type="unfinished"/>
+        <translation>Liity &amp;katsojana</translation>
     </message>
 </context>
 <context>
@@ -1712,83 +1725,83 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gamesmodel.cpp" line="17"/>
         <source>New</source>
-        <translation type="unfinished"/>
+        <translation>Uusi</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="109"/>
         <source>password</source>
-        <translation type="unfinished"/>
+        <translation>salasana</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="111"/>
         <source>buddies only</source>
-        <translation type="unfinished"/>
+        <translation>vain kaverit</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="113"/>
         <source>reg. users only</source>
-        <translation type="unfinished"/>
+        <translation>vain rekisteröityneet käyttäjät</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="145"/>
         <location filename="../src/gamesmodel.cpp" line="149"/>
         <source>can chat</source>
-        <translation type="unfinished"/>
+        <translation>voi jutella</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="145"/>
         <source>see hands</source>
-        <translation type="unfinished"/>
+        <translation>katso käsikortit</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="153"/>
         <source>can see hands</source>
-        <translation type="unfinished"/>
+        <translation>voi nähdä käsikortit</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="158"/>
         <source>not allowed</source>
-        <translation type="unfinished"/>
+        <translation>ei sallittu</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="174"/>
         <source>Room</source>
-        <translation type="unfinished"/>
+        <translation>Huone</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="178"/>
         <source>Age</source>
-        <translation type="unfinished"/>
+        <translation>Ikä</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="185"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Muoto</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="183"/>
         <source>Description</source>
-        <translation type="unfinished"/>
+        <translation>Kuvaus</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="184"/>
         <source>Creator</source>
-        <translation type="unfinished"/>
+        <translation>Luoja</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="186"/>
         <source>Restrictions</source>
-        <translation type="unfinished"/>
+        <translation>Ehdot</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="190"/>
         <source>Players</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajat</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="195"/>
         <source>Spectators</source>
-        <translation type="unfinished"/>
+        <translation>Katsojat</translation>
     </message>
 </context>
 <context>
@@ -1800,22 +1813,22 @@ You may have to build from source yourself.</source>
         <location filename="../src/dlg_settings.cpp" line="263"/>
         <location filename="../src/dlg_settings.cpp" line="273"/>
         <source>Choose path</source>
-        <translation type="unfinished"/>
+        <translation>Valitse polku</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="256"/>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Onnistui</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="256"/>
         <source>Downloaded card pictures have been reset.</source>
-        <translation type="unfinished"/>
+        <translation>Ladatut korttikuvat on resetoitu.</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="258"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="258"/>
@@ -1825,17 +1838,17 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="288"/>
         <source>Personal settings</source>
-        <translation type="unfinished"/>
+        <translation>Henkilökohtaiset asetukset</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="289"/>
         <source>Language:</source>
-        <translation type="unfinished"/>
+        <translation>Kieli:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="290"/>
         <source>Download card pictures on the fly</source>
-        <translation type="unfinished"/>
+        <translation>Lataa korttien kuvat lennosta</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="294"/>
@@ -1845,32 +1858,32 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="296"/>
         <source>Paths</source>
-        <translation type="unfinished"/>
+        <translation>Polut</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="299"/>
         <source>Decks directory:</source>
-        <translation type="unfinished"/>
+        <translation>Pakkojen kansio:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="300"/>
         <source>Replays directory:</source>
-        <translation type="unfinished"/>
+        <translation>Replay kansio:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="301"/>
         <source>Pictures directory:</source>
-        <translation type="unfinished"/>
+        <translation>Kuvakansio:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="302"/>
         <source>Card database:</source>
-        <translation type="unfinished"/>
+        <translation>Korttitietokanta:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="303"/>
         <source>Token database:</source>
-        <translation type="unfinished"/>
+        <translation>Tokenitietokanta:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="304"/>
@@ -1880,27 +1893,27 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="305"/>
         <source>Primary download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Pääsääntöinen URL latauksille:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="306"/>
         <source>Fallback download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Toissijainen URL latauksille:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="307"/>
         <source>How to set a custom picture url</source>
-        <translation type="unfinished"/>
+        <translation>Miten asetetan oman url -osoitteen kuville</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="308"/>
         <source>Reset/clear downloaded pictures</source>
-        <translation type="unfinished"/>
+        <translation>Resetoi/tyhjennä ladatut kuvat</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="309"/>
         <source>Update channel</source>
-        <translation type="unfinished"/>
+        <translation>Päivitä kanava</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="310"/>
@@ -1911,7 +1924,7 @@ You may have to build from source yourself.</source>
         <location filename="../src/dlg_settings.cpp" line="311"/>
         <location filename="../src/dlg_settings.cpp" line="312"/>
         <source>Reset</source>
-        <translation type="unfinished"/>
+        <translation>Resetoi</translation>
     </message>
 </context>
 <context>
@@ -1930,17 +1943,17 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/window_main.cpp" line="94"/>
         <source>Banned by moderator</source>
-        <translation type="unfinished"/>
+        <translation>Bännätty moderaattorin toimesta</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="96"/>
         <source>Expected end time: %1</source>
-        <translation type="unfinished"/>
+        <translation>Arvioitu päättymisaika: %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="98"/>
         <source>This ban lasts indefinitely.</source>
-        <translation type="unfinished"/>
+        <translation>Bänni kestää loputtomasti.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="103"/>
@@ -1951,7 +1964,7 @@ You may have to build from source yourself.</source>
         <location filename="../src/window_main.cpp" line="104"/>
         <location filename="../src/window_main.cpp" line="405"/>
         <source>Invalid username.</source>
-        <translation type="unfinished"/>
+        <translation>Väärä käyttäjänimi.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="105"/>
@@ -1961,13 +1974,14 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/window_main.cpp" line="108"/>
         <source>Connection closed</source>
-        <translation type="unfinished"/>
+        <translation>Yhteys suljettu</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="108"/>
         <source>The server has terminated your connection.
 Reason: %1</source>
-        <translation type="unfinished"/>
+        <translation>Serveri katkaisi yhteyden.
+Syy: %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/window_main.cpp" line="113"/>
@@ -1985,105 +1999,107 @@ Reason for shutdown: %1</source>
         <location filename="../src/window_main.cpp" line="152"/>
         <location filename="../src/window_main.cpp" line="162"/>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Onnistui</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="152"/>
         <source>Registration accepted.
 Will now login.</source>
-        <translation type="unfinished"/>
+        <translation>Rekisteröinti hyväksytty
+Kirjautuu.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="162"/>
         <source>Account activation accepted.
 Will now login.</source>
-        <translation type="unfinished"/>
+        <translation>Tilin aktivointi hyväksytty.
+Kirjautuu.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="201"/>
         <source>Number of players</source>
-        <translation type="unfinished"/>
+        <translation>Pelaajien lukumäärä</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="201"/>
         <source>Please enter the number of players.</source>
-        <translation type="unfinished"/>
+        <translation>Anna pelaajien lukumäärä.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="211"/>
         <location filename="../src/window_main.cpp" line="217"/>
         <source>Player %1</source>
-        <translation type="unfinished"/>
+        <translation>Pelaaja %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="229"/>
         <source>Load replay</source>
-        <translation type="unfinished"/>
+        <translation>Lataa replay</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="284"/>
         <source>About Cockatrice</source>
-        <translation type="unfinished"/>
+        <translation>Tieto sovelluksesta</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="287"/>
         <source>Cockatrice Webpage</source>
-        <translation type="unfinished"/>
+        <translation>Cockatricen Webbsivut</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="288"/>
         <source>Project Manager:</source>
-        <translation type="unfinished"/>
+        <translation>Projektipäällikkö:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="289"/>
         <source>Past Project Managers:</source>
-        <translation type="unfinished"/>
+        <translation>Edelliset projektipäälliköt:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="290"/>
         <source>Developers:</source>
-        <translation type="unfinished"/>
+        <translation>Kehittäjät:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="291"/>
         <source>Our Developers</source>
-        <translation type="unfinished"/>
+        <translation>Kehittäjämme</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="292"/>
         <source>Help Develop!</source>
-        <translation type="unfinished"/>
+        <translation>Auta kehittämään!</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="293"/>
         <source>Translators:</source>
-        <translation type="unfinished"/>
+        <translation>Kääntäjät:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="295"/>
         <source>Help Translate!</source>
-        <translation type="unfinished"/>
+        <translation>Auta Kääntämään!</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="296"/>
         <source>Support:</source>
-        <translation type="unfinished"/>
+        <translation>Tuki:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="297"/>
         <source>Report an Issue</source>
-        <translation type="unfinished"/>
+        <translation>Ilmoita puute</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="298"/>
         <source>Troubleshooting</source>
-        <translation type="unfinished"/>
+        <translation>Vianhaku</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="299"/>
         <source>F.A.Q.</source>
-        <translation type="unfinished"/>
+        <translation>F.A.Q.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="326"/>
@@ -2106,17 +2122,17 @@ Will now login.</source>
         <location filename="../src/window_main.cpp" line="915"/>
         <location filename="../src/window_main.cpp" line="951"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="326"/>
         <source>Server timeout</source>
-        <translation type="unfinished"/>
+        <translation>Serverin aikakatkaisu</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="342"/>
         <source>Failed Login</source>
-        <translation type="unfinished"/>
+        <translation>Kirjautuminen epäonnistui</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="349"/>
@@ -2165,7 +2181,7 @@ Please close and reopen your client to try again.</source>
     <message>
         <location filename="../src/window_main.cpp" line="393"/>
         <source>Server Full</source>
-        <translation type="unfinished"/>
+        <translation>Serveri on täynnä</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="397"/>
@@ -3672,7 +3688,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="716"/>
         <source>Red</source>
-        <translation type="unfinished"/>
+        <translation>Punainen</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="717"/>
@@ -3898,7 +3914,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/remotedecklist_treewidget.cpp" line="161"/>
         <source>Name</source>
-        <translation type="unfinished"/>
+        <translation>Nimi</translation>
     </message>
     <message>
         <location filename="../src/remotedecklist_treewidget.cpp" line="162"/>
@@ -3921,7 +3937,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/remotereplaylist_treewidget.cpp" line="138"/>
         <source>Name</source>
-        <translation type="unfinished"/>
+        <translation>Nimi</translation>
     </message>
     <message>
         <location filename="../src/remotereplaylist_treewidget.cpp" line="139"/>
@@ -4323,7 +4339,7 @@ Do you want to save the changes?</source>
         <location filename="../src/tab_deck_editor.cpp" line="711"/>
         <location filename="../src/tab_deck_editor.cpp" line="731"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="687"/>
@@ -4641,7 +4657,7 @@ Please enter a name:</source>
         <location filename="../src/tab_logs.cpp" line="65"/>
         <location filename="../src/tab_logs.cpp" line="75"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/tab_logs.cpp" line="65"/>
@@ -4935,7 +4951,7 @@ The more information you put in, the more specific your results will be.</source
         <location filename="../src/tab_server.cpp" line="212"/>
         <location filename="../src/tab_server.cpp" line="215"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="206"/>
@@ -5045,7 +5061,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/tappedout_interface.cpp" line="23"/>
         <location filename="../src/tappedout_interface.cpp" line="66"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/tappedout_interface.cpp" line="45"/>
@@ -5225,7 +5241,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userinfobox.cpp" line="68"/>
         <source>Real name:</source>
-        <translation type="unfinished"/>
+        <translation>Oikea nimi:</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="69"/>
@@ -5325,7 +5341,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/userinfobox.cpp" line="280"/>
         <location filename="../src/userinfobox.cpp" line="284"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/userinfobox.cpp" line="241"/>
@@ -5422,7 +5438,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/userlist.cpp" line="334"/>
         <source>Users connected to server: %1</source>
-        <translation type="unfinished"/>
+        <translation>Käyttäjiä serverillä: %1</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="335"/>
@@ -5466,7 +5482,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <location filename="../src/userlist.cpp" line="151"/>
         <location filename="../src/userlist.cpp" line="156"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Virhe</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="151"/>
@@ -5823,7 +5839,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1761"/>
         <source>Red</source>
-        <translation type="unfinished"/>
+        <translation>Punainen</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1765"/>
