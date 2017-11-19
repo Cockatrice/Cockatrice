@@ -479,7 +479,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../../cockatrice/src/settingscache.cpp" line="154"/>
         <source>English</source>
-        <translation>英语</translation>
+        <translation>简体中文 (Chinese Simplified)</translation>
     </message>
 </context>
 </TS>

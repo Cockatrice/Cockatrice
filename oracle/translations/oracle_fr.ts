@@ -16,12 +16,12 @@ Vous devrez spécifier une URL ou un fichier qui sera utilisé comme source.</tr
     <message>
         <location filename="../src/oraclewizard.cpp" line="174"/>
         <source>Language:</source>
-        <translation>Langue:</translation>
+        <translation>Langue :</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="175"/>
         <source>Version:</source>
-        <translation type="unfinished"/>
+        <translation>Version :</translation>
     </message>
 </context>
 <context>
@@ -39,12 +39,12 @@ Vous devrez spécifier une URL ou un fichier qui sera utilisé comme source.</tr
     <message>
         <location filename="../src/oraclewizard.cpp" line="228"/>
         <source>Download URL:</source>
-        <translation>URL de téléchargement:</translation>
+        <translation>URL de téléchargement :</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="229"/>
         <source>Local file:</source>
-        <translation>Fichier local:</translation>
+        <translation>Fichier local :</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="230"/>
