@@ -476,7 +476,7 @@ You will need to specify a URL or a filename that will be used as a source.</sou
     <message>
         <location filename="../../cockatrice/src/settingscache.cpp" line="154"/>
         <source>English</source>
-        <translation>Srpski</translation>
+        <translation>Srpski (Serbian)</translation>
     </message>
 </context>
 </TS>

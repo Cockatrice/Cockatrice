@@ -16,12 +16,12 @@ Necesitarás especificar la URL o el nombre de archivo que será usado como orig
     <message>
         <location filename="../src/oraclewizard.cpp" line="174"/>
         <source>Language:</source>
-        <translation>Idioma</translation>
+        <translation>Idioma:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="175"/>
         <source>Version:</source>
-        <translation type="unfinished"/>
+        <translation>Versión:</translation>
     </message>
 </context>
 <context>
