@@ -1,10 +1,19 @@
-<p align='center'><img src=https://cloud.githubusercontent.com/assets/9874850/7516775/b00b8e36-f4d1-11e4-8da4-3df294d01f86.png></p>
+<p align='center'>
+   <img src=https://cloud.githubusercontent.com/assets/9874850/7516775/b00b8e36-f4d1-11e4-8da4-3df294d01f86.png>
 
 ---
 
-**Table of Contents** &nbsp;&nbsp; [Cockatrice](#cockatrice) | [Downloads](#downloads-) | [Get Involved](#get-involved-) | [Community](#community-resources) | [Translation](#translation-status-) | [Building](#building--) | [Running](#running) | [License](#license-)
-
+   <a href="#cockatrice">Cockatrice</a> | 
+   <a href="#downloads-">Downloads</a> | 
+   <a href="#get-involved-">Get Involved</a> | 
+   <a href="#community-resources">Community</a> | 
+   <a href="#translation-status-">Translation</a> | 
+   <a href="#building--">Building</a> | 
+   <a href="#running">Running</a> | 
+   <a href="#license-">License</a>
+   
 ---
+</p>
 
 <br><pre>
 <b>To get started, &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
