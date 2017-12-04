@@ -166,6 +166,7 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["TabDeckEditor/aRemoveCard"] = parseSequenceString("Del");
     defaultShortCuts["TabDeckEditor/aResetLayout"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aSaveDeck"] = parseSequenceString("Ctrl+S");
+    defaultShortCuts["TabDeckEditor/aExportDeck"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aSaveDeckAs"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aSaveDeckToClipboard"] = parseSequenceString("Ctrl+Shift+C");
 

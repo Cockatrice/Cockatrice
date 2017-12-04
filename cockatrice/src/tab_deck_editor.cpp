@@ -23,6 +23,7 @@
 #include <QPushButton>
 #include <QDir>
 #include <QDesktopServices>
+#include <QUrl>
 #include "tab_deck_editor.h"
 #include "carddatabase.h"
 #include "pictureloader.h"
@@ -213,6 +214,9 @@ void TabDeckEditor::createMenus()
 
     aSaveDeck = new QAction(QString(), this);
     connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
+    
+    aExportDeck = new QAction(QString(), this);
+    connect(aExportDeck, SIGNAL(triggered()), this, SLOT(actExportDeck()));
 
     aSaveDeckAs = new QAction(QString(), this);
     connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
@@ -251,6 +255,7 @@ void TabDeckEditor::createMenus()
     deckMenu->addAction(aNewDeck);
     deckMenu->addAction(aLoadDeck);
     deckMenu->addAction(aSaveDeck);
+    deckMenu->addAction(aExportDeck);
     deckMenu->addAction(aSaveDeckAs);
     deckMenu->addSeparator();
     deckMenu->addAction(aLoadDeckFromClipboard);
@@ -453,6 +458,7 @@ void TabDeckEditor::refreshShortcuts()
     aNewDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aNewDeck"));
     aLoadDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aLoadDeck"));
     aSaveDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeck"));
+    aExportDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aExportDeck"));
     aSaveDeckAs->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeckAs"));
     aLoadDeckFromClipboard->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
     aPrintDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aPrintDeck"));
@@ -541,6 +547,7 @@ void TabDeckEditor::retranslateUi()
     aNewDeck->setText(tr("&New deck"));
     aLoadDeck->setText(tr("&Load deck..."));
     aSaveDeck->setText(tr("&Save deck"));
+    aExportDeck->setText(tr("&Export deck to Decklist"));
     aSaveDeckAs->setText(tr("Save deck &as..."));
     aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
     aSaveDeckToClipboard->setText(tr("Save deck to clip&board"));
@@ -710,6 +717,18 @@ bool TabDeckEditor::actSaveDeck()
     }
     QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
     return false;
+}
+
+bool TabDeckEditor::actExportDeck()
+{
+    DeckLoader *const deck = deckModel->getDeckList();
+    QString decklistUrl = deck->exportDeckToDecklist();
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle("Export to Decklist.org");
+    msgBox.setTextFormat(Qt::RichText);   //this is what makes the links clickable
+    msgBox.setText("<a href='"+QUrl(decklistUrl).toEncoded()+"'>Click here to view your deck on Decklist.org</a>");
+    msgBox.exec();
+    return true;
 }
 
 bool TabDeckEditor::actSaveDeckAs()

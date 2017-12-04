@@ -28,6 +28,7 @@ public:
     bool loadFromFile(const QString &fileName, FileFormat fmt);
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
     bool saveToFile(const QString &fileName, FileFormat fmt);
+    QString exportDeckToDecklist();
 
     // overload
     bool saveToStream_Plain(QTextStream &out);

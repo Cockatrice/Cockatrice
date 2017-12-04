@@ -103,6 +103,47 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
     return result;
 }
 
+struct FormatDeckListForExport
+{
+    QString &mainBoardCards;
+    QString &sideBoardCards;
+    
+    FormatDeckListForExport(
+                    QString &_mainBoardCards, QString &_sideBoardCards
+                            ) : mainBoardCards(_mainBoardCards),
+                                sideBoardCards(_sideBoardCards){};
+    
+    void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const{
+        CardInfo * dbCard = db->getCard(card->getName());
+        if (!dbCard || dbCard->getIsToken())
+            return;
+        if(node->getName() == DECK_ZONE_SIDE){
+            sideBoardCards+=QString::number(card->getNumber());
+            sideBoardCards+="%20";
+            sideBoardCards+=card->getName();
+            sideBoardCards+="%0A";
+        }
+        else{
+            mainBoardCards+=QString::number(card->getNumber());
+            mainBoardCards+="%20";
+            mainBoardCards+=card->getName();
+            mainBoardCards+="%0A";
+        }
+    }
+};
+
+QString DeckLoader::exportDeckToDecklist()
+{
+    QString deckString = "https://www.decklist.org/?";
+    QString mainBoardCards, sideBoardCards;
+    FormatDeckListForExport formatDeckListForExport(mainBoardCards, sideBoardCards);
+    forEachCard(formatDeckListForExport);
+    mainBoardCards.chop(3);
+    sideBoardCards.chop(3);
+    deckString+="deckmain="+mainBoardCards+"&deckside="+sideBoardCards;
+    return deckString;
+}
+
 DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
 {
     if (fileName.endsWith(".cod", Qt::CaseInsensitive)) {
