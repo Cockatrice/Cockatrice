@@ -48,11 +48,11 @@ class TabDeckEditor : public Tab {
             void actNewDeck();
             void actLoadDeck();
             bool actSaveDeck();
-            bool actExportDeck();
             bool actSaveDeckAs();
             void actLoadDeckFromClipboard();
             void actSaveDeckToClipboard();
             void actPrintDeck();
+            void actExportDeckDecklist();
             void actAnalyzeDeckDeckstats();
             void actAnalyzeDeckTappedout();
 
@@ -111,7 +111,7 @@ private:
     QWidget *filterBox;
 
     QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *analyzeDeckMenu;
-    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aExportDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aClose;
+    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aExportDeckDecklist, *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aClose;
     QAction *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
     QAction *aResetLayout;

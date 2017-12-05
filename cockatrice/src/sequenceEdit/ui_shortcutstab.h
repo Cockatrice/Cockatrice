@@ -80,8 +80,8 @@ public:
     SequenceEdit *TabDeckEditor_aIncrement;
     QLabel *lbl_TabDeckEditor_aSaveDeck;
     SequenceEdit *TabDeckEditor_aSaveDeck;
-    QLabel *lbl_TabDeckEditor_aExportDeck;
-    SequenceEdit *TabDeckEditor_aExportDeck;
+    QLabel *lbl_TabDeckEditor_aExportDeckDecklist;
+    SequenceEdit *TabDeckEditor_aExportDeckDecklist;
     QLabel *lbl_TabDeckEditor_aDecrement;
     SequenceEdit *TabDeckEditor_aDecrement;
     QLabel *lbl_TabDeckEditor_aSaveDeckAs;
@@ -597,14 +597,13 @@ public:
 
         lbl_TabDeckEditor_aSaveDeck = new QLabel(groupBox_2);
         lbl_TabDeckEditor_aSaveDeck->setObjectName("lbl_TabDeckEditor_aSaveDeck");
-        
+
         gridLayout->addWidget(lbl_TabDeckEditor_aSaveDeck, 6, 2, 1, 1);
-        
+
         TabDeckEditor_aSaveDeck = new SequenceEdit("TabDeckEditor/aSaveDeck",groupBox_2);
         TabDeckEditor_aSaveDeck->setObjectName("TabDeckEditor_aSaveDeck");
-        
+
         gridLayout->addWidget(TabDeckEditor_aSaveDeck, 6, 3, 1, 1);
-        
 
         lbl_TabDeckEditor_aDecrement = new QLabel(groupBox_2);
         lbl_TabDeckEditor_aDecrement->setObjectName("lbl_TabDeckEditor_aDecrement");
@@ -646,15 +645,15 @@ public:
 
         gridLayout->addWidget(TabDeckEditor_aSaveDeckToClipboard, 8, 3, 1, 1);
         
-        lbl_TabDeckEditor_aExportDeck = new QLabel(groupBox_2);
-        lbl_TabDeckEditor_aExportDeck->setObjectName("lbl_TabDeckEditor_aExportDeck");
+        lbl_TabDeckEditor_aExportDeckDecklist = new QLabel(groupBox_2);
+        lbl_TabDeckEditor_aExportDeckDecklist->setObjectName("lbl_TabDeckEditor_aExportDeckDecklist");
         
-        gridLayout->addWidget(lbl_TabDeckEditor_aExportDeck, 9, 2, 1, 1);
+        gridLayout->addWidget(lbl_TabDeckEditor_aExportDeckDecklist, 9, 2, 1, 1);
         
-        TabDeckEditor_aExportDeck = new SequenceEdit("TabDeckEditor/aExportDeck",groupBox_2);
-        TabDeckEditor_aExportDeck->setObjectName("TabDeckEditor_aExportDeck");
+        TabDeckEditor_aExportDeckDecklist = new SequenceEdit("TabDeckEditor/aExportDeckDecklist",groupBox_2);
+        TabDeckEditor_aExportDeckDecklist->setObjectName("TabDeckEditor_aExportDeckDecklist");
         
-        gridLayout->addWidget(TabDeckEditor_aExportDeck, 9, 3, 1, 1);
+        gridLayout->addWidget(TabDeckEditor_aExportDeckDecklist, 9, 3, 1, 1);
 
         gridLayout_3->addWidget(groupBox_2, 0, 1, 1, 1);
 
@@ -1762,7 +1761,7 @@ public:
         lbl_TabDeckEditor_aResetLayout->setText(QApplication::translate("shortcutsTab", "Reset layout", 0));
         lbl_TabDeckEditor_aIncrement->setText(QApplication::translate("shortcutsTab", "Add card", 0));
         lbl_TabDeckEditor_aSaveDeck->setText(QApplication::translate("shortcutsTab", "Save deck", 0));
-        lbl_TabDeckEditor_aExportDeck->setText(QApplication::translate("shortcutsTab", "Export deck", 0));
+        lbl_TabDeckEditor_aExportDeckDecklist->setText(QApplication::translate("shortcutsTab", "Export deck", 0));
         lbl_TabDeckEditor_aDecrement->setText(QApplication::translate("shortcutsTab", "Remove card", 0));
         lbl_TabDeckEditor_aSaveDeckAs->setText(QApplication::translate("shortcutsTab", "Save deck as", 0));
         lbl_TabDeckEditor_aLoadDeck->setText(QApplication::translate("shortcutsTab", "Load deck", 0));

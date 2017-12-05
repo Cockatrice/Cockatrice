@@ -157,6 +157,7 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["TabDeckEditor/aDecrement"] = parseSequenceString("-");
     defaultShortCuts["TabDeckEditor/aEditSets"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aEditTokens"] = parseSequenceString("");
+    defaultShortCuts["TabDeckEditor/aExportDeckDecklist"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aIncrement"] = parseSequenceString("+");
     defaultShortCuts["TabDeckEditor/aLoadDeck"] = parseSequenceString("Ctrl+O");
     defaultShortCuts["TabDeckEditor/aLoadDeckFromClipboard"] = parseSequenceString("Ctrl+Shift+V");
@@ -166,7 +167,6 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["TabDeckEditor/aRemoveCard"] = parseSequenceString("Del");
     defaultShortCuts["TabDeckEditor/aResetLayout"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aSaveDeck"] = parseSequenceString("Ctrl+S");
-    defaultShortCuts["TabDeckEditor/aExportDeck"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aSaveDeckAs"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aSaveDeckToClipboard"] = parseSequenceString("Ctrl+Shift+C");
 
