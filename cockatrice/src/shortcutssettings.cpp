@@ -157,6 +157,7 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["TabDeckEditor/aDecrement"] = parseSequenceString("-");
     defaultShortCuts["TabDeckEditor/aEditSets"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aEditTokens"] = parseSequenceString("");
+    defaultShortCuts["TabDeckEditor/aExportDeckDecklist"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aIncrement"] = parseSequenceString("+");
     defaultShortCuts["TabDeckEditor/aLoadDeck"] = parseSequenceString("Ctrl+O");
     defaultShortCuts["TabDeckEditor/aLoadDeckFromClipboard"] = parseSequenceString("Ctrl+Shift+V");

@@ -23,6 +23,7 @@
 #include <QPushButton>
 #include <QDir>
 #include <QDesktopServices>
+#include <QUrl>
 #include "tab_deck_editor.h"
 #include "carddatabase.h"
 #include "pictureloader.h"
@@ -226,6 +227,9 @@ void TabDeckEditor::createMenus()
     aPrintDeck = new QAction(QString(), this);
     connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
 
+    aExportDeckDecklist = new QAction(QString(), this);
+    connect(aExportDeckDecklist, SIGNAL(triggered()), this, SLOT(actExportDeckDecklist()));
+
     aAnalyzeDeckDeckstats = new QAction(QString(), this);
     connect(aAnalyzeDeckDeckstats, SIGNAL(triggered()), this, SLOT(actAnalyzeDeckDeckstats()));
 
@@ -233,6 +237,7 @@ void TabDeckEditor::createMenus()
     connect(aAnalyzeDeckTappedout, SIGNAL(triggered()), this, SLOT(actAnalyzeDeckTappedout()));
 
     analyzeDeckMenu = new QMenu(this);
+    analyzeDeckMenu->addAction(aExportDeckDecklist);
     analyzeDeckMenu->addAction(aAnalyzeDeckDeckstats);
     analyzeDeckMenu->addAction(aAnalyzeDeckTappedout);
 
@@ -453,6 +458,7 @@ void TabDeckEditor::refreshShortcuts()
     aNewDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aNewDeck"));
     aLoadDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aLoadDeck"));
     aSaveDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeck"));
+    aExportDeckDecklist->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aExportDeckDecklist"));
     aSaveDeckAs->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeckAs"));
     aLoadDeckFromClipboard->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
     aPrintDeck->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aPrintDeck"));
@@ -546,9 +552,10 @@ void TabDeckEditor::retranslateUi()
     aSaveDeckToClipboard->setText(tr("Save deck to clip&board"));
     aPrintDeck->setText(tr("&Print deck..."));
 
-    analyzeDeckMenu->setTitle(tr("&Analyze deck online"));
-    aAnalyzeDeckDeckstats->setText("deckstats.net");
-    aAnalyzeDeckTappedout->setText("tappedout.net");
+    analyzeDeckMenu->setTitle(tr("&Send deck to online service"));
+    aExportDeckDecklist->setText(tr("Create decklist (decklist.org)"));
+    aAnalyzeDeckDeckstats->setText(tr("Analyze deck (deckstats.net)"));
+    aAnalyzeDeckTappedout->setText(tr("Analyze deck (tappedout.net)"));
 
     aClose->setText(tr("&Close"));
     
@@ -762,6 +769,37 @@ void TabDeckEditor::actPrintDeck()
     QPrintPreviewDialog *dlg = new QPrintPreviewDialog(this);
     connect(dlg, SIGNAL(paintRequested(QPrinter *)), deckModel, SLOT(printDeckList(QPrinter *)));
     dlg->exec();
+}
+
+//Action called when export deck to decklist menu item is pressed.
+void TabDeckEditor::actExportDeckDecklist()
+{
+    //Get the decklist class for the deck.
+    DeckLoader *const deck = deckModel->getDeckList();
+    //create a string to load the decklist url into.
+    QString decklistUrlString;
+    //check if deck is not null
+    if(deck){
+        //Get the decklist url string from the deck loader class.
+        decklistUrlString = deck->exportDeckToDecklist();
+        //Check to make sure the string isn't empty.
+        if(QString::compare(decklistUrlString, "", Qt::CaseInsensitive) == 0){
+            //Show an error if the deck is empty, and return.
+            QMessageBox::critical(this, tr("Error"), tr("There are no cards in your deck to be exported"));
+            return;
+        }
+        //Encode the string recieved from the model to make sure all characters are encoded.
+        //first we put it into a qurl object
+        QUrl decklistUrl = QUrl(decklistUrlString);
+        //we get the correctly encoded url.
+        decklistUrlString = decklistUrl.toEncoded();
+        //We open the url in the user's default browser
+        QDesktopServices::openUrl(decklistUrlString);
+    }
+    else{
+        //if there's no deck loader object, return an error
+        QMessageBox::critical(this, tr("Error"), tr("No deck was selected to be saved."));
+    }
 }
 
 void TabDeckEditor::actAnalyzeDeckDeckstats()

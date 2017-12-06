@@ -103,6 +103,73 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
     return result;
 }
 
+//This struct is here to support the forEachCard function call, defined in decklist. It
+//requires a function to be called for each card, and passes an inner node and a card for
+//each card in the decklist.
+struct FormatDeckListForExport
+{
+    //Create refrences for the strings that will be passed in.
+    QString &mainBoardCards;
+    QString &sideBoardCards;
+    //create main operator for struct, allowing the foreachcard to work.
+    FormatDeckListForExport(
+                    QString &_mainBoardCards, QString &_sideBoardCards
+                            ) : mainBoardCards(_mainBoardCards),
+                                sideBoardCards(_sideBoardCards){};
+    
+    void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const{
+        //Get the card name
+        CardInfo * dbCard = db->getCard(card->getName());
+        if (!dbCard || dbCard->getIsToken()){
+            //If it's a token, we don't care about the card.
+            return;
+        }
+        //Check if it's a sideboard card.
+        if(node->getName() == DECK_ZONE_SIDE){
+            //Get the number of cards and add the card name
+            sideBoardCards+=QString::number(card->getNumber());
+            //Add a space between card num and name
+            sideBoardCards+="%20";
+            //Add card name
+            sideBoardCards+=card->getName();
+            //Add a return at the end of the card
+            sideBoardCards+="%0A";
+        }
+        //If it's a mainboard card, do the same thing, but for the mainboard card string
+        else{
+            mainBoardCards+=QString::number(card->getNumber());
+            mainBoardCards+="%20";
+            mainBoardCards+=card->getName();
+            mainBoardCards+="%0A";
+        }
+    }
+};
+
+//Export deck to decklist function, called to format the deck in a way to be sent to a server
+QString DeckLoader::exportDeckToDecklist()
+{
+    //Add the base url
+    QString deckString = "https://www.decklist.org/?";
+    //Create two strings to pass to function
+    QString mainBoardCards, sideBoardCards;
+    //Set up the struct to call.
+    FormatDeckListForExport formatDeckListForExport(mainBoardCards, sideBoardCards);
+    //call our struct function for each card in the deck
+    forEachCard(formatDeckListForExport);
+    //Remove the extra return at the end of the last cards
+    mainBoardCards.chop(3);
+    sideBoardCards.chop(3);
+    //if after we've called it for each card, and the strings are empty, we know that
+    //there were no non-token cards in the deck, so show an error message.
+    if((QString::compare(mainBoardCards, "", Qt::CaseInsensitive) == 0) &&
+       (QString::compare(sideBoardCards, "", Qt::CaseInsensitive) == 0)) {
+        return "";
+    }
+    //return a string with the url for decklist export
+    deckString+="deckmain="+mainBoardCards+"&deckside="+sideBoardCards;
+    return deckString;
+}
+
 DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
 {
     if (fileName.endsWith(".cod", Qt::CaseInsensitive)) {
