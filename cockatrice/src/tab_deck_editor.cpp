@@ -774,7 +774,7 @@ void TabDeckEditor::actPrintDeck()
 void TabDeckEditor::actExportDeckDecklist()
 {
     DeckLoader *const deck = deckModel->getDeckList();
-    if(deck != NULL){
+    if(deck != nullptr){
         QString decklistUrlString = deck->exportDeckToDecklist();
         QUrl decklistUrl = QUrl(decklistUrlString);
         decklistUrlString = decklistUrl.toEncoded();
