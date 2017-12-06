@@ -771,22 +771,35 @@ void TabDeckEditor::actPrintDeck()
     dlg->exec();
 }
 
+//Action called when export deck to decklist menu item is pressed.
 void TabDeckEditor::actExportDeckDecklist()
 {
+    //Get the decklist class for the deck.
     DeckLoader *const deck = deckModel->getDeckList();
+    //create a string to load the decklist url into.
     QString decklistUrlString;
+    //check if deck is not null
     if(deck){
+        //Get the decklist url string from the deck loader class.
         decklistUrlString = deck->exportDeckToDecklist();
+        //Check to make sure the string isn't empty.
         if(QString::compare(decklistUrlString, "", Qt::CaseInsensitive) == 0){
+            //Show an error if the deck is empty, and return.
             QMessageBox::critical(this, tr("Error"), tr("There are no cards in your deck to be exported"));
             return;
         }
+        //Encode the string recieved from the model to make sure all characters are encoded.
+        //first we put it into a qurl object
         QUrl decklistUrl = QUrl(decklistUrlString);
+        //we get the correctly encoded url.
         decklistUrlString = decklistUrl.toEncoded();
+        //We open the url in the user's default browser
         QDesktopServices::openUrl(decklistUrlString);
     }
-    else
+    else{
+        //if there's no deck loader object, return an error
         QMessageBox::critical(this, tr("Error"), tr("No deck was selected to be saved."));
+    }
 }
 
 void TabDeckEditor::actAnalyzeDeckDeckstats()
