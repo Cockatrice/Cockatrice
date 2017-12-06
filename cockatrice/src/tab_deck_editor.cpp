@@ -553,9 +553,9 @@ void TabDeckEditor::retranslateUi()
     aPrintDeck->setText(tr("&Print deck..."));
 
     analyzeDeckMenu->setTitle(tr("&Send deck to online service"));
-    aExportDeckDecklist->setText(tr("&Create decklist (decklist.org)"));
-    aAnalyzeDeckDeckstats->setText("&Analyze deck (deckstats.net)");
-    aAnalyzeDeckTappedout->setText("&Analyze deck (tappedout.net)");
+    aExportDeckDecklist->setText(tr("Create decklist (decklist.org)"));
+    aAnalyzeDeckDeckstats->setText(tr("Analyze deck (deckstats.net)"));
+    aAnalyzeDeckTappedout->setText(tr("Analyze deck (tappedout.net)"));
 
     aClose->setText(tr("&Close"));
     
@@ -775,7 +775,7 @@ void TabDeckEditor::actExportDeckDecklist()
 {
     DeckLoader *const deck = deckModel->getDeckList();
     QString decklistUrlString;
-    if(deck != nullptr){
+    if(deck){
         decklistUrlString = deck->exportDeckToDecklist();
         if(QString::compare(decklistUrlString, "", Qt::CaseInsensitive) == 0){
             QMessageBox::critical(this, tr("Error"), tr("There are no cards in your deck to be exported"));
