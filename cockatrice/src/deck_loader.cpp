@@ -140,6 +140,10 @@ QString DeckLoader::exportDeckToDecklist()
     forEachCard(formatDeckListForExport);
     mainBoardCards.chop(3);
     sideBoardCards.chop(3);
+    if((QString::compare(mainBoardCards, "", Qt::CaseInsensitive) == 0) &&
+       (QString::compare(sideBoardCards, "", Qt::CaseInsensitive) == 0)) {
+        return "";
+    }
     deckString+="deckmain="+mainBoardCards+"&deckside="+sideBoardCards;
     return deckString;
 }

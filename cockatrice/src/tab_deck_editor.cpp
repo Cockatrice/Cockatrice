@@ -774,8 +774,13 @@ void TabDeckEditor::actPrintDeck()
 void TabDeckEditor::actExportDeckDecklist()
 {
     DeckLoader *const deck = deckModel->getDeckList();
+    QString decklistUrlString;
     if(deck != nullptr){
-        QString decklistUrlString = deck->exportDeckToDecklist();
+        decklistUrlString = deck->exportDeckToDecklist();
+        if(QString::compare(decklistUrlString, "", Qt::CaseInsensitive) == 0){
+            QMessageBox::critical(this, tr("Error"), tr("There are no cards in your deck to be exported"));
+            return;
+        }
         QUrl decklistUrl = QUrl(decklistUrlString);
         decklistUrlString = decklistUrl.toEncoded();
         QDesktopServices::openUrl(decklistUrlString);
