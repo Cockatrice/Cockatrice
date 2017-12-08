@@ -638,18 +638,17 @@ struct WriteToStream {
            stream << "SB: ";
        }
        if (!slashTappedOutSplitCards) {
+           stream << QString("%1 %2\n").arg(
+               card->getNumber()
+           ).arg(
+               card->getName()
+	   );
+       } else {
 	   stream << QString("%1 %2\n").arg(
 	       card->getNumber()
-	     ).arg(
-		   card->getName()
-	   );
-       }
-       else {
-	   stream << QString("%1 %2\n").arg(
-	       card->getNumber()
-	     ).arg(
-		   card->getName().replace("//", "/")
-	   );
+	   ).arg(
+               card->getName().replace("//", "/")
+           );
        }
     }
 };
