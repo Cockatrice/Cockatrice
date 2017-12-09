@@ -577,9 +577,7 @@ void LoadTokensPage::initializePage()
 void LoadTokensPage::retranslateUi()
 {
     setTitle(tr("Tokens source selection"));
-    setSubTitle(tr("Please specify a source for the list of tokens. "
-                   "You can specify a URL address that will be downloaded or "
-                   "use an existing file from your computer."));
+    setSubTitle(tr("Please specify a source for the list of tokens."));
 
     urlLabel->setText(tr("Download URL:"));
     urlButton->setText(tr("Restore default URL"));
