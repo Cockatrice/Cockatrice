@@ -168,9 +168,7 @@ void IntroPage::retranslateUi()
 {
     setTitle(tr("Introduction"));
     label->setText(tr("This wizard will import the list of sets, cards, and tokens "
-                      "that will be used by Cockatrice."
-                      "\nYou will need to specify a URL or a filename that "
-                      "will be used as a source."));
+                      "that will be used by Cockatrice."));
     languageLabel->setText(tr("Language:"));
     versionLabel->setText(tr("Version:") + QString(" %1").arg(VERSION_STRING));
 }
