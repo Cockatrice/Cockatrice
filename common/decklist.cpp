@@ -647,7 +647,7 @@ struct WriteToStream {
 	   stream << QString("%1 %2\n").arg(
 	       card->getNumber()
 	   ).arg(
-               card->getName().replace("//", "/").replace("Who / What / When / Where / Why", "Who/What/When/Where/Why")
+               card->getName().replace("//", "/")
            );
        }
     }
