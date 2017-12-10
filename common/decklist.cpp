@@ -626,8 +626,9 @@ bool DeckList::loadFromFile_Plain(QIODevice *device)
 struct WriteToStream {
     QTextStream &stream;
     bool prefixSideboardCards;
+    bool slashTappedOutSplitCards;
 
-    WriteToStream(QTextStream &_stream, bool _prefixSideboardCards) : stream(_stream), prefixSideboardCards(_prefixSideboardCards) {}
+  WriteToStream(QTextStream &_stream, bool _prefixSideboardCards, bool _slashTappedOutSplitCards):  stream(_stream), prefixSideboardCards(_prefixSideboardCards), slashTappedOutSplitCards(_slashTappedOutSplitCards) {}
 
     void operator()(
         const InnerDecklistNode *node,
@@ -636,32 +637,40 @@ struct WriteToStream {
        if (prefixSideboardCards && node->getName() == DECK_ZONE_SIDE) {
            stream << "SB: ";
        }
-       stream << QString("%1 %2\n").arg(
-           card->getNumber()
-       ).arg(
-           card->getName()
-       );
+       if (!slashTappedOutSplitCards) {
+           stream << QString("%1 %2\n").arg(
+               card->getNumber()
+           ).arg(
+               card->getName()
+	   );
+       } else {
+	   stream << QString("%1 %2\n").arg(
+	       card->getNumber()
+	   ).arg(
+               card->getName().replace("//", "/")
+           );
+       }
     }
 };
 
-bool DeckList::saveToStream_Plain(QTextStream &out, bool prefixSideboardCards)
+  bool DeckList::saveToStream_Plain(QTextStream &out, bool prefixSideboardCards, bool slashTappedOutSplitCards)
 {
-    WriteToStream writeToStream(out, prefixSideboardCards);
+    WriteToStream writeToStream(out, prefixSideboardCards, slashTappedOutSplitCards);
     forEachCard(writeToStream);
     return true;
 }
 
-bool DeckList::saveToFile_Plain(QIODevice *device, bool prefixSideboardCards)
+bool DeckList::saveToFile_Plain(QIODevice *device, bool prefixSideboardCards, bool slashTappedOutSplitCards)
 {
     QTextStream out(device);
-    return saveToStream_Plain(out, prefixSideboardCards);
+    return saveToStream_Plain(out, prefixSideboardCards, slashTappedOutSplitCards);
 }
 
-QString DeckList::writeToString_Plain(bool prefixSideboardCards)
+QString DeckList::writeToString_Plain(bool prefixSideboardCards, bool slashTappedOutSplitCards)
 {
     QString result;
     QTextStream out(&result);
-    saveToStream_Plain(out, prefixSideboardCards);
+    saveToStream_Plain(out, prefixSideboardCards, slashTappedOutSplitCards);
     return result;
 }
 
