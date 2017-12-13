@@ -42,6 +42,7 @@
 #include "soundengine.h"
 #include "featureset.h"
 #include "logger.h"
+#include "spoilerbackgroundupdater.h"
 
 CardDatabase *db;
 QTranslator *translator, *qtTranslator;
@@ -131,6 +132,11 @@ int main(int argc, char *argv[])
 
     ui.show();
     qDebug("main(): ui.show() finished");
+
+    // Create thread that will count down how long
+    // until we need to check for an update to
+    // spoilers.xml and then download it accordingly
+    SpoilerBackgroundUpdater mtSpoilerUpdateChecker;
 
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.exec();

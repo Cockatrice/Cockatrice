@@ -171,6 +171,14 @@ SettingsCache::SettingsCache()
     releaseChannels << new StableReleaseChannel();
     releaseChannels << new DevReleaseChannel();
 
+    // Add the times for the options to re-check for new spoilers
+    manDownloadSpoilerTimeIntervals.insert(30,    tr("30 minutes"));
+    manDownloadSpoilerTimeIntervals.insert(60,    tr("1 hour"));
+    manDownloadSpoilerTimeIntervals.insert(60*6,  tr("6 hours"));
+    manDownloadSpoilerTimeIntervals.insert(60*12, tr("12 hours"));
+    manDownloadSpoilerTimeIntervals.insert(60*24, tr("1 day"));
+    manDownloadSpoilerTimeIntervals.insert(60*48, tr("2 days"));
+
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
 
@@ -187,6 +195,7 @@ SettingsCache::SettingsCache()
 
     cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
     tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
+    msSpoilerDatabasePath = getSafeConfigFilePath("paths/spoilerdatabase", dataPath + "/spoilers.xml");
 
     themeName = settings->value("theme/name").toString();
 
@@ -212,6 +221,9 @@ SettingsCache::SettingsCache()
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
+    mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
+    msDownloadSpoilersTimeMinutes = settings->value("personal/downloadspoilerstimeMinutes", -1).toInt();
+    mnDownloadSpoilerLastUpdateTime = settings->value("personal/downloadspoilerslastupdatetime", -1).toLongLong();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     playToStack = settings->value("interface/playtostack", true).toBool();
@@ -324,6 +336,12 @@ void SettingsCache::setDeckPath(const QString &_deckPath)
 {
     deckPath = _deckPath;
     settings->setValue("paths/decks", deckPath);
+}
+
+void SettingsCache::setSpoilerDatabasePath(const QString &_asSpoilerDatabasePath)
+{
+    msSpoilerDatabasePath = _asSpoilerDatabasePath;
+    settings->setValue("paths/spoilerdatabase", msSpoilerDatabasePath);
 }
 
 void SettingsCache::setReplaysPath(const QString &_replaysPath)
@@ -644,14 +662,33 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 
 void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
-    notifyAboutUpdates = _notifyaboutupdate;
+    notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+void SettingsCache::setDownloadSpoilerStatus(bool _spoilerStatus)
+{
+    mbDownloadSpoilers = _spoilerStatus;
+    settings->setValue("personal/downloadspoilers", mbDownloadSpoilers);
+    emit downloadSpoilerStatusChanged();
 }
 
 void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
 {
     updateReleaseChannel = _updateReleaseChannel;
     settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
+}
+
+void SettingsCache::setDownloadSpoilerTimeMinutes(int _lnTimeInterval)
+{
+    msDownloadSpoilersTimeMinutes = _lnTimeInterval;
+    settings->setValue("personal/downloadspoilerstimeMinutes", msDownloadSpoilersTimeMinutes);
+}
+
+void SettingsCache::setDownloadSpoilerLastUpdateTime(long long _timestamp)
+{
+    mnDownloadSpoilerLastUpdateTime = _timestamp;
+    settings->setValue("personal/downloadspoilerslastupdatetime", mnDownloadSpoilerLastUpdateTime);
 }
 
 void SettingsCache::setMaxFontSize(int _max)

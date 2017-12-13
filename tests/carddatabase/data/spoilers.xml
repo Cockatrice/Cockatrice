@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cockatrice_carddatabase version="3">
+    <cards>
+        <card>
+            <name>Fluffy</name>
+            <set muId="311">CAT</set>
+            <color>G</color>
+            <manacost></manacost>
+            <cmc></cmc>
+            <type>Token</type>
+            <pt>0/1</pt>
+            <tablerow>0</tablerow>
+            <text></text>
+            <token>1</token>
+        </card>
+    </cards>
+</cockatrice_carddatabase>
