@@ -551,6 +551,10 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         rx.setPattern("\\(.*\\)");
         line.remove(rx);
 
+        // Filter out the phrase *cmdr* for commander decks
+        rx.setPattern("\\s*\\*cmdr\\*\\s*");
+        line.remove(rx);
+
         // Filter out post card name editions
         rx.setPattern("\\|.*$");
         line.remove(rx);
