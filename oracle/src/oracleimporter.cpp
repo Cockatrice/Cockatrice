@@ -250,7 +250,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
             if(map.contains("name"))
             {
                 if(!cardName.isEmpty())
-                    cardName += prefix;
+                  cardName += (orderedMaps.count() > 2) ? QString("/") : prefix;
                 cardName += map.value("name").toString();
             }
             if(map.contains("manaCost"))
