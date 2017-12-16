@@ -823,6 +823,7 @@ void TabDeckEditor::actAnalyzeDeckTappedout()
 void TabDeckEditor::actClearFilterAll()
 {
     databaseDisplayModel->clearFilterAll();
+    searchEdit->setText("");
 }
 
 void TabDeckEditor::actClearFilterOne()
