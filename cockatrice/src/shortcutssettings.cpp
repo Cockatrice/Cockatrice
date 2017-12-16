@@ -218,7 +218,6 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/aTap"] = parseSequenceString("");
     defaultShortCuts["Player/aUnattach"] = parseSequenceString("");
     defaultShortCuts["Player/aUndoDraw"] = parseSequenceString("Ctrl+Shift+D");
-    defaultShortCuts["Player/aUntap"] = parseSequenceString("");
     defaultShortCuts["Player/aUntapAll"] = parseSequenceString("Ctrl+U");
     defaultShortCuts["Player/aViewGraveyard"] = parseSequenceString("F4");
     defaultShortCuts["Player/aViewLibrary"] = parseSequenceString("F3");

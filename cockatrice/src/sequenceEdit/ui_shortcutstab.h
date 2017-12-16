@@ -245,7 +245,6 @@ public:
     QGridLayout *gridLayout_13;
     QLabel *lbl_Player_aTap;
     SequenceEdit *Player_aTap;
-    QLabel *lbl_Player_aUntap;
     SequenceEdit *Player_aUntap;
     QLabel *lbl_Player_aUntapAll;
     SequenceEdit *Player_aUntapAll;
@@ -1247,16 +1246,6 @@ public:
 
         gridLayout_13->addWidget(Player_aTap, 0, 1, 1, 1);
 
-        lbl_Player_aUntap = new QLabel(groupBox_13);
-        lbl_Player_aUntap->setObjectName("lbl_Player_aUntap");
-
-        gridLayout_13->addWidget(lbl_Player_aUntap, 1, 0, 1, 1);
-
-        Player_aUntap = new SequenceEdit("Player/aUntap",groupBox_13);
-        Player_aUntap->setObjectName("Player_aUntap");
-
-        gridLayout_13->addWidget(Player_aUntap, 1, 1, 1, 1);
-
         lbl_Player_aUntapAll = new QLabel(groupBox_13);
         lbl_Player_aUntapAll->setObjectName("lbl_Player_aUntapAll");
 
@@ -1843,8 +1832,7 @@ public:
         lbl_TabGame_aNextPhase->setText(QApplication::translate("shortcutsTab", "Next phase", 0));
         lbl_TabGame_aNextTurn->setText(QApplication::translate("shortcutsTab", "Next turn", 0));
         groupBox_13->setTitle(QApplication::translate("shortcutsTab", "Playing Area", 0));
-        lbl_Player_aTap->setText(QApplication::translate("shortcutsTab", "Tap Card", 0));
-        lbl_Player_aUntap->setText(QApplication::translate("shortcutsTab", "Untap Card", 0));
+        lbl_Player_aTap->setText(QApplication::translate("shortcutsTab", "Tap / Untap Card", 0));
         lbl_Player_aUntapAll->setText(QApplication::translate("shortcutsTab", "Untap all", 0));
         lbl_Player_aDoesntUntap->setText(QApplication::translate("shortcutsTab", "Toggle untap", 0));
         lbl_Player_aFlip->setText(QApplication::translate("shortcutsTab", "Flip card", 0));
