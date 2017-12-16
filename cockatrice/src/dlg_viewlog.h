@@ -2,6 +2,7 @@
 #define DLG_VIEWLOG_H
 
 #include <QDialog>
+#include <QCheckBox>
 
 class QPlainTextEdit;
 class QCloseEvent;
@@ -13,11 +14,13 @@ public:
 protected:
     void closeEvent(QCloseEvent *event);
 private:
-	QPlainTextEdit *logArea;
+    QPlainTextEdit *logArea;
+    QCheckBox *coClearLog;
 
-	void loadInitialLogBuffer();
+    void loadInitialLogBuffer();
+    void actCheckBoxChanged(bool abNewValue);
 private slots:
-	void logEntryAdded(QString message);
+    void logEntryAdded(QString message);
 };
 
 #endif

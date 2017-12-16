@@ -1,17 +1,25 @@
 #include "dlg_viewlog.h"
 #include "logger.h"
+#include "settingscache.h"
 
 #include <QVBoxLayout>
 #include <QPlainTextEdit>
 
-DlgViewLog::DlgViewLog(QWidget *parent)
-: QDialog(parent)
+DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 {
+
+
     logArea = new QPlainTextEdit;
     logArea->setReadOnly(true);
     
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(logArea);
+
+    coClearLog = new QCheckBox;
+    coClearLog->setText(tr("Clear log when closing"));
+    coClearLog->setChecked(settingsCache->servers().getClearDebugLogStatus(true));
+    connect(coClearLog, SIGNAL(toggled(bool)), this, SLOT(actCheckBoxChanged(bool)));
+    mainLayout->addWidget(coClearLog);
 
     setLayout(mainLayout);
 
@@ -20,6 +28,11 @@ DlgViewLog::DlgViewLog(QWidget *parent)
 
     loadInitialLogBuffer();
     connect(&Logger::getInstance(), SIGNAL(logEntryAdded(QString)), this, SLOT(logEntryAdded(QString)));    
+}
+
+void DlgViewLog::actCheckBoxChanged(bool abNewValue)
+{
+    settingsCache->servers().setClearDebugLogStatus(abNewValue);
 }
 
 void DlgViewLog::loadInitialLogBuffer()
@@ -36,6 +49,10 @@ void DlgViewLog::logEntryAdded(QString message)
 
 void DlgViewLog::closeEvent(QCloseEvent * /* event */)
 {
-    logArea->clear();
+    if (coClearLog->isChecked())
+    {
+        logArea->clear();
+    }
+
     logArea->appendPlainText(Logger::getInstance().getClientVersion());
 }

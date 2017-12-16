@@ -21,9 +21,13 @@ Logger::~Logger()
 void Logger::logToFile(bool enabled)
 {
     if (enabled)
+    {
         openLogfileSession();
+    }
     else
+    {
         closeLogfileSession();
+    }
 }
 
 QString Logger::getClientVersion()
@@ -34,7 +38,9 @@ QString Logger::getClientVersion()
 void Logger::openLogfileSession()
 {
     if (logToFileEnabled)
+    {
         return;
+    }
 
     fileHandle.setFileName(LOGGER_FILENAME);
     fileHandle.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
