@@ -166,33 +166,43 @@ bool FilterItem::acceptColor(const CardInfo *info) const
     QString::const_iterator it;
     int match_count;
 
-    converted_term = term;
-    converted_term.replace(QString("green"), QString("g"), Qt::CaseInsensitive);
-    converted_term.replace(QString("grn"), QString("g"), Qt::CaseInsensitive);
-    converted_term.replace(QString("blue"), QString("u"), Qt::CaseInsensitive);
-    converted_term.replace(QString("blu"), QString("u"), Qt::CaseInsensitive);
-    converted_term.replace(QString("black"), QString("b"), Qt::CaseInsensitive);
-    converted_term.replace(QString("blk"), QString("b"), Qt::CaseInsensitive);
-    converted_term.replace(QString("red"), QString("r"), Qt::CaseInsensitive);
-    converted_term.replace(QString("white"), QString("w"), Qt::CaseInsensitive);
-    converted_term.replace(QString("wht"), QString("w"), Qt::CaseInsensitive);
+    converted_term = term.trimmed();
+
+    converted_term.replace("green", "g", Qt::CaseInsensitive);
+    converted_term.replace("grn", "g", Qt::CaseInsensitive);
+    converted_term.replace("blue", "u", Qt::CaseInsensitive);
+    converted_term.replace("blu", "u", Qt::CaseInsensitive);
+    converted_term.replace("black", "b"), Qt::CaseInsensitive);
+    converted_term.replace("blk", "b", Qt::CaseInsensitive);
+    converted_term.replace("red", "r", Qt::CaseInsensitive);
+    converted_term.replace("white", "w", Qt::CaseInsensitive);
+    converted_term.replace("wht", "w", Qt::CaseInsensitive);
+    converted_term.replace("colorless", "c", Qt::CaseInsensitive);
+    converted_term.replace("colourless", "c", Qt::CaseInsensitive);
+    converted_term.replace("none", "c", Qt::CaseInsensitive);
+
     converted_term.replace(QString(" "), QString(""), Qt::CaseInsensitive);
-    
-    if (converted_term.toLower() == "none" || converted_term.toLower() == "colorless" || converted_term.toLower() == "c" || converted_term.toLower() == "colourless") {    
-        if (info->getColors().length() < 1) {
-            return true;
-        }
+
+    // Colorless card filter
+    if (converted_term.toLower() == "c" && info->getColors().length() < 1)
+    {
+        return true;
     }
 
-    /* This is a tricky part, if the filter has multiple colors in it, like UGW,
-       then we should match all of them to the card's colors */
-    
+    /*
+     * This is a tricky part, if the filter has multiple colors in it, like UGW,
+     * then we should match all of them to the card's colors
+     */
     match_count = 0;
-    for (it = converted_term.begin(); it != converted_term.end(); it++) {
+    for (it = converted_term.begin(); it != converted_term.end(); it++)
+    {
         for (i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++)
-            if ((*i).contains((*it), Qt::CaseInsensitive)) {
+        {
+            if ((*i).contains((*it), Qt::CaseInsensitive))
+            {
                 match_count++;
             }
+        }
     }
 
     return match_count == converted_term.length();
@@ -249,10 +259,36 @@ bool FilterItem::acceptToughness(const CardInfo *info) const
 
 bool FilterItem::acceptRarity(const CardInfo *info) const
 {
-    foreach (QString rareLevel, info->getRarities())
-        if (rareLevel.compare(term, Qt::CaseInsensitive) == 0)
-            return true;
+    QString converted_term = term.trimmed();
 
+    /*
+     * The purpose of this loop is to only apply one of the replacement
+     * policies and then escape. If we attempt to layer them ontop of
+     * each other, we will get awkward results (i.e. comythic rare mythic rareon)
+     * Conditional statement will exit once a case is successful in
+     * replacement OR we go through all possible cases
+     */
+    for (int i = 0; converted_term.length() <= 2 && i <= 5; i++)
+    {
+        switch (i)
+        {
+            case 0: converted_term.replace("mr", "mythic rare", Qt::CaseInsensitive); break;
+            case 1: converted_term.replace("c", "common", Qt::CaseInsensitive); break;
+            case 2: converted_term.replace("u", "uncommon", Qt::CaseInsensitive); break;
+            case 3: converted_term.replace("m", "mythic rare", Qt::CaseInsensitive); break;
+            case 4: converted_term.replace("r", "rare", Qt::CaseInsensitive); break;
+            case 5: converted_term.replace("s", "special", Qt::CaseInsensitive); break;
+            default: break;
+        }
+    }
+
+    foreach (QString rareLevel, info->getRarities())
+    {
+        if (rareLevel.compare(converted_term, Qt::CaseInsensitive) == 0)
+        {
+            return true;
+        }
+    }
     return false;
 }
 
