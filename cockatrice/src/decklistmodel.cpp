@@ -264,12 +264,12 @@ QModelIndex DeckListModel::findCard(const QString &cardName, const QString &zone
     return nodeToIndex(cardNode);
 }
 
-QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneName, bool anAddAnyway)
+QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneName, bool abAddAnyway)
 {
     CardInfo *info = db->getCard(cardName);
     if (info == nullptr)
     {
-        if (anAddAnyway)
+        if (abAddAnyway)
         {
             // We need to keep this card added no matter what
             // This is usually called from tab_deck_editor
