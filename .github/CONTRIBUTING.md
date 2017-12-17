@@ -1,3 +1,9 @@
+&nbsp; [Style Guide](#style-guide) | [Translations](#translations) | [Release Management](#release-management)
+
+----
+
+<br>
+
 # Style Guide #
 
 ### Compatibility ###
@@ -141,7 +147,9 @@ The migration file should include the sql statements needed to migrate the datab
 Cockatrice and Servatrice exchange data using binary messages. The syntax of these messages is defined in the `proto` files in the `common/pb` folder. These files defines the way data contained in each message is serialized using Google's [protocol buffer](https://developers.google.com/protocol-buffers/).
 Any change to the `proto` file should be taken with caution and tested intensively before being merged, becaus a change to the protocol could make new clients incompatible to the old server and vice versa.
 
-### Translations: introduction ###
+# Translations #
+
+### Introduction ###
 
 Basic workflow for translations:
  1. developer adds a `tr("foo")` string in the code;
@@ -216,6 +224,28 @@ from Transifex to the source code and vice versa.
 ### Translations (for translators) ###
 
 Please have a look at the specific [FAQ for translators](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
+
+
+# Release Management #
+
+### TODO list around new main releases ###
+
+ - [Write a `Release Draft`](https://github.com/Cockatrice/Cockatrice/releases/new) on GitHub with all changes since the last main release
+ - [Build newest strings](#step-2-updating-_ents-files) and upload them to transifex --> Give translators some time to update them
+ - [Fetch newest translations](#step-5-fetch-new-translations-from-transifex) from transifex and create a PR for them
+ <br>
+ 
+ - **Final commit:** push a PR which adds the `Release Name` in the `About` window
+ - Release on GitHub (aka remove the `Draft` label and append builds for all platforms)
+ - Push a PR which immediately removes the `Release Name` again to not have them in continous development builds
+ <br>
+  
+ - Check if the download links on our official [website](https://cockatrice.github.io) are automatically updated
+ - Announce the new release ([reddit](https://www.reddit.com/r/Cockatrice/), twitter...)
+ - Delete former `beta` releases from [GitHub Releases](https://github.com/Cockatrice/Cockatrice/releases)
+ <br>
+ 
+ - Create a new milestone & project for the next followup release
 
 ### Publish A New Development Snapshot
 
