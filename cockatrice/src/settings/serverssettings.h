@@ -39,6 +39,9 @@ public:
     void setFPPlayerName(QString playerName);
     void addNewServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword);
     bool updateExistingServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword);
+    void setClearDebugLogStatus(bool abIsChecked);
+    bool getClearDebugLogStatus(bool abDefaultValue);
+
 signals:
 
 public slots:

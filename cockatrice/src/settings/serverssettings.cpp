@@ -164,6 +164,17 @@ QString ServersSettings::getFPPlayerName(QString defaultName)
     return name == QVariant() ? defaultName : name.toString();
 }
 
+void ServersSettings::setClearDebugLogStatus(bool abIsChecked)
+{
+    setValue(abIsChecked, "save_debug_log", "server");
+}
+
+bool ServersSettings::getClearDebugLogStatus(bool abDefaultValue)
+{
+    QVariant cbFlushLog = getValue("save_debug_log", "server");
+    return cbFlushLog == QVariant() ? abDefaultValue : cbFlushLog.toBool();
+}
+
 void ServersSettings::addNewServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword)
 {
     if (updateExistingServer(saveName, serv, port, username, password, savePassword))
