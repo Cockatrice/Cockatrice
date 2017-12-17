@@ -158,8 +158,10 @@ void TabDeckEditor::createFiltersDock()
     filterView->setUniformRowHeights(true);
     filterView->setHeaderHidden(true);
     filterView->setContextMenuPolicy(Qt::CustomContextMenu);
+    filterView->installEventFilter(&filterViewKeySignals);
     connect(filterModel, SIGNAL(layoutChanged()), filterView, SLOT(expandAll()));
     connect(filterView, SIGNAL(customContextMenuRequested(const QPoint &)),this, SLOT(filterViewCustomContextMenu(const QPoint &)));
+    connect(&filterViewKeySignals, SIGNAL(onDelete()), this, SLOT(actClearFilterOne()));
 
     FilterBuilder *filterBuilder = new FilterBuilder;
     filterBuilder->setObjectName("filterBuilder");

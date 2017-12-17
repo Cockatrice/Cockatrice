@@ -108,6 +108,7 @@ private:
     QLabel *hashLabel;
     FilterTreeModel *filterModel;
     QTreeView *filterView;
+    KeySignals filterViewKeySignals;
     QWidget *filterBox;
 
     QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *analyzeDeckMenu;
