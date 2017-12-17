@@ -342,6 +342,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         aCreateAnotherToken->setEnabled(false);
 
         createPredefinedTokenMenu = new QMenu(QString());
+        createPredefinedTokenMenu->setEnabled(false);
 
         playerMenu->addSeparator();
         countersMenu = playerMenu->addMenu(QString());
@@ -358,6 +359,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         initSayMenu();
 
         aCardMenu = new QAction(this);
+        aCardMenu->setEnabled(false);
         playerMenu->addSeparator();
         playerMenu->addAction(aCardMenu);
 
@@ -841,6 +843,7 @@ void Player::initSayMenu()
     sayMenu->clear();
 
     int count = settingsCache->messages().getCount();
+    sayMenu->setEnabled(count > 0);
 
     for (int i = 0; i < count; i++) {
         QAction *newAction = new QAction(settingsCache->messages().getMessageAt(i), this);
@@ -858,10 +861,15 @@ void Player::setDeck(const DeckLoader &_deck)
     aOpenDeckInDeckEditor->setEnabled(deck);
 
     createPredefinedTokenMenu->clear();
+    createPredefinedTokenMenu->setEnabled(false);
     predefinedTokens.clear();
     InnerDecklistNode *tokenZone = dynamic_cast<InnerDecklistNode *>(deck->getRoot()->findChild(DECK_ZONE_TOKENS));
 
     if (tokenZone)
+    {
+        if(tokenZone->size() > 0)
+            createPredefinedTokenMenu->setEnabled(true);
+
         for (int i = 0; i < tokenZone->size(); ++i) {
             const QString tokenName = tokenZone->at(i)->getName();
             predefinedTokens.append(tokenName);
@@ -872,6 +880,7 @@ void Player::setDeck(const DeckLoader &_deck)
             }
             connect(a, SIGNAL(triggered()), this, SLOT(actCreatePredefinedToken()));
         }
+    }
 }
 
 void Player::actViewLibrary()
@@ -2705,7 +2714,10 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu) {
 void Player::setCardMenu(QMenu *menu)
 {
     if (aCardMenu)
+    {
+        aCardMenu->setEnabled(menu != nullptr);
         aCardMenu->setMenu(menu);
+    }
 }
 
 QMenu *Player::getCardMenu() const
