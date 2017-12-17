@@ -429,7 +429,7 @@ void LoadSetsPage::zipDownloadFailed(const QString &message)
     progressBar->hide();
 
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, tr("Error"), message + "<br/>" + tr("Do you want to try to download a fresh copy of the uncompressed file instead?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+    reply = QMessageBox::question(this, tr("Error"), message + "\n" + tr("Do you want to try to download a fresh copy of the uncompressed file instead?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
     if (reply == QMessageBox::Yes)
     {
         urlRadioButton->setChecked(true);
