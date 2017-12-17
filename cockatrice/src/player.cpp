@@ -379,9 +379,6 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     aTap = new QAction(this);
     aTap->setData(cmTap);
     connect(aTap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
-    aUntap = new QAction(this);
-    aUntap->setData(cmUntap);
-    connect(aUntap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     aDoesntUntap = new QAction(this);
     aDoesntUntap->setData(cmDoesntUntap);
     connect(aDoesntUntap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
@@ -694,8 +691,7 @@ void Player::retranslateUi()
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
-    aTap->setText(tr("&Tap"));
-    aUntap->setText(tr("&Untap"));
+    aTap->setText(tr("&Tap / Untap"));
     aDoesntUntap->setText(tr("Toggle &normal untapping"));
     aFlip->setText(tr("&Flip"));
     aPeek->setText(tr("&Peek at card face"));
@@ -745,7 +741,6 @@ void Player::setShortcutsActive()
 
     aPlay->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aPlay"));
     aTap->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aTap"));
-    aUntap->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aUntap"));
     aDoesntUntap->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDoesntUntap"));
     aFlip->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aFlip"));
     aPeek->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aPeek"));
@@ -905,13 +900,13 @@ void Player::actOpenDeckInDeckEditor()
 
 void Player::actViewGraveyard()
 {
-    static_cast<GameScene *>(scene())->toggleZoneView(this, "grave", -1);
+    dynamic_cast<GameScene *>(scene())->toggleZoneView(this, "grave", -1);
 }
 
 void Player::actRevealRandomGraveyardCard()
 {
     Command_RevealCards cmd;
-    QAction *action = static_cast<QAction *>(sender());
+    QAction *action = dynamic_cast<QAction *>(sender());
     const int otherPlayerId = action->data().toInt();
     if (otherPlayerId != -1)
         cmd.set_player_id(otherPlayerId);
@@ -2119,7 +2114,7 @@ void Player::actMoveCardXCardsFromTop()
 
 void Player::cardMenuAction()
 {
-    QAction *a = static_cast<QAction *>(sender());
+    QAction *a = dynamic_cast<QAction *>(sender());
     QList<QGraphicsItem *> sel = scene()->selectedItems();
     QList<CardItem *> cardList;
     while (!sel.isEmpty())
@@ -2127,30 +2122,26 @@ void Player::cardMenuAction()
 
     QList< const ::google::protobuf::Message * > commandList;
     if (a->data().toInt() <= (int) cmClone)
-        for (int i = 0; i < cardList.size(); ++i) {
+    {
+        for (int i = 0; i < cardList.size(); ++i)
+        {
             CardItem *card = cardList[i];
-            switch (static_cast<CardMenuActionType>(a->data().toInt())) {
-                case cmTap:
-                    if (!card->getTapped()) {
-                        Command_SetCardAttr *cmd = new Command_SetCardAttr;
-                        cmd->set_zone(card->getZone()->getName().toStdString());
-                        cmd->set_card_id(card->getId());
-                        cmd->set_attribute(AttrTapped);
-                        cmd->set_attr_value("1");
-                        commandList.append(cmd);
-                    }
-                    break;
+            switch (static_cast<CardMenuActionType>(a->data().toInt()))
+            {
+                // Leaving both for compatibility with server
                 case cmUntap:
-                    if (card->getTapped()) {
-                        Command_SetCardAttr *cmd = new Command_SetCardAttr;
-                        cmd->set_zone(card->getZone()->getName().toStdString());
-                        cmd->set_card_id(card->getId());
-                        cmd->set_attribute(AttrTapped);
-                        cmd->set_attr_value("0");
-                        commandList.append(cmd);
-                    }
+                case cmTap:
+                {
+                    Command_SetCardAttr *cmd = new Command_SetCardAttr;
+                    cmd->set_zone(card->getZone()->getName().toStdString());
+                    cmd->set_card_id(card->getId());
+                    cmd->set_attribute(AttrTapped);
+                    cmd->set_attr_value(std::to_string(1 - static_cast<int>(card->getTapped())));
+                    commandList.append(cmd);
                     break;
-                case cmDoesntUntap: {
+                }
+                case cmDoesntUntap:
+                {
                     Command_SetCardAttr *cmd = new Command_SetCardAttr;
                     cmd->set_zone(card->getZone()->getName().toStdString());
                     cmd->set_card_id(card->getId());
@@ -2159,7 +2150,8 @@ void Player::cardMenuAction()
                     commandList.append(cmd);
                     break;
                 }
-                case cmFlip: {
+                case cmFlip:
+                {
                     Command_FlipCard *cmd = new Command_FlipCard;
                     cmd->set_zone(card->getZone()->getName().toStdString());
                     cmd->set_card_id(card->getId());
@@ -2167,7 +2159,8 @@ void Player::cardMenuAction()
                     commandList.append(cmd);
                     break;
                 }
-                case cmPeek: {
+                case cmPeek:
+                {
                     Command_RevealCards *cmd = new Command_RevealCards;
                     cmd->set_zone_name(card->getZone()->getName().toStdString());
                     cmd->set_card_id(card->getId());
@@ -2175,7 +2168,8 @@ void Player::cardMenuAction()
                     commandList.append(cmd);
                     break;
                 }
-                case cmClone: {
+                case cmClone:
+                {
                     Command_CreateToken *cmd = new Command_CreateToken;
                     cmd->set_zone("table");
                     cmd->set_card_name(card->getName().toStdString());
@@ -2188,18 +2182,25 @@ void Player::cardMenuAction()
                     commandList.append(cmd);
                     break;
                 }
-                default: break;
+                default:
+                    break;
             }
         }
-    else {
+    }
+    else
+    {
         ListOfCardsToMove idList;
-        for (int i = 0; i < cardList.size(); ++i)
+        for (int i = 0; i < cardList.size(); i++)
+        {
             idList.add_card()->set_card_id(cardList[i]->getId());
+        }
         int startPlayerId = cardList[0]->getZone()->getPlayer()->getId();
         QString startZone = cardList[0]->getZone()->getName();
 
-        switch (static_cast<CardMenuActionType>(a->data().toInt())) {
-            case cmMoveToTopLibrary: {
+        switch (static_cast<CardMenuActionType>(a->data().toInt()))
+        {
+            case cmMoveToTopLibrary:
+            {
                 Command_MoveCard *cmd = new Command_MoveCard;
                 cmd->set_start_player_id(startPlayerId);
                 cmd->set_start_zone(startZone.toStdString());
@@ -2211,7 +2212,8 @@ void Player::cardMenuAction()
                 commandList.append(cmd);
                 break;
             }
-            case cmMoveToBottomLibrary: {
+            case cmMoveToBottomLibrary:
+            {
                 Command_MoveCard *cmd = new Command_MoveCard;
                 cmd->set_start_player_id(startPlayerId);
                 cmd->set_start_zone(startZone.toStdString());
@@ -2223,7 +2225,8 @@ void Player::cardMenuAction()
                 commandList.append(cmd);
                 break;
             }
-            case cmMoveToHand: {
+            case cmMoveToHand:
+            {
                 Command_MoveCard *cmd = new Command_MoveCard;
                 cmd->set_start_player_id(startPlayerId);
                 cmd->set_start_zone(startZone.toStdString());
@@ -2235,7 +2238,8 @@ void Player::cardMenuAction()
                 commandList.append(cmd);
                 break;
             }
-            case cmMoveToGraveyard: {
+            case cmMoveToGraveyard:
+            {
                 Command_MoveCard *cmd = new Command_MoveCard;
                 cmd->set_start_player_id(startPlayerId);
                 cmd->set_start_zone(startZone.toStdString());
@@ -2247,7 +2251,8 @@ void Player::cardMenuAction()
                 commandList.append(cmd);
                 break;
             }
-            case cmMoveToExile: {
+            case cmMoveToExile:
+            {
                 Command_MoveCard *cmd = new Command_MoveCard;
                 cmd->set_start_player_id(startPlayerId);
                 cmd->set_start_zone(startZone.toStdString());
@@ -2259,13 +2264,19 @@ void Player::cardMenuAction()
                 commandList.append(cmd);
                 break;
             }
-            default: ;
+            default:
+                break;
         }
     }
-    if(local)
+
+    if (local)
+    {
         sendGameCommand(prepareGameCommand(commandList));
+    }
     else
+    {
         game->sendGameCommand(prepareGameCommand(commandList));
+    }
 }
 
 void Player::actIncPT(int deltaP, int deltaT)
@@ -2586,7 +2597,6 @@ void Player::updateCardMenu(const CardItem *card)
                 }
 
                 cardMenu->addAction(aTap);
-                cardMenu->addAction(aUntap);
                 cardMenu->addAction(aDoesntUntap);
                 cardMenu->addAction(aFlip);
                 if (card->getFaceDown()) {
