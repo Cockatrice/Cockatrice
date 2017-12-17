@@ -76,9 +76,9 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             switch(role) {
             case SORT_ROLE:
             case Qt::DisplayRole:
-                return QString::fromStdString(g.creator_info().name());
+                return QString::fromStdString(g.host_info().name());
             case Qt::DecorationRole: {
-                    QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)g.creator_info().user_level(), false, QString::fromStdString(g.creator_info().privlevel()));
+                    QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(13, (UserLevelFlags)g.host_info().user_level(), false, QString::fromStdString(g.creator_info().privlevel()));
                     return QIcon(avatarPixmap);
                 }
             default:
@@ -181,7 +181,7 @@ QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, in
         }
     }
     case DESCRIPTION: return tr("Description");
-    case CREATOR: return tr("Creator");
+    case CREATOR: return tr("Host");
     case GAME_TYPE: return tr("Type");
     case RESTRICTIONS: return tr("Restrictions");
     case PLAYERS: {

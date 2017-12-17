@@ -1107,6 +1107,12 @@ void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/,
 
 void TabGame::eventGameHostChanged(const Event_GameHostChanged & /*event*/, int eventPlayerId, const GameEventContext & /*context*/)
 {
+    Command_UpdateGameHost cmd;
+    cmd.set_player_id(eventPlayerId->getId());
+    
+    PendingCommand *pend = player->prepareGameCommand(cmd);
+    player->sendGameCommand(pend);
+
     hostId = eventPlayerId;
 }
 
