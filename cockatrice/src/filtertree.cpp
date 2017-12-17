@@ -274,8 +274,10 @@ bool FilterItem::acceptRarity(const CardInfo *info) const
      * policies and then escape. If we attempt to layer them ontop of
      * each other, we will get awkward results (i.e. comythic rare mythic rareon)
      * Conditional statement will exit once a case is successful in
-     * replacement OR we go through all possible cases
+     * replacement OR we go through all possible cases.
+     * Will also need to replace just "mythic"
      */
+    converted_term.replace("mythic", "mythic rare", Qt::CaseInsensitive);
     for (int i = 0; converted_term.length() <= 3 && i <= 6; i++)
     {
         switch (i)
