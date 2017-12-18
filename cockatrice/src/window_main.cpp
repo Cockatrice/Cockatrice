@@ -32,6 +32,7 @@
 #include <QApplication>
 #include <QtNetwork>
 #include <QtConcurrent>
+#include <QSysInfo>
 
 #include "main.h"
 #include "window_main.h"
