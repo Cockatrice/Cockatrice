@@ -29,11 +29,11 @@ environment:
           cmake_generator: Visual Studio 14 2015 Win64
           cmake_toolset: v140,host=x64
           target_arch: x86_64
-        - qt_ver: 5.6\msvc2015 # last version compatible with Windows XP, Vista
+        - qt_ver: 5.6\msvc2013   # last version compatible with Windows XP + Vista, and 32bit systems 
           protobuf_ver: 3.4.1
           zlib_ver: 1.2.11
           cmake_generator: Visual Studio 14 2015
-          cmake_toolset: v140_xp # use the windows XP compatible toolset
+          cmake_toolset: v120_xp   # use the Windows XP compatible toolset
           target_arch: x86
           
 install:
