@@ -281,6 +281,7 @@ void MainWindow::actExit()
 
 void MainWindow::actAbout()
 {
+    QString arch = QSysInfo::buildAbi().split('-')[0];
     QMessageBox mb(QMessageBox::NoIcon, tr("About Cockatrice"), QString(
         "<font size=\"8\"><b>Cockatrice</b></font><br>"
         + tr("Version") + QString(" %1").arg(VERSION_STRING)
@@ -296,7 +297,8 @@ void MainWindow::actAbout()
         + "<b>" + tr("Support:") + "</b><br>"
         + "<a href='" + GITHUB_ISSUES_URL + "'>" + tr("Report an Issue") + "</a><br>"
         + "<a href='" + GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>"
-        + "<a href='" + GITHUB_FAQ_URL + "'>" + tr("F.A.Q.") + "</a><br>"),
+        + "<a href='" + GITHUB_FAQ_URL + "'>" + tr("F.A.Q.") + "</a><br>")
+        + "<br><b>" + tr("Build Architecture:") + "</b><br>" + arch + "<br>",
         QMessageBox::Ok, this
     );
     mb.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64));
