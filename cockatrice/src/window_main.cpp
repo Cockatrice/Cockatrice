@@ -32,7 +32,6 @@
 #include <QApplication>
 #include <QtNetwork>
 #include <QtConcurrent>
-#include <QSysInfo>
 
 #include "main.h"
 #include "window_main.h"
@@ -282,7 +281,6 @@ void MainWindow::actExit()
 
 void MainWindow::actAbout()
 {
-    QString arch = QSysInfo::buildAbi().split('-')[0];
     QMessageBox mb(QMessageBox::NoIcon, tr("About Cockatrice"), QString(
         "<font size=\"8\"><b>Cockatrice</b></font><br>"
         + tr("Version") + QString(" %1").arg(VERSION_STRING)
@@ -299,7 +297,14 @@ void MainWindow::actAbout()
         + "<a href='" + GITHUB_ISSUES_URL + "'>" + tr("Report an Issue") + "</a><br>"
         + "<a href='" + GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>"
         + "<a href='" + GITHUB_FAQ_URL + "'>" + tr("F.A.Q.") + "</a><br>")
-        + "<br><b>" + tr("Build Architecture:") + "</b><br>" + arch + "<br>",
+        + "<br><b>" + tr("Build Architecture:") +
+#ifdef Q_PROCESSOR_X86_32
+        + "</b><br>X86_32<br>",
+#elif defined(Q_PROCESSOR_X86_64)
+       + "</b><br>X86_64<br>",
+#else
+       + "</b><br>unknown<br>",
+#endif
         QMessageBox::Ok, this
     );
     mb.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64));
