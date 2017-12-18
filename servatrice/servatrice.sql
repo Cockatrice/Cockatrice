@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_games` (
   `room_name` varchar(255) NOT NULL,
   `id` int(7) unsigned NOT NULL auto_increment,
   `descr` varchar(50) default NULL,
-  `creator_name` varchar(255) NOT NULL,
+  `creator_name` varchar(35) NOT NULL,
   `password` tinyint(1) NOT NULL,
   `game_types` varchar(255) NOT NULL,
   `player_count` tinyint(3) NOT NULL,
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_games` (
 
 CREATE TABLE IF NOT EXISTS `cockatrice_games_players` (
   `id_game` int(7) unsigned zerofill NOT NULL,
-  `player_name` varchar(255) NOT NULL,
+  `player_name` varchar(35) NOT NULL,
   FOREIGN KEY(`id_game`) REFERENCES `cockatrice_games`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_sessions` (
 
 -- server moderation
 CREATE TABLE IF NOT EXISTS `cockatrice_bans` (
- `user_name` varchar(255) NOT NULL,
+ `user_name` varchar(35) NOT NULL,
  `ip_address` varchar(45) NOT NULL,
  `id_admin` int(7) unsigned zerofill NOT NULL,
  `time_from` datetime NOT NULL,
@@ -208,8 +208,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_bans` (
 
 CREATE TABLE IF NOT EXISTS `cockatrice_warnings` (
   `user_id` int(7) unsigned NOT NULL,
-  `user_name` varchar(255) NOT NULL,
-  `mod_name` varchar(255) NOT NULL,
+  `user_name` varchar(35) NOT NULL,
+  `mod_name` varchar(35) NOT NULL,
   `reason` text NOT NULL,
   `time_of` datetime NOT NULL,
   `clientid` varchar(15) NOT NULL,
@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_log` (
   `log_time` datetime NOT NULL,
   `sender_id` int(7) unsigned NULL,
   `sender_name` varchar(35) NOT NULL,
-  `sender_ip` varchar(255) NOT NULL,
+  `sender_ip` varchar(45) NOT NULL,
   `log_message` text NOT NULL,
   `target_type` ENUM('room', 'game', 'chat'),
   `target_id` int(7) NULL,
@@ -250,7 +250,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_user_analytics` (
 
 CREATE TABLE IF NOT EXISTS `cockatrice_donations` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) DEFAULT NULL,
+  `username` varchar(35) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `payment_pre_fee` double DEFAULT NULL,
   `payment_post_fee` double DEFAULT NULL,
@@ -273,7 +273,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_audit` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `id_server` tinyint(3) NOT NULL,
   `name` varchar(35) NOT NULL,
-  `ip_address` varchar(255) NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
   `clientid` varchar(15) NOT NULL,
   `incidentDate` datetime NOT NULL default '0000-00-00 00:00:00',
   `action` varchar(35) NOT NULL,
