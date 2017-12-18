@@ -1,4 +1,5 @@
 sudo: required   # forces legacy build infrastructure
+group: travis_lts   # forces most stable build images
 
 language: cpp
 
