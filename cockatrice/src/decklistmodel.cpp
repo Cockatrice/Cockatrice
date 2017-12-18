@@ -264,11 +264,44 @@ QModelIndex DeckListModel::findCard(const QString &cardName, const QString &zone
     return nodeToIndex(cardNode);
 }
 
-QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneName)
+QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneName, bool abAddAnyway)
 {
     CardInfo *info = db->getCard(cardName);
     if (info == nullptr)
-        return QModelIndex();
+    {
+        if (abAddAnyway)
+        {
+            // We need to keep this card added no matter what
+            // This is usually called from tab_deck_editor
+            // So we'll create a new CardInfo with the name
+            // and default values for all fields
+            info = new CardInfo(
+                    cardName,
+                    false,
+                    nullptr,
+                    nullptr,
+                    "unknown",
+                    nullptr,
+                    nullptr,
+                    QStringList(),
+                    QList<CardRelation *>(),
+                    QList<CardRelation *>(),
+                    false,
+                    0,
+                    false,
+                    0,
+                    SetList(),
+                    QStringMap(),
+                    MuidMap(),
+                    QStringMap(),
+                    QStringMap()
+            );
+        }
+        else
+        {
+            return QModelIndex();
+        }
+    }
 
     InnerDecklistNode *zoneNode = createNodeIfNeeded(zoneName, root);
 
