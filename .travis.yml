@@ -39,11 +39,14 @@ deploy:
   provider: releases
   api_key:
     secure: "mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU="
+  skip_cleanup: true
+#  name: "release name"
+#  body: "release text"
   file_glob: true
   file: "build/Cockatrice-*"
-  prerelease: true
-  skip_cleanup: true
   overwrite: true
+  draft: false
+  prerelease: false
   on:
     tags: true
     repo: Cockatrice/Cockatrice

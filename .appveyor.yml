@@ -87,11 +87,12 @@ deploy:
   provider: GitHub
   auth_token:
     secure: p+7wPVry2XEa6TBm9XH8IaQZbBmXQ/J2ldbGmcIxUZD3NkkPrSRRlmE7Of1CBBIO
-  description: "Dev build of Cockatrice"
+#  release: "release name"    
+#  description: "release text"
   artifact: /.*\.exe/
-  draft: false
-  prerelease: true
   force_update: true
+  draft: false
+  prerelease: false
   on:
     appveyor_repo_tag: true
 
