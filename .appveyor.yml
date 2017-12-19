@@ -92,7 +92,7 @@ deploy:
   artifact: /.*\.exe/
   force_update: true
   draft: false
-  prerelease: false
+  prerelease: true
   on:
     appveyor_repo_tag: true
 

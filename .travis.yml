@@ -46,7 +46,7 @@ deploy:
   file: "build/Cockatrice-*"
   overwrite: true
   draft: false
-  prerelease: false
+  prerelease: true
   on:
     tags: true
     repo: Cockatrice/Cockatrice
