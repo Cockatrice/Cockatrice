@@ -39,6 +39,7 @@ protected:
 protected slots:
     void internalLog(const QString message);
 signals:
-    void logEntryAdded(QString message);};
+    void logEntryAdded(QString message);
+};
 
 #endif
