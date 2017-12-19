@@ -31,6 +31,7 @@ public:
 	void logToFile(bool enabled);
     void log(QtMsgType type, const QMessageLogContext &ctx, const QString message);
     QString getClientVersion();
+    QString getBuildArchitecture();
     QList<QString> getLogBuffer() { return logBuffer; }
 protected:
     void openLogfileSession();
@@ -38,7 +39,6 @@ protected:
 protected slots:
     void internalLog(const QString message);
 signals:
-    void logEntryAdded(QString message);
-};
+    void logEntryAdded(QString message);};
 
 #endif

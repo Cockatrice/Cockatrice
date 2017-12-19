@@ -281,8 +281,17 @@ void MainWindow::actExit()
 
 void MainWindow::actAbout()
 {
+#if   defined(Q_PROCESSOR_X86_32)
+  QString arch = "(32-bit)";
+#elif defined(Q_PROCESSOR_X86_64)
+  QString arch = "(64-bit)";
+#elif defined(Q_PROCESSOR_ARM)
+  QString arch = "(ARM)";
+#else
+  QString arch = "(unknown)";
+#endif
     QMessageBox mb(QMessageBox::NoIcon, tr("About Cockatrice"), QString(
-        "<font size=\"8\"><b>Cockatrice</b></font><br>"
+        "<font size=\"8\"><b>Cockatrice</b></font>" + arch + "<br>"
         + tr("Version") + QString(" %1").arg(VERSION_STRING)
         + "<br><br><b><a href='" + GITHUB_PAGES_URL + "'>" + tr("Cockatrice Webpage") + "</a></b><br>"
         + "<br><br><b>" + tr("Project Manager:") + "</b><br>Gavin Bisesi<br><br>"
@@ -296,15 +305,7 @@ void MainWindow::actAbout()
         + "<b>" + tr("Support:") + "</b><br>"
         + "<a href='" + GITHUB_ISSUES_URL + "'>" + tr("Report an Issue") + "</a><br>"
         + "<a href='" + GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>"
-        + "<a href='" + GITHUB_FAQ_URL + "'>" + tr("F.A.Q.") + "</a><br>")
-        + "<br><b>" + tr("Build Architecture:") +
-#ifdef Q_PROCESSOR_X86_32
-        + "</b><br>X86_32<br>",
-#elif defined(Q_PROCESSOR_X86_64)
-       + "</b><br>X86_64<br>",
-#else
-       + "</b><br>unknown<br>",
-#endif
+        + "<a href='" + GITHUB_FAQ_URL + "'>" + tr("F.A.Q.") + "</a><br>"),
         QMessageBox::Ok, this
     );
     mb.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64));
