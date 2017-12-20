@@ -55,5 +55,5 @@ void DlgViewLog::closeEvent(QCloseEvent * /* event */)
     }
 
     logArea->appendPlainText(Logger::getInstance().getClientVersion());
-    logArea->appendPlainText(Logger::getInstance().getBuildArchitecture());
+    logArea->appendPlainText(Logger::getInstance().printBuildArchitecture());
 }

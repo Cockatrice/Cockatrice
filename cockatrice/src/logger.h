@@ -7,6 +7,16 @@
 #include <QString>
 #include <QMutex>
 
+#if   defined(Q_PROCESSOR_X86_32)
+  #define BUILD_ARCHITECTURE "32-bit"
+#elif defined(Q_PROCESSOR_X86_64)
+  #define BUILD_ARCHITECTURE "64-bit"
+#elif defined(Q_PROCESSOR_ARM)
+  #define BUILD_ARCHITECTURE "ARM"
+#else
+  #define BUILD_ARCHITECTURE "unknown"
+#endif
+
 class Logger : public QObject {
 Q_OBJECT
 public:
@@ -31,7 +41,8 @@ public:
 	void logToFile(bool enabled);
     void log(QtMsgType type, const QMessageLogContext &ctx, const QString message);
     QString getClientVersion();
-    QString getBuildArchitecture();
+    QString getClientOperatingSystem();
+    QString printBuildArchitecture();
     QList<QString> getLogBuffer() { return logBuffer; }
 protected:
     void openLogfileSession();

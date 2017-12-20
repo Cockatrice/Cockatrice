@@ -6,12 +6,18 @@
 #define LOGGER_MAX_ENTRIES 128
 #define LOGGER_FILENAME "qdebug.txt"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+
+#include <QSysInfo>
+
+#endif
+
 Logger::Logger() : logToFileEnabled(false)
 {
     logBuffer.append(getClientVersion());
-    logBuffer.append(getBuildArchitecture());
+    logBuffer.append(printBuildArchitecture());
     std::cerr << getClientVersion().toStdString() << std::endl;
-    std::cerr << getBuildArchitecture().toStdString() << std::endl;
+    std::cerr << printBuildArchitecture().toStdString() << std::endl;
 }
 
 Logger::~Logger()
@@ -49,7 +55,7 @@ void Logger::openLogfileSession()
     fileStream.setDevice(&fileHandle);
     fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << endl;
     fileStream << getClientVersion() << endl;
-    fileStream << getBuildArchitecture() << endl;
+    fileStream << printBuildArchitecture() << endl;
     logToFileEnabled = true;
 }
 
@@ -85,29 +91,23 @@ void Logger::internalLog(const QString message)
         fileStream << message << endl; // Print to fileStream
 }
 
-QString Logger::getBuildArchitecture()
+QString Logger::printBuildArchitecture()
 {
-#if   defined(Q_OS_MACOS)
-  QString systemOS = "macOS";
-#elif defined(Q_OS_LINUX)
-  QString systemOS = "Linux";
-#elif defined(Q_OS_WIN)
-  QString systemOS = "Windows";
-#elif defined(Q_OS_ANDROID)
-  QString systemOS = "Android";
-#else
-  QString systemOS = "unknown";
-#endif
-#if   defined(Q_PROCESSOR_X86_32)
-  QString arch = "32-bit";
-#elif defined(Q_PROCESSOR_X86_64)
-  QString arch = "64-bit";
-#elif defined(Q_PROCESSOR_ARM)
-  QString arch = "ARM";
-#else
-  QString arch = "unknown";
-#endif
-    return "Client Operating System: " + systemOS + "\n" +
-           "Build Architecture: " + arch + "\n" +
+    QString result;
+    if(!getClientOperatingSystem().isEmpty())
+    {
+        result += "Client Operating System: " + getClientOperatingSystem() + "\n";
+    }
+    result += "Build Architecture: " + QString::fromStdString(BUILD_ARCHITECTURE) + "\n" +
            "Qt Version: " + QT_VERSION_STR;
+    return result;
+}
+
+QString Logger::getClientOperatingSystem()
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+    return QSysInfo::prettyProductName();
+#else
+    return "";
+#endif
 }

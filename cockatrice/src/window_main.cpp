@@ -48,6 +48,7 @@
 #include "localserver.h"
 #include "localserverinterface.h"
 #include "localclient.h"
+#include "logger.h"
 #include "settingscache.h"
 #include "tab_game.h"
 #include "version_string.h"
@@ -281,17 +282,8 @@ void MainWindow::actExit()
 
 void MainWindow::actAbout()
 {
-#if   defined(Q_PROCESSOR_X86_32)
-  QString arch = "(32-bit)";
-#elif defined(Q_PROCESSOR_X86_64)
-  QString arch = "(64-bit)";
-#elif defined(Q_PROCESSOR_ARM)
-  QString arch = "(ARM)";
-#else
-  QString arch = "(unknown)";
-#endif
     QMessageBox mb(QMessageBox::NoIcon, tr("About Cockatrice"), QString(
-        "<font size=\"8\"><b>Cockatrice</b></font>" + arch + "<br>"
+	"<font size=\"8\"><b>Cockatrice</b></font>(" + QString::fromStdString(BUILD_ARCHITECTURE) + ")<br>"
         + tr("Version") + QString(" %1").arg(VERSION_STRING)
         + "<br><br><b><a href='" + GITHUB_PAGES_URL + "'>" + tr("Cockatrice Webpage") + "</a></b><br>"
         + "<br><br><b>" + tr("Project Manager:") + "</b><br>Gavin Bisesi<br><br>"
