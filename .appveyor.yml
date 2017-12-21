@@ -14,13 +14,13 @@ skip_commits:
     - '*.md'
     - Dockerfile
     - LICENSE
-    
+
 image: Visual Studio 2015
 
 cache:
     - c:\protobuf-release
     - c:\zlib-release
-    
+
 environment:
     matrix:
         - qt_ver: 5.9\msvc2015_64
@@ -35,7 +35,7 @@ environment:
           cmake_generator: Visual Studio 14 2015
           cmake_toolset: v140
           target_arch: x86
-          
+
 install:
     - ps: |
         if (Test-Path c:\protobuf-release) {
@@ -56,10 +56,10 @@ install:
             cmake . -G "$env:cmake_generator" -T "$env:cmake_toolset" -DCMAKE_INSTALL_PREFIX=c:/zlib-release
             msbuild INSTALL.vcxproj /p:Configuration=Release
         }
-        
+
 services:
     - mysql
-    
+
 build_script:
     - ps: |
         New-Item -ItemType directory -Path $env:APPVEYOR_BUILD_FOLDER\build
@@ -83,18 +83,35 @@ build_script:
         
 test: off
 
+
+# Builds for pull requests skip the deployment step altogether
 deploy:
-  provider: GitHub
-  auth_token:
-    secure: p+7wPVry2XEa6TBm9XH8IaQZbBmXQ/J2ldbGmcIxUZD3NkkPrSRRlmE7Of1CBBIO
-#  release: "release name"    
-#  description: "release text"
-  artifact: /.*\.exe/
-  force_update: true
-  draft: false
-  prerelease: true
-  on:
-    appveyor_repo_tag: true
+# Deploy configuration for "beta" releases
+  - provider: GitHub
+    auth_token:
+      secure: p+7wPVry2XEa6TBm9XH8IaQZbBmXQ/J2ldbGmcIxUZD3NkkPrSRRlmE7Of1CBBIO
+    release: "Cockatrice $APPVEYOR_REPO_TAG_NAME"    
+    description: "Beta release of Cockatrice"
+    artifact: /.*\.exe/
+    force_update: true
+    draft: false
+    prerelease: true
+    on:
+      APPVEYOR_REPO_TAG: true
+      APPVEYOR_REPO_TAG_NAME: /([0-9]|[1-9][0-9])(.([0-9]|[1-9][0-9])){2}-beta(|.([2-9]|[1-9][0-9]))$/
+
+# Deploy configuration for "stable" releases
+  - provider: GitHub
+    auth_token:
+       secure: p+7wPVry2XEa6TBm9XH8IaQZbBmXQ/J2ldbGmcIxUZD3NkkPrSRRlmE7Of1CBBIO
+    artifact: /.*\.exe/
+    force_update: true
+    draft: false
+    prerelease: false
+    on:
+      APPVEYOR_REPO_TAG: true
+      APPVEYOR_REPO_TAG_NAME: /([0-9]|[1-9][0-9])(.([0-9]|[1-9][0-9])){2}$/
+
 
 # official validator for ".appveyor.yml" config file: https://ci.appveyor.com/tools/validate-yaml
 # appveyor config documentation: https://www.appveyor.com/docs/build-configuration/
