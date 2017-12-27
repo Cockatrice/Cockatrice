@@ -53,7 +53,7 @@ deploy:
     on:
       tags: true
       repo: Cockatrice/Cockatrice
-      condition: "$BUILDTYPE = Release && $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(.([0-9]|[1-9][0-9])){2}-beta(|.([2-9]|[1-9][0-9]))$"
+      condition: "$BUILDTYPE = Release && $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(.([0-9]|[1-9][0-9])){2}-beta(.([2-9]|[1-9][0-9]))?$"
       
 # Deploy configuration for "stable" releases
   - provider: releases
