@@ -41,7 +41,7 @@ deploy:
 # Deploy configuration for "beta" releases
   - provider: releases
     api_key:
-      secure: "mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU="
+      secure: mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU=
     skip_cleanup: true
     name: "Cockatrice $TRAVIS_TAG"
     body: "Beta release of Cockatrice"
@@ -53,12 +53,12 @@ deploy:
     on:
       tags: true
       repo: Cockatrice/Cockatrice
-      condition: "$BUILDTYPE = Release && $TRAVIS_TAG =~ (\\d|[1-9]\\d)(\\.(\\d|[1-9]\\d)){2}-beta(\\.([2-9]|[1-9]\\d))?$"     # regex to match semver naming convention for beta pre-releases
+      condition: $BUILDTYPE = Release && $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(\.([0-9]|[1-9][0-9])){2}-beta(\.([2-9]|[1-9][0-9]))?$     # regex to match semver naming convention for beta pre-releases
       
 # Deploy configuration for "stable" releases
   - provider: releases
     api_key:
-      secure: "mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU="
+      secure: mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU=
     skip_cleanup: true
     file_glob: true
     file: "build/Cockatrice-*"
@@ -68,7 +68,7 @@ deploy:
     on:
       tags: true
       repo: Cockatrice/Cockatrice
-      condition: "$BUILDTYPE = Release && $TRAVIS_TAG =~ (\\d|[1-9]\\d)(\\.(\\d|[1-9]\\d)){2}$"    # regex to match semver naming convention for stable full releases
+      condition: $BUILDTYPE = Release && $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(\.([0-9]|[1-9][0-9])){2}$    # regex to match semver naming convention for stable full releases
 
 
 notifications:
