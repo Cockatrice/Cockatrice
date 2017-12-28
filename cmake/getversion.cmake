@@ -86,7 +86,7 @@ function(get_tag_name commit)
 
 	# Sanity checks: length
 	list(LENGTH GIT_TAG_EXPLODED GIT_TAG_LISTCOUNT)
-	if(${GIT_TAG_LISTCOUNT} LESS 7 OR ${GIT_TAG_LISTCOUNT} GREATER 8)
+	if(${GIT_TAG_LISTCOUNT} LESS 7 OR ${GIT_TAG_LISTCOUNT} GREATER 9)
 		message(WARNING "Invalid tag format, got ${GIT_TAG_LISTCOUNT} tokens")
 		return()
 	endif()
