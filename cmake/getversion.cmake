@@ -80,7 +80,7 @@ function(get_tag_name commit)
 
 	# Extract information from tag:
 	# YYYY-MM-DD-Release-MAJ.MIN.PATCH
-	# YYYY-MM-DD-Development-MAJ.MIN.PATCH-betaX
+	# YYYY-MM-DD-Development-MAJ.MIN.PATCH-beta.X
 	string(REPLACE "-" ";" GIT_TAG_EXPLODED "${GIT_TAG}")
 	string(REPLACE "." ";" GIT_TAG_EXPLODED "${GIT_TAG_EXPLODED}")
 
@@ -141,8 +141,16 @@ function(get_tag_name commit)
 	endif()
 
 	# Label
+	# 7 = Full release
+	# 8 = Dev release, first beta so only "beta" attached
+	# 9 = Dev release, not first beta so "beta.N" attached
 	if(${GIT_TAG_LISTCOUNT} EQUAL 8)
 		list(GET GIT_TAG_EXPLODED 7 GIT_TAG_LABEL)
+	elseif(${GIT_TAG_LISTCOUNT} EQUAL 9)
+		list(GET GIT_TAG_EXPLODED 7 GIT_TAG_LABEL)
+		list(GET GIT_TAG_EXPLODED 8 GIT_TAG_LABEL_NUM)
+		set(GIT_TAG_LABEL ${GIT_TAG_LABEL} ${GIT_TAG_LABEL_NUM})
+		string(REPLACE ";" "." GIT_TAG_LABEL "${GIT_TAG_LABEL}")
 	else()
 		SET(GIT_TAG_LABEL "")
 	endif()
