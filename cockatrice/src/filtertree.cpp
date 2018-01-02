@@ -168,14 +168,9 @@ bool FilterItemList::testTypeOrNot(const CardInfo *info, CardFilter::Attr attr) 
     return !testTypeAnd(info, attr);
 }
 
-bool FilterItem::acceptName(const CardInfo *info) const
+bool FilterItem::acceptCmc(const CardInfo *info) const
 {
-    return info->getName().contains(term, Qt::CaseInsensitive);
-}
-
-bool FilterItem::acceptType(const CardInfo *info) const
-{
-    return info->getCardType().contains(term, Qt::CaseInsensitive);
+    return (info->getCmc() == term);
 }
 
 bool FilterItem::acceptColor(const CardInfo *info) const
@@ -222,47 +217,20 @@ bool FilterItem::acceptColor(const CardInfo *info) const
     return match_count == converted_term.length();
 }
 
-bool FilterItem::acceptText(const CardInfo *info) const
-{
-    return info->getText().contains(term, Qt::CaseInsensitive);
-}
-
-bool FilterItem::acceptSet(const CardInfo *info) const
-{
-    bool status = false;
-    for (auto i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++)
-    {
-        if ((*i)->getShortName().compare(term, Qt::CaseInsensitive) == 0
-            || (*i)->getLongName().compare(term, Qt::CaseInsensitive) == 0)
-        {
-            status = true;
-            break;
-        }
-    }
-
-    return status;
-}
-
 bool FilterItem::acceptManaCost(const CardInfo *info) const
 {
     return (info->getManaCost() == term);
 }
 
-bool FilterItem::acceptCmc(const CardInfo *info) const
+bool FilterItem::acceptName(const CardInfo *info) const
 {
-    return (info->getCmc() == term);
+    return info->getName().contains(term, Qt::CaseInsensitive);
 }
 
 bool FilterItem::acceptPower(const CardInfo *info) const
 {
     int slash = info->getPowTough().indexOf("/");
     return (slash != -1) ? (info->getPowTough().mid(0,slash) == term) : false;
-}
-
-bool FilterItem::acceptToughness(const CardInfo *info) const
-{
-    int slash = info->getPowTough().indexOf("/");
-    return (slash != -1) ? (info->getPowTough().mid(slash+1) == term) : false;
 }
 
 bool FilterItem::acceptRarity(const CardInfo *info) const
@@ -303,20 +271,52 @@ bool FilterItem::acceptRarity(const CardInfo *info) const
     return false;
 }
 
+bool FilterItem::acceptSet(const CardInfo *info) const
+{
+    bool status = false;
+    for (auto i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++)
+    {
+        if ((*i)->getShortName().compare(term, Qt::CaseInsensitive) == 0
+            || (*i)->getLongName().compare(term, Qt::CaseInsensitive) == 0)
+        {
+            status = true;
+            break;
+        }
+    }
+
+    return status;
+}
+
+bool FilterItem::acceptText(const CardInfo *info) const
+{
+    return info->getText().contains(term, Qt::CaseInsensitive);
+}
+
+bool FilterItem::acceptToughness(const CardInfo *info) const
+{
+    int slash = info->getPowTough().indexOf("/");
+    return (slash != -1) ? (info->getPowTough().mid(slash+1) == term) : false;
+}
+
+bool FilterItem::acceptType(const CardInfo *info) const
+{
+    return info->getCardType().contains(term, Qt::CaseInsensitive);
+}
+
 bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) const
 {
     switch (attr)
     {
-        case CardFilter::AttrName: return acceptName(info);
-        case CardFilter::AttrType: return acceptType(info);
-        case CardFilter::AttrColor: return acceptColor(info);
-        case CardFilter::AttrText: return acceptText(info);
-        case CardFilter::AttrSet: return acceptSet(info);
-        case CardFilter::AttrManaCost: return acceptManaCost(info);
         case CardFilter::AttrCmc: return acceptCmc(info);
-        case CardFilter::AttrRarity: return acceptRarity(info);
+        case CardFilter::AttrColor: return acceptColor(info);
+        case CardFilter::AttrManaCost: return acceptManaCost(info);
+        case CardFilter::AttrName: return acceptName(info);
         case CardFilter::AttrPow: return acceptPower(info);
+        case CardFilter::AttrRarity: return acceptRarity(info);
+        case CardFilter::AttrSet: return acceptSet(info);
+        case CardFilter::AttrText: return acceptText(info);
         case CardFilter::AttrTough: return acceptToughness(info);
+        case CardFilter::AttrType: return acceptType(info);
         default: return true; /* ignore this attribute */
     }
 }
