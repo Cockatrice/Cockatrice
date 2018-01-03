@@ -17,15 +17,15 @@ public:
      * add its string representation in attrName */
     enum Attr {
         AttrCmc = 0,
-		AttrColor,
-		AttrManaCost,
+        AttrColor,
+        AttrManaCost,
         AttrName,
-		AttrPow,
-		AttrRarity,
-		AttrSet,
+        AttrPow,
+        AttrRarity,
+        AttrSet,
         AttrText,
         AttrTough,
-		AttrType,
+        AttrType,
         AttrEnd
     };
 
