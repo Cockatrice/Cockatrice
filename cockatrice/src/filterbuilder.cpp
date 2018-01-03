@@ -14,7 +14,7 @@ FilterBuilder::FilterBuilder(QWidget *parent)
     filterCombo->setObjectName("filterCombo");
     for (int i = 0; i < CardFilter::AttrEnd; i++)
         filterCombo->addItem(
-            tr(CardFilter::attrName(static_cast<CardFilter::Attr>(i))),
+            CardFilter::attrName(static_cast<CardFilter::Attr>(i)),
             QVariant(i)
         );
 
