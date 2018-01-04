@@ -187,6 +187,7 @@ SettingsCache::SettingsCache()
 
     cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
     tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
+    spoilerDatabasePath = getSafeConfigFilePath("paths/spoilerdatabase", dataPath + "/spoilers.xml");
 
     themeName = settings->value("theme/name").toString();
 
@@ -345,6 +346,13 @@ void SettingsCache::setCardDatabasePath(const QString &_cardDatabasePath)
 {
     cardDatabasePath = _cardDatabasePath;
     settings->setValue("paths/carddatabase", cardDatabasePath);
+    emit cardDatabasePathChanged();
+}
+
+void SettingsCache::setSpoilerDatabasePath(const QString &_spoilerDatabasePath)
+{
+    spoilerDatabasePath = _spoilerDatabasePath;
+    settings->setValue("paths/spoilerdatabase", spoilerDatabasePath);
     emit cardDatabasePathChanged();
 }
 
