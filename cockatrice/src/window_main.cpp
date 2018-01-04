@@ -873,10 +873,9 @@ void MainWindow::cardDatabaseAllNewSetsEnabled()
 }
 
 /* CARD UPDATER */
-
 void MainWindow::actCheckCardUpdates()
 {
-    if(cardUpdateProcess)
+    if (cardUpdateProcess)
     {
         QMessageBox::information(this, tr("Information"), tr("A card database update is already running."));
         return;

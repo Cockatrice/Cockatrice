@@ -40,6 +40,8 @@ class DlgViewLog;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
+public slots:
+    void actCheckCardUpdates();
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
@@ -78,7 +80,6 @@ private slots:
     void promptForgotPasswordChallenge();
     void showWindowIfHidden();
 
-    void actCheckCardUpdates();
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void refreshShortcuts();

@@ -1,6 +1,7 @@
 #include "carddatabase.h"
 #include "pictureloader.h"
 #include "settingscache.h"
+#include "spoilerbackgroundupdater.h"
 
 #include <QCryptographicHash>
 #include <QDebug>
@@ -734,7 +735,9 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
 {
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty())
+    {
         tempLoadStatus = loadFromFile(path);
+    }
 
     qDebug() << "[CardDatabase] loadCardDatabase(): Path =" << path << "Status =" << tempLoadStatus << "Cards =" << cards.size() << "Sets=" << sets.size();
 
@@ -744,12 +747,13 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
 LoadStatus CardDatabase::loadCardDatabases()
 {
     qDebug() << "CardDatabase::loadCardDatabases start";
-    // clean old db
-    clear();
-    // load main card database
-    loadStatus = loadCardDatabase(settingsCache->getCardDatabasePath());
-    // laod tokens database
-    loadCardDatabase(settingsCache->getTokenDatabasePath());
+
+    clear(); // remove old db
+
+    loadStatus = loadCardDatabase(settingsCache->getCardDatabasePath()); // load main card database
+    loadCardDatabase(settingsCache->getTokenDatabasePath()); // load tokens database
+    loadCardDatabase(settingsCache->getSpoilerCardDatabasePath()); // load spoilers database
+
     // load custom card databases
     QDir dir(settingsCache->getCustomCardDatabasePath());
     foreach(QString fileName, dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase))
@@ -763,25 +767,25 @@ LoadStatus CardDatabase::loadCardDatabases()
     SetList allSets;
     QHashIterator<QString, CardSet *> setsIterator(sets);
     while (setsIterator.hasNext())
+    {
         allSets.append(setsIterator.next().value());
+    }
     allSets.sortByKey();
 
     // resolve the reverse-related tags
     refreshCachedReverseRelatedCards();
 
-    if(loadStatus == Ok)
+    if (loadStatus == Ok)
     {
-        // check for unknown sets
-        checkUnknownSets();
-        // update deck editors, etc
+        checkUnknownSets(); // update deck editors, etc
         qDebug() << "CardDatabase::loadCardDatabases success";
-    } else {
-        // bring up thr settings dialog
+    }
+    else
+    {
         qDebug() << "CardDatabase::loadCardDatabases failed";
-        emit cardDatabaseLoadingFailed();
+        emit cardDatabaseLoadingFailed(); // bring up the settings dialog
     }
 
-    // return the loadstatus of the main card database.
     return loadStatus;
 }
 

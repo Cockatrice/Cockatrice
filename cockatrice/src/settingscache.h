@@ -48,6 +48,8 @@ signals:
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void masterVolumeChanged(int value);
     void chatMentionCompleterChanged();
+    void downloadSpoilerTimeIndexChanged();
+    void downloadSpoilerStatusChanged();
 private:
     QSettings *settings;
     ShortcutsSettings *shortcutsSettings;
@@ -62,8 +64,11 @@ private:
     QString lang;
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
+    bool mbDownloadSpoilers;
     int updateReleaseChannel;
     int maxFontSize;
+    int msDownloadSpoilersTimeMinutes;
+    long long mnDownloadSpoilerLastUpdateTime;
     bool picDownload;
     bool notificationsEnabled;
     bool spectatorNotificationsEnabled;
@@ -115,6 +120,7 @@ private:
     QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
     bool rememberGameSettings;
     QList<ReleaseChannel*> releaseChannels;
+    QMap<int, QString> manDownloadSpoilerTimeIntervals;
     bool isPortableBuild;
 
 public:
@@ -201,7 +207,13 @@ public:
     GameFiltersSettings& gameFilters() const { return *gameFiltersSettings; }
     LayoutsSettings& layouts() const { return *layoutsSettings; }
     bool getIsPortableBuild() const { return isPortableBuild; }
+    bool getDownloadSpoilersStatus() const { return mbDownloadSpoilers; }
+    int getDownloadSpoilerTimeMinutes() const { return msDownloadSpoilersTimeMinutes; }
+    QMap<int, QString> getDownloadSpoilerTimeIntervals() const { return manDownloadSpoilerTimeIntervals; }
+    long getDownloadSpoilerLastUpdateTime() const { return mnDownloadSpoilerLastUpdateTime; }
 public slots:
+    void setDownloadSpoilerStatus(bool _spoilerStatus);
+
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setTokenDialogGeometry(const QByteArray &_tokenDialog);
     void setLang(const QString &_lang);
@@ -261,6 +273,8 @@ public slots:
     void setNotifyAboutUpdate(int _notifyaboutupdate);
     void setUpdateReleaseChannel(int _updateReleaseChannel);
     void setMaxFontSize(int _max);
+    void setDownloadSpoilerLastUpdateTime(long long _timestamp);
+    void setDownloadSpoilerTimeMinutes(int _lnTimeInterval);
 };
 
 extern SettingsCache *settingsCache;

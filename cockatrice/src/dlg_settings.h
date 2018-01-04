@@ -124,15 +124,30 @@ public:
     void retranslateUi();
 };
 
-class DeckEditorSettingsPage : public AbstractSettingsPage {
-    Q_OBJECT
+class DeckEditorSettingsPage : public AbstractSettingsPage
+{
+Q_OBJECT
 public:
     DeckEditorSettingsPage();
     void retranslateUi();
 private slots:
+    void setSpoilersEnabled(bool);
+    void setDownloadSpoilerTime(QString);
+    void spoilerPathButtonClicked();
 signals:
 private:
-    QGroupBox *generalGroupBox;
+    QCheckBox mcDownloadSpoilersCheckBox;
+    QComboBox msDownloadSpoilersTimeIntervalComboBox;
+    QLabel msDownloadSpoilersLabel;
+    QGroupBox *mpGeneralGroupBox;
+    QGroupBox *mpSpoilerGroupBox;
+    QLineEdit *mpSpoilerSavePathLineEdit;
+    QLabel mcSpoilerSaveLabel;
+    QLabel mcGeneralMessageLabel;
+    QLabel mcNextUpdateTimeToolTipLabel;
+    QLabel mcNextUpdateTimeLabel;
+    QPushButton *mpSpoilerPathButton;
+    void updateDownloadTimer(bool abIsEnabled = true);
 };
 
 class MessagesSettingsPage : public AbstractSettingsPage {

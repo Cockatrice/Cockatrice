@@ -42,6 +42,7 @@
 #include "soundengine.h"
 #include "featureset.h"
 #include "logger.h"
+#include "spoilerbackgroundupdater.h"
 
 CardDatabase *db;
 QTranslator *translator, *qtTranslator;
@@ -128,6 +129,9 @@ int main(int argc, char *argv[])
     ui.setWindowIcon(QPixmap("theme:cockatrice"));
     
     settingsCache->setClientID(generateClientID());
+
+    // Once the cards load in, we will restart our spoiler timer
+    SpoilerBackgroundUpdater spoilerTimer;
 
     ui.show();
     qDebug("main(): ui.show() finished");
