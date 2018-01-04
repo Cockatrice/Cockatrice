@@ -48,14 +48,18 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 
     addPage(new IntroPage);
 
-
-    addPage(new LoadSetsPage);
-    addPage(new SaveSetsPage);
-    addPage(new LoadTokensPage);
-    addPage(new SaveTokensPage);
-
-    addPage(new LoadSpoilersPage);
-    addPage(new SaveSpoilersPage);
+    if (! isSpoilersOnly)
+    {
+        addPage(new LoadSetsPage);
+        addPage(new SaveSetsPage);
+        addPage(new LoadTokensPage);
+        addPage(new SaveTokensPage);
+    }
+    else
+    {
+        addPage(new LoadSpoilersPage);
+        addPage(new SaveSpoilersPage);
+    }
 
     retranslateUi();
 }

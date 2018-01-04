@@ -3,6 +3,7 @@
 #include <QIcon>
 #include <QTranslator>
 #include <QLibraryInfo>
+#include <QCommandLineParser>
 
 #include "main.h"
 #include "oraclewizard.h"
@@ -15,6 +16,7 @@ ThemeManager *themeManager;
 
 const QString translationPrefix = "oracle";
 QString translationPath;
+bool isSpoilersOnly;
 
 void installNewTranslator()
 {
@@ -34,6 +36,13 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain("cockatrice");
 	// this can't be changed, as it influences the default savepath for cards.xml
 	QCoreApplication::setApplicationName("Cockatrice");
+
+    // If the program is opened with the -s flag, it will only do spoilers. Otherwise it will do MTGJSON/Tokens
+    QCommandLineParser parser;
+    QCommandLineOption showProgressOption("s", QCoreApplication::translate("main", "Only run in spoiler mode"));
+    parser.addOption(showProgressOption);
+    parser.process(app);
+    isSpoilersOnly = parser.isSet(showProgressOption);
 
 #ifdef Q_OS_MAC
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";

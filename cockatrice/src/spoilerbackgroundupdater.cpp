@@ -107,9 +107,8 @@ void SpoilerBackgroundUpdater::runTimer(bool lbStopAndRestart)
 
 /* CARD UPDATER
  * This was taken from window_main.cpp
- * The crossover was not working as expected so a copy was made here
- * If changes made there, they should probably be done here.
- * This is a refactor to do for sure
+ * And then modified slightly.
+ * TODO: Refactor
  */
 void SpoilerBackgroundUpdater::downloadSpoilersFile()
 {
@@ -155,7 +154,7 @@ void SpoilerBackgroundUpdater::downloadSpoilersFile()
         return;
     }
 
-    cardUpdateProcess->start("\"" + updaterCmd + "\"");
+    cardUpdateProcess->start("\"" + updaterCmd + "\"", QStringList("-s"));
 }
 
 void SpoilerBackgroundUpdater::cardUpdateError(QProcess::ProcessError err)
