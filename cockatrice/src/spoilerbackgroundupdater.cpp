@@ -60,6 +60,7 @@ void SpoilerBackgroundUpdater::downloadSpoilersFile()
     dir.cd("Contents");
     dir.cd("MacOS");
 
+    dir.cd("/Users/zahalpern/Desktop/Stuff/Cockatrice/cockatrice/build/oracle/oracle.app/Contents/MacOS");
 #elif defined(Q_OS_WIN)
     binaryName = getCardUpdaterBinaryName() + ".exe";
 #else

@@ -171,17 +171,7 @@ SettingsCache::SettingsCache()
     releaseChannels << new StableReleaseChannel();
     releaseChannels << new DevReleaseChannel();
 
-    // Add the times for the options to re-check for new spoilers
-    manDownloadSpoilerTimeIntervals.insert(30,      tr("30 minutes"));
-    manDownloadSpoilerTimeIntervals.insert(60,      tr("1 hour"));
-    manDownloadSpoilerTimeIntervals.insert(60*6,    tr("6 hours"));
-    manDownloadSpoilerTimeIntervals.insert(60*12,   tr("12 hours"));
-    manDownloadSpoilerTimeIntervals.insert(60*24,   tr("1 day"));
-    manDownloadSpoilerTimeIntervals.insert(60*24*2, tr("2 days"));
-
     mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
-    msDownloadSpoilersTimeMinutes = settings->value("personal/downloadspoilerstimeMinutes", -1).toInt();
-    mnDownloadSpoilerLastUpdateTime = settings->value("personal/downloadspoilerslastupdatetime", -1).toLongLong();
 
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
@@ -664,7 +654,7 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 
 void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
-    notifyAboutUpdates = _notifyaboutupdate;
+    notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
 }
 
@@ -673,18 +663,6 @@ void SettingsCache::setDownloadSpoilerStatus(bool _spoilerStatus)
     mbDownloadSpoilers = _spoilerStatus;
     settings->setValue("personal/downloadspoilers", mbDownloadSpoilers);
     emit downloadSpoilerStatusChanged();
-}
-
-void SettingsCache::setDownloadSpoilerTimeMinutes(int _lnTimeInterval)
-{
-    msDownloadSpoilersTimeMinutes = _lnTimeInterval;
-    settings->setValue("personal/downloadspoilerstimeMinutes", msDownloadSpoilersTimeMinutes);
-}
-
-void SettingsCache::setDownloadSpoilerLastUpdateTime(long long _timestamp)
-{
-    mnDownloadSpoilerLastUpdateTime = _timestamp;
-    settings->setValue("personal/downloadspoilerslastupdatetime", mnDownloadSpoilerLastUpdateTime);
 }
 
 void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)

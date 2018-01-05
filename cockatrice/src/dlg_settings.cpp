@@ -492,29 +492,6 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     auto *lpGeneralGrid = new QGridLayout;
     auto *lpSpoilerGrid = new QGridLayout;
 
-    // Get all the update options and put them into the Combo Box
-    QMap<int, QString> lacSettingTimes = settingsCache->getDownloadSpoilerTimeIntervals();
-    bool lbCurrentIndexDefaulted = true;
-    int lnIndexToInsert = 0;
-    for (auto lIterator = lacSettingTimes.begin(); lIterator != lacSettingTimes.end(); lIterator++, lnIndexToInsert++)
-    {
-        msDownloadSpoilersTimeIntervalComboBox.insertItem(lnIndexToInsert, lIterator.value());
-
-        // If this is the saved value, we can mark it off it
-        if (lIterator.key() == settingsCache->getDownloadSpoilerTimeMinutes())
-        {
-            msDownloadSpoilersTimeIntervalComboBox.setCurrentIndex(lnIndexToInsert);
-            lbCurrentIndexDefaulted = false;
-        }
-    }
-
-    // Set the combo box's selected if we don't have a setting in the settingsCache
-    if (lbCurrentIndexDefaulted)
-    {
-        settingsCache->setDownloadSpoilerTimeMinutes(lacSettingTimes.keys().last()); // greatest value
-        msDownloadSpoilersTimeIntervalComboBox.setCurrentIndex(lacSettingTimes.size() - 1);
-    }
-
     mcDownloadSpoilersCheckBox.setChecked(settingsCache->getDownloadSpoilersStatus());
 
     mpSpoilerSavePathLineEdit = new QLineEdit(settingsCache->getSpoilerCardDatabasePath());
