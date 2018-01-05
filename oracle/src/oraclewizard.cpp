@@ -676,7 +676,7 @@ void LoadSpoilersPage::actDownloadFinishedSpoilersFile()
     progressLabel->hide();
     progressBar->hide();
 
-    // save spoilers.xml url, but only if the user customized it and download was successful
+    // save spoiler.xml url, but only if the user customized it and download was successful
     if (urlLineEdit->text() != QString(SPOILERS_URL))
     {
         wizard()->settings->setValue("spoilersurl", urlLineEdit->text());

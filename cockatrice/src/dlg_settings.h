@@ -132,7 +132,6 @@ public:
     void retranslateUi();
 private slots:
     void setSpoilersEnabled(bool);
-    void setDownloadSpoilerTime(QString);
     void spoilerPathButtonClicked();
 signals:
 private:
@@ -144,10 +143,7 @@ private:
     QLineEdit *mpSpoilerSavePathLineEdit;
     QLabel mcSpoilerSaveLabel;
     QLabel mcGeneralMessageLabel;
-    QLabel mcNextUpdateTimeToolTipLabel;
-    QLabel mcNextUpdateTimeLabel;
     QPushButton *mpSpoilerPathButton;
-    void updateDownloadTimer(bool abIsEnabled = true);
 };
 
 class MessagesSettingsPage : public AbstractSettingsPage {

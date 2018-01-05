@@ -527,25 +527,15 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     // Create the layout
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
-    lpSpoilerGrid->addWidget(&msDownloadSpoilersLabel, 0, 1);
-    lpSpoilerGrid->addWidget(&msDownloadSpoilersTimeIntervalComboBox, 0, 2);
     lpSpoilerGrid->addWidget(&mcSpoilerSaveLabel, 1, 0);
     lpSpoilerGrid->addWidget(mpSpoilerSavePathLineEdit, 1, 1);
     lpSpoilerGrid->addWidget(mpSpoilerPathButton, 1, 2);
-    lpSpoilerGrid->addWidget(&mcNextUpdateTimeToolTipLabel, 2, 0);
-    lpSpoilerGrid->addWidget(&mcNextUpdateTimeLabel, 2, 1);
-
-    lpSpoilerGrid->setColumnStretch(0, 2);
-    lpSpoilerGrid->setColumnStretch(1, 4);
-    lpSpoilerGrid->setColumnStretch(2, 1);
-
     lpGeneralGrid->addWidget(&mcGeneralMessageLabel, 0, 0);
 
     // On a change to the check box, hide/unhide the other fields
     // On a change to the combo box, send a signal to the timer threads
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), settingsCache, SLOT(setDownloadSpoilerStatus(bool)));
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
-    connect(&msDownloadSpoilersTimeIntervalComboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(setDownloadSpoilerTime(QString)));
 
     mpGeneralGroupBox = new QGroupBox;
     mpGeneralGroupBox->setLayout(lpGeneralGrid);
@@ -572,57 +562,12 @@ void DeckEditorSettingsPage::spoilerPathButtonClicked()
     settingsCache->setSpoilerDatabasePath(lsPath + "/spoiler.xml");
 }
 
-void DeckEditorSettingsPage::setDownloadSpoilerTime(QString asValue)
-{
-    // Sets the downloadspoilerstimeMinutes field (stored in MINUTES (int))
-    QMap<int, QString> lacSettingTimes = settingsCache->getDownloadSpoilerTimeIntervals();
-    int lnMinutesToReload = lacSettingTimes.key(asValue);
-
-    // Update settings cache downloadspoilerstimeMinutes
-    settingsCache->setDownloadSpoilerTimeMinutes(lnMinutesToReload);
-
-    // Update the GUI display
-    updateDownloadTimer();
-}
-
 void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
 {
     msDownloadSpoilersLabel.setEnabled(anInput);
-    msDownloadSpoilersTimeIntervalComboBox.setEnabled(anInput);
     mcSpoilerSaveLabel.setEnabled(anInput);
     mpSpoilerSavePathLineEdit->setEnabled(anInput);
     mpSpoilerPathButton->setEnabled(anInput);
-    updateDownloadTimer(anInput);
-}
-
-void DeckEditorSettingsPage::updateDownloadTimer(bool abIsEnabled)
-{
-    // Update the display so the user sees when the next download time is or nothing if disabled
-    if (abIsEnabled)
-    {
-        long lnTimeUntilNextUpdate = QDateTime::currentMSecsSinceEpoch() - settingsCache->getDownloadSpoilerLastUpdateTime();
-        long lnTimeToWaitBetween = settingsCache->getDownloadSpoilerTimeMinutes() * 60000;
-
-        QDateTime lTimeNow(QDateTime::currentDateTime());
-
-        // If not defaulted
-        if (settingsCache->getDownloadSpoilerLastUpdateTime() != -1)
-        {
-            mcNextUpdateTimeLabel.setText(lTimeNow.addMSecs(lnTimeToWaitBetween - lnTimeUntilNextUpdate).toString());
-        }
-        else
-        {
-            // Value not set in config, so just show how long until the update based on what we know
-            mcNextUpdateTimeLabel.setText(lTimeNow.addMSecs(lnTimeToWaitBetween).toString());
-        }
-    }
-    else
-    {
-        mcNextUpdateTimeLabel.setText(tr("Never"));
-    }
-
-    mcNextUpdateTimeToolTipLabel.setEnabled(abIsEnabled);
-    mcNextUpdateTimeLabel.setEnabled(abIsEnabled);
 }
 
 void DeckEditorSettingsPage::retranslateUi()
@@ -630,10 +575,7 @@ void DeckEditorSettingsPage::retranslateUi()
     mpSpoilerGroupBox->setTitle(tr("Spoilers"));
     mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
-    msDownloadSpoilersLabel.setText(tr("Check for Updates Every"));
-    msDownloadSpoilersLabel.setAlignment(Qt::AlignRight);
     mcGeneralMessageLabel.setText(tr("Hey, something's here finally!"));
-    mcNextUpdateTimeToolTipLabel.setText(tr("Next Download At:"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()

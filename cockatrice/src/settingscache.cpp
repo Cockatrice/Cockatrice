@@ -199,7 +199,7 @@ SettingsCache::SettingsCache()
 
     cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
     tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
-    spoilerDatabasePath = getSafeConfigFilePath("paths/spoilerdatabase", dataPath + "/spoilers.xml");
+    spoilerDatabasePath = getSafeConfigFilePath("paths/spoilerdatabase", dataPath + "/spoiler.xml");
 
     themeName = settings->value("theme/name").toString();
 

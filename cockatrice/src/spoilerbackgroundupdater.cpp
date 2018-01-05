@@ -14,95 +14,17 @@
 
 SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(apParent), cardUpdateProcess(nullptr)
 {
-    // If there is a change in the settings, update the timer so we know when to update correctly
-    connect(settingsCache, SIGNAL(downloadSpoilerStatusChanged()), this, SLOT(changeActiveStatus()));
-    connect(settingsCache, SIGNAL(downloadSpoilerTimeIndexChanged()), this, SLOT(handleNewTimeInterval()));
+    qDebug() << "Spoiler Service Online";
 
-    qDebug() << "Spoiler Service online";
-
-    runTimer();
-    // TODO: User wants spoilers, so lets see if we're in spoiler season or not.
-}
-
-void SpoilerBackgroundUpdater::changeActiveStatus()
-{
-    mbIsActiveThread = (settingsCache->getDownloadSpoilersStatus());
-    qDebug() << "Spoiler Timer running status has been changed to" << mbIsActiveThread;
-
-    // If they enable spoilers, auto-download the file (aka timer expired) and restart the timer
-    if (mbIsActiveThread)
+    isSpoilerDownloadEnabled = settingsCache->getDownloadSpoilersStatus();
+    if (isSpoilerDownloadEnabled)
     {
-        timeoutOccurredTimeToDownloadSpoilers();
-    }
-}
-
-void SpoilerBackgroundUpdater::timeoutOccurredTimeToDownloadSpoilers()
-{
-    qDebug() << "Spoiler Timer has finished";
-
-    settingsCache->setDownloadSpoilerLastUpdateTime(QDateTime::currentMSecsSinceEpoch());
-
-    // If this thread is active, then initiate download
-    if (mbIsActiveThread)
-    {
-        qDebug() << "Timer thread is active, so attempting to download spoilers";
         downloadSpoilersFile();
     }
 
-    // Now that we've downloaded the spoiler, reset the timer.
-    // Take it from the top, Jenkins!
-    runTimer(true);
-}
+    qDebug() << "Spoiler Service Completed";
 
-void SpoilerBackgroundUpdater::handleNewTimeInterval()
-{
-    // Cause the timer to stop then restart w/ new interval
-    qDebug() << "Spoiler Timer has new time interval established";
-    runTimer(true);
-}
-
-void SpoilerBackgroundUpdater::runTimer(bool lbStopAndRestart)
-{
-    // If the timer doesn't exist (user ticked checkbox, for example, as an override, create it)
-    if (mpTimerForSpoilers == nullptr)
-    {
-        // When timer ends, cause download of Spoilers XML file
-        mpTimerForSpoilers = new QTimer(this);
-        connect(mpTimerForSpoilers, SIGNAL(timeout()), this, SLOT(timeoutOccurredTimeToDownloadSpoilers()));
-        qDebug() << "Timer was null, established now";
-    }
-
-    // Cause a restart of the timer as if we just restart via start() a timeout() will be
-    // thrown which will trigger a download... which we don't want off time!
-    if (lbStopAndRestart)
-    {
-        mpTimerForSpoilers->stop();
-    }
-
-    // Determine how long to wait between updates (Gets the # of hours from settingsCache / convert Mins -> Millis)
-    int lnTimeToWaitBetween = settingsCache->getDownloadSpoilerTimeMinutes() * 60000;
-
-    // How much time is needed until the next update (NOW() - Last Update Time == Time Remaining)
-    long lnLastUpdateTime = settingsCache->getDownloadSpoilerLastUpdateTime();
-    long lnTimeSinceLastUpdate = QDateTime::currentMSecsSinceEpoch() - lnLastUpdateTime;
-    if (lnTimeSinceLastUpdate <= 500 || lnLastUpdateTime == -1)
-    {
-        // The update just occurred less then half a sec ago, so we will restart the timer from the beginning (time zero)
-        mpTimerForSpoilers->start(lnTimeToWaitBetween);
-    }
-    else if (lnTimeSinceLastUpdate < lnTimeToWaitBetween)
-    {
-        // If we have checked for an update in the past and it's not yet time to check for another update
-        // Start the clock to count down until lnTimeSinceLastUpdate
-        mpTimerForSpoilers->start(static_cast<int>(lnTimeToWaitBetween - lnTimeSinceLastUpdate));
-    }
-    else
-    {
-        // It's been too long since we last checked (above threshold), so we will start now (time inf)
-        mpTimerForSpoilers->start(0);
-    }
-
-    qDebug() << "Spoiler Timer has started and will finish in" << mpTimerForSpoilers->interval()/60000. << "minutes";
+    // TODO: User wants spoilers, so lets see if we're in spoiler season or not.
 }
 
 /* CARD UPDATER
@@ -137,6 +59,7 @@ void SpoilerBackgroundUpdater::downloadSpoilersFile()
     dir.cd(binaryName + ".app");
     dir.cd("Contents");
     dir.cd("MacOS");
+
 #elif defined(Q_OS_WIN)
     binaryName = getCardUpdaterBinaryName() + ".exe";
 #else
@@ -154,7 +77,7 @@ void SpoilerBackgroundUpdater::downloadSpoilersFile()
         return;
     }
 
-    cardUpdateProcess->start("\"" + updaterCmd + "\"", QStringList("-s"));
+    cardUpdateProcess->start(updaterCmd, QStringList("-s"));
 }
 
 void SpoilerBackgroundUpdater::cardUpdateError(QProcess::ProcessError err)

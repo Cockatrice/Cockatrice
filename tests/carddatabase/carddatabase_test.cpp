@@ -14,7 +14,7 @@ SettingsCache::~SettingsCache() { delete cardDatabaseSettings; };
 QString SettingsCache::getCustomCardDatabasePath() const { return QString("%1/customsets/").arg(CARDDB_DATADIR); }
 QString SettingsCache::getCardDatabasePath() const { return QString("%1/cards.xml").arg(CARDDB_DATADIR); }
 QString SettingsCache::getTokenDatabasePath() const { return QString("%1/tokens.xml").arg(CARDDB_DATADIR); }
-QString SettingsCache::getSpoilerCardDatabasePath() const { return QString("%1/spoilers.xml").arg(CARDDB_DATADIR); }
+QString SettingsCache::getSpoilerCardDatabasePath() const { return QString("%1/spoiler.xml").arg(CARDDB_DATADIR); }
 CardDatabaseSettings& SettingsCache::cardDatabase() const { return *cardDatabaseSettings; }
 
 SettingsCache *settingsCache;
