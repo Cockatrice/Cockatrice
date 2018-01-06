@@ -97,7 +97,7 @@ class LoadSetsPage : public OracleWizardPage
         QPushButton *urlButton;
         QPushButton *fileButton;
         QLabel *progressLabel;
-        QProgressBar * progressBar;
+        QProgressBar *progressBar;
 
         QNetworkAccessManager *nam;
         QFutureWatcher<bool> watcher;
@@ -144,7 +144,7 @@ class LoadSpoilersPage : public OracleWizardPage
         QLineEdit *urlLineEdit;
         QPushButton *urlButton;
         QLabel *progressLabel;
-        QProgressBar * progressBar;
+        QProgressBar *progressBar;
         QNetworkAccessManager *nam;
 
     private slots:

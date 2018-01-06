@@ -12,111 +12,95 @@
 #include "main.h"
 #include "window_main.h"
 
+#define SPOILERS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/spoiler.xml"
+
 SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(apParent), cardUpdateProcess(nullptr)
 {
+    // TODO: See if we're in spoilers season or not
+
     qDebug() << "Spoiler Service Online";
 
     isSpoilerDownloadEnabled = settingsCache->getDownloadSpoilersStatus();
     if (isSpoilerDownloadEnabled)
     {
-        downloadSpoilersFile();
+        startSpoilerDownloadProcess();
     }
 
     qDebug() << "Spoiler Service Completed";
-
-    // TODO: User wants spoilers, so lets see if we're in spoiler season or not.
 }
 
-/* CARD UPDATER
- * This was taken from window_main.cpp
- * And then modified slightly.
- * TODO: Refactor
- */
-void SpoilerBackgroundUpdater::downloadSpoilersFile()
+void SpoilerBackgroundUpdater::startSpoilerDownloadProcess()
 {
-    if (cardUpdateProcess)
-    {
-        QMessageBox::information(nullptr, tr("Information"), tr("A card database update is already running."));
-        return;
-    }
-
-    cardUpdateProcess = new QProcess(this);
-    connect(cardUpdateProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(cardUpdateError(QProcess::ProcessError)));
-    connect(cardUpdateProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(cardUpdateFinished(int, QProcess::ExitStatus)));
-
-    // full "run the update" command; leave empty if not present
-    QString updaterCmd;
-    QString binaryName;
-    QDir dir = QDir(QApplication::applicationDirPath());
-
-#if defined(Q_OS_MAC)
-    binaryName = getCardUpdaterBinaryName();
-
-    // exit from the application bundle
-    dir.cdUp();
-    dir.cdUp();
-    dir.cdUp();
-    dir.cd(binaryName + ".app");
-    dir.cd("Contents");
-    dir.cd("MacOS");
-
-    dir.cd("/Users/zahalpern/Desktop/Stuff/Cockatrice/cockatrice/build/oracle/oracle.app/Contents/MacOS");
-#elif defined(Q_OS_WIN)
-    binaryName = getCardUpdaterBinaryName() + ".exe";
-#else
-    binaryName = getCardUpdaterBinaryName();
-#endif
-
-    if (dir.exists(binaryName))
-    {
-        updaterCmd = dir.absoluteFilePath(binaryName);
-    }
-
-    if (updaterCmd.isEmpty())
-    {
-        QMessageBox::warning(nullptr, tr("Error"), tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
-        return;
-    }
-
-    cardUpdateProcess->start(updaterCmd, QStringList("-s"));
+    // Order of Operations: downloadFromURL -> actDownloadFinishedSpoilersFile -> saveDownloadedFile
+    auto spoilerURL = QUrl(SPOILERS_URL);
+    downloadFromURL(spoilerURL);
 }
 
-void SpoilerBackgroundUpdater::cardUpdateError(QProcess::ProcessError err)
+void SpoilerBackgroundUpdater::downloadFromURL(QUrl url)
 {
-    QString error;
-    switch(err)
-    {
-        case QProcess::FailedToStart:
-            error = tr("failed to start.");
-            break;
-        case QProcess::Crashed:
-            error = tr("crashed.");
-            break;
-        case QProcess::Timedout:
-            error = tr("timed out.");
-            break;
-        case QProcess::WriteError:
-            error = tr("write error.");
-            break;
-        case QProcess::ReadError:
-            error = tr("read error.");
-            break;
-        case QProcess::UnknownError:
-        default:
-            error = tr("unknown error.");
-            break;
-    }
+    auto *nam = new QNetworkAccessManager(this);
+    QNetworkReply *reply = nam->get(QNetworkRequest(url));
 
-    cardUpdateProcess->deleteLater();
-    cardUpdateProcess = nullptr;
-    QMessageBox::warning(nullptr, tr("Error"), tr("The card database updater exited with an error: %1").arg(error));
+    connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSpoilersFile()));
 }
 
-void SpoilerBackgroundUpdater::cardUpdateFinished(int, QProcess::ExitStatus)
+void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
 {
-    cardUpdateProcess->deleteLater();
-    cardUpdateProcess = nullptr;
-    QMessageBox::information(nullptr, tr("Information"), tr("Update completed successfully.\nCockatrice will now reload the card database."));
+    // Check for server reply
+    auto *reply = dynamic_cast<QNetworkReply *>(sender());
+    QNetworkReply::NetworkError errorCode = reply->error();
 
-    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    if (errorCode == QNetworkReply::NoError)
+    {
+        spoilerData = reply->readAll();
+        reply->deleteLater();
+        saveDownloadedFile(spoilerData);
+    }
+}
+
+bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
+{
+    QString fileName = settingsCache->getSpoilerCardDatabasePath();
+    QString windowName = tr("Save spoiler database");
+    QString fileType = tr("XML; card database (*.xml)");
+
+    QFileInfo fi(fileName);
+    QDir fileDir(fi.path());
+    if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath()))
+    {
+        return false;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        qDebug() << "Spoiler Service Error: File open (w) failed for" << fileName;
+        return false;
+    }
+
+    if (file.write(data) == -1)
+    {
+        qDebug() << "Spoiler Service Error: File write (w) failed for" << fileName;
+        return false;
+    }
+
+    file.close();
+
+    qDebug() << "Spoiler Service Data Written";
+    if (trayIcon)
+    {
+        QList<QByteArray> lines = data.split('\n');
+
+        foreach (QByteArray line, lines)
+        {
+            if (line.indexOf("created:") > -1)
+            {
+                QString str = QString(line).replace("created:", "").trimmed();
+                trayIcon->showMessage(tr("Spoilers last updated at"), str);
+                return true;
+            }
+        }
+    }
+
+    return true;
 }

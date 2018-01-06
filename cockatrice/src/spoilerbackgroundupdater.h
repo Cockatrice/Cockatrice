@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QProcess>
+#include <QByteArray>
 
 class SpoilerBackgroundUpdater : public QObject
 {
@@ -12,13 +13,15 @@ class SpoilerBackgroundUpdater : public QObject
         inline QString getCardUpdaterBinaryName() { return "oracle"; };
 
     private slots:
-        void cardUpdateError(QProcess::ProcessError err);
-        void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
+        void actDownloadFinishedSpoilersFile();
 
     private:
         bool isSpoilerDownloadEnabled;
-        void downloadSpoilersFile();
         QProcess *cardUpdateProcess;
+        QByteArray spoilerData;
+        void startSpoilerDownloadProcess();
+        void downloadFromURL(QUrl url);
+        bool saveDownloadedFile(QByteArray data);
 };
 
 #endif //COCKATRICE_TIMERTHREAD_H

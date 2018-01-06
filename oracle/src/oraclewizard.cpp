@@ -46,10 +46,9 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 
     importer = new OracleImporter(settingsCache->getDataPath(), this);
 
-    addPage(new IntroPage);
-
     if (! isSpoilersOnly)
     {
+        addPage(new IntroPage);
         addPage(new LoadSetsPage);
         addPage(new SaveSetsPage);
         addPage(new LoadTokensPage);
@@ -902,6 +901,7 @@ SaveSpoilersPage::SaveSpoilersPage(QWidget *parent) : OracleWizardPage(parent)
     layout->addWidget(defaultPathCheckBox, 0, 0);
 
     setLayout(layout);
+
 }
 
 void SaveSpoilersPage::retranslateUi()
@@ -947,9 +947,6 @@ bool SaveSpoilersPage::validatePage()
         if (wizard()->saveTokensToFile(fileName))
         {
             ok = true;
-            QMessageBox::information(this,
-                                     tr("Success"),
-                                     tr("The spoiler database has been saved successfully to\n%1").arg(fileName));
         }
         else
         {
