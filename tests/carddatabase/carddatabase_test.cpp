@@ -39,7 +39,7 @@ namespace {
 
         // load dummy cards and test result
         db->loadCardDatabases();
-        ASSERT_EQ(7, db->getCardList().size()) << "Wrong card count after load";
+        ASSERT_EQ(6, db->getCardList().size()) << "Wrong card count after load";
         ASSERT_EQ(3, db->getSetList().size()) << "Wrong sets count after load";
         ASSERT_EQ(4, db->getAllColors().size()) << "Wrong colors count after load";
         ASSERT_EQ(2, db->getAllMainCardTypes().size()) << "Wrong types count after load";
