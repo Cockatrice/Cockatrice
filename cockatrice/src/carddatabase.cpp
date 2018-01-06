@@ -852,11 +852,17 @@ void CardDatabase::checkUnknownSets()
         // if some sets are first found on thus run, ask the user
         int numUnknownSets = sets.getUnknownSetsNum();
         QStringList unknownSetNames = sets.getUnknownSetsNames();
-        if(numUnknownSets > 0)
+        if (numUnknownSets > 0)
+        {
             emit cardDatabaseNewSetsFound(numUnknownSets, unknownSetNames);
+        }
         else
+        {
             sets.markAllAsKnown();
-    } else {
+        }
+    }
+    else
+    {
         // No set enabled. Probably this is the first time running trice
         sets.guessSortKeys();
         sets.sortByKey();

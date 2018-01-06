@@ -76,11 +76,11 @@ const QStringList MainWindow::fileNameFilters = QStringList()
 
 void MainWindow::updateTabMenu(const QList<QMenu *> &newMenuList)
 {
-    for (int i = 0; i < tabMenus.size(); ++i)
-        menuBar()->removeAction(tabMenus[i]->menuAction());
+    for (auto &tabMenu : tabMenus)
+        menuBar()->removeAction(tabMenu->menuAction());
     tabMenus = newMenuList;
-    for (int i = 0; i < tabMenus.size(); ++i)
-        menuBar()->insertMenu(helpMenu->menuAction(), tabMenus[i]);
+    for (auto &tabMenu : tabMenus)
+        menuBar()->insertMenu(helpMenu->menuAction(), tabMenu);
 }
 
 void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &event)
@@ -166,10 +166,10 @@ void MainWindow::activateAccepted()
 
 void MainWindow::actConnect()
 {
-    DlgConnect *dlg = new DlgConnect(this);
+    auto *dlg = new DlgConnect(this);
     connect(dlg, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
     if (dlg->exec())
-        client->connectToServer(dlg->getHost(), dlg->getPort(), dlg->getPlayerName(), dlg->getPassword());
+        client->connectToServer(dlg->getHost(), static_cast<unsigned int>(dlg->getPort()), dlg->getPlayerName(), dlg->getPassword());
 }
 
 void MainWindow::actRegister()
@@ -179,7 +179,7 @@ void MainWindow::actRegister()
     {
         client->registerToServer(
             dlg.getHost(),
-            dlg.getPort(),
+            static_cast<unsigned int>(dlg.getPort()),
             dlg.getPlayerName(),
             dlg.getPassword(),
             dlg.getEmail(),
@@ -220,7 +220,7 @@ void MainWindow::actSinglePlayer()
     tabSupervisor->startLocal(localClients);
 
     Command_CreateGame createCommand;
-    createCommand.set_max_players(numberPlayers);
+    createCommand.set_max_players(static_cast<google::protobuf::uint32>(numberPlayers));
     mainClient->sendCommand(mainClient->prepareRoomCommand(createCommand, 0));
 }
 
@@ -239,7 +239,7 @@ void MainWindow::actWatchReplay()
     QByteArray buf = file.readAll();
     file.close();
 
-    GameReplay *replay = new GameReplay;
+    auto *replay = new GameReplay;
     replay->ParseFromArray(buf.data(), buf.size());
 
     tabSupervisor->openReplay(replay);
@@ -248,7 +248,7 @@ void MainWindow::actWatchReplay()
 void MainWindow::localGameEnded()
 {
     delete localServer;
-    localServer = 0;
+    localServer = nullptr;
 
     aConnect->setEnabled(true);
     aRegister->setEnabled(true);
@@ -257,7 +257,7 @@ void MainWindow::localGameEnded()
 
 void MainWindow::actDeckEditor()
 {
-    tabSupervisor->addDeckEditorTab(0);
+    tabSupervisor->addDeckEditorTab(nullptr);
 }
 
 void MainWindow::actFullScreen(bool checked)
@@ -655,7 +655,7 @@ void MainWindow::createMenus()
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), localServer(0), bHasActivated(false), cardUpdateProcess(0), logviewDialog(0)
+    : QMainWindow(parent), localServer(nullptr), bHasActivated(false), cardUpdateProcess(nullptr), logviewDialog(nullptr)
 {
     connect(settingsCache, SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
     pixmapCacheSizeChanged(settingsCache->getPixmapCacheSize());
@@ -691,7 +691,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
     connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
     connect(tabSupervisor, SIGNAL(showWindowIfHidden()), this, SLOT(showWindowIfHidden()));
-    tabSupervisor->addDeckEditorTab(0);
+    tabSupervisor->addDeckEditorTab(nullptr);
 
     setCentralWidget(tabSupervisor);
 
@@ -699,7 +699,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     resize(900, 700);
     restoreGeometry(settingsCache->getMainWindowGeometry());
-    aFullScreen->setChecked(windowState() & Qt::WindowFullScreen);
+    aFullScreen->setChecked(static_cast<bool>(windowState() & Qt::WindowFullScreen));
 
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
         createTrayActions();
@@ -727,7 +727,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::createTrayIcon() {
-    QMenu *trayIconMenu = new QMenu(this);
+    auto *trayIconMenu = new QMenu(this);
     trayIconMenu->addAction(closeAction);
 
     trayIcon = new QSystemTrayIcon(this);
@@ -754,7 +754,7 @@ void MainWindow::promptForgotPasswordChallenge()
 {
     DlgForgotPasswordChallenge dlg(this);
     if (dlg.exec())
-        client->submitForgotPasswordChallengeToServer(dlg.getHost(),dlg.getPort(),dlg.getPlayerName(),dlg.getEmail());
+        client->submitForgotPasswordChallengeToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(), dlg.getEmail());
 }
 
 
@@ -794,7 +794,7 @@ void MainWindow::changeEvent(QEvent *event)
             if(settingsCache->servers().getAutoConnect()) {
                 qDebug() << "Attempting auto-connect...";
                  DlgConnect dlg(this);
-                 client->connectToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getPassword());
+                 client->connectToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(), dlg.getPassword());
             }
         }
     }
@@ -856,11 +856,17 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
 
     msgBox.exec();
 
-    if (msgBox.clickedButton() == yesButton) {
+    if (msgBox.clickedButton() == yesButton)
+    {
         db->enableAllUnknownSets();
-    } else if (msgBox.clickedButton() == noButton) {
+        actEditSets();
+    }
+    else if (msgBox.clickedButton() == noButton)
+    {
         db->markAllSetsAsKnown();
-    } else if (msgBox.clickedButton() == settingsButton) {
+    }
+    else if (msgBox.clickedButton() == settingsButton)
+    {
         db->markAllSetsAsKnown();
         actEditSets();
     }
@@ -945,7 +951,7 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
     }
 
     cardUpdateProcess->deleteLater();
-    cardUpdateProcess = 0;
+    cardUpdateProcess = nullptr;
 
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error: %1").arg(error));
 }
@@ -953,10 +959,9 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
 void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
 {
     cardUpdateProcess->deleteLater();
-    cardUpdateProcess = 0;
+    cardUpdateProcess = nullptr;
 
     QMessageBox::information(this, tr("Information"), tr("Update completed successfully.\nCockatrice will now reload the card database."));
-
     QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 }
 
@@ -988,7 +993,7 @@ void MainWindow::actOpenCustomFolder()
 #if defined(Q_OS_MAC)
     QStringList scriptArgs;
     scriptArgs << QLatin1String("-e");
-    scriptArgs << QString::fromLatin1("tell application \"Finder\" to open POSIX file \"%1\"").arg(dir);
+    scriptArgs << QString::fromLatin1(R"(tell application "Finder" to open POSIX file "%1")").arg(dir);
     scriptArgs << QLatin1String("-e");
     scriptArgs << QLatin1String("tell application \"Finder\" to activate");
 
@@ -1007,7 +1012,7 @@ void MainWindow::actOpenCustomsetsFolder()
 #if defined(Q_OS_MAC)
     QStringList scriptArgs;
     scriptArgs << QLatin1String("-e");
-    scriptArgs << QString::fromLatin1("tell application \"Finder\" to open POSIX file \"%1\"").arg(dir);
+    scriptArgs << QString::fromLatin1(R"(tell application "Finder" to open POSIX file "%1")").arg(dir);
     scriptArgs << QLatin1String("-e");
     scriptArgs << QLatin1String("tell application \"Finder\" to activate");
 
@@ -1093,7 +1098,7 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir) {
 
 void MainWindow::actEditSets()
 {
-    WndSets *w = new WndSets;
+    auto *w = new WndSets;
     w->setWindowModality(Qt::WindowModal);
     w->show();
 }
@@ -1109,7 +1114,7 @@ void MainWindow::actForgotPasswordRequest()
 {
     DlgForgotPasswordRequest dlg(this);
     if (dlg.exec())
-        client->requestForgotPasswordToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName());
+        client->requestForgotPasswordToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName());
 }
 
 void MainWindow::forgotPasswordSuccess()
@@ -1133,5 +1138,5 @@ void MainWindow::promptForgotPasswordReset()
     QMessageBox::information(this, tr("Forgot Password"), tr("Activation request received, please check your email for an activation token."));
     DlgForgotPasswordReset dlg(this);
     if (dlg.exec())
-        client->submitForgotPasswordResetToServer(dlg.getHost(), dlg.getPort(), dlg.getPlayerName(), dlg.getToken(), dlg.getPassword());
+        client->submitForgotPasswordResetToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(), dlg.getToken(), dlg.getPassword());
 }

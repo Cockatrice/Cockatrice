@@ -16,8 +16,7 @@
 
 #define PUBLIC_SERVERS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers"
 
-DlgConnect::DlgConnect(QWidget *parent)
-    : QDialog(parent)
+DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
     previousHostButton = new QRadioButton(tr("Known Hosts"), this);
     previousHosts = new QComboBox(this);
@@ -64,7 +63,7 @@ DlgConnect::DlgConnect(QWidget *parent)
 
     if (savePasswordCheckBox->isChecked())
     {
-        autoConnectCheckBox->setChecked(settingsCache->servers().getAutoConnect());
+        autoConnectCheckBox->setChecked(static_cast<bool>(settingsCache->servers().getAutoConnect()));
         autoConnectCheckBox->setEnabled(true);
     }
     else
@@ -87,11 +86,11 @@ DlgConnect::DlgConnect(QWidget *parent)
     btnCancel->setFixedWidth(100);
     connect(btnCancel, SIGNAL(released()), this, SLOT(actCancel()));
 
-    QGridLayout *newHostLayout = new QGridLayout;
+    auto *newHostLayout = new QGridLayout;
     newHostLayout->addWidget(newHostButton, 0, 1);
     newHostLayout->addWidget(publicServersLabel, 0, 2);
 
-    QGridLayout *connectionLayout = new QGridLayout;
+    auto *connectionLayout = new QGridLayout;
     connectionLayout->addWidget(previousHostButton, 0, 1);
     connectionLayout->addWidget(previousHosts, 1, 1);
     connectionLayout->addLayout(newHostLayout, 2, 1, 1, 2);
@@ -103,7 +102,7 @@ DlgConnect::DlgConnect(QWidget *parent)
     connectionLayout->addWidget(portEdit, 5, 1);
     connectionLayout->addWidget(autoConnectCheckBox, 6, 1);
 
-    QGridLayout *buttons = new QGridLayout;
+    auto *buttons = new QGridLayout;
     buttons->addWidget(btnOk, 0, 0);
     buttons->addWidget(btnForgotPassword, 0, 1);
     buttons->addWidget(btnCancel, 0, 2);
@@ -111,7 +110,7 @@ DlgConnect::DlgConnect(QWidget *parent)
     QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Server"));
     restrictionsGroupBox->setLayout(connectionLayout);
 
-    QGridLayout *loginLayout = new QGridLayout;
+    auto *loginLayout = new QGridLayout;
     loginLayout->addWidget(playernameLabel, 0, 0);
     loginLayout->addWidget(playernameEdit, 0, 1);
     loginLayout->addWidget(passwordLabel, 1, 0);
@@ -124,12 +123,12 @@ DlgConnect::DlgConnect(QWidget *parent)
     QGroupBox *btnGroupBox = new QGroupBox(tr(""));
     btnGroupBox->setLayout(buttons);
 
-    QGridLayout *grid = new QGridLayout;
+    auto *grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
     grid->addWidget(loginGroupBox, 1, 0);
     grid->addWidget(btnGroupBox, 2, 0);
-         
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
     setLayout(mainLayout);
 
@@ -289,9 +288,9 @@ void DlgConnect::actCancel()
 bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        auto *keyEvent = dynamic_cast<QKeyEvent *>(event);
         if (keyEvent->key() == Qt::Key_Delete) {
-            QComboBox* combobox = reinterpret_cast<QComboBox *>(obj);
+            auto *combobox = reinterpret_cast<QComboBox *>(obj);
             combobox->removeItem(combobox->currentIndex());
             return true;
         }

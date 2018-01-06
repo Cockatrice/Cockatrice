@@ -121,36 +121,39 @@ private:
     
 public:
     UserInterfaceSettingsPage();
-    void retranslateUi();
+    void retranslateUi() override;
 };
 
 class DeckEditorSettingsPage : public AbstractSettingsPage
 {
-Q_OBJECT
-public:
-    DeckEditorSettingsPage();
-    void retranslateUi();
-private slots:
-    void setSpoilersEnabled(bool);
-    void spoilerPathButtonClicked();
-signals:
-private:
-    QCheckBox mcDownloadSpoilersCheckBox;
-    QComboBox msDownloadSpoilersTimeIntervalComboBox;
-    QLabel msDownloadSpoilersLabel;
-    QGroupBox *mpGeneralGroupBox;
-    QGroupBox *mpSpoilerGroupBox;
-    QLineEdit *mpSpoilerSavePathLineEdit;
-    QLabel mcSpoilerSaveLabel;
-    QLabel mcGeneralMessageLabel;
-    QPushButton *mpSpoilerPathButton;
+    Q_OBJECT
+    public:
+        DeckEditorSettingsPage();
+        void retranslateUi() override;
+
+    private slots:
+        void setSpoilersEnabled(bool);
+        void spoilerPathButtonClicked();
+        void updateSpoilers();
+
+    private:
+        QCheckBox mcDownloadSpoilersCheckBox;
+        QLabel msDownloadSpoilersLabel;
+        QGroupBox *mpGeneralGroupBox;
+        QGroupBox *mpSpoilerGroupBox;
+        QLineEdit *mpSpoilerSavePathLineEdit;
+        QLabel mcSpoilerSaveLabel;
+        QLabel mcGeneralMessageLabel;
+        QLabel infoOnSpoilersLabel;
+        QPushButton *mpSpoilerPathButton;
+        QPushButton *updateNowButton;
 };
 
 class MessagesSettingsPage : public AbstractSettingsPage {
     Q_OBJECT
 public:
     MessagesSettingsPage();
-    void retranslateUi();
+    void retranslateUi() override;
 private slots:
     void actAdd();
     void actRemove();

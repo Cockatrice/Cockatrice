@@ -90,6 +90,10 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
             qDebug() << "Spoiler Service Offline";
         }
     }
+    else
+    {
+        qDebug() << "ERROR WITH DOWNLOAD: " << errorCode;
+    }
 }
 
 bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
@@ -118,6 +122,7 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 
     file.close();
 
+    // Data written, so reload the card database
     qDebug() << "Spoiler Service Data Written";
     QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 
@@ -133,6 +138,7 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
             {
                 QString timeStamp = QString(line).replace("created:", "").trimmed();
                 trayIcon->showMessage(tr("Spoilers have been updated!"), timeStamp);
+                emit spoilersUpdatedSuccessfully();
                 return true;
             }
         }

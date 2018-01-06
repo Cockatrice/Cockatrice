@@ -30,6 +30,7 @@
 #include "releasechannel.h"
 #include "soundengine.h"
 #include "sequenceEdit/shortcutstab.h"
+#include "spoilerbackgroundupdater.h"
 
 #define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Picture-Download-URLs"
 
@@ -81,7 +82,7 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     setEnabledStatus(settingsCache->getPicDownload());
 
-    QGridLayout *personalGrid = new QGridLayout;
+    auto *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
     personalGrid->addWidget(&languageBox, 0, 1);
     personalGrid->addWidget(&updateReleaseChannelLabel, 1, 0);
@@ -130,7 +131,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
     
-    if(settingsCache->getIsPortableBuild())
+    if (settingsCache->getIsPortableBuild())
     {
         deckPathEdit->setEnabled(false);
         replaysPathEdit->setEnabled(false);
@@ -145,7 +146,7 @@ GeneralSettingsPage::GeneralSettingsPage()
         tokenDatabasePathButton->setVisible(false);
     }
 
-    QGridLayout *pathsGrid = new QGridLayout;
+    auto *pathsGrid = new QGridLayout;
     pathsGrid->addWidget(&deckPathLabel, 0, 0);
     pathsGrid->addWidget(deckPathEdit, 0, 1);
     pathsGrid->addWidget(deckPathButton, 0, 2);
@@ -164,7 +165,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     pathsGroupBox = new QGroupBox;
     pathsGroupBox->setLayout(pathsGrid);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(personalGroupBox);
     mainLayout->addWidget(pathsGroupBox);
     
@@ -332,8 +333,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     }
 
     connect(&themeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(themeBoxChanged(int)));
-    
-    QGridLayout *themeGrid = new QGridLayout;
+
+    auto *themeGrid = new QGridLayout;
     themeGrid->addWidget(&themeLabel, 0, 0);
     themeGrid->addWidget(&themeBox, 0, 1);
 
@@ -345,8 +346,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     cardScalingCheckBox.setChecked(settingsCache->getScaleCards());
     connect(&cardScalingCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setCardScaling(int)));
-    
-    QGridLayout *cardsGrid = new QGridLayout;
+
+    auto *cardsGrid = new QGridLayout;
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
     cardsGrid->addWidget(&cardScalingCheckBox, 1, 0, 1, 2);
     
@@ -358,8 +359,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     leftJustifiedHandCheckBox.setChecked(settingsCache->getLeftJustified());
     connect(&leftJustifiedHandCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setLeftJustified(int)));
-    
-    QGridLayout *handGrid = new QGridLayout;
+
+    auto *handGrid = new QGridLayout;
     handGrid->addWidget(&horizontalHandCheckBox, 0, 0, 1, 2);
     handGrid->addWidget(&leftJustifiedHandCheckBox, 1, 0, 1, 2);
     
@@ -380,7 +381,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     maxFontSizeForCardsEdit.setMinimum(9);
     maxFontSizeForCardsEdit.setMaximum(100);
 
-    QGridLayout *tableGrid = new QGridLayout;
+    auto *tableGrid = new QGridLayout;
     tableGrid->addWidget(&invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
     tableGrid->addWidget(&minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
     tableGrid->addWidget(&minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
@@ -389,8 +390,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     
     tableGroupBox = new QGroupBox;
     tableGroupBox->setLayout(tableGrid);
-    
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(themeGroupBox);
     mainLayout->addWidget(cardsGroupBox);
     mainLayout->addWidget(handGroupBox);
@@ -444,7 +445,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     annotateTokensCheckBox.setChecked(settingsCache->getAnnotateTokens());
     connect(&annotateTokensCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setAnnotateTokens(int)));
 
-    QGridLayout *generalGrid = new QGridLayout;
+    auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&notificationsEnabledCheckBox, 0, 0);
     generalGrid->addWidget(&specNotificationsEnabledCheckBox, 1, 0);
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 2, 0);
@@ -456,14 +457,14 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     
     tapAnimationCheckBox.setChecked(settingsCache->getTapAnimation());
     connect(&tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
-    
-    QGridLayout *animationGrid = new QGridLayout;
+
+    auto *animationGrid = new QGridLayout;
     animationGrid->addWidget(&tapAnimationCheckBox, 0, 0);
     
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(generalGroupBox);
     mainLayout->addWidget(animationGroupBox);
     
@@ -486,7 +487,6 @@ void UserInterfaceSettingsPage::retranslateUi()
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
 }
 
-
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
     auto *lpGeneralGrid = new QGridLayout;
@@ -499,15 +499,21 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     mpSpoilerPathButton = new QPushButton("...");
     connect(mpSpoilerPathButton, SIGNAL(clicked()), this, SLOT(spoilerPathButtonClicked()));
 
+    updateNowButton = new QPushButton(tr("Update Spoilers"));
+    connect(updateNowButton, SIGNAL(clicked()), this, SLOT(updateSpoilers()));
+
     // Update the GUI depending on if the box is ticked or not
     setSpoilersEnabled(mcDownloadSpoilersCheckBox.isChecked());
 
     // Create the layout
+    lpGeneralGrid->addWidget(&mcGeneralMessageLabel, 0, 0);
+
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
+    lpSpoilerGrid->addWidget(updateNowButton, 0, 2);
     lpSpoilerGrid->addWidget(&mcSpoilerSaveLabel, 1, 0);
     lpSpoilerGrid->addWidget(mpSpoilerSavePathLineEdit, 1, 1);
     lpSpoilerGrid->addWidget(mpSpoilerPathButton, 1, 2);
-    lpGeneralGrid->addWidget(&mcGeneralMessageLabel, 0, 0);
+    lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 2, 0, 1, 3, Qt::AlignTop);
 
     // On a change to the check box, hide/unhide the other fields
     // On a change to the combo box, send a signal to the timer threads
@@ -525,6 +531,12 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpMainLayout->addWidget(mpSpoilerGroupBox);
 
     setLayout(lpMainLayout);
+}
+
+void DeckEditorSettingsPage::updateSpoilers()
+{
+    // This will launch the spoiler checker as if the client was anew
+    new SpoilerBackgroundUpdater();
 }
 
 void DeckEditorSettingsPage::spoilerPathButtonClicked()
@@ -545,6 +557,8 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
     mcSpoilerSaveLabel.setEnabled(anInput);
     mpSpoilerSavePathLineEdit->setEnabled(anInput);
     mpSpoilerPathButton->setEnabled(anInput);
+    updateNowButton->setEnabled(anInput);
+    infoOnSpoilersLabel.setEnabled(anInput);
 }
 
 void DeckEditorSettingsPage::retranslateUi()
@@ -553,6 +567,11 @@ void DeckEditorSettingsPage::retranslateUi()
     mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
     mcGeneralMessageLabel.setText(tr("Hey, something's here finally!"));
+    infoOnSpoilersLabel.setText(
+            tr("Spoilers will download automatically on launch") + "\n" +
+            tr("Press the button to manually update without relaunching") + "\n" +
+            tr("It will take a moment to download, so be patient")
+    );
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
@@ -593,7 +612,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     customAlertString->setText(settingsCache->getHighlightWords());
     connect(customAlertString, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighlightWords(QString)));
 
-    QGridLayout *chatGrid = new QGridLayout;
+    auto *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
     chatGrid->addWidget(&invertMentionForeground, 0, 1);
     chatGrid->addWidget(mentionColor, 0, 2);
@@ -612,7 +631,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     updateHighlightPreview();
     connect(highlightColor, SIGNAL(textChanged(QString)), this, SLOT(updateHighlightColor(QString)));
 
-    QGridLayout *highlightNotice = new QGridLayout;
+    auto *highlightNotice = new QGridLayout;
     highlightNotice->addWidget(highlightColor, 0, 2);
     highlightNotice->addWidget(&invertHighlightForeground, 0, 1);
     highlightNotice->addWidget(&hexHighlightLabel, 1, 2);
@@ -634,19 +653,19 @@ MessagesSettingsPage::MessagesSettingsPage()
     aRemove->setIcon(QPixmap("theme:icons/decrement"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
 
-    QToolBar *messageToolBar = new QToolBar;
+    auto *messageToolBar = new QToolBar;
     messageToolBar->setOrientation(Qt::Vertical);
     messageToolBar->addAction(aAdd);
     messageToolBar->addAction(aRemove);
 
-    QHBoxLayout *messageListLayout = new QHBoxLayout;
+    auto *messageListLayout = new QHBoxLayout;
     messageListLayout->addWidget(messageToolBar);
     messageListLayout->addWidget(messageList);
 
     messageShortcuts = new QGroupBox;
     messageShortcuts->setLayout(messageListLayout);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
 
     mainLayout->addWidget(messageShortcuts);
     mainLayout->addWidget(chatGroupBox);
@@ -657,7 +676,8 @@ MessagesSettingsPage::MessagesSettingsPage()
     retranslateUi();
 }
 
-void MessagesSettingsPage::updateColor(const QString &value) {
+void MessagesSettingsPage::updateColor(const QString &value)
+{
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
     if (colorToSet.isValid()) {
@@ -666,7 +686,8 @@ void MessagesSettingsPage::updateColor(const QString &value) {
     }
 }
 
-void MessagesSettingsPage::updateHighlightColor(const QString &value) {
+void MessagesSettingsPage::updateHighlightColor(const QString &value)
+{
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
     if (colorToSet.isValid()) {
@@ -675,22 +696,26 @@ void MessagesSettingsPage::updateHighlightColor(const QString &value) {
     }
 }
 
-void MessagesSettingsPage::updateTextColor(int value) {
+void MessagesSettingsPage::updateTextColor(int value)
+{
     settingsCache->setChatMentionForeground(value);
     updateMentionPreview();
 }
 
-void MessagesSettingsPage::updateTextHighlightColor(int value) {
+void MessagesSettingsPage::updateTextHighlightColor(int value)
+{
     settingsCache->setChatHighlightForeground(value);
     updateHighlightPreview();
 }
 
-void MessagesSettingsPage::updateMentionPreview() {
+void MessagesSettingsPage::updateMentionPreview()
+{
     mentionColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatMentionColor() + 
         ";color: " + (settingsCache->getChatMentionForeground() ? "white" : "black") + ";}");
 }
 
-void MessagesSettingsPage::updateHighlightPreview() {
+void MessagesSettingsPage::updateHighlightPreview()
+{
     highlightColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatHighlightColor() +
         ";color: " + (settingsCache->getChatHighlightForeground() ? "white" : "black") + ";}");
 }
@@ -773,7 +798,7 @@ SoundSettingsPage::SoundSettingsPage()
     connect(masterVolumeSlider, SIGNAL(valueChanged(int)), masterVolumeSpinBox, SLOT(setValue(int)));
     connect(masterVolumeSpinBox, SIGNAL(valueChanged(int)), masterVolumeSlider, SLOT(setValue(int)));
 
-    QGridLayout *soundGrid = new QGridLayout;
+    auto *soundGrid = new QGridLayout;
     soundGrid->addWidget(&soundEnabledCheckBox, 0, 0, 1, 3);
     soundGrid->addWidget(&masterVolumeLabel, 1, 0);
     soundGrid->addWidget(masterVolumeSlider, 1, 1);
@@ -785,7 +810,7 @@ SoundSettingsPage::SoundSettingsPage()
     soundGroupBox = new QGroupBox;
     soundGroupBox->setLayout(soundGrid);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(soundGroupBox);
 
     setLayout(mainLayout);
@@ -798,11 +823,13 @@ void SoundSettingsPage::themeBoxChanged(int index)
         settingsCache->setSoundThemeName(themeDirs.at(index));
 }
 
-void SoundSettingsPage::masterVolumeChanged(int value) {
+void SoundSettingsPage::masterVolumeChanged(int value)
+{
     masterVolumeSlider->setToolTip(QString::number(value));
 }
 
-void SoundSettingsPage::retranslateUi() {
+void SoundSettingsPage::retranslateUi()
+{
     soundEnabledCheckBox.setText(tr("Enable &sounds"));
     themeLabel.setText(tr("Current sounds theme:"));
     soundTestButton.setText(tr("Test system sound engine"));
@@ -810,8 +837,7 @@ void SoundSettingsPage::retranslateUi() {
     masterVolumeLabel.setText(tr("Master volume"));    
 }
 
-DlgSettings::DlgSettings(QWidget *parent)
-    : QDialog(parent)
+DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 {
     QRect rec = QApplication::desktop()->availableGeometry();
     this->setMinimumSize(rec.width() / 2, rec.height() - 100);
@@ -838,15 +864,15 @@ DlgSettings::DlgSettings(QWidget *parent)
     
     createIcons();
     contentsWidget->setCurrentRow(0);
-    
-    QVBoxLayout *vboxLayout = new QVBoxLayout;
+
+    auto *vboxLayout = new QVBoxLayout;
     vboxLayout->addWidget(contentsWidget);
     vboxLayout->addWidget(pagesWidget);
     
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(close()));
-    
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(vboxLayout);
     mainLayout->addSpacing(12);
     mainLayout->addWidget(buttonBox);
@@ -905,7 +931,8 @@ void DlgSettings::changePage(QListWidgetItem *current, QListWidgetItem *previous
     pagesWidget->setCurrentIndex(contentsWidget->row(current));
 }
 
-void DlgSettings::setTab(int index) {
+void DlgSettings::setTab(int index)
+{
     if (index <= contentsWidget->count()-1 && index >= 0) {
         changePage(contentsWidget->item(index), contentsWidget->currentItem());
         contentsWidget->setCurrentRow(index);

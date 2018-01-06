@@ -24,6 +24,9 @@ class SpoilerBackgroundUpdater : public QObject
         void startSpoilerDownloadProcess(QString url, bool saveResults);
         void downloadFromURL(QUrl url, bool saveResults);
         bool saveDownloadedFile(QByteArray data);
+
+    signals:
+        void spoilersUpdatedSuccessfully();
 };
 
 #endif //COCKATRICE_TIMERTHREAD_H
