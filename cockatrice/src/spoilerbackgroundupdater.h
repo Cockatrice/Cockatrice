@@ -14,13 +14,15 @@ class SpoilerBackgroundUpdater : public QObject
 
     private slots:
         void actDownloadFinishedSpoilersFile();
+        void actCheckIfSpoilerSeasonEnabled();
 
     private:
         bool isSpoilerDownloadEnabled;
         QProcess *cardUpdateProcess;
         QByteArray spoilerData;
-        void startSpoilerDownloadProcess();
-        void downloadFromURL(QUrl url);
+        bool isSpoilerSeason;
+        void startSpoilerDownloadProcess(QString url, bool saveResults);
+        void downloadFromURL(QUrl url, bool saveResults);
         bool saveDownloadedFile(QByteArray data);
 };
 
