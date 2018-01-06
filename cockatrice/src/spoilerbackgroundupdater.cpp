@@ -17,9 +17,13 @@
 
 SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(apParent), cardUpdateProcess(nullptr)
 {
-    // Start the process of checking if we're in spoiler season
-    // "enabled" means yes, anything else means no
-    startSpoilerDownloadProcess(SPOILERS_STATUS_URL, false);
+    isSpoilerDownloadEnabled = settingsCache->getDownloadSpoilersStatus();
+    if (isSpoilerDownloadEnabled)
+    {
+        // Start the process of checking if we're in spoiler season
+        // "enabled" means yes, anything else means no
+        startSpoilerDownloadProcess(SPOILERS_STATUS_URL, false);
+    }
 }
 
 void SpoilerBackgroundUpdater::startSpoilerDownloadProcess(QString url, bool saveResults)
@@ -79,12 +83,7 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
         if (isSpoilerSeason)
         {
             qDebug() << "Spoiler Service Online";
-
-            isSpoilerDownloadEnabled = settingsCache->getDownloadSpoilersStatus();
-            if (isSpoilerDownloadEnabled)
-            {
-                startSpoilerDownloadProcess(SPOILERS_URL, true);
-            }
+            startSpoilerDownloadProcess(SPOILERS_URL, true);
         }
         else
         {
