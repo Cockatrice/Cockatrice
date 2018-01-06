@@ -119,6 +119,7 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
     file.close();
 
     qDebug() << "Spoiler Service Data Written";
+    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 
     // If the user has notifications enabled, let them know
     // when the database was last updated
