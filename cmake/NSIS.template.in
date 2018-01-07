@@ -196,6 +196,17 @@ ${If} $PortableMode = 0
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "InstallLocation" "$INSTDIR"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayIcon" "$INSTDIR\cockatrice.exe"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "EstimatedSize" "$0"
+
+	IfFileExists "$INSTDIR\vc_redist.x86.exe" VcRedist86Exists PastVcRedist86Check
+	VcRedist86Exists:
+		ExecWait '"$INSTDIR\vc_redist.x86.exe"  /quiet /norestart'
+	PastVcRedist86Check:
+
+	IfFileExists "$INSTDIR\vc_redist.x64.exe" VcRedist64Exists PastVcRedist64Check
+	VcRedist64Exists:
+		ExecWait '"$INSTDIR\vc_redist.x64.exe"  /quiet /norestart'
+	PastVcRedist64Check:
+
 ${Else}
     ; Create the file the application uses to detect portable mode
     FileOpen $0 "$INSTDIR\portable.dat" w
@@ -220,20 +231,12 @@ Section "un.Application" UnSecApplication
 	RMDir /r "$INSTDIR\sounds"
 	RMDir /r "$INSTDIR\themes"
 	RMDir /r "$INSTDIR\translations"
-	Delete "$INSTDIR\uninstall.exe"
-	Delete "$INSTDIR\cockatrice.exe"
-	Delete "$INSTDIR\oracle.exe"
-	Delete "$INSTDIR\servatrice.exe"
-	Delete "$INSTDIR\Qt*.dll"
-	Delete "$INSTDIR\libmysql.dll"
-	Delete "$INSTDIR\icu*.dll"
-	Delete "$INSTDIR\libeay32.dll"
-	Delete "$INSTDIR\ssleay32.dll"
+	Delete "$INSTDIR\*.exe"
+	Delete "$INSTDIR\*.dll"
 	Delete "$INSTDIR\qt.conf"
 	Delete "$INSTDIR\qdebug.txt"
 	Delete "$INSTDIR\servatrice.sql"
 	Delete "$INSTDIR\servatrice.ini.example"
-	Delete "$INSTDIR\zlib*.dll"
 	RMDir "$INSTDIR"
 
 	RMDir "$SMPROGRAMS\Cockatrice"
