@@ -712,7 +712,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(db, SIGNAL(cardDatabaseLoadingFailed()), this, SLOT(cardDatabaseLoadingFailed()));
     connect(db, SIGNAL(cardDatabaseNewSetsFound(int, QStringList)), this, SLOT(cardDatabaseNewSetsFound(int, QStringList)));
     connect(db, SIGNAL(cardDatabaseAllNewSetsEnabled()), this, SLOT(cardDatabaseAllNewSetsEnabled()));
-    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+
+    if (! settingsCache->getDownloadSpoilersStatus())
+    {
+        qDebug() << "Spoilers Disabled, Reloading Database";
+        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -1029,16 +1034,20 @@ void MainWindow::actAddCustomSet()
     QFileDialog dialog(this, tr("Load sets/cards"), QDir::homePath());
     dialog.setNameFilters(MainWindow::fileNameFilters);
     if (!dialog.exec())
+    {
         return;
+    }
 
     QString fullFilePath = dialog.selectedFiles().at(0);
 
-    if (!QFile::exists(fullFilePath)) {
+    if (!QFile::exists(fullFilePath))
+    {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Selected file cannot be found."));
         return;
     }
 
-    if (QFileInfo(fullFilePath).suffix() != "xml") { // fileName = *.xml
+    if (QFileInfo(fullFilePath).suffix() != "xml") // fileName = *.xml
+    {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("You can only import XML databases at this time."));
         return;
     }
@@ -1046,7 +1055,7 @@ void MainWindow::actAddCustomSet()
     QDir dir = settingsCache->getCustomCardDatabasePath();
     int nextPrefix = getNextCustomSetPrefix(dir);
 
-    bool res = false;
+    bool res;
 
     QString fileName = QFileInfo(fullFilePath).fileName();
     if (fileName.compare("spoiler.xml", Qt::CaseInsensitive) == 0)
@@ -1082,7 +1091,8 @@ void MainWindow::actAddCustomSet()
     }
 }
 
-int MainWindow::getNextCustomSetPrefix(QDir dataDir) {
+int MainWindow::getNextCustomSetPrefix(QDir dataDir)
+{
     QStringList files = dataDir.entryList();
     int maxIndex = 0;
 
@@ -1138,5 +1148,8 @@ void MainWindow::promptForgotPasswordReset()
     QMessageBox::information(this, tr("Forgot Password"), tr("Activation request received, please check your email for an activation token."));
     DlgForgotPasswordReset dlg(this);
     if (dlg.exec())
-        client->submitForgotPasswordResetToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(), dlg.getToken(), dlg.getPassword());
+    {
+        client->submitForgotPasswordResetToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
+                                                  dlg.getPlayerName(), dlg.getToken(), dlg.getPassword());
+    }
 }
