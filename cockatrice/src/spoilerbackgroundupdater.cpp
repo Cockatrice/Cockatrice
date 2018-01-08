@@ -87,7 +87,13 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
         }
         else
         {
-            qDebug() << "Spoiler Service Offline";
+            qDebug() << "Spoiler Service Offline, Reloading Database";
+
+            /*
+             * ALERT: Ensure two reloads of the card database do not happen
+             * at the same time or a racetime condition can/will happen!
+             */
+            QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
         }
     }
     else
