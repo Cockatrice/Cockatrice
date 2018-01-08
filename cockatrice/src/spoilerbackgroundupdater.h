@@ -1,5 +1,5 @@
-#ifndef COCKATRICE_TIMERTHREAD_H
-#define COCKATRICE_TIMERTHREAD_H
+#ifndef COCKATRICE_SPOILER_DOWNLOADER_H
+#define COCKATRICE_SPOILER_DOWNLOADER_H
 
 #include <QObject>
 #include <QProcess>
@@ -29,4 +29,4 @@ class SpoilerBackgroundUpdater : public QObject
         void spoilersUpdatedSuccessfully();
 };
 
-#endif //COCKATRICE_TIMERTHREAD_H
+#endif //COCKATRICE_SPOILER_DOWNLOADER_H
