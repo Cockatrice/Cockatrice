@@ -516,7 +516,6 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 2, 0, 1, 3, Qt::AlignTop);
 
     // On a change to the check box, hide/unhide the other fields
-    // On a change to the combo box, send a signal to the timer threads
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), settingsCache, SLOT(setDownloadSpoilerStatus(bool)));
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
 

@@ -130,8 +130,9 @@ int main(int argc, char *argv[])
     
     settingsCache->setClientID(generateClientID());
 
-    // Once the cards load in, we will restart our spoiler timer
-    SpoilerBackgroundUpdater spoilerTimer;
+    // If spoiler mode is enabled, we will download the spoilers
+    // then reload the DB. otherwise just reload the DB
+    SpoilerBackgroundUpdater spoilerBackgroundUpdater;
 
     ui.show();
     qDebug("main(): ui.show() finished");

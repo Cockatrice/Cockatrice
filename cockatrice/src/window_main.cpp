@@ -715,6 +715,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     if (! settingsCache->getDownloadSpoilersStatus())
     {
+        /*
+         * ALERT: Ensure two reloads of the card database do not happen
+         * at the same time or a racetime condition can/will happen!
+         */
         qDebug() << "Spoilers Disabled, Reloading Database";
         QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
     }

@@ -122,7 +122,11 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 
     file.close();
 
-    // Data written, so reload the card database
+    /*
+     * Data written, so reload the card database
+     * ALERT: Ensure two reloads of the card database do not happen
+     * at the same time or a racetime condition can/will happen!
+     */
     qDebug() << "Spoiler Service Data Written";
     QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 
