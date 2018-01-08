@@ -20,25 +20,25 @@ const char *CardFilter::attrName(Attr a)
 {
     switch (a) {
         case AttrName:
-            return "name";
+            return "Name";
         case AttrType:
-            return "type";
+            return "Type";
         case AttrColor:
-            return "color";
+            return "Color";
         case AttrText:
-            return "text";
+            return "Text";
         case AttrSet:
-            return "set";
+            return "Set";
         case AttrManaCost:
-            return "mana cost";
+            return "Mana Cost";
         case AttrCmc:
-            return "cmc";
+            return "CMC";
         case AttrRarity:
-            return "rarity";
+            return "Rarity";
         case AttrPow:
-            return "power";
+            return "Power";
         case AttrTough:
-            return "toughness";
+            return "Toughness";
         default:
             return "";
     }
