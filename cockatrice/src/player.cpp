@@ -2676,7 +2676,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu) {
             if (relatedCards.at(0)->getDoesAttach()) {
                 createRelatedCards = new QAction(tr("Token: ") + tr("Attach to ") + "\"" + relatedCards.at(0)->getName() + "\"", this);
             } else
-                createRelatedCards = new QAction(tr("Token: ") + (relatedCards.at(0)->getIsVariable() ? "X " : QString(relatedCards.at(0)->getDefaultCount() == 1 ? "1x " : QString::number(relatedCards.at(0)->getDefaultCount()) + "x ")) + relatedCards.at(0)->getName(), this);
+                createRelatedCards = new QAction(tr("Token: ") + (relatedCards.at(0)->getIsVariable() ? "X " : QString(relatedCards.at(0)->getDefaultCount() == 1 ? QString() : QString::number(relatedCards.at(0)->getDefaultCount()) + "x ")) + relatedCards.at(0)->getName(), this);
             connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
             if (shortcutsActive) {
                 createRelatedCards->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
@@ -2692,9 +2692,9 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu) {
                 QString cardName = cardRelation->getName();
                 QAction *createRelated;
                 if (cardRelation->getDoesAttach())
-                    createRelated = new QAction(tr("Token: ") + tr("Attach to ") + cardName, this);
+                    createRelated = new QAction(tr("Token: ") + tr("Attach to ") + "\"" + cardName + "\"", this);
                 else
-                    createRelated = new QAction(tr("Token: ") + (cardRelation->getIsVariable() ? "X " : QString(cardRelation->getDefaultCount() == 1 ? QString() : QString::number(cardRelation->getDefaultCount()) + " ")) + cardName, this);
+                    createRelated = new QAction(tr("Token: ") + (cardRelation->getIsVariable() ? "X " : QString(cardRelation->getDefaultCount() == 1 ? QString() : QString::number(cardRelation->getDefaultCount()) + "x ")) + cardName, this);
                 createRelated->setData(QVariant(i));
                 connect(createRelated, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
                 cardMenu->addAction(createRelated);
