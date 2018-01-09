@@ -60,10 +60,11 @@ void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
     if (errorCode == QNetworkReply::NoError)
     {
         spoilerData = reply->readAll();
-        reply->deleteLater();
 
         // Save the spoiler.xml file to the disk
         saveDownloadedFile(spoilerData);
+
+        reply->deleteLater();
     }
     else
     {
@@ -89,6 +90,10 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
         if (file.exists() && file.remove())
         {
             qDebug() << "Spoiler Season Offline, Deleting spoiler.xml";
+            if (trayIcon)
+            {
+                trayIcon->showMessage(tr("Spoilers season has ended"), tr("Deleting spoiler.xml. Please run Oracle"));
+            }
         }
 
         /*
@@ -136,12 +141,14 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
     if (!file.open(QIODevice::WriteOnly))
     {
         qDebug() << "Spoiler Service Error: File open (w) failed for" << fileName;
+        file.close();
         return false;
     }
 
     if (file.write(data) == -1)
     {
         qDebug() << "Spoiler Service Error: File write (w) failed for" << fileName;
+        file.close();
         return false;
     }
 
@@ -188,6 +195,8 @@ QByteArray SpoilerBackgroundUpdater::getHash(const QString fileName)
         QCryptographicHash hash(QCryptographicHash::Algorithm::Md5);
         hash.addData(bytes);
 
+        qDebug() << "File Hash =" << hash.result();
+
         file.close();
         return hash.result();
     }
@@ -206,5 +215,8 @@ QByteArray SpoilerBackgroundUpdater::getHash(QByteArray data)
 
     QCryptographicHash hash(QCryptographicHash::Algorithm::Md5);
     hash.addData(bytes);
+
+    qDebug() << "Data Hash =" << hash.result();
+
     return hash.result();
 }

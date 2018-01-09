@@ -14,7 +14,7 @@ const char* CardDatabase::TOKENS_SETNAME = "TK";
 
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
 {
-    if (! set)
+    if (set == nullptr)
     {
         qDebug() << "&operator<< set is nullptr";
         return xml;
@@ -78,9 +78,9 @@ class SetList::KeyCompareFunctor
     public:
         inline bool operator()(CardSet *a, CardSet *b) const
         {
-            if (!a || !b)
+            if (a == nullptr || b == nullptr)
             {
-                qDebug() << "SetList a or b is null";
+                qDebug() << "SetList::KeyCompareFunctor a or b is null";
                 return false;
             }
 
@@ -158,7 +158,7 @@ void SetList::enableAll()
     {
         CardSet *set = at(i);
 
-        if (!set)
+        if (set == nullptr)
         {
             qDebug() << "enabledAll has null";
             continue;
@@ -198,7 +198,7 @@ void SetList::guessSortKeys()
     for (int i = 0; i < size(); ++i)
     {
         CardSet *set = at(i);
-        if (! set)
+        if (set == nullptr)
         {
             qDebug() << "guessSortKeys set is null";
             continue;
@@ -324,7 +324,7 @@ QString CardInfo::getCorrectedName() const
 
 void CardInfo::addToSet(CardSet *set)
 {
-    if (! set)
+    if (set == nullptr)
     {
         qDebug() << "addToSet(nullptr)";
         return;
@@ -387,9 +387,9 @@ const QChar CardInfo::getColorChar() const
 
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 {
-    if (! info)
+    if (info == nullptr)
     {
-        qDebug() << "operator<< (~376) info is nullptr";
+        qDebug() << "operator<< info is nullptr";
         return xml;
     }
 
@@ -574,7 +574,7 @@ void CardDatabase::addCard(CardInfo *card)
 
 void CardDatabase::removeCard(CardInfo *card)
 {
-    if (! card)
+    if (card == nullptr)
     {
         qDebug() << "removeCard(nullptr)";
         return;
@@ -939,7 +939,7 @@ bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
     xml.writeStartElement("cockatrice_carddatabase");
     xml.writeAttribute("version", QString::number(versionNeeded));
 
-    if (!tokens)
+    if (! tokens)
     {
         xml.writeStartElement("sets");
         QHashIterator<QString, CardSet *> setIterator(sets);
