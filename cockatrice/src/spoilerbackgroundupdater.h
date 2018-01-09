@@ -11,6 +11,8 @@ class SpoilerBackgroundUpdater : public QObject
     public:
         explicit SpoilerBackgroundUpdater(QObject *apParent = nullptr);
         inline QString getCardUpdaterBinaryName() { return "oracle"; };
+        QByteArray getHash(const QString fileName);
+        QByteArray getHash(QByteArray data);
 
     private slots:
         void actDownloadFinishedSpoilersFile();
@@ -20,7 +22,6 @@ class SpoilerBackgroundUpdater : public QObject
         bool isSpoilerDownloadEnabled;
         QProcess *cardUpdateProcess;
         QByteArray spoilerData;
-        bool isSpoilerSeason;
         void startSpoilerDownloadProcess(QString url, bool saveResults);
         void downloadFromURL(QUrl url, bool saveResults);
         bool saveDownloadedFile(QByteArray data);

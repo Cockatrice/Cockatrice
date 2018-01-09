@@ -6,13 +6,15 @@
 #include <QFile>
 #include <QApplication>
 #include <QtConcurrent>
+#include <QCryptographicHash>
+
 #include "spoilerbackgroundupdater.h"
 #include "settingscache.h"
 #include "carddatabase.h"
 #include "main.h"
 #include "window_main.h"
 
-#define SPOILERS_STATUS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/SpoilerSeasonStatus"
+#define SPOILERS_STATUS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/SpoilerSeasonEnabled"
 #define SPOILERS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/spoiler.xml"
 
 SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(apParent), cardUpdateProcess(nullptr)
@@ -21,7 +23,7 @@ SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(
     if (isSpoilerDownloadEnabled)
     {
         // Start the process of checking if we're in spoiler season
-        // "enabled" means yes, anything else means no
+        // File exists means we're in spoiler season
         startSpoilerDownloadProcess(SPOILERS_STATUS_URL, false);
     }
 }
@@ -63,42 +65,47 @@ void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
         // Save the spoiler.xml file to the disk
         saveDownloadedFile(spoilerData);
     }
+    else
+    {
+        qDebug() << "Error downloading spoilers file" << errorCode;
+    }
 }
 
 void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
 {
-    // Check for server reply
-    auto *reply = dynamic_cast<QNetworkReply *>(sender());
-    QNetworkReply::NetworkError errorCode = reply->error();
+    auto *response = dynamic_cast<QNetworkReply *>(sender());
+    QNetworkReply::NetworkError errorCode = response->error();
 
-    if (errorCode == QNetworkReply::NoError)
+    if (errorCode == QNetworkReply::ContentNotFoundError)
     {
-        spoilerData = reply->readAll();
-        reply->deleteLater();
+        // Spoiler season is offline at this point, so the spoiler.xml file can be safely deleted
+        // The user should run Oracle to get the latest card information
+        QString fileName = settingsCache->getSpoilerCardDatabasePath();
+        QFileInfo fi(fileName);
+        QDir fileDir(fi.path());
+        QFile file(fileName);
 
-        isSpoilerSeason = (spoilerData.indexOf("enabled") > -1);
-
-        // If it is spoiler season, go through the download process
-        // of spoiler.xml from Cockatrice/Magic-Spoiler
-        if (isSpoilerSeason)
+        // Delete the spoiler.xml file as we're not in spoiler season
+        if (file.exists() && file.remove())
         {
-            qDebug() << "Spoiler Service Online";
-            startSpoilerDownloadProcess(SPOILERS_URL, true);
+            qDebug() << "Spoiler Season Offline, Deleting spoiler.xml";
         }
-        else
-        {
-            qDebug() << "Spoiler Service Offline, Reloading Database";
 
-            /*
-             * ALERT: Ensure two reloads of the card database do not happen
-             * at the same time or a racetime condition can/will happen!
-             */
-            QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
-        }
+        /*
+         * ALERT: Ensure two reloads of the card database do not happen
+         * at the same time or a racetime condition can/will happen!
+         */
+        qDebug() << "Spoiler Season Offline, Reloading Database";
+        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    }
+    else if (errorCode == QNetworkReply::NoError)
+    {
+        qDebug() << "Spoiler Service Online";
+        startSpoilerDownloadProcess(SPOILERS_URL, true);
     }
     else
     {
-        qDebug() << "ERROR WITH DOWNLOAD: " << errorCode;
+        qDebug() << "Error: Spoiler download failed with reason" << errorCode;
     }
 }
 
@@ -110,6 +117,18 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 
     if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath()))
     {
+        return false;
+    }
+
+    // Check if the data matches. If it does, then spoilers are up to date.
+    if (getHash(fileName) == getHash(data))
+    {
+        if (trayIcon)
+        {
+            trayIcon->showMessage(tr("Spoilers already up to date"), tr("No new spoilers added"));
+        }
+        qDebug() << "Spoilers Up to Date, Reloading Database";
+        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
         return false;
     }
 
@@ -133,7 +152,7 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
      * ALERT: Ensure two reloads of the card database do not happen
      * at the same time or a racetime condition can/will happen!
      */
-    qDebug() << "Spoiler Service Data Written";
+    qDebug() << "Spoiler Service Data Written, Reloading Database";
     QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 
     // If the user has notifications enabled, let them know
@@ -147,7 +166,7 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
             if (line.indexOf("created:") > -1)
             {
                 QString timeStamp = QString(line).replace("created:", "").trimmed();
-                trayIcon->showMessage(tr("Spoilers have been updated!"), timeStamp);
+                trayIcon->showMessage(tr("Spoilers have been updated!"), tr("Last change:") + " " + timeStamp);
                 emit spoilersUpdatedSuccessfully();
                 return true;
             }
@@ -155,4 +174,37 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
     }
 
     return true;
+}
+
+QByteArray SpoilerBackgroundUpdater::getHash(const QString fileName)
+{
+    QFile file(fileName);
+
+    if (file.open(QFile::ReadOnly))
+    {
+        // Only read the first 512 bytes (enough to get the "created" tag)
+        const QByteArray bytes = file.read(512);
+
+        QCryptographicHash hash(QCryptographicHash::Algorithm::Md5);
+        hash.addData(bytes);
+
+        file.close();
+        return hash.result();
+    }
+    else
+    {
+        qDebug() << "getHash ReadOnly failed!";
+        file.close();
+        return QByteArray();
+    }
+}
+
+QByteArray SpoilerBackgroundUpdater::getHash(QByteArray data)
+{
+    // Only read the first 512 bytes (enough to get the "created" tag)
+    const QByteArray bytes = data.left(512);
+
+    QCryptographicHash hash(QCryptographicHash::Algorithm::Md5);
+    hash.addData(bytes);
+    return hash.result();
 }
