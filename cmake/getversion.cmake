@@ -15,7 +15,7 @@ function(get_commit_id)
 
 	string(REPLACE "\n" "" GIT_COM_ID "${GIT_COM_ID}")
 	set(GIT_COMMIT_ID "${GIT_COM_ID}" PARENT_SCOPE)
-	set(PROJECT_VERSION_LABEL "custom_${GIT_COM_ID}" PARENT_SCOPE)
+	set(PROJECT_VERSION_LABEL "custom(${GIT_COM_ID})" PARENT_SCOPE)
 endfunction()
 
 function(get_commit_date)
@@ -192,7 +192,7 @@ endfunction()
 set(GIT_COMMIT_ID "unknown")
 set(GIT_COMMIT_DATE "unknown")
 set(GIT_COMMIT_DATE_FRIENDLY "unknown")
-set(PROJECT_VERSION_LABEL "custom_unknown")
+set(PROJECT_VERSION_LABEL "custom(unknown)")
 set(PROJECT_VERSION_RELEASENAME "")
 
 find_package(Git)
