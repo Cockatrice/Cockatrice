@@ -434,15 +434,15 @@ void MessageLogWidget::logKicked()
 void MessageLogWidget::logLeave(Player *player, QString reason)
 {
     soundEngine->playSound("player_leave");
-    appendHtmlServerMessage(tr("%1 has left the game (%2).")
-                                    .arg(sanitizeHtml(player->getName()), sanitizeHtml(reason)), true);
+    appendHtmlServerMessage(tr("%1 has left the game").arg(sanitizeHtml(player->getName()))
+							+ QString(" (%1).").arg(sanitizeHtml(reason)), true);
 }
 
 void MessageLogWidget::logLeaveSpectator(QString name, QString reason)
 {
     soundEngine->playSound("spectator_leave");
-    appendHtmlServerMessage(tr("%1 is not watching the game any more (%2).")
-                                    .arg(sanitizeHtml(name), sanitizeHtml(reason)));
+    appendHtmlServerMessage(tr("%1 is not watching the game any more").arg(sanitizeHtml(name))
+							+ QString(" (%1).").arg(sanitizeHtml(reason)));
 }
 
 void MessageLogWidget::logNotReadyStart(Player *player)
