@@ -67,10 +67,12 @@ void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
         saveDownloadedFile(spoilerData);
 
         reply->deleteLater();
+        emit spoilerCheckerDone();
     }
     else
     {
         qDebug() << "Error downloading spoilers file" << errorCode;
+        emit spoilerCheckerDone();
     }
 }
 
@@ -108,6 +110,7 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
         }
 
         qDebug() << "Spoiler Season Offline";
+        emit spoilerCheckerDone();
     }
     else if (errorCode == QNetworkReply::NoError)
     {
@@ -122,6 +125,7 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
         }
 
         qDebug() << "Spoiler download failed due to no internet connection";
+        emit spoilerCheckerDone();
     }
     else
     {
@@ -131,6 +135,7 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
         }
 
         qDebug() << "Spoiler download failed with reason" << errorCode;
+        emit spoilerCheckerDone();
     }
 }
 

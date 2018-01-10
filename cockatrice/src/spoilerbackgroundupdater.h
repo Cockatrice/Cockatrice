@@ -29,6 +29,7 @@ class SpoilerBackgroundUpdater : public QObject
 
     signals:
         void spoilersUpdatedSuccessfully();
+        void spoilerCheckerDone();
 };
 
 #endif //COCKATRICE_SPOILER_DOWNLOADER_H

@@ -534,8 +534,18 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
 void DeckEditorSettingsPage::updateSpoilers()
 {
-    // This will launch the spoiler checker as if the client was anew
-    new SpoilerBackgroundUpdater();
+    // Disable the button so the user can only press it once at a time
+    updateNowButton->setDisabled(true);
+
+    // Create a new SBU that will act as if the client was just reloaded
+    auto *sbu = new SpoilerBackgroundUpdater();
+    connect(sbu, SIGNAL(spoilerCheckerDone()), this, SLOT(unlockSettings()));
+    connect(sbu, SIGNAL(spoilersUpdatedSuccessfully()), this, SLOT(unlockSettings()));
+}
+
+void DeckEditorSettingsPage::unlockSettings()
+{
+    updateNowButton->setDisabled(false);
 }
 
 QString DeckEditorSettingsPage::getLastUpdateTime()
@@ -588,9 +598,9 @@ void DeckEditorSettingsPage::retranslateUi()
     mcGeneralMessageLabel.setText(tr("Hey, something's here finally!"));
     infoOnSpoilersLabel.setText(
             tr("Last Updated") + ": " + getLastUpdateTime() + "\n\n" +
-            tr("Spoilers will download automatically on launch") + "\n" +
-            tr("Press the button to manually update without relaunching") + "\n" +
-            tr("Please wait a few moments for spoilers to manually download")
+            tr("Spoilers download automatically on launch") + "\n" +
+            tr("Press the button to manually update without relaunching") + "\n\n" +
+            tr("Do not close settings until manual update complete")
     );
 }
 
@@ -889,7 +899,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     vboxLayout->addWidget(contentsWidget);
     vboxLayout->addWidget(pagesWidget);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(close()));
 
     auto *mainLayout = new QVBoxLayout;
