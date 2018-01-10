@@ -8,6 +8,7 @@
 #include <QDataStream>
 #include <QList>
 #include <QXmlStreamReader>
+#include <QBasicMutex>
 
 class CardDatabase;
 class CardInfo;
