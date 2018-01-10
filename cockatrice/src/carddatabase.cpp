@@ -526,7 +526,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 
 CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoaded)
 {
-    connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabases()), Qt::QueuedConnection);
+    connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(threadSafeReloadCardDatabase()));
 }
 
 CardDatabase::~CardDatabase()

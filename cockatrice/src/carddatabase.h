@@ -196,22 +196,17 @@ class CardDatabase : public QObject
 {
     Q_OBJECT
     protected:
-        /*
-         * The cards, indexed by name.
-         */
+        // The cards, indexed by name.
         CardNameMap cards;
 
-        /**
-         * The cards, indexed by their simple name.
-         */
+        // The cards, indexed by their simple name.
         CardNameMap simpleNameCards;
 
-        /*
-         * The sets, indexed by short name.
-         */
+        // The sets, indexed by short name.
         SetNameMap sets;
 
         LoadStatus loadStatus;
+
     private:
         static const int versionNeeded;
         void loadCardsFromXml(QXmlStreamReader &xml);
@@ -221,9 +216,10 @@ class CardDatabase : public QObject
         void checkUnknownSets();
         void refreshCachedReverseRelatedCards();
         void reloadCardDatabases();
+        LoadStatus loadCardDatabases();
+
     public:
         static const char* TOKENS_SETNAME;
-        static void threadSafeReloadCardDatabase();
 
         explicit CardDatabase(QObject *parent = nullptr);
         ~CardDatabase() override;
@@ -253,7 +249,7 @@ class CardDatabase : public QObject
         void notifyEnabledSetsChanged();
 
     public slots:
-        LoadStatus loadCardDatabases();
+        static void threadSafeReloadCardDatabase();
 
     private slots:
         LoadStatus loadCardDatabase(const QString &path);
