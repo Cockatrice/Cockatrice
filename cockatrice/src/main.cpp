@@ -46,6 +46,7 @@
 #include "spoilerbackgroundupdater.h"
 
 CardDatabase *db;
+QBasicMutex *reloadDatabaseMutex;
 QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;
 RNG_Abstract *rng;
@@ -115,10 +116,8 @@ int main(int argc, char *argv[])
     settingsCache = new SettingsCache;
     themeManager = new ThemeManager;
     soundEngine = new SoundEngine;
-
-    // This mutex is to be used when reloading the card database
-    reloadDatabaseMutex = new QBasicMutex;
     db = new CardDatabase;
+    reloadDatabaseMutex = new QBasicMutex();
 
     qtTranslator = new QTranslator;
     translator = new QTranslator;

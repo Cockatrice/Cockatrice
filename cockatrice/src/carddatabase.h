@@ -220,6 +220,7 @@ class CardDatabase : public QObject
         CardInfo *getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
         void checkUnknownSets();
         void refreshCachedReverseRelatedCards();
+        void reloadCardDatabases();
     public:
         static const char* TOKENS_SETNAME;
         static void threadSafeReloadCardDatabase();
@@ -253,8 +254,10 @@ class CardDatabase : public QObject
 
     public slots:
         LoadStatus loadCardDatabases();
+
     private slots:
         LoadStatus loadCardDatabase(const QString &path);
+
     signals:
         void cardDatabaseLoadingFailed();
         void cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames);

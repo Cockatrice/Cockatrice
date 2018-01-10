@@ -526,7 +526,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 
 CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoaded)
 {
-    connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabases()));
+    connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabases()), Qt::QueuedConnection);
 }
 
 CardDatabase::~CardDatabase()
@@ -699,14 +699,33 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
  */
 void CardDatabase::threadSafeReloadCardDatabase()
 {
+    QtConcurrent::run(db, &CardDatabase::reloadCardDatabases);
+}
+
+void CardDatabase::reloadCardDatabases()
+{
     if (reloadDatabaseMutex == nullptr)
     {
         reloadDatabaseMutex = new QBasicMutex();
     }
 
-    reloadDatabaseMutex->lock();
-    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
-    reloadDatabaseMutex->unlock();
+    // Try to obtain the lock.
+    // If it fails, then the database is already
+    // being reloaded and we don't need to reload
+    // again as no results will change.
+    if (reloadDatabaseMutex->tryLock())
+    {
+        qDebug() << "CardDatabase::reloadCardDatabases Lock Acquired";
+
+        db->loadCardDatabases();
+        reloadDatabaseMutex->unlock();
+
+        qDebug() << "CardDatabase::reloadCardDatabases Lock Released";
+    }
+    else
+    {
+        qDebug() << "CardDatabase::reloadCardDatabases Failed to Acquire Lock";
+    }
 }
 
 void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
@@ -1003,8 +1022,6 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
 
 LoadStatus CardDatabase::loadCardDatabases()
 {
-    qDebug() << "CardDatabase::loadCardDatabases start";
-
     clear(); // remove old db
 
     loadStatus = loadCardDatabase(settingsCache->getCardDatabasePath()); // load main card database
@@ -1035,11 +1052,10 @@ LoadStatus CardDatabase::loadCardDatabases()
     if (loadStatus == Ok)
     {
         checkUnknownSets(); // update deck editors, etc
-        qDebug() << "CardDatabase::loadCardDatabases success";
     }
     else
     {
-        qDebug() << "CardDatabase::loadCardDatabases failed";
+        qDebug() << "CardDatabase::loadCardDatabases Reload Failed";
         emit cardDatabaseLoadingFailed(); // bring up the settings dialog
     }
 
