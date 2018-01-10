@@ -120,8 +120,8 @@ public slots:
     void actUndoDraw();
     void actMulligan();
     void actMoveTopCardToPlayFaceDown();
-    void actMoveTopCardsToGrave();
-    void actMoveTopCardsToExile();
+    void actMoveTopCardsToGrave(bool showDialog = true);
+    void actMoveTopCardsToExile(bool showDialog = true);
     void actMoveTopCardToBottom();
     void actMoveBottomCardToGrave();
 
@@ -175,7 +175,7 @@ private:
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
         *aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg,
         *aMoveRfgToTopLibrary, *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave,
-        *aViewLibrary, *aViewTopCards, *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardsToGrave, *aMoveTopCardsToExile, *aMoveTopCardToBottom,
+        *aViewLibrary, *aViewTopCards, *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardsToGrave, *aMoveTopOneCardToGrave, *aMoveTopCardsToExile, *aMoveTopOneCardToExile, *aMoveTopCardToBottom,
         *aViewGraveyard, *aViewRfg, *aViewSideboard,
                 *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlayFaceDown,
         *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,

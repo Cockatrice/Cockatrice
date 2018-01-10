@@ -242,6 +242,8 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/phase7"] = parseSequenceString("");
     defaultShortCuts["Player/phase8"] = parseSequenceString("");
     defaultShortCuts["Player/phase9"] = parseSequenceString("F9");
+    defaultShortCuts["Player/aMoveTopToGrave"] = parseSequenceString("");
+    defaultShortCuts["Player/aMoveTopToExile"] = parseSequenceString("");
 
 
     defaultShortCuts["Player/aIncCounter_w"] = parseSequenceString("");

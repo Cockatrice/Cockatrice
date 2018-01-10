@@ -285,6 +285,15 @@ public:
     SequenceEdit *Player_aMoveToExile;
     QLabel *lbl_Player_aMoveToHand;
     SequenceEdit *Player_aMoveToHand;
+
+    QGroupBox *groupBox_MoveCardFromTo;
+    QGridLayout *gridLayout_MoveCardFromTo;
+    QLabel *lbl_Player_aMoveTopOneCardToGrave;
+    SequenceEdit *Player_aMoveTopOneCardToGrave;
+    QLabel *lbl_Player_aMoveTopOneCardToExile;
+    SequenceEdit *Player_aMoveTopOneCardToExile;
+
+
     QGroupBox *groupBox_16;
     QGridLayout *gridLayout_16;
     QLabel *lbl_Player_aViewGraveyard;
@@ -1433,6 +1442,29 @@ public:
 
         gridLayout_20->addWidget(groupBox_15, 0, 1, 1, 1);
 
+        groupBox_MoveCardFromTo = new QGroupBox(tab_3);//TODO this still looks funky in the UI
+        groupBox_MoveCardFromTo->setObjectName("groupBox_MoveCardFromTo");
+        gridLayout_MoveCardFromTo = new QGridLayout(groupBox_MoveCardFromTo);
+        gridLayout_MoveCardFromTo->setObjectName("gridLayout_MoveCardFromTo");
+
+        lbl_Player_aMoveTopOneCardToGrave = new QLabel(groupBox_MoveCardFromTo);
+        lbl_Player_aMoveTopOneCardToGrave->setObjectName("lbl_Player_aMoveTopOneCardToGrave");
+        gridLayout_MoveCardFromTo->addWidget(lbl_Player_aMoveTopOneCardToGrave, 0, 0, 1, 1);
+
+        Player_aMoveTopOneCardToGrave = new SequenceEdit("Player/aMoveTopToGrave", groupBox_MoveCardFromTo);
+        Player_aMoveTopOneCardToGrave->setObjectName("Player_aMoveTopOneCardToGrave");
+        gridLayout_MoveCardFromTo->addWidget(Player_aMoveTopOneCardToGrave, 0, 1, 1, 1);
+
+        lbl_Player_aMoveTopOneCardToExile = new QLabel(groupBox_MoveCardFromTo);
+        lbl_Player_aMoveTopOneCardToExile->setObjectName("lbl_Player_aMoveTopOneCardToExile");
+        gridLayout_MoveCardFromTo->addWidget(lbl_Player_aMoveTopOneCardToExile, 1, 0, 1, 1);
+
+        Player_aMoveTopOneCardToExile = new SequenceEdit("Player/aMoveTopToExile", groupBox_MoveCardFromTo);
+        Player_aMoveTopOneCardToExile->setObjectName("Player_aMoveTopOneCardToExile");
+        gridLayout_MoveCardFromTo->addWidget(Player_aMoveTopOneCardToExile, 1, 1, 1, 1);
+
+        gridLayout_20->addWidget(groupBox_MoveCardFromTo, 2, 0, 1, 1);
+
         groupBox_16 = new QGroupBox(tab_3);
         groupBox_16->setObjectName("groupBox_16");
         gridLayout_16 = new QGridLayout(groupBox_16);
@@ -1666,7 +1698,7 @@ public:
         gridLayout_14->addWidget(Player_aAlwaysRevealTopCard, 3, 1, 1, 1);
         gridLayout_20->addWidget(groupBox_14, 0, 0, 1, 1);
         verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-        gridLayout_20->addItem(verticalSpacer_3, 2, 1, 1, 1);
+        gridLayout_20->addItem(verticalSpacer_3, 3, 0, 1, 1);
         tabWidget->addTab(tab_3, QString());
         tab_4 = new QWidget(tabWidget);
         QGridLayout* grid = new QGridLayout(tab_4);
@@ -1852,6 +1884,11 @@ public:
         lbl_Player_aMoveToGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard", 0));
         lbl_Player_aMoveToExile->setText(QApplication::translate("shortcutsTab", "Exile", 0));
         lbl_Player_aMoveToHand->setText(QApplication::translate("shortcutsTab", "Hand", 0));
+
+        groupBox_MoveCardFromTo->setTitle(QApplication::translate("shortcutsTab", "Move card From/To", 0));
+        lbl_Player_aMoveTopOneCardToGrave->setText(QApplication::translate("shortcutsTab", "Deck/Graveyard", 0));
+        lbl_Player_aMoveTopOneCardToExile->setText(QApplication::translate("shortcutsTab", "Deck/Exile", 0));
+
         groupBox_16->setTitle(QApplication::translate("shortcutsTab", "View", 0));
         lbl_Player_aViewGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard", 0));
         lbl_Player_aViewLibrary->setText(QApplication::translate("shortcutsTab", "Library", 0));

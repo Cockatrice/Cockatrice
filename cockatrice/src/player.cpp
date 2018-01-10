@@ -368,6 +368,13 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
             allPlayersActions.append(newAction);
             playerLists[i]->addSeparator();
         }
+
+        aMoveTopOneCardToGrave = new QAction(this);
+        connect(aMoveTopOneCardToGrave, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToGrave(false)));
+        aMoveTopOneCardToExile = new QAction(this);
+        connect(aMoveTopOneCardToExile, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToExile(false)));
+
+
     } else {
         countersMenu = 0;
         sbMenu = 0;
@@ -805,6 +812,9 @@ void Player::setShortcutsActive()
     aCreateToken->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateToken"));
     aCreateAnotherToken->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateAnotherToken"));
     aAlwaysRevealTopCard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aAlwaysRevealTopCard"));
+
+    aMoveTopOneCardToExile->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopToExile"));
+    aMoveTopOneCardToGrave->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopToGrave"));
 }
 
 void Player::setShortcutsInactive()
@@ -825,6 +835,8 @@ void Player::setShortcutsInactive()
     aCreateToken->setShortcut(QKeySequence());
     aCreateAnotherToken->setShortcut(QKeySequence());
     aAlwaysRevealTopCard->setShortcut(QKeySequence());
+    aMoveTopOneCardToExile->setShortcut(QKeySequence());
+    aMoveTopOneCardToGrave->setShortcut(QKeySequence());
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
     while (counterIterator.hasNext())
@@ -957,11 +969,19 @@ void Player::actUndoDraw()
     sendGameCommand(Command_UndoDraw());
 }
 
-void Player::actMoveTopCardsToGrave()
+void Player::actMoveTopCardsToGrave(bool showDialog)
 {
-    int number = QInputDialog::getInt(0, tr("Move top cards to grave"), tr("Number:"));
-    if (!number)
-        return;
+    int number;
+    if (showDialog) {
+        number = QInputDialog::getInt(0, tr("Move top cards to grave"), tr("Number:"));
+        if (!number)
+            return;
+    }
+    else {
+        //default to 1 otherwise
+        number = 1;
+    }
+
 
     const int maxCards = zones.value("deck")->getCards().size();
     if (number > maxCards)
@@ -980,11 +1000,19 @@ void Player::actMoveTopCardsToGrave()
     sendGameCommand(cmd);
 }
 
-void Player::actMoveTopCardsToExile()
+void Player::actMoveTopCardsToExile(bool showDialog)
 {
-    int number = QInputDialog::getInt(0, tr("Move top cards to exile"), tr("Number:"));
-    if (!number)
-        return;
+    int number;
+    if (showDialog) {
+        number = QInputDialog::getInt(0, tr("Move top cards to exile"), tr("Number:"));
+        if (!number)
+            return;
+    }
+    else {
+        //default to 1 otherwise
+        number = 1;
+    }
+
 
     const int maxCards = zones.value("deck")->getCards().size();
     if (number > maxCards)
