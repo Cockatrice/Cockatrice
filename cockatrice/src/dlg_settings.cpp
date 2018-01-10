@@ -538,6 +538,21 @@ void DeckEditorSettingsPage::updateSpoilers()
     new SpoilerBackgroundUpdater();
 }
 
+QString DeckEditorSettingsPage::getLastUpdateTime()
+{
+    QString fileName = settingsCache->getSpoilerCardDatabasePath();
+    QFileInfo fi(fileName);
+    QDir fileDir(fi.path());
+    QFile file(fileName);
+
+    if (file.exists())
+    {
+        return fi.lastModified().toString("MMM d, hh:mm");
+    }
+
+    return QString();
+}
+
 void DeckEditorSettingsPage::spoilerPathButtonClicked()
 {
     QString lsPath = QFileDialog::getExistingDirectory(this, tr("Choose path"));
@@ -558,6 +573,11 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
     mpSpoilerPathButton->setEnabled(anInput);
     updateNowButton->setEnabled(anInput);
     infoOnSpoilersLabel.setEnabled(anInput);
+
+    if (! anInput)
+    {
+        SpoilerBackgroundUpdater::deleteSpoilerFile();
+    }
 }
 
 void DeckEditorSettingsPage::retranslateUi()
@@ -567,9 +587,10 @@ void DeckEditorSettingsPage::retranslateUi()
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
     mcGeneralMessageLabel.setText(tr("Hey, something's here finally!"));
     infoOnSpoilersLabel.setText(
+            tr("Last Updated") + ": " + getLastUpdateTime() + "\n\n" +
             tr("Spoilers will download automatically on launch") + "\n" +
             tr("Press the button to manually update without relaunching") + "\n" +
-            tr("It will take a moment to download, so be patient")
+            tr("Please wait a few moments for spoilers to manually download")
     );
 }
 

@@ -222,6 +222,7 @@ class CardDatabase : public QObject
         void refreshCachedReverseRelatedCards();
     public:
         static const char* TOKENS_SETNAME;
+        static void threadSafeReloadCardDatabase();
 
         explicit CardDatabase(QObject *parent = nullptr);
         ~CardDatabase() override;

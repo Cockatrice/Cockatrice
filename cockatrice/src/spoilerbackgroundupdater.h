@@ -13,6 +13,7 @@ class SpoilerBackgroundUpdater : public QObject
         inline QString getCardUpdaterBinaryName() { return "oracle"; };
         QByteArray getHash(const QString fileName);
         QByteArray getHash(QByteArray data);
+        static bool deleteSpoilerFile();
 
     private slots:
         void actDownloadFinishedSpoilersFile();

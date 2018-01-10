@@ -28,6 +28,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QDebug>
+#include <QtConcurrent>
 #include <QSystemTrayIcon>
 #include "QtNetwork/QNetworkInterface"
 #include <QCryptographicHash>
@@ -114,6 +115,9 @@ int main(int argc, char *argv[])
     settingsCache = new SettingsCache;
     themeManager = new ThemeManager;
     soundEngine = new SoundEngine;
+
+    // This mutex is to be used when reloading the card database
+    reloadDatabaseMutex = new QBasicMutex;
     db = new CardDatabase;
 
     qtTranslator = new QTranslator;

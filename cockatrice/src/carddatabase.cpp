@@ -2,12 +2,14 @@
 #include "pictureloader.h"
 #include "settingscache.h"
 #include "spoilerbackgroundupdater.h"
+#include "main.h"
 
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QMessageBox>
+#include <QtConcurrent>
 
 const int CardDatabase::versionNeeded = 3;
 const char* CardDatabase::TOKENS_SETNAME = "TK";
@@ -688,6 +690,23 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
             newSet->setReleaseDate(releaseDate);
         }
     }
+}
+
+/*
+ * If the database needs to be loaded/reloaded this method can be called
+ * and is thread safe. This solves the bug where if two instances of
+ * the reload were taking place, a race time condition would appear.
+ */
+void CardDatabase::threadSafeReloadCardDatabase()
+{
+    if (reloadDatabaseMutex == nullptr)
+    {
+        reloadDatabaseMutex = new QBasicMutex();
+    }
+
+    reloadDatabaseMutex->lock();
+    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    reloadDatabaseMutex->unlock();
 }
 
 void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)

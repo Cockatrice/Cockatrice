@@ -715,12 +715,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     if (! settingsCache->getDownloadSpoilersStatus())
     {
-        /*
-         * ALERT: Ensure two reloads of the card database do not happen
-         * at the same time or a racetime condition can/will happen!
-         */
-        qDebug() << "Spoilers Disabled, Reloading Database";
-        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+        qDebug() << "Spoilers Disabled";
+        CardDatabase::threadSafeReloadCardDatabase();
     }
 }
 
@@ -868,7 +864,7 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
     if (msgBox.clickedButton() == yesButton)
     {
         db->enableAllUnknownSets();
-        actEditSets();
+        CardDatabase::threadSafeReloadCardDatabase();
     }
     else if (msgBox.clickedButton() == noButton)
     {
@@ -971,7 +967,7 @@ void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
     cardUpdateProcess = nullptr;
 
     QMessageBox::information(this, tr("Information"), tr("Update completed successfully.\nCockatrice will now reload the card database."));
-    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    CardDatabase::threadSafeReloadCardDatabase();
 }
 
 void MainWindow::refreshShortcuts()
@@ -1087,7 +1083,7 @@ void MainWindow::actAddCustomSet()
     if (res)
     {
         QMessageBox::information(this, tr("Load sets/cards"), tr("The new sets/cards have been added successfully.\nCockatrice will now reload the card database."));
-        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+        CardDatabase::threadSafeReloadCardDatabase();
     }
     else
     {
