@@ -2,14 +2,12 @@
 #include "pictureloader.h"
 #include "settingscache.h"
 #include "spoilerbackgroundupdater.h"
-#include "main.h"
 
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QMessageBox>
-#include <QtConcurrent>
 
 const int CardDatabase::versionNeeded = 3;
 const char* CardDatabase::TOKENS_SETNAME = "TK";
@@ -526,7 +524,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 
 CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoaded)
 {
-    connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(threadSafeReloadCardDatabase()));
+    connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabases()));
 }
 
 CardDatabase::~CardDatabase()
@@ -536,6 +534,8 @@ CardDatabase::~CardDatabase()
 
 void CardDatabase::clear()
 {
+    clearDatabaseMutex->lock();
+
     QHashIterator<QString, CardInfo *> i(cards);
     while (i.hasNext())
     {
@@ -560,6 +560,8 @@ void CardDatabase::clear()
     sets.clear();
 
     loadStatus = NotLoaded;
+
+    clearDatabaseMutex->unlock();
 }
 
 void CardDatabase::addCard(CardInfo *card)
@@ -569,8 +571,11 @@ void CardDatabase::addCard(CardInfo *card)
         qDebug() << "addCard(nullptr)";
         return;
     }
+
+    addCardMutex->lock();
     cards.insert(card->getName(), card);
     simpleNameCards.insert(card->getSimpleName(), card);
+    addCardMutex->unlock();
     emit cardAdded(card);
 }
 
@@ -591,8 +596,10 @@ void CardDatabase::removeCard(CardInfo *card)
     foreach(CardRelation * cardRelation, card->getReverseRelatedCards2Me())
         cardRelation->deleteLater();
 
+    removeCardMutex->lock();
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
+    removeCardMutex->unlock();
     emit cardRemoved(card);
 }
 
@@ -689,42 +696,6 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
             newSet->setSetType(setType);
             newSet->setReleaseDate(releaseDate);
         }
-    }
-}
-
-/*
- * If the database needs to be loaded/reloaded this method can be called
- * and is thread safe. This solves the bug where if two instances of
- * the reload were taking place, a race time condition would appear.
- */
-void CardDatabase::threadSafeReloadCardDatabase()
-{
-    QtConcurrent::run(db, &CardDatabase::reloadCardDatabases);
-}
-
-void CardDatabase::reloadCardDatabases()
-{
-    if (reloadDatabaseMutex == nullptr)
-    {
-        reloadDatabaseMutex = new QBasicMutex();
-    }
-
-    // Try to obtain the lock.
-    // If it fails, then the database is already
-    // being reloaded and we don't need to reload
-    // again as no results will change.
-    if (reloadDatabaseMutex->tryLock())
-    {
-        qDebug() << "CardDatabase::reloadCardDatabases Lock Acquired";
-
-        db->loadCardDatabases();
-        reloadDatabaseMutex->unlock();
-
-        qDebug() << "CardDatabase::reloadCardDatabases Lock Released";
-    }
-    else
-    {
-        qDebug() << "CardDatabase::reloadCardDatabases Failed to Acquire Lock";
     }
 }
 
@@ -912,7 +883,6 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName)
         return FileError;
     }
 
-
     QXmlStreamReader xml(&file);
     while (!xml.atEnd())
     {
@@ -1012,7 +982,9 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty())
     {
+        loadFromFileMutex->lock();
         tempLoadStatus = loadFromFile(path);
+        loadFromFileMutex->unlock();
     }
 
     qDebug() << "[CardDatabase] loadCardDatabase(): Path =" << path << "Status =" << tempLoadStatus << "Cards =" << cards.size() << "Sets=" << sets.size();
@@ -1022,6 +994,10 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
 
 LoadStatus CardDatabase::loadCardDatabases()
 {
+    reloadDatabaseMutex->lock();
+
+    qDebug() << "CardDatabase::loadCardDatabases start";
+
     clear(); // remove old db
 
     loadStatus = loadCardDatabase(settingsCache->getCardDatabasePath()); // load main card database
@@ -1052,13 +1028,15 @@ LoadStatus CardDatabase::loadCardDatabases()
     if (loadStatus == Ok)
     {
         checkUnknownSets(); // update deck editors, etc
+        qDebug() << "CardDatabase::loadCardDatabases success";
     }
     else
     {
-        qDebug() << "CardDatabase::loadCardDatabases Reload Failed";
+        qDebug() << "CardDatabase::loadCardDatabases failed";
         emit cardDatabaseLoadingFailed(); // bring up the settings dialog
     }
 
+    reloadDatabaseMutex->unlock();
     return loadStatus;
 }
 

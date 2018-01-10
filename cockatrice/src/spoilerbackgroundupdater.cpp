@@ -25,7 +25,7 @@ SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(
         // Start the process of checking if we're in spoiler season
         // File exists means we're in spoiler season
         // We will load the database before attempting to download spoilers, incase they fail
-        CardDatabase::threadSafeReloadCardDatabase();
+        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
         startSpoilerDownloadProcess(SPOILERS_STATUS_URL, false);
     }
 }
@@ -177,7 +177,7 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 
     // Data written, so reload the card database
     qDebug() << "Spoiler Service Data Written";
-    CardDatabase::threadSafeReloadCardDatabase();
+    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 
     // If the user has notifications enabled, let them know
     // when the database was last updated
@@ -185,23 +185,23 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
     {
         QList<QByteArray> lines = data.split('\n');
 
-        foreach (QByteArray line, lines)
-        {
-            if (line.indexOf("created:") > -1)
+                foreach (QByteArray line, lines)
             {
-                QString timeStamp = QString(line).replace("created:", "").trimmed();
-                timeStamp.chop(6); // Remove " (UTC)"
+                if (line.indexOf("created:") > -1)
+                {
+                    QString timeStamp = QString(line).replace("created:", "").trimmed();
+                    timeStamp.chop(6); // Remove " (UTC)"
 
-                auto utcTime = QDateTime::fromString(timeStamp, QString("ddd, MMM dd yyyy, hh:mm:ss"));
-                utcTime.setTimeSpec(Qt::UTC);
+                    auto utcTime = QDateTime::fromString(timeStamp, QString("ddd, MMM dd yyyy, hh:mm:ss"));
+                    utcTime.setTimeSpec(Qt::UTC);
 
-                QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");
+                    QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");
 
-                trayIcon->showMessage(tr("Spoilers have been updated!"), tr("Last change:") + " " + localTime);
-                emit spoilersUpdatedSuccessfully();
-                return true;
+                    trayIcon->showMessage(tr("Spoilers have been updated!"), tr("Last change:") + " " + localTime);
+                    emit spoilersUpdatedSuccessfully();
+                    return true;
+                }
             }
-        }
     }
 
     return true;
