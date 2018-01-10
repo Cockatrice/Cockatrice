@@ -48,6 +48,8 @@ signals:
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void masterVolumeChanged(int value);
     void chatMentionCompleterChanged();
+    void downloadSpoilerTimeIndexChanged();
+    void downloadSpoilerStatusChanged();
 private:
     QSettings *settings;
     ShortcutsSettings *shortcutsSettings;
@@ -60,8 +62,9 @@ private:
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, tokenDatabasePath, themeName;
+    QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath, spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
+    bool mbDownloadSpoilers;
     int updateReleaseChannel;
     int maxFontSize;
     bool picDownload;
@@ -130,6 +133,7 @@ public:
     QString getCustomPicsPath() const { return customPicsPath; }
     QString getCustomCardDatabasePath() const { return customCardDatabasePath; }
     QString getCardDatabasePath() const { return cardDatabasePath; }
+    QString getSpoilerCardDatabasePath() const { return spoilerDatabasePath; }
     QString getTokenDatabasePath() const { return tokenDatabasePath; }
     QString getThemeName() const { return themeName; }
     QString getChatMentionColor() const { return chatMentionColor; }
@@ -200,7 +204,10 @@ public:
     GameFiltersSettings& gameFilters() const { return *gameFiltersSettings; }
     LayoutsSettings& layouts() const { return *layoutsSettings; }
     bool getIsPortableBuild() const { return isPortableBuild; }
+    bool getDownloadSpoilersStatus() const { return mbDownloadSpoilers; }
 public slots:
+    void setDownloadSpoilerStatus(bool _spoilerStatus);
+
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setTokenDialogGeometry(const QByteArray &_tokenDialog);
     void setLang(const QString &_lang);
@@ -208,6 +215,7 @@ public slots:
     void setReplaysPath(const QString &_replaysPath);
     void setPicsPath(const QString &_picsPath);
     void setCardDatabasePath(const QString &_cardDatabasePath);
+    void setSpoilerDatabasePath(const QString &_spoilerDatabasePath);
     void setTokenDatabasePath(const QString &_tokenDatabasePath);
     void setThemeName(const QString &_themeName);
     void setChatMentionColor(const QString &_chatMentionColor);

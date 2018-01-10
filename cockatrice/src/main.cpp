@@ -42,6 +42,7 @@
 #include "soundengine.h"
 #include "featureset.h"
 #include "logger.h"
+#include "spoilerbackgroundupdater.h"
 
 CardDatabase *db;
 QTranslator *translator, *qtTranslator;
@@ -128,6 +129,10 @@ int main(int argc, char *argv[])
     ui.setWindowIcon(QPixmap("theme:cockatrice"));
     
     settingsCache->setClientID(generateClientID());
+
+    // If spoiler mode is enabled, we will download the spoilers
+    // then reload the DB. otherwise just reload the DB
+    SpoilerBackgroundUpdater spoilerBackgroundUpdater;
 
     ui.show();
     qDebug("main(): ui.show() finished");

@@ -171,6 +171,8 @@ SettingsCache::SettingsCache()
     releaseChannels << new StableReleaseChannel();
     releaseChannels << new DevReleaseChannel();
 
+    mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
+
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
 
@@ -187,6 +189,7 @@ SettingsCache::SettingsCache()
 
     cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
     tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
+    spoilerDatabasePath = getSafeConfigFilePath("paths/spoilerdatabase", dataPath + "/spoiler.xml");
 
     themeName = settings->value("theme/name").toString();
 
@@ -345,6 +348,13 @@ void SettingsCache::setCardDatabasePath(const QString &_cardDatabasePath)
 {
     cardDatabasePath = _cardDatabasePath;
     settings->setValue("paths/carddatabase", cardDatabasePath);
+    emit cardDatabasePathChanged();
+}
+
+void SettingsCache::setSpoilerDatabasePath(const QString &_spoilerDatabasePath)
+{
+    spoilerDatabasePath = _spoilerDatabasePath;
+    settings->setValue("paths/spoilerdatabase", spoilerDatabasePath);
     emit cardDatabasePathChanged();
 }
 
@@ -644,8 +654,15 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 
 void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
-    notifyAboutUpdates = _notifyaboutupdate;
+    notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+void SettingsCache::setDownloadSpoilerStatus(bool _spoilerStatus)
+{
+    mbDownloadSpoilers = _spoilerStatus;
+    settings->setValue("personal/downloadspoilers", mbDownloadSpoilers);
+    emit downloadSpoilerStatusChanged();
 }
 
 void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
