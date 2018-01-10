@@ -24,6 +24,8 @@ SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(
     {
         // Start the process of checking if we're in spoiler season
         // File exists means we're in spoiler season
+        // We will load the database before attempting to download spoilers, incase they fail
+        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
         startSpoilerDownloadProcess(SPOILERS_STATUS_URL, false);
     }
 }
@@ -72,6 +74,25 @@ void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
     }
 }
 
+bool SpoilerBackgroundUpdater::deleteSpoilerFile()
+{
+    QString fileName = settingsCache->getSpoilerCardDatabasePath();
+    QFileInfo fi(fileName);
+    QDir fileDir(fi.path());
+    QFile file(fileName);
+
+    // Delete the spoiler.xml file
+    if (file.exists() && file.remove())
+    {
+        qDebug() << "Deleting spoiler.xml";
+        return true;
+
+    }
+
+    qDebug() << "Error: Spoiler.xml not found or not deleted";
+    return false;
+}
+
 void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
 {
     auto *response = dynamic_cast<QNetworkReply *>(sender());
@@ -81,36 +102,35 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
     {
         // Spoiler season is offline at this point, so the spoiler.xml file can be safely deleted
         // The user should run Oracle to get the latest card information
-        QString fileName = settingsCache->getSpoilerCardDatabasePath();
-        QFileInfo fi(fileName);
-        QDir fileDir(fi.path());
-        QFile file(fileName);
-
-        // Delete the spoiler.xml file as we're not in spoiler season
-        if (file.exists() && file.remove())
+        if (deleteSpoilerFile() && trayIcon)
         {
-            qDebug() << "Spoiler Season Offline, Deleting spoiler.xml";
-            if (trayIcon)
-            {
-                trayIcon->showMessage(tr("Spoilers season has ended"), tr("Deleting spoiler.xml. Please run Oracle"));
-            }
+            trayIcon->showMessage(tr("Spoilers season has ended"), tr("Deleting spoiler.xml. Please run Oracle"));
         }
 
-        /*
-         * ALERT: Ensure two reloads of the card database do not happen
-         * at the same time or a racetime condition can/will happen!
-         */
-        qDebug() << "Spoiler Season Offline, Reloading Database";
-        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+        qDebug() << "Spoiler Season Offline";
     }
     else if (errorCode == QNetworkReply::NoError)
     {
         qDebug() << "Spoiler Service Online";
         startSpoilerDownloadProcess(SPOILERS_URL, true);
     }
+    else if (errorCode == QNetworkReply::HostNotFoundError)
+    {
+        if (trayIcon)
+        {
+            trayIcon->showMessage(tr("Spoilers download failed"), tr("No internet connection"));
+        }
+
+        qDebug() << "Spoiler download failed due to no internet connection";
+    }
     else
     {
-        qDebug() << "Error: Spoiler download failed with reason" << errorCode;
+        if (trayIcon)
+        {
+            trayIcon->showMessage(tr("Spoilers download failed"), tr("Error") + " " + errorCode);
+        }
+
+        qDebug() << "Spoiler download failed with reason" << errorCode;
     }
 }
 
@@ -132,8 +152,8 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
         {
             trayIcon->showMessage(tr("Spoilers already up to date"), tr("No new spoilers added"));
         }
-        qDebug() << "Spoilers Up to Date, Reloading Database";
-        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+
+        qDebug() << "Spoilers Up to Date";
         return false;
     }
 
@@ -154,12 +174,9 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 
     file.close();
 
-    /*
-     * Data written, so reload the card database
-     * ALERT: Ensure two reloads of the card database do not happen
-     * at the same time or a racetime condition can/will happen!
-     */
-    qDebug() << "Spoiler Service Data Written, Reloading Database";
+
+    // Data written, so reload the card database
+    qDebug() << "Spoiler Service Data Written";
     QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 
     // If the user has notifications enabled, let them know
@@ -168,16 +185,23 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
     {
         QList<QByteArray> lines = data.split('\n');
 
-        foreach (QByteArray line, lines)
-        {
-            if (line.indexOf("created:") > -1)
+                foreach (QByteArray line, lines)
             {
-                QString timeStamp = QString(line).replace("created:", "").trimmed();
-                trayIcon->showMessage(tr("Spoilers have been updated!"), tr("Last change:") + " " + timeStamp);
-                emit spoilersUpdatedSuccessfully();
-                return true;
+                if (line.indexOf("created:") > -1)
+                {
+                    QString timeStamp = QString(line).replace("created:", "").trimmed();
+                    timeStamp.chop(6); // Remove " (UTC)"
+
+                    auto utcTime = QDateTime::fromString(timeStamp, QString("ddd, MMM dd yyyy, hh:mm:ss"));
+                    utcTime.setTimeSpec(Qt::UTC);
+
+                    QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");
+
+                    trayIcon->showMessage(tr("Spoilers have been updated!"), tr("Last change:") + " " + localTime);
+                    emit spoilersUpdatedSuccessfully();
+                    return true;
+                }
             }
-        }
     }
 
     return true;

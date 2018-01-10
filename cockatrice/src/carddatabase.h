@@ -220,7 +220,14 @@ class CardDatabase : public QObject
         CardInfo *getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
         void checkUnknownSets();
         void refreshCachedReverseRelatedCards();
-    public:
+
+        QBasicMutex *reloadDatabaseMutex = new QBasicMutex(),
+                *clearDatabaseMutex = new QBasicMutex(),
+                *loadFromFileMutex = new QBasicMutex(),
+                *addCardMutex = new QBasicMutex(),
+                *removeCardMutex = new QBasicMutex();
+
+public:
         static const char* TOKENS_SETNAME;
 
         explicit CardDatabase(QObject *parent = nullptr);

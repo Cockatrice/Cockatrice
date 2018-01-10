@@ -534,6 +534,8 @@ CardDatabase::~CardDatabase()
 
 void CardDatabase::clear()
 {
+    clearDatabaseMutex->lock();
+
     QHashIterator<QString, CardInfo *> i(cards);
     while (i.hasNext())
     {
@@ -558,6 +560,8 @@ void CardDatabase::clear()
     sets.clear();
 
     loadStatus = NotLoaded;
+
+    clearDatabaseMutex->unlock();
 }
 
 void CardDatabase::addCard(CardInfo *card)
@@ -567,8 +571,11 @@ void CardDatabase::addCard(CardInfo *card)
         qDebug() << "addCard(nullptr)";
         return;
     }
+
+    addCardMutex->lock();
     cards.insert(card->getName(), card);
     simpleNameCards.insert(card->getSimpleName(), card);
+    addCardMutex->unlock();
     emit cardAdded(card);
 }
 
@@ -589,8 +596,10 @@ void CardDatabase::removeCard(CardInfo *card)
     foreach(CardRelation * cardRelation, card->getReverseRelatedCards2Me())
         cardRelation->deleteLater();
 
+    removeCardMutex->lock();
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
+    removeCardMutex->unlock();
     emit cardRemoved(card);
 }
 
@@ -874,7 +883,6 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName)
         return FileError;
     }
 
-
     QXmlStreamReader xml(&file);
     while (!xml.atEnd())
     {
@@ -974,7 +982,9 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty())
     {
+        loadFromFileMutex->lock();
         tempLoadStatus = loadFromFile(path);
+        loadFromFileMutex->unlock();
     }
 
     qDebug() << "[CardDatabase] loadCardDatabase(): Path =" << path << "Status =" << tempLoadStatus << "Cards =" << cards.size() << "Sets=" << sets.size();
@@ -984,6 +994,8 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
 
 LoadStatus CardDatabase::loadCardDatabases()
 {
+    reloadDatabaseMutex->lock();
+
     qDebug() << "CardDatabase::loadCardDatabases start";
 
     clear(); // remove old db
@@ -1024,6 +1036,7 @@ LoadStatus CardDatabase::loadCardDatabases()
         emit cardDatabaseLoadingFailed(); // bring up the settings dialog
     }
 
+    reloadDatabaseMutex->unlock();
     return loadStatus;
 }
 

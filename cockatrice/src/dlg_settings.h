@@ -130,6 +130,7 @@ class DeckEditorSettingsPage : public AbstractSettingsPage
     public:
         DeckEditorSettingsPage();
         void retranslateUi() override;
+        QString getLastUpdateTime();
 
     private slots:
         void setSpoilersEnabled(bool);
