@@ -185,23 +185,23 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
     {
         QList<QByteArray> lines = data.split('\n');
 
-                foreach (QByteArray line, lines)
+        foreach (QByteArray line, lines)
+        {
+            if (line.indexOf("created:") > -1)
             {
-                if (line.indexOf("created:") > -1)
-                {
-                    QString timeStamp = QString(line).replace("created:", "").trimmed();
-                    timeStamp.chop(6); // Remove " (UTC)"
+                QString timeStamp = QString(line).replace("created:", "").trimmed();
+                timeStamp.chop(6); // Remove " (UTC)"
 
-                    auto utcTime = QDateTime::fromString(timeStamp, QString("ddd, MMM dd yyyy, hh:mm:ss"));
-                    utcTime.setTimeSpec(Qt::UTC);
+                auto utcTime = QDateTime::fromString(timeStamp, QString("ddd, MMM dd yyyy, hh:mm:ss"));
+                utcTime.setTimeSpec(Qt::UTC);
 
-                    QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");
+                QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");
 
-                    trayIcon->showMessage(tr("Spoilers have been updated!"), tr("Last change:") + " " + localTime);
-                    emit spoilersUpdatedSuccessfully();
-                    return true;
-                }
+                trayIcon->showMessage(tr("Spoilers have been updated!"), tr("Last change:") + " " + localTime);
+                emit spoilersUpdatedSuccessfully();
+                return true;
             }
+        }
     }
 
     return true;
