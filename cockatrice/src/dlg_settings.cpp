@@ -49,10 +49,10 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     // updates
     QList<ReleaseChannel*> channels = settingsCache->getUpdateReleaseChannels();
-            foreach(ReleaseChannel* chan, channels)
-        {
-            updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
-        }
+    foreach(ReleaseChannel* chan, channels)
+    {
+        updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
+    }
     updateReleaseChannelBox.setCurrentIndex(settingsCache->getUpdateReleaseChannel()->getIndex());
 
     updateNotificationCheckBox.setChecked(settingsCache->getNotifyAboutUpdates());
@@ -731,13 +731,13 @@ void MessagesSettingsPage::updateTextHighlightColor(int value)
 void MessagesSettingsPage::updateMentionPreview()
 {
     mentionColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatMentionColor() +
-                                ";color: " + (settingsCache->getChatMentionForeground() ? "white" : "black") + ";}");
+        ";color: " + (settingsCache->getChatMentionForeground() ? "white" : "black") + ";}");
 }
 
 void MessagesSettingsPage::updateHighlightPreview()
 {
     highlightColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatHighlightColor() +
-                                  ";color: " + (settingsCache->getChatHighlightForeground() ? "white" : "black") + ";}");
+        ";color: " + (settingsCache->getChatHighlightForeground() ? "white" : "black") + ";}");
 }
 
 void MessagesSettingsPage::storeSettings()
@@ -978,7 +978,8 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     QString loadErrorMessage = tr("Unknown Error loading card database");
     LoadStatus loadStatus = db->getLoadStatus();
     qDebug() << "Card Database load status: " << loadStatus;
-    switch(loadStatus) {
+    switch(loadStatus)
+    {
         case Ok:
             showLoadError = false;
             break;
@@ -1020,23 +1021,36 @@ void DlgSettings::closeEvent(QCloseEvent *event)
 
             break;
     }
+
     if (showLoadError)
-        if (QMessageBox::critical(this, tr("Error"), loadErrorMessage, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+    {
+        if (QMessageBox::critical(this, tr("Error"), loadErrorMessage, QMessageBox::Yes | QMessageBox::No) ==
+            QMessageBox::Yes)
+        {
             event->ignore();
             return;
         }
+    }
+
     if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty())
+    {
         // TODO: Prompt to create it
-        if (QMessageBox::critical(this, tr("Error"), tr("The path to your deck directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+        if (QMessageBox::critical(this, tr("Error"), tr("The path to your deck directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        {
             event->ignore();
             return;
         }
+    }
+
     if (!QDir(settingsCache->getPicsPath()).exists() || settingsCache->getPicsPath().isEmpty())
+    {
         // TODO: Prompt to create it
-        if (QMessageBox::critical(this, tr("Error"), tr("The path to your card pictures directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+        if (QMessageBox::critical(this, tr("Error"), tr("The path to your card pictures directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        {
             event->ignore();
             return;
         }
+    }
     event->accept();
 }
 

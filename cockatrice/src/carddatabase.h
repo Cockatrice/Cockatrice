@@ -228,7 +228,7 @@ class CardDatabase : public QObject
                 *addCardMutex = new QBasicMutex(),
                 *removeCardMutex = new QBasicMutex();
 
-public:
+    public:
         static const char* TOKENS_SETNAME;
 
         explicit CardDatabase(QObject *parent = nullptr);

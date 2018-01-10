@@ -28,7 +28,6 @@
 #include <QDateTime>
 #include <QDir>
 #include <QDebug>
-#include <QtConcurrent>
 #include <QSystemTrayIcon>
 #include "QtNetwork/QNetworkInterface"
 #include <QCryptographicHash>
@@ -46,7 +45,6 @@
 #include "spoilerbackgroundupdater.h"
 
 CardDatabase *db;
-QBasicMutex *reloadDatabaseMutex;
 QTranslator *translator, *qtTranslator;
 SettingsCache *settingsCache;
 RNG_Abstract *rng;

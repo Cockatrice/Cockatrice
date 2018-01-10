@@ -864,7 +864,8 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
     if (msgBox.clickedButton() == yesButton)
     {
         db->enableAllUnknownSets();
-        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);    }
+        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    }
     else if (msgBox.clickedButton() == noButton)
     {
         db->markAllSetsAsKnown();
@@ -966,7 +967,8 @@ void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
     cardUpdateProcess = nullptr;
 
     QMessageBox::information(this, tr("Information"), tr("Update completed successfully.\nCockatrice will now reload the card database."));
-    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);}
+    QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+}
 
 void MainWindow::refreshShortcuts()
 {
@@ -1081,7 +1083,8 @@ void MainWindow::actAddCustomSet()
     if (res)
     {
         QMessageBox::information(this, tr("Load sets/cards"), tr("The new sets/cards have been added successfully.\nCockatrice will now reload the card database."));
-        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);    }
+        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+    }
     else
     {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Sets/cards failed to import."));
