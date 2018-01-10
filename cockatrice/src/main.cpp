@@ -117,7 +117,6 @@ int main(int argc, char *argv[])
     themeManager = new ThemeManager;
     soundEngine = new SoundEngine;
     db = new CardDatabase;
-    reloadDatabaseMutex = new QBasicMutex();
 
     qtTranslator = new QTranslator;
     translator = new QTranslator;

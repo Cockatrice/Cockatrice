@@ -7,7 +7,6 @@ class QSystemTrayIcon;
 class SoundEngine;
 
 extern CardDatabase *db;
-extern QBasicMutex *reloadDatabaseMutex;
 
 extern QSystemTrayIcon *trayIcon;
 extern QTranslator *translator;
