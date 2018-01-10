@@ -16,16 +16,16 @@ public:
     /* if you add an atribute here you also need to
      * add its string representation in attrName */
     enum Attr {
-        AttrName = 0,
-        AttrType,
+        AttrCmc = 0,
         AttrColor,
-        AttrText,
-        AttrSet,
         AttrManaCost,
-        AttrCmc,
-        AttrRarity,
+        AttrName,
         AttrPow,
+        AttrRarity,
+        AttrSet,
+        AttrText,
         AttrTough,
+        AttrType,
         AttrEnd
     };
 
