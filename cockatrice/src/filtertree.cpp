@@ -22,8 +22,8 @@ void FilterTreeBranch<T>::deleteAt(int i)
 template <class T>
 int FilterTreeBranch<T>::childIndex(const FilterTreeNode *node) const
 {
-    FilterTreeNode *unconst = const_cast<FilterTreeNode *>(node);
-    T downcasted = dynamic_cast<T>(unconst);
+    auto *unconst = const_cast<FilterTreeNode *>(node);
+    auto downcasted = dynamic_cast<T>(unconst);
     return (downcasted) ? childNodes.indexOf(downcasted) : -1;
 }
 
@@ -208,11 +208,11 @@ bool FilterItem::acceptColor(const CardInfo *info) const
      * then we should match all of them to the card's colors
      */
     int match_count = 0;
-    for (auto it = converted_term.begin(); it != converted_term.end(); it++)
+    for (auto &it : converted_term)
     {
         for (auto i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++)
         {
-            if ((*i).contains((*it), Qt::CaseInsensitive))
+            if ((*i).contains(it, Qt::CaseInsensitive))
             {
                 match_count++;
             }
@@ -245,7 +245,15 @@ bool FilterItem::acceptSet(const CardInfo *info) const
 
 bool FilterItem::acceptManaCost(const CardInfo *info) const
 {
-    return (info->getManaCost() == term);
+    QString partialCost = term.toUpper();
+    QString fullManaCost = info->getManaCost();
+
+    // Sort the mana costs so they can be easily compared
+    std::sort(partialCost.begin(), partialCost.end());
+    std::sort(fullManaCost.begin(), fullManaCost.end());
+
+    // If the partial is found in the full, return true
+    return (fullManaCost.indexOf(partialCost) > -1);
 }
 
 bool FilterItem::acceptCmc(const CardInfo *info) const
@@ -325,8 +333,8 @@ bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) con
  * Need to define these here to make QT happy, otherwise
  * moc doesnt find some of the FilterTreeBranch symbols.
  */
-FilterTree::FilterTree() {}
-FilterTree::~FilterTree() {}
+FilterTree::FilterTree() = default;
+FilterTree::~FilterTree() = default;
 
 LogicMap *FilterTree::attrLogicMap(CardFilter::Attr attr)
 {
