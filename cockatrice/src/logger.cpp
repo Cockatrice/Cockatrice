@@ -6,18 +6,16 @@
 #define LOGGER_MAX_ENTRIES 128
 #define LOGGER_FILENAME "qdebug.txt"
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
-
-#include <QSysInfo>
-
+#if QT_VERSION >= 0x050400
+    #include <QSysInfo>
 #endif
 
 Logger::Logger() : logToFileEnabled(false)
 {
     logBuffer.append(getClientVersion());
-    logBuffer.append(printBuildArchitecture());
+    logBuffer.append(getSystemArchitecture());
     std::cerr << getClientVersion().toStdString() << std::endl;
-    std::cerr << printBuildArchitecture().toStdString() << std::endl;
+    std::cerr << getSystemArchitecture().toStdString() << std::endl;
 }
 
 Logger::~Logger()
@@ -55,7 +53,7 @@ void Logger::openLogfileSession()
     fileStream.setDevice(&fileHandle);
     fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << endl;
     fileStream << getClientVersion() << endl;
-    fileStream << printBuildArchitecture() << endl;
+    fileStream << getSystemArchitecture() << endl;
     logToFileEnabled = true;
 }
 
@@ -91,23 +89,26 @@ void Logger::internalLog(const QString message)
         fileStream << message << endl; // Print to fileStream
 }
 
-QString Logger::printBuildArchitecture()
+QString Logger::getSystemArchitecture()
 {
     QString result;
-    if(!getClientOperatingSystem().isEmpty())
+
+    if (!getClientOperatingSystem().isEmpty())
     {
-        result += "Client Operating System: " + getClientOperatingSystem() + "\n";
+        result.append(tr("Client Operating System") + ": " + getClientOperatingSystem() + "\n");
     }
-    result += "Build Architecture: " + QString::fromStdString(BUILD_ARCHITECTURE) + "\n" +
-           "Qt Version: " + QT_VERSION_STR;
+
+    result.append(tr("Build Architecture") + ": " + QString::fromStdString(BUILD_ARCHITECTURE) + "\n");
+    result.append(tr("Qt Version") + ": " + QT_VERSION_STR);
+
     return result;
 }
 
 QString Logger::getClientOperatingSystem()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
-    return QSysInfo::prettyProductName();
-#else
-    return "";
-#endif
+    #ifdef QSYSINFO_H
+        return QSysInfo::prettyProductName();
+    #endif
+
+    return {};
 }
