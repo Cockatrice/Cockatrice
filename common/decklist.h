@@ -135,7 +135,7 @@ class DeckList : public QObject
         InnerDecklistNode *getZoneObjFromName(QString zoneName);
 
     protected:
-        virtual QString getCardZoneFromName(const QString cardName, QString currentZoneName) { return currentZoneName; };
+        virtual QString getCardZoneFromName(const QString /*cardName*/, QString currentZoneName) { return currentZoneName; };
         virtual QString getCompleteCardName(const QString cardName) const { return cardName; };
 
     signals:
