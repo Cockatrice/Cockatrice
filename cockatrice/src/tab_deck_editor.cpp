@@ -312,18 +312,18 @@ void TabDeckEditor::createCentralFrame()
 {
     searchEdit = new SearchLineEdit;
     searchEdit->setObjectName("searchEdit");
+    searchEdit->setPlaceholderText(tr("Search by card name"));
 #if QT_VERSION >= 0x050200
     searchEdit->setClearButtonEnabled(true);
 #endif
 #if QT_VERSION >= 0x050300
     searchEdit->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
 #endif
+    searchEdit->installEventFilter(&searchKeySignals);
 
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
 
-    searchEdit->installEventFilter(&searchKeySignals);
-    searchEdit->setPlaceholderText(tr("Search by card name"));
     searchKeySignals.setObjectName("searchKeySignals");
     connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
     connect(&searchKeySignals, SIGNAL(onEnter()), this, SLOT(actAddCard()));

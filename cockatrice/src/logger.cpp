@@ -106,7 +106,7 @@ QString Logger::getSystemArchitecture()
 
 QString Logger::getClientOperatingSystem()
 {
-    #ifdef QSYSINFO_H
+    #if QT_VERSION >= 0x050400
         return QSysInfo::prettyProductName();
     #endif
 
