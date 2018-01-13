@@ -4,8 +4,7 @@
 #include "../settingscache.h"
 #include <QMessageBox>
 
-ShortcutsTab::ShortcutsTab() :
-    ui(new Ui::shortcutsTab)
+ShortcutsTab::ShortcutsTab() : ui(new Ui::shortcutsTab)
 {
     ui->setupUi(this);
     connect(ui->btnResetAll,SIGNAL(clicked()),this,SLOT(resetShortcuts()));
@@ -26,7 +25,7 @@ ShortcutsTab::~ShortcutsTab()
 
 void ShortcutsTab::resetShortcuts()
 {
-    if(QMessageBox::question(this,tr("Restore all default shortcuts"),
+    if (QMessageBox::question(this,tr("Restore all default shortcuts"),
                              tr("Do you really want to restore all default shortcuts?")) == QMessageBox::Yes)
     {
         settingsCache->shortcuts().resetAllShortcuts();
@@ -36,15 +35,15 @@ void ShortcutsTab::resetShortcuts()
 void ShortcutsTab::refreshEdits()
 {    
     QList<SequenceEdit*> edits = this->findChildren<SequenceEdit*>();
-    for(int i= 0; i < edits.length(); ++i)
+    for (auto edit : edits)
     {
-        edits.at(i)->refreshShortcut();
+        edit->refreshShortcut();
     }
 }
 
 void ShortcutsTab::clearShortcuts()
 {
-    if(QMessageBox::question(this,tr("Clear all default shortcuts"),
+    if (QMessageBox::question(this,tr("Clear all default shortcuts"),
                              tr("Do you really want to clear all shortcuts?")) == QMessageBox::Yes)
     {
         settingsCache->shortcuts().clearAllShortcuts();
@@ -54,8 +53,8 @@ void ShortcutsTab::clearShortcuts()
 void ShortcutsTab::afterClear()
 {    
     QList<SequenceEdit*> edits = this->findChildren<SequenceEdit*>();
-    for(int i= 0; i < edits.length(); ++i)
+    for (auto edit : edits)
     {
-        edits.at(i)->clear();
+        edit->clear();
     }
 }

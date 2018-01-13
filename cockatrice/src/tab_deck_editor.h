@@ -51,6 +51,7 @@ class TabDeckEditor : public Tab {
             bool actSaveDeckAs();
             void actLoadDeckFromClipboard();
             void actSaveDeckToClipboard();
+            void actSaveDeckToClipboardRaw();
             void actPrintDeck();
             void actExportDeckDecklist();
             void actAnalyzeDeckDeckstats();
@@ -111,8 +112,8 @@ private:
     KeySignals filterViewKeySignals;
     QWidget *filterBox;
 
-    QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *analyzeDeckMenu;
-    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aPrintDeck, *aExportDeckDecklist, *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aClose;
+    QMenu *deckMenu, *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *analyzeDeckMenu, *saveDeckToClipboardMenu;
+    QAction *aNewDeck, *aLoadDeck, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aSaveDeckToClipboardRaw, *aPrintDeck, *aExportDeckDecklist, *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aClose;
     QAction *aClearFilterAll, *aClearFilterOne;
     QAction *aAddCard, *aAddCardToSideboard, *aRemoveCard, *aIncrement, *aDecrement;
     QAction *aResetLayout;
