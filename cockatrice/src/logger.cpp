@@ -6,10 +6,16 @@
 #define LOGGER_MAX_ENTRIES 128
 #define LOGGER_FILENAME "qdebug.txt"
 
+#if QT_VERSION >= 0x050400
+    #include <QSysInfo>
+#endif
+
 Logger::Logger() : logToFileEnabled(false)
 {
     logBuffer.append(getClientVersion());
+    logBuffer.append(getSystemArchitecture());
     std::cerr << getClientVersion().toStdString() << std::endl;
+    std::cerr << getSystemArchitecture().toStdString() << std::endl;
 }
 
 Logger::~Logger()
@@ -47,6 +53,7 @@ void Logger::openLogfileSession()
     fileStream.setDevice(&fileHandle);
     fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << endl;
     fileStream << getClientVersion() << endl;
+    fileStream << getSystemArchitecture() << endl;
     logToFileEnabled = true;
 }
 
@@ -80,4 +87,28 @@ void Logger::internalLog(const QString message)
 
     if (logToFileEnabled)
         fileStream << message << endl; // Print to fileStream
+}
+
+QString Logger::getSystemArchitecture()
+{
+    QString result;
+
+    if (!getClientOperatingSystem().isEmpty())
+    {
+        result.append(tr("Client Operating System") + ": " + getClientOperatingSystem() + "\n");
+    }
+
+    result.append(tr("Build Architecture") + ": " + QString::fromStdString(BUILD_ARCHITECTURE) + "\n");
+    result.append(tr("Qt Version") + ": " + QT_VERSION_STR);
+
+    return result;
+}
+
+QString Logger::getClientOperatingSystem()
+{
+    #ifdef QSYSINFO_H
+        return QSysInfo::prettyProductName();
+    #endif
+
+    return {};
 }
