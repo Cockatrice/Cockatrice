@@ -52,7 +52,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
     autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
 
-    publicServersLabel = new QLabel(QString("(<a href=\"%1\">%2</a>").arg(PUBLIC_SERVERS_URL).arg(tr("Public Servers")));
+    publicServersLabel = new QLabel(QString("(<a href=\"%1\">%2</a>)").arg(PUBLIC_SERVERS_URL).arg(tr("Public Servers")));
     publicServersLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
     publicServersLabel->setWordWrap(true);
     publicServersLabel->setTextFormat(Qt::RichText);
