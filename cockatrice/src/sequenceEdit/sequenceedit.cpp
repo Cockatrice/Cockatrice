@@ -89,7 +89,7 @@ bool SequenceEdit::eventFilter(QObject *, QEvent * event)
 {
     if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
     {
-        auto *keyEvent = (QKeyEvent *) event;
+        auto *keyEvent = reinterpret_cast<QKeyEvent *>(event);
 
         if (event->type() == QEvent::KeyPress && !keyEvent->isAutoRepeat())
         {
