@@ -65,8 +65,6 @@ endif()
 # Define proper compilation flags
 IF(MSVC)
     # Visual Studio:
-    # Support from Windows XP
-    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS,5.01")
     # Maximum optimization
     set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
     # Generate complete debugging information
@@ -182,6 +180,15 @@ elseif(WIN32)
         ${CMAKE_MODULE_PATH}/NSIS.definitions.nsh.in
         ${PROJECT_BINARY_DIR}/NSIS.definitions.nsh
     )
+
+    # include vcredist into the package; NSIS will take care of running it
+    IF(MSVC)
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            INSTALL(FILES "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/redist/MSVC/14.12.25810/vc_redist.x64.exe" DESTINATION ./)
+        else()
+            INSTALL(FILES "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/redist/MSVC/14.12.25810/vc_redist.x86.exe" DESTINATION ./)
+        endif()
+    ENDIF()
 endif()
 
 include(CPack)

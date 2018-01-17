@@ -15,29 +15,41 @@ skip_commits:
     - Dockerfile
     - LICENSE
 
-image: Visual Studio 2015
+image: Visual Studio 2017
 
 cache:
+    - c:\openssl-release
     - c:\protobuf-release
     - c:\zlib-release
 
 environment:
     matrix:
-        - qt_ver: 5.9\msvc2015_64
-          protobuf_ver: 3.4.1
+        - qt_ver: 5.9\msvc2017_64
+          openssl_ver: 1.0.2n-x64_86-win64
+          protobuf_ver: 3.5.1
           zlib_ver: 1.2.11
-          cmake_generator: Visual Studio 14 2015 Win64
-          cmake_toolset: v140,host=x64
+          cmake_generator: Visual Studio 15 2017 Win64
+          cmake_toolset: v141,host=x64
           target_arch: x86_64
-        - qt_ver: 5.9\msvc2015
-          protobuf_ver: 3.4.1
+          vc_arch: amd64
+        - qt_ver: 5.9\msvc2015 # Qt doesn't provide a msvc2017_32
+          openssl_ver: 1.0.2n-i386-win32
+          protobuf_ver: 3.5.1
           zlib_ver: 1.2.11
-          cmake_generator: Visual Studio 14 2015
-          cmake_toolset: v140
+          cmake_generator: Visual Studio 15 2017
+          cmake_toolset: v141
           target_arch: x86
+          vc_arch: amd64_x86
 
 install:
     - ps: |
+        if (Test-Path c:\openssl-release) {
+            echo "using openssl from cache"
+        } else {
+            Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver.zip" -OutFile c:\openssl-$env:openssl_ver.zip
+            Expand-Archive -Path c:\openssl-$env:openssl_ver.zip -DestinationPath c:\openssl-release
+            Set-Location -Path C:\openssl-release
+        }
         if (Test-Path c:\protobuf-release) {
             echo "using protobuf from cache"
         } else {
@@ -65,10 +77,11 @@ build_script:
         New-Item -ItemType directory -Path $env:APPVEYOR_BUILD_FOLDER\build
         Set-Location -Path $env:APPVEYOR_BUILD_FOLDER\build
         $zlibdir = "c:\zlib-release"
+        $openssldir = "C:\openssl-release"
         $protodir = "c:\protobuf-release"
         $protoc = "c:\protobuf-release\bin\protoc.exe"
         $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
-        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir;$zlibdir" "-DWITH_SERVER=1" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
+        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir;$zlibdir;$openssldir" "-DWITH_SERVER=1" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
     - msbuild PACKAGE.vcxproj /p:Configuration=Release
     - ps: |
         $exe = dir -name *.exe
