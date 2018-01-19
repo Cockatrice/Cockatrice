@@ -1,12 +1,24 @@
+# Contributing to Cockatrice #
+First off, thanks for taking the time to contribute to our project! 🎉 ❤ ️✨
+
+The following is a set of guidelines for contributing to Cockatrice. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
+
+# Recommended Setups #
+
+For those developers who like the Linux or MacOS environment, many of our developers like working with a nifty program called [CLion](https://www.jetbrains.com/clion/). The program's a great asset and one of the best tools you'll find on these systems, but you're welcomed to use any IDE you most enjoy.
+
+Developers who like Windows development tend to find [Visual Studio](https://www.visualstudio.com/) the best tool for the job.
+
+If you have any questions on IDEs, feel free to chat with us on [Gitter](https://gitter.im/Cockatrice/Cockatrice) and we would love to help answer your questions!  
+
 # Style Guide #
 
 ### Compatibility ###
 
-Cockatrice is compiled on all platform using <kbd>C++11</kbd>, even if the majority of the
-code is written in <kbd>C++03</kbd>.
+Cockatrice is currently compiled on all platforms using <kbd>C++11</kbd>. You'll notice <kbd>C++03</kbd> code throughout the codebase. Please feel free to help convert it over! 
 
-For consistency, use Qt data structures where possible, such as `QString` over
-`std::string` or `QList` over `std::vector`.
+For consistency, we use Qt data structures where possible. For example, `QString` over
+`std::string` and `QList` over `std::vector`.
 
 ### Header files ###
 
@@ -20,13 +32,13 @@ but other functions should be written in the source file.
 
 Keep library includes and project includes grouped together. So this is okay:
 ```c++
-// Good:
+// Good
 #include <QList>
 #include <QString>
 #include "card.h"
 #include "deck.h"
 
-// Good:
+// Good
 #include "card.h"
 #include "deck.h"
 #include <QList>
@@ -38,6 +50,7 @@ Keep library includes and project includes grouped together. So this is okay:
 #include <QString>
 #include "deck.h"
 ```
+
 ### Naming ###
 
 Use `UpperCamelCase` for classes, structs, enums, etc. and `lowerCamelCase` for
@@ -49,18 +62,19 @@ underscores, etc.
 For arguments to constructors which have the same names as member variables,
 prefix those arguments with underscores:
 ```c++
-MyClass::MyClass(int _myData)
-    : myData(_myData)
-{}
+MyClass::MyClass(int _myData) : myData(_myData)
+{
+ 
+}
 ```
 Pointers and references should be denoted with the `*` or `&` going with the
 variable name:
 ```c++
-// Good:
+// Good
 Foo *foo1 = new Foo;
 Foo &foo2 = *foo1;
 
-// Bad:
+// Bad
 Bar* bar1 = new Bar;
 Bar& bar2 = *bar1;
 ```
@@ -69,32 +83,41 @@ If you find any usage of the old keywords, we encourage you to fix it.
 
 ### Braces ###
 
-Use K&R-style braces. Braces for function implementations go on their own
-lines, but they go on the same line everywhere else:
+Braces should almost always go on their own line:
 ```c++
 int main()
 {
-    if (someCondition) {
+    if (someCondition)
+    {
         doSomething();
-    } else {
-        while (someOtherCondition) {
+    }
+    else if (someOtherCondition1)
+    {
+        for (int i = 0; i < 100; i++)
+        {
+            doSomethingElse();
+        }
+    }
+    else
+    {
+        while (someOtherCondition2)
+        {
             doSomethingElse();
         }
     }
 }
 ```
-Braces can be omitted for single-statement if's and the like, as long as it is
-still legible.
+Braces should never be omitted for single-statement. Keeping the code legibile is a high priority of ours and we hope you share a similar belief :)
 
-### Tabs ###
+### Tabs vs Spaces ###
 
-Use only spaces. Four spaces per tab.
+We _highly_ encourate the use of spaces. If you use tabs, please readjust them to 4 spaces per tab before submitting.
 
 ### Lines ###
 
-Do not have trailing whitespace in your lines.
+Do not have trailing whitespace in your lines, if possible. Most IDEs check for this nowadays and clean it up for you.
 
-Lines should be 80 characters or less, as a soft limit.
+Lines should be 120 characters or less, but you can exceed this if you find it necessary.
 
 ### Memory Management ###
 
@@ -108,7 +131,7 @@ int main()
     Card card;
     showCard(card);
 }
-
+ 
 // Bad: relies on manual memory management and doesn't give us much
 // null-safety.
 void showCard(const Card *card);
@@ -140,6 +163,8 @@ The migration file should include the sql statements needed to migrate the datab
 
 Cockatrice and Servatrice exchange data using binary messages. The syntax of these messages is defined in the `proto` files in the `common/pb` folder. These files defines the way data contained in each message is serialized using Google's [protocol buffer](https://developers.google.com/protocol-buffers/).
 Any change to the `proto` file should be taken with caution and tested intensively before being merged, becaus a change to the protocol could make new clients incompatible to the old server and vice versa.
+
+You can find more information on how we use Protobuf on [our wiki!](https://github.com/Cockatrice/Cockatrice/wiki/Client-server-protocol)
 
 ### Translations: introduction ###
 
@@ -236,13 +261,13 @@ upstream - git@github.com:Cockatrice/Cockatrice.git
 $COCKATRICE_REPO - /Location/of/repository/cockatrice.git
 $TAG_NAME
   - If full release, YYYY-MM-DD-Release-MAJ.MIN.PATCH
-  - If dev snapshot, YYYY-MM-DD-Development-MAJ.MIN.PATCH-betaX
+  - If dev snapshot, YYYY-MM-DD-Development-MAJ.MIN.PATCH-beta.X
         - MAJ.MIN.PATCH will be the NEXT release version
 ```
 
 This will cause a tag release to be established on the GitHub repository, which will then lead to the upload of binaries. If you use this method, the tags (releases) that you create will be marked as a "pre-release" build. The `/latest` URL will not be impacted (For stable branch downloads) so that's good.
 
-If you accidentally push a tag incorrectly (the tag is outdated (you didn't pull in the latest branch accidentally), you named the tag wrong, etc) you can revoke the tag by doing the following:
+If you accidentally push a tag incorrectly (the tag is outdated, you didn't pull in the latest branch accidentally, you named the tag wrong, etc.) you can revoke the tag by doing the following:
 ```bash
 git push --delete upstream $TAG_NAME
 git tag -d $TAG_NAME
