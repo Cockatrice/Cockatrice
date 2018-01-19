@@ -55,7 +55,9 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt)
             }
             break;
         }
-        default: break;
+
+        default:
+            break;
     }
 
     if (result)
@@ -97,7 +99,6 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
     {
         case PlainTextFormat: result = saveToFile_Plain(&file); break;
         case CockatriceFormat: result = saveToFile_Native(&file); break;
-        default: break;
     }
 
     if (result)
@@ -118,7 +119,7 @@ struct FormatDeckListForExport
     QString &sideBoardCards;
     //create main operator for struct, allowing the foreachcard to work.
     FormatDeckListForExport(QString &_mainBoardCards, QString &_sideBoardCards) : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards){};
-    
+
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {
         //Get the card name
@@ -128,6 +129,7 @@ struct FormatDeckListForExport
             //If it's a token, we don't care about the card.
             return;
         }
+
         //Check if it's a sideboard card.
         if (node->getName() == DECK_ZONE_SIDE)
         {
@@ -166,9 +168,9 @@ QString DeckLoader::exportDeckToDecklist()
     sideBoardCards.chop(3);
     //if after we've called it for each card, and the strings are empty, we know that
     //there were no non-token cards in the deck, so show an error message.
-    if((QString::compare(mainBoardCards, "", Qt::CaseInsensitive) == 0) && (QString::compare(sideBoardCards, "", Qt::CaseInsensitive) == 0))
-    {
-        return QString();
+    if((QString::compare(mainBoardCards, "", Qt::CaseInsensitive) == 0) &&
+       (QString::compare(sideBoardCards, "", Qt::CaseInsensitive) == 0)) {
+        return "";
     }
     //return a string with the url for decklist export
     deckString+="deckmain="+mainBoardCards+"&deckside="+sideBoardCards;
@@ -184,16 +186,19 @@ DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
     return PlainTextFormat;
 }
 
-bool DeckLoader::saveToStream_Plain(QTextStream &out)
+bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments)
 {
-    saveToStream_DeckHeader(out);
+    if (addComments)
+    {
+        saveToStream_DeckHeader(out);
+    }
 
     // loop zones
     for (int i = 0; i < getRoot()->size(); i++)
     {
-        const InnerDecklistNode *zoneNode = dynamic_cast<InnerDecklistNode *>(getRoot()->at(i));
+        const auto *zoneNode = dynamic_cast<InnerDecklistNode *>(getRoot()->at(i));
 
-        saveToStream_DeckZone(out, zoneNode);
+        saveToStream_DeckZone(out, zoneNode, addComments);
 
         // end of zone
         out << "\n";
@@ -212,19 +217,18 @@ void DeckLoader::saveToStream_DeckHeader(QTextStream &out)
     if (!getComments().isEmpty())
     {
         QStringList commentRows = getComments().split(QRegExp("\n|\r\n|\r"));
-        for (QString row : commentRows)
+        foreach(QString row, commentRows)
         {
             out << "// " << row << "\n";
         }
-
         out << "\n";
     }
 }
 
-void DeckLoader::saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode *zoneNode)
+void DeckLoader::saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode *zoneNode, bool addComments)
 {
    // group cards by card type and count the subtotals
-    QMultiMap<QString, DecklistCardNode *> cardsByType;
+    QMultiMap<QString, DecklistCardNode*> cardsByType;
     QMap<QString, int> cardTotalByType;
     int cardTotal = 0;
 
@@ -249,50 +253,67 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode
         cardTotal += card->getNumber();
     }
 
-    out << "// " << cardTotal << " " << zoneNode->getVisibleName() << "\n";
+    if (addComments)
+    {
+        out << "// " << cardTotal << " " << zoneNode->getVisibleName() << "\n";
+    }
 
     // print cards to stream
     foreach(QString cardType, cardsByType.uniqueKeys())
     {
+        if (addComments)
+        {
+            out << "// " << cardTotalByType[cardType] << " " << cardType << "\n";
+        }
 
-        out << "// " << cardTotalByType[cardType] << " " << cardType << "\n";
         QList <DecklistCardNode*> cards = cardsByType.values(cardType);
 
-        saveToStream_DeckZoneCards(out, zoneNode, cards);
+        saveToStream_DeckZoneCards(out, zoneNode, cards, addComments);
 
-        out << "\n";
+        if (addComments)
+        {
+            out << "\n";
+        }
     }
 }
 
-void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out, const InnerDecklistNode *zoneNode, QList <DecklistCardNode*> cards)
+void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out, const InnerDecklistNode *zoneNode, QList <DecklistCardNode*> cards, bool addComments)
 {
     // QMultiMap sorts values in reverse order
-    for(int i = cards.size() - 1; i >= 0; --i)
+    for (int i = cards.size() - 1; i >= 0; --i)
     {
         DecklistCardNode* card = cards[i];
 
-        if (zoneNode->getName() == DECK_ZONE_SIDE)
+        if (zoneNode->getName() == DECK_ZONE_SIDE && addComments)
+        {
             out << "SB: ";
+        }
 
-       out << card->getNumber() << " " << card->getName() << "\n";
+        out << card->getNumber() << " " << card->getName() << "\n";
     }
 }
 
 QString DeckLoader::getCardZoneFromName(QString cardName, QString currentZoneName)
 {
     CardInfo *card = db->getCard(cardName);
+
     if (card && card->getIsToken())
+    {
         return DECK_ZONE_TOKENS;
+    }
 
     return currentZoneName;
 }
 
 QString DeckLoader::getCompleteCardName(const QString cardName) const
 {
-    if (db) {
+    if (db)
+    {
         CardInfo *temp = db->getCardBySimpleName(cardName);
         if (temp)
+        {
             return temp->getName();
+        }
     }
 
     return cardName;

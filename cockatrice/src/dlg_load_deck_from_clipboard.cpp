@@ -2,8 +2,6 @@
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QKeySequence>
 #include <QApplication>
 #include <QTextStream>
 #include <QDialogButtonBox>
@@ -12,8 +10,7 @@
 #include "deck_loader.h"
 #include "settingscache.h"
 
-DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
-    : QDialog(parent), deckList(0)
+DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : QDialog(parent), deckList(nullptr)
 {
     contentsEdit = new QPlainTextEdit;
     
@@ -25,7 +22,7 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent)
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOK()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
     
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(contentsEdit);
     mainLayout->addWidget(buttonBox);
 
@@ -54,25 +51,28 @@ void DlgLoadDeckFromClipboard::actOK()
     QString buffer = contentsEdit->toPlainText();
     QTextStream stream(&buffer);
     
-    DeckLoader *l = new DeckLoader;
+    auto *deckLoader = new DeckLoader;
     if (buffer.contains("<cockatrice_deck version=\"1\">"))
     {
-        if (l->loadFromString_Native(buffer))
+        if (deckLoader->loadFromString_Native(buffer))
         {
-            deckList = l;
+            deckList = deckLoader;
             accept();
         }
         else
         {
             QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
-            delete l;
+            delete deckLoader;
         }
     }
-    else if (l->loadFromStream_Plain(stream)) {
-        deckList = l;
+    else if (deckLoader->loadFromStream_Plain(stream))
+    {
+        deckList = deckLoader;
         accept();
-    } else {
+    }
+    else
+    {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
-        delete l;
+        delete deckLoader;
     }
 }

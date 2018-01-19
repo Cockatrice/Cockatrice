@@ -35,12 +35,12 @@ class DeckLoader : public DeckList
         QString exportDeckToDecklist();
 
         // overload
-        bool saveToStream_Plain(QTextStream &out);
+        bool saveToStream_Plain(QTextStream &out, bool addComments = true);
 
     protected:
         void saveToStream_DeckHeader(QTextStream &out);
-        void saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode *zoneNode);
-        void saveToStream_DeckZoneCards(QTextStream &out, const InnerDecklistNode *zoneNode, QList <DecklistCardNode*> cards);
+        void saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode *zoneNode, bool addComments = true);
+        void saveToStream_DeckZoneCards(QTextStream &out, const InnerDecklistNode *zoneNode, QList <DecklistCardNode*> cards, bool addComments = true);
         virtual QString getCardZoneFromName(QString cardName, QString currentZoneName);
         virtual QString getCompleteCardName(const QString cardName) const;
 };

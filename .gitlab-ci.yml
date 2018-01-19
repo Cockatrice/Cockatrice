@@ -78,22 +78,6 @@ stages:
   <<: *artifacts_deb
   <<: *cache
 
-.build_1610: &1610
-  image: ubuntu:16.10
-  <<: *tags
-  <<: *branches
-  <<: *install_requirements_16xx
-  <<: *artifacts_deb
-  <<: *cache
-
-.build_1704: &1704
-  image: ubuntu:17.04
-  <<: *tags
-  <<: *branches
-  <<: *install_requirements_17xx
-  <<: *artifacts_deb
-  <<: *cache
-
 .build_1710: &1710
   image: ubuntu:17.10
   <<: *tags
@@ -111,28 +95,6 @@ build_debug_1604:
   <<: *1604
   <<: *build_debug_package_deb
   when: always
-
-build_rc_1610:
-  <<: *1610
-  <<: *build_rc_package_deb
-  when: always
-
-build_debug_1610:
-  <<: *1610
-  <<: *build_debug_package_deb
-  when: always
-  allow_failure: true
-
-build_rc_1704:
-  <<: *1704
-  <<: *build_rc_package_deb
-  when: always
-
-build_debug_1704:
-  <<: *1704
-  <<: *build_debug_package_deb
-  when: always
-  allow_failure: true
 
 build_rc_1710:
   <<: *1710

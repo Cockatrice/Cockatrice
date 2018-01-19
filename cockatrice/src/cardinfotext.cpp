@@ -59,7 +59,7 @@ CardInfoText::CardInfoText(QWidget *parent)
 
 void CardInfoText::setCard(CardInfo *card)
 {
-    if(card)
+    if (card)
     {
         nameLabel2->setText(card->getName());
         manacostLabel2->setText(card->getManaCost());
@@ -68,7 +68,9 @@ void CardInfoText::setCard(CardInfo *card)
         powtoughLabel2->setText(card->getPowTough());
         loyaltyLabel2->setText(card->getLoyalty() > 0 ? QString::number(card->getLoyalty()) : QString());
         textLabel->setText(card->getText());
-    } else {
+    }
+    else
+    {
         nameLabel2->setText("");
         manacostLabel2->setText("");
         colorLabel2->setText("");

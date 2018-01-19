@@ -226,6 +226,9 @@ void TabDeckEditor::createMenus()
     aSaveDeckToClipboard = new QAction(QString(), this);
     connect(aSaveDeckToClipboard, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboard()));
 
+    aSaveDeckToClipboardRaw = new QAction(QString(), this);
+    connect(aSaveDeckToClipboardRaw, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboardRaw()));
+
     aPrintDeck = new QAction(QString(), this);
     connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
 
@@ -254,6 +257,10 @@ void TabDeckEditor::createMenus()
     aClearFilterOne->setIcon(QPixmap("theme:icons/decrement"));
     connect(aClearFilterOne, SIGNAL(triggered()), this, SLOT(actClearFilterOne()));
 
+    saveDeckToClipboardMenu = new QMenu(this);
+    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboard);
+    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardRaw);
+
     deckMenu = new QMenu(this);
     deckMenu->addAction(aNewDeck);
     deckMenu->addAction(aLoadDeck);
@@ -261,7 +268,7 @@ void TabDeckEditor::createMenus()
     deckMenu->addAction(aSaveDeckAs);
     deckMenu->addSeparator();
     deckMenu->addAction(aLoadDeckFromClipboard);
-    deckMenu->addAction(aSaveDeckToClipboard);
+    deckMenu->addMenu(saveDeckToClipboardMenu);
     deckMenu->addSeparator();
     deckMenu->addAction(aPrintDeck);
     deckMenu->addMenu(analyzeDeckMenu);
@@ -312,18 +319,18 @@ void TabDeckEditor::createCentralFrame()
 {
     searchEdit = new SearchLineEdit;
     searchEdit->setObjectName("searchEdit");
+    searchEdit->setPlaceholderText(tr("Search by card name"));
 #if QT_VERSION >= 0x050200
     searchEdit->setClearButtonEnabled(true);
 #endif
 #if QT_VERSION >= 0x050300
     searchEdit->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
 #endif
+    searchEdit->installEventFilter(&searchKeySignals);
 
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
 
-    searchEdit->installEventFilter(&searchKeySignals);
-    searchEdit->setPlaceholderText(tr("Search by card name"));
     searchKeySignals.setObjectName("searchKeySignals");
     connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
     connect(&searchKeySignals, SIGNAL(onEnter()), this, SLOT(actAddCard()));
@@ -470,7 +477,10 @@ void TabDeckEditor::refreshShortcuts()
     aResetLayout->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aResetLayout"));
     aClearFilterAll->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterAll"));
     aClearFilterOne->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterOne"));
+
     aSaveDeckToClipboard->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeckToClipboard"));
+    aSaveDeckToClipboardRaw->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aSaveDeckToClipboardRaw"));
+
     aClearFilterOne->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClearFilterOne"));
     aClose->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aClose"));
     aRemoveCard->setShortcuts(settingsCache->shortcuts().getShortcut("TabDeckEditor/aRemoveCard"));
@@ -552,7 +562,11 @@ void TabDeckEditor::retranslateUi()
     aSaveDeck->setText(tr("&Save deck"));
     aSaveDeckAs->setText(tr("Save deck &as..."));
     aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
-    aSaveDeckToClipboard->setText(tr("Save deck to clip&board"));
+
+    saveDeckToClipboardMenu->setTitle(tr("Save deck to clipboard"));
+    aSaveDeckToClipboard->setText(tr("Annotated"));
+    aSaveDeckToClipboardRaw->setText(tr("Not Annotated"));
+
     aPrintDeck->setText(tr("&Print deck..."));
 
     analyzeDeckMenu->setTitle(tr("&Send deck to online service"));
@@ -763,6 +777,15 @@ void TabDeckEditor::actSaveDeckToClipboard()
     QString buffer;
     QTextStream stream(&buffer);
     deckModel->getDeckList()->saveToStream_Plain(stream);
+    QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
+    QApplication::clipboard()->setText(buffer, QClipboard::Selection);
+}
+
+void TabDeckEditor::actSaveDeckToClipboardRaw()
+{
+    QString buffer;
+    QTextStream stream(&buffer);
+    deckModel->getDeckList()->saveToStream_Plain(stream, false);
     QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
