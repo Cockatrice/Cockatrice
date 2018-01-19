@@ -315,6 +315,7 @@ void DeckViewContainer::sideboardPlanChanged()
 
 void DeckViewContainer::setReadyStart(bool ready)
 {
+    qDebug() << "setReadyStart" << ready;
     readyStartButton->setState(ready);
     deckView->setLocked(ready || !sideboardLockButton->getState());
     sideboardLockButton->setEnabled(!readyStartButton->getState());
@@ -885,6 +886,26 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
                     emitUserEvent();
                     break;
                 }
+                case GameEvent_GameEventType_GAME_SAY:break;
+                case GameEvent_GameEventType_CREATE_ARROW:break;
+                case GameEvent_GameEventType_DELETE_ARROW:break;
+                case GameEvent_GameEventType_CREATE_COUNTER:break;
+                case GameEvent_GameEventType_SET_COUNTER:break;
+                case GameEvent_GameEventType_DEL_COUNTER:break;
+                case GameEvent_GameEventType_DRAW_CARDS:break;
+                case GameEvent_GameEventType_REVEAL_CARDS:break;
+                case GameEvent_GameEventType_SHUFFLE:break;
+                case GameEvent_GameEventType_ROLL_DIE:break;
+                case GameEvent_GameEventType_MOVE_CARD:break;
+                case GameEvent_GameEventType_FLIP_CARD:break;
+                case GameEvent_GameEventType_DESTROY_CARD:break;
+                case GameEvent_GameEventType_ATTACH_CARD:break;
+                case GameEvent_GameEventType_CREATE_TOKEN:break;
+                case GameEvent_GameEventType_SET_CARD_ATTR:break;
+                case GameEvent_GameEventType_SET_CARD_COUNTER:break;
+                case GameEvent_GameEventType_DUMP_ZONE:break;
+                case GameEvent_GameEventType_STOP_DUMP_ZONE:break;
+                case GameEvent_GameEventType_CHANGE_ZONE_PROPERTIES:break;
             }
         }
     }
@@ -990,10 +1011,7 @@ void TabGame::startGame(bool resuming)
         QMapIterator<int, Player *> playerIterator(players);
         while (playerIterator.hasNext())
         {
-            if (playerIterator.next().value())
-            {
-                playerIterator.next().value()->setGameStarted();
-            }
+            playerIterator.next().value()->setGameStarted();
         }
     }
 

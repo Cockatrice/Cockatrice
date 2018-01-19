@@ -28,8 +28,7 @@
 #include "pb/serverinfo_room.pb.h"
 #include "pb/moderator_commands.pb.h"
 
-CloseButton::CloseButton(QWidget *parent)
-    : QAbstractButton(parent)
+CloseButton::CloseButton(QWidget *parent) : QAbstractButton(parent)
 {
     setFocusPolicy(Qt::NoFocus);
     setCursor(Qt::ArrowCursor);
@@ -39,9 +38,9 @@ CloseButton::CloseButton(QWidget *parent)
 QSize CloseButton::sizeHint() const
 {
     ensurePolished();
-    int width = style()->pixelMetric(QStyle::PM_TabCloseIndicatorWidth, 0, this);
-    int height = style()->pixelMetric(QStyle::PM_TabCloseIndicatorHeight, 0, this);
-    return QSize(width, height);
+    int width = style()->pixelMetric(QStyle::PM_TabCloseIndicatorWidth, nullptr, this);
+    int height = style()->pixelMetric(QStyle::PM_TabCloseIndicatorHeight, nullptr, this);
+    return {width, height};
 }
 
 void CloseButton::enterEvent(QEvent *event)
@@ -63,24 +62,34 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
     opt.init(this);
     opt.state |= QStyle::State_AutoRaise;
     if (isEnabled() && underMouse() && !isChecked() && !isDown())
+    {
         opt.state |= QStyle::State_Raised;
+    }
+
     if (isChecked())
+    {
         opt.state |= QStyle::State_On;
+    }
+
     if (isDown())
+    {
         opt.state |= QStyle::State_Sunken;
-    
-    if (const QTabBar *tb = qobject_cast<const QTabBar *>(parent())) {
+    }
+
+    if (const auto *tb = qobject_cast<const QTabBar *>(parent()))
+    {
         int index = tb->currentIndex();
-        QTabBar::ButtonPosition position = (QTabBar::ButtonPosition) style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tb);
+        auto position = static_cast<QTabBar::ButtonPosition>(style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tb));
         if (tb->tabButton(index, position) == this)
+        {
             opt.state |= QStyle::State_Selected;
+        }
     }
     
     style()->drawPrimitive(QStyle::PE_IndicatorTabClose, &opt, &p, this);
 }
 
-TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
-    : QTabWidget(parent), userInfo(0), client(_client), tabServer(0), tabUserLists(0), tabDeckStorage(0), tabReplays(0), tabAdmin(0), tabLog(0)
+TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent) : QTabWidget(parent), userInfo(nullptr), client(_client), tabServer(nullptr), tabUserLists(nullptr), tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr), tabLog(nullptr)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -113,42 +122,63 @@ void TabSupervisor::retranslateUi()
     tabs.append(tabLog);
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext())
+    {
         tabs.append(roomIterator.next().value());
+    }
+
     QMapIterator<int, TabGame *> gameIterator(gameTabs);
     while (gameIterator.hasNext())
+    {
         tabs.append(gameIterator.next().value());
+    }
+
     QListIterator<TabGame *> replayIterator(replayTabs);
     while (replayIterator.hasNext())
+    {
         tabs.append(replayIterator.next());
+    }
+
     QListIterator<TabDeckEditor *> deckEditorIterator(deckEditorTabs);
     while (deckEditorIterator.hasNext())
+    {
         tabs.append(deckEditorIterator.next());
+    }
+
     QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
     while (messageIterator.hasNext())
+    {
         tabs.append(messageIterator.next().value());
+    }
     
-    for (int i = 0; i < tabs.size(); ++i)
-        if (tabs[i]) {
-            int idx = indexOf(tabs[i]);
-            QString tabText = tabs[i]->getTabText();
+    for (auto &tab : tabs)
+    {
+        if (tab)
+        {
+            int idx = indexOf(tab);
+            QString tabText = tab->getTabText();
             setTabText(idx, sanitizeTabName(tabText));
             setTabToolTip(idx, sanitizeHtml(tabText));
-            tabs[i]->retranslateUi();
+            tab->retranslateUi();
         }
+    }
 }
 
 bool TabSupervisor::closeRequest()
 {
-    if (getGameCount()) {
-        if (QMessageBox::question(this, tr("Are you sure?"), tr("There are still open games. Are you sure you want to quit?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+    if (getGameCount())
+    {
+        if (QMessageBox::question(this, tr("Are you sure?"), tr("There are still open games. Are you sure you want to quit?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No)
+        {
             return false;
         }
     }
 
-    foreach(TabDeckEditor *tab,  deckEditorTabs)
+    for (TabDeckEditor *tab : deckEditorTabs)
     {
-        if(!tab->confirmClose())
+        if (!tab->confirmClose())
+        {
             return false;
+        }
     }
 
     return true;
@@ -185,53 +215,52 @@ int TabSupervisor::myAddTab(Tab *tab)
     return idx;
 }
 
-void TabSupervisor::start(const ServerInfo_User &_userInfo) {
+void TabSupervisor::start(const ServerInfo_User &_userInfo)
+{
     isLocalGame = false;
     userInfo = new ServerInfo_User(_userInfo);
 
     tabServer = new TabServer(this, client);
-    connect(tabServer, SIGNAL(roomJoined(
-                                      const ServerInfo_Room &, bool)), this, SLOT(addRoomTab(
-                                                                                          const ServerInfo_Room &, bool)));
+    connect(tabServer, SIGNAL(roomJoined(const ServerInfo_Room &, bool)), this, SLOT(addRoomTab(const ServerInfo_Room &, bool)));
     myAddTab(tabServer);
 
     tabUserLists = new TabUserLists(this, client, *userInfo);
-    connect(tabUserLists, SIGNAL(openMessageDialog(
-                                         const QString &, bool)), this, SLOT(addMessageTab(
-                                                                                     const QString &, bool)));
+    connect(tabUserLists, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
     connect(tabUserLists, SIGNAL(userJoined(ServerInfo_User)), this, SLOT(processUserJoined(ServerInfo_User)));
-    connect(tabUserLists, SIGNAL(userLeft(
-                                         const QString &)), this, SLOT(processUserLeft(
-                                                                               const QString &)));
+    connect(tabUserLists, SIGNAL(userLeft(const QString &)), this, SLOT(processUserLeft(const QString &)));
     myAddTab(tabUserLists);
 
     updatePingTime(0, -1);
 
-    if (userInfo->user_level() & ServerInfo_User::IsRegistered) {
+    if (userInfo->user_level() & ServerInfo_User::IsRegistered)
+    {
         tabDeckStorage = new TabDeckStorage(this, client);
-        connect(tabDeckStorage, SIGNAL(openDeckEditor(
-                                               const DeckLoader *)), this, SLOT(addDeckEditorTab(
-                                                                                        const DeckLoader *)));
+        connect(tabDeckStorage, SIGNAL(openDeckEditor(const DeckLoader *)), this, SLOT(addDeckEditorTab(const DeckLoader *)));
         myAddTab(tabDeckStorage);
 
         tabReplays = new TabReplays(this, client);
         connect(tabReplays, SIGNAL(openReplay(GameReplay * )), this, SLOT(openReplay(GameReplay * )));
         myAddTab(tabReplays);
-    } else {
-        tabDeckStorage = 0;
-        tabReplays = 0;
+    }
+    else
+    {
+        tabDeckStorage = nullptr;
+        tabReplays = nullptr;
     }
 
-    if (userInfo->user_level() & ServerInfo_User::IsModerator) {
-        tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
+    if (userInfo->user_level() & ServerInfo_User::IsModerator)
+    {
+        tabAdmin = new TabAdmin(this, client, static_cast<bool>(userInfo->user_level() & ServerInfo_User::IsAdmin));
         connect(tabAdmin, SIGNAL(adminLockChanged(bool)), this, SIGNAL(adminLockChanged(bool)));
         myAddTab(tabAdmin);
 
         tabLog = new TabLog(this, client);
         myAddTab(tabLog);
-    } else {
-        tabAdmin = 0;
-        tabLog = 0;
+    }
+    else
+    {
+        tabAdmin = nullptr;
+        tabLog = nullptr;
     }
 
     retranslateUi();
@@ -247,82 +276,117 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     isLocalGame = true;
     userInfo = new ServerInfo_User;
     localClients = _clients;
-    for (int i = 0; i < localClients.size(); ++i)
-        connect(localClients[i], SIGNAL(gameEventContainerReceived(const GameEventContainer &)), this, SLOT(processGameEventContainer(const GameEventContainer &)));
+    for (auto &localClient : localClients)
+    {
+        connect(localClient, SIGNAL(gameEventContainerReceived(const GameEventContainer &)), this, SLOT(processGameEventContainer(const GameEventContainer &)));
+    }
+
     connect(localClients.first(), SIGNAL(gameJoinedEventReceived(const Event_GameJoined &)), this, SLOT(localGameJoined(const Event_GameJoined &)));
 }
 
 void TabSupervisor::stop()
 {
     if ((!client) && localClients.isEmpty())
+    {
         return;
+    }
     
-    if (!localClients.isEmpty()) {
-        for (int i = 0; i < localClients.size(); ++i)
-            localClients[i]->deleteLater();
+    if (!localClients.isEmpty())
+    {
+        for (auto &localClient : localClients)
+        {
+            localClient->deleteLater();
+        }
+
         localClients.clear();
         
         emit localGameEnded();
-    } else {
-        if (tabUserLists)
-            tabUserLists->deleteLater();
-        if (tabServer)
-            tabServer->deleteLater();
-        if (tabDeckStorage)
-            tabDeckStorage->deleteLater();
-        if (tabReplays)
-            tabReplays->deleteLater();
-        if (tabAdmin)
-            tabAdmin->deleteLater();
-        if (tabLog)
-            tabLog->deleteLater();
     }
-    tabUserLists = 0;
-    tabServer = 0;
-    tabDeckStorage = 0;
-    tabReplays = 0;
-    tabAdmin = 0;
-    tabLog = 0;
+    else
+    {
+        if (tabUserLists)
+        {
+            tabUserLists->deleteLater();
+        }
+
+        if (tabServer)
+        {
+            tabServer->deleteLater();
+        }
+
+        if (tabDeckStorage)
+        {
+            tabDeckStorage->deleteLater();
+        }
+
+        if (tabReplays)
+        {
+            tabReplays->deleteLater();
+        }
+
+        if (tabAdmin)
+        {
+            tabAdmin->deleteLater();
+        }
+
+        if (tabLog)
+        {
+            tabLog->deleteLater();
+        }
+    }
+
+    tabUserLists = nullptr;
+    tabServer = nullptr;
+    tabDeckStorage = nullptr;
+    tabReplays = nullptr;
+    tabAdmin = nullptr;
+    tabLog = nullptr;
     
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext())
+    {
         roomIterator.next().value()->deleteLater();
+    }
     roomTabs.clear();
 
     QMapIterator<int, TabGame *> gameIterator(gameTabs);
     while (gameIterator.hasNext())
+    {
         gameIterator.next().value()->deleteLater();
+    }
     gameTabs.clear();
 
     QListIterator<TabGame *> replayIterator(replayTabs);
     while (replayIterator.hasNext())
+    {
         replayIterator.next()->deleteLater();
+    }
     replayTabs.clear();
 
     delete userInfo;
-    userInfo = 0;
+    userInfo = nullptr;
 }
 
 void TabSupervisor::updatePingTime(int value, int max)
 {
-    if (!tabServer)
+    if (!tabServer || tabServer->getContentsChanged())
+    {
         return;
-    if (tabServer->getContentsChanged())
-        return;
+    }
     
     setTabIcon(indexOf(tabServer), QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
 }
 
 void TabSupervisor::closeButtonPressed()
 {
-    Tab *tab = static_cast<Tab *>(static_cast<CloseButton *>(sender())->property("tab").value<QObject *>());
+    Tab *tab = dynamic_cast<Tab *>(dynamic_cast<CloseButton *>(sender())->property("tab").value<QObject *>());
     tab->closeRequest();
 }
 
 void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex)
 {
-    QTabBar::ButtonPosition closeSide = (QTabBar::ButtonPosition) tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tabBar());
-    CloseButton *closeButton = new CloseButton;
+    auto closeSide = static_cast<QTabBar::ButtonPosition>(tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, 0, tabBar()));
+    auto *closeButton = new CloseButton;
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeButtonPressed()));
     closeButton->setProperty("tab", qVariantFromValue((QObject *) tab));
     tabBar()->setTabButton(tabIndex, closeSide, closeButton);
@@ -333,10 +397,16 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
     QMap<int, QString> roomGameTypes;
     TabRoom *room = roomTabs.value(event.game_info().room_id());
     if (room)
+    {
         roomGameTypes = room->getGameTypes();
+    }
     else
+    {
         for (int i = 0; i < event.game_types_size(); ++i)
+        {
             roomGameTypes.insert(event.game_types(i).game_type_id(), QString::fromStdString(event.game_types(i).description()));
+        }
+    }
     
     TabGame *tab = new TabGame(this, QList<AbstractClient *>() << client, event, roomGameTypes);
     connect(tab, SIGNAL(gameClosing(TabGame *)), this, SLOT(gameLeft(TabGame *)));
@@ -358,7 +428,8 @@ void TabSupervisor::localGameJoined(const Event_GameJoined &event)
     gameTabs.insert(event.game_info().game_id(), tab);
     setCurrentWidget(tab);
     
-    for (int i = 1; i < localClients.size(); ++i) {
+    for (int i = 1; i < localClients.size(); ++i)
+    {
         Command_JoinGame cmd;
         cmd.set_game_id(event.game_info().game_id());
         localClients[i]->sendCommand(localClients[i]->prepareRoomCommand(cmd, 0));
@@ -367,19 +438,28 @@ void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 
 void TabSupervisor::gameLeft(TabGame *tab)
 {
+    if (tab == nullptr)
+    {
+        return;
+    }
+
     if (tab == currentWidget())
+    {
         emit setMenu();
+    }
 
     gameTabs.remove(tab->getGameId());
     removeTab(indexOf(tab));
     
     if (!localClients.isEmpty())
+    {
         stop();
+    }
 }
 
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 {
-    TabRoom *tab = new TabRoom(this, client, userInfo, info);
+    auto *tab = new TabRoom(this, client, userInfo, info);
     connect(tab, SIGNAL(maximizeClient()), this, SLOT(maximizeMainWindow()));   
     connect(tab, SIGNAL(roomClosing(TabRoom *)), this, SLOT(roomLeft(TabRoom *)));
     connect(tab, SIGNAL(openMessageDialog(const QString &, bool)), this, SLOT(addMessageTab(const QString &, bool)));
@@ -387,13 +467,22 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     addCloseButtonToTab(tab, tabIndex);
     roomTabs.insert(info.room_id(), tab);
     if (setCurrent)
+    {
         setCurrentWidget(tab);
+    }
 }
 
 void TabSupervisor::roomLeft(TabRoom *tab)
 {
+    if (tab == nullptr)
+    {
+        return;
+    }
+
     if (tab == currentWidget())
+    {
         emit setMenu();
+    }
     
     roomTabs.remove(tab->getRoomId());
     removeTab(indexOf(tab));
@@ -401,7 +490,7 @@ void TabSupervisor::roomLeft(TabRoom *tab)
 
 void TabSupervisor::openReplay(GameReplay *replay)
 {
-    TabGame *replayTab = new TabGame(this, replay);
+    auto *replayTab = new TabGame(this, replay);
     connect(replayTab, SIGNAL(gameClosing(TabGame *)), this, SLOT(replayLeft(TabGame *)));
     int tabIndex = myAddTab(replayTab);
     addCloseButtonToTab(replayTab, tabIndex);
@@ -412,7 +501,9 @@ void TabSupervisor::openReplay(GameReplay *replay)
 void TabSupervisor::replayLeft(TabGame *tab)
 {
     if (tab == currentWidget())
+    {
         emit setMenu();
+    }
     
     replayTabs.removeAt(replayTabs.indexOf(tab));
 }
@@ -420,20 +511,30 @@ void TabSupervisor::replayLeft(TabGame *tab)
 TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus)
 {
     if (receiverName == QString::fromStdString(userInfo->name()))
-        return 0;
+    {
+        return nullptr;
+    }
     
     ServerInfo_User otherUser;
     UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(receiverName);
     if (twi)
+    {
         otherUser = twi->getUserInfo();
+    }
     else
+    {
         otherUser.set_name(receiverName.toStdString());
+    }
 
     TabMessage *tab;
     tab = messageTabs.value(QString::fromStdString(otherUser.name()));
-    if (tab) {
+    if (tab)
+    {
         if (focus)
-          setCurrentWidget(tab);
+        {
+            setCurrentWidget(tab);
+        }
+
         return tab;
     }
 
@@ -444,7 +545,9 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     addCloseButtonToTab(tab, tabIndex);
     messageTabs.insert(receiverName, tab);
     if (focus)
+    {
         setCurrentWidget(tab);
+    }
     return tab;
 }
 
