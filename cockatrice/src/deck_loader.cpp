@@ -25,7 +25,10 @@ DeckLoader::DeckLoader(const DeckList &other) : DeckList(other), lastFileName(QS
 
 }
 
-DeckLoader::DeckLoader(const DeckLoader &other) = default;
+DeckLoader::DeckLoader(const DeckLoader &other) : DeckList(other), lastFileName(other.lastFileName), lastFileFormat(other.lastFileFormat), lastRemoteDeckId(other.lastRemoteDeckId)
+{
+
+}
 
 bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt)
 {
