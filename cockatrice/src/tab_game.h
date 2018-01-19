@@ -100,12 +100,10 @@ class DeckViewContainer : public QWidget
 
     signals:
         void newCardAdded(AbstractCardItem *card);
-        void notIdle();
 
     public:
         DeckViewContainer(int _playerId, TabGame *parent);
         void retranslateUi();
-        void setButtonsVisible(bool _visible);
         void setReadyStart(bool ready);
         void setSideboardLocked(bool locked);
         void setDeck(const DeckLoader &deck);
@@ -184,7 +182,6 @@ class TabGame : public Tab
         void eventSetActivePlayer(const Event_SetActivePlayer &event, int eventPlayerId, const GameEventContext &context);
         void setActivePhase(int phase);
         void eventSetActivePhase(const Event_SetActivePhase &event, int eventPlayerId, const GameEventContext &context);
-        //void eventPing(const Event_Ping &event, int eventPlayerId, const GameEventContext &context);
         void emitUserEvent();
         void createMenuItems();
         void createReplayMenuItems();
@@ -205,7 +202,6 @@ class TabGame : public Tab
         void containerProcessingDone();
         void openMessageDialog(const QString &userName, bool focus);
         void openDeckEditor(const DeckLoader *deck);
-        void notIdle();
 
     private slots:
         void replayNextEvent();

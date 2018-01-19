@@ -239,7 +239,7 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         myAddTab(tabDeckStorage);
 
         tabReplays = new TabReplays(this, client);
-        connect(tabReplays, SIGNAL(openReplay(GameReplay * )), this, SLOT(openReplay(GameReplay * )));
+        connect(tabReplays, SIGNAL(openReplay(GameReplay* )), this, SLOT(openReplay(GameReplay* )));
         myAddTab(tabReplays);
     }
     else
@@ -551,14 +551,22 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     return tab;
 }
 
-void TabSupervisor::maximizeMainWindow() {
+void TabSupervisor::maximizeMainWindow()
+{
     emit showWindowIfHidden();
 }
 
 void TabSupervisor::talkLeft(TabMessage *tab)
 {
+    if (tab == nullptr)
+    {
+        return;
+    }
+
     if (tab == currentWidget())
+    {
         emit setMenu();
+    }
 
     messageTabs.remove(tab->getUserName());
     removeTab(indexOf(tab));
@@ -566,9 +574,13 @@ void TabSupervisor::talkLeft(TabMessage *tab)
 
 TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
 {
-    TabDeckEditor *tab = new TabDeckEditor(this);
+    auto *tab = new TabDeckEditor(this);
+
     if (deckToOpen)
+    {
         tab->setDeck(new DeckLoader(*deckToOpen));
+    }
+
     connect(tab, SIGNAL(deckEditorClosing(TabDeckEditor *)), this, SLOT(deckEditorClosed(TabDeckEditor *)));
     int tabIndex = myAddTab(tab);
     addCloseButtonToTab(tab, tabIndex);
@@ -579,8 +591,15 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
 
 void TabSupervisor::deckEditorClosed(TabDeckEditor *tab)
 {
+    if (tab == nullptr)
+    {
+        return;
+    }
+
     if (tab == currentWidget())
+    {
         emit setMenu();
+    }
     
     deckEditorTabs.removeAt(deckEditorTabs.indexOf(tab));
     removeTab(indexOf(tab));
@@ -588,13 +607,18 @@ void TabSupervisor::deckEditorClosed(TabDeckEditor *tab)
 
 void TabSupervisor::tabUserEvent(bool globalEvent)
 {
-    Tab *tab = static_cast<Tab *>(sender());
-    if (tab != currentWidget()) {
+    auto *tab = dynamic_cast<Tab *>(sender());
+
+    if (tab != currentWidget())
+    {
         tab->setContentsChanged(true);
         setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
     }
+
     if (globalEvent && settingsCache->getNotificationsEnabled())
+    {
         QApplication::alert(this);
+    }
 }
 
 void TabSupervisor::updateTabText(Tab *tab, const QString &newTabText)
@@ -607,90 +631,129 @@ void TabSupervisor::updateTabText(Tab *tab, const QString &newTabText)
 void TabSupervisor::processRoomEvent(const RoomEvent &event)
 {
     TabRoom *tab = roomTabs.value(event.room_id(), 0);
+
     if (tab)
+    {
         tab->processRoomEvent(event);
+    }
 }
 
 void TabSupervisor::processGameEventContainer(const GameEventContainer &cont)
 {
     TabGame *tab = gameTabs.value(cont.game_id());
+
     if (tab)
+    {
         tab->processGameEventContainer(cont, qobject_cast<AbstractClient *>(sender()));
+    }
     else
+    {
         qDebug() << "gameEvent: invalid gameId";
+    }
 }
 
 void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
 {
     QString senderName = QString::fromStdString(event.sender_name());
     TabMessage *tab = messageTabs.value(senderName);
-    if (!tab)
+
+    if (tab == nullptr)
+    {
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
-    if (!tab) {
+    }
+
+    if (tab == nullptr)
+    {
         UserListTWI *twi = tabUserLists->getAllUsersList()->getUsers().value(senderName);
-        if (twi) {
+
+        if (twi)
+        {
             UserLevelFlags userLevel = UserLevelFlags(twi->getUserInfo().user_level());
-            if (settingsCache->getIgnoreUnregisteredUserMessages() &&
-                !userLevel.testFlag(ServerInfo_User::IsRegistered))
+            if (settingsCache->getIgnoreUnregisteredUserMessages() && !userLevel.testFlag(ServerInfo_User::IsRegistered))
+            {
                 // Flags are additive, so reg/mod/admin are all IsRegistered
                 return;
+            }
         }
+
         tab = addMessageTab(QString::fromStdString(event.sender_name()), false);
     }
-    if (!tab)
+
+    if (tab == nullptr)
+    {
         return;
+    }
+
     tab->processUserMessageEvent(event);
 }
 
 void TabSupervisor::processUserLeft(const QString &userName)
 {
     TabMessage *tab = messageTabs.value(userName);
+
     if (tab)
+    {
         tab->processUserLeft();
+    }
 }
 
 void TabSupervisor::processUserJoined(const ServerInfo_User &userInfo)
 {
     TabMessage *tab = messageTabs.value(QString::fromStdString(userInfo.name()));
     if (tab)
+    {
         tab->processUserJoined(userInfo);
+    }
 }
 
 void TabSupervisor::updateCurrent(int index)
 {
-    if (index != -1) {
-        Tab *tab = static_cast<Tab *>(widget(index));
-        if (tab->getContentsChanged()) {
+    if (index != -1)
+    {
+        auto *tab = dynamic_cast<Tab *>(widget(index));
+        if (tab->getContentsChanged())
+        {
             setTabIcon(index, QIcon());
             tab->setContentsChanged(false);
         }
-        emit setMenu(static_cast<Tab *>(widget(index))->getTabMenus());
+        emit setMenu(dynamic_cast<Tab *>(widget(index))->getTabMenus());
         tab->tabActivated();
-    } else
+    }
+    else
+    {
         emit setMenu();
+    }
 }
 
 bool TabSupervisor::getAdminLocked() const
 {
     if (!tabAdmin)
+    {
         return true;
+    }
     return tabAdmin->getLocked();
 }
 
 void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
 {
 
-    switch ((Event_NotifyUser::NotificationType) event.type()) {
+    switch ((Event_NotifyUser::NotificationType) event.type())
+    {
         case Event_NotifyUser::UNKNOWN: QMessageBox::information(this, tr("Unknown Event"), tr("The server has sent you a message that your client does not understand.\nThis message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.\n\nTo update your client, go to Help -> Check for Updates.")); break;
         case Event_NotifyUser::IDLEWARNING: QMessageBox::information(this, tr("Idle Timeout"), tr("You are about to be logged out due to inactivity.")); break;
         case Event_NotifyUser::PROMOTED: QMessageBox::information(this, tr("Promotion"), tr("You have been promoted to moderator. Please log out and back in for changes to take effect.")); break;
-        case Event_NotifyUser::WARNING: {
+        case Event_NotifyUser::WARNING:
+        {
             if (!QString::fromStdString(event.warning_reason()).simplified().isEmpty())
+            {
                 QMessageBox::warning(this, tr("Warned"), tr("You have received a warning due to %1.\nPlease refrain from engaging in this activity or further actions may be taken against you. If you have any questions, please private message a moderator.").arg(QString::fromStdString(event.warning_reason()).simplified()));
+            }
             break;
         }
-        case Event_NotifyUser::CUSTOM: {
-            if (!QString::fromStdString(event.custom_title()).simplified().isEmpty() && !QString::fromStdString(event.custom_content()).simplified().isEmpty()) {
+        case Event_NotifyUser::CUSTOM:
+        {
+            if (!QString::fromStdString(event.custom_title()).simplified().isEmpty() && !QString::fromStdString(event.custom_content()).simplified().isEmpty())
+            {
                 QMessageBox msgBox;
                 msgBox.setParent(this);
                 msgBox.setWindowFlags(Qt::Dialog);
@@ -703,7 +766,7 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
             }
             break;
         }
-        default: ;
+        default: break;
     }
 
 }
@@ -720,8 +783,11 @@ QString TabSupervisor::getOwnUsername() const
 
 bool TabSupervisor::isUserBuddy(const QString &userName) const
 {
-    if (!getUserListsTab()) return false;
-    if (!getUserListsTab()->getBuddyList()) return false;
+    if (!getUserListsTab() || !getUserListsTab()->getBuddyList())
+    {
+        return false;
+    }
+
     QMap<QString, UserListTWI *> buddyList = getUserListsTab()->getBuddyList()->getUsers();
     bool senderIsBuddy = buddyList.contains(userName);
     return senderIsBuddy;
@@ -729,23 +795,30 @@ bool TabSupervisor::isUserBuddy(const QString &userName) const
 
 bool TabSupervisor::isUserIgnored(const QString &userName) const
 {
-    if (!getUserListsTab()) return false;
-    if (!getUserListsTab()->getIgnoreList()) return false;
+    if (!getUserListsTab() || !getUserListsTab()->getIgnoreList())
+    {
+        return false;
+    }
+
     QMap<QString, UserListTWI *> buddyList = getUserListsTab()->getIgnoreList()->getUsers();
     bool senderIsBuddy = buddyList.contains(userName);
     return senderIsBuddy;
 }
 
-const ServerInfo_User * TabSupervisor::getOnlineUser(const QString &userName) const
+const ServerInfo_User* TabSupervisor::getOnlineUser(const QString &userName) const
 {
-    if (!getUserListsTab()) return nullptr;
-    if (!getUserListsTab()->getAllUsersList()) return nullptr;
+    if (!getUserListsTab() || !getUserListsTab()->getAllUsersList())
+    {
+        return nullptr;
+    }
+
     QMap<QString, UserListTWI *> userList = getUserListsTab()->getAllUsersList()->getUsers();
     const QString &userNameToMatchLower = userName.toLower();
     QMap<QString, UserListTWI *>::iterator i;
 
     for (i = userList.begin(); i != userList.end(); ++i)
-        if (i.key().toLower() == userNameToMatchLower) {
+        if (i.key().toLower() == userNameToMatchLower)
+        {
             const ServerInfo_User &userInfo = i.value()->getUserInfo();
             return &userInfo;
         }

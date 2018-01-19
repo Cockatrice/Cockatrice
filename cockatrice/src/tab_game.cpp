@@ -95,7 +95,7 @@ void ToggleButton::setState(bool _state)
     update();
 }
 
-DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent) : QWidget(0), parentGame(parent), playerId(_playerId)
+DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent) : QWidget(nullptr), parentGame(parent), playerId(_playerId)
 {
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
@@ -144,14 +144,6 @@ void DeckViewContainer::retranslateUi()
     loadRemoteButton->setText(tr("Load remote deck..."));
     readyStartButton->setText(tr("Ready to s&tart"));
     updateSideboardLockButtonText();
-}
-
-void DeckViewContainer::setButtonsVisible(bool _visible)
-{
-    loadLocalButton->setVisible(_visible);
-    loadRemoteButton->setVisible(_visible);
-    readyStartButton->setVisible(_visible);
-    sideboardLockButton->setVisible(_visible);
 }
 
 void DeckViewContainer::updateSideboardLockButtonText()
