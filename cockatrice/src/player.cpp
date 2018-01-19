@@ -2740,8 +2740,10 @@ qreal Player::getMinimumWidth() const
 
 void Player::setGameStarted()
 {
-    if (local)
+    if (local && aAlwaysRevealTopCard)
+    {
         aAlwaysRevealTopCard->setChecked(false);
+    }
     setConceded(false);
 }
 
