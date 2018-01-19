@@ -6,12 +6,12 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QToolTip>
+#include <utility>
 
 SequenceEdit::SequenceEdit(QString _shorcutName, QWidget *parent) : QWidget(parent)
 {
-    shorcutName = _shorcutName;
+    shorcutName = std::move(_shorcutName);
     currentKey = 0;
-    maxKeys = 4;
     keys = 0;
     valid = false;
 
@@ -31,7 +31,7 @@ SequenceEdit::SequenceEdit(QString _shorcutName, QWidget *parent) : QWidget(pare
     clearButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
     defaultButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    auto *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(1);
     layout->addWidget(lineEdit);
@@ -53,14 +53,18 @@ QString SequenceEdit::getSecuence()
 void SequenceEdit::removeLastShortcut()
 {
     QString secuences = lineEdit->text();
-    if(!secuences.isEmpty())
+    if (!secuences.isEmpty())
     {
-        if(secuences.lastIndexOf(";") > 0){
+        if (secuences.lastIndexOf(";") > 0)
+        {
             QString valid = secuences.left(secuences.lastIndexOf(";"));
             lineEdit->setText(valid);
         }
         else
+        {
             lineEdit->clear();
+        }
+
         updateSettings();
     }
 }
@@ -83,14 +87,19 @@ void SequenceEdit::clear()
 
 bool SequenceEdit::eventFilter(QObject *, QEvent * event)
 {
-    if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
+    if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
     {
-        QKeyEvent * keyEvent = (QKeyEvent *) event;
+        auto *keyEvent = reinterpret_cast<QKeyEvent *>(event);
 
-        if(event->type() == QEvent::KeyPress && !keyEvent->isAutoRepeat())
+        if (event->type() == QEvent::KeyPress && !keyEvent->isAutoRepeat())
+        {
             processKey(keyEvent);
+        }
         else if (event->type() == QEvent::KeyRelease && !keyEvent->isAutoRepeat())
+        {
             finishShortcut();
+        }
+
         return true;
     }
     return false;
@@ -99,16 +108,18 @@ bool SequenceEdit::eventFilter(QObject *, QEvent * event)
 void SequenceEdit::processKey(QKeyEvent* e)
 {
     int key = e->key();
-    if(key != Qt::Key_Control && key != Qt::Key_Shift
-       && key != Qt::Key_Meta && key != Qt::Key_Alt)
+    if (key != Qt::Key_Control && key != Qt::Key_Shift && key != Qt::Key_Meta && key != Qt::Key_Alt)
     {
         valid = true;
         key |= translateModifiers(e->modifiers(), e->text());
     }
+
     keys = key;
     currentKey++;
-    if(currentKey >= key)
+    if (currentKey >= key)
+    {
         finishShortcut();
+    }
 }
 
 int SequenceEdit::translateModifiers(Qt::KeyboardModifiers state, const QString &text)
@@ -120,29 +131,42 @@ int SequenceEdit::translateModifiers(Qt::KeyboardModifiers state, const QString 
                                         !text.at(0).isPrint() ||
                                         text.at(0).isLetterOrNumber() ||
                                         text.at(0).isSpace()))
+    {
         result |= Qt::SHIFT;
+    }
 
     if (state & Qt::ControlModifier)
+    {
         result |= Qt::CTRL;
+    }
+
     if (state & Qt::MetaModifier)
+    {
         result |= Qt::META;
+    }
+
     if (state & Qt::AltModifier)
+    {
         result |= Qt::ALT;
+    }
+
     return result;
 }
 
 void SequenceEdit::finishShortcut()
 {
     QKeySequence secuence(keys);
-    if(!secuence.isEmpty() && valid)
+    if (!secuence.isEmpty() && valid)
     {
         QString secuenceString = secuence.toString();
-        if(settingsCache->shortcuts().isValid(shorcutName,secuenceString))
+        if (settingsCache->shortcuts().isValid(shorcutName,secuenceString))
         {
-            if(!lineEdit->text().isEmpty())
+            if (!lineEdit->text().isEmpty())
             {
-                if(lineEdit->text().contains(secuenceString))
+                if (lineEdit->text().contains(secuenceString))
+                {
                     return;
+                }
                 lineEdit->setText(lineEdit->text() + ";");
             }
             lineEdit->setText(lineEdit->text() + secuenceString);
@@ -152,6 +176,7 @@ void SequenceEdit::finishShortcut()
             QToolTip::showText(lineEdit->mapToGlobal(QPoint()), tr("Shortcut already in use"));
         }
     }
+
     currentKey = 0;
     keys = 0;
     valid = false;
@@ -162,4 +187,3 @@ void SequenceEdit::updateSettings()
 {
     settingsCache->shortcuts().setShortcuts(shorcutName,lineEdit->text());
 }
-
