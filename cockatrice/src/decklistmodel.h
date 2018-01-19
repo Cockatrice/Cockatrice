@@ -34,18 +34,18 @@ signals:
 public:
     DeckListModel(QObject *parent = 0);
     ~DeckListModel();
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex &index) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    bool removeRows(int row, int count, const QModelIndex &parent);
     QModelIndex findCard(const QString &cardName, const QString &zoneName) const;
     QModelIndex addCard(const QString &cardName, const QString &zoneName, bool abAddAnyway = false);
-    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
+    void sort(int column, Qt::SortOrder order);
     void cleanList();
     DeckLoader *getDeckList() const { return deckList; }
     void setDeckList(DeckLoader *_deck);
