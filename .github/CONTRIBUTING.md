@@ -5,7 +5,7 @@ The following is a set of guidelines for contributing to Cockatrice. These are m
 
 # Recommended Setups #
 
-For those developers who like the Linux or MacOS environment, we recommend a nifty program called [CLion](https://www.jetbrains.com/clion/). The program's a great asset and one of the best tools you'll find on these systems.
+For those developers who like the Linux or MacOS environment, many of our developers like working with a nifty program called [CLion](https://www.jetbrains.com/clion/). The program's a great asset and one of the best tools you'll find on these systems, but you're welcomed to use any IDE you most enjoy.
 
 Developers who like Windows development tend to find [Visual Studio](https://www.visualstudio.com/) the best tool for the job.
 
@@ -15,8 +15,7 @@ If you have any questions on IDEs, feel free to chat with us on [Gitter](https:/
 
 ### Compatibility ###
 
-Cockatrice is compiled on all platform using <kbd>C++11</kbd>, even if the majority of the
-code is written in <kbd>C++03</kbd>.
+Cockatrice is currently compiled on all platforms using <kbd>C++11</kbd>. You'll notice <kbd>C++03</kbd> code throughout the codebase. Please feel free to help convert it over! 
 
 For consistency, we use Qt data structures where possible. For example, `QString` over
 `std::string` and `QList` over `std::vector`.
@@ -38,13 +37,13 @@ Keep library includes and project includes grouped together. So this is okay:
 #include <QString>
 #include "card.h"
 #include "deck.h"
- 
+
 // Good
 #include "card.h"
 #include "deck.h"
 #include <QList>
 #include <QString>
- 
+
 // Bad:
 #include <QList>
 #include "card.h"
@@ -74,7 +73,7 @@ variable name:
 // Good
 Foo *foo1 = new Foo;
 Foo &foo2 = *foo1;
- 
+
 // Bad
 Bar* bar1 = new Bar;
 Bar& bar2 = *bar1;
@@ -164,6 +163,8 @@ The migration file should include the sql statements needed to migrate the datab
 
 Cockatrice and Servatrice exchange data using binary messages. The syntax of these messages is defined in the `proto` files in the `common/pb` folder. These files defines the way data contained in each message is serialized using Google's [protocol buffer](https://developers.google.com/protocol-buffers/).
 Any change to the `proto` file should be taken with caution and tested intensively before being merged, becaus a change to the protocol could make new clients incompatible to the old server and vice versa.
+
+You can find more information on how we use Protobuf on [our wiki!](https://github.com/Cockatrice/Cockatrice/wiki/Client-server-protocol)
 
 ### Translations: introduction ###
 
