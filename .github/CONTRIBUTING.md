@@ -1,7 +1,14 @@
+&nbsp; [Introduction](#contributing-to-cockatrice) | [Code Style Guide](#code-style-guide) | [Translations](#translations) | [Release Management](#release-management)
+
+----
+
+<br>
+
 # Contributing to Cockatrice #
 First off, thanks for taking the time to contribute to our project! 🎉 ❤ ️✨
 
 The following is a set of guidelines for contributing to Cockatrice. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
+
 
 # Recommended Setups #
 
@@ -11,7 +18,8 @@ Developers who like Windows development tend to find [Visual Studio](https://www
 
 If you have any questions on IDEs, feel free to chat with us on [Gitter](https://gitter.im/Cockatrice/Cockatrice) and we would love to help answer your questions!  
 
-# Style Guide #
+
+# Code Style Guide #
 
 ### Compatibility ###
 
@@ -166,7 +174,10 @@ Any change to the `proto` file should be taken with caution and tested intensive
 
 You can find more information on how we use Protobuf on [our wiki!](https://github.com/Cockatrice/Cockatrice/wiki/Client-server-protocol)
 
-### Translations: introduction ###
+
+# Translations #
+
+### Introduction ###
 
 Basic workflow for translations:
  1. developer adds a `tr("foo")` string in the code;
@@ -189,7 +200,7 @@ translators on Transifex.
 
 ### Translations (for maintainers) ###
 
-#### Step 2: updating *_en.ts files ####
+#### Step 2: updating `*_en.ts` files ####
 
 When new translatable strings have been added to the code, it would be nice to
 make them available to translators on Transifex. Every few days, or when a lot
@@ -242,11 +253,14 @@ from Transifex to the source code and vice versa.
 
 Please have a look at the specific [FAQ for translators](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
 
-### Publish A New Development Snapshot
 
-TravisCI and Appveyor have been configured to upload files to GitHub whenever a tag is pushed. Usually, tags are created through publishing a full release, but there's a way around that.
+# Release Management #
 
-To trigger TravisCI and Appveyor, simply do the following:
+### Publish A New Development Snapshot ###
+
+Travis and AppVeyor have been configured to upload files to GitHub Releases whenever a <kbd>tag</kbd> is pushed. Usually, tags are created through publishing a release, but there's a way around that.
+
+To trigger Travis and AppVeyor, simply do the following:
 ```bash
 cd $COCKATRICE_REPO
 git checkout master
@@ -260,12 +274,12 @@ You should define the variables as such:
 upstream - git@github.com:Cockatrice/Cockatrice.git
 $COCKATRICE_REPO - /Location/of/repository/cockatrice.git
 $TAG_NAME
-  - If full release, YYYY-MM-DD-Release-MAJ.MIN.PATCH
-  - If dev snapshot, YYYY-MM-DD-Development-MAJ.MIN.PATCH-beta.X
+  - If stable release, YYYY-MM-DD-Release-MAJ.MIN.PATCH
+  - If beta release, YYYY-MM-DD-Development-MAJ.MIN.PATCH-beta.X
         - MAJ.MIN.PATCH will be the NEXT release version
 ```
 
-This will cause a tag release to be established on the GitHub repository, which will then lead to the upload of binaries. If you use this method, the tags (releases) that you create will be marked as a "pre-release" build. The `/latest` URL will not be impacted (For stable branch downloads) so that's good.
+This will cause a tag release to be established on the GitHub repository, which will then lead to the upload of binaries. If you use this method, the tags (releases) that you create will be marked as a "Pre-release". The `/latest` URL will not be impacted (for stable release downloads) so that's good.
 
 If you accidentally push a tag incorrectly (the tag is outdated, you didn't pull in the latest branch accidentally, you named the tag wrong, etc.) you can revoke the tag by doing the following:
 ```bash
@@ -273,11 +287,11 @@ git push --delete upstream $TAG_NAME
 git tag -d $TAG_NAME
 ```
 
-**NOTE:** Unfortunately, due to the method of how TravisCI and Appveyor work, to publish a full release you will need to make a copy of the release notes locally and then paste them into the GitHub GUI once the binaries have been uploaded. These build sites will automatically change the name of the release (to $TAG_NAME from whatever it was), the status of the release (to pre-release), and the body (to "Dev build of Cockatrice").
+**NOTE:** Unfortunately, due to the method of how Travis and AppVeyor work, to publish a full release you will need to make a copy of the release notes locally and then paste them into the GitHub GUI once the binaries have been uploaded by them. These CI services will automatically overwrite the name of the release (to "Cockatrice $TAG_NAME"), the status of the release (to "Pre-release"), and the release body (to "Beta build of Cockatrice").
 
 **NOTE 2:** In the first lines of https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt there's an hardcoded version number used when compiling custom (not tagged) versions. While on tagged versions these numbers are overriden by the version numbers coming from the tag title, it's a good practice to keep them aligned with the real ones.
 The preferred flow of operations is:
  * just before a release, update the version number in CMakeLists.txt to "next release version";
  * tag the release following the previously described syntax in order to get it built by CI;
  * wait for CI to upload the binaries, double check if everything is in order
- * after the release is complete, update the version number again to "next development version", typically increasing `PROJECT_VERSION_PATCH` by one.
+ * after the release is complete, update the version number again to "next beta version", typically increasing `PROJECT_VERSION_PATCH` by one.
