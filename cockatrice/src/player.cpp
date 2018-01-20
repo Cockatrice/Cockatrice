@@ -1897,11 +1897,15 @@ void Player::addCard(CardItem *c)
 
 void Player::deleteCard(CardItem *c)
 {
-    if (dialogSemaphore)
+    if (c == nullptr)
+    {
+        return;
+    }
+    else if (dialogSemaphore)
     {
         cardsToDelete.append(c);
     }
-    else if (c != nullptr)
+    else
     {
         c->deleteLater();
     }
