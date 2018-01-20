@@ -485,7 +485,9 @@ void Player::clear()
 
     QMapIterator<QString, CardZone *> i(zones);
     while (i.hasNext())
+    {
         i.next().value()->clearContents();
+    }
 
     clearCounters();
 }
@@ -1896,9 +1898,13 @@ void Player::addCard(CardItem *c)
 void Player::deleteCard(CardItem *c)
 {
     if (dialogSemaphore)
+    {
         cardsToDelete.append(c);
-    else
+    }
+    else if (c != nullptr)
+    {
         c->deleteLater();
+    }
 }
 
 void Player::addZone(CardZone *z)
@@ -2552,7 +2558,7 @@ void Player::updateCardMenu(const CardItem *card)
     bool writeableCard = getLocal();
     if (card->getZone() && card->getZone()->getIsView())
     {
-        ZoneViewZone *view = static_cast<ZoneViewZone *>(card->getZone());
+        auto *view = dynamic_cast<ZoneViewZone *>(card->getZone());
         if (view->getRevealZone())
         {
             if (view->getWriteableRevealZone())

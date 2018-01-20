@@ -434,12 +434,14 @@ void TabGame::emitUserEvent() {
 
 TabGame::~TabGame()
 {
-    if(replay)
-        delete replay;
+    delete replay;
 
     QMapIterator<int, Player *> i(players);
     while (i.hasNext())
+    {
         delete i.next().value();
+    }
+
     players.clear();
 
     emit gameClosing(this);

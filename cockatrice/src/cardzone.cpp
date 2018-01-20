@@ -31,12 +31,13 @@ void CardZone::retranslateUi()
 
 void CardZone::clearContents()
 {
-    for (int i = 0; i < cards.size(); i++) {
+    for (int i = 0; i < cards.size(); i++)
+    {
         // If an incorrectly implemented server doesn't return attached cards to whom they belong before dropping a player,
         // we have to return them to avoid a crash.
         const QList<CardItem *> &attachedCards = cards[i]->getAttachedCards();
-        for (int j = 0; j < attachedCards.size(); ++j)
-            attachedCards[j]->setParentItem(attachedCards[j]->getZone());
+        for (auto attachedCard : attachedCards)
+            attachedCard->setParentItem(attachedCard->getZone());
 
         player->deleteCard(cards.at(i));
     }
