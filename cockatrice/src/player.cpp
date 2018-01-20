@@ -485,7 +485,9 @@ void Player::clear()
 
     QMapIterator<QString, CardZone *> i(zones);
     while (i.hasNext())
+    {
         i.next().value()->clearContents();
+    }
 
     clearCounters();
 }
@@ -1895,10 +1897,18 @@ void Player::addCard(CardItem *c)
 
 void Player::deleteCard(CardItem *c)
 {
-    if (dialogSemaphore)
+    if (c == nullptr)
+    {
+        return;
+    }
+    else if (dialogSemaphore)
+    {
         cardsToDelete.append(c);
+    }
     else
+    {
         c->deleteLater();
+    }
 }
 
 void Player::addZone(CardZone *z)
@@ -2062,8 +2072,13 @@ bool Player::clearCardsToDelete()
     if (cardsToDelete.isEmpty())
         return false;
 
-    for (int i = 0; i < cardsToDelete.size(); ++i)
-        cardsToDelete[i]->deleteLater();
+    for (auto &i : cardsToDelete)
+    {
+        if (i != nullptr)
+        {
+            i->deleteLater();
+        }
+    }
     cardsToDelete.clear();
 
     return true;
@@ -2087,8 +2102,8 @@ void Player::actMoveCardXCardsFromTop()
 
     QList< const ::google::protobuf::Message * > commandList;
     ListOfCardsToMove idList;
-    for (int i = 0; i < cardList.size(); ++i)
-        idList.add_card()->set_card_id(cardList[i]->getId());
+    for (auto &i : cardList)
+        idList.add_card()->set_card_id(i->getId());
 
     if (cardList.isEmpty())
         return;
@@ -2552,7 +2567,7 @@ void Player::updateCardMenu(const CardItem *card)
     bool writeableCard = getLocal();
     if (card->getZone() && card->getZone()->getIsView())
     {
-        ZoneViewZone *view = static_cast<ZoneViewZone *>(card->getZone());
+        auto *view = dynamic_cast<ZoneViewZone *>(card->getZone());
         if (view->getRevealZone())
         {
             if (view->getWriteableRevealZone())
