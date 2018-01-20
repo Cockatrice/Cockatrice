@@ -1,6 +1,3 @@
-sudo: required   # forces legacy build infrastructure
-group: travis_lts   # forces most stable build images
-
 language: cpp
 
 matrix:
@@ -8,10 +5,38 @@ matrix:
   include:
   - os: linux
     dist: trusty
-    env: BUILDTYPE=Debug DIST=trusty
+    env: BUILDTYPE=Debug
+    addons:
+      apt:
+        packages:
+        - bc
+        - cmake  
+        - libprotobuf-dev
+        - protobuf-compiler
+        - qt5-default
+        - qttools5-dev
+        - qttools5-dev-tools
+        - qtmultimedia5-dev
+        - libqt5multimedia5-plugins
+        - libqt5svg5-dev
+        - libqt5sql5-mysql
   - os: linux
     dist: trusty
-    env: BUILDTYPE=Release DIST=trusty
+    env: BUILDTYPE=Release
+    addons:
+      apt:
+        packages:
+        - bc
+        - cmake  
+        - libprotobuf-dev
+        - protobuf-compiler
+        - qt5-default
+        - qttools5-dev
+        - qttools5-dev-tools
+        - qtmultimedia5-dev
+        - libqt5multimedia5-plugins
+        - libqt5svg5-dev
+        - libqt5sql5-mysql
   - os: osx
     osx_image: xcode7.3
     env: BUILDTYPE=Debug
@@ -31,7 +56,7 @@ matrix:
 
 cache: ccache
 
-install: bash ./.travis/travis-dependencies.sh
+before_install: bash ./.travis/travis-dependencies.sh
 
 script: bash ./.travis/travis-compile.sh
 
