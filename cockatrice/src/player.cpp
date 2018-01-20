@@ -2072,8 +2072,13 @@ bool Player::clearCardsToDelete()
     if (cardsToDelete.isEmpty())
         return false;
 
-    for (int i = 0; i < cardsToDelete.size(); ++i)
-        cardsToDelete[i]->deleteLater();
+    for (auto &i : cardsToDelete)
+    {
+        if (i != nullptr)
+        {
+            i->deleteLater();
+        }
+    }
     cardsToDelete.clear();
 
     return true;
@@ -2097,8 +2102,8 @@ void Player::actMoveCardXCardsFromTop()
 
     QList< const ::google::protobuf::Message * > commandList;
     ListOfCardsToMove idList;
-    for (int i = 0; i < cardList.size(); ++i)
-        idList.add_card()->set_card_id(cardList[i]->getId());
+    for (auto &i : cardList)
+        idList.add_card()->set_card_id(i->getId());
 
     if (cardList.isEmpty())
         return;
