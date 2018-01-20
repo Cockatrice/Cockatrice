@@ -10,17 +10,17 @@ class QCloseEvent;
 class DlgViewLog : public QDialog {
 Q_OBJECT
 public:
-    DlgViewLog(QWidget *parent);
+    explicit DlgViewLog(QWidget *parent);
 protected:
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event) override;
 private:
     QPlainTextEdit *logArea;
     QCheckBox *coClearLog;
 
     void loadInitialLogBuffer();
-    void actCheckBoxChanged(bool abNewValue);
 private slots:
     void logEntryAdded(QString message);
+    void actCheckBoxChanged(bool abNewValue);
 };
 
 #endif
