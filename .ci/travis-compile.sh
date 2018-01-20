@@ -7,6 +7,7 @@ set -e
 mkdir -p build
 cd build
 prefix=""
+
 if [[ $TRAVIS_OS_NAME == "osx" ]]; then
   export PATH="/usr/local/opt/ccache/libexec:$PATH"
   prefix="-DCMAKE_PREFIX_PATH=$(echo /usr/local/opt/qt*/)"
@@ -20,7 +21,8 @@ if [[ $BUILDTYPE == "Debug" ]]; then
 	cmake .. -DWITH_SERVER=1 -DTEST=1 -DCMAKE_BUILD_TYPE=$BUILDTYPE $prefix
 	make -j2
 	make test
-else
+fi
+if [[ $BUILDTYPE == "Release" ]]; then
 	cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=$BUILDTYPE $prefix
 	make package -j2
 fi

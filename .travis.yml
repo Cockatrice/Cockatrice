@@ -1,10 +1,14 @@
 language: cpp
 
+cache: ccache
+
+
 matrix:
   fast_finish: true
   include:
   - os: linux
     dist: trusty
+    group: stable
     env: BUILDTYPE=Debug
     addons:
       apt:
@@ -22,6 +26,7 @@ matrix:
         - libqt5sql5-mysql
   - os: linux
     dist: trusty
+    group: stable
     env: BUILDTYPE=Release
     addons:
       apt:
@@ -38,27 +43,16 @@ matrix:
         - libqt5svg5-dev
         - libqt5sql5-mysql
   - os: osx
-    osx_image: xcode7.3
+    osx_image: xcode8
     env: BUILDTYPE=Debug
-    cache:
-      ccache: true
-      timeout: 360 # 6min timeout for cache uploading instead default 3
-      directories:
-        - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
   - os: osx
-    osx_image: xcode7.3
+    osx_image: xcode8
     env: BUILDTYPE=Release
-    cache:
-      ccache: true
-      timeout: 360 # 6min timeout for cache uploading instead default 3
-      directories:
-        - $HOME/Library/Caches/Homebrew   # cache Homebrew ressources
 
-cache: ccache
 
-before_install: bash ./.travis/travis-dependencies.sh
+before_install: bash ./.ci/travis-dependencies.sh
 
-script: bash ./.travis/travis-compile.sh
+script: bash ./.ci/travis-compile.sh
 
 
 # Builds for pull requests skip the deployment step altogether
