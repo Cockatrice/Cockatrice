@@ -231,10 +231,12 @@ It's now suggested to disable the parameter using:
 ```sh
 cmake .. -DUPDATE_TRANSLATIONS=OFF
 ```
-Now you are ready to propose your change. Once your change gets merged, 
-Transifex will pick up the modified files automatically (checks every 24 hours)
-and update the interface where translators will be able to translate the new
-strings.
+Now you are ready to propose your change.
+
+**Step 3: Automatic pushing to Transifex**
+
+Once your change gets merged, Transifex will pick up the modified files automatically (checks every 24 hours)
+and update the interface where translators will be able to translate the new strings.
 
 **Step 5: Fetching new translations from Transifex**
 
