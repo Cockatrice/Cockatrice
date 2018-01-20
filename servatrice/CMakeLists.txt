@@ -82,7 +82,7 @@ if(UNIX)
         SET(MYSQLCLIENT_DEFAULT_PATHS "/usr/lib64" "/usr/local/lib64" "/usr/lib" "/usr/local/lib")
     endif()
 elseif(WIN32)
-    SET(MYSQLCLIENT_DEFAULT_PATHS "C:\\Program Files\\MySQL\\MySQL Server 5.5\\lib" "C:\\Program Files\\MySQL\\MySQL Server 5.6\\lib" "C:\\Program Files\\MySQL\\MySQL Server 5.7\\lib")
+    SET(MYSQLCLIENT_DEFAULT_PATHS "C:\\Program Files\\MySQL\\MySQL Server 5.7\\lib" "C:\\Program Files (x86)\\MySQL\\MySQL Server 5.7\\lib")
 endif()
 
 find_library(MYSQLCLIENT_LIBRARIES NAMES mysqlclient PATHS ${MYSQLCLIENT_DEFAULT_PATHS} PATH_SUFFIXES mysql mariadb)
