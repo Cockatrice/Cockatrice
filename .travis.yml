@@ -14,12 +14,14 @@ matrix:
     dist: trusty
     group: stable
     env: BUILDTYPE=Release
+    if: branch = master
   - os: osx
     osx_image: xcode8
     env: BUILDTYPE=Debug
   - os: osx
     osx_image: xcode8
     env: BUILDTYPE=Release
+    if: branch = master
 
 #install dependencies for container-based "linux" builds
 addons:
