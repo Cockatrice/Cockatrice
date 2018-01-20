@@ -177,19 +177,20 @@ You can find more information on how we use Protobuf on [our wiki!](https://gith
 
 # Translations #
 
-### Introduction ###
-
-Basic workflow for translations:
- 1. developer adds a `tr("foo")` string in the code;
- 2. every few days, a maintainer updates the `*_en.ts files` adding the new strings;
+**Basic workflow for translations:**
+ 1. Developer adds a `tr("foo")` string in the code;
+ 2. Every few days, a maintainer updates the `*_en.ts files` with the new strings;
  3. Transifex picks up the new files from github every 24 hours;
- 4. translators translate the new untraslated strings on Transifex;
- 5. before a release, a maintainer fetches the updated translations from Transifex.
+ 4. Translators translate the new untraslated strings on Transifex;
+ 5. Before a release, a maintainer fetches the updated translations from Transifex.
 
 ### Translations (for developers) ###
 
+**Step 1: Adding translatable strings to the code (`tr("foo")`)**
+
 All the user-interface strings inside Cockatrice's source code must be written in
-english language. Translations to other languages are managed using [Transifex](https://www.transifex.com/projects/p/cockatrice/).
+english language.<br>
+Translations to other languages are managed using [Transifex](https://www.transifex.com/projects/p/cockatrice/).
 
 If you're about to propose a change that adds or modifies any translatable string
 in the code, you don't need to take care of adding the new strings to the
@@ -200,7 +201,7 @@ translators on Transifex.
 
 ### Translations (for maintainers) ###
 
-#### Step 2: updating `*_en.ts` files ####
+**Step 2: Updating `*_en.ts` files with new strings**
 
 When new translatable strings have been added to the code, it would be nice to
 make them available to translators on Transifex. Every few days, or when a lot
@@ -235,7 +236,7 @@ Transifex will pick up the modified files automatically (checks every 24 hours)
 and update the interface where translators will be able to translate the new
 strings.
 
-#### Step 5: fetch new translations from Transifex ####
+**Step 5: Fetching new translations from Transifex**
 
 Before rushing out a new release, it would be nice to fetch the most up to date
 translations from Transifex and commit them into the Cockatrice source code.
@@ -250,6 +251,8 @@ You'll then be able to use a git-like cli command to push and pull translations
 from Transifex to the source code and vice versa.
 
 ### Translations (for translators) ###
+
+**Step 4: Editing translations at Transifex**
 
 Please have a look at the specific [FAQ for translators](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
 
