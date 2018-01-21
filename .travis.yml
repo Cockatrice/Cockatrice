@@ -87,6 +87,8 @@ notifications:
     on_success: change
     on_failure: change
     on_start: never
+    on_cancel: change
+    on_error: change
  
  
 # official validator for ".travis.yml" config file: https://yaml.travis-ci.org
