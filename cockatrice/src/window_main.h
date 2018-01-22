@@ -91,7 +91,7 @@ private slots:
     void actOpenCustomsetsFolder();
     void actAddCustomSet();
 
-    void actEditSets();
+    void actManageSets();
     void actEditTokens();
 private:
     static const QString appName;
@@ -111,7 +111,7 @@ private:
     QMenu *cockatriceMenu, *dbMenu, *helpMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
         *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
-    QAction *aEditSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
+    QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
 
     QMenu *trayIconMenu;
