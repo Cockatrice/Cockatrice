@@ -88,6 +88,11 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
 
 void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
+    if (painter == nullptr)
+    {
+        return;
+    }
+
     qreal scaleFactor = translatedSize.width() / boundingRect().width();
     QPixmap translatedPixmap;
     bool paintImage = true;
@@ -150,6 +155,11 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
 
 void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
+    if (painter == nullptr)
+    {
+        return;
+    }
+
     painter->save();
 
     QSizeF translatedSize = getTranslatedSize(painter);

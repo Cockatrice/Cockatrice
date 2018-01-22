@@ -85,6 +85,11 @@ void CardItem::retranslateUi()
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    if (painter == nullptr)
+    {
+        return;
+    }
+
     painter->save();
     AbstractCardItem::paint(painter, option, widget);
     
