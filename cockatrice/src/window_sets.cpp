@@ -128,7 +128,7 @@ WndSets::WndSets(QWidget *parent)
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
 
-    setWindowTitle(tr("Edit sets"));
+    setWindowTitle(tr("Manage sets"));
     resize(700, 400);
 }
 

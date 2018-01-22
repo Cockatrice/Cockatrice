@@ -68,8 +68,8 @@ class Ui_shortcutsTab
         SequenceEdit *TabDeckEditor_aClose;
         QLabel *lbl_TabDeckEditor_aPrintDeck;
         SequenceEdit *TabDeckEditor_aPrintDeck;
-        QLabel *lbl_TabDeckEditor_aEditSets;
-        SequenceEdit *TabDeckEditor_aEditSets;
+        QLabel *lbl_TabDeckEditor_aManageSets;
+        SequenceEdit *TabDeckEditor_aManageSets;
         QLabel *lbl_TabDeckEditor_aRemoveCard;
         SequenceEdit *TabDeckEditor_aRemoveCard;
         QLabel *lbl_TabDeckEditor_aEditTokens;
@@ -548,15 +548,15 @@ class Ui_shortcutsTab
 
             gridLayout->addWidget(TabDeckEditor_aPrintDeck, 3, 3, 1, 1);
 
-            lbl_TabDeckEditor_aEditSets = new QLabel(groupBox_2);
-            lbl_TabDeckEditor_aEditSets->setObjectName("lbl_TabDeckEditor_aEditSets");
+            lbl_TabDeckEditor_aManageSets = new QLabel(groupBox_2);
+            lbl_TabDeckEditor_aManageSets->setObjectName("lbl_TabDeckEditor_aManageSets");
 
-            gridLayout->addWidget(lbl_TabDeckEditor_aEditSets, 4, 0, 1, 1);
+            gridLayout->addWidget(lbl_TabDeckEditor_aManageSets, 4, 0, 1, 1);
 
-            TabDeckEditor_aEditSets = new SequenceEdit("TabDeckEditor/aEditSets",groupBox_2);
-            TabDeckEditor_aEditSets->setObjectName("TabDeckEditor_aEditSets");
+            TabDeckEditor_aManageSets = new SequenceEdit("TabDeckEditor/aManageSets",groupBox_2);
+            TabDeckEditor_aManageSets->setObjectName("TabDeckEditor_aManageSets");
 
-            gridLayout->addWidget(TabDeckEditor_aEditSets, 4, 1, 1, 1);
+            gridLayout->addWidget(TabDeckEditor_aManageSets, 4, 1, 1, 1);
 
             lbl_TabDeckEditor_aRemoveCard = new QLabel(groupBox_2);
             lbl_TabDeckEditor_aRemoveCard->setObjectName("lbl_TabDeckEditor_aRemoveCard");
@@ -1759,7 +1759,7 @@ class Ui_shortcutsTab
             lbl_TabDeckEditor_aOpenCustomFolder->setText(QApplication::translate("shortcutsTab", "Open custom pic folder", 0));
             lbl_TabDeckEditor_aClose->setText(QApplication::translate("shortcutsTab", "Close", 0));
             lbl_TabDeckEditor_aPrintDeck->setText(QApplication::translate("shortcutsTab", "Print deck", 0));
-            lbl_TabDeckEditor_aEditSets->setText(QApplication::translate("shortcutsTab", "Edit sets", 0));
+            lbl_TabDeckEditor_aManageSets->setText(QApplication::translate("shortcutsTab", "Manage sets", 0));
             lbl_TabDeckEditor_aRemoveCard->setText(QApplication::translate("shortcutsTab", "Delete card", 0));
             lbl_TabDeckEditor_aEditTokens->setText(QApplication::translate("shortcutsTab", "Edit tokens", 0));
             lbl_TabDeckEditor_aResetLayout->setText(QApplication::translate("shortcutsTab", "Reset layout", 0));

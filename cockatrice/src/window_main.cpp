@@ -545,7 +545,7 @@ void MainWindow::retranslateUi()
     aOpenCustomFolder->setText(tr("Open custom image folder"));
     aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
     aAddCustomSet->setText(tr("Add custom sets/cards"));
-    aEditSets->setText(tr("&Edit sets..."));
+    aManageSets->setText(tr("&Manage sets..."));
     aEditTokens->setText(tr("Edit &tokens..."));
 
     aAbout->setText(tr("&About Cockatrice"));
@@ -598,8 +598,8 @@ void MainWindow::createActions()
     aAddCustomSet = new QAction(QString(), this);
     connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
 
-    aEditSets = new QAction(QString(), this);
-    connect(aEditSets, SIGNAL(triggered()), this, SLOT(actEditSets()));
+    aManageSets = new QAction(QString(), this);
+    connect(aManageSets, SIGNAL(triggered()), this, SLOT(actManageSets()));
 
     aEditTokens = new QAction(QString(), this);
     connect(aEditTokens, SIGNAL(triggered()), this, SLOT(actEditTokens()));
@@ -640,7 +640,7 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aExit);
 
     dbMenu = menuBar()->addMenu(QString());
-    dbMenu->addAction(aEditSets);
+    dbMenu->addAction(aManageSets);
     dbMenu->addAction(aEditTokens);
     dbMenu->addSeparator();
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
@@ -874,14 +874,14 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
     else if (msgBox.clickedButton() == settingsButton)
     {
         db->markAllSetsAsKnown();
-        actEditSets();
+        actManageSets();
     }
 }
 
 void MainWindow::cardDatabaseAllNewSetsEnabled()
 {
-    QMessageBox::information(this, tr("Welcome"), tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the card database have been enabled.\nRead more about changing the set order or disabling specific sets and consequent effects in the \"Edit Sets\" window."));
-    actEditSets();
+    QMessageBox::information(this, tr("Welcome"), tr("Hi! It seems like you're running this version of Cockatrice for the first time.\nAll the sets in the card database have been enabled.\nRead more about changing the set order or disabling specific sets and consequent effects in the \"Manage Sets\" dialog."));
+    actManageSets();
 }
 
 /* CARD UPDATER */
@@ -984,7 +984,7 @@ void MainWindow::refreshShortcuts()
     aExit->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aExit"));
     aCheckCardUpdates->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aCheckCardUpdates"));
     aOpenCustomFolder->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aOpenCustomFolder"));
-    aEditSets->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aEditSets"));
+    aManageSets->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aManageSets"));
     aEditTokens->setShortcuts(settingsCache->shortcuts().getShortcut("MainWindow/aEditTokens"));
 }
 
@@ -1107,7 +1107,7 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
     return maxIndex + 1;
 }
 
-void MainWindow::actEditSets()
+void MainWindow::actManageSets()
 {
     auto *w = new WndSets;
     w->setWindowModality(Qt::WindowModal);

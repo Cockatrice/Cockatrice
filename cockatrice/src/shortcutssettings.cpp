@@ -165,7 +165,7 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["TabDeckEditor/aClearFilterOne"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aClose"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aDecrement"] = parseSequenceString("-");
-    defaultShortCuts["TabDeckEditor/aEditSets"] = parseSequenceString("");
+    defaultShortCuts["TabDeckEditor/aManageSets"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aEditTokens"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aExportDeckDecklist"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aIncrement"] = parseSequenceString("+");
