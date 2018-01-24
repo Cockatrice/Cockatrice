@@ -4,13 +4,13 @@ const char *CardFilter::typeName(Type t)
 {
     switch (t) {
         case TypeAnd:
-            return "and";
+            return "AND";
         case TypeOr:
-            return "or";
+            return "OR";
         case TypeAndNot:
-            return "and not";
+            return "AND NOT";
         case TypeOrNot:
-            return "or not";
+            return "OR NOT";
         default:
             return "";
     }

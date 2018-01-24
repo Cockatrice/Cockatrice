@@ -22,7 +22,7 @@ FilterBuilder::FilterBuilder(QWidget *parent)
     typeCombo->setObjectName("typeCombo");
     for (int i = 0; i < CardFilter::TypeEnd; i++)
         typeCombo->addItem(
-            tr(CardFilter::typeName(static_cast<CardFilter::Type>(i))),
+            CardFilter::typeName(static_cast<CardFilter::Type>(i)),
             QVariant(i)
         );
 
