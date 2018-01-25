@@ -45,6 +45,7 @@ QStringMap &ThemeManager::getAvailableThemes()
     }
 
     // load themes from cockatrice system dir
+
 #ifdef Q_OS_MAC
     dir = qApp->applicationDirPath() + "/../Resources/themes";
 #elif defined(Q_OS_WIN)
