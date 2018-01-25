@@ -117,13 +117,13 @@ QStringMap &SoundEngine::getAvailableThemes()
     }
 
     // load themes from cockatrice system dir
-    dir = qApp->applicationDirPath() + 
+    dir = qApp->applicationDirPath() +
 #ifdef Q_OS_MAC
-    "/../Resources/sounds";
+        "/../Resources/sounds";
 #elif defined(Q_OS_WIN)
-    "/sounds";
+        "/sounds";
 #else // linux
-    "/../share/cockatrice/sounds";
+        "/../share/cockatrice/sounds";
 #endif
 
     foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
