@@ -12,7 +12,6 @@ BraceWrapping:
   AfterNamespace: true
   AfterStruct: true
   AfterUnion: true
-  AfterExternBlock: true
   BeforeCatch: false
   BeforeElse: false
   IndentBraces: false
