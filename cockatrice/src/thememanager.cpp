@@ -45,14 +45,15 @@ QStringMap &ThemeManager::getAvailableThemes()
     }
 
     // load themes from cockatrice system dir
-
+    dir = qApp->applicationDirPath() + 
 #ifdef Q_OS_MAC
-    dir = qApp->applicationDirPath() + "/../Resources/themes";
+    "/../Resources/themes";
 #elif defined(Q_OS_WIN)
-    dir = qApp->applicationDirPath() + "/themes";
+    "/themes";
 #else // linux
-    dir = qApp->applicationDirPath() + "/../share/cockatrice/themes";
+    "/../share/cockatrice/themes";
 #endif
+
     foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
     {
         if (!availableThemes.contains(themeName))
