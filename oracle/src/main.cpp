@@ -1,9 +1,9 @@
 #include <QApplication>
-#include <QTextCodec>
-#include <QIcon>
-#include <QTranslator>
-#include <QLibraryInfo>
 #include <QCommandLineParser>
+#include <QIcon>
+#include <QLibraryInfo>
+#include <QTextCodec>
+#include <QTranslator>
 
 #include "main.h"
 #include "oraclewizard.h"
@@ -30,12 +30,12 @@ void installNewTranslator()
 
 int main(int argc, char *argv[])
 {
-	QApplication app(argc, argv);
+    QApplication app(argc, argv);
 
-	QCoreApplication::setOrganizationName("Cockatrice");
-	QCoreApplication::setOrganizationDomain("cockatrice");
-	// this can't be changed, as it influences the default savepath for cards.xml
-	QCoreApplication::setApplicationName("Cockatrice");
+    QCoreApplication::setOrganizationName("Cockatrice");
+    QCoreApplication::setOrganizationDomain("cockatrice");
+    // this can't be changed, as it influences the default savepath for cards.xml
+    QCoreApplication::setApplicationName("Cockatrice");
 
     // If the program is opened with the -s flag, it will only do spoilers. Otherwise it will do MTGJSON/Tokens
     QCommandLineParser parser;
@@ -52,19 +52,19 @@ int main(int argc, char *argv[])
     translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
 #endif
 
-	settingsCache = new SettingsCache;
+    settingsCache = new SettingsCache;
     themeManager = new ThemeManager;
 
     qtTranslator = new QTranslator;
     translator = new QTranslator;
     installNewTranslator();
 
-	OracleWizard wizard;
+    OracleWizard wizard;
 
     QIcon icon("theme:appicon.svg");
     wizard.setWindowIcon(icon);
 
-	wizard.show();
+    wizard.show();
 
-	return app.exec();
+    return app.exec();
 }

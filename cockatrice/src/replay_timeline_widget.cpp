@@ -22,12 +22,15 @@ void ReplayTimelineWidget::setTimeline(const QList<int> &_replayTimeline)
     histogram.clear();
     int binEndTime = binLength - 1;
     int binValue = 0;
-    for (int i = 0; i < replayTimeline.size(); ++i) {
-        if (replayTimeline[i] > binEndTime) {
+    for (int i = 0; i < replayTimeline.size(); ++i)
+    {
+        if (replayTimeline[i] > binEndTime)
+        {
             histogram.append(binValue);
             if (binValue > maxBinValue)
                 maxBinValue = binValue;
-            while (replayTimeline[i] > binEndTime + binLength) {
+            while (replayTimeline[i] > binEndTime + binLength)
+            {
                 histogram.append(0);
                 binEndTime += binLength;
             }
@@ -39,7 +42,7 @@ void ReplayTimelineWidget::setTimeline(const QList<int> &_replayTimeline)
     histogram.append(binValue);
     if (!replayTimeline.isEmpty())
         maxTime = replayTimeline.last();
-    
+
     update();
 }
 
@@ -47,18 +50,18 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
     painter.drawRect(0, 0, width() - 1, height() - 1);
-    
-    qreal binWidth = (qreal) width() / histogram.size();
+
+    qreal binWidth = (qreal)width() / histogram.size();
     QPainterPath path;
     path.moveTo(0, height() - 1);
     for (int i = 0; i < histogram.size(); ++i)
-        path.lineTo(round(i * binWidth), (height() - 1) * (1.0 - (qreal) histogram[i] / maxBinValue));
+        path.lineTo(round(i * binWidth), (height() - 1) * (1.0 - (qreal)histogram[i] / maxBinValue));
     path.lineTo(width() - 1, height() - 1);
     path.lineTo(0, height() - 1);
     painter.fillPath(path, Qt::black);
-    
+
     const QColor barColor = QColor::fromHsv(120, 255, 255, 100);
-    quint64 w = (quint64)(width() - 1) * (quint64) currentTime / maxTime;
+    quint64 w = (quint64)(width() - 1) * (quint64)currentTime / maxTime;
     painter.fillRect(0, 0, w, height() - 1, barColor);
 }
 
@@ -75,15 +78,17 @@ QSize ReplayTimelineWidget::minimumSizeHint() const
 void ReplayTimelineWidget::replayTimerTimeout()
 {
     currentTime += 200;
-    while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentTime)) {
+    while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentTime))
+    {
         emit processNextEvent();
         ++currentEvent;
     }
-    if (currentEvent == replayTimeline.size()) {
+    if (currentEvent == replayTimeline.size())
+    {
         emit replayFinished();
         replayTimer->stop();
     }
-    
+
     if (!(currentTime % 1000))
         update();
 }

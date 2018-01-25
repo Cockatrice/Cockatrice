@@ -2,16 +2,15 @@
 #include "logger.h"
 #include "settingscache.h"
 
-#include <QVBoxLayout>
 #include <QPlainTextEdit>
+#include <QVBoxLayout>
 
 DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 {
 
-
     logArea = new QPlainTextEdit;
     logArea->setReadOnly(true);
-    
+
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(logArea);
 
@@ -27,7 +26,7 @@ DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
     resize(800, 500);
 
     loadInitialLogBuffer();
-    connect(&Logger::getInstance(), SIGNAL(logEntryAdded(QString)), this, SLOT(logEntryAdded(QString)));    
+    connect(&Logger::getInstance(), SIGNAL(logEntryAdded(QString)), this, SLOT(logEntryAdded(QString)));
 }
 
 void DlgViewLog::actCheckBoxChanged(bool abNewValue)
@@ -38,7 +37,7 @@ void DlgViewLog::actCheckBoxChanged(bool abNewValue)
 void DlgViewLog::loadInitialLogBuffer()
 {
     QList<QString> logBuffer = Logger::getInstance().getLogBuffer();
-    foreach(QString message, logBuffer)
+    foreach (QString message, logBuffer)
         logEntryAdded(message);
 }
 

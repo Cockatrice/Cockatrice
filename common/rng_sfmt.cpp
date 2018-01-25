@@ -10,8 +10,7 @@
 #define UINT64_MAX (~(uint64_t)0)
 #endif
 
-RNG_SFMT::RNG_SFMT(QObject *parent)
-    : RNG_Abstract(parent)
+RNG_SFMT::RNG_SFMT(QObject *parent) : RNG_Abstract(parent)
 {
     // initialize the random number generator with a 32bit integer seed (timestamp)
     sfmt_init_gen_rand(&sfmt, QDateTime::currentDateTime().toTime_t());
@@ -26,33 +25,35 @@ RNG_SFMT::RNG_SFMT(QObject *parent)
  * It is only necessary that the upper bound is larger or equal to the lower bound - with the exception
  * that someone wants something like rand() % -foo.
  */
-unsigned int RNG_SFMT::rand(int min, int max) {
-  /* If min is negative, it would be possible to calculate
-   * cdf(0, max - min) + min
-   * There has been no use for negative random numbers with rand() though, so it's treated as error.
-   */
-  if(min < 0) {
-    throw std::invalid_argument(
-      QString("Invalid bounds for RNG: Got min " +
-      QString::number(min) + " < 0!\n").toStdString());
-    // at this point, the method exits. No return value is needed, because
-    // basically the exception itself is returned.
-  }
+unsigned int RNG_SFMT::rand(int min, int max)
+{
+    /* If min is negative, it would be possible to calculate
+     * cdf(0, max - min) + min
+     * There has been no use for negative random numbers with rand() though, so it's treated as error.
+     */
+    if (min < 0)
+    {
+        throw std::invalid_argument(
+            QString("Invalid bounds for RNG: Got min " + QString::number(min) + " < 0!\n").toStdString());
+        // at this point, the method exits. No return value is needed, because
+        // basically the exception itself is returned.
+    }
 
-  // For complete fairness and equal timing, this should be a roll, but let's skip it anyway
-  if(min == max)
-    return max;
+    // For complete fairness and equal timing, this should be a roll, but let's skip it anyway
+    if (min == max)
+        return max;
 
-  // This is actually not used in Cockatrice:
-  // Someone wants rand() % -foo, so we compute -rand(0, +foo)
-  // This is the only time where min > max is (sort of) legal.
-  // Not handling this will cause the application to crash.
-  if(min == 0 && max < 0) {
-    return -cdf(0, -max);
-  }
+    // This is actually not used in Cockatrice:
+    // Someone wants rand() % -foo, so we compute -rand(0, +foo)
+    // This is the only time where min > max is (sort of) legal.
+    // Not handling this will cause the application to crash.
+    if (min == 0 && max < 0)
+    {
+        return -cdf(0, -max);
+    }
 
-  // No special cases are left, except !(min > max) which is caught in the cdf itself.
-  return cdf(min, max);
+    // No special cases are left, except !(min > max) which is caught in the cdf itself.
+    return cdf(min, max);
 }
 
 /**
@@ -89,9 +90,9 @@ unsigned int RNG_SFMT::rand(int min, int max) {
  * This can be compared to an ideal six sided die that is rolled until only sides
  * 1-5 show up, while 6 represents something that you don't want. So you basically roll
  * a five sided die.
- * 
+ *
  * Note: If you replace the SFMT RNG with some other rand() function in the future,
- * then you _need_ to change the UINT64_MAX constant to the largest possible random 
+ * then you _need_ to change the UINT64_MAX constant to the largest possible random
  * number which can be created by the new rand() function. This value is often defined
  * in a RAND_MAX constant.
  * Otherwise you will probably skew the outcome of the rand() method or worsen the
@@ -100,11 +101,11 @@ unsigned int RNG_SFMT::rand(int min, int max) {
 unsigned int RNG_SFMT::cdf(unsigned int min, unsigned int max)
 {
     // This all makes no sense if min > max, which should never happen.
-    if(min > max) {
-        throw std::invalid_argument(
-          QString("Invalid bounds for RNG: min > max! Values were: min = " +
-          QString::number(min) + ", max = " +
-          QString::number(max)).toStdString());
+    if (min > max)
+    {
+        throw std::invalid_argument(QString("Invalid bounds for RNG: min > max! Values were: min = " +
+                                            QString::number(min) + ", max = " + QString::number(max))
+                                        .toStdString());
         // at this point, the method exits. No return value is needed, because
         // basically the exception itself is returned.
     }
@@ -125,12 +126,13 @@ unsigned int RNG_SFMT::cdf(unsigned int min, unsigned int max)
     // To make the random number generation thread-safe, a mutex is created around
     // the generation. Outside of the loop of course, to avoid lock/unlock overhead.
     mutex.lock();
-    do {
+    do
+    {
         rand = sfmt_genrand_uint64(&sfmt);
     } while (rand >= limit);
     mutex.unlock();
 
     // Now determine the bucket containing the SFMT() random number and after adding
     // the lower bound, a random number from [min, max] can be returned.
-    return (unsigned int) (rand / buckets + min);
+    return (unsigned int)(rand / buckets + min);
 }

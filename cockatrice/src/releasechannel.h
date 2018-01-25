@@ -1,57 +1,106 @@
 #ifndef RELEASECHANNEL_H
 #define RELEASECHANNEL_H
 
-#include <QString>
 #include <QDate>
 #include <QObject>
+#include <QString>
 #include <QVariantMap>
 
 class QNetworkReply;
 class QNetworkAccessManager;
 
-class Release {
+class Release
+{
     friend class StableReleaseChannel;
     friend class DevReleaseChannel;
+
 public:
-    Release() {};
-    ~Release() {};
+    Release(){};
+    ~Release(){};
+
 private:
     QString name, descriptionUrl, downloadUrl, commitHash;
     QDate publishDate;
     bool compatibleVersionFound = false;
+
 protected:
-    void setName(QString _name) { name = _name; }
-    void setDescriptionUrl(QString _descriptionUrl) { descriptionUrl = _descriptionUrl; }
-    void setDownloadUrl(QString _downloadUrl) { downloadUrl = _downloadUrl; compatibleVersionFound = true; }
-    void setCommitHash(QString _commitHash) { commitHash = _commitHash; }
-    void setPublishDate(QDate _publishDate) { publishDate = _publishDate; }
+    void setName(QString _name)
+    {
+        name = _name;
+    }
+    void setDescriptionUrl(QString _descriptionUrl)
+    {
+        descriptionUrl = _descriptionUrl;
+    }
+    void setDownloadUrl(QString _downloadUrl)
+    {
+        downloadUrl = _downloadUrl;
+        compatibleVersionFound = true;
+    }
+    void setCommitHash(QString _commitHash)
+    {
+        commitHash = _commitHash;
+    }
+    void setPublishDate(QDate _publishDate)
+    {
+        publishDate = _publishDate;
+    }
+
 public:
-    QString getName() const { return name; }
-    QString getDescriptionUrl() const { return descriptionUrl; }
-    QString getDownloadUrl() const { return downloadUrl; }
-    QString getCommitHash() const { return commitHash; }
-    QDate getPublishDate() const { return publishDate; }
-    bool isCompatibleVersionFound() const { return compatibleVersionFound; }
+    QString getName() const
+    {
+        return name;
+    }
+    QString getDescriptionUrl() const
+    {
+        return descriptionUrl;
+    }
+    QString getDownloadUrl() const
+    {
+        return downloadUrl;
+    }
+    QString getCommitHash() const
+    {
+        return commitHash;
+    }
+    QDate getPublishDate() const
+    {
+        return publishDate;
+    }
+    bool isCompatibleVersionFound() const
+    {
+        return compatibleVersionFound;
+    }
 };
 
-class ReleaseChannel: public QObject {
+class ReleaseChannel : public QObject
+{
     Q_OBJECT
 public:
     ReleaseChannel();
     ~ReleaseChannel();
+
 protected:
     // shared by all instances
     static int sharedIndex;
     int index;
     QNetworkAccessManager *netMan;
     QNetworkReply *response;
-    Release * lastRelease;
+    Release *lastRelease;
+
 protected:
     static bool downloadMatchesCurrentOS(const QString &fileName);
     virtual QString getReleaseChannelUrl() const = 0;
+
 public:
-    int getIndex() const { return index; }
-    Release * getLastRelease() { return lastRelease; }
+    int getIndex() const
+    {
+        return index;
+    }
+    Release *getLastRelease()
+    {
+        return lastRelease;
+    }
     virtual QString getManualDownloadUrl() const = 0;
     virtual QString getName() const = 0;
     void checkForUpdates();
@@ -63,13 +112,15 @@ protected slots:
     virtual void fileListFinished() = 0;
 };
 
-class StableReleaseChannel: public ReleaseChannel {
+class StableReleaseChannel : public ReleaseChannel
+{
     Q_OBJECT
 public:
-    StableReleaseChannel() {};
-    ~StableReleaseChannel() {};
+    StableReleaseChannel(){};
+    ~StableReleaseChannel(){};
     virtual QString getManualDownloadUrl() const;
     virtual QString getName() const;
+
 protected:
     virtual QString getReleaseChannelUrl() const;
 protected slots:
@@ -78,13 +129,15 @@ protected slots:
     virtual void fileListFinished();
 };
 
-class DevReleaseChannel: public ReleaseChannel {
+class DevReleaseChannel : public ReleaseChannel
+{
     Q_OBJECT
 public:
-    DevReleaseChannel() {};
-    ~DevReleaseChannel() {};
+    DevReleaseChannel(){};
+    ~DevReleaseChannel(){};
     virtual QString getManualDownloadUrl() const;
     virtual QString getName() const;
+
 protected:
     virtual QString getReleaseChannelUrl() const;
 protected slots:

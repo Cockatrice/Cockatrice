@@ -3,7 +3,8 @@
 
 #include <QGraphicsItem>
 
-enum GraphicsItemType {
+enum GraphicsItemType
+{
     typeCard = QGraphicsItem::UserType + 1,
     typeCardDrag = QGraphicsItem::UserType + 2,
     typeZone = QGraphicsItem::UserType + 3,
@@ -12,13 +13,17 @@ enum GraphicsItemType {
     typeOther = QGraphicsItem::UserType + 6
 };
 
-class AbstractGraphicsItem : public QObject, public QGraphicsItem {
+class AbstractGraphicsItem : public QObject, public QGraphicsItem
+{
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 protected:
     void paintNumberEllipse(int number, int radius, const QColor &color, int position, int count, QPainter *painter);
+
 public:
-    AbstractGraphicsItem(QGraphicsItem *parent = 0) : QObject(), QGraphicsItem(parent) { }
+    AbstractGraphicsItem(QGraphicsItem *parent = 0) : QObject(), QGraphicsItem(parent)
+    {
+    }
 };
 
 #endif

@@ -1,10 +1,10 @@
 #ifndef PLAYERLISTWIDGET_H
 #define PLAYERLISTWIDGET_H
 
-#include <QTreeWidget>
-#include <QMap>
 #include <QIcon>
+#include <QMap>
 #include <QStyledItemDelegate>
+#include <QTreeWidget>
 
 class ServerInfo_PlayerProperties;
 class TabSupervisor;
@@ -12,19 +12,23 @@ class AbstractClient;
 class TabGame;
 class UserContextMenu;
 
-class PlayerListItemDelegate : public QStyledItemDelegate {
+class PlayerListItemDelegate : public QStyledItemDelegate
+{
 public:
     PlayerListItemDelegate(QObject *const parent);
-    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
+    bool
+    editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
 };
 
-class PlayerListTWI : public QTreeWidgetItem {
+class PlayerListTWI : public QTreeWidgetItem
+{
 public:
     PlayerListTWI();
     bool operator<(const QTreeWidgetItem &other) const;
 };
 
-class PlayerListWidget : public QTreeWidget {
+class PlayerListWidget : public QTreeWidget
+{
     Q_OBJECT
 private:
     PlayerListItemDelegate *itemDelegate;
@@ -37,6 +41,7 @@ private:
     bool gameStarted;
 signals:
     void openMessageDialog(const QString &userName, bool focus);
+
 public:
     PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent = 0);
     void retranslateUi();

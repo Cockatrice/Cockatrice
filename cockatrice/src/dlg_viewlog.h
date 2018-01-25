@@ -1,18 +1,21 @@
 #ifndef DLG_VIEWLOG_H
 #define DLG_VIEWLOG_H
 
-#include <QDialog>
 #include <QCheckBox>
+#include <QDialog>
 
 class QPlainTextEdit;
 class QCloseEvent;
 
-class DlgViewLog : public QDialog {
-Q_OBJECT
+class DlgViewLog : public QDialog
+{
+    Q_OBJECT
 public:
     explicit DlgViewLog(QWidget *parent);
+
 protected:
     void closeEvent(QCloseEvent *event) override;
+
 private:
     QPlainTextEdit *logArea;
     QCheckBox *coClearLog;

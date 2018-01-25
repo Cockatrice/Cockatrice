@@ -11,18 +11,21 @@ class QPushButton;
 class QSpinBox;
 class QLineEdit;
 
-class ShutdownDialog : public QDialog {
+class ShutdownDialog : public QDialog
+{
     Q_OBJECT
 private:
     QLineEdit *reasonEdit;
     QSpinBox *minutesEdit;
+
 public:
     ShutdownDialog(QWidget *parent = 0);
     QString getReason() const;
     int getMinutes() const;
 };
 
-class TabAdmin : public Tab {
+class TabAdmin : public Tab
+{
     Q_OBJECT
 private:
     bool locked;
@@ -37,14 +40,21 @@ private slots:
     void actUpdateServerMessage();
     void actShutdownServer();
     void actReloadConfig();
-    
+
     void actUnlock();
     void actLock();
+
 public:
     TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _fullAdmin, QWidget *parent = 0);
     void retranslateUi();
-    QString getTabText() const { return tr("Administration"); }
-    bool getLocked() const { return locked; }
+    QString getTabText() const
+    {
+        return tr("Administration");
+    }
+    bool getLocked() const
+    {
+        return locked;
+    }
 };
 
 #endif

@@ -7,7 +7,8 @@ class QLabel;
 class QTextEdit;
 class CardInfo;
 
-class CardInfoText : public QFrame {
+class CardInfoText : public QFrame
+{
     Q_OBJECT
 
 private:

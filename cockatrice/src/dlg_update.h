@@ -1,15 +1,16 @@
 #ifndef DLG_UPDATE_H
 #define DLG_UPDATE_H
 
-#include <QtNetwork>
-#include <QProgressDialog>
 #include <QDialogButtonBox>
+#include <QProgressDialog>
+#include <QtNetwork>
 
 #include "update_downloader.h"
 class Release;
 
-class DlgUpdate : public QDialog {
-Q_OBJECT
+class DlgUpdate : public QDialog
+{
+    Q_OBJECT
 public:
     DlgUpdate(QWidget *parent);
 
@@ -23,6 +24,7 @@ private slots:
     void downloadProgressMade(qint64 bytesRead, qint64 totalBytes);
     void downloadError(QString errorString);
     void closeDialog();
+
 private:
     QUrl updateUrl;
     void enableUpdateButton(bool enable);

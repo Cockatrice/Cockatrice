@@ -1,14 +1,11 @@
 #include "server_arrow.h"
-#include "server_player.h"
+#include "pb/serverinfo_arrow.pb.h"
 #include "server_card.h"
 #include "server_cardzone.h"
-#include "pb/serverinfo_arrow.pb.h"
+#include "server_player.h"
 
 Server_Arrow::Server_Arrow(int _id, Server_Card *_startCard, Server_ArrowTarget *_targetItem, const color &_arrowColor)
-        : id(_id),
-          startCard(_startCard),
-          targetItem(_targetItem),
-          arrowColor(_arrowColor)
+    : id(_id), startCard(_startCard), targetItem(_targetItem), arrowColor(_arrowColor)
 {
 }
 
@@ -21,7 +18,8 @@ void Server_Arrow::getInfo(ServerInfo_Arrow *info)
     info->mutable_arrow_color()->CopyFrom(arrowColor);
 
     Server_Card *targetCard = qobject_cast<Server_Card *>(targetItem);
-    if (targetCard) {
+    if (targetCard)
+    {
         info->set_target_player_id(targetCard->getZone()->getPlayer()->getPlayerId());
         info->set_target_zone(targetCard->getZone()->getName().toStdString());
         info->set_target_card_id(targetCard->getId());

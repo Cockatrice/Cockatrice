@@ -10,27 +10,27 @@
 
 #include "dlg_edit_avatar.h"
 
-DlgEditAvatar::DlgEditAvatar(QWidget *parent)
-    : QDialog(parent)
+DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent)
 {
     imageLabel = new QLabel(tr("No image chosen."));
     imageLabel->setFixedSize(400, 200);
     imageLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     imageLabel->setStyleSheet("border: 1px solid #000");
 
-    textLabel = new QLabel(tr("To change your avatar, choose a new image.\nTo remove your current avatar, confirm without choosing a new image."));
+    textLabel = new QLabel(tr("To change your avatar, choose a new image.\nTo remove your current avatar, confirm "
+                              "without choosing a new image."));
     browseButton = new QPushButton(tr("Browse..."));
     connect(browseButton, SIGNAL(clicked()), this, SLOT(actBrowse()));
-    
+
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(imageLabel, 0, 0, 1, 2);
     grid->addWidget(textLabel, 1, 0);
     grid->addWidget(browseButton, 1, 1);
-    
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
-         
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
     mainLayout->addWidget(buttonBox);
@@ -42,7 +42,7 @@ DlgEditAvatar::DlgEditAvatar(QWidget *parent)
 }
 
 void DlgEditAvatar::actOk()
-{  
+{
     accept();
 }
 
@@ -53,8 +53,9 @@ void DlgEditAvatar::actCancel()
 
 void DlgEditAvatar::actBrowse()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), QDir::homePath(), tr("Image Files (*.png *.jpg *.bmp)"));
-    if(fileName.isEmpty())
+    QString fileName =
+        QFileDialog::getOpenFileName(this, tr("Open Image"), QDir::homePath(), tr("Image Files (*.png *.jpg *.bmp)"));
+    if (fileName.isEmpty())
     {
         imageLabel->setText(tr("No image chosen."));
         return;
@@ -64,7 +65,7 @@ void DlgEditAvatar::actBrowse()
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
     imgReader.setFileName(fileName);
-    if(!imgReader.read(&image))
+    if (!imgReader.read(&image))
     {
         qDebug() << "Avatar image loading failed for file:" << fileName;
         imageLabel->setText(tr("Invalid image chosen."));
@@ -76,11 +77,11 @@ void DlgEditAvatar::actBrowse()
 QByteArray DlgEditAvatar::getImage()
 {
     const QPixmap *pix = imageLabel->pixmap();
-    if(!pix || pix->isNull())
+    if (!pix || pix->isNull())
         return QByteArray();
 
     QImage image = pix->toImage();
-    if(image.isNull())
+    if (image.isNull())
         return QByteArray();
 
     QByteArray ba;

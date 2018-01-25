@@ -1,19 +1,18 @@
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
-
-#include "selectzone.h"
 #include "abstractcarditem.h"
-
+#include "selectzone.h"
 
 /*
-* TableZone is the grid based rect where CardItems may be placed.
-* It is the main play zone and can be customized with background images.
-*
-* TODO: Refactor methods to make more readable, extract some logic to
-* private methods (Im looking at you TableZone::reorganizeCards())
-*/
-class TableZone : public SelectZone {
+ * TableZone is the grid based rect where CardItems may be placed.
+ * It is the main play zone and can be customized with background images.
+ *
+ * TODO: Refactor methods to make more readable, extract some logic to
+ * private methods (Im looking at you TableZone::reorganizeCards())
+ */
+class TableZone : public SelectZone
+{
     Q_OBJECT
 
 signals:
@@ -29,7 +28,7 @@ private:
     static const int MARGIN_RIGHT = 15;
     static const int MARGIN_TOP = 10;
     static const int MARGIN_BOTTOM = 30;
-    static const int PADDING_X  = 35;
+    static const int PADDING_X = 35;
     static const int PADDING_Y = 30;
 
     /*
@@ -55,7 +54,7 @@ private:
     static const QColor FADE_MASK;
     static const QColor GRADIENT_COLOR;
     static const QColor GRADIENT_COLORLESS;
-    
+
     /*
        Size and shape variables
      */
@@ -100,7 +99,7 @@ public:
        @param parent defaults to null
      */
     TableZone(Player *_p, QGraphicsItem *parent = 0);
-    
+
     /**
        @return a QRectF of the TableZone bounding box.
      */
@@ -109,7 +108,7 @@ public:
     /**
        Render the TableZone
 
-       @param painter 
+       @param painter
        @param option
      */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -154,15 +153,29 @@ public:
     CardItem *takeCard(int position, int cardId, bool canResize = true);
 
     /**
-       Resizes the TableZone in case CardItems are within or 
+       Resizes the TableZone in case CardItems are within or
        outside of the TableZone constraints.
      */
     void resizeToContents();
 
-    int getMinimumWidth() const { return currentMinimumWidth; }
-    void setWidth(qreal _width) { prepareGeometryChange(); width = _width; }
-    qreal getWidth() const { return width; }
-    void setActive(bool _active) { active = _active; update(); }
+    int getMinimumWidth() const
+    {
+        return currentMinimumWidth;
+    }
+    void setWidth(qreal _width)
+    {
+        prepareGeometryChange();
+        width = _width;
+    }
+    qreal getWidth() const
+    {
+        return width;
+    }
+    void setActive(bool _active)
+    {
+        active = _active;
+        update();
+    }
 
 protected:
     void addCardImpl(CardItem *card, int x, int y);
@@ -185,7 +198,10 @@ private:
     /*
     Helper function to create a single key from a card stack location.
     */
-    int getCardStackMapKey (int x, int y) const { return x + (y * 1000); }
+    int getCardStackMapKey(int x, int y) const
+    {
+        return x + (y * 1000);
+    }
 };
 
 #endif

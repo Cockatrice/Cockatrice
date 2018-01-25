@@ -1,17 +1,15 @@
 #include "filtertree.h"
-#include "cardfilter.h"
 #include "carddatabase.h"
+#include "cardfilter.h"
 
 #include <QList>
 
-template <class T>
-FilterTreeNode *FilterTreeBranch<T>::nodeAt(int i) const
+template <class T> FilterTreeNode *FilterTreeBranch<T>::nodeAt(int i) const
 {
     return (childNodes.size() > i) ? childNodes.at(i) : nullptr;
 }
 
-template <class T>
-void FilterTreeBranch<T>::deleteAt(int i)
+template <class T> void FilterTreeBranch<T>::deleteAt(int i)
 {
     preRemoveChild(this, i);
     delete childNodes.takeAt(i);
@@ -19,16 +17,14 @@ void FilterTreeBranch<T>::deleteAt(int i)
     nodeChanged();
 }
 
-template <class T>
-int FilterTreeBranch<T>::childIndex(const FilterTreeNode *node) const
+template <class T> int FilterTreeBranch<T>::childIndex(const FilterTreeNode *node) const
 {
     auto *unconst = const_cast<FilterTreeNode *>(node);
     auto downcasted = dynamic_cast<T>(unconst);
     return (downcasted) ? childNodes.indexOf(downcasted) : -1;
 }
 
-template <class T>
-FilterTreeBranch<T>::~FilterTreeBranch()
+template <class T> FilterTreeBranch<T>::~FilterTreeBranch()
 {
     while (!childNodes.isEmpty())
     {
@@ -117,12 +113,12 @@ bool FilterItemList::testTypeAnd(const CardInfo *info, CardFilter::Attr attr) co
 {
     for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
     {
-        if (! (*i)->isEnabled())
+        if (!(*i)->isEnabled())
         {
             continue;
         }
 
-        if (! (*i)->acceptCardAttr(info, attr))
+        if (!(*i)->acceptCardAttr(info, attr))
         {
             return false;
         }
@@ -143,7 +139,7 @@ bool FilterItemList::testTypeOr(const CardInfo *info, CardFilter::Attr attr) con
 
     for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
     {
-        if (! (*i)->isEnabled())
+        if (!(*i)->isEnabled())
         {
             continue;
         }
@@ -232,8 +228,8 @@ bool FilterItem::acceptSet(const CardInfo *info) const
     bool status = false;
     for (auto i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++)
     {
-        if ((*i)->getShortName().compare(term, Qt::CaseInsensitive) == 0
-            || (*i)->getLongName().compare(term, Qt::CaseInsensitive) == 0)
+        if ((*i)->getShortName().compare(term, Qt::CaseInsensitive) == 0 ||
+            (*i)->getLongName().compare(term, Qt::CaseInsensitive) == 0)
         {
             status = true;
             break;
@@ -264,13 +260,13 @@ bool FilterItem::acceptCmc(const CardInfo *info) const
 bool FilterItem::acceptPower(const CardInfo *info) const
 {
     int slash = info->getPowTough().indexOf("/");
-    return (slash != -1) ? (info->getPowTough().mid(0,slash) == term) : false;
+    return (slash != -1) ? (info->getPowTough().mid(0, slash) == term) : false;
 }
 
 bool FilterItem::acceptToughness(const CardInfo *info) const
 {
     int slash = info->getPowTough().indexOf("/");
-    return (slash != -1) ? (info->getPowTough().mid(slash+1) == term) : false;
+    return (slash != -1) ? (info->getPowTough().mid(slash + 1) == term) : false;
 }
 
 bool FilterItem::acceptRarity(const CardInfo *info) const
@@ -290,14 +286,29 @@ bool FilterItem::acceptRarity(const CardInfo *info) const
     {
         switch (i)
         {
-            case 0: converted_term.replace("mr", "mythic rare", Qt::CaseInsensitive); break;
-            case 1: converted_term.replace("m r", "mythic rare", Qt::CaseInsensitive); break;
-            case 2: converted_term.replace("m", "mythic rare", Qt::CaseInsensitive); break;
-            case 3: converted_term.replace("c", "common", Qt::CaseInsensitive); break;
-            case 4: converted_term.replace("u", "uncommon", Qt::CaseInsensitive); break;
-            case 5: converted_term.replace("r", "rare", Qt::CaseInsensitive); break;
-            case 6: converted_term.replace("s", "special", Qt::CaseInsensitive); break;
-            default: break;
+            case 0:
+                converted_term.replace("mr", "mythic rare", Qt::CaseInsensitive);
+                break;
+            case 1:
+                converted_term.replace("m r", "mythic rare", Qt::CaseInsensitive);
+                break;
+            case 2:
+                converted_term.replace("m", "mythic rare", Qt::CaseInsensitive);
+                break;
+            case 3:
+                converted_term.replace("c", "common", Qt::CaseInsensitive);
+                break;
+            case 4:
+                converted_term.replace("u", "uncommon", Qt::CaseInsensitive);
+                break;
+            case 5:
+                converted_term.replace("r", "rare", Qt::CaseInsensitive);
+                break;
+            case 6:
+                converted_term.replace("s", "special", Qt::CaseInsensitive);
+                break;
+            default:
+                break;
         }
     }
 
@@ -315,17 +326,28 @@ bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) con
 {
     switch (attr)
     {
-        case CardFilter::AttrName: return acceptName(info);
-        case CardFilter::AttrType: return acceptType(info);
-        case CardFilter::AttrColor: return acceptColor(info);
-        case CardFilter::AttrText: return acceptText(info);
-        case CardFilter::AttrSet: return acceptSet(info);
-        case CardFilter::AttrManaCost: return acceptManaCost(info);
-        case CardFilter::AttrCmc: return acceptCmc(info);
-        case CardFilter::AttrRarity: return acceptRarity(info);
-        case CardFilter::AttrPow: return acceptPower(info);
-        case CardFilter::AttrTough: return acceptToughness(info);
-        default: return true; /* ignore this attribute */
+        case CardFilter::AttrName:
+            return acceptName(info);
+        case CardFilter::AttrType:
+            return acceptType(info);
+        case CardFilter::AttrColor:
+            return acceptColor(info);
+        case CardFilter::AttrText:
+            return acceptText(info);
+        case CardFilter::AttrSet:
+            return acceptSet(info);
+        case CardFilter::AttrManaCost:
+            return acceptManaCost(info);
+        case CardFilter::AttrCmc:
+            return acceptCmc(info);
+        case CardFilter::AttrRarity:
+            return acceptRarity(info);
+        case CardFilter::AttrPow:
+            return acceptPower(info);
+        case CardFilter::AttrTough:
+            return acceptToughness(info);
+        default:
+            return true; /* ignore this attribute */
     }
 }
 

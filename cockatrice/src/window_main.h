@@ -22,9 +22,9 @@
 
 #include <QList>
 #include <QMainWindow>
-#include <QSystemTrayIcon>
-#include <QProcess>
 #include <QMessageBox>
+#include <QProcess>
+#include <QSystemTrayIcon>
 #include <QtNetwork>
 
 #include "abstractclient.h"
@@ -38,7 +38,8 @@ class ServerInfo_User;
 class QThread;
 class DlgViewLog;
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
 public slots:
     void actCheckCardUpdates();
@@ -93,6 +94,7 @@ private slots:
 
     void actManageSets();
     void actEditTokens();
+
 private:
     static const QString appName;
     static const QStringList fileNameFilters;
@@ -105,7 +107,10 @@ private:
     void createTrayActions();
     int getNextCustomSetPrefix(QDir dataDir);
     // TODO: add a preference item to choose updater name for other games
-    inline QString getCardUpdaterBinaryName() { return "oracle"; };
+    inline QString getCardUpdaterBinaryName()
+    {
+        return "oracle";
+    };
 
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu;
@@ -120,21 +125,23 @@ private:
 
     RemoteClient *client;
     QThread *clientThread;
-    
+
     LocalServer *localServer;
     bool bHasActivated;
 
     QMessageBox serverShutdownMessageBox;
-    QProcess * cardUpdateProcess;
+    QProcess *cardUpdateProcess;
 
-    DlgViewLog * logviewDialog;
+    DlgViewLog *logviewDialog;
+
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
 protected:
     void closeEvent(QCloseEvent *event);
     void changeEvent(QEvent *event);
-    QString extractInvalidUsernameMessage(QString & in);
+    QString extractInvalidUsernameMessage(QString &in);
 };
 
 #endif

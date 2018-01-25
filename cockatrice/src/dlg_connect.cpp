@@ -1,17 +1,17 @@
-#include <QLabel>
-#include <QCheckBox>
-#include <QComboBox>
-#include <QRadioButton>
-#include <QGridLayout>
-#include <QDialogButtonBox>
-#include <QEvent>
-#include <QKeyEvent>
-#include <QMessageBox>
-#include <QGroupBox>
-#include <QPushButton>
 #include "dlg_connect.h"
 #include "settingscache.h"
 #include "userconnection_information.h"
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDialogButtonBox>
+#include <QEvent>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QRadioButton>
 
 #define PUBLIC_SERVERS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers"
 
@@ -24,7 +24,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     rebuildComboBoxList();
 
     newHostButton = new QRadioButton(tr("New Host"), this);
-    
+
     saveLabel = new QLabel(tr("Name:"));
     saveEdit = new QLineEdit(settingsCache->servers().getSaveName());
     saveLabel->setBuddy(saveEdit);
@@ -45,14 +45,15 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     passwordEdit = new QLineEdit(settingsCache->servers().getPassword());
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
-    
+
     savePasswordCheckBox = new QCheckBox(tr("&Save password"));
     savePasswordCheckBox->setChecked(settingsCache->servers().getSavePassword());
 
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
     autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
 
-    publicServersLabel = new QLabel(QString("(<a href=\"%1\">%2</a>)").arg(PUBLIC_SERVERS_URL).arg(tr("Public Servers")));
+    publicServersLabel =
+        new QLabel(QString("(<a href=\"%1\">%2</a>)").arg(PUBLIC_SERVERS_URL).arg(tr("Public Servers")));
     publicServersLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
     publicServersLabel->setWordWrap(true);
     publicServersLabel->setTextFormat(Qt::RichText);
@@ -64,8 +65,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     {
         autoConnectCheckBox->setChecked(static_cast<bool>(settingsCache->servers().getAutoConnect()));
         autoConnectCheckBox->setEnabled(true);
-    }
-    else
+    } else
     {
         settingsCache->servers().setAutoConnect(0);
         autoConnectCheckBox->setChecked(false);
@@ -140,7 +140,8 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     previousHostButton->setChecked(true);
 
-    connect(previousHosts, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(updateDisplayInfo(const QString &)));
+    connect(previousHosts, SIGNAL(currentIndexChanged(const QString &)), this,
+            SLOT(updateDisplayInfo(const QString &)));
 
     playernameEdit->setFocus();
 }
@@ -148,24 +149,14 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 void DlgConnect::actSaveConfig()
 {
     bool updateSuccess = settingsCache->servers().updateExistingServer(
-            saveEdit->text().trimmed(),
-            hostEdit->text().trimmed(),
-            portEdit->text().trimmed(),
-            playernameEdit->text().trimmed(),
-            passwordEdit->text(),
-            savePasswordCheckBox->isChecked()
-    );
+        saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
+        playernameEdit->text().trimmed(), passwordEdit->text(), savePasswordCheckBox->isChecked());
 
-    if (! updateSuccess)
+    if (!updateSuccess)
     {
-        settingsCache->servers().addNewServer(
-                saveEdit->text().trimmed(),
-                hostEdit->text().trimmed(),
-                portEdit->text().trimmed(),
-                playernameEdit->text().trimmed(),
-                passwordEdit->text(),
-                savePasswordCheckBox->isChecked()
-        );
+        settingsCache->servers().addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
+                                              portEdit->text().trimmed(), playernameEdit->text().trimmed(),
+                                              passwordEdit->text(), savePasswordCheckBox->isChecked());
     }
 
     rebuildComboBoxList();
@@ -194,17 +185,16 @@ void DlgConnect::rebuildComboBoxList()
         if (saveName.size())
         {
             previousHosts->addItem(saveName);
-            
+
             if (settingsCache->servers().getPrevioushostName() == saveName)
             {
                 previousHosts->setCurrentIndex(i);
             }
-            
+
             i++;
         }
     }
 }
-
 
 void DlgConnect::previousHostSelected(bool state)
 {
@@ -226,7 +216,7 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     QStringList data = uci.getServerInfo(saveName);
 
     bool savePasswordStatus = (data.at(5) == "1");
-    
+
     saveEdit->setText(data.at(0));
     hostEdit->setText(data.at(1));
     portEdit->setText(data.at(2));
@@ -252,22 +242,19 @@ void DlgConnect::newHostSelected(bool state)
         saveEdit->clear();
         saveEdit->setPlaceholderText("New Menu Name");
         saveEdit->setDisabled(false);
-    }
-    else
+    } else
     {
         rebuildComboBoxList();
     }
 }
-
 
 void DlgConnect::passwordSaved(int state)
 {
     Q_UNUSED(state);
     if (savePasswordCheckBox->isChecked())
     {
-       autoConnectCheckBox->setEnabled(true);
-    }
-    else
+        autoConnectCheckBox->setEnabled(true);
+    } else
     {
         autoConnectCheckBox->setChecked(false);
         autoConnectCheckBox->setEnabled(false);
@@ -284,25 +271,14 @@ void DlgConnect::actOk()
             return;
         }
 
-        settingsCache->servers().addNewServer(
-                saveEdit->text().trimmed(),
-                hostEdit->text().trimmed(),
-                portEdit->text().trimmed(),
-                playernameEdit->text().trimmed(),
-                passwordEdit->text(),
-                savePasswordCheckBox->isChecked()
-        );
-    }
-    else
+        settingsCache->servers().addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
+                                              portEdit->text().trimmed(), playernameEdit->text().trimmed(),
+                                              passwordEdit->text(), savePasswordCheckBox->isChecked());
+    } else
     {
-        settingsCache->servers().updateExistingServer(
-                saveEdit->text().trimmed(),
-                hostEdit->text().trimmed(),
-                portEdit->text().trimmed(),
-                playernameEdit->text().trimmed(),
-                passwordEdit->text(),
-                savePasswordCheckBox->isChecked()
-        );
+        settingsCache->servers().updateExistingServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
+                                                      portEdit->text().trimmed(), playernameEdit->text().trimmed(),
+                                                      passwordEdit->text(), savePasswordCheckBox->isChecked());
     }
 
     settingsCache->servers().setPrevioushostName(saveEdit->text());
@@ -316,7 +292,6 @@ void DlgConnect::actOk()
 
     accept();
 }
-
 
 QString DlgConnect::getHost() const
 {

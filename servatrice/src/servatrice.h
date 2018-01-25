@@ -22,17 +22,16 @@
 
 #include <QTcpServer>
 #if QT_VERSION > 0x050300
-  #include <QWebSocketServer>
+#include <QWebSocketServer>
 #endif
-#include <QMutex>
-#include <QSslCertificate>
-#include <QSslKey>
+#include "server.h"
 #include <QHostAddress>
+#include <QMetaType>
+#include <QMutex>
 #include <QReadWriteLock>
 #include <QSqlDatabase>
-#include <QMetaType>
-#include "server.h"
-
+#include <QSslCertificate>
+#include <QSslKey>
 
 Q_DECLARE_METATYPE(QSqlDatabase)
 
@@ -47,28 +46,37 @@ class AbstractServerSocketInterface;
 class IslInterface;
 class FeatureSet;
 
-class Servatrice_GameServer : public QTcpServer {
+class Servatrice_GameServer : public QTcpServer
+{
     Q_OBJECT
 private:
     Servatrice *server;
     QList<Servatrice_ConnectionPool *> connectionPools;
+
 public:
     Servatrice_GameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
     ~Servatrice_GameServer();
+
 protected:
     void incomingConnection(qintptr socketDescriptor);
     Servatrice_ConnectionPool *findLeastUsedConnectionPool();
 };
 
 #if QT_VERSION > 0x050300
-class Servatrice_WebsocketGameServer : public QWebSocketServer {
+class Servatrice_WebsocketGameServer : public QWebSocketServer
+{
     Q_OBJECT
 private:
     Servatrice *server;
     QList<Servatrice_ConnectionPool *> connectionPools;
+
 public:
-    Servatrice_WebsocketGameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
+    Servatrice_WebsocketGameServer(Servatrice *_server,
+                                   int _numberPools,
+                                   const QSqlDatabase &_sqlDatabase,
+                                   QObject *parent = 0);
     ~Servatrice_WebsocketGameServer();
+
 protected:
     Servatrice_ConnectionPool *findLeastUsedConnectionPool();
 protected slots:
@@ -76,20 +84,29 @@ protected slots:
 };
 #endif
 
-class Servatrice_IslServer : public QTcpServer {
+class Servatrice_IslServer : public QTcpServer
+{
     Q_OBJECT
 private:
     Servatrice *server;
     QSslCertificate cert;
     QSslKey privateKey;
+
 public:
-    Servatrice_IslServer(Servatrice *_server, const QSslCertificate &_cert, const QSslKey &_privateKey, QObject *parent = 0)
-        : QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey) { }
+    Servatrice_IslServer(Servatrice *_server,
+                         const QSslCertificate &_cert,
+                         const QSslKey &_privateKey,
+                         QObject *parent = 0)
+        : QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey)
+    {
+    }
+
 protected:
     void incomingConnection(qintptr socketDescriptor);
 };
 
-class ServerProperties {
+class ServerProperties
+{
 public:
     int id;
     QSslCertificate cert;
@@ -98,22 +115,40 @@ public:
     int gamePort;
     int controlPort;
 
-    ServerProperties(int _id, const QSslCertificate &_cert, const QString &_hostname, const QHostAddress &_address, int _gamePort, int _controlPort)
-        : id(_id), cert(_cert), hostname(_hostname), address(_address), gamePort(_gamePort), controlPort(_controlPort) { }
+    ServerProperties(int _id,
+                     const QSslCertificate &_cert,
+                     const QString &_hostname,
+                     const QHostAddress &_address,
+                     int _gamePort,
+                     int _controlPort)
+        : id(_id), cert(_cert), hostname(_hostname), address(_address), gamePort(_gamePort), controlPort(_controlPort)
+    {
+    }
 };
 
 class Servatrice : public Server
 {
     Q_OBJECT
 public:
-    enum AuthenticationMethod { AuthenticationNone, AuthenticationSql, AuthenticationPassword };
+    enum AuthenticationMethod
+    {
+        AuthenticationNone,
+        AuthenticationSql,
+        AuthenticationPassword
+    };
 private slots:
     void statusUpdate();
     void shutdownTimeout();
+
 protected:
     void doSendIslMessage(const IslMessage &msg, int serverId);
+
 private:
-    enum DatabaseType { DatabaseNone, DatabaseMySql };
+    enum DatabaseType
+    {
+        DatabaseNone,
+        DatabaseMySql
+    };
     AuthenticationMethod authenticationMethod;
     DatabaseType databaseType;
     QTimer *pingClock, *statusUpdateClock;
@@ -167,22 +202,45 @@ public slots:
     void scheduleShutdown(const QString &reason, int minutes);
     void updateLoginMessage();
     void setRequiredFeatures(const QString featureList);
+
 public:
     Servatrice(QObject *parent = 0);
     ~Servatrice();
     bool initServer();
-    QMap<QString, bool> getServerRequiredFeatureList() const { return serverRequiredFeatureList; }
-    QString getOfficialWarningsList() const { return officialWarnings; }
+    QMap<QString, bool> getServerRequiredFeatureList() const
+    {
+        return serverRequiredFeatureList;
+    }
+    QString getOfficialWarningsList() const
+    {
+        return officialWarnings;
+    }
     QString getServerName() const;
-    QString getLoginMessage() const { QMutexLocker locker(&loginMessageMutex); return loginMessage; }
+    QString getLoginMessage() const
+    {
+        QMutexLocker locker(&loginMessageMutex);
+        return loginMessage;
+    }
     QString getRequiredFeatures() const;
     QString getAuthenticationMethodString() const;
     QString getDBTypeString() const;
-    QString getDbPrefix() const { return dbPrefix; }
+    QString getDbPrefix() const
+    {
+        return dbPrefix;
+    }
     QString getEmailBlackList() const;
-    AuthenticationMethod getAuthenticationMethod() const { return authenticationMethod; }
-    bool permitUnregisteredUsers() const { return authenticationMethod != AuthenticationNone; }
-    bool getGameShouldPing() const { return true; }
+    AuthenticationMethod getAuthenticationMethod() const
+    {
+        return authenticationMethod;
+    }
+    bool permitUnregisteredUsers() const
+    {
+        return authenticationMethod != AuthenticationNone;
+    }
+    bool getGameShouldPing() const
+    {
+        return true;
+    }
     bool getClientIDRequiredEnabled() const;
     bool getRegOnlyServerEnabled() const;
     bool getMaxUserLimitEnabled() const;

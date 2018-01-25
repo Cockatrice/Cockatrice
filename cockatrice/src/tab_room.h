@@ -1,15 +1,21 @@
 #ifndef TAB_ROOM_H
 #define TAB_ROOM_H
 
-#include "tab.h"
 #include "lineeditcompleter.h"
-#include <QGroupBox>
-#include <QMap>
-#include <QLineEdit>
-#include <QKeyEvent>
+#include "tab.h"
 #include <QFocusEvent>
+#include <QGroupBox>
+#include <QKeyEvent>
+#include <QLineEdit>
+#include <QMap>
 
-namespace google { namespace protobuf { class Message; } }
+namespace google
+{
+namespace protobuf
+{
+class Message;
+}
+} // namespace google
 class AbstractClient;
 class UserList;
 class QLabel;
@@ -31,7 +37,8 @@ class PendingCommand;
 class ServerInfo_User;
 class LineEditCompleter;
 
-class TabRoom : public Tab {
+class TabRoom : public Tab
+{
     Q_OBJECT
 private:
     AbstractClient *client;
@@ -39,14 +46,14 @@ private:
     QString roomName;
     ServerInfo_User *ownUser;
     QMap<int, QString> gameTypes;
-    
+
     GameSelector *gameSelector;
     UserList *userList;
     ChatView *chatView;
     QLabel *sayLabel;
     LineEditCompleter *sayEdit;
     QGroupBox *chatGroupBox;
-    
+
     QMenu *roomMenu;
     QAction *aLeaveRoom;
     QAction *aOpenChatSettings;
@@ -76,18 +83,37 @@ private slots:
     void processLeaveRoomEvent(const Event_LeaveRoom &event);
     void processRoomSayEvent(const Event_RoomSay &event);
     void refreshShortcuts();
+
 public:
-    TabRoom(TabSupervisor *_tabSupervisor, AbstractClient *_client, ServerInfo_User *_ownUser, const ServerInfo_Room &info);
+    TabRoom(TabSupervisor *_tabSupervisor,
+            AbstractClient *_client,
+            ServerInfo_User *_ownUser,
+            const ServerInfo_Room &info);
     ~TabRoom();
     void retranslateUi();
     void closeRequest();
     void tabActivated();
     void processRoomEvent(const RoomEvent &event);
-    int getRoomId() const { return roomId; }
-    const QMap<int, QString> &getGameTypes() const { return gameTypes; }
-    QString getChannelName() const { return roomName; }
-    QString getTabText() const { return roomName; }
-    const ServerInfo_User *getUserInfo() const { return ownUser; }
+    int getRoomId() const
+    {
+        return roomId;
+    }
+    const QMap<int, QString> &getGameTypes() const
+    {
+        return gameTypes;
+    }
+    QString getChannelName() const
+    {
+        return roomName;
+    }
+    QString getTabText() const
+    {
+        return roomName;
+    }
+    const ServerInfo_User *getUserInfo() const
+    {
+        return ownUser;
+    }
 
     PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd);
     void sendRoomCommand(PendingCommand *pend);

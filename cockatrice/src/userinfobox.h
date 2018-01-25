@@ -1,21 +1,22 @@
 #ifndef USERINFOBOX_H
 #define USERINFOBOX_H
 
-#include <QWidget>
 #include <QLabel>
 #include <QPushButton>
+#include <QWidget>
 
 class ServerInfo_User;
 class AbstractClient;
 class Response;
 
-class UserInfoBox : public QWidget {
+class UserInfoBox : public QWidget
+{
     Q_OBJECT
 private:
     AbstractClient *client;
     bool editable;
-    QLabel avatarLabel, nameLabel, realNameLabel1, realNameLabel2, countryLabel1,
-        countryLabel2, countryLabel3, userLevelLabel1, userLevelLabel2, userLevelLabel3, accountAgeLebel1, accountAgeLabel2;
+    QLabel avatarLabel, nameLabel, realNameLabel1, realNameLabel2, countryLabel1, countryLabel2, countryLabel3,
+        userLevelLabel1, userLevelLabel2, userLevelLabel3, accountAgeLebel1, accountAgeLabel2;
     QPushButton editButton, passwordButton, avatarButton;
 
 public:

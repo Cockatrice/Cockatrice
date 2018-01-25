@@ -1,17 +1,17 @@
+#include <QApplication>
+#include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
-#include <QUrl>
-#include <QNetworkReply>
-#include <QMessageBox>
 #include <QFile>
-#include <QApplication>
+#include <QMessageBox>
+#include <QNetworkReply>
+#include <QUrl>
 #include <QtConcurrent>
-#include <QCryptographicHash>
 
-#include "spoilerbackgroundupdater.h"
-#include "settingscache.h"
 #include "carddatabase.h"
 #include "main.h"
+#include "settingscache.h"
+#include "spoilerbackgroundupdater.h"
 #include "window_main.h"
 
 #define SPOILERS_STATUS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/SpoilerSeasonEnabled"
@@ -45,8 +45,7 @@ void SpoilerBackgroundUpdater::downloadFromURL(QUrl url, bool saveResults)
     {
         // This will write out to the file (used for spoiler.xml)
         connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSpoilersFile()));
-    }
-    else
+    } else
     {
         // This will check the status (used to see if we're in spoiler season or not)
         connect(reply, SIGNAL(finished()), this, SLOT(actCheckIfSpoilerSeasonEnabled()));
@@ -68,8 +67,7 @@ void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
 
         reply->deleteLater();
         emit spoilerCheckerDone();
-    }
-    else
+    } else
     {
         qDebug() << "Error downloading spoilers file" << errorCode;
         emit spoilerCheckerDone();
@@ -88,7 +86,6 @@ bool SpoilerBackgroundUpdater::deleteSpoilerFile()
     {
         qDebug() << "Deleting spoiler.xml";
         return true;
-
     }
 
     qDebug() << "Error: Spoiler.xml not found or not deleted";
@@ -111,13 +108,11 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
 
         qDebug() << "Spoiler Season Offline";
         emit spoilerCheckerDone();
-    }
-    else if (errorCode == QNetworkReply::NoError)
+    } else if (errorCode == QNetworkReply::NoError)
     {
         qDebug() << "Spoiler Service Online";
         startSpoilerDownloadProcess(SPOILERS_URL, true);
-    }
-    else if (errorCode == QNetworkReply::HostNotFoundError)
+    } else if (errorCode == QNetworkReply::HostNotFoundError)
     {
         if (trayIcon)
         {
@@ -126,8 +121,7 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
 
         qDebug() << "Spoiler download failed due to no internet connection";
         emit spoilerCheckerDone();
-    }
-    else
+    } else
     {
         if (trayIcon)
         {
@@ -179,7 +173,6 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 
     file.close();
 
-
     // Data written, so reload the card database
     qDebug() << "Spoiler Service Data Written";
     QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
@@ -228,8 +221,7 @@ QByteArray SpoilerBackgroundUpdater::getHash(const QString fileName)
 
         file.close();
         return hash.result();
-    }
-    else
+    } else
     {
         qDebug() << "getHash ReadOnly failed!";
         file.close();

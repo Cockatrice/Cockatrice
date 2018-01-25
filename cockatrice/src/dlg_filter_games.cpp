@@ -1,20 +1,20 @@
 #include "dlg_filter_games.h"
 #include <QCheckBox>
-#include <QPushButton>
-#include <QLabel>
-#include <QSpinBox>
-#include <QLineEdit>
+#include <QCryptographicHash>
+#include <QDialogButtonBox>
+#include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QSpinBox>
 #include <QVBoxLayout>
-#include <QGridLayout>
-#include <QDialogButtonBox>
-#include <QCryptographicHash>
 
-DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const GamesProxyModel *_gamesProxyModel, QWidget *parent)
-    : QDialog(parent),
-      allGameTypes(_allGameTypes),
-      gamesProxyModel(_gamesProxyModel)
+DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
+                               const GamesProxyModel *_gamesProxyModel,
+                               QWidget *parent)
+    : QDialog(parent), allGameTypes(_allGameTypes), gamesProxyModel(_gamesProxyModel)
 {
     showBuddiesOnlyGames = new QCheckBox(tr("Show '&buddies only' games"));
     showBuddiesOnlyGames->setChecked(gamesProxyModel->getShowBuddiesOnlyGames());
@@ -37,7 +37,8 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const Ga
 
     QVBoxLayout *gameTypeFilterLayout = new QVBoxLayout;
     QMapIterator<int, QString> gameTypesIterator(allGameTypes);
-    while (gameTypesIterator.hasNext()) {
+    while (gameTypesIterator.hasNext())
+    {
         gameTypesIterator.next();
 
         QCheckBox *temp = new QCheckBox(gameTypesIterator.value());
@@ -47,7 +48,8 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const Ga
         gameTypeFilterLayout->addWidget(temp);
     }
     QGroupBox *gameTypeFilterGroupBox;
-    if (!allGameTypes.isEmpty()) {
+    if (!allGameTypes.isEmpty())
+    {
         gameTypeFilterGroupBox = new QGroupBox(tr("&Game types"));
         gameTypeFilterGroupBox->setLayout(gameTypeFilterLayout);
     } else
@@ -84,7 +86,6 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const Ga
     QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
     restrictionsGroupBox->setLayout(restrictionsLayout);
 
-
     QGridLayout *leftGrid = new QGridLayout;
     leftGrid->addWidget(gameNameFilterLabel, 0, 0);
     leftGrid->addWidget(gameNameFilterEdit, 0, 1);
@@ -92,7 +93,6 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const Ga
     leftGrid->addWidget(creatorNameFilterEdit, 1, 1);
     leftGrid->addWidget(maxPlayersGroupBox, 2, 0, 1, 2);
     leftGrid->addWidget(restrictionsGroupBox, 3, 0, 1, 2);
-
 
     QVBoxLayout *leftColumn = new QVBoxLayout;
     leftColumn->addLayout(leftGrid);
@@ -117,7 +117,8 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes, const Ga
     setWindowTitle(tr("Filter games"));
 }
 
-void DlgFilterGames::actOk() {
+void DlgFilterGames::actOk()
+{
     accept();
 }
 
@@ -175,7 +176,8 @@ QSet<int> DlgFilterGames::getGameTypeFilter() const
 {
     QSet<int> result;
     QMapIterator<int, QCheckBox *> i(gameTypeFilterCheckBoxes);
-    while (i.hasNext()) {
+    while (i.hasNext())
+    {
         i.next();
         if (i.value()->isChecked())
             result.insert(i.key());
@@ -186,7 +188,8 @@ QSet<int> DlgFilterGames::getGameTypeFilter() const
 void DlgFilterGames::setGameTypeFilter(const QSet<int> &_gameTypeFilter)
 {
     QMapIterator<int, QCheckBox *> i(gameTypeFilterCheckBoxes);
-    while (i.hasNext()) {
+    while (i.hasNext())
+    {
         i.next();
         i.value()->setChecked(_gameTypeFilter.contains(i.key()));
     }
@@ -205,5 +208,6 @@ int DlgFilterGames::getMaxPlayersFilterMax() const
 void DlgFilterGames::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax)
 {
     maxPlayersFilterMinSpinBox->setValue(_maxPlayersFilterMin);
-    maxPlayersFilterMaxSpinBox->setValue(_maxPlayersFilterMax == -1 ? maxPlayersFilterMaxSpinBox->maximum() : _maxPlayersFilterMax);
+    maxPlayersFilterMaxSpinBox->setValue(_maxPlayersFilterMax == -1 ? maxPlayersFilterMaxSpinBox->maximum()
+                                                                    : _maxPlayersFilterMax);
 }

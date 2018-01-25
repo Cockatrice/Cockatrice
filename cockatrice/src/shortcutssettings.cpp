@@ -8,7 +8,7 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
     this->settingsFilePath = std::move(settingsPath);
     this->settingsFilePath.append("shortcuts.ini");
     fillDefaultShorcuts();
-    shortCuts = QMap<QString,QList<QKeySequence> >(defaultShortCuts);
+    shortCuts = QMap<QString, QList<QKeySequence>>(defaultShortCuts);
 
     bool exists = QFile(settingsFilePath).exists();
 
@@ -19,7 +19,7 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
         shortCutsFile.beginGroup("Custom");
         const QStringList customKeys = shortCutsFile.allKeys();
 
-        for(QStringList::const_iterator it = customKeys.constBegin(); it != customKeys.constEnd(); ++it)
+        for (QStringList::const_iterator it = customKeys.constBegin(); it != customKeys.constEnd(); ++it)
         {
             QString stringSequence = shortCutsFile.value(*it).toString();
             QList<QKeySequence> SequenceList = parseSequenceString(stringSequence);
@@ -58,7 +58,7 @@ QString ShortcutsSettings::getShortcutString(QString name)
 QString ShortcutsSettings::stringifySequence(QList<QKeySequence> Sequence) const
 {
     QString stringSequence;
-    for (int i=0; i < Sequence.size(); ++i)
+    for (int i = 0; i < Sequence.size(); ++i)
     {
         stringSequence.append(Sequence.at(i).toString(QKeySequence::PortableText));
         if (i < Sequence.size() - 1)
@@ -131,16 +131,16 @@ bool ShortcutsSettings::isValid(QString name, QString Sequences)
 
 void ShortcutsSettings::resetAllShortcuts()
 {
-   for (auto it = defaultShortCuts.begin(); it != defaultShortCuts.end(); ++it)
-   {
-       setShortcuts(it.key(), it.value());
-   }
-   emit allShortCutsReset();
+    for (auto it = defaultShortCuts.begin(); it != defaultShortCuts.end(); ++it)
+    {
+        setShortcuts(it.key(), it.value());
+    }
+    emit allShortCutsReset();
 }
 
 void ShortcutsSettings::clearAllShortcuts()
 {
-    for(auto it = shortCuts.begin(); it != shortCuts.end(); ++it)
+    for (auto it = shortCuts.begin(); it != shortCuts.end(); ++it)
     {
         setShortcuts(it.key(), "");
     }
@@ -253,7 +253,6 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/phase7"] = parseSequenceString("");
     defaultShortCuts["Player/phase8"] = parseSequenceString("");
     defaultShortCuts["Player/phase9"] = parseSequenceString("F9");
-
 
     defaultShortCuts["Player/aIncCounter_w"] = parseSequenceString("");
     defaultShortCuts["Player/aDecCounter_w"] = parseSequenceString("");

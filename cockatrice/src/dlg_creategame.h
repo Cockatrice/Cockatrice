@@ -17,7 +17,8 @@ class TabRoom;
 class Response;
 class ServerInfo_Game;
 
-class DlgCreateGame : public QDialog {
+class DlgCreateGame : public QDialog
+{
     Q_OBJECT
 public:
     DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
@@ -27,6 +28,7 @@ private slots:
     void actReset();
     void checkResponse(const Response &response);
     void spectatorsAllowedChanged(int state);
+
 private:
     TabRoom *room;
     QMap<int, QString> gameTypes;
@@ -37,11 +39,12 @@ private:
     QLineEdit *descriptionEdit, *passwordEdit;
     QSpinBox *maxPlayersEdit;
     QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
-    QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox, *spectatorsSeeEverythingCheckBox;
+    QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox,
+        *spectatorsSeeEverythingCheckBox;
     QDialogButtonBox *buttonBox;
     QPushButton *clearButton;
     QCheckBox *rememberGameSettings;
-    
+
     void sharedCtor();
 };
 

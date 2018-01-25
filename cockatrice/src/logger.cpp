@@ -7,7 +7,7 @@
 #define LOGGER_FILENAME "qdebug.txt"
 
 #if QT_VERSION >= 0x050400
-    #include <QSysInfo>
+#include <QSysInfo>
 #endif
 
 Logger::Logger() : logToFileEnabled(false)
@@ -29,8 +29,7 @@ void Logger::logToFile(bool enabled)
     if (enabled)
     {
         openLogfileSession();
-    }
-    else
+    } else
     {
         closeLogfileSession();
     }
@@ -106,9 +105,9 @@ QString Logger::getSystemArchitecture()
 
 QString Logger::getClientOperatingSystem()
 {
-    #if QT_VERSION >= 0x050400
-        return QSysInfo::prettyProductName();
-    #endif
+#if QT_VERSION >= 0x050400
+    return QSysInfo::prettyProductName();
+#endif
 
     return {};
 }

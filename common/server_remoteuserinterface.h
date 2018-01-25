@@ -3,12 +3,19 @@
 
 #include "server_abstractuserinterface.h"
 
-class Server_RemoteUserInterface : public Server_AbstractUserInterface {
+class Server_RemoteUserInterface : public Server_AbstractUserInterface
+{
 public:
-    Server_RemoteUserInterface(Server *_server, const ServerInfo_User_Container &_userInfoContainer) : Server_AbstractUserInterface(_server, _userInfoContainer) { }
-    
-    int getLastCommandTime() const { return 0; }
-    
+    Server_RemoteUserInterface(Server *_server, const ServerInfo_User_Container &_userInfoContainer)
+        : Server_AbstractUserInterface(_server, _userInfoContainer)
+    {
+    }
+
+    int getLastCommandTime() const
+    {
+        return 0;
+    }
+
     void sendProtocolItem(const Response &item);
     void sendProtocolItem(const SessionEvent &item);
     void sendProtocolItem(const GameEventContainer &item);

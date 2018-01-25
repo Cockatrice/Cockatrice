@@ -1,36 +1,35 @@
-#include <QLabel>
-#include <QLineEdit>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QGroupBox>
-#include <QPushButton>
-#include <QGridLayout>
-#include <QListWidget>
-#include <QStackedWidget>
-#include <QCloseEvent>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QToolBar>
-#include <QTranslator>
+#include "dlg_settings.h"
+#include "carddatabase.h"
+#include "main.h"
+#include "releasechannel.h"
+#include "sequenceEdit/shortcutstab.h"
+#include "settingscache.h"
+#include "soundengine.h"
+#include "spoilerbackgroundupdater.h"
+#include "thememanager.h"
 #include <QAction>
 #include <QApplication>
-#include <QInputDialog>
-#include <QSpinBox>
-#include <QDialogButtonBox>
-#include <QRadioButton>
+#include <QCheckBox>
+#include <QCloseEvent>
+#include <QComboBox>
 #include <QDebug>
+#include <QDesktopWidget>
+#include <QDialogButtonBox>
+#include <QFileDialog>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QInputDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QRadioButton>
 #include <QSlider>
 #include <QSpinBox>
-#include <QDesktopWidget>
-#include "carddatabase.h"
-#include "dlg_settings.h"
-#include "main.h"
-#include "settingscache.h"
-#include "thememanager.h"
-#include "releasechannel.h"
-#include "soundengine.h"
-#include "sequenceEdit/shortcutstab.h"
-#include "spoilerbackgroundupdater.h"
+#include <QStackedWidget>
+#include <QToolBar>
+#include <QTranslator>
 
 #define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Picture-Download-URLs"
 
@@ -38,18 +37,20 @@ GeneralSettingsPage::GeneralSettingsPage()
 {
     QString setLanguage = settingsCache->getLang();
     QStringList qmFiles = findQmFiles();
-    for (int i = 0; i < qmFiles.size(); i++) {
+    for (int i = 0; i < qmFiles.size(); i++)
+    {
         QString langName = languageName(qmFiles[i]);
         languageBox.addItem(langName, qmFiles[i]);
-        if ((qmFiles[i] == setLanguage) || (setLanguage.isEmpty() && langName == QCoreApplication::translate("i18n", DEFAULT_LANG_NAME)))
+        if ((qmFiles[i] == setLanguage) ||
+            (setLanguage.isEmpty() && langName == QCoreApplication::translate("i18n", DEFAULT_LANG_NAME)))
             languageBox.setCurrentIndex(i);
     }
 
     picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
 
     // updates
-    QList<ReleaseChannel*> channels = settingsCache->getUpdateReleaseChannels();
-    foreach(ReleaseChannel* chan, channels)
+    QList<ReleaseChannel *> channels = settingsCache->getUpdateReleaseChannels();
+    foreach (ReleaseChannel *chan, channels)
     {
         updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
     }
@@ -72,7 +73,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
-    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), settingsCache, SLOT(setUpdateReleaseChannel(int)));
+    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), settingsCache,
+            SLOT(setUpdateReleaseChannel(int)));
     connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotifyAboutUpdate(int)));
     connect(&picDownloadCheckBox, SIGNAL(clicked(bool)), this, SLOT(setEnabledStatus(bool)));
     connect(defaultUrlEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrl(QString)));
@@ -182,7 +184,7 @@ QStringList GeneralSettingsPage::findQmFiles()
 
 QString GeneralSettingsPage::languageName(const QString &qmFile)
 {
-    if(qmFile == DEFAULT_LANG_CODE)
+    if (qmFile == DEFAULT_LANG_CODE)
         return DEFAULT_LANG_NAME;
 
     QTranslator translator;
@@ -240,12 +242,14 @@ void GeneralSettingsPage::clearDownloadedPicsButtonClicked()
     QString picsPath = settingsCache->getPicsPath() + "/downloadedPics/";
     QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     bool outerSuccessRemove = true;
-    for (int i = 0; i < dirs.length(); i ++) {
+    for (int i = 0; i < dirs.length(); i++)
+    {
         QString currentPath = picsPath + dirs.at(i) + "/";
         QStringList files = QDir(currentPath).entryList(QDir::Files);
         bool innerSuccessRemove = true;
-        for (int j = 0; j < files.length(); j ++)
-            if (!QDir(currentPath).remove(files.at(j))) {
+        for (int j = 0; j < files.length(); j++)
+            if (!QDir(currentPath).remove(files.at(j)))
+            {
                 qDebug() << "Failed to remove " + currentPath.toUtf8() + files.at(j).toUtf8();
                 outerSuccessRemove = false;
                 innerSuccessRemove = false;
@@ -290,10 +294,11 @@ void GeneralSettingsPage::retranslateUi()
     languageLabel.setText(tr("Language:"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
 
-    if(settingsCache->getIsPortableBuild())
+    if (settingsCache->getIsPortableBuild())
     {
         pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
-    } else {
+    } else
+    {
         pathsGroupBox->setTitle(tr("Paths"));
     }
 
@@ -305,7 +310,8 @@ void GeneralSettingsPage::retranslateUi()
     pixmapCacheLabel.setText(tr("Picture cache size:"));
     defaultUrlLabel.setText(tr("Primary download URL:"));
     fallbackUrlLabel.setText(tr("Fallback download URL:"));
-    urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to set a custom picture url")));
+    urlLinkLabel.setText(
+        QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to set a custom picture url")));
     clearDownloadedPicsButton.setText(tr("Reset/clear downloaded pictures"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
@@ -326,7 +332,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     QString themeName = settingsCache->getThemeName();
 
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
-    for (int i = 0; i < themeDirs.size(); i++) {
+    for (int i = 0; i < themeDirs.size(); i++)
+    {
         themeBox.addItem(themeDirs[i]);
         if (themeDirs[i] == themeName)
             themeBox.setCurrentIndex(i);
@@ -368,11 +375,13 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     handGroupBox->setLayout(handGrid);
 
     invertVerticalCoordinateCheckBox.setChecked(settingsCache->getInvertVerticalCoordinate());
-    connect(&invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setInvertVerticalCoordinate(int)));
+    connect(&invertVerticalCoordinateCheckBox, SIGNAL(stateChanged(int)), settingsCache,
+            SLOT(setInvertVerticalCoordinate(int)));
 
     minPlayersForMultiColumnLayoutEdit.setMinimum(2);
     minPlayersForMultiColumnLayoutEdit.setValue(settingsCache->getMinPlayersForMultiColumnLayout());
-    connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMinPlayersForMultiColumnLayout(int)));
+    connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), settingsCache,
+            SLOT(setMinPlayersForMultiColumnLayout(int)));
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
     connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setMaxFontSize(int)));
@@ -403,7 +412,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 void AppearanceSettingsPage::themeBoxChanged(int index)
 {
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
-    if(index >= 0 && index < themeDirs.count())
+    if (index >= 0 && index < themeDirs.count())
         settingsCache->setThemeName(themeDirs.at(index));
 }
 
@@ -429,12 +438,14 @@ void AppearanceSettingsPage::retranslateUi()
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
     notificationsEnabledCheckBox.setChecked(settingsCache->getNotificationsEnabled());
-    connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotificationsEnabled(int)));
+    connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache,
+            SLOT(setNotificationsEnabled(int)));
     connect(&notificationsEnabledCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setSpecNotificationEnabled(int)));
 
     specNotificationsEnabledCheckBox.setChecked(settingsCache->getSpectatorNotificationsEnabled());
     specNotificationsEnabledCheckBox.setEnabled(settingsCache->getNotificationsEnabled());
-    connect(&specNotificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setSpectatorNotificationsEnabled(int)));
+    connect(&specNotificationsEnabledCheckBox, SIGNAL(stateChanged(int)), settingsCache,
+            SLOT(setSpectatorNotificationsEnabled(int)));
 
     doubleClickToPlayCheckBox.setChecked(settingsCache->getDoubleClickToPlay());
     connect(&doubleClickToPlayCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setDoubleClickToPlay(int)));
@@ -471,7 +482,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     setLayout(mainLayout);
 }
 
-void UserInterfaceSettingsPage::setSpecNotificationEnabled(int i) {
+void UserInterfaceSettingsPage::setSpecNotificationEnabled(int i)
+{
     specNotificationsEnabledCheckBox.setEnabled(i != 0);
 }
 
@@ -586,7 +598,7 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
     updateNowButton->setEnabled(anInput);
     infoOnSpoilersLabel.setEnabled(anInput);
 
-    if (! anInput)
+    if (!anInput)
     {
         SpoilerBackgroundUpdater::deleteSpoilerFile();
     }
@@ -598,12 +610,10 @@ void DeckEditorSettingsPage::retranslateUi()
     mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
     mcGeneralMessageLabel.setText(tr("Hey, something's here finally!"));
-    infoOnSpoilersLabel.setText(
-            tr("Last Updated") + ": " + getLastUpdateTime() + "\n\n" +
-            tr("Spoilers download automatically on launch") + "\n" +
-            tr("Press the button to manually update without relaunching") + "\n\n" +
-            tr("Do not close settings until manual update complete")
-    );
+    infoOnSpoilersLabel.setText(tr("Last Updated") + ": " + getLastUpdateTime() + "\n\n" +
+                                tr("Spoilers download automatically on launch") + "\n" +
+                                tr("Press the button to manually update without relaunching") + "\n\n" +
+                                tr("Do not close settings until manual update complete"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
@@ -612,12 +622,14 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&chatMentionCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMention(int)));
 
     chatMentionCompleterCheckbox.setChecked(settingsCache->getChatMentionCompleter());
-    connect(&chatMentionCompleterCheckbox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setChatMentionCompleter(int)));
+    connect(&chatMentionCompleterCheckbox, SIGNAL(stateChanged(int)), settingsCache,
+            SLOT(setChatMentionCompleter(int)));
 
     ignoreUnregUsersMainChat.setChecked(settingsCache->getIgnoreUnregisteredUsers());
     ignoreUnregUserMessages.setChecked(settingsCache->getIgnoreUnregisteredUserMessages());
     connect(&ignoreUnregUsersMainChat, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreUnregisteredUsers(int)));
-    connect(&ignoreUnregUserMessages, SIGNAL(stateChanged(int)), settingsCache, SLOT(setIgnoreUnregisteredUserMessages(int)));
+    connect(&ignoreUnregUserMessages, SIGNAL(stateChanged(int)), settingsCache,
+            SLOT(setIgnoreUnregisteredUserMessages(int)));
 
     invertMentionForeground.setChecked(settingsCache->getChatMentionForeground());
     connect(&invertMentionForeground, SIGNAL(stateChanged(int)), this, SLOT(updateTextColor(int)));
@@ -712,7 +724,8 @@ void MessagesSettingsPage::updateColor(const QString &value)
 {
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
-    if (colorToSet.isValid()) {
+    if (colorToSet.isValid())
+    {
         settingsCache->setChatMentionColor(value);
         updateMentionPreview();
     }
@@ -722,7 +735,8 @@ void MessagesSettingsPage::updateHighlightColor(const QString &value)
 {
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
-    if (colorToSet.isValid()) {
+    if (colorToSet.isValid())
+    {
         settingsCache->setChatHighlightColor(value);
         updateHighlightPreview();
     }
@@ -743,13 +757,13 @@ void MessagesSettingsPage::updateTextHighlightColor(int value)
 void MessagesSettingsPage::updateMentionPreview()
 {
     mentionColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatMentionColor() +
-        ";color: " + (settingsCache->getChatMentionForeground() ? "white" : "black") + ";}");
+                                ";color: " + (settingsCache->getChatMentionForeground() ? "white" : "black") + ";}");
 }
 
 void MessagesSettingsPage::updateHighlightPreview()
 {
-    highlightColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatHighlightColor() +
-        ";color: " + (settingsCache->getChatHighlightForeground() ? "white" : "black") + ";}");
+    highlightColor->setStyleSheet("QLineEdit{background:#" + settingsCache->getChatHighlightColor() + ";color: " +
+                                  (settingsCache->getChatHighlightForeground() ? "white" : "black") + ";}");
 }
 
 void MessagesSettingsPage::storeSettings()
@@ -763,7 +777,8 @@ void MessagesSettingsPage::actAdd()
 {
     bool ok;
     QString msg = QInputDialog::getText(this, tr("Add message"), tr("Message:"), QLineEdit::Normal, QString(), &ok);
-    if (ok) {
+    if (ok)
+    {
         messageList->addItem(msg);
         storeSettings();
     }
@@ -771,7 +786,8 @@ void MessagesSettingsPage::actAdd()
 
 void MessagesSettingsPage::actRemove()
 {
-    if (messageList->currentItem()) {
+    if (messageList->currentItem())
+    {
         delete messageList->takeItem(messageList->currentRow());
         storeSettings();
     }
@@ -796,7 +812,6 @@ void MessagesSettingsPage::retranslateUi()
     customAlertStringLabel.setText(tr("Separate words with a space, alphanumeric characters only"));
 }
 
-
 SoundSettingsPage::SoundSettingsPage()
 {
     soundEnabledCheckBox.setChecked(settingsCache->getSoundEnabled());
@@ -805,7 +820,8 @@ SoundSettingsPage::SoundSettingsPage()
     QString themeName = settingsCache->getSoundThemeName();
 
     QStringList themeDirs = soundEngine->getAvailableThemes().keys();
-    for (int i = 0; i < themeDirs.size(); i++) {
+    for (int i = 0; i < themeDirs.size(); i++)
+    {
         themeBox.addItem(themeDirs[i]);
         if (themeDirs[i] == themeName)
             themeBox.setCurrentIndex(i);
@@ -851,7 +867,7 @@ SoundSettingsPage::SoundSettingsPage()
 void SoundSettingsPage::themeBoxChanged(int index)
 {
     QStringList themeDirs = soundEngine->getAvailableThemes().keys();
-    if(index >= 0 && index < themeDirs.count())
+    if (index >= 0 && index < themeDirs.count())
         settingsCache->setSoundThemeName(themeDirs.at(index));
 }
 
@@ -952,7 +968,8 @@ void DlgSettings::createIcons()
     shortcutsButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     shortcutsButton->setIcon(QPixmap("theme:config/shorcuts"));
 
-    connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(changePage(QListWidgetItem *, QListWidgetItem *)));
+    connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this,
+            SLOT(changePage(QListWidgetItem *, QListWidgetItem *)));
 }
 
 void DlgSettings::changePage(QListWidgetItem *current, QListWidgetItem *previous)
@@ -965,7 +982,8 @@ void DlgSettings::changePage(QListWidgetItem *current, QListWidgetItem *previous
 
 void DlgSettings::setTab(int index)
 {
-    if (index <= contentsWidget->count()-1 && index >= 0) {
+    if (index <= contentsWidget->count() - 1 && index >= 0)
+    {
         changePage(contentsWidget->item(index), contentsWidget->currentItem());
         contentsWidget->setCurrentRow(index);
     }
@@ -990,46 +1008,41 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     QString loadErrorMessage = tr("Unknown Error loading card database");
     LoadStatus loadStatus = db->getLoadStatus();
     qDebug() << "Card Database load status: " << loadStatus;
-    switch(loadStatus)
+    switch (loadStatus)
     {
         case Ok:
             showLoadError = false;
             break;
         case Invalid:
-            loadErrorMessage =
-                    tr("Your card database is invalid.\n\n"
-                               "Cockatrice may not function correctly with an invalid database\n\n"
-                               "You may need to rerun oracle to update your card database.\n\n"
-                               "Would you like to change your database location setting?");
+            loadErrorMessage = tr("Your card database is invalid.\n\n"
+                                  "Cockatrice may not function correctly with an invalid database\n\n"
+                                  "You may need to rerun oracle to update your card database.\n\n"
+                                  "Would you like to change your database location setting?");
             break;
         case VersionTooOld:
-            loadErrorMessage =
-                    tr("Your card database version is too old.\n\n"
-                               "This can cause problems loading card information or images\n\n"
-                               "Usually this can be fixed by rerunning oracle to to update your card database.\n\n"
-                               "Would you like to change your database location setting?");
+            loadErrorMessage = tr("Your card database version is too old.\n\n"
+                                  "This can cause problems loading card information or images\n\n"
+                                  "Usually this can be fixed by rerunning oracle to to update your card database.\n\n"
+                                  "Would you like to change your database location setting?");
             break;
         case NotLoaded:
-            loadErrorMessage =
-                    tr("Your card database did not finish loading\n\n"
-                               "Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached\n\n"
-                               "Would you like to change your database location setting?");
+            loadErrorMessage = tr("Your card database did not finish loading\n\n"
+                                  "Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues with your "
+                                  "cards.xml attached\n\n"
+                                  "Would you like to change your database location setting?");
             break;
         case FileError:
-            loadErrorMessage =
-                    tr("File Error loading your card database.\n\n"
-                               "Would you like to change your database location setting?");
+            loadErrorMessage = tr("File Error loading your card database.\n\n"
+                                  "Would you like to change your database location setting?");
             break;
         case NoCards:
-            loadErrorMessage =
-                    tr("Your card database was loaded but contains no cards.\n\n"
-                               "Would you like to change your database location setting?");
+            loadErrorMessage = tr("Your card database was loaded but contains no cards.\n\n"
+                                  "Would you like to change your database location setting?");
             break;
         default:
-            loadErrorMessage =
-                    tr("Unknown card database load status\n\n"
-                               "Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues\n\n"
-                               "Would you like to change your database location setting?");
+            loadErrorMessage = tr("Unknown card database load status\n\n"
+                                  "Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues\n\n"
+                                  "Would you like to change your database location setting?");
 
             break;
     }
@@ -1047,7 +1060,10 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty())
     {
         // TODO: Prompt to create it
-        if (QMessageBox::critical(this, tr("Error"), tr("The path to your deck directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        if (QMessageBox::critical(
+                this, tr("Error"),
+                tr("The path to your deck directory is invalid. Would you like to go back and set the correct path?"),
+                QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
             event->ignore();
             return;
@@ -1057,7 +1073,10 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     if (!QDir(settingsCache->getPicsPath()).exists() || settingsCache->getPicsPath().isEmpty())
     {
         // TODO: Prompt to create it
-        if (QMessageBox::critical(this, tr("Error"), tr("The path to your card pictures directory is invalid. Would you like to go back and set the correct path?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        if (QMessageBox::critical(this, tr("Error"),
+                                  tr("The path to your card pictures directory is invalid. Would you like to go back "
+                                     "and set the correct path?"),
+                                  QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
             event->ignore();
             return;

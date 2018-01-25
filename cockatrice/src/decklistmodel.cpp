@@ -1,17 +1,17 @@
-#include <QFile>
-#include <QTextStream>
-#include <QFont>
-#include <QBrush>
-#include <QTextCursor>
-#include <QTextDocument>
-#include <QPrinter>
-#include <QTextTable>
-#include <QProgressDialog>
-#include "main.h"
 #include "decklistmodel.h"
 #include "carddatabase.h"
-#include "settingscache.h"
 #include "deck_loader.h"
+#include "main.h"
+#include "settingscache.h"
+#include <QBrush>
+#include <QFile>
+#include <QFont>
+#include <QPrinter>
+#include <QProgressDialog>
+#include <QTextCursor>
+#include <QTextDocument>
+#include <QTextStream>
+#include <QTextTable>
 
 DeckListModel::DeckListModel(QObject *parent)
     : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)
@@ -69,26 +69,25 @@ void DeckListModel::rebuildTree()
 
 int DeckListModel::rowCount(const QModelIndex &parent) const
 {
-    //debugIndexInfo("rowCount", parent);
+    // debugIndexInfo("rowCount", parent);
     auto *node = getNode<InnerDecklistNode *>(parent);
     if (node)
     {
         return node->size();
-    }
-    else
+    } else
     {
         return 0;
     }
 }
 
-int DeckListModel::columnCount(const QModelIndex &/*parent*/) const
+int DeckListModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 2;
 }
 
 QVariant DeckListModel::data(const QModelIndex &index, int role) const
 {
-    //debugIndexInfo("data", index);
+    // debugIndexInfo("data", index);
     if (!index.isValid())
     {
         return QVariant();
@@ -132,12 +131,12 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
             }
             case Qt::ForegroundRole:
             {
-                return QBrush(QColor(0 ,0 ,0));
+                return QBrush(QColor(0, 0, 0));
             }
-            default: return QVariant();
+            default:
+                return QVariant();
         }
-    }
-    else
+    } else
     {
         switch (role)
         {
@@ -146,9 +145,12 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
             {
                 switch (index.column())
                 {
-                    case 0: return card->getNumber();
-                    case 1: return card->getName();
-                    default: return QVariant();
+                    case 0:
+                        return card->getNumber();
+                    case 1:
+                        return card->getName();
+                    default:
+                        return QVariant();
                 }
             }
             case Qt::BackgroundRole:
@@ -158,7 +160,7 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
             }
             case Qt::ForegroundRole:
             {
-                return QBrush(QColor(0 ,0 ,0));
+                return QBrush(QColor(0, 0, 0));
             }
             default:
                 return QVariant();
@@ -180,15 +182,18 @@ QVariant DeckListModel::headerData(int section, Qt::Orientation orientation, int
 
     switch (section)
     {
-        case 0: return tr("Number");
-        case 1: return tr("Card");
-        default: return QVariant();
+        case 0:
+            return tr("Number");
+        case 1:
+            return tr("Card");
+        default:
+            return QVariant();
     }
 }
 
 QModelIndex DeckListModel::index(int row, int column, const QModelIndex &parent) const
 {
-    //debugIndexInfo("index", parent);
+    // debugIndexInfo("index", parent);
     if (!hasIndex(row, column, parent))
     {
         return {};
@@ -196,7 +201,6 @@ QModelIndex DeckListModel::index(int row, int column, const QModelIndex &parent)
 
     auto *parentNode = getNode<InnerDecklistNode *>(parent);
     return row >= parentNode->size() ? QModelIndex() : createIndex(row, column, parentNode->at(row));
-
 }
 
 QModelIndex DeckListModel::parent(const QModelIndex &ind) const
@@ -243,9 +247,14 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, int
 
     switch (index.column())
     {
-        case 0: node->setNumber(value.toInt()); break;
-        case 1: node->setName(value.toString()); break;
-        default: return false;
+        case 0:
+            node->setNumber(value.toInt());
+            break;
+        case 1:
+            node->setName(value.toString());
+            break;
+        default:
+            return false;
     }
 
     emitRecursiveUpdates(index);
@@ -281,8 +290,7 @@ bool DeckListModel::removeRows(int row, int count, const QModelIndex &parent)
     if (node->empty() && (node != root))
     {
         removeRows(parent.row(), 1, parent.parent());
-    }
-    else
+    } else
     {
         emitRecursiveUpdates(parent);
     }
@@ -354,29 +362,10 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
             // This is usually called from tab_deck_editor
             // So we'll create a new CardInfo with the name
             // and default values for all fields
-            info = new CardInfo(
-                    cardName,
-                    false,
-                    nullptr,
-                    nullptr,
-                    "unknown",
-                    nullptr,
-                    nullptr,
-                    QStringList(),
-                    QList<CardRelation *>(),
-                    QList<CardRelation *>(),
-                    false,
-                    0,
-                    false,
-                    0,
-                    SetList(),
-                    QStringMap(),
-                    MuidMap(),
-                    QStringMap(),
-                    QStringMap()
-            );
-        }
-        else
+            info = new CardInfo(cardName, false, nullptr, nullptr, "unknown", nullptr, nullptr, QStringList(),
+                                QList<CardRelation *>(), QList<CardRelation *>(), false, 0, false, 0, SetList(),
+                                QStringMap(), MuidMap(), QStringMap(), QStringMap());
+        } else
         {
             return {};
         }
@@ -395,8 +384,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
         beginInsertRows(parentIndex, cardTypeNode->size(), cardTypeNode->size());
         cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
         endInsertRows();
-    }
-    else
+    } else
     {
         cardNode->setNumber(cardNode->getNumber() + 1);
         deckList->updateDeckHash();
@@ -420,7 +408,7 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
 {
     // Sort children of node and save the information needed to
     // update the list of persistent indexes.
-    QVector<QPair<int, int> > sortResult = node->sort(order);
+    QVector<QPair<int, int>> sortResult = node->sort(order);
 
     QModelIndexList from, to;
     int columns = columnCount();
@@ -455,7 +443,7 @@ void DeckListModel::sort(int column, Qt::SortOrder order)
 
     emit layoutAboutToBeChanged();
     DeckSortMethod sortMethod;
-    switch(column)
+    switch (column)
     {
         case 0:
             sortMethod = ByNumber;
@@ -502,7 +490,7 @@ void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *no
         tableFormat.setCellPadding(0);
         tableFormat.setCellSpacing(0);
         tableFormat.setBorder(0);
-                QTextTable *table = cursor->insertTable(node->size() + 1, totalColumns, tableFormat);
+        QTextTable *table = cursor->insertTable(node->size() + 1, totalColumns, tableFormat);
         for (int i = 0; i < node->size(); i++)
         {
             auto *card = dynamic_cast<AbstractDecklistCardNode *>(node->at(i));
@@ -519,10 +507,8 @@ void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *no
             cell.setFormat(cellCharFormat);
             cellCursor = cell.firstCursorPosition();
             cellCursor.insertText(card->getName());
-
         }
-    }
-    else if (node->height() == 2)
+    } else if (node->height() == 2)
     {
         QTextBlockFormat blockFormat;
         QTextCharFormat charFormat;
@@ -579,7 +565,7 @@ void DeckListModel::printDeckList(QPrinter *printer)
     for (int i = 0; i < root->size(); i++)
     {
         cursor.insertHtml("<br><img src=theme:hr.jpg>");
-        //cursor.insertHtml("<hr>");
+        // cursor.insertHtml("<hr>");
         cursor.insertBlock(headerBlockFormat, headerCharFormat);
 
         printDeckListNode(&cursor, dynamic_cast<InnerDecklistNode *>(root->at(i)));

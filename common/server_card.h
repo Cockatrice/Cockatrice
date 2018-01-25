@@ -20,15 +20,16 @@
 #ifndef SERVER_CARD_H
 #define SERVER_CARD_H
 
-#include "server_arrowtarget.h"
 #include "pb/card_attributes.pb.h"
-#include <QString>
+#include "server_arrowtarget.h"
 #include <QMap>
+#include <QString>
 
 class Server_CardZone;
 class ServerInfo_Card;
 
-class Server_Card : public Server_ArrowTarget {
+class Server_Card : public Server_ArrowTarget
+{
     Q_OBJECT
 private:
     Server_CardZone *zone;
@@ -44,52 +45,141 @@ private:
     QString annotation;
     bool destroyOnZoneChange;
     bool doesntUntap;
-    
+
     Server_Card *parentCard;
     QList<Server_Card *> attachedCards;
+
 public:
     Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone = 0);
     ~Server_Card();
-    
-    Server_CardZone *getZone() const { return zone; }
-    void setZone(Server_CardZone *_zone) { zone = _zone; }
-    
-    int getId() const { return id; }
-    int getX() const { return coord_x; }
-    int getY() const { return coord_y; }
-    QString getName() const { return name; }
-    const QMap<int, int> &getCounters() const { return counters; }
-    int getCounter(int id) const { return counters.value(id, 0); }
-    bool getTapped() const { return tapped; }
-    bool getAttacking() const { return attacking; }
-    bool getFaceDown() const { return facedown; }
-    QString getColor() const { return color; }
-    QString getPT() const;
-    QString getAnnotation() const { return annotation; }
-    bool getDoesntUntap() const { return doesntUntap; }
-    bool getDestroyOnZoneChange() const { return destroyOnZoneChange; }
-    Server_Card *getParentCard() const { return parentCard; }
-    const QList<Server_Card *> &getAttachedCards() const { return attachedCards; }
 
-    void setId(int _id) { id = _id; }
-    void setCoords(int x, int y) { coord_x = x; coord_y = y; }
-    void setName(const QString &_name) { name = _name; }
+    Server_CardZone *getZone() const
+    {
+        return zone;
+    }
+    void setZone(Server_CardZone *_zone)
+    {
+        zone = _zone;
+    }
+
+    int getId() const
+    {
+        return id;
+    }
+    int getX() const
+    {
+        return coord_x;
+    }
+    int getY() const
+    {
+        return coord_y;
+    }
+    QString getName() const
+    {
+        return name;
+    }
+    const QMap<int, int> &getCounters() const
+    {
+        return counters;
+    }
+    int getCounter(int id) const
+    {
+        return counters.value(id, 0);
+    }
+    bool getTapped() const
+    {
+        return tapped;
+    }
+    bool getAttacking() const
+    {
+        return attacking;
+    }
+    bool getFaceDown() const
+    {
+        return facedown;
+    }
+    QString getColor() const
+    {
+        return color;
+    }
+    QString getPT() const;
+    QString getAnnotation() const
+    {
+        return annotation;
+    }
+    bool getDoesntUntap() const
+    {
+        return doesntUntap;
+    }
+    bool getDestroyOnZoneChange() const
+    {
+        return destroyOnZoneChange;
+    }
+    Server_Card *getParentCard() const
+    {
+        return parentCard;
+    }
+    const QList<Server_Card *> &getAttachedCards() const
+    {
+        return attachedCards;
+    }
+
+    void setId(int _id)
+    {
+        id = _id;
+    }
+    void setCoords(int x, int y)
+    {
+        coord_x = x;
+        coord_y = y;
+    }
+    void setName(const QString &_name)
+    {
+        name = _name;
+    }
     void setCounter(int id, int value);
-    void setTapped(bool _tapped) { tapped = _tapped; }
-    void setAttacking(bool _attacking) { attacking = _attacking; }
-    void setFaceDown(bool _facedown) { facedown = _facedown; }
-    void setColor(const QString &_color) { color = _color; }
+    void setTapped(bool _tapped)
+    {
+        tapped = _tapped;
+    }
+    void setAttacking(bool _attacking)
+    {
+        attacking = _attacking;
+    }
+    void setFaceDown(bool _facedown)
+    {
+        facedown = _facedown;
+    }
+    void setColor(const QString &_color)
+    {
+        color = _color;
+    }
     void setPT(const QString &_pt);
-    void setAnnotation(const QString &_annotation) { annotation = _annotation; }
-    void setDestroyOnZoneChange(bool _destroy) { destroyOnZoneChange = _destroy; }
-    void setDoesntUntap(bool _doesntUntap) { doesntUntap = _doesntUntap; }
+    void setAnnotation(const QString &_annotation)
+    {
+        annotation = _annotation;
+    }
+    void setDestroyOnZoneChange(bool _destroy)
+    {
+        destroyOnZoneChange = _destroy;
+    }
+    void setDoesntUntap(bool _doesntUntap)
+    {
+        doesntUntap = _doesntUntap;
+    }
     void setParentCard(Server_Card *_parentCard);
-    void addAttachedCard(Server_Card *card) { attachedCards.append(card); }
-    void removeAttachedCard(Server_Card *card) { attachedCards.removeAt(attachedCards.indexOf(card)); }
-    
+    void addAttachedCard(Server_Card *card)
+    {
+        attachedCards.append(card);
+    }
+    void removeAttachedCard(Server_Card *card)
+    {
+        attachedCards.removeAt(attachedCards.indexOf(card));
+    }
+
     void resetState();
     QString setAttribute(CardAttribute attribute, const QString &avalue, bool allCards);
-    
+
     void getInfo(ServerInfo_Card *info);
 };
 

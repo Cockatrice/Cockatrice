@@ -1,10 +1,10 @@
 #include "cardframe.h"
 
-#include "carditem.h"
 #include "carddatabase.h"
-#include "main.h"
 #include "cardinfopicture.h"
 #include "cardinfotext.h"
+#include "carditem.h"
+#include "main.h"
 #include "settingscache.h"
 
 #include <QSplitter>
@@ -68,7 +68,7 @@ void CardFrame::retranslateUi()
 
 void CardFrame::setViewMode(int mode)
 {
-    if(currentIndex() != mode)
+    if (currentIndex() != mode)
         setCurrentIndex(mode);
 
     switch (mode)
@@ -122,5 +122,5 @@ void CardFrame::setCard(AbstractCardItem *card)
 
 void CardFrame::clear()
 {
-    setCard((CardInfo*) nullptr);
+    setCard((CardInfo *)nullptr);
 }

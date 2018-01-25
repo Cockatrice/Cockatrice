@@ -2,36 +2,38 @@
 #include "settingscache.h"
 #include "smtp/qxtsmtp.h"
 
-#include <QTcpSocket>
 #include <QSslSocket>
+#include <QTcpSocket>
 
-SmtpClient::SmtpClient(QObject *parent)
-: QObject(parent)
+SmtpClient::SmtpClient(QObject *parent) : QObject(parent)
 {
     smtp = new QxtSmtp(this);
 
     connect(smtp, SIGNAL(authenticated()), this, SLOT(authenticated()));
-    connect(smtp, SIGNAL(authenticationFailed(const QByteArray &)), this, SLOT(authenticationFailed(const QByteArray &)));
+    connect(smtp, SIGNAL(authenticationFailed(const QByteArray &)), this,
+            SLOT(authenticationFailed(const QByteArray &)));
     connect(smtp, SIGNAL(connected()), this, SLOT(connected()));
     connect(smtp, SIGNAL(connectionFailed(const QByteArray &)), this, SLOT(connectionFailed(const QByteArray &)));
     connect(smtp, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(smtp, SIGNAL(encrypted()), this, SLOT(encrypted()));
     connect(smtp, SIGNAL(encryptionFailed(const QByteArray &)), this, SLOT(encryptionFailed(const QByteArray &)));
     connect(smtp, SIGNAL(finished()), this, SLOT(finished()));
-    connect(smtp, SIGNAL(mailFailed(int, int, const QByteArray &)), this, SLOT(mailFailed(int, int, const QByteArray &)));
+    connect(smtp, SIGNAL(mailFailed(int, int, const QByteArray &)), this,
+            SLOT(mailFailed(int, int, const QByteArray &)));
     connect(smtp, SIGNAL(mailSent(int)), this, SLOT(mailSent(int)));
-    connect(smtp, SIGNAL(recipientRejected(int, const QString &, const QByteArray &)), this, SLOT(recipientRejected(int, const QString &, const QByteArray &)));
-    connect(smtp, SIGNAL(senderRejected(int, const QString &, const QByteArray &)), this, SLOT(senderRejected(int, const QString &, const QByteArray &)));
+    connect(smtp, SIGNAL(recipientRejected(int, const QString &, const QByteArray &)), this,
+            SLOT(recipientRejected(int, const QString &, const QByteArray &)));
+    connect(smtp, SIGNAL(senderRejected(int, const QString &, const QByteArray &)), this,
+            SLOT(senderRejected(int, const QString &, const QByteArray &)));
 }
 
 SmtpClient::~SmtpClient()
 {
-    if(smtp)
+    if (smtp)
     {
         delete smtp;
         smtp = 0;
     }
-    
 }
 
 bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token)
@@ -41,31 +43,31 @@ bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QStri
     QString subject = settingsCache->value("smtp/subject", "").toString();
     QString body = settingsCache->value("smtp/body", "").toString();
 
-    if(email.isEmpty())
+    if (email.isEmpty())
     {
         qDebug() << "[MAIL] Missing sender email in configuration";
         return false;
     }
 
-    if(subject.isEmpty())
+    if (subject.isEmpty())
     {
         qDebug() << "[MAIL] Missing subject field in configuration";
         return false;
     }
 
-    if(body.isEmpty())
+    if (body.isEmpty())
     {
         qDebug() << "[MAIL] Missing body field in configuration";
         return false;
     }
 
-    if(recipient.isEmpty())
+    if (recipient.isEmpty())
     {
         qDebug() << "[MAIL] Missing recipient field for user " << nickname;
         return false;
     }
 
-    if(token.isEmpty())
+    if (token.isEmpty())
     {
         qDebug() << "[MAIL] Missing token field for user " << nickname;
         return false;
@@ -133,10 +135,10 @@ bool SmtpClient::enqueueForgotPasswordTokenMail(const QString &nickname, const Q
 void SmtpClient::sendAllEmails()
 {
     // still connected from the previous round
-    if(smtp->socket()->state()  == QAbstractSocket::ConnectedState)
+    if (smtp->socket()->state() == QAbstractSocket::ConnectedState)
         return;
 
-    if(smtp->pendingMessages() == 0)
+    if (smtp->pendingMessages() == 0)
         return;
 
     QString connectionType = settingsCache->value("smtp/connection", "tcp").toString();
@@ -150,12 +152,13 @@ void SmtpClient::sendAllEmails()
     smtp->setPassword(password);
 
     // Connect
-    if(connectionType == "ssl")
+    if (connectionType == "ssl")
     {
-        if(acceptAllCerts)
+        if (acceptAllCerts)
             smtp->sslSocket()->setPeerVerifyMode(QSslSocket::QueryPeer);
         smtp->connectToSecureHost(host, port);
-    } else {
+    } else
+    {
         smtp->connectToHost(host, port);
     }
 }
@@ -165,7 +168,7 @@ void SmtpClient::authenticated()
     qDebug() << "[MAIL] authenticated";
 }
 
-void SmtpClient::authenticationFailed(const QByteArray & msg)
+void SmtpClient::authenticationFailed(const QByteArray &msg)
 {
     qDebug() << "[MAIL] authenticationFailed" << QString(msg);
 }
@@ -175,7 +178,7 @@ void SmtpClient::connected()
     qDebug() << "[MAIL] connected";
 }
 
-void SmtpClient::connectionFailed(const QByteArray & msg)
+void SmtpClient::connectionFailed(const QByteArray &msg)
 {
     qDebug() << "[MAIL] connectionFailed" << QString(msg);
 }
@@ -190,7 +193,7 @@ void SmtpClient::encrypted()
     qDebug() << "[MAIL] encrypted";
 }
 
-void SmtpClient::encryptionFailed(const QByteArray & msg)
+void SmtpClient::encryptionFailed(const QByteArray &msg)
 {
     qDebug() << "[MAIL] encryptionFailed" << QString(msg);
     qDebug() << "[MAIL] Try enabling the \"acceptallcerts\" option in servatrice.ini";
@@ -202,7 +205,7 @@ void SmtpClient::finished()
     smtp->disconnectFromHost();
 }
 
-void SmtpClient::mailFailed(int mailID, int errorCode, const QByteArray & msg)
+void SmtpClient::mailFailed(int mailID, int errorCode, const QByteArray &msg)
 {
     qDebug() << "[MAIL] mailFailed id=" << mailID << " errorCode=" << errorCode << "msg=" << QString(msg);
 }
@@ -212,12 +215,12 @@ void SmtpClient::mailSent(int mailID)
     qDebug() << "[MAIL] mailSent" << mailID;
 }
 
-void SmtpClient::recipientRejected(int mailID, const QString & address, const QByteArray & msg)
+void SmtpClient::recipientRejected(int mailID, const QString &address, const QByteArray &msg)
 {
     qDebug() << "[MAIL] recipientRejected id=" << mailID << " address=" << address << "msg=" << QString(msg);
 }
 
-void SmtpClient::senderRejected(int mailID, const QString & address, const QByteArray & msg)
+void SmtpClient::senderRejected(int mailID, const QString &address, const QByteArray &msg)
 {
     qDebug() << "[MAIL] senderRejected id=" << mailID << " address=" << address << "msg=" << QString(msg);
 }

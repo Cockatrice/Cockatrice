@@ -1,11 +1,10 @@
-#include <QPainter>
-#include <QPixmapCache>
-#include <QGraphicsSceneMouseEvent>
 #include "handcounter.h"
 #include "cardzone.h"
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
+#include <QPixmapCache>
 
-HandCounter::HandCounter(QGraphicsItem *parent)
-    : AbstractGraphicsItem(parent), number(0)
+HandCounter::HandCounter(QGraphicsItem *parent) : AbstractGraphicsItem(parent), number(0)
 {
     setCacheMode(DeviceCoordinateCache);
 }
@@ -30,20 +29,22 @@ void HandCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     painter->save();
     QSize translatedSize = painter->combinedTransform().mapRect(boundingRect()).size().toSize();
     QPixmap cachedPixmap;
-    if (!QPixmapCache::find("handCounter" + QString::number(translatedSize.width()), &cachedPixmap)) {
+    if (!QPixmapCache::find("handCounter" + QString::number(translatedSize.width()), &cachedPixmap))
+    {
         cachedPixmap = QPixmap("theme:hand").scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert("handCounter" + QString::number(translatedSize.width()), cachedPixmap);
     }
     painter->resetTransform();
     painter->drawPixmap(cachedPixmap.rect(), cachedPixmap, cachedPixmap.rect());
     painter->restore();
-    
+
     paintNumberEllipse(number, 24, Qt::white, -1, -1, painter);
 }
 
 void HandCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::RightButton) {
+    if (event->button() == Qt::RightButton)
+    {
         emit showContextMenu(event->screenPos());
         event->accept();
     }
