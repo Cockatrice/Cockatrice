@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_USERLISTPROXY_H
 #define COCKATRICE_USERLISTPROXY_H
 
+class QString;
 class ServerInfo_User;
 
 /**

@@ -16,6 +16,7 @@ class QLabel;
 class QDockWidget;
 class QWidget;
 class QGridLayout;
+class QVBoxLayout;
 class QTableWidget;
 class CommandContainer;
 class Response;

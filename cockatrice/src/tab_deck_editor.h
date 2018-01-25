@@ -22,6 +22,7 @@ class FilterBuilder;
 class CardInfo;
 class QGroupBox;
 class QHBoxLayout;
+class QVBoxLayout;
 class QPushButton;
 class QDockWidget;
 
