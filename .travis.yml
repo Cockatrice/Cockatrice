@@ -28,7 +28,8 @@ addons:
   apt:
     packages:
     - bc
-    - cmake  
+    - clang-format-3.9
+    - cmake
     - libprotobuf-dev
     - protobuf-compiler
     - qt5-default
