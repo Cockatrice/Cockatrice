@@ -133,9 +133,9 @@ int main(int argc, char *argv[])
 
     parser.process(app);
 
-    bool testRandom  = parser.isSet(testRandomOpt);
-    bool testHashFunction  = parser.isSet(testHashFunctionOpt);
-    bool logToConsole  = parser.isSet(logToConsoleOpt);
+    bool testRandom = parser.isSet(testRandomOpt);
+    bool testHashFunction = parser.isSet(testHashFunctionOpt);
+    bool logToConsole = parser.isSet(logToConsoleOpt);
     QString configPath = parser.value(configPathOpt);
 
     qRegisterMetaType<QList<int>>("QList<int>");
