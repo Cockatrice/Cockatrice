@@ -1015,7 +1015,7 @@ void Servatrice_DatabaseInterface::updateUsersLastLoginData(const QString &userN
     }
 
     if (usersID) {
-        int userCount;
+        int userCount = 0;
         query = prepareQuery("select count(id) from {prefix}_user_analytics where id = :user_id");
         query->bindValue(":user_id", usersID);
         if (!execSqlQuery(query))

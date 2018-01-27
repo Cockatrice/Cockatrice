@@ -3,7 +3,7 @@
 #include <QThread>
 
 Servatrice_ConnectionPool::Servatrice_ConnectionPool(Servatrice_DatabaseInterface *_databaseInterface)
-    : databaseInterface(_databaseInterface), clientCount(0)
+    : databaseInterface(_databaseInterface), threaded(false), clientCount(0)
 {
 }
 

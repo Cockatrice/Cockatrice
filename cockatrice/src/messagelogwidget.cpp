@@ -796,6 +796,6 @@ MessageLogWidget::MessageLogWidget(const TabSupervisor *_tabSupervisor,
                                    const UserlistProxy *_userlistProxy,
                                    TabGame *_game,
                                    QWidget *parent)
-    : ChatView(_tabSupervisor, _userlistProxy, _game, true, parent), currentContext(MessageContext_None)
+    : ChatView(_tabSupervisor, _userlistProxy, _game, true, parent), mulliganNumber(0), currentContext(MessageContext_None)
 {
 }

@@ -89,7 +89,7 @@ Server_Player::Server_Player(Server_Game *_game,
                              bool _spectator,
                              Server_AbstractUserInterface *_userInterface)
     : ServerInfo_User_Container(_userInfo), game(_game), userInterface(_userInterface), deck(0), pingTime(0),
-      playerId(_playerId), spectator(_spectator), nextCardId(0), readyStart(false), conceded(false),
+      playerId(_playerId), spectator(_spectator), initialCards(0), nextCardId(0), readyStart(false), conceded(false),
       sideboardLocked(true)
 {
 }
@@ -326,7 +326,7 @@ private:
     int x;
 
 public:
-    MoveCardCompareFunctor(int _x) : x(_x)
+    explicit MoveCardCompareFunctor(int _x) : x(_x)
     {
     }
     inline bool operator()(QPair<Server_Card *, int> a, QPair<Server_Card *, int> b)
@@ -451,7 +451,6 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             }
         }
 
-        int publicNewX;
         if (card->getDestroyOnZoneChange() && (startzone->getName() != targetzone->getName())) {
             Event_DestroyCard event;
             event.set_zone_name(startzone->getName().toStdString());
@@ -504,7 +503,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             if (startzone->getType() == ServerInfo_Zone::HiddenZone)
                 privatePosition = position;
 
-            publicNewX = newX;
+            int publicNewX = newX;
 
             Event_MoveCard eventOthers;
             eventOthers.set_start_player_id(startzone->getPlayer()->getPlayerId());
@@ -674,7 +673,7 @@ Server_Player::cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &r
         try {
             newDeck = game->getRoom()->getServer()->getDatabaseInterface()->getDeckFromDatabase(cmd.deck_id(),
                                                                                                 userInfo->id());
-        } catch (Response::ResponseCode r) {
+        } catch (Response::ResponseCode &r) {
             return r;
         }
     } else
@@ -1600,9 +1599,8 @@ Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer 
     if (conceded)
         return Response::RespContextError;
 
-    Server_Player *otherPlayer = 0;
     if (cmd.has_player_id()) {
-        otherPlayer = game->getPlayers().value(cmd.player_id());
+        Server_Player *otherPlayer = game->getPlayers().value(cmd.player_id());
         if (!otherPlayer)
             return Response::RespNameNotFound;
     }

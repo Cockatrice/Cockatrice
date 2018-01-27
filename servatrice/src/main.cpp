@@ -115,11 +115,6 @@ int main(int argc, char *argv[])
     app.setApplicationName("Servatrice");
     app.setApplicationVersion(VERSION_STRING);
 
-    bool testRandom = false;
-    bool testHashFunction = false;
-    bool logToConsole = false;
-    QString configPath;
-
     QCommandLineParser parser;
     parser.addHelpOption();
     parser.addVersionOption();
@@ -138,10 +133,10 @@ int main(int argc, char *argv[])
 
     parser.process(app);
 
-    testRandom = parser.isSet(testRandomOpt);
-    testHashFunction = parser.isSet(testHashFunctionOpt);
-    logToConsole = parser.isSet(logToConsoleOpt);
-    configPath = parser.value(configPathOpt);
+    bool testRandom  = parser.isSet(testRandomOpt);
+    bool testHashFunction  = parser.isSet(testHashFunctionOpt);
+    bool logToConsole  = parser.isSet(logToConsoleOpt);
+    QString configPath = parser.value(configPathOpt);
 
     qRegisterMetaType<QList<int>>("QList<int>");
 

@@ -178,7 +178,7 @@ void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
     QMetaObject::invokeMethod(interface, "initServer", Qt::QueuedConnection);
 }
 
-Servatrice::Servatrice(QObject *parent) : Server(parent), uptime(0), shutdownTimer(0), isFirstShutdownMessage(true)
+Servatrice::Servatrice(QObject *parent) : authenticationMethod(AuthenticationNone), Server(parent), uptime(0), shutdownTimer(0), isFirstShutdownMessage(true)
 {
     qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
@@ -398,7 +398,7 @@ bool Servatrice::initServer()
             else
                 throw QString("islServer->listen()");
         }
-    } catch (QString error) {
+    } catch (QString &error) {
         qDebug() << "ERROR --" << error;
         return false;
     }

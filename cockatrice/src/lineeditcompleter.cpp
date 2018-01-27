@@ -9,7 +9,7 @@
 #include <QTextCursor>
 #include <QWidget>
 
-LineEditCompleter::LineEditCompleter(QWidget *parent) : QLineEdit(parent)
+LineEditCompleter::LineEditCompleter(QWidget *parent) : QLineEdit(parent), c(nullptr)
 {
 }
 
