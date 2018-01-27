@@ -9,11 +9,8 @@ cd build
 prefix=""
 
 if [[ $TRAVIS_OS_NAME == "osx" ]]; then
+  export PATH="/usr/local/opt/ccache/bin:$PATH"
   prefix="-DCMAKE_PREFIX_PATH=$(echo /usr/local/opt/qt*/)"
-  mkdir -p "${HOME}/bin"
-  ln -s /usr/local/opt/ccache/bin/ccache "${HOME}/bin/${CC}"
-  ln -s /usr/local/opt/ccache/bin/ccache "${HOME}/bin/${CXX}"
-  export PATH="${HOME}/bin:${PATH}"
 fi
 if [[ $TRAVIS_OS_NAME == "linux" ]]; then
   prefix="-DCMAKE_PREFIX_PATH=$(echo /opt/qt5*/lib/cmake/)"

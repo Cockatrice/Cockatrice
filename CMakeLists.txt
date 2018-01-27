@@ -24,6 +24,14 @@ ELSE()
    SET(CMAKE_BUILD_TYPE Release CACHE STRING "Type of build")
 ENDIF()
 
+# Early detect ccache
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    # Support Unix Makefiles and Ninja
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+    MESSAGE(STATUS "Found CCache ${CCACHE_PROGRAM}")
+endif()
+
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
 PROJECT("Cockatrice" VERSION 2.5.0)
@@ -47,10 +55,28 @@ include(createversionfile)
 # Define a proper install path
 if(UNIX)
     if(APPLE)
-        # MacOS X
+        # macOS
         # Due to the special bundle structure ignore
         # the prefix eventually set by the user.
         set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
+
+        # Force ccache usage if available
+        get_property(RULE_LAUNCH_COMPILE GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
+        if(RULE_LAUNCH_COMPILE)
+            MESSAGE(STATUS "Force enabling CCache usage under macOS")
+            # Set up wrapper scripts
+            configure_file(${CMAKE_MODULE_PATH}/launch-c.in   launch-c)
+            configure_file(${CMAKE_MODULE_PATH}/launch-cxx.in launch-cxx)
+            execute_process(COMMAND chmod a+rx
+                "${CMAKE_BINARY_DIR}/launch-c"
+                "${CMAKE_BINARY_DIR}/launch-cxx")
+
+            # Set Xcode project attributes to route compilation through our scripts
+            set(CMAKE_XCODE_ATTRIBUTE_CC         "${CMAKE_BINARY_DIR}/launch-c")
+            set(CMAKE_XCODE_ATTRIBUTE_CXX        "${CMAKE_BINARY_DIR}/launch-cxx")
+            set(CMAKE_XCODE_ATTRIBUTE_LD         "${CMAKE_BINARY_DIR}/launch-c")
+            set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS "${CMAKE_BINARY_DIR}/launch-cxx")
+        endif()
     else()
         # Linux / BSD
         if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
