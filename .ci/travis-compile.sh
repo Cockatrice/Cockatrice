@@ -9,15 +9,14 @@ cd build
 prefix=""
 
 if [[ $TRAVIS_OS_NAME == "osx" ]]; then
+  prefix="-DCMAKE_PREFIX_PATH=$(echo /usr/local/opt/qt*/)"
   mkdir -p "${HOME}/bin"
   ln -s /usr/local/opt/ccache/bin/ccache "${HOME}/bin/${CC}"
   ln -s /usr/local/opt/ccache/bin/ccache "${HOME}/bin/${CXX}"
   export PATH="${HOME}/bin:${PATH}"
-  prefix="-DCMAKE_PREFIX_PATH=$(echo /usr/local/opt/qt*/)"
 fi
 if [[ $TRAVIS_OS_NAME == "linux" ]]; then
   prefix="-DCMAKE_PREFIX_PATH=$(echo /opt/qt5*/lib/cmake/)"
-  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$(echo /opt/qt5*/lib/)"
 fi
 
 if [[ $BUILDTYPE == "Debug" ]]; then
