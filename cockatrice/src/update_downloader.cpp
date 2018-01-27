@@ -3,7 +3,7 @@
 
 #include "update_downloader.h"
 
-UpdateDownloader::UpdateDownloader(QObject *parent) : QObject(parent)
+UpdateDownloader::UpdateDownloader(QObject *parent) : QObject(parent), response(nullptr)
 {
     netMan = new QNetworkAccessManager(this);
 }

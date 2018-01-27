@@ -37,7 +37,7 @@ private:
     int flags;
 
 public:
-    compareFunctor(int _flags) : flags(_flags)
+    explicit compareFunctor(int _flags) : flags(_flags)
     {
     }
     inline bool operator()(CardItem *a, CardItem *b) const

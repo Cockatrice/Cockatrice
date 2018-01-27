@@ -220,7 +220,6 @@ QModelIndex FilterTreeModel::parent(const QModelIndex &ind) const
 {
     const FilterTreeNode *node;
     FilterTreeNode *parent;
-    int row;
     QModelIndex idx;
 
     if (!ind.isValid())
@@ -232,7 +231,7 @@ QModelIndex FilterTreeModel::parent(const QModelIndex &ind) const
 
     parent = node->parent();
     if (parent) {
-        row = parent->index();
+        int row = parent->index();
         if (row < 0)
             return QModelIndex();
         idx = createIndex(row, 0, parent);

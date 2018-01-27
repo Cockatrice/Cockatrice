@@ -35,7 +35,7 @@ const FilterItemList *LogicMap::findTypeList(CardFilter::Type type) const
 {
     QList<FilterItemList *>::const_iterator i;
 
-    for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
+    for (i = childNodes.constBegin(); i != childNodes.constEnd(); ++i) {
         if ((*i)->type == type) {
             return *i;
         }
@@ -49,7 +49,7 @@ FilterItemList *LogicMap::typeList(CardFilter::Type type)
     QList<FilterItemList *>::iterator i;
     int count = 0;
 
-    for (i = childNodes.begin(); i != childNodes.end(); i++) {
+    for (i = childNodes.begin(); i != childNodes.end(); ++i) {
         if ((*i)->type == type) {
             break;
         }

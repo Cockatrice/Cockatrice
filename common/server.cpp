@@ -426,7 +426,7 @@ void Server::externalJoinGameCommandReceived(const Command_JoinGame &cmd,
         ResponseContainer responseContainer(cmdId);
         Response::ResponseCode responseCode = room->processJoinGameCommand(cmd, responseContainer, userInterface);
         userInterface->sendResponseContainer(responseContainer, responseCode);
-    } catch (Response::ResponseCode code) {
+    } catch (Response::ResponseCode &code) {
         Response response;
         response.set_cmd_id(cmdId);
         response.set_response_code(code);

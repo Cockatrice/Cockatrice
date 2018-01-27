@@ -564,7 +564,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownload(const Comm
     DeckList *deck;
     try {
         deck = sqlInterface->getDeckFromDatabase(cmd.deck_id(), userInfo->id());
-    } catch (Response::ResponseCode r) {
+    } catch (Response::ResponseCode &r) {
         return r;
     }
 

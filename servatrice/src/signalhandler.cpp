@@ -19,7 +19,7 @@
 
 int SignalHandler::sigHupFD[2];
 
-SignalHandler::SignalHandler(QObject *parent) : QObject(parent)
+SignalHandler::SignalHandler(QObject *parent) : QObject(parent), snHup(nullptr)
 {
 #ifdef Q_OS_UNIX
     ::socketpair(AF_UNIX, SOCK_STREAM, 0, sigHupFD);

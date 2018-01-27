@@ -10,7 +10,6 @@ class SettingsCache : public QSettings
 {
     Q_OBJECT
 private:
-    QSettings *settings;
     bool isPortableBuild;
 
 public:

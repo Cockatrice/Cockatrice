@@ -20,7 +20,6 @@ private:
     CardInfo *card;
     QList<CardSet *> sortedSets;
     int setIndex;
-    bool hq;
 
 public:
     PictureToLoad(CardInfo *_card = 0);
