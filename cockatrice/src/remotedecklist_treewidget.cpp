@@ -1,15 +1,16 @@
+#include "remotedecklist_treewidget.h"
+#include "abstractclient.h"
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
-#include "remotedecklist_treewidget.h"
-#include "abstractclient.h"
 
-#include "pending_command.h"
 #include "pb/command_deck_list.pb.h"
 #include "pb/response_deck_list.pb.h"
 #include "pb/serverinfo_deckstorage.pb.h"
+#include "pending_command.h"
 
-RemoteDeckList_TreeModel::DirectoryNode::DirectoryNode(const QString &_name, RemoteDeckList_TreeModel::DirectoryNode *_parent)
+RemoteDeckList_TreeModel::DirectoryNode::DirectoryNode(const QString &_name,
+                                                       RemoteDeckList_TreeModel::DirectoryNode *_parent)
     : RemoteDeckList_TreeModel::Node(_name, _parent)
 {
 }
@@ -48,7 +49,7 @@ RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeModel::DirectoryNode
         if (pathItem.isEmpty() && name.isEmpty())
             return this;
     }
-    
+
     for (int i = 0; i < size(); ++i) {
         DirectoryNode *node = dynamic_cast<DirectoryNode *>(at(i));
         if (!node)
@@ -101,7 +102,7 @@ int RemoteDeckList_TreeModel::rowCount(const QModelIndex &parent) const
         return 0;
 }
 
-int RemoteDeckList_TreeModel::columnCount(const QModelIndex &/*parent*/) const
+int RemoteDeckList_TreeModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 3;
 }
@@ -120,22 +121,27 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
         switch (role) {
             case Qt::DisplayRole: {
                 switch (index.column()) {
-                    case 0: return node->getName();
+                    case 0:
+                        return node->getName();
                     default:
                         return QVariant();
                 }
             }
             case Qt::DecorationRole:
                 return index.column() == 0 ? dirIcon : QVariant();
-            default: return QVariant();
+            default:
+                return QVariant();
         }
     } else {
         switch (role) {
             case Qt::DisplayRole: {
                 switch (index.column()) {
-                    case 0: return file->getName();
-                    case 1: return file->getId();
-                    case 2: return file->getUploadTime();
+                    case 0:
+                        return file->getName();
+                    case 1:
+                        return file->getId();
+                    case 2:
+                        return file->getUploadTime();
                     default:
                         return QVariant();
                 }
@@ -144,7 +150,8 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
                 return index.column() == 0 ? fileIcon : QVariant();
             case Qt::TextAlignmentRole:
                 return index.column() == 1 ? Qt::AlignRight : Qt::AlignLeft;
-            default: return QVariant();
+            default:
+                return QVariant();
         }
     }
 }
@@ -158,13 +165,18 @@ QVariant RemoteDeckList_TreeModel::headerData(int section, Qt::Orientation orien
             return section == 1 ? Qt::AlignRight : Qt::AlignLeft;
         case Qt::DisplayRole: {
             switch (section) {
-                case 0: return tr("Name");
-                case 1: return tr("ID");
-                case 2: return tr("Upload time");
-                default: return QVariant();
+                case 0:
+                    return tr("Name");
+                case 1:
+                    return tr("ID");
+                case 2:
+                    return tr("Upload time");
+                default:
+                    return QVariant();
             }
         }
-        default: return QVariant();
+        default:
+            return QVariant();
     }
 }
 
@@ -208,7 +220,7 @@ void RemoteDeckList_TreeModel::addFileToTree(const ServerInfo_DeckStorage_TreeIt
     const ServerInfo_DeckStorage_File &fileInfo = file.file();
     QDateTime time;
     time.setTime_t(fileInfo.creation_time());
-    
+
     beginInsertRows(nodeToIndex(parent), parent->size(), parent->size());
     parent->append(new FileNode(QString::fromStdString(file.name()), file.id(), time, parent));
     endInsertRows();
@@ -228,7 +240,8 @@ void RemoteDeckList_TreeModel::addFolderToTree(const ServerInfo_DeckStorage_Tree
     }
 }
 
-RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeModel::addNamedFolderToTree(const QString &name, DirectoryNode *parent)
+RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeModel::addNamedFolderToTree(const QString &name,
+                                                                                        DirectoryNode *parent)
 {
     DirectoryNode *newItem = new DirectoryNode(name, parent);
     beginInsertRows(nodeToIndex(parent), parent->size(), parent->size());
@@ -249,8 +262,9 @@ void RemoteDeckList_TreeModel::removeNode(RemoteDeckList_TreeModel::Node *node)
 void RemoteDeckList_TreeModel::refreshTree()
 {
     PendingCommand *pend = client->prepareSessionCommand(Command_DeckList());
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(deckListFinished(const Response &)));
-    
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+            SLOT(deckListFinished(const Response &)));
+
     client->sendCommand(pend);
 }
 
@@ -263,17 +277,16 @@ void RemoteDeckList_TreeModel::deckListFinished(const Response &r)
     root->clearTree();
 
     endResetModel();
-    
+
     ServerInfo_DeckStorage_TreeItem tempRoot;
     tempRoot.set_id(0);
     tempRoot.mutable_folder()->CopyFrom(resp.root());
     addFolderToTree(tempRoot, root);
-    
+
     emit treeRefreshed();
 }
 
-RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent)
-    : QTreeView(parent)
+RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent) : QTreeView(parent)
 {
     treeModel = new RemoteDeckList_TreeModel(_client, this);
     proxyModel = new QSortFilterProxyModel(this);
@@ -310,12 +323,14 @@ RemoteDeckList_TreeModel::FileNode *RemoteDeckList_TreeWidget::getNodeById(int i
     return treeModel->getRoot()->getNodeById(id);
 }
 
-void RemoteDeckList_TreeWidget::addFileToTree(const ServerInfo_DeckStorage_TreeItem &file, RemoteDeckList_TreeModel::DirectoryNode *parent)
+void RemoteDeckList_TreeWidget::addFileToTree(const ServerInfo_DeckStorage_TreeItem &file,
+                                              RemoteDeckList_TreeModel::DirectoryNode *parent)
 {
     treeModel->addFileToTree(file, parent);
 }
 
-void RemoteDeckList_TreeWidget::addFolderToTree(const ServerInfo_DeckStorage_TreeItem &folder, RemoteDeckList_TreeModel::DirectoryNode *parent)
+void RemoteDeckList_TreeWidget::addFolderToTree(const ServerInfo_DeckStorage_TreeItem &folder,
+                                                RemoteDeckList_TreeModel::DirectoryNode *parent)
 {
     treeModel->addFolderToTree(folder, parent);
 }

@@ -16,16 +16,19 @@ class QLabel;
 class QDockWidget;
 class QWidget;
 class QGridLayout;
+class QVBoxLayout;
 class QTableWidget;
 class CommandContainer;
 class Response;
 class AbstractClient;
 
-class TabLog : public Tab {
+class TabLog : public Tab
+{
     Q_OBJECT
 private:
     AbstractClient *client;
-    QLabel *labelFindUserName, *labelFindIPAddress, *labelFindGameName, *labelFindGameID, *labelMessage, *labelMaximum, *labelDescription;
+    QLabel *labelFindUserName, *labelFindIPAddress, *labelFindGameName, *labelFindGameID, *labelMessage, *labelMaximum,
+        *labelDescription;
     QLineEdit *findUsername, *findIPAddress, *findGameName, *findGameID, *findMessage;
     QCheckBox *mainRoom, *gameRoom, *privateChat;
     QRadioButton *pastDays, *today, *lastHour;
@@ -34,7 +37,8 @@ private:
     QWidget *searchDockContents;
     QPushButton *getButton, *clearButton;
     QGridLayout *criteriaGrid, *locationGrid, *rangeGrid, *maxResultsGrid, *descriptionGrid, *buttonGrid;
-    QGroupBox *criteriaGroupBox, *locationGroupBox, *rangeGroupBox, *maxResultsGroupBox, *descriptionGroupBox, *buttonGroupBox;
+    QGroupBox *criteriaGroupBox, *locationGroupBox, *rangeGroupBox, *maxResultsGroupBox, *descriptionGroupBox,
+        *buttonGroupBox;
     QVBoxLayout *mainLayout;
     QTableWidget *roomTable, *gameTable, *chatTable;
 
@@ -51,7 +55,10 @@ public:
     TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = 0);
     ~TabLog();
     void retranslateUi();
-    QString getTabText() const { return tr("Logs"); }
+    QString getTabText() const
+    {
+        return tr("Logs");
+    }
 };
 
 #endif

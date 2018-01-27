@@ -1,24 +1,23 @@
 #include "window_sets.h"
-#include "setsmodel.h"
-#include "pictureloader.h"
 #include "main.h"
+#include "pictureloader.h"
+#include "setsmodel.h"
 
-#include <QTreeView>
-#include <QGridLayout>
-#include <QHeaderView>
-#include <QPushButton>
-#include <QItemSelection>
-#include <QMessageBox>
-#include <QGroupBox>
-#include <QDialogButtonBox>
-#include <QVBoxLayout>
-#include <QToolBar>
 #include <QAction>
-#include <QLabel>
 #include <QDebug>
+#include <QDialogButtonBox>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QHeaderView>
+#include <QItemSelection>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QToolBar>
+#include <QTreeView>
+#include <QVBoxLayout>
 
-WndSets::WndSets(QWidget *parent)
-    : QMainWindow(parent)
+WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 {
     // left toolbar
     setsEditToolBar = new QToolBar;
@@ -54,7 +53,7 @@ WndSets::WndSets(QWidget *parent)
     connect(aBottom, SIGNAL(triggered()), this, SLOT(actBottom()));
     setsEditToolBar->addAction(aBottom);
 
-    // view 
+    // view
     model = new SetsModel(db, this);
     view = new QTreeView;
     view->setModel(model);
@@ -90,20 +89,22 @@ WndSets::WndSets(QWidget *parent)
     connect(disableAllButton, SIGNAL(clicked()), this, SLOT(actDisableAll()));
     connect(enableSomeButton, SIGNAL(clicked()), this, SLOT(actEnableSome()));
     connect(disableSomeButton, SIGNAL(clicked()), this, SLOT(actDisableSome()));
-    connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-            this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
+    connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
+            SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
 
     labNotes = new QLabel;
     labNotes->setWordWrap(true);
     labNotes->setTextInteractionFlags(Qt::TextBrowserInteraction);
     labNotes->setOpenExternalLinks(true);
     labNotes->setText(
-    "<b>" + tr("Deck Editor") + ":</b> "
-    + tr("Only cards in enabled sets will appear in the deck editor card list")
-    + "<br><b>" + tr("Card Art") + ":</b> " + tr("Image priority is decided in the following order")
-    + "<ol><li>" + tr("The") + "<a href='https://github.com/Cockatrice/Cockatrice/wiki/Custom-Cards-%26-Sets#to-add-custom-art-for-cards-the-easiest-way-is-to-use-the-custom-folder'> "
-    + tr("CUSTOM Folder") + "</a></li><li>" + tr("Enabled Sets (Top to Bottom)") + "</li><li>" + tr("Disabled Sets (Top to Bottom)") + "</li></ol>"
-    );
+        "<b>" + tr("Deck Editor") + ":</b> " +
+        tr("Only cards in enabled sets will appear in the deck editor card list") + "<br><b>" + tr("Card Art") +
+        ":</b> " + tr("Image priority is decided in the following order") + "<ol><li>" + tr("The") +
+        "<a "
+        "href='https://github.com/Cockatrice/Cockatrice/wiki/"
+        "Custom-Cards-%26-Sets#to-add-custom-art-for-cards-the-easiest-way-is-to-use-the-custom-folder'> " +
+        tr("CUSTOM Folder") + "</a></li><li>" + tr("Enabled Sets (Top to Bottom)") + "</li><li>" +
+        tr("Disabled Sets (Top to Bottom)") + "</li></ol>");
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
@@ -141,8 +142,7 @@ void WndSets::rebuildMainLayout(int actionToTake)
     if (mainLayout == nullptr)
         return;
 
-    switch (actionToTake)
-    {
+    switch (actionToTake) {
         case NO_SETS_SELECTED:
             enableAllButton->show();
             disableAllButton->show();
@@ -173,7 +173,7 @@ void WndSets::actRestore()
     close();
 }
 
-void WndSets::actToggleButtons(const QItemSelection & selected, const QItemSelection &)
+void WndSets::actToggleButtons(const QItemSelection &selected, const QItemSelection &)
 {
     bool disabled = selected.empty();
     aTop->setDisabled(disabled);
@@ -183,24 +183,20 @@ void WndSets::actToggleButtons(const QItemSelection & selected, const QItemSelec
 
     int rows = view->selectionModel()->selectedRows().size();
     rebuildMainLayout((rows > 1) ? SOME_SETS_SELECTED : NO_SETS_SELECTED);
-
 }
 
 void WndSets::selectRows(QSet<int> rows)
 {
-    foreach (int i, rows)
-    {
+    foreach (int i, rows) {
         QModelIndex idx = model->index(i, 0);
         view->selectionModel()->select(idx, QItemSelectionModel::Select | QItemSelectionModel::Rows);
         view->scrollTo(idx, QAbstractItemView::EnsureVisible);
     }
 }
 
-
 void WndSets::actEnableAll()
 {
     model->toggleAll(true);
-
 }
 
 void WndSets::actDisableAll()
@@ -212,16 +208,15 @@ void WndSets::actEnableSome()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
 
-    foreach(QModelIndex i, rows)
+    foreach (QModelIndex i, rows)
         model->toggleRow(i.row(), true);
-
 }
 
 void WndSets::actDisableSome()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
 
-    foreach(QModelIndex i, rows)
+    foreach (QModelIndex i, rows)
         model->toggleRow(i.row(), false);
 }
 
@@ -234,8 +229,7 @@ void WndSets::actUp()
     if (rows.empty())
         return;
 
-    foreach (QModelIndex i, rows)
-    {
+    foreach (QModelIndex i, rows) {
         int oldRow = i.row();
         int newRow = oldRow - 1;
         if (oldRow <= 0)
@@ -257,8 +251,7 @@ void WndSets::actDown()
     if (rows.empty())
         return;
 
-    foreach (QModelIndex i, rows)
-    {
+    foreach (QModelIndex i, rows) {
         int oldRow = i.row();
         int newRow = oldRow + 1;
         if (oldRow >= model->rowCount() - 1)
@@ -281,8 +274,7 @@ void WndSets::actTop()
     if (rows.empty())
         return;
 
-    for (int i = 0; i < rows.length(); i++)
-    {
+    for (int i = 0; i < rows.length(); i++) {
         int oldRow = rows.at(i).row();
 
         if (oldRow <= 0) {
@@ -307,8 +299,7 @@ void WndSets::actBottom()
     if (rows.empty())
         return;
 
-    for (int i = 0; i < rows.length(); i++)
-    {
+    for (int i = 0; i < rows.length(); i++) {
         int oldRow = rows.at(i).row();
 
         if (oldRow >= newRow) {

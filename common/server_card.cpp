@@ -18,12 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "server_card.h"
+#include "pb/serverinfo_card.pb.h"
 #include "server_cardzone.h"
 #include "server_player.h"
-#include "pb/serverinfo_card.pb.h"
 
 Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)
-    : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false), facedown(false), color(QString()), power(-1), toughness(-1), annotation(QString()), destroyOnZoneChange(false), doesntUntap(false), parentCard(0)
+    : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false),
+      facedown(false), color(QString()), power(-1), toughness(-1), annotation(QString()), destroyOnZoneChange(false),
+      doesntUntap(false), parentCard(0)
 {
 }
 
@@ -32,7 +34,7 @@ Server_Card::~Server_Card()
     // setParentCard(0) leads to the item being removed from our list, so we can't iterate properly
     while (!attachedCards.isEmpty())
         attachedCards.first()->setParentCard(0);
-    
+
     if (parentCard)
         parentCard->removeAttachedCard(this);
 }
@@ -57,12 +59,24 @@ QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue
                 setTapped(value);
             break;
         }
-        case AttrAttacking: setAttacking(avalue == "1"); break;
-        case AttrFaceDown: setFaceDown(avalue == "1"); break;
-        case AttrColor: setColor(avalue); break;
-        case AttrPT: setPT(avalue); return getPT();
-        case AttrAnnotation: setAnnotation(avalue); break;
-        case AttrDoesntUntap: setDoesntUntap(avalue == "1"); break;
+        case AttrAttacking:
+            setAttacking(avalue == "1");
+            break;
+        case AttrFaceDown:
+            setFaceDown(avalue == "1");
+            break;
+        case AttrColor:
+            setColor(avalue);
+            break;
+        case AttrPT:
+            setPT(avalue);
+            return getPT();
+        case AttrAnnotation:
+            setAnnotation(avalue);
+            break;
+        case AttrDoesntUntap:
+            setDoesntUntap(avalue == "1");
+            break;
     }
     return avalue;
 }
@@ -121,14 +135,13 @@ void Server_Card::setParentCard(Server_Card *_parentCard)
 void Server_Card::getInfo(ServerInfo_Card *info)
 {
     QString displayedName = facedown ? QString() : name;
-    
+
     info->set_id(id);
     info->set_name(displayedName.toStdString());
     info->set_x(coord_x);
     info->set_y(coord_y);
     QString ptStr = getPT();
-    if (facedown)
-    {
+    if (facedown) {
         info->set_face_down(true);
         ptStr = getPT();
     }
@@ -145,7 +158,7 @@ void Server_Card::getInfo(ServerInfo_Card *info)
         info->set_destroy_on_zone_change(true);
     if (doesntUntap)
         info->set_doesnt_untap(true);
-    
+
     QMapIterator<int, int> cardCounterIterator(counters);
     while (cardCounterIterator.hasNext()) {
         cardCounterIterator.next();

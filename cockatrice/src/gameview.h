@@ -5,12 +5,14 @@
 
 class QRubberBand;
 
-class GameView : public QGraphicsView {
+class GameView : public QGraphicsView
+{
     Q_OBJECT
 private:
     QAction *aCloseMostRecentZoneView;
     QRubberBand *rubberBand;
     QPointF selectionOrigin;
+
 protected:
     void resizeEvent(QResizeEvent *event);
 private slots:
@@ -20,6 +22,7 @@ private slots:
     void refreshShortcuts();
 public slots:
     void updateSceneRect(const QRectF &rect);
+
 public:
     GameView(QGraphicsScene *scene, QWidget *parent = 0);
 };

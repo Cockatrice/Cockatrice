@@ -26,9 +26,13 @@ matrix:
 #install dependencies for container-based "linux" builds
 addons:
   apt:
+    sources:
+    - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
+      key_url: 'http://llvm.org/apt/llvm-snapshot.gpg.key'
     packages:
     - bc
-    - cmake  
+    - clang-format-5.0
+    - cmake
     - libprotobuf-dev
     - protobuf-compiler
     - qt5-default
@@ -39,7 +43,6 @@ addons:
     - libqt5svg5-dev
     - libqt5sql5-mysql
 
-    
 before_install: bash ./.ci/travis-dependencies.sh
 
 script: bash ./.ci/travis-compile.sh

@@ -1,12 +1,11 @@
 #include "gameview.h"
 #include "gamescene.h"
 #include "settingscache.h"
-#include <QResizeEvent>
 #include <QAction>
+#include <QResizeEvent>
 #include <QRubberBand>
 
-GameView::GameView(QGraphicsScene *scene, QWidget *parent)
-    : QGraphicsView(scene, parent), rubberBand(0)
+GameView::GameView(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene, parent), rubberBand(0)
 {
     setBackgroundBrush(QBrush(QColor(0, 0, 0)));
     setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing);
@@ -14,7 +13,7 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
     setViewportUpdateMode(BoundingRectViewportUpdate);
 
     connect(scene, SIGNAL(sceneRectChanged(const QRectF &)), this, SLOT(updateSceneRect(const QRectF &)));
-    
+
     connect(scene, SIGNAL(sigStartRubberBand(const QPointF &)), this, SLOT(startRubberBand(const QPointF &)));
     connect(scene, SIGNAL(sigResizeRubberBand(const QPointF &)), this, SLOT(resizeRubberBand(const QPointF &)));
     connect(scene, SIGNAL(sigStopRubberBand()), this, SLOT(stopRubberBand()));
@@ -23,7 +22,7 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent)
 
     connect(aCloseMostRecentZoneView, SIGNAL(triggered()), scene, SLOT(closeMostRecentZoneView()));
     addAction(aCloseMostRecentZoneView);
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
     rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 }
@@ -35,7 +34,7 @@ void GameView::resizeEvent(QResizeEvent *event)
     GameScene *s = dynamic_cast<GameScene *>(scene());
     if (s)
         s->processViewSizeChange(event->size());
-    
+
     updateSceneRect(scene()->sceneRect());
 }
 

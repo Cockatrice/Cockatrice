@@ -2,29 +2,28 @@
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
 #include "main.h"
-#include <QDialogButtonBox>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QGridLayout>
-#include <QLabel>
-#include <QComboBox>
-#include <QLineEdit>
-#include <QGroupBox>
-#include <QTreeView>
-#include <QHeaderView>
-#include <QToolBar>
 #include <QAction>
+#include <QComboBox>
+#include <QDialogButtonBox>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QHeaderView>
 #include <QInputDialog>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMessageBox>
+#include <QToolBar>
+#include <QTreeView>
+#include <QVBoxLayout>
 
-DlgEditTokens::DlgEditTokens(QWidget *parent)
-    : QDialog(parent), currentCard(0)
+DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(0)
 {
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit;
     nameEdit->setEnabled(false);
     nameLabel->setBuddy(nameEdit);
-    
+
     colorLabel = new QLabel(tr("C&olor:"));
     colorEdit = new QComboBox;
     colorEdit->addItem(tr("white"), QChar('w'));
@@ -36,17 +35,17 @@ DlgEditTokens::DlgEditTokens(QWidget *parent)
     colorEdit->addItem(tr("colorless"), QChar());
     colorLabel->setBuddy(colorEdit);
     connect(colorEdit, SIGNAL(currentIndexChanged(int)), this, SLOT(colorChanged(int)));
-    
+
     ptLabel = new QLabel(tr("&P/T:"));
     ptEdit = new QLineEdit;
     ptLabel->setBuddy(ptEdit);
     connect(ptEdit, SIGNAL(textChanged(QString)), this, SLOT(ptChanged(QString)));
-    
+
     annotationLabel = new QLabel(tr("&Annotation:"));
     annotationEdit = new QLineEdit;
     annotationLabel->setBuddy(annotationEdit);
     connect(annotationEdit, SIGNAL(textChanged(QString)), this, SLOT(annotationChanged(QString)));
-    
+
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(nameLabel, 0, 0);
     grid->addWidget(nameEdit, 0, 1);
@@ -56,7 +55,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent)
     grid->addWidget(ptEdit, 2, 1);
     grid->addWidget(annotationLabel, 3, 0);
     grid->addWidget(annotationEdit, 3, 1);
-    
+
     QGroupBox *tokenDataGroupBox = new QGroupBox(tr("Token data"));
     tokenDataGroupBox->setLayout(grid);
 
@@ -65,7 +64,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent)
     cardDatabaseDisplayModel = new TokenDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(databaseModel);
     cardDatabaseDisplayModel->setIsToken(CardDatabaseDisplayModel::ShowTrue);
-    
+
     chooseTokenView = new QTreeView;
     chooseTokenView->setModel(cardDatabaseDisplayModel);
     chooseTokenView->setUniformRowHeights(true);
@@ -80,31 +79,32 @@ DlgEditTokens::DlgEditTokens(QWidget *parent)
     chooseTokenView->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
     chooseTokenView->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
 
-    connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this, SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
-    
+    connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this,
+            SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
+
     QAction *aAddToken = new QAction(tr("Add token"), this);
     aAddToken->setIcon(QPixmap("theme:icons/increment"));
     connect(aAddToken, SIGNAL(triggered()), this, SLOT(actAddToken()));
     QAction *aRemoveToken = new QAction(tr("Remove token"), this);
     aRemoveToken->setIcon(QPixmap("theme:icons/decrement"));
     connect(aRemoveToken, SIGNAL(triggered()), this, SLOT(actRemoveToken()));
-    
+
     QToolBar *databaseToolBar = new QToolBar;
     databaseToolBar->addAction(aAddToken);
     databaseToolBar->addAction(aRemoveToken);
-    
+
     QVBoxLayout *leftVBox = new QVBoxLayout;
     leftVBox->addWidget(chooseTokenView);
     leftVBox->addWidget(databaseToolBar);
-    
+
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addLayout(leftVBox);
     hbox->addWidget(tokenDataGroupBox);
-    
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(hbox);
     mainLayout->addWidget(buttonBox);
@@ -118,8 +118,7 @@ void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QMod
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
     currentCard = current.row() >= 0 ? databaseModel->getCard(realIndex.row()) : 0;
 
-    if(currentCard)
-    {
+    if (currentCard) {
         nameEdit->setText(currentCard->getName());
         const QChar cardColor = currentCard->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
@@ -139,16 +138,17 @@ void DlgEditTokens::actAddToken()
     bool askAgain = true;
     do {
         name = QInputDialog::getText(this, tr("Add token"), tr("Please enter the name of the token:"));
-        if(name.isEmpty())
+        if (name.isEmpty())
             return;
         if (databaseModel->getDatabase()->getCard(name)) {
-            QMessageBox::critical(this, tr("Error"), tr("The chosen name conflicts with an existing card or token.\nMake sure to enable the 'Token' set in the \"Manage sets\" dialog to display them correctly."));
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("The chosen name conflicts with an existing card or token.\nMake sure to enable "
+                                     "the 'Token' set in the \"Manage sets\" dialog to display them correctly."));
         } else {
             askAgain = false;
         }
     } while (askAgain);
-    
-    
+
     CardInfo *card = new CardInfo(name, true);
     card->addToSet(databaseModel->getDatabase()->getSet(CardDatabase::TOKENS_SETNAME));
     card->setCardType("Token");

@@ -8,7 +8,8 @@ class QComboBox;
 class QLineEdit;
 class CardFilter;
 
-class FilterBuilder : public QWidget {
+class FilterBuilder : public QWidget
+{
     Q_OBJECT
 
 private:
@@ -29,6 +30,7 @@ signals:
 public slots:
 private slots:
     void emit_add();
+
 protected:
 };
 

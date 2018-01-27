@@ -22,11 +22,11 @@
 
 #include <QTcpSocket>
 #if QT_VERSION > 0x050300
-  #include <QWebSocket>
+#include <QWebSocket>
 #endif
+#include "server_protocolhandler.h"
 #include <QHostAddress>
 #include <QMutex>
-#include "server_protocolhandler.h"
 
 class Servatrice;
 class Servatrice_DatabaseInterface;
@@ -63,19 +63,21 @@ protected slots:
     virtual void flushOutputQueue() = 0;
 signals:
     void outputQueueChanged();
+
 protected:
     void logDebugMessage(const QString &message);
     bool tooManyRegistrationAttempts(const QString &ipAddress);
 
-    virtual void writeToSocket(QByteArray & data) = 0;
+    virtual void writeToSocket(QByteArray &data) = 0;
     virtual void flushSocket() = 0;
 
     Servatrice *servatrice;
     QList<ServerMessage> outputQueue;
     QMutex outputQueueMutex;
+
 private:
     Servatrice_DatabaseInterface *sqlInterface;
-        
+
     Response::ResponseCode cmdAddToList(const Command_AddToList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
     int getDeckPathId(int basePathId, QStringList path);
@@ -104,21 +106,26 @@ private:
     Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdActivateAccount(const Command_Activate &cmd, ResponseContainer & /* rc */);
-    Response::ResponseCode cmdReloadConfig(const Command_ReloadConfig &/* cmd */, ResponseContainer & /*rc*/);
+    Response::ResponseCode cmdReloadConfig(const Command_ReloadConfig & /* cmd */, ResponseContainer & /*rc*/);
     Response::ResponseCode cmdAdjustMod(const Command_AdjustMod &cmd, ResponseContainer & /*rc*/);
     Response::ResponseCode cmdForgotPasswordRequest(const Command_ForgotPasswordRequest &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdForgotPasswordReset(const Command_ForgotPasswordReset &cmd, ResponseContainer &rc);
-    Response::ResponseCode cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd,
+                                                      ResponseContainer &rc);
     Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
-    Response::ResponseCode processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
+    Response::ResponseCode
+    processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
     Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc);
 
     Response::ResponseCode cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdAccountPassword(const Command_AccountPassword &cmd, ResponseContainer &rc);
+
 public:
-    AbstractServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent = 0);
-    ~AbstractServerSocketInterface() { };
+    AbstractServerSocketInterface(Servatrice *_server,
+                                  Servatrice_DatabaseInterface *_databaseInterface,
+                                  QObject *parent = 0);
+    ~AbstractServerSocketInterface(){};
     bool initSession();
 
     virtual QHostAddress getPeerAddress() const = 0;
@@ -131,21 +138,40 @@ class TcpServerSocketInterface : public AbstractServerSocketInterface
 {
     Q_OBJECT
 public:
-    TcpServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent = 0);
+    TcpServerSocketInterface(Servatrice *_server,
+                             Servatrice_DatabaseInterface *_databaseInterface,
+                             QObject *parent = 0);
     ~TcpServerSocketInterface();
 
-    QHostAddress getPeerAddress() const { return socket->peerAddress(); }
-    QString getAddress() const { return socket->peerAddress().toString(); }
-    QString getConnectionType() const { return "tcp"; };
+    QHostAddress getPeerAddress() const
+    {
+        return socket->peerAddress();
+    }
+    QString getAddress() const
+    {
+        return socket->peerAddress().toString();
+    }
+    QString getConnectionType() const
+    {
+        return "tcp";
+    };
+
 private:
     QTcpSocket *socket;
     QByteArray inputBuffer;
     bool messageInProgress;
     bool handshakeStarted;
     int messageLength;
+
 protected:
-    void writeToSocket(QByteArray & data) { socket->write(data); };
-    void flushSocket() { socket->flush(); };
+    void writeToSocket(QByteArray &data)
+    {
+        socket->write(data);
+    };
+    void flushSocket()
+    {
+        socket->flush();
+    };
     void initSessionDeprecated();
     bool initTcpSession();
 protected slots:
@@ -160,23 +186,42 @@ class WebsocketServerSocketInterface : public AbstractServerSocketInterface
 {
     Q_OBJECT
 public:
-    WebsocketServerSocketInterface(Servatrice *_server, Servatrice_DatabaseInterface *_databaseInterface, QObject *parent = 0);
+    WebsocketServerSocketInterface(Servatrice *_server,
+                                   Servatrice_DatabaseInterface *_databaseInterface,
+                                   QObject *parent = 0);
     ~WebsocketServerSocketInterface();
 
-    QHostAddress getPeerAddress() const { return socket->peerAddress(); }
-    QString getAddress() const { return socket->peerAddress().toString(); }
-    QString getConnectionType() const { return "websocket"; };
+    QHostAddress getPeerAddress() const
+    {
+        return socket->peerAddress();
+    }
+    QString getAddress() const
+    {
+        return socket->peerAddress().toString();
+    }
+    QString getConnectionType() const
+    {
+        return "websocket";
+    };
+
 private:
     QWebSocket *socket;
+
 protected:
-    void writeToSocket(QByteArray & data) { socket->sendBinaryMessage(data); };
-    void flushSocket() { socket->flush(); };
+    void writeToSocket(QByteArray &data)
+    {
+        socket->sendBinaryMessage(data);
+    };
+    void flushSocket()
+    {
+        socket->flush();
+    };
     bool initWebsocketSession();
 protected slots:
-    void binaryMessageReceived(const QByteArray & message);
+    void binaryMessageReceived(const QByteArray &message);
     void flushOutputQueue();
 public slots:
-    void initConnection(void * _socket);
+    void initConnection(void *_socket);
 };
 #endif
 

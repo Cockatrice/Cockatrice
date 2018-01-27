@@ -1,8 +1,8 @@
 #ifndef ZONEVIEWWIDGET_H
 #define ZONEVIEWWIDGET_H
 
-#include <QGraphicsWidget>
 #include <QCheckBox>
+#include <QGraphicsWidget>
 
 class QLabel;
 class QPushButton;
@@ -18,7 +18,8 @@ class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 class QStyleOption;
 
-class ZoneViewWidget : public QGraphicsWidget {
+class ZoneViewWidget : public QGraphicsWidget
+{
     Q_OBJECT
 private:
     ZoneViewZone *zone;
@@ -30,7 +31,7 @@ private:
     QCheckBox sortByTypeCheckBox;
     QCheckBox shuffleCheckBox;
     QCheckBox pileViewCheckBox;
-    
+
     bool canBeShuffled;
     int extraHeight;
     Player *player;
@@ -45,10 +46,20 @@ private slots:
     void handleScrollBarChange(int value);
     void zoneDeleted();
     void moveEvent(QGraphicsSceneMoveEvent * /* event */);
+
 public:
-    ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards = 0, bool _revealZone = false, bool _writeableRevealZone = false, const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
-    ZoneViewZone *getZone() const { return zone; }
+    ZoneViewWidget(Player *_player,
+                   CardZone *_origZone,
+                   int numberCards = 0,
+                   bool _revealZone = false,
+                   bool _writeableRevealZone = false,
+                   const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
+    ZoneViewZone *getZone() const
+    {
+        return zone;
+    }
     void retranslateUi();
+
 protected:
     void closeEvent(QCloseEvent *event);
     void initStyleOption(QStyleOption *option) const;

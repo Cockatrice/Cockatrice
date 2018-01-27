@@ -1,34 +1,33 @@
 #include "userlist.h"
-#include "tab_userlists.h"
-#include "tab_supervisor.h"
 #include "abstractclient.h"
-#include "pixmapgenerator.h"
-#include "user_context_menu.h"
 #include "gameselector.h"
-#include <QHeaderView>
-#include <QVBoxLayout>
-#include <QMouseEvent>
-#include <QMenu>
-#include <QInputDialog>
-#include <QLabel>
-#include <QSpinBox>
-#include <QRadioButton>
-#include <QPlainTextEdit>
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QCheckBox>
-#include <QMessageBox>
-#include "pending_command.h"
-#include "pb/session_commands.pb.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_get_games_of_user.pb.h"
 #include "pb/response_get_user_info.pb.h"
+#include "pb/session_commands.pb.h"
+#include "pending_command.h"
+#include "pixmapgenerator.h"
+#include "tab_supervisor.h"
+#include "tab_userlists.h"
+#include "user_context_menu.h"
+#include <QCheckBox>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QInputDialog>
+#include <QLabel>
+#include <QMenu>
+#include <QMessageBox>
+#include <QMouseEvent>
+#include <QPlainTextEdit>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QSpinBox>
+#include <QVBoxLayout>
 
-BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent)
-    : QDialog(parent)
+BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(parent)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    
+
     nameBanCheckBox = new QCheckBox(tr("ban &user name"));
     nameBanCheckBox->setChecked(true);
     nameBanEdit = new QLineEdit(QString::fromStdString(info.name()));
@@ -50,7 +49,7 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent)
     banTypeGrid->addWidget(idBanEdit, 2, 1);
     QGroupBox *banTypeGroupBox = new QGroupBox(tr("Ban type"));
     banTypeGroupBox->setLayout(banTypeGrid);
-    
+
     permanentRadio = new QRadioButton(tr("&permanent ban"));
     temporaryRadio = new QRadioButton(tr("&temporary ban"));
     temporaryRadio->setChecked(true);
@@ -84,24 +83,26 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent)
     durationLayout->addWidget(minutesEdit, 2, 5);
     QGroupBox *durationGroupBox = new QGroupBox(tr("Duration of the ban"));
     durationGroupBox->setLayout(durationLayout);
-    
-    QLabel *reasonLabel = new QLabel(tr("Please enter the reason for the ban.\nThis is only saved for moderators and cannot be seen by the banned person."));
+
+    QLabel *reasonLabel = new QLabel(tr("Please enter the reason for the ban.\nThis is only saved for moderators and "
+                                        "cannot be seen by the banned person."));
     reasonEdit = new QPlainTextEdit;
-    
-    QLabel *visibleReasonLabel = new QLabel(tr("Please enter the reason for the ban that will be visible to the banned person."));
+
+    QLabel *visibleReasonLabel =
+        new QLabel(tr("Please enter the reason for the ban that will be visible to the banned person."));
     visibleReasonEdit = new QPlainTextEdit;
-    
+
     QPushButton *okButton = new QPushButton(tr("&OK"));
     okButton->setAutoDefault(true);
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
     QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-    
+
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
     buttonLayout->addWidget(okButton);
     buttonLayout->addWidget(cancelButton);
-    
+
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(banTypeGroupBox);
     vbox->addWidget(durationGroupBox);
@@ -110,13 +111,12 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent)
     vbox->addWidget(visibleReasonLabel);
     vbox->addWidget(visibleReasonEdit);
     vbox->addLayout(buttonLayout);
-    
+
     setLayout(vbox);
     setWindowTitle(tr("Ban user from server"));
 }
 
-WarningDialog::WarningDialog(const QString userName, const QString clientID, QWidget *parent)
-        : QDialog(parent)
+WarningDialog::WarningDialog(const QString userName, const QString clientID, QWidget *parent) : QDialog(parent)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     descriptionLabel = new QLabel(tr("Which warning would you like to send?"));
@@ -148,12 +148,14 @@ WarningDialog::WarningDialog(const QString userName, const QString clientID, QWi
 void WarningDialog::okClicked()
 {
     if (nameWarning->text().simplified().isEmpty()) {
-        QMessageBox::critical(this, tr("Error"), tr("User name to send a warning to can not be blank, please specify a user to warn."));
+        QMessageBox::critical(this, tr("Error"),
+                              tr("User name to send a warning to can not be blank, please specify a user to warn."));
         return;
     }
 
     if (warningOption->currentText().simplified().isEmpty()) {
-        QMessageBox::critical(this, tr("Error"), tr("Warning to use can not be blank, please select a valid warning to send."));
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Warning to use can not be blank, please select a valid warning to send."));
         return;
     }
 
@@ -183,25 +185,31 @@ void WarningDialog::addWarningOption(const QString warning)
 void BanDialog::okClicked()
 {
     if (!nameBanCheckBox->isChecked() && !ipBanCheckBox->isChecked() && !idBanCheckBox->isChecked()) {
-        QMessageBox::critical(this, tr("Error"), tr("You have to select a name-based, IP-based, clientId based, or some combination of the three to place a ban."));
+        QMessageBox::critical(this, tr("Error"),
+                              tr("You have to select a name-based, IP-based, clientId based, or some combination of "
+                                 "the three to place a ban."));
         return;
     }
 
     if (nameBanCheckBox->isChecked())
-        if (nameBanEdit->text().simplified() == ""){
-            QMessageBox::critical(this, tr("Error"), tr("You must have a value in the name ban when selecting the name ban checkbox."));
+        if (nameBanEdit->text().simplified() == "") {
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("You must have a value in the name ban when selecting the name ban checkbox."));
             return;
         }
 
     if (ipBanCheckBox->isChecked())
-        if (ipBanEdit->text().simplified() == ""){
-            QMessageBox::critical(this, tr("Error"), tr("You must have a value in the ip ban when selecting the ip ban checkbox."));
+        if (ipBanEdit->text().simplified() == "") {
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("You must have a value in the ip ban when selecting the ip ban checkbox."));
             return;
         }
 
     if (idBanCheckBox->isChecked())
-        if (idBanEdit->text().simplified() == ""){
-            QMessageBox::critical(this, tr("Error"), tr("You must have a value in the clientid ban when selecting the clientid ban checkbox."));
+        if (idBanEdit->text().simplified() == "") {
+            QMessageBox::critical(
+                this, tr("Error"),
+                tr("You must have a value in the clientid ban when selecting the clientid ban checkbox."));
             return;
         }
 
@@ -235,7 +243,8 @@ QString BanDialog::getBanIP() const
 
 int BanDialog::getMinutes() const
 {
-    return permanentRadio->isChecked() ? 0 : (daysEdit->value() * 24 * 60 + hoursEdit->value() * 60 + minutesEdit->value());
+    return permanentRadio->isChecked() ? 0
+                                       : (daysEdit->value() * 24 * 60 + hoursEdit->value() * 60 + minutesEdit->value());
 }
 
 QString BanDialog::getReason() const
@@ -248,12 +257,14 @@ QString BanDialog::getVisibleReason() const
     return visibleReasonEdit->toPlainText();
 }
 
-UserListItemDelegate::UserListItemDelegate(QObject *const parent)
-    : QStyledItemDelegate(parent)
+UserListItemDelegate::UserListItemDelegate(QObject *const parent) : QStyledItemDelegate(parent)
 {
 }
 
-bool UserListItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
+bool UserListItemDelegate::editorEvent(QEvent *event,
+                                       QAbstractItemModel *model,
+                                       const QStyleOptionViewItem &option,
+                                       const QModelIndex &index)
 {
     if ((event->type() == QEvent::MouseButtonPress) && index.isValid()) {
         QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
@@ -265,8 +276,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model,
     return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
 
-UserListTWI::UserListTWI(const ServerInfo_User &_userInfo)
-    : QTreeWidgetItem(Type)
+UserListTWI::UserListTWI(const ServerInfo_User &_userInfo) : QTreeWidgetItem(Type)
 {
     setUserInfo(_userInfo);
 }
@@ -276,7 +286,8 @@ void UserListTWI::setUserInfo(const ServerInfo_User &_userInfo)
     userInfo = _userInfo;
 
     setData(0, Qt::UserRole, userInfo.user_level());
-    setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(userInfo.user_level()), false, QString::fromStdString(userInfo.privlevel()))));
+    setIcon(0, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(userInfo.user_level()), false,
+                                                              QString::fromStdString(userInfo.privlevel()))));
     setIcon(1, QIcon(CountryPixmapGenerator::generatePixmap(12, QString::fromStdString(userInfo.country()))));
     setData(2, Qt::UserRole, QString::fromStdString(userInfo.name()));
     setData(2, Qt::DisplayRole, QString::fromStdString(userInfo.name()));
@@ -293,11 +304,11 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     // Sort by online/offline
     if (data(0, Qt::UserRole + 1) != other.data(0, Qt::UserRole + 1))
         return data(0, Qt::UserRole + 1).toBool();
-    
+
     // Sort by user level
     if (data(0, Qt::UserRole) != other.data(0, Qt::UserRole))
         return data(0, Qt::UserRole).toInt() > other.data(0, Qt::UserRole).toInt();
-    
+
     // Sort by name
     return QString::localeAwareCompare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
 }
@@ -308,7 +319,7 @@ UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserL
     itemDelegate = new UserListItemDelegate(this);
     userContextMenu = new UserContextMenu(tabSupervisor, this);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
-    
+
     userTree = new QTreeWidget;
     userTree->setColumnCount(3);
     userTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -318,12 +329,12 @@ UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserL
     userTree->setItemDelegate(itemDelegate);
     userTree->setAlternatingRowColors(true);
     connect(userTree, SIGNAL(itemActivated(QTreeWidgetItem *, int)), this, SLOT(userClicked(QTreeWidgetItem *, int)));
-    
+
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(userTree);
-    
+
     setLayout(vbox);
-    
+
     retranslateUi();
 }
 
@@ -331,10 +342,18 @@ void UserList::retranslateUi()
 {
     userContextMenu->retranslateUi();
     switch (type) {
-        case AllUsersList: titleStr = tr("Users connected to server: %1"); break;
-        case RoomList: titleStr = tr("Users in this room: %1"); break;
-        case BuddyList: titleStr = tr("Buddies online: %1 / %2"); break;
-        case IgnoreList: titleStr = tr("Ignored users online: %1 / %2"); break;
+        case AllUsersList:
+            titleStr = tr("Users connected to server: %1");
+            break;
+        case RoomList:
+            titleStr = tr("Users in this room: %1");
+            break;
+        case BuddyList:
+            titleStr = tr("Buddies online: %1 / %2");
+            break;
+        case IgnoreList:
+            titleStr = tr("Ignored users online: %1 / %2");
+            break;
     }
     updateCount();
 }
@@ -368,7 +387,7 @@ bool UserList::deleteUser(const QString &userName)
         updateCount();
         return true;
     }
-    
+
     return false;
 }
 
@@ -377,7 +396,7 @@ void UserList::setUserOnline(const QString &userName, bool online)
     UserListTWI *twi = users.value(userName);
     if (!twi)
         return;
-    
+
     twi->setOnline(online);
     if (online)
         ++onlineCount;
@@ -404,7 +423,8 @@ void UserList::showContextMenu(const QPoint &pos, const QModelIndex &index)
     const ServerInfo_User &userInfo = static_cast<UserListTWI *>(userTree->topLevelItem(index.row()))->getUserInfo();
     bool online = index.sibling(index.row(), 0).data(Qt::UserRole + 1).toBool();
 
-    userContextMenu->showContextMenu(pos, QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()), online);
+    userContextMenu->showContextMenu(pos, QString::fromStdString(userInfo.name()),
+                                     UserLevelFlags(userInfo.user_level()), online);
 }
 
 void UserList::sortItems()

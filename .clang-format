@@ -1,0 +1,25 @@
+IndentWidth: 4
+AccessModifierOffset: -4
+ColumnLimit: 120
+---
+Language: Cpp
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: false
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: false
+  BeforeElse: false
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+AllowShortFunctionsOnASingleLine: None
+BinPackParameters: false
+AllowAllParametersOfDeclarationOnNextLine: false
+IndentCaseLabels: true
+PointerAlignment: Right

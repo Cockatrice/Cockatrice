@@ -1,10 +1,10 @@
 #include "server_logger.h"
 #include "settingscache.h"
+#include <QDateTime>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QDir>
 #include <QTextStream>
-#include <QDateTime>
 #include <iostream>
 
 ServerLogger::ServerLogger(bool _logToConsole, QObject *parent)
@@ -30,9 +30,8 @@ void ServerLogger::startLog(const QString &logFileName)
             return;
         }
 
-
         logFile = new QFile(logFileName, this);
-        if(!logFile->open(QIODevice::Append)) {
+        if (!logFile->open(QIODevice::Append)) {
             std::cerr << "ERROR: can't open() logfile." << std::endl;
             delete logFile;
             logFile = 0;
@@ -40,7 +39,7 @@ void ServerLogger::startLog(const QString &logFileName)
         }
     } else
         logFile = 0;
-    
+
     connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
 }
 
@@ -48,24 +47,24 @@ void ServerLogger::logMessage(QString message, void *caller)
 {
     if (!logFile)
         return;
-    
+
     QString callerString;
     if (caller)
-        callerString = QString::number((qulonglong) caller, 16) + " ";
-        
-    //filter out all log entries based on values in configuration file
-    bool shouldWeWriteLog = settingsCache->value("server/writelog",1).toBool();
+        callerString = QString::number((qulonglong)caller, 16) + " ";
+
+    // filter out all log entries based on values in configuration file
+    bool shouldWeWriteLog = settingsCache->value("server/writelog", 1).toBool();
     QString logFilters = settingsCache->value("server/logfilters").toString();
-    QStringList listlogFilters = logFilters.split(",", QString::SkipEmptyParts); 
-    bool shouldWeSkipLine = false; 
-    
+    QStringList listlogFilters = logFilters.split(",", QString::SkipEmptyParts);
+    bool shouldWeSkipLine = false;
+
     if (!shouldWeWriteLog)
         return;
 
-    if (!logFilters.trimmed().isEmpty()){
+    if (!logFilters.trimmed().isEmpty()) {
         shouldWeSkipLine = true;
-        foreach(QString logFilter, listlogFilters){ 
-            if (message.contains(logFilter, Qt::CaseInsensitive)){
+        foreach (QString logFilter, listlogFilters) {
+            if (message.contains(logFilter, Qt::CaseInsensitive)) {
                 shouldWeSkipLine = false;
                 break;
             }
@@ -85,10 +84,11 @@ void ServerLogger::flushBuffer()
 {
     if (flushRunning)
         return;
-    
+
     flushRunning = true;
     QTextStream stream(logFile);
-    forever {
+    forever
+    {
         bufferMutex.lock();
         if (buffer.isEmpty()) {
             bufferMutex.unlock();
@@ -97,10 +97,10 @@ void ServerLogger::flushBuffer()
         }
         QString message = buffer.takeFirst();
         bufferMutex.unlock();
-        
+
         stream << message << "\n";
         stream.flush();
-        
+
         if (logToConsole)
             std::cout << message.toStdString() << std::endl;
     }
@@ -112,7 +112,7 @@ void ServerLogger::rotateLogs()
         return;
 
     flushBuffer();
-    
+
     logFile->close();
     logFile->open(QIODevice::Append);
 }

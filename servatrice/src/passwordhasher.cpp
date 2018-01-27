@@ -1,7 +1,7 @@
 #include "passwordhasher.h"
 
-#include <QCryptographicHash>
 #include "rng_sfmt.h"
+#include <QCryptographicHash>
 
 void PasswordHasher::initialize()
 {
@@ -23,10 +23,9 @@ QString PasswordHasher::computeHash(const QString &password, const QString &salt
 
 QString PasswordHasher::generateRandomSalt(const int len)
 {
-    static const char alphanum[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
+    static const char alphanum[] = "0123456789"
+                                   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                   "abcdefghijklmnopqrstuvwxyz";
 
     QString ret;
     int size = sizeof(alphanum) - 1;

@@ -1,16 +1,24 @@
 #include "abstractcounter.h"
-#include "player.h"
-#include "settingscache.h"
-#include <QPainter>
-#include <QMenu>
-#include <QAction>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsSceneHoverEvent>
 #include "pb/command_inc_counter.pb.h"
 #include "pb/command_set_counter.pb.h"
+#include "player.h"
+#include "settingscache.h"
+#include <QAction>
+#include <QGraphicsSceneHoverEvent>
+#include <QGraphicsSceneMouseEvent>
+#include <QMenu>
+#include <QPainter>
 
-AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name, bool _shownInCounterArea, int _value, bool _useNameForShortcut, QGraphicsItem *parent)
-    : QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value), useNameForShortcut(_useNameForShortcut), hovered(false), aDec(0), aInc(0), dialogSemaphore(false), deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
+AbstractCounter::AbstractCounter(Player *_player,
+                                 int _id,
+                                 const QString &_name,
+                                 bool _shownInCounterArea,
+                                 int _value,
+                                 bool _useNameForShortcut,
+                                 QGraphicsItem *parent)
+    : QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value),
+      useNameForShortcut(_useNameForShortcut), hovered(false), aDec(0), aInc(0), dialogSemaphore(false),
+      deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
 {
     setAcceptHoverEvents(true);
 
@@ -37,8 +45,8 @@ AbstractCounter::AbstractCounter(Player *_player, int _id, const QString &_name,
             }
     } else
         menu = nullptr;
-    
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
     retranslateUi();
 }
@@ -93,7 +101,7 @@ void AbstractCounter::setShortcutsInactive()
 
 void AbstractCounter::refreshShortcuts()
 {
-    if(shortcutActive)
+    if (shortcutActive)
         setShortcutsActive();
 }
 
@@ -122,8 +130,8 @@ void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
             if (menu)
                 menu->exec(event->screenPos());
             event->accept();
-        } 
-    }else
+        }
+    } else
         event->ignore();
 }
 
@@ -152,8 +160,8 @@ void AbstractCounter::setCounter()
 {
     bool ok;
     dialogSemaphore = true;
-    int newValue = 
-    QInputDialog::getInt(0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value, -2000000000, 2000000000, 1, &ok);
+    int newValue = QInputDialog::getInt(0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value,
+                                        -2000000000, 2000000000, 1, &ok);
     if (deleteAfterDialog) {
         deleteLater();
         return;
@@ -161,7 +169,7 @@ void AbstractCounter::setCounter()
     dialogSemaphore = false;
     if (!ok)
         return;
-    
+
     Command_SetCounter cmd;
     cmd.set_counter_id(id);
     cmd.set_value(newValue);

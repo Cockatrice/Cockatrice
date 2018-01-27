@@ -1,14 +1,13 @@
 #include "cardinfotext.h"
 
+#include "carddatabase.h"
+#include "carditem.h"
+#include "main.h"
+#include <QGridLayout>
 #include <QLabel>
 #include <QTextEdit>
-#include <QGridLayout>
-#include "carditem.h"
-#include "carddatabase.h"
-#include "main.h"
 
-CardInfoText::CardInfoText(QWidget *parent)
-    : QFrame(parent), info(nullptr)
+CardInfoText::CardInfoText(QWidget *parent) : QFrame(parent), info(nullptr)
 {
     nameLabel1 = new QLabel;
     nameLabel2 = new QLabel;
@@ -59,8 +58,7 @@ CardInfoText::CardInfoText(QWidget *parent)
 
 void CardInfoText::setCard(CardInfo *card)
 {
-    if (card)
-    {
+    if (card) {
         nameLabel2->setText(card->getName());
         manacostLabel2->setText(card->getManaCost());
         colorLabel2->setText(card->getColors().join(""));
@@ -68,9 +66,7 @@ void CardInfoText::setCard(CardInfo *card)
         powtoughLabel2->setText(card->getPowTough());
         loyaltyLabel2->setText(card->getLoyalty() > 0 ? QString::number(card->getLoyalty()) : QString());
         textLabel->setText(card->getText());
-    }
-    else
-    {
+    } else {
         nameLabel2->setText("");
         manacostLabel2->setText("");
         colorLabel2->setText("");

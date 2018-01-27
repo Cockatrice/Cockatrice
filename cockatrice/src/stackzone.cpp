@@ -1,12 +1,12 @@
-#include <QPainter>
-#include <QSet>
-#include "arrowitem.h"
 #include "stackzone.h"
-#include "settingscache.h"
-#include "thememanager.h"
-#include "player.h"
+#include "arrowitem.h"
 #include "carddragitem.h"
 #include "carditem.h"
+#include "player.h"
+#include "settingscache.h"
+#include "thememanager.h"
+#include <QPainter>
+#include <QSet>
 
 #include "pb/command_move_card.pb.h"
 
@@ -49,11 +49,13 @@ void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
     painter->fillRect(boundingRect(), themeManager->getStackBgBrush());
 }
 
-void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &/*dropPoint*/)
+void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
+                                CardZone *startZone,
+                                const QPoint & /*dropPoint*/)
 {
     if (startZone == this)
         return;
-    
+
     Command_MoveCard cmd;
     cmd.set_start_player_id(startZone->getPlayer()->getId());
     cmd.set_start_zone(startZone->getName().toStdString());
@@ -61,7 +63,7 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
     cmd.set_target_zone(getName().toStdString());
     cmd.set_x(0);
     cmd.set_y(0);
-    
+
     for (int i = 0; i < dragItems.size(); ++i)
         cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
 
@@ -72,7 +74,7 @@ void StackZone::reorganizeCards()
 {
     if (!cards.isEmpty()) {
         QList<ArrowItem *> arrowsToUpdate;
-        
+
         const int cardCount = cards.size();
         qreal totalWidth = boundingRect().width();
         qreal totalHeight = boundingRect().height();
@@ -81,18 +83,18 @@ void StackZone::reorganizeCards()
         qreal xspace = 5;
         qreal x1 = xspace;
         qreal x2 = totalWidth - xspace - cardWidth;
-    
+
         for (int i = 0; i < cardCount; i++) {
             CardItem *c = cards.at(i);
             qreal x = (i % 2) ? x2 : x1;
             // If the total height of the cards is smaller than the available height,
             // the cards do not need to overlap and are displayed in the center of the area.
             if (cardHeight * cardCount > totalHeight)
-                c->setPos(x, ((qreal) i) * (totalHeight - cardHeight) / (cardCount - 1));
+                c->setPos(x, ((qreal)i) * (totalHeight - cardHeight) / (cardCount - 1));
             else
-                c->setPos(x, ((qreal) i) * cardHeight + (totalHeight - cardCount * cardHeight) / 2);
+                c->setPos(x, ((qreal)i) * cardHeight + (totalHeight - cardCount * cardHeight) / 2);
             c->setRealZValue(i);
-            
+
             arrowsToUpdate.append(c->getArrowsFrom());
             arrowsToUpdate.append(c->getArrowsTo());
         }

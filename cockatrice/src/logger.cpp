@@ -7,7 +7,7 @@
 #define LOGGER_FILENAME "qdebug.txt"
 
 #if QT_VERSION >= 0x050400
-    #include <QSysInfo>
+#include <QSysInfo>
 #endif
 
 Logger::Logger() : logToFileEnabled(false)
@@ -26,12 +26,9 @@ Logger::~Logger()
 
 void Logger::logToFile(bool enabled)
 {
-    if (enabled)
-    {
+    if (enabled) {
         openLogfileSession();
-    }
-    else
-    {
+    } else {
         closeLogfileSession();
     }
 }
@@ -43,8 +40,7 @@ QString Logger::getClientVersion()
 
 void Logger::openLogfileSession()
 {
-    if (logToFileEnabled)
-    {
+    if (logToFileEnabled) {
         return;
     }
 
@@ -77,8 +73,7 @@ void Logger::internalLog(const QString message)
     QMutexLocker locker(&mutex);
 
     logBuffer.append(message);
-    if (logBuffer.size() > LOGGER_MAX_ENTRIES)
-    {
+    if (logBuffer.size() > LOGGER_MAX_ENTRIES) {
         logBuffer.removeAt(1);
     }
 
@@ -93,8 +88,7 @@ QString Logger::getSystemArchitecture()
 {
     QString result;
 
-    if (!getClientOperatingSystem().isEmpty())
-    {
+    if (!getClientOperatingSystem().isEmpty()) {
         result.append(tr("Client Operating System") + ": " + getClientOperatingSystem() + "\n");
     }
 
@@ -106,9 +100,9 @@ QString Logger::getSystemArchitecture()
 
 QString Logger::getClientOperatingSystem()
 {
-    #if QT_VERSION >= 0x050400
-        return QSysInfo::prettyProductName();
-    #endif
+#if QT_VERSION >= 0x050400
+    return QSysInfo::prettyProductName();
+#endif
 
     return {};
 }

@@ -1,14 +1,11 @@
 #include "server_arrow.h"
-#include "server_player.h"
+#include "pb/serverinfo_arrow.pb.h"
 #include "server_card.h"
 #include "server_cardzone.h"
-#include "pb/serverinfo_arrow.pb.h"
+#include "server_player.h"
 
 Server_Arrow::Server_Arrow(int _id, Server_Card *_startCard, Server_ArrowTarget *_targetItem, const color &_arrowColor)
-        : id(_id),
-          startCard(_startCard),
-          targetItem(_targetItem),
-          arrowColor(_arrowColor)
+    : id(_id), startCard(_startCard), targetItem(_targetItem), arrowColor(_arrowColor)
 {
 }
 

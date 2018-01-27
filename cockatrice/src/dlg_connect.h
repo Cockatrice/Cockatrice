@@ -18,17 +18,27 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event);
 };
 
-
-class DlgConnect : public QDialog {
+class DlgConnect : public QDialog
+{
     Q_OBJECT
-signals :
+signals:
     void sigStartForgotPasswordRequest();
+
 public:
     DlgConnect(QWidget *parent = 0);
     QString getHost() const;
-    int getPort() const { return portEdit->text().toInt(); }
-    QString getPlayerName() const { return playernameEdit->text(); }
-    QString getPassword() const { return passwordEdit->text(); }
+    int getPort() const
+    {
+        return portEdit->text().toInt();
+    }
+    QString getPlayerName() const
+    {
+        return playernameEdit->text();
+    }
+    QString getPassword() const
+    {
+        return passwordEdit->text();
+    }
 private slots:
     void actOk();
     void actCancel();
@@ -39,6 +49,7 @@ private slots:
     void actForgotPassword();
     void updateDisplayInfo(const QString &saveName);
     void rebuildComboBoxList();
+
 private:
     QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel, *publicServersLabel;
     QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *saveEdit;

@@ -1,28 +1,27 @@
 #include "abstractclient.h"
 
-#include "pending_command.h"
+#include "client_metatypes.h"
+#include "featureset.h"
+#include "get_pb_extension.h"
 #include "pb/commands.pb.h"
-#include "pb/server_message.pb.h"
+#include "pb/event_add_to_list.pb.h"
+#include "pb/event_connection_closed.pb.h"
+#include "pb/event_game_joined.pb.h"
+#include "pb/event_list_rooms.pb.h"
+#include "pb/event_notify_user.pb.h"
+#include "pb/event_remove_from_list.pb.h"
+#include "pb/event_replay_added.pb.h"
 #include "pb/event_server_identification.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/event_server_shutdown.pb.h"
-#include "pb/event_connection_closed.pb.h"
-#include "pb/event_user_message.pb.h"
-#include "pb/event_notify_user.pb.h"
-#include "pb/event_list_rooms.pb.h"
-#include "pb/event_add_to_list.pb.h"
-#include "pb/event_remove_from_list.pb.h"
 #include "pb/event_user_joined.pb.h"
 #include "pb/event_user_left.pb.h"
-#include "pb/event_game_joined.pb.h"
-#include "pb/event_replay_added.pb.h"
-#include "get_pb_extension.h"
+#include "pb/event_user_message.pb.h"
+#include "pb/server_message.pb.h"
+#include "pending_command.h"
 #include <google/protobuf/descriptor.h>
-#include "client_metatypes.h"
-#include "featureset.h"
 
-AbstractClient::AbstractClient(QObject *parent)
-    : QObject(parent), nextCmdId(0), status(StatusDisconnected)
+AbstractClient::AbstractClient(QObject *parent) : QObject(parent), nextCmdId(0), status(StatusDisconnected)
 {
     qRegisterMetaType<QVariant>("QVariant");
     qRegisterMetaType<CommandContainer>("CommandContainer");
@@ -44,13 +43,13 @@ AbstractClient::AbstractClient(QObject *parent)
     qRegisterMetaType<Event_UserMessage>("Event_UserMessage");
     qRegisterMetaType<Event_NotifyUser>("Event_NotifyUser");
     qRegisterMetaType<ServerInfo_User>("ServerInfo_User");
-    qRegisterMetaType<QList<ServerInfo_User> >("QList<ServerInfo_User>");
+    qRegisterMetaType<QList<ServerInfo_User>>("QList<ServerInfo_User>");
     qRegisterMetaType<Event_ReplayAdded>("Event_ReplayAdded");
-    qRegisterMetaType<QList<QString> >("missingFeatures");
+    qRegisterMetaType<QList<QString>>("missingFeatures");
 
     FeatureSet features;
     features.initalizeFeatureList(clientFeatures);
-    
+
     connect(this, SIGNAL(sigQueuePendingCommand(PendingCommand *)), this, SLOT(queuePendingCommand(PendingCommand *)));
 }
 
@@ -64,33 +63,60 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
         case ServerMessage::RESPONSE: {
             const Response &response = item.response();
             const int cmdId = response.cmd_id();
-            
+
             PendingCommand *pend = pendingCommands.value(cmdId, 0);
             if (!pend)
                 return;
             pendingCommands.remove(cmdId);
-            
+
             pend->processResponse(response);
             pend->deleteLater();
             break;
         }
         case ServerMessage::SESSION_EVENT: {
             const SessionEvent &event = item.session_event();
-            switch ((SessionEvent::SessionEventType) getPbExtension(event)) {
-                case SessionEvent::SERVER_IDENTIFICATION: emit serverIdentificationEventReceived(event.GetExtension(Event_ServerIdentification::ext)); break;
-                case SessionEvent::SERVER_MESSAGE: emit serverMessageEventReceived(event.GetExtension(Event_ServerMessage::ext)); break;
-                case SessionEvent::SERVER_SHUTDOWN: emit serverShutdownEventReceived(event.GetExtension(Event_ServerShutdown::ext)); break;
-                case SessionEvent::CONNECTION_CLOSED: emit connectionClosedEventReceived(event.GetExtension(Event_ConnectionClosed::ext)); break;
-                case SessionEvent::USER_MESSAGE: emit userMessageEventReceived(event.GetExtension(Event_UserMessage::ext)); break;
-                case SessionEvent::NOTIFY_USER: emit notifyUserEventReceived(event.GetExtension(Event_NotifyUser::ext)); break;
-                case SessionEvent::LIST_ROOMS: emit listRoomsEventReceived(event.GetExtension(Event_ListRooms::ext)); break;
-                case SessionEvent::ADD_TO_LIST: emit addToListEventReceived(event.GetExtension(Event_AddToList::ext)); break;
-                case SessionEvent::REMOVE_FROM_LIST: emit removeFromListEventReceived(event.GetExtension(Event_RemoveFromList::ext)); break;
-                case SessionEvent::USER_JOINED: emit userJoinedEventReceived(event.GetExtension(Event_UserJoined::ext)); break;
-                case SessionEvent::USER_LEFT: emit userLeftEventReceived(event.GetExtension(Event_UserLeft::ext)); break;
-                case SessionEvent::GAME_JOINED: emit gameJoinedEventReceived(event.GetExtension(Event_GameJoined::ext)); break;
-                case SessionEvent::REPLAY_ADDED: emit replayAddedEventReceived(event.GetExtension(Event_ReplayAdded::ext)); break;
-                default: break;
+            switch ((SessionEvent::SessionEventType)getPbExtension(event)) {
+                case SessionEvent::SERVER_IDENTIFICATION:
+                    emit serverIdentificationEventReceived(event.GetExtension(Event_ServerIdentification::ext));
+                    break;
+                case SessionEvent::SERVER_MESSAGE:
+                    emit serverMessageEventReceived(event.GetExtension(Event_ServerMessage::ext));
+                    break;
+                case SessionEvent::SERVER_SHUTDOWN:
+                    emit serverShutdownEventReceived(event.GetExtension(Event_ServerShutdown::ext));
+                    break;
+                case SessionEvent::CONNECTION_CLOSED:
+                    emit connectionClosedEventReceived(event.GetExtension(Event_ConnectionClosed::ext));
+                    break;
+                case SessionEvent::USER_MESSAGE:
+                    emit userMessageEventReceived(event.GetExtension(Event_UserMessage::ext));
+                    break;
+                case SessionEvent::NOTIFY_USER:
+                    emit notifyUserEventReceived(event.GetExtension(Event_NotifyUser::ext));
+                    break;
+                case SessionEvent::LIST_ROOMS:
+                    emit listRoomsEventReceived(event.GetExtension(Event_ListRooms::ext));
+                    break;
+                case SessionEvent::ADD_TO_LIST:
+                    emit addToListEventReceived(event.GetExtension(Event_AddToList::ext));
+                    break;
+                case SessionEvent::REMOVE_FROM_LIST:
+                    emit removeFromListEventReceived(event.GetExtension(Event_RemoveFromList::ext));
+                    break;
+                case SessionEvent::USER_JOINED:
+                    emit userJoinedEventReceived(event.GetExtension(Event_UserJoined::ext));
+                    break;
+                case SessionEvent::USER_LEFT:
+                    emit userLeftEventReceived(event.GetExtension(Event_UserLeft::ext));
+                    break;
+                case SessionEvent::GAME_JOINED:
+                    emit gameJoinedEventReceived(event.GetExtension(Event_GameJoined::ext));
+                    break;
+                case SessionEvent::REPLAY_ADDED:
+                    emit replayAddedEventReceived(event.GetExtension(Event_ReplayAdded::ext));
+                    break;
+                default:
+                    break;
             }
             break;
         }
@@ -130,9 +156,9 @@ void AbstractClient::queuePendingCommand(PendingCommand *pend)
     // This function is always called from the client thread via signal/slot.
     const int cmdId = getNewCmdId();
     pend->getCommandContainer().set_cmd_id(cmdId);
-    
+
     pendingCommands.insert(cmdId, pend);
-    
+
     sendCommandContainer(pend->getCommandContainer());
 }
 

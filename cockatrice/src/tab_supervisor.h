@@ -1,11 +1,11 @@
 #ifndef TAB_SUPERVISOR_H
 #define TAB_SUPERVISOR_H
 
-#include <QTabWidget>
-#include <QMap>
-#include <QAbstractButton>
-#include "deck_loader.h"
 #include "chatview/userlistProxy.h"
+#include "deck_loader.h"
+#include <QAbstractButton>
+#include <QMap>
+#include <QTabWidget>
 
 class QMenu;
 class AbstractClient;
@@ -30,19 +30,25 @@ class ServerInfo_User;
 class GameReplay;
 class DeckList;
 
-class CloseButton : public QAbstractButton {
+class CloseButton : public QAbstractButton
+{
     Q_OBJECT
 public:
     CloseButton(QWidget *parent = 0);
     QSize sizeHint() const;
-    inline QSize minimumSizeHint() const { return sizeHint(); }
+    inline QSize minimumSizeHint() const
+    {
+        return sizeHint();
+    }
+
 protected:
     void enterEvent(QEvent *event);
     void leaveEvent(QEvent *event);
     void paintEvent(QPaintEvent *event);
 };
 
-class TabSupervisor : public QTabWidget, public UserlistProxy {
+class TabSupervisor : public QTabWidget, public UserlistProxy
+{
     Q_OBJECT
 private:
     ServerInfo_User *userInfo;
@@ -64,6 +70,7 @@ private:
     QString sanitizeTabName(QString dirty) const;
     QString sanitizeHtml(QString dirty) const;
     bool isLocalGame;
+
 public:
     TabSupervisor(AbstractClient *_client, QWidget *parent = 0);
     ~TabSupervisor();
@@ -71,19 +78,34 @@ public:
     void start(const ServerInfo_User &userInfo);
     void startLocal(const QList<AbstractClient *> &_clients);
     void stop();
-    bool getIsLocalGame() const { return isLocalGame; }
-    int getGameCount() const { return gameTabs.size(); }
-    TabUserLists *getUserListsTab() const { return tabUserLists; }
-    ServerInfo_User *getUserInfo() const { return userInfo; }
+    bool getIsLocalGame() const
+    {
+        return isLocalGame;
+    }
+    int getGameCount() const
+    {
+        return gameTabs.size();
+    }
+    TabUserLists *getUserListsTab() const
+    {
+        return tabUserLists;
+    }
+    ServerInfo_User *getUserInfo() const
+    {
+        return userInfo;
+    }
     AbstractClient *getClient() const;
-    const QMap<int, TabRoom *> &getRoomTabs() const { return roomTabs; }
+    const QMap<int, TabRoom *> &getRoomTabs() const
+    {
+        return roomTabs;
+    }
     bool getAdminLocked() const;
     bool closeRequest();
     bool isOwnUserRegistered() const;
     QString getOwnUsername() const;
     bool isUserBuddy(const QString &userName) const;
     bool isUserIgnored(const QString &userName) const;
-    const ServerInfo_User* getOnlineUser(const QString &userName) const;
+    const ServerInfo_User *getOnlineUser(const QString &userName) const;
 signals:
     void setMenu(const QList<QMenu *> &newMenuList = QList<QMenu *>());
     void localGameEnded();

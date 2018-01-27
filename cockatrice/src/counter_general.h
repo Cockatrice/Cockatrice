@@ -3,13 +3,22 @@
 
 #include "abstractcounter.h"
 
-class GeneralCounter : public AbstractCounter {
+class GeneralCounter : public AbstractCounter
+{
     Q_OBJECT
 private:
     QColor color;
     int radius;
+
 public:
-    GeneralCounter(Player *_player, int _id, const QString &_name, const QColor &_color, int _radius, int _value, bool useNameForShortcut = false, QGraphicsItem *parent = 0);
+    GeneralCounter(Player *_player,
+                   int _id,
+                   const QString &_name,
+                   const QColor &_color,
+                   int _radius,
+                   int _value,
+                   bool useNameForShortcut = false,
+                   QGraphicsItem *parent = 0);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };

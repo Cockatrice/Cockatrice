@@ -18,27 +18,26 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "server.h"
-#include "server_game.h"
-#include "server_player.h"
-#include "server_counter.h"
-#include "server_room.h"
-#include "server_protocolhandler.h"
-#include "server_remoteuserinterface.h"
-#include "server_metatypes.h"
-#include "server_database_interface.h"
+#include "featureset.h"
+#include "pb/event_connection_closed.pb.h"
+#include "pb/event_list_rooms.pb.h"
 #include "pb/event_user_joined.pb.h"
 #include "pb/event_user_left.pb.h"
-#include "pb/event_list_rooms.pb.h"
-#include "pb/session_event.pb.h"
-#include "pb/event_connection_closed.pb.h"
 #include "pb/isl_message.pb.h"
-#include "featureset.h"
+#include "pb/session_event.pb.h"
+#include "server_counter.h"
+#include "server_database_interface.h"
+#include "server_game.h"
+#include "server_metatypes.h"
+#include "server_player.h"
+#include "server_protocolhandler.h"
+#include "server_remoteuserinterface.h"
+#include "server_room.h"
 #include <QCoreApplication>
-#include <QThread>
 #include <QDebug>
+#include <QThread>
 
-Server::Server(QObject *parent)
-    : QObject(parent), nextLocalGameId(0), tcpUserCount(0), webSocketUserCount(0)
+Server::Server(QObject *parent) : QObject(parent), nextLocalGameId(0), tcpUserCount(0), webSocketUserCount(0)
 {
     qRegisterMetaType<ServerInfo_Ban>("ServerInfo_Ban");
     qRegisterMetaType<ServerInfo_Game>("ServerInfo_Game");
@@ -50,7 +49,8 @@ Server::Server(QObject *parent)
     qRegisterMetaType<IslMessage>("IslMessage");
     qRegisterMetaType<Command_JoinGame>("Command_JoinGame");
 
-    connect(this, SIGNAL(sigSendIslMessage(IslMessage, int)), this, SLOT(doSendIslMessage(IslMessage, int)), Qt::QueuedConnection);
+    connect(this, SIGNAL(sigSendIslMessage(IslMessage, int)), this, SLOT(doSendIslMessage(IslMessage, int)),
+            Qt::QueuedConnection);
 }
 
 Server::~Server()
@@ -78,15 +78,24 @@ Server_DatabaseInterface *Server::getDatabaseInterface() const
     return databaseInterfaces.value(QThread::currentThread());
 }
 
-AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString &name, const QString &password, QString &reasonStr, int &secondsLeft, QString &clientid, QString &clientVersion, QString & /* connectionType */)
+AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
+                                       QString &name,
+                                       const QString &password,
+                                       QString &reasonStr,
+                                       int &secondsLeft,
+                                       QString &clientid,
+                                       QString &clientVersion,
+                                       QString & /* connectionType */)
 {
     if (name.size() > 35)
         name = name.left(35);
 
     Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
 
-    AuthenticationResult authState = databaseInterface->checkUserPassword(session, name, password, clientid, reasonStr, secondsLeft);
-    if (authState == NotLoggedIn || authState == UserIsBanned || authState == UsernameInvalid || authState == UserIsInactive)
+    AuthenticationResult authState =
+        databaseInterface->checkUserPassword(session, name, password, clientid, reasonStr, secondsLeft);
+    if (authState == NotLoggedIn || authState == UserIsBanned || authState == UsernameInvalid ||
+        authState == UserIsInactive)
         return authState;
 
     ServerInfo_User data = databaseInterface->getUserData(name, true);
@@ -108,7 +117,9 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
                 users.value(name)->prepareDestroy();
             } else {
-                qDebug() << "Active session and sessions table inconsistent, please validate session table information for user " << name;
+                qDebug() << "Active session and sessions table inconsistent, please validate session table information "
+                            "for user "
+                         << name;
             }
         }
 
@@ -123,7 +134,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
 
         QString tempName = name;
         int i = 0;
-        while (users.contains(tempName) || databaseInterface->activeUserExists(tempName) || databaseInterface->userSessionExists(tempName))
+        while (users.contains(tempName) || databaseInterface->activeUserExists(tempName) ||
+               databaseInterface->userSessionExists(tempName))
             tempName = name + "_" + QString::number(++i);
         name = tempName;
         data.set_name(name.toStdString());
@@ -134,7 +146,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     users.insert(name, session);
     qDebug() << "Server::loginUser:" << session << "name=" << name;
 
-    data.set_session_id(databaseInterface->startSession(name, session->getAddress(), clientid, session->getConnectionType()));
+    data.set_session_id(
+        databaseInterface->startSession(name, session->getAddress(), clientid, session->getConnectionType()));
     databaseInterface->unlockSessionTables();
 
     usersBySessionId.insert(data.session_id(), session);
@@ -153,12 +166,11 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session, QString 
     event.mutable_user_info()->CopyFrom(session->copyUserInfo(true, true, true));
     locker.unlock();
 
-    if (clientid.isEmpty()){
+    if (clientid.isEmpty()) {
         // client id is empty, either out dated client or client has been modified
         if (getClientIDRequiredEnabled())
             return ClientIdRequired;
-    }
-    else {
+    } else {
         // update users database table with client id
         databaseInterface->updateUsersClientID(name, clientid);
     }
@@ -214,7 +226,7 @@ void Server::addClient(Server_ProtocolHandler *client)
 
 void Server::removeClient(Server_ProtocolHandler *client)
 {
-    
+
     if (client->getConnectionType() == "tcp")
         tcpUserCount--;
 
@@ -244,7 +256,8 @@ void Server::removeClient(Server_ProtocolHandler *client)
             qDebug() << "closed session id:" << sessionId;
         }
     }
-    qDebug() << "Server::removeClient: removed" << (void *) client << ";" << clients.size() << "clients; " << users.size() << "users left";
+    qDebug() << "Server::removeClient: removed" << (void *)client << ";" << clients.size() << "clients; "
+             << users.size() << "users left";
 }
 
 QList<QString> Server::getOnlineModeratorList()
@@ -254,11 +267,9 @@ QList<QString> Server::getOnlineModeratorList()
     for (int i = 0; i < clients.size(); ++i) {
         ServerInfo_User *data = clients[i]->getUserInfo();
 
-        //TODO: this line should be updated in the event there is any type of new user level created
+        // TODO: this line should be updated in the event there is any type of new user level created
         if (data &&
-            (data->user_level() & ServerInfo_User::IsModerator ||
-             data->user_level() & ServerInfo_User::IsAdmin)
-           )
+            (data->user_level() & ServerInfo_User::IsModerator || data->user_level() & ServerInfo_User::IsAdmin))
             results << QString::fromStdString(data->name()).simplified();
     }
     return results;
@@ -297,8 +308,8 @@ void Server::externalUserLeft(const QString &userName)
     externalUsersBySessionId.remove(user->getUserInfo()->session_id());
     clientsLock.unlock();
 
-    QMap<int, QPair<int, int> > userGames(user->getGames());
-    QMapIterator<int, QPair<int, int> > userGamesIterator(userGames);
+    QMap<int, QPair<int, int>> userGames(user->getGames());
+    QMapIterator<int, QPair<int, int>> userGamesIterator(userGames);
     roomsLock.lockForRead();
     while (userGamesIterator.hasNext()) {
         userGamesIterator.next();
@@ -372,7 +383,8 @@ void Server::externalRoomSay(int roomId, const QString &userName, const QString 
     }
     room->say(userName, message, false);
 
-    getDatabaseInterface()->logMessage(0, userName, "ISL", message, Server_DatabaseInterface::MessageTargetIslRoom, room->getId(), room->getName());
+    getDatabaseInterface()->logMessage(0, userName, "ISL", message, Server_DatabaseInterface::MessageTargetIslRoom,
+                                       room->getId(), room->getName());
 }
 
 void Server::externalRoomGameListChanged(int roomId, const ServerInfo_Game &gameInfo)
@@ -388,7 +400,11 @@ void Server::externalRoomGameListChanged(int roomId, const ServerInfo_Game &game
     room->updateExternalGameList(gameInfo);
 }
 
-void Server::externalJoinGameCommandReceived(const Command_JoinGame &cmd, int cmdId, int roomId, int serverId, qint64 sessionId)
+void Server::externalJoinGameCommandReceived(const Command_JoinGame &cmd,
+                                             int cmdId,
+                                             int roomId,
+                                             int serverId,
+                                             qint64 sessionId)
 {
     // This function is always called from the main thread via signal/slot.
 
@@ -419,7 +435,10 @@ void Server::externalJoinGameCommandReceived(const Command_JoinGame &cmd, int cm
     }
 }
 
-void Server::externalGameCommandContainerReceived(const CommandContainer &cont, int playerId, int serverId, qint64 sessionId)
+void Server::externalGameCommandContainerReceived(const CommandContainer &cont,
+                                                  int playerId,
+                                                  int serverId,
+                                                  qint64 sessionId)
 {
     // This function is always called from the main thread via signal/slot.
 
@@ -528,7 +547,8 @@ void Server::addRoom(Server_Room *newRoom)
     QWriteLocker locker(&roomsLock);
     qDebug() << "Adding room: ID=" << newRoom->getId() << "name=" << newRoom->getName();
     rooms.insert(newRoom->getId(), newRoom);
-    connect(newRoom, SIGNAL(roomInfoChanged(ServerInfo_Room)), this, SLOT(broadcastRoomUpdate(const ServerInfo_Room &)), Qt::QueuedConnection);
+    connect(newRoom, SIGNAL(roomInfoChanged(ServerInfo_Room)), this, SLOT(broadcastRoomUpdate(const ServerInfo_Room &)),
+            Qt::QueuedConnection);
 }
 
 int Server::getUsersCount() const

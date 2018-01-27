@@ -1,9 +1,8 @@
 #include "cardlist.h"
-#include "carditem.h"
 #include "carddatabase.h"
+#include "carditem.h"
 
-CardList::CardList(bool _contentsKnown)
-    : QList<CardItem *>(), contentsKnown(_contentsKnown)
+CardList::CardList(bool _contentsKnown) : QList<CardItem *>(), contentsKnown(_contentsKnown)
 {
 }
 
@@ -32,9 +31,11 @@ CardItem *CardList::findCard(const int id, const bool remove, int *position)
     return 0;
 }
 
-class CardList::compareFunctor {
+class CardList::compareFunctor
+{
 private:
     int flags;
+
 public:
     compareFunctor(int _flags) : flags(_flags)
     {
