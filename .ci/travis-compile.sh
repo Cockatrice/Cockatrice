@@ -10,8 +10,8 @@ prefix=""
 
 if [[ $TRAVIS_OS_NAME == "osx" ]]; then
   mkdir -p "${HOME}/bin"
-  ln -s "$(which ccache)" "${HOME}/bin/${CC}"
-  ln -s "$(which ccache)" "${HOME}/bin/${CXX}"
+  ln -s /usr/local/opt/ccache/bin/ccache "${HOME}/bin/${CC}"
+  ln -s /usr/local/opt/ccache/bin/ccache "${HOME}/bin/${CXX}"
   export PATH="${HOME}/bin:${PATH}"
   prefix="-DCMAKE_PREFIX_PATH=$(echo /usr/local/opt/qt*/)"
 fi
