@@ -29,8 +29,7 @@ void HandCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     painter->save();
     QSize translatedSize = painter->combinedTransform().mapRect(boundingRect()).size().toSize();
     QPixmap cachedPixmap;
-    if (!QPixmapCache::find("handCounter" + QString::number(translatedSize.width()), &cachedPixmap))
-    {
+    if (!QPixmapCache::find("handCounter" + QString::number(translatedSize.width()), &cachedPixmap)) {
         cachedPixmap = QPixmap("theme:hand").scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert("handCounter" + QString::number(translatedSize.width()), cachedPixmap);
     }
@@ -43,8 +42,7 @@ void HandCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 
 void HandCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::RightButton)
-    {
+    if (event->button() == Qt::RightButton) {
         emit showContextMenu(event->screenPos());
         event->accept();
     }

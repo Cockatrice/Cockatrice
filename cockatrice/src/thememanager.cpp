@@ -23,8 +23,7 @@ ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 
 void ThemeManager::ensureThemeDirectoryExists()
 {
-    if (settingsCache->getThemeName().isEmpty() || !getAvailableThemes().contains(settingsCache->getThemeName()))
-    {
+    if (settingsCache->getThemeName().isEmpty() || !getAvailableThemes().contains(settingsCache->getThemeName())) {
         qDebug() << "Theme name not set, setting default value";
         settingsCache->setThemeName(DEFAULT_THEME_NAME);
     }
@@ -38,8 +37,7 @@ QStringMap &ThemeManager::getAvailableThemes()
     // load themes from user profile dir
     dir = settingsCache->getDataPath() + "/themes";
 
-    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
-    {
+    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
     }
@@ -54,8 +52,7 @@ QStringMap &ThemeManager::getAvailableThemes()
           "/../share/cockatrice/themes";
 #endif
 
-    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
-    {
+    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
     }
@@ -67,12 +64,10 @@ QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 {
     QBrush brush;
     QPixmap tmp = QPixmap("theme:zones/" + fileName);
-    if (tmp.isNull())
-    {
+    if (tmp.isNull()) {
         brush.setColor(fallbackColor);
         brush.setStyle(Qt::SolidPattern);
-    } else
-    {
+    } else {
         brush.setTexture(tmp);
     }
 

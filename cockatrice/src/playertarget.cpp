@@ -82,8 +82,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     QPixmap cachedPixmap;
     const QString cacheKey = "avatar" + QString::number(translatedSize.width()) + "_" +
                              QString::number(info->user_level()) + "_" + QString::number(fullPixmap.cacheKey());
-    if (!QPixmapCache::find(cacheKey, &cachedPixmap))
-    {
+    if (!QPixmapCache::find(cacheKey, &cachedPixmap)) {
         cachedPixmap = QPixmap(translatedSize.width(), translatedSize.height());
 
         QPainter tempPainter(&cachedPixmap);
@@ -146,8 +145,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 
 AbstractCounter *PlayerTarget::addCounter(int _counterId, const QString &_name, int _value)
 {
-    if (playerCounter)
-    {
+    if (playerCounter) {
         disconnect(playerCounter, 0, this, 0);
         playerCounter->delCounter();
     }

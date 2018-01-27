@@ -59,10 +59,8 @@ AbstractClient::~AbstractClient()
 
 void AbstractClient::processProtocolItem(const ServerMessage &item)
 {
-    switch (item.message_type())
-    {
-        case ServerMessage::RESPONSE:
-        {
+    switch (item.message_type()) {
+        case ServerMessage::RESPONSE: {
             const Response &response = item.response();
             const int cmdId = response.cmd_id();
 
@@ -75,11 +73,9 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
             pend->deleteLater();
             break;
         }
-        case ServerMessage::SESSION_EVENT:
-        {
+        case ServerMessage::SESSION_EVENT: {
             const SessionEvent &event = item.session_event();
-            switch ((SessionEvent::SessionEventType)getPbExtension(event))
-            {
+            switch ((SessionEvent::SessionEventType)getPbExtension(event)) {
                 case SessionEvent::SERVER_IDENTIFICATION:
                     emit serverIdentificationEventReceived(event.GetExtension(Event_ServerIdentification::ext));
                     break;
@@ -124,13 +120,11 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
             }
             break;
         }
-        case ServerMessage::GAME_EVENT_CONTAINER:
-        {
+        case ServerMessage::GAME_EVENT_CONTAINER: {
             emit gameEventContainerReceived(item.game_event_container());
             break;
         }
-        case ServerMessage::ROOM_EVENT:
-        {
+        case ServerMessage::ROOM_EVENT: {
             emit roomEventReceived(item.room_event());
             break;
         }
@@ -140,8 +134,7 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
 void AbstractClient::setStatus(const ClientStatus _status)
 {
     QMutexLocker locker(&clientMutex);
-    if (_status != status)
-    {
+    if (_status != status) {
         status = _status;
         emit statusChanged(_status);
     }

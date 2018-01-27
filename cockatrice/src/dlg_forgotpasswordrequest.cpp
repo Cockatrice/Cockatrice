@@ -20,8 +20,7 @@ DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(pa
     lastfpplayername = settingsCache->servers().getPlayerName("Player");
 
     if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() &&
-        !settingsCache->servers().getFPPlayerName().isEmpty())
-    {
+        !settingsCache->servers().getFPPlayerName().isEmpty()) {
         lastfphost = settingsCache->servers().getFPHostname();
         lastfpport = settingsCache->servers().getFPPort();
         lastfpplayername = settingsCache->servers().getFPPlayerName();
@@ -63,8 +62,7 @@ DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(pa
 
 void DlgForgotPasswordRequest::actOk()
 {
-    if (playernameEdit->text().isEmpty())
-    {
+    if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Forgot Password Request Warning"), tr("The player name can't be empty."));
         return;
     }

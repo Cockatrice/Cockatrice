@@ -22,15 +22,12 @@ void ReplayTimelineWidget::setTimeline(const QList<int> &_replayTimeline)
     histogram.clear();
     int binEndTime = binLength - 1;
     int binValue = 0;
-    for (int i = 0; i < replayTimeline.size(); ++i)
-    {
-        if (replayTimeline[i] > binEndTime)
-        {
+    for (int i = 0; i < replayTimeline.size(); ++i) {
+        if (replayTimeline[i] > binEndTime) {
             histogram.append(binValue);
             if (binValue > maxBinValue)
                 maxBinValue = binValue;
-            while (replayTimeline[i] > binEndTime + binLength)
-            {
+            while (replayTimeline[i] > binEndTime + binLength) {
                 histogram.append(0);
                 binEndTime += binLength;
             }
@@ -78,13 +75,11 @@ QSize ReplayTimelineWidget::minimumSizeHint() const
 void ReplayTimelineWidget::replayTimerTimeout()
 {
     currentTime += 200;
-    while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentTime))
-    {
+    while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentTime)) {
         emit processNextEvent();
         ++currentEvent;
     }
-    if (currentEvent == replayTimeline.size())
-    {
+    if (currentEvent == replayTimeline.size()) {
         emit replayFinished();
         replayTimer->stop();
     }

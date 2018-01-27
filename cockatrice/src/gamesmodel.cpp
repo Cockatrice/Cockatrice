@@ -28,13 +28,11 @@ const QString GamesModel::getGameCreatedString(const int secs) const
         ret = tr("New");
     else if (secs < SECS_PER_MIN * 10) // from 2 - 10 mins we show the mins
         ret = QString("%1 min").arg(QString::number(secs / SECS_PER_MIN));
-    else if (secs < SECS_PER_MIN * 60)
-    { // from 10 mins to 1h we aggregate every 10 mins
+    else if (secs < SECS_PER_MIN * 60) { // from 10 mins to 1h we aggregate every 10 mins
         int unitOfTen = secs / SECS_PER_TEN_MIN;
         QString str = "%1%2";
         ret = str.arg(QString::number(unitOfTen), "0+ min");
-    } else
-    { // from 1 hr onward we show hrs
+    } else { // from 1 hr onward we show hrs
         int hours = secs / SECS_PER_HOUR;
         if (secs % SECS_PER_HOUR >= SECS_PER_MIN * 30) // if the room is open for 1hr 30 mins, we round to 2hrs
             hours++;
@@ -60,18 +58,15 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     const ServerInfo_Game &g = gameList[index.row()];
-    switch (index.column())
-    {
+    switch (index.column()) {
         case ROOM:
             return rooms.value(g.room_id());
-        case CREATED:
-        {
+        case CREATED: {
             QDateTime then;
             then.setTime_t(g.start_time());
             int secs = then.secsTo(QDateTime::currentDateTime());
 
-            switch (role)
-            {
+            switch (role) {
                 case Qt::DisplayRole:
                     return getGameCreatedString(secs);
                 case SORT_ROLE:
@@ -83,8 +78,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             }
         }
         case DESCRIPTION:
-            switch (role)
-            {
+            switch (role) {
                 case SORT_ROLE:
                 case Qt::DisplayRole:
                     return QString::fromStdString(g.description());
@@ -93,15 +87,12 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                 default:
                     return QVariant();
             }
-        case CREATOR:
-        {
-            switch (role)
-            {
+        case CREATOR: {
+            switch (role) {
                 case SORT_ROLE:
                 case Qt::DisplayRole:
                     return QString::fromStdString(g.creator_info().name());
-                case Qt::DecorationRole:
-                {
+                case Qt::DecorationRole: {
                     QPixmap avatarPixmap = UserLevelPixmapGenerator::generatePixmap(
                         13, (UserLevelFlags)g.creator_info().user_level(), false,
                         QString::fromStdString(g.creator_info().privlevel()));
@@ -112,11 +103,9 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             }
         }
         case GAME_TYPE:
-            switch (role)
-            {
+            switch (role) {
                 case SORT_ROLE:
-                case Qt::DisplayRole:
-                {
+                case Qt::DisplayRole: {
                     QStringList result;
                     GameTypeMap gameTypeMap = gameTypes.value(g.room_id());
                     for (int i = g.game_types_size() - 1; i >= 0; --i)
@@ -129,11 +118,9 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                     return QVariant();
             }
         case RESTRICTIONS:
-            switch (role)
-            {
+            switch (role) {
                 case SORT_ROLE:
-                case Qt::DisplayRole:
-                {
+                case Qt::DisplayRole: {
                     QStringList result;
                     if (g.with_password())
                         result.append(tr("password"));
@@ -143,8 +130,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                         result.append(tr("reg. users only"));
                     return result.join(", ");
                 }
-                case Qt::DecorationRole:
-                {
+                case Qt::DecorationRole: {
                     return g.with_password() ? QIcon(LockPixmapGenerator::generatePixmap(13)) : QVariant();
                     case Qt::TextAlignmentRole:
                         return Qt::AlignLeft;
@@ -153,8 +139,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                 }
             }
         case PLAYERS:
-            switch (role)
-            {
+            switch (role) {
                 case SORT_ROLE:
                 case Qt::DisplayRole:
                     return QString("%1/%2").arg(g.player_count()).arg(g.max_players());
@@ -165,28 +150,22 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             }
 
         case SPECTATORS:
-            switch (role)
-            {
+            switch (role) {
                 case SORT_ROLE:
-                case Qt::DisplayRole:
-                {
-                    if (g.spectators_allowed())
-                    {
+                case Qt::DisplayRole: {
+                    if (g.spectators_allowed()) {
                         QString result;
                         result.append(QString::number(g.spectators_count()));
 
-                        if (g.spectators_can_chat() && g.spectators_omniscient())
-                        {
+                        if (g.spectators_can_chat() && g.spectators_omniscient()) {
                             result.append(" (")
                                 .append(tr("can chat"))
                                 .append(" & ")
                                 .append(tr("see hands"))
                                 .append(")");
-                        } else if (g.spectators_can_chat())
-                        {
+                        } else if (g.spectators_can_chat()) {
                             result.append(" (").append(tr("can chat")).append(")");
-                        } else if (g.spectators_omniscient())
-                        {
+                        } else if (g.spectators_omniscient()) {
                             result.append(" (").append(tr("can see hands")).append(")");
                         }
 
@@ -208,14 +187,11 @@ QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, in
 {
     if ((role != Qt::DisplayRole) && (role != Qt::TextAlignmentRole))
         return QVariant();
-    switch (section)
-    {
+    switch (section) {
         case ROOM:
             return tr("Room");
-        case CREATED:
-        {
-            switch (role)
-            {
+        case CREATED: {
+            switch (role) {
                 case Qt::DisplayRole:
                     return tr("Age");
                 case Qt::TextAlignmentRole:
@@ -230,10 +206,8 @@ QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, in
             return tr("Type");
         case RESTRICTIONS:
             return tr("Restrictions");
-        case PLAYERS:
-        {
-            switch (role)
-            {
+        case PLAYERS: {
+            switch (role) {
                 case Qt::DisplayRole:
                     return tr("Players");
                 case Qt::TextAlignmentRole:
@@ -255,17 +229,13 @@ const ServerInfo_Game &GamesModel::getGame(int row)
 
 void GamesModel::updateGameList(const ServerInfo_Game &game)
 {
-    for (int i = 0; i < gameList.size(); i++)
-    {
-        if (gameList[i].game_id() == game.game_id())
-        {
-            if (game.closed())
-            {
+    for (int i = 0; i < gameList.size(); i++) {
+        if (gameList[i].game_id() == game.game_id()) {
+            if (game.closed()) {
                 beginRemoveRows(QModelIndex(), i, i);
                 gameList.removeAt(i);
                 endRemoveRows();
-            } else
-            {
+            } else {
                 gameList[i].MergeFrom(game);
                 emit dataChanged(index(i, 0), index(i, NUM_COLS - 1));
             }
@@ -354,11 +324,9 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     maxPlayersFilterMax = settingsCache->gameFilters().getMaxPlayers();
 
     QMapIterator<int, QString> gameTypesIterator(allGameTypes);
-    while (gameTypesIterator.hasNext())
-    {
+    while (gameTypesIterator.hasNext()) {
         gameTypesIterator.next();
-        if (settingsCache->gameFilters().isGameTypeEnabled(gameTypesIterator.value()))
-        {
+        if (settingsCache->gameFilters().isGameTypeEnabled(gameTypesIterator.value())) {
             gameTypeFilter.insert(gameTypesIterator.key());
         }
     }
@@ -374,8 +342,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     settingsCache->gameFilters().setGameNameFilter(gameNameFilter);
 
     QMapIterator<int, QString> gameTypeIterator(allGameTypes);
-    while (gameTypeIterator.hasNext())
-    {
+    while (gameTypeIterator.hasNext()) {
         gameTypeIterator.next();
         bool enabled = gameTypeFilter.contains(gameTypeIterator.key());
         settingsCache->gameFilters().setGameTypeEnabled(gameTypeIterator.value(), enabled);
@@ -393,12 +360,10 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sour
 
     const ServerInfo_Game &game = model->getGame(sourceRow);
 
-    if (!showBuddiesOnlyGames && game.only_buddies())
-    {
+    if (!showBuddiesOnlyGames && game.only_buddies()) {
         return false;
     }
-    if (!unavailableGamesVisible)
-    {
+    if (!unavailableGamesVisible) {
         if (game.player_count() == game.max_players())
             return false;
         if (game.started())

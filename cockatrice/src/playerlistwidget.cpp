@@ -24,11 +24,9 @@ bool PlayerListItemDelegate::editorEvent(QEvent *event,
                                          const QStyleOptionViewItem &option,
                                          const QModelIndex &index)
 {
-    if ((event->type() == QEvent::MouseButtonPress) && index.isValid())
-    {
+    if ((event->type() == QEvent::MouseButtonPress) && index.isValid()) {
         QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
-        if (mouseEvent->button() == Qt::RightButton)
-        {
+        if (mouseEvent->button() == Qt::RightButton) {
             static_cast<PlayerListWidget *>(parent())->showContextMenu(mouseEvent->globalPos(), index);
             return true;
         }
@@ -63,8 +61,7 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
     spectatorIcon = QPixmap("theme:icons/spectator");
     lockIcon = QPixmap("theme:icons/lock");
 
-    if (tabSupervisor)
-    {
+    if (tabSupervisor) {
         itemDelegate = new PlayerListItemDelegate(this);
         setItemDelegate(itemDelegate);
 
@@ -117,8 +114,7 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
     player->setIcon(1, isSpectator ? spectatorIcon : playerIcon);
     player->setData(1, Qt::UserRole, !isSpectator);
 
-    if (!isSpectator)
-    {
+    if (!isSpectator) {
         if (prop.has_conceded())
             player->setData(2, Qt::UserRole, prop.conceded());
         if (prop.has_ready_start())
@@ -127,8 +123,7 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
             player->setIcon(2, gameStarted ? (prop.conceded() ? concededIcon : QIcon())
                                            : (prop.ready_start() ? readyIcon : notReadyIcon));
     }
-    if (prop.has_user_info())
-    {
+    if (prop.has_user_info()) {
         player->setData(3, Qt::UserRole, prop.user_info().user_level());
         player->setIcon(
             3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(prop.user_info().user_level()), false,
@@ -143,10 +138,8 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
     if (prop.has_player_id())
         player->setData(4, Qt::UserRole + 1, prop.player_id());
 
-    if (!isSpectator)
-    {
-        if (prop.has_deck_hash())
-        {
+    if (!isSpectator) {
+        if (prop.has_deck_hash()) {
             player->setText(5, QString::fromStdString(prop.deck_hash()));
         }
         if (prop.has_sideboard_locked())
@@ -168,8 +161,7 @@ void PlayerListWidget::removePlayer(int playerId)
 void PlayerListWidget::setActivePlayer(int playerId)
 {
     QMapIterator<int, QTreeWidgetItem *> i(players);
-    while (i.hasNext())
-    {
+    while (i.hasNext()) {
         i.next();
         QTreeWidgetItem *twi = i.value();
         QColor c = i.key() == playerId ? QColor(150, 255, 150) : Qt::white;
@@ -181,25 +173,21 @@ void PlayerListWidget::setGameStarted(bool _gameStarted, bool resuming)
 {
     gameStarted = _gameStarted;
     QMapIterator<int, QTreeWidgetItem *> i(players);
-    while (i.hasNext())
-    {
+    while (i.hasNext()) {
         QTreeWidgetItem *twi = i.next().value();
 
         bool isPlayer = twi->data(1, Qt::UserRole).toBool();
         if (!isPlayer)
             continue;
 
-        if (gameStarted)
-        {
+        if (gameStarted) {
             if (resuming)
                 twi->setIcon(2, twi->data(2, Qt::UserRole).toBool() ? concededIcon : QIcon());
-            else
-            {
+            else {
                 twi->setData(2, Qt::UserRole, false);
                 twi->setIcon(2, QIcon());
             }
-        } else
-        {
+        } else {
             twi->setIcon(2, notReadyIcon);
         }
     }

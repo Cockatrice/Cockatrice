@@ -17,8 +17,7 @@ TappedOutInterface::TappedOutInterface(CardDatabase &_cardDatabase, QObject *par
 
 void TappedOutInterface::queryFinished(QNetworkReply *reply)
 {
-    if (reply->error() != QNetworkReply::NoError)
-    {
+    if (reply->error() != QNetworkReply::NoError) {
         QMessageBox::critical(0, tr("Error"), reply->errorString());
         reply->deleteLater();
         deleteLater();
@@ -26,8 +25,7 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
     }
 
     int httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if (reply->hasRawHeader("Location"))
-    {
+    if (reply->hasRawHeader("Location")) {
         /*
          * If the reply contains a "Location" header, a relative URL to the deck on TappedOut
          * can be extracted from the header. The http status is a 302 "redirect".
@@ -35,8 +33,7 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
         QString deckUrl = reply->rawHeader("Location");
         qDebug() << "Tappedout: good reply, http status" << httpStatus << "location" << deckUrl;
         QDesktopServices::openUrl("http://tappedout.net" + deckUrl);
-    } else
-    {
+    } else {
         /*
          * Otherwise, the deck has not been parsed correctly. Error messages can be extracted
          * from the html. Css pseudo selector for errors: $("div.alert-danger > ul > li")
@@ -47,15 +44,13 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
         QRegExp rx("<div class=\"alert alert-danger.*<ul>(.*)</ul>");
         rx.setMinimal(true);
         int found = rx.indexIn(data);
-        if (found >= 0)
-        {
+        if (found >= 0) {
             QString errors = rx.cap(1);
             QRegExp rx2("<li>(.*)</li>");
             rx2.setMinimal(true);
 
             int captures = rx2.captureCount();
-            for (int i = 1; i <= captures; i++)
-            {
+            for (int i = 1; i <= captures; i++) {
                 errorMessage += QString("\n") + rx2.cap(i).remove(QRegExp("<[^>]*>")).simplified();
             }
         }

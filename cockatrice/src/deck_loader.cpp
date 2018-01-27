@@ -32,23 +32,19 @@ DeckLoader::DeckLoader(const DeckLoader &other)
 bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt)
 {
     QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return false;
     }
 
     bool result = false;
-    switch (fmt)
-    {
+    switch (fmt) {
         case PlainTextFormat:
             result = loadFromFile_Plain(&file);
             break;
-        case CockatriceFormat:
-        {
+        case CockatriceFormat: {
             result = loadFromFile_Native(&file);
             qDebug() << "Loaded from" << fileName << "-" << result;
-            if (!result)
-            {
+            if (!result) {
                 qDebug() << "Retying as plain format";
                 file.seek(0);
                 result = loadFromFile_Plain(&file);
@@ -61,8 +57,7 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt)
             break;
     }
 
-    if (result)
-    {
+    if (result) {
         lastFileName = fileName;
         lastFileFormat = fmt;
 
@@ -76,8 +71,7 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt)
 bool DeckLoader::loadFromRemote(const QString &nativeString, int remoteDeckId)
 {
     bool result = loadFromString_Native(nativeString);
-    if (result)
-    {
+    if (result) {
         lastFileName = QString();
         lastFileFormat = CockatriceFormat;
         lastRemoteDeckId = remoteDeckId;
@@ -90,14 +84,12 @@ bool DeckLoader::loadFromRemote(const QString &nativeString, int remoteDeckId)
 bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
 {
     QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         return false;
     }
 
     bool result = false;
-    switch (fmt)
-    {
+    switch (fmt) {
         case PlainTextFormat:
             result = saveToFile_Plain(&file);
             break;
@@ -106,8 +98,7 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
             break;
     }
 
-    if (result)
-    {
+    if (result) {
         lastFileName = fileName;
         lastFileFormat = fmt;
     }
@@ -130,15 +121,13 @@ struct FormatDeckListForExport
     {
         // Get the card name
         CardInfo *dbCard = db->getCard(card->getName());
-        if (!dbCard || dbCard->getIsToken())
-        {
+        if (!dbCard || dbCard->getIsToken()) {
             // If it's a token, we don't care about the card.
             return;
         }
 
         // Check if it's a sideboard card.
-        if (node->getName() == DECK_ZONE_SIDE)
-        {
+        if (node->getName() == DECK_ZONE_SIDE) {
             // Get the number of cards and add the card name
             sideBoardCards += QString::number(card->getNumber());
             // Add a space between card num and name
@@ -174,8 +163,7 @@ QString DeckLoader::exportDeckToDecklist()
     // if after we've called it for each card, and the strings are empty, we know that
     // there were no non-token cards in the deck, so show an error message.
     if ((QString::compare(mainBoardCards, "", Qt::CaseInsensitive) == 0) &&
-        (QString::compare(sideBoardCards, "", Qt::CaseInsensitive) == 0))
-    {
+        (QString::compare(sideBoardCards, "", Qt::CaseInsensitive) == 0)) {
         return "";
     }
     // return a string with the url for decklist export
@@ -185,8 +173,7 @@ QString DeckLoader::exportDeckToDecklist()
 
 DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
 {
-    if (fileName.endsWith(".cod", Qt::CaseInsensitive))
-    {
+    if (fileName.endsWith(".cod", Qt::CaseInsensitive)) {
         return CockatriceFormat;
     }
     return PlainTextFormat;
@@ -194,14 +181,12 @@ DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
 
 bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments)
 {
-    if (addComments)
-    {
+    if (addComments) {
         saveToStream_DeckHeader(out);
     }
 
     // loop zones
-    for (int i = 0; i < getRoot()->size(); i++)
-    {
+    for (int i = 0; i < getRoot()->size(); i++) {
         const auto *zoneNode = dynamic_cast<InnerDecklistNode *>(getRoot()->at(i));
 
         saveToStream_DeckZone(out, zoneNode, addComments);
@@ -215,16 +200,13 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments)
 
 void DeckLoader::saveToStream_DeckHeader(QTextStream &out)
 {
-    if (!getName().isEmpty())
-    {
+    if (!getName().isEmpty()) {
         out << "// " << getName() << "\n\n";
     }
 
-    if (!getComments().isEmpty())
-    {
+    if (!getComments().isEmpty()) {
         QStringList commentRows = getComments().split(QRegExp("\n|\r\n|\r"));
-        foreach (QString row, commentRows)
-        {
+        foreach (QString row, commentRows) {
             out << "// " << row << "\n";
         }
         out << "\n";
@@ -238,8 +220,7 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode
     QMap<QString, int> cardTotalByType;
     int cardTotal = 0;
 
-    for (int j = 0; j < zoneNode->size(); j++)
-    {
+    for (int j = 0; j < zoneNode->size(); j++) {
         auto *card = dynamic_cast<DecklistCardNode *>(zoneNode->at(j));
 
         CardInfo *info = db->getCard(card->getName());
@@ -247,27 +228,22 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode
 
         cardsByType.insert(cardType, card);
 
-        if (cardTotalByType.contains(cardType))
-        {
+        if (cardTotalByType.contains(cardType)) {
             cardTotalByType[cardType] += card->getNumber();
-        } else
-        {
+        } else {
             cardTotalByType[cardType] = card->getNumber();
         }
 
         cardTotal += card->getNumber();
     }
 
-    if (addComments)
-    {
+    if (addComments) {
         out << "// " << cardTotal << " " << zoneNode->getVisibleName() << "\n";
     }
 
     // print cards to stream
-    foreach (QString cardType, cardsByType.uniqueKeys())
-    {
-        if (addComments)
-        {
+    foreach (QString cardType, cardsByType.uniqueKeys()) {
+        if (addComments) {
             out << "// " << cardTotalByType[cardType] << " " << cardType << "\n";
         }
 
@@ -275,8 +251,7 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode
 
         saveToStream_DeckZoneCards(out, zoneNode, cards, addComments);
 
-        if (addComments)
-        {
+        if (addComments) {
             out << "\n";
         }
     }
@@ -288,12 +263,10 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
                                             bool addComments)
 {
     // QMultiMap sorts values in reverse order
-    for (int i = cards.size() - 1; i >= 0; --i)
-    {
+    for (int i = cards.size() - 1; i >= 0; --i) {
         DecklistCardNode *card = cards[i];
 
-        if (zoneNode->getName() == DECK_ZONE_SIDE && addComments)
-        {
+        if (zoneNode->getName() == DECK_ZONE_SIDE && addComments) {
             out << "SB: ";
         }
 
@@ -305,8 +278,7 @@ QString DeckLoader::getCardZoneFromName(QString cardName, QString currentZoneNam
 {
     CardInfo *card = db->getCard(cardName);
 
-    if (card && card->getIsToken())
-    {
+    if (card && card->getIsToken()) {
         return DECK_ZONE_TOKENS;
     }
 
@@ -315,11 +287,9 @@ QString DeckLoader::getCardZoneFromName(QString cardName, QString currentZoneNam
 
 QString DeckLoader::getCompleteCardName(const QString cardName) const
 {
-    if (db)
-    {
+    if (db) {
         CardInfo *temp = db->getCardBySimpleName(cardName);
-        if (temp)
-        {
+        if (temp) {
             return temp->getName();
         }
     }

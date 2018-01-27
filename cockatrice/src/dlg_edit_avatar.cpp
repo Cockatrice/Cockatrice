@@ -55,8 +55,7 @@ void DlgEditAvatar::actBrowse()
 {
     QString fileName =
         QFileDialog::getOpenFileName(this, tr("Open Image"), QDir::homePath(), tr("Image Files (*.png *.jpg *.bmp)"));
-    if (fileName.isEmpty())
-    {
+    if (fileName.isEmpty()) {
         imageLabel->setText(tr("No image chosen."));
         return;
     }
@@ -65,8 +64,7 @@ void DlgEditAvatar::actBrowse()
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
     imgReader.setFileName(fileName);
-    if (!imgReader.read(&image))
-    {
+    if (!imgReader.read(&image)) {
         qDebug() << "Avatar image loading failed for file:" << fileName;
         imageLabel->setText(tr("Invalid image chosen."));
         return;

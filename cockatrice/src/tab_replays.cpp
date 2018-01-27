@@ -186,8 +186,7 @@ void TabReplays::actDownload()
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
     if (!curLeft.isValid())
         filePath = localDirModel->rootPath();
-    else
-    {
+    else {
         while (!localDirModel->isDir(curLeft))
             curLeft = curLeft.parent();
         filePath = localDirModel->filePath(curLeft);
@@ -195,8 +194,7 @@ void TabReplays::actDownload()
 
     ServerInfo_Replay const *curRight = serverDirView->getCurrentReplay();
 
-    if (!curRight)
-    {
+    if (!curRight) {
         QMessageBox::information(this, tr("Downloading Replays"),
                                  tr("You cannot download replay folders at this time"));
         return;

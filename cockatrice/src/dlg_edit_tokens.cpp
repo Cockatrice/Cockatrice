@@ -118,15 +118,13 @@ void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QMod
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
     currentCard = current.row() >= 0 ? databaseModel->getCard(realIndex.row()) : 0;
 
-    if (currentCard)
-    {
+    if (currentCard) {
         nameEdit->setText(currentCard->getName());
         const QChar cardColor = currentCard->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
         ptEdit->setText(currentCard->getPowTough());
         annotationEdit->setText(currentCard->getText());
-    } else
-    {
+    } else {
         nameEdit->setText("");
         colorEdit->setCurrentIndex(colorEdit->findData(QChar(), Qt::UserRole, Qt::MatchFixedString));
         ptEdit->setText("");
@@ -138,18 +136,15 @@ void DlgEditTokens::actAddToken()
 {
     QString name;
     bool askAgain = true;
-    do
-    {
+    do {
         name = QInputDialog::getText(this, tr("Add token"), tr("Please enter the name of the token:"));
         if (name.isEmpty())
             return;
-        if (databaseModel->getDatabase()->getCard(name))
-        {
+        if (databaseModel->getDatabase()->getCard(name)) {
             QMessageBox::critical(this, tr("Error"),
                                   tr("The chosen name conflicts with an existing card or token.\nMake sure to enable "
                                      "the 'Token' set in the \"Manage sets\" dialog to display them correctly."));
-        } else
-        {
+        } else {
             askAgain = false;
         }
     } while (askAgain);
@@ -162,8 +157,7 @@ void DlgEditTokens::actAddToken()
 
 void DlgEditTokens::actRemoveToken()
 {
-    if (currentCard)
-    {
+    if (currentCard) {
         CardInfo *cardToRemove = currentCard; // the currentCard property gets modified during db->removeCard()
         currentCard = 0;
         databaseModel->getDatabase()->removeCard(cardToRemove);

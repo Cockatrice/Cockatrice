@@ -17,8 +17,7 @@ SelectZone::SelectZone(Player *_player,
 
 void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->buttons().testFlag(Qt::LeftButton))
-    {
+    if (event->buttons().testFlag(Qt::LeftButton)) {
         QPointF pos = event->pos();
         if (pos.x() < 0)
             pos.setX(0);
@@ -31,8 +30,7 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             pos.setY(br.height());
 
         QRectF selectionRect = QRectF(selectionOrigin, pos).normalized();
-        for (int i = 0; i < cards.size(); ++i)
-        {
+        for (int i = 0; i < cards.size(); ++i) {
             if (cards[i]->getAttachedTo())
                 if (cards[i]->getAttachedTo()->getZone() != this)
                     continue;
@@ -46,8 +44,7 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void SelectZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton)
-    {
+    if (event->button() == Qt::LeftButton) {
         scene()->clearSelection();
 
         selectionOrigin = event->pos();

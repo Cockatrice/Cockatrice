@@ -9,8 +9,7 @@ bool KeySignals::eventFilter(QObject * /*object*/, QEvent *event)
         return false;
 
     kevent = static_cast<QKeyEvent *>(event);
-    switch (kevent->key())
-    {
+    switch (kevent->key()) {
         case Qt::Key_Return:
         case Qt::Key_Enter:
             if (kevent->modifiers().testFlag(Qt::AltModifier) && kevent->modifiers().testFlag(Qt::ControlModifier))

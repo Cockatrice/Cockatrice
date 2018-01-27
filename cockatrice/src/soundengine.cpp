@@ -26,8 +26,7 @@ SoundEngine::SoundEngine(QObject *parent) : QObject(parent), player(0)
 
 SoundEngine::~SoundEngine()
 {
-    if (player)
-    {
+    if (player) {
         player->deleteLater();
         player = 0;
     }
@@ -37,11 +36,9 @@ SoundEngine::~SoundEngine()
 
 void SoundEngine::soundEnabledChanged()
 {
-    if (settingsCache->getSoundEnabled())
-    {
+    if (settingsCache->getSoundEnabled()) {
         qDebug("SoundEngine: enabling sound");
-        if (!player)
-        {
+        if (!player) {
             QAudioFormat format;
             format.setSampleRate(44100);
             format.setChannelCount(1);
@@ -51,11 +48,9 @@ void SoundEngine::soundEnabledChanged()
             format.setSampleType(QAudioFormat::SignedInt);
             player = new QAudioOutput(format, this);
         }
-    } else
-    {
+    } else {
         qDebug("SoundEngine: disabling sound");
-        if (player)
-        {
+        if (player) {
             player->stop();
             player->deleteLater();
             player = 0;
@@ -94,8 +89,7 @@ void SoundEngine::testSound()
 void SoundEngine::ensureThemeDirectoryExists()
 {
     if (settingsCache->getSoundThemeName().isEmpty() ||
-        !getAvailableThemes().contains(settingsCache->getSoundThemeName()))
-    {
+        !getAvailableThemes().contains(settingsCache->getSoundThemeName())) {
         qDebug() << "Sounds theme name not set, setting default value";
         settingsCache->setSoundThemeName(DEFAULT_THEME_NAME);
     }
@@ -110,8 +104,7 @@ QStringMap &SoundEngine::getAvailableThemes()
 
     dir = settingsCache->getDataPath() + "/sounds";
 
-    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
-    {
+    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
     }
@@ -126,8 +119,7 @@ QStringMap &SoundEngine::getAvailableThemes()
           "/../share/cockatrice/sounds";
 #endif
 
-    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
-    {
+    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
     }
@@ -182,8 +174,7 @@ void SoundEngine::themeChangedSlot()
                                          << "all_mention"
                                          << "private_message";
 
-    for (int i = 0; i < fileNames.size(); ++i)
-    {
+    for (int i = 0; i < fileNames.size(); ++i) {
         if (!dir.exists(fileNames[i] + ".wav"))
             continue;
 

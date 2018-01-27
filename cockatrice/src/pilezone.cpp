@@ -45,8 +45,7 @@ void PileZone::addCardImpl(CardItem *card, int x, int /*y*/)
     connect(card, SIGNAL(sigPixmapUpdated()), this, SLOT(callUpdate()));
     cards.insert(x, card);
     card->setPos(0, 0);
-    if (!contentsKnown())
-    {
+    if (!contentsKnown()) {
         card->setName(QString());
         card->setId(-1);
         // If we obscure a previously revealed card, its name has to be forgotten
@@ -87,8 +86,7 @@ void PileZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->isAccepted())
         return;
 
-    if (event->button() == Qt::LeftButton)
-    {
+    if (event->button() == Qt::LeftButton) {
         setCursor(Qt::ClosedHandCursor);
         event->accept();
     } else

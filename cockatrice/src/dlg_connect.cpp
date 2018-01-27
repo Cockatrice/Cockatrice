@@ -61,12 +61,10 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     publicServersLabel->setOpenExternalLinks(true);
     publicServersLabel->setAlignment(Qt::AlignCenter);
 
-    if (savePasswordCheckBox->isChecked())
-    {
+    if (savePasswordCheckBox->isChecked()) {
         autoConnectCheckBox->setChecked(static_cast<bool>(settingsCache->servers().getAutoConnect()));
         autoConnectCheckBox->setEnabled(true);
-    } else
-    {
+    } else {
         settingsCache->servers().setAutoConnect(0);
         autoConnectCheckBox->setChecked(false);
         autoConnectCheckBox->setEnabled(false);
@@ -152,8 +150,7 @@ void DlgConnect::actSaveConfig()
         saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
         playernameEdit->text().trimmed(), passwordEdit->text(), savePasswordCheckBox->isChecked());
 
-    if (!updateSuccess)
-    {
+    if (!updateSuccess) {
         settingsCache->servers().addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
                                               portEdit->text().trimmed(), playernameEdit->text().trimmed(),
                                               passwordEdit->text(), savePasswordCheckBox->isChecked());
@@ -169,8 +166,7 @@ void DlgConnect::rebuildComboBoxList()
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
 
-    if (savedHostList.size() == 1)
-    {
+    if (savedHostList.size() == 1) {
         settingsCache->servers().addNewServer("Woogerworks", "cockatrice.woogerworks.com", "4747", "", "", false);
         settingsCache->servers().addNewServer("Chickatrice", "chickatrice.net", "4747", "", "", false);
         settingsCache->servers().addNewServer("cockatric.es", "cockatric.es", "4747", "", "", false);
@@ -179,15 +175,12 @@ void DlgConnect::rebuildComboBoxList()
     savedHostList = uci.getServerInfo();
 
     int i = 0;
-    for (UserConnection_Information tmp : savedHostList)
-    {
+    for (UserConnection_Information tmp : savedHostList) {
         QString saveName = tmp.getSaveName();
-        if (saveName.size())
-        {
+        if (saveName.size()) {
             previousHosts->addItem(saveName);
 
-            if (settingsCache->servers().getPrevioushostName() == saveName)
-            {
+            if (settingsCache->servers().getPrevioushostName() == saveName) {
                 previousHosts->setCurrentIndex(i);
             }
 
@@ -198,8 +191,7 @@ void DlgConnect::rebuildComboBoxList()
 
 void DlgConnect::previousHostSelected(bool state)
 {
-    if (state)
-    {
+    if (state) {
         saveEdit->setDisabled(true);
         previousHosts->setDisabled(false);
     }
@@ -207,8 +199,7 @@ void DlgConnect::previousHostSelected(bool state)
 
 void DlgConnect::updateDisplayInfo(const QString &saveName)
 {
-    if (saveEdit == nullptr)
-    {
+    if (saveEdit == nullptr) {
         return;
     }
 
@@ -223,16 +214,14 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     playernameEdit->setText(data.at(3));
     savePasswordCheckBox->setChecked(savePasswordStatus);
 
-    if (savePasswordStatus)
-    {
+    if (savePasswordStatus) {
         passwordEdit->setText(data.at(4));
     }
 }
 
 void DlgConnect::newHostSelected(bool state)
 {
-    if (state)
-    {
+    if (state) {
         previousHosts->setDisabled(true);
         hostEdit->clear();
         portEdit->clear();
@@ -242,8 +231,7 @@ void DlgConnect::newHostSelected(bool state)
         saveEdit->clear();
         saveEdit->setPlaceholderText("New Menu Name");
         saveEdit->setDisabled(false);
-    } else
-    {
+    } else {
         rebuildComboBoxList();
     }
 }
@@ -251,11 +239,9 @@ void DlgConnect::newHostSelected(bool state)
 void DlgConnect::passwordSaved(int state)
 {
     Q_UNUSED(state);
-    if (savePasswordCheckBox->isChecked())
-    {
+    if (savePasswordCheckBox->isChecked()) {
         autoConnectCheckBox->setEnabled(true);
-    } else
-    {
+    } else {
         autoConnectCheckBox->setChecked(false);
         autoConnectCheckBox->setEnabled(false);
     }
@@ -263,10 +249,8 @@ void DlgConnect::passwordSaved(int state)
 
 void DlgConnect::actOk()
 {
-    if (newHostButton->isChecked())
-    {
-        if (saveEdit->text().isEmpty())
-        {
+    if (newHostButton->isChecked()) {
+        if (saveEdit->text().isEmpty()) {
             QMessageBox::critical(this, tr("Connection Warning"), tr("You need to name your new connection profile."));
             return;
         }
@@ -274,8 +258,7 @@ void DlgConnect::actOk()
         settingsCache->servers().addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
                                               portEdit->text().trimmed(), playernameEdit->text().trimmed(),
                                               passwordEdit->text(), savePasswordCheckBox->isChecked());
-    } else
-    {
+    } else {
         settingsCache->servers().updateExistingServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
                                                       portEdit->text().trimmed(), playernameEdit->text().trimmed(),
                                                       passwordEdit->text(), savePasswordCheckBox->isChecked());
@@ -284,8 +267,7 @@ void DlgConnect::actOk()
     settingsCache->servers().setPrevioushostName(saveEdit->text());
     settingsCache->servers().setAutoConnect(autoConnectCheckBox->isChecked());
 
-    if (playernameEdit->text().isEmpty())
-    {
+    if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Connect Warning"), tr("The player name can't be empty."));
         return;
     }
@@ -307,12 +289,10 @@ void DlgConnect::actCancel()
 
 bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *obj, QEvent *event)
 {
-    if (event->type() == QEvent::KeyPress)
-    {
+    if (event->type() == QEvent::KeyPress) {
         auto *keyEvent = dynamic_cast<QKeyEvent *>(event);
 
-        if (keyEvent->key() == Qt::Key_Delete)
-        {
+        if (keyEvent->key() == Qt::Key_Delete) {
             auto *combobox = reinterpret_cast<QComboBox *>(obj);
             combobox->removeItem(combobox->currentIndex());
             return true;

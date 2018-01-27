@@ -11,8 +11,7 @@ Tab::Tab(TabSupervisor *_tabSupervisor, QWidget *parent)
 
 void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName)
 {
-    if (infoPopup)
-    {
+    if (infoPopup) {
         infoPopup->deleteLater();
     }
     currentCardName = cardName;
@@ -29,10 +28,8 @@ void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName)
 
 void Tab::deleteCardInfoPopup(const QString &cardName)
 {
-    if (infoPopup)
-    {
-        if ((currentCardName == cardName) || (cardName == "_"))
-        {
+    if (infoPopup) {
+        if ((currentCardName == cardName) || (cardName == "_")) {
             infoPopup->deleteLater();
             infoPopup = 0;
         }

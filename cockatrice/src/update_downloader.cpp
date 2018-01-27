@@ -32,15 +32,13 @@ void UpdateDownloader::fileFinished()
 {
     // If we finished but there's a redirect, follow it
     QVariant redirect = response->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    if (!redirect.isNull())
-    {
+    if (!redirect.isNull()) {
         beginDownload(redirect.toUrl());
         return;
     }
 
     // Handle any errors we had
-    if (response->error())
-    {
+    if (response->error()) {
         emit error(response->errorString());
         return;
     }
@@ -50,8 +48,7 @@ void UpdateDownloader::fileFinished()
 
     // Save the build in a temporary directory
     QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly))
-    {
+    if (!file.open(QIODevice::WriteOnly)) {
         emit error(tr("Could not open the file for reading."));
         return;
     }

@@ -57,14 +57,11 @@ bool Server_Room::userMayJoin(const ServerInfo_User &userInfo)
     if (permissionLevel.toLower() == "registered" && !(userInfo.user_level() & ServerInfo_User::IsRegistered))
         return false;
 
-    if (privilegeLevel.toLower() != "none")
-    {
-        if (privilegeLevel.toLower() == "privileged")
-        {
+    if (privilegeLevel.toLower() != "none") {
+        if (privilegeLevel.toLower() == "privileged") {
             if (privilegeLevel.toLower() == "none")
                 return false;
-        } else
-        {
+        } else {
             if (privilegeLevel.toLower() != QString::fromStdString(userInfo.privlevel()).toLower())
                 return false;
         }
@@ -89,13 +86,11 @@ Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes,
 
     gamesLock.lockForRead();
     result.set_game_count(games.size() + externalGames.size());
-    if (complete)
-    {
+    if (complete) {
         QMapIterator<int, Server_Game *> gameIterator(games);
         while (gameIterator.hasNext())
             gameIterator.next().value()->getInfo(*result.add_game_list());
-        if (includeExternalData)
-        {
+        if (includeExternalData) {
             QMapIterator<int, ServerInfo_Game> externalGameIterator(externalGames);
             while (externalGameIterator.hasNext())
                 result.add_game_list()->CopyFrom(externalGameIterator.next().value());
@@ -105,13 +100,11 @@ Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes,
 
     usersLock.lockForRead();
     result.set_player_count(users.size() + externalUsers.size());
-    if (complete)
-    {
+    if (complete) {
         QMapIterator<QString, Server_ProtocolHandler *> userIterator(users);
         while (userIterator.hasNext())
             result.add_user_list()->CopyFrom(userIterator.next().value()->copyUserInfo(false));
-        if (includeExternalData)
-        {
+        if (includeExternalData) {
             QMapIterator<QString, ServerInfo_User_Container> externalUserIterator(externalUsers);
             while (externalUserIterator.hasNext())
                 result.add_user_list()->CopyFrom(externalUserIterator.next().value().copyUserInfo(false));
@@ -120,8 +113,7 @@ Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes,
     usersLock.unlock();
 
     if (complete || showGameTypes)
-        for (int i = 0; i < gameTypes.size(); ++i)
-        {
+        for (int i = 0; i < gameTypes.size(); ++i) {
             ServerInfo_GameType *gameTypeInfo = result.add_gametype_list();
             gameTypeInfo->set_game_type_id(i);
             gameTypeInfo->set_description(gameTypes[i].toStdString());
@@ -251,10 +243,8 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
 
     QReadLocker roomGamesLocker(&gamesLock);
     Server_Game *g = games.value(cmd.game_id());
-    if (!g)
-    {
-        if (externalGames.contains(cmd.game_id()))
-        {
+    if (!g) {
+        if (externalGames.contains(cmd.game_id())) {
             CommandContainer cont;
             cont.set_cmd_id(rc.getCmdId());
             RoomCommand *roomCommand = cont.add_room_command();
@@ -286,8 +276,7 @@ void Server_Room::say(const QString &userName, const QString &s, bool sendToIsl)
     event.set_message(s.toStdString());
     sendRoomEvent(prepareRoomEvent(event), sendToIsl);
 
-    if (chatHistorySize != 0)
-    {
+    if (chatHistorySize != 0) {
         ServerInfo_ChatMessage chatMessage;
         QDateTime dateTime = dateTime.currentDateTimeUtc();
         QString dateTimeString = dateTime.toString();
@@ -397,11 +386,9 @@ QList<ServerInfo_Game> Server_Room::getGamesOfUser(const QString &userName) cons
 
     QList<ServerInfo_Game> result;
     QMapIterator<int, Server_Game *> gamesIterator(games);
-    while (gamesIterator.hasNext())
-    {
+    while (gamesIterator.hasNext()) {
         Server_Game *game = gamesIterator.next().value();
-        if (game->containsUser(userName))
-        {
+        if (game->containsUser(userName)) {
             ServerInfo_Game gameInfo;
             game->getInfo(gameInfo);
             result.append(gameInfo);

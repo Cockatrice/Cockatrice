@@ -31,8 +31,7 @@ void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /
     painter->resetTransform();
     painter->drawPixmap(QPoint(0, 0), pixmap);
 
-    if (value)
-    {
+    if (value) {
         QFont f("Serif");
         f.setPixelSize(qMax((int)(radius * scaleFactor), 10));
         f.setWeight(QFont::Bold);

@@ -340,18 +340,15 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 
 void DlgRegister::actOk()
 {
-    if (passwordEdit->text() != passwordConfirmationEdit->text())
-    {
+    if (passwordEdit->text() != passwordConfirmationEdit->text()) {
         QMessageBox::critical(this, tr("Registration Warning"), tr("Your passwords do not match, please try again."));
         return;
-    } else if (emailConfirmationEdit->text() != emailEdit->text())
-    {
+    } else if (emailConfirmationEdit->text() != emailEdit->text()) {
         QMessageBox::critical(this, tr("Registration Warning"),
                               tr("Your email addresses do not match, please try again."));
         return;
     }
-    if (playernameEdit->text().isEmpty())
-    {
+    if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Registration Warning"), tr("The player name can't be empty."));
         return;
     }

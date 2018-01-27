@@ -2,8 +2,7 @@
 
 const char *CardFilter::typeName(Type t)
 {
-    switch (t)
-    {
+    switch (t) {
         case TypeAnd:
             return "and";
         case TypeOr:
@@ -19,8 +18,7 @@ const char *CardFilter::typeName(Type t)
 
 const char *CardFilter::attrName(Attr a)
 {
-    switch (a)
-    {
+    switch (a) {
         case AttrName:
             return "Name";
         case AttrType:

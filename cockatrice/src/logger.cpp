@@ -26,11 +26,9 @@ Logger::~Logger()
 
 void Logger::logToFile(bool enabled)
 {
-    if (enabled)
-    {
+    if (enabled) {
         openLogfileSession();
-    } else
-    {
+    } else {
         closeLogfileSession();
     }
 }
@@ -42,8 +40,7 @@ QString Logger::getClientVersion()
 
 void Logger::openLogfileSession()
 {
-    if (logToFileEnabled)
-    {
+    if (logToFileEnabled) {
         return;
     }
 
@@ -76,8 +73,7 @@ void Logger::internalLog(const QString message)
     QMutexLocker locker(&mutex);
 
     logBuffer.append(message);
-    if (logBuffer.size() > LOGGER_MAX_ENTRIES)
-    {
+    if (logBuffer.size() > LOGGER_MAX_ENTRIES) {
         logBuffer.removeAt(1);
     }
 
@@ -92,8 +88,7 @@ QString Logger::getSystemArchitecture()
 {
     QString result;
 
-    if (!getClientOperatingSystem().isEmpty())
-    {
+    if (!getClientOperatingSystem().isEmpty()) {
         result.append(tr("Client Operating System") + ": " + getClientOperatingSystem() + "\n");
     }
 

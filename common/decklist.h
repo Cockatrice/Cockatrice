@@ -268,11 +268,9 @@ public:
     {
         // Support for this is only possible if the internal structure
         // doesn't get more complicated.
-        for (int i = 0; i < root->size(); i++)
-        {
+        for (int i = 0; i < root->size(); i++) {
             const InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
-            for (int j = 0; j < node->size(); j++)
-            {
+            for (int j = 0; j < node->size(); j++) {
                 const DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
                 callback(node, card);
             }

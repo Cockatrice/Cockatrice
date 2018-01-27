@@ -18,8 +18,7 @@ void Server_Arrow::getInfo(ServerInfo_Arrow *info)
     info->mutable_arrow_color()->CopyFrom(arrowColor);
 
     Server_Card *targetCard = qobject_cast<Server_Card *>(targetItem);
-    if (targetCard)
-    {
+    if (targetCard) {
         info->set_target_player_id(targetCard->getZone()->getPlayer()->getPlayerId());
         info->set_target_zone(targetCard->getZone()->getName().toStdString());
         info->set_target_card_id(targetCard->getId());

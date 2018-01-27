@@ -16,15 +16,13 @@ CardInfoPicture::CardInfoPicture(QWidget *parent) : QWidget(parent), info(nullpt
 
 void CardInfoPicture::setCard(CardInfo *card)
 {
-    if (info)
-    {
+    if (info) {
         disconnect(info, nullptr, this, nullptr);
     }
 
     info = card;
 
-    if (info)
-    {
+    if (info) {
         connect(info, SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
     }
 

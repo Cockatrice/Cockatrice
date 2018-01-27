@@ -27,8 +27,7 @@ Servatrice_DatabaseInterface::~Servatrice_DatabaseInterface()
 
 void Servatrice_DatabaseInterface::initDatabase(const QSqlDatabase &_sqlDatabase)
 {
-    if (_sqlDatabase.isValid())
-    {
+    if (_sqlDatabase.isValid()) {
         sqlDatabase = QSqlDatabase::cloneDatabase(_sqlDatabase, "pool_" + QString::number(instanceId));
         openDatabase();
     }
@@ -56,35 +55,30 @@ bool Servatrice_DatabaseInterface::openDatabase()
 
     const QString poolStr = instanceId == -1 ? QString("main") : QString("pool %1").arg(instanceId);
     qDebug() << QString("[%1] Opening database...").arg(poolStr);
-    if (!sqlDatabase.open())
-    {
+    if (!sqlDatabase.open()) {
         qCritical() << QString("[%1] Error opening database: %2").arg(poolStr).arg(sqlDatabase.lastError().text());
         return false;
     }
 
     QSqlQuery *versionQuery = prepareQuery("select version from {prefix}_schema_version limit 1");
-    if (!execSqlQuery(versionQuery))
-    {
+    if (!execSqlQuery(versionQuery)) {
         qCritical() << QString("[%1] Error opening database: unable to load database schema version (hint: ensure the "
                                "cockatrice_schema_version exists)")
                            .arg(poolStr);
         return false;
     }
 
-    if (versionQuery->next())
-    {
+    if (versionQuery->next()) {
         const int dbversion = versionQuery->value(0).toInt();
         const int expectedversion = DATABASE_SCHEMA_VERSION;
-        if (dbversion < expectedversion)
-        {
+        if (dbversion < expectedversion) {
             qCritical() << QString("[%1] Error opening database: the database schema version is too old, you need to "
                                    "run the migrations to update it from version %2 to version %3")
                                .arg(poolStr)
                                .arg(dbversion)
                                .arg(expectedversion);
             return false;
-        } else if (dbversion > expectedversion)
-        {
+        } else if (dbversion > expectedversion) {
             qCritical() << QString("[%1] Error opening database: the database schema version %2 is too new, you need "
                                    "to update servatrice (this servatrice actually uses version %3)")
                                .arg(poolStr)
@@ -92,8 +86,7 @@ bool Servatrice_DatabaseInterface::openDatabase()
                                .arg(expectedversion);
             return false;
         }
-    } else
-    {
+    } else {
         qCritical() << QString("[%1] Error opening database: unable to load database schema version (hint: ensure the "
                                "cockatrice_schema_version contains a single record)")
                            .arg(poolStr);
@@ -172,14 +165,12 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
     if (!allowPunctuationPrefix && allowedPunctuation.contains(user.at(0)))
         return false;
 
-    for (const QString &word : disallowedWords)
-    {
+    for (const QString &word : disallowedWords) {
         if (user.contains(word, Qt::CaseInsensitive))
             return false;
     }
 
-    for (const QRegExp &regExp : settingsCache->disallowedRegExp)
-    {
+    for (const QRegExp &regExp : settingsCache->disallowedRegExp) {
         if (regExp.exactMatch(user))
             return false;
     }
@@ -229,8 +220,7 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName,
     query->bindValue(":active", active ? 1 : 0);
     query->bindValue(":token", token);
 
-    if (!execSqlQuery(query))
-    {
+    if (!execSqlQuery(query)) {
         qDebug() << "Failed to insert user: " << query->lastError() << " sql: " << query->lastQuery();
         return false;
     }
@@ -248,25 +238,21 @@ bool Servatrice_DatabaseInterface::activateUser(const QString &userName, const Q
 
     activateQuery->bindValue(":username", userName);
     activateQuery->bindValue(":token", token);
-    if (!execSqlQuery(activateQuery))
-    {
+    if (!execSqlQuery(activateQuery)) {
         qDebug() << "Account activation failed: SQL error." << activateQuery->lastError()
                  << " sql: " << activateQuery->lastQuery();
         return false;
     }
 
-    if (activateQuery->next())
-    {
+    if (activateQuery->next()) {
         const QString name = activateQuery->value(0).toString();
         // redundant check
-        if (name == userName)
-        {
+        if (name == userName) {
 
             QSqlQuery *query = prepareQuery("update {prefix}_users set active=1 where name = :userName");
             query->bindValue(":userName", userName);
 
-            if (!execSqlQuery(query))
-            {
+            if (!execSqlQuery(query)) {
                 qDebug() << "Failed to activate user: " << query->lastError() << " sql: " << query->lastQuery();
                 return false;
             }
@@ -279,8 +265,7 @@ bool Servatrice_DatabaseInterface::activateUser(const QString &userName, const Q
 
 QChar Servatrice_DatabaseInterface::getGenderChar(ServerInfo_User_Gender const &gender)
 {
-    switch (gender)
-    {
+    switch (gender) {
         case ServerInfo_User_Gender_GenderUnknown:
             return QChar('u');
         case ServerInfo_User_Gender_Male:
@@ -299,20 +284,17 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                                                                      QString &reasonStr,
                                                                      int &banSecondsLeft)
 {
-    switch (server->getAuthenticationMethod())
-    {
+    switch (server->getAuthenticationMethod()) {
         case Servatrice::AuthenticationNone:
             return UnknownUser;
-        case Servatrice::AuthenticationPassword:
-        {
+        case Servatrice::AuthenticationPassword: {
             QString configPassword = settingsCache->value("authentication/password").toString();
             if (configPassword == password)
                 return PasswordRight;
 
             return NotLoggedIn;
         }
-        case Servatrice::AuthenticationSql:
-        {
+        case Servatrice::AuthenticationSql: {
             if (!checkSql())
                 return UnknownUser;
 
@@ -325,32 +307,26 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
             QSqlQuery *passwordQuery =
                 prepareQuery("select password_sha512, active from {prefix}_users where name = :name");
             passwordQuery->bindValue(":name", user);
-            if (!execSqlQuery(passwordQuery))
-            {
+            if (!execSqlQuery(passwordQuery)) {
                 qDebug("Login denied: SQL error");
                 return NotLoggedIn;
             }
 
-            if (passwordQuery->next())
-            {
+            if (passwordQuery->next()) {
                 const QString correctPassword = passwordQuery->value(0).toString();
                 const bool userIsActive = passwordQuery->value(1).toBool();
-                if (!userIsActive)
-                {
+                if (!userIsActive) {
                     qDebug("Login denied: user not active");
                     return UserIsInactive;
                 }
-                if (correctPassword == PasswordHasher::computeHash(password, correctPassword.left(16)))
-                {
+                if (correctPassword == PasswordHasher::computeHash(password, correctPassword.left(16))) {
                     qDebug("Login accepted: password right");
                     return PasswordRight;
-                } else
-                {
+                } else {
                     qDebug("Login denied: password wrong");
                     return NotLoggedIn;
                 }
-            } else
-            {
+            } else {
                 qDebug("Login accepted: unknown user");
                 return UnknownUser;
             }
@@ -368,8 +344,7 @@ bool Servatrice_DatabaseInterface::checkUserIsBanned(const QString &ipAddress,
     if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql)
         return false;
 
-    if (!checkSql())
-    {
+    if (!checkSql()) {
         qDebug("Failed to check if user is banned. Database invalid.");
         return false;
     }
@@ -400,18 +375,15 @@ bool Servatrice_DatabaseInterface::checkUserIsIdBanned(const QString &clientId,
 
     idBanQuery->bindValue(":id", clientId);
     idBanQuery->bindValue(":id2", clientId);
-    if (!execSqlQuery(idBanQuery))
-    {
+    if (!execSqlQuery(idBanQuery)) {
         qDebug() << "Id ban check failed: SQL error." << idBanQuery->lastError();
         return false;
     }
 
-    if (idBanQuery->next())
-    {
+    if (idBanQuery->next()) {
         const int secondsLeft = idBanQuery->value(0).toInt();
         const bool permanentBan = idBanQuery->value(1).toInt();
-        if ((secondsLeft > 0) || permanentBan)
-        {
+        if ((secondsLeft > 0) || permanentBan) {
             banReason = idBanQuery->value(2).toString();
             banSecondsRemaining = permanentBan ? 0 : secondsLeft;
             qDebug() << "User is banned by client id" << clientId;
@@ -431,18 +403,15 @@ bool Servatrice_DatabaseInterface::checkUserIsNameBanned(const QString &userName
                      "{prefix}_bans c where c.user_name = :name2) and b.user_name = :name1");
     nameBanQuery->bindValue(":name1", userName);
     nameBanQuery->bindValue(":name2", userName);
-    if (!execSqlQuery(nameBanQuery))
-    {
+    if (!execSqlQuery(nameBanQuery)) {
         qDebug() << "Name ban check failed: SQL error" << nameBanQuery->lastError();
         return false;
     }
 
-    if (nameBanQuery->next())
-    {
+    if (nameBanQuery->next()) {
         const int secondsLeft = nameBanQuery->value(0).toInt();
         const bool permanentBan = nameBanQuery->value(1).toInt();
-        if ((secondsLeft > 0) || permanentBan)
-        {
+        if ((secondsLeft > 0) || permanentBan) {
             banReason = nameBanQuery->value(2).toString();
             banSecondsRemaining = permanentBan ? 0 : secondsLeft;
             qDebug() << "Username" << userName << "is banned by name";
@@ -470,18 +439,15 @@ bool Servatrice_DatabaseInterface::checkUserIsIpBanned(const QString &ipAddress,
 
     ipBanQuery->bindValue(":address", ipAddress);
     ipBanQuery->bindValue(":address2", ipAddress);
-    if (!execSqlQuery(ipBanQuery))
-    {
+    if (!execSqlQuery(ipBanQuery)) {
         qDebug() << "IP ban check failed: SQL error." << ipBanQuery->lastError();
         return false;
     }
 
-    if (ipBanQuery->next())
-    {
+    if (ipBanQuery->next()) {
         const int secondsLeft = ipBanQuery->value(0).toInt();
         const bool permanentBan = ipBanQuery->value(1).toInt();
-        if ((secondsLeft > 0) || permanentBan)
-        {
+        if ((secondsLeft > 0) || permanentBan) {
             banReason = ipBanQuery->value(2).toString();
             banSecondsRemaining = permanentBan ? 0 : secondsLeft;
             qDebug() << "User is banned by address" << ipAddress;
@@ -493,8 +459,7 @@ bool Servatrice_DatabaseInterface::checkUserIsIpBanned(const QString &ipAddress,
 
 bool Servatrice_DatabaseInterface::activeUserExists(const QString &user)
 {
-    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql)
-    {
+    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         checkSql();
 
         QSqlQuery *query = prepareQuery("select 1 from {prefix}_users where name = :name and active = 1");
@@ -508,8 +473,7 @@ bool Servatrice_DatabaseInterface::activeUserExists(const QString &user)
 
 bool Servatrice_DatabaseInterface::userExists(const QString &user)
 {
-    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql)
-    {
+    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         checkSql();
 
         QSqlQuery *query = prepareQuery("select 1 from {prefix}_users where name = :name");
@@ -523,8 +487,7 @@ bool Servatrice_DatabaseInterface::userExists(const QString &user)
 
 int Servatrice_DatabaseInterface::getUserIdInDB(const QString &name)
 {
-    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql)
-    {
+    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         QSqlQuery *query = prepareQuery("select id from {prefix}_users where name = :name and active = 1");
         query->bindValue(":name", name);
         if (!execSqlQuery(query))
@@ -600,8 +563,7 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
     if (!privlevel.isEmpty())
         result.set_privlevel(privlevel.toStdString());
 
-    if (complete)
-    {
+    if (complete) {
         const QString genderStr = query->value(5).toString();
         if (genderStr == "m")
             result.set_gender(ServerInfo_User::Male);
@@ -617,8 +579,7 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
             result.set_avatar_bmp(avatarBmp.data(), avatarBmp.size());
 
         const QDateTime regDate = query->value(8).toDateTime();
-        if (!regDate.toString(Qt::ISODate).isEmpty())
-        {
+        if (!regDate.toString(Qt::ISODate).isEmpty()) {
             qint64 accountAgeInSeconds = regDate.secsTo(QDateTime::currentDateTime());
             result.set_accountage_secs(accountAgeInSeconds);
         }
@@ -640,8 +601,7 @@ ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, b
     result.set_name(name.toStdString());
     result.set_user_level(ServerInfo_User::IsUser);
 
-    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql)
-    {
+    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         if (!checkSql())
             return result;
 
@@ -741,8 +701,7 @@ QMap<QString, ServerInfo_User> Servatrice_DatabaseInterface::getBuddyList(const 
 {
     QMap<QString, ServerInfo_User> result;
 
-    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql)
-    {
+    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         checkSql();
 
         QSqlQuery *query = prepareQuery("select a.id, a.name, a.admin, a.country, a.privlevel from {prefix}_users a "
@@ -752,8 +711,7 @@ QMap<QString, ServerInfo_User> Servatrice_DatabaseInterface::getBuddyList(const 
         if (!execSqlQuery(query))
             return result;
 
-        while (query->next())
-        {
+        while (query->next()) {
             const ServerInfo_User &temp = evalUserQueryResult(query, false);
             result.insert(QString::fromStdString(temp.name()), temp);
         }
@@ -765,8 +723,7 @@ QMap<QString, ServerInfo_User> Servatrice_DatabaseInterface::getIgnoreList(const
 {
     QMap<QString, ServerInfo_User> result;
 
-    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql)
-    {
+    if (server->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
         checkSql();
 
         QSqlQuery *query = prepareQuery("select a.id, a.name, a.admin, a.country, a.privlevel from {prefix}_users a "
@@ -776,8 +733,7 @@ QMap<QString, ServerInfo_User> Servatrice_DatabaseInterface::getIgnoreList(const
         if (!execSqlQuery(query))
             return result;
 
-        while (query->next())
-        {
+        while (query->next()) {
             ServerInfo_User temp = evalUserQueryResult(query, false);
             result.insert(QString::fromStdString(temp.name()), temp);
         }
@@ -825,16 +781,14 @@ void Servatrice_DatabaseInterface::storeGameInformation(const QString &roomName,
 
     QVariantList gameIds1, playerNames, gameIds2, userIds, replayNames;
     QSetIterator<QString> playerIterator(allPlayersEver);
-    while (playerIterator.hasNext())
-    {
+    while (playerIterator.hasNext()) {
         gameIds1.append(gameInfo.game_id());
         const QString &playerName = playerIterator.next();
         playerNames.append(playerName);
     }
     QSet<QString> allUsersInGame = allPlayersEver + allSpectatorsEver;
     QSetIterator<QString> allUsersIterator(allUsersInGame);
-    while (allUsersIterator.hasNext())
-    {
+    while (allUsersIterator.hasNext()) {
         int id = getUserIdInDB(allUsersIterator.next());
         if (id == -1)
             continue;
@@ -844,8 +798,7 @@ void Servatrice_DatabaseInterface::storeGameInformation(const QString &roomName,
     }
 
     QVariantList replayIds, replayGameIds, replayDurations, replayBlobs;
-    for (int i = 0; i < replayList.size(); ++i)
-    {
+    for (int i = 0; i < replayList.size(); ++i) {
         QByteArray blob;
         const unsigned int size = replayList[i]->ByteSize();
         blob.resize(size);
@@ -924,8 +877,7 @@ void Servatrice_DatabaseInterface::logMessage(const int senderId,
                                               const QString &targetName)
 {
     QString targetTypeString;
-    switch (targetType)
-    {
+    switch (targetType) {
         case MessageTargetRoom:
             if (!settingsCache->value("logging/log_user_msg_room", 0).toBool())
                 return;
@@ -981,10 +933,8 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
     QSqlQuery *passwordQuery = prepareQuery("select password_sha512 from {prefix}_users where name = :name");
     passwordQuery->bindValue(":name", user);
 
-    if (!force)
-    {
-        if (!execSqlQuery(passwordQuery))
-        {
+    if (!force) {
+        if (!execSqlQuery(passwordQuery)) {
             qDebug("Change password denied: SQL error");
             return false;
         }
@@ -1055,39 +1005,33 @@ void Servatrice_DatabaseInterface::updateUsersLastLoginData(const QString &userN
 
     QSqlQuery *query = prepareQuery("select id from {prefix}_users where name = :user_name");
     query->bindValue(":user_name", userName);
-    if (!execSqlQuery(query))
-    {
+    if (!execSqlQuery(query)) {
         qDebug("Failed to locate user id when updating users last login data: SQL Error");
         return;
     }
 
-    if (query->next())
-    {
+    if (query->next()) {
         usersID = query->value(0).toInt();
     }
 
-    if (usersID)
-    {
+    if (usersID) {
         int userCount;
         query = prepareQuery("select count(id) from {prefix}_user_analytics where id = :user_id");
         query->bindValue(":user_id", usersID);
         if (!execSqlQuery(query))
             return;
 
-        if (query->next())
-        {
+        if (query->next()) {
             userCount = query->value(0).toInt();
         }
 
-        if (!userCount)
-        {
+        if (!userCount) {
             query = prepareQuery(
                 "insert into {prefix}_user_analytics (id,client_ver,last_login) values (:user_id,:client_ver,NOW())");
             query->bindValue(":user_id", usersID);
             query->bindValue(":client_ver", clientVersion);
             execSqlQuery(query);
-        } else
-        {
+        } else {
             query = prepareQuery(
                 "update {prefix}_user_analytics set last_login = NOW(), client_ver = :client_ver where id = :user_id");
             query->bindValue(":client_ver", clientVersion);
@@ -1110,14 +1054,12 @@ QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QStr
                      "{prefix}_bans A LEFT JOIN {prefix}_users B ON A.id_admin=B.id WHERE A.user_name = :user_name");
     query->bindValue(":user_name", userName);
 
-    if (!execSqlQuery(query))
-    {
+    if (!execSqlQuery(query)) {
         qDebug("Failed to collect ban history information: SQL Error");
         return results;
     }
 
-    while (query->next())
-    {
+    while (query->next()) {
         banDetails.set_admin_id(QString(query->value(0).toString()).toStdString());
         banDetails.set_admin_name(QString(query->value(5).toString()).toStdString());
         banDetails.set_ban_time(QString(query->value(1).toString()).toStdString());
@@ -1147,8 +1089,7 @@ bool Servatrice_DatabaseInterface::addWarning(const QString userName,
     query->bindValue(":mod_name", adminName);
     query->bindValue(":warn_reason", warningReason);
     query->bindValue(":client_id", clientID);
-    if (!execSqlQuery(query))
-    {
+    if (!execSqlQuery(query)) {
         qDebug("Failed to collect create warning history information: SQL Error");
         return false;
     }
@@ -1169,14 +1110,12 @@ QList<ServerInfo_Warning> Servatrice_DatabaseInterface::getUserWarnHistory(const
         prepareQuery("SELECT user_name, mod_name, reason, time_of FROM {prefix}_warnings WHERE user_id = :user_id");
     query->bindValue(":user_id", userID);
 
-    if (!execSqlQuery(query))
-    {
+    if (!execSqlQuery(query)) {
         qDebug("Failed to collect warning history information: SQL Error");
         return results;
     }
 
-    while (query->next())
-    {
+    while (query->next()) {
         warnDetails.set_user_name(QString(query->value(0).toString()).toStdString());
         warnDetails.set_admin_name(QString(query->value(1).toString()).toStdString());
         warnDetails.set_reason(QString(query->value(2).toString()).toStdString());
@@ -1222,23 +1161,20 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
     if (!message.isEmpty())
         queryString.append(" AND `log_message` LIKE :log_message");
 
-    if (chat || game || room)
-    {
+    if (chat || game || room) {
         queryString.append(" AND (");
 
         if (chat)
             queryString.append("`target_type` = 'chat'");
 
-        if (game)
-        {
+        if (game) {
             if (chat)
                 queryString.append(" OR `target_type` = 'game'");
             else
                 queryString.append("`target_type` = 'game'");
         }
 
-        if (room)
-        {
+        if (room) {
             if (game || chat)
                 queryString.append(" OR `target_type` = 'room'");
             else
@@ -1254,43 +1190,34 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         queryString.append(" LIMIT :limit_size");
 
     QSqlQuery *query = prepareQuery(queryString);
-    if (!user.isEmpty())
-    {
+    if (!user.isEmpty()) {
         query->bindValue(":user_name", user);
     }
-    if (!ipaddress.isEmpty())
-    {
+    if (!ipaddress.isEmpty()) {
         query->bindValue(":ip_to_find", ipaddress);
     }
-    if (!gameid.isEmpty())
-    {
+    if (!gameid.isEmpty()) {
         query->bindValue(":game_id", gameid);
     }
-    if (!gamename.isEmpty())
-    {
+    if (!gamename.isEmpty()) {
         query->bindValue(":game_name", gamename);
     }
-    if (!message.isEmpty())
-    {
+    if (!message.isEmpty()) {
         query->bindValue(":log_message", message);
     }
-    if (range)
-    {
+    if (range) {
         query->bindValue(":range_time", range);
     }
-    if (maxresults)
-    {
+    if (maxresults) {
         query->bindValue(":limit_size", maxresults);
     }
 
-    if (!execSqlQuery(query))
-    {
+    if (!execSqlQuery(query)) {
         qDebug("Failed to collect log history information: SQL Error");
         return results;
     }
 
-    while (query->next())
-    {
+    while (query->next()) {
         chatMessage.set_time(QString(query->value(0).toString()).toStdString());
         chatMessage.set_sender_id(QString(query->value(1).toString()).toStdString());
         chatMessage.set_sender_name(QString(query->value(2).toString()).toStdString());
@@ -1313,8 +1240,7 @@ int Servatrice_DatabaseInterface::checkNumberOfUserAccounts(const QString &email
     QSqlQuery *query = prepareQuery("SELECT count(email) FROM {prefix}_users WHERE email = :user_email");
     query->bindValue(":user_email", email);
 
-    if (!execSqlQuery(query))
-    {
+    if (!execSqlQuery(query)) {
         qDebug("Failed to identify the number of users accounts for users email address: SQL Error");
         return 0;
     }

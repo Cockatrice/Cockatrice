@@ -48,8 +48,7 @@ void DlgViewLog::logEntryAdded(QString message)
 
 void DlgViewLog::closeEvent(QCloseEvent * /* event */)
 {
-    if (coClearLog->isChecked())
-    {
+    if (coClearLog->isChecked()) {
         logArea->clear();
     }
 

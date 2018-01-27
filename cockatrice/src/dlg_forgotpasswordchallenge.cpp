@@ -20,16 +20,14 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
     lastfpplayername = settingsCache->servers().getPlayerName("Player");
 
     if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() &&
-        !settingsCache->servers().getFPPlayerName().isEmpty())
-    {
+        !settingsCache->servers().getFPPlayerName().isEmpty()) {
         lastfphost = settingsCache->servers().getFPHostname();
         lastfpport = settingsCache->servers().getFPPort();
         lastfpplayername = settingsCache->servers().getFPPlayerName();
     }
 
     if (settingsCache->servers().getFPHostname().isEmpty() && settingsCache->servers().getFPPort().isEmpty() &&
-        settingsCache->servers().getFPPlayerName().isEmpty())
-    {
+        settingsCache->servers().getFPPlayerName().isEmpty()) {
         QMessageBox::warning(this, tr("Forgot Password Challenge Warning"),
                              tr("Oops, looks like something has gone wrong.  Please restart the forgot password "
                                 "process by using the forgot password button on the connection screen."));
@@ -53,8 +51,7 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
     emailLabel->setBuddy(emailLabel);
 
     if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() &&
-        !settingsCache->servers().getFPPlayerName().isEmpty())
-    {
+        !settingsCache->servers().getFPPlayerName().isEmpty()) {
         hostLabel->hide();
         hostEdit->hide();
         portLabel->hide();
@@ -89,8 +86,7 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
 
 void DlgForgotPasswordChallenge::actOk()
 {
-    if (emailEdit->text().isEmpty())
-    {
+    if (emailEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Forgot Password Challenge Warning"), tr("The email address can't be empty."));
         return;
     }

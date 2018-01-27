@@ -50,15 +50,13 @@ void ZoneViewZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 
 void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardList)
 {
-    if (!cardList.isEmpty())
-    {
+    if (!cardList.isEmpty()) {
         for (int i = 0; i < cardList.size(); ++i)
             addCard(
                 new CardItem(player, QString::fromStdString(cardList[i]->name()), cardList[i]->id(), revealZone, this),
                 false, i);
         reorganizeCards();
-    } else if (!origZone->contentsKnown())
-    {
+    } else if (!origZone->contentsKnown()) {
         Command_DumpZone cmd;
         cmd.set_player_id(player->getId());
         cmd.set_zone_name(name.toStdString());
@@ -68,12 +66,10 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(zoneDumpReceived(const Response &)));
         player->sendGameCommand(pend);
-    } else
-    {
+    } else {
         const CardList &c = origZone->getCards();
         int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
-        for (int i = 0; i < number; i++)
-        {
+        for (int i = 0; i < number; i++) {
             CardItem *card = c.at(i);
             addCard(new CardItem(player, card->getName(), card->getId(), revealZone, this), false, i);
         }
@@ -85,8 +81,7 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
 {
     const Response_DumpZone &resp = r.GetExtension(Response_DumpZone::ext);
     const int respCardListSize = resp.zone_info().card_list_size();
-    for (int i = 0; i < respCardListSize; ++i)
-    {
+    for (int i = 0; i < respCardListSize; ++i) {
         const ServerInfo_Card &cardInfo = resp.zone_info().card_list(i);
         CardItem *card = new CardItem(player, QString::fromStdString(cardInfo.name()), cardInfo.id(), revealZone, this);
         addCard(card, false, i);
@@ -111,8 +106,7 @@ void ZoneViewZone::reorganizeCards()
         rows = 1;
     if (minRows == 0)
         minRows = rows;
-    else if (rows < minRows)
-    {
+    else if (rows < minRows) {
         rows = minRows;
         cols = ceil((double)cardCount / minRows);
     }
@@ -127,21 +121,17 @@ void ZoneViewZone::reorganizeCards()
 
     int typeColumn = 0;
     int longestRow = 0;
-    if (pileView && sortByType)
-    { // we need sort by type enabled for the feature to work
+    if (pileView && sortByType) { // we need sort by type enabled for the feature to work
         int typeRow = 0;
         QString lastCardType;
-        for (int i = 0; i < cardCount; i++)
-        {
+        for (int i = 0; i < cardCount; i++) {
             CardItem *c = cardsToDisplay.at(i);
             QString cardType = c->getInfo() ? c->getInfo()->getMainCardType() : "";
 
-            if (i)
-            { // if not the first card
+            if (i) { // if not the first card
                 if (cardType == lastCardType)
                     typeRow++; // add below current card
-                else
-                { // if no match then move card to next column
+                else {         // if no match then move card to next column
                     typeColumn++;
                     typeRow = 0;
                 }
@@ -154,10 +144,8 @@ void ZoneViewZone::reorganizeCards()
             c->setRealZValue(i);
             longestRow = qMax(typeRow, longestRow);
         }
-    } else
-    {
-        for (int i = 0; i < cardCount; i++)
-        {
+    } else {
+        for (int i = 0; i < cardCount; i++) {
             CardItem *c = cardsToDisplay.at(i);
             qreal x = 7 + ((i / rows) * CARD_WIDTH);
             qreal y = (i % rows) * CARD_HEIGHT / 3;

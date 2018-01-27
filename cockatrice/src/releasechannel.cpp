@@ -55,16 +55,13 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
     QString arch;
     QString devSnapshotEnd;
 
-    if (wordSize == "llp64")
-    {
+    if (wordSize == "llp64") {
         arch = "win64";
         devSnapshotEnd = "-x86_64_qt5";
-    } else if (wordSize == "ilp32")
-    {
+    } else if (wordSize == "ilp32") {
         arch = "win32";
         devSnapshotEnd = "-x86_qt5";
-    } else
-    {
+    } else {
         qWarning() << "Error checking for upgrade version: wordSize is" << wordSize;
         return false;
     }
@@ -106,16 +103,14 @@ void StableReleaseChannel::releaseListFinished()
     reply->deleteLater();
 
     QVariantMap resultMap = QtJson::Json::parse(tmp, ok).toMap();
-    if (!ok)
-    {
+    if (!ok) {
         qWarning() << "No reply received from the release update server:" << tmp;
         emit error(tr("No reply received from the release update server."));
         return;
     }
 
     if (!(resultMap.contains("name") && resultMap.contains("html_url") && resultMap.contains("tag_name") &&
-          resultMap.contains("published_at")))
-    {
+          resultMap.contains("published_at"))) {
         qWarning() << "Invalid received from the release update server:" << tmp;
         emit error(tr("Invalid reply received from the release update server."));
         return;
@@ -128,8 +123,7 @@ void StableReleaseChannel::releaseListFinished()
     lastRelease->setDescriptionUrl(resultMap["html_url"].toString());
     lastRelease->setPublishDate(resultMap["published_at"].toDate());
 
-    if (resultMap.contains("assets"))
-    {
+    if (resultMap.contains("assets")) {
         auto rawAssets = resultMap["assets"].toList();
         // [(name, url)]
         QVector<std::pair<QString, QString>> assets;
@@ -144,8 +138,7 @@ void StableReleaseChannel::releaseListFinished()
             return downloadMatchesCurrentOS(nameAndUrl.first);
         });
 
-        if (_releaseAsset != assets.end())
-        {
+        if (_releaseAsset != assets.end()) {
             std::pair<QString, QString> releaseAsset = *_releaseAsset;
             auto releaseUrl = releaseAsset.second;
             lastRelease->setDownloadUrl(releaseUrl);
@@ -175,15 +168,13 @@ void StableReleaseChannel::tagListFinished()
     reply->deleteLater();
 
     QVariantMap resultMap = QtJson::Json::parse(tmp, ok).toMap();
-    if (!ok)
-    {
+    if (!ok) {
         qWarning() << "No reply received from the tag update server:" << tmp;
         emit error(tr("No reply received from the tag update server."));
         return;
     }
 
-    if (!(resultMap.contains("object") && resultMap["object"].toMap().contains("sha")))
-    {
+    if (!(resultMap.contains("object") && resultMap["object"].toMap().contains("sha"))) {
         qWarning() << "Invalid received from the tag update server:" << tmp;
         emit error(tr("Invalid reply received from the tag update server."));
         return;
@@ -237,8 +228,7 @@ void DevReleaseChannel::releaseListFinished()
      */
     QVariantMap resultMap = array.at(0).toObject().toVariantMap();
 
-    if (array.size() == 0 || resultMap.size() == 0)
-    {
+    if (array.size() == 0 || resultMap.size() == 0) {
         qWarning() << "No reply received from the release update server:" << QString(jsonData);
         emit error(tr("No reply received from the release update server."));
         return;
@@ -247,8 +237,7 @@ void DevReleaseChannel::releaseListFinished()
     // Make sure resultMap has all elements we'll need
     if (!resultMap.contains("assets") || !resultMap.contains("author") || !resultMap.contains("tag_name") ||
         !resultMap.contains("target_commitish") || !resultMap.contains("assets_url") ||
-        !resultMap.contains("published_at"))
-    {
+        !resultMap.contains("published_at")) {
         qWarning() << "Invalid received from the release update server:" << resultMap;
         emit error(tr("Invalid reply received from the release update server."));
         return;
@@ -283,8 +272,7 @@ void DevReleaseChannel::fileListFinished()
     bool ok;
 
     QVariantList resultList = QtJson::Json::parse(jsonData, ok).toList();
-    if (!ok)
-    {
+    if (!ok) {
         qWarning() << "No reply received from the file update server:" << QString(jsonData);
         emit error(tr("No reply received from the file update server."));
         return;
@@ -297,8 +285,7 @@ void DevReleaseChannel::fileListFinished()
     bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
     bool compatibleVersion = false;
 
-    foreach (QVariant file, resultList)
-    {
+    foreach (QVariant file, resultList) {
         QVariantMap map = file.toMap();
 
         QString url = map["browser_download_url"].toString();

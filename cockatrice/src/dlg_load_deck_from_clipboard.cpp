@@ -52,23 +52,18 @@ void DlgLoadDeckFromClipboard::actOK()
     QTextStream stream(&buffer);
 
     auto *deckLoader = new DeckLoader;
-    if (buffer.contains("<cockatrice_deck version=\"1\">"))
-    {
-        if (deckLoader->loadFromString_Native(buffer))
-        {
+    if (buffer.contains("<cockatrice_deck version=\"1\">")) {
+        if (deckLoader->loadFromString_Native(buffer)) {
             deckList = deckLoader;
             accept();
-        } else
-        {
+        } else {
             QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
             delete deckLoader;
         }
-    } else if (deckLoader->loadFromStream_Plain(stream))
-    {
+    } else if (deckLoader->loadFromStream_Plain(stream)) {
         deckList = deckLoader;
         accept();
-    } else
-    {
+    } else {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
         delete deckLoader;
     }

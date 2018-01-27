@@ -33,8 +33,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
     QGraphicsLinearLayout *hPilebox = 0;
 
-    if (numberCards < 0)
-    {
+    if (numberCards < 0) {
         hPilebox = new QGraphicsLinearLayout(Qt::Horizontal);
         QGraphicsLinearLayout *hFilterbox = new QGraphicsLinearLayout(Qt::Horizontal);
 
@@ -60,8 +59,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         hPilebox->addItem(pileViewProxy);
     }
 
-    if (_origZone->getIsShufflable() && (numberCards == -1))
-    {
+    if (_origZone->getIsShufflable() && (numberCards == -1)) {
         shuffleCheckBox.setChecked(true);
         QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
         shuffleProxy->setWidget(&shuffleCheckBox);
@@ -97,8 +95,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     // numberCard is the num of cards we want to reveal from an area. Ex: scry the top 3 cards.
     // If the number is < 0 then it means that we can make the area sorted and we dont care about the order.
-    if (numberCards < 0)
-    {
+    if (numberCards < 0) {
         connect(&sortByNameCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSortByName(int)));
         connect(&sortByTypeCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSortByType(int)));
         connect(&pileViewCheckBox, SIGNAL(stateChanged(int)), this, SLOT(processSetPileView(int)));
@@ -155,21 +152,17 @@ void ZoneViewWidget::moveEvent(QGraphicsSceneMoveEvent * /* event */)
 
     QPointF scenePos = pos();
 
-    if (scenePos.x() < 0)
-    {
+    if (scenePos.x() < 0) {
         scenePos.setX(0);
-    } else
-    {
+    } else {
         qreal maxw = scene()->sceneRect().width() - 100;
         if (scenePos.x() > maxw)
             scenePos.setX(maxw);
     }
 
-    if (scenePos.y() < titleBarHeight)
-    {
+    if (scenePos.y() < titleBarHeight) {
         scenePos.setY(titleBarHeight);
-    } else
-    {
+    } else {
         qreal maxh = scene()->sceneRect().height() - titleBarHeight;
         if (scenePos.y() > maxh)
             scenePos.setY(maxh);
@@ -212,8 +205,7 @@ void ZoneViewWidget::handleScrollBarChange(int value)
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
     disconnect(zone, SIGNAL(beingDeleted()), this, 0);
-    if (zone->getNumberCards() != -2)
-    {
+    if (zone->getNumberCards() != -2) {
         Command_StopDumpZone cmd;
         cmd.set_player_id(player->getId());
         cmd.set_zone_name(zone->getName().toStdString());

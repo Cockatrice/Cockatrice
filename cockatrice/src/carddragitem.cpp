@@ -33,8 +33,7 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 
     CardZone *cardZone = 0;
     ZoneViewZone *zoneViewZone = 0;
-    for (int i = colliding.size() - 1; i >= 0; i--)
-    {
+    for (int i = colliding.size() - 1; i >= 0; i--) {
         CardZone *temp = qgraphicsitem_cast<CardZone *>(colliding.at(i));
         if (!cardZone)
             cardZone = temp;
@@ -56,8 +55,7 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
     QPointF closestGridPoint = cursorZone->closestGridPoint(cardTopLeft);
     QPointF newPos = zonePos + closestGridPoint;
 
-    if (newPos != pos())
-    {
+    if (newPos != pos()) {
         for (int i = 0; i < childDrags.size(); i++)
             childDrags[i]->setPos(newPos + childDrags[i]->getHotSpot());
         setPos(newPos);
@@ -67,8 +65,7 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
         if (table)
             if (table->getCardFromCoords(closestGridPoint))
                 newOccupied = true;
-        if (newOccupied != occupied)
-        {
+        if (newOccupied != occupied) {
             occupied = newOccupied;
             update();
         }
@@ -84,11 +81,9 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     QList<CardDragItem *> dragItemList;
     CardZone *startZone = static_cast<CardItem *>(item)->getZone();
-    if (currentZone && !(static_cast<CardItem *>(item)->getAttachedTo() && (startZone == currentZone)))
-    {
+    if (currentZone && !(static_cast<CardItem *>(item)->getAttachedTo() && (startZone == currentZone))) {
         dragItemList.append(this);
-        for (int i = 0; i < childDrags.size(); i++)
-        {
+        for (int i = 0; i < childDrags.size(); i++) {
             CardDragItem *c = static_cast<CardDragItem *>(childDrags[i]);
             if (!(static_cast<CardItem *>(c->item)->getAttachedTo() && (startZone == currentZone)) && !c->occupied)
                 dragItemList.append(c);

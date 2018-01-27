@@ -31,8 +31,7 @@ unsigned int RNG_SFMT::rand(int min, int max)
      * cdf(0, max - min) + min
      * There has been no use for negative random numbers with rand() though, so it's treated as error.
      */
-    if (min < 0)
-    {
+    if (min < 0) {
         throw std::invalid_argument(
             QString("Invalid bounds for RNG: Got min " + QString::number(min) + " < 0!\n").toStdString());
         // at this point, the method exits. No return value is needed, because
@@ -47,8 +46,7 @@ unsigned int RNG_SFMT::rand(int min, int max)
     // Someone wants rand() % -foo, so we compute -rand(0, +foo)
     // This is the only time where min > max is (sort of) legal.
     // Not handling this will cause the application to crash.
-    if (min == 0 && max < 0)
-    {
+    if (min == 0 && max < 0) {
         return -cdf(0, -max);
     }
 
@@ -101,8 +99,7 @@ unsigned int RNG_SFMT::rand(int min, int max)
 unsigned int RNG_SFMT::cdf(unsigned int min, unsigned int max)
 {
     // This all makes no sense if min > max, which should never happen.
-    if (min > max)
-    {
+    if (min > max) {
         throw std::invalid_argument(QString("Invalid bounds for RNG: min > max! Values were: min = " +
                                             QString::number(min) + ", max = " + QString::number(max))
                                         .toStdString());
@@ -126,8 +123,7 @@ unsigned int RNG_SFMT::cdf(unsigned int min, unsigned int max)
     // To make the random number generation thread-safe, a mutex is created around
     // the generation. Outside of the loop of course, to avoid lock/unlock overhead.
     mutex.lock();
-    do
-    {
+    do {
         rand = sfmt_genrand_uint64(&sfmt);
     } while (rand >= limit);
     mutex.unlock();

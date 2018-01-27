@@ -104,8 +104,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     addTabMenu(roomMenu);
 
     const int userListSize = info.user_list_size();
-    for (int i = 0; i < userListSize; ++i)
-    {
+    for (int i = 0; i < userListSize; ++i) {
         userList->processUserInfo(info.user_list(i), true);
         autocompleteUserList.append("@" + QString::fromStdString(info.user_list(i).name()));
     }
@@ -160,8 +159,7 @@ void TabRoom::focusTab()
 void TabRoom::actShowMentionPopup(QString &sender)
 {
     if (trayIcon && (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this) ||
-                     QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0))
-    {
+                     QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0)) {
         disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
         trayIcon->showMessage(sender + tr(" mentioned you."), tr("Click to view"));
         connect(trayIcon, SIGNAL(messageClicked()), chatView, SLOT(actMessageClicked()));
@@ -186,15 +184,12 @@ QString TabRoom::sanitizeHtml(QString dirty) const
 
 void TabRoom::sendMessage()
 {
-    if (sayEdit->text().isEmpty())
-    {
+    if (sayEdit->text().isEmpty()) {
         return;
-    } else if (completer->popup()->isVisible())
-    {
+    } else if (completer->popup()->isVisible()) {
         completer->popup()->hide();
         return;
-    } else
-    {
+    } else {
         Command_RoomSay cmd;
         cmd.set_message(sayEdit->text().toStdString());
 
@@ -237,8 +232,7 @@ void TabRoom::actCompleterChanged()
 
 void TabRoom::processRoomEvent(const RoomEvent &event)
 {
-    switch (static_cast<RoomEvent::RoomEventType>(getPbExtension(event)))
-    {
+    switch (static_cast<RoomEvent::RoomEventType>(getPbExtension(event))) {
         case RoomEvent::LIST_GAMES:
             processListGamesEvent(event.GetExtension(Event_ListGames::ext));
             break;
@@ -266,8 +260,7 @@ void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)
 {
     userList->processUserInfo(event.user_info(), true);
     userList->sortItems();
-    if (!autocompleteUserList.contains("@" + QString::fromStdString(event.user_info().name())))
-    {
+    if (!autocompleteUserList.contains("@" + QString::fromStdString(event.user_info().name()))) {
         autocompleteUserList << "@" + QString::fromStdString(event.user_info().name());
         sayEdit->setCompletionList(autocompleteUserList);
     }
@@ -291,8 +284,7 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     UserListTWI *twi = userList->getUsers().value(senderName);
     UserLevelFlags userLevel;
     QString userPrivLevel;
-    if (twi)
-    {
+    if (twi) {
         userLevel = UserLevelFlags(twi->getUserInfo().user_level());
         userPrivLevel = QString::fromStdString(twi->getUserInfo().privlevel());
         if (settingsCache->getIgnoreUnregisteredUsers() && !userLevel.testFlag(ServerInfo_User::IsRegistered))

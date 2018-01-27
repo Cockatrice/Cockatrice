@@ -54,8 +54,7 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     setLayout(parentLayout);
 
     // Check for SSL (this probably isn't necessary)
-    if (!QSslSocket::supportsSsl())
-    {
+    if (!QSslSocket::supportsSsl()) {
         enableUpdateButton(false);
         QMessageBox::critical(this, tr("Error"),
                               tr("Cockatrice was not built with SSL support, therefore you cannot download updates "
@@ -123,8 +122,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
     enableUpdateButton(isCompatible);
 
     // Give the user the appropriate message
-    if (!needToUpdate)
-    {
+    if (!needToUpdate) {
         // If there's no need to update, tell them that. However we still allow them to run the
         // downloader themselves if there's a compatible build
         QMessageBox::information(
@@ -138,8 +136,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
     }
 
     publishDate = release->getPublishDate().toString(Qt::DefaultLocaleLongDate);
-    if (isCompatible)
-    {
+    if (isCompatible) {
         // If there is an update, save its URL and work out its name
         updateUrl = release->getDownloadUrl();
 
@@ -154,8 +151,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
 
         if (reply == QMessageBox::Yes)
             downloadUpdate();
-    } else
-    {
+    } else {
         QMessageBox::information(
             this, tr("Update Available"),
             tr("A new version of Cockatrice is available!") + "<br><br>" + "<b>" + tr("New version") +
@@ -176,13 +172,11 @@ void DlgUpdate::enableUpdateButton(bool enable)
 
 void DlgUpdate::addStopDownloadAndRemoveOthers(bool enable)
 {
-    if (enable)
-    {
+    if (enable) {
         buttonBox->addButton(stopDownload, QDialogButtonBox::ActionRole);
         buttonBox->removeButton(manualDownload);
         buttonBox->removeButton(gotoDownload);
-    } else
-    {
+    } else {
         buttonBox->removeButton(stopDownload);
         buttonBox->addButton(manualDownload, QDialogButtonBox::ActionRole);
         buttonBox->addButton(gotoDownload, QDialogButtonBox::ActionRole);
@@ -218,13 +212,11 @@ void DlgUpdate::downloadSuccessful(QUrl filepath)
 {
     setLabel(tr("Installing..."));
     // Try to open the installer. If it opens, quit Cockatrice
-    if (QDesktopServices::openUrl(filepath))
-    {
+    if (QDesktopServices::openUrl(filepath)) {
         QMetaObject::invokeMethod(static_cast<MainWindow *>(parent()), "close", Qt::QueuedConnection);
         qDebug() << "Opened downloaded update file successfully - closing Cockatrice";
         close();
-    } else
-    {
+    } else {
         setLabel(tr("Error"));
         QMessageBox::critical(this, tr("Update Error"),
                               tr("Cockatrice is unable to open the installer.") + "<br><br>" +

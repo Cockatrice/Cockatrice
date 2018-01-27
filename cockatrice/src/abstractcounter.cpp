@@ -24,19 +24,16 @@ AbstractCounter::AbstractCounter(Player *_player,
 
     shortcutActive = false;
 
-    if (player->getLocal())
-    {
+    if (player->getLocal()) {
         menu = new QMenu(name);
         aSet = new QAction(this);
         connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
         menu->addAction(aSet);
         menu->addSeparator();
         for (int i = 10; i >= -10; --i)
-            if (i == 0)
-            {
+            if (i == 0) {
                 menu->addSeparator();
-            } else
-            {
+            } else {
                 QAction *aIncrement = new QAction(QString(i < 0 ? "%1" : "+%1").arg(i), this);
                 if (i == -1)
                     aDec = aIncrement;
@@ -69,26 +66,22 @@ void AbstractCounter::delCounter()
 
 void AbstractCounter::retranslateUi()
 {
-    if (menu)
-    {
+    if (menu) {
         aSet->setText(tr("&Set counter..."));
     }
 }
 
 void AbstractCounter::setShortcutsActive()
 {
-    if (!player->getLocal())
-    {
+    if (!player->getLocal()) {
         return;
     }
-    if (name == "life")
-    {
+    if (name == "life") {
         shortcutActive = true;
         aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSet"));
         aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDec"));
         aInc->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aInc"));
-    } else if (useNameForShortcut)
-    {
+    } else if (useNameForShortcut) {
         shortcutActive = true;
         aSet->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetCounter_" + name));
         aDec->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecCounter_" + name));
@@ -99,8 +92,7 @@ void AbstractCounter::setShortcutsActive()
 void AbstractCounter::setShortcutsInactive()
 {
     shortcutActive = false;
-    if (name == "life" || useNameForShortcut)
-    {
+    if (name == "life" || useNameForShortcut) {
         aSet->setShortcut(QKeySequence());
         aDec->setShortcut(QKeySequence());
         aInc->setShortcut(QKeySequence());
@@ -121,24 +113,20 @@ void AbstractCounter::setValue(int _value)
 
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (isUnderMouse() && player->getLocal())
-    {
-        if (event->button() == Qt::LeftButton)
-        {
+    if (isUnderMouse() && player->getLocal()) {
+        if (event->button() == Qt::LeftButton) {
             Command_IncCounter cmd;
             cmd.set_counter_id(id);
             cmd.set_delta(1);
             player->sendGameCommand(cmd);
             event->accept();
-        } else if (event->button() == Qt::RightButton)
-        {
+        } else if (event->button() == Qt::RightButton) {
             Command_IncCounter cmd;
             cmd.set_counter_id(id);
             cmd.set_delta(-1);
             player->sendGameCommand(cmd);
             event->accept();
-        } else if (event->button() == Qt::MidButton)
-        {
+        } else if (event->button() == Qt::MidButton) {
             if (menu)
                 menu->exec(event->screenPos());
             event->accept();
@@ -174,8 +162,7 @@ void AbstractCounter::setCounter()
     dialogSemaphore = true;
     int newValue = QInputDialog::getInt(0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value,
                                         -2000000000, 2000000000, 1, &ok);
-    if (deleteAfterDialog)
-    {
+    if (deleteAfterDialog) {
         deleteLater();
         return;
     }

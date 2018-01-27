@@ -82,15 +82,13 @@ void RemoteClient::slotConnected()
 
 void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentification &event)
 {
-    if (event.protocol_version() != protocolVersion)
-    {
+    if (event.protocol_version() != protocolVersion) {
         emit protocolVersionMismatch(protocolVersion, event.protocol_version());
         setStatus(StatusDisconnecting);
         return;
     }
 
-    if (getStatus() == StatusRequestingForgotPassword)
-    {
+    if (getStatus() == StatusRequestingForgotPassword) {
         Command_ForgotPasswordRequest cmdForgotPasswordRequest;
         cmdForgotPasswordRequest.set_user_name(userName.toStdString());
         cmdForgotPasswordRequest.set_clientid(getSrvClientID(lastHostname).toStdString());
@@ -101,8 +99,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
 
-    if (getStatus() == StatusSubmitForgotPasswordReset)
-    {
+    if (getStatus() == StatusSubmitForgotPasswordReset) {
         Command_ForgotPasswordReset cmdForgotPasswordReset;
         cmdForgotPasswordReset.set_user_name(userName.toStdString());
         cmdForgotPasswordReset.set_clientid(getSrvClientID(lastHostname).toStdString());
@@ -115,8 +112,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
 
-    if (getStatus() == StatusSubmitForgotPasswordChallenge)
-    {
+    if (getStatus() == StatusSubmitForgotPasswordChallenge) {
         Command_ForgotPasswordChallenge cmdForgotPasswordChallenge;
         cmdForgotPasswordChallenge.set_user_name(userName.toStdString());
         cmdForgotPasswordChallenge.set_clientid(getSrvClientID(lastHostname).toStdString());
@@ -128,8 +124,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
 
-    if (getStatus() == StatusRegistering)
-    {
+    if (getStatus() == StatusRegistering) {
         Command_Register cmdRegister;
         cmdRegister.set_user_name(userName.toStdString());
         cmdRegister.set_password(password.toStdString());
@@ -145,8 +140,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
 
-    if (getStatus() == StatusActivating)
-    {
+    if (getStatus() == StatusActivating) {
         Command_Activate cmdActivate;
         cmdActivate.set_user_name(userName.toStdString());
         cmdActivate.set_token(token.toStdString());
@@ -171,8 +165,7 @@ void RemoteClient::doLogin()
     cmdLogin.set_clientid(getSrvClientID(lastHostname).toStdString());
     cmdLogin.set_clientver(VERSION_STRING);
 
-    if (!clientFeatures.isEmpty())
-    {
+    if (!clientFeatures.isEmpty()) {
         QMap<QString, bool>::iterator i;
         for (i = clientFeatures.begin(); i != clientFeatures.end(); ++i)
             cmdLogin.add_clientfeatures(i.key().toStdString().c_str());
@@ -192,14 +185,12 @@ void RemoteClient::loginResponse(const Response &response)
     const Response_Login &resp = response.GetExtension(Response_Login::ext);
 
     QString possibleMissingFeatures;
-    if (resp.missing_features_size() > 0)
-    {
+    if (resp.missing_features_size() > 0) {
         for (int i = 0; i < resp.missing_features_size(); ++i)
             possibleMissingFeatures.append("," + QString::fromStdString(resp.missing_features(i)));
     }
 
-    if (response.response_code() == Response::RespOk)
-    {
+    if (response.response_code() == Response::RespOk) {
         setStatus(StatusLoggedIn);
         emit userInfoChanged(resp.user_info());
 
@@ -214,17 +205,14 @@ void RemoteClient::loginResponse(const Response &response)
         emit ignoreListReceived(ignoreList);
 
         if (newMissingFeatureFound(possibleMissingFeatures) && resp.missing_features_size() > 0 &&
-            settingsCache->getNotifyAboutUpdates())
-        {
+            settingsCache->getNotifyAboutUpdates()) {
             settingsCache->setKnownMissingFeatures(possibleMissingFeatures);
             emit notifyUserAboutUpdate();
         }
 
-    } else if (response.response_code() != Response::RespNotConnected)
-    {
+    } else if (response.response_code() != Response::RespNotConnected) {
         QList<QString> missingFeatures;
-        if (resp.missing_features_size() > 0)
-        {
+        if (resp.missing_features_size() > 0) {
             for (int i = 0; i < resp.missing_features_size(); ++i)
                 missingFeatures << QString::fromStdString(resp.missing_features(i));
         }
@@ -237,8 +225,7 @@ void RemoteClient::loginResponse(const Response &response)
 void RemoteClient::registerResponse(const Response &response)
 {
     const Response_Register &resp = response.GetExtension(Response_Register::ext);
-    switch (response.response_code())
-    {
+    switch (response.response_code()) {
         case Response::RespRegistrationAccepted:
             emit registerAccepted();
             doLogin();
@@ -258,13 +245,11 @@ void RemoteClient::registerResponse(const Response &response)
 
 void RemoteClient::activateResponse(const Response &response)
 {
-    if (response.response_code() == Response::RespActivationAccepted)
-    {
+    if (response.response_code() == Response::RespActivationAccepted) {
         emit activateAccepted();
 
         doLogin();
-    } else
-    {
+    } else {
         emit activateError();
     }
 }
@@ -276,23 +261,17 @@ void RemoteClient::readData()
 
     inputBuffer.append(data);
 
-    do
-    {
-        if (!messageInProgress)
-        {
-            if (inputBuffer.size() >= 4)
-            {
+    do {
+        if (!messageInProgress) {
+            if (inputBuffer.size() >= 4) {
                 // dirty hack to be compatible with v14 server that sends 60 bytes of garbage at the beginning
-                if (!handshakeStarted)
-                {
+                if (!handshakeStarted) {
                     handshakeStarted = true;
-                    if (inputBuffer.startsWith("<?xm"))
-                    {
+                    if (inputBuffer.startsWith("<?xm")) {
                         messageInProgress = true;
                         messageLength = 60;
                     }
-                } else
-                {
+                } else {
                     // end of hack
                     messageLength = (((quint32)(unsigned char)inputBuffer[0]) << 24) +
                                     (((quint32)(unsigned char)inputBuffer[1]) << 16) +
@@ -398,8 +377,7 @@ void RemoteClient::doDisconnectFromServer()
     messageLength = 0;
 
     QList<PendingCommand *> pc = pendingCommands.values();
-    for (int i = 0; i < pc.size(); i++)
-    {
+    for (int i = 0; i < pc.size(); i++) {
         Response response;
         response.set_response_code(Response::RespNotConnected);
         response.set_cmd_id(pc[i]->getCommandContainer().cmd_id());
@@ -416,11 +394,9 @@ void RemoteClient::doDisconnectFromServer()
 void RemoteClient::ping()
 {
     QMutableMapIterator<int, PendingCommand *> i(pendingCommands);
-    while (i.hasNext())
-    {
+    while (i.hasNext()) {
         PendingCommand *pend = i.next().value();
-        if (pend->tick() > maxTimeout)
-        {
+        if (pend->tick() > maxTimeout) {
             i.remove();
             pend->deleteLater();
         }
@@ -429,12 +405,10 @@ void RemoteClient::ping()
     int keepalive = settingsCache->getKeepAlive();
     int maxTime = timeRunning - lastDataReceived;
     emit maxPingTime(maxTime, maxTimeout);
-    if (maxTime >= (keepalive * maxTimeout))
-    {
+    if (maxTime >= (keepalive * maxTimeout)) {
         disconnectFromServer();
         emit serverTimeout();
-    } else
-    {
+    } else {
         sendCommand(prepareSessionCommand(Command_Ping()));
         ++timeRunning;
     }
@@ -474,12 +448,10 @@ QString RemoteClient::getSrvClientID(const QString _hostname)
 {
     QString srvClientID = settingsCache->getClientID();
     QHostInfo hostInfo = QHostInfo::fromName(_hostname);
-    if (!hostInfo.error())
-    {
+    if (!hostInfo.error()) {
         QHostAddress hostAddress = hostInfo.addresses().first();
         srvClientID += hostAddress.toString();
-    } else
-    {
+    } else {
         qDebug() << "Warning: ClientID generation host lookup failure [" << hostInfo.errorString() << "]";
         srvClientID += _hostname;
     }
@@ -492,10 +464,8 @@ bool RemoteClient::newMissingFeatureFound(QString _serversMissingFeatures)
 {
     bool newMissingFeature = false;
     QStringList serversMissingFeaturesList = _serversMissingFeatures.split(",");
-    foreach (const QString &feature, serversMissingFeaturesList)
-    {
-        if (!feature.isEmpty())
-        {
+    foreach (const QString &feature, serversMissingFeaturesList) {
+        if (!feature.isEmpty()) {
             if (!settingsCache->getKnownMissingFeatures().contains(feature))
                 return true;
         }
@@ -507,10 +477,8 @@ void RemoteClient::clearNewClientFeatures()
 {
     QString newKnownMissingFeatures;
     QStringList existingKnownMissingFeatures = settingsCache->getKnownMissingFeatures().split(",");
-    foreach (const QString &existingKnownFeature, existingKnownMissingFeatures)
-    {
-        if (!existingKnownFeature.isEmpty())
-        {
+    foreach (const QString &existingKnownFeature, existingKnownMissingFeatures) {
+        if (!existingKnownFeature.isEmpty()) {
             if (!clientFeatures.contains(existingKnownFeature))
                 newKnownMissingFeatures.append("," + existingKnownFeature);
         }
@@ -547,10 +515,8 @@ void RemoteClient::doRequestForgotPasswordToServer(const QString &hostname, unsi
 void RemoteClient::requestForgotPasswordResponse(const Response &response)
 {
     const Response_ForgotPasswordRequest &resp = response.GetExtension(Response_ForgotPasswordRequest::ext);
-    if (response.response_code() == Response::RespOk)
-    {
-        if (resp.challenge_email())
-        {
+    if (response.response_code() == Response::RespOk) {
+        if (resp.challenge_email()) {
             emit sigPromptForForgotPasswordChallenge();
         } else
             emit sigPromptForForgotPasswordReset();
@@ -580,8 +546,7 @@ void RemoteClient::doSubmitForgotPasswordResetToServer(const QString &hostname,
 
 void RemoteClient::submitForgotPasswordResetResponse(const Response &response)
 {
-    if (response.response_code() == Response::RespOk)
-    {
+    if (response.response_code() == Response::RespOk) {
         emit sigForgotPasswordSuccess();
     } else
         emit sigForgotPasswordError();
@@ -615,8 +580,7 @@ void RemoteClient::doSubmitForgotPasswordChallengeToServer(const QString &hostna
 
 void RemoteClient::submitForgotPasswordChallengeResponse(const Response &response)
 {
-    if (response.response_code() == Response::RespOk)
-    {
+    if (response.response_code() == Response::RespOk) {
         emit sigPromptForForgotPasswordReset();
     } else
         emit sigForgotPasswordError();

@@ -147,15 +147,13 @@ WarningDialog::WarningDialog(const QString userName, const QString clientID, QWi
 
 void WarningDialog::okClicked()
 {
-    if (nameWarning->text().simplified().isEmpty())
-    {
+    if (nameWarning->text().simplified().isEmpty()) {
         QMessageBox::critical(this, tr("Error"),
                               tr("User name to send a warning to can not be blank, please specify a user to warn."));
         return;
     }
 
-    if (warningOption->currentText().simplified().isEmpty())
-    {
+    if (warningOption->currentText().simplified().isEmpty()) {
         QMessageBox::critical(this, tr("Error"),
                               tr("Warning to use can not be blank, please select a valid warning to send."));
         return;
@@ -186,8 +184,7 @@ void WarningDialog::addWarningOption(const QString warning)
 
 void BanDialog::okClicked()
 {
-    if (!nameBanCheckBox->isChecked() && !ipBanCheckBox->isChecked() && !idBanCheckBox->isChecked())
-    {
+    if (!nameBanCheckBox->isChecked() && !ipBanCheckBox->isChecked() && !idBanCheckBox->isChecked()) {
         QMessageBox::critical(this, tr("Error"),
                               tr("You have to select a name-based, IP-based, clientId based, or some combination of "
                                  "the three to place a ban."));
@@ -195,24 +192,21 @@ void BanDialog::okClicked()
     }
 
     if (nameBanCheckBox->isChecked())
-        if (nameBanEdit->text().simplified() == "")
-        {
+        if (nameBanEdit->text().simplified() == "") {
             QMessageBox::critical(this, tr("Error"),
                                   tr("You must have a value in the name ban when selecting the name ban checkbox."));
             return;
         }
 
     if (ipBanCheckBox->isChecked())
-        if (ipBanEdit->text().simplified() == "")
-        {
+        if (ipBanEdit->text().simplified() == "") {
             QMessageBox::critical(this, tr("Error"),
                                   tr("You must have a value in the ip ban when selecting the ip ban checkbox."));
             return;
         }
 
     if (idBanCheckBox->isChecked())
-        if (idBanEdit->text().simplified() == "")
-        {
+        if (idBanEdit->text().simplified() == "") {
             QMessageBox::critical(
                 this, tr("Error"),
                 tr("You must have a value in the clientid ban when selecting the clientid ban checkbox."));
@@ -272,11 +266,9 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
                                        const QStyleOptionViewItem &option,
                                        const QModelIndex &index)
 {
-    if ((event->type() == QEvent::MouseButtonPress) && index.isValid())
-    {
+    if ((event->type() == QEvent::MouseButtonPress) && index.isValid()) {
         QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
-        if (mouseEvent->button() == Qt::RightButton)
-        {
+        if (mouseEvent->button() == Qt::RightButton) {
             static_cast<UserList *>(parent())->showContextMenu(mouseEvent->globalPos(), index);
             return true;
         }
@@ -349,8 +341,7 @@ UserList::UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserL
 void UserList::retranslateUi()
 {
     userContextMenu->retranslateUi();
-    switch (type)
-    {
+    switch (type) {
         case AllUsersList:
             titleStr = tr("Users connected to server: %1");
             break;
@@ -373,8 +364,7 @@ void UserList::processUserInfo(const ServerInfo_User &user, bool online)
     UserListTWI *item = users.value(userName);
     if (item)
         item->setUserInfo(user);
-    else
-    {
+    else {
         item = new UserListTWI(user);
         users.insert(userName, item);
         userTree->addTopLevelItem(item);
@@ -388,8 +378,7 @@ void UserList::processUserInfo(const ServerInfo_User &user, bool online)
 bool UserList::deleteUser(const QString &userName)
 {
     UserListTWI *twi = users.value(userName);
-    if (twi)
-    {
+    if (twi) {
         users.remove(userName);
         userTree->takeTopLevelItem(userTree->indexOfTopLevelItem(twi));
         if (twi->data(0, Qt::UserRole + 1).toBool())

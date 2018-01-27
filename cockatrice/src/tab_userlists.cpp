@@ -139,8 +139,7 @@ void TabUserLists::processListUsersResponse(const Response &response)
     const Response_ListUsers &resp = response.GetExtension(Response_ListUsers::ext);
 
     const int userListSize = resp.user_list_size();
-    for (int i = 0; i < userListSize; ++i)
-    {
+    for (int i = 0; i < userListSize; ++i) {
         const ServerInfo_User &info = resp.user_list(i);
         const QString userName = QString::fromStdString(info.name());
         allUsersList->processUserInfo(info, true);
@@ -179,8 +178,7 @@ void TabUserLists::processUserLeftEvent(const Event_UserLeft &event)
     if (buddyList->getUsers().keys().contains(userName))
         soundEngine->playSound("buddy_leave");
 
-    if (allUsersList->deleteUser(userName))
-    {
+    if (allUsersList->deleteUser(userName)) {
         ignoreList->setUserOnline(userName, false);
         buddyList->setUserOnline(userName, false);
         ignoreList->sortItems();

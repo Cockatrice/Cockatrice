@@ -53,8 +53,7 @@ void GameEventStorage::sendToGame(Server_Game *game)
 
     GameEventContainer *contPrivate = new GameEventContainer;
     GameEventContainer *contOthers = new GameEventContainer;
-    for (int i = 0; i < gameEventList.size(); ++i)
-    {
+    for (int i = 0; i < gameEventList.size(); ++i) {
         const GameEvent &event = gameEventList[i]->getGameEvent();
         const GameEventStorageItem::EventRecipients recipients = gameEventList[i]->getRecipients();
         if (recipients.testFlag(GameEventStorageItem::SendToPrivate))
@@ -62,8 +61,7 @@ void GameEventStorage::sendToGame(Server_Game *game)
         if (recipients.testFlag(GameEventStorageItem::SendToOthers))
             contOthers->add_event_list()->CopyFrom(event);
     }
-    if (gameEventContext)
-    {
+    if (gameEventContext) {
         contPrivate->mutable_context()->CopyFrom(*gameEventContext);
         contOthers->mutable_context()->CopyFrom(*gameEventContext);
     }

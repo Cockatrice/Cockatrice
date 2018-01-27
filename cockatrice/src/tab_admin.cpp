@@ -109,8 +109,7 @@ void TabAdmin::actUpdateServerMessage()
 void TabAdmin::actShutdownServer()
 {
     ShutdownDialog dlg;
-    if (dlg.exec())
-    {
+    if (dlg.exec()) {
         Command_ShutdownServer cmd;
         cmd.set_reason(dlg.getReason().toStdString());
         cmd.set_minutes(dlg.getMinutes());

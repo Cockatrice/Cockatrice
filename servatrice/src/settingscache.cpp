@@ -13,8 +13,7 @@ SettingsCache::SettingsCache(const QString &fileName, QSettings::Format format, 
     QStringList disallowedRegExpStr =
         value("users/disallowedregexp", "").toString().split(",", QString::SkipEmptyParts);
     disallowedRegExpStr.removeDuplicates();
-    for (const QString &regExpStr : disallowedRegExpStr)
-    {
+    for (const QString &regExpStr : disallowedRegExpStr) {
         disallowedRegExp.append(QRegExp(regExpStr));
     }
 }
@@ -22,8 +21,7 @@ SettingsCache::SettingsCache(const QString &fileName, QSettings::Format format, 
 QString SettingsCache::guessConfigurationPath(QString &specificPath)
 {
     const QString fileName = "servatrice.ini";
-    if (QFile::exists(qApp->applicationDirPath() + "/portable.dat"))
-    {
+    if (QFile::exists(qApp->applicationDirPath() + "/portable.dat")) {
         qDebug() << "Portable mode enabled";
         return fileName;
     }

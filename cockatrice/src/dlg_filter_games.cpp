@@ -37,8 +37,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
 
     QVBoxLayout *gameTypeFilterLayout = new QVBoxLayout;
     QMapIterator<int, QString> gameTypesIterator(allGameTypes);
-    while (gameTypesIterator.hasNext())
-    {
+    while (gameTypesIterator.hasNext()) {
         gameTypesIterator.next();
 
         QCheckBox *temp = new QCheckBox(gameTypesIterator.value());
@@ -48,8 +47,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
         gameTypeFilterLayout->addWidget(temp);
     }
     QGroupBox *gameTypeFilterGroupBox;
-    if (!allGameTypes.isEmpty())
-    {
+    if (!allGameTypes.isEmpty()) {
         gameTypeFilterGroupBox = new QGroupBox(tr("&Game types"));
         gameTypeFilterGroupBox->setLayout(gameTypeFilterLayout);
     } else
@@ -176,8 +174,7 @@ QSet<int> DlgFilterGames::getGameTypeFilter() const
 {
     QSet<int> result;
     QMapIterator<int, QCheckBox *> i(gameTypeFilterCheckBoxes);
-    while (i.hasNext())
-    {
+    while (i.hasNext()) {
         i.next();
         if (i.value()->isChecked())
             result.insert(i.key());
@@ -188,8 +185,7 @@ QSet<int> DlgFilterGames::getGameTypeFilter() const
 void DlgFilterGames::setGameTypeFilter(const QSet<int> &_gameTypeFilter)
 {
     QMapIterator<int, QCheckBox *> i(gameTypeFilterCheckBoxes);
-    while (i.hasNext())
-    {
+    while (i.hasNext()) {
         i.next();
         i.value()->setChecked(_gameTypeFilter.contains(i.key()));
     }

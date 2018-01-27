@@ -15,8 +15,7 @@
 void Server_AbstractUserInterface::sendProtocolItemByType(ServerMessage::MessageType type,
                                                           const ::google::protobuf::Message &item)
 {
-    switch (type)
-    {
+    switch (type) {
         case ServerMessage::RESPONSE:
             sendProtocolItem(static_cast<const Response &>(item));
             break;
@@ -49,8 +48,7 @@ void Server_AbstractUserInterface::sendResponseContainer(const ResponseContainer
     for (int i = 0; i < preResponseQueue.size(); ++i)
         sendProtocolItemByType(preResponseQueue[i].first, *preResponseQueue[i].second);
 
-    if (responseCode != Response::RespNothing)
-    {
+    if (responseCode != Response::RespNothing) {
         Response response;
         response.set_cmd_id(responseContainer.getCmdId());
         response.set_response_code(responseCode);
@@ -90,8 +88,7 @@ void Server_AbstractUserInterface::joinPersistentGames(ResponseContainer &rc)
         server->getPersistentPlayerReferences(QString::fromStdString(userInfo->name()));
 
     server->roomsLock.lockForRead();
-    for (int i = 0; i < gamesToJoin.size(); ++i)
-    {
+    for (int i = 0; i < gamesToJoin.size(); ++i) {
         const PlayerReference &pr = gamesToJoin.at(i);
 
         Server_Room *room = server->getRooms().value(pr.getRoomId());

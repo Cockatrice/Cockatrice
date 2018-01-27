@@ -45,8 +45,7 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     mainLayout->addWidget(&accountAgeLabel2, 6, 2, 1, 1);
     mainLayout->setColumnStretch(2, 10);
 
-    if (editable)
-    {
+    if (editable) {
         QHBoxLayout *buttonsLayout = new QHBoxLayout;
         buttonsLayout->addWidget(&editButton);
         buttonsLayout->addWidget(&passwordButton);
@@ -90,12 +89,10 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     realNameLabel2.setText(QString::fromStdString(user.real_name()));
     QString country = QString::fromStdString(user.country());
 
-    if (country.length() != 0)
-    {
+    if (country.length() != 0) {
         countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(15, country));
         countryLabel3.setText(QString("(%1)").arg(country.toUpper()));
-    } else
-    {
+    } else {
         countryLabel2.setText("");
         countryLabel3.setText("");
     }
@@ -112,8 +109,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     else
         userLevelText = tr("Unregistered user");
 
-    if (user.has_privlevel() && user.privlevel() != "NONE")
-    {
+    if (user.has_privlevel() && user.privlevel() != "NONE") {
         userLevelText += " | " + QString("%1").arg(user.privlevel().c_str());
     }
 
@@ -121,12 +117,10 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 
     QString accountAgeString = tr("Unregistered user");
     if (userLevel.testFlag(ServerInfo_User::IsAdmin) || userLevel.testFlag(ServerInfo_User::IsModerator) ||
-        userLevel.testFlag(ServerInfo_User::IsRegistered))
-    {
+        userLevel.testFlag(ServerInfo_User::IsRegistered)) {
         if (user.accountage_secs() == 0)
             accountAgeString = tr("Unknown");
-        else
-        {
+        else {
             qint64 seconds = user.accountage_secs();
             qint64 minutes = seconds / SIXTY;
             qint64 hours = minutes / SIXTY;
@@ -135,8 +129,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
             qint64 daysMinusYears = days - (years * DAYS_IN_A_YEAR);
 
             accountAgeString = "";
-            if (years >= 1)
-            {
+            if (years >= 1) {
                 accountAgeString = QString::number(years);
                 accountAgeString.append(" ");
                 accountAgeString.append(years == 1 ? tr("Year") : tr("Years"));
@@ -243,8 +236,7 @@ void UserInfoBox::actAvatar()
 
 void UserInfoBox::processEditResponse(const Response &r)
 {
-    switch (r.response_code())
-    {
+    switch (r.response_code()) {
         case Response::RespOk:
             updateInfo(nameLabel.text());
             QMessageBox::information(this, tr("Information"), tr("User information updated."));
@@ -263,8 +255,7 @@ void UserInfoBox::processEditResponse(const Response &r)
 
 void UserInfoBox::processPasswordResponse(const Response &r)
 {
-    switch (r.response_code())
-    {
+    switch (r.response_code()) {
         case Response::RespOk:
             QMessageBox::information(this, tr("Information"), tr("Password changed."));
             break;
@@ -287,8 +278,7 @@ void UserInfoBox::processPasswordResponse(const Response &r)
 
 void UserInfoBox::processAvatarResponse(const Response &r)
 {
-    switch (r.response_code())
-    {
+    switch (r.response_code()) {
         case Response::RespOk:
             updateInfo(nameLabel.text());
             QMessageBox::information(this, tr("Information"), tr("Avatar updated."));

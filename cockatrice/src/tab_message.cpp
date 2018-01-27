@@ -143,14 +143,12 @@ bool TabMessage::shouldShowSystemPopup(const Event_UserMessage &event)
 
 void TabMessage::showSystemPopup(const Event_UserMessage &event)
 {
-    if (trayIcon)
-    {
+    if (trayIcon) {
         disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
         trayIcon->showMessage(tr("Private message from") + " " + otherUserInfo->name().c_str(),
                               event.message().c_str());
         connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
-    } else
-    {
+    } else {
         qDebug() << "Error: trayIcon is NULL. TabMessage::showSystemPopup failed";
     }
 }

@@ -23,8 +23,7 @@ QMap<QString, UserConnection_Information> UserConnection_Information::getServerI
 
     int size = settingsCache->servers().getValue("totalServers", "server", "server_details").toInt() + 1;
 
-    for (int i = 0; i < size; i++)
-    {
+    for (int i = 0; i < size; i++) {
         QString saveName =
             settingsCache->servers().getValue(QString("saveName%1").arg(i), "server", "server_details").toString();
         QString serverName =
@@ -50,8 +49,7 @@ QStringList UserConnection_Information::getServerInfo(const QString &find)
     QStringList server;
 
     int size = settingsCache->servers().getValue("totalServers", "server", "server_details").toInt() + 1;
-    for (int i = 0; i < size; i++)
-    {
+    for (int i = 0; i < size; i++) {
         QString saveName =
             settingsCache->servers().getValue(QString("saveName%1").arg(i), "server", "server_details").toString();
 

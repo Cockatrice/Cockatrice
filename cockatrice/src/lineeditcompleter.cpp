@@ -16,8 +16,7 @@ LineEditCompleter::LineEditCompleter(QWidget *parent) : QLineEdit(parent)
 void LineEditCompleter::focusOutEvent(QFocusEvent *e)
 {
     QLineEdit::focusOutEvent(e);
-    if (c->popup()->isVisible())
-    {
+    if (c->popup()->isVisible()) {
         // Remove Popup
         c->popup()->hide();
         // Truncate the line to last space or whole string
@@ -35,13 +34,11 @@ void LineEditCompleter::focusOutEvent(QFocusEvent *e)
 
 void LineEditCompleter::keyPressEvent(QKeyEvent *event)
 {
-    switch (event->key())
-    {
+    switch (event->key()) {
         case Qt::Key_Return:
         case Qt::Key_Enter:
         case Qt::Key_Escape:
-            if (c->popup()->isVisible())
-            {
+            if (c->popup()->isVisible()) {
                 event->ignore();
                 // Remove Popup
                 c->popup()->hide();
@@ -57,8 +54,7 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
             }
             break;
         case Qt::Key_Space:
-            if (c->popup()->isVisible())
-            {
+            if (c->popup()->isVisible()) {
                 event->ignore();
                 // Remove Popup
                 c->popup()->hide();
@@ -80,16 +76,14 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
     QLineEdit::keyPressEvent(event);
     // return if the completer is null or if the most recently typed char was '@'.
     // Only want the popup AFTER typing the first char of the mention.
-    if (!c || text().right(1).contains("@"))
-    {
+    if (!c || text().right(1).contains("@")) {
         c->popup()->hide();
         return;
     }
 
     // Set new completion prefix
     c->setCompletionPrefix(cursorWord(text()));
-    if (c->completionPrefix().length() < 1)
-    {
+    if (c->completionPrefix().length() < 1) {
         c->popup()->hide();
         return;
     }

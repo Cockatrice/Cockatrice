@@ -8,8 +8,7 @@ CardList::CardList(bool _contentsKnown) : QList<CardItem *>(), contentsKnown(_co
 
 CardItem *CardList::findCard(const int id, const bool remove, int *position)
 {
-    if (!contentsKnown)
-    {
+    if (!contentsKnown) {
         if (empty())
             return 0;
         CardItem *temp = at(0);
@@ -19,11 +18,9 @@ CardItem *CardList::findCard(const int id, const bool remove, int *position)
             *position = id;
         return temp;
     } else
-        for (int i = 0; i < size(); i++)
-        {
+        for (int i = 0; i < size(); i++) {
             CardItem *temp = at(i);
-            if (temp->getId() == id)
-            {
+            if (temp->getId() == id) {
                 if (remove)
                     removeAt(i);
                 if (position)
@@ -45,8 +42,7 @@ public:
     }
     inline bool operator()(CardItem *a, CardItem *b) const
     {
-        if (flags & SortByType)
-        {
+        if (flags & SortByType) {
             QString t1 = a->getInfo() ? a->getInfo()->getMainCardType() : QString();
             QString t2 = b->getInfo() ? b->getInfo()->getMainCardType() : QString();
             if ((t1 == t2) && (flags & SortByName))

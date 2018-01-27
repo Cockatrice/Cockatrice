@@ -26,8 +26,7 @@ template <class T> int FilterTreeBranch<T>::childIndex(const FilterTreeNode *nod
 
 template <class T> FilterTreeBranch<T>::~FilterTreeBranch()
 {
-    while (!childNodes.isEmpty())
-    {
+    while (!childNodes.isEmpty()) {
         delete childNodes.takeFirst();
     }
 }
@@ -36,10 +35,8 @@ const FilterItemList *LogicMap::findTypeList(CardFilter::Type type) const
 {
     QList<FilterItemList *>::const_iterator i;
 
-    for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
-    {
-        if ((*i)->type == type)
-        {
+    for (i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
+        if ((*i)->type == type) {
             return *i;
         }
     }
@@ -52,17 +49,14 @@ FilterItemList *LogicMap::typeList(CardFilter::Type type)
     QList<FilterItemList *>::iterator i;
     int count = 0;
 
-    for (i = childNodes.begin(); i != childNodes.end(); i++)
-    {
-        if ((*i)->type == type)
-        {
+    for (i = childNodes.begin(); i != childNodes.end(); i++) {
+        if ((*i)->type == type) {
             break;
         }
         count++;
     }
 
-    if (i == childNodes.end())
-    {
+    if (i == childNodes.end()) {
         preInsertChild(this, count);
         i = childNodes.insert(i, new FilterItemList(type, this));
         postInsertChild(this, count);
@@ -79,10 +73,8 @@ FilterTreeNode *LogicMap::parent() const
 
 int FilterItemList::termIndex(const QString &term) const
 {
-    for (int i = 0; i < childNodes.count(); i++)
-    {
-        if ((childNodes.at(i))->term == term)
-        {
+    for (int i = 0; i < childNodes.count(); i++) {
+        if ((childNodes.at(i))->term == term) {
             return i;
         }
     }
@@ -93,8 +85,7 @@ int FilterItemList::termIndex(const QString &term) const
 FilterTreeNode *FilterItemList::termNode(const QString &term)
 {
     int i = termIndex(term);
-    if (i < 0)
-    {
+    if (i < 0) {
         FilterItem *fi = new FilterItem(term, this);
         int count = childNodes.count();
 
@@ -111,15 +102,12 @@ FilterTreeNode *FilterItemList::termNode(const QString &term)
 
 bool FilterItemList::testTypeAnd(const CardInfo *info, CardFilter::Attr attr) const
 {
-    for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
-    {
-        if (!(*i)->isEnabled())
-        {
+    for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
+        if (!(*i)->isEnabled()) {
             continue;
         }
 
-        if (!(*i)->acceptCardAttr(info, attr))
-        {
+        if (!(*i)->acceptCardAttr(info, attr)) {
             return false;
         }
     }
@@ -137,20 +125,16 @@ bool FilterItemList::testTypeOr(const CardInfo *info, CardFilter::Attr attr) con
 {
     bool noChildEnabledChild = true;
 
-    for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
-    {
-        if (!(*i)->isEnabled())
-        {
+    for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
+        if (!(*i)->isEnabled()) {
             continue;
         }
 
-        if (noChildEnabledChild)
-        {
+        if (noChildEnabledChild) {
             noChildEnabledChild = false;
         }
 
-        if ((*i)->acceptCardAttr(info, attr))
-        {
+        if ((*i)->acceptCardAttr(info, attr)) {
             return true;
         }
     }
@@ -194,8 +178,7 @@ bool FilterItem::acceptColor(const CardInfo *info) const
     converted_term.replace(QString(" "), QString(""), Qt::CaseInsensitive);
 
     // Colorless card filter
-    if (converted_term.toLower() == "c" && info->getColors().length() < 1)
-    {
+    if (converted_term.toLower() == "c" && info->getColors().length() < 1) {
         return true;
     }
 
@@ -204,12 +187,9 @@ bool FilterItem::acceptColor(const CardInfo *info) const
      * then we should match all of them to the card's colors
      */
     int match_count = 0;
-    for (auto &it : converted_term)
-    {
-        for (auto i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++)
-        {
-            if ((*i).contains(it, Qt::CaseInsensitive))
-            {
+    for (auto &it : converted_term) {
+        for (auto i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++) {
+            if ((*i).contains(it, Qt::CaseInsensitive)) {
                 match_count++;
             }
         }
@@ -226,11 +206,9 @@ bool FilterItem::acceptText(const CardInfo *info) const
 bool FilterItem::acceptSet(const CardInfo *info) const
 {
     bool status = false;
-    for (auto i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++)
-    {
+    for (auto i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++) {
         if ((*i)->getShortName().compare(term, Qt::CaseInsensitive) == 0 ||
-            (*i)->getLongName().compare(term, Qt::CaseInsensitive) == 0)
-        {
+            (*i)->getLongName().compare(term, Qt::CaseInsensitive) == 0) {
             status = true;
             break;
         }
@@ -282,10 +260,8 @@ bool FilterItem::acceptRarity(const CardInfo *info) const
      * Will also need to replace just "mythic"
      */
     converted_term.replace("mythic", "mythic rare", Qt::CaseInsensitive);
-    for (int i = 0; converted_term.length() <= 3 && i <= 6; i++)
-    {
-        switch (i)
-        {
+    for (int i = 0; converted_term.length() <= 3 && i <= 6; i++) {
+        switch (i) {
             case 0:
                 converted_term.replace("mr", "mythic rare", Qt::CaseInsensitive);
                 break;
@@ -312,10 +288,8 @@ bool FilterItem::acceptRarity(const CardInfo *info) const
         }
     }
 
-    foreach (QString rareLevel, info->getRarities())
-    {
-        if (rareLevel.compare(converted_term, Qt::CaseInsensitive) == 0)
-        {
+    foreach (QString rareLevel, info->getRarities()) {
+        if (rareLevel.compare(converted_term, Qt::CaseInsensitive) == 0) {
             return true;
         }
     }
@@ -324,8 +298,7 @@ bool FilterItem::acceptRarity(const CardInfo *info) const
 
 bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) const
 {
-    switch (attr)
-    {
+    switch (attr) {
         case CardFilter::AttrName:
             return acceptName(info);
         case CardFilter::AttrType:
@@ -363,17 +336,14 @@ LogicMap *FilterTree::attrLogicMap(CardFilter::Attr attr)
     QList<LogicMap *>::iterator i;
 
     int count = 0;
-    for (i = childNodes.begin(); i != childNodes.end(); i++)
-    {
-        if ((*i)->attr == attr)
-        {
+    for (i = childNodes.begin(); i != childNodes.end(); i++) {
+        if ((*i)->attr == attr) {
             break;
         }
         count++;
     }
 
-    if (i == childNodes.end())
-    {
+    if (i == childNodes.end()) {
         preInsertChild(this, count);
         i = childNodes.insert(i, new LogicMap(attr, this));
         postInsertChild(this, count);
@@ -419,32 +389,27 @@ bool FilterTree::testAttr(const CardInfo *info, const LogicMap *lm) const
     bool status = true;
 
     fil = lm->findTypeList(CardFilter::TypeAnd);
-    if (fil && fil->isEnabled() && !fil->testTypeAnd(info, lm->attr))
-    {
+    if (fil && fil->isEnabled() && !fil->testTypeAnd(info, lm->attr)) {
         return false;
     }
 
     fil = lm->findTypeList(CardFilter::TypeAndNot);
-    if (fil && fil->isEnabled() && !fil->testTypeAndNot(info, lm->attr))
-    {
+    if (fil && fil->isEnabled() && !fil->testTypeAndNot(info, lm->attr)) {
         return false;
     }
 
     fil = lm->findTypeList(CardFilter::TypeOr);
-    if (fil && fil->isEnabled())
-    {
+    if (fil && fil->isEnabled()) {
         status = false;
 
         // if this is true we can return because it is OR'd with the OrNot list
-        if (fil->testTypeOr(info, lm->attr))
-        {
+        if (fil->testTypeOr(info, lm->attr)) {
             return true;
         }
     }
 
     fil = lm->findTypeList(CardFilter::TypeOrNot);
-    if (fil && fil->isEnabled() && fil->testTypeOrNot(info, lm->attr))
-    {
+    if (fil && fil->isEnabled() && fil->testTypeOrNot(info, lm->attr)) {
         return true;
     }
 
@@ -453,10 +418,8 @@ bool FilterTree::testAttr(const CardInfo *info, const LogicMap *lm) const
 
 bool FilterTree::acceptsCard(const CardInfo *info) const
 {
-    for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++)
-    {
-        if ((*i)->isEnabled() && !testAttr(info, *i))
-        {
+    for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
+        if ((*i)->isEnabled() && !testAttr(info, *i)) {
             return false;
         }
     }
@@ -466,8 +429,7 @@ bool FilterTree::acceptsCard(const CardInfo *info) const
 
 void FilterTree::clear()
 {
-    while (childCount() > 0)
-    {
+    while (childCount() > 0) {
         deleteAt(0);
     }
 }

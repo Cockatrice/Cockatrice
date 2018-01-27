@@ -27,8 +27,7 @@ void HandZone::addCardImpl(CardItem *card, int x, int /*y*/)
         x = cards.size();
     cards.insert(x, card);
 
-    if (!cards.getContentsKnown())
-    {
+    if (!cards.getContentsKnown()) {
         card->setId(-1);
         card->setName();
     }
@@ -42,13 +41,11 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone 
 {
     QPoint point = dropPoint + scenePos().toPoint();
     int x = -1;
-    if (settingsCache->getHorizontalHand())
-    {
+    if (settingsCache->getHorizontalHand()) {
         for (x = 0; x < cards.size(); x++)
             if (point.x() < static_cast<CardItem *>(cards.at(x))->scenePos().x())
                 break;
-    } else
-    {
+    } else {
         for (x = 0; x < cards.size(); x++)
             if (point.y() < static_cast<CardItem *>(cards.at(x))->scenePos().y())
                 break;
@@ -83,26 +80,22 @@ void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 
 void HandZone::reorganizeCards()
 {
-    if (!cards.isEmpty())
-    {
+    if (!cards.isEmpty()) {
         const int cardCount = cards.size();
-        if (settingsCache->getHorizontalHand())
-        {
+        if (settingsCache->getHorizontalHand()) {
             bool leftJustified = settingsCache->getLeftJustified();
             qreal cardWidth = cards.at(0)->boundingRect().width();
             const int xPadding = leftJustified ? cardWidth * 1.4 : 5;
             qreal totalWidth =
                 leftJustified ? boundingRect().width() - (1 * xPadding) - 5 : boundingRect().width() - 2 * xPadding;
 
-            for (int i = 0; i < cardCount; i++)
-            {
+            for (int i = 0; i < cardCount; i++) {
                 CardItem *c = cards.at(i);
                 // If the total width of the cards is smaller than the available width,
                 // the cards do not need to overlap and are displayed in the center of the area.
                 if (cardWidth * cardCount > totalWidth)
                     c->setPos(xPadding + ((qreal)i) * (totalWidth - cardWidth) / (cardCount - 1), 5);
-                else
-                {
+                else {
                     qreal xPosition =
                         leftJustified ? xPadding + ((qreal)i) * cardWidth
                                       : xPadding + ((qreal)i) * cardWidth + (totalWidth - cardCount * cardWidth) / 2;
@@ -110,8 +103,7 @@ void HandZone::reorganizeCards()
                 }
                 c->setRealZValue(i);
             }
-        } else
-        {
+        } else {
             qreal totalWidth = boundingRect().width();
             qreal totalHeight = boundingRect().height();
             qreal cardWidth = cards.at(0)->boundingRect().width();
@@ -120,8 +112,7 @@ void HandZone::reorganizeCards()
             qreal x1 = xspace;
             qreal x2 = totalWidth - xspace - cardWidth;
 
-            for (int i = 0; i < cardCount; i++)
-            {
+            for (int i = 0; i < cardCount; i++) {
                 CardItem *c = cards.at(i);
                 qreal x = (i % 2) ? x2 : x1;
                 // If the total height of the cards is smaller than the available height,
@@ -139,8 +130,7 @@ void HandZone::reorganizeCards()
 
 void HandZone::setWidth(qreal _width)
 {
-    if (settingsCache->getHorizontalHand())
-    {
+    if (settingsCache->getHorizontalHand()) {
         prepareGeometryChange();
         width = _width;
         reorganizeCards();

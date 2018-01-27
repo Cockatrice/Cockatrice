@@ -142,8 +142,7 @@ void WndSets::rebuildMainLayout(int actionToTake)
     if (mainLayout == nullptr)
         return;
 
-    switch (actionToTake)
-    {
+    switch (actionToTake) {
         case NO_SETS_SELECTED:
             enableAllButton->show();
             disableAllButton->show();
@@ -188,8 +187,7 @@ void WndSets::actToggleButtons(const QItemSelection &selected, const QItemSelect
 
 void WndSets::selectRows(QSet<int> rows)
 {
-    foreach (int i, rows)
-    {
+    foreach (int i, rows) {
         QModelIndex idx = model->index(i, 0);
         view->selectionModel()->select(idx, QItemSelectionModel::Select | QItemSelectionModel::Rows);
         view->scrollTo(idx, QAbstractItemView::EnsureVisible);
@@ -231,8 +229,7 @@ void WndSets::actUp()
     if (rows.empty())
         return;
 
-    foreach (QModelIndex i, rows)
-    {
+    foreach (QModelIndex i, rows) {
         int oldRow = i.row();
         int newRow = oldRow - 1;
         if (oldRow <= 0)
@@ -254,8 +251,7 @@ void WndSets::actDown()
     if (rows.empty())
         return;
 
-    foreach (QModelIndex i, rows)
-    {
+    foreach (QModelIndex i, rows) {
         int oldRow = i.row();
         int newRow = oldRow + 1;
         if (oldRow >= model->rowCount() - 1)
@@ -278,12 +274,10 @@ void WndSets::actTop()
     if (rows.empty())
         return;
 
-    for (int i = 0; i < rows.length(); i++)
-    {
+    for (int i = 0; i < rows.length(); i++) {
         int oldRow = rows.at(i).row();
 
-        if (oldRow <= 0)
-        {
+        if (oldRow <= 0) {
             newRow++;
             continue;
         }
@@ -305,12 +299,10 @@ void WndSets::actBottom()
     if (rows.empty())
         return;
 
-    for (int i = 0; i < rows.length(); i++)
-    {
+    for (int i = 0; i < rows.length(); i++) {
         int oldRow = rows.at(i).row();
 
-        if (oldRow >= newRow)
-        {
+        if (oldRow >= newRow) {
             newRow--;
             continue;
         }

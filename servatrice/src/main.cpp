@@ -63,16 +63,13 @@ void testRNG()
 
     QVector<QVector<int>> numbers(maxMax - minMax + 1);
     QVector<double> chisq(maxMax - minMax + 1);
-    for (int max = minMax; max <= maxMax; ++max)
-    {
+    for (int max = minMax; max <= maxMax; ++max) {
         numbers[max - minMax] = rng->makeNumbersVector(n * (max - min + 1), min, max);
         chisq[max - minMax] = rng->testRandom(numbers[max - minMax]);
     }
-    for (int i = 0; i <= maxMax - min; ++i)
-    {
+    for (int i = 0; i <= maxMax - min; ++i) {
         std::cerr << (min + i);
-        for (int j = 0; j < numbers.size(); ++j)
-        {
+        for (int j = 0; j < numbers.size(); ++j) {
             if (i < numbers[j].size())
                 std::cerr << "\t" << numbers[j][i];
             else
@@ -185,8 +182,7 @@ int main(int argc, char *argv[])
     Servatrice *server = new Servatrice();
     QObject::connect(server, SIGNAL(destroyed()), &app, SLOT(quit()), Qt::QueuedConnection);
     int retval = 0;
-    if (server->initServer())
-    {
+    if (server->initServer()) {
         std::cerr << "-------------------------" << std::endl;
         std::cerr << "Server initialized." << std::endl;
 

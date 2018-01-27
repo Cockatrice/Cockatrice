@@ -41,8 +41,7 @@ void DlgCreateGame::sharedCtor()
 
     QVBoxLayout *gameTypeLayout = new QVBoxLayout;
     QMapIterator<int, QString> gameTypeIterator(gameTypes);
-    while (gameTypeIterator.hasNext())
-    {
+    while (gameTypeIterator.hasNext()) {
         gameTypeIterator.next();
         QRadioButton *gameTypeRadioButton = new QRadioButton(gameTypeIterator.value(), this);
         gameTypeLayout->addWidget(gameTypeRadioButton);
@@ -59,11 +58,9 @@ void DlgCreateGame::sharedCtor()
 
     onlyBuddiesCheckBox = new QCheckBox(tr("Only &buddies can join"));
     onlyRegisteredCheckBox = new QCheckBox(tr("Only &registered users can join"));
-    if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered)
-    {
+    if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered) {
         onlyRegisteredCheckBox->setChecked(true);
-    } else
-    {
+    } else {
         onlyBuddiesCheckBox->setEnabled(false);
         onlyRegisteredCheckBox->setEnabled(false);
     }
@@ -117,12 +114,10 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
     rememberGameSettings->setChecked(settingsCache->getRememberGameSettings());
     descriptionEdit->setText(settingsCache->getGameDescription());
     maxPlayersEdit->setValue(settingsCache->getMaxPlayers());
-    if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered)
-    {
+    if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsRegistered) {
         onlyBuddiesCheckBox->setChecked(settingsCache->getOnlyBuddies());
         onlyRegisteredCheckBox->setChecked(settingsCache->getOnlyRegistered());
-    } else
-    {
+    } else {
         onlyBuddiesCheckBox->setEnabled(false);
         onlyRegisteredCheckBox->setEnabled(false);
     }
@@ -131,8 +126,7 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
     spectatorsCanTalkCheckBox->setChecked(settingsCache->getSpectatorsCanTalk());
     spectatorsSeeEverythingCheckBox->setChecked(settingsCache->getSpectatorsCanSeeEverything());
 
-    if (!rememberGameSettings->isChecked())
-    {
+    if (!rememberGameSettings->isChecked()) {
         actReset();
     }
 
@@ -176,8 +170,7 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
         types.insert(gameInfo.game_types(i));
 
     QMapIterator<int, QString> gameTypeIterator(gameTypes);
-    while (gameTypeIterator.hasNext())
-    {
+    while (gameTypeIterator.hasNext()) {
         gameTypeIterator.next();
 
         QRadioButton *gameTypeCheckBox = gameTypeCheckBoxes.value(gameTypeIterator.key());
@@ -205,8 +198,7 @@ void DlgCreateGame::actReset()
     spectatorsSeeEverythingCheckBox->setChecked(false);
 
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
-    while (gameTypeCheckBoxIterator.hasNext())
-    {
+    while (gameTypeCheckBoxIterator.hasNext()) {
         gameTypeCheckBoxIterator.next();
         // must set auto enclusive to false to be able to set the check to false
         gameTypeCheckBoxIterator.value()->setAutoExclusive(false);
@@ -232,19 +224,16 @@ void DlgCreateGame::actOK()
 
     QString gameTypes = QString();
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
-    while (gameTypeCheckBoxIterator.hasNext())
-    {
+    while (gameTypeCheckBoxIterator.hasNext()) {
         gameTypeCheckBoxIterator.next();
-        if (gameTypeCheckBoxIterator.value()->isChecked())
-        {
+        if (gameTypeCheckBoxIterator.value()->isChecked()) {
             cmd.add_game_type_ids(gameTypeCheckBoxIterator.key());
             gameTypes += gameTypeCheckBoxIterator.value()->text() + ", ";
         }
     }
 
     settingsCache->setRememberGameSettings(rememberGameSettings->isChecked());
-    if (rememberGameSettings->isChecked())
-    {
+    if (rememberGameSettings->isChecked()) {
         settingsCache->setGameDescription(descriptionEdit->text());
         settingsCache->setMaxPlayers(maxPlayersEdit->value());
         settingsCache->setOnlyBuddies(onlyBuddiesCheckBox->isChecked());
@@ -268,8 +257,7 @@ void DlgCreateGame::checkResponse(const Response &response)
 
     if (response.response_code() == Response::RespOk)
         accept();
-    else
-    {
+    else {
         QMessageBox::critical(this, tr("Error"), tr("Server error."));
         return;
     }

@@ -3,8 +3,7 @@
 SetsModel::SetsModel(CardDatabase *_db, QObject *parent) : QAbstractTableModel(parent), sets(_db->getSetList())
 {
     sets.sortByKey();
-    foreach (CardSet *set, sets)
-    {
+    foreach (CardSet *set, sets) {
         if (set->getEnabled())
             enabledSets.insert(set);
     }
@@ -29,10 +28,8 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
 
     CardSet *set = sets[index.row()];
 
-    if (index.column() == EnabledCol)
-    {
-        switch (role)
-        {
+    if (index.column() == EnabledCol) {
+        switch (role) {
             case SortRole:
                 return enabledSets.contains(set) ? "1" : "0";
             case Qt::CheckStateRole:
@@ -46,8 +43,7 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
     if (role != Qt::DisplayRole && role != SortRole)
         return QVariant();
 
-    switch (index.column())
-    {
+    switch (index.column()) {
         case SortKeyCol:
             return QString("%1").arg(set->getSortKey(), 8, 10, QChar('0'));
         case IsKnownCol:
@@ -67,8 +63,7 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
 
 bool SetsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (role == Qt::CheckStateRole && index.column() == EnabledCol)
-    {
+    if (role == Qt::CheckStateRole && index.column() == EnabledCol) {
         toggleRow(index.row(), value == Qt::Checked);
         return true;
     }
@@ -79,8 +74,7 @@ QVariant SetsModel::headerData(int section, Qt::Orientation orientation, int rol
 {
     if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
         return QVariant();
-    switch (section)
-    {
+    switch (section) {
         case SortKeyCol:
             return QString("Key"); /* no tr() for translations needed, column just used for sorting --> hidden */
         case IsKnownCol:
@@ -136,8 +130,7 @@ bool SetsModel::dropMimeData(const QMimeData *data,
 {
     if (action != Qt::MoveAction)
         return false;
-    if (row == -1)
-    {
+    if (row == -1) {
         if (!parent.isValid())
             return false;
         row = parent.row();
@@ -213,16 +206,12 @@ void SetsModel::sort(int column, Qt::SortOrder order)
 
     QList<CardSet *> tmp = setMap.values();
     sets.clear();
-    if (order == Qt::AscendingOrder)
-    {
-        for (row = 0; row < tmp.size(); row++)
-        {
+    if (order == Qt::AscendingOrder) {
+        for (row = 0; row < tmp.size(); row++) {
             sets.append(tmp.at(row));
         }
-    } else
-    {
-        for (row = tmp.size() - 1; row >= 0; row--)
-        {
+    } else {
+        for (row = tmp.size() - 1; row >= 0; row--) {
             sets.append(tmp.at(row));
         }
     }
@@ -253,8 +242,7 @@ void SetsModel::restore(CardDatabase *db)
 
     // enabled sets
     enabledSets.clear();
-    foreach (CardSet *set, sets)
-    {
+    foreach (CardSet *set, sets) {
         if (set->getEnabled())
             enabledSets.insert(set);
     }

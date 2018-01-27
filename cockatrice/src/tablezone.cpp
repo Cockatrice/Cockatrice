@@ -58,11 +58,9 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 {
     painter->fillRect(boundingRect(), themeManager->getTableBgBrush());
 
-    if (active)
-    {
+    if (active) {
         paintZoneOutline(painter);
-    } else
-    {
+    } else {
         // inactive player gets a darker table zone with a semi transparent black mask
         // this means if the user provides a custom background it will fade
         painter->fillRect(boundingRect(), FADE_MASK);
@@ -138,8 +136,7 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
 
-    for (int i = 0; i < dragItems.size(); ++i)
-    {
+    for (int i = 0; i < dragItems.size(); ++i) {
         CardToMove *ctm = cmd.mutable_cards_to_move()->add_card();
         ctm->set_card_id(dragItems[i]->getId());
         ctm->set_face_down(dragItems[i]->getFaceDown());
@@ -159,8 +156,7 @@ void TableZone::reorganizeCards()
     // Calculate card stack widths so mapping functions work properly
     computeCardStackWidths();
 
-    for (int i = 0; i < cards.size(); ++i)
-    {
+    for (int i = 0; i < cards.size(); ++i) {
         QPoint gridPoint = cards[i]->getGridPos();
         if (gridPoint.x() == -1)
             continue;
@@ -180,8 +176,7 @@ void TableZone::reorganizeCards()
 
         QListIterator<CardItem *> attachedCardIterator(cards[i]->getAttachedCards());
         int j = 0;
-        while (attachedCardIterator.hasNext())
-        {
+        while (attachedCardIterator.hasNext()) {
             ++j;
             CardItem *attachedCard = attachedCardIterator.next();
             qreal childX = actualX - j * STACKED_CARD_OFFSET_X;
@@ -210,17 +205,14 @@ void TableZone::toggleTapped()
     QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
     bool tapAll = false;
     for (int i = 0; i < selectedItems.size(); i++)
-        if (!qgraphicsitem_cast<CardItem *>(selectedItems[i])->getTapped())
-        {
+        if (!qgraphicsitem_cast<CardItem *>(selectedItems[i])->getTapped()) {
             tapAll = true;
             break;
         }
     QList<const ::google::protobuf::Message *> cmdList;
-    for (int i = 0; i < selectedItems.size(); i++)
-    {
+    for (int i = 0; i < selectedItems.size(); i++) {
         CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItems[i]);
-        if (temp->getTapped() != tapAll)
-        {
+        if (temp->getTapped() != tapAll) {
             Command_SetCardAttr *cmd = new Command_SetCardAttr;
             cmd->set_zone(name.toStdString());
             cmd->set_card_id(temp->getId());
@@ -256,8 +248,7 @@ void TableZone::resizeToContents()
     if (currentMinimumWidth < MIN_WIDTH)
         currentMinimumWidth = MIN_WIDTH;
 
-    if (currentMinimumWidth != width)
-    {
+    if (currentMinimumWidth != width) {
         prepareGeometryChange();
         width = currentMinimumWidth;
         emit sizeChanged();
@@ -283,8 +274,7 @@ void TableZone::computeCardStackWidths()
     // Each card stack is three grid points worth of card locations.
     // First pass: compute the number of cards at each card stack.
     QMap<int, int> cardStackCount;
-    for (int i = 0; i < cards.size(); ++i)
-    {
+    for (int i = 0; i < cards.size(); ++i) {
         const QPoint &gridPoint = cards[i]->getGridPos();
         if (gridPoint.x() == -1)
             continue;
@@ -295,8 +285,7 @@ void TableZone::computeCardStackWidths()
 
     // Second pass: compute the width at each card stack.
     cardStackWidth.clear();
-    for (int i = 0; i < cards.size(); ++i)
-    {
+    for (int i = 0; i < cards.size(); ++i) {
         const QPoint &gridPoint = cards[i]->getGridPos();
         if (gridPoint.x() == -1)
             continue;
@@ -318,8 +307,7 @@ QPointF TableZone::mapFromGrid(QPoint gridPoint) const
     x = MARGIN_LEFT + (gridPoint.x() % 3) * STACKED_CARD_OFFSET_X;
 
     // Add in width of card stack plus padding for each column
-    for (int i = 0; i < gridPoint.x() / 3; ++i)
-    {
+    for (int i = 0; i < gridPoint.x() / 3; ++i) {
         const int key = getCardStackMapKey(i, gridPoint.y());
         x += cardStackWidth.value(key, CARD_WIDTH) + PADDING_X;
     }
@@ -367,8 +355,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     int xStack = 0;
     int xNextStack = 0;
     int nextStackCol = 0;
-    while ((xNextStack <= x) && (xNextStack <= xMax))
-    {
+    while ((xNextStack <= x) && (xNextStack <= xMax)) {
         xStack = xNextStack;
         const int key = getCardStackMapKey(nextStackCol, gridPointY);
         xNextStack += cardStackWidth.value(key, CARD_WIDTH) + PADDING_X;

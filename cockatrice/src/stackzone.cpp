@@ -29,8 +29,7 @@ void StackZone::addCardImpl(CardItem *card, int x, int /*y*/)
         x = cards.size();
     cards.insert(x, card);
 
-    if (!cards.getContentsKnown())
-    {
+    if (!cards.getContentsKnown()) {
         card->setId(-1);
         card->setName();
     }
@@ -73,8 +72,7 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 
 void StackZone::reorganizeCards()
 {
-    if (!cards.isEmpty())
-    {
+    if (!cards.isEmpty()) {
         QList<ArrowItem *> arrowsToUpdate;
 
         const int cardCount = cards.size();
@@ -86,8 +84,7 @@ void StackZone::reorganizeCards()
         qreal x1 = xspace;
         qreal x2 = totalWidth - xspace - cardWidth;
 
-        for (int i = 0; i < cardCount; i++)
-        {
+        for (int i = 0; i < cardCount; i++) {
             CardItem *c = cards.at(i);
             qreal x = (i % 2) ? x2 : x1;
             // If the total height of the cards is smaller than the available height,

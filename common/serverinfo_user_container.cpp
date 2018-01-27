@@ -33,17 +33,14 @@ ServerInfo_User &ServerInfo_User_Container::copyUserInfo(ServerInfo_User &result
                                                          bool internalInfo,
                                                          bool sessionInfo) const
 {
-    if (userInfo)
-    {
+    if (userInfo) {
         result.CopyFrom(*userInfo);
-        if (!sessionInfo)
-        {
+        if (!sessionInfo) {
             result.clear_session_id();
             result.clear_address();
             result.clear_clientid();
         }
-        if (!internalInfo)
-        {
+        if (!internalInfo) {
             result.clear_id();
             result.clear_email();
         }

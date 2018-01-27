@@ -37,8 +37,7 @@ GeneralSettingsPage::GeneralSettingsPage()
 {
     QString setLanguage = settingsCache->getLang();
     QStringList qmFiles = findQmFiles();
-    for (int i = 0; i < qmFiles.size(); i++)
-    {
+    for (int i = 0; i < qmFiles.size(); i++) {
         QString langName = languageName(qmFiles[i]);
         languageBox.addItem(langName, qmFiles[i]);
         if ((qmFiles[i] == setLanguage) ||
@@ -50,8 +49,7 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     // updates
     QList<ReleaseChannel *> channels = settingsCache->getUpdateReleaseChannels();
-    foreach (ReleaseChannel *chan, channels)
-    {
+    foreach (ReleaseChannel *chan, channels) {
         updateReleaseChannelBox.insertItem(chan->getIndex(), tr(chan->getName().toUtf8()));
     }
     updateReleaseChannelBox.setCurrentIndex(settingsCache->getUpdateReleaseChannel()->getIndex());
@@ -133,8 +131,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
 
-    if (settingsCache->getIsPortableBuild())
-    {
+    if (settingsCache->getIsPortableBuild()) {
         deckPathEdit->setEnabled(false);
         replaysPathEdit->setEnabled(false);
         picsPathEdit->setEnabled(false);
@@ -242,14 +239,12 @@ void GeneralSettingsPage::clearDownloadedPicsButtonClicked()
     QString picsPath = settingsCache->getPicsPath() + "/downloadedPics/";
     QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     bool outerSuccessRemove = true;
-    for (int i = 0; i < dirs.length(); i++)
-    {
+    for (int i = 0; i < dirs.length(); i++) {
         QString currentPath = picsPath + dirs.at(i) + "/";
         QStringList files = QDir(currentPath).entryList(QDir::Files);
         bool innerSuccessRemove = true;
         for (int j = 0; j < files.length(); j++)
-            if (!QDir(currentPath).remove(files.at(j)))
-            {
+            if (!QDir(currentPath).remove(files.at(j))) {
                 qDebug() << "Failed to remove " + currentPath.toUtf8() + files.at(j).toUtf8();
                 outerSuccessRemove = false;
                 innerSuccessRemove = false;
@@ -294,11 +289,9 @@ void GeneralSettingsPage::retranslateUi()
     languageLabel.setText(tr("Language:"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
 
-    if (settingsCache->getIsPortableBuild())
-    {
+    if (settingsCache->getIsPortableBuild()) {
         pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
-    } else
-    {
+    } else {
         pathsGroupBox->setTitle(tr("Paths"));
     }
 
@@ -332,8 +325,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     QString themeName = settingsCache->getThemeName();
 
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
-    for (int i = 0; i < themeDirs.size(); i++)
-    {
+    for (int i = 0; i < themeDirs.size(); i++) {
         themeBox.addItem(themeDirs[i]);
         if (themeDirs[i] == themeName)
             themeBox.setCurrentIndex(i);
@@ -569,8 +561,7 @@ QString DeckEditorSettingsPage::getLastUpdateTime()
     QDir fileDir(fi.path());
     QFile file(fileName);
 
-    if (file.exists())
-    {
+    if (file.exists()) {
         return fi.lastModified().toString("MMM d, hh:mm");
     }
 
@@ -580,8 +571,7 @@ QString DeckEditorSettingsPage::getLastUpdateTime()
 void DeckEditorSettingsPage::spoilerPathButtonClicked()
 {
     QString lsPath = QFileDialog::getExistingDirectory(this, tr("Choose path"));
-    if (lsPath.isEmpty())
-    {
+    if (lsPath.isEmpty()) {
         return;
     }
 
@@ -598,8 +588,7 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
     updateNowButton->setEnabled(anInput);
     infoOnSpoilersLabel.setEnabled(anInput);
 
-    if (!anInput)
-    {
+    if (!anInput) {
         SpoilerBackgroundUpdater::deleteSpoilerFile();
     }
 }
@@ -724,8 +713,7 @@ void MessagesSettingsPage::updateColor(const QString &value)
 {
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
-    if (colorToSet.isValid())
-    {
+    if (colorToSet.isValid()) {
         settingsCache->setChatMentionColor(value);
         updateMentionPreview();
     }
@@ -735,8 +723,7 @@ void MessagesSettingsPage::updateHighlightColor(const QString &value)
 {
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
-    if (colorToSet.isValid())
-    {
+    if (colorToSet.isValid()) {
         settingsCache->setChatHighlightColor(value);
         updateHighlightPreview();
     }
@@ -777,8 +764,7 @@ void MessagesSettingsPage::actAdd()
 {
     bool ok;
     QString msg = QInputDialog::getText(this, tr("Add message"), tr("Message:"), QLineEdit::Normal, QString(), &ok);
-    if (ok)
-    {
+    if (ok) {
         messageList->addItem(msg);
         storeSettings();
     }
@@ -786,8 +772,7 @@ void MessagesSettingsPage::actAdd()
 
 void MessagesSettingsPage::actRemove()
 {
-    if (messageList->currentItem())
-    {
+    if (messageList->currentItem()) {
         delete messageList->takeItem(messageList->currentRow());
         storeSettings();
     }
@@ -820,8 +805,7 @@ SoundSettingsPage::SoundSettingsPage()
     QString themeName = settingsCache->getSoundThemeName();
 
     QStringList themeDirs = soundEngine->getAvailableThemes().keys();
-    for (int i = 0; i < themeDirs.size(); i++)
-    {
+    for (int i = 0; i < themeDirs.size(); i++) {
         themeBox.addItem(themeDirs[i]);
         if (themeDirs[i] == themeName)
             themeBox.setCurrentIndex(i);
@@ -982,8 +966,7 @@ void DlgSettings::changePage(QListWidgetItem *current, QListWidgetItem *previous
 
 void DlgSettings::setTab(int index)
 {
-    if (index <= contentsWidget->count() - 1 && index >= 0)
-    {
+    if (index <= contentsWidget->count() - 1 && index >= 0) {
         changePage(contentsWidget->item(index), contentsWidget->currentItem());
         contentsWidget->setCurrentRow(index);
     }
@@ -1008,8 +991,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     QString loadErrorMessage = tr("Unknown Error loading card database");
     LoadStatus loadStatus = db->getLoadStatus();
     qDebug() << "Card Database load status: " << loadStatus;
-    switch (loadStatus)
-    {
+    switch (loadStatus) {
         case Ok:
             showLoadError = false;
             break;
@@ -1047,37 +1029,31 @@ void DlgSettings::closeEvent(QCloseEvent *event)
             break;
     }
 
-    if (showLoadError)
-    {
+    if (showLoadError) {
         if (QMessageBox::critical(this, tr("Error"), loadErrorMessage, QMessageBox::Yes | QMessageBox::No) ==
-            QMessageBox::Yes)
-        {
+            QMessageBox::Yes) {
             event->ignore();
             return;
         }
     }
 
-    if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty())
-    {
+    if (!QDir(settingsCache->getDeckPath()).exists() || settingsCache->getDeckPath().isEmpty()) {
         // TODO: Prompt to create it
         if (QMessageBox::critical(
                 this, tr("Error"),
                 tr("The path to your deck directory is invalid. Would you like to go back and set the correct path?"),
-                QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-        {
+                QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
             event->ignore();
             return;
         }
     }
 
-    if (!QDir(settingsCache->getPicsPath()).exists() || settingsCache->getPicsPath().isEmpty())
-    {
+    if (!QDir(settingsCache->getPicsPath()).exists() || settingsCache->getPicsPath().isEmpty()) {
         // TODO: Prompt to create it
         if (QMessageBox::critical(this, tr("Error"),
                                   tr("The path to your card pictures directory is invalid. Would you like to go back "
                                      "and set the correct path?"),
-                                  QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-        {
+                                  QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
             event->ignore();
             return;
         }

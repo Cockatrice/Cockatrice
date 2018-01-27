@@ -21,20 +21,17 @@ ServerLogger::~ServerLogger()
 
 void ServerLogger::startLog(const QString &logFileName)
 {
-    if (!logFileName.isEmpty())
-    {
+    if (!logFileName.isEmpty()) {
         QFileInfo fi(logFileName);
         QDir fileDir(fi.path());
-        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath()))
-        {
+        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
             std::cerr << "ERROR: logfile folder doesn't exist and i can't create it." << std::endl;
             logFile = 0;
             return;
         }
 
         logFile = new QFile(logFileName, this);
-        if (!logFile->open(QIODevice::Append))
-        {
+        if (!logFile->open(QIODevice::Append)) {
             std::cerr << "ERROR: can't open() logfile." << std::endl;
             delete logFile;
             logFile = 0;
@@ -64,13 +61,10 @@ void ServerLogger::logMessage(QString message, void *caller)
     if (!shouldWeWriteLog)
         return;
 
-    if (!logFilters.trimmed().isEmpty())
-    {
+    if (!logFilters.trimmed().isEmpty()) {
         shouldWeSkipLine = true;
-        foreach (QString logFilter, listlogFilters)
-        {
-            if (message.contains(logFilter, Qt::CaseInsensitive))
-            {
+        foreach (QString logFilter, listlogFilters) {
+            if (message.contains(logFilter, Qt::CaseInsensitive)) {
                 shouldWeSkipLine = false;
                 break;
             }
@@ -96,8 +90,7 @@ void ServerLogger::flushBuffer()
     forever
     {
         bufferMutex.lock();
-        if (buffer.isEmpty())
-        {
+        if (buffer.isEmpty()) {
             bufferMutex.unlock();
             flushRunning = false;
             return;

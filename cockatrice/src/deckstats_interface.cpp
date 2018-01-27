@@ -17,8 +17,7 @@ DeckStatsInterface::DeckStatsInterface(CardDatabase &_cardDatabase, QObject *par
 
 void DeckStatsInterface::queryFinished(QNetworkReply *reply)
 {
-    if (reply->error() != QNetworkReply::NoError)
-    {
+    if (reply->error() != QNetworkReply::NoError) {
         QMessageBox::critical(0, tr("Error"), reply->errorString());
         reply->deleteLater();
         deleteLater();
@@ -29,8 +28,7 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
     reply->deleteLater();
 
     QRegExp rx("<meta property=\"og:url\" content=\"([^\"]+)\"");
-    if (-1 == rx.indexIn(data))
-    {
+    if (-1 == rx.indexIn(data)) {
         QMessageBox::critical(0, tr("Error"), tr("The reply from the server could not be parsed."));
         deleteLater();
         return;
@@ -77,8 +75,7 @@ struct CopyIfNotAToken
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {
         CardInfo *dbCard = cardDatabase.getCard(card->getName());
-        if (dbCard && !dbCard->getIsToken())
-        {
+        if (dbCard && !dbCard->getIsToken()) {
             DecklistCardNode *addedCard = destination.addCard(card->getName(), node->getName());
             addedCard->setNumber(card->getNumber());
         }

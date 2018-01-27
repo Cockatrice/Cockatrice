@@ -14,18 +14,14 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
                                            AbstractCardDragItem *parentDrag)
     : QGraphicsItem(), item(_item), hotSpot(_hotSpot)
 {
-    if (parentDrag)
-    {
+    if (parentDrag) {
         parentDrag->addChildDrag(this);
         setZValue(2000000007 + hotSpot.x() * 1000000 + hotSpot.y() * 1000 + 1000);
-    } else
-    {
-        if ((hotSpot.x() < 0) || (hotSpot.y() < 0))
-        {
+    } else {
+        if ((hotSpot.x() < 0) || (hotSpot.y() < 0)) {
             qDebug() << "CardDragItem: coordinate overflow: x =" << hotSpot.x() << ", y =" << hotSpot.y();
             hotSpot = QPointF();
-        } else if ((hotSpot.x() > CARD_WIDTH) || (hotSpot.y() > CARD_HEIGHT))
-        {
+        } else if ((hotSpot.x() > CARD_WIDTH) || (hotSpot.y() > CARD_HEIGHT)) {
             qDebug() << "CardDragItem: coordinate overflow: x =" << hotSpot.x() << ", y =" << hotSpot.y();
             hotSpot = QPointF(CARD_WIDTH, CARD_HEIGHT);
         }

@@ -115,11 +115,9 @@ QVariant FilterTreeModel::data(const QModelIndex &index, int role) const
     if (node == NULL)
         return QVariant();
 
-    switch (role)
-    {
+    switch (role) {
         case Qt::FontRole:
-            if (!node->isLeaf())
-            {
+            if (!node->isLeaf()) {
                 QFont f;
                 f.setBold(true);
                 return f;
@@ -233,8 +231,7 @@ QModelIndex FilterTreeModel::parent(const QModelIndex &ind) const
         return QModelIndex();
 
     parent = node->parent();
-    if (parent)
-    {
+    if (parent) {
         row = parent->index();
         if (row < 0)
             return QModelIndex();

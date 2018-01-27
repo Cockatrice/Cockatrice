@@ -38,8 +38,7 @@ void SettingsCache::translateLegacySettings()
     // Sets
     legacySetting.beginGroup("sets");
     QStringList setsGroups = legacySetting.childGroups();
-    for (int i = 0; i < setsGroups.size(); i++)
-    {
+    for (int i = 0; i < setsGroups.size(); i++) {
         legacySetting.beginGroup(setsGroups.at(i));
         cardDatabase().setEnabled(setsGroups.at(i), legacySetting.value("enabled").toBool());
         cardDatabase().setIsKnown(setsGroups.at(i), legacySetting.value("isknown").toBool());
@@ -47,8 +46,7 @@ void SettingsCache::translateLegacySettings()
         legacySetting.endGroup();
     }
     QStringList setsKeys = legacySetting.allKeys();
-    for (int i = 0; i < setsKeys.size(); ++i)
-    {
+    for (int i = 0; i < setsKeys.size(); ++i) {
         usedKeys.append("sets/" + setsKeys.at(i));
     }
     legacySetting.endGroup();
@@ -68,8 +66,7 @@ void SettingsCache::translateLegacySettings()
     servers().setFPPlayerName(legacySetting.value("fpplayername").toString());
     usedKeys.append(legacySetting.allKeys());
     QStringList allKeysServer = legacySetting.allKeys();
-    for (int i = 0; i < allKeysServer.size(); ++i)
-    {
+    for (int i = 0; i < allKeysServer.size(); ++i) {
         usedKeys.append("server/" + allKeysServer.at(i));
     }
     legacySetting.endGroup();
@@ -77,10 +74,8 @@ void SettingsCache::translateLegacySettings()
     // Messages
     legacySetting.beginGroup("messages");
     QStringList allMessages = legacySetting.allKeys();
-    for (int i = 0; i < allMessages.size(); ++i)
-    {
-        if (allMessages.at(i) != "count")
-        {
+    for (int i = 0; i < allMessages.size(); ++i) {
+        if (allMessages.at(i) != "count") {
             QString temp = allMessages.at(i);
             int index = temp.remove("msg").toInt();
             messages().setMessageAt(index, legacySetting.value(allMessages.at(i)).toString());
@@ -88,8 +83,7 @@ void SettingsCache::translateLegacySettings()
     }
     messages().setCount(legacySetting.value("count").toInt());
     QStringList allKeysmessages = legacySetting.allKeys();
-    for (int i = 0; i < allKeysmessages.size(); ++i)
-    {
+    for (int i = 0; i < allKeysmessages.size(); ++i) {
         usedKeys.append("messages/" + allKeysmessages.at(i));
     }
     legacySetting.endGroup();
@@ -108,23 +102,19 @@ void SettingsCache::translateLegacySettings()
         gameFilters().setMaxPlayers(99); // This prevents a bug where no games will show if max was not set before
 
     QStringList allFilters = legacySetting.allKeys();
-    for (int i = 0; i < allFilters.size(); ++i)
-    {
-        if (allFilters.at(i).startsWith("game_type"))
-        {
+    for (int i = 0; i < allFilters.size(); ++i) {
+        if (allFilters.at(i).startsWith("game_type")) {
             gameFilters().setGameHashedTypeEnabled(allFilters.at(i), legacySetting.value(allFilters.at(i)).toBool());
         }
     }
     QStringList allKeysfilter_games = legacySetting.allKeys();
-    for (int i = 0; i < allKeysfilter_games.size(); ++i)
-    {
+    for (int i = 0; i < allKeysfilter_games.size(); ++i) {
         usedKeys.append("filter_games/" + allKeysfilter_games.at(i));
     }
     legacySetting.endGroup();
 
     QStringList allLegacyKeys = legacySetting.allKeys();
-    for (int i = 0; i < allLegacyKeys.size(); ++i)
-    {
+    for (int i = 0; i < allLegacyKeys.size(); ++i) {
         if (usedKeys.contains(allLegacyKeys.at(i)))
             continue;
         settings->setValue(allLegacyKeys.at(i), legacySetting.value(allLegacyKeys.at(i)));
@@ -136,8 +126,7 @@ QString SettingsCache::getSafeConfigPath(QString configEntry, QString defaultPat
     QString tmp = settings->value(configEntry).toString();
     // if the config settings is empty or refers to a not-existing folder,
     // ensure that the defaut path exists and return it
-    if (!QDir(tmp).exists() || tmp.isEmpty())
-    {
+    if (!QDir(tmp).exists() || tmp.isEmpty()) {
         if (!QDir().mkpath(defaultPath))
             qDebug() << "[SettingsCache] Could not create folder:" << defaultPath;
         tmp = defaultPath;
@@ -206,8 +195,7 @@ SettingsCache::SettingsCache()
 
     // we only want to reset the cache once, then its up to the user
     bool updateCache = settings->value("revert/pixmapCacheSize", false).toBool();
-    if (!updateCache)
-    {
+    if (!updateCache) {
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
         settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
         settings->setValue("personal/picturedownloadhq", false);

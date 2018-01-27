@@ -34,8 +34,7 @@ QPixmap CounterPixmapGenerator::generatePixmap(int height, QString name, bool hi
 
     QPixmap pixmap =
         QPixmap("theme:counters/" + name).scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    if (pixmap.isNull())
-    {
+    if (pixmap.isNull()) {
         name = "general";
         if (highlight)
             name.append("_highlight");
@@ -124,18 +123,15 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
         return pmCache.value(key);
 
     QString levelString;
-    if (userLevel.testFlag(ServerInfo_User::IsAdmin))
-    {
+    if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
         levelString = "admin";
         if (privLevel.toLower() == "vip")
             levelString.append("_" + privLevel.toLower());
-    } else if (userLevel.testFlag(ServerInfo_User::IsModerator))
-    {
+    } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
         levelString = "moderator";
         if (privLevel.toLower() == "vip")
             levelString.append("_" + privLevel.toLower());
-    } else if (userLevel.testFlag(ServerInfo_User::IsRegistered))
-    {
+    } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
         levelString = "registered";
         if (privLevel.toLower() != "none")
             levelString.append("_" + privLevel.toLower());

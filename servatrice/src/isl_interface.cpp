@@ -64,13 +64,11 @@ IslInterface::~IslInterface()
 
     server->roomsLock.lockForRead();
     QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
-    while (roomIterator.hasNext())
-    {
+    while (roomIterator.hasNext()) {
         Server_Room *room = roomIterator.next().value();
         room->usersLock.lockForRead();
         QMapIterator<QString, ServerInfo_User_Container> roomUsers(room->getExternalUsers());
-        while (roomUsers.hasNext())
-        {
+        while (roomUsers.hasNext()) {
             roomUsers.next();
             if (roomUsers.value().getUserInfo()->server_id() == serverId)
                 emit externalRoomUserLeft(room->getId(), roomUsers.key());
@@ -81,8 +79,7 @@ IslInterface::~IslInterface()
 
     server->clientsLock.lockForRead();
     QMapIterator<QString, Server_AbstractUserInterface *> extUsers(server->getExternalUsers());
-    while (extUsers.hasNext())
-    {
+    while (extUsers.hasNext()) {
         extUsers.next();
         if (extUsers.value()->getUserInfo()->server_id() == serverId)
             emit externalUserLeft(extUsers.key());
@@ -99,13 +96,11 @@ void IslInterface::initServer()
     QList<ServerProperties> serverList = server->getServerList();
     int listIndex = -1;
     for (int i = 0; i < serverList.size(); ++i)
-        if (serverList[i].address == socket->peerAddress())
-        {
+        if (serverList[i].address == socket->peerAddress()) {
             listIndex = i;
             break;
         }
-    if (listIndex == -1)
-    {
+    if (listIndex == -1) {
         logger->logMessage(
             QString("[ISL] address %1 unknown, terminating connection").arg(socket->peerAddress().toString()));
         deleteLater();
@@ -113,8 +108,7 @@ void IslInterface::initServer()
     }
 
     socket->startServerEncryption();
-    if (!socket->waitForEncrypted(5000))
-    {
+    if (!socket->waitForEncrypted(5000)) {
         QList<QSslError> sslErrors(socket->sslErrors());
         if (sslErrors.isEmpty())
             qDebug() << "[ISL] SSL handshake timeout, terminating connection";
@@ -126,8 +120,7 @@ void IslInterface::initServer()
 
     if (serverList[listIndex].cert == socket->peerCertificate())
         logger->logMessage(QString("[ISL] Peer authenticated as " + serverList[listIndex].hostname));
-    else
-    {
+    else {
         logger->logMessage(QString("[ISL] Authentication failed, terminating connection"));
         deleteLater();
         return;
@@ -145,8 +138,7 @@ void IslInterface::initServer()
 
     server->roomsLock.lockForRead();
     QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
-    while (roomIterator.hasNext())
-    {
+    while (roomIterator.hasNext()) {
         Server_Room *room = roomIterator.next().value();
         room->usersLock.lockForRead();
         room->gamesLock.lockForRead();
@@ -161,20 +153,17 @@ void IslInterface::initServer()
         ->CopyFrom(event);
 
     server->islLock.lockForWrite();
-    if (server->islConnectionExists(serverId))
-    {
+    if (server->islConnectionExists(serverId)) {
         qDebug() << "[ISL] Duplicate connection to #" << serverId << "terminating connection";
         deleteLater();
-    } else
-    {
+    } else {
         transmitMessage(message);
         server->addIslInterface(serverId, this);
     }
     server->islLock.unlock();
 
     roomIterator.toFront();
-    while (roomIterator.hasNext())
-    {
+    while (roomIterator.hasNext()) {
         roomIterator.next();
         roomIterator.value()->gamesLock.unlock();
         roomIterator.value()->usersLock.unlock();
@@ -191,14 +180,12 @@ void IslInterface::initClient()
     qDebug() << "[ISL] Connecting to #" << serverId << ":" << peerAddress << ":" << peerPort;
 
     socket->connectToHostEncrypted(peerAddress, peerPort, peerHostName);
-    if (!socket->waitForConnected(5000))
-    {
+    if (!socket->waitForConnected(5000)) {
         qDebug() << "[ISL] Socket error:" << socket->errorString();
         deleteLater();
         return;
     }
-    if (!socket->waitForEncrypted(5000))
-    {
+    if (!socket->waitForEncrypted(5000)) {
         QList<QSslError> sslErrors(socket->sslErrors());
         if (sslErrors.isEmpty())
             qDebug() << "[ISL] SSL handshake timeout, terminating connection";
@@ -209,8 +196,7 @@ void IslInterface::initClient()
     }
 
     server->islLock.lockForWrite();
-    if (server->islConnectionExists(serverId))
-    {
+    if (server->islConnectionExists(serverId)) {
         qDebug() << "[ISL] Duplicate connection to #" << serverId << "terminating connection";
         deleteLater();
         return;
@@ -237,12 +223,9 @@ void IslInterface::readClient()
     server->incRxBytes(data.size());
     inputBuffer.append(data);
 
-    do
-    {
-        if (!messageInProgress)
-        {
-            if (inputBuffer.size() >= 4)
-            {
+    do {
+        if (!messageInProgress) {
+            if (inputBuffer.size() >= 4) {
                 messageLength = (((quint32)(unsigned char)inputBuffer[0]) << 24) +
                                 (((quint32)(unsigned char)inputBuffer[1]) << 16) +
                                 (((quint32)(unsigned char)inputBuffer[2]) << 8) +
@@ -294,23 +277,19 @@ void IslInterface::transmitMessage(const IslMessage &item)
 
 void IslInterface::sessionEvent_ServerCompleteList(const Event_ServerCompleteList &event)
 {
-    for (int i = 0; i < event.user_list_size(); ++i)
-    {
+    for (int i = 0; i < event.user_list_size(); ++i) {
         ServerInfo_User temp(event.user_list(i));
         temp.set_server_id(serverId);
         emit externalUserJoined(temp);
     }
-    for (int i = 0; i < event.room_list_size(); ++i)
-    {
+    for (int i = 0; i < event.room_list_size(); ++i) {
         const ServerInfo_Room &room = event.room_list(i);
-        for (int j = 0; j < room.user_list_size(); ++j)
-        {
+        for (int j = 0; j < room.user_list_size(); ++j) {
             ServerInfo_User userInfo(room.user_list(j));
             userInfo.set_server_id(serverId);
             emit externalRoomUserJoined(room.room_id(), userInfo);
         }
-        for (int j = 0; j < room.game_list_size(); ++j)
-        {
+        for (int j = 0; j < room.game_list_size(); ++j) {
             ServerInfo_Game gameInfo(room.game_list(j));
             gameInfo.set_server_id(serverId);
             emit externalRoomGameListChanged(room.room_id(), gameInfo);
@@ -349,8 +328,7 @@ void IslInterface::roomEvent_Say(int roomId, const Event_RoomSay &event)
 
 void IslInterface::roomEvent_ListGames(int roomId, const Event_ListGames &event)
 {
-    for (int i = 0; i < event.game_list_size(); ++i)
-    {
+    for (int i = 0; i < event.game_list_size(); ++i) {
         ServerInfo_Game gameInfo(event.game_list(i));
         gameInfo.set_server_id(serverId);
         emit externalRoomGameListChanged(roomId, gameInfo);
@@ -364,8 +342,7 @@ void IslInterface::roomCommand_JoinGame(const Command_JoinGame &cmd, int cmdId, 
 
 void IslInterface::processSessionEvent(const SessionEvent &event, qint64 sessionId)
 {
-    switch (getPbExtension(event))
-    {
+    switch (getPbExtension(event)) {
         case SessionEvent::SERVER_COMPLETE_LIST:
             sessionEvent_ServerCompleteList(event.GetExtension(Event_ServerCompleteList::ext));
             break;
@@ -375,12 +352,10 @@ void IslInterface::processSessionEvent(const SessionEvent &event, qint64 session
         case SessionEvent::USER_LEFT:
             sessionEvent_UserLeft(event.GetExtension(Event_UserLeft::ext));
             break;
-        case SessionEvent::GAME_JOINED:
-        {
+        case SessionEvent::GAME_JOINED: {
             QReadLocker clientsLocker(&server->clientsLock);
             Server_AbstractUserInterface *client = server->getUsersBySessionId().value(sessionId);
-            if (!client)
-            {
+            if (!client) {
                 qDebug() << "IslInterface::processSessionEvent: session id" << sessionId << "not found";
                 break;
             }
@@ -391,12 +366,10 @@ void IslInterface::processSessionEvent(const SessionEvent &event, qint64 session
             break;
         }
         case SessionEvent::USER_MESSAGE:
-        case SessionEvent::REPLAY_ADDED:
-        {
+        case SessionEvent::REPLAY_ADDED: {
             QReadLocker clientsLocker(&server->clientsLock);
             Server_AbstractUserInterface *client = server->getUsersBySessionId().value(sessionId);
-            if (!client)
-            {
+            if (!client) {
                 qDebug() << "IslInterface::processSessionEvent: session id" << sessionId << "not found";
                 break;
             }
@@ -410,8 +383,7 @@ void IslInterface::processSessionEvent(const SessionEvent &event, qint64 session
 
 void IslInterface::processRoomEvent(const RoomEvent &event)
 {
-    switch (getPbExtension(event))
-    {
+    switch (getPbExtension(event)) {
         case RoomEvent::JOIN_ROOM:
             roomEvent_UserJoined(event.room_id(), event.GetExtension(Event_JoinRoom::ext));
             break;
@@ -430,11 +402,9 @@ void IslInterface::processRoomEvent(const RoomEvent &event)
 
 void IslInterface::processRoomCommand(const CommandContainer &cont, qint64 sessionId)
 {
-    for (int i = 0; i < cont.room_command_size(); ++i)
-    {
+    for (int i = 0; i < cont.room_command_size(); ++i) {
         const RoomCommand &roomCommand = cont.room_command(i);
-        switch (static_cast<RoomCommand::RoomCommandType>(getPbExtension(roomCommand)))
-        {
+        switch (static_cast<RoomCommand::RoomCommandType>(getPbExtension(roomCommand))) {
             case RoomCommand::JOIN_GAME:
                 roomCommand_JoinGame(roomCommand.GetExtension(Command_JoinGame::ext), cont.cmd_id(), cont.room_id(),
                                      sessionId);
@@ -447,35 +417,28 @@ void IslInterface::processMessage(const IslMessage &item)
 {
     qDebug() << QString::fromStdString(item.DebugString());
 
-    switch (item.message_type())
-    {
-        case IslMessage::ROOM_COMMAND_CONTAINER:
-        {
+    switch (item.message_type()) {
+        case IslMessage::ROOM_COMMAND_CONTAINER: {
             processRoomCommand(item.room_command(), item.session_id());
             break;
         }
-        case IslMessage::GAME_COMMAND_CONTAINER:
-        {
+        case IslMessage::GAME_COMMAND_CONTAINER: {
             emit gameCommandContainerReceived(item.game_command(), item.player_id(), serverId, item.session_id());
             break;
         }
-        case IslMessage::SESSION_EVENT:
-        {
+        case IslMessage::SESSION_EVENT: {
             processSessionEvent(item.session_event(), item.session_id());
             break;
         }
-        case IslMessage::RESPONSE:
-        {
+        case IslMessage::RESPONSE: {
             emit responseReceived(item.response(), item.session_id());
             break;
         }
-        case IslMessage::GAME_EVENT_CONTAINER:
-        {
+        case IslMessage::GAME_EVENT_CONTAINER: {
             emit gameEventContainerReceived(item.game_event_container(), item.session_id());
             break;
         }
-        case IslMessage::ROOM_EVENT:
-        {
+        case IslMessage::ROOM_EVENT: {
             processRoomEvent(item.room_event());
             break;
         }

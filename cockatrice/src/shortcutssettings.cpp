@@ -14,13 +14,11 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
 
     QSettings shortCutsFile(settingsFilePath, QSettings::IniFormat);
 
-    if (exists)
-    {
+    if (exists) {
         shortCutsFile.beginGroup("Custom");
         const QStringList customKeys = shortCutsFile.allKeys();
 
-        for (QStringList::const_iterator it = customKeys.constBegin(); it != customKeys.constEnd(); ++it)
-        {
+        for (QStringList::const_iterator it = customKeys.constBegin(); it != customKeys.constEnd(); ++it) {
             QString stringSequence = shortCutsFile.value(*it).toString();
             QList<QKeySequence> SequenceList = parseSequenceString(stringSequence);
             shortCuts.insert(*it, SequenceList);
@@ -32,8 +30,7 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
 
 QList<QKeySequence> ShortcutsSettings::getShortcut(QString name)
 {
-    if (shortCuts.contains(name))
-    {
+    if (shortCuts.contains(name)) {
         return shortCuts.value(name);
     }
 
@@ -58,11 +55,9 @@ QString ShortcutsSettings::getShortcutString(QString name)
 QString ShortcutsSettings::stringifySequence(QList<QKeySequence> Sequence) const
 {
     QString stringSequence;
-    for (int i = 0; i < Sequence.size(); ++i)
-    {
+    for (int i = 0; i < Sequence.size(); ++i) {
         stringSequence.append(Sequence.at(i).toString(QKeySequence::PortableText));
-        if (i < Sequence.size() - 1)
-        {
+        if (i < Sequence.size() - 1) {
             stringSequence.append(";");
         }
     }
@@ -74,8 +69,7 @@ QList<QKeySequence> ShortcutsSettings::parseSequenceString(QString stringSequenc
 {
     QStringList Sequences = stringSequence.split(";");
     QList<QKeySequence> SequenceList;
-    for (QStringList::const_iterator ss = Sequences.constBegin(); ss != Sequences.constEnd(); ++ss)
-    {
+    for (QStringList::const_iterator ss = Sequences.constBegin(); ss != Sequences.constEnd(); ++ss) {
         SequenceList.append(QKeySequence(*ss, QKeySequence::PortableText));
     }
 
@@ -111,16 +105,12 @@ bool ShortcutsSettings::isValid(QString name, QString Sequences)
     QString checkSequence = Sequences.split(";").last();
 
     QList<QString> allKeys = shortCuts.keys();
-    for (const auto &key : allKeys)
-    {
-        if (key.startsWith(checkKey) || key.startsWith("MainWindow") || checkKey.startsWith("MainWindow"))
-        {
+    for (const auto &key : allKeys) {
+        if (key.startsWith(checkKey) || key.startsWith("MainWindow") || checkKey.startsWith("MainWindow")) {
             QString storedSequence = stringifySequence(shortCuts.value(key));
             QStringList stringSequences = storedSequence.split(";");
-            for (int j = 0; j < stringSequences.size(); j++)
-            {
-                if (checkSequence == stringSequences.at(j))
-                {
+            for (int j = 0; j < stringSequences.size(); j++) {
+                if (checkSequence == stringSequences.at(j)) {
                     return false;
                 }
             }
@@ -131,8 +121,7 @@ bool ShortcutsSettings::isValid(QString name, QString Sequences)
 
 void ShortcutsSettings::resetAllShortcuts()
 {
-    for (auto it = defaultShortCuts.begin(); it != defaultShortCuts.end(); ++it)
-    {
+    for (auto it = defaultShortCuts.begin(); it != defaultShortCuts.end(); ++it) {
         setShortcuts(it.key(), it.value());
     }
     emit allShortCutsReset();
@@ -140,8 +129,7 @@ void ShortcutsSettings::resetAllShortcuts()
 
 void ShortcutsSettings::clearAllShortcuts()
 {
-    for (auto it = shortCuts.begin(); it != shortCuts.end(); ++it)
-    {
+    for (auto it = shortCuts.begin(); it != shortCuts.end(); ++it) {
         setShortcuts(it.key(), "");
     }
     emit allShortCutsClear();

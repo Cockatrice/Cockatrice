@@ -366,12 +366,10 @@ void TabDeckEditor::createCentralFrame()
     connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
 
     QByteArray dbHeaderState = settingsCache->layouts().getDeckEditorDbHeaderState();
-    if (dbHeaderState.isNull())
-    {
+    if (dbHeaderState.isNull()) {
         // first run
         databaseView->setColumnWidth(0, 200);
-    } else
-    {
+    } else {
         databaseView->header()->restoreState(dbHeaderState);
     }
     connect(databaseView->header(), SIGNAL(geometriesChanged()), this, SLOT(saveDbHeaderState()));
@@ -664,8 +662,7 @@ void TabDeckEditor::updateHash()
 
 bool TabDeckEditor::confirmClose()
 {
-    if (modified)
-    {
+    if (modified) {
         tabSupervisor->setCurrentWidget(this);
         QMessageBox::StandardButton ret = QMessageBox::warning(
             this, tr("Are you sure?"), tr("The decklist has been modified.\nDo you want to save the changes?"),
@@ -725,8 +722,7 @@ void TabDeckEditor::saveDeckRemoteFinished(const Response &response)
 bool TabDeckEditor::actSaveDeck()
 {
     DeckLoader *const deck = deckModel->getDeckList();
-    if (deck->getLastRemoteDeckId() != -1)
-    {
+    if (deck->getLastRemoteDeckId() != -1) {
         Command_DeckUpload cmd;
         cmd.set_deck_id(deck->getLastRemoteDeckId());
         cmd.set_deck_list(deck->writeToString_Native().toStdString());
@@ -739,8 +735,7 @@ bool TabDeckEditor::actSaveDeck()
         return true;
     } else if (deck->getLastFileName().isEmpty())
         return actSaveDeckAs();
-    else if (deck->saveToFile(deck->getLastFileName(), deck->getLastFileFormat()))
-    {
+    else if (deck->saveToFile(deck->getLastFileName(), deck->getLastFileFormat())) {
         setModified(false);
         return true;
     }
@@ -765,8 +760,7 @@ bool TabDeckEditor::actSaveDeckAs()
     QString fileName = dialog.selectedFiles().at(0);
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
-    if (!deckModel->getDeckList()->saveToFile(fileName, fmt))
-    {
+    if (!deckModel->getDeckList()->saveToFile(fileName, fmt)) {
         QMessageBox::critical(
             this, tr("Error"),
             tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
@@ -822,13 +816,11 @@ void TabDeckEditor::actExportDeckDecklist()
     // create a string to load the decklist url into.
     QString decklistUrlString;
     // check if deck is not null
-    if (deck)
-    {
+    if (deck) {
         // Get the decklist url string from the deck loader class.
         decklistUrlString = deck->exportDeckToDecklist();
         // Check to make sure the string isn't empty.
-        if (QString::compare(decklistUrlString, "", Qt::CaseInsensitive) == 0)
-        {
+        if (QString::compare(decklistUrlString, "", Qt::CaseInsensitive) == 0) {
             // Show an error if the deck is empty, and return.
             QMessageBox::critical(this, tr("Error"), tr("There are no cards in your deck to be exported"));
             return;
@@ -840,8 +832,7 @@ void TabDeckEditor::actExportDeckDecklist()
         decklistUrlString = decklistUrl.toEncoded();
         // We open the url in the user's default browser
         QDesktopServices::openUrl(decklistUrlString);
-    } else
-    {
+    } else {
         // if there's no deck loader object, return an error
         QMessageBox::critical(this, tr("Error"), tr("No deck was selected to be saved."));
     }
@@ -1063,24 +1054,19 @@ void TabDeckEditor::filterRemove(QAction *action)
 // Method uses to sync docks state with menu items state
 bool TabDeckEditor::eventFilter(QObject *o, QEvent *e)
 {
-    if (e->type() == QEvent::Close)
-    {
-        if (o == cardInfoDock)
-        {
+    if (e->type() == QEvent::Close) {
+        if (o == cardInfoDock) {
             aCardInfoDockVisible->setChecked(false);
             aCardInfoDockFloating->setEnabled(false);
-        } else if (o == deckDock)
-        {
+        } else if (o == deckDock) {
             aDeckDockVisible->setChecked(false);
             aDeckDockFloating->setEnabled(false);
-        } else if (o == filterDock)
-        {
+        } else if (o == filterDock) {
             aFilterDockVisible->setChecked(false);
             aFilterDockFloating->setEnabled(false);
         }
     }
-    if (o == this && e->type() == QEvent::Hide)
-    {
+    if (o == this && e->type() == QEvent::Hide) {
         settingsCache->layouts().setDeckEditorLayoutState(saveState());
         settingsCache->layouts().setDeckEditorGeometry(saveGeometry());
         settingsCache->layouts().setDeckEditorCardSize(cardInfoDock->size());
@@ -1093,22 +1079,19 @@ bool TabDeckEditor::eventFilter(QObject *o, QEvent *e)
 void TabDeckEditor::dockVisibleTriggered()
 {
     QObject *o = sender();
-    if (o == aCardInfoDockVisible)
-    {
+    if (o == aCardInfoDockVisible) {
         cardInfoDock->setVisible(aCardInfoDockVisible->isChecked());
         aCardInfoDockFloating->setEnabled(aCardInfoDockVisible->isChecked());
         return;
     }
 
-    if (o == aDeckDockVisible)
-    {
+    if (o == aDeckDockVisible) {
         deckDock->setVisible(aDeckDockVisible->isChecked());
         aDeckDockFloating->setEnabled(aDeckDockVisible->isChecked());
         return;
     }
 
-    if (o == aFilterDockVisible)
-    {
+    if (o == aFilterDockVisible) {
         filterDock->setVisible(aFilterDockVisible->isChecked());
         aFilterDockFloating->setEnabled(aFilterDockVisible->isChecked());
         return;
@@ -1118,20 +1101,17 @@ void TabDeckEditor::dockVisibleTriggered()
 void TabDeckEditor::dockFloatingTriggered()
 {
     QObject *o = sender();
-    if (o == aCardInfoDockFloating)
-    {
+    if (o == aCardInfoDockFloating) {
         cardInfoDock->setFloating(aCardInfoDockFloating->isChecked());
         return;
     }
 
-    if (o == aDeckDockFloating)
-    {
+    if (o == aDeckDockFloating) {
         deckDock->setFloating(aDeckDockFloating->isChecked());
         return;
     }
 
-    if (o == aFilterDockFloating)
-    {
+    if (o == aFilterDockFloating) {
         filterDock->setFloating(aFilterDockFloating->isChecked());
         return;
     }
@@ -1140,20 +1120,17 @@ void TabDeckEditor::dockFloatingTriggered()
 void TabDeckEditor::dockTopLevelChanged(bool topLevel)
 {
     QObject *o = sender();
-    if (o == cardInfoDock)
-    {
+    if (o == cardInfoDock) {
         aCardInfoDockFloating->setChecked(topLevel);
         return;
     }
 
-    if (o == deckDock)
-    {
+    if (o == deckDock) {
         aDeckDockFloating->setChecked(topLevel);
         return;
     }
 
-    if (o == filterDock)
-    {
+    if (o == filterDock) {
         aFilterDockFloating->setChecked(topLevel);
         return;
     }

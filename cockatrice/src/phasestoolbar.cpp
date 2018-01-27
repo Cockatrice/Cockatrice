@@ -19,8 +19,7 @@ PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_
     : QObject(), QGraphicsItem(parent), name(_name), active(false), highlightable(_highlightable),
       activeAnimationCounter(0), doubleClickAction(_doubleClickAction), width(50)
 {
-    if (highlightable)
-    {
+    if (highlightable) {
         activeAnimationTimer = new QTimer(this);
         connect(activeAnimationTimer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
         activeAnimationTimer->setSingleShot(false);
@@ -77,12 +76,10 @@ void PhaseButton::updateAnimation()
     if (!highlightable)
         return;
 
-    if (active)
-    {
+    if (active) {
         if (++activeAnimationCounter >= 10)
             activeAnimationTimer->stop();
-    } else
-    {
+    } else {
         if (--activeAnimationCounter <= 0)
             activeAnimationTimer->stop();
     }
@@ -152,8 +149,7 @@ void PhasesToolbar::retranslateUi()
 
 QString PhasesToolbar::getLongPhaseName(int phase) const
 {
-    switch (phase)
-    {
+    switch (phase) {
         case 0:
             return tr("Untap step");
         case 1:

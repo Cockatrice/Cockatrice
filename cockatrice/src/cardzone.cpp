@@ -38,8 +38,7 @@ void CardZone::retranslateUi()
 
 void CardZone::clearContents()
 {
-    for (int i = 0; i < cards.size(); i++)
-    {
+    for (int i = 0; i < cards.size(); i++) {
         // If an incorrectly implemented server doesn't return attached cards to whom they belong before dropping a
         // player, we have to return them to avoid a crash.
         const QList<CardItem *> &attachedCards = cards[i]->getAttachedCards();
@@ -58,8 +57,7 @@ QString CardZone::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
     if (name == "hand")
         return (theirOwn ? tr("their hand", "nominative") : tr("%1's hand", "nominative").arg(ownerName));
     else if (name == "deck")
-        switch (gc)
-        {
+        switch (gc) {
             case CaseLookAtZone:
                 return (theirOwn ? tr("their library", "look at zone")
                                  : tr("%1's library", "look at zone").arg(ownerName));
@@ -79,8 +77,7 @@ QString CardZone::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
     else if (name == "rfg")
         return (theirOwn ? tr("their exile", "nominative") : tr("%1's exile", "nominative").arg(ownerName));
     else if (name == "sb")
-        switch (gc)
-        {
+        switch (gc) {
             case CaseLookAtZone:
                 return (theirOwn ? tr("their sideboard", "look at zone")
                                  : tr("%1's sideboard", "look at zone").arg(ownerName));
@@ -101,8 +98,7 @@ void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * /*event*/)
 
 bool CardZone::showContextMenu(const QPoint &screenPos)
 {
-    if (menu)
-    {
+    if (menu) {
         menu->exec(screenPos);
         return true;
     }
@@ -111,8 +107,7 @@ bool CardZone::showContextMenu(const QPoint &screenPos)
 
 void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::RightButton)
-    {
+    if (event->button() == Qt::RightButton) {
         if (showContextMenu(event->screenPos()))
             event->accept();
         else
@@ -139,16 +134,14 @@ void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 CardItem *CardZone::getCard(int cardId, const QString &cardName)
 {
     CardItem *c = cards.findCard(cardId, false);
-    if (!c)
-    {
+    if (!c) {
         qDebug() << "CardZone::getCard: card id=" << cardId << "not found";
         return 0;
     }
     // If the card's id is -1, this zone is invisible,
     // so we need to give the card an id and a name as it comes out.
     // It can be assumed that in an invisible zone, all cards are equal.
-    if ((c->getId() == -1) || (c->getName().isEmpty()))
-    {
+    if ((c->getId() == -1) || (c->getName().isEmpty())) {
         c->setId(cardId);
         c->setName(cardName);
     }
@@ -157,13 +150,11 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
 
 CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
 {
-    if (position == -1)
-    {
+    if (position == -1) {
         // position == -1 means either that the zone is indexed by card id
         // or that it doesn't matter which card you take.
         for (int i = 0; i < cards.size(); ++i)
-            if (cards[i]->getId() == cardId)
-            {
+            if (cards[i]->getId() == cardId) {
                 position = i;
                 break;
             }

@@ -151,8 +151,7 @@ void TabDeckStorage::actUpload()
     DeckLoader deck;
     if (!deck.loadFromFile(filePath, DeckLoader::CockatriceFormat))
         return;
-    if (deck.getName().isEmpty())
-    {
+    if (deck.getName().isEmpty()) {
         bool ok;
         QString deckName = QInputDialog::getText(this, tr("Enter deck name"),
                                                  tr("This decklist does not have a name.\nPlease enter a name:"),
@@ -241,8 +240,7 @@ void TabDeckStorage::actDownload()
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
     if (!curLeft.isValid())
         filePath = localDirModel->rootPath();
-    else
-    {
+    else {
         while (!localDirModel->isDir(curLeft))
             curLeft = curLeft.parent();
         filePath = localDirModel->filePath(curLeft);
@@ -325,8 +323,7 @@ void TabDeckStorage::actDeleteRemoteDeck()
     if (!curRight)
         return;
     RemoteDeckList_TreeModel::DirectoryNode *dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight);
-    if (dir)
-    {
+    if (dir) {
         QString path = dir->getPath();
         if (path.isEmpty())
             return;
@@ -339,8 +336,7 @@ void TabDeckStorage::actDeleteRemoteDeck()
         pend = client->prepareSessionCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(deleteFolderFinished(Response, CommandContainer)));
-    } else
-    {
+    } else {
         RemoteDeckList_TreeModel::FileNode *deckNode = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
         if (QMessageBox::warning(this, tr("Delete remote deck"),
                                  tr("Are you sure you want to delete \"%1\"?").arg(deckNode->getName()),

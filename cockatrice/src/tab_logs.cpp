@@ -63,26 +63,22 @@ void TabLog::retranslateUi()
 void TabLog::getClicked()
 {
     if (findUsername->text().isEmpty() && findIPAddress->text().isEmpty() && findGameName->text().isEmpty() &&
-        findGameID->text().isEmpty() && findMessage->text().isEmpty())
-    {
+        findGameID->text().isEmpty() && findMessage->text().isEmpty()) {
         QMessageBox::critical(this, tr("Error"), tr("You must select at least one filter."));
         return;
     }
 
-    if (!lastHour->isChecked() && !today->isChecked() && !pastDays->isChecked())
-    {
+    if (!lastHour->isChecked() && !today->isChecked() && !pastDays->isChecked()) {
         pastDays->setChecked(true);
         pastXDays->setValue(20);
     }
 
-    if (pastDays->isChecked() && pastXDays->value() == 0)
-    {
+    if (pastDays->isChecked() && pastXDays->value() == 0) {
         QMessageBox::critical(this, tr("Error"), tr("You have to select a valid number of days to locate."));
         return;
     }
 
-    if (!mainRoom->isChecked() && !gameRoom->isChecked() && !privateChat->isChecked())
-    {
+    if (!mainRoom->isChecked() && !gameRoom->isChecked() && !privateChat->isChecked()) {
         mainRoom->setChecked(true);
         gameRoom->setChecked(true);
         privateChat->setChecked(true);
@@ -107,16 +103,13 @@ void TabLog::getClicked()
     cmd.set_game_name(findGameName->text().toStdString());
     cmd.set_game_id(findGameID->text().toStdString());
     cmd.set_message(findMessage->text().toStdString());
-    if (mainRoom->isChecked())
-    {
+    if (mainRoom->isChecked()) {
         cmd.add_log_location("room");
     };
-    if (gameRoom->isChecked())
-    {
+    if (gameRoom->isChecked()) {
         cmd.add_log_location("game");
     };
-    if (privateChat->isChecked())
-    {
+    if (privateChat->isChecked()) {
         cmd.add_log_location("chat");
     };
     cmd.set_date_range(dateRange);
@@ -267,15 +260,13 @@ void TabLog::createDock()
 void TabLog::viewLogHistory_processResponse(const Response &resp)
 {
     const Response_ViewLogHistory &response = resp.GetExtension(Response_ViewLogHistory::ext);
-    if (resp.response_code() != Response::RespOk)
-    {
+    if (resp.response_code() != Response::RespOk) {
         QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Message History"),
                               tr("Failed to collect message history information."));
         return;
     }
 
-    if (response.log_message_size() == 0)
-    {
+    if (response.log_message_size() == 0) {
         QMessageBox::information(static_cast<QWidget *>(parent()), tr("Message History"),
                                  tr("There are no messages for the selected filters."));
         return;
@@ -286,11 +277,9 @@ void TabLog::viewLogHistory_processResponse(const Response &resp)
     gameTable->setRowCount(gameCounter);
     chatTable->setRowCount(chatCounter);
 
-    for (int i = 0; i < response.log_message_size(); ++i)
-    {
+    for (int i = 0; i < response.log_message_size(); ++i) {
         ServerInfo_ChatMessage message = response.log_message(i);
-        if (QString::fromStdString(message.target_type()) == "room")
-        {
+        if (QString::fromStdString(message.target_type()) == "room") {
             roomTable->insertRow(roomCounter);
             roomTable->setItem(roomCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
             roomTable->setItem(roomCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
@@ -301,8 +290,7 @@ void TabLog::viewLogHistory_processResponse(const Response &resp)
             ++roomCounter;
         }
 
-        if (QString::fromStdString(message.target_type()) == "game")
-        {
+        if (QString::fromStdString(message.target_type()) == "game") {
             gameTable->insertRow(gameCounter);
             gameTable->setItem(gameCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
             gameTable->setItem(gameCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
@@ -313,8 +301,7 @@ void TabLog::viewLogHistory_processResponse(const Response &resp)
             ++gameCounter;
         }
 
-        if (QString::fromStdString(message.target_type()) == "chat")
-        {
+        if (QString::fromStdString(message.target_type()) == "chat") {
             chatTable->insertRow(chatCounter);
             chatTable->setItem(chatCounter, 0, new QTableWidgetItem(QString::fromStdString(message.time())));
             chatTable->setItem(chatCounter, 1, new QTableWidgetItem(QString::fromStdString(message.sender_name())));
@@ -326,30 +313,24 @@ void TabLog::viewLogHistory_processResponse(const Response &resp)
         }
     }
 
-    if (roomCounter)
-    {
+    if (roomCounter) {
         roomTable->show();
         roomTable->resizeColumnsToContents();
-    } else
-    {
+    } else {
         roomTable->hide();
     }
 
-    if (gameCounter)
-    {
+    if (gameCounter) {
         gameTable->resizeColumnsToContents();
         gameTable->show();
-    } else
-    {
+    } else {
         gameTable->hide();
     }
 
-    if (chatCounter)
-    {
+    if (chatCounter) {
         chatTable->resizeColumnsToContents();
         chatTable->show();
-    } else
-    {
+    } else {
         chatTable->hide();
     }
 }

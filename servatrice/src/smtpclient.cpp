@@ -29,8 +29,7 @@ SmtpClient::SmtpClient(QObject *parent) : QObject(parent)
 
 SmtpClient::~SmtpClient()
 {
-    if (smtp)
-    {
+    if (smtp) {
         delete smtp;
         smtp = 0;
     }
@@ -43,32 +42,27 @@ bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QStri
     QString subject = settingsCache->value("smtp/subject", "").toString();
     QString body = settingsCache->value("smtp/body", "").toString();
 
-    if (email.isEmpty())
-    {
+    if (email.isEmpty()) {
         qDebug() << "[MAIL] Missing sender email in configuration";
         return false;
     }
 
-    if (subject.isEmpty())
-    {
+    if (subject.isEmpty()) {
         qDebug() << "[MAIL] Missing subject field in configuration";
         return false;
     }
 
-    if (body.isEmpty())
-    {
+    if (body.isEmpty()) {
         qDebug() << "[MAIL] Missing body field in configuration";
         return false;
     }
 
-    if (recipient.isEmpty())
-    {
+    if (recipient.isEmpty()) {
         qDebug() << "[MAIL] Missing recipient field for user " << nickname;
         return false;
     }
 
-    if (token.isEmpty())
-    {
+    if (token.isEmpty()) {
         qDebug() << "[MAIL] Missing token field for user " << nickname;
         return false;
     }
@@ -91,32 +85,27 @@ bool SmtpClient::enqueueForgotPasswordTokenMail(const QString &nickname, const Q
     QString subject = settingsCache->value("forgotpassword/subject", "").toString();
     QString body = settingsCache->value("forgotpassword/body", "").toString();
 
-    if (email.isEmpty())
-    {
+    if (email.isEmpty()) {
         qDebug() << "[MAIL] Missing sender email in configuration";
         return false;
     }
 
-    if (subject.isEmpty())
-    {
+    if (subject.isEmpty()) {
         qDebug() << "[MAIL] Missing subject field in configuration";
         return false;
     }
 
-    if (body.isEmpty())
-    {
+    if (body.isEmpty()) {
         qDebug() << "[MAIL] Missing body field in configuration";
         return false;
     }
 
-    if (recipient.isEmpty())
-    {
+    if (recipient.isEmpty()) {
         qDebug() << "[MAIL] Missing recipient field for user " << nickname;
         return false;
     }
 
-    if (token.isEmpty())
-    {
+    if (token.isEmpty()) {
         qDebug() << "[MAIL] Missing token field for user " << nickname;
         return false;
     }
@@ -152,13 +141,11 @@ void SmtpClient::sendAllEmails()
     smtp->setPassword(password);
 
     // Connect
-    if (connectionType == "ssl")
-    {
+    if (connectionType == "ssl") {
         if (acceptAllCerts)
             smtp->sslSocket()->setPeerVerifyMode(QSslSocket::QueryPeer);
         smtp->connectToSecureHost(host, port);
-    } else
-    {
+    } else {
         smtp->connectToHost(host, port);
     }
 }

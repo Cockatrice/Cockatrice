@@ -52,10 +52,8 @@ void Server_Card::resetState()
 
 QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue, bool allCards)
 {
-    switch (attribute)
-    {
-        case AttrTapped:
-        {
+    switch (attribute) {
+        case AttrTapped: {
             bool value = avalue == "1";
             if (!(!value && allCards && doesntUntap))
                 setTapped(value);
@@ -93,12 +91,10 @@ void Server_Card::setCounter(int id, int value)
 
 void Server_Card::setPT(const QString &_pt)
 {
-    if (_pt.isEmpty())
-    {
+    if (_pt.isEmpty()) {
         power = 0;
         toughness = -1;
-    } else
-    {
+    } else {
         int sep = _pt.indexOf('/');
         QString p1 = _pt.left(sep);
         QString p2 = _pt.mid(sep + 1);
@@ -145,8 +141,7 @@ void Server_Card::getInfo(ServerInfo_Card *info)
     info->set_x(coord_x);
     info->set_y(coord_y);
     QString ptStr = getPT();
-    if (facedown)
-    {
+    if (facedown) {
         info->set_face_down(true);
         ptStr = getPT();
     }
@@ -165,16 +160,14 @@ void Server_Card::getInfo(ServerInfo_Card *info)
         info->set_doesnt_untap(true);
 
     QMapIterator<int, int> cardCounterIterator(counters);
-    while (cardCounterIterator.hasNext())
-    {
+    while (cardCounterIterator.hasNext()) {
         cardCounterIterator.next();
         ServerInfo_CardCounter *counterInfo = info->add_counter_list();
         counterInfo->set_id(cardCounterIterator.key());
         counterInfo->set_value(cardCounterIterator.value());
     }
 
-    if (parentCard)
-    {
+    if (parentCard) {
         info->set_attach_player_id(parentCard->getZone()->getPlayer()->getPlayerId());
         info->set_attach_zone(parentCard->getZone()->getName().toStdString());
         info->set_attach_card_id(parentCard->getId());

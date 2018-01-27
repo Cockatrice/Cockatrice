@@ -27,8 +27,7 @@ void AbstractGraphicsItem::paintNumberEllipse(int number,
     QRectF textRect;
     if (position == -1)
         textRect = QRectF((boundingRect().width() - w) / 2.0, (boundingRect().height() - h) / 2.0, w, h);
-    else
-    {
+    else {
         qreal xOffset = 10;
         qreal yOffset = 20;
         qreal spacing = 2;

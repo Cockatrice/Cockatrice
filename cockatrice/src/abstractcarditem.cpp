@@ -91,34 +91,28 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     QPixmap translatedPixmap;
     bool paintImage = true;
 
-    if (facedown || name.isEmpty())
-    {
+    if (facedown || name.isEmpty()) {
         // never reveal card color, always paint the card back
         PictureLoader::getCardBackPixmap(translatedPixmap, translatedSize.toSize());
-    } else
-    {
+    } else {
         // don't even spend time trying to load the picture if our size is too small
-        if (translatedSize.width() > 10)
-        {
+        if (translatedSize.width() > 10) {
             PictureLoader::getPixmap(translatedPixmap, info, translatedSize.toSize());
             if (translatedPixmap.isNull())
                 paintImage = false;
-        } else
-        {
+        } else {
             paintImage = false;
         }
     }
 
     painter->save();
 
-    if (paintImage)
-    {
+    if (paintImage) {
         painter->save();
         transformPainter(painter, translatedSize, angle);
         painter->drawPixmap(QPointF(1, 1), translatedPixmap);
         painter->restore();
-    } else
-    {
+    } else {
         painter->setBrush(bgColor);
     }
 
@@ -133,8 +127,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     else
         painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 1.5));
 
-    if (translatedPixmap.isNull() || settingsCache->getDisplayCardNames() || facedown)
-    {
+    if (translatedPixmap.isNull() || settingsCache->getDisplayCardNames() || facedown) {
         painter->save();
         transformPainter(painter, translatedSize, angle);
         painter->setPen(Qt::white);
@@ -165,8 +158,7 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->setRenderHint(QPainter::Antialiasing, false);
     transformPainter(painter, translatedSize, tapAngle);
 
-    if (isSelected() || isHovered)
-    {
+    if (isSelected() || isHovered) {
         QPen pen;
         if (isHovered)
             pen.setColor(Qt::yellow);
@@ -220,17 +212,14 @@ void AbstractCardItem::setColor(const QString &_color)
 void AbstractCardItem::cacheBgColor()
 {
     QChar colorChar;
-    if (color.isEmpty())
-    {
+    if (color.isEmpty()) {
         if (info)
             colorChar = info->getColorChar();
-    } else
-    {
+    } else {
         colorChar = color.at(0);
     }
 
-    switch (colorChar.toLower().toLatin1())
-    {
+    switch (colorChar.toLower().toLatin1()) {
         case 'b':
             bgColor = QColor(0, 0, 0);
             break;
@@ -263,8 +252,7 @@ void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
     tapped = _tapped;
     if (settingsCache->getTapAnimation() && canAnimate)
         static_cast<GameScene *>(scene())->registerAnimationItem(this);
-    else
-    {
+    else {
         tapAngle = tapped ? 90 : 0;
         setTransform(QTransform()
                          .translate((float)CARD_WIDTH / 2, (float)CARD_HEIGHT / 2)
@@ -283,11 +271,9 @@ void AbstractCardItem::setFaceDown(bool _facedown)
 
 void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if ((event->modifiers() & Qt::ControlModifier))
-    {
+    if ((event->modifiers() & Qt::ControlModifier)) {
         setSelected(!isSelected());
-    } else if (!isSelected())
-    {
+    } else if (!isSelected()) {
         scene()->clearSelection();
         setSelected(true);
     }
@@ -314,8 +300,7 @@ void AbstractCardItem::processHoverEvent()
 
 QVariant AbstractCardItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
-    if (change == ItemSelectedHasChanged)
-    {
+    if (change == ItemSelectedHasChanged) {
         update();
         return value;
     } else

@@ -69,15 +69,12 @@ void RoomSelector::retranslateUi()
 void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
 {
     const int roomListSize = event.room_list_size();
-    for (int i = 0; i < roomListSize; ++i)
-    {
+    for (int i = 0; i < roomListSize; ++i) {
         const ServerInfo_Room &room = event.room_list(i);
 
-        for (int j = 0; j < roomList->topLevelItemCount(); ++j)
-        {
+        for (int j = 0; j < roomList->topLevelItemCount(); ++j) {
             QTreeWidgetItem *twi = roomList->topLevelItem(j);
-            if (twi->data(0, Qt::UserRole).toInt() == room.room_id())
-            {
+            if (twi->data(0, Qt::UserRole).toInt() == room.room_id()) {
                 if (room.has_name())
                     twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
                 if (room.has_description())
@@ -172,12 +169,10 @@ void TabServer::retranslateUi()
 void TabServer::processServerMessageEvent(const Event_ServerMessage &event)
 {
     serverInfoBox->setHtml(QString::fromStdString(event.message()));
-    if (shouldEmitUpdate)
-    {
+    if (shouldEmitUpdate) {
         // prevent the initial server message from taking attention from ping icon
         emit userEvent();
-    } else
-    {
+    } else {
         shouldEmitUpdate = true;
     }
 }
@@ -185,8 +180,7 @@ void TabServer::processServerMessageEvent(const Event_ServerMessage &event)
 void TabServer::joinRoom(int id, bool setCurrent)
 {
     TabRoom *room = tabSupervisor->getRoomTabs().value(id);
-    if (!room)
-    {
+    if (!room) {
         Command_JoinRoom cmd;
         cmd.set_room_id(id);
 
@@ -208,8 +202,7 @@ void TabServer::joinRoomFinished(const Response &r,
                                  const CommandContainer & /*commandContainer*/,
                                  const QVariant &extraData)
 {
-    switch (r.response_code())
-    {
+    switch (r.response_code()) {
         case Response::RespOk:
             break;
         case Response::RespNameNotFound:

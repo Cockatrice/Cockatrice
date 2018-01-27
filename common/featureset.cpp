@@ -49,10 +49,8 @@ QMap<QString, bool> FeatureSet::identifyMissingFeatures(QMap<QString, bool> supp
 {
     QMap<QString, bool> missingList;
     QMap<QString, bool>::iterator i;
-    for (i = requiredFeatures.begin(); i != requiredFeatures.end(); ++i)
-    {
-        if (!suppliedFeatures.contains(i.key()))
-        {
+    for (i = requiredFeatures.begin(); i != requiredFeatures.end(); ++i) {
+        if (!suppliedFeatures.contains(i.key())) {
             missingList.insert(i.key(), i.value());
         }
     }
@@ -62,10 +60,8 @@ QMap<QString, bool> FeatureSet::identifyMissingFeatures(QMap<QString, bool> supp
 bool FeatureSet::isRequiredFeaturesMissing(QMap<QString, bool> suppliedFeatures, QMap<QString, bool> requiredFeatures)
 {
     QMap<QString, bool>::iterator i;
-    for (i = requiredFeatures.begin(); i != requiredFeatures.end(); ++i)
-    {
-        if (i.value() && suppliedFeatures.contains(i.key()))
-        {
+    for (i = requiredFeatures.begin(); i != requiredFeatures.end(); ++i) {
+        if (i.value() && suppliedFeatures.contains(i.key())) {
             return true;
         }
     }

@@ -9,13 +9,11 @@ ArrowTarget::ArrowTarget(Player *_owner, QGraphicsItem *parent)
 
 ArrowTarget::~ArrowTarget()
 {
-    for (int i = 0; i < arrowsFrom.size(); ++i)
-    {
+    for (int i = 0; i < arrowsFrom.size(); ++i) {
         arrowsFrom[i]->setStartItem(0);
         arrowsFrom[i]->delArrow();
     }
-    for (int i = 0; i < arrowsTo.size(); ++i)
-    {
+    for (int i = 0; i < arrowsTo.size(); ++i) {
         arrowsTo[i]->setTargetItem(0);
         arrowsTo[i]->delArrow();
     }

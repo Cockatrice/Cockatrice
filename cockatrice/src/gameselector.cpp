@@ -30,14 +30,12 @@ GameSelector::GameSelector(AbstractClient *_client,
 {
     gameListView = new QTreeView;
     gameListModel = new GamesModel(_rooms, _gameTypes, this);
-    if (showfilters)
-    {
+    if (showfilters) {
         gameListProxyModel = new GamesProxyModel(this, tabSupervisor->isOwnUserRegistered());
         gameListProxyModel->setSourceModel(gameListModel);
         gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         gameListView->setModel(gameListProxyModel);
-    } else
-    {
+    } else {
         gameListView->setModel(gameListModel);
     }
     gameListView->setSortingEnabled(true);
@@ -73,8 +71,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     clearFilterButton->setEnabled(true);
     connect(clearFilterButton, SIGNAL(clicked()), this, SLOT(actClearFilter()));
 
-    if (room)
-    {
+    if (room) {
         createButton = new QPushButton;
         connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
     } else
@@ -83,8 +80,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     spectateButton = new QPushButton;
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    if (showfilters)
-    {
+    if (showfilters) {
         buttonLayout->addWidget(filterButton);
         buttonLayout->addWidget(clearFilterButton);
     }
@@ -141,8 +137,7 @@ void GameSelector::actClearFilter()
 
 void GameSelector::actCreate()
 {
-    if (room == nullptr)
-    {
+    if (room == nullptr) {
         qWarning() << "Attempted to create game, but the room was null";
         return;
     }
@@ -157,8 +152,7 @@ void GameSelector::checkResponse(const Response &response)
         createButton->setEnabled(true);
     joinButton->setEnabled(true);
 
-    switch (response.response_code())
-    {
+    switch (response.response_code()) {
         case Response::RespNotInRoom:
             QMessageBox::critical(this, tr("Error"), tr("Please join the appropriate room first."));
             break;
@@ -199,8 +193,7 @@ void GameSelector::actJoin()
     bool spectator = sender() == spectateButton || game.player_count() == game.max_players();
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
     QString password;
-    if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions)
-    {
+    if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
         bool ok;
         password = QInputDialog::getText(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
         if (!ok)
@@ -214,8 +207,7 @@ void GameSelector::actJoin()
     cmd.set_override_restrictions(overrideRestrictions);
 
     TabRoom *r = tabSupervisor->getRoomTabs().value(game.room_id());
-    if (!r)
-    {
+    if (!r) {
         QMessageBox::critical(this, tr("Error"), tr("Please join the respective room first."));
         return;
     }

@@ -87,16 +87,14 @@ void MainWindow::processConnectionClosedEvent(const Event_ConnectionClosed &even
 {
     client->disconnectFromServer();
     QString reasonStr;
-    switch (event.reason())
-    {
+    switch (event.reason()) {
         case Event_ConnectionClosed::USER_LIMIT_REACHED:
             reasonStr = tr("The server has reached its maximum user capacity, please check back later.");
             break;
         case Event_ConnectionClosed::TOO_MANY_CONNECTIONS:
             reasonStr = tr("There are too many concurrent connections from your address.");
             break;
-        case Event_ConnectionClosed::BANNED:
-        {
+        case Event_ConnectionClosed::BANNED: {
             reasonStr = tr("Banned by moderator");
             if (event.has_end_time())
                 reasonStr.append("\n" +
@@ -138,8 +136,7 @@ void MainWindow::processServerShutdownEvent(const Event_ServerShutdown &event)
 void MainWindow::statusChanged(ClientStatus _status)
 {
     setClientStatusTitle();
-    switch (_status)
-    {
+    switch (_status) {
         case StatusDisconnected:
             tabSupervisor->stop();
             aSinglePlayer->setEnabled(true);
@@ -195,8 +192,7 @@ void MainWindow::actConnect()
 void MainWindow::actRegister()
 {
     DlgRegister dlg(this);
-    if (dlg.exec())
-    {
+    if (dlg.exec()) {
         client->registerToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
                                  dlg.getPassword(), dlg.getEmail(), dlg.getGender(), dlg.getCountry(),
                                  dlg.getRealName());
@@ -226,8 +222,7 @@ void MainWindow::actSinglePlayer()
     QList<AbstractClient *> localClients;
     localClients.append(mainClient);
 
-    for (int i = 0; i < numberPlayers - 1; ++i)
-    {
+    for (int i = 0; i < numberPlayers - 1; ++i) {
         LocalServerInterface *slaveLsi = localServer->newConnection();
         LocalClient *slaveClient =
             new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), settingsCache->getClientID(), this);
@@ -325,8 +320,7 @@ void MainWindow::actUpdate()
 
 void MainWindow::actViewLog()
 {
-    if (logviewDialog == nullptr)
-    {
+    if (logviewDialog == nullptr) {
         logviewDialog = new DlgViewLog(this);
     }
 
@@ -346,10 +340,8 @@ void MainWindow::loginError(Response::ResponseCode r,
                             quint32 endTime,
                             QList<QString> missingFeatures)
 {
-    switch (r)
-    {
-        case Response::RespClientUpdateRequired:
-        {
+    switch (r) {
+        case Response::RespClientUpdateRequired: {
             QString formattedMissingFeatures;
             formattedMissingFeatures = "Missing Features: ";
             for (int i = 0; i < missingFeatures.size(); ++i)
@@ -375,8 +367,7 @@ void MainWindow::loginError(Response::ResponseCode r,
                                   tr("There is already an active session using this user name.\nPlease close that "
                                      "session first and re-login."));
             break;
-        case Response::RespUserIsBanned:
-        {
+        case Response::RespUserIsBanned: {
             QString bannedStr;
             if (endTime)
                 bannedStr = tr("You are banned until %1.").arg(QDateTime::fromTime_t(endTime).toString());
@@ -388,16 +379,14 @@ void MainWindow::loginError(Response::ResponseCode r,
             QMessageBox::critical(this, tr("Error"), bannedStr);
             break;
         }
-        case Response::RespUsernameInvalid:
-        {
+        case Response::RespUsernameInvalid: {
             QMessageBox::critical(this, tr("Error"), extractInvalidUsernameMessage(reasonStr));
             break;
         }
         case Response::RespRegistrationRequired:
             if (QMessageBox::question(this, tr("Error"),
                                       tr("This server requires user registration. Do you want to register now?"),
-                                      QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-            {
+                                      QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
                 actRegister();
             }
             break;
@@ -413,23 +402,20 @@ void MainWindow::loginError(Response::ResponseCode r,
                                      "try again. If the error persists try updating your client to the most recent "
                                      "build and if need be contact your software provider."));
             break;
-        case Response::RespAccountNotActivated:
-        {
+        case Response::RespAccountNotActivated: {
             bool ok = false;
             QString token = QInputDialog::getText(this, tr("Account activation"),
                                                   tr("Your account has not been activated yet.\nYou need to provide "
                                                      "the activation token received in the activation email."),
                                                   QLineEdit::Normal, QString(), &ok);
-            if (ok && !token.isEmpty())
-            {
+            if (ok && !token.isEmpty()) {
                 client->activateToServer(token);
                 return;
             }
             client->disconnectFromServer();
             break;
         }
-        case Response::RespServerFull:
-        {
+        case Response::RespServerFull: {
             QMessageBox::critical(this, tr("Server Full"),
                                   tr("The server has reached its maximum user capacity, please check back later."));
             break;
@@ -448,8 +434,7 @@ QString MainWindow::extractInvalidUsernameMessage(QString &in)
 {
     QString out = tr("Invalid username.") + "<br/>";
     QStringList rules = in.split(QChar('|'));
-    if (rules.size() == 7 || rules.size() == 9)
-    {
+    if (rules.size() == 7 || rules.size() == 9) {
         out += tr("Your username must respect these rules:") + "<ul>";
 
         out += "<li>" + tr("is %1 - %2 characters long").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
@@ -467,8 +452,7 @@ QString MainWindow::extractInvalidUsernameMessage(QString &in)
                tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) +
                "</li>";
 
-        if (rules.size() == 9)
-        {
+        if (rules.size() == 9) {
             if (rules.at(7).size() > 0)
                 out += "<li>" + tr("can not contain any of the following words: %1").arg(rules.at(7).toHtmlEscaped()) +
                        "</li>";
@@ -480,8 +464,7 @@ QString MainWindow::extractInvalidUsernameMessage(QString &in)
         }
 
         out += "</ul>";
-    } else
-    {
+    } else {
         out += tr("You may only use A-Z, a-z, 0-9, _, ., and - in your username.");
     }
 
@@ -490,8 +473,7 @@ QString MainWindow::extractInvalidUsernameMessage(QString &in)
 
 void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime)
 {
-    switch (r)
-    {
+    switch (r) {
         case Response::RespRegistrationDisabled:
             QMessageBox::critical(this, tr("Registration denied"),
                                   tr("Registration is currently disabled on this server"));
@@ -520,8 +502,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
         case Response::RespPasswordTooShort:
             QMessageBox::critical(this, tr("Registration denied"), tr("Password too short."));
             break;
-        case Response::RespUserIsBanned:
-        {
+        case Response::RespUserIsBanned: {
             QString bannedStr;
             if (endTime)
                 bannedStr = tr("You are banned until %1.").arg(QDateTime::fromTime_t(endTime).toString());
@@ -533,8 +514,7 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
             QMessageBox::critical(this, tr("Error"), bannedStr);
             break;
         }
-        case Response::RespUsernameInvalid:
-        {
+        case Response::RespUsernameInvalid: {
             QMessageBox::critical(this, tr("Error"), extractInvalidUsernameMessage(reasonStr));
             break;
         }
@@ -581,8 +561,7 @@ void MainWindow::protocolVersionMismatch(int localVersion, int remoteVersion)
 
 void MainWindow::setClientStatusTitle()
 {
-    switch (client->getStatus())
-    {
+    switch (client->getStatus()) {
         case StatusConnecting:
             setWindowTitle(appName + " - " + tr("Connecting to %1...").arg(client->peerName()));
             break;
@@ -807,8 +786,7 @@ MainWindow::MainWindow(QWidget *parent)
     restoreGeometry(settingsCache->getMainWindowGeometry());
     aFullScreen->setChecked(static_cast<bool>(windowState() & Qt::WindowFullScreen));
 
-    if (QSystemTrayIcon::isSystemTrayAvailable())
-    {
+    if (QSystemTrayIcon::isSystemTrayAvailable()) {
         createTrayActions();
         createTrayIcon();
     }
@@ -821,8 +799,7 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(cardDatabaseNewSetsFound(int, QStringList)));
     connect(db, SIGNAL(cardDatabaseAllNewSetsEnabled()), this, SLOT(cardDatabaseAllNewSetsEnabled()));
 
-    if (!settingsCache->getDownloadSpoilersStatus())
-    {
+    if (!settingsCache->getDownloadSpoilersStatus()) {
         qDebug() << "Spoilers Disabled";
         QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
     }
@@ -830,8 +807,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    if (trayIcon)
-    {
+    if (trayIcon) {
         trayIcon->hide();
         trayIcon->deleteLater();
     }
@@ -856,12 +832,10 @@ void MainWindow::createTrayIcon()
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    if (reason == QSystemTrayIcon::DoubleClick)
-    {
+    if (reason == QSystemTrayIcon::DoubleClick) {
         if (windowState() != Qt::WindowMinimized && windowState() != Qt::WindowMinimized + Qt::WindowMaximized)
             showMinimized();
-        else
-        {
+        else {
             showNormal();
             QApplication::setActiveWindow(this);
         }
@@ -890,8 +864,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         return;
     bClosingDown = true;
 
-    if (!tabSupervisor->closeRequest())
-    {
+    if (!tabSupervisor->closeRequest()) {
         event->ignore();
         bClosingDown = false;
         return;
@@ -906,13 +879,10 @@ void MainWindow::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::LanguageChange)
         retranslateUi();
-    else if (event->type() == QEvent::ActivationChange)
-    {
-        if (isActiveWindow() && !bHasActivated)
-        {
+    else if (event->type() == QEvent::ActivationChange) {
+        if (isActiveWindow() && !bHasActivated) {
             bHasActivated = true;
-            if (settingsCache->servers().getAutoConnect())
-            {
+            if (settingsCache->servers().getAutoConnect()) {
                 qDebug() << "Attempting auto-connect...";
                 DlgConnect dlg(this);
                 client->connectToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
@@ -954,11 +924,9 @@ void MainWindow::cardDatabaseLoadingFailed()
 
     msgBox.exec();
 
-    if (msgBox.clickedButton() == yesButton)
-    {
+    if (msgBox.clickedButton() == yesButton) {
         actCheckCardUpdates();
-    } else if (msgBox.clickedButton() == settingsButton)
-    {
+    } else if (msgBox.clickedButton() == settingsButton) {
         actSettings();
     }
 }
@@ -981,15 +949,12 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
 
     msgBox.exec();
 
-    if (msgBox.clickedButton() == yesButton)
-    {
+    if (msgBox.clickedButton() == yesButton) {
         db->enableAllUnknownSets();
         QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
-    } else if (msgBox.clickedButton() == noButton)
-    {
+    } else if (msgBox.clickedButton() == noButton) {
         db->markAllSetsAsKnown();
-    } else if (msgBox.clickedButton() == settingsButton)
-    {
+    } else if (msgBox.clickedButton() == settingsButton) {
         db->markAllSetsAsKnown();
         actManageSets();
     }
@@ -1008,8 +973,7 @@ void MainWindow::cardDatabaseAllNewSetsEnabled()
 /* CARD UPDATER */
 void MainWindow::actCheckCardUpdates()
 {
-    if (cardUpdateProcess)
-    {
+    if (cardUpdateProcess) {
         QMessageBox::information(this, tr("Information"), tr("A card database update is already running."));
         return;
     }
@@ -1044,8 +1008,7 @@ void MainWindow::actCheckCardUpdates()
     if (dir.exists(binaryName))
         updaterCmd = dir.absoluteFilePath(binaryName);
 
-    if (updaterCmd.isEmpty())
-    {
+    if (updaterCmd.isEmpty()) {
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
         return;
@@ -1057,8 +1020,7 @@ void MainWindow::actCheckCardUpdates()
 void MainWindow::cardUpdateError(QProcess::ProcessError err)
 {
     QString error;
-    switch (err)
-    {
+    switch (err) {
         case QProcess::FailedToStart:
             error = tr("failed to start.");
             break;
@@ -1163,15 +1125,13 @@ void MainWindow::actAddCustomSet()
 {
     QFileDialog dialog(this, tr("Load sets/cards"), QDir::homePath());
     dialog.setNameFilters(MainWindow::fileNameFilters);
-    if (!dialog.exec())
-    {
+    if (!dialog.exec()) {
         return;
     }
 
     QString fullFilePath = dialog.selectedFiles().at(0);
 
-    if (!QFile::exists(fullFilePath))
-    {
+    if (!QFile::exists(fullFilePath)) {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Selected file cannot be found."));
         return;
     }
@@ -1188,33 +1148,28 @@ void MainWindow::actAddCustomSet()
     bool res;
 
     QString fileName = QFileInfo(fullFilePath).fileName();
-    if (fileName.compare("spoiler.xml", Qt::CaseInsensitive) == 0)
-    {
+    if (fileName.compare("spoiler.xml", Qt::CaseInsensitive) == 0) {
         /*
          * If the file being added is "spoiler.xml"
          * then we'll want to overwrite the old version
          * and replace it with the new one
          */
-        if (QFile::exists(dir.absolutePath() + "/spoiler.xml"))
-        {
+        if (QFile::exists(dir.absolutePath() + "/spoiler.xml")) {
             QFile::remove(dir.absolutePath() + "/spoiler.xml");
         }
 
         res = QFile::copy(fullFilePath, dir.absolutePath() + "/spoiler.xml");
-    } else
-    {
+    } else {
         res = QFile::copy(fullFilePath, dir.absolutePath() + "/" + (nextPrefix > 9 ? "" : "0") +
                                             QString::number(nextPrefix) + "." + fileName);
     }
 
-    if (res)
-    {
+    if (res) {
         QMessageBox::information(
             this, tr("Load sets/cards"),
             tr("The new sets/cards have been added successfully.\nCockatrice will now reload the card database."));
         QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
-    } else
-    {
+    } else {
         QMessageBox::warning(this, tr("Load sets/cards"), tr("Sets/cards failed to import."));
     }
 }
@@ -1225,8 +1180,7 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
     int maxIndex = 0;
 
     QStringList::const_iterator filesIterator;
-    for (filesIterator = files.constBegin(); filesIterator != files.constEnd(); ++filesIterator)
-    {
+    for (filesIterator = files.constBegin(); filesIterator != files.constEnd(); ++filesIterator) {
         int fileIndex = (*filesIterator).split(".").at(0).toInt();
         if (fileIndex > maxIndex)
             maxIndex = fileIndex;
@@ -1282,8 +1236,7 @@ void MainWindow::promptForgotPasswordReset()
     QMessageBox::information(this, tr("Forgot Password"),
                              tr("Activation request received, please check your email for an activation token."));
     DlgForgotPasswordReset dlg(this);
-    if (dlg.exec())
-    {
+    if (dlg.exec()) {
         client->submitForgotPasswordResetToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
                                                   dlg.getPlayerName(), dlg.getToken(), dlg.getPassword());
     }

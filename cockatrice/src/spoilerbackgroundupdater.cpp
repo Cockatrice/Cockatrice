@@ -20,8 +20,7 @@
 SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(apParent), cardUpdateProcess(nullptr)
 {
     isSpoilerDownloadEnabled = settingsCache->getDownloadSpoilersStatus();
-    if (isSpoilerDownloadEnabled)
-    {
+    if (isSpoilerDownloadEnabled) {
         // Start the process of checking if we're in spoiler season
         // File exists means we're in spoiler season
         // We will load the database before attempting to download spoilers, incase they fail
@@ -41,12 +40,10 @@ void SpoilerBackgroundUpdater::downloadFromURL(QUrl url, bool saveResults)
     auto *nam = new QNetworkAccessManager(this);
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
 
-    if (saveResults)
-    {
+    if (saveResults) {
         // This will write out to the file (used for spoiler.xml)
         connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSpoilersFile()));
-    } else
-    {
+    } else {
         // This will check the status (used to see if we're in spoiler season or not)
         connect(reply, SIGNAL(finished()), this, SLOT(actCheckIfSpoilerSeasonEnabled()));
     }
@@ -58,8 +55,7 @@ void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
     auto *reply = dynamic_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError errorCode = reply->error();
 
-    if (errorCode == QNetworkReply::NoError)
-    {
+    if (errorCode == QNetworkReply::NoError) {
         spoilerData = reply->readAll();
 
         // Save the spoiler.xml file to the disk
@@ -67,8 +63,7 @@ void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
 
         reply->deleteLater();
         emit spoilerCheckerDone();
-    } else
-    {
+    } else {
         qDebug() << "Error downloading spoilers file" << errorCode;
         emit spoilerCheckerDone();
     }
@@ -82,8 +77,7 @@ bool SpoilerBackgroundUpdater::deleteSpoilerFile()
     QFile file(fileName);
 
     // Delete the spoiler.xml file
-    if (file.exists() && file.remove())
-    {
+    if (file.exists() && file.remove()) {
         qDebug() << "Deleting spoiler.xml";
         return true;
     }
@@ -97,34 +91,27 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
     auto *response = dynamic_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError errorCode = response->error();
 
-    if (errorCode == QNetworkReply::ContentNotFoundError)
-    {
+    if (errorCode == QNetworkReply::ContentNotFoundError) {
         // Spoiler season is offline at this point, so the spoiler.xml file can be safely deleted
         // The user should run Oracle to get the latest card information
-        if (deleteSpoilerFile() && trayIcon)
-        {
+        if (deleteSpoilerFile() && trayIcon) {
             trayIcon->showMessage(tr("Spoilers season has ended"), tr("Deleting spoiler.xml. Please run Oracle"));
         }
 
         qDebug() << "Spoiler Season Offline";
         emit spoilerCheckerDone();
-    } else if (errorCode == QNetworkReply::NoError)
-    {
+    } else if (errorCode == QNetworkReply::NoError) {
         qDebug() << "Spoiler Service Online";
         startSpoilerDownloadProcess(SPOILERS_URL, true);
-    } else if (errorCode == QNetworkReply::HostNotFoundError)
-    {
-        if (trayIcon)
-        {
+    } else if (errorCode == QNetworkReply::HostNotFoundError) {
+        if (trayIcon) {
             trayIcon->showMessage(tr("Spoilers download failed"), tr("No internet connection"));
         }
 
         qDebug() << "Spoiler download failed due to no internet connection";
         emit spoilerCheckerDone();
-    } else
-    {
-        if (trayIcon)
-        {
+    } else {
+        if (trayIcon) {
             trayIcon->showMessage(tr("Spoilers download failed"), tr("Error") + " " + errorCode);
         }
 
@@ -139,16 +126,13 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
     QFileInfo fi(fileName);
     QDir fileDir(fi.path());
 
-    if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath()))
-    {
+    if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
         return false;
     }
 
     // Check if the data matches. If it does, then spoilers are up to date.
-    if (getHash(fileName) == getHash(data))
-    {
-        if (trayIcon)
-        {
+    if (getHash(fileName) == getHash(data)) {
+        if (trayIcon) {
             trayIcon->showMessage(tr("Spoilers already up to date"), tr("No new spoilers added"));
         }
 
@@ -157,15 +141,13 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
     }
 
     QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly))
-    {
+    if (!file.open(QIODevice::WriteOnly)) {
         qDebug() << "Spoiler Service Error: File open (w) failed for" << fileName;
         file.close();
         return false;
     }
 
-    if (file.write(data) == -1)
-    {
+    if (file.write(data) == -1) {
         qDebug() << "Spoiler Service Error: File write (w) failed for" << fileName;
         file.close();
         return false;
@@ -179,14 +161,11 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 
     // If the user has notifications enabled, let them know
     // when the database was last updated
-    if (trayIcon)
-    {
+    if (trayIcon) {
         QList<QByteArray> lines = data.split('\n');
 
-        foreach (QByteArray line, lines)
-        {
-            if (line.indexOf("created:") > -1)
-            {
+        foreach (QByteArray line, lines) {
+            if (line.indexOf("created:") > -1) {
                 QString timeStamp = QString(line).replace("created:", "").trimmed();
                 timeStamp.chop(6); // Remove " (UTC)"
 
@@ -209,8 +188,7 @@ QByteArray SpoilerBackgroundUpdater::getHash(const QString fileName)
 {
     QFile file(fileName);
 
-    if (file.open(QFile::ReadOnly))
-    {
+    if (file.open(QFile::ReadOnly)) {
         // Only read the first 512 bytes (enough to get the "created" tag)
         const QByteArray bytes = file.read(512);
 
@@ -221,8 +199,7 @@ QByteArray SpoilerBackgroundUpdater::getHash(const QString fileName)
 
         file.close();
         return hash.result();
-    } else
-    {
+    } else {
         qDebug() << "getHash ReadOnly failed!";
         file.close();
         return QByteArray();

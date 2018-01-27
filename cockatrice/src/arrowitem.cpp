@@ -41,14 +41,12 @@ ArrowItem::~ArrowItem()
 
 void ArrowItem::delArrow()
 {
-    if (startItem)
-    {
+    if (startItem) {
         startItem->removeArrowFrom(this);
         startItem = 0;
     }
 
-    if (targetItem)
-    {
+    if (targetItem) {
         targetItem->setBeingPointedAt(false);
         targetItem->removeArrowTo(this);
         targetItem = 0;
@@ -87,8 +85,7 @@ void ArrowItem::updatePath(const QPointF &endPoint)
     prepareGeometryChange();
     if (lineLength < 30)
         path = QPainterPath();
-    else
-    {
+    else {
         QPointF c(lineLength / 2, tan(phi * M_PI / 180) * lineLength);
 
         QPainterPath centerLine;
@@ -135,25 +132,21 @@ void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
 void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (!player->getLocal())
-    {
+    if (!player->getLocal()) {
         event->ignore();
         return;
     }
 
     QList<QGraphicsItem *> colliding = scene()->items(event->scenePos());
-    for (int i = 0; i < colliding.size(); ++i)
-    {
-        if (qgraphicsitem_cast<CardItem *>(colliding[i]))
-        {
+    for (int i = 0; i < colliding.size(); ++i) {
+        if (qgraphicsitem_cast<CardItem *>(colliding[i])) {
             event->ignore();
             return;
         }
     }
 
     event->accept();
-    if (event->button() == Qt::RightButton)
-    {
+    if (event->button() == Qt::RightButton) {
         Command_DeleteArrow cmd;
         cmd.set_arrow_id(id);
         player->sendGameCommand(cmd);
@@ -182,35 +175,27 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QList<QGraphicsItem *> colliding = scene()->items(endPos);
     ArrowTarget *cursorItem = 0;
     qreal cursorItemZ = -1;
-    for (int i = colliding.size() - 1; i >= 0; i--)
-    {
-        if (qgraphicsitem_cast<PlayerTarget *>(colliding.at(i)) || qgraphicsitem_cast<CardItem *>(colliding.at(i)))
-        {
-            if (colliding.at(i)->zValue() > cursorItemZ)
-            {
+    for (int i = colliding.size() - 1; i >= 0; i--) {
+        if (qgraphicsitem_cast<PlayerTarget *>(colliding.at(i)) || qgraphicsitem_cast<CardItem *>(colliding.at(i))) {
+            if (colliding.at(i)->zValue() > cursorItemZ) {
                 cursorItem = static_cast<ArrowTarget *>(colliding.at(i));
                 cursorItemZ = cursorItem->zValue();
             }
         }
     }
 
-    if ((cursorItem != targetItem) && targetItem)
-    {
+    if ((cursorItem != targetItem) && targetItem) {
         targetItem->setBeingPointedAt(false);
         targetItem->removeArrowTo(this);
     }
-    if (!cursorItem)
-    {
+    if (!cursorItem) {
         fullColor = false;
         targetItem = 0;
         updatePath(endPos);
-    } else
-    {
-        if (cursorItem != targetItem)
-        {
+    } else {
+        if (cursorItem != targetItem) {
             fullColor = true;
-            if (cursorItem != startItem)
-            {
+            if (cursorItem != startItem) {
                 cursorItem->setBeingPointedAt(true);
                 cursorItem->addArrowTo(this);
             }
@@ -220,8 +205,7 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     }
     update();
 
-    for (int i = 0; i < childArrows.size(); ++i)
-    {
+    for (int i = 0; i < childArrows.size(); ++i) {
         childArrows[i]->mouseMoveEvent(event);
     }
 }
@@ -231,8 +215,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (!startItem)
         return;
 
-    if (targetItem && (targetItem != startItem))
-    {
+    if (targetItem && (targetItem != startItem)) {
         CardZone *startZone = static_cast<CardItem *>(startItem)->getZone();
         // For now, we can safely assume that the start item is always a card.
         // The target item can be a player as well.
@@ -245,19 +228,16 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         cmd.set_start_zone(startZone->getName().toStdString());
         cmd.set_start_card_id(startCard->getId());
 
-        if (targetCard)
-        {
+        if (targetCard) {
             CardZone *targetZone = targetCard->getZone();
             cmd.set_target_player_id(targetZone->getPlayer()->getId());
             cmd.set_target_zone(targetZone->getName().toStdString());
             cmd.set_target_card_id(targetCard->getId());
-        } else
-        {
+        } else {
             PlayerTarget *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem);
             cmd.set_target_player_id(targetPlayer->getOwner()->getId());
         }
-        if (startZone->getName().compare("hand") == 0)
-        {
+        if (startZone->getName().compare("hand") == 0) {
             startCard->playCard(false);
             CardInfo *ci = startCard->getInfo();
             if (ci && (((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) ||
@@ -290,32 +270,25 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QList<QGraphicsItem *> colliding = scene()->items(endPos);
     ArrowTarget *cursorItem = 0;
     qreal cursorItemZ = -1;
-    for (int i = colliding.size() - 1; i >= 0; i--)
-    {
-        if (qgraphicsitem_cast<CardItem *>(colliding.at(i)))
-        {
-            if (colliding.at(i)->zValue() > cursorItemZ)
-            {
+    for (int i = colliding.size() - 1; i >= 0; i--) {
+        if (qgraphicsitem_cast<CardItem *>(colliding.at(i))) {
+            if (colliding.at(i)->zValue() > cursorItemZ) {
                 cursorItem = static_cast<ArrowTarget *>(colliding.at(i));
                 cursorItemZ = cursorItem->zValue();
             }
         }
     }
 
-    if ((cursorItem != targetItem) && targetItem)
-    {
+    if ((cursorItem != targetItem) && targetItem) {
         targetItem->setBeingPointedAt(false);
     }
-    if (!cursorItem)
-    {
+    if (!cursorItem) {
         fullColor = false;
         targetItem = 0;
         updatePath(endPos);
-    } else
-    {
+    } else {
         fullColor = true;
-        if (cursorItem != startItem)
-        {
+        if (cursorItem != startItem) {
             cursorItem->setBeingPointedAt(true);
         }
         targetItem = cursorItem;
@@ -329,8 +302,7 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
     if (!startItem)
         return;
 
-    if (targetItem && (targetItem != startItem))
-    {
+    if (targetItem && (targetItem != startItem)) {
         CardItem *startCard = qgraphicsitem_cast<CardItem *>(startItem);
         CardZone *startZone = startCard->getZone();
         CardItem *targetCard = qgraphicsitem_cast<CardItem *>(targetItem);

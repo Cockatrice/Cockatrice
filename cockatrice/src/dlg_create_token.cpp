@@ -98,12 +98,10 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
             SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
     connect(chooseTokenView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(actOk()));
 
-    if (predefinedTokens.isEmpty())
-    {
+    if (predefinedTokens.isEmpty()) {
         chooseTokenFromAllRadioButton->setChecked(true);
         chooseTokenFromDeckRadioButton->setDisabled(true); // No tokens in deck = no need for option
-    } else
-    {
+    } else {
         chooseTokenFromDeckRadioButton->setChecked(true);
         cardDatabaseDisplayModel->setCardNameSet(QSet<QString>::fromList(predefinedTokens));
     }
@@ -148,16 +146,14 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
     CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : 0;
 
-    if (cardInfo)
-    {
+    if (cardInfo) {
         updateSearchFieldWithoutUpdatingFilter(cardInfo->getName());
         const QChar cardColor = cardInfo->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
         ptEdit->setText(cardInfo->getPowTough());
         if (settingsCache->getAnnotateTokens())
             annotationEdit->setText(cardInfo->getText());
-    } else
-    {
+    } else {
         nameEdit->setText("");
         colorEdit->setCurrentIndex(colorEdit->findData(QString(), Qt::UserRole, Qt::MatchFixedString));
         ptEdit->setText("");

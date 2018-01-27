@@ -29,8 +29,7 @@ void RemoteDeckList_TreeModel::DirectoryNode::clearTree()
 
 QString RemoteDeckList_TreeModel::DirectoryNode::getPath() const
 {
-    if (parent)
-    {
+    if (parent) {
         QString parentPath = parent->getPath();
         if (parentPath.isEmpty())
             return name;
@@ -43,8 +42,7 @@ QString RemoteDeckList_TreeModel::DirectoryNode::getPath() const
 RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeModel::DirectoryNode::getNodeByPath(QStringList path)
 {
     QString pathItem;
-    if (parent)
-    {
+    if (parent) {
         if (path.isEmpty())
             return this;
         pathItem = path.takeFirst();
@@ -52,8 +50,7 @@ RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeModel::DirectoryNode
             return this;
     }
 
-    for (int i = 0; i < size(); ++i)
-    {
+    for (int i = 0; i < size(); ++i) {
         DirectoryNode *node = dynamic_cast<DirectoryNode *>(at(i));
         if (!node)
             continue;
@@ -65,16 +62,13 @@ RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeModel::DirectoryNode
 
 RemoteDeckList_TreeModel::FileNode *RemoteDeckList_TreeModel::DirectoryNode::getNodeById(int id) const
 {
-    for (int i = 0; i < size(); ++i)
-    {
+    for (int i = 0; i < size(); ++i) {
         DirectoryNode *node = dynamic_cast<DirectoryNode *>(at(i));
-        if (node)
-        {
+        if (node) {
             FileNode *result = node->getNodeById(id);
             if (result)
                 return result;
-        } else
-        {
+        } else {
             FileNode *file = dynamic_cast<FileNode *>(at(i));
             if (file->getId() == id)
                 return file;
@@ -122,15 +116,11 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
 
     Node *temp = static_cast<Node *>(index.internalPointer());
     FileNode *file = dynamic_cast<FileNode *>(temp);
-    if (!file)
-    {
+    if (!file) {
         DirectoryNode *node = dynamic_cast<DirectoryNode *>(temp);
-        switch (role)
-        {
-            case Qt::DisplayRole:
-            {
-                switch (index.column())
-                {
+        switch (role) {
+            case Qt::DisplayRole: {
+                switch (index.column()) {
                     case 0:
                         return node->getName();
                     default:
@@ -142,14 +132,10 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
             default:
                 return QVariant();
         }
-    } else
-    {
-        switch (role)
-        {
-            case Qt::DisplayRole:
-            {
-                switch (index.column())
-                {
+    } else {
+        switch (role) {
+            case Qt::DisplayRole: {
+                switch (index.column()) {
                     case 0:
                         return file->getName();
                     case 1:
@@ -174,14 +160,11 @@ QVariant RemoteDeckList_TreeModel::headerData(int section, Qt::Orientation orien
 {
     if (orientation != Qt::Horizontal)
         return QVariant();
-    switch (role)
-    {
+    switch (role) {
         case Qt::TextAlignmentRole:
             return section == 1 ? Qt::AlignRight : Qt::AlignLeft;
-        case Qt::DisplayRole:
-        {
-            switch (section)
-            {
+        case Qt::DisplayRole: {
+            switch (section) {
                 case 0:
                     return tr("Name");
                 case 1:
@@ -248,8 +231,7 @@ void RemoteDeckList_TreeModel::addFolderToTree(const ServerInfo_DeckStorage_Tree
     DirectoryNode *newItem = addNamedFolderToTree(QString::fromStdString(folder.name()), parent);
     const ServerInfo_DeckStorage_Folder &folderInfo = folder.folder();
     const int folderItemsSize = folderInfo.items_size();
-    for (int i = 0; i < folderItemsSize; ++i)
-    {
+    for (int i = 0; i < folderItemsSize; ++i) {
         const ServerInfo_DeckStorage_TreeItem &subItem = folderInfo.items(i);
         if (subItem.has_folder())
             addFolderToTree(subItem, newItem);

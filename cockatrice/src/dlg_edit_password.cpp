@@ -53,8 +53,7 @@ DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
 
 void DlgEditPassword::actOk()
 {
-    if (newPasswordEdit->text() != newPasswordEdit2->text())
-    {
+    if (newPasswordEdit->text() != newPasswordEdit2->text()) {
         QMessageBox::warning(this, tr("Error"), tr("The new passwords don't match."));
         return;
     }

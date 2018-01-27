@@ -46,24 +46,20 @@ CardItem::~CardItem()
 
 void CardItem::prepareDelete()
 {
-    if (owner)
-    {
-        if (owner->getCardMenu() == cardMenu)
-        {
+    if (owner) {
+        if (owner->getCardMenu() == cardMenu) {
             owner->setCardMenu(0);
             owner->getGame()->setActiveCard(0);
         }
         owner = 0;
     }
 
-    while (!attachedCards.isEmpty())
-    {
+    while (!attachedCards.isEmpty()) {
         attachedCards.first()->setZone(0); // so that it won't try to call reorganizeCards()
         attachedCards.first()->setAttachedTo(0);
     }
 
-    if (attachedTo)
-    {
+    if (attachedTo) {
         attachedTo->removeAttachedCard(this);
         attachedTo = 0;
     }
@@ -94,8 +90,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     int i = 0;
     QMapIterator<int, int> counterIterator(counters);
-    while (counterIterator.hasNext())
-    {
+    while (counterIterator.hasNext()) {
         counterIterator.next();
         QColor color;
         color.setHsv(counterIterator.key() * 60, 150, 255);
@@ -107,13 +102,11 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QSizeF translatedSize = getTranslatedSize(painter);
     qreal scaleFactor = translatedSize.width() / boundingRect().width();
 
-    if (!pt.isEmpty())
-    {
+    if (!pt.isEmpty()) {
         painter->save();
         transformPainter(painter, translatedSize, tapAngle);
 
-        if (info)
-        {
+        if (info) {
             QStringList ptSplit = pt.split("/");
             QStringList ptDbSplit = info->getPowTough().split("/");
 
@@ -121,8 +114,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
                 painter->setPen(QColor(255, 150, 0));
             else
                 painter->setPen(Qt::white);
-        } else
-        {
+        } else {
             painter->setPen(Qt::white);
         }
         painter->setBackground(Qt::black);
@@ -134,8 +126,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->restore();
     }
 
-    if (!annotation.isEmpty())
-    {
+    if (!annotation.isEmpty()) {
         painter->save();
 
         transformPainter(painter, translatedSize, tapAngle);
@@ -149,14 +140,12 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->restore();
     }
 
-    if (getBeingPointedAt())
-    {
+    if (getBeingPointedAt()) {
         painter->fillRect(boundingRect(), QBrush(QColor(255, 0, 0, 100)));
         painter->restore();
     }
 
-    if (doesntUntap)
-    {
+    if (doesntUntap) {
         painter->save();
 
         painter->setRenderHint(QPainter::Antialiasing, false);
@@ -213,8 +202,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
 
     gridPoint.setX(-1);
     attachedTo = _attachedTo;
-    if (attachedTo)
-    {
+    if (attachedTo) {
         setParentItem(attachedTo->getZone());
         attachedTo->addAttachedCard(this);
         if (zone != attachedTo->getZone())
@@ -248,8 +236,7 @@ void CardItem::processCardInfo(const ServerInfo_Card &info)
 {
     counters.clear();
     const int counterListSize = info.counter_list_size();
-    for (int i = 0; i < counterListSize; ++i)
-    {
+    for (int i = 0; i < counterListSize; ++i) {
         const ServerInfo_CardCounter &counterInfo = info.counter_list(i);
         counters.insert(counterInfo.id(), counterInfo.value());
     }
@@ -296,8 +283,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
     arrow->grabMouse();
 
     QListIterator<QGraphicsItem *> itemIterator(scene()->selectedItems());
-    while (itemIterator.hasNext())
-    {
+    while (itemIterator.hasNext()) {
         CardItem *c = qgraphicsitem_cast<CardItem *>(itemIterator.next());
         if (!c || (c == this))
             continue;
@@ -312,8 +298,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
 
 void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->buttons().testFlag(Qt::RightButton))
-    {
+    if (event->buttons().testFlag(Qt::RightButton)) {
         if ((event->screenPos() - event->buttonDownScreenPos(Qt::RightButton)).manhattanLength() <
             2 * QApplication::startDragDistance())
             return;
@@ -327,13 +312,11 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             arrowColor = Qt::green;
 
         drawArrow(arrowColor);
-    } else if (event->buttons().testFlag(Qt::LeftButton))
-    {
+    } else if (event->buttons().testFlag(Qt::LeftButton)) {
         if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() <
             2 * QApplication::startDragDistance())
             return;
-        if (zone->getIsView())
-        {
+        if (zone->getIsView()) {
             const ZoneViewZone *const view = static_cast<const ZoneViewZone *const>(zone);
             if (view->getRevealZone() && !view->getWriteableRevealZone())
                 return;
@@ -347,8 +330,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         QList<QGraphicsItem *> sel = scene()->selectedItems();
         int j = 0;
-        for (int i = 0; i < sel.size(); i++)
-        {
+        for (int i = 0; i < sel.size(); i++) {
             CardItem *c = static_cast<CardItem *>(sel.at(i));
             if ((c == this) || (c->getZone() != zone))
                 continue;
@@ -381,27 +363,21 @@ void CardItem::playCard(bool faceDown)
 
 void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::RightButton)
-    {
-        if (cardMenu && !cardMenu->isEmpty() && owner)
-        {
+    if (event->button() == Qt::RightButton) {
+        if (cardMenu && !cardMenu->isEmpty() && owner) {
             owner->updateCardMenu(this);
             cardMenu->exec(event->screenPos());
         }
-    } else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay())
-    {
+    } else if ((event->button() == Qt::LeftButton) && !settingsCache->getDoubleClickToPlay()) {
         bool hideCard = false;
-        if (zone && zone->getIsView())
-        {
+        if (zone && zone->getIsView()) {
             ZoneViewZone *view = static_cast<ZoneViewZone *>(zone);
             if (view->getRevealZone() && !view->getWriteableRevealZone())
                 hideCard = true;
         }
-        if (zone && hideCard)
-        {
+        if (zone && hideCard) {
             zone->removeCard(this);
-        } else
-        {
+        } else {
             playCard(event->modifiers().testFlag(Qt::ShiftModifier));
         }
     }
@@ -412,8 +388,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (settingsCache->getDoubleClickToPlay() && event->buttons() == Qt::LeftButton)
-    {
+    if (settingsCache->getDoubleClickToPlay() && event->buttons() == Qt::LeftButton) {
         if (revealedCard)
             zone->removeCard(this);
         else
@@ -444,14 +419,11 @@ bool CardItem::animationEvent()
 
 QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if ((change == ItemSelectedHasChanged) && owner)
-    {
-        if (value == true)
-        {
+    if ((change == ItemSelectedHasChanged) && owner) {
+        if (value == true) {
             owner->setCardMenu(cardMenu);
             owner->getGame()->setActiveCard(this);
-        } else if (owner->getCardMenu() == cardMenu)
-        {
+        } else if (owner->getCardMenu() == cardMenu) {
             owner->setCardMenu(0);
             owner->getGame()->setActiveCard(0);
         }
