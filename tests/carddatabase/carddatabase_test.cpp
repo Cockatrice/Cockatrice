@@ -1,7 +1,5 @@
 #include "gtest/gtest.h"
 
-#include "carddatabase_test.h"
-
 void CardDatabaseSettings::setSortKey(QString /* shortName */, unsigned int /* sortKey */) { };
 void CardDatabaseSettings::setEnabled(QString /* shortName */, bool /* enabled */) { };
 void CardDatabaseSettings::setIsKnown(QString /* shortName */, bool /* isknown */) { };
@@ -22,7 +20,7 @@ SettingsCache *settingsCache;
 void PictureLoader::clearPixmapCache(CardInfoPtr /* card */) { }
 
 // include out main header file _after_ the hack is complete
-#include "../../cockatrice/src/carddatabase.h"
+#include "carddatabase_test.h"
 
 namespace {
 
