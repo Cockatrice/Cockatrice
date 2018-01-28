@@ -10,7 +10,6 @@ class QLabel;
 class QComboBox;
 class QLineEdit;
 class QTreeView;
-class CardInfo;
 
 class DlgEditTokens : public QDialog
 {
@@ -25,7 +24,7 @@ private slots:
     void actRemoveToken();
 
 private:
-    CardInfo *currentCard;
+    CardInfoPtr currentCard;
     CardDatabaseModel *databaseModel;
     TokenDisplayModel *cardDatabaseDisplayModel;
     QStringList predefinedTokens;

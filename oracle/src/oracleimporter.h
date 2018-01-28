@@ -57,7 +57,7 @@ private:
     QVariantMap setsMap;
     QString dataDir;
 
-    CardInfo *addCard(const QString &setName,
+    CardInfoPtr addCard(const QString &setName,
                       QString cardName,
                       bool isToken,
                       int cardId,
@@ -81,7 +81,7 @@ public:
     OracleImporter(const QString &_dataDir, QObject *parent = 0);
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
-    int importTextSpoiler(CardSet *set, const QVariant &data);
+    int importTextSpoiler(QSharedPointer<CardSet> set, const QVariant &data);
     QList<SetToDownload> &getSets()
     {
         return allSets;

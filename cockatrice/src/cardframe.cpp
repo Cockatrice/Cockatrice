@@ -1,6 +1,5 @@
 #include "cardframe.h"
 
-#include "carddatabase.h"
 #include "cardinfopicture.h"
 #include "cardinfotext.h"
 #include "carditem.h"
@@ -88,16 +87,16 @@ void CardFrame::setViewMode(int mode)
     settingsCache->setCardInfoViewMode(mode);
 }
 
-void CardFrame::setCard(CardInfo *card)
+void CardFrame::setCard(CardInfoPtr card)
 {
     if (info) {
-        disconnect(info, nullptr, this, nullptr);
+        disconnect(info.data(), nullptr, this, nullptr);
     }
 
     info = card;
 
     if (info) {
-        connect(info, SIGNAL(destroyed()), this, SLOT(clear()));
+        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clear()));
     }
 
     text->setCard(info);
@@ -118,5 +117,5 @@ void CardFrame::setCard(AbstractCardItem *card)
 
 void CardFrame::clear()
 {
-    setCard((CardInfo *)nullptr);
+    setCard((CardInfoPtr )nullptr);
 }

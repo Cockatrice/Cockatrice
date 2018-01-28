@@ -1,5 +1,4 @@
 #include "filtertree.h"
-#include "carddatabase.h"
 #include "cardfilter.h"
 
 #include <QList>
@@ -100,7 +99,7 @@ FilterTreeNode *FilterItemList::termNode(const QString &term)
     return childNodes.at(i);
 }
 
-bool FilterItemList::testTypeAnd(const CardInfo *info, CardFilter::Attr attr) const
+bool FilterItemList::testTypeAnd(const CardInfoPtr info, CardFilter::Attr attr) const
 {
     for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
         if (!(*i)->isEnabled()) {
@@ -115,13 +114,13 @@ bool FilterItemList::testTypeAnd(const CardInfo *info, CardFilter::Attr attr) co
     return true;
 }
 
-bool FilterItemList::testTypeAndNot(const CardInfo *info, CardFilter::Attr attr) const
+bool FilterItemList::testTypeAndNot(const CardInfoPtr info, CardFilter::Attr attr) const
 {
     // if any one in the list is true, return false
     return !testTypeOr(info, attr);
 }
 
-bool FilterItemList::testTypeOr(const CardInfo *info, CardFilter::Attr attr) const
+bool FilterItemList::testTypeOr(const CardInfoPtr info, CardFilter::Attr attr) const
 {
     bool noChildEnabledChild = true;
 
@@ -142,23 +141,23 @@ bool FilterItemList::testTypeOr(const CardInfo *info, CardFilter::Attr attr) con
     return noChildEnabledChild;
 }
 
-bool FilterItemList::testTypeOrNot(const CardInfo *info, CardFilter::Attr attr) const
+bool FilterItemList::testTypeOrNot(const CardInfoPtr info, CardFilter::Attr attr) const
 {
     // if any one in the list is false, return true
     return !testTypeAnd(info, attr);
 }
 
-bool FilterItem::acceptName(const CardInfo *info) const
+bool FilterItem::acceptName(const CardInfoPtr info) const
 {
     return info->getName().contains(term, Qt::CaseInsensitive);
 }
 
-bool FilterItem::acceptType(const CardInfo *info) const
+bool FilterItem::acceptType(const CardInfoPtr info) const
 {
     return info->getCardType().contains(term, Qt::CaseInsensitive);
 }
 
-bool FilterItem::acceptColor(const CardInfo *info) const
+bool FilterItem::acceptColor(const CardInfoPtr info) const
 {
     QString converted_term = term.trimmed();
 
@@ -198,12 +197,12 @@ bool FilterItem::acceptColor(const CardInfo *info) const
     return match_count == converted_term.length();
 }
 
-bool FilterItem::acceptText(const CardInfo *info) const
+bool FilterItem::acceptText(const CardInfoPtr info) const
 {
     return info->getText().contains(term, Qt::CaseInsensitive);
 }
 
-bool FilterItem::acceptSet(const CardInfo *info) const
+bool FilterItem::acceptSet(const CardInfoPtr info) const
 {
     bool status = false;
     for (auto i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++) {
@@ -217,7 +216,7 @@ bool FilterItem::acceptSet(const CardInfo *info) const
     return status;
 }
 
-bool FilterItem::acceptManaCost(const CardInfo *info) const
+bool FilterItem::acceptManaCost(const CardInfoPtr info) const
 {
     QString partialCost = term.toUpper();
     QString fullManaCost = info->getManaCost();
@@ -230,24 +229,24 @@ bool FilterItem::acceptManaCost(const CardInfo *info) const
     return (fullManaCost.indexOf(partialCost) > -1);
 }
 
-bool FilterItem::acceptCmc(const CardInfo *info) const
+bool FilterItem::acceptCmc(const CardInfoPtr info) const
 {
     return (info->getCmc() == term);
 }
 
-bool FilterItem::acceptPower(const CardInfo *info) const
+bool FilterItem::acceptPower(const CardInfoPtr info) const
 {
     int slash = info->getPowTough().indexOf("/");
     return (slash != -1) ? (info->getPowTough().mid(0, slash) == term) : false;
 }
 
-bool FilterItem::acceptToughness(const CardInfo *info) const
+bool FilterItem::acceptToughness(const CardInfoPtr info) const
 {
     int slash = info->getPowTough().indexOf("/");
     return (slash != -1) ? (info->getPowTough().mid(slash + 1) == term) : false;
 }
 
-bool FilterItem::acceptRarity(const CardInfo *info) const
+bool FilterItem::acceptRarity(const CardInfoPtr info) const
 {
     QString converted_term = term.trimmed();
 
@@ -296,7 +295,7 @@ bool FilterItem::acceptRarity(const CardInfo *info) const
     return false;
 }
 
-bool FilterItem::acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) const
+bool FilterItem::acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) const
 {
     switch (attr) {
         case CardFilter::AttrName:
@@ -383,7 +382,7 @@ FilterTreeNode *FilterTree::attrTypeNode(CardFilter::Attr attr, CardFilter::Type
     return attrTypeList(attr, type);
 }
 
-bool FilterTree::testAttr(const CardInfo *info, const LogicMap *lm) const
+bool FilterTree::testAttr(const CardInfoPtr info, const LogicMap *lm) const
 {
     const FilterItemList *fil;
     bool status = true;
@@ -416,7 +415,7 @@ bool FilterTree::testAttr(const CardInfo *info, const LogicMap *lm) const
     return status;
 }
 
-bool FilterTree::acceptsCard(const CardInfo *info) const
+bool FilterTree::acceptsCard(const CardInfoPtr info) const
 {
     for (auto i = childNodes.constBegin(); i != childNodes.constEnd(); i++) {
         if ((*i)->isEnabled() && !testAttr(info, *i)) {

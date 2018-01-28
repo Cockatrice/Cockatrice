@@ -1066,7 +1066,7 @@ void Player::actCreateToken()
 
     lastTokenName = dlg.getName();
     lastTokenPT = dlg.getPT();
-    CardInfo *correctedCard = db->getCardBySimpleName(lastTokenName);
+    CardInfoPtr correctedCard = db->getCardBySimpleName(lastTokenName);
     if (correctedCard) {
         lastTokenName = correctedCard->getName();
         lastTokenTableRow = table->clampValidTableRow(2 - correctedCard->getTableRow());
@@ -1102,7 +1102,7 @@ void Player::actCreateAnotherToken()
 void Player::actCreatePredefinedToken()
 {
     QAction *action = static_cast<QAction *>(sender());
-    CardInfo *cardInfo = db->getCard(action->text());
+    CardInfoPtr cardInfo = db->getCard(action->text());
     if (!cardInfo)
         return;
 
@@ -1128,7 +1128,7 @@ void Player::actCreateRelatedCard()
      * then let's allow it to be created via "create another token"
      */
     if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
-        CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(cardRelation->getName()));
+        CardInfoPtr cardInfo = db->getCard(dbNameFromTokenDisplayName(cardRelation->getName()));
         setLastToken(cardInfo);
     }
 }
@@ -1207,7 +1207,7 @@ void Player::actCreateAllRelatedCards()
      * then assign the first to the "Create another" shortcut.
      */
     if (cardRelation != nullptr && cardRelation->getCanCreateAnother()) {
-        CardInfo *cardInfo = db->getCard(dbNameFromTokenDisplayName(cardRelation->getName()));
+        CardInfoPtr cardInfo = db->getCard(dbNameFromTokenDisplayName(cardRelation->getName()));
         setLastToken(cardInfo);
     }
 }
@@ -1244,7 +1244,7 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
 
 void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach)
 {
-    CardInfo *cardInfo = db->getCard(dbCardName);
+    CardInfoPtr cardInfo = db->getCard(dbCardName);
 
     if (cardInfo == nullptr || sourceCard == nullptr)
         return;
@@ -1407,7 +1407,7 @@ void Player::eventCreateToken(const Event_CreateToken &event)
     if (!QString::fromStdString(event.pt()).isEmpty()) {
         card->setPT(QString::fromStdString(event.pt()));
     } else {
-        CardInfo *dbCard = db->getCard(QString::fromStdString(event.card_name()));
+        CardInfoPtr dbCard = db->getCard(QString::fromStdString(event.card_name()));
         if (dbCard)
             card->setPT(dbCard->getPowTough());
     }
@@ -1909,7 +1909,7 @@ void Player::playCard(CardItem *c, bool faceDown, bool tapped)
     CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(c->getId());
 
-    CardInfo *ci = c->getInfo();
+    CardInfoPtr ci = c->getInfo();
     if (!ci)
         return;
     if (!faceDown && ((!settingsCache->getPlayToStack() && ci->getTableRow() == 3) ||
@@ -2820,7 +2820,7 @@ void Player::processSceneSizeChange(int newPlayerWidth)
     hand->setWidth(tableWidth + stack->boundingRect().width());
 }
 
-void Player::setLastToken(CardInfo *cardInfo)
+void Player::setLastToken(CardInfoPtr cardInfo)
 {
     if (cardInfo == nullptr || aCreateAnotherToken == nullptr)
         return;

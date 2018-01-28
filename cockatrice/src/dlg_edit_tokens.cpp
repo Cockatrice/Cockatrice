@@ -1,6 +1,6 @@
-#include "dlg_edit_tokens.h"
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
+#include "dlg_edit_tokens.h"
 #include "main.h"
 #include <QAction>
 #include <QComboBox>
@@ -149,7 +149,7 @@ void DlgEditTokens::actAddToken()
         }
     } while (askAgain);
 
-    CardInfo *card = new CardInfo(name, true);
+    CardInfoPtr card = CardInfo::newInstance(name, true);
     card->addToSet(databaseModel->getDatabase()->getSet(CardDatabase::TOKENS_SETNAME));
     card->setCardType("Token");
     databaseModel->getDatabase()->addCard(card);
@@ -158,10 +158,9 @@ void DlgEditTokens::actAddToken()
 void DlgEditTokens::actRemoveToken()
 {
     if (currentCard) {
-        CardInfo *cardToRemove = currentCard; // the currentCard property gets modified during db->removeCard()
+        CardInfoPtr cardToRemove = currentCard; // the currentCard property gets modified during db->removeCard()
         currentCard = 0;
         databaseModel->getDatabase()->removeCard(cardToRemove);
-        delete cardToRemove;
     }
 }
 

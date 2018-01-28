@@ -36,21 +36,21 @@ public:
     {
         return db;
     }
-    CardInfo *getCard(int index) const
+    CardInfoPtr getCard(int index) const
     {
         return cardList[index];
     }
 
 private:
-    QList<CardInfo *> cardList;
+    QList<CardInfoPtr> cardList;
     CardDatabase *db;
     bool showOnlyCardsFromEnabledSets;
 
-    inline bool checkCardHasAtLeastOneEnabledSet(CardInfo *card);
+    inline bool checkCardHasAtLeastOneEnabledSet(CardInfoPtr card);
 private slots:
-    void cardAdded(CardInfo *card);
-    void cardRemoved(CardInfo *card);
-    void cardInfoChanged(CardInfo *card);
+    void cardAdded(CardInfoPtr card);
+    void cardRemoved(CardInfoPtr card);
+    void cardInfoChanged(CardInfoPtr card);
     void cardDatabaseEnabledSetsChanged();
 };
 
@@ -122,7 +122,7 @@ protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
     static int lessThanNumerically(const QString &left, const QString &right);
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
-    bool rowMatchesCardName(CardInfo const *info) const;
+    bool rowMatchesCardName(CardInfoPtr info) const;
     bool canFetchMore(const QModelIndex &parent) const;
     void fetchMore(const QModelIndex &parent);
 private slots:

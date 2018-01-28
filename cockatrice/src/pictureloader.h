@@ -6,8 +6,7 @@
 #include <QMutex>
 #include <QNetworkRequest>
 
-class CardInfo;
-class CardSet;
+#include "carddatabase.h"
 class QNetworkAccessManager;
 class QNetworkReply;
 class QThread;
@@ -17,18 +16,22 @@ class PictureToLoad
 private:
     class SetDownloadPriorityComparator;
 
-    CardInfo *card;
-    QList<CardSet *> sortedSets;
+    CardInfoPtr card;
+    QList<QSharedPointer<CardSet> > sortedSets;
     int setIndex;
     bool hq;
 
 public:
-    PictureToLoad(CardInfo *_card = 0);
-    CardInfo *getCard() const
+    PictureToLoad(CardInfoPtr _card = CardInfoPtr());
+    CardInfoPtr getCard() const
     {
         return card;
     }
-    CardSet *getCurrentSet() const;
+    void clear()
+    {
+        card.clear();
+    }
+    QSharedPointer<CardSet> getCurrentSet() const;
     QString getSetName() const;
     bool nextSet();
 };
@@ -40,7 +43,7 @@ public:
     PictureLoaderWorker();
     ~PictureLoaderWorker();
 
-    void enqueueImageLoad(CardInfo *card);
+    void enqueueImageLoad(CardInfoPtr card);
 
 private:
     static QStringList md5Blacklist;
@@ -68,7 +71,7 @@ public slots:
     void processLoadQueue();
 signals:
     void startLoadQueue();
-    void imageLoaded(CardInfo *card, const QImage &image);
+    void imageLoaded(CardInfoPtr card, const QImage &image);
 };
 
 class PictureLoader : public QObject
@@ -91,15 +94,15 @@ private:
     PictureLoaderWorker *worker;
 
 public:
-    static void getPixmap(QPixmap &pixmap, CardInfo *card, QSize size);
+    static void getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size);
     static void getCardBackPixmap(QPixmap &pixmap, QSize size);
-    static void clearPixmapCache(CardInfo *card);
+    static void clearPixmapCache(CardInfoPtr card);
     static void clearPixmapCache();
-    static void cacheCardPixmaps(QList<CardInfo *> cards);
+    static void cacheCardPixmaps(QList<CardInfoPtr> cards);
 private slots:
     void picDownloadChanged();
     void picsPathChanged();
 public slots:
-    void imageLoaded(CardInfo *card, const QImage &image);
+    void imageLoaded(CardInfoPtr card, const QImage &image);
 };
 #endif

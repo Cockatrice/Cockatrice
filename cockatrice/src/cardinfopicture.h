@@ -3,15 +3,16 @@
 
 #include <QWidget>
 
+#include "carddatabase.h"
+
 class AbstractCardItem;
-class CardInfo;
 
 class CardInfoPicture : public QWidget
 {
     Q_OBJECT
 
 private:
-    CardInfo *info;
+    CardInfoPtr info;
     QPixmap resizedPixmap;
     bool pixmapDirty;
 
@@ -23,7 +24,7 @@ protected:
     void paintEvent(QPaintEvent *);
     void loadPixmap();
 public slots:
-    void setCard(CardInfo *card);
+    void setCard(CardInfoPtr card);
     void updatePixmap();
 };
 

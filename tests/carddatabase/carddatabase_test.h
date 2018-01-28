@@ -41,5 +41,5 @@ signals:
 class CardInfo;
 
 class PictureLoader {
-    void clearPixmapCache(CardInfo *card);
+    void clearPixmapCache(CardInfoPtr card);
 };

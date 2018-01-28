@@ -9,17 +9,20 @@
 #include <QMap>
 #include <QPixmap>
 #include <QXmlStreamReader>
+#include <QMetaType>
 
 class CardDatabase;
 class CardInfo;
+class CardSet;
 class CardRelation;
 
 typedef QMap<QString, QString> QStringMap;
-
-// If we don't typedef this, CardInfo::CardInfo will refuse to compile on OS X < 10.9
 typedef QMap<QString, int> MuidMap;
+typedef QSharedPointer<CardInfo> CardInfoPtr;
+typedef QSharedPointer<CardSet> CardSetPtr;
+Q_DECLARE_METATYPE(CardInfoPtr)
 
-class CardSet : public QList<CardInfo *>
+class CardSet : public QList<CardInfoPtr>
 {
 private:
     QString shortName, longName;
@@ -30,6 +33,10 @@ private:
 
 public:
     explicit CardSet(const QString &_shortName = QString(),
+                     const QString &_longName = QString(),
+                     const QString &_setType = QString(),
+                     const QDate &_releaseDate = QDate());
+    static CardSetPtr newInstance(const QString &_shortName = QString(),
                      const QString &_longName = QString(),
                      const QString &_setType = QString(),
                      const QDate &_releaseDate = QDate());
@@ -87,7 +94,7 @@ public:
     }
 };
 
-class SetList : public QList<CardSet *>
+class SetList : public QList<QSharedPointer<CardSet> >
 {
 private:
     class KeyCompareFunctor;
@@ -107,6 +114,7 @@ class CardInfo : public QObject
 {
     Q_OBJECT
 private:
+    CardInfoPtr smartThis;
     QString name;
 
     /*
@@ -146,7 +154,7 @@ private:
     QString pixmapCacheKey;
 
 public:
-    explicit CardInfo(const QString &_name = QString(),
+   explicit CardInfo(const QString &_name = QString(),
                       bool _isToken = false,
                       const QString &_manacost = QString(),
                       const QString &_cmc = QString(),
@@ -166,6 +174,31 @@ public:
                       QStringMap _collectorNumbers = QStringMap(),
                       QStringMap _rarities = QStringMap());
     ~CardInfo() override;
+
+    static CardInfoPtr newInstance(const QString &_name = QString(),
+                      bool _isToken = false,
+                      const QString &_manacost = QString(),
+                      const QString &_cmc = QString(),
+                      const QString &_cardtype = QString(),
+                      const QString &_powtough = QString(),
+                      const QString &_text = QString(),
+                      const QStringList &_colors = QStringList(),
+                      const QList<CardRelation *> &_relatedCards = QList<CardRelation *>(),
+                      const QList<CardRelation *> &_reverseRelatedCards = QList<CardRelation *>(),
+                      bool _upsideDownArt = false,
+                      int _loyalty = 0,
+                      bool _cipt = false,
+                      int _tableRow = 0,
+                      const SetList &_sets = SetList(),
+                      const QStringMap &_customPicURLs = QStringMap(),
+                      MuidMap muids = MuidMap(),
+                      QStringMap _collectorNumbers = QStringMap(),
+                      QStringMap _rarities = QStringMap());
+
+    void setSmartPointer(CardInfoPtr _ptr)
+    {
+        smartThis = _ptr;
+    }
 
     inline const QString &getName() const
     {
@@ -219,27 +252,27 @@ public:
     {
         return cipt;
     }
-    // void setManaCost(const QString &_manaCost) { manacost = _manaCost; emit cardInfoChanged(this); }
-    // void setCmc(const QString &_cmc) { cmc = _cmc; emit cardInfoChanged(this); }
+    // void setManaCost(const QString &_manaCost) { manacost = _manaCost; emit cardInfoChanged(smartThis); }
+    // void setCmc(const QString &_cmc) { cmc = _cmc; emit cardInfoChanged(smartThis); }
     void setCardType(const QString &_cardType)
     {
         cardtype = _cardType;
-        emit cardInfoChanged(this);
+        emit cardInfoChanged(smartThis);
     }
     void setPowTough(const QString &_powTough)
     {
         powtough = _powTough;
-        emit cardInfoChanged(this);
+        emit cardInfoChanged(smartThis);
     }
     void setText(const QString &_text)
     {
         text = _text;
-        emit cardInfoChanged(this);
+        emit cardInfoChanged(smartThis);
     }
     void setColors(const QStringList &_colors)
     {
         colors = _colors;
-        emit cardInfoChanged(this);
+        emit cardInfoChanged(smartThis);
     }
     const QChar getColorChar() const;
     const QStringList &getColors() const
@@ -297,7 +330,7 @@ public:
     {
         tableRow = _tableRow;
     }
-    // void setLoyalty(int _loyalty) { loyalty = _loyalty; emit cardInfoChanged(this); }
+    // void setLoyalty(int _loyalty) { loyalty = _loyalty; emit cardInfoChanged(smartThis); }
     // void setCustomPicURL(const QString &_set, const QString &_customPicURL) { customPicURLs.insert(_set,
     // _customPicURL); }
     void setMuId(const QString &_set, const int &_muId)
@@ -312,7 +345,7 @@ public:
     {
         rarities.insert(_set, _setNumber);
     }
-    void addToSet(CardSet *set);
+    void addToSet(QSharedPointer<CardSet> set);
     void emitPixmapUpdated()
     {
         emit pixmapUpdated();
@@ -327,7 +360,7 @@ public:
 
 signals:
     void pixmapUpdated();
-    void cardInfoChanged(CardInfo *card);
+    void cardInfoChanged(CardInfoPtr card);
 };
 
 enum LoadStatus
@@ -340,8 +373,8 @@ enum LoadStatus
     NoCards
 };
 
-typedef QHash<QString, CardInfo *> CardNameMap;
-typedef QHash<QString, CardSet *> SetNameMap;
+typedef QHash<QString, CardInfoPtr> CardNameMap;
+typedef QHash<QString, QSharedPointer<CardSet> > SetNameMap;
 
 class CardDatabase : public QObject
 {
@@ -369,7 +402,7 @@ private:
     void loadCardsFromXml(QXmlStreamReader &xml);
     void loadSetsFromXml(QXmlStreamReader &xml);
 
-    CardInfo *getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
+    CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     void checkUnknownSets();
     void refreshCachedReverseRelatedCards();
 
@@ -383,19 +416,19 @@ public:
     explicit CardDatabase(QObject *parent = nullptr);
     ~CardDatabase() override;
     void clear();
-    void addCard(CardInfo *card);
-    void removeCard(CardInfo *card);
-    CardInfo *getCard(const QString &cardName) const;
-    QList<CardInfo *> getCards(const QStringList &cardNames) const;
+    void addCard(CardInfoPtr card);
+    void removeCard(CardInfoPtr card);
+    CardInfoPtr getCard(const QString &cardName) const;
+    QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
 
     /*
      * Get a card by its simple name. The name will be simplified in this
      * function, so you don't need to simplify it beforehand.
      */
-    CardInfo *getCardBySimpleName(const QString &cardName) const;
+    CardInfoPtr getCardBySimpleName(const QString &cardName) const;
 
-    CardSet *getSet(const QString &setName);
-    QList<CardInfo *> getCardList() const
+    QSharedPointer<CardSet> getSet(const QString &setName);
+    QList<CardInfoPtr> getCardList() const
     {
         return cards.values();
     }
@@ -422,8 +455,8 @@ signals:
     void cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames);
     void cardDatabaseAllNewSetsEnabled();
     void cardDatabaseEnabledSetsChanged();
-    void cardAdded(CardInfo *card);
-    void cardRemoved(CardInfo *card);
+    void cardAdded(CardInfoPtr card);
+    void cardRemoved(CardInfoPtr card);
 };
 
 class CardRelation : public QObject

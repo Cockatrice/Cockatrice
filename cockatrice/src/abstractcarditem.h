@@ -2,8 +2,8 @@
 #define ABSTRACTCARDITEM_H
 
 #include "arrowtarget.h"
+#include "carddatabase.h"
 
-class CardInfo;
 class Player;
 
 const int CARD_WIDTH = 72;
@@ -13,7 +13,7 @@ class AbstractCardItem : public ArrowTarget
 {
     Q_OBJECT
 protected:
-    CardInfo *info;
+    CardInfoPtr info;
     int id;
     QString name;
     bool tapped;
@@ -54,7 +54,7 @@ public:
     QSizeF getTranslatedSize(QPainter *painter) const;
     void paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    CardInfo *getInfo() const
+    CardInfoPtr getInfo() const
     {
         return info;
     }

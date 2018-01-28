@@ -47,7 +47,7 @@ void DeckListModel::rebuildTree()
                 continue;
             }
 
-            CardInfo *info = db->getCard(currentCard->getName());
+            CardInfoPtr info = db->getCard(currentCard->getName());
             QString cardType = info ? info->getMainCardType() : "unknown";
 
             auto *cardTypeNode = dynamic_cast<InnerDecklistNode *>(node->findChild(cardType));
@@ -276,7 +276,7 @@ InnerDecklistNode *DeckListModel::createNodeIfNeeded(const QString &name, InnerD
 DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName, const QString &zoneName) const
 {
     InnerDecklistNode *zoneNode, *typeNode;
-    CardInfo *info;
+    CardInfoPtr info;
     QString cardType;
 
     zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
@@ -312,16 +312,17 @@ QModelIndex DeckListModel::findCard(const QString &cardName, const QString &zone
 
 QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneName, bool abAddAnyway)
 {
-    CardInfo *info = db->getCard(cardName);
+    CardInfoPtr info = db->getCard(cardName);
     if (info == nullptr) {
         if (abAddAnyway) {
             // We need to keep this card added no matter what
             // This is usually called from tab_deck_editor
             // So we'll create a new CardInfo with the name
             // and default values for all fields
-            info = new CardInfo(cardName, false, nullptr, nullptr, "unknown", nullptr, nullptr, QStringList(),
-                                QList<CardRelation *>(), QList<CardRelation *>(), false, 0, false, 0, SetList(),
-                                QStringMap(), MuidMap(), QStringMap(), QStringMap());
+            info = CardInfo::newInstance(cardName, false, nullptr, nullptr, "unknown", nullptr, nullptr,
+                                         QStringList(), QList<CardRelation *>(), QList<CardRelation *>(),
+                                         false, 0, false, 0, SetList(), QStringMap(), MuidMap(), QStringMap(),
+                                         QStringMap());
         } else {
             return {};
         }
