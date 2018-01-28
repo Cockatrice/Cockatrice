@@ -83,7 +83,7 @@ CardSetPtr PictureToLoad::getCurrentSet() const
     if (setIndex < sortedSets.size())
         return sortedSets[setIndex];
     else
-        return 0;
+        return {};
 }
 
 QStringList PictureLoaderWorker::md5Blacklist =
