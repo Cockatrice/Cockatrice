@@ -20,6 +20,7 @@ typedef QMap<QString, QString> QStringMap;
 typedef QMap<QString, int> MuidMap;
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
+
 Q_DECLARE_METATYPE(CardInfoPtr)
 
 class CardSet : public QList<CardInfoPtr>
@@ -94,7 +95,7 @@ public:
     }
 };
 
-class SetList : public QList<QSharedPointer<CardSet> >
+class SetList : public QList<CardSetPtr>
 {
 private:
     class KeyCompareFunctor;
@@ -345,7 +346,7 @@ public:
     {
         rarities.insert(_set, _setNumber);
     }
-    void addToSet(QSharedPointer<CardSet> set);
+    void addToSet(CardSetPtr set);
     void emitPixmapUpdated()
     {
         emit pixmapUpdated();
@@ -374,7 +375,7 @@ enum LoadStatus
 };
 
 typedef QHash<QString, CardInfoPtr> CardNameMap;
-typedef QHash<QString, QSharedPointer<CardSet> > SetNameMap;
+typedef QHash<QString, CardSetPtr> SetNameMap;
 
 class CardDatabase : public QObject
 {
@@ -427,7 +428,7 @@ public:
      */
     CardInfoPtr getCardBySimpleName(const QString &cardName) const;
 
-    QSharedPointer<CardSet> getSet(const QString &setName);
+    CardSetPtr getSet(const QString &setName);
     QList<CardInfoPtr> getCardList() const
     {
         return cards.values();

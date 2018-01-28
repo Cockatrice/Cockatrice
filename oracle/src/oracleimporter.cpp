@@ -134,7 +134,7 @@ void OracleImporter::extractColors(const QStringList &in, QStringList &out)
     }
 }
 
-int OracleImporter::importTextSpoiler(QSharedPointer<CardSet> set, const QVariant &data)
+int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
 {
     int cards = 0;
 
@@ -311,14 +311,14 @@ int OracleImporter::startImport()
     const SetToDownload *curSet;
 
     // add an empty set for tokens
-    QSharedPointer<CardSet> tokenSet = CardSet::newInstance(TOKENS_SETNAME, 
+    CardSetPtr tokenSet = CardSet::newInstance(TOKENS_SETNAME, 
                                                             tr("Dummy set containing tokens"),
                                                             "Tokens");
     sets.insert(TOKENS_SETNAME, tokenSet);
 
     while (it.hasNext()) {
         curSet = &it.next();
-        QSharedPointer<CardSet> set =
+        CardSetPtr set =
             CardSet::newInstance(curSet->getShortName(), curSet->getLongName(), curSet->getSetType(),
                                  curSet->getReleaseDate());
         if (!sets.contains(set->getShortName()))

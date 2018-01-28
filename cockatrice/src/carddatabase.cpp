@@ -12,7 +12,7 @@
 const int CardDatabase::versionNeeded = 3;
 const char *CardDatabase::TOKENS_SETNAME = "TK";
 
-static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const QSharedPointer<CardSet> set)
+static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr set)
 {
     if (set == nullptr) {
         qDebug() << "&operator<< set is nullptr";
@@ -106,7 +106,7 @@ void CardSet::setIsKnown(bool _isknown)
 class SetList::KeyCompareFunctor
 {
 public:
-    inline bool operator()(QSharedPointer<CardSet> a, QSharedPointer<CardSet> b) const
+    inline bool operator()(CardSetPtr a, CardSetPtr b) const
     {
         if (a == nullptr || b == nullptr) {
             qDebug() << "SetList::KeyCompareFunctor a or b is null";
@@ -126,7 +126,7 @@ int SetList::getEnabledSetsNum()
 {
     int num = 0;
     for (int i = 0; i < size(); ++i) {
-        QSharedPointer<CardSet> set = at(i);
+        CardSetPtr set = at(i);
         if (set && set->getEnabled()) {
             ++num;
         }
@@ -138,7 +138,7 @@ int SetList::getUnknownSetsNum()
 {
     int num = 0;
     for (int i = 0; i < size(); ++i) {
-        QSharedPointer<CardSet> set = at(i);
+        CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             ++num;
         }
@@ -150,7 +150,7 @@ QStringList SetList::getUnknownSetsNames()
 {
     QStringList sets = QStringList();
     for (int i = 0; i < size(); ++i) {
-        QSharedPointer<CardSet> set = at(i);
+        CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             sets << set->getShortName();
         }
@@ -161,7 +161,7 @@ QStringList SetList::getUnknownSetsNames()
 void SetList::enableAllUnknown()
 {
     for (int i = 0; i < size(); ++i) {
-        QSharedPointer<CardSet> set = at(i);
+        CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             set->setIsKnown(true);
             set->setEnabled(true);
@@ -174,7 +174,7 @@ void SetList::enableAllUnknown()
 void SetList::enableAll()
 {
     for (int i = 0; i < size(); ++i) {
-        QSharedPointer<CardSet> set = at(i);
+        CardSetPtr set = at(i);
 
         if (set == nullptr) {
             qDebug() << "enabledAll has null";
@@ -192,7 +192,7 @@ void SetList::enableAll()
 void SetList::markAllAsKnown()
 {
     for (int i = 0; i < size(); ++i) {
-        QSharedPointer<CardSet> set = at(i);
+        CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             set->setIsKnown(true);
             set->setEnabled(false);
@@ -208,7 +208,7 @@ void SetList::guessSortKeys()
     QDate distantFuture(2050, 1, 1);
     int aHundredYears = 36500;
     for (int i = 0; i < size(); ++i) {
-        QSharedPointer<CardSet> set = at(i);
+        CardSetPtr set = at(i);
         if (set == nullptr) {
             qDebug() << "guessSortKeys set is null";
             continue;
@@ -336,7 +336,7 @@ QString CardInfo::getCorrectedName() const
     return result.remove(" // ").remove(':').remove('"').remove('?').replace('/', ' ');
 }
 
-void CardInfo::addToSet(QSharedPointer<CardSet> set)
+void CardInfo::addToSet(CardSetPtr set)
 {
     if (set == nullptr) {
         qDebug() << "addToSet(nullptr)";
@@ -596,12 +596,12 @@ CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
     return getCardFromMap(simpleNameCards, CardInfo::simplifyName(cardName));
 }
 
-QSharedPointer<CardSet> CardDatabase::getSet(const QString &setName)
+CardSetPtr CardDatabase::getSet(const QString &setName)
 {
     if (sets.contains(setName)) {
         return sets.value(setName);
     } else {
-        QSharedPointer<CardSet> newSet = CardSet::newInstance(setName);
+        CardSetPtr newSet = CardSet::newInstance(setName);
         sets.insert(setName, newSet);
         return newSet;
     }
@@ -610,7 +610,7 @@ QSharedPointer<CardSet> CardDatabase::getSet(const QString &setName)
 SetList CardDatabase::getSetList() const
 {
     SetList result;
-    QHashIterator<QString, QSharedPointer<CardSet> > i(sets);
+    QHashIterator<QString, CardSetPtr> i(sets);
     while (i.hasNext()) {
         i.next();
         result << i.value();
@@ -647,7 +647,7 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
                 }
             }
 
-            QSharedPointer<CardSet> newSet = getSet(shortName);
+            CardSetPtr newSet = getSet(shortName);
             newSet->setLongName(longName);
             newSet->setSetType(setType);
             newSet->setReleaseDate(releaseDate);
@@ -842,7 +842,7 @@ bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
 
     if (!tokens) {
         xml.writeStartElement("sets");
-        QHashIterator<QString, QSharedPointer<CardSet> > setIterator(sets);
+        QHashIterator<QString, CardSetPtr> setIterator(sets);
         while (setIterator.hasNext()) {
             xml << setIterator.next().value();
         }
@@ -904,7 +904,7 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     // reorder sets (TODO: refactor, this smells)
     SetList allSets;
-    QHashIterator<QString, QSharedPointer<CardSet> > setsIterator(sets);
+    QHashIterator<QString, CardSetPtr> setsIterator(sets);
     while (setsIterator.hasNext()) {
         allSets.append(setsIterator.next().value());
     }
@@ -1031,7 +1031,7 @@ void CardDatabase::notifyEnabledSetsChanged()
 
 bool CardDatabase::saveCustomTokensToFile()
 {
-    QSharedPointer<CardSet> customTokensSet = getSet(CardDatabase::TOKENS_SETNAME);
+    CardSetPtr customTokensSet = getSet(CardDatabase::TOKENS_SETNAME);
     QString fileName = settingsCache->getCustomCardDatabasePath() + "/" + CardDatabase::TOKENS_SETNAME + ".xml";
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {

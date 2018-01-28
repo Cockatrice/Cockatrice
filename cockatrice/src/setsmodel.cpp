@@ -3,7 +3,7 @@
 SetsModel::SetsModel(CardDatabase *_db, QObject *parent) : QAbstractTableModel(parent), sets(_db->getSetList())
 {
     sets.sortByKey();
-    foreach (QSharedPointer<CardSet> set, sets) {
+    foreach (CardSetPtr set, sets) {
         if (set->getEnabled())
             enabledSets.insert(set);
     }
@@ -26,7 +26,7 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || (index.column() >= NUM_COLS) || (index.row() >= rowCount()))
         return QVariant();
 
-    QSharedPointer<CardSet> set = sets[index.row()];
+    CardSetPtr set = sets[index.row()];
 
     if (index.column() == EnabledCol) {
         switch (role) {
@@ -146,7 +146,7 @@ bool SetsModel::dropMimeData(const QMimeData *data,
 
 void SetsModel::toggleRow(int row, bool enable)
 {
-    QSharedPointer<CardSet> temp = sets.at(row);
+    CardSetPtr temp = sets.at(row);
 
     if (enable)
         enabledSets.insert(temp);
@@ -158,7 +158,7 @@ void SetsModel::toggleRow(int row, bool enable)
 
 void SetsModel::toggleRow(int row)
 {
-    QSharedPointer<CardSet> tmp = sets.at(row);
+    CardSetPtr tmp = sets.at(row);
 
     if (tmp == nullptr)
         return;
@@ -176,7 +176,7 @@ void SetsModel::toggleAll(bool enabled)
     enabledSets.clear();
 
     if (enabled)
-        foreach (QSharedPointer<CardSet> set, sets)
+        foreach (CardSetPtr set, sets)
             enabledSets.insert(set);
 
     emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
@@ -185,7 +185,7 @@ void SetsModel::toggleAll(bool enabled)
 void SetsModel::swapRows(int oldRow, int newRow)
 {
     beginRemoveRows(QModelIndex(), oldRow, oldRow);
-    QSharedPointer<CardSet> temp = sets.takeAt(oldRow);
+    CardSetPtr temp = sets.takeAt(oldRow);
     endRemoveRows();
 
     beginInsertRows(QModelIndex(), newRow, newRow);
@@ -197,14 +197,14 @@ void SetsModel::swapRows(int oldRow, int newRow)
 
 void SetsModel::sort(int column, Qt::SortOrder order)
 {
-    QMap<QString, QSharedPointer<CardSet> > setMap;
+    QMap<QString, CardSetPtr> setMap;
     int numRows = rowCount();
     int row;
 
     for (row = 0; row < numRows; ++row)
         setMap.insertMulti(index(row, column).data(SetsModel::SortRole).toString(), sets.at(row));
 
-    QList<QSharedPointer<CardSet> > tmp = setMap.values();
+    QList<CardSetPtr> tmp = setMap.values();
     sets.clear();
     if (order == Qt::AscendingOrder) {
         for (row = 0; row < tmp.size(); row++) {
@@ -226,7 +226,7 @@ void SetsModel::save(CardDatabase *db)
         sets[i]->setSortKey(i + 1);
 
     // enabled sets
-    foreach (QSharedPointer<CardSet> set, sets)
+    foreach (CardSetPtr set, sets)
         set->setEnabled(enabledSets.contains(set));
 
     sets.sortByKey();
@@ -242,7 +242,7 @@ void SetsModel::restore(CardDatabase *db)
 
     // enabled sets
     enabledSets.clear();
-    foreach (QSharedPointer<CardSet> set, sets) {
+    foreach (CardSetPtr set, sets) {
         if (set->getEnabled())
             enabledSets.insert(set);
     }

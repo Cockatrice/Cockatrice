@@ -91,7 +91,7 @@ bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
     if (!showOnlyCardsFromEnabledSets)
         return true;
 
-    foreach (QSharedPointer<CardSet> set, card->getSets()) {
+    foreach (CardSetPtr set, card->getSets()) {
         if (set->getEnabled())
             return true;
     }

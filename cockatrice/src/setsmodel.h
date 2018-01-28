@@ -36,7 +36,7 @@ class SetsModel : public QAbstractTableModel
 private:
     static const int NUM_COLS = 7;
     SetList sets;
-    QSet<QSharedPointer<CardSet> > enabledSets;
+    QSet<CardSetPtr> enabledSets;
 
 public:
     enum SetsColumns

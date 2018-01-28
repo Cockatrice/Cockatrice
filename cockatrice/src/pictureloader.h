@@ -17,7 +17,7 @@ private:
     class SetDownloadPriorityComparator;
 
     CardInfoPtr card;
-    QList<QSharedPointer<CardSet> > sortedSets;
+    QList<CardSetPtr> sortedSets;
     int setIndex;
     bool hq;
 
@@ -31,7 +31,7 @@ public:
     {
         card.clear();
     }
-    QSharedPointer<CardSet> getCurrentSet() const;
+    CardSetPtr getCurrentSet() const;
     QString getSetName() const;
     bool nextSet();
 };

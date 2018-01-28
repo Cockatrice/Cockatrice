@@ -81,7 +81,7 @@ public:
     OracleImporter(const QString &_dataDir, QObject *parent = 0);
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
-    int importTextSpoiler(QSharedPointer<CardSet> set, const QVariant &data);
+    int importTextSpoiler(CardSetPtr set, const QVariant &data);
     QList<SetToDownload> &getSets()
     {
         return allSets;

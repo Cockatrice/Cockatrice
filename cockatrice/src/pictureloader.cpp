@@ -32,7 +32,7 @@ public:
      * Enabled sets have priority over disabled sets
      * Both groups follows the user-defined order
      */
-    inline bool operator()(QSharedPointer<CardSet> a, QSharedPointer<CardSet> b) const
+    inline bool operator()(CardSetPtr a, CardSetPtr b) const
     {
         if (a->getEnabled()) {
             if (b->getEnabled()) {
@@ -78,7 +78,7 @@ QString PictureToLoad::getSetName() const
         return QString("");
 }
 
-QSharedPointer<CardSet> PictureToLoad::getCurrentSet() const
+CardSetPtr PictureToLoad::getCurrentSet() const
 {
     if (setIndex < sortedSets.size())
         return sortedSets[setIndex];
@@ -214,7 +214,7 @@ QString PictureLoaderWorker::getPicUrl()
         return QString();
 
     CardInfoPtr card = cardBeingDownloaded.getCard();
-    QSharedPointer<CardSet> set = cardBeingDownloaded.getCurrentSet();
+    CardSetPtr set = cardBeingDownloaded.getCurrentSet();
     QString picUrl = QString("");
 
     // if sets have been defined for the card, they can contain custom picUrls
