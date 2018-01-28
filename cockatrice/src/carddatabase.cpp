@@ -582,7 +582,11 @@ QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
 {
     QList<CardInfoPtr> cardInfos;
     foreach (QString cardName, cardNames)
-        cardInfos.append(getCardFromMap(cards, cardName));
+    {
+        CardInfoPtr ptr = getCardFromMap(cards, cardName);
+        if(ptr)
+            cardInfos.append(ptr);
+    }
 
     return cardInfos;
 }
@@ -771,11 +775,10 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
 
 CardInfoPtr CardDatabase::getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const
 {
-    if (cardMap.contains(cardName)) {
+    if (cardMap.contains(cardName))
         return cardMap.value(cardName);
-    }
 
-    return nullptr;
+    return {};
 }
 
 LoadStatus CardDatabase::loadFromFile(const QString &fileName)
