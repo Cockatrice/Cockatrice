@@ -6,8 +6,8 @@
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromEnabledSets, QObject *parent)
     : QAbstractListModel(parent), db(_db), showOnlyCardsFromEnabledSets(_showOnlyCardsFromEnabledSets)
 {
-    connect(db, SIGNAL(cardAdded(CardInfoPtr )), this, SLOT(cardAdded(CardInfoPtr )));
-    connect(db, SIGNAL(cardRemoved(CardInfoPtr )), this, SLOT(cardRemoved(CardInfoPtr )));
+    connect(db, SIGNAL(cardAdded(CardInfoPtr)), this, SLOT(cardAdded(CardInfoPtr)));
+    connect(db, SIGNAL(cardRemoved(CardInfoPtr)), this, SLOT(cardRemoved(CardInfoPtr)));
     connect(db, SIGNAL(cardDatabaseEnabledSetsChanged()), this, SLOT(cardDatabaseEnabledSetsChanged()));
 
     cardDatabaseEnabledSetsChanged();
@@ -120,7 +120,7 @@ void CardDatabaseModel::cardAdded(CardInfoPtr card)
         // add the card if it's present in at least one enabled set
         beginInsertRows(QModelIndex(), cardList.size(), cardList.size());
         cardList.append(card);
-        connect(card.data(), SIGNAL(cardInfoChanged(CardInfoPtr )), this, SLOT(cardInfoChanged(CardInfoPtr )));
+        connect(card.data(), SIGNAL(cardInfoChanged(CardInfoPtr)), this, SLOT(cardInfoChanged(CardInfoPtr)));
         endInsertRows();
     }
 }

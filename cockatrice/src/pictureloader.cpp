@@ -405,8 +405,8 @@ PictureLoader::PictureLoader() : QObject(0)
     connect(settingsCache, SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
     connect(settingsCache, SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 
-    connect(worker, SIGNAL(imageLoaded(CardInfoPtr , const QImage &)), this,
-            SLOT(imageLoaded(CardInfoPtr , const QImage &)));
+    connect(worker, SIGNAL(imageLoaded(CardInfoPtr, const QImage &)), this,
+            SLOT(imageLoaded(CardInfoPtr, const QImage &)));
 }
 
 PictureLoader::~PictureLoader()

@@ -61,5 +61,5 @@ void CardInfoWidget::setCard(AbstractCardItem *card)
 
 void CardInfoWidget::clear()
 {
-    setCard((CardInfoPtr )nullptr);
+    setCard((CardInfoPtr) nullptr);
 }

@@ -874,8 +874,10 @@ void TabDeckEditor::recursiveExpand(const QModelIndex &index)
 CardInfoPtr TabDeckEditor::currentCardInfo() const
 {
     const QModelIndex currentIndex = databaseView->selectionModel()->currentIndex();
-    if (!currentIndex.isValid())
-        return NULL;
+    if (!currentIndex.isValid()) {
+        return {};
+    }
+
     const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
 
     return db->getCard(cardName);

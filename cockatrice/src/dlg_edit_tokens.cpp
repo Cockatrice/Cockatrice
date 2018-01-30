@@ -1,6 +1,6 @@
+#include "dlg_edit_tokens.h"
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
-#include "dlg_edit_tokens.h"
 #include "main.h"
 #include <QAction>
 #include <QComboBox>
@@ -116,9 +116,14 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(0)
 void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /* previous */)
 {
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
-    currentCard = current.row() >= 0 ? databaseModel->getCard(realIndex.row()) : 0;
 
-    if (currentCard) {
+    if (current.row() >= 0) {
+        currentCard = databaseModel->getCard(realIndex.row());
+    } else {
+        currentCard.clear();
+    }
+
+    if (!currentCard) {
         nameEdit->setText(currentCard->getName());
         const QChar cardColor = currentCard->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
@@ -159,7 +164,7 @@ void DlgEditTokens::actRemoveToken()
 {
     if (currentCard) {
         CardInfoPtr cardToRemove = currentCard; // the currentCard property gets modified during db->removeCard()
-        currentCard = 0;
+        currentCard.clear();
         databaseModel->getDatabase()->removeCard(cardToRemove);
     }
 }

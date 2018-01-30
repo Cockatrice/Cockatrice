@@ -117,5 +117,5 @@ void CardFrame::setCard(AbstractCardItem *card)
 
 void CardFrame::clear()
 {
-    setCard((CardInfoPtr )nullptr);
+    setCard((CardInfoPtr) nullptr);
 }

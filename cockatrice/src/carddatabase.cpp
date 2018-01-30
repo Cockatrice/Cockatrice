@@ -39,12 +39,12 @@ CardSet::CardSet(const QString &_shortName,
 }
 
 CardSetPtr CardSet::newInstance(const QString &_shortName,
-                 const QString &_longName,
-                 const QString &_setType,
-                 const QDate &_releaseDate)
+                                const QString &_longName,
+                                const QString &_setType,
+                                const QDate &_releaseDate)
 {
     CardSetPtr ptr(new CardSet(_shortName, _longName, _setType, _releaseDate));
-    //ptr->setSmartPointer(ptr);
+    // ptr->setSmartPointer(ptr);
     return ptr;
 }
 
@@ -260,28 +260,28 @@ CardInfo::~CardInfo()
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name,
-                                            bool _isToken,
-                                            const QString &_manacost,
-                                            const QString &_cmc,
-                                            const QString &_cardtype,
-                                            const QString &_powtough,
-                                            const QString &_text,
-                                            const QStringList &_colors,
-                                            const QList<CardRelation *> &_relatedCards,
-                                            const QList<CardRelation *> &_reverseRelatedCards,
-                                            bool _upsideDownArt,
-                                            int _loyalty,
-                                            bool _cipt,
-                                            int _tableRow,
-                                            const SetList &_sets,
-                                            const QStringMap &_customPicURLs,
-                                            MuidMap _muIds,
-                                            QStringMap _collectorNumbers,
-                                            QStringMap _rarities)
+                                  bool _isToken,
+                                  const QString &_manacost,
+                                  const QString &_cmc,
+                                  const QString &_cardtype,
+                                  const QString &_powtough,
+                                  const QString &_text,
+                                  const QStringList &_colors,
+                                  const QList<CardRelation *> &_relatedCards,
+                                  const QList<CardRelation *> &_reverseRelatedCards,
+                                  bool _upsideDownArt,
+                                  int _loyalty,
+                                  bool _cipt,
+                                  int _tableRow,
+                                  const SetList &_sets,
+                                  const QStringMap &_customPicURLs,
+                                  MuidMap _muIds,
+                                  QStringMap _collectorNumbers,
+                                  QStringMap _rarities)
 {
-    CardInfoPtr ptr(new CardInfo(_name, _isToken, _manacost, _cmc, _cardtype, _powtough, _text,
-        _colors, _relatedCards, _reverseRelatedCards, _upsideDownArt, _loyalty, _cipt, _tableRow, _sets,
-        _customPicURLs, _muIds, _collectorNumbers, _rarities));
+    CardInfoPtr ptr(new CardInfo(_name, _isToken, _manacost, _cmc, _cardtype, _powtough, _text, _colors, _relatedCards,
+                                 _reverseRelatedCards, _upsideDownArt, _loyalty, _cipt, _tableRow, _sets,
+                                 _customPicURLs, _muIds, _collectorNumbers, _rarities));
     ptr->setSmartPointer(ptr);
 
     for (int i = 0; i < _sets.size(); i++) {
@@ -581,10 +581,9 @@ CardInfoPtr CardDatabase::getCard(const QString &cardName) const
 QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
 {
     QList<CardInfoPtr> cardInfos;
-    foreach (QString cardName, cardNames)
-    {
+    foreach (QString cardName, cardNames) {
         CardInfoPtr ptr = getCardFromMap(cards, cardName);
-        if(ptr)
+        if (ptr)
             cardInfos.append(ptr);
     }
 
@@ -765,10 +764,9 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                 }
             }
 
-            addCard(
-                CardInfo::newInstance(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards,
-                                      reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets,
-                                      customPicURLs, muids, collectorNumbers, rarities));
+            addCard(CardInfo::newInstance(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards,
+                                          reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs,
+                                          muids, collectorNumbers, rarities));
         }
     }
 }
