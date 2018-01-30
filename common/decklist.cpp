@@ -564,7 +564,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         // Filter out MWS edition symbols and basic land extras
         QRegExp rx("\\[.*\\]\\s?");
         line.remove(rx);
-        rx.setPattern("\\\\s(.*\\)");
+        rx.setPattern("\\(.*\\)");
         line.remove(rx);
 
         // Filter out post card name editions
