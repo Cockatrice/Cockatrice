@@ -2,6 +2,7 @@
 #define DLG_EDIT_TOKENS_H
 
 #include <QDialog>
+#include "carddatabase.h"
 
 class QModelIndex;
 class CardDatabaseModel;
@@ -34,7 +35,7 @@ private:
     QTreeView *chooseTokenView;
 
 public:
-    DlgEditTokens(QWidget *parent = 0);
+    DlgEditTokens(QWidget *parent = nullptr);
 };
 
 #endif
