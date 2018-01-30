@@ -7,9 +7,9 @@
 #include <QHash>
 #include <QList>
 #include <QMap>
+#include <QMetaType>
 #include <QPixmap>
 #include <QXmlStreamReader>
-#include <QMetaType>
 
 class CardDatabase;
 class CardInfo;
@@ -38,9 +38,9 @@ public:
                      const QString &_setType = QString(),
                      const QDate &_releaseDate = QDate());
     static CardSetPtr newInstance(const QString &_shortName = QString(),
-                     const QString &_longName = QString(),
-                     const QString &_setType = QString(),
-                     const QDate &_releaseDate = QDate());
+                                  const QString &_longName = QString(),
+                                  const QString &_setType = QString(),
+                                  const QDate &_releaseDate = QDate());
     QString getCorrectedShortName() const;
     QString getShortName() const
     {
@@ -155,7 +155,7 @@ private:
     QString pixmapCacheKey;
 
 public:
-   explicit CardInfo(const QString &_name = QString(),
+    explicit CardInfo(const QString &_name = QString(),
                       bool _isToken = false,
                       const QString &_manacost = QString(),
                       const QString &_cmc = QString(),
@@ -177,24 +177,24 @@ public:
     ~CardInfo() override;
 
     static CardInfoPtr newInstance(const QString &_name = QString(),
-                      bool _isToken = false,
-                      const QString &_manacost = QString(),
-                      const QString &_cmc = QString(),
-                      const QString &_cardtype = QString(),
-                      const QString &_powtough = QString(),
-                      const QString &_text = QString(),
-                      const QStringList &_colors = QStringList(),
-                      const QList<CardRelation *> &_relatedCards = QList<CardRelation *>(),
-                      const QList<CardRelation *> &_reverseRelatedCards = QList<CardRelation *>(),
-                      bool _upsideDownArt = false,
-                      int _loyalty = 0,
-                      bool _cipt = false,
-                      int _tableRow = 0,
-                      const SetList &_sets = SetList(),
-                      const QStringMap &_customPicURLs = QStringMap(),
-                      MuidMap muids = MuidMap(),
-                      QStringMap _collectorNumbers = QStringMap(),
-                      QStringMap _rarities = QStringMap());
+                                   bool _isToken = false,
+                                   const QString &_manacost = QString(),
+                                   const QString &_cmc = QString(),
+                                   const QString &_cardtype = QString(),
+                                   const QString &_powtough = QString(),
+                                   const QString &_text = QString(),
+                                   const QStringList &_colors = QStringList(),
+                                   const QList<CardRelation *> &_relatedCards = QList<CardRelation *>(),
+                                   const QList<CardRelation *> &_reverseRelatedCards = QList<CardRelation *>(),
+                                   bool _upsideDownArt = false,
+                                   int _loyalty = 0,
+                                   bool _cipt = false,
+                                   int _tableRow = 0,
+                                   const SetList &_sets = SetList(),
+                                   const QStringMap &_customPicURLs = QStringMap(),
+                                   MuidMap muids = MuidMap(),
+                                   QStringMap _collectorNumbers = QStringMap(),
+                                   QStringMap _rarities = QStringMap());
 
     void setSmartPointer(CardInfoPtr _ptr)
     {

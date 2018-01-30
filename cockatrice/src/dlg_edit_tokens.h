@@ -1,8 +1,8 @@
 #ifndef DLG_EDIT_TOKENS_H
 #define DLG_EDIT_TOKENS_H
 
-#include <QDialog>
 #include "carddatabase.h"
+#include <QDialog>
 
 class QModelIndex;
 class CardDatabaseModel;
