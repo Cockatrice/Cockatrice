@@ -1,24 +1,26 @@
-#include <QLabel>
 #include <QCheckBox>
+#include <QDebug>
+#include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
-#include <QDialogButtonBox>
+#include <QLabel>
 #include <QMessageBox>
-#include <QDebug>
 
 #include "dlg_forgotpasswordrequest.h"
 #include "settingscache.h"
 
-DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent)
-    : QDialog(parent)
+DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(parent)
 {
 
-    QString lastfphost; QString lastfpport; QString lastfpplayername;
+    QString lastfphost;
+    QString lastfpport;
+    QString lastfpplayername;
     lastfphost = settingsCache->servers().getHostname("cockatrice.woogerworks.com");
     lastfpport = settingsCache->servers().getPort("4747");
     lastfpplayername = settingsCache->servers().getPlayerName("Player");
 
-    if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() && !settingsCache->servers().getFPPlayerName().isEmpty()) {
+    if (!settingsCache->servers().getFPHostname().isEmpty() && !settingsCache->servers().getFPPort().isEmpty() &&
+        !settingsCache->servers().getFPPlayerName().isEmpty()) {
         lastfphost = settingsCache->servers().getFPHostname();
         lastfpport = settingsCache->servers().getFPPort();
         lastfpplayername = settingsCache->servers().getFPPlayerName();
@@ -60,8 +62,7 @@ DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent)
 
 void DlgForgotPasswordRequest::actOk()
 {
-    if(playernameEdit->text().isEmpty())
-    {
+    if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Forgot Password Request Warning"), tr("The player name can't be empty."));
         return;
     }

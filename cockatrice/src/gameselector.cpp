@@ -1,30 +1,36 @@
-#include <QTreeView>
-#include <QCheckBox>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QMessageBox>
-#include <QHeaderView>
-#include <QInputDialog>
-#include <QDebug>
-#include "tab_supervisor.h"
+#include "gameselector.h"
 #include "dlg_creategame.h"
 #include "dlg_filter_games.h"
-#include "gameselector.h"
 #include "gamesmodel.h"
-#include "tab_room.h"
-#include "pending_command.h"
+#include "pb/response.pb.h"
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_game.pb.h"
-#include "pb/response.pb.h"
+#include "pending_command.h"
+#include "tab_room.h"
+#include "tab_supervisor.h"
+#include <QCheckBox>
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QTreeView>
+#include <QVBoxLayout>
 
-GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSupervisor, TabRoom *_room, const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, const bool restoresettings, const bool showfilters, QWidget *parent)
+GameSelector::GameSelector(AbstractClient *_client,
+                           const TabSupervisor *_tabSupervisor,
+                           TabRoom *_room,
+                           const QMap<int, QString> &_rooms,
+                           const QMap<int, GameTypeMap> &_gameTypes,
+                           const bool restoresettings,
+                           const bool showfilters,
+                           QWidget *parent)
     : QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room)
 {
     gameListView = new QTreeView;
     gameListModel = new GamesModel(_rooms, _gameTypes, this);
-    if(showfilters)
-    {
+    if (showfilters) {
         gameListProxyModel = new GamesProxyModel(this, tabSupervisor->isOwnUserRegistered());
         gameListProxyModel->setSourceModel(gameListModel);
         gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -53,7 +59,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
         gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
 
     if (showfilters && restoresettings)
-    	gameListProxyModel->loadFilterParameters(gameTypeMap);
+        gameListProxyModel->loadFilterParameters(gameTypeMap);
 
     gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
@@ -74,8 +80,7 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     spectateButton = new QPushButton;
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    if(showfilters)
-    {
+    if (showfilters) {
         buttonLayout->addWidget(filterButton);
         buttonLayout->addWidget(clearFilterButton);
     }
@@ -93,12 +98,13 @@ GameSelector::GameSelector(AbstractClient *_client, const TabSupervisor *_tabSup
     retranslateUi();
     setLayout(mainLayout);
 
-    setMinimumWidth((qreal) (gameListView->columnWidth(0) * gameListModel->columnCount()) / 1.5);
+    setMinimumWidth((qreal)(gameListView->columnWidth(0) * gameListModel->columnCount()) / 1.5);
     setMinimumHeight(200);
 
     connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
     connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
-    connect(gameListView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(actSelectedGameChanged(const QModelIndex &, const QModelIndex &)));
+    connect(gameListView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
+            SLOT(actSelectedGameChanged(const QModelIndex &, const QModelIndex &)));
     connect(gameListView, SIGNAL(activated(const QModelIndex &)), this, SLOT(actJoin()));
 }
 
@@ -147,15 +153,31 @@ void GameSelector::checkResponse(const Response &response)
     joinButton->setEnabled(true);
 
     switch (response.response_code()) {
-        case Response::RespNotInRoom: QMessageBox::critical(this, tr("Error"), tr("Please join the appropriate room first.")); break;
-        case Response::RespWrongPassword: QMessageBox::critical(this, tr("Error"), tr("Wrong password.")); break;
-        case Response::RespSpectatorsNotAllowed: QMessageBox::critical(this, tr("Error"), tr("Spectators are not allowed in this game.")); break;
-        case Response::RespGameFull: QMessageBox::critical(this, tr("Error"), tr("The game is already full.")); break;
-        case Response::RespNameNotFound: QMessageBox::critical(this, tr("Error"), tr("The game does not exist any more.")); break;
-        case Response::RespUserLevelTooLow: QMessageBox::critical(this, tr("Error"), tr("This game is only open to registered users.")); break;
-        case Response::RespOnlyBuddies: QMessageBox::critical(this, tr("Error"), tr("This game is only open to its creator's buddies.")); break;
-        case Response::RespInIgnoreList: QMessageBox::critical(this, tr("Error"), tr("You are being ignored by the creator of this game.")); break;
-        default: ;
+        case Response::RespNotInRoom:
+            QMessageBox::critical(this, tr("Error"), tr("Please join the appropriate room first."));
+            break;
+        case Response::RespWrongPassword:
+            QMessageBox::critical(this, tr("Error"), tr("Wrong password."));
+            break;
+        case Response::RespSpectatorsNotAllowed:
+            QMessageBox::critical(this, tr("Error"), tr("Spectators are not allowed in this game."));
+            break;
+        case Response::RespGameFull:
+            QMessageBox::critical(this, tr("Error"), tr("The game is already full."));
+            break;
+        case Response::RespNameNotFound:
+            QMessageBox::critical(this, tr("Error"), tr("The game does not exist any more."));
+            break;
+        case Response::RespUserLevelTooLow:
+            QMessageBox::critical(this, tr("Error"), tr("This game is only open to registered users."));
+            break;
+        case Response::RespOnlyBuddies:
+            QMessageBox::critical(this, tr("Error"), tr("This game is only open to its creator's buddies."));
+            break;
+        case Response::RespInIgnoreList:
+            QMessageBox::critical(this, tr("Error"), tr("You are being ignored by the creator of this game."));
+            break;
+        default:;
     }
 
     if (response.response_code() != Response::RespSpectatorsNotAllowed)
@@ -225,5 +247,5 @@ void GameSelector::actSelectedGameChanged(const QModelIndex &current, const QMod
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
 
     spectateButton->setEnabled(game.spectators_allowed() || overrideRestrictions);
-    joinButton->setEnabled( game.player_count() < game.max_players() || overrideRestrictions);
+    joinButton->setEnabled(game.player_count() < game.max_players() || overrideRestrictions);
 }

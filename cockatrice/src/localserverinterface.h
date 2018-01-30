@@ -11,9 +11,15 @@ class LocalServerInterface : public Server_ProtocolHandler
 public:
     LocalServerInterface(LocalServer *_server, Server_DatabaseInterface *_databaseInterface);
     ~LocalServerInterface();
-    
-    QString getAddress() const { return QString(); }
-    QString getConnectionType() const { return "local"; };
+
+    QString getAddress() const
+    {
+        return QString();
+    }
+    QString getConnectionType() const
+    {
+        return "local";
+    };
     void transmitProtocolItem(const ServerMessage &item);
 signals:
     void itemToClient(const ServerMessage &item);

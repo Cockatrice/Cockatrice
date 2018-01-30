@@ -1,11 +1,11 @@
 #ifndef ABSTRACTCLIENT_H
 #define ABSTRACTCLIENT_H
 
-#include <QObject>
-#include <QVariant>
-#include <QMutex>
 #include "pb/response.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include <QMutex>
+#include <QObject>
+#include <QVariant>
 
 class PendingCommand;
 class CommandContainer;
@@ -27,7 +27,8 @@ class Event_ServerShutdown;
 class Event_ReplayAdded;
 class FeatureSet;
 
-enum ClientStatus {
+enum ClientStatus
+{
     StatusDisconnected,
     StatusDisconnecting,
     StatusConnecting,
@@ -40,11 +41,12 @@ enum ClientStatus {
     StatusSubmitForgotPasswordChallenge,
 };
 
-class AbstractClient : public QObject {
+class AbstractClient : public QObject
+{
     Q_OBJECT
 signals:
     void statusChanged(ClientStatus _status);
-    
+
     // Room events
     void roomEventReceived(const RoomEvent &event);
     // Game events
@@ -69,8 +71,9 @@ signals:
     void registerAccepted();
     void registerAcceptedNeedsActivate();
     void activateAccepted();
-    
+
     void sigQueuePendingCommand(PendingCommand *pend);
+
 private:
     int nextCmdId;
     mutable QMutex clientMutex;
@@ -79,23 +82,35 @@ private slots:
     void queuePendingCommand(PendingCommand *pend);
 protected slots:
     void processProtocolItem(const ServerMessage &item);
+
 protected:
     QMap<int, PendingCommand *> pendingCommands;
     QString userName, password, email, country, realName, token;
     int gender;
     void setStatus(ClientStatus _status);
-    int getNewCmdId() { return nextCmdId++; }
+    int getNewCmdId()
+    {
+        return nextCmdId++;
+    }
     virtual void sendCommandContainer(const CommandContainer &cont) = 0;
+
 public:
     AbstractClient(QObject *parent = 0);
     ~AbstractClient();
-    
-    ClientStatus getStatus() const { QMutexLocker locker(&clientMutex); return status; }
+
+    ClientStatus getStatus() const
+    {
+        QMutexLocker locker(&clientMutex);
+        return status;
+    }
     void sendCommand(const CommandContainer &cont);
     void sendCommand(PendingCommand *pend);
 
-    const QString getUserName() {return userName;}
-    
+    const QString getUserName()
+    {
+        return userName;
+    }
+
     static PendingCommand *prepareSessionCommand(const ::google::protobuf::Message &cmd);
     static PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd, int roomId);
     static PendingCommand *prepareModeratorCommand(const ::google::protobuf::Message &cmd);

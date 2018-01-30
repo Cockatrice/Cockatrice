@@ -1,16 +1,17 @@
 #ifndef CARDINFOWIDGET_H
 #define CARDINFOWIDGET_H
 
+#include <QComboBox>
 #include <QFrame>
 #include <QStringList>
-#include <QComboBox>
 
 class CardInfo;
 class CardInfoPicture;
 class CardInfoText;
 class AbstractCardItem;
 
-class CardInfoWidget : public QFrame {
+class CardInfoWidget : public QFrame
+{
     Q_OBJECT
 
 private:
@@ -18,6 +19,7 @@ private:
     CardInfo *info;
     CardInfoPicture *pic;
     CardInfoText *text;
+
 public:
     CardInfoWidget(const QString &cardName, QWidget *parent = 0, Qt::WindowFlags f = 0);
 

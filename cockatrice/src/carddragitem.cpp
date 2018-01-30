@@ -1,14 +1,18 @@
 #include "carddragitem.h"
 #include "carditem.h"
 #include "cardzone.h"
+#include "gamescene.h"
 #include "tablezone.h"
 #include "zoneviewzone.h"
-#include "gamescene.h"
-#include <QGraphicsSceneMouseEvent>
 #include <QCursor>
+#include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
-CardDragItem::CardDragItem(CardItem *_item, int _id, const QPointF &_hotSpot, bool _faceDown, AbstractCardDragItem *parentDrag)
+CardDragItem::CardDragItem(CardItem *_item,
+                           int _id,
+                           const QPointF &_hotSpot,
+                           bool _faceDown,
+                           AbstractCardDragItem *parentDrag)
     : AbstractCardDragItem(_item, _hotSpot, parentDrag), id(_id), faceDown(_faceDown), occupied(false), currentZone(0)
 {
 }
@@ -16,14 +20,16 @@ CardDragItem::CardDragItem(CardItem *_item, int _id, const QPointF &_hotSpot, bo
 void CardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     AbstractCardDragItem::paint(painter, option, widget);
-    
+
     if (occupied)
         painter->fillRect(boundingRect(), QColor(200, 0, 0, 100));
 }
 
 void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 {
-    QList<QGraphicsItem *> colliding = scene()->items(cursorScenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, static_cast<GameScene *>(scene())->getViewTransform());
+    QList<QGraphicsItem *> colliding =
+        scene()->items(cursorScenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder,
+                       static_cast<GameScene *>(scene())->getViewTransform());
 
     CardZone *cardZone = 0;
     ZoneViewZone *zoneViewZone = 0;
@@ -42,18 +48,18 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
     if (!cursorZone)
         return;
     currentZone = cursorZone;
-    
+
     QPointF zonePos = currentZone->scenePos();
     QPointF cursorPosInZone = cursorScenePos - zonePos;
     QPointF cardTopLeft = cursorPosInZone - hotSpot;
     QPointF closestGridPoint = cursorZone->closestGridPoint(cardTopLeft);
     QPointF newPos = zonePos + closestGridPoint;
-    
+
     if (newPos != pos()) {
         for (int i = 0; i < childDrags.size(); i++)
             childDrags[i]->setPos(newPos + childDrags[i]->getHotSpot());
         setPos(newPos);
-        
+
         bool newOccupied = false;
         TableZone *table = qobject_cast<TableZone *>(cursorZone);
         if (table)
@@ -85,7 +91,7 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         }
     }
 
-    if(currentZone)
+    if (currentZone)
         currentZone->handleDropEvent(dragItemList, startZone, (sp - currentZone->scenePos()).toPoint());
 
     event->accept();

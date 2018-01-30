@@ -9,7 +9,8 @@ class AbstractClient;
 class QPushButton;
 class QDialogButtonBox;
 
-class DlgLoadRemoteDeck: public QDialog {
+class DlgLoadRemoteDeck : public QDialog
+{
     Q_OBJECT
 private:
     AbstractClient *client;
@@ -17,6 +18,7 @@ private:
     QDialogButtonBox *buttonBox;
 private slots:
     void currentItemChanged(const QModelIndex &current, const QModelIndex &previous);
+
 public:
     DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent = 0);
     int getDeckId() const;

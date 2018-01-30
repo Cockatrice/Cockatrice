@@ -1,11 +1,11 @@
 #ifndef WINDOW_SETS_H
 #define WINDOW_SETS_H
 
+#include <QDialogButtonBox>
+#include <QGridLayout>
+#include <QLabel>
 #include <QMainWindow>
 #include <QSet>
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QGridLayout>
 
 class SetsModel;
 class SetsProxyModel;
@@ -14,7 +14,8 @@ class CardDatabase;
 class QItemSelection;
 class QTreeView;
 
-class WndSets : public QMainWindow {
+class WndSets : public QMainWindow
+{
     Q_OBJECT
 private:
     SetsModel *model;
@@ -27,10 +28,16 @@ private:
     QLabel *labNotes;
     QGridLayout *mainLayout;
     void rebuildMainLayout(int actionToTake);
-    enum {NO_SETS_SELECTED, SOME_SETS_SELECTED};
+    enum
+    {
+        NO_SETS_SELECTED,
+        SOME_SETS_SELECTED
+    };
+
 public:
     WndSets(QWidget *parent = 0);
     ~WndSets();
+
 protected:
     void selectRows(QSet<int> rows);
 private slots:
@@ -44,7 +51,7 @@ private slots:
     void actDown();
     void actTop();
     void actBottom();
-    void actToggleButtons(const QItemSelection & selected, const QItemSelection & deselected);
+    void actToggleButtons(const QItemSelection &selected, const QItemSelection &deselected);
 };
 
 #endif

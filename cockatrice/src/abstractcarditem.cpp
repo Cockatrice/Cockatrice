@@ -1,26 +1,27 @@
-#include <QPainter>
-#include <QGraphicsScene>
 #include <QCursor>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
-#include <cmath>
+#include <QPainter>
 #include <algorithm>
+#include <cmath>
 #ifdef _WIN32
 #include "round.h"
 #endif /* _WIN32 */
-#include "carddatabase.h"
 #include "abstractcarditem.h"
+#include "carddatabase.h"
+#include "gamescene.h"
+#include "main.h"
 #include "pictureloader.h"
 #include "settingscache.h"
-#include "main.h"
-#include "gamescene.h"
 
 AbstractCardItem::AbstractCardItem(const QString &_name, Player *_owner, int _id, QGraphicsItem *parent)
-    : ArrowTarget(_owner, parent), id(_id), name(_name), tapped(false), facedown(false), tapAngle(0), bgColor(Qt::transparent), isHovered(false), realZValue(0)
+    : ArrowTarget(_owner, parent), id(_id), name(_name), tapped(false), facedown(false), tapAngle(0),
+      bgColor(Qt::transparent), isHovered(false), realZValue(0)
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
     setCacheMode(DeviceCoordinateCache);
-    
+
     connect(settingsCache, SIGNAL(displayCardNamesChanged()), this, SLOT(callUpdate()));
     cardInfoUpdated();
 }
@@ -44,7 +45,7 @@ void AbstractCardItem::pixmapUpdated()
 void AbstractCardItem::cardInfoUpdated()
 {
     info = db->getCard(name);
-    if(info)
+    if (info)
         connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
 
     cacheBgColor();
@@ -59,10 +60,8 @@ void AbstractCardItem::setRealZValue(qreal _zValue)
 
 QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
 {
-    return QSizeF(
-        painter->combinedTransform().map(QLineF(0, 0, boundingRect().width(), 0)).length(),
-        painter->combinedTransform().map(QLineF(0, 0, 0, boundingRect().height())).length()
-    );
+    return QSizeF(painter->combinedTransform().map(QLineF(0, 0, boundingRect().width(), 0)).length(),
+                  painter->combinedTransform().map(QLineF(0, 0, 0, boundingRect().height())).length());
 }
 
 void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle)
@@ -71,9 +70,9 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
     const int fontSize = std::max(9, MAX_FONT_SIZE);
 
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
-    
+
     painter->resetTransform();
-    
+
     QTransform pixmapTransform;
     pixmapTransform.translate(totalBoundingRect.width() / 2, totalBoundingRect.height() / 2);
     pixmapTransform.rotate(angle);
@@ -92,16 +91,14 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     QPixmap translatedPixmap;
     bool paintImage = true;
 
-    if(facedown || name.isEmpty())
-    {
+    if (facedown || name.isEmpty()) {
         // never reveal card color, always paint the card back
         PictureLoader::getCardBackPixmap(translatedPixmap, translatedSize.toSize());
     } else {
         // don't even spend time trying to load the picture if our size is too small
-        if(translatedSize.width() > 10)
-        {
+        if (translatedSize.width() > 10) {
             PictureLoader::getPixmap(translatedPixmap, info, translatedSize.toSize());
-            if(translatedPixmap.isNull())
+            if (translatedPixmap.isNull())
                 paintImage = false;
         } else {
             paintImage = false;
@@ -109,7 +106,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     }
 
     painter->save();
-    
+
     if (paintImage) {
         painter->save();
         transformPainter(painter, translatedSize, angle);
@@ -129,7 +126,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         painter->drawRect(QRectF(0, 0, CARD_WIDTH - 1, CARD_HEIGHT - penWidth));
     else
         painter->drawRect(QRectF(1, 1, CARD_WIDTH - 2, CARD_HEIGHT - 1.5));
-    
+
     if (translatedPixmap.isNull() || settingsCache->getDisplayCardNames() || facedown) {
         painter->save();
         transformPainter(painter, translatedSize, angle);
@@ -141,10 +138,12 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
             nameStr = "# " + QString::number(id);
         else
             nameStr = name;
-        painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor, translatedSize.height() - 6 * scaleFactor), Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, nameStr);
+        painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor,
+                                 translatedSize.height() - 6 * scaleFactor),
+                          Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, nameStr);
         painter->restore();
     }
-    
+
     painter->restore();
 }
 
@@ -154,7 +153,7 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     QSizeF translatedSize = getTranslatedSize(painter);
     paintPicture(painter, translatedSize, tapAngle);
-    
+
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, false);
     transformPainter(painter, translatedSize, tapAngle);
@@ -180,9 +179,9 @@ void AbstractCardItem::setName(const QString &_name)
 {
     if (name == _name)
         return;
-    
+
     emit deleteCardInfoPopup(name);
-    if(info)
+    if (info)
         disconnect(info, nullptr, this, nullptr);
     name = _name;
 
@@ -193,7 +192,7 @@ void AbstractCardItem::setHovered(bool _hovered)
 {
     if (isHovered == _hovered)
         return;
-    
+
     if (_hovered)
         processHoverEvent();
     isHovered = _hovered;
@@ -213,16 +212,14 @@ void AbstractCardItem::setColor(const QString &_color)
 void AbstractCardItem::cacheBgColor()
 {
     QChar colorChar;
-    if (color.isEmpty())
-    {
-        if(info)
+    if (color.isEmpty()) {
+        if (info)
             colorChar = info->getColorChar();
     } else {
         colorChar = color.at(0);
     }
-    
-    switch(colorChar.toLower().toLatin1())
-    {
+
+    switch (colorChar.toLower().toLatin1()) {
         case 'b':
             bgColor = QColor(0, 0, 0);
             break;
@@ -251,13 +248,16 @@ void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
 {
     if (tapped == _tapped)
         return;
-    
+
     tapped = _tapped;
     if (settingsCache->getTapAnimation() && canAnimate)
         static_cast<GameScene *>(scene())->registerAnimationItem(this);
     else {
         tapAngle = tapped ? 90 : 0;
-        setTransform(QTransform().translate((float) CARD_WIDTH / 2, (float) CARD_HEIGHT / 2).rotate(tapAngle).translate((float) -CARD_WIDTH / 2, (float) -CARD_HEIGHT / 2));
+        setTransform(QTransform()
+                         .translate((float)CARD_WIDTH / 2, (float)CARD_HEIGHT / 2)
+                         .rotate(tapAngle)
+                         .translate((float)-CARD_WIDTH / 2, (float)-CARD_HEIGHT / 2));
         update();
     }
 }
@@ -273,8 +273,7 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if ((event->modifiers() & Qt::ControlModifier)) {
         setSelected(!isSelected());
-    }
-    else if (!isSelected()) {
+    } else if (!isSelected()) {
         scene()->clearSelection();
         setSelected(true);
     }
@@ -289,7 +288,7 @@ void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::MidButton)
         emit deleteCardInfoPopup(name);
-    
+
     // This function ensures the parent function doesn't mess around with our selection.
     event->accept();
 }
@@ -307,4 +306,3 @@ QVariant AbstractCardItem::itemChange(QGraphicsItem::GraphicsItemChange change, 
     } else
         return QGraphicsItem::itemChange(change, value);
 }
-

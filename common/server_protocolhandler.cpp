@@ -1,43 +1,36 @@
-#include <QDebug>
-#include <QDateTime>
-#include <math.h>
 #include "server_protocolhandler.h"
-#include "server_database_interface.h"
-#include "server_room.h"
-#include "server_game.h"
-#include "server_player.h"
+#include "featureset.h"
 #include "get_pb_extension.h"
 #include "pb/commands.pb.h"
+#include "pb/event_game_joined.pb.h"
+#include "pb/event_list_rooms.pb.h"
+#include "pb/event_notify_user.pb.h"
+#include "pb/event_room_say.pb.h"
+#include "pb/event_server_message.pb.h"
+#include "pb/event_user_message.pb.h"
 #include "pb/response.pb.h"
-#include "pb/response_login.pb.h"
-#include "pb/response_list_users.pb.h"
 #include "pb/response_get_games_of_user.pb.h"
 #include "pb/response_get_user_info.pb.h"
 #include "pb/response_join_room.pb.h"
-#include "pb/event_list_rooms.pb.h"
-#include "pb/event_server_message.pb.h"
-#include "pb/event_user_message.pb.h"
-#include "pb/event_game_joined.pb.h"
-#include "pb/event_room_say.pb.h"
+#include "pb/response_list_users.pb.h"
+#include "pb/response_login.pb.h"
 #include "pb/serverinfo_user.pb.h"
-#include "pb/event_notify_user.pb.h"
+#include "server_database_interface.h"
+#include "server_game.h"
+#include "server_player.h"
+#include "server_room.h"
+#include <QDateTime>
+#include <QDebug>
 #include <google/protobuf/descriptor.h>
-#include "featureset.h"
+#include <math.h>
 
+Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
+                                               Server_DatabaseInterface *_databaseInterface,
+                                               QObject *parent)
+    : QObject(parent), Server_AbstractUserInterface(_server), deleted(false), databaseInterface(_databaseInterface),
+      authState(NotLoggedIn), acceptsUserListChanges(false), acceptsRoomListChanges(false),
+      idleClientWarningSent(false), timeRunning(0), lastDataReceived(0), lastActionReceived(0)
 
-Server_ProtocolHandler::Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent)
-    : QObject(parent),
-      Server_AbstractUserInterface(_server),
-      deleted(false),
-      databaseInterface(_databaseInterface),
-      authState(NotLoggedIn),
-      acceptsUserListChanges(false),
-      acceptsRoomListChanges(false),
-      idleClientWarningSent(false),
-      timeRunning(0),
-      lastDataReceived(0),
-      lastActionReceived(0)
-      
 {
     connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
 }
@@ -58,10 +51,10 @@ void Server_ProtocolHandler::prepareDestroy()
     while (roomIterator.hasNext())
         roomIterator.next().value()->removeClient(this);
 
-    QMap<int, QPair<int, int> > tempGames(getGames());
+    QMap<int, QPair<int, int>> tempGames(getGames());
 
     server->roomsLock.lockForRead();
-    QMapIterator<int, QPair<int, int> > gameIterator(tempGames);
+    QMapIterator<int, QPair<int, int>> gameIterator(tempGames);
     while (gameIterator.hasNext()) {
         gameIterator.next();
 
@@ -130,14 +123,15 @@ void Server_ProtocolHandler::sendProtocolItem(const RoomEvent &item)
     transmitProtocolItem(msg);
 }
 
-Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
+Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(const CommandContainer &cont,
+                                                                              ResponseContainer &rc)
 {
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.session_command_size() - 1; i >= 0; --i) {
         Response::ResponseCode resp = Response::RespInvalidCommand;
         const SessionCommand &sc = cont.session_command(i);
         const int num = getPbExtension(sc);
-        if (num != SessionCommand::PING) { // don't log ping commands
+        if (num != SessionCommand::PING) {      // don't log ping commands
             if (num == SessionCommand::LOGIN) { // log login commands, but hide passwords
                 SessionCommand debugSc(sc);
                 debugSc.MutableExtension(Command_Login::ext)->clear_password();
@@ -149,16 +143,33 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
             } else
                 logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
         }
-        switch ((SessionCommand::SessionCommandType) num) {
-            case SessionCommand::PING: resp = cmdPing(sc.GetExtension(Command_Ping::ext), rc); break;
-            case SessionCommand::LOGIN: resp = cmdLogin(sc.GetExtension(Command_Login::ext), rc); break;
-            case SessionCommand::MESSAGE: resp = cmdMessage(sc.GetExtension(Command_Message::ext), rc); break;
-            case SessionCommand::GET_GAMES_OF_USER: resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), rc); break;
-            case SessionCommand::GET_USER_INFO: resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), rc); break;
-            case SessionCommand::LIST_ROOMS: resp = cmdListRooms(sc.GetExtension(Command_ListRooms::ext), rc); break;
-            case SessionCommand::JOIN_ROOM: resp = cmdJoinRoom(sc.GetExtension(Command_JoinRoom::ext), rc); break;
-            case SessionCommand::LIST_USERS: resp = cmdListUsers(sc.GetExtension(Command_ListUsers::ext), rc); break;
-            default: resp = processExtendedSessionCommand(num, sc, rc);
+        switch ((SessionCommand::SessionCommandType)num) {
+            case SessionCommand::PING:
+                resp = cmdPing(sc.GetExtension(Command_Ping::ext), rc);
+                break;
+            case SessionCommand::LOGIN:
+                resp = cmdLogin(sc.GetExtension(Command_Login::ext), rc);
+                break;
+            case SessionCommand::MESSAGE:
+                resp = cmdMessage(sc.GetExtension(Command_Message::ext), rc);
+                break;
+            case SessionCommand::GET_GAMES_OF_USER:
+                resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), rc);
+                break;
+            case SessionCommand::GET_USER_INFO:
+                resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), rc);
+                break;
+            case SessionCommand::LIST_ROOMS:
+                resp = cmdListRooms(sc.GetExtension(Command_ListRooms::ext), rc);
+                break;
+            case SessionCommand::JOIN_ROOM:
+                resp = cmdJoinRoom(sc.GetExtension(Command_JoinRoom::ext), rc);
+                break;
+            case SessionCommand::LIST_USERS:
+                resp = cmdListUsers(sc.GetExtension(Command_ListUsers::ext), rc);
+                break;
+            default:
+                resp = processExtendedSessionCommand(num, sc, rc);
         }
         if (resp != Response::RespOk)
             finalResponseCode = resp;
@@ -166,7 +177,8 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
     return finalResponseCode;
 }
 
-Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
+Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const CommandContainer &cont,
+                                                                           ResponseContainer &rc)
 {
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
@@ -184,11 +196,19 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
         const RoomCommand &sc = cont.room_command(i);
         const int num = getPbExtension(sc);
         logDebugMessage(QString::fromStdString(sc.ShortDebugString()));
-        switch ((RoomCommand::RoomCommandType) num) {
-            case RoomCommand::LEAVE_ROOM: resp = cmdLeaveRoom(sc.GetExtension(Command_LeaveRoom::ext), room, rc); break;
-            case RoomCommand::ROOM_SAY: resp = cmdRoomSay(sc.GetExtension(Command_RoomSay::ext), room, rc); break;
-            case RoomCommand::CREATE_GAME: resp = cmdCreateGame(sc.GetExtension(Command_CreateGame::ext), room, rc); break;
-            case RoomCommand::JOIN_GAME: resp = cmdJoinGame(sc.GetExtension(Command_JoinGame::ext), room, rc); break;
+        switch ((RoomCommand::RoomCommandType)num) {
+            case RoomCommand::LEAVE_ROOM:
+                resp = cmdLeaveRoom(sc.GetExtension(Command_LeaveRoom::ext), room, rc);
+                break;
+            case RoomCommand::ROOM_SAY:
+                resp = cmdRoomSay(sc.GetExtension(Command_RoomSay::ext), room, rc);
+                break;
+            case RoomCommand::CREATE_GAME:
+                resp = cmdCreateGame(sc.GetExtension(Command_CreateGame::ext), room, rc);
+                break;
+            case RoomCommand::JOIN_GAME:
+                resp = cmdJoinGame(sc.GetExtension(Command_JoinGame::ext), room, rc);
+                break;
         }
         if (resp != Response::RespOk)
             finalResponseCode = resp;
@@ -196,9 +216,11 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
     return finalResponseCode;
 }
 
-Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
+Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const CommandContainer &cont,
+                                                                           ResponseContainer &rc)
 {
-    static QList<GameCommand::GameCommandType> antifloodCommandsWhiteList = QList<GameCommand::GameCommandType>()
+    static QList<GameCommand::GameCommandType> antifloodCommandsWhiteList =
+        QList<GameCommand::GameCommandType>()
         // draw/undo card draw (example: drawing 10 cards one by one from the deck)
         << GameCommand::DRAW_CARDS
         << GameCommand::UNDO_DRAW
@@ -217,7 +239,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
 
-    QMap<int, QPair<int, int> > gameMap = getGames();
+    QMap<int, QPair<int, int>> gameMap = getGames();
     if (!gameMap.contains(cont.game_id()))
         return Response::RespNotInRoom;
     const QPair<int, int> roomIdAndPlayerId = gameMap.value(cont.game_id());
@@ -231,12 +253,8 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     Server_Game *game = room->getGames().value(cont.game_id());
     if (!game) {
         if (room->getExternalGames().contains(cont.game_id())) {
-            server->sendIsl_GameCommand(cont,
-                                        room->getExternalGames().value(cont.game_id()).server_id(),
-                                        userInfo->session_id(),
-                                        roomIdAndPlayerId.first,
-                                        roomIdAndPlayerId.second
-                                        );
+            server->sendIsl_GameCommand(cont, room->getExternalGames().value(cont.game_id()).server_id(),
+                                        userInfo->session_id(), roomIdAndPlayerId.first, roomIdAndPlayerId.second);
             return Response::RespNothing;
         }
         return Response::RespNotInRoom;
@@ -255,14 +273,15 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.game_command_size() - 1; i >= 0; --i) {
         const GameCommand &sc = cont.game_command(i);
-        logDebugMessage(QString("game %1 player %2: ").arg(cont.game_id()).arg(roomIdAndPlayerId.second) + QString::fromStdString(sc.ShortDebugString()));
+        logDebugMessage(QString("game %1 player %2: ").arg(cont.game_id()).arg(roomIdAndPlayerId.second) +
+                        QString::fromStdString(sc.ShortDebugString()));
 
         if (commandCountingInterval > 0) {
             int totalCount = 0;
             if (commandCountOverTime.isEmpty())
                 commandCountOverTime.prepend(0);
 
-            if(!antifloodCommandsWhiteList.contains((GameCommand::GameCommandType) getPbExtension(sc)))
+            if (!antifloodCommandsWhiteList.contains((GameCommand::GameCommandType)getPbExtension(sc)))
                 ++commandCountOverTime[0];
 
             for (int i = 0; i < commandCountOverTime.size(); ++i)
@@ -282,7 +301,8 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     return finalResponseCode;
 }
 
-Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
+Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(const CommandContainer &cont,
+                                                                                ResponseContainer &rc)
 {
     if (!userInfo)
         return Response::RespLoginNeeded;
@@ -305,7 +325,8 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
     return finalResponseCode;
 }
 
-Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(const CommandContainer &cont, ResponseContainer &rc)
+Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(const CommandContainer &cont,
+                                                                            ResponseContainer &rc)
 {
     if (!userInfo)
         return Response::RespLoginNeeded;
@@ -365,7 +386,7 @@ void Server_ProtocolHandler::pingClockTimeout()
 
     int interval = server->getMessageCountingInterval();
     if (interval > 0) {
-        if(pingclockinterval > 0) {
+        if (pingclockinterval > 0) {
             messageSizeOverTime.prepend(0);
             if (messageSizeOverTime.size() > (msgcountinterval / pingclockinterval))
                 messageSizeOverTime.removeLast();
@@ -394,7 +415,8 @@ void Server_ProtocolHandler::pingClockTimeout()
             }
         }
 
-        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() *.9)) && (!idleClientWarningSent) && (server->getIdleClientTimeout() > 0)) {
+        if (((timeRunning - lastActionReceived) >= ceil(server->getIdleClientTimeout() * .9)) &&
+            (!idleClientWarningSent) && (server->getIdleClientTimeout() > 0)) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::IDLEWARNING);
             SessionEvent *se = prepareSessionEvent(event);
@@ -414,7 +436,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdPing(const Command_Ping & /*cm
 
 Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd, ResponseContainer &rc)
 {
-    
+
     QString userName = QString::fromStdString(cmd.user_name()).simplified();
     QString clientId = QString::fromStdString(cmd.clientid()).simplified();
     QString clientVersion = QString::fromStdString(cmd.clientver()).simplified();
@@ -430,7 +452,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     for (int i = 0; i < cmd.clientfeatures().size(); ++i)
         receivedClientFeatures.insert(QString::fromStdString(cmd.clientfeatures(i)).simplified(), false);
 
-    missingClientFeatures = features.identifyMissingFeatures(receivedClientFeatures, server->getServerRequiredFeatureList());
+    missingClientFeatures =
+        features.identifyMissingFeatures(receivedClientFeatures, server->getServerRequiredFeatureList());
 
     if (!missingClientFeatures.isEmpty()) {
         if (features.isRequiredFeaturesMissing(missingClientFeatures, server->getServerRequiredFeatureList())) {
@@ -447,7 +470,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QString reasonStr;
     int banSecondsLeft = 0;
     QString connectionType = getConnectionType();
-    AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr, banSecondsLeft, clientId, clientVersion, connectionType);
+    AuthenticationResult res = server->loginUser(this, userName, QString::fromStdString(cmd.password()), reasonStr,
+                                                 banSecondsLeft, clientId, clientVersion, connectionType);
     switch (res) {
         case UserIsBanned: {
             Response_Login *re = new Response_Login;
@@ -457,18 +481,24 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             rc.setResponseExtension(re);
             return Response::RespUserIsBanned;
         }
-        case NotLoggedIn: return Response::RespWrongPassword;
-        case WouldOverwriteOldSession: return Response::RespWouldOverwriteOldSession;
+        case NotLoggedIn:
+            return Response::RespWrongPassword;
+        case WouldOverwriteOldSession:
+            return Response::RespWouldOverwriteOldSession;
         case UsernameInvalid: {
             Response_Login *re = new Response_Login;
             re->set_denied_reason_str(reasonStr.toStdString());
             rc.setResponseExtension(re);
             return Response::RespUsernameInvalid;
         }
-        case RegistrationRequired: return Response::RespRegistrationRequired;
-        case ClientIdRequired: return Response::RespClientIdRequired;
-        case UserIsInactive: return Response::RespAccountNotActivated;
-        default: authState = res;
+        case RegistrationRequired:
+            return Response::RespRegistrationRequired;
+        case ClientIdRequired:
+            return Response::RespClientIdRequired;
+        case UserIsInactive:
+            return Response::RespAccountNotActivated;
+        default:
+            authState = res;
     }
 
     // limit the number of non-privileged users that can connect to the server based on configuration settings
@@ -535,12 +565,16 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
     userInterface->sendProtocolItem(*se);
     rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, se);
 
-    databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()), QString::fromStdString(cmd.message()), Server_DatabaseInterface::MessageTargetChat, userInterface->getUserInfo()->id(), receiver);
+    databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()),
+                                  QString::fromStdString(userInfo->address()), QString::fromStdString(cmd.message()),
+                                  Server_DatabaseInterface::MessageTargetChat, userInterface->getUserInfo()->id(),
+                                  receiver);
     resetIdleTimer();
     return Response::RespOk;
 }
 
-Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd, ResponseContainer &rc)
+Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd,
+                                                                 ResponseContainer &rc)
 {
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
@@ -581,12 +615,12 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
 
         ServerInfo_User_Container *infoSource = server->findUser(userName);
         if (!infoSource) {
-            re->mutable_user_info()->CopyFrom(databaseInterface->getUserData(userName,true));
+            re->mutable_user_info()->CopyFrom(databaseInterface->getUserData(userName, true));
         } else {
-            re->mutable_user_info()->CopyFrom(infoSource->copyUserInfo(true, false, userInfo->user_level() & ServerInfo_User::IsModerator));
+            re->mutable_user_info()->CopyFrom(
+                infoSource->copyUserInfo(true, false, userInfo->user_level() & ServerInfo_User::IsModerator));
         }
     }
-
 
     rc.setResponseExtension(re);
     return Response::RespOk;
@@ -640,7 +674,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
         Event_RoomSay roomChatHistory;
         roomChatHistory.set_message(chatMessage.sender_name() + ": " + chatMessage.message());
         roomChatHistory.set_message_type(Event_RoomSay::ChatHistory);
-        roomChatHistory.set_time_of(QDateTime::fromString(QString::fromStdString(chatMessage.time())).toMSecsSinceEpoch());
+        roomChatHistory.set_time_of(
+            QDateTime::fromString(QString::fromStdString(chatMessage.time())).toMSecsSinceEpoch());
         rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, r->prepareRoomEvent(roomChatHistory));
     }
 
@@ -672,14 +707,16 @@ Response::ResponseCode Server_ProtocolHandler::cmdListUsers(const Command_ListUs
     return Response::RespOk;
 }
 
-Response::ResponseCode Server_ProtocolHandler::cmdLeaveRoom(const Command_LeaveRoom & /*cmd*/, Server_Room *room, ResponseContainer & /*rc*/)
+Response::ResponseCode
+Server_ProtocolHandler::cmdLeaveRoom(const Command_LeaveRoom & /*cmd*/, Server_Room *room, ResponseContainer & /*rc*/)
 {
     rooms.remove(room->getId());
     room->removeClient(this);
     return Response::RespOk;
 }
 
-Response::ResponseCode Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room, ResponseContainer & /*rc*/)
+Response::ResponseCode
+Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room, ResponseContainer & /*rc*/)
 {
     QString msg = QString::fromStdString(cmd.message());
 
@@ -697,19 +734,23 @@ Response::ResponseCode Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay 
         for (int i = 0; i < messageCountOverTime.size(); ++i)
             totalCount += messageCountOverTime[i];
 
-        if ((totalSize > server->getMaxMessageSizePerInterval()) || (totalCount > server->getMaxMessageCountPerInterval()))
+        if ((totalSize > server->getMaxMessageSizePerInterval()) ||
+            (totalCount > server->getMaxMessageCountPerInterval()))
             return Response::RespChatFlood;
     }
     msg.replace(QChar('\n'), QChar(' '));
 
     room->say(QString::fromStdString(userInfo->name()), msg);
 
-    databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()), msg, Server_DatabaseInterface::MessageTargetRoom, room->getId(), room->getName());
+    databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()),
+                                  QString::fromStdString(userInfo->address()), msg,
+                                  Server_DatabaseInterface::MessageTargetRoom, room->getId(), room->getName());
 
     return Response::RespOk;
 }
 
-Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room *room, ResponseContainer &rc)
+Response::ResponseCode
+Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room *room, ResponseContainer &rc)
 {
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
@@ -731,14 +772,18 @@ Response::ResponseCode Server_ProtocolHandler::cmdCreateGame(const Command_Creat
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
     bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
-    Server_Game *game = new Server_Game(copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes, cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
+    Server_Game *game = new Server_Game(
+        copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes,
+        cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(),
+        cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
     game->addPlayer(this, rc, false, false);
     room->addGame(game);
 
     return Response::RespOk;
 }
 
-Response::ResponseCode Server_ProtocolHandler::cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room, ResponseContainer &rc)
+Response::ResponseCode
+Server_ProtocolHandler::cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room, ResponseContainer &rc)
 {
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;

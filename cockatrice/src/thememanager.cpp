@@ -1,10 +1,10 @@
 #include "thememanager.h"
 #include "settingscache.h"
 #include <QApplication>
-#include <QDebug>
 #include <QColor>
-#include <QPixmapCache>
+#include <QDebug>
 #include <QLibraryInfo>
+#include <QPixmapCache>
 #include <QStandardPaths>
 
 #define DEFAULT_THEME_NAME "Default"
@@ -14,8 +14,7 @@
 #define STACKZONE_BG_NAME "stackzone"
 #define TABLEZONE_BG_NAME "tablezone"
 
-ThemeManager::ThemeManager(QObject *parent)
-    :QObject(parent)
+ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     ensureThemeDirectoryExists();
     connect(settingsCache, SIGNAL(themeChanged()), this, SLOT(themeChangedSlot()));
@@ -24,15 +23,13 @@ ThemeManager::ThemeManager(QObject *parent)
 
 void ThemeManager::ensureThemeDirectoryExists()
 {
-    if(settingsCache->getThemeName().isEmpty() ||
-        !getAvailableThemes().contains(settingsCache->getThemeName()))
-    {
+    if (settingsCache->getThemeName().isEmpty() || !getAvailableThemes().contains(settingsCache->getThemeName())) {
         qDebug() << "Theme name not set, setting default value";
         settingsCache->setThemeName(DEFAULT_THEME_NAME);
     }
 }
 
-QStringMap & ThemeManager::getAvailableThemes()
+QStringMap &ThemeManager::getAvailableThemes()
 {
     QDir dir;
     availableThemes.clear();
@@ -40,23 +37,23 @@ QStringMap & ThemeManager::getAvailableThemes()
     // load themes from user profile dir
     dir = settingsCache->getDataPath() + "/themes";
 
-    foreach(QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
-    {
-        if(!availableThemes.contains(themeName))
+    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
+        if (!availableThemes.contains(themeName))
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
     }
 
     // load themes from cockatrice system dir
+    dir = qApp->applicationDirPath() +
 #ifdef Q_OS_MAC
-    dir = qApp->applicationDirPath() + "/../Resources/themes";
+          "/../Resources/themes";
 #elif defined(Q_OS_WIN)
-    dir = qApp->applicationDirPath() + "/themes";
+          "/themes";
 #else // linux
-    dir = qApp->applicationDirPath() + "/../share/cockatrice/themes";
+          "/../share/cockatrice/themes";
 #endif
-    foreach(QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
-    {
-        if(!availableThemes.contains(themeName))
+
+    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
+        if (!availableThemes.contains(themeName))
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
     }
 
@@ -67,8 +64,7 @@ QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 {
     QBrush brush;
     QPixmap tmp = QPixmap("theme:zones/" + fileName);
-    if(tmp.isNull())
-    {
+    if (tmp.isNull()) {
         brush.setColor(fallbackColor);
         brush.setStyle(Qt::SolidPattern);
     } else {
@@ -86,7 +82,7 @@ void ThemeManager::themeChangedSlot()
     QDir dir = getAvailableThemes().value(themeName);
 
     // css
-    if(dir.exists(STYLE_CSS_NAME))
+    if (dir.exists(STYLE_CSS_NAME))
 
         qApp->setStyleSheet("file:///" + dir.absoluteFilePath(STYLE_CSS_NAME));
     else

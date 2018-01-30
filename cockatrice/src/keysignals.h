@@ -1,10 +1,11 @@
 #ifndef KEYSIGNALS_H
 #define KEYSIGNALS_H
 
-#include <QObject>
 #include <QEvent>
+#include <QObject>
 
-class KeySignals : public QObject {
+class KeySignals : public QObject
+{
     Q_OBJECT
 
 signals:

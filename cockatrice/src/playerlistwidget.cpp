@@ -1,26 +1,28 @@
-#include <QHeaderView>
 #include "playerlistwidget.h"
-#include "pixmapgenerator.h"
 #include "abstractclient.h"
+#include "pixmapgenerator.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
 #include "tab_userlists.h"
-#include "userlist.h"
 #include "user_context_menu.h"
-#include <QMouseEvent>
+#include "userlist.h"
 #include <QAction>
+#include <QHeaderView>
 #include <QMenu>
+#include <QMouseEvent>
 
-#include "pb/session_commands.pb.h"
 #include "pb/command_kick_from_game.pb.h"
 #include "pb/serverinfo_playerproperties.pb.h"
+#include "pb/session_commands.pb.h"
 
-PlayerListItemDelegate::PlayerListItemDelegate(QObject *const parent)
-    : QStyledItemDelegate(parent)
+PlayerListItemDelegate::PlayerListItemDelegate(QObject *const parent) : QStyledItemDelegate(parent)
 {
 }
 
-bool PlayerListItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
+bool PlayerListItemDelegate::editorEvent(QEvent *event,
+                                         QAbstractItemModel *model,
+                                         const QStyleOptionViewItem &option,
+                                         const QModelIndex &index)
 {
     if ((event->type() == QEvent::MouseButtonPress) && index.isValid()) {
         QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
@@ -32,8 +34,7 @@ bool PlayerListItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *mode
     return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
 
-PlayerListTWI::PlayerListTWI()
-    : QTreeWidgetItem(Type)
+PlayerListTWI::PlayerListTWI() : QTreeWidgetItem(Type)
 {
 }
 
@@ -42,12 +43,15 @@ bool PlayerListTWI::operator<(const QTreeWidgetItem &other) const
     // Sort by spectator/player
     if (data(1, Qt::UserRole) != other.data(1, Qt::UserRole))
         return data(1, Qt::UserRole).toBool();
-    
+
     // Sort by player ID
     return data(4, Qt::UserRole + 1).toInt() < other.data(4, Qt::UserRole + 1).toInt();
 }
 
-PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent)
+PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
+                                   AbstractClient *_client,
+                                   TabGame *_game,
+                                   QWidget *parent)
     : QTreeWidget(parent), tabSupervisor(_tabSupervisor), client(_client), game(_game), gameStarted(false)
 {
     readyIcon = QPixmap("theme:icons/ready_start");
@@ -56,16 +60,17 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient
     playerIcon = QPixmap("theme:icons/player");
     spectatorIcon = QPixmap("theme:icons/spectator");
     lockIcon = QPixmap("theme:icons/lock");
-    
+
     if (tabSupervisor) {
         itemDelegate = new PlayerListItemDelegate(this);
         setItemDelegate(itemDelegate);
-        
+
         userContextMenu = new UserContextMenu(tabSupervisor, this, game);
-        connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
+        connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this,
+                SIGNAL(openMessageDialog(QString, bool)));
     } else
         userContextMenu = 0;
-    
+
     setMinimumHeight(40);
     setIconSize(QSize(20, 15));
     setColumnCount(6);
@@ -100,27 +105,29 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
 {
     if (playerId == -1)
         playerId = prop.player_id();
-    
+
     QTreeWidgetItem *player = players.value(playerId, 0);
     if (!player)
         return;
-    
+
     bool isSpectator = prop.has_spectator() && prop.spectator();
     player->setIcon(1, isSpectator ? spectatorIcon : playerIcon);
     player->setData(1, Qt::UserRole, !isSpectator);
 
-    if(!isSpectator)
-    {
+    if (!isSpectator) {
         if (prop.has_conceded())
             player->setData(2, Qt::UserRole, prop.conceded());
         if (prop.has_ready_start())
             player->setData(2, Qt::UserRole + 1, prop.ready_start());
         if (prop.has_conceded() || prop.has_ready_start())
-            player->setIcon(2, gameStarted ? (prop.conceded() ? concededIcon : QIcon()) : (prop.ready_start() ? readyIcon : notReadyIcon));
+            player->setIcon(2, gameStarted ? (prop.conceded() ? concededIcon : QIcon())
+                                           : (prop.ready_start() ? readyIcon : notReadyIcon));
     }
     if (prop.has_user_info()) {
         player->setData(3, Qt::UserRole, prop.user_info().user_level());
-        player->setIcon(3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(prop.user_info().user_level()), false, QString::fromStdString(prop.user_info().privlevel()))));
+        player->setIcon(
+            3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(prop.user_info().user_level()), false,
+                                                              QString::fromStdString(prop.user_info().privlevel()))));
         player->setText(4, QString::fromStdString(prop.user_info().name()));
         const QString country = QString::fromStdString(prop.user_info().country());
         if (!country.isEmpty())
@@ -131,8 +138,7 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
     if (prop.has_player_id())
         player->setData(4, Qt::UserRole + 1, prop.player_id());
 
-    if(!isSpectator)
-    {
+    if (!isSpectator) {
         if (prop.has_deck_hash()) {
             player->setText(5, QString::fromStdString(prop.deck_hash()));
         }
@@ -171,7 +177,7 @@ void PlayerListWidget::setGameStarted(bool _gameStarted, bool resuming)
         QTreeWidgetItem *twi = i.next().value();
 
         bool isPlayer = twi->data(1, Qt::UserRole).toBool();
-        if(!isPlayer)
+        if (!isPlayer)
             continue;
 
         if (gameStarted) {
@@ -191,10 +197,10 @@ void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &ind
 {
     if (!userContextMenu)
         return;
-    
+
     const QString &userName = index.sibling(index.row(), 4).data(Qt::UserRole).toString();
     int playerId = index.sibling(index.row(), 4).data(Qt::UserRole + 1).toInt();
     UserLevelFlags userLevel(index.sibling(index.row(), 3).data(Qt::UserRole).toInt());
-    
+
     userContextMenu->showContextMenu(pos, userName, userLevel, true, playerId);
 }

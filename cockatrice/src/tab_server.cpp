@@ -1,28 +1,27 @@
-#include <QLabel>
-#include <QTreeView>
-#include <QCheckBox>
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QTextEdit>
-#include <QMessageBox>
-#include <QLineEdit>
-#include <QHeaderView>
-#include <QInputDialog>
 #include "tab_server.h"
 #include "abstractclient.h"
-#include "userlist.h"
 #include "tab_supervisor.h"
+#include "userlist.h"
+#include <QCheckBox>
 #include <QDebug>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QInputDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QTreeView>
+#include <QVBoxLayout>
 
-#include "pending_command.h"
-#include "pb/session_commands.pb.h"
 #include "pb/event_list_rooms.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/response_join_room.pb.h"
+#include "pb/session_commands.pb.h"
+#include "pending_command.h"
 
-RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
-    : QGroupBox(parent), client(_client)
+RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent) : QGroupBox(parent), client(_client)
 {
     roomList = new QTreeWidget;
     roomList->setRootIsDecorated(false);
@@ -41,11 +40,12 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent)
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(roomList);
     vbox->addLayout(buttonLayout);
-    
+
     retranslateUi();
     setLayout(vbox);
-    
-    connect(client, SIGNAL(listRoomsEventReceived(const Event_ListRooms &)), this, SLOT(processListRoomsEvent(const Event_ListRooms &)));
+
+    connect(client, SIGNAL(listRoomsEventReceived(const Event_ListRooms &)), this,
+            SLOT(processListRoomsEvent(const Event_ListRooms &)));
     connect(roomList, SIGNAL(activated(const QModelIndex &)), this, SLOT(joinClicked()));
     client->sendCommand(client->prepareSessionCommand(Command_ListRooms()));
 }
@@ -73,7 +73,7 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
         const ServerInfo_Room &room = event.room_list(i);
 
         for (int j = 0; j < roomList->topLevelItemCount(); ++j) {
-              QTreeWidgetItem *twi = roomList->topLevelItem(j);
+            QTreeWidgetItem *twi = roomList->topLevelItem(j);
             if (twi->data(0, Qt::UserRole).toInt() == room.room_id()) {
                 if (room.has_name())
                     twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
@@ -101,7 +101,7 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
         twi->setTextAlignment(2, Qt::AlignRight);
         twi->setTextAlignment(3, Qt::AlignRight);
         twi->setTextAlignment(4, Qt::AlignRight);
-        
+
         roomList->addTopLevelItem(twi);
         if (room.has_auto_join())
             if (room.auto_join())
@@ -109,19 +109,19 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
     }
 }
 
-QString RoomSelector::getRoomPermissionDisplay(const ServerInfo_Room & room)
+QString RoomSelector::getRoomPermissionDisplay(const ServerInfo_Room &room)
 {
     /*
-    * A room can have a permission level and a privilege level. How ever we want to display only the necessary information
-    * on the server tab needed to inform users of required permissions to enter a room. If the room has a privilege level
-    * the server tab will display the privilege level in the "permissions" column in the row however if the room contains
-    * a permissions level for the room the permissions level defined for the room will be displayed.
-    */
+     * A room can have a permission level and a privilege level. How ever we want to display only the necessary
+     * information on the server tab needed to inform users of required permissions to enter a room. If the room has a
+     * privilege level the server tab will display the privilege level in the "permissions" column in the row however if
+     * the room contains a permissions level for the room the permissions level defined for the room will be displayed.
+     */
 
     QString roomPermissionDisplay = QString::fromStdString(room.privilegelevel()).toLower();
     if (QString::fromStdString(room.permissionlevel()).toLower() != "none")
         roomPermissionDisplay = QString::fromStdString(room.permissionlevel()).toLower();
-    if (roomPermissionDisplay == "")    // catch all for misconfigured .ini room definitions 
+    if (roomPermissionDisplay == "") // catch all for misconfigured .ini room definitions
         roomPermissionDisplay = "none";
 
     return roomPermissionDisplay;
@@ -132,7 +132,7 @@ void RoomSelector::joinClicked()
     QTreeWidgetItem *twi = roomList->currentItem();
     if (!twi)
         return;
-    
+
     int id = twi->data(0, Qt::UserRole).toInt();
 
     emit joinRoomRequest(id, true);
@@ -144,18 +144,19 @@ TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWi
     roomSelector = new RoomSelector(client);
     serverInfoBox = new QTextBrowser;
     serverInfoBox->setOpenExternalLinks(true);
-    
+
     connect(roomSelector, SIGNAL(joinRoomRequest(int, bool)), this, SLOT(joinRoom(int, bool)));
-    
-    connect(client, SIGNAL(serverMessageEventReceived(const Event_ServerMessage &)), this, SLOT(processServerMessageEvent(const Event_ServerMessage &)));
-    
+
+    connect(client, SIGNAL(serverMessageEventReceived(const Event_ServerMessage &)), this,
+            SLOT(processServerMessageEvent(const Event_ServerMessage &)));
+
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(roomSelector);
     vbox->addWidget(serverInfoBox);
- 
+
     retranslateUi();
 
-    QWidget * mainWidget = new QWidget(this);
+    QWidget *mainWidget = new QWidget(this);
     mainWidget->setLayout(vbox);
     setCentralWidget(mainWidget);
 }
@@ -179,25 +180,27 @@ void TabServer::processServerMessageEvent(const Event_ServerMessage &event)
 void TabServer::joinRoom(int id, bool setCurrent)
 {
     TabRoom *room = tabSupervisor->getRoomTabs().value(id);
-    if(!room)
-    {
+    if (!room) {
         Command_JoinRoom cmd;
         cmd.set_room_id(id);
-        
+
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         pend->setExtraData(setCurrent);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(joinRoomFinished(Response, CommandContainer, QVariant)));
-        
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(joinRoomFinished(Response, CommandContainer, QVariant)));
+
         client->sendCommand(pend);
 
-        return;   
+        return;
     }
 
-    if(setCurrent)
-        tabSupervisor->setCurrentWidget((QWidget*)room);
+    if (setCurrent)
+        tabSupervisor->setCurrentWidget((QWidget *)room);
 }
 
-void TabServer::joinRoomFinished(const Response &r, const CommandContainer & /*commandContainer*/, const QVariant &extraData)
+void TabServer::joinRoomFinished(const Response &r,
+                                 const CommandContainer & /*commandContainer*/,
+                                 const QVariant &extraData)
 {
     switch (r.response_code()) {
         case Response::RespOk:
@@ -206,13 +209,16 @@ void TabServer::joinRoomFinished(const Response &r, const CommandContainer & /*c
             QMessageBox::critical(this, tr("Error"), tr("Failed to join the room: it doesn't exists on the server."));
             return;
         case Response::RespContextError:
-            QMessageBox::critical(this, tr("Error"), tr("The server thinks you are in the room but Cockatrice is unable to display it. Try restarting Cockatrice."));
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("The server thinks you are in the room but Cockatrice is unable to display it. "
+                                     "Try restarting Cockatrice."));
             return;
         case Response::RespUserLevelTooLow:
             QMessageBox::critical(this, tr("Error"), tr("You do not have the required permission to join this room."));
             return;
         default:
-            QMessageBox::critical(this, tr("Error"), tr("Failed to join the room due to an unknown error: %1.").arg(r.response_code()));
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("Failed to join the room due to an unknown error: %1.").arg(r.response_code()));
             return;
     }
 

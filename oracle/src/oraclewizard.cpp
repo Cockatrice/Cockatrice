@@ -1,14 +1,11 @@
-#include <QtGui>
-#include <QStandardPaths>
-#include <QtConcurrent>
 #include <QAbstractButton>
 #include <QBuffer>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDir>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QLabel>
-#include <QComboBox>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
@@ -18,11 +15,14 @@
 #include <QRadioButton>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QStandardPaths>
 #include <QTextEdit>
+#include <QtConcurrent>
+#include <QtGui>
 
-#include "oraclewizard.h"
-#include "oracleimporter.h"
 #include "main.h"
+#include "oracleimporter.h"
+#include "oraclewizard.h"
 #include "settingscache.h"
 #include "version_string.h"
 
@@ -30,10 +30,10 @@
 #define ALLSETS_URL_FALLBACK "https://mtgjson.com/json/AllSets.json"
 
 #ifdef HAS_ZLIB
-    #include "zip/unzip.h"
-    #define ALLSETS_URL "https://mtgjson.com/json/AllSets.json.zip"
+#include "zip/unzip.h"
+#define ALLSETS_URL "https://mtgjson.com/json/AllSets.json.zip"
 #else
-    #define ALLSETS_URL "https://mtgjson.com/json/AllSets.json"
+#define ALLSETS_URL "https://mtgjson.com/json/AllSets.json"
 #endif
 
 #define TOKENS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml"
@@ -41,21 +41,18 @@
 
 OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 {
-    settings = new QSettings(settingsCache->getSettingsPath()+"global.ini",QSettings::IniFormat, this);
+    settings = new QSettings(settingsCache->getSettingsPath() + "global.ini", QSettings::IniFormat, this);
     connect(settingsCache, SIGNAL(langChanged()), this, SLOT(updateLanguage()));
 
     importer = new OracleImporter(settingsCache->getDataPath(), this);
 
-    if (! isSpoilersOnly)
-    {
+    if (!isSpoilersOnly) {
         addPage(new IntroPage);
         addPage(new LoadSetsPage);
         addPage(new SaveSetsPage);
         addPage(new LoadTokensPage);
         addPage(new SaveTokensPage);
-    }
-    else
-    {
+    } else {
         addPage(new LoadSpoilersPage);
         addPage(new SaveSpoilersPage);
     }
@@ -71,8 +68,7 @@ void OracleWizard::updateLanguage()
 
 void OracleWizard::changeEvent(QEvent *event)
 {
-    if (event->type() == QEvent::LanguageChange)
-    {
+    if (event->type() == QEvent::LanguageChange) {
         retranslateUi();
     }
 
@@ -83,9 +79,8 @@ void OracleWizard::retranslateUi()
 {
     setWindowTitle(tr("Oracle Importer"));
     QWizard::setButtonText(QWizard::FinishButton, tr("Save"));
-    
-    for (int i = 0; i < pageIds().count(); i++)
-    {
+
+    for (int i = 0; i < pageIds().count(); i++) {
         dynamic_cast<OracleWizardPage *>(page(i))->retranslateUi();
     }
 }
@@ -107,17 +102,15 @@ void OracleWizard::disableButtons()
     button(QWizard::BackButton)->setDisabled(true);
 }
 
-bool OracleWizard::saveTokensToFile(const QString & fileName)
+bool OracleWizard::saveTokensToFile(const QString &fileName)
 {
     QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly))
-    {
+    if (!file.open(QIODevice::WriteOnly)) {
         qDebug() << "File open (w) failed for" << fileName;
         return false;
     }
 
-    if (file.write(tokensData) == -1)
-    {
+    if (file.write(tokensData) == -1) {
         qDebug() << "File write (w) failed for" << fileName;
         return false;
     }
@@ -137,12 +130,11 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
     QString setLanguage = settingsCache->getLang();
 
     QStringList qmFiles = findQmFiles();
-    for (int i = 0; i < qmFiles.size(); i++)
-    {
+    for (int i = 0; i < qmFiles.size(); i++) {
         QString langName = languageName(qmFiles[i]);
         languageBox->addItem(langName, qmFiles[i]);
-        if ((qmFiles[i] == setLanguage) || (setLanguage.isEmpty() && langName == QCoreApplication::translate("i18n", DEFAULT_LANG_NAME)))
-        {
+        if ((qmFiles[i] == setLanguage) ||
+            (setLanguage.isEmpty() && langName == QCoreApplication::translate("i18n", DEFAULT_LANG_NAME))) {
             languageBox->setCurrentIndex(i);
         }
     }
@@ -168,14 +160,13 @@ QStringList IntroPage::findQmFiles()
 
 QString IntroPage::languageName(const QString &qmFile)
 {
-    if (qmFile == DEFAULT_LANG_CODE)
-    {
+    if (qmFile == DEFAULT_LANG_CODE) {
         return DEFAULT_LANG_NAME;
     }
 
     QTranslator translator;
     translator.load(translationPrefix + "_" + qmFile + ".qm", translationPath);
-    
+
     return translator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
@@ -257,20 +248,18 @@ void LoadSetsPage::actLoadSetsFile()
 {
     QFileDialog dialog(this, tr("Load sets file"));
     dialog.setFileMode(QFileDialog::ExistingFile);
-    
+
 #ifdef HAS_ZLIB
     dialog.setNameFilter(tr("Sets JSON file (*.json *.zip)"));
 #else
     dialog.setNameFilter(tr("Sets JSON file (*.json)"));
 #endif
 
-    if (!fileLineEdit->text().isEmpty() && QFile::exists(fileLineEdit->text()))
-    {
+    if (!fileLineEdit->text().isEmpty() && QFile::exists(fileLineEdit->text())) {
         dialog.selectFile(fileLineEdit->text());
     }
 
-    if (!dialog.exec())
-    {
+    if (!dialog.exec()) {
         return;
     }
 
@@ -280,17 +269,14 @@ void LoadSetsPage::actLoadSetsFile()
 bool LoadSetsPage::validatePage()
 {
     // once the import is finished, we call next(); skip validation
-    if (wizard()->importer->getSets().count() > 0)
-    {
+    if (wizard()->importer->getSets().count() > 0) {
         return true;
     }
 
     // else, try to import sets
-    if (urlRadioButton->isChecked())
-    {
+    if (urlRadioButton->isChecked()) {
         QUrl url = QUrl::fromUserInput(urlLineEdit->text());
-        if (!url.isValid())
-        {
+        if (!url.isValid()) {
             QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
             return false;
         }
@@ -307,18 +293,14 @@ bool LoadSetsPage::validatePage()
         setEnabled(false);
 
         downloadSetsFile(url);
-    }
-    else if (fileRadioButton->isChecked())
-    {
+    } else if (fileRadioButton->isChecked()) {
         QFile setsFile(fileLineEdit->text());
-        if (!setsFile.exists())
-        {
+        if (!setsFile.exists()) {
             QMessageBox::critical(this, tr("Error"), tr("Please choose a file."));
             return false;
         }
 
-        if (!setsFile.open(QIODevice::ReadOnly))
-        {
+        if (!setsFile.open(QIODevice::ReadOnly)) {
             QMessageBox::critical(nullptr, tr("Error"), tr("Cannot open file '%1'.").arg(fileLineEdit->text()));
             return false;
         }
@@ -327,7 +309,6 @@ bool LoadSetsPage::validatePage()
         setEnabled(false);
 
         readSetsFromByteArray(setsFile.readAll());
-
     }
 
     return false;
@@ -335,8 +316,7 @@ bool LoadSetsPage::validatePage()
 
 void LoadSetsPage::downloadSetsFile(QUrl url)
 {
-    if (!nam)
-    {
+    if (!nam) {
         nam = new QNetworkAccessManager(this);
     }
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
@@ -347,12 +327,11 @@ void LoadSetsPage::downloadSetsFile(QUrl url)
 
 void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
 {
-    if (total > 0)
-    {
+    if (total > 0) {
         progressBar->setMaximum(static_cast<int>(total));
         progressBar->setValue(static_cast<int>(received));
     }
-    progressLabel->setText(tr("Downloading (%1MB)").arg((int) received / (1024 * 1024)));
+    progressLabel->setText(tr("Downloading (%1MB)").arg((int)received / (1024 * 1024)));
 }
 
 void LoadSetsPage::actDownloadFinishedSetsFile()
@@ -360,8 +339,7 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
     // check for a reply
     auto *reply = dynamic_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError errorCode = reply->error();
-    if (errorCode != QNetworkReply::NoError)
-    {
+    if (errorCode != QNetworkReply::NoError) {
         QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
 
         wizard()->enableButtons();
@@ -372,8 +350,7 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
     }
 
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if (statusCode == 301 || statusCode == 302)
-    {
+    if (statusCode == 301 || statusCode == 302) {
         QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
         qDebug() << "following redirect url:" << redirectUrl.toString();
         downloadSetsFile(redirectUrl);
@@ -385,12 +362,9 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
     progressBar->hide();
 
     // save allsets.json url, but only if the user customized it and download was successfull
-    if (urlLineEdit->text() != QString(ALLSETS_URL))
-    {
+    if (urlLineEdit->text() != QString(ALLSETS_URL)) {
         wizard()->settings->setValue("allsetsurl", urlLineEdit->text());
-    }
-    else
-    {
+    } else {
         wizard()->settings->remove("allsetsurl");
     }
 
@@ -409,8 +383,7 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
     progressBar->show();
 
     // unzip the file if needed
-    if(data.startsWith(ZIP_SIGNATURE))
-    {
+    if (data.startsWith(ZIP_SIGNATURE)) {
 #ifdef HAS_ZLIB
         // zipped file
         auto *inBuffer = new QBuffer(&data);
@@ -420,23 +393,20 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
         UnZip uz;
 
         ec = uz.openArchive(inBuffer);
-        if (ec != UnZip::Ok)
-        {
+        if (ec != UnZip::Ok) {
             zipDownloadFailed(tr("Failed to open Zip archive: %1.").arg(uz.formatError(ec)));
             return;
         }
 
-        if (uz.fileList().size() != 1)
-        {
+        if (uz.fileList().size() != 1) {
             zipDownloadFailed(tr("Zip extraction failed: the Zip archive doesn't contain exactly one file."));
-            return;            
+            return;
         }
         fileName = uz.fileList().at(0);
 
         outBuffer->open(QBuffer::ReadWrite);
         ec = uz.extractFile(fileName, outBuffer);
-        if (ec != UnZip::Ok)
-        {
+        if (ec != UnZip::Ok) {
             zipDownloadFailed(tr("Zip extraction failed: %1.").arg(uz.formatError(ec)));
             uz.closeArchive();
             return;
@@ -454,7 +424,7 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
         progressBar->hide();
         return;
 #endif
-    } 
+    }
     // Start the computation.
     future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, data);
     watcher.setFuture(future);
@@ -468,10 +438,12 @@ void LoadSetsPage::zipDownloadFailed(const QString &message)
     progressBar->hide();
 
     QMessageBox::StandardButton reply;
-    reply = static_cast<QMessageBox::StandardButton>(QMessageBox::question(this, tr("Error"), message + "<br/>" + tr("Do you want to try to download a fresh copy of the uncompressed file instead?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes));
+    reply = static_cast<QMessageBox::StandardButton>(QMessageBox::question(
+        this, tr("Error"),
+        message + "<br/>" + tr("Do you want to try to download a fresh copy of the uncompressed file instead?"),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes));
 
-    if (reply == QMessageBox::Yes)
-    {
+    if (reply == QMessageBox::Yes) {
         urlRadioButton->setChecked(true);
         urlLineEdit->setText(ALLSETS_URL_FALLBACK);
 
@@ -486,13 +458,11 @@ void LoadSetsPage::importFinished()
     progressLabel->hide();
     progressBar->hide();
 
-    if (watcher.future().result())
-    {
+    if (watcher.future().result()) {
         wizard()->next();
-    }
-    else
-    {
-        QMessageBox::critical(this, tr("Error"), tr("The file was retrieved successfully, but it does not contain any sets data."));
+    } else {
+        QMessageBox::critical(this, tr("Error"),
+                              tr("The file was retrieved successfully, but it does not contain any sets data."));
     }
 }
 
@@ -520,10 +490,10 @@ void SaveSetsPage::initializePage()
 {
     messageLog->clear();
 
-    connect(wizard()->importer, SIGNAL(setIndexChanged(int, int, const QString &)), this, SLOT(updateTotalProgress(int, int, const QString &)));
+    connect(wizard()->importer, SIGNAL(setIndexChanged(int, int, const QString &)), this,
+            SLOT(updateTotalProgress(int, int, const QString &)));
 
-    if (!wizard()->importer->startImport())
-    {
+    if (!wizard()->importer->startImport()) {
         QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
     }
 }
@@ -539,13 +509,11 @@ void SaveSetsPage::retranslateUi()
 
 void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, const QString &setName)
 {
-    if (setName.isEmpty())
-    {
-        messageLog->append("<b>" + tr("Import finished: %1 cards.").arg(wizard()->importer->getCardList().size()) + "</b>");
-    }
-    else
-    {
-        messageLog->append(tr("%1: %2 cards imported").arg(setName).arg(cardsImported));        
+    if (setName.isEmpty()) {
+        messageLog->append("<b>" + tr("Import finished: %1 cards.").arg(wizard()->importer->getCardList().size()) +
+                           "</b>");
+    } else {
+        messageLog->append(tr("%1: %2 cards imported").arg(setName).arg(cardsImported));
     }
 
     messageLog->verticalScrollBar()->setValue(messageLog->verticalScrollBar()->maximum());
@@ -558,42 +526,32 @@ bool SaveSetsPage::validatePage()
     QString windowName = tr("Save card database");
     QString fileType = tr("XML; card database (*.xml)");
 
-    do
-    {
+    do {
         QString fileName;
-        if (defaultPathCheckBox->isChecked())
-        {
+        if (defaultPathCheckBox->isChecked()) {
             fileName = defaultPath;
-        }
-        else
-        {
+        } else {
             fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
         }
 
-        if (fileName.isEmpty())
-        {
+        if (fileName.isEmpty()) {
             return false;
         }
 
         QFileInfo fi(fileName);
         QDir fileDir(fi.path());
-        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath()))
-        {
+        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
             return false;
         }
 
-        if (wizard()->importer->saveToFile(fileName))
-        {
+        if (wizard()->importer->saveToFile(fileName)) {
             ok = true;
-            QMessageBox::information(this,
-              tr("Success"),
-              tr("The card database has been saved successfully to\n%1").arg(fileName));
-        }
-        else
-        {
-            QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));;
-            if (defaultPathCheckBox->isChecked())
-            {
+            QMessageBox::information(this, tr("Success"),
+                                     tr("The card database has been saved successfully to\n%1").arg(fileName));
+        } else {
+            QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
+            ;
+            if (defaultPathCheckBox->isChecked()) {
                 defaultPathCheckBox->setChecked(false);
             }
         }
@@ -636,13 +594,12 @@ void LoadSpoilersPage::initializePage()
 
 void LoadSpoilersPage::actDownloadProgressSpoilersFile(qint64 received, qint64 total)
 {
-    if (total > 0)
-    {
+    if (total > 0) {
         progressBar->setMaximum(static_cast<int>(total));
         progressBar->setValue(static_cast<int>(received));
     }
 
-    progressLabel->setText(tr("Downloading (%1MB)").arg((int) received / (1024 * 1024)));
+    progressLabel->setText(tr("Downloading (%1MB)").arg((int)received / (1024 * 1024)));
 }
 
 void LoadSpoilersPage::actDownloadFinishedSpoilersFile()
@@ -651,8 +608,7 @@ void LoadSpoilersPage::actDownloadFinishedSpoilersFile()
     auto *reply = dynamic_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError errorCode = reply->error();
 
-    if (errorCode != QNetworkReply::NoError)
-    {
+    if (errorCode != QNetworkReply::NoError) {
         QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
 
         wizard()->enableButtons();
@@ -663,8 +619,7 @@ void LoadSpoilersPage::actDownloadFinishedSpoilersFile()
     }
 
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if (statusCode == 301 || statusCode == 302)
-    {
+    if (statusCode == 301 || statusCode == 302) {
         QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
         qDebug() << "following redirect url:" << redirectUrl.toString();
         downloadSpoilersFile(redirectUrl);
@@ -676,12 +631,9 @@ void LoadSpoilersPage::actDownloadFinishedSpoilersFile()
     progressBar->hide();
 
     // save spoiler.xml url, but only if the user customized it and download was successful
-    if (urlLineEdit->text() != QString(SPOILERS_URL))
-    {
+    if (urlLineEdit->text() != QString(SPOILERS_URL)) {
         wizard()->settings->setValue("spoilersurl", urlLineEdit->text());
-    }
-    else
-    {
+    } else {
         wizard()->settings->remove("spoilersurl");
     }
 
@@ -698,27 +650,25 @@ void LoadSpoilersPage::actDownloadFinishedSpoilersFile()
 
 void LoadSpoilersPage::downloadSpoilersFile(QUrl url)
 {
-    if (!nam)
-    {
+    if (!nam) {
         nam = new QNetworkAccessManager(this);
     }
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
 
     connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSpoilersFile()));
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(actDownloadProgressSpoilersFile(qint64, qint64)));
+    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this,
+            SLOT(actDownloadProgressSpoilersFile(qint64, qint64)));
 }
 
 bool LoadSpoilersPage::validatePage()
 {
     // once the import is finished, we call next(); skip validation
-    if (wizard()->hasTokensData())
-    {
+    if (wizard()->hasTokensData()) {
         return true;
     }
 
     QUrl url = QUrl::fromUserInput(urlLineEdit->text());
-    if (!url.isValid())
-    {
+    if (!url.isValid()) {
         QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
         return false;
     }
@@ -793,14 +743,12 @@ void LoadTokensPage::actRestoreDefaultUrl()
 bool LoadTokensPage::validatePage()
 {
     // once the import is finished, we call next(); skip validation
-    if (wizard()->hasTokensData())
-    {
+    if (wizard()->hasTokensData()) {
         return true;
     }
 
     QUrl url = QUrl::fromUserInput(urlLineEdit->text());
-    if (!url.isValid())
-    {
+    if (!url.isValid()) {
         QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
         return false;
     }
@@ -822,8 +770,7 @@ bool LoadTokensPage::validatePage()
 
 void LoadTokensPage::downloadTokensFile(QUrl url)
 {
-    if (!nam)
-    {
+    if (!nam) {
         nam = new QNetworkAccessManager(this);
     }
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
@@ -834,12 +781,11 @@ void LoadTokensPage::downloadTokensFile(QUrl url)
 
 void LoadTokensPage::actDownloadProgressTokensFile(qint64 received, qint64 total)
 {
-    if (total > 0)
-    {
+    if (total > 0) {
         progressBar->setMaximum(static_cast<int>(total));
         progressBar->setValue(static_cast<int>(received));
     }
-    progressLabel->setText(tr("Downloading (%1MB)").arg((int) received / (1024 * 1024)));
+    progressLabel->setText(tr("Downloading (%1MB)").arg((int)received / (1024 * 1024)));
 }
 
 void LoadTokensPage::actDownloadFinishedTokensFile()
@@ -847,8 +793,7 @@ void LoadTokensPage::actDownloadFinishedTokensFile()
     // check for a reply
     auto *reply = dynamic_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError errorCode = reply->error();
-    if (errorCode != QNetworkReply::NoError)
-    {
+    if (errorCode != QNetworkReply::NoError) {
         QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
 
         wizard()->enableButtons();
@@ -859,8 +804,7 @@ void LoadTokensPage::actDownloadFinishedTokensFile()
     }
 
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if (statusCode == 301 || statusCode == 302)
-    {
+    if (statusCode == 301 || statusCode == 302) {
         QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
         qDebug() << "following redirect url:" << redirectUrl.toString();
         downloadTokensFile(redirectUrl);
@@ -872,12 +816,9 @@ void LoadTokensPage::actDownloadFinishedTokensFile()
     progressBar->hide();
 
     // save tokens.xml url, but only if the user customized it and download was successfull
-    if (urlLineEdit->text() != QString(TOKENS_URL))
-    {
+    if (urlLineEdit->text() != QString(TOKENS_URL)) {
         wizard()->settings->setValue("tokensurl", urlLineEdit->text());
-    }
-    else
-    {
+    } else {
         wizard()->settings->remove("tokensurl");
     }
 
@@ -901,14 +842,13 @@ SaveSpoilersPage::SaveSpoilersPage(QWidget *parent) : OracleWizardPage(parent)
     layout->addWidget(defaultPathCheckBox, 0, 0);
 
     setLayout(layout);
-
 }
 
 void SaveSpoilersPage::retranslateUi()
 {
     setTitle(tr("Spoilers imported"));
     setSubTitle(tr("The spoilers file has been imported. "
-                           "Press \"Save\" to save the imported spoilers to the Cockatrice card database."));
+                   "Press \"Save\" to save the imported spoilers to the Cockatrice card database."));
 
     defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
 }
@@ -920,39 +860,30 @@ bool SaveSpoilersPage::validatePage()
     QString windowName = tr("Save spoiler database");
     QString fileType = tr("XML; card database (*.xml)");
 
-    do
-    {
+    do {
         QString fileName;
-        if (defaultPathCheckBox->isChecked())
-        {
+        if (defaultPathCheckBox->isChecked()) {
             fileName = defaultPath;
-        }
-        else
-        {
+        } else {
             fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
         }
 
-        if (fileName.isEmpty())
-        {
+        if (fileName.isEmpty()) {
             return false;
         }
 
         QFileInfo fi(fileName);
         QDir fileDir(fi.path());
-        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath()))
-        {
+        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
             return false;
         }
 
-        if (wizard()->saveTokensToFile(fileName))
-        {
+        if (wizard()->saveTokensToFile(fileName)) {
             ok = true;
-        }
-        else
-        {
-            QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));;
-            if (defaultPathCheckBox->isChecked())
-            {
+        } else {
+            QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
+            ;
+            if (defaultPathCheckBox->isChecked()) {
                 defaultPathCheckBox->setChecked(false);
             }
         }
@@ -988,43 +919,32 @@ bool SaveTokensPage::validatePage()
     QString windowName = tr("Save token database");
     QString fileType = tr("XML; token database (*.xml)");
 
-    do
-    {
+    do {
         QString fileName;
-        if (defaultPathCheckBox->isChecked())
-        {
+        if (defaultPathCheckBox->isChecked()) {
             fileName = defaultPath;
-        }
-        else
-        {
+        } else {
             fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
         }
 
-        if (fileName.isEmpty())
-        {
+        if (fileName.isEmpty()) {
             return false;
         }
-
 
         QFileInfo fi(fileName);
         QDir fileDir(fi.path());
-        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath()))
-        {
+        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
             return false;
         }
 
-        if (wizard()->saveTokensToFile(fileName))
-        {
+        if (wizard()->saveTokensToFile(fileName)) {
             ok = true;
-            QMessageBox::information(this,
-              tr("Success"),
-              tr("The token database has been saved successfully to\n%1").arg(fileName));
-        }
-        else
-        {
-            QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));;
-            if (defaultPathCheckBox->isChecked())
-            {
+            QMessageBox::information(this, tr("Success"),
+                                     tr("The token database has been saved successfully to\n%1").arg(fileName));
+        } else {
+            QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
+            ;
+            if (defaultPathCheckBox->isChecked()) {
                 defaultPathCheckBox->setChecked(false);
             }
         }

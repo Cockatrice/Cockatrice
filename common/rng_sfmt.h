@@ -1,10 +1,10 @@
 #ifndef RNG_SFMT_H
 #define RNG_SFMT_H
 
-#include <climits>
-#include <QMutex>
-#include "sfmt/SFMT.h"
 #include "rng_abstract.h"
+#include "sfmt/SFMT.h"
+#include <QMutex>
+#include <climits>
 
 /**
  * This class encapsulates a state of the art PRNG and can be used
@@ -25,17 +25,18 @@
  * Edition Volume 2 / Seminumerical Algorithms".
  */
 
-class RNG_SFMT : public RNG_Abstract {
+class RNG_SFMT : public RNG_Abstract
+{
     Q_OBJECT
 private:
     QMutex mutex;
     sfmt_t sfmt;
     // The discrete cumulative distribution function for the RNG
     unsigned int cdf(unsigned int min, unsigned int max);
+
 public:
     RNG_SFMT(QObject *parent = 0);
     unsigned int rand(int min, int max);
 };
 
 #endif
- 

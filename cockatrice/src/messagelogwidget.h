@@ -10,7 +10,8 @@ class CardZone;
 class GameEventContext;
 class CardItem;
 
-struct LogMoveCard {
+struct LogMoveCard
+{
     Player *player;
     CardItem *card;
     QString cardName;
@@ -20,10 +21,12 @@ struct LogMoveCard {
     int newX;
 };
 
-class MessageLogWidget : public ChatView {
+class MessageLogWidget : public ChatView
+{
     Q_OBJECT
 private:
-    enum MessageContext {
+    enum MessageContext
+    {
         MessageContext_None,
         MessageContext_MoveCard,
         MessageContext_Mulligan
@@ -55,7 +58,12 @@ public slots:
     void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
     void logConcede(Player *player);
     void logConnectionStateChanged(Player *player, bool connectionState);
-    void logCreateArrow(Player *player, Player *startPlayer, QString startCard, Player *targetPlayer, QString targetCard, bool playerTarget);
+    void logCreateArrow(Player *player,
+                        Player *startPlayer,
+                        QString startCard,
+                        Player *targetPlayer,
+                        QString targetCard,
+                        bool playerTarget);
     void logCreateToken(Player *player, QString cardName, QString pt);
     void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
     void logDestroyCard(Player *player, QString cardName);
@@ -75,7 +83,8 @@ public slots:
     void logMulligan(Player *player, int number);
     void logReplayStarted(int gameId);
     void logReadyStart(Player *player);
-    void logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown);
+    void
+    logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown);
     void logRollDie(Player *player, int sides, int roll);
     void logSay(Player *player, QString message);
     void logSetActivePhase(int phase);
@@ -88,14 +97,18 @@ public slots:
     void logSetSideboardLock(Player *player, bool locked);
     void logSetTapped(Player *player, CardItem *card, bool tapped);
     void logShuffle(Player *player, CardZone *zone);
-    void logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString userPrivLevel, QString message);
+    void
+    logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString userPrivLevel, QString message);
     void logStopDumpZone(Player *player, CardZone *zone);
     void logUnattachCard(Player *player, QString cardName);
     void logUndoDraw(Player *player, QString cardName);
 
 public:
     void connectToPlayer(Player *player);
-    MessageLogWidget(const TabSupervisor *_tabSupervisor, const UserlistProxy *_userlistProxy, TabGame *_game, QWidget *parent = 0);
+    MessageLogWidget(const TabSupervisor *_tabSupervisor,
+                     const UserlistProxy *_userlistProxy,
+                     TabGame *_game,
+                     QWidget *parent = 0);
 };
 
 #endif
