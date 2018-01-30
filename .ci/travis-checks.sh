@@ -2,7 +2,9 @@
 
 if [[ $TRAVIS_OS_NAME == "linux" ]]; then
   echo "Checking code style..."
+  pwd
   cd ..
+  pwd
   clang-format -i \
     common/*.h \
     common/*.cpp \
