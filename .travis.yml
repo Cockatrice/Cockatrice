@@ -23,6 +23,7 @@ matrix:
     env: BUILDTYPE=Release
     if: (branch = master AND NOT type = pull_request) OR tag IS present
 
+
 #install dependencies for container-based "linux" builds
 addons:
   apt:
@@ -43,7 +44,10 @@ addons:
     - libqt5svg5-dev
     - libqt5sql5-mysql
 
-before_install: bash ./.ci/travis-dependencies.sh
+
+before_install: bash ./.ci/travis-checks.sh
+
+install: bash ./.ci/travis-dependencies.sh
 
 script: bash ./.ci/travis-compile.sh
 
