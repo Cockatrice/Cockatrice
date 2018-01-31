@@ -14,7 +14,7 @@ if [[ $TRAVIS_OS_NAME == "linux" ]]; then
       servatrice/src/*.cpp
       
     git clean -f
-    git diff --quiet && echo "Code style - OK"; || (
+    git diff --quiet && echo "Code style - OK" || (
       echo "*****************************************************";
       echo "***  This PR is not clean against our code style  ***";
       echo "***  Run clang-format and fix up any differences  ***";
