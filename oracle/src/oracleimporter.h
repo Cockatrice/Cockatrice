@@ -58,21 +58,21 @@ private:
     QString dataDir;
 
     CardInfoPtr addCard(const QString &setName,
-                      QString cardName,
-                      bool isToken,
-                      int cardId,
-                      QString &setNumber,
-                      QString &cardCost,
-                      QString &cmc,
-                      const QString &cardType,
-                      const QString &cardPT,
-                      int cardLoyalty,
-                      const QString &cardText,
-                      const QStringList &colors,
-                      const QList<CardRelation *> &relatedCards,
-                      const QList<CardRelation *> &reverseRelatedCards,
-                      bool upsideDown,
-                      QString &rarity);
+                        QString cardName,
+                        bool isToken,
+                        int cardId,
+                        QString &setNumber,
+                        QString &cardCost,
+                        QString &cmc,
+                        const QString &cardType,
+                        const QString &cardPT,
+                        int cardLoyalty,
+                        const QString &cardText,
+                        const QStringList &colors,
+                        const QList<CardRelation *> &relatedCards,
+                        const QList<CardRelation *> &reverseRelatedCards,
+                        bool upsideDown,
+                        QString &rarity);
 signals:
     void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
     void dataReadProgress(int bytesRead, int totalBytes);

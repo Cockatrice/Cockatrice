@@ -52,21 +52,21 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
 }
 
 CardInfoPtr OracleImporter::addCard(const QString &setName,
-                                  QString cardName,
-                                  bool isToken,
-                                  int cardId,
-                                  QString &setNumber,
-                                  QString &cardCost,
-                                  QString &cmc,
-                                  const QString &cardType,
-                                  const QString &cardPT,
-                                  int cardLoyalty,
-                                  const QString &cardText,
-                                  const QStringList &colors,
-                                  const QList<CardRelation *> &relatedCards,
-                                  const QList<CardRelation *> &reverseRelatedCards,
-                                  bool upsideDown,
-                                  QString &rarity)
+                                    QString cardName,
+                                    bool isToken,
+                                    int cardId,
+                                    QString &setNumber,
+                                    QString &cardCost,
+                                    QString &cmc,
+                                    const QString &cardType,
+                                    const QString &cardPT,
+                                    int cardLoyalty,
+                                    const QString &cardText,
+                                    const QStringList &colors,
+                                    const QList<CardRelation *> &relatedCards,
+                                    const QList<CardRelation *> &reverseRelatedCards,
+                                    bool upsideDown,
+                                    QString &rarity)
 {
     QStringList cardTextRows = cardText.split("\n");
 
@@ -95,8 +95,8 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
                                               !cardText.contains(cardName + " enters the battlefield tapped unless"));
 
         // insert the card and its properties
-        card = CardInfo::newInstance(cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors,
-                                     relatedCards, reverseRelatedCards, upsideDown, cardLoyalty, cipt);
+        card = CardInfo::newInstance(cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards,
+                                     reverseRelatedCards, upsideDown, cardLoyalty, cipt);
         int tableRow = 1;
         QString mainCardType = card->getMainCardType();
         if ((mainCardType == "Land") || mArtifact)
@@ -290,8 +290,9 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
         upsideDown = false;
 
         // add the card
-        CardInfoPtr card = addCard(set->getShortName(), cardName, false, muid, setNumber, cardCost, cmc, cardType, cardPT,
-                                 cardLoyalty, cardText, colors, relatedCards, reverseRelatedCards, upsideDown, rarity);
+        CardInfoPtr card =
+            addCard(set->getShortName(), cardName, false, muid, setNumber, cardCost, cmc, cardType, cardPT, cardLoyalty,
+                    cardText, colors, relatedCards, reverseRelatedCards, upsideDown, rarity);
 
         if (!set->contains(card)) {
             card->addToSet(set);
@@ -311,16 +312,13 @@ int OracleImporter::startImport()
     const SetToDownload *curSet;
 
     // add an empty set for tokens
-    CardSetPtr tokenSet = CardSet::newInstance(TOKENS_SETNAME, 
-                                                            tr("Dummy set containing tokens"),
-                                                            "Tokens");
+    CardSetPtr tokenSet = CardSet::newInstance(TOKENS_SETNAME, tr("Dummy set containing tokens"), "Tokens");
     sets.insert(TOKENS_SETNAME, tokenSet);
 
     while (it.hasNext()) {
         curSet = &it.next();
-        CardSetPtr set =
-            CardSet::newInstance(curSet->getShortName(), curSet->getLongName(), curSet->getSetType(),
-                                 curSet->getReleaseDate());
+        CardSetPtr set = CardSet::newInstance(curSet->getShortName(), curSet->getLongName(), curSet->getSetType(),
+                                              curSet->getReleaseDate());
         if (!sets.contains(set->getShortName()))
             sets.insert(set->getShortName(), set);
 
