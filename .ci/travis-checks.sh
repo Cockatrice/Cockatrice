@@ -2,7 +2,7 @@
 
 if [[ $TRAVIS_OS_NAME == "linux" ]]; then
   if [[ $BUILDTYPE == "Debug" ]]; then #TODO: generalize h cpp files search to top-directory? / check with ctrlaltca
-    echo "Checking code style..."
+    echo "Checking code style...";
     clang-format -i \
       common/*.h \
       common/*.cpp \
@@ -14,7 +14,7 @@ if [[ $TRAVIS_OS_NAME == "linux" ]]; then
       servatrice/src/*.cpp
       
     git clean -f
-    git diff --quiet && echo "Code style - OK" || (
+    git diff --quiet && echo "Code style - OK"; || (
       echo "*****************************************************";
       echo "***  This PR is not clean against our code style  ***";
       echo "***  Run clang-format and fix up any differences  ***";
@@ -24,9 +24,9 @@ if [[ $TRAVIS_OS_NAME == "linux" ]]; then
     )
     git diff --exit-code
   else
-    echo "Skipping... checks are only performed on runs in debug mode"
+    echo "Skipping... checks are only performed on runs in debug mode";
 fi
 
 if [[ $TRAVIS_OS_NAME == "osx" ]]; then
-  echo "Skipping... checks are only performed on runs from Linux"
+  echo "Skipping... checks are only performed on runs from Linux";
 fi
