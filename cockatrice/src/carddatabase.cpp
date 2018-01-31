@@ -282,7 +282,8 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
 {
     CardInfoPtr ptr(new CardInfo(_name, _isToken, _manacost, _cmc, _cardtype, _powtough, _text, _colors, _relatedCards,
                                  _reverseRelatedCards, _upsideDownArt, _loyalty, _cipt, _tableRow, _sets,
-                                 _customPicURLs, std::move(_muIds), std::move(_collectorNumbers), std::move(_rarities)));
+                                 _customPicURLs, std::move(_muIds), std::move(_collectorNumbers),
+                                 std::move(_rarities)));
     ptr->setSmartPointer(ptr);
 
     for (int i = 0; i < _sets.size(); i++) {

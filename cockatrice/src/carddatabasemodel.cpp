@@ -128,8 +128,7 @@ void CardDatabaseModel::cardAdded(CardInfoPtr card)
 void CardDatabaseModel::cardRemoved(CardInfoPtr card)
 {
     const int row = cardList.indexOf(card);
-    if (row == -1)
-    {
+    if (row == -1) {
         return;
     }
 
