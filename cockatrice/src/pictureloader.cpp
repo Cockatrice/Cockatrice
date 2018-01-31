@@ -20,6 +20,7 @@
 #include <QSvgRenderer>
 #include <QThread>
 #include <QUrl>
+#include <utility>
 
 // never cache more than 300 cards at once for a single deck
 #define CACHED_CARD_PER_DECK_MAX 300
@@ -32,29 +33,17 @@ public:
      * Enabled sets have priority over disabled sets
      * Both groups follows the user-defined order
      */
-    inline bool operator()(CardSetPtr a, CardSetPtr b) const
+    inline bool operator()(const CardSetPtr &a, const CardSetPtr &b) const
     {
         if (a->getEnabled()) {
-            if (b->getEnabled()) {
-                // both enabled: sort by key
-                return a->getSortKey() < b->getSortKey();
-            } else {
-                // only a enabled
-                return true;
-            }
+            return !b->getEnabled() || a->getSortKey() < b->getSortKey();
         } else {
-            if (b->getEnabled()) {
-                // only b enabled
-                return false;
-            } else {
-                // both disabled: sort by key
-                return a->getSortKey() < b->getSortKey();
-            }
+            return !b->getEnabled() && a->getSortKey() < b->getSortKey();
         }
     }
 };
 
-PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(_card), setIndex(0)
+PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card)), setIndex(0)
 {
     if (card) {
         sortedSets = card->getSets();

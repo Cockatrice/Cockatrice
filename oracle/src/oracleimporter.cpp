@@ -324,11 +324,11 @@ int OracleImporter::startImport()
         if (!sets.contains(set->getShortName()))
             sets.insert(set->getShortName(), set);
 
-        int setCards = importTextSpoiler(set, curSet->getCards());
+        int setCardsHere = importTextSpoiler(set, curSet->getCards());
 
         ++setIndex;
 
-        emit setIndexChanged(setCards, setIndex, curSet->getLongName());
+        emit setIndexChanged(setCardsHere, setIndex, curSet->getLongName());
     }
 
     emit setIndexChanged(setCards, setIndex, QString());

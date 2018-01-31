@@ -8,13 +8,14 @@
 #include <QDir>
 #include <QFile>
 #include <QMessageBox>
+#include <utility>
 
 const int CardDatabase::versionNeeded = 3;
 const char *CardDatabase::TOKENS_SETNAME = "TK";
 
-static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr set)
+static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set)
 {
-    if (set == nullptr) {
+    if (set.isNull()) {
         qDebug() << "&operator<< set is nullptr";
         return xml;
     }
@@ -106,9 +107,9 @@ void CardSet::setIsKnown(bool _isknown)
 class SetList::KeyCompareFunctor
 {
 public:
-    inline bool operator()(CardSetPtr a, CardSetPtr b) const
+    inline bool operator()(const CardSetPtr &a, const CardSetPtr &b) const
     {
-        if (a == nullptr || b == nullptr) {
+        if (a.isNull() || b.isNull()) {
             qDebug() << "SetList::KeyCompareFunctor a or b is null";
             return false;
         }
@@ -209,7 +210,7 @@ void SetList::guessSortKeys()
     int aHundredYears = 36500;
     for (int i = 0; i < size(); ++i) {
         CardSetPtr set = at(i);
-        if (set == nullptr) {
+        if (set.isNull()) {
             qDebug() << "guessSortKeys set is null";
             continue;
         }
@@ -281,7 +282,7 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
 {
     CardInfoPtr ptr(new CardInfo(_name, _isToken, _manacost, _cmc, _cardtype, _powtough, _text, _colors, _relatedCards,
                                  _reverseRelatedCards, _upsideDownArt, _loyalty, _cipt, _tableRow, _sets,
-                                 _customPicURLs, _muIds, _collectorNumbers, _rarities));
+                                 _customPicURLs, std::move(_muIds), std::move(_collectorNumbers), std::move(_rarities)));
     ptr->setSmartPointer(ptr);
 
     for (int i = 0; i < _sets.size(); i++) {
@@ -338,7 +339,7 @@ QString CardInfo::getCorrectedName() const
 
 void CardInfo::addToSet(CardSetPtr set)
 {
-    if (set == nullptr) {
+    if (set.isNull()) {
         qDebug() << "addToSet(nullptr)";
         return;
     }
@@ -394,9 +395,9 @@ const QChar CardInfo::getColorChar() const
     }
 }
 
-static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr info)
+static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &info)
 {
-    if (info == nullptr) {
+    if (info.isNull()) {
         qDebug() << "operator<< info is nullptr";
         return xml;
     }
@@ -552,7 +553,7 @@ void CardDatabase::addCard(CardInfoPtr card)
 
 void CardDatabase::removeCard(CardInfoPtr card)
 {
-    if (card == nullptr) {
+    if (card.isNull()) {
         qDebug() << "removeCard(nullptr)";
         return;
     }
@@ -569,6 +570,7 @@ void CardDatabase::removeCard(CardInfoPtr card)
     removeCardMutex->lock();
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
+    card.clear();
     removeCardMutex->unlock();
     emit cardRemoved(card);
 }
@@ -925,10 +927,10 @@ LoadStatus CardDatabase::loadCardDatabases()
 
 void CardDatabase::refreshCachedReverseRelatedCards()
 {
-    foreach (CardInfoPtr card, cards)
+    for (const CardInfoPtr &card : cards)
         card->resetReverseRelatedCards2Me();
 
-    foreach (CardInfoPtr card, cards) {
+    for (const CardInfoPtr &card : cards) {
         if (card->getReverseRelatedCards().isEmpty()) {
             continue;
         }
@@ -1020,7 +1022,7 @@ void CardDatabase::markAllSetsAsKnown()
 void CardDatabase::notifyEnabledSetsChanged()
 {
     // refresh the list of cached set names
-    foreach (CardInfoPtr card, cards)
+    for (const CardInfoPtr &card : cards)
         card->refreshCachedSetNames();
 
     // inform the carddatabasemodels that they need to re-check their list of cards

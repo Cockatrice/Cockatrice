@@ -3,15 +3,13 @@
 SetsModel::SetsModel(CardDatabase *_db, QObject *parent) : QAbstractTableModel(parent), sets(_db->getSetList())
 {
     sets.sortByKey();
-    foreach (CardSetPtr set, sets) {
+    for (const CardSetPtr &set : sets) {
         if (set->getEnabled())
             enabledSets.insert(set);
     }
 }
 
-SetsModel::~SetsModel()
-{
-}
+SetsModel::~SetsModel() = default;
 
 int SetsModel::rowCount(const QModelIndex &parent) const
 {
@@ -176,7 +174,7 @@ void SetsModel::toggleAll(bool enabled)
     enabledSets.clear();
 
     if (enabled)
-        foreach (CardSetPtr set, sets)
+        for (CardSetPtr set : sets)
             enabledSets.insert(set);
 
     emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
@@ -222,11 +220,11 @@ void SetsModel::sort(int column, Qt::SortOrder order)
 void SetsModel::save(CardDatabase *db)
 {
     // order
-    for (int i = 0; i < sets.size(); i++)
+    for (unsigned int i = 0; i < sets.size(); i++)
         sets[i]->setSortKey(i + 1);
 
     // enabled sets
-    foreach (CardSetPtr set, sets)
+    for (const CardSetPtr &set : sets)
         set->setEnabled(enabledSets.contains(set));
 
     sets.sortByKey();
@@ -242,7 +240,7 @@ void SetsModel::restore(CardDatabase *db)
 
     // enabled sets
     enabledSets.clear();
-    foreach (CardSetPtr set, sets) {
+    for (const CardSetPtr &set : sets) {
         if (set->getEnabled())
             enabledSets.insert(set);
     }

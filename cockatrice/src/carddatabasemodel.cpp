@@ -91,7 +91,7 @@ bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
     if (!showOnlyCardsFromEnabledSets)
         return true;
 
-    foreach (CardSetPtr set, card->getSets()) {
+    for (CardSetPtr set : card->getSets()) {
         if (set->getEnabled())
             return true;
     }
@@ -129,17 +129,20 @@ void CardDatabaseModel::cardRemoved(CardInfoPtr card)
 {
     const int row = cardList.indexOf(card);
     if (row == -1)
+    {
         return;
+    }
 
     beginRemoveRows(QModelIndex(), row, row);
-    disconnect(card.data(), 0, this, 0);
+    disconnect(card.data(), nullptr, this, nullptr);
+    card.clear();
     cardList.removeAt(row);
     endRemoveRows();
 }
 
 CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent) : QSortFilterProxyModel(parent), isToken(ShowAll)
 {
-    filterTree = NULL;
+    filterTree = nullptr;
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
 
@@ -290,7 +293,7 @@ bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfoPtr info) const
     if (!cardNameSet.isEmpty() && !cardNameSet.contains(info->getName()))
         return false;
 
-    if (filterTree != NULL)
+    if (filterTree != nullptr)
         return filterTree->acceptsCard(info);
 
     return true;
@@ -302,15 +305,15 @@ void CardDatabaseDisplayModel::clearFilterAll()
     cardText.clear();
     cardTypes.clear();
     cardColors.clear();
-    if (filterTree != NULL)
+    if (filterTree != nullptr)
         filterTree->clear();
     invalidateFilter();
 }
 
 void CardDatabaseDisplayModel::setFilterTree(FilterTree *filterTree)
 {
-    if (this->filterTree != NULL)
-        disconnect(this->filterTree, 0, this, 0);
+    if (this->filterTree != nullptr)
+        disconnect(this->filterTree, nullptr, this, nullptr);
 
     this->filterTree = filterTree;
     connect(this->filterTree, SIGNAL(changed()), this, SLOT(filterTreeChanged()));
