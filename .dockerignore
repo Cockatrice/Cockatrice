@@ -1,7 +1,7 @@
+.ci/
 .git/
 build/
 .github/
-.travis/
 .tx/
 cockatrice/
 doc/
