@@ -7,6 +7,8 @@
 #include <QDir>
 #include <QLineEdit>
 
+#include "carddatabase.h"
+
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 class DeckListModel;
@@ -19,7 +21,6 @@ class DeckLoader;
 class Response;
 class FilterTreeModel;
 class FilterBuilder;
-class CardInfo;
 class QGroupBox;
 class QHBoxLayout;
 class QVBoxLayout;
@@ -95,7 +96,7 @@ private slots:
     void saveDbHeaderState();
 
 private:
-    CardInfo *currentCardInfo() const;
+    CardInfoPtr currentCardInfo() const;
     void addCardHelper(QString zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(QString zoneName);

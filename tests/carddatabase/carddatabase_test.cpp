@@ -19,10 +19,7 @@ CardDatabaseSettings& SettingsCache::cardDatabase() const { return *cardDatabase
 
 SettingsCache *settingsCache;
 
-void PictureLoader::clearPixmapCache(CardInfo * /* card */) { }
-
-// include out main header file _after_ the hack is complete
-#include "../../cockatrice/src/carddatabase.h"
+void PictureLoader::clearPixmapCache(CardInfoPtr /* card */) { }
 
 namespace {
 

@@ -116,9 +116,14 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(0)
 void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /* previous */)
 {
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
-    currentCard = current.row() >= 0 ? databaseModel->getCard(realIndex.row()) : 0;
 
-    if (currentCard) {
+    if (current.row() >= 0) {
+        currentCard = databaseModel->getCard(realIndex.row());
+    } else {
+        currentCard.clear();
+    }
+
+    if (!currentCard) {
         nameEdit->setText(currentCard->getName());
         const QChar cardColor = currentCard->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
@@ -149,7 +154,7 @@ void DlgEditTokens::actAddToken()
         }
     } while (askAgain);
 
-    CardInfo *card = new CardInfo(name, true);
+    CardInfoPtr card = CardInfo::newInstance(name, true);
     card->addToSet(databaseModel->getDatabase()->getSet(CardDatabase::TOKENS_SETNAME));
     card->setCardType("Token");
     databaseModel->getDatabase()->addCard(card);
@@ -158,10 +163,9 @@ void DlgEditTokens::actAddToken()
 void DlgEditTokens::actRemoveToken()
 {
     if (currentCard) {
-        CardInfo *cardToRemove = currentCard; // the currentCard property gets modified during db->removeCard()
-        currentCard = 0;
+        CardInfoPtr cardToRemove = currentCard; // the currentCard property gets modified during db->removeCard()
+        currentCard.clear();
         databaseModel->getDatabase()->removeCard(cardToRemove);
-        delete cardToRemove;
     }
 }
 

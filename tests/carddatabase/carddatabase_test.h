@@ -6,6 +6,8 @@
 #include <QObject>
 #include <QString>
 
+#include "../../cockatrice/src/carddatabase.h"
+
 #define SETTINGSCACHE_H
 
 class CardDatabaseSettings
@@ -38,8 +40,7 @@ signals:
 
 
 #define PICTURELOADER_H
-class CardInfo;
 
 class PictureLoader {
-    void clearPixmapCache(CardInfo *card);
+    void clearPixmapCache(CardInfoPtr card);
 };

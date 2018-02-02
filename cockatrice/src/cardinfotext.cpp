@@ -1,6 +1,5 @@
 #include "cardinfotext.h"
 
-#include "carddatabase.h"
 #include "carditem.h"
 #include "main.h"
 #include <QGridLayout>
@@ -56,7 +55,7 @@ CardInfoText::CardInfoText(QWidget *parent) : QFrame(parent), info(nullptr)
     retranslateUi();
 }
 
-void CardInfoText::setCard(CardInfo *card)
+void CardInfoText::setCard(CardInfoPtr card)
 {
     if (card) {
         nameLabel2->setText(card->getName());

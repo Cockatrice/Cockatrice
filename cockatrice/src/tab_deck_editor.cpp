@@ -1,6 +1,5 @@
 #include "tab_deck_editor.h"
 #include "abstractclient.h"
-#include "carddatabase.h"
 #include "carddatabasemodel.h"
 #include "cardframe.h"
 #include "decklistmodel.h"
@@ -872,11 +871,13 @@ void TabDeckEditor::recursiveExpand(const QModelIndex &index)
     deckView->expand(index);
 }
 
-CardInfo *TabDeckEditor::currentCardInfo() const
+CardInfoPtr TabDeckEditor::currentCardInfo() const
 {
     const QModelIndex currentIndex = databaseView->selectionModel()->currentIndex();
-    if (!currentIndex.isValid())
-        return NULL;
+    if (!currentIndex.isValid()) {
+        return {};
+    }
+
     const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
 
     return db->getCard(cardName);
@@ -884,9 +885,7 @@ CardInfo *TabDeckEditor::currentCardInfo() const
 
 void TabDeckEditor::addCardHelper(QString zoneName)
 {
-    const CardInfo *info;
-
-    info = currentCardInfo();
+    const CardInfoPtr info = currentCardInfo();
     if (!info)
         return;
     if (info->getIsToken())
@@ -961,10 +960,9 @@ void TabDeckEditor::offsetCountAtIndex(const QModelIndex &idx, int offset)
 
 void TabDeckEditor::decrementCardHelper(QString zoneName)
 {
-    const CardInfo *info;
+    const CardInfoPtr info = currentCardInfo();
     QModelIndex idx;
 
-    info = currentCardInfo();
     if (!info)
         return;
     if (info->getIsToken())

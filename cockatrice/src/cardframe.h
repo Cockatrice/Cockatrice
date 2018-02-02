@@ -3,8 +3,9 @@
 
 #include <QTabWidget>
 
+#include "carddatabase.h"
+
 class AbstractCardItem;
-class CardInfo;
 class CardInfoPicture;
 class CardInfoText;
 class QVBoxLayout;
@@ -14,7 +15,7 @@ class CardFrame : public QTabWidget
 {
     Q_OBJECT
 private:
-    CardInfo *info;
+    CardInfoPtr info;
     CardInfoPicture *pic;
     CardInfoText *text;
     bool cardTextOnly;
@@ -33,7 +34,7 @@ public:
     void retranslateUi();
 
 public slots:
-    void setCard(CardInfo *card);
+    void setCard(CardInfoPtr card);
     void setCard(const QString &cardName);
     void setCard(AbstractCardItem *card);
     void clear();

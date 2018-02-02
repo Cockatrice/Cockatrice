@@ -57,22 +57,22 @@ private:
     QVariantMap setsMap;
     QString dataDir;
 
-    CardInfo *addCard(const QString &setName,
-                      QString cardName,
-                      bool isToken,
-                      int cardId,
-                      QString &setNumber,
-                      QString &cardCost,
-                      QString &cmc,
-                      const QString &cardType,
-                      const QString &cardPT,
-                      int cardLoyalty,
-                      const QString &cardText,
-                      const QStringList &colors,
-                      const QList<CardRelation *> &relatedCards,
-                      const QList<CardRelation *> &reverseRelatedCards,
-                      bool upsideDown,
-                      QString &rarity);
+    CardInfoPtr addCard(const QString &setName,
+                        QString cardName,
+                        bool isToken,
+                        int cardId,
+                        QString &setNumber,
+                        QString &cardCost,
+                        QString &cmc,
+                        const QString &cardType,
+                        const QString &cardPT,
+                        int cardLoyalty,
+                        const QString &cardText,
+                        const QStringList &colors,
+                        const QList<CardRelation *> &relatedCards,
+                        const QList<CardRelation *> &reverseRelatedCards,
+                        bool upsideDown,
+                        QString &rarity);
 signals:
     void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
     void dataReadProgress(int bytesRead, int totalBytes);
@@ -81,7 +81,7 @@ public:
     OracleImporter(const QString &_dataDir, QObject *parent = 0);
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
-    int importTextSpoiler(CardSet *set, const QVariant &data);
+    int importTextSpoiler(CardSetPtr set, const QVariant &data);
     QList<SetToDownload> &getSets()
     {
         return allSets;

@@ -1,6 +1,7 @@
 #ifndef DLG_EDIT_TOKENS_H
 #define DLG_EDIT_TOKENS_H
 
+#include "carddatabase.h"
 #include <QDialog>
 
 class QModelIndex;
@@ -10,7 +11,6 @@ class QLabel;
 class QComboBox;
 class QLineEdit;
 class QTreeView;
-class CardInfo;
 
 class DlgEditTokens : public QDialog
 {
@@ -25,7 +25,7 @@ private slots:
     void actRemoveToken();
 
 private:
-    CardInfo *currentCard;
+    CardInfoPtr currentCard;
     CardDatabaseModel *databaseModel;
     TokenDisplayModel *cardDatabaseDisplayModel;
     QStringList predefinedTokens;
@@ -35,7 +35,7 @@ private:
     QTreeView *chooseTokenView;
 
 public:
-    DlgEditTokens(QWidget *parent = 0);
+    DlgEditTokens(QWidget *parent = nullptr);
 };
 
 #endif
