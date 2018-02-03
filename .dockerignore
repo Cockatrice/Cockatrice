@@ -1,8 +1,8 @@
 .ci/
 .git/
-build/
 .github/
 .tx/
+build/
 cockatrice/
 doc/
 oracle/
