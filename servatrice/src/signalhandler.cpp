@@ -1,26 +1,25 @@
 #include <QSocketNotifier>
 
-#include "signalhandler.h"
+#include "main.h"
 #include "server_logger.h"
 #include "settingscache.h"
-#include "main.h"
+#include "signalhandler.h"
 
 #ifdef Q_OS_UNIX
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <signal.h>
+#include <cstdio>
 #include <execinfo.h>
 #include <iostream>
-#include <cstdio>
+#include <signal.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 #endif
 
 #define SIGSEGV_TRACE_LINES 40
 
 int SignalHandler::sigHupFD[2];
 
-SignalHandler::SignalHandler(QObject *parent)
-: QObject(parent)
+SignalHandler::SignalHandler(QObject *parent) : QObject(parent), snHup(nullptr)
 {
 #ifdef Q_OS_UNIX
     ::socketpair(AF_UNIX, SOCK_STREAM, 0, sigHupFD);
@@ -34,14 +33,14 @@ SignalHandler::SignalHandler(QObject *parent)
     hup.sa_flags = 0;
     hup.sa_flags |= SA_RESTART;
     sigaction(SIGHUP, &hup, 0);
-    
+
     struct sigaction segv;
     segv.sa_handler = SignalHandler::sigSegvHandler;
     segv.sa_flags = SA_RESETHAND;
     sigemptyset(&segv.sa_mask);
     sigaction(SIGSEGV, &segv, 0);
     sigaction(SIGABRT, &segv, 0);
-    
+
     signal(SIGPIPE, SIG_IGN);
 #endif
 }
@@ -69,7 +68,7 @@ void SignalHandler::internalSigHupHandler()
     logger->rotateLogs();
 
     settingsCache->sync();
-    
+
     snHup->setEnabled(true);
 }
 
@@ -90,12 +89,11 @@ void SignalHandler::sigSegvHandler(int sig)
         logger->logMessage("CRASH: SIGSEGV");
     else if (sig == SIGABRT)
         logger->logMessage("CRASH: SIGABRT");
-    
+
     logger->deleteLater();
     loggerThread->wait();
     delete loggerThread;
-    
+
     raise(sig);
 #endif
 }
-

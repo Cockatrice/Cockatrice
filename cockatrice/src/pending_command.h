@@ -5,15 +5,18 @@
 #include "pb/response.pb.h"
 #include <QVariant>
 
-class PendingCommand : public QObject {
+class PendingCommand : public QObject
+{
     Q_OBJECT
 signals:
     void finished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
     void finished(Response::ResponseCode respCode);
+
 private:
     CommandContainer commandContainer;
     QVariant extraData;
     int ticks;
+
 public:
     PendingCommand(const CommandContainer &_commandContainer, QVariant _extraData = QVariant());
     CommandContainer &getCommandContainer();
@@ -23,4 +26,4 @@ public:
     int tick();
 };
 
-#endif 
+#endif

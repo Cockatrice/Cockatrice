@@ -1,10 +1,9 @@
 #include "cardframe.h"
 
-#include "carditem.h"
-#include "carddatabase.h"
-#include "main.h"
 #include "cardinfopicture.h"
 #include "cardinfotext.h"
+#include "carditem.h"
+#include "main.h"
 #include "settingscache.h"
 
 #include <QSplitter>
@@ -68,11 +67,10 @@ void CardFrame::retranslateUi()
 
 void CardFrame::setViewMode(int mode)
 {
-    if(currentIndex() != mode)
+    if (currentIndex() != mode)
         setCurrentIndex(mode);
 
-    switch (mode)
-    {
+    switch (mode) {
         case ImageOnlyView:
         case TextOnlyView:
             tab1Layout->addWidget(pic);
@@ -89,18 +87,16 @@ void CardFrame::setViewMode(int mode)
     settingsCache->setCardInfoViewMode(mode);
 }
 
-void CardFrame::setCard(CardInfo *card)
+void CardFrame::setCard(CardInfoPtr card)
 {
-    if (info)
-    {
-        disconnect(info, nullptr, this, nullptr);
+    if (info) {
+        disconnect(info.data(), nullptr, this, nullptr);
     }
 
     info = card;
 
-    if (info)
-    {
-        connect(info, SIGNAL(destroyed()), this, SLOT(clear()));
+    if (info) {
+        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clear()));
     }
 
     text->setCard(info);
@@ -114,13 +110,12 @@ void CardFrame::setCard(const QString &cardName)
 
 void CardFrame::setCard(AbstractCardItem *card)
 {
-    if (card)
-    {
+    if (card) {
         setCard(card->getInfo());
     }
 }
 
 void CardFrame::clear()
 {
-    setCard((CardInfo*) nullptr);
+    setCard((CardInfoPtr) nullptr);
 }

@@ -1,13 +1,13 @@
 #ifndef USERLIST_H
 #define USERLIST_H
 
+#include "pb/moderator_commands.pb.h"
+#include "user_level.h"
+#include <QComboBox>
 #include <QDialog>
 #include <QGroupBox>
-#include <QComboBox>
-#include <QTreeWidgetItem>
 #include <QStyledItemDelegate>
-#include "user_level.h"
-#include "pb/moderator_commands.pb.h"
+#include <QTreeWidgetItem>
 
 class QTreeWidget;
 class ServerInfo_User;
@@ -22,7 +22,8 @@ class Response;
 class CommandContainer;
 class UserContextMenu;
 
-class BanDialog : public QDialog {
+class BanDialog : public QDialog
+{
     Q_OBJECT
 private:
     QLabel *daysLabel, *hoursLabel, *minutesLabel;
@@ -34,6 +35,7 @@ private:
 private slots:
     void okClicked();
     void enableTemporaryEdits(bool enabled);
+
 public:
     BanDialog(const ServerInfo_User &info, QWidget *parent = 0);
     QString getBanName() const;
@@ -44,15 +46,17 @@ public:
     QString getVisibleReason() const;
 };
 
-class WarningDialog : public QDialog {
+class WarningDialog : public QDialog
+{
     Q_OBJECT
 private:
     QLabel *descriptionLabel;
     QLineEdit *nameWarning;
     QComboBox *warningOption;
-    QLineEdit * warnClientID;
+    QLineEdit *warnClientID;
 private slots:
     void okClicked();
+
 public:
     WarningDialog(const QString userName, const QString clientID, QWidget *parent = 0);
     QString getName() const;
@@ -61,27 +65,42 @@ public:
     void addWarningOption(const QString warning);
 };
 
-class UserListItemDelegate : public QStyledItemDelegate {
+class UserListItemDelegate : public QStyledItemDelegate
+{
 public:
     UserListItemDelegate(QObject *const parent);
-    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
+    bool
+    editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
 };
 
-class UserListTWI : public QTreeWidgetItem {
+class UserListTWI : public QTreeWidgetItem
+{
 private:
     ServerInfo_User userInfo;
+
 public:
     UserListTWI(const ServerInfo_User &_userInfo);
-    const ServerInfo_User &getUserInfo() const { return userInfo; }
+    const ServerInfo_User &getUserInfo() const
+    {
+        return userInfo;
+    }
     void setUserInfo(const ServerInfo_User &_userInfo);
     void setOnline(bool online);
     bool operator<(const QTreeWidgetItem &other) const;
 };
 
-class UserList : public QGroupBox {
+class UserList : public QGroupBox
+{
     Q_OBJECT
 public:
-    enum UserListType { AllUsersList, RoomList, BuddyList, IgnoreList };
+    enum UserListType
+    {
+        AllUsersList,
+        RoomList,
+        BuddyList,
+        IgnoreList
+    };
+
 private:
     QMap<QString, UserListTWI *> users;
     TabSupervisor *tabSupervisor;
@@ -101,13 +120,17 @@ signals:
     void removeBuddy(const QString &userName);
     void addIgnore(const QString &userName);
     void removeIgnore(const QString &userName);
+
 public:
     UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = 0);
     void retranslateUi();
     void processUserInfo(const ServerInfo_User &user, bool online);
     bool deleteUser(const QString &userName);
     void setUserOnline(const QString &userName, bool online);
-    const QMap<QString, UserListTWI *> &getUsers() const { return users; }
+    const QMap<QString, UserListTWI *> &getUsers() const
+    {
+        return users;
+    }
     void showContextMenu(const QPoint &pos, const QModelIndex &index);
     void sortItems();
 };

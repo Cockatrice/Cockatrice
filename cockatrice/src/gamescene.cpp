@@ -1,28 +1,25 @@
 #include "gamescene.h"
+#include "carditem.h"
+#include "phasestoolbar.h"
 #include "player.h"
+#include "settingscache.h"
 #include "zoneviewwidget.h"
 #include "zoneviewzone.h"
-#include "phasestoolbar.h"
-#include "settingscache.h"
-#include "carditem.h"
-#include <math.h>
 #include <QAction>
-#include <QGraphicsSceneMouseEvent>
-#include <QSet>
 #include <QBasicTimer>
-#include <QGraphicsView>
 #include <QDebug>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
+#include <QSet>
+#include <math.h>
 
 GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
-    : QGraphicsScene(parent),
-      phasesToolbar(_phasesToolbar),
-      viewSize(QSize()),
-      playerRotation(0)
+    : QGraphicsScene(parent), phasesToolbar(_phasesToolbar), viewSize(QSize()), playerRotation(0)
 {
     animationTimer = new QBasicTimer;
     addItem(phasesToolbar);
     connect(settingsCache, SIGNAL(minPlayersForMultiColumnLayoutChanged()), this, SLOT(rearrange()));
-    
+
     rearrange();
 }
 
@@ -93,7 +90,7 @@ void GameScene::rearrange()
 
     const int playersCount = playersPlaying.size();
     const int columns = playersCount < settingsCache->getMinPlayersForMultiColumnLayout() ? 1 : 2;
-    const int rows = ceil((qreal) playersCount / columns);
+    const int rows = ceil((qreal)playersCount / columns);
     qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;
     QList<int> columnWidth;
 
@@ -150,29 +147,32 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
     }
 
     ZoneViewWidget *item = new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false);
-        zoneViews.append(item);
-        connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
+    zoneViews.append(item);
+    connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
     addItem(item);
-    if (zoneName=="grave")
+    if (zoneName == "grave")
         item->setPos(360, 100);
-    else if (zoneName=="rfg")
+    else if (zoneName == "rfg")
         item->setPos(380, 120);
     else
         item->setPos(340, 80);
 }
 
-void GameScene::addRevealedZoneView(Player *player, CardZone *zone, const QList<const ServerInfo_Card *> &cardList, bool withWritePermission)
+void GameScene::addRevealedZoneView(Player *player,
+                                    CardZone *zone,
+                                    const QList<const ServerInfo_Card *> &cardList,
+                                    bool withWritePermission)
 {
     ZoneViewWidget *item = new ZoneViewWidget(player, zone, -2, true, withWritePermission, cardList);
     zoneViews.append(item);
-        connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
+    connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
     addItem(item);
     item->setPos(600, 80);
 }
 
 void GameScene::removeZoneView(ZoneViewWidget *item)
 {
-        zoneViews.removeAt(zoneViews.indexOf(item));
+    zoneViews.removeAt(zoneViews.indexOf(item));
     removeItem(item);
 }
 
@@ -201,8 +201,8 @@ QTransform GameScene::getViewportTransform() const
 void GameScene::processViewSizeChange(const QSize &newSize)
 {
     viewSize = newSize;
-    
-    qreal newRatio = ((qreal) newSize.width()) / newSize.height();
+
+    qreal newRatio = ((qreal)newSize.width()) / newSize.height();
     qreal minWidth = 0;
     QList<qreal> minWidthByColumn;
     for (int col = 0; col < playersByColumn.size(); ++col) {
@@ -215,7 +215,7 @@ void GameScene::processViewSizeChange(const QSize &newSize)
         minWidth += minWidthByColumn[col];
     }
     minWidth += phasesToolbar->getWidth();
-    
+
     qreal minRatio = minWidth / sceneRect().height();
     qreal newWidth;
     if (minRatio > newRatio) {
@@ -230,7 +230,7 @@ void GameScene::processViewSizeChange(const QSize &newSize)
     qreal extraWidthPerColumn = (newWidth - minWidth) / playersByColumn.size();
     qreal newx = phasesToolbar->getWidth();
     for (int col = 0; col < playersByColumn.size(); ++col) {
-        for (int row = 0; row < playersByColumn[col].size(); ++row){
+        for (int row = 0; row < playersByColumn[col].size(); ++row) {
             playersByColumn[col][row]->processSceneSizeChange(minWidthByColumn[col] + extraWidthPerColumn);
             playersByColumn[col][row]->setPos(newx, playersByColumn[col][row]->y());
         }
@@ -240,14 +240,15 @@ void GameScene::processViewSizeChange(const QSize &newSize)
 
 void GameScene::updateHover(const QPointF &scenePos)
 {
-    QList<QGraphicsItem *> itemList = items(scenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, getViewTransform());
-    
+    QList<QGraphicsItem *> itemList =
+        items(scenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, getViewTransform());
+
     // Search for the topmost zone and ignore all cards not belonging to that zone.
     CardZone *zone = 0;
     for (int i = 0; i < itemList.size(); ++i)
         if ((zone = qgraphicsitem_cast<CardZone *>(itemList[i])))
             break;
-    
+
     CardItem *maxZCard = 0;
     if (zone) {
         qreal maxZ = -1;
@@ -260,7 +261,7 @@ void GameScene::updateHover(const QPointF &scenePos)
                     continue;
             } else if (card->getZone() != zone)
                 continue;
-            
+
             if (card->getRealZValue() > maxZ) {
                 maxZ = card->getRealZValue();
                 maxZCard = card;
@@ -278,7 +279,7 @@ bool GameScene::event(QEvent *event)
 {
     if (event->type() == QEvent::GraphicsSceneMouseMove)
         updateHover(static_cast<QGraphicsSceneMouseEvent *>(event)->scenePos());
-    
+
     return QGraphicsScene::event(event);
 }
 

@@ -15,14 +15,15 @@ class ServerInfo_Card;
 class PhasesToolbar;
 class QBasicTimer;
 
-class GameScene : public QGraphicsScene {
+class GameScene : public QGraphicsScene
+{
     Q_OBJECT
 private:
     static const int playerAreaSpacing = 5;
-    
+
     PhasesToolbar *phasesToolbar;
     QList<Player *> players;
-    QList<QList<Player *> > playersByColumn;
+    QList<QList<Player *>> playersByColumn;
     QList<ZoneViewWidget *> zoneViews;
     QSize viewSize;
     QPointer<CardItem> hoveredCard;
@@ -30,6 +31,7 @@ private:
     QSet<CardItem *> cardsToAnimate;
     int playerRotation;
     void updateHover(const QPointF &scenePos);
+
 public:
     GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = 0);
     ~GameScene();
@@ -37,16 +39,19 @@ public:
     void processViewSizeChange(const QSize &newSize);
     QTransform getViewTransform() const;
     QTransform getViewportTransform() const;
-    
+
     void startRubberBand(const QPointF &selectionOrigin);
     void resizeRubberBand(const QPointF &cursorPoint);
     void stopRubberBand();
-    
+
     void registerAnimationItem(AbstractCardItem *item);
     void unregisterAnimationItem(AbstractCardItem *card);
 public slots:
     void toggleZoneView(Player *player, const QString &zoneName, int numberCards);
-    void addRevealedZoneView(Player *player, CardZone *zone, const QList<const ServerInfo_Card *> &cardList, bool withWritePermission);
+    void addRevealedZoneView(Player *player,
+                             CardZone *zone,
+                             const QList<const ServerInfo_Card *> &cardList,
+                             bool withWritePermission);
     void removeZoneView(ZoneViewWidget *item);
     void addPlayer(Player *player);
     void removePlayer(Player *player);
@@ -54,6 +59,7 @@ public slots:
     void closeMostRecentZoneView();
     void adjustPlayerRotation(int rotationAdjustment);
     void rearrange();
+
 protected:
     bool event(QEvent *event);
     void timerEvent(QTimerEvent *event);

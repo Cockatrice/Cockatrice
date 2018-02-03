@@ -1,29 +1,29 @@
+#include "user_context_menu.h"
+#include "abstractclient.h"
+#include "gameselector.h"
+#include "pending_command.h"
+#include "tab_game.h"
+#include "tab_supervisor.h"
+#include "tab_userlists.h"
+#include "userinfobox.h"
+#include "userlist.h"
 #include <QAction>
 #include <QMenu>
 #include <QMessageBox>
-#include "user_context_menu.h"
-#include "tab_supervisor.h"
-#include "tab_userlists.h"
-#include "tab_game.h"
-#include "userlist.h"
-#include "abstractclient.h"
-#include "userinfobox.h"
-#include "gameselector.h"
-#include "pending_command.h"
 
+#include <QSignalMapper>
 #include <QtGui>
 #include <QtWidgets>
-#include <QSignalMapper>
 
-#include "pb/commands.pb.h"
-#include "pb/session_commands.pb.h"
-#include "pb/moderator_commands.pb.h"
 #include "pb/command_kick_from_game.pb.h"
+#include "pb/commands.pb.h"
+#include "pb/moderator_commands.pb.h"
+#include "pb/response_ban_history.pb.h"
 #include "pb/response_get_games_of_user.pb.h"
 #include "pb/response_get_user_info.pb.h"
-#include "pb/response_ban_history.pb.h"
 #include "pb/response_warn_history.pb.h"
 #include "pb/response_warn_list.pb.h"
+#include "pb/session_commands.pb.h"
 
 UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor), game(_game)
@@ -135,12 +135,13 @@ void UserContextMenu::warnUser_processUserInfoResponse(const Response &resp)
     cmd.set_user_name(userInfo.name());
     cmd.set_user_clientid(userInfo.clientid());
     PendingCommand *pend = client->prepareModeratorCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(warnUser_processGetWarningsListResponse(Response)));
+    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+            SLOT(warnUser_processGetWarningsListResponse(Response)));
     client->sendCommand(pend);
-
 }
 
-void UserContextMenu::banUserHistory_processResponse(const Response &resp) {
+void UserContextMenu::banUserHistory_processResponse(const Response &resp)
+{
     const Response_BanHistory &response = resp.GetExtension(Response_BanHistory::ext);
     if (resp.response_code() == Response::RespOk) {
 
@@ -152,9 +153,10 @@ void UserContextMenu::banUserHistory_processResponse(const Response &resp) {
             table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
             table->setHorizontalHeaderLabels(
-                    QString(tr("Ban Time;Moderator;Ban Length;Ban Reason;Visible Reason")).split(";"));
+                QString(tr("Ban Time;Moderator;Ban Length;Ban Reason;Visible Reason")).split(";"));
 
-            ServerInfo_Ban ban; for (int i = 0; i < response.ban_list_size(); ++i) {
+            ServerInfo_Ban ban;
+            for (int i = 0; i < response.ban_list_size(); ++i) {
                 ban = response.ban_list(i);
                 table->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(ban.ban_time())));
                 table->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(ban.admin_name())));
@@ -164,16 +166,20 @@ void UserContextMenu::banUserHistory_processResponse(const Response &resp) {
             }
 
             table->resizeColumnsToContents();
-            table->setMinimumSize(table->horizontalHeader()->length() + (table->columnCount() * 5), table->verticalHeader()->length() + (table->rowCount() * 3));
+            table->setMinimumSize(table->horizontalHeader()->length() + (table->columnCount() * 5),
+                                  table->verticalHeader()->length() + (table->rowCount() * 3));
             table->show();
         } else
-            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Ban History"), tr("User has never been banned."));
+            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Ban History"),
+                                     tr("User has never been banned."));
 
     } else
-        QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Ban History"), tr("Failed to collecting ban information."));
+        QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Ban History"),
+                              tr("Failed to collecting ban information."));
 }
 
-void UserContextMenu::warnUserHistory_processResponse(const Response &resp) {
+void UserContextMenu::warnUserHistory_processResponse(const Response &resp)
+{
     const Response_WarnHistory &response = resp.GetExtension(Response_WarnHistory::ext);
     if (resp.response_code() == Response::RespOk) {
 
@@ -184,10 +190,10 @@ void UserContextMenu::warnUserHistory_processResponse(const Response &resp) {
             table->setColumnCount(4);
             table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-            table->setHorizontalHeaderLabels(
-                    QString(tr("Warning Time;Moderator;User Name;Reason")).split(";"));
+            table->setHorizontalHeaderLabels(QString(tr("Warning Time;Moderator;User Name;Reason")).split(";"));
 
-            ServerInfo_Warning warn; for (int i = 0; i < response.warn_list_size(); ++i) {
+            ServerInfo_Warning warn;
+            for (int i = 0; i < response.warn_list_size(); ++i) {
                 warn = response.warn_list(i);
                 table->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(warn.time_of())));
                 table->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(warn.admin_name())));
@@ -196,13 +202,16 @@ void UserContextMenu::warnUserHistory_processResponse(const Response &resp) {
             }
 
             table->resizeColumnsToContents();
-            table->setMinimumSize(table->horizontalHeader()->length() + (table->columnCount() * 5), table->verticalHeader()->length() + (table->rowCount() * 3));
+            table->setMinimumSize(table->horizontalHeader()->length() + (table->columnCount() * 5),
+                                  table->verticalHeader()->length() + (table->rowCount() * 3));
             table->show();
         } else
-            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Warning History"), tr("User has never been warned."));
+            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Warning History"),
+                                     tr("User has never been warned."));
 
     } else
-        QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Warning History"), tr("Failed to collecting warning information."));
+        QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Warning History"),
+                              tr("Failed to collecting warning information."));
 }
 
 void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const CommandContainer &commandContainer)
@@ -212,7 +221,8 @@ void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const 
 
     if (resp.response_code() == Response::RespOk) {
         if (cmd.should_be_mod()) {
-            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Success"), tr("Successfully promoted user."));
+            QMessageBox::information(static_cast<QWidget *>(parent()), tr("Success"),
+                                     tr("Successfully promoted user."));
         } else {
             QMessageBox::information(static_cast<QWidget *>(parent()), tr("Success"), tr("Successfully demoted user."));
         }
@@ -254,10 +264,13 @@ void UserContextMenu::warnUser_dialogFinished()
     cmd.set_clientid(dlg->getWarnID().toStdString());
 
     client->sendCommand(client->prepareModeratorCommand(cmd));
-
 }
 
-void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName, UserLevelFlags userLevel, bool online, int playerId)
+void UserContextMenu::showContextMenu(const QPoint &pos,
+                                      const QString &userName,
+                                      UserLevelFlags userLevel,
+                                      bool online,
+                                      int playerId)
 {
     aUserName->setText(userName);
 
@@ -291,10 +304,12 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
         menu->addAction(aBanHistory);
 
         menu->addSeparator();
-        if (userLevel.testFlag(ServerInfo_User::IsModerator) && (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+        if (userLevel.testFlag(ServerInfo_User::IsModerator) &&
+            (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
             menu->addAction(aDemoteFromMod);
 
-        } else if (userLevel.testFlag(ServerInfo_User::IsRegistered) && (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+        } else if (userLevel.testFlag(ServerInfo_User::IsRegistered) &&
+                   (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
             menu->addAction(aPromoteToMod);
         }
     }
@@ -316,7 +331,9 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
 
     QAction *actionClicked = menu->exec(pos);
     if (actionClicked == aDetails) {
-        UserInfoBox *infoWidget = new UserInfoBox(client, false, static_cast<QWidget *>(parent()), Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
+        UserInfoBox *infoWidget =
+            new UserInfoBox(client, false, static_cast<QWidget *>(parent()),
+                            Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
         infoWidget->setAttribute(Qt::WA_DeleteOnClose);
         infoWidget->updateInfo(userName);
     } else if (actionClicked == aChat)
@@ -326,7 +343,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
         cmd.set_user_name(userName.toStdString());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(gamesOfUserReceived(Response, CommandContainer)));
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(gamesOfUserReceived(Response, CommandContainer)));
 
         client->sendCommand(pend);
     } else if (actionClicked == aAddToBuddyList) {
@@ -363,7 +381,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
         cmd.set_user_name(userName.toStdString());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(banUser_processUserInfoResponse(Response)));
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(banUser_processUserInfoResponse(Response)));
         client->sendCommand(pend);
     } else if (actionClicked == aPromoteToMod || actionClicked == aDemoteFromMod) {
         Command_AdjustMod cmd;
@@ -371,25 +390,29 @@ void UserContextMenu::showContextMenu(const QPoint &pos, const QString &userName
         cmd.set_should_be_mod(actionClicked == aPromoteToMod);
 
         PendingCommand *pend = client->prepareAdminCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(adjustMod_processUserResponse(Response, CommandContainer)));
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(adjustMod_processUserResponse(Response, CommandContainer)));
         client->sendCommand(pend);
     } else if (actionClicked == aBanHistory) {
         Command_GetBanHistory cmd;
         cmd.set_user_name(userName.toStdString());
         PendingCommand *pend = client->prepareModeratorCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(banUserHistory_processResponse(Response)));
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(banUserHistory_processResponse(Response)));
         client->sendCommand(pend);
     } else if (actionClicked == aWarnUser) {
         Command_GetUserInfo cmd;
         cmd.set_user_name(userName.toStdString());
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(warnUser_processUserInfoResponse(Response)));
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(warnUser_processUserInfoResponse(Response)));
         client->sendCommand(pend);
     } else if (actionClicked == aWarnHistory) {
         Command_GetWarnHistory cmd;
         cmd.set_user_name(userName.toStdString());
         PendingCommand *pend = client->prepareModeratorCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(warnUserHistory_processResponse(Response)));
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(warnUserHistory_processResponse(Response)));
         client->sendCommand(pend);
     }
 

@@ -1,16 +1,16 @@
 #include "settingscache.h"
 #include "releasechannel.h"
 
-#include <QSettings>
-#include <QFile>
-#include <QDir>
-#include <QDebug>
 #include <QApplication>
+#include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QSettings>
 #include <QStandardPaths>
 
 QString SettingsCache::getDataPath()
 {
-    if(isPortableBuild)
+    if (isPortableBuild)
         return qApp->applicationDirPath() + "/data/";
     else
         return QStandardPaths::writableLocation(QStandardPaths::DataLocation);
@@ -23,22 +23,22 @@ QString SettingsCache::getSettingsPath()
 
 void SettingsCache::translateLegacySettings()
 {
-    if(isPortableBuild)
+    if (isPortableBuild)
         return;
 
-    //Layouts
-    QFile layoutFile(getSettingsPath()+"layouts/deckLayout.ini");
-    if(layoutFile.exists())
-        if(layoutFile.copy(getSettingsPath()+"layouts.ini"))
+    // Layouts
+    QFile layoutFile(getSettingsPath() + "layouts/deckLayout.ini");
+    if (layoutFile.exists())
+        if (layoutFile.copy(getSettingsPath() + "layouts.ini"))
             layoutFile.remove();
 
     QStringList usedKeys;
     QSettings legacySetting;
 
-    //Sets
+    // Sets
     legacySetting.beginGroup("sets");
     QStringList setsGroups = legacySetting.childGroups();
-    for(int i = 0; i < setsGroups.size(); i++){        
+    for (int i = 0; i < setsGroups.size(); i++) {
         legacySetting.beginGroup(setsGroups.at(i));
         cardDatabase().setEnabled(setsGroups.at(i), legacySetting.value("enabled").toBool());
         cardDatabase().setIsKnown(setsGroups.at(i), legacySetting.value("isknown").toBool());
@@ -47,11 +47,11 @@ void SettingsCache::translateLegacySettings()
     }
     QStringList setsKeys = legacySetting.allKeys();
     for (int i = 0; i < setsKeys.size(); ++i) {
-        usedKeys.append("sets/"+setsKeys.at(i));
+        usedKeys.append("sets/" + setsKeys.at(i));
     }
     legacySetting.endGroup();
 
-    //Servers
+    // Servers
     legacySetting.beginGroup("server");
     servers().setPreviousHostLogin(legacySetting.value("previoushostlogin").toInt());
     servers().setPreviousHostList(legacySetting.value("previoushosts").toStringList());
@@ -67,28 +67,28 @@ void SettingsCache::translateLegacySettings()
     usedKeys.append(legacySetting.allKeys());
     QStringList allKeysServer = legacySetting.allKeys();
     for (int i = 0; i < allKeysServer.size(); ++i) {
-        usedKeys.append("server/"+allKeysServer.at(i));
+        usedKeys.append("server/" + allKeysServer.at(i));
     }
     legacySetting.endGroup();
 
-    //Messages
+    // Messages
     legacySetting.beginGroup("messages");
     QStringList allMessages = legacySetting.allKeys();
     for (int i = 0; i < allMessages.size(); ++i) {
-        if(allMessages.at(i) != "count"){
+        if (allMessages.at(i) != "count") {
             QString temp = allMessages.at(i);
             int index = temp.remove("msg").toInt();
-            messages().setMessageAt(index,legacySetting.value(allMessages.at(i)).toString());
+            messages().setMessageAt(index, legacySetting.value(allMessages.at(i)).toString());
         }
     }
     messages().setCount(legacySetting.value("count").toInt());
     QStringList allKeysmessages = legacySetting.allKeys();
     for (int i = 0; i < allKeysmessages.size(); ++i) {
-        usedKeys.append("messages/"+allKeysmessages.at(i));
+        usedKeys.append("messages/" + allKeysmessages.at(i));
     }
     legacySetting.endGroup();
 
-    //Game filters
+    // Game filters
     legacySetting.beginGroup("filter_games");
     gameFilters().setUnavailableGamesVisible(legacySetting.value("unavailable_games_visible").toBool());
     gameFilters().setShowPasswordProtectedGames(legacySetting.value("show_password_protected_games").toBool());
@@ -103,19 +103,19 @@ void SettingsCache::translateLegacySettings()
 
     QStringList allFilters = legacySetting.allKeys();
     for (int i = 0; i < allFilters.size(); ++i) {
-        if(allFilters.at(i).startsWith("game_type")){
+        if (allFilters.at(i).startsWith("game_type")) {
             gameFilters().setGameHashedTypeEnabled(allFilters.at(i), legacySetting.value(allFilters.at(i)).toBool());
         }
     }
     QStringList allKeysfilter_games = legacySetting.allKeys();
     for (int i = 0; i < allKeysfilter_games.size(); ++i) {
-        usedKeys.append("filter_games/"+allKeysfilter_games.at(i));
+        usedKeys.append("filter_games/" + allKeysfilter_games.at(i));
     }
     legacySetting.endGroup();
 
     QStringList allLegacyKeys = legacySetting.allKeys();
     for (int i = 0; i < allLegacyKeys.size(); ++i) {
-        if(usedKeys.contains(allLegacyKeys.at(i)))
+        if (usedKeys.contains(allLegacyKeys.at(i)))
             continue;
         settings->setValue(allLegacyKeys.at(i), legacySetting.value(allLegacyKeys.at(i)));
     }
@@ -127,7 +127,7 @@ QString SettingsCache::getSafeConfigPath(QString configEntry, QString defaultPat
     // if the config settings is empty or refers to a not-existing folder,
     // ensure that the defaut path exists and return it
     if (!QDir(tmp).exists() || tmp.isEmpty()) {
-        if(!QDir().mkpath(defaultPath))
+        if (!QDir().mkpath(defaultPath))
             qDebug() << "[SettingsCache] Could not create folder:" << defaultPath;
         tmp = defaultPath;
     }
@@ -147,7 +147,7 @@ SettingsCache::SettingsCache()
 {
     // first, figure out if we are running in portable mode
     isPortableBuild = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
-    if(isPortableBuild)
+    if (isPortableBuild)
         qDebug() << "Portable mode enabled";
 
     // define a dummy context that will be used where needed
@@ -155,15 +155,15 @@ SettingsCache::SettingsCache()
 
     QString dataPath = getDataPath();
     QString settingsPath = getSettingsPath();
-    settings = new QSettings(settingsPath+"global.ini", QSettings::IniFormat, this);
-    shortcutsSettings = new ShortcutsSettings(settingsPath,this);
-    cardDatabaseSettings = new CardDatabaseSettings(settingsPath,this);
-    serversSettings = new ServersSettings(settingsPath,this);
-    messageSettings = new MessageSettings(settingsPath,this);
+    settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
+    shortcutsSettings = new ShortcutsSettings(settingsPath, this);
+    cardDatabaseSettings = new CardDatabaseSettings(settingsPath, this);
+    serversSettings = new ServersSettings(settingsPath, this);
+    messageSettings = new MessageSettings(settingsPath, this);
     gameFiltersSettings = new GameFiltersSettings(settingsPath, this);
     layoutsSettings = new LayoutsSettings(settingsPath, this);
 
-    if(!QFile(settingsPath+"global.ini").exists())
+    if (!QFile(settingsPath + "global.ini").exists())
         translateLegacySettings();
 
     // updates - don't reorder them or their index in the settings won't match
@@ -185,7 +185,7 @@ SettingsCache::SettingsCache()
     // this has never been exposed as an user-configurable setting
     customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
     // this has never been exposed as an user-configurable setting
-    customCardDatabasePath = getSafeConfigPath("paths/customsets", dataPath + "/customsets/");    
+    customCardDatabasePath = getSafeConfigPath("paths/customsets", dataPath + "/customsets/");
 
     cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
     tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
@@ -200,11 +200,10 @@ SettingsCache::SettingsCache()
         settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
         settings->setValue("personal/picturedownloadhq", false);
         settings->setValue("revert/pixmapCacheSize", true);
-    }
-    else
+    } else
         pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
-    //sanity check
-    if(pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
+    // sanity check
+    if (pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
@@ -255,9 +254,9 @@ SettingsCache::SettingsCache()
 
     cardInfoViewMode = settings->value("cards/cardinfoviewmode", 0).toInt();
     highlightWords = settings->value("personal/highlightWords", QString()).toString();
-    gameDescription = settings->value("game/gamedescription","").toString();
+    gameDescription = settings->value("game/gamedescription", "").toString();
     maxPlayers = settings->value("game/maxplayers", 2).toInt();
-    gameTypes = settings->value("game/gametypes","").toString();
+    gameTypes = settings->value("game/gametypes", "").toString();
     onlyBuddies = settings->value("game/onlybuddies", false).toBool();
     onlyRegistered = settings->value("game/onlyregistered", true).toBool();
     spectatorsAllowed = settings->value("game/spectatorsallowed", true).toBool();
@@ -269,49 +268,58 @@ SettingsCache::SettingsCache()
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
 }
 
-void SettingsCache::setKnownMissingFeatures(QString _knownMissingFeatures) {
+void SettingsCache::setKnownMissingFeatures(QString _knownMissingFeatures)
+{
     knownMissingFeatures = _knownMissingFeatures;
     settings->setValue("interface/knownmissingfeatures", knownMissingFeatures);
 }
 
-void SettingsCache::setCardInfoViewMode(const int _viewMode) {
+void SettingsCache::setCardInfoViewMode(const int _viewMode)
+{
     cardInfoViewMode = _viewMode;
     settings->setValue("cards/cardinfoviewmode", cardInfoViewMode);
 }
 
-void SettingsCache::setHighlightWords(const QString &_highlightWords) {
+void SettingsCache::setHighlightWords(const QString &_highlightWords)
+{
     highlightWords = _highlightWords;
     settings->setValue("personal/highlightWords", highlightWords);
 }
 
-void SettingsCache::setMasterVolume(int _masterVolume) {
+void SettingsCache::setMasterVolume(int _masterVolume)
+{
     masterVolume = _masterVolume;
     settings->setValue("sound/mastervolume", masterVolume);
     emit masterVolumeChanged(masterVolume);
 }
 
-void SettingsCache::setLeftJustified(const int _leftJustified) {
+void SettingsCache::setLeftJustified(const int _leftJustified)
+{
     leftJustified = _leftJustified;
     settings->setValue("interface/leftjustified", leftJustified);
     emit handJustificationChanged();
 }
 
-void SettingsCache::setCardScaling(const int _scaleCards) {
+void SettingsCache::setCardScaling(const int _scaleCards)
+{
     scaleCards = _scaleCards;
     settings->setValue("cards/scaleCards", scaleCards);
 }
 
-void SettingsCache::setShowMessagePopups(const int _showMessagePopups) {
+void SettingsCache::setShowMessagePopups(const int _showMessagePopups)
+{
     showMessagePopups = _showMessagePopups;
     settings->setValue("chat/showmessagepopups", showMessagePopups);
 }
 
-void SettingsCache::setShowMentionPopups(const int _showMentionPopus) {
+void SettingsCache::setShowMentionPopups(const int _showMentionPopus)
+{
     showMentionPopups = _showMentionPopus;
     settings->setValue("chat/showmentionpopups", showMentionPopups);
 }
 
-void SettingsCache::setRoomHistory(const int _roomHistory) {
+void SettingsCache::setRoomHistory(const int _roomHistory)
+{
     roomHistory = _roomHistory;
     settings->setValue("chat/roomhistory", roomHistory);
 }
@@ -397,7 +405,8 @@ void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
     settings->setValue("interface/notificationsenabled", notificationsEnabled);
 }
 
-void SettingsCache::setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled) {
+void SettingsCache::setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled)
+{
     spectatorNotificationsEnabled = _spectatorNotificationsEnabled;
     settings->setValue("interface/specnotificationsenabled", spectatorNotificationsEnabled);
 }
@@ -460,7 +469,8 @@ void SettingsCache::setTapAnimation(int _tapAnimation)
     settings->setValue("cards/tapanimation", tapAnimation);
 }
 
-void SettingsCache::setChatMention(int _chatMention) {
+void SettingsCache::setChatMention(int _chatMention)
+{
     chatMention = _chatMention;
     settings->setValue("chat/mention", chatMention);
 }
@@ -472,22 +482,26 @@ void SettingsCache::setChatMentionCompleter(const int _enableMentionCompleter)
     emit chatMentionCompleterChanged();
 }
 
-void SettingsCache::setChatMentionForeground(int _chatMentionForeground) {
+void SettingsCache::setChatMentionForeground(int _chatMentionForeground)
+{
     chatMentionForeground = _chatMentionForeground;
     settings->setValue("chat/mentionforeground", chatMentionForeground);
 }
 
-void SettingsCache::setChatHighlightForeground(int _chatHighlightForeground) {
+void SettingsCache::setChatHighlightForeground(int _chatHighlightForeground)
+{
     chatHighlightForeground = _chatHighlightForeground;
     settings->setValue("chat/highlightforeground", chatHighlightForeground);
 }
 
-void SettingsCache::setChatMentionColor(const QString &_chatMentionColor) {
+void SettingsCache::setChatMentionColor(const QString &_chatMentionColor)
+{
     chatMentionColor = _chatMentionColor;
     settings->setValue("chat/mentioncolor", chatMentionColor);
 }
 
-void SettingsCache::setChatHighlightColor(const QString &_chatHighlightColor) {
+void SettingsCache::setChatHighlightColor(const QString &_chatHighlightColor)
+{
     chatHighlightColor = _chatHighlightColor;
     settings->setValue("chat/highlightcolor", chatHighlightColor);
 }
@@ -504,7 +518,8 @@ void SettingsCache::setZoneViewSortByType(int _zoneViewSortByType)
     settings->setValue("zoneview/sortbytype", zoneViewSortByType);
 }
 
-void SettingsCache::setZoneViewPileView(int _zoneViewPileView){
+void SettingsCache::setZoneViewPileView(int _zoneViewPileView)
+{
     zoneViewPileView = _zoneViewPileView;
     settings->setValue("zoneview/pileview", zoneViewPileView);
 }
@@ -562,32 +577,255 @@ void SettingsCache::setClientID(QString _clientID)
 
 QStringList SettingsCache::getCountries() const
 {
-    static QStringList countries = QStringList()
-    << "ad" << "ae" << "af" << "ag" << "ai" << "al" << "am" << "ao" << "aq" << "ar"
-    << "as" << "at" << "au" << "aw" << "ax" << "az" << "ba" << "bb" << "bd" << "be"
-    << "bf" << "bg" << "bh" << "bi" << "bj" << "bl" << "bm" << "bn" << "bo" << "bq"
-    << "br" << "bs" << "bt" << "bv" << "bw" << "by" << "bz" << "ca" << "cc" << "cd"
-    << "cf" << "cg" << "ch" << "ci" << "ck" << "cl" << "cm" << "cn" << "co" << "cr"
-    << "cu" << "cv" << "cw" << "cx" << "cy" << "cz" << "de" << "dj" << "dk" << "dm"
-    << "do" << "dz" << "ec" << "ee" << "eg" << "eh" << "er" << "es" << "et" << "fi"
-    << "fj" << "fk" << "fm" << "fo" << "fr" << "ga" << "gb" << "gd" << "ge" << "gf"
-    << "gg" << "gh" << "gi" << "gl" << "gm" << "gn" << "gp" << "gq" << "gr" << "gs"
-    << "gt" << "gu" << "gw" << "gy" << "hk" << "hm" << "hn" << "hr" << "ht" << "hu"
-    << "id" << "ie" << "il" << "im" << "in" << "io" << "iq" << "ir" << "is" << "it"
-    << "je" << "jm" << "jo" << "jp" << "ke" << "kg" << "kh" << "ki" << "km" << "kn"
-    << "kp" << "kr" << "kw" << "ky" << "kz" << "la" << "lb" << "lc" << "li" << "lk"
-    << "lr" << "ls" << "lt" << "lu" << "lv" << "ly" << "ma" << "mc" << "md" << "me"
-    << "mf" << "mg" << "mh" << "mk" << "ml" << "mm" << "mn" << "mo" << "mp" << "mq"
-    << "mr" << "ms" << "mt" << "mu" << "mv" << "mw" << "mx" << "my" << "mz" << "na"
-    << "nc" << "ne" << "nf" << "ng" << "ni" << "nl" << "no" << "np" << "nr" << "nu"
-    << "nz" << "om" << "pa" << "pe" << "pf" << "pg" << "ph" << "pk" << "pl" << "pm"
-    << "pn" << "pr" << "ps" << "pt" << "pw" << "py" << "qa" << "re" << "ro" << "rs"
-    << "ru" << "rw" << "sa" << "sb" << "sc" << "sd" << "se" << "sg" << "sh" << "si"
-    << "sj" << "sk" << "sl" << "sm" << "sn" << "so" << "sr" << "ss" << "st" << "sv"
-    << "sx" << "sy" << "sz" << "tc" << "td" << "tf" << "tg" << "th" << "tj" << "tk"
-    << "tl" << "tm" << "tn" << "to" << "tr" << "tt" << "tv" << "tw" << "tz" << "ua"
-    << "ug" << "um" << "us" << "uy" << "uz" << "va" << "vc" << "ve" << "vg" << "vi"
-    << "vn" << "vu" << "wf" << "ws" << "ye" << "yt" << "za" << "zm" << "zw";
+    static QStringList countries = QStringList() << "ad"
+                                                 << "ae"
+                                                 << "af"
+                                                 << "ag"
+                                                 << "ai"
+                                                 << "al"
+                                                 << "am"
+                                                 << "ao"
+                                                 << "aq"
+                                                 << "ar"
+                                                 << "as"
+                                                 << "at"
+                                                 << "au"
+                                                 << "aw"
+                                                 << "ax"
+                                                 << "az"
+                                                 << "ba"
+                                                 << "bb"
+                                                 << "bd"
+                                                 << "be"
+                                                 << "bf"
+                                                 << "bg"
+                                                 << "bh"
+                                                 << "bi"
+                                                 << "bj"
+                                                 << "bl"
+                                                 << "bm"
+                                                 << "bn"
+                                                 << "bo"
+                                                 << "bq"
+                                                 << "br"
+                                                 << "bs"
+                                                 << "bt"
+                                                 << "bv"
+                                                 << "bw"
+                                                 << "by"
+                                                 << "bz"
+                                                 << "ca"
+                                                 << "cc"
+                                                 << "cd"
+                                                 << "cf"
+                                                 << "cg"
+                                                 << "ch"
+                                                 << "ci"
+                                                 << "ck"
+                                                 << "cl"
+                                                 << "cm"
+                                                 << "cn"
+                                                 << "co"
+                                                 << "cr"
+                                                 << "cu"
+                                                 << "cv"
+                                                 << "cw"
+                                                 << "cx"
+                                                 << "cy"
+                                                 << "cz"
+                                                 << "de"
+                                                 << "dj"
+                                                 << "dk"
+                                                 << "dm"
+                                                 << "do"
+                                                 << "dz"
+                                                 << "ec"
+                                                 << "ee"
+                                                 << "eg"
+                                                 << "eh"
+                                                 << "er"
+                                                 << "es"
+                                                 << "et"
+                                                 << "fi"
+                                                 << "fj"
+                                                 << "fk"
+                                                 << "fm"
+                                                 << "fo"
+                                                 << "fr"
+                                                 << "ga"
+                                                 << "gb"
+                                                 << "gd"
+                                                 << "ge"
+                                                 << "gf"
+                                                 << "gg"
+                                                 << "gh"
+                                                 << "gi"
+                                                 << "gl"
+                                                 << "gm"
+                                                 << "gn"
+                                                 << "gp"
+                                                 << "gq"
+                                                 << "gr"
+                                                 << "gs"
+                                                 << "gt"
+                                                 << "gu"
+                                                 << "gw"
+                                                 << "gy"
+                                                 << "hk"
+                                                 << "hm"
+                                                 << "hn"
+                                                 << "hr"
+                                                 << "ht"
+                                                 << "hu"
+                                                 << "id"
+                                                 << "ie"
+                                                 << "il"
+                                                 << "im"
+                                                 << "in"
+                                                 << "io"
+                                                 << "iq"
+                                                 << "ir"
+                                                 << "is"
+                                                 << "it"
+                                                 << "je"
+                                                 << "jm"
+                                                 << "jo"
+                                                 << "jp"
+                                                 << "ke"
+                                                 << "kg"
+                                                 << "kh"
+                                                 << "ki"
+                                                 << "km"
+                                                 << "kn"
+                                                 << "kp"
+                                                 << "kr"
+                                                 << "kw"
+                                                 << "ky"
+                                                 << "kz"
+                                                 << "la"
+                                                 << "lb"
+                                                 << "lc"
+                                                 << "li"
+                                                 << "lk"
+                                                 << "lr"
+                                                 << "ls"
+                                                 << "lt"
+                                                 << "lu"
+                                                 << "lv"
+                                                 << "ly"
+                                                 << "ma"
+                                                 << "mc"
+                                                 << "md"
+                                                 << "me"
+                                                 << "mf"
+                                                 << "mg"
+                                                 << "mh"
+                                                 << "mk"
+                                                 << "ml"
+                                                 << "mm"
+                                                 << "mn"
+                                                 << "mo"
+                                                 << "mp"
+                                                 << "mq"
+                                                 << "mr"
+                                                 << "ms"
+                                                 << "mt"
+                                                 << "mu"
+                                                 << "mv"
+                                                 << "mw"
+                                                 << "mx"
+                                                 << "my"
+                                                 << "mz"
+                                                 << "na"
+                                                 << "nc"
+                                                 << "ne"
+                                                 << "nf"
+                                                 << "ng"
+                                                 << "ni"
+                                                 << "nl"
+                                                 << "no"
+                                                 << "np"
+                                                 << "nr"
+                                                 << "nu"
+                                                 << "nz"
+                                                 << "om"
+                                                 << "pa"
+                                                 << "pe"
+                                                 << "pf"
+                                                 << "pg"
+                                                 << "ph"
+                                                 << "pk"
+                                                 << "pl"
+                                                 << "pm"
+                                                 << "pn"
+                                                 << "pr"
+                                                 << "ps"
+                                                 << "pt"
+                                                 << "pw"
+                                                 << "py"
+                                                 << "qa"
+                                                 << "re"
+                                                 << "ro"
+                                                 << "rs"
+                                                 << "ru"
+                                                 << "rw"
+                                                 << "sa"
+                                                 << "sb"
+                                                 << "sc"
+                                                 << "sd"
+                                                 << "se"
+                                                 << "sg"
+                                                 << "sh"
+                                                 << "si"
+                                                 << "sj"
+                                                 << "sk"
+                                                 << "sl"
+                                                 << "sm"
+                                                 << "sn"
+                                                 << "so"
+                                                 << "sr"
+                                                 << "ss"
+                                                 << "st"
+                                                 << "sv"
+                                                 << "sx"
+                                                 << "sy"
+                                                 << "sz"
+                                                 << "tc"
+                                                 << "td"
+                                                 << "tf"
+                                                 << "tg"
+                                                 << "th"
+                                                 << "tj"
+                                                 << "tk"
+                                                 << "tl"
+                                                 << "tm"
+                                                 << "tn"
+                                                 << "to"
+                                                 << "tr"
+                                                 << "tt"
+                                                 << "tv"
+                                                 << "tw"
+                                                 << "tz"
+                                                 << "ua"
+                                                 << "ug"
+                                                 << "um"
+                                                 << "us"
+                                                 << "uy"
+                                                 << "uz"
+                                                 << "va"
+                                                 << "vc"
+                                                 << "ve"
+                                                 << "vg"
+                                                 << "vi"
+                                                 << "vn"
+                                                 << "vu"
+                                                 << "wf"
+                                                 << "ws"
+                                                 << "ye"
+                                                 << "yt"
+                                                 << "za"
+                                                 << "zm"
+                                                 << "zw";
 
     return countries;
 }

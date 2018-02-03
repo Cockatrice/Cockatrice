@@ -12,8 +12,7 @@
 #define DEFAULT_THEME_NAME "Default"
 #define TEST_SOUND_FILENAME "player_join"
 
-SoundEngine::SoundEngine(QObject *parent)
-: QObject(parent), player(0)
+SoundEngine::SoundEngine(QObject *parent) : QObject(parent), player(0)
 {
     inputBuffer = new QBuffer(this);
 
@@ -27,8 +26,7 @@ SoundEngine::SoundEngine(QObject *parent)
 
 SoundEngine::~SoundEngine()
 {
-    if(player)
-    {
+    if (player) {
         player->deleteLater();
         player = 0;
     }
@@ -40,8 +38,7 @@ void SoundEngine::soundEnabledChanged()
 {
     if (settingsCache->getSoundEnabled()) {
         qDebug("SoundEngine: enabling sound");
-        if(!player)
-        {
+        if (!player) {
             QAudioFormat format;
             format.setSampleRate(44100);
             format.setChannelCount(1);
@@ -53,8 +50,7 @@ void SoundEngine::soundEnabledChanged()
         }
     } else {
         qDebug("SoundEngine: disabling sound");
-        if(player)
-        {
+        if (player) {
             player->stop();
             player->deleteLater();
             player = 0;
@@ -64,14 +60,14 @@ void SoundEngine::soundEnabledChanged()
 
 void SoundEngine::playSound(QString fileName)
 {
-    if(!player)
+    if (!player)
         return;
 
     // still playing the previous sound?
-    if(player->state() == QAudio::ActiveState)
+    if (player->state() == QAudio::ActiveState)
         return;
 
-    if(!audioData.contains(fileName))
+    if (!audioData.contains(fileName))
         return;
 
     qDebug() << "playing" << fileName;
@@ -92,40 +88,39 @@ void SoundEngine::testSound()
 
 void SoundEngine::ensureThemeDirectoryExists()
 {
-    if(settingsCache->getSoundThemeName().isEmpty() ||
-        !getAvailableThemes().contains(settingsCache->getSoundThemeName()))
-    {
+    if (settingsCache->getSoundThemeName().isEmpty() ||
+        !getAvailableThemes().contains(settingsCache->getSoundThemeName())) {
         qDebug() << "Sounds theme name not set, setting default value";
         settingsCache->setSoundThemeName(DEFAULT_THEME_NAME);
     }
 }
 
-QStringMap & SoundEngine::getAvailableThemes()
+QStringMap &SoundEngine::getAvailableThemes()
 {
     QDir dir;
     availableThemes.clear();
 
     // load themes from user profile dir
 
-    dir = settingsCache->getDataPath() +  "/sounds";
+    dir = settingsCache->getDataPath() + "/sounds";
 
-    foreach(QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
-    {
-        if(!availableThemes.contains(themeName))
+    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
+        if (!availableThemes.contains(themeName))
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
     }
 
     // load themes from cockatrice system dir
+    dir = qApp->applicationDirPath() +
 #ifdef Q_OS_MAC
-    dir = qApp->applicationDirPath() + "/../Resources/sounds";
+          "/../Resources/sounds";
 #elif defined(Q_OS_WIN)
-    dir = qApp->applicationDirPath() + "/sounds";
+          "/sounds";
 #else // linux
-    dir = qApp->applicationDirPath() + "/../share/cockatrice/sounds";
+          "/../share/cockatrice/sounds";
 #endif
-    foreach(QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name))
-    {
-        if(!availableThemes.contains(themeName))
+
+    foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
+        if (!availableThemes.contains(themeName))
             availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
     }
 
@@ -142,24 +137,45 @@ void SoundEngine::themeChangedSlot()
     audioData.clear();
 
     static const QStringList fileNames = QStringList()
-        // Phases
-        << "untap_step" << "upkeep_step" << "draw_step" << "main_1"
-        << "start_combat" << "attack_step" << "block_step" << "damage_step" << "end_combat"
-        << "main_2" << "end_step"
-        // Game Actions
-        << "draw_card" << "play_card" << "tap_card" << "untap_card"
-        << "shuffle" << "roll_dice" << "life_change"
-        // Player
-        << "player_join" << "player_leave" << "player_disconnect" << "player_reconnect" << "player_concede"
-        // Spectator
-        << "spectator_join" << "spectator_leave"
-        // Buddy
-        << "buddy_join" << "buddy_leave"
-        // Chat & UI
-        << "chat_mention" << "all_mention" << "private_message";
+                                         // Phases
+                                         << "untap_step"
+                                         << "upkeep_step"
+                                         << "draw_step"
+                                         << "main_1"
+                                         << "start_combat"
+                                         << "attack_step"
+                                         << "block_step"
+                                         << "damage_step"
+                                         << "end_combat"
+                                         << "main_2"
+                                         << "end_step"
+                                         // Game Actions
+                                         << "draw_card"
+                                         << "play_card"
+                                         << "tap_card"
+                                         << "untap_card"
+                                         << "shuffle"
+                                         << "roll_dice"
+                                         << "life_change"
+                                         // Player
+                                         << "player_join"
+                                         << "player_leave"
+                                         << "player_disconnect"
+                                         << "player_reconnect"
+                                         << "player_concede"
+                                         // Spectator
+                                         << "spectator_join"
+                                         << "spectator_leave"
+                                         // Buddy
+                                         << "buddy_join"
+                                         << "buddy_leave"
+                                         // Chat & UI
+                                         << "chat_mention"
+                                         << "all_mention"
+                                         << "private_message";
 
     for (int i = 0; i < fileNames.size(); ++i) {
-        if(!dir.exists(fileNames[i] + ".wav"))
+        if (!dir.exists(fileNames[i] + ".wav"))
             continue;
 
         QFile file(dir.filePath(fileNames[i] + ".wav"));

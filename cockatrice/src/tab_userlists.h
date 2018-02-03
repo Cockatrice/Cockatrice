@@ -1,8 +1,8 @@
 #ifndef TAB_USERLISTS_H
 #define TAB_USERLISTS_H
 
-#include "tab.h"
 #include "pb/serverinfo_user.pb.h"
+#include "tab.h"
 #include <QLineEdit>
 
 class AbstractClient;
@@ -17,7 +17,8 @@ class ServerInfo_User;
 class Event_AddToList;
 class Event_RemoveFromList;
 
-class TabUserLists : public Tab {
+class TabUserLists : public Tab
+{
     Q_OBJECT
 signals:
     void openMessageDialog(const QString &userName, bool focus);
@@ -33,6 +34,7 @@ private slots:
     void processRemoveFromListEvent(const Event_RemoveFromList &event);
     void addToIgnoreList();
     void addToBuddyList();
+
 private:
     AbstractClient *client;
     UserList *allUsersList;
@@ -42,13 +44,29 @@ private:
     QLineEdit *addBuddyEdit;
     QLineEdit *addIgnoreEdit;
     void addToList(const std::string &listName, const QString &userName);
+
 public:
-    TabUserLists(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo, QWidget *parent = 0);
+    TabUserLists(TabSupervisor *_tabSupervisor,
+                 AbstractClient *_client,
+                 const ServerInfo_User &userInfo,
+                 QWidget *parent = 0);
     void retranslateUi();
-    QString getTabText() const { return tr("Account"); }
-    const UserList *getAllUsersList() const { return allUsersList; }
-    const UserList *getBuddyList() const { return buddyList; }
-    const UserList *getIgnoreList() const { return ignoreList; }
+    QString getTabText() const
+    {
+        return tr("Account");
+    }
+    const UserList *getAllUsersList() const
+    {
+        return allUsersList;
+    }
+    const UserList *getBuddyList() const
+    {
+        return buddyList;
+    }
+    const UserList *getIgnoreList() const
+    {
+        return ignoreList;
+    }
 };
 
 #endif

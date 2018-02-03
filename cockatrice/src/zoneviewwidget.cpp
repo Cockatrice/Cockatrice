@@ -1,23 +1,28 @@
+#include "zoneviewwidget.h"
+#include "carditem.h"
+#include "gamescene.h"
+#include "player.h"
+#include "settingscache.h"
+#include "zoneviewzone.h"
+#include <QCheckBox>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsSceneMouseEvent>
-#include <QCheckBox>
 #include <QLabel>
 #include <QPainter>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
-#include "zoneviewwidget.h"
-#include "carditem.h"
-#include "zoneviewzone.h"
-#include "player.h"
-#include "gamescene.h"
-#include "settingscache.h"
 
-#include "pb/command_stop_dump_zone.pb.h"
 #include "pb/command_shuffle.pb.h"
+#include "pb/command_stop_dump_zone.pb.h"
 
-ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberCards, bool _revealZone, bool _writeableRevealZone, const QList<const ServerInfo_Card *> &cardList)
+ZoneViewWidget::ZoneViewWidget(Player *_player,
+                               CardZone *_origZone,
+                               int numberCards,
+                               bool _revealZone,
+                               bool _writeableRevealZone,
+                               const QList<const ServerInfo_Card *> &cardList)
     : QGraphicsWidget(0, Qt::Window), canBeShuffled(_origZone->getIsShufflable()), player(_player)
 {
     setAcceptHoverEvents(true);
@@ -85,7 +90,8 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
     vbox->addItem(zoneHBox);
 
     zone = new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, zoneContainer);
-    connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), this, SLOT(handleWheelEvent(QGraphicsSceneWheelEvent *)));
+    connect(zone, SIGNAL(wheelEventReceived(QGraphicsSceneWheelEvent *)), this,
+            SLOT(handleWheelEvent(QGraphicsSceneWheelEvent *)));
 
     // numberCard is the num of cards we want to reveal from an area. Ex: scry the top 3 cards.
     // If the number is < 0 then it means that we can make the area sorted and we dont care about the order.
@@ -108,19 +114,22 @@ ZoneViewWidget::ZoneViewWidget(Player *_player, CardZone *_origZone, int numberC
     zone->initializeCards(cardList);
 }
 
-void ZoneViewWidget::processSortByType(int value) {
+void ZoneViewWidget::processSortByType(int value)
+{
     pileViewCheckBox.setEnabled(value);
     settingsCache->setZoneViewSortByType(value);
     zone->setPileView(pileViewCheckBox.isChecked());
     zone->setSortByType(value);
 }
 
-void ZoneViewWidget::processSortByName(int value) {
+void ZoneViewWidget::processSortByName(int value)
+{
     settingsCache->setZoneViewSortByName(value);
     zone->setSortByName(value);
 }
 
-void ZoneViewWidget::processSetPileView(int value) {
+void ZoneViewWidget::processSetPileView(int value)
+{
     settingsCache->setZoneViewPileView(value);
     zone->setPileView(value);
 }
@@ -136,32 +145,30 @@ void ZoneViewWidget::retranslateUi()
 
 void ZoneViewWidget::moveEvent(QGraphicsSceneMoveEvent * /* event */)
 {
-    if(!scene())
+    if (!scene())
         return;
 
     int titleBarHeight = 24;
 
     QPointF scenePos = pos();
 
-    if(scenePos.x() < 0)
-    {
+    if (scenePos.x() < 0) {
         scenePos.setX(0);
     } else {
         qreal maxw = scene()->sceneRect().width() - 100;
-        if(scenePos.x() > maxw)
+        if (scenePos.x() > maxw)
             scenePos.setX(maxw);
     }
 
-    if(scenePos.y() < titleBarHeight)
-    {
+    if (scenePos.y() < titleBarHeight) {
         scenePos.setY(titleBarHeight);
     } else {
         qreal maxh = scene()->sceneRect().height() - titleBarHeight;
-        if(scenePos.y() > maxh)
+        if (scenePos.y() > maxh)
             scenePos.setY(maxh);
     }
 
-    if(scenePos != pos())
+    if (scenePos != pos())
         setPos(scenePos);
 }
 
@@ -171,7 +178,9 @@ void ZoneViewWidget::resizeToZoneContents()
     qreal totalZoneHeight = zoneRect.height();
     if (zoneRect.height() > 500)
         zoneRect.setHeight(500);
-    QSizeF newSize(qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(), zoneRect.width() + scrollBar->width() + 10), zoneRect.height() + extraHeight + 10);
+    QSizeF newSize(qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(),
+                        zoneRect.width() + scrollBar->width() + 10),
+                   zoneRect.height() + extraHeight + 10);
     setMaximumSize(newSize);
     resize(newSize);
 
@@ -215,7 +224,8 @@ void ZoneViewWidget::zoneDeleted()
     deleteLater();
 }
 
-void ZoneViewWidget::initStyleOption(QStyleOption *option) const {
+void ZoneViewWidget::initStyleOption(QStyleOption *option) const
+{
     QStyleOptionTitleBar *titleBar = qstyleoption_cast<QStyleOptionTitleBar *>(option);
     if (titleBar)
         titleBar->icon = QPixmap("theme:cockatrice");

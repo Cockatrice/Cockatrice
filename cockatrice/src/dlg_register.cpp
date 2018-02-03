@@ -1,17 +1,16 @@
-#include <QLabel>
 #include <QCheckBox>
+#include <QDebug>
+#include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
-#include <QDialogButtonBox>
+#include <QLabel>
 #include <QMessageBox>
-#include <QDebug>
 
 #include "dlg_register.h"
-#include "settingscache.h"
 #include "pb/serverinfo_user.pb.h"
+#include "settingscache.h"
 
-DlgRegister::DlgRegister(QWidget *parent)
-    : QDialog(parent)
+DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 {
     hostLabel = new QLabel(tr("&Host:"));
     hostEdit = new QLineEdit(settingsCache->servers().getHostname("cockatrice.woogerworks.com"));
@@ -298,7 +297,7 @@ DlgRegister::DlgRegister(QWidget *parent)
     countryEdit->addItem(QPixmap("theme:countries/zw"), "zw");
     countryEdit->setCurrentIndex(0);
     QStringList countries = settingsCache->getCountries();
-    foreach(QString c, countries)
+    foreach (QString c, countries)
         countryEdit->addItem(QPixmap("theme:countries/" + c.toLower()), c);
 
     realnameLabel = new QLabel(tr("Real name:"));
@@ -341,18 +340,15 @@ DlgRegister::DlgRegister(QWidget *parent)
 
 void DlgRegister::actOk()
 {
-    if (passwordEdit->text() != passwordConfirmationEdit->text())
-    {
-         QMessageBox::critical(this, tr("Registration Warning"), tr("Your passwords do not match, please try again."));
-         return;
-    }
-    else if (emailConfirmationEdit->text() != emailEdit->text())
-    {
-        QMessageBox::critical(this, tr("Registration Warning"), tr("Your email addresses do not match, please try again."));
+    if (passwordEdit->text() != passwordConfirmationEdit->text()) {
+        QMessageBox::critical(this, tr("Registration Warning"), tr("Your passwords do not match, please try again."));
+        return;
+    } else if (emailConfirmationEdit->text() != emailEdit->text()) {
+        QMessageBox::critical(this, tr("Registration Warning"),
+                              tr("Your email addresses do not match, please try again."));
         return;
     }
-    if(playernameEdit->text().isEmpty())
-    {
+    if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Registration Warning"), tr("The player name can't be empty."));
         return;
     }

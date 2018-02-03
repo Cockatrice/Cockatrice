@@ -1,12 +1,12 @@
 #ifndef TAB_GAME_H
 #define TAB_GAME_H
 
+#include "pb/event_leave.pb.h"
+#include "pb/serverinfo_game.pb.h"
+#include "tab.h"
+#include <QCompleter>
 #include <QMap>
 #include <QPushButton>
-#include <QCompleter>
-#include "tab.h"
-#include "pb/serverinfo_game.pb.h"
-#include "pb/event_leave.pb.h"
 
 class AbstractClient;
 class CardDatabase;
@@ -60,21 +60,28 @@ class LineEditCompleter;
 class QDockWidget;
 class QStackedWidget;
 
-class ToggleButton : public QPushButton {
+class ToggleButton : public QPushButton
+{
     Q_OBJECT
 private:
     bool state;
 signals:
     void stateChanged();
+
 public:
     ToggleButton(QWidget *parent = 0);
-    bool getState() const { return state; }
+    bool getState() const
+    {
+        return state;
+    }
     void setState(bool _state);
+
 protected:
     void paintEvent(QPaintEvent *event);
 };
 
-class DeckViewContainer : public QWidget {
+class DeckViewContainer : public QWidget
+{
     Q_OBJECT
 private:
     QPushButton *loadLocalButton, *loadRemoteButton;
@@ -94,6 +101,7 @@ private slots:
 signals:
     void newCardAdded(AbstractCardItem *card);
     void notIdle();
+
 public:
     DeckViewContainer(int _playerId, TabGame *parent);
     void retranslateUi();
@@ -103,7 +111,8 @@ public:
     void setDeck(const DeckLoader &deck);
 };
 
-class TabGame : public Tab {
+class TabGame : public Tab
+{
     Q_OBJECT
 private:
     QTimer *gameTimer;
@@ -127,8 +136,8 @@ private:
     QStringList gameTypes;
     QCompleter *completer;
     QStringList autocompleteUserList;
-    QStackedWidget * mainWidget;
-    
+    QStackedWidget *mainWidget;
+
     // Replay related members
     GameReplay *replay;
     int currentReplayStep;
@@ -148,12 +157,16 @@ private:
     QMap<int, DeckViewContainer *> deckViewContainers;
     QVBoxLayout *cardVInfoLayout, *messageLogLayout, *gamePlayAreaVBox, *deckViewContainerLayout;
     QHBoxLayout *cardHInfoLayout, *sayHLayout, *mainHLayout, *replayControlLayout;
-    QWidget *cardBoxLayoutWidget, *messageLogLayoutWidget, *gamePlayAreaWidget, *deckViewContainerWidget, *replayControlWidget;
+    QWidget *cardBoxLayoutWidget, *messageLogLayoutWidget, *gamePlayAreaWidget, *deckViewContainerWidget,
+        *replayControlWidget;
     QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
     QAction *playersSeparator;
-    QMenu *gameMenu, *phasesMenu, *viewMenu, *cardInfoDockMenu, *messageLayoutDockMenu, *playerListDockMenu, *replayDockMenu;
-    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
-    QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aMessageLayoutDockVisible, *aMessageLayoutDockFloating, *aPlayerListDockVisible, *aPlayerListDockFloating, *aReplayDockVisible, *aReplayDockFloating;
+    QMenu *gameMenu, *phasesMenu, *viewMenu, *cardInfoDockMenu, *messageLayoutDockMenu, *playerListDockMenu,
+        *replayDockMenu;
+    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows,
+        *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
+    QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aMessageLayoutDockVisible, *aMessageLayoutDockFloating,
+        *aPlayerListDockVisible, *aPlayerListDockFloating, *aReplayDockVisible, *aReplayDockFloating;
     QList<QAction *> phaseActions;
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
@@ -164,9 +177,11 @@ private:
 
     void eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext &context);
     void eventSpectatorLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext &context);
-    
+
     void eventGameStateChanged(const Event_GameStateChanged &event, int eventPlayerId, const GameEventContext &context);
-    void eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &event, int eventPlayerId, const GameEventContext &context);
+    void eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &event,
+                                      int eventPlayerId,
+                                      const GameEventContext &context);
     void eventJoin(const Event_Join &event, int eventPlayerId, const GameEventContext &context);
     void eventLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext &context);
     void eventKicked(const Event_Kicked &event, int eventPlayerId, const GameEventContext &context);
@@ -181,11 +196,11 @@ private:
     void createMenuItems();
     void createReplayMenuItems();
     void createViewMenuItems();
-    void createCardInfoDock(bool bReplay=false);
-    void createPlayerListDock(bool bReplay=false);
-    void createMessageDock(bool bReplay=false);
-    void createPlayAreaWidget(bool bReplay=false);
-    void createDeckViewContainerWidget(bool bReplay=false);
+    void createCardInfoDock(bool bReplay = false);
+    void createPlayerListDock(bool bReplay = false);
+    void createMessageDock(bool bReplay = false);
+    void createPlayAreaWidget(bool bReplay = false);
+    void createDeckViewContainerWidget(bool bReplay = false);
     void createReplayDock();
     QString getLeaveReason(Event_Leave::LeaveReason reason);
 signals:
@@ -203,12 +218,12 @@ private slots:
     void replayStartButtonClicked();
     void replayPauseButtonClicked();
     void replayFastForwardButtonToggled(bool checked);
-    
+
     void incrementGameTime();
     void adminLockChanged(bool lock);
     void newCardAdded(AbstractCardItem *card);
     void updateCardMenu(AbstractCardItem *card);
-    
+
     void actGameInfo();
     void actConcede();
     void actLeaveGame();
@@ -222,11 +237,11 @@ private slots:
 
     void addMentionTag(QString value);
     void commandFinished(const Response &response);
-	
+
     void refreshShortcuts();
-	
+
     void loadLayout();
-	void actCompleterChanged();
+    void actCompleterChanged();
     void actResetLayout();
     void freeDocksSize();
 
@@ -234,31 +249,59 @@ private slots:
     void dockVisibleTriggered();
     void dockFloatingTriggered();
     void dockTopLevelChanged(bool topLevel);
+
 public:
-    TabGame(TabSupervisor *_tabSupervisor, QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes);
+    TabGame(TabSupervisor *_tabSupervisor,
+            QList<AbstractClient *> &_clients,
+            const Event_GameJoined &event,
+            const QMap<int, QString> &_roomGameTypes);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
     ~TabGame();
     void retranslateUi();
     void updatePlayerListDockTitle();
     void closeRequest();
-    const QMap<int, Player *> &getPlayers() const { return players; }
+    const QMap<int, Player *> &getPlayers() const
+    {
+        return players;
+    }
     CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
-    bool isHost() const { return hostId == localPlayerId; }
-    bool getIsLocalGame() const { return isLocalGame; }
-    int getGameId() const { return gameInfo.game_id(); }
+    bool isHost() const
+    {
+        return hostId == localPlayerId;
+    }
+    bool getIsLocalGame() const
+    {
+        return isLocalGame;
+    }
+    int getGameId() const
+    {
+        return gameInfo.game_id();
+    }
     QString getTabText() const;
-    bool getSpectator() const { return spectator; }
-    bool getSpectatorsSeeEverything() const { return gameInfo.spectators_omniscient(); }
+    bool getSpectator() const
+    {
+        return spectator;
+    }
+    bool getSpectatorsSeeEverything() const
+    {
+        return gameInfo.spectators_omniscient();
+    }
     bool isSpectator();
     Player *getActiveLocalPlayer() const;
     AbstractClient *getClientForPlayer(int playerId) const;
 
-    void setActiveCard(CardItem *_card) { activeCard = _card; }
-    CardItem *getActiveCard() const { return activeCard; }
+    void setActiveCard(CardItem *_card)
+    {
+        activeCard = _card;
+    }
+    CardItem *getActiveCard() const
+    {
+        return activeCard;
+    }
 
     void processGameEventContainer(const GameEventContainer &cont, AbstractClient *client);
     PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
-    PendingCommand *prepareGameCommand(const QList< const ::google::protobuf::Message * > &cmdList);
+    PendingCommand *prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList);
 public slots:
     void sendGameCommand(PendingCommand *pend, int playerId = -1);
     void sendGameCommand(const ::google::protobuf::Message &command, int playerId = -1);

@@ -39,7 +39,7 @@ void ReplayTimelineWidget::setTimeline(const QList<int> &_replayTimeline)
     histogram.append(binValue);
     if (!replayTimeline.isEmpty())
         maxTime = replayTimeline.last();
-    
+
     update();
 }
 
@@ -47,18 +47,18 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
     painter.drawRect(0, 0, width() - 1, height() - 1);
-    
-    qreal binWidth = (qreal) width() / histogram.size();
+
+    qreal binWidth = (qreal)width() / histogram.size();
     QPainterPath path;
     path.moveTo(0, height() - 1);
     for (int i = 0; i < histogram.size(); ++i)
-        path.lineTo(round(i * binWidth), (height() - 1) * (1.0 - (qreal) histogram[i] / maxBinValue));
+        path.lineTo(round(i * binWidth), (height() - 1) * (1.0 - (qreal)histogram[i] / maxBinValue));
     path.lineTo(width() - 1, height() - 1);
     path.lineTo(0, height() - 1);
     painter.fillPath(path, Qt::black);
-    
+
     const QColor barColor = QColor::fromHsv(120, 255, 255, 100);
-    quint64 w = (quint64)(width() - 1) * (quint64) currentTime / maxTime;
+    quint64 w = (quint64)(width() - 1) * (quint64)currentTime / maxTime;
     painter.fillRect(0, 0, w, height() - 1, barColor);
 }
 
@@ -83,7 +83,7 @@ void ReplayTimelineWidget::replayTimerTimeout()
         emit replayFinished();
         replayTimer->stop();
     }
-    
+
     if (!(currentTime % 1000))
         update();
 }

@@ -1,27 +1,27 @@
-#include <QClipboard>
-#include <QPlainTextEdit>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QApplication>
-#include <QTextStream>
-#include <QDialogButtonBox>
-#include <QMessageBox>
 #include "dlg_load_deck_from_clipboard.h"
 #include "deck_loader.h"
 #include "settingscache.h"
+#include <QApplication>
+#include <QClipboard>
+#include <QDialogButtonBox>
+#include <QMessageBox>
+#include <QPlainTextEdit>
+#include <QPushButton>
+#include <QTextStream>
+#include <QVBoxLayout>
 
 DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : QDialog(parent), deckList(nullptr)
 {
     contentsEdit = new QPlainTextEdit;
-    
+
     refreshButton = new QPushButton(tr("&Refresh"));
     connect(refreshButton, SIGNAL(clicked()), this, SLOT(actRefresh()));
-    
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     buttonBox->addButton(refreshButton, QDialogButtonBox::ActionRole);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOK()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    
+
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(contentsEdit);
     mainLayout->addWidget(buttonBox);
@@ -30,9 +30,9 @@ DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : QDialog(pa
 
     setWindowTitle(tr("Load deck from clipboard"));
     resize(500, 500);
-    
+
     actRefresh();
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()),this,SLOT(refreshShortcuts()));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 }
 
@@ -50,28 +50,20 @@ void DlgLoadDeckFromClipboard::actOK()
 {
     QString buffer = contentsEdit->toPlainText();
     QTextStream stream(&buffer);
-    
+
     auto *deckLoader = new DeckLoader;
-    if (buffer.contains("<cockatrice_deck version=\"1\">"))
-    {
-        if (deckLoader->loadFromString_Native(buffer))
-        {
+    if (buffer.contains("<cockatrice_deck version=\"1\">")) {
+        if (deckLoader->loadFromString_Native(buffer)) {
             deckList = deckLoader;
             accept();
-        }
-        else
-        {
+        } else {
             QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
             delete deckLoader;
         }
-    }
-    else if (deckLoader->loadFromStream_Plain(stream))
-    {
+    } else if (deckLoader->loadFromStream_Plain(stream)) {
         deckList = deckLoader;
         accept();
-    }
-    else
-    {
+    } else {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
         delete deckLoader;
     }

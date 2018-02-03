@@ -1,20 +1,19 @@
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QGridLayout>
-#include <QPushButton>
-#include <QGroupBox>
-#include <QMessageBox>
-#include <QDialogButtonBox>
-#include <QSpinBox>
-#include <QLabel>
-#include <QLineEdit>
 #include "tab_admin.h"
 #include "abstractclient.h"
+#include <QDialogButtonBox>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QVBoxLayout>
 
 #include "pb/admin_commands.pb.h"
 
-ShutdownDialog::ShutdownDialog(QWidget *parent)
-    : QDialog(parent)
+ShutdownDialog::ShutdownDialog(QWidget *parent) : QDialog(parent)
 {
     QLabel *reasonLabel = new QLabel(tr("&Reason for shutdown:"));
     reasonEdit = new QLineEdit;
@@ -25,18 +24,18 @@ ShutdownDialog::ShutdownDialog(QWidget *parent)
     minutesEdit->setMinimum(0);
     minutesEdit->setValue(5);
     minutesEdit->setMaximum(999);
-    
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    
+
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(reasonLabel, 0, 0);
     mainLayout->addWidget(reasonEdit, 0, 1);
     mainLayout->addWidget(minutesLabel, 1, 0);
     mainLayout->addWidget(minutesEdit, 1, 1);
     mainLayout->addWidget(buttonBox, 2, 0, 1, 2);
-    
+
     setLayout(mainLayout);
     setWindowTitle(tr("Shut down server"));
 }
@@ -60,31 +59,31 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
     connect(shutdownServerButton, SIGNAL(clicked()), this, SLOT(actShutdownServer()));
     reloadConfigButton = new QPushButton;
     connect(reloadConfigButton, SIGNAL(clicked()), this, SLOT(actReloadConfig()));
-    
+
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(updateServerMessageButton);
     vbox->addWidget(shutdownServerButton);
     vbox->addWidget(reloadConfigButton);
     vbox->addStretch();
-    
+
     adminGroupBox = new QGroupBox;
     adminGroupBox->setLayout(vbox);
     adminGroupBox->setEnabled(false);
-    
+
     unlockButton = new QPushButton;
     connect(unlockButton, SIGNAL(clicked()), this, SLOT(actUnlock()));
     lockButton = new QPushButton;
     lockButton->setEnabled(false);
     connect(lockButton, SIGNAL(clicked()), this, SLOT(actLock()));
-    
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(adminGroupBox);
     mainLayout->addWidget(unlockButton);
     mainLayout->addWidget(lockButton);
-    
+
     retranslateUi();
 
-    QWidget * mainWidget = new QWidget(this);
+    QWidget *mainWidget = new QWidget(this);
     mainWidget->setLayout(mainLayout);
     setCentralWidget(mainWidget);
 
@@ -97,7 +96,7 @@ void TabAdmin::retranslateUi()
     shutdownServerButton->setText(tr("&Shut down server"));
     reloadConfigButton->setText(tr("&Reload configuration"));
     adminGroupBox->setTitle(tr("Server administration functions"));
-    
+
     unlockButton->setText(tr("&Unlock functions"));
     lockButton->setText(tr("&Lock functions"));
 }
@@ -114,7 +113,7 @@ void TabAdmin::actShutdownServer()
         Command_ShutdownServer cmd;
         cmd.set_reason(dlg.getReason().toStdString());
         cmd.set_minutes(dlg.getMinutes());
-        
+
         client->sendCommand(client->prepareAdminCommand(cmd));
     }
 }
@@ -127,12 +126,12 @@ void TabAdmin::actReloadConfig()
 
 void TabAdmin::actUnlock()
 {
-        if (fullAdmin)
-            adminGroupBox->setEnabled(true);
-        lockButton->setEnabled(true);
-        unlockButton->setEnabled(false);
-        locked = false;
-        emit adminLockChanged(false);
+    if (fullAdmin)
+        adminGroupBox->setEnabled(true);
+    lockButton->setEnabled(true);
+    unlockButton->setEnabled(false);
+    locked = false;
+    emit adminLockChanged(false);
 }
 
 void TabAdmin::actLock()

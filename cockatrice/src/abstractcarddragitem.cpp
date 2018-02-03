@@ -1,15 +1,17 @@
 #include "abstractcarddragitem.h"
 #include "carddatabase.h"
 #include <QCursor>
-#include <QGraphicsSceneMouseEvent>
 #include <QDebug>
+#include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
 static const float CARD_WIDTH_HALF = CARD_WIDTH / 2;
 static const float CARD_HEIGHT_HALF = CARD_HEIGHT / 2;
 const QColor GHOST_MASK = QColor(255, 255, 255, 50);
 
-AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag)
+AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
+                                           const QPointF &_hotSpot,
+                                           AbstractCardDragItem *parentDrag)
     : QGraphicsItem(), item(_item), hotSpot(_hotSpot)
 {
     if (parentDrag) {
@@ -27,7 +29,10 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item, const QPoint
         setZValue(2000000007);
     }
     if (item->getTapped())
-        setTransform(QTransform().translate(CARD_WIDTH_HALF, CARD_HEIGHT_HALF).rotate(90).translate(-CARD_WIDTH_HALF, -CARD_HEIGHT_HALF));
+        setTransform(QTransform()
+                         .translate(CARD_WIDTH_HALF, CARD_HEIGHT_HALF)
+                         .rotate(90)
+                         .translate(-CARD_WIDTH_HALF, -CARD_HEIGHT_HALF));
 
     setCacheMode(DeviceCoordinateCache);
 }

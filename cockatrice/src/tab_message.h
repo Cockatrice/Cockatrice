@@ -10,7 +10,8 @@ class Event_UserMessage;
 class Response;
 class ServerInfo_User;
 
-class TabMessage : public Tab {
+class TabMessage : public Tab
+{
     Q_OBJECT
 private:
     AbstractClient *client;
@@ -18,7 +19,7 @@ private:
     ServerInfo_User *ownUserInfo;
     ServerInfo_User *otherUserInfo;
     bool userOnline;
-    
+
     ChatView *chatView;
     QLineEdit *sayEdit;
 
@@ -32,8 +33,12 @@ private slots:
     void messageSent(const Response &response);
     void addMentionTag(QString mentionTag);
     void messageClicked();
+
 public:
-    TabMessage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &_ownUserInfo, const ServerInfo_User &_otherUserInfo);
+    TabMessage(TabSupervisor *_tabSupervisor,
+               AbstractClient *_client,
+               const ServerInfo_User &_ownUserInfo,
+               const ServerInfo_User &_otherUserInfo);
     ~TabMessage();
     void retranslateUi();
     void closeRequest();
@@ -45,6 +50,7 @@ public:
 
     void processUserLeft();
     void processUserJoined(const ServerInfo_User &_userInfo);
+
 private:
     bool shouldShowSystemPopup(const Event_UserMessage &event);
     void showSystemPopup(const Event_UserMessage &event);

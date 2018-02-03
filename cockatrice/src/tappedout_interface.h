@@ -16,16 +16,18 @@ class DeckList;
  * logic is implemented in TappedOutInterface::queryFinished().
  */
 
-class TappedOutInterface : public QObject {
+class TappedOutInterface : public QObject
+{
     Q_OBJECT
 private:
     QNetworkAccessManager *manager;
 
     CardDatabase &cardDatabase;
-    void copyDeckSplitMainAndSide(const DeckList &source, DeckList& mainboard, DeckList& sideboard);
+    void copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard);
 private slots:
     void queryFinished(QNetworkReply *reply);
     void getAnalyzeRequestData(DeckList *deck, QByteArray *data);
+
 public:
     TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent = 0);
     void analyzeDeck(DeckList *deck);
