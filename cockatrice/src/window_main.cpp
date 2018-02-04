@@ -782,8 +782,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     retranslateUi();
 
-    if (!restoreGeometry(settingsCache->getMainWindowGeometry()))
-    {
+    if (!restoreGeometry(settingsCache->getMainWindowGeometry())) {
         this->setWindowState(Qt::WindowMaximized);
     }
     aFullScreen->setChecked(static_cast<bool>(windowState() & Qt::WindowFullScreen));
