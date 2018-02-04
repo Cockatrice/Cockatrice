@@ -42,6 +42,7 @@ FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
 
     setLayout(layout);
 
+    connect(filterCombo, SIGNAL(activated(int)), edit, SLOT(setFocus()));
     connect(edit, SIGNAL(returnPressed()), this, SLOT(emit_add()));
     connect(ok, SIGNAL(released()), this, SLOT(emit_add()));
     fltr = NULL;
