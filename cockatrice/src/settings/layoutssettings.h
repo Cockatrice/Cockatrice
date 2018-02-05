@@ -53,11 +53,11 @@ signals:
 public slots:
 
 private:
-    LayoutsSettings(QString settingPath,QObject *parent = 0);
+    explicit LayoutsSettings(QString settingPath,QObject *parent = nullptr);
     LayoutsSettings( const LayoutsSettings& /*other*/ );
-    LayoutsSettings( LayoutsSettings& /*other*/ );
-    LayoutsSettings( volatile const LayoutsSettings& /*other*/ );
-    LayoutsSettings( volatile LayoutsSettings& /*other*/ );
+    //LayoutsSettings( LayoutsSettings& /*other*/ );
+    //LayoutsSettings( volatile const LayoutsSettings& /*other*/ );
+    //LayoutsSettings( volatile LayoutsSettings& /*other*/ );
 };
 
 #endif // LAYOUTSSETTINGS_H
