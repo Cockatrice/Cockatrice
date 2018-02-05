@@ -231,19 +231,19 @@ bool FilterItem::acceptManaCost(const CardInfoPtr info) const
 
 bool FilterItem::acceptCmc(const CardInfoPtr info) const
 {
-    return (info->getCmc() == term);
+    return relationCheck(info->getCmc().toInt());
 }
 
 bool FilterItem::acceptPower(const CardInfoPtr info) const
 {
     int slash = info->getPowTough().indexOf("/");
-    return (slash != -1) ? (info->getPowTough().mid(0, slash) == term) : false;
+    return (slash != -1) ? (relationCheck(info->getPowTough().mid(0, slash).toInt())) : false;
 }
 
 bool FilterItem::acceptToughness(const CardInfoPtr info) const
 {
     int slash = info->getPowTough().indexOf("/");
-    return (slash != -1) ? (info->getPowTough().mid(slash + 1) == term) : false;
+    return (slash != -1) ? (relationCheck(info->getPowTough().mid(slash + 1).toInt())) : false;
 }
 
 bool FilterItem::acceptRarity(const CardInfoPtr info) const
@@ -293,6 +293,28 @@ bool FilterItem::acceptRarity(const CardInfoPtr info) const
         }
     }
     return false;
+}
+
+bool FilterItem::relationCheck(int cardInfo) const
+{
+    bool result, conversion;
+    int termInt;
+
+    result = (cardInfo == term.toInt(&conversion));
+    if (!conversion)
+    {
+        termInt = term.mid(1).toInt();
+        if (term.startsWith('<')) {
+            result = (cardInfo < termInt);
+        }
+        else if (term.startsWith('>')) {
+            result = (cardInfo > termInt);
+        }
+        else if (term.startsWith('=')) {
+            result = (cardInfo == termInt);
+        }
+    }
+    return result;
 }
 
 bool FilterItem::acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) const
