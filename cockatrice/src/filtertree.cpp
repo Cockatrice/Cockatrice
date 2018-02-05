@@ -299,17 +299,16 @@ bool FilterItem::relationCheck(int cardInfo) const
 {
     bool result, conversion;
 
+    result = (cardInfo term.left(1)
+
     result = (cardInfo == term.toInt(&conversion));
-    if (!conversion)
-    {
+    if (!conversion) {
         int termInt = term.mid(1).toInt();
         if (term.startsWith('<')) {
             result = (cardInfo < termInt);
-        }
-        else if (term.startsWith('>')) {
+        } else if (term.startsWith('>')) {
             result = (cardInfo > termInt);
-        }
-        else if (term.startsWith('=')) {
+        } else {
             result = (cardInfo == termInt);
         }
     }
