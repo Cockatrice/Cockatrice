@@ -175,17 +175,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/userlist.cpp" line="192"/>
         <source>You must have a value in the name ban when selecting the name ban checkbox.</source>
-        <translation type="unfinished"/>
+        <translation>名前BANチェックボックスを選択するときは、名前BANの値を持っている必要があります。</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="198"/>
         <source>You must have a value in the ip ban when selecting the ip ban checkbox.</source>
-        <translation type="unfinished"/>
+        <translation>IP BANチェックボックスを選択するときは、IP BANの値を持っている必要があります。</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="204"/>
         <source>You must have a value in the clientid ban when selecting the clientid ban checkbox.</source>
-        <translation type="unfinished"/>
+        <translation>クライアントID BANチェックボックスを選択するときは、クライアントID BANに値を持っている必要があります。</translation>
     </message>
 </context>
 <context>
@@ -569,7 +569,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_connect.cpp" line="57"/>
         <source>Public Servers</source>
-        <translation type="unfinished"/>
+        <translation>公開サーバー</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="79"/>
@@ -1478,7 +1478,7 @@ http://github.com/Cockatrice/Cockatrice/issues でチケットを提出してく
     <message>
         <location filename="../src/dlg_update.cpp" line="24"/>
         <source>Current release channel</source>
-        <translation type="unfinished"/>
+        <translation>現在のリリースチャンネル:</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="31"/>
@@ -1499,55 +1499,56 @@ http://github.com/Cockatrice/Cockatrice/issues でチケットを提出してく
         <location filename="../src/dlg_update.cpp" line="56"/>
         <source>Cockatrice was not built with SSL support, therefore you cannot download updates automatically! 
 Please visit the download page to update manually.</source>
-        <translation type="unfinished"/>
+        <translation>CockatriceはSSLをサポートしていなかったため、更新を自動ダウンロード出来ません。
+ダウンロードページから手動で更新してください。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="108"/>
         <source>Finished checking for updates</source>
-        <translation type="unfinished"/>
+        <translation>更新のチェックが完了しました</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="117"/>
         <source>No Update Available</source>
-        <translation type="unfinished"/>
+        <translation>更新がありません</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="118"/>
         <source>Cockatrice is up to date!</source>
-        <translation type="unfinished"/>
+        <translation>Cockatriceは最新版です。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="119"/>
         <source>You are already running the latest version available in the chosen release channel.</source>
-        <translation type="unfinished"/>
+        <translation>選択したリリースチャンネルで最新のバージョンを使用しています。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="120"/>
         <source>Current version</source>
-        <translation type="unfinished"/>
+        <translation>現在のバージョン</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="121"/>
         <source>Selected release channel</source>
-        <translation type="unfinished"/>
+        <translation>選択したリリースチャンネル</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="131"/>
         <location filename="../src/dlg_update.cpp" line="141"/>
         <source>Update Available</source>
-        <translation type="unfinished"/>
+        <translation>更新できます！！！</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="132"/>
         <location filename="../src/dlg_update.cpp" line="142"/>
         <source>A new version of Cockatrice is available!</source>
-        <translation type="unfinished"/>
+        <translation>新しいバージョンのCockatriceが利用できます！</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="133"/>
         <location filename="../src/dlg_update.cpp" line="143"/>
         <source>New version</source>
-        <translation type="unfinished"/>
+        <translation>新しいバージョン</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="134"/>
@@ -1564,43 +1565,44 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="135"/>
         <source>Do you want to update now?</source>
-        <translation type="unfinished"/>
+        <translation>今から更新しますか？</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="145"/>
         <source>Unfortunately there are no download packages available for your operating system. 
 You may have to build from source yourself.</source>
-        <translation type="unfinished"/>
+        <translation>残念ながら、お使いのオペレーティングシステム用のダウンロードパッケージはありません。 
+自分でソースからビルドする必要があるかもしれません。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="146"/>
         <source>Please check the download page manually and visit the wiki for instructions on compiling.</source>
-        <translation type="unfinished"/>
+        <translation>ダウンロードページを手動で確認し、wikiにアクセスしてコンパイルの手順を確認してください。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="178"/>
         <source>An error occurred while checking for updates:</source>
-        <translation type="unfinished"/>
+        <translation>更新のチェック中にエラーが発生しました:</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="185"/>
         <source>An error occurred while downloading an update:</source>
-        <translation type="unfinished"/>
+        <translation>更新のダウンロード中にエラーが発生しました:</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="199"/>
         <source>Cockatrice is unable to open the installer.</source>
-        <translation type="unfinished"/>
+        <translation>インストーラーが開けませんでした。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="200"/>
         <source>Try to update manually by closing Cockatrice and running the installer.</source>
-        <translation type="unfinished"/>
+        <translation>Cockatriceを終了した後、インストーラーから手動で更新してください。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="201"/>
         <source>Download location</source>
-        <translation type="unfinished"/>
+        <translation>ダウンロード場所</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="83"/>
@@ -1867,7 +1869,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="294"/>
         <source>Paths (editing disabled in portable mode)</source>
-        <translation type="unfinished"/>
+        <translation>パス（ポータブルモードでの編集は無効）</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="296"/>
@@ -1927,7 +1929,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="309"/>
         <source>Update channel</source>
-        <translation>チャンネルの更新</translation>
+        <translation>更新チャンネル</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="310"/>
@@ -2306,7 +2308,7 @@ This usually means that your client version is out of date, and the server sent 
     <message>
         <location filename="../src/window_main.cpp" line="286"/>
         <source>Version</source>
-        <translation type="unfinished"/>
+        <translation>バージョン</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="294"/>
@@ -2328,7 +2330,7 @@ You need to provide the activation token received in the activation email.</sour
     <message>
         <location filename="../src/window_main.cpp" line="456"/>
         <source>It appears you are attempting to register a new account on this server yet you already have an account registered with the email provided. This server restricts the number of accounts a user can register per address.  Please contact the server operator for further assistance or to obtain your credential information.</source>
-        <translation type="unfinished"/>
+        <translation>このサーバーに新しいアカウントを登録しようとしていますが、提供されたメールアドレスに登録されているアカウントが既に存在しています。このサーバーは、ユーザーがアドレスごとに登録できるアカウントの数を制限しています。詳細なサポートや資格情報の入手については、サーバーのオペレーターにお問い合わせください。</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="459"/>
@@ -2490,7 +2492,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/window_main.cpp" line="551"/>
         <source>Check for Client Updates</source>
-        <translation type="unfinished"/>
+        <translation>クライアントの更新チェック</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="552"/>
@@ -2632,7 +2634,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/window_main.cpp" line="1038"/>
         <source>You can only import XML databases at this time.</source>
-        <translation type="unfinished"/>
+        <translation>ここではXMLデータベースのみをインポートできます。</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1118"/>
@@ -2814,77 +2816,77 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="437"/>
         <source>%1 has left the game (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1はゲームから離脱した（%2）。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="444"/>
         <source>%1 is not watching the game any more (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1が観戦から離脱した（%2）。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="597"/>
         <source>Untap</source>
-        <translation type="unfinished"/>
+        <translation>アンタップ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="602"/>
         <source>Upkeep</source>
-        <translation type="unfinished"/>
+        <translation>アップキープ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="607"/>
         <source>Draw</source>
-        <translation type="unfinished"/>
+        <translation>ドロー</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="612"/>
         <source>First Main</source>
-        <translation type="unfinished"/>
+        <translation>戦闘前メイン・フェイズ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="617"/>
         <source>Beginning of Combat</source>
-        <translation type="unfinished"/>
+        <translation>戦闘開始ステップ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="622"/>
         <source>Declare Attackers</source>
-        <translation type="unfinished"/>
+        <translation>攻撃クリーチャー指定ステップ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="627"/>
         <source>Declare Blockers</source>
-        <translation type="unfinished"/>
+        <translation>ブロック・クリーチャー指定ステップ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="632"/>
         <source>Combat Damage</source>
-        <translation type="unfinished"/>
+        <translation>戦闘ダメージ・ステップ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="637"/>
         <source>End of Combat</source>
-        <translation type="unfinished"/>
+        <translation>戦闘終了ステップ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="642"/>
         <source>Second Main</source>
-        <translation type="unfinished"/>
+        <translation>戦闘後メイン・フェイズ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="647"/>
         <source>End/Cleanup</source>
-        <translation type="unfinished"/>
+        <translation>終了/クリンナップステップ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="652"/>
         <source>Unknown Phase</source>
-        <translation type="unfinished"/>
+        <translation>謎のフェイズ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="666"/>
         <source>%1&apos;s turn.</source>
-        <translation type="unfinished"/>
+        <translation>■%1のターン■</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="691"/>
@@ -3560,7 +3562,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="672"/>
         <source>Reveal random card to...</source>
-        <translation type="unfinished"/>
+        <translation>無作為に1枚選んで公開する</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="673"/>
@@ -3735,18 +3737,18 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="731"/>
         <source>X cards from the top of library...</source>
-        <translation type="unfinished"/>
+        <translation>ライブラリーの一番上からX枚...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1092"/>
         <location filename="../src/player.cpp" line="2778"/>
         <source>C&amp;reate another %1 token</source>
-        <translation type="unfinished"/>
+        <translation>別の%1トークンを出す</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1236"/>
         <source>Create tokens</source>
-        <translation type="unfinished"/>
+        <translation>トークンを作成</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1351"/>
@@ -3761,7 +3763,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="2080"/>
         <source>Place card X cards from top of library</source>
-        <translation type="unfinished"/>
+        <translation>ライブラリーの一番上からX枚を置く</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2080"/>
@@ -3772,7 +3774,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="2667"/>
         <location filename="../src/player.cpp" line="2685"/>
         <source>Attach to </source>
-        <translation type="unfinished"/>
+        <translation>つける</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2693"/>
@@ -4636,22 +4638,22 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="1054"/>
         <source>kicked by game host or moderator</source>
-        <translation type="unfinished"/>
+        <translation>ホストもしくはモデレーターからキックされた</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1057"/>
         <source>player left the game</source>
-        <translation type="unfinished"/>
+        <translation>プレイヤーはゲームから離脱した</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1060"/>
         <source>player disconnected from server</source>
-        <translation type="unfinished"/>
+        <translation>プレイヤーはサーバーから切断した</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1064"/>
         <source>reason unknown</source>
-        <translation type="unfinished"/>
+        <translation>原因不明</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1101"/>
@@ -5581,22 +5583,22 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/window_sets.cpp" line="101"/>
         <source>Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>デッキエディター</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="102"/>
         <source>Only cards in enabled sets will appear in the deck editor card list</source>
-        <translation type="unfinished"/>
+        <translation>有効にしたセットのカードのみがデッキエディタのカードリストに表示されます</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="103"/>
         <source>Card Art</source>
-        <translation type="unfinished"/>
+        <translation>カードアート</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="103"/>
         <source>Image priority is decided in the following order</source>
-        <translation type="unfinished"/>
+        <translation>画像の優先順位は、次の順序で決定されます</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="104"/>
@@ -5606,7 +5608,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/window_sets.cpp" line="105"/>
         <source>CUSTOM Folder</source>
-        <translation type="unfinished"/>
+        <translation>CUSTOMフォルダ</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="105"/>
@@ -5895,37 +5897,37 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1774"/>
         <source>Storm</source>
-        <translation type="unfinished"/>
+        <translation>ストーム</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1778"/>
         <source>W</source>
-        <translation type="unfinished"/>
+        <translation>白</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1782"/>
         <source>U</source>
-        <translation type="unfinished"/>
+        <translation>青</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1786"/>
         <source>B</source>
-        <translation type="unfinished"/>
+        <translation>黒</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1790"/>
         <source>R</source>
-        <translation type="unfinished"/>
+        <translation>赤</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1794"/>
         <source>G</source>
-        <translation type="unfinished"/>
+        <translation>緑</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1798"/>
         <source>X</source>
-        <translation type="unfinished"/>
+        <translation>無</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1806"/>

@@ -569,7 +569,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="../src/dlg_connect.cpp" line="57"/>
         <source>Public Servers</source>
-        <translation type="unfinished"/>
+        <translation>Servidores Públicos</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="79"/>
@@ -1509,12 +1509,12 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="117"/>
         <source>No Update Available</source>
-        <translation type="unfinished"/>
+        <translation>Sem atualização disponível</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="118"/>
         <source>Cockatrice is up to date!</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice está atualizado!</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="119"/>
@@ -1524,7 +1524,7 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="120"/>
         <source>Current version</source>
-        <translation type="unfinished"/>
+        <translation>Versão atual</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="121"/>
@@ -1535,36 +1535,36 @@ Please visit the download page to update manually.</source>
         <location filename="../src/dlg_update.cpp" line="131"/>
         <location filename="../src/dlg_update.cpp" line="141"/>
         <source>Update Available</source>
-        <translation type="unfinished"/>
+        <translation>Atualização disponível</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="132"/>
         <location filename="../src/dlg_update.cpp" line="142"/>
         <source>A new version of Cockatrice is available!</source>
-        <translation type="unfinished"/>
+        <translation>Uma nova versão do Cockatrice está disponível!</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="133"/>
         <location filename="../src/dlg_update.cpp" line="143"/>
         <source>New version</source>
-        <translation type="unfinished"/>
+        <translation>Nova versão</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="134"/>
         <location filename="../src/dlg_update.cpp" line="144"/>
         <source>Released</source>
-        <translation type="unfinished"/>
+        <translation>Lançado</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="134"/>
         <location filename="../src/dlg_update.cpp" line="144"/>
         <source>Changelog</source>
-        <translation type="unfinished"/>
+        <translation>Log de mudanças</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="135"/>
         <source>Do you want to update now?</source>
-        <translation type="unfinished"/>
+        <translation>Você quer atualizar agora?</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="145"/>
@@ -1580,7 +1580,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="178"/>
         <source>An error occurred while checking for updates:</source>
-        <translation type="unfinished"/>
+        <translation>Ocorreu um erro enquanto procurávamos por atualizações:</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="185"/>
@@ -1590,7 +1590,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="199"/>
         <source>Cockatrice is unable to open the installer.</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice está incapaz de abrir o instalador.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="200"/>
@@ -2307,7 +2307,7 @@ Isso geralmente significa que seu cliente está obsoleto, e o servidor enviou um
     <message>
         <location filename="../src/window_main.cpp" line="286"/>
         <source>Version</source>
-        <translation type="unfinished"/>
+        <translation>Versão</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="294"/>
@@ -2817,22 +2817,22 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="437"/>
         <source>%1 has left the game (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1 deixou o jogo (%2)</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="444"/>
         <source>%1 is not watching the game any more (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1 não está mais assistindo o jogo (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="597"/>
         <source>Untap</source>
-        <translation type="unfinished"/>
+        <translation>Desvirar</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="602"/>
         <source>Upkeep</source>
-        <translation type="unfinished"/>
+        <translation>Manutenção</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="607"/>
@@ -2842,37 +2842,37 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="612"/>
         <source>First Main</source>
-        <translation type="unfinished"/>
+        <translation>Fase Principal</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="617"/>
         <source>Beginning of Combat</source>
-        <translation type="unfinished"/>
+        <translation>Iniciando o Combate</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="622"/>
         <source>Declare Attackers</source>
-        <translation type="unfinished"/>
+        <translation>Declarar Atacantes</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="627"/>
         <source>Declare Blockers</source>
-        <translation type="unfinished"/>
+        <translation>Declarar Bloqueadores</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="632"/>
         <source>Combat Damage</source>
-        <translation type="unfinished"/>
+        <translation>Etapa de Dano de Combate</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="637"/>
         <source>End of Combat</source>
-        <translation type="unfinished"/>
+        <translation>Fim do Combate</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="642"/>
         <source>Second Main</source>
-        <translation type="unfinished"/>
+        <translation>Segunda Fase</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="647"/>
@@ -2882,12 +2882,12 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="652"/>
         <source>Unknown Phase</source>
-        <translation type="unfinished"/>
+        <translation>Fase Desconhecida</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="666"/>
         <source>%1&apos;s turn.</source>
-        <translation type="unfinished"/>
+        <translation>Turno de %1.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="691"/>
@@ -3563,7 +3563,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="672"/>
         <source>Reveal random card to...</source>
-        <translation type="unfinished"/>
+        <translation>Revele uma carta aleatória a...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="673"/>
@@ -3738,7 +3738,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="731"/>
         <source>X cards from the top of library...</source>
-        <translation type="unfinished"/>
+        <translation>X cartas do topo do grimório...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1092"/>
@@ -4639,7 +4639,7 @@ Por favor, entre um nome:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="1054"/>
         <source>kicked by game host or moderator</source>
-        <translation type="unfinished"/>
+        <translation>expulso pelo hospedador do jogo ou moderador.</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1057"/>
@@ -4649,12 +4649,12 @@ Por favor, entre um nome:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="1060"/>
         <source>player disconnected from server</source>
-        <translation type="unfinished"/>
+        <translation>jogador desconectado do servidor</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1064"/>
         <source>reason unknown</source>
-        <translation type="unfinished"/>
+        <translation>razão desconhecida</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1101"/>
@@ -5584,7 +5584,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/window_sets.cpp" line="101"/>
         <source>Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Editor de Deck</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="102"/>

@@ -137,12 +137,12 @@
         <source>Please enter the reason for the ban.
 This is only saved for moderators and cannot be seen by the banned person.</source>
         <translation>Voer een reden voor de ban in.
-Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de gebannen persoon.</translation>
+Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de verbannen persoon.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="91"/>
         <source>Please enter the reason for the ban that will be visible to the banned person.</source>
-        <translation>Voer een reden in die zichtbaar zal zijn voor de gebannen persoon.</translation>
+        <translation>Voer een reden in die zichtbaar zal zijn voor de verbannen persoon.</translation>
     </message>
     <message>
         <location filename="../src/userlist.cpp" line="94"/>
@@ -218,7 +218,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="64"/>
         <source>Color(s)</source>
-        <translation type="unfinished"/>
+        <translation>Kleur(en)</translation>
     </message>
 </context>
 <context>
@@ -445,7 +445,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/deckstats_interface.cpp" line="34"/>
         <source>The reply from the server could not be parsed.</source>
-        <translation>Het antwoord van de server kon niet geparset worden.</translation>
+        <translation>Het antwoord van de server kon niet geparsed worden.</translation>
     </message>
 </context>
 <context>
@@ -453,7 +453,7 @@ Dit wordt opgeslagen voor het moderatorteam en zal niet zichtbaar zijn voor de g
     <message>
         <location filename="../src/tab_game.cpp" line="140"/>
         <source>Load deck...</source>
-        <translation type="unfinished"/>
+        <translation>Deck laden...</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="141"/>
@@ -1932,7 +1932,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="310"/>
         <source>Notify if a feature supported by the server is missing in my client</source>
-        <translation type="unfinished"/>
+        <translation>Waarschuw als een functie die is ondersteund door de server mist in mijn client</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="311"/>
@@ -2029,7 +2029,7 @@ Will now login.</source>
     <message>
         <location filename="../src/window_main.cpp" line="201"/>
         <source>Number of players</source>
-        <translation type="unfinished"/>
+        <translation>Aantal spelers</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="201"/>
@@ -4992,7 +4992,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_supervisor.cpp" line="143"/>
         <source>Are you sure?</source>
-        <translation>Ben je zeker?</translation>
+        <translation>Weet je het zeker?</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="143"/>
