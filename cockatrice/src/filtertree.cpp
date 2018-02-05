@@ -299,8 +299,6 @@ bool FilterItem::relationCheck(int cardInfo) const
 {
     bool result, conversion;
 
-    result = (cardInfo term.left(1)
-
     result = (cardInfo == term.toInt(&conversion));
     if (!conversion) {
         int termInt = term.mid(1).toInt();
