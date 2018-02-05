@@ -298,12 +298,11 @@ bool FilterItem::acceptRarity(const CardInfoPtr info) const
 bool FilterItem::relationCheck(int cardInfo) const
 {
     bool result, conversion;
-    int termInt;
 
     result = (cardInfo == term.toInt(&conversion));
     if (!conversion)
     {
-        termInt = term.mid(1).toInt();
+        int termInt = term.mid(1).toInt();
         if (term.startsWith('<')) {
             result = (cardInfo < termInt);
         }
