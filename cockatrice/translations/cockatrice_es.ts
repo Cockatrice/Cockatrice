@@ -1571,12 +1571,12 @@ Por favor, visita la página de descargas para actualizarlo manualmente.</transl
         <location filename="../src/dlg_update.cpp" line="145"/>
         <source>Unfortunately there are no download packages available for your operating system. 
 You may have to build from source yourself.</source>
-        <translation type="unfinished"/>
+        <translation>Desafortunadamente no hay paquetes de descarga disponibles para su sistema operativo. Es posible que tenga que generar una versión propia a partir del código fuente. </translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="146"/>
         <source>Please check the download page manually and visit the wiki for instructions on compiling.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor revise la página de descargas manualmente y visite la wiki para instrucciones de como compilar.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="178"/>
@@ -1596,7 +1596,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="200"/>
         <source>Try to update manually by closing Cockatrice and running the installer.</source>
-        <translation type="unfinished"/>
+        <translation>Intente actualizar manualmente cerrando Cockatrice y ejecutando el instalador.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="201"/>
@@ -1868,7 +1868,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="294"/>
         <source>Paths (editing disabled in portable mode)</source>
-        <translation type="unfinished"/>
+        <translation>Rutas (edición deshabilitada en modo portatil)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="296"/>
@@ -2330,7 +2330,7 @@ Tienes que proporcionar el código recibido en el email de activación</translat
     <message>
         <location filename="../src/window_main.cpp" line="456"/>
         <source>It appears you are attempting to register a new account on this server yet you already have an account registered with the email provided. This server restricts the number of accounts a user can register per address.  Please contact the server operator for further assistance or to obtain your credential information.</source>
-        <translation type="unfinished"/>
+        <translation>Parece ser que usted está intentando registrar una cuenta nueva en este servidor; sin embargo usted ya tiene una cuetna registrada con el correo provisto. Este servidor restringe el número de cuentas que un usuario puede registrar por correo electrónico. Por favor contacte al operador del servidor para asistencia o para obtener la información de sus credenciales.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="459"/>
@@ -2830,7 +2830,7 @@ Cockatrice está recargando la base de datos de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="602"/>
         <source>Upkeep</source>
-        <translation type="unfinished"/>
+        <translation>Mantenimiento</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="607"/>
@@ -2840,47 +2840,47 @@ Cockatrice está recargando la base de datos de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="612"/>
         <source>First Main</source>
-        <translation type="unfinished"/>
+        <translation>Primera Fase Principal </translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="617"/>
         <source>Beginning of Combat</source>
-        <translation type="unfinished"/>
+        <translation>Comienzo del Combate</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="622"/>
         <source>Declare Attackers</source>
-        <translation type="unfinished"/>
+        <translation>Paso de Declarar Atacantes</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="627"/>
         <source>Declare Blockers</source>
-        <translation type="unfinished"/>
+        <translation>Paso de Declarar Bloqueadores</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="632"/>
         <source>Combat Damage</source>
-        <translation type="unfinished"/>
+        <translation>Paso de Daño de Combate</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="637"/>
         <source>End of Combat</source>
-        <translation type="unfinished"/>
+        <translation>Final del Combate</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="642"/>
         <source>Second Main</source>
-        <translation type="unfinished"/>
+        <translation>Segunda fase Principal</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="647"/>
         <source>End/Cleanup</source>
-        <translation type="unfinished"/>
+        <translation>Paso Final/Limpieza</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="652"/>
         <source>Unknown Phase</source>
-        <translation type="unfinished"/>
+        <translation>Fase Desconocida</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="666"/>
@@ -3562,7 +3562,7 @@ Cockatrice está recargando la base de datos de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="672"/>
         <source>Reveal random card to...</source>
-        <translation type="unfinished"/>
+        <translation>Revelar una carta al azar a...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="673"/>
@@ -3737,18 +3737,18 @@ Cockatrice está recargando la base de datos de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="731"/>
         <source>X cards from the top of library...</source>
-        <translation type="unfinished"/>
+        <translation>X cartas desde la parte superior de su biblioteca</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1092"/>
         <location filename="../src/player.cpp" line="2778"/>
         <source>C&amp;reate another %1 token</source>
-        <translation type="unfinished"/>
+        <translation>Crear otro token %1</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1236"/>
         <source>Create tokens</source>
-        <translation type="unfinished"/>
+        <translation>Crear fichas</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1351"/>
@@ -5607,7 +5607,7 @@ Por favor, absténgase de realizar de nuevo esta actividad o se tomarán medidas
     <message>
         <location filename="../src/window_sets.cpp" line="105"/>
         <source>CUSTOM Folder</source>
-        <translation type="unfinished"/>
+        <translation>Carpeta PERSONALIZADA</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="105"/>

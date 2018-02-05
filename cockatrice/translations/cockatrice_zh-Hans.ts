@@ -569,7 +569,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_connect.cpp" line="57"/>
         <source>Public Servers</source>
-        <translation type="unfinished"/>
+        <translation>公共服务器</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="79"/>
@@ -1476,7 +1476,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="24"/>
         <source>Current release channel</source>
-        <translation type="unfinished"/>
+        <translation>当前的发行通道</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="31"/>
@@ -1497,108 +1497,110 @@ Would you like to change your database location setting?</source>
         <location filename="../src/dlg_update.cpp" line="56"/>
         <source>Cockatrice was not built with SSL support, therefore you cannot download updates automatically! 
 Please visit the download page to update manually.</source>
-        <translation type="unfinished"/>
+        <translation>鸡蛇不支持建立SSL连接，因此你不能自动下载更新！
+请访问下载页面以手动更新。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="108"/>
         <source>Finished checking for updates</source>
-        <translation type="unfinished"/>
+        <translation>更新检查完成</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="117"/>
         <source>No Update Available</source>
-        <translation type="unfinished"/>
+        <translation>没有更新可用</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="118"/>
         <source>Cockatrice is up to date!</source>
-        <translation type="unfinished"/>
+        <translation>鸡蛇已经是最新的了！</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="119"/>
         <source>You are already running the latest version available in the chosen release channel.</source>
-        <translation type="unfinished"/>
+        <translation>你运行的已经是最新的发行版本了。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="120"/>
         <source>Current version</source>
-        <translation type="unfinished"/>
+        <translation>当前版本</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="121"/>
         <source>Selected release channel</source>
-        <translation type="unfinished"/>
+        <translation>选择发行渠道</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="131"/>
         <location filename="../src/dlg_update.cpp" line="141"/>
         <source>Update Available</source>
-        <translation type="unfinished"/>
+        <translation>更新可用</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="132"/>
         <location filename="../src/dlg_update.cpp" line="142"/>
         <source>A new version of Cockatrice is available!</source>
-        <translation type="unfinished"/>
+        <translation>鸡蛇有新版本可用！</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="133"/>
         <location filename="../src/dlg_update.cpp" line="143"/>
         <source>New version</source>
-        <translation type="unfinished"/>
+        <translation>新版本</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="134"/>
         <location filename="../src/dlg_update.cpp" line="144"/>
         <source>Released</source>
-        <translation type="unfinished"/>
+        <translation>发布</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="134"/>
         <location filename="../src/dlg_update.cpp" line="144"/>
         <source>Changelog</source>
-        <translation type="unfinished"/>
+        <translation>更新日志</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="135"/>
         <source>Do you want to update now?</source>
-        <translation type="unfinished"/>
+        <translation>你打算现在就更新吗？</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="145"/>
         <source>Unfortunately there are no download packages available for your operating system. 
 You may have to build from source yourself.</source>
-        <translation type="unfinished"/>
+        <translation>您的鸡蛇版本太旧，但没有适合您操作系统的更新包。
+您可能需要自行从源码编译鸡蛇。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="146"/>
         <source>Please check the download page manually and visit the wiki for instructions on compiling.</source>
-        <translation type="unfinished"/>
+        <translation>请点击检查下载页面，并访问wiki获取编译信息。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="178"/>
         <source>An error occurred while checking for updates:</source>
-        <translation type="unfinished"/>
+        <translation>检查更新时发生错误：</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="185"/>
         <source>An error occurred while downloading an update:</source>
-        <translation type="unfinished"/>
+        <translation>下载更新时发生错误：</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="199"/>
         <source>Cockatrice is unable to open the installer.</source>
-        <translation type="unfinished"/>
+        <translation>鸡蛇无法打开安装程序。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="200"/>
         <source>Try to update manually by closing Cockatrice and running the installer.</source>
-        <translation type="unfinished"/>
+        <translation>尝试关闭鸡蛇运行安装程序手动更新。</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="201"/>
         <source>Download location</source>
-        <translation type="unfinished"/>
+        <translation>下载区域信息</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="83"/>
@@ -1865,7 +1867,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="294"/>
         <source>Paths (editing disabled in portable mode)</source>
-        <translation type="unfinished"/>
+        <translation>路径(在便携模式下禁止编辑)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="296"/>
@@ -2303,7 +2305,7 @@ This usually means that your client version is out of date, and the server sent 
     <message>
         <location filename="../src/window_main.cpp" line="286"/>
         <source>Version</source>
-        <translation type="unfinished"/>
+        <translation>版本</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="294"/>
@@ -2325,7 +2327,7 @@ You need to provide the activation token received in the activation email.</sour
     <message>
         <location filename="../src/window_main.cpp" line="456"/>
         <source>It appears you are attempting to register a new account on this server yet you already have an account registered with the email provided. This server restricts the number of accounts a user can register per address.  Please contact the server operator for further assistance or to obtain your credential information.</source>
-        <translation type="unfinished"/>
+        <translation>看起来你正试图在这个服务器上注册一个新账户，但是你已经有了一个用提供的邮箱注册的账户。 此服务器限制每个邮箱地址可以注册用户帐户的数量。请联系服务器运营商以获得进一步帮助或获取您的凭据信息。</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="459"/>
@@ -2487,7 +2489,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/window_main.cpp" line="551"/>
         <source>Check for Client Updates</source>
-        <translation type="unfinished"/>
+        <translation>检查客户端更新</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="552"/>
@@ -2797,7 +2799,7 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="343"/>
         <source>%1 puts %2%3 into their library %4 cards from the top.</source>
-        <translation type="unfinished"/>
+        <translation>%1将%2%3放入牌库%4张牌放在牌库顶</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="346"/>
@@ -2812,77 +2814,77 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="437"/>
         <source>%1 has left the game (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1 已经离开了游戏(%2)。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="444"/>
         <source>%1 is not watching the game any more (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1 不再旁观游戏(%2)。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="597"/>
         <source>Untap</source>
-        <translation type="unfinished"/>
+        <translation>重置阶段</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="602"/>
         <source>Upkeep</source>
-        <translation type="unfinished"/>
+        <translation>维持阶段</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="607"/>
         <source>Draw</source>
-        <translation type="unfinished"/>
+        <translation>抓牌阶段</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="612"/>
         <source>First Main</source>
-        <translation type="unfinished"/>
+        <translation>主要阶段1</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="617"/>
         <source>Beginning of Combat</source>
-        <translation type="unfinished"/>
+        <translation>战斗开始阶段</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="622"/>
         <source>Declare Attackers</source>
-        <translation type="unfinished"/>
+        <translation>宣告进攻阶段</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="627"/>
         <source>Declare Blockers</source>
-        <translation type="unfinished"/>
+        <translation>宣告阻挡阶段</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="632"/>
         <source>Combat Damage</source>
-        <translation type="unfinished"/>
+        <translation>战斗伤害阶段</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="637"/>
         <source>End of Combat</source>
-        <translation type="unfinished"/>
+        <translation>战斗结束阶段</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="642"/>
         <source>Second Main</source>
-        <translation type="unfinished"/>
+        <translation>主要阶段2</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="647"/>
         <source>End/Cleanup</source>
-        <translation type="unfinished"/>
+        <translation>结束/清理阶段</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="652"/>
         <source>Unknown Phase</source>
-        <translation type="unfinished"/>
+        <translation>未知阶段</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="666"/>
         <source>%1&apos;s turn.</source>
-        <translation type="unfinished"/>
+        <translation>现在是%1的回合。</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="691"/>
@@ -3558,7 +3560,7 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
     <message>
         <location filename="../src/player.cpp" line="672"/>
         <source>Reveal random card to...</source>
-        <translation type="unfinished"/>
+        <translation>随机展示牌给...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="673"/>
@@ -3733,18 +3735,18 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
     <message>
         <location filename="../src/player.cpp" line="731"/>
         <source>X cards from the top of library...</source>
-        <translation type="unfinished"/>
+        <translation>从牌库顶X张牌...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1092"/>
         <location filename="../src/player.cpp" line="2778"/>
         <source>C&amp;reate another %1 token</source>
-        <translation type="unfinished"/>
+        <translation>创造%1个衍生物</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1236"/>
         <source>Create tokens</source>
-        <translation type="unfinished"/>
+        <translation>创造一个衍生物</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1351"/>
@@ -3759,18 +3761,18 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
     <message>
         <location filename="../src/player.cpp" line="2080"/>
         <source>Place card X cards from top of library</source>
-        <translation type="unfinished"/>
+        <translation>查看牌库顶X张牌</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2080"/>
         <source>How many cards from the top of the deck should this card be placed:</source>
-        <translation type="unfinished"/>
+        <translation>多少张牌应该放在牌库顶：</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2667"/>
         <location filename="../src/player.cpp" line="2685"/>
         <source>Attach to </source>
-        <translation type="unfinished"/>
+        <translation>结附于</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2693"/>
@@ -4634,22 +4636,22 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="1054"/>
         <source>kicked by game host or moderator</source>
-        <translation type="unfinished"/>
+        <translation>被游戏主机或管理器踢出</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1057"/>
         <source>player left the game</source>
-        <translation type="unfinished"/>
+        <translation>玩家离开游戏</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1060"/>
         <source>player disconnected from server</source>
-        <translation type="unfinished"/>
+        <translation>玩家与服务器断开连接</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1064"/>
         <source>reason unknown</source>
-        <translation type="unfinished"/>
+        <translation>原因不明</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1101"/>
@@ -5579,42 +5581,42 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/window_sets.cpp" line="101"/>
         <source>Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>套牌编辑器</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="102"/>
         <source>Only cards in enabled sets will appear in the deck editor card list</source>
-        <translation type="unfinished"/>
+        <translation>套牌编辑器卡牌列表将只显示已启用卡组牌张</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="103"/>
         <source>Card Art</source>
-        <translation type="unfinished"/>
+        <translation>牌张风格</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="103"/>
         <source>Image priority is decided in the following order</source>
-        <translation type="unfinished"/>
+        <translation>图片使用的优先级由以下规则决定</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="104"/>
         <source>The</source>
-        <translation type="unfinished"/>
+        <translation>这个</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="105"/>
         <source>CUSTOM Folder</source>
-        <translation type="unfinished"/>
+        <translation>自定义文件夹</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="105"/>
         <source>Enabled Sets (Top to Bottom)</source>
-        <translation type="unfinished"/>
+        <translation>启用的系列(从上到下)</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="105"/>
         <source>Disabled Sets (Top to Bottom)</source>
-        <translation type="unfinished"/>
+        <translation>禁用的系列(从上到下)</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="131"/>
@@ -5893,37 +5895,37 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1774"/>
         <source>Storm</source>
-        <translation type="unfinished"/>
+        <translation>风暴</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1778"/>
         <source>W</source>
-        <translation type="unfinished"/>
+        <translation>白</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1782"/>
         <source>U</source>
-        <translation type="unfinished"/>
+        <translation>蓝</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1786"/>
         <source>B</source>
-        <translation type="unfinished"/>
+        <translation>黑</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1790"/>
         <source>R</source>
-        <translation type="unfinished"/>
+        <translation>红</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1794"/>
         <source>G</source>
-        <translation type="unfinished"/>
+        <translation>绿</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1798"/>
         <source>X</source>
-        <translation type="unfinished"/>
+        <translation>可变法术力</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1806"/>

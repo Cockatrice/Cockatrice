@@ -569,7 +569,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_connect.cpp" line="57"/>
         <source>Public Servers</source>
-        <translation type="unfinished"/>
+        <translation>Δημόσιοι Σέρβερ</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="79"/>
@@ -1075,7 +1075,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="29"/>
         <source>Oops, looks like something has gone wrong.  Please restart the forgot password process by using the forgot password button on the connection screen.</source>
-        <translation type="unfinished"/>
+        <translation>Ουπς, κάτι πήγε στραβά. Παρακαλώ ξαναρχίστε τη διαδικασία ανάκτησης κωδικού πρόσβασης πατώντας το κουμπί ανάκτησης κωδικού στην οθόνη σύνδεσης</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="33"/>
@@ -1105,7 +1105,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_forgotpasswordchallenge.cpp" line="86"/>
         <source>The email address can&apos;t be empty.</source>
-        <translation type="unfinished"/>
+        <translation>Η διεύθυνση e-mail δεν μπορεί να είναι άδεια</translation>
     </message>
 </context>
 <context>
@@ -1219,7 +1219,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="34"/>
         <source>Load deck from clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Φόρτωση deck από το clipboard</translation>
     </message>
     <message>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="67"/>
@@ -1231,7 +1231,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="67"/>
         <location filename="../src/dlg_load_deck_from_clipboard.cpp" line="75"/>
         <source>Invalid deck list.</source>
-        <translation type="unfinished"/>
+        <translation>Μη έγκυρο deck list</translation>
     </message>
 </context>
 <context>
@@ -1267,7 +1267,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_register.cpp" line="33"/>
         <source>Password (again):</source>
-        <translation type="unfinished"/>
+        <translation>Κωδικός (ξανά):</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="38"/>
@@ -1277,7 +1277,7 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_register.cpp" line="42"/>
         <source>Email (again):</source>
-        <translation type="unfinished"/>
+        <translation>Διεύθυνση e-mail (ξανά):</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="46"/>
@@ -1297,19 +1297,19 @@ Make sure to enable the &apos;token set&apos; in the &apos;Edit sets...&apos; di
     <message>
         <location filename="../src/dlg_register.cpp" line="337"/>
         <source>Register to server</source>
-        <translation type="unfinished"/>
+        <translation>Εγγραφή σε διακομιστή</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="346"/>
         <location filename="../src/dlg_register.cpp" line="351"/>
         <location filename="../src/dlg_register.cpp" line="356"/>
         <source>Registration Warning</source>
-        <translation type="unfinished"/>
+        <translation>Προειδοποίηση Εγγραφής</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="346"/>
         <source>Your passwords do not match, please try again.</source>
-        <translation type="unfinished"/>
+        <translation>Οι κωδικοί δεν ταιριάζουν, παρακαλώ προσπαθήστε ξανά</translation>
     </message>
     <message>
         <location filename="../src/dlg_register.cpp" line="351"/>
@@ -1349,7 +1349,13 @@ This can cause problems loading card information or images
 Usually this can be fixed by rerunning oracle to to update your card database.
 
 Would you like to change your database location setting?</source>
-        <translation type="unfinished"/>
+        <translation>Η έκδοση της βάσης δεδομένων των καρτών είναι πολύ παλιά.
+
+Αυτό μπορεί να προκαλέσει προβλήματα στη φόρτωση πληροφοριών για τις κάρτες ή τις εικόνες
+
+Συνήθως αυτό φτιάχνεται ξανατρέχοντας το oracle για να επικαιροποιήσετε τη βάση δεδομένων σας.
+
+Θα θέλατε να αλλάξετε τη ρυθμισμένη θέση της βάσης δεδομένων σας;</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="906"/>
@@ -1403,7 +1409,7 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="950"/>
         <source>Settings</source>
-        <translation type="unfinished"/>
+        <translation>Ρυθμίσεις</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="952"/>
@@ -1413,17 +1419,17 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="953"/>
         <source>Appearance</source>
-        <translation type="unfinished"/>
+        <translation>Εμφάνιση</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="954"/>
         <source>User Interface</source>
-        <translation type="unfinished"/>
+        <translation>Διεπαφή Χρήστη</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="955"/>
         <source>Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Επεξεργασία Deck</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="956"/>
@@ -1433,12 +1439,12 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="957"/>
         <source>Sound</source>
-        <translation type="unfinished"/>
+        <translation>Ήχος</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="958"/>
         <source>Shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Συντομεύσεις</translation>
     </message>
 </context>
 <context>
@@ -1454,22 +1460,22 @@ Would you like to change your database location setting?</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="24"/>
         <source>Current release channel</source>
-        <translation type="unfinished"/>
+        <translation>Τρέχον κανάλι έκδοσης</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="31"/>
         <source>Reinstall</source>
-        <translation type="unfinished"/>
+        <translation>Επανεγκατάσταση</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="32"/>
         <source>Cancel Download</source>
-        <translation type="unfinished"/>
+        <translation>Ακύρωση Κατεβάσματος</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="33"/>
         <source>Open Download Page</source>
-        <translation type="unfinished"/>
+        <translation>Άνοιγμα Σελίδας Κατεβάσματος</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="56"/>
@@ -1480,50 +1486,50 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="108"/>
         <source>Finished checking for updates</source>
-        <translation type="unfinished"/>
+        <translation>Ο έλεγχος για ενημερώσεις ολοκληρώθηκε</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="117"/>
         <source>No Update Available</source>
-        <translation type="unfinished"/>
+        <translation>Καμία Διαθέσιμη Ενημέρωση</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="118"/>
         <source>Cockatrice is up to date!</source>
-        <translation type="unfinished"/>
+        <translation>Το Cockatrice είναι πλήρως ενημερωμένο!</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="119"/>
         <source>You are already running the latest version available in the chosen release channel.</source>
-        <translation type="unfinished"/>
+        <translation>Ήδη τρέχετε την πιό πρόσφατη έκδοση διαθέσιμη σε αυτό το κανάλι.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="120"/>
         <source>Current version</source>
-        <translation type="unfinished"/>
+        <translation>Τρέχουσα έκδοση</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="121"/>
         <source>Selected release channel</source>
-        <translation type="unfinished"/>
+        <translation>Επιλεγμένο κανάλι έκδοσης</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="131"/>
         <location filename="../src/dlg_update.cpp" line="141"/>
         <source>Update Available</source>
-        <translation type="unfinished"/>
+        <translation>Υπάρχει Διαθέσιμη Ενημέρωση</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="132"/>
         <location filename="../src/dlg_update.cpp" line="142"/>
         <source>A new version of Cockatrice is available!</source>
-        <translation type="unfinished"/>
+        <translation>Μία νέα έκδοση του Cockatrice είναι διαθέσιμη!</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="133"/>
         <location filename="../src/dlg_update.cpp" line="143"/>
         <source>New version</source>
-        <translation type="unfinished"/>
+        <translation>Νέα έκδοση</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="134"/>
@@ -1535,12 +1541,12 @@ Please visit the download page to update manually.</source>
         <location filename="../src/dlg_update.cpp" line="134"/>
         <location filename="../src/dlg_update.cpp" line="144"/>
         <source>Changelog</source>
-        <translation type="unfinished"/>
+        <translation>Αρχείο Αλλαγών</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="135"/>
         <source>Do you want to update now?</source>
-        <translation type="unfinished"/>
+        <translation>Θέλετε να ενημερώσετε τώρα;</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="145"/>
@@ -1672,7 +1678,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gameselector.cpp" line="176"/>
         <source>Password:</source>
-        <translation type="unfinished"/>
+        <translation>Κωδικός:</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="189"/>
@@ -1692,22 +1698,22 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gameselector.cpp" line="207"/>
         <source>C&amp;lear filter</source>
-        <translation type="unfinished"/>
+        <translation>Καθάρισμα Φίλτρου</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="209"/>
         <source>C&amp;reate</source>
-        <translation type="unfinished"/>
+        <translation>Δημιουργία</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="210"/>
         <source>&amp;Join</source>
-        <translation type="unfinished"/>
+        <translation>Είσοδος</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="211"/>
         <source>J&amp;oin as spectator</source>
-        <translation type="unfinished"/>
+        <translation>Είσοδος ως θεατής</translation>
     </message>
 </context>
 <context>
@@ -1715,83 +1721,83 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gamesmodel.cpp" line="17"/>
         <source>New</source>
-        <translation type="unfinished"/>
+        <translation>Νέο</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="109"/>
         <source>password</source>
-        <translation type="unfinished"/>
+        <translation>κωδικός</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="111"/>
         <source>buddies only</source>
-        <translation type="unfinished"/>
+        <translation>μόνο φίλοι</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="113"/>
         <source>reg. users only</source>
-        <translation type="unfinished"/>
+        <translation>μόνο εγγεγραμμένοι χρήστες</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="145"/>
         <location filename="../src/gamesmodel.cpp" line="149"/>
         <source>can chat</source>
-        <translation type="unfinished"/>
+        <translation>μπορούν να συνομιλήσουν</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="145"/>
         <source>see hands</source>
-        <translation type="unfinished"/>
+        <translation>βλέπουν τα χέρια</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="153"/>
         <source>can see hands</source>
-        <translation type="unfinished"/>
+        <translation>μπορούν να δούν τα χέρια</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="158"/>
         <source>not allowed</source>
-        <translation type="unfinished"/>
+        <translation>δεν επιτρέπεται</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="174"/>
         <source>Room</source>
-        <translation type="unfinished"/>
+        <translation>Δωμάτιο</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="178"/>
         <source>Age</source>
-        <translation type="unfinished"/>
+        <translation>Ηλικία</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="185"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Τύπος</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="183"/>
         <source>Description</source>
-        <translation type="unfinished"/>
+        <translation>Περιγραφή</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="184"/>
         <source>Creator</source>
-        <translation type="unfinished"/>
+        <translation>Δημιουργός</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="186"/>
         <source>Restrictions</source>
-        <translation type="unfinished"/>
+        <translation>Περιορισμοί</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="190"/>
         <source>Players</source>
-        <translation type="unfinished"/>
+        <translation>Παίκτες</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="195"/>
         <source>Spectators</source>
-        <translation type="unfinished"/>
+        <translation>Θεατές</translation>
     </message>
 </context>
 <context>
@@ -1803,12 +1809,12 @@ You may have to build from source yourself.</source>
         <location filename="../src/dlg_settings.cpp" line="263"/>
         <location filename="../src/dlg_settings.cpp" line="273"/>
         <source>Choose path</source>
-        <translation type="unfinished"/>
+        <translation>Επιλέξτε θέση</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="256"/>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Επιτυχία</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="256"/>
@@ -1818,7 +1824,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="258"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="258"/>
@@ -1833,7 +1839,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="289"/>
         <source>Language:</source>
-        <translation type="unfinished"/>
+        <translation>Γλώσσα:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="290"/>
@@ -1853,42 +1859,42 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="299"/>
         <source>Decks directory:</source>
-        <translation type="unfinished"/>
+        <translation>Φάκελος deck:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="300"/>
         <source>Replays directory:</source>
-        <translation type="unfinished"/>
+        <translation>Φάκελος replay:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="301"/>
         <source>Pictures directory:</source>
-        <translation type="unfinished"/>
+        <translation>Φάκελος εικόνων:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="302"/>
         <source>Card database:</source>
-        <translation type="unfinished"/>
+        <translation>Βάση δεδομένων καρτών</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="303"/>
         <source>Token database:</source>
-        <translation type="unfinished"/>
+        <translation>Βάση δεδομένων token:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="304"/>
         <source>Picture cache size:</source>
-        <translation type="unfinished"/>
+        <translation>Μέγεθος cache εικόνων:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="305"/>
         <source>Primary download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Πρωτεύον URL κατεβάσματος:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="306"/>
         <source>Fallback download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Εφεδρικό URL κατεβάσματος:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="307"/>
@@ -1898,7 +1904,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="308"/>
         <source>Reset/clear downloaded pictures</source>
-        <translation type="unfinished"/>
+        <translation>Ανανέωση/Καθαρισμός κατεβασμένων εικόνων</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="309"/>
@@ -2071,22 +2077,22 @@ Will now login.</source>
     <message>
         <location filename="../src/window_main.cpp" line="296"/>
         <source>Support:</source>
-        <translation type="unfinished"/>
+        <translation>Υποστήριξη:</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="297"/>
         <source>Report an Issue</source>
-        <translation type="unfinished"/>
+        <translation>Αναφορά Προβλήματος</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="298"/>
         <source>Troubleshooting</source>
-        <translation type="unfinished"/>
+        <translation>Αντιμετώπιση Προβλημάτων</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="299"/>
         <source>F.A.Q.</source>
-        <translation type="unfinished"/>
+        <translation>Συχνές Ερωτήσεις</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="326"/>
@@ -2109,7 +2115,7 @@ Will now login.</source>
         <location filename="../src/window_main.cpp" line="915"/>
         <location filename="../src/window_main.cpp" line="951"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Σφάλμα</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="326"/>
@@ -2119,7 +2125,7 @@ Will now login.</source>
     <message>
         <location filename="../src/window_main.cpp" line="342"/>
         <source>Failed Login</source>
-        <translation type="unfinished"/>
+        <translation>Αποτυχημένη Σύνδεση</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="349"/>
@@ -2136,18 +2142,18 @@ Please close that session first and re-login.</source>
         <location filename="../src/window_main.cpp" line="357"/>
         <location filename="../src/window_main.cpp" line="464"/>
         <source>You are banned until %1.</source>
-        <translation type="unfinished"/>
+        <translation>Είστε αποκλεισμένος μέχρι %1.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="359"/>
         <location filename="../src/window_main.cpp" line="466"/>
         <source>You are banned indefinitely.</source>
-        <translation type="unfinished"/>
+        <translation>Είστε αποκλεισμένος επ&apos; αόριστον.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="371"/>
         <source>This server requires user registration. Do you want to register now?</source>
-        <translation type="unfinished"/>
+        <translation>Ο σέρβερ απαιτεί εγγραφή. Θέλετε να εγγραφείτε τώρα;</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="376"/>
@@ -2163,17 +2169,17 @@ Please close and reopen your client to try again.</source>
     <message>
         <location filename="../src/window_main.cpp" line="383"/>
         <source>Account activation</source>
-        <translation type="unfinished"/>
+        <translation>Ενεργοποίηση λογαριασμού</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="393"/>
         <source>Server Full</source>
-        <translation type="unfinished"/>
+        <translation>Σέρβερ Πλήρης</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="397"/>
         <source>Unknown login error: %1</source>
-        <translation type="unfinished"/>
+        <translation>Άγνωστο σφάλμα σύνδεσης: %1</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="397"/>
@@ -2273,12 +2279,12 @@ This usually means that your client version is out of date, and the server sent 
     <message>
         <location filename="../src/window_main.cpp" line="286"/>
         <source>Version</source>
-        <translation type="unfinished"/>
+        <translation>Έκδοση</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="294"/>
         <source>Our Translators</source>
-        <translation type="unfinished"/>
+        <translation>Οι μεταφραστές μας</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="383"/>
@@ -2363,17 +2369,17 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/window_main.cpp" line="526"/>
         <source>&amp;Connect...</source>
-        <translation type="unfinished"/>
+        <translation>Σύνδεση...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="527"/>
         <source>&amp;Disconnect</source>
-        <translation type="unfinished"/>
+        <translation>Αποσύνδεση</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="528"/>
         <source>Start &amp;local game...</source>
-        <translation type="unfinished"/>
+        <translation>Έναρξη τοπικού παιχνιδιού...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="529"/>
@@ -2383,28 +2389,28 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/window_main.cpp" line="530"/>
         <source>&amp;Deck editor</source>
-        <translation type="unfinished"/>
+        <translation>Επεξεργασία Deck</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="531"/>
         <source>&amp;Full screen</source>
-        <translation type="unfinished"/>
+        <translation>Πλήρης οθόνη</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="532"/>
         <source>&amp;Register to server...</source>
-        <translation type="unfinished"/>
+        <translation>Εγγραφή σε σέρβερ...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="533"/>
         <source>&amp;Settings...</source>
-        <translation type="unfinished"/>
+        <translation>Ρυθμίσεις...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="535"/>
         <location filename="../src/window_main.cpp" line="762"/>
         <source>&amp;Exit</source>
-        <translation type="unfinished"/>
+        <translation>Έξοδος</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="538"/>
@@ -2414,12 +2420,12 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/window_main.cpp" line="540"/>
         <source>&amp;Cockatrice</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Cockatrice</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="543"/>
         <source>C&amp;ard Database</source>
-        <translation type="unfinished"/>
+        <translation>Βάση δεδομένων καρτών</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="544"/>
@@ -2439,22 +2445,22 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/window_main.cpp" line="547"/>
         <source>&amp;Edit sets...</source>
-        <translation type="unfinished"/>
+        <translation>Επεξεργασία σετ...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="548"/>
         <source>Edit &amp;tokens...</source>
-        <translation type="unfinished"/>
+        <translation>Επεξεργασία tokens...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="550"/>
         <source>&amp;About Cockatrice</source>
-        <translation type="unfinished"/>
+        <translation>Σχετικά με το Cockatrice</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="551"/>
         <source>Check for Client Updates</source>
-        <translation type="unfinished"/>
+        <translation>Έλεγχος για ενημερώσεις</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="552"/>
@@ -2464,17 +2470,17 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/window_main.cpp" line="553"/>
         <source>&amp;Help</source>
-        <translation type="unfinished"/>
+        <translation>Βοήθεια</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="554"/>
         <source>Check for card updates...</source>
-        <translation type="unfinished"/>
+        <translation>Έλεγχος για ενημερώσεις καρτών...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="821"/>
         <source>Card database</source>
-        <translation type="unfinished"/>
+        <translation>Βάση δεδομένων καρτών</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="823"/>
@@ -2487,23 +2493,23 @@ If unsure or first time user, choose &quot;Yes&quot;</source>
         <location filename="../src/window_main.cpp" line="827"/>
         <location filename="../src/window_main.cpp" line="852"/>
         <source>Yes</source>
-        <translation type="unfinished"/>
+        <translation>Ναι</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="828"/>
         <location filename="../src/window_main.cpp" line="853"/>
         <source>No</source>
-        <translation type="unfinished"/>
+        <translation>Όχι</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="829"/>
         <source>Open settings</source>
-        <translation type="unfinished"/>
+        <translation>Άνοιγμα ρυθμίσεων</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="844"/>
         <source>New sets found</source>
-        <translation type="unfinished"/>
+        <translation>Βρέθηκαν νέα σετ</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="847"/>
@@ -2515,12 +2521,12 @@ Do you want to enable it/them?</source>
     <message>
         <location filename="../src/window_main.cpp" line="854"/>
         <source>View sets</source>
-        <translation type="unfinished"/>
+        <translation>Εμφάνιση σετ</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="871"/>
         <source>Welcome</source>
-        <translation type="unfinished"/>
+        <translation>Καλωσήρθατε</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="871"/>
@@ -2534,7 +2540,7 @@ Read more about changing the set order or disabling specific sets and consequent
         <location filename="../src/window_main.cpp" line="959"/>
         <location filename="../src/window_main.cpp" line="983"/>
         <source>Information</source>
-        <translation type="unfinished"/>
+        <translation>Πληροφορίες</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="881"/>
@@ -2549,12 +2555,12 @@ Read more about changing the set order or disabling specific sets and consequent
     <message>
         <location filename="../src/window_main.cpp" line="928"/>
         <source>failed to start.</source>
-        <translation type="unfinished"/>
+        <translation>απέτυχε να ξεκινήσει.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="931"/>
         <source>crashed.</source>
-        <translation type="unfinished"/>
+        <translation>κράσαρε.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="934"/>
@@ -2564,17 +2570,17 @@ Read more about changing the set order or disabling specific sets and consequent
     <message>
         <location filename="../src/window_main.cpp" line="937"/>
         <source>write error.</source>
-        <translation type="unfinished"/>
+        <translation>σφάλμα εγγραφής.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="940"/>
         <source>read error.</source>
-        <translation type="unfinished"/>
+        <translation>σφάλμα ανάγνωσης.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="944"/>
         <source>unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>άγνωστο σφάλμα.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="951"/>
@@ -2597,7 +2603,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/window_main.cpp" line="1126"/>
         <location filename="../src/window_main.cpp" line="1134"/>
         <source>Forgot Password</source>
-        <translation type="unfinished"/>
+        <translation>Ανάκτηση κωδικού</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1118"/>
@@ -2621,7 +2627,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/window_main.cpp" line="1072"/>
         <location filename="../src/window_main.cpp" line="1077"/>
         <source>Load sets/cards</source>
-        <translation type="unfinished"/>
+        <translation>Φόρτωση σετ/καρτών</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="983"/>
@@ -2634,7 +2640,7 @@ To update your client, go to Help -&gt; Check for Updates.</source>
     <message>
         <location filename="../src/window_main.cpp" line="1033"/>
         <source>Selected file cannot be found.</source>
-        <translation type="unfinished"/>
+        <translation>Το επιλεγμένο αρχείο δε βρέθηκε.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1072"/>
@@ -2653,103 +2659,103 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="407"/>
         <source>The game has been closed.</source>
-        <translation type="unfinished"/>
+        <translation>Το παιχνίδι έχει κλείσει</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="431"/>
         <source>You have been kicked out of the game.</source>
-        <translation type="unfinished"/>
+        <translation>Σας απέβαλαν από το παιχνίδι.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="425"/>
         <source>%1 is now watching the game.</source>
-        <translation type="unfinished"/>
+        <translation>Ο/Η %1 παρακολουθεί το παιχνίδι.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="268"/>
         <source>%1 has loaded a deck (%2).</source>
-        <translation type="unfinished"/>
+        <translation>Ο/Η %1 φόρτωσε ένα deck (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="272"/>
         <source>%1 has loaded a deck with %2 sideboard cards (%3).</source>
-        <translation type="unfinished"/>
+        <translation>Ο/Η %1 φόρτωσε ένα deck με %2 κάτρες στο sideboard (%3).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="412"/>
         <source>The game has started.</source>
-        <translation type="unfinished"/>
+        <translation>Το παιχνίδι ξεκίνησε.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="79"/>
         <source> from play</source>
-        <translation type="unfinished"/>
+        <translation>από το παιχνίδι</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="83"/>
         <source> from exile</source>
-        <translation type="unfinished"/>
+        <translation>από την εξορία</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="90"/>
         <source>the top card of %1&apos;s library</source>
-        <translation type="unfinished"/>
+        <translation>την πρώτη κάρτα της βιβλιοθήκης του/της %1</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="96"/>
         <source> from the top of %1&apos;s library</source>
-        <translation type="unfinished"/>
+        <translation>από την κορυφή της βιβλιοθήκης του/της %1</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="103"/>
         <source>the bottom card of %1&apos;s library</source>
-        <translation type="unfinished"/>
+        <translation>την τελευταία κάρτα της βιβλιοθήκης του/της %1</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="109"/>
         <source> from the bottom of %1&apos;s library</source>
-        <translation type="unfinished"/>
+        <translation>από το τέλος της βιβλιοθήκης του/της %1</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="115"/>
         <source> from %1&apos;s library</source>
-        <translation type="unfinished"/>
+        <translation>από τη βιβλιοθήκη του/της %1</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="120"/>
         <source> from sideboard</source>
-        <translation type="unfinished"/>
+        <translation>από το sideboard</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="122"/>
         <source> from the stack</source>
-        <translation type="unfinished"/>
+        <translation>από το stack</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="306"/>
         <location filename="../src/messagelogwidget.cpp" line="515"/>
         <source>a card</source>
-        <translation type="unfinished"/>
+        <translation>μία κάρτα</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="312"/>
         <source>%1 gives %2 control over %3.</source>
-        <translation type="unfinished"/>
+        <translation>ο/η %1 δίνει στον/στην %2 τον έλεγχο του %3 .</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="324"/>
         <source>%1 puts %2 into play tapped%3.</source>
-        <translation type="unfinished"/>
+        <translation>ο/η %1 βάζει στο παιχνίδι το %2 εξαντλημένο%3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="326"/>
         <source>%1 puts %2 into play%3.</source>
-        <translation type="unfinished"/>
+        <translation>ο/η %1 βάζει στο παιχνίδι το %2%3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="330"/>
         <source>%1 exiles %2%3.</source>
-        <translation type="unfinished"/>
+        <translation>ο/η %1 εξορίζει το %2%3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="343"/>

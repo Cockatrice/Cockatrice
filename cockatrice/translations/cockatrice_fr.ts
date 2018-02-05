@@ -1478,7 +1478,7 @@ Voulez vous changer les paramètres d&apos;emplacement de base de données ?</tr
     <message>
         <location filename="../src/dlg_update.cpp" line="24"/>
         <source>Current release channel</source>
-        <translation type="unfinished"/>
+        <translation>Branche logiciel actuelle</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="31"/>
@@ -1519,7 +1519,7 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="119"/>
         <source>You are already running the latest version available in the chosen release channel.</source>
-        <translation type="unfinished"/>
+        <translation>Vous avez déjà la dernière version correspondant à votre branche</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="120"/>
@@ -1529,7 +1529,7 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="121"/>
         <source>Selected release channel</source>
-        <translation type="unfinished"/>
+        <translation>Branche logiciel selectionnée</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="131"/>
@@ -1591,17 +1591,17 @@ Vous devez compiler les sources vous-même.</translation>
     <message>
         <location filename="../src/dlg_update.cpp" line="199"/>
         <source>Cockatrice is unable to open the installer.</source>
-        <translation type="unfinished"/>
+        <translation>cockatrice n&apos;a pas pu ouvrir l&apos;installateur</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="200"/>
         <source>Try to update manually by closing Cockatrice and running the installer.</source>
-        <translation type="unfinished"/>
+        <translation>Essayer de mettre à jour manuellement en fermant Cockatrice et en exécutant l&apos;installateur</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="201"/>
         <source>Download location</source>
-        <translation type="unfinished"/>
+        <translation>Répertoire de téléchargement</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="83"/>
@@ -1868,7 +1868,7 @@ Vous devez compiler les sources vous-même.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="294"/>
         <source>Paths (editing disabled in portable mode)</source>
-        <translation type="unfinished"/>
+        <translation>Chemins (édition impossible en mode portable)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="296"/>
@@ -2800,7 +2800,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="343"/>
         <source>%1 puts %2%3 into their library %4 cards from the top.</source>
-        <translation type="unfinished"/>
+        <translation>%1 met %2%3 dans sa bibliothèque %4 cartes depuis le dessus</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="346"/>
@@ -3561,7 +3561,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/player.cpp" line="672"/>
         <source>Reveal random card to...</source>
-        <translation type="unfinished"/>
+        <translation>révéler une carte aléatoire à ...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="673"/>
@@ -3736,13 +3736,13 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/player.cpp" line="731"/>
         <source>X cards from the top of library...</source>
-        <translation type="unfinished"/>
+        <translation>X cartes du dessus de la bibliothèque ...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1092"/>
         <location filename="../src/player.cpp" line="2778"/>
         <source>C&amp;reate another %1 token</source>
-        <translation type="unfinished"/>
+        <translation>Créer un autre jeton %1</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1236"/>
@@ -3767,7 +3767,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/player.cpp" line="2080"/>
         <source>How many cards from the top of the deck should this card be placed:</source>
-        <translation type="unfinished"/>
+        <translation>A quelle place depuis le dessus de la bibliothèque cette carte doit elle être placée:</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2667"/>
@@ -5587,37 +5587,37 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/window_sets.cpp" line="102"/>
         <source>Only cards in enabled sets will appear in the deck editor card list</source>
-        <translation type="unfinished"/>
+        <translation>Seul les cartes des éditions activées apparaissent dans la liste des cartes de l&apos;éditeur de deck</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="103"/>
         <source>Card Art</source>
-        <translation type="unfinished"/>
+        <translation>Images des cartes</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="103"/>
         <source>Image priority is decided in the following order</source>
-        <translation type="unfinished"/>
+        <translation>La priorité des images est décidé dans l&apos;ordre suivant</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="104"/>
         <source>The</source>
-        <translation type="unfinished"/>
+        <translation>Le</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="105"/>
         <source>CUSTOM Folder</source>
-        <translation type="unfinished"/>
+        <translation>Répertoire personnalisé</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="105"/>
         <source>Enabled Sets (Top to Bottom)</source>
-        <translation type="unfinished"/>
+        <translation>éditions activées (Du haut vers le bas)</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="105"/>
         <source>Disabled Sets (Top to Bottom)</source>
-        <translation type="unfinished"/>
+        <translation>éditions désactivées (Du haut vers le bas)</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="131"/>
@@ -5901,32 +5901,32 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1778"/>
         <source>W</source>
-        <translation type="unfinished"/>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1782"/>
         <source>U</source>
-        <translation type="unfinished"/>
+        <translation>U</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1786"/>
         <source>B</source>
-        <translation type="unfinished"/>
+        <translation>B</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1790"/>
         <source>R</source>
-        <translation type="unfinished"/>
+        <translation>R</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1794"/>
         <source>G</source>
-        <translation type="unfinished"/>
+        <translation>G</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1798"/>
         <source>X</source>
-        <translation type="unfinished"/>
+        <translation>X</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1806"/>
