@@ -151,7 +151,7 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         cardInfo = cardDatabaseModel->getCard(realIndex.row());
     }
 
-    if (!cardInfo) {
+    if (cardInfo) {
         updateSearchFieldWithoutUpdatingFilter(cardInfo->getName());
         const QChar cardColor = cardInfo->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
