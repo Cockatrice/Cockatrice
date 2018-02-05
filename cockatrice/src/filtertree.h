@@ -214,7 +214,7 @@ public:
     bool acceptToughness(const CardInfoPtr info) const;
     bool acceptRarity(const CardInfoPtr info) const;
     bool acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) const;
-    bool relationCheck(int vardInfo) const;
+    bool relationCheck(int cardInfo) const;
 };
 
 class FilterTree : public QObject, public FilterTreeBranch<LogicMap *>
