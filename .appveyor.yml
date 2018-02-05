@@ -30,7 +30,7 @@ environment:
           zlib_ver: 1.2.11
           cmake_generator: Visual Studio 15 2017 Win64
           cmake_toolset: v141,host=x64
-          target_arch: x86_64
+          target_arch: win64
           vc_arch: amd64
         - qt_ver: 5.9\msvc2015 # Qt doesn't provide a msvc2017_32
           openssl_ver: 1.0.2n-i386-win32
@@ -38,7 +38,7 @@ environment:
           zlib_ver: 1.2.11
           cmake_generator: Visual Studio 15 2017
           cmake_toolset: v141
-          target_arch: x86
+          target_arch: win32
           vc_arch: amd64_x86
 
 install:
@@ -85,9 +85,9 @@ build_script:
     - msbuild PACKAGE.vcxproj /p:Configuration=Release
     - ps: |
         $exe = dir -name *.exe
-        $new_name = $exe.Replace(".exe", "-${env:target_arch}_qt5.exe")
+        $new_name = $exe.Replace(".exe", "-${env:target_arch}.exe")
         Push-AppveyorArtifact $exe -FileName $new_name
-        $cmake_name = $exe.Replace(".exe", "-${env:target_arch}_qt5.cmake.txt")
+        $cmake_name = $exe.Replace(".exe", "-${env:target_arch}.cmake.txt")
         Push-AppveyorArtifact CMakeCache.txt -FileName $cmake_name
         $json = New-Object PSObject
         (New-Object PSObject | Add-Member -PassThru NoteProperty bin $new_name | Add-Member -PassThru NoteProperty cmake $cmake_name | Add-Member -PassThru NoteProperty commit $env:APPVEYOR_REPO_COMMIT) | ConvertTo-JSON | Out-File -FilePath "latest-$env:target_arch" -Encoding ASCII
