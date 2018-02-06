@@ -212,6 +212,7 @@ public:
     bool acceptCmc(const CardInfoPtr info) const;
     bool acceptPower(const CardInfoPtr info) const;
     bool acceptToughness(const CardInfoPtr info) const;
+    bool acceptLoyalty(const CardInfoPtr info) const;
     bool acceptRarity(const CardInfoPtr info) const;
     bool acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) const;
     bool relationCheck(int cardInfo) const;

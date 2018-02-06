@@ -234,6 +234,11 @@ bool FilterItem::acceptCmc(const CardInfoPtr info) const
     return relationCheck(info->getCmc().toInt());
 }
 
+bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
+{
+    return relationCheck(info->getLoyalty());
+}
+
 bool FilterItem::acceptPower(const CardInfoPtr info) const
 {
     int slash = info->getPowTough().indexOf("/");
@@ -351,6 +356,8 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) c
             return acceptPower(info);
         case CardFilter::AttrTough:
             return acceptToughness(info);
+        case CardFilter::AttrLoyalty:
+            return acceptLoyalty(info);
         default:
             return true; /* ignore this attribute */
     }

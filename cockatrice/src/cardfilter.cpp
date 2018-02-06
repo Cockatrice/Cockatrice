@@ -39,6 +39,8 @@ const char *CardFilter::attrName(Attr a)
             return "Power";
         case AttrTough:
             return "Toughness";
+        case AttrLoyalty:
+            return "Loyalty";
         default:
             return "";
     }
