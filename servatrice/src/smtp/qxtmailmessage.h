@@ -28,10 +28,10 @@
 #include "qxtglobal.h"
 #include "qxtmailattachment.h"
 
-#include <QStringList>
 #include <QHash>
 #include <QMetaType>
 #include <QSharedDataPointer>
+#include <QStringList>
 
 struct QxtMailMessagePrivate;
 class QXT_NETWORK_EXPORT QxtMailMessage
@@ -45,35 +45,35 @@ public:
     };
 
     QxtMailMessage();
-    QxtMailMessage(const QxtMailMessage& other);
-    QxtMailMessage(const QString& sender, const QString& recipient);
-    QxtMailMessage& operator=(const QxtMailMessage& other);
+    QxtMailMessage(const QxtMailMessage &other);
+    QxtMailMessage(const QString &sender, const QString &recipient);
+    QxtMailMessage &operator=(const QxtMailMessage &other);
     ~QxtMailMessage();
 
     QString sender() const;
-    void setSender(const QString&);
+    void setSender(const QString &);
 
     QString subject() const;
-    void setSubject(const QString&);
+    void setSubject(const QString &);
 
     QString body() const;
-    void setBody(const QString&);
+    void setBody(const QString &);
 
     QStringList recipients(RecipientType type = To) const;
-    void addRecipient(const QString&, RecipientType type = To);
-    void removeRecipient(const QString&);
+    void addRecipient(const QString &, RecipientType type = To);
+    void removeRecipient(const QString &);
 
     QHash<QString, QString> extraHeaders() const;
-    QString extraHeader(const QString&) const;
-    bool hasExtraHeader(const QString&) const;
-    void setExtraHeader(const QString& key, const QString& value);
-    void setExtraHeaders(const QHash<QString, QString>&);
-    void removeExtraHeader(const QString& key);
+    QString extraHeader(const QString &) const;
+    bool hasExtraHeader(const QString &) const;
+    void setExtraHeader(const QString &key, const QString &value);
+    void setExtraHeaders(const QHash<QString, QString> &);
+    void removeExtraHeader(const QString &key);
 
     QHash<QString, QxtMailAttachment> attachments() const;
-    QxtMailAttachment attachment(const QString& filename) const;
-    void addAttachment(const QString& filename, const QxtMailAttachment& attach);
-    void removeAttachment(const QString& filename);
+    QxtMailAttachment attachment(const QString &filename) const;
+    void addAttachment(const QString &filename, const QxtMailAttachment &attach);
+    void removeAttachment(const QString &filename);
 
     QByteArray rfc2822() const;
 

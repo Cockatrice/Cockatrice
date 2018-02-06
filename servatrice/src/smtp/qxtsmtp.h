@@ -25,8 +25,8 @@
 #ifndef QXTSMTP_H
 #define QXTSMTP_H
 
-#include <QObject>
 #include <QHostAddress>
+#include <QObject>
 #include <QString>
 
 #include "qxtglobal.h"
@@ -56,49 +56,49 @@ public:
         TransactionFailed
     };
 
-    QxtSmtp(QObject* parent = 0);
+    QxtSmtp(QObject *parent = 0);
 
     QByteArray username() const;
-    void setUsername(const QByteArray& name);
+    void setUsername(const QByteArray &name);
 
     QByteArray password() const;
-    void setPassword(const QByteArray& password);
+    void setPassword(const QByteArray &password);
 
-    int send(const QxtMailMessage& message);
+    int send(const QxtMailMessage &message);
     int pendingMessages() const;
 
-    QTcpSocket* socket() const;
-    void connectToHost(const QString& hostName, quint16 port = 25);
-    void connectToHost(const QHostAddress& address, quint16 port = 25);
+    QTcpSocket *socket() const;
+    void connectToHost(const QString &hostName, quint16 port = 25);
+    void connectToHost(const QHostAddress &address, quint16 port = 25);
     void disconnectFromHost();
 
     bool startTlsDisabled() const;
     void setStartTlsDisabled(bool disable);
 
-    QSslSocket* sslSocket() const;
-    void connectToSecureHost(const QString& hostName, quint16 port = 465);
-    void connectToSecureHost(const QHostAddress& address, quint16 port = 465);
+    QSslSocket *sslSocket() const;
+    void connectToSecureHost(const QString &hostName, quint16 port = 465);
+    void connectToSecureHost(const QHostAddress &address, quint16 port = 465);
 
-    bool hasExtension(const QString& extension);
-    QString extensionData(const QString& extension);
+    bool hasExtension(const QString &extension);
+    QString extensionData(const QString &extension);
 
 Q_SIGNALS:
     void connected();
     void connectionFailed();
-    void connectionFailed( const QByteArray & msg );
+    void connectionFailed(const QByteArray &msg);
     void encrypted();
     void encryptionFailed();
-    void encryptionFailed( const QByteArray & msg );
+    void encryptionFailed(const QByteArray &msg);
     void authenticated();
     void authenticationFailed();
-    void authenticationFailed( const QByteArray & msg );
+    void authenticationFailed(const QByteArray &msg);
 
-    void senderRejected(int mailID, const QString& address );
-    void senderRejected(int mailID, const QString& address, const QByteArray & msg );
-    void recipientRejected(int mailID, const QString& address );
-    void recipientRejected(int mailID, const QString& address, const QByteArray & msg );
+    void senderRejected(int mailID, const QString &address);
+    void senderRejected(int mailID, const QString &address, const QByteArray &msg);
+    void recipientRejected(int mailID, const QString &address);
+    void recipientRejected(int mailID, const QString &address, const QByteArray &msg);
     void mailFailed(int mailID, int errorCode);
-    void mailFailed(int mailID, int errorCode, const QByteArray & msg);
+    void mailFailed(int mailID, int errorCode, const QByteArray &msg);
     void mailSent(int mailID);
 
     void finished();
