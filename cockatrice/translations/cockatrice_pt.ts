@@ -458,7 +458,7 @@ Isto apenas é guardado para os moderadores e não é visível para a pessoa ban
     <message>
         <location filename="../src/tab_game.cpp" line="141"/>
         <source>Load remote deck...</source>
-        <translation>Use um deck armazenado no servidor remoto</translation>
+        <translation>Carregar deck remoto...</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="142"/>
@@ -1574,7 +1574,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="146"/>
         <source>Please check the download page manually and visit the wiki for instructions on compiling.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor verifique manualmente a página de download  e visite a wiki para mais informações sobre compilar.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="178"/>
@@ -1866,7 +1866,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="294"/>
         <source>Paths (editing disabled in portable mode)</source>
-        <translation type="unfinished"/>
+        <translation>Diretórios (edição desativada em modo portátil)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="296"/>
@@ -2797,7 +2797,7 @@ O Cockatrice irá agora recarregar a base de dados das cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="343"/>
         <source>%1 puts %2%3 into their library %4 cards from the top.</source>
-        <translation type="unfinished"/>
+        <translation>%1 põe %2%3 no seu grimório, %4 cartas a contar do topo.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="346"/>
@@ -2812,12 +2812,12 @@ O Cockatrice irá agora recarregar a base de dados das cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="437"/>
         <source>%1 has left the game (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1 abandonou o jogo (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="444"/>
         <source>%1 is not watching the game any more (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1  não está mais a observar o jogo (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="597"/>
@@ -2882,7 +2882,7 @@ O Cockatrice irá agora recarregar a base de dados das cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="666"/>
         <source>%1&apos;s turn.</source>
-        <translation type="unfinished"/>
+        <translation>Turno de %1.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="691"/>
@@ -3733,13 +3733,13 @@ O Cockatrice irá agora recarregar a base de dados das cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="731"/>
         <source>X cards from the top of library...</source>
-        <translation type="unfinished"/>
+        <translation>X cartas do topo do grimório...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1092"/>
         <location filename="../src/player.cpp" line="2778"/>
         <source>C&amp;reate another %1 token</source>
-        <translation type="unfinished"/>
+        <translation>C&amp;riar outro marcador %1</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1236"/>

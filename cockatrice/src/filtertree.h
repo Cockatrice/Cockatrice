@@ -5,9 +5,8 @@
 #include <QMap>
 #include <QObject>
 
+#include "carddatabase.h"
 #include "cardfilter.h"
-
-class CardInfo;
 
 class FilterTreeNode
 {
@@ -160,10 +159,10 @@ public:
         return CardFilter::typeName(type);
     }
 
-    bool testTypeAnd(const CardInfo *info, CardFilter::Attr attr) const;
-    bool testTypeAndNot(const CardInfo *info, CardFilter::Attr attr) const;
-    bool testTypeOr(const CardInfo *info, CardFilter::Attr attr) const;
-    bool testTypeOrNot(const CardInfo *info, CardFilter::Attr attr) const;
+    bool testTypeAnd(const CardInfoPtr info, CardFilter::Attr attr) const;
+    bool testTypeAndNot(const CardInfoPtr info, CardFilter::Attr attr) const;
+    bool testTypeOr(const CardInfoPtr info, CardFilter::Attr attr) const;
+    bool testTypeOrNot(const CardInfoPtr info, CardFilter::Attr attr) const;
 };
 
 class FilterItem : public FilterTreeNode
@@ -204,17 +203,18 @@ public:
         return true;
     }
 
-    bool acceptName(const CardInfo *info) const;
-    bool acceptType(const CardInfo *info) const;
-    bool acceptColor(const CardInfo *info) const;
-    bool acceptText(const CardInfo *info) const;
-    bool acceptSet(const CardInfo *info) const;
-    bool acceptManaCost(const CardInfo *info) const;
-    bool acceptCmc(const CardInfo *info) const;
-    bool acceptPower(const CardInfo *info) const;
-    bool acceptToughness(const CardInfo *info) const;
-    bool acceptRarity(const CardInfo *info) const;
-    bool acceptCardAttr(const CardInfo *info, CardFilter::Attr attr) const;
+    bool acceptName(const CardInfoPtr info) const;
+    bool acceptType(const CardInfoPtr info) const;
+    bool acceptColor(const CardInfoPtr info) const;
+    bool acceptText(const CardInfoPtr info) const;
+    bool acceptSet(const CardInfoPtr info) const;
+    bool acceptManaCost(const CardInfoPtr info) const;
+    bool acceptCmc(const CardInfoPtr info) const;
+    bool acceptPower(const CardInfoPtr info) const;
+    bool acceptToughness(const CardInfoPtr info) const;
+    bool acceptRarity(const CardInfoPtr info) const;
+    bool acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) const;
+    bool relationCheck(int cardInfo) const;
 };
 
 class FilterTree : public QObject, public FilterTreeBranch<LogicMap *>
@@ -232,7 +232,7 @@ private:
     LogicMap *attrLogicMap(CardFilter::Attr attr);
     FilterItemList *attrTypeList(CardFilter::Attr attr, CardFilter::Type type);
 
-    bool testAttr(const CardInfo *info, const LogicMap *lm) const;
+    bool testAttr(const CardInfoPtr info, const LogicMap *lm) const;
 
     void nodeChanged() const
     {
@@ -272,7 +272,7 @@ public:
         return 0;
     }
 
-    bool acceptsCard(const CardInfo *info) const;
+    bool acceptsCard(const CardInfoPtr info) const;
     void clear();
 };
 

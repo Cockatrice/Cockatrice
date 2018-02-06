@@ -403,7 +403,7 @@ public:
     void sendGameCommand(PendingCommand *pend);
     void sendGameCommand(const google::protobuf::Message &command);
 
-    void setLastToken(CardInfo *cardInfo);
+    void setLastToken(CardInfoPtr cardInfo);
 };
 
 #endif

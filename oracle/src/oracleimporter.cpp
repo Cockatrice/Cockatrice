@@ -51,22 +51,22 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     return true;
 }
 
-CardInfo *OracleImporter::addCard(const QString &setName,
-                                  QString cardName,
-                                  bool isToken,
-                                  int cardId,
-                                  QString &setNumber,
-                                  QString &cardCost,
-                                  QString &cmc,
-                                  const QString &cardType,
-                                  const QString &cardPT,
-                                  int cardLoyalty,
-                                  const QString &cardText,
-                                  const QStringList &colors,
-                                  const QList<CardRelation *> &relatedCards,
-                                  const QList<CardRelation *> &reverseRelatedCards,
-                                  bool upsideDown,
-                                  QString &rarity)
+CardInfoPtr OracleImporter::addCard(const QString &setName,
+                                    QString cardName,
+                                    bool isToken,
+                                    int cardId,
+                                    QString &setNumber,
+                                    QString &cardCost,
+                                    QString &cmc,
+                                    const QString &cardType,
+                                    const QString &cardPT,
+                                    int cardLoyalty,
+                                    const QString &cardText,
+                                    const QStringList &colors,
+                                    const QList<CardRelation *> &relatedCards,
+                                    const QList<CardRelation *> &reverseRelatedCards,
+                                    bool upsideDown,
+                                    QString &rarity)
 {
     QStringList cardTextRows = cardText.split("\n");
 
@@ -74,7 +74,7 @@ CardInfo *OracleImporter::addCard(const QString &setName,
     cardName = cardName.replace("Æ", "AE");
     cardName = cardName.replace("’", "'");
 
-    CardInfo *card;
+    CardInfoPtr card;
     if (cards.contains(cardName)) {
         card = cards.value(cardName);
     } else {
@@ -95,8 +95,8 @@ CardInfo *OracleImporter::addCard(const QString &setName,
                                               !cardText.contains(cardName + " enters the battlefield tapped unless"));
 
         // insert the card and its properties
-        card = new CardInfo(cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards,
-                            reverseRelatedCards, upsideDown, cardLoyalty, cipt);
+        card = CardInfo::newInstance(cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards,
+                                     reverseRelatedCards, upsideDown, cardLoyalty, cipt);
         int tableRow = 1;
         QString mainCardType = card->getMainCardType();
         if ((mainCardType == "Land") || mArtifact)
@@ -134,7 +134,7 @@ void OracleImporter::extractColors(const QStringList &in, QStringList &out)
     }
 }
 
-int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
+int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
 {
     int cards = 0;
 
@@ -202,7 +202,7 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
         colors.clear();
         extractColors(map.value("colors").toStringList(), colors);
 
-        CardInfo *card =
+        CardInfoPtr card =
             addCard(set->getShortName(), cardName, false, cardId, setNumber, cardCost, cmc, cardType, cardPT,
                     cardLoyalty, cardText, colors, relatedCards, reverseRelatedCards, upsideDown, rarity);
 
@@ -290,8 +290,9 @@ int OracleImporter::importTextSpoiler(CardSet *set, const QVariant &data)
         upsideDown = false;
 
         // add the card
-        CardInfo *card = addCard(set->getShortName(), cardName, false, muid, setNumber, cardCost, cmc, cardType, cardPT,
-                                 cardLoyalty, cardText, colors, relatedCards, reverseRelatedCards, upsideDown, rarity);
+        CardInfoPtr card =
+            addCard(set->getShortName(), cardName, false, muid, setNumber, cardCost, cmc, cardType, cardPT, cardLoyalty,
+                    cardText, colors, relatedCards, reverseRelatedCards, upsideDown, rarity);
 
         if (!set->contains(card)) {
             card->addToSet(set);
@@ -311,21 +312,21 @@ int OracleImporter::startImport()
     const SetToDownload *curSet;
 
     // add an empty set for tokens
-    CardSet *tokenSet = new CardSet(TOKENS_SETNAME, tr("Dummy set containing tokens"), "Tokens");
+    CardSetPtr tokenSet = CardSet::newInstance(TOKENS_SETNAME, tr("Dummy set containing tokens"), "Tokens");
     sets.insert(TOKENS_SETNAME, tokenSet);
 
     while (it.hasNext()) {
         curSet = &it.next();
-        CardSet *set =
-            new CardSet(curSet->getShortName(), curSet->getLongName(), curSet->getSetType(), curSet->getReleaseDate());
+        CardSetPtr set = CardSet::newInstance(curSet->getShortName(), curSet->getLongName(), curSet->getSetType(),
+                                              curSet->getReleaseDate());
         if (!sets.contains(set->getShortName()))
             sets.insert(set->getShortName(), set);
 
-        int setCards = importTextSpoiler(set, curSet->getCards());
+        int setCardsHere = importTextSpoiler(set, curSet->getCards());
 
         ++setIndex;
 
-        emit setIndexChanged(setCards, setIndex, curSet->getLongName());
+        emit setIndexChanged(setCardsHere, setIndex, curSet->getLongName());
     }
 
     emit setIndexChanged(setCards, setIndex, QString());

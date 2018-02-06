@@ -8,13 +8,14 @@
 #include <QDir>
 #include <QFile>
 #include <QMessageBox>
+#include <utility>
 
 const int CardDatabase::versionNeeded = 3;
 const char *CardDatabase::TOKENS_SETNAME = "TK";
 
-static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSet *set)
+static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set)
 {
-    if (set == nullptr) {
+    if (set.isNull()) {
         qDebug() << "&operator<< set is nullptr";
         return xml;
     }
@@ -36,6 +37,16 @@ CardSet::CardSet(const QString &_shortName,
     : shortName(_shortName), longName(_longName), releaseDate(_releaseDate), setType(_setType)
 {
     loadSetOptions();
+}
+
+CardSetPtr CardSet::newInstance(const QString &_shortName,
+                                const QString &_longName,
+                                const QString &_setType,
+                                const QDate &_releaseDate)
+{
+    CardSetPtr ptr(new CardSet(_shortName, _longName, _setType, _releaseDate));
+    // ptr->setSmartPointer(ptr);
+    return ptr;
 }
 
 QString CardSet::getCorrectedShortName() const
@@ -96,9 +107,9 @@ void CardSet::setIsKnown(bool _isknown)
 class SetList::KeyCompareFunctor
 {
 public:
-    inline bool operator()(CardSet *a, CardSet *b) const
+    inline bool operator()(const CardSetPtr &a, const CardSetPtr &b) const
     {
-        if (a == nullptr || b == nullptr) {
+        if (a.isNull() || b.isNull()) {
             qDebug() << "SetList::KeyCompareFunctor a or b is null";
             return false;
         }
@@ -116,7 +127,7 @@ int SetList::getEnabledSetsNum()
 {
     int num = 0;
     for (int i = 0; i < size(); ++i) {
-        CardSet *set = at(i);
+        CardSetPtr set = at(i);
         if (set && set->getEnabled()) {
             ++num;
         }
@@ -128,7 +139,7 @@ int SetList::getUnknownSetsNum()
 {
     int num = 0;
     for (int i = 0; i < size(); ++i) {
-        CardSet *set = at(i);
+        CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             ++num;
         }
@@ -140,7 +151,7 @@ QStringList SetList::getUnknownSetsNames()
 {
     QStringList sets = QStringList();
     for (int i = 0; i < size(); ++i) {
-        CardSet *set = at(i);
+        CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             sets << set->getShortName();
         }
@@ -151,7 +162,7 @@ QStringList SetList::getUnknownSetsNames()
 void SetList::enableAllUnknown()
 {
     for (int i = 0; i < size(); ++i) {
-        CardSet *set = at(i);
+        CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             set->setIsKnown(true);
             set->setEnabled(true);
@@ -164,7 +175,7 @@ void SetList::enableAllUnknown()
 void SetList::enableAll()
 {
     for (int i = 0; i < size(); ++i) {
-        CardSet *set = at(i);
+        CardSetPtr set = at(i);
 
         if (set == nullptr) {
             qDebug() << "enabledAll has null";
@@ -182,7 +193,7 @@ void SetList::enableAll()
 void SetList::markAllAsKnown()
 {
     for (int i = 0; i < size(); ++i) {
-        CardSet *set = at(i);
+        CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             set->setIsKnown(true);
             set->setEnabled(false);
@@ -198,8 +209,8 @@ void SetList::guessSortKeys()
     QDate distantFuture(2050, 1, 1);
     int aHundredYears = 36500;
     for (int i = 0; i < size(); ++i) {
-        CardSet *set = at(i);
-        if (set == nullptr) {
+        CardSetPtr set = at(i);
+        if (set.isNull()) {
             qDebug() << "guessSortKeys set is null";
             continue;
         }
@@ -241,16 +252,45 @@ CardInfo::CardInfo(const QString &_name,
     pixmapCacheKey = QLatin1String("card_") + name;
     simpleName = CardInfo::simplifyName(name);
 
-    for (int i = 0; i < sets.size(); i++) {
-        sets[i]->append(this);
-    }
-
     refreshCachedSetNames();
 }
 
 CardInfo::~CardInfo()
 {
-    PictureLoader::clearPixmapCache(this);
+    PictureLoader::clearPixmapCache(smartThis);
+}
+
+CardInfoPtr CardInfo::newInstance(const QString &_name,
+                                  bool _isToken,
+                                  const QString &_manacost,
+                                  const QString &_cmc,
+                                  const QString &_cardtype,
+                                  const QString &_powtough,
+                                  const QString &_text,
+                                  const QStringList &_colors,
+                                  const QList<CardRelation *> &_relatedCards,
+                                  const QList<CardRelation *> &_reverseRelatedCards,
+                                  bool _upsideDownArt,
+                                  int _loyalty,
+                                  bool _cipt,
+                                  int _tableRow,
+                                  const SetList &_sets,
+                                  const QStringMap &_customPicURLs,
+                                  MuidMap _muIds,
+                                  QStringMap _collectorNumbers,
+                                  QStringMap _rarities)
+{
+    CardInfoPtr ptr(new CardInfo(_name, _isToken, _manacost, _cmc, _cardtype, _powtough, _text, _colors, _relatedCards,
+                                 _reverseRelatedCards, _upsideDownArt, _loyalty, _cipt, _tableRow, _sets,
+                                 _customPicURLs, std::move(_muIds), std::move(_collectorNumbers),
+                                 std::move(_rarities)));
+    ptr->setSmartPointer(ptr);
+
+    for (int i = 0; i < _sets.size(); i++) {
+        _sets[i]->append(ptr);
+    }
+
+    return ptr;
 }
 
 QString CardInfo::getMainCardType() const
@@ -298,14 +338,14 @@ QString CardInfo::getCorrectedName() const
     return result.remove(" // ").remove(':').remove('"').remove('?').replace('/', ' ');
 }
 
-void CardInfo::addToSet(CardSet *set)
+void CardInfo::addToSet(CardSetPtr set)
 {
-    if (set == nullptr) {
+    if (set.isNull()) {
         qDebug() << "addToSet(nullptr)";
         return;
     }
 
-    set->append(this);
+    set->append(smartThis);
     sets << set;
 
     refreshCachedSetNames();
@@ -356,9 +396,9 @@ const QChar CardInfo::getColorChar() const
     }
 }
 
-static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
+static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &info)
 {
-    if (info == nullptr) {
+    if (info.isNull()) {
         qDebug() << "operator<< info is nullptr";
         return xml;
     }
@@ -467,6 +507,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfo *info)
 
 CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoaded)
 {
+    qRegisterMetaType<CardInfoPtr>("CardInfoPtr");
     connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabases()));
 }
 
@@ -479,24 +520,17 @@ void CardDatabase::clear()
 {
     clearDatabaseMutex->lock();
 
-    QHashIterator<QString, CardInfo *> i(cards);
+    QHashIterator<QString, CardInfoPtr> i(cards);
     while (i.hasNext()) {
         i.next();
         if (i.value()) {
             removeCard(i.value());
-            i.value()->deleteLater();
         }
     }
 
-    // The pointers themselves were already deleted, so we don't delete them again.
     cards.clear();
     simpleNameCards.clear();
 
-    QHashIterator<QString, CardSet *> setIt(sets);
-    while (setIt.hasNext()) {
-        setIt.next();
-        delete setIt.value();
-    }
     sets.clear();
 
     loadStatus = NotLoaded;
@@ -504,7 +538,7 @@ void CardDatabase::clear()
     clearDatabaseMutex->unlock();
 }
 
-void CardDatabase::addCard(CardInfo *card)
+void CardDatabase::addCard(CardInfoPtr card)
 {
     if (card == nullptr) {
         qDebug() << "addCard(nullptr)";
@@ -518,9 +552,9 @@ void CardDatabase::addCard(CardInfo *card)
     emit cardAdded(card);
 }
 
-void CardDatabase::removeCard(CardInfo *card)
+void CardDatabase::removeCard(CardInfoPtr card)
 {
-    if (card == nullptr) {
+    if (card.isNull()) {
         qDebug() << "removeCard(nullptr)";
         return;
     }
@@ -537,35 +571,39 @@ void CardDatabase::removeCard(CardInfo *card)
     removeCardMutex->lock();
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
+    card.clear();
     removeCardMutex->unlock();
     emit cardRemoved(card);
 }
 
-CardInfo *CardDatabase::getCard(const QString &cardName) const
+CardInfoPtr CardDatabase::getCard(const QString &cardName) const
 {
     return getCardFromMap(cards, cardName);
 }
 
-QList<CardInfo *> CardDatabase::getCards(const QStringList &cardNames) const
+QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
 {
-    QList<CardInfo *> cardInfos;
-    foreach (QString cardName, cardNames)
-        cardInfos.append(getCardFromMap(cards, cardName));
+    QList<CardInfoPtr> cardInfos;
+    foreach (QString cardName, cardNames) {
+        CardInfoPtr ptr = getCardFromMap(cards, cardName);
+        if (ptr)
+            cardInfos.append(ptr);
+    }
 
     return cardInfos;
 }
 
-CardInfo *CardDatabase::getCardBySimpleName(const QString &cardName) const
+CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
 {
     return getCardFromMap(simpleNameCards, CardInfo::simplifyName(cardName));
 }
 
-CardSet *CardDatabase::getSet(const QString &setName)
+CardSetPtr CardDatabase::getSet(const QString &setName)
 {
     if (sets.contains(setName)) {
         return sets.value(setName);
     } else {
-        CardSet *newSet = new CardSet(setName);
+        CardSetPtr newSet = CardSet::newInstance(setName);
         sets.insert(setName, newSet);
         return newSet;
     }
@@ -574,7 +612,7 @@ CardSet *CardDatabase::getSet(const QString &setName)
 SetList CardDatabase::getSetList() const
 {
     SetList result;
-    QHashIterator<QString, CardSet *> i(sets);
+    QHashIterator<QString, CardSetPtr> i(sets);
     while (i.hasNext()) {
         i.next();
         result << i.value();
@@ -611,7 +649,7 @@ void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
                 }
             }
 
-            CardSet *newSet = getSet(shortName);
+            CardSetPtr newSet = getSet(shortName);
             newSet->setLongName(longName);
             newSet->setSetType(setType);
             newSet->setReleaseDate(releaseDate);
@@ -729,20 +767,19 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                 }
             }
 
-            addCard(new CardInfo(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards,
-                                 reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs, muids,
-                                 collectorNumbers, rarities));
+            addCard(CardInfo::newInstance(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards,
+                                          reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs,
+                                          muids, collectorNumbers, rarities));
         }
     }
 }
 
-CardInfo *CardDatabase::getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const
+CardInfoPtr CardDatabase::getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const
 {
-    if (cardMap.contains(cardName)) {
+    if (cardMap.contains(cardName))
         return cardMap.value(cardName);
-    }
 
-    return nullptr;
+    return {};
 }
 
 LoadStatus CardDatabase::loadFromFile(const QString &fileName)
@@ -806,7 +843,7 @@ bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
 
     if (!tokens) {
         xml.writeStartElement("sets");
-        QHashIterator<QString, CardSet *> setIterator(sets);
+        QHashIterator<QString, CardSetPtr> setIterator(sets);
         while (setIterator.hasNext()) {
             xml << setIterator.next().value();
         }
@@ -815,9 +852,9 @@ bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
     }
 
     xml.writeStartElement("cards");
-    QHashIterator<QString, CardInfo *> cardIterator(cards);
+    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
     while (cardIterator.hasNext()) {
-        CardInfo *card = cardIterator.next().value();
+        CardInfoPtr card = cardIterator.next().value();
         if (tokens == card->getIsToken()) {
             xml << card;
         }
@@ -868,7 +905,7 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     // reorder sets (TODO: refactor, this smells)
     SetList allSets;
-    QHashIterator<QString, CardSet *> setsIterator(sets);
+    QHashIterator<QString, CardSetPtr> setsIterator(sets);
     while (setsIterator.hasNext()) {
         allSets.append(setsIterator.next().value());
     }
@@ -891,10 +928,10 @@ LoadStatus CardDatabase::loadCardDatabases()
 
 void CardDatabase::refreshCachedReverseRelatedCards()
 {
-    foreach (CardInfo *card, cards)
+    for (const CardInfoPtr &card : cards)
         card->resetReverseRelatedCards2Me();
 
-    foreach (CardInfo *card, cards) {
+    for (const CardInfoPtr &card : cards) {
         if (card->getReverseRelatedCards().isEmpty()) {
             continue;
         }
@@ -923,7 +960,7 @@ void CardDatabase::refreshCachedReverseRelatedCards()
 QStringList CardDatabase::getAllColors() const
 {
     QSet<QString> colors;
-    QHashIterator<QString, CardInfo *> cardIterator(cards);
+    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
     while (cardIterator.hasNext()) {
         const QStringList &cardColors = cardIterator.next().value()->getColors();
         if (cardColors.isEmpty()) {
@@ -940,7 +977,7 @@ QStringList CardDatabase::getAllColors() const
 QStringList CardDatabase::getAllMainCardTypes() const
 {
     QSet<QString> types;
-    QHashIterator<QString, CardInfo *> cardIterator(cards);
+    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
     while (cardIterator.hasNext()) {
         types.insert(cardIterator.next().value()->getMainCardType());
     }
@@ -986,7 +1023,7 @@ void CardDatabase::markAllSetsAsKnown()
 void CardDatabase::notifyEnabledSetsChanged()
 {
     // refresh the list of cached set names
-    foreach (CardInfo *card, cards)
+    for (const CardInfoPtr &card : cards)
         card->refreshCachedSetNames();
 
     // inform the carddatabasemodels that they need to re-check their list of cards
@@ -995,7 +1032,7 @@ void CardDatabase::notifyEnabledSetsChanged()
 
 bool CardDatabase::saveCustomTokensToFile()
 {
-    CardSet *customTokensSet = getSet(CardDatabase::TOKENS_SETNAME);
+    CardSetPtr customTokensSet = getSet(CardDatabase::TOKENS_SETNAME);
     QString fileName = settingsCache->getCustomCardDatabasePath() + "/" + CardDatabase::TOKENS_SETNAME + ".xml";
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
@@ -1010,9 +1047,9 @@ bool CardDatabase::saveCustomTokensToFile()
     xml.writeAttribute("version", QString::number(versionNeeded));
 
     xml.writeStartElement("cards");
-    QHashIterator<QString, CardInfo *> cardIterator(cards);
+    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
     while (cardIterator.hasNext()) {
-        CardInfo *card = cardIterator.next().value();
+        CardInfoPtr card = cardIterator.next().value();
         if (card->getSets().contains(customTokensSet)) {
             xml << card;
         }

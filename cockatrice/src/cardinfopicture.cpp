@@ -4,7 +4,6 @@
 #include <QStyle>
 #include <QWidget>
 
-#include "carddatabase.h"
 #include "carditem.h"
 #include "main.h"
 #include "pictureloader.h"
@@ -14,16 +13,16 @@ CardInfoPicture::CardInfoPicture(QWidget *parent) : QWidget(parent), info(nullpt
     setMinimumHeight(100);
 }
 
-void CardInfoPicture::setCard(CardInfo *card)
+void CardInfoPicture::setCard(CardInfoPtr card)
 {
     if (info) {
-        disconnect(info, nullptr, this, nullptr);
+        disconnect(info.data(), nullptr, this, nullptr);
     }
 
     info = card;
 
     if (info) {
-        connect(info, SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
+        connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
     }
 
     updatePixmap();

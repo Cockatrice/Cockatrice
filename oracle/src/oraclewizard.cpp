@@ -145,7 +145,7 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
     layout->addWidget(label, 0, 0, 1, 2);
     layout->addWidget(languageLabel, 1, 0);
     layout->addWidget(languageBox, 1, 1);
-    layout->addWidget(versionLabel, 4, 0);
+    layout->addWidget(versionLabel, 2, 0, 1, 2);
 
     setLayout(layout);
 }

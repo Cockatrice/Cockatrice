@@ -1,5 +1,4 @@
 #include "cardinfowidget.h"
-#include "carddatabase.h"
 #include "cardinfopicture.h"
 #include "cardinfotext.h"
 #include "carditem.h"
@@ -38,13 +37,13 @@ CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::Win
     resize(width(), sizeHint().height());
 }
 
-void CardInfoWidget::setCard(CardInfo *card)
+void CardInfoWidget::setCard(CardInfoPtr card)
 {
     if (info)
-        disconnect(info, nullptr, this, nullptr);
+        disconnect(info.data(), nullptr, this, nullptr);
     info = card;
     if (info)
-        connect(info, SIGNAL(destroyed()), this, SLOT(clear()));
+        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clear()));
 
     text->setCard(info);
     pic->setCard(info);
@@ -62,5 +61,5 @@ void CardInfoWidget::setCard(AbstractCardItem *card)
 
 void CardInfoWidget::clear()
 {
-    setCard((CardInfo *)nullptr);
+    setCard((CardInfoPtr) nullptr);
 }

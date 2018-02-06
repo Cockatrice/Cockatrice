@@ -6,8 +6,8 @@
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromEnabledSets, QObject *parent)
     : QAbstractListModel(parent), db(_db), showOnlyCardsFromEnabledSets(_showOnlyCardsFromEnabledSets)
 {
-    connect(db, SIGNAL(cardAdded(CardInfo *)), this, SLOT(cardAdded(CardInfo *)));
-    connect(db, SIGNAL(cardRemoved(CardInfo *)), this, SLOT(cardRemoved(CardInfo *)));
+    connect(db, SIGNAL(cardAdded(CardInfoPtr)), this, SLOT(cardAdded(CardInfoPtr)));
+    connect(db, SIGNAL(cardRemoved(CardInfoPtr)), this, SLOT(cardRemoved(CardInfoPtr)));
     connect(db, SIGNAL(cardDatabaseEnabledSetsChanged()), this, SLOT(cardDatabaseEnabledSetsChanged()));
 
     cardDatabaseEnabledSetsChanged();
@@ -33,7 +33,7 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
         (role != Qt::DisplayRole && role != SortRole))
         return QVariant();
 
-    CardInfo *card = cardList.at(index.row());
+    CardInfoPtr card = cardList.at(index.row());
     switch (index.column()) {
         case NameColumn:
             return card->getName();
@@ -77,7 +77,7 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
     }
 }
 
-void CardDatabaseModel::cardInfoChanged(CardInfo *card)
+void CardDatabaseModel::cardInfoChanged(CardInfoPtr card)
 {
     const int row = cardList.indexOf(card);
     if (row == -1)
@@ -86,12 +86,12 @@ void CardDatabaseModel::cardInfoChanged(CardInfo *card)
     emit dataChanged(index(row, 0), index(row, CARDDBMODEL_COLUMNS - 1));
 }
 
-bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfo *card)
+bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
 {
     if (!showOnlyCardsFromEnabledSets)
         return true;
 
-    foreach (CardSet *set, card->getSets()) {
+    for (CardSetPtr set : card->getSets()) {
         if (set->getEnabled())
             return true;
     }
@@ -102,44 +102,46 @@ bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfo *card)
 void CardDatabaseModel::cardDatabaseEnabledSetsChanged()
 {
     // remove all the cards no more present in at least one enabled set
-    foreach (CardInfo *card, cardList) {
+    foreach (CardInfoPtr card, cardList) {
         if (!checkCardHasAtLeastOneEnabledSet(card))
             cardRemoved(card);
     }
 
     // re-check all the card currently not shown, maybe their part of a newly-enabled set
-    foreach (CardInfo *card, db->getCardList()) {
+    foreach (CardInfoPtr card, db->getCardList()) {
         if (!cardList.contains(card))
             cardAdded(card);
     }
 }
 
-void CardDatabaseModel::cardAdded(CardInfo *card)
+void CardDatabaseModel::cardAdded(CardInfoPtr card)
 {
     if (checkCardHasAtLeastOneEnabledSet(card)) {
         // add the card if it's present in at least one enabled set
         beginInsertRows(QModelIndex(), cardList.size(), cardList.size());
         cardList.append(card);
-        connect(card, SIGNAL(cardInfoChanged(CardInfo *)), this, SLOT(cardInfoChanged(CardInfo *)));
+        connect(card.data(), SIGNAL(cardInfoChanged(CardInfoPtr)), this, SLOT(cardInfoChanged(CardInfoPtr)));
         endInsertRows();
     }
 }
 
-void CardDatabaseModel::cardRemoved(CardInfo *card)
+void CardDatabaseModel::cardRemoved(CardInfoPtr card)
 {
     const int row = cardList.indexOf(card);
-    if (row == -1)
+    if (row == -1) {
         return;
+    }
 
     beginRemoveRows(QModelIndex(), row, row);
-    disconnect(card, 0, this, 0);
+    disconnect(card.data(), nullptr, this, nullptr);
+    card.clear();
     cardList.removeAt(row);
     endRemoveRows();
 }
 
 CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent) : QSortFilterProxyModel(parent), isToken(ShowAll)
 {
-    filterTree = NULL;
+    filterTree = nullptr;
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
 
@@ -274,7 +276,7 @@ int CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QSt
 }
 bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
-    CardInfo const *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
+    CardInfoPtr info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
 
     if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
         return false;
@@ -282,7 +284,7 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
     return rowMatchesCardName(info);
 }
 
-bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfo const *info) const
+bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfoPtr info) const
 {
     if (!cardName.isEmpty() && !info->getName().contains(cardName, Qt::CaseInsensitive))
         return false;
@@ -290,7 +292,7 @@ bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfo const *info) const
     if (!cardNameSet.isEmpty() && !cardNameSet.contains(info->getName()))
         return false;
 
-    if (filterTree != NULL)
+    if (filterTree != nullptr)
         return filterTree->acceptsCard(info);
 
     return true;
@@ -302,15 +304,15 @@ void CardDatabaseDisplayModel::clearFilterAll()
     cardText.clear();
     cardTypes.clear();
     cardColors.clear();
-    if (filterTree != NULL)
+    if (filterTree != nullptr)
         filterTree->clear();
     invalidateFilter();
 }
 
 void CardDatabaseDisplayModel::setFilterTree(FilterTree *filterTree)
 {
-    if (this->filterTree != NULL)
-        disconnect(this->filterTree, 0, this, 0);
+    if (this->filterTree != nullptr)
+        disconnect(this->filterTree, nullptr, this, nullptr);
 
     this->filterTree = filterTree;
     connect(this->filterTree, SIGNAL(changed()), this, SLOT(filterTreeChanged()));
@@ -328,7 +330,7 @@ TokenDisplayModel::TokenDisplayModel(QObject *parent) : CardDatabaseDisplayModel
 
 bool TokenDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
-    CardInfo const *info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
+    CardInfoPtr info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
     return info->getIsToken() && rowMatchesCardName(info);
 }
 

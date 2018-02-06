@@ -6,5 +6,5 @@ fi
 
 if [[ $TRAVIS_OS_NAME == "osx" ]] ; then
   brew update
-  brew install ccache clang-format protobuf qt@5.7
+  brew install ccache clang-format protobuf qt@5.5
 fi

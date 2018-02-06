@@ -144,7 +144,12 @@ void DlgCreateToken::closeEvent(QCloseEvent *event)
 void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
     const QModelIndex realIndex = cardDatabaseDisplayModel->mapToSource(current);
-    CardInfo *cardInfo = current.row() >= 0 ? cardDatabaseModel->getCard(realIndex.row()) : 0;
+
+    CardInfoPtr cardInfo;
+
+    if (current.row() >= 0) {
+        cardInfo = cardDatabaseModel->getCard(realIndex.row());
+    }
 
     if (cardInfo) {
         updateSearchFieldWithoutUpdatingFilter(cardInfo->getName());

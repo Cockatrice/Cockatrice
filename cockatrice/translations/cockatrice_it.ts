@@ -1478,7 +1478,7 @@ Vuoi modificare le impostazioni della posizione del database della carte?</trans
     <message>
         <location filename="../src/dlg_update.cpp" line="24"/>
         <source>Current release channel</source>
-        <translation type="unfinished"/>
+        <translation>Canale della versione corrente</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="31"/>
@@ -1506,12 +1506,12 @@ Per favore, visitate la pagina di download per aggiornare manualmente.</translat
     <message>
         <location filename="../src/dlg_update.cpp" line="108"/>
         <source>Finished checking for updates</source>
-        <translation>Terminato controllo per aggiornamenti</translation>
+        <translation>Terminato il controllo per gli aggiornamenti</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="117"/>
         <source>No Update Available</source>
-        <translation>Nessun Update disponibile</translation>
+        <translation>Nessun aggiornamento disponibile</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="118"/>
@@ -1521,7 +1521,7 @@ Per favore, visitate la pagina di download per aggiornare manualmente.</translat
     <message>
         <location filename="../src/dlg_update.cpp" line="119"/>
         <source>You are already running the latest version available in the chosen release channel.</source>
-        <translation type="unfinished"/>
+        <translation>Hai già la versione più recente nel canale della versione scelto.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="120"/>
@@ -1531,7 +1531,7 @@ Per favore, visitate la pagina di download per aggiornare manualmente.</translat
     <message>
         <location filename="../src/dlg_update.cpp" line="121"/>
         <source>Selected release channel</source>
-        <translation type="unfinished"/>
+        <translation>Canale della versione selezionato</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="131"/>
@@ -1555,13 +1555,13 @@ Per favore, visitate la pagina di download per aggiornare manualmente.</translat
         <location filename="../src/dlg_update.cpp" line="134"/>
         <location filename="../src/dlg_update.cpp" line="144"/>
         <source>Released</source>
-        <translation type="unfinished"/>
+        <translation>Rilasciato</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="134"/>
         <location filename="../src/dlg_update.cpp" line="144"/>
         <source>Changelog</source>
-        <translation type="unfinished"/>
+        <translation>Cambiamenti della versione</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="135"/>
@@ -1572,7 +1572,8 @@ Per favore, visitate la pagina di download per aggiornare manualmente.</translat
         <location filename="../src/dlg_update.cpp" line="145"/>
         <source>Unfortunately there are no download packages available for your operating system. 
 You may have to build from source yourself.</source>
-        <translation type="unfinished"/>
+        <translation>Sfortunatamente non ci sono pacchetti scaricabili disponibili per il tuo sistema operativo.
+Potresti dover creare dal codice sorgente da solo.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="146"/>
@@ -1587,7 +1588,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="185"/>
         <source>An error occurred while downloading an update:</source>
-        <translation>Errore durante il download di un update:</translation>
+        <translation>Errore durante il download di un aggiornamento:</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="199"/>
@@ -1869,7 +1870,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="294"/>
         <source>Paths (editing disabled in portable mode)</source>
-        <translation type="unfinished"/>
+        <translation>Destinazioni (non si può personalizzare in modalità portatile)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="296"/>
@@ -2839,7 +2840,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="607"/>
         <source>Draw</source>
-        <translation>Acquisizione</translation>
+        <translation>Pescata</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="612"/>
@@ -2879,7 +2880,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="647"/>
         <source>End/Cleanup</source>
-        <translation>Finale/Cancellazione</translation>
+        <translation>Finale/Pulizia</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="652"/>
@@ -4640,7 +4641,7 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="1054"/>
         <source>kicked by game host or moderator</source>
-        <translation>kickato da proprietario del gioco o moderatore</translation>
+        <translation>espulso da proprietario del gioco o moderatore</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1057"/>

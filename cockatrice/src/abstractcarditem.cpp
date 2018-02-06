@@ -46,7 +46,7 @@ void AbstractCardItem::cardInfoUpdated()
 {
     info = db->getCard(name);
     if (info)
-        connect(info, SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
+        connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
 
     cacheBgColor();
     update();
@@ -182,7 +182,7 @@ void AbstractCardItem::setName(const QString &_name)
 
     emit deleteCardInfoPopup(name);
     if (info)
-        disconnect(info, nullptr, this, nullptr);
+        disconnect(info.data(), nullptr, this, nullptr);
     name = _name;
 
     cardInfoUpdated();

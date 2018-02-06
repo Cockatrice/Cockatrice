@@ -4,14 +4,15 @@
 #include "settingsmanager.h"
 
 #include <QObject>
-#include <QVariant>
 #include <QSettings>
+#include <QVariant>
 
 class CardDatabaseSettings : public SettingsManager
 {
     Q_OBJECT
     friend class SettingsCache;
-public:    
+
+public:
     void setSortKey(QString shortName, unsigned int sortKey);
     void setEnabled(QString shortName, bool enabled);
     void setIsKnown(QString shortName, bool isknown);
@@ -24,11 +25,8 @@ signals:
 public slots:
 
 private:
-    CardDatabaseSettings(QString settingPath, QObject *parent = 0);
-    CardDatabaseSettings( const CardDatabaseSettings& /*other*/ );
-    CardDatabaseSettings( CardDatabaseSettings& /*other*/ );
-    CardDatabaseSettings( volatile const CardDatabaseSettings& /*other*/ );
-    CardDatabaseSettings( volatile CardDatabaseSettings& /*other*/ );    
+    explicit CardDatabaseSettings(QString settingPath, QObject *parent = nullptr);
+    CardDatabaseSettings(const CardDatabaseSettings & /*other*/);
 };
 
 #endif // CARDDATABASESETTINGS_H

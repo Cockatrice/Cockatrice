@@ -782,8 +782,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     retranslateUi();
 
-    resize(900, 700);
-    restoreGeometry(settingsCache->getMainWindowGeometry());
+    if (!restoreGeometry(settingsCache->getMainWindowGeometry())) {
+        setWindowState(Qt::WindowMaximized);
+    }
     aFullScreen->setChecked(static_cast<bool>(windowState() & Qt::WindowFullScreen));
 
     if (QSystemTrayIcon::isSystemTrayAvailable()) {

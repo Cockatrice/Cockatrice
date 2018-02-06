@@ -17,7 +17,7 @@ FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
     typeCombo = new QComboBox;
     typeCombo->setObjectName("typeCombo");
     for (int i = 0; i < CardFilter::TypeEnd; i++)
-        typeCombo->addItem(tr(CardFilter::typeName(static_cast<CardFilter::Type>(i))), QVariant(i));
+        typeCombo->addItem(CardFilter::typeName(static_cast<CardFilter::Type>(i)), QVariant(i));
 
     QPushButton *ok = new QPushButton(QPixmap("theme:icons/increment"), QString());
     ok->setObjectName("ok");
@@ -42,6 +42,7 @@ FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
 
     setLayout(layout);
 
+    connect(filterCombo, SIGNAL(activated(int)), edit, SLOT(setFocus()));
     connect(edit, SIGNAL(returnPressed()), this, SLOT(emit_add()));
     connect(ok, SIGNAL(released()), this, SLOT(emit_add()));
     fltr = NULL;

@@ -5,7 +5,8 @@
 #include <QFrame>
 #include <QStringList>
 
-class CardInfo;
+#include "carddatabase.h"
+
 class CardInfoPicture;
 class CardInfoText;
 class AbstractCardItem;
@@ -16,7 +17,7 @@ class CardInfoWidget : public QFrame
 
 private:
     qreal aspectRatio;
-    CardInfo *info;
+    CardInfoPtr info;
     CardInfoPicture *pic;
     CardInfoText *text;
 
@@ -24,7 +25,7 @@ public:
     CardInfoWidget(const QString &cardName, QWidget *parent = 0, Qt::WindowFlags f = 0);
 
 public slots:
-    void setCard(CardInfo *card);
+    void setCard(CardInfoPtr card);
     void setCard(const QString &cardName);
     void setCard(AbstractCardItem *card);
 
