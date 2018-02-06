@@ -55,9 +55,6 @@ public slots:
 private:
     explicit LayoutsSettings(QString settingPath,QObject *parent = nullptr);
     LayoutsSettings( const LayoutsSettings& /*other*/ );
-    //LayoutsSettings( LayoutsSettings& /*other*/ );
-    //LayoutsSettings( volatile const LayoutsSettings& /*other*/ );
-    //LayoutsSettings( volatile LayoutsSettings& /*other*/ );
 };
 
 #endif // LAYOUTSSETTINGS_H

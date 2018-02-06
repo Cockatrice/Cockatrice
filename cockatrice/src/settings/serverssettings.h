@@ -49,9 +49,6 @@ public slots:
 private:
     explicit ServersSettings(QString settingPath,QObject *parent = nullptr);
     ServersSettings( const ServersSettings& /*other*/ );
-    //ServersSettings( ServersSettings& /*other*/ );
-    //ServersSettings( volatile const ServersSettings& /*other*/ );
-    //ServersSettings( volatile ServersSettings& /*other*/ );
 };
 
 #endif // SERVERSSETTINGS_H

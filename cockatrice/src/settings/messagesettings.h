@@ -21,9 +21,6 @@ public slots:
 private:
     explicit MessageSettings(QString settingPath, QObject *parent = nullptr);
     MessageSettings( const MessageSettings& /*other*/ );
-    //MessageSettings( MessageSettings& /*other*/ );
-    //MessageSettings( volatile const MessageSettings& /*other*/ );
-    //MessageSettings( volatile MessageSettings& /*other*/ );
 };
 
 #endif // MESSAGESETTINGS_H

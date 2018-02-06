@@ -26,9 +26,6 @@ public slots:
 private:
     explicit CardDatabaseSettings(QString settingPath, QObject *parent = nullptr);
     CardDatabaseSettings( const CardDatabaseSettings& /*other*/ );
-    //CardDatabaseSettings( CardDatabaseSettings& /*other*/ );
-    //CardDatabaseSettings( volatile const CardDatabaseSettings& /*other*/ );
-    //CardDatabaseSettings( volatile CardDatabaseSettings& /*other*/ );
 };
 
 #endif // CARDDATABASESETTINGS_H

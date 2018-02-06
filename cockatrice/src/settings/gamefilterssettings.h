@@ -31,9 +31,6 @@ public slots:
 private:
     explicit GameFiltersSettings(QString settingPath,QObject *parent = nullptr);
     GameFiltersSettings( const GameFiltersSettings& /*other*/ );
-    //GameFiltersSettings( GameFiltersSettings& /*other*/ );
-    //GameFiltersSettings( volatile const GameFiltersSettings& /*other*/ );
-    //GameFiltersSettings( volatile GameFiltersSettings& /*other*/ );
 
     QString hashGameType(const QString &gameType) const;
 };
