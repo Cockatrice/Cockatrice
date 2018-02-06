@@ -299,15 +299,30 @@ bool FilterItem::relationCheck(int cardInfo) const
 {
     bool result, conversion;
 
+    // if int conversion fails, there must be either an operator at the start
     result = (cardInfo == term.toInt(&conversion));
     if (!conversion) {
-        int termInt = term.mid(1).toInt();
-        if (term.startsWith('<')) {
-            result = (cardInfo < termInt);
-        } else if (term.startsWith('>')) {
-            result = (cardInfo > termInt);
+        // leading whitespaces could cause indexing to fail
+        QString trimmedTerm = term.trimmed();
+        // check whether it's a 2 char operator (<=, >=, or ==)
+        if (trimmedTerm[1] == '=') {
+            int termInt = trimmedTerm.mid(2).toInt();
+            if (trimmedTerm.startsWith('<')) {
+                result = (cardInfo <= termInt);
+            } else if (trimmedTerm.startsWith('>')) {
+                result = (cardInfo >= termInt);
+            } else {
+                result = (cardInfo == termInt);
+            }
         } else {
-            result = (cardInfo == termInt);
+            int termInt = trimmedTerm.mid(1).toInt();
+            if (trimmedTerm.startsWith('<')) {
+                result = (cardInfo < termInt);
+            } else if (trimmedTerm.startsWith('>')) {
+                result = (cardInfo > termInt);
+            } else {
+                result = (cardInfo == termInt);
+            }
         }
     }
     return result;
