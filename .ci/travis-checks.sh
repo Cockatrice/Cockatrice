@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ $TRAVIS_OS_NAME == "linux" ]]; then
-  if [[ $BUILDTYPE == "Debug" ]]; then   ## TODO: generalize h cpp files search to top-directory? other comments, 3 nested if's the right approach? / check with ctrlaltca
+  if [[ $BUILDTYPE == "Debug" ]]; then   ## TODO: generalize h cpp files search to top-directory? run bash script by zach here?
     echo "Checking code style..."
     clang-format -i \
       common/*.h \
@@ -14,10 +14,11 @@ if [[ $TRAVIS_OS_NAME == "linux" ]]; then
       servatrice/src/*.cpp
       
     git clean -f
-    git diff --quiet
-	if [[  == "" ]]; then   ## missing condition, should check result of "--exit-code" from "diff --quiet" (0 or 1)
-	  echo "Code style - OK"
-	else (   ## brackets correct?
+    if git diff --quiet; then
+      ## exit code = 0 (no differences)
+      echo "Code style - OK"
+    else (
+      ## exit code = 1 (differences)
       echo "*****************************************************";
       echo "***  This PR is not clean against our code style  ***";
       echo "***  Run clang-format and fix up any differences  ***";
