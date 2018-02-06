@@ -11,7 +11,7 @@ if hash clang-format 2>/dev/null; then
 		-not -path "./common/sfmt/*" \
 		-not -path "./oracle/src/zip/*" \
 		-not -path "./build*/*" \
-		-exec clang-format -i {} \;
+		-exec clang-format -style=file -i {} \;
 	echo "Repository properly formatted"
 else
 	echo "Please install clang-format to use this program"
