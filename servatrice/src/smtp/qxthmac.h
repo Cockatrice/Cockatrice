@@ -26,9 +26,9 @@
 #ifndef QXTHMAC_H
 #define QXTHMAC_H
 
-#include <QtGlobal>
-#include <QCryptographicHash>
 #include "qxtglobal.h"
+#include <QCryptographicHash>
+#include <QtGlobal>
 
 class QxtHmacPrivate;
 class QXT_CORE_EXPORT QxtHmac
@@ -41,15 +41,15 @@ public:
     void setKey(QByteArray key);
     void reset();
 
-    void addData(const char* data, int length);
-    void addData(const QByteArray& data);
+    void addData(const char *data, int length);
+    void addData(const QByteArray &data);
 
     QByteArray innerHash() const;
     QByteArray result();
-    bool verify(const QByteArray& otherInner);
+    bool verify(const QByteArray &otherInner);
 
-    static QByteArray hash(const QByteArray& key, const QByteArray& data, Algorithm algorithm);
-    static bool verify(const QByteArray& key, const QByteArray& hmac, const QByteArray& inner, Algorithm algorithm);
+    static QByteArray hash(const QByteArray &key, const QByteArray &data, Algorithm algorithm);
+    static bool verify(const QByteArray &key, const QByteArray &hmac, const QByteArray &inner, Algorithm algorithm);
 
 private:
     QXT_DECLARE_PRIVATE(QxtHmac)

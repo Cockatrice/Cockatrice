@@ -27,9 +27,9 @@
 
 #include "qxtsmtp.h"
 #include <QHash>
-#include <QString>
 #include <QList>
 #include <QPair>
+#include <QString>
 
 class QxtSmtpPrivate : public QObject, public QxtPrivate<QxtSmtp>
 {
@@ -69,27 +69,28 @@ public:
     };
 
     bool useSecure, disableStartTLS;
-    SmtpState state;// rather then an int use the enum.  makes sure invalid states are entered at compile time, and makes debugging easier
+    SmtpState state; // rather then an int use the enum.  makes sure invalid states are entered at compile time, and
+                     // makes debugging easier
     AuthType authType;
     QByteArray buffer, username, password;
     QHash<QString, QString> extensions;
-    QList<QPair<int, QxtMailMessage> > pending;
+    QList<QPair<int, QxtMailMessage>> pending;
     QStringList recipients;
     int nextID, rcptNumber, rcptAck;
     bool mailAck;
 
-    QSslSocket* socket;
+    QSslSocket *socket;
 
-    void parseEhlo(const QByteArray& code, bool cont, const QString& line);
+    void parseEhlo(const QByteArray &code, bool cont, const QString &line);
     void startTLS();
     void authenticate();
 
-    void authCramMD5(const QByteArray& challenge = QByteArray());
+    void authCramMD5(const QByteArray &challenge = QByteArray());
     void authPlain();
     void authLogin();
 
-    void sendNextRcpt(const QByteArray& code, const QByteArray & line);
-    void sendBody(const QByteArray& code, const QByteArray & line);
+    void sendNextRcpt(const QByteArray &code, const QByteArray &line);
+    void sendBody(const QByteArray &code, const QByteArray &line);
 
 public slots:
     void socketError(QAbstractSocket::SocketError err);

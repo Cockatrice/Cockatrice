@@ -7,6 +7,7 @@ class GameFiltersSettings : public SettingsManager
 {
     Q_OBJECT
     friend class SettingsCache;
+
 public:
     bool isShowBuddiesOnlyGames();
     bool isUnavailableGamesVisible();
@@ -29,8 +30,8 @@ signals:
 public slots:
 
 private:
-    explicit GameFiltersSettings(QString settingPath,QObject *parent = nullptr);
-    GameFiltersSettings( const GameFiltersSettings& /*other*/ );
+    explicit GameFiltersSettings(QString settingPath, QObject *parent = nullptr);
+    GameFiltersSettings(const GameFiltersSettings & /*other*/);
 
     QString hashGameType(const QString &gameType) const;
 };

@@ -21,11 +21,11 @@
 extern "C" {
 #endif
 
-#include <string.h>
-#include <assert.h>
 #include "SFMT.h"
-#include "SFMT-params.h"
 #include "SFMT-common.h"
+#include "SFMT-params.h"
+#include <assert.h>
+#include <string.h>
 
 #if defined(__BIG_ENDIAN__) && !defined(__amd64) && !defined(BIG_ENDIAN64)
 #define BIG_ENDIAN64 1
@@ -34,37 +34,36 @@ extern "C" {
 #define BIG_ENDIAN64 1
 #endif
 #if defined(ONLY64) && !defined(BIG_ENDIAN64)
-  #if defined(__GNUC__)
-    #error "-DONLY64 must be specified with -DBIG_ENDIAN64"
-  #endif
+#if defined(__GNUC__)
+#error "-DONLY64 must be specified with -DBIG_ENDIAN64"
+#endif
 #undef ONLY64
 #endif
 
 /**
  * parameters used by sse2.
  */
-static const w128_t sse2_param_mask = {{SFMT_MSK1, SFMT_MSK2,
-                                        SFMT_MSK3, SFMT_MSK4}};
+static const w128_t sse2_param_mask = {{SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MSK4}};
 /*----------------
   STATIC FUNCTIONS
   ----------------*/
 inline static int idxof(int i);
-inline static void gen_rand_array(sfmt_t * sfmt, w128_t *array, int size);
+inline static void gen_rand_array(sfmt_t *sfmt, w128_t *array, int size);
 inline static uint32_t func1(uint32_t x);
 inline static uint32_t func2(uint32_t x);
-static void period_certification(sfmt_t * sfmt);
+static void period_certification(sfmt_t *sfmt);
 #if defined(BIG_ENDIAN64) && !defined(ONLY64)
 inline static void swap(w128_t *array, int size);
 #endif
 
 #if defined(HAVE_ALTIVEC)
-  #include "SFMT-alti.h"
+#include "SFMT-alti.h"
 #elif defined(HAVE_SSE2)
-  #if defined(_MSC_VER)
-    #include "SFMT-sse2-msc.h"
-  #else
-    #include "SFMT-sse2.h"
-  #endif
+#if defined(_MSC_VER)
+#include "SFMT-sse2-msc.h"
+#else
+#include "SFMT-sse2.h"
+#endif
 #endif
 
 /**
@@ -72,11 +71,13 @@ inline static void swap(w128_t *array, int size);
  * in BIG ENDIAN machine.
  */
 #ifdef ONLY64
-inline static int idxof(int i) {
+inline static int idxof(int i)
+{
     return i ^ 1;
 }
 #else
-inline static int idxof(int i) {
+inline static int idxof(int i)
+{
     return i;
 }
 #endif
@@ -90,7 +91,8 @@ inline static int idxof(int i) {
  * @param array an 128-bit array to be filled by pseudorandom numbers.
  * @param size number of 128-bit pseudorandom numbers to be generated.
  */
-inline static void gen_rand_array(sfmt_t * sfmt, w128_t *array, int size) {
+inline static void gen_rand_array(sfmt_t *sfmt, w128_t *array, int size)
+{
     int i, j;
     w128_t *r1, *r2;
 
@@ -102,14 +104,12 @@ inline static void gen_rand_array(sfmt_t * sfmt, w128_t *array, int size) {
         r2 = &array[i];
     }
     for (; i < SFMT_N; i++) {
-        do_recursion(&array[i], &sfmt->state[i],
-                     &array[i + SFMT_POS1 - SFMT_N], r1, r2);
+        do_recursion(&array[i], &sfmt->state[i], &array[i + SFMT_POS1 - SFMT_N], r1, r2);
         r1 = r2;
         r2 = &array[i];
     }
     for (; i < size - SFMT_N; i++) {
-        do_recursion(&array[i], &array[i - SFMT_N],
-                     &array[i + SFMT_POS1 - SFMT_N], r1, r2);
+        do_recursion(&array[i], &array[i - SFMT_N], &array[i + SFMT_POS1 - SFMT_N], r1, r2);
         r1 = r2;
         r2 = &array[i];
     }
@@ -117,8 +117,7 @@ inline static void gen_rand_array(sfmt_t * sfmt, w128_t *array, int size) {
         sfmt->state[j] = array[j + size - SFMT_N];
     }
     for (; i < size; i++, j++) {
-        do_recursion(&array[i], &array[i - SFMT_N],
-                     &array[i + SFMT_POS1 - SFMT_N], r1, r2);
+        do_recursion(&array[i], &array[i - SFMT_N], &array[i + SFMT_POS1 - SFMT_N], r1, r2);
         r1 = r2;
         r2 = &array[i];
         sfmt->state[j] = array[i];
@@ -127,7 +126,8 @@ inline static void gen_rand_array(sfmt_t * sfmt, w128_t *array, int size) {
 #endif
 
 #if defined(BIG_ENDIAN64) && !defined(ONLY64) && !defined(HAVE_ALTIVEC)
-inline static void swap(w128_t *array, int size) {
+inline static void swap(w128_t *array, int size)
+{
     int i;
     uint32_t x, y;
 
@@ -147,7 +147,8 @@ inline static void swap(w128_t *array, int size) {
  * @param x 32-bit integer
  * @return 32-bit integer
  */
-static uint32_t func1(uint32_t x) {
+static uint32_t func1(uint32_t x)
+{
     return (x ^ (x >> 27)) * (uint32_t)1664525UL;
 }
 
@@ -157,7 +158,8 @@ static uint32_t func1(uint32_t x) {
  * @param x 32-bit integer
  * @return 32-bit integer
  */
-static uint32_t func2(uint32_t x) {
+static uint32_t func2(uint32_t x)
+{
     return (x ^ (x >> 27)) * (uint32_t)1566083941UL;
 }
 
@@ -165,13 +167,13 @@ static uint32_t func2(uint32_t x) {
  * This function certificate the period of 2^{MEXP}
  * @param sfmt SFMT internal state
  */
-static void period_certification(sfmt_t * sfmt) {
+static void period_certification(sfmt_t *sfmt)
+{
     int inner = 0;
     int i, j;
     uint32_t work;
     uint32_t *psfmt32 = &sfmt->state[0].u[0];
-    const uint32_t parity[4] = {SFMT_PARITY1, SFMT_PARITY2,
-                                SFMT_PARITY3, SFMT_PARITY4};
+    const uint32_t parity[4] = {SFMT_PARITY1, SFMT_PARITY2, SFMT_PARITY3, SFMT_PARITY4};
 
     for (i = 0; i < 4; i++)
         inner ^= psfmt32[idxof(i)] & parity[i];
@@ -205,7 +207,8 @@ static void period_certification(sfmt_t * sfmt) {
  * and all parameters of this generator.
  * @param sfmt SFMT internal state
  */
-const char *sfmt_get_idstring(sfmt_t * sfmt) {
+const char *sfmt_get_idstring(sfmt_t *sfmt)
+{
     UNUSED_VARIABLE(sfmt);
     return SFMT_IDSTR;
 }
@@ -216,7 +219,8 @@ const char *sfmt_get_idstring(sfmt_t * sfmt) {
  * @param sfmt SFMT internal state
  * @return minimum size of array used for fill_array32() function.
  */
-int sfmt_get_min_array_size32(sfmt_t * sfmt) {
+int sfmt_get_min_array_size32(sfmt_t *sfmt)
+{
     UNUSED_VARIABLE(sfmt);
     return SFMT_N32;
 }
@@ -227,7 +231,8 @@ int sfmt_get_min_array_size32(sfmt_t * sfmt) {
  * @param sfmt SFMT internal state
  * @return minimum size of array used for fill_array64() function.
  */
-int sfmt_get_min_array_size64(sfmt_t * sfmt) {
+int sfmt_get_min_array_size64(sfmt_t *sfmt)
+{
     UNUSED_VARIABLE(sfmt);
     return SFMT_N64;
 }
@@ -238,21 +243,20 @@ int sfmt_get_min_array_size64(sfmt_t * sfmt) {
  * integers.
  * @param sfmt SFMT internal state
  */
-void sfmt_gen_rand_all(sfmt_t * sfmt) {
+void sfmt_gen_rand_all(sfmt_t *sfmt)
+{
     int i;
     w128_t *r1, *r2;
 
     r1 = &sfmt->state[SFMT_N - 2];
     r2 = &sfmt->state[SFMT_N - 1];
     for (i = 0; i < SFMT_N - SFMT_POS1; i++) {
-        do_recursion(&sfmt->state[i], &sfmt->state[i],
-                     &sfmt->state[i + SFMT_POS1], r1, r2);
+        do_recursion(&sfmt->state[i], &sfmt->state[i], &sfmt->state[i + SFMT_POS1], r1, r2);
         r1 = r2;
         r2 = &sfmt->state[i];
     }
     for (; i < SFMT_N; i++) {
-        do_recursion(&sfmt->state[i], &sfmt->state[i],
-                     &sfmt->state[i + SFMT_POS1 - SFMT_N], r1, r2);
+        do_recursion(&sfmt->state[i], &sfmt->state[i], &sfmt->state[i + SFMT_POS1 - SFMT_N], r1, r2);
         r1 = r2;
         r2 = &sfmt->state[i];
     }
@@ -286,7 +290,8 @@ void sfmt_gen_rand_all(sfmt_t * sfmt) {
  * memory. Mac OSX doesn't have these functions, but \b malloc of OSX
  * returns the pointer to the aligned memory block.
  */
-void sfmt_fill_array32(sfmt_t * sfmt, uint32_t *array, int size) {
+void sfmt_fill_array32(sfmt_t *sfmt, uint32_t *array, int size)
+{
     assert(sfmt->idx == SFMT_N32);
     assert(size % 4 == 0);
     assert(size >= SFMT_N32);
@@ -322,7 +327,8 @@ void sfmt_fill_array32(sfmt_t * sfmt, uint32_t *array, int size) {
  * memory. Mac OSX doesn't have these functions, but \b malloc of OSX
  * returns the pointer to the aligned memory block.
  */
-void sfmt_fill_array64(sfmt_t * sfmt, uint64_t *array, int size) {
+void sfmt_fill_array64(sfmt_t *sfmt, uint64_t *array, int size)
+{
     assert(sfmt->idx == SFMT_N32);
     assert(size % 2 == 0);
     assert(size >= SFMT_N64);
@@ -331,7 +337,7 @@ void sfmt_fill_array64(sfmt_t * sfmt, uint64_t *array, int size) {
     sfmt->idx = SFMT_N32;
 
 #if defined(BIG_ENDIAN64) && !defined(ONLY64)
-    swap((w128_t *)array, size /2);
+    swap((w128_t *)array, size / 2);
 #endif
 }
 
@@ -342,16 +348,15 @@ void sfmt_fill_array64(sfmt_t * sfmt, uint64_t *array, int size) {
  * @param sfmt SFMT internal state
  * @param seed a 32-bit integer used as the seed.
  */
-void sfmt_init_gen_rand(sfmt_t * sfmt, uint32_t seed) {
+void sfmt_init_gen_rand(sfmt_t *sfmt, uint32_t seed)
+{
     int i;
 
     uint32_t *psfmt32 = &sfmt->state[0].u[0];
 
     psfmt32[idxof(0)] = seed;
     for (i = 1; i < SFMT_N32; i++) {
-        psfmt32[idxof(i)] = 1812433253UL * (psfmt32[idxof(i - 1)]
-                                            ^ (psfmt32[idxof(i - 1)] >> 30))
-            + i;
+        psfmt32[idxof(i)] = 1812433253UL * (psfmt32[idxof(i - 1)] ^ (psfmt32[idxof(i - 1)] >> 30)) + i;
     }
     sfmt->idx = SFMT_N32;
     period_certification(sfmt);
@@ -364,7 +369,8 @@ void sfmt_init_gen_rand(sfmt_t * sfmt, uint32_t seed) {
  * @param init_key the array of 32-bit integers, used as a seed.
  * @param key_length the length of init_key.
  */
-void sfmt_init_by_array(sfmt_t * sfmt, uint32_t *init_key, int key_length) {
+void sfmt_init_by_array(sfmt_t *sfmt, uint32_t *init_key, int key_length)
+{
     int i, j, count;
     uint32_t r;
     int lag;
@@ -389,8 +395,7 @@ void sfmt_init_by_array(sfmt_t * sfmt, uint32_t *init_key, int key_length) {
     } else {
         count = SFMT_N32;
     }
-    r = func1(psfmt32[idxof(0)] ^ psfmt32[idxof(mid)]
-              ^ psfmt32[idxof(SFMT_N32 - 1)]);
+    r = func1(psfmt32[idxof(0)] ^ psfmt32[idxof(mid)] ^ psfmt32[idxof(SFMT_N32 - 1)]);
     psfmt32[idxof(mid)] += r;
     r += key_length;
     psfmt32[idxof(mid + lag)] += r;
@@ -398,8 +403,8 @@ void sfmt_init_by_array(sfmt_t * sfmt, uint32_t *init_key, int key_length) {
 
     count--;
     for (i = 1, j = 0; (j < count) && (j < key_length); j++) {
-        r = func1(psfmt32[idxof(i)] ^ psfmt32[idxof((i + mid) % SFMT_N32)]
-                  ^ psfmt32[idxof((i + SFMT_N32 - 1) % SFMT_N32)]);
+        r = func1(psfmt32[idxof(i)] ^ psfmt32[idxof((i + mid) % SFMT_N32)] ^
+                  psfmt32[idxof((i + SFMT_N32 - 1) % SFMT_N32)]);
         psfmt32[idxof((i + mid) % SFMT_N32)] += r;
         r += init_key[j] + i;
         psfmt32[idxof((i + mid + lag) % SFMT_N32)] += r;
@@ -407,8 +412,8 @@ void sfmt_init_by_array(sfmt_t * sfmt, uint32_t *init_key, int key_length) {
         i = (i + 1) % SFMT_N32;
     }
     for (; j < count; j++) {
-        r = func1(psfmt32[idxof(i)] ^ psfmt32[idxof((i + mid) % SFMT_N32)]
-                  ^ psfmt32[idxof((i + SFMT_N32 - 1) % SFMT_N32)]);
+        r = func1(psfmt32[idxof(i)] ^ psfmt32[idxof((i + mid) % SFMT_N32)] ^
+                  psfmt32[idxof((i + SFMT_N32 - 1) % SFMT_N32)]);
         psfmt32[idxof((i + mid) % SFMT_N32)] += r;
         r += i;
         psfmt32[idxof((i + mid + lag) % SFMT_N32)] += r;
@@ -416,8 +421,8 @@ void sfmt_init_by_array(sfmt_t * sfmt, uint32_t *init_key, int key_length) {
         i = (i + 1) % SFMT_N32;
     }
     for (j = 0; j < SFMT_N32; j++) {
-        r = func2(psfmt32[idxof(i)] + psfmt32[idxof((i + mid) % SFMT_N32)]
-                  + psfmt32[idxof((i + SFMT_N32 - 1) % SFMT_N32)]);
+        r = func2(psfmt32[idxof(i)] + psfmt32[idxof((i + mid) % SFMT_N32)] +
+                  psfmt32[idxof((i + SFMT_N32 - 1) % SFMT_N32)]);
         psfmt32[idxof((i + mid) % SFMT_N32)] ^= r;
         r -= i;
         psfmt32[idxof((i + mid + lag) % SFMT_N32)] ^= r;

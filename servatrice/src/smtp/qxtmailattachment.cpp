@@ -29,15 +29,12 @@
  * \brief The QxtMailAttachment class represents an attachement to a QxtMailMessage
  */
 
-
-
-
 #include "qxtmailattachment.h"
 #include "qxtmail_p.h"
-#include <QTextCodec>
 #include <QBuffer>
-#include <QPointer>
 #include <QFile>
+#include <QPointer>
+#include <QTextCodec>
 #include <QtDebug>
 
 struct QxtMailAttachmentPrivate : public QSharedData
@@ -68,26 +65,26 @@ QxtMailAttachment::QxtMailAttachment()
     qxt_d = new QxtMailAttachmentPrivate;
 }
 
-QxtMailAttachment::QxtMailAttachment(const QxtMailAttachment& other) : qxt_d(other.qxt_d)
+QxtMailAttachment::QxtMailAttachment(const QxtMailAttachment &other) : qxt_d(other.qxt_d)
 {
     // trivial copy constructor
 }
 
-QxtMailAttachment::QxtMailAttachment(const QByteArray& content, const QString& contentType)
+QxtMailAttachment::QxtMailAttachment(const QByteArray &content, const QString &contentType)
 {
     qxt_d = new QxtMailAttachmentPrivate;
     setContentType(contentType);
     setContent(content);
 }
 
-QxtMailAttachment::QxtMailAttachment(QIODevice* content, const QString& contentType)
+QxtMailAttachment::QxtMailAttachment(QIODevice *content, const QString &contentType)
 {
     qxt_d = new QxtMailAttachmentPrivate;
     setContentType(contentType);
     setContent(content);
 }
 
-QxtMailAttachment& QxtMailAttachment::operator=(const QxtMailAttachment & other)
+QxtMailAttachment &QxtMailAttachment::operator=(const QxtMailAttachment &other)
 {
     qxt_d = other.qxt_d;
     return *this;
@@ -98,20 +95,20 @@ QxtMailAttachment::~QxtMailAttachment()
     // trivial destructor
 }
 
-QIODevice* QxtMailAttachment::content() const
+QIODevice *QxtMailAttachment::content() const
 {
     return qxt_d->content;
 }
 
-void QxtMailAttachment::setContent(const QByteArray& content)
+void QxtMailAttachment::setContent(const QByteArray &content)
 {
     if (qxt_d->deleteContent && qxt_d->content)
         qxt_d->content->deleteLater();
     qxt_d->content = new QBuffer;
-    static_cast<QBuffer*>(qxt_d->content.data())->setData(content);
+    static_cast<QBuffer *>(qxt_d->content.data())->setData(content);
 }
 
-void QxtMailAttachment::setContent(QIODevice* content)
+void QxtMailAttachment::setContent(QIODevice *content)
 {
     if (qxt_d->deleteContent && qxt_d->content)
         qxt_d->content->deleteLater();
@@ -133,7 +130,7 @@ QString QxtMailAttachment::contentType() const
     return qxt_d->contentType;
 }
 
-void QxtMailAttachment::setContentType(const QString& contentType)
+void QxtMailAttachment::setContentType(const QString &contentType)
 {
     qxt_d->contentType = contentType;
 }
@@ -143,67 +140,62 @@ QHash<QString, QString> QxtMailAttachment::extraHeaders() const
     return qxt_d->extraHeaders;
 }
 
-QString QxtMailAttachment::extraHeader(const QString& key) const
+QString QxtMailAttachment::extraHeader(const QString &key) const
 {
     return qxt_d->extraHeaders[key.toLower()];
 }
 
-bool QxtMailAttachment::hasExtraHeader(const QString& key) const
+bool QxtMailAttachment::hasExtraHeader(const QString &key) const
 {
     return qxt_d->extraHeaders.contains(key.toLower());
 }
 
-void QxtMailAttachment::setExtraHeader(const QString& key, const QString& value)
+void QxtMailAttachment::setExtraHeader(const QString &key, const QString &value)
 {
     qxt_d->extraHeaders[key.toLower()] = value;
 }
 
-void QxtMailAttachment::setExtraHeaders(const QHash<QString, QString>& a)
+void QxtMailAttachment::setExtraHeaders(const QHash<QString, QString> &a)
 {
-    QHash<QString, QString>& headers = qxt_d->extraHeaders;
+    QHash<QString, QString> &headers = qxt_d->extraHeaders;
     headers.clear();
-    foreach(const QString& key, a.keys())
-    {
+    foreach (const QString &key, a.keys()) {
         headers[key.toLower()] = a[key];
     }
 }
 
-void QxtMailAttachment::removeExtraHeader(const QString& key)
+void QxtMailAttachment::removeExtraHeader(const QString &key)
 {
     qxt_d->extraHeaders.remove(key.toLower());
 }
 
 QByteArray QxtMailAttachment::mimeData()
 {
-    QIODevice* c = content();
-    if (!c)
-    {
+    QIODevice *c = content();
+    if (!c) {
         qWarning() << "QxtMailAttachment::mimeData(): Content not set or already output";
         return QByteArray();
     }
-    if (!c->isOpen() && !c->open(QIODevice::ReadOnly))
-    {
+    if (!c->isOpen() && !c->open(QIODevice::ReadOnly)) {
         qWarning() << "QxtMailAttachment::mimeData(): Cannot open content for reading";
         return QByteArray();
     }
 
-    QTextCodec* latin1 = QTextCodec::codecForName("latin1");
+    QTextCodec *latin1 = QTextCodec::codecForName("latin1");
     QByteArray rv = "Content-Type: " + qxt_d->contentType.toLatin1() + "\r\nContent-Transfer-Encoding: base64\r\n";
-    foreach(const QString& r, qxt_d->extraHeaders.keys())
-    {
+    foreach (const QString &r, qxt_d->extraHeaders.keys()) {
         rv += qxt_fold_mime_header(r.toLatin1(), extraHeader(r), latin1);
     }
     rv += "\r\n";
 
-    while (!c->atEnd())
-    {
+    while (!c->atEnd()) {
         rv += c->read(57).toBase64() + "\r\n";
     }
-    setContent((QIODevice*)0);
+    setContent((QIODevice *)0);
     return rv;
 }
 
-QxtMailAttachment QxtMailAttachment::fromFile(const QString& filename)
+QxtMailAttachment QxtMailAttachment::fromFile(const QString &filename)
 {
     QxtMailAttachment rv(new QFile(filename));
     rv.setDeleteContent(true);
