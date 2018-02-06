@@ -1,16 +1,19 @@
 #include "gtest/gtest.h"
 
-namespace {
-    class FooTest : public ::testing::Test {
+namespace
+{
+class FooTest : public ::testing::Test
+{
+};
 
-    };
-
-    TEST(DummyTest, Works) {
-        ASSERT_EQ(1, 1) << "One is not equal to one";
-    }
+TEST(DummyTest, Works)
+{
+    ASSERT_EQ(1, 1) << "One is not equal to one";
 }
+} // namespace
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

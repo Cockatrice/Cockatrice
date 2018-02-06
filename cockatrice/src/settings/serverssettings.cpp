@@ -2,7 +2,7 @@
 #include <QDebug>
 
 ServersSettings::ServersSettings(QString settingPath, QObject *parent)
-    : SettingsManager(settingPath+"servers.ini", parent)
+    : SettingsManager(settingPath + "servers.ini", parent)
 {
 }
 
@@ -175,7 +175,12 @@ bool ServersSettings::getClearDebugLogStatus(bool abDefaultValue)
     return cbFlushLog == QVariant() ? abDefaultValue : cbFlushLog.toBool();
 }
 
-void ServersSettings::addNewServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword)
+void ServersSettings::addNewServer(QString saveName,
+                                   QString serv,
+                                   QString port,
+                                   QString username,
+                                   QString password,
+                                   bool savePassword)
 {
     if (updateExistingServer(saveName, serv, port, username, password, savePassword))
         return;
@@ -189,17 +194,19 @@ void ServersSettings::addNewServer(QString saveName, QString serv, QString port,
     setValue(savePassword, QString("savePassword%1").arg(index), "server", "server_details");
     setValue(index, "totalServers", "server", "server_details");
     setValue(password, QString("password%1").arg(index), "server", "server_details");
-    
 }
 
-bool ServersSettings::updateExistingServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword)
+bool ServersSettings::updateExistingServer(QString saveName,
+                                           QString serv,
+                                           QString port,
+                                           QString username,
+                                           QString password,
+                                           bool savePassword)
 {
     int size = getValue("totalServers", "server", "server_details").toInt() + 1;
 
-    for (int i = 0; i < size; i++)
-    {
-        if (saveName == getValue(QString("saveName%1").arg(i), "server", "server_details").toString())
-        {
+    for (int i = 0; i < size; i++) {
+        if (saveName == getValue(QString("saveName%1").arg(i), "server", "server_details").toString()) {
             setValue(serv, QString("server%1").arg(i), "server", "server_details");
             setValue(port, QString("port%1").arg(i), "server", "server_details");
             setValue(username, QString("username%1").arg(i), "server", "server_details");

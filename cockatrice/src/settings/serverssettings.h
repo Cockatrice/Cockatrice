@@ -9,7 +9,7 @@ class ServersSettings : public SettingsManager
     Q_OBJECT
     friend class SettingsCache;
 
-public:    
+public:
     int getPreviousHostLogin();
     int getPrevioushostindex(const QString &);
     QStringList getPreviousHostList();
@@ -37,8 +37,14 @@ public:
     void setFPPort(QString port);
     void setSavePassword(int save);
     void setFPPlayerName(QString playerName);
-    void addNewServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword);
-    bool updateExistingServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword);
+    void
+    addNewServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword);
+    bool updateExistingServer(QString saveName,
+                              QString serv,
+                              QString port,
+                              QString username,
+                              QString password,
+                              bool savePassword);
     void setClearDebugLogStatus(bool abIsChecked);
     bool getClearDebugLogStatus(bool abDefaultValue);
 
@@ -47,8 +53,8 @@ signals:
 public slots:
 
 private:
-    explicit ServersSettings(QString settingPath,QObject *parent = nullptr);
-    ServersSettings( const ServersSettings& /*other*/ );
+    explicit ServersSettings(QString settingPath, QObject *parent = nullptr);
+    ServersSettings(const ServersSettings & /*other*/);
 };
 
 #endif // SERVERSSETTINGS_H
