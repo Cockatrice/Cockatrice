@@ -39,5 +39,6 @@ if hash clang-format 2>/dev/null; then
         fi
 
 else
-	echo "Please install clang-format to use this program! Read our CONTRIBUTING.md file for details."			
+	echo "Please install clang-format to use this program!"
+	echo "Read our CONTRIBUTING.md file for more details."
 fi
