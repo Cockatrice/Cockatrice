@@ -20,6 +20,7 @@ if hash clang-format 2>/dev/null; then
 		if [[ $TRAVIS == false ]]; then
             echo "Repository properly formatted"
 		else
+		# if run from Travis CI, we want to compare the changes and report back to the contributor
 			git clean -f
 			if git diff --quiet; then
 				## exit code = 0 (no differences)
@@ -34,6 +35,7 @@ if hash clang-format 2>/dev/null; then
 				echo "*****************************************************";
 				)
 			fi
+			git diff --exit-code ## correct position? what is this used for? original script: https://github.com/Cockatrice/Cockatrice/blob/994a643d9c4e08dad1dfd7b13272598fdb42b196/.ci/travis-compile.sh
         fi
 
 else
