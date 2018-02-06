@@ -236,7 +236,8 @@ bool FilterItem::acceptCmc(const CardInfoPtr info) const
 
 bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
 {
-    return relationCheck(info->getLoyalty());
+    int loyalty = info->getLoyalty();
+    return loyalty >= 0 ? relationCheck(loyalty) : false;
 }
 
 bool FilterItem::acceptPower(const CardInfoPtr info) const

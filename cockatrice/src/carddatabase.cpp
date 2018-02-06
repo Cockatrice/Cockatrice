@@ -673,7 +673,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
             QStringMap collectorNumbers, rarities;
             SetList sets;
             int tableRow = 0;
-            int loyalty = 0;
+            int loyalty = -1;
             bool cipt = false;
             bool isToken = false;
             bool upsideDown = false;
