@@ -20,7 +20,7 @@ public slots:
 
 private:
     explicit MessageSettings(QString settingPath, QObject *parent = nullptr);
-    MessageSettings( const MessageSettings& /*other*/ );
+    MessageSettings(const MessageSettings & /*other*/);
 };
 
 #endif // MESSAGESETTINGS_H

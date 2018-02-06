@@ -1,8 +1,8 @@
 #include "carddatabasesettings.h"
 
-CardDatabaseSettings::CardDatabaseSettings(QString settingPath, QObject *parent) : SettingsManager(settingPath+"cardDatabase.ini", parent)
+CardDatabaseSettings::CardDatabaseSettings(QString settingPath, QObject *parent)
+    : SettingsManager(settingPath + "cardDatabase.ini", parent)
 {
-
 }
 
 void CardDatabaseSettings::setSortKey(QString shortName, unsigned int sortKey)

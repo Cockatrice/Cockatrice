@@ -12,7 +12,7 @@
 
 class CardDatabaseSettings
 {
-public:    
+public:
     void setSortKey(QString shortName, unsigned int sortKey);
     void setEnabled(QString shortName, bool enabled);
     void setIsKnown(QString shortName, bool isknown);
@@ -22,10 +22,12 @@ public:
     bool isKnown(QString shortName);
 };
 
-class SettingsCache: public QObject {
+class SettingsCache : public QObject
+{
     Q_OBJECT
 private:
     CardDatabaseSettings *cardDatabaseSettings;
+
 public:
     SettingsCache();
     ~SettingsCache();
@@ -33,14 +35,14 @@ public:
     QString getCardDatabasePath() const;
     QString getTokenDatabasePath() const;
     QString getSpoilerCardDatabasePath() const;
-    CardDatabaseSettings& cardDatabase() const;
+    CardDatabaseSettings &cardDatabase() const;
 signals:
     void cardDatabasePathChanged();
 };
 
-
 #define PICTURELOADER_H
 
-class PictureLoader {
+class PictureLoader
+{
     void clearPixmapCache(CardInfoPtr card);
 };

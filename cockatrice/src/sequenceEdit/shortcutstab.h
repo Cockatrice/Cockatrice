@@ -7,25 +7,25 @@
 
 namespace Ui
 {
-    class shortcutsTab;
+class shortcutsTab;
 }
 
 class ShortcutsTab : public AbstractSettingsPage
 {
     Q_OBJECT
-    public:
-        ShortcutsTab();
-        void retranslateUi();
-        ~ShortcutsTab();
+public:
+    ShortcutsTab();
+    void retranslateUi();
+    ~ShortcutsTab();
 
-    private slots:
-        void resetShortcuts();
-        void refreshEdits();
-        void clearShortcuts();
-        void afterClear();
+private slots:
+    void resetShortcuts();
+    void refreshEdits();
+    void clearShortcuts();
+    void afterClear();
 
-    private:
-        Ui::shortcutsTab *ui;
+private:
+    Ui::shortcutsTab *ui;
 };
 
 #endif // SHORTCUTSTAB_H
