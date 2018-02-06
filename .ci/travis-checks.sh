@@ -3,7 +3,7 @@
 if [[ $TRAVIS_OS_NAME == "linux" ]]; then
   if [[ $BUILDTYPE == "Debug" ]]; then
     echo "Checking code style of repository..."
-    ../clangify.sh
+    sh ../clangify.sh
   else
     echo "Skipping... checks are only performed on runs in debug mode"
   fi
