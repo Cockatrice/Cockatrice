@@ -4,9 +4,7 @@
 
 set -e
 
-if [[ $TRAVIS == true ]]; then
-    echo "Checking code style of repository..."
-else
+if [[ $TRAVIS == false ]]; then
     echo "Applying code style to repository..."
 fi
 
