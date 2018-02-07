@@ -141,9 +141,9 @@ function(get_tag_name commit)
 	endif()
 
 	# Label
-	# 7 = Full release
+	# 7 = Stable release
 	# 8 = Dev release, first beta so only "beta" attached
-	# 9 = Dev release, not first beta so "beta.N" attached
+	# 9 = Dev release, subsequent beta so "beta.N" attached (N>=2)
 	if(${GIT_TAG_LISTCOUNT} EQUAL 8)
 		list(GET GIT_TAG_EXPLODED 7 GIT_TAG_LABEL)
 	elseif(${GIT_TAG_LISTCOUNT} EQUAL 9)

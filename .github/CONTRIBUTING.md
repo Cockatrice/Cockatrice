@@ -261,9 +261,10 @@ Please have a look at the specific [FAQ for translators](https://github.com/Cock
 
 # Release Management #
 
-### Publish A New Development Snapshot ###
+### Publishing A New Beta Release ###
 
-Travis and AppVeyor have been configured to upload files to GitHub Releases whenever a <kbd>tag</kbd> is pushed. Usually, tags are created through publishing a release, but there's a way around that.
+Travis and AppVeyor have been configured to upload files to GitHub Releases whenever a <kbd>tag</kbd> is pushed.<br>
+Usually, tags are created through publishing a (pre-)release, but there's a way around that.
 
 To trigger Travis and AppVeyor, simply do the following:
 ```bash
@@ -278,13 +279,13 @@ You should define the variables as such:
 ```
 upstream - git@github.com:Cockatrice/Cockatrice.git
 $COCKATRICE_REPO - /Location/of/repository/cockatrice.git
-$TAG_NAME
-  - If stable release, YYYY-MM-DD-Release-MAJ.MIN.PATCH
-  - If beta release, YYYY-MM-DD-Development-MAJ.MIN.PATCH-beta.X
-        - MAJ.MIN.PATCH will be the NEXT release version
+`$TAG_NAME` should be:
+  - `YYYY-MM-DD-Release-MAJ.MIN.PATCH` for **stable releases**
+  - `YYYY-MM-DD-Development-MAJ.MIN.PATCH-beta.X` for **beta releases**<br>
+    With *MAJ.MIN.PATCH* being the NEXT release version!
 ```
 
-This will cause a tag release to be established on the GitHub repository, which will then lead to the upload of binaries. If you use this method, the tags (releases) that you create will be marked as a "Pre-release". The `/latest` URL will not be impacted (for stable release downloads) so that's good.
+This will cause a tagged release to be established on the GitHub repository, which will then lead to the upload of binaries. If you use this method, the tags (releases) that you create will be marked as a "Pre-release". The `/latest` URL will not be impacted (for stable release downloads) so that's good.
 
 If you accidentally push a tag incorrectly (the tag is outdated, you didn't pull in the latest branch accidentally, you named the tag wrong, etc.) you can revoke the tag by doing the following:
 ```bash
@@ -292,11 +293,11 @@ git push --delete upstream $TAG_NAME
 git tag -d $TAG_NAME
 ```
 
-**NOTE:** Unfortunately, due to the method of how Travis and AppVeyor work, to publish a full release you will need to make a copy of the release notes locally and then paste them into the GitHub GUI once the binaries have been uploaded by them. These CI services will automatically overwrite the name of the release (to "Cockatrice $TAG_NAME"), the status of the release (to "Pre-release"), and the release body (to "Beta build of Cockatrice").
+**NOTE:** Unfortunately, due to the method of how Travis and AppVeyor work, to publish a stable release you will need to make a copy of the release notes locally and then paste them into the GitHub GUI once the binaries have been uploaded by them. These CI services will automatically overwrite the name of the release (to "Cockatrice $TAG_NAME"), the status of the release (to "Pre-release"), and the release body (to "Beta build of Cockatrice").
 
 **NOTE 2:** In the first lines of https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt there's an hardcoded version number used when compiling custom (not tagged) versions. While on tagged versions these numbers are overriden by the version numbers coming from the tag title, it's a good practice to keep them aligned with the real ones.
 The preferred flow of operations is:
  * just before a release, update the version number in CMakeLists.txt to "next release version";
  * tag the release following the previously described syntax in order to get it built by CI;
  * wait for CI to upload the binaries, double check if everything is in order
- * after the release is complete, update the version number again to "next beta version", typically increasing `PROJECT_VERSION_PATCH` by one.
+ * after the release is complete, update the version number again to "next targeted beta version", typically increasing `PROJECT_VERSION_PATCH` by one.
