@@ -236,8 +236,19 @@ bool FilterItem::acceptCmc(const CardInfoPtr info) const
 
 bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
 {
-    int loyalty = info->getLoyalty();
-    return loyalty >= 0 ? relationCheck(loyalty) : false;
+    if (info->getLoyalty() == "")
+        return false;
+    else {
+        bool success;
+        // if loyalty can't be converted to "int" it must be "X"
+        int loyalty = info->getLoyalty().toInt(&success);
+        if (success) {
+            return relationCheck(loyalty);
+        } else if (term.trimmed().toUpper() == info->getLoyalty()) {
+            return true;
+        } else
+            return false;
+    }
 }
 
 bool FilterItem::acceptPower(const CardInfoPtr info) const

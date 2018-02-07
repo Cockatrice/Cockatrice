@@ -235,7 +235,7 @@ CardInfo::CardInfo(const QString &_name,
                    const QList<CardRelation *> &_relatedCards,
                    const QList<CardRelation *> &_reverseRelatedCards,
                    bool _upsideDownArt,
-                   int _loyalty,
+                   const QString &_loyalty,
                    bool _cipt,
                    int _tableRow,
                    const SetList &_sets,
@@ -271,7 +271,7 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const QList<CardRelation *> &_relatedCards,
                                   const QList<CardRelation *> &_reverseRelatedCards,
                                   bool _upsideDownArt,
-                                  int _loyalty,
+                                  const QString &_loyalty,
                                   bool _cipt,
                                   int _tableRow,
                                   const SetList &_sets,
@@ -488,7 +488,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
     xml.writeTextElement("text", info->getText());
     if (info->getMainCardType() == "Planeswalker") {
-        xml.writeTextElement("loyalty", QString::number(info->getLoyalty()));
+        xml.writeTextElement("loyalty", info->getLoyalty());
     }
     if (info->getCipt()) {
         xml.writeTextElement("cipt", "1");
@@ -665,7 +665,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
         }
 
         if (xml.name() == "card") {
-            QString name, manacost, cmc, type, pt, text;
+            QString name, manacost, cmc, type, pt, text, loyalty;
             QStringList colors;
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             QStringMap customPicURLs;
@@ -673,7 +673,6 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
             QStringMap collectorNumbers, rarities;
             SetList sets;
             int tableRow = 0;
-            int loyalty = -1;
             bool cipt = false;
             bool isToken = false;
             bool upsideDown = false;
@@ -758,7 +757,7 @@ void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
                 } else if (xml.name() == "upsidedown") {
                     upsideDown = (xml.readElementText() == "1");
                 } else if (xml.name() == "loyalty") {
-                    loyalty = xml.readElementText().toInt();
+                    loyalty = xml.readElementText();
                 } else if (xml.name() == "token") {
                     isToken = static_cast<bool>(xml.readElementText().toInt());
                 } else if (xml.name() != "") {
