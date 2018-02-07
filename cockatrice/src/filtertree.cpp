@@ -236,18 +236,17 @@ bool FilterItem::acceptCmc(const CardInfoPtr info) const
 
 bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
 {
-    if (info->getLoyalty() == "")
+    if (info->getLoyalty().isEmpty()) {
         return false;
-    else {
+    } else {
         bool success;
         // if loyalty can't be converted to "int" it must be "X"
         int loyalty = info->getLoyalty().toInt(&success);
         if (success) {
             return relationCheck(loyalty);
-        } else if (term.trimmed().toUpper() == info->getLoyalty()) {
-            return true;
-        } else
-            return false;
+        } else {
+            return term.trimmed().toUpper() == info->getLoyalty();
+        }
     }
 }
 
@@ -304,7 +303,7 @@ bool FilterItem::acceptRarity(const CardInfoPtr info) const
         }
     }
 
-    foreach (QString rareLevel, info->getRarities()) {
+    for (const QString &rareLevel : info->getRarities()) {
         if (rareLevel.compare(converted_term, Qt::CaseInsensitive) == 0) {
             return true;
         }
