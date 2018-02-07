@@ -231,7 +231,22 @@ bool FilterItem::acceptManaCost(const CardInfoPtr info) const
 
 bool FilterItem::acceptCmc(const CardInfoPtr info) const
 {
-    return relationCheck(info->getCmc().toInt());
+    bool convertSuccess;
+    int cmcInt = info->getCmc().toInt(&convertSuccess);
+    // if conversion failed, check for the "//" separator used in split cards
+    if (!convertSuccess) {
+        int cmcSum = 0;
+        for (const QString &cmc : info->getCmc().split("//")) {
+            cmcInt = cmc.toInt();
+            cmcSum += cmcInt;
+            if (relationCheck(cmcInt)) {
+                return true;
+            }
+        }
+        return relationCheck(cmcSum);
+    } else {
+        return relationCheck(cmcInt);
+    }
 }
 
 bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
