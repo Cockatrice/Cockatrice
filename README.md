@@ -20,17 +20,16 @@ Cockatrice is an open-source, multiplatform program for playing tabletop card ga
 
 # Downloads [![Cockatrice Eternal Download Count](https://img.shields.io/github/downloads/cockatrice/cockatrice/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)
 
-Downloads are available for full releases and the current development version.<br>
+Downloads are available for full releases and the current beta version in development.<br>
 Full releases are checkpoints featuring major feature or UI enhancements - we recommend to use those. There is no strict schedule for new full releases.
 
-The development version contains the most recently added features and bugfixes, but can be unstable. They are released as we feel need.
+The beta release contains the most recently added features and bugfixes, but can be unstable. They are released as we feel need.
 
 - Latest full release (**recommended**): [![Download from GitHub Releases](https://img.shields.io/github/release/cockatrice/cockatrice.svg)](https://github.com/cockatrice/cockatrice/releases/latest) [![Download Count on Latest Release](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)<br>
 
-- Latest development version: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases) 
-   - Development builds may be unstable and contain bugs.
-   - To be a Cockatrice Beta Tester, use this version.
-   - Find more information on the development build [here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)
+- Latest beta release: [![Download from GitHub Pre-Releases](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg)](https://github.com/cockatrice/cockatrice/releases) 
+   - Beta versions may be unstable and contain bugs.
+   - To be a Cockatrice Beta Tester, use this version. Find more information [here](https://github.com/Cockatrice/Cockatrice/wiki/Release-Channels)!
 
 
 # Get Involved [![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice.svg)](https://gitter.im/Cockatrice/Cockatrice)
