@@ -12,9 +12,9 @@
 #define STABLETAG_URL "https://api.github.com/repos/Cockatrice/Cockatrice/git/refs/tags/"
 #define STABLEMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/latest"
 
-#define DEVRELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases"
-#define DEVMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/"
-#define DEVRELEASE_DESCURL "https://github.com/Cockatrice/Cockatrice/compare/%1...%2"
+#define BETARELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases"
+#define BETAMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/"
+#define BETARELEASE_CHANGESURL "https://github.com/Cockatrice/Cockatrice/compare/%1...%2"
 
 #define GIT_SHORT_HASH_LEN 7
 
@@ -53,22 +53,22 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
     QString wordSize = QSysInfo::buildAbi().split('-')[2];
     QString arch;
-    QString devSnapshotEnd;
+    QString betaEnd;
 
     if (wordSize == "llp64") {
         arch = "win64";
-        devSnapshotEnd = "-x86_64_qt5";
+        betaEnd = "-x86_64_qt5";
     } else if (wordSize == "ilp32") {
         arch = "win32";
-        devSnapshotEnd = "-x86_qt5";
+        betaEnd = "-x86_qt5";
     } else {
         qWarning() << "Error checking for upgrade version: wordSize is" << wordSize;
         return false;
     }
 
     auto exeName = arch + ".exe";
-    auto exeDevName = devSnapshotEnd + ".exe";
-    return (fileName.endsWith(exeName) || fileName.endsWith(exeDevName));
+    auto exeBetaName = betaEnd + ".exe";
+    return (fileName.endsWith(exeName) || fileName.endsWith(exeBetaName));
 }
 #else
 
@@ -87,7 +87,7 @@ QString StableReleaseChannel::getManualDownloadUrl() const
 
 QString StableReleaseChannel::getName() const
 {
-    return tr("Stable releases");
+    return tr("Stable Releases");
 }
 
 QString StableReleaseChannel::getReleaseChannelUrl() const
@@ -197,22 +197,22 @@ void StableReleaseChannel::fileListFinished()
     return;
 }
 
-QString DevReleaseChannel::getManualDownloadUrl() const
+QString BetaReleaseChannel::getManualDownloadUrl() const
 {
-    return QString(DEVMANUALDOWNLOAD_URL);
+    return QString(BETAMANUALDOWNLOAD_URL);
 }
 
-QString DevReleaseChannel::getName() const
+QString BetaReleaseChannel::getName() const
 {
-    return tr("Development snapshots");
+    return tr("Beta Releases");
 }
 
-QString DevReleaseChannel::getReleaseChannelUrl() const
+QString BetaReleaseChannel::getReleaseChannelUrl() const
 {
-    return QString(DEVRELEASE_URL);
+    return QString(BETARELEASE_URL);
 }
 
-void DevReleaseChannel::releaseListFinished()
+void BetaReleaseChannel::releaseListFinished()
 {
     QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
     QByteArray jsonData = reply->readAll();
@@ -251,20 +251,20 @@ void DevReleaseChannel::releaseListFinished()
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
     lastRelease->setName(QString("%1 (%2)").arg(resultMap["tag_name"].toString()).arg(shortHash));
-    lastRelease->setDescriptionUrl(QString(DEVRELEASE_DESCURL).arg(VERSION_COMMIT, shortHash));
+    lastRelease->setDescriptionUrl(QString(BETARELEASE_CHANGESURL).arg(VERSION_COMMIT, shortHash));
 
     qDebug() << "Got reply from release server, size=" << resultMap.size() << "name=" << lastRelease->getName()
              << "desc=" << lastRelease->getDescriptionUrl() << "commit=" << lastRelease->getCommitHash()
              << "date=" << lastRelease->getPublishDate();
 
-    QString devBuildDownloadUrl = resultMap["assets_url"].toString();
+    QString betaBuildDownloadUrl = resultMap["assets_url"].toString();
 
-    qDebug() << "Searching for a corresponding file on the dev channel: " << devBuildDownloadUrl;
-    response = netMan->get(QNetworkRequest(devBuildDownloadUrl));
+    qDebug() << "Searching for a corresponding file on the beta channel: " << betaBuildDownloadUrl;
+    response = netMan->get(QNetworkRequest(betaBuildDownloadUrl));
     connect(response, SIGNAL(finished()), this, SLOT(fileListFinished()));
 }
 
-void DevReleaseChannel::fileListFinished()
+void BetaReleaseChannel::fileListFinished()
 {
     QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
     QByteArray jsonData = reply->readAll();

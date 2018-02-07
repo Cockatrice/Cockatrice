@@ -261,9 +261,10 @@ Please have a look at the specific [FAQ for translators](https://github.com/Cock
 
 # Release Management #
 
-### Publish A New Development Snapshot ###
+### Publishing A New Beta Release ###
 
-Travis and AppVeyor have been configured to upload files to GitHub Releases whenever a <kbd>tag</kbd> is pushed. Usually, tags are created through publishing a release, but there's a way around that.
+Travis and AppVeyor have been configured to upload files to GitHub Releases whenever a <kbd>tag</kbd> is pushed.
+Usually, tags are created through publishing a release, but there's a way around that.
 
 To trigger Travis and AppVeyor, simply do the following:
 ```bash
