@@ -254,8 +254,8 @@ public:
     SequenceEdit *Player_aUntapAll;
     QLabel *lbl_Player_aDoesntUntap;
     SequenceEdit *Player_aDoesntUntap;
-    QLabel *lbl_Player_aFlip;
-    SequenceEdit *Player_aFlip;
+    QLabel *lbl_Player_aTurnOver;
+    SequenceEdit *Player_aTurnOver;
     QLabel *lbl_Player_aPeek;
     SequenceEdit *Player_aPeek;
     QLabel *lbl_Player_aPlay;
@@ -1281,15 +1281,15 @@ public:
 
         gridLayout_13->addWidget(Player_aDoesntUntap, 3, 1, 1, 1);
 
-        lbl_Player_aFlip = new QLabel(groupBox_13);
-        lbl_Player_aFlip->setObjectName("lbl_Player_aFlip");
+        lbl_Player_aTurnOver = new QLabel(groupBox_13);
+        lbl_Player_aTurnOver->setObjectName("lbl_Player_aTurnOver");
 
-        gridLayout_13->addWidget(lbl_Player_aFlip, 4, 0, 1, 1);
+        gridLayout_13->addWidget(lbl_Player_aTurnOver, 4, 0, 1, 1);
 
-        Player_aFlip = new SequenceEdit("Player/aFlip", groupBox_13);
-        Player_aFlip->setObjectName("Player_aFlip");
+        Player_aTurnOver = new SequenceEdit("Player/aTurnOver", groupBox_13);
+        Player_aTurnOver->setObjectName("Player_aTurnOver");
 
-        gridLayout_13->addWidget(Player_aFlip, 4, 1, 1, 1);
+        gridLayout_13->addWidget(Player_aTurnOver, 4, 1, 1, 1);
 
         lbl_Player_aPeek = new QLabel(groupBox_13);
         lbl_Player_aPeek->setObjectName("lbl_Player_aPeek");
@@ -1855,7 +1855,7 @@ public:
         lbl_Player_aTap->setText(QApplication::translate("shortcutsTab", "Tap / Untap Card", 0));
         lbl_Player_aUntapAll->setText(QApplication::translate("shortcutsTab", "Untap all", 0));
         lbl_Player_aDoesntUntap->setText(QApplication::translate("shortcutsTab", "Toggle untap", 0));
-        lbl_Player_aFlip->setText(QApplication::translate("shortcutsTab", "Flip card", 0));
+        lbl_Player_aTurnOver->setText(QApplication::translate("shortcutsTab", "Turn card over", 0));
         lbl_Player_aPeek->setText(QApplication::translate("shortcutsTab", "Peek card", 0));
         lbl_Player_aPlay->setText(QApplication::translate("shortcutsTab", "Play card", 0));
         lbl_Player_aAttach->setText(QApplication::translate("shortcutsTab", "Attach card", 0));

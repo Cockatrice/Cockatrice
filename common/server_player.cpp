@@ -24,7 +24,7 @@
 #include "pb/command_delete_arrow.pb.h"
 #include "pb/command_draw_cards.pb.h"
 #include "pb/command_dump_zone.pb.h"
-#include "pb/command_flip_card.pb.h"
+#include "pb/command_turn_card_over.pb.h"
 #include "pb/command_game_say.pb.h"
 #include "pb/command_inc_card_counter.pb.h"
 #include "pb/command_inc_counter.pb.h"
@@ -55,7 +55,7 @@
 #include "pb/event_destroy_card.pb.h"
 #include "pb/event_draw_cards.pb.h"
 #include "pb/event_dump_zone.pb.h"
-#include "pb/event_flip_card.pb.h"
+#include "pb/event_turn_card_over.pb.h"
 #include "pb/event_game_say.pb.h"
 #include "pb/event_move_card.pb.h"
 #include "pb/event_player_properties_changed.pb.h"
@@ -979,7 +979,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
 }
 
 Response::ResponseCode
-Server_Player::cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::cmdTurnCardOver(const Command_TurnCardOver &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
     if (spectator)
         return Response::RespFunctionNotAllowed;
@@ -1005,7 +1005,7 @@ Server_Player::cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer & /*rc
 
     card->setFaceDown(faceDown);
 
-    Event_FlipCard event;
+    Event_TurnCardOver event;
     event.set_zone_name(zone->getName().toStdString());
     event.set_card_id(card->getId());
     if (!faceDown)
@@ -1750,8 +1750,8 @@ Server_Player::processGameCommand(const GameCommand &command, ResponseContainer 
         case GameCommand::UNDO_DRAW:
             return cmdUndoDraw(command.GetExtension(Command_UndoDraw::ext), rc, ges);
             break;
-        case GameCommand::FLIP_CARD:
-            return cmdFlipCard(command.GetExtension(Command_FlipCard::ext), rc, ges);
+        case GameCommand::TURN_CARD_OVER:
+            return cmdTurnCardOver(command.GetExtension(Command_TurnCardOver::ext), rc, ges);
             break;
         case GameCommand::ATTACH_CARD:
             return cmdAttachCard(command.GetExtension(Command_AttachCard::ext), rc, ges);

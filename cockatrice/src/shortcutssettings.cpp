@@ -193,7 +193,7 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/aDrawArrow"] = parseSequenceString("");
     defaultShortCuts["Player/aDrawCard"] = parseSequenceString("Ctrl+D");
     defaultShortCuts["Player/aDrawCards"] = parseSequenceString("Ctrl+E");
-    defaultShortCuts["Player/aFlip"] = parseSequenceString("");
+    defaultShortCuts["Player/aTurnOver"] = parseSequenceString("");
     defaultShortCuts["Player/aIncPT"] = parseSequenceString("Ctrl+Alt++");
     defaultShortCuts["Player/aIncT"] = parseSequenceString("Alt++");
     defaultShortCuts["Player/aMoveToBottomLibrary"] = parseSequenceString("");

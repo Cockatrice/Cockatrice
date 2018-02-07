@@ -1,9 +1,9 @@
 syntax = "proto2";
 import "game_event.proto";
 
-message Event_FlipCard {
+message Event_TurnCardOver {
     extend GameEvent {
-        optional Event_FlipCard ext = 2010;
+        optional Event_TurnCardOver ext = 2010;
     }
     optional string zone_name = 1;
     optional sint32 card_id = 2;

@@ -23,7 +23,7 @@ SET(PROTO_FILES
     command_delete_arrow.proto
     command_draw_cards.proto
     command_dump_zone.proto
-    command_flip_card.proto
+    command_turn_card_over.proto
     command_game_say.proto
     command_inc_card_counter.proto
     command_inc_counter.proto
@@ -70,7 +70,7 @@ SET(PROTO_FILES
     event_destroy_card.proto
     event_draw_cards.proto
     event_dump_zone.proto
-    event_flip_card.proto
+    event_turn_card_over.proto
     event_game_closed.proto
     event_game_host_changed.proto
     event_game_joined.proto

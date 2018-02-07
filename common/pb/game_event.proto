@@ -19,7 +19,7 @@ message GameEvent {
         SHUFFLE = 2007;
         ROLL_DIE = 2008;
         MOVE_CARD = 2009;
-        FLIP_CARD = 2010;
+        TURN_CARD_OVER = 2010;
         DESTROY_CARD = 2011;
         ATTACH_CARD = 2012;
         CREATE_TOKEN = 2013;

@@ -360,12 +360,12 @@ void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCar
                                     .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone)));
 }
 
-void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
+void MessageLogWidget::logTurnCardOver(Player *player, QString cardName, bool faceDown)
 {
     if (faceDown) {
-        appendHtmlServerMessage(tr("%1 flips %2 face-down.").arg(sanitizeHtml(player->getName())).arg(cardName));
+        appendHtmlServerMessage(tr("%1 turns %2 face-down.").arg(sanitizeHtml(player->getName())).arg(cardName));
     } else {
-        appendHtmlServerMessage(tr("%1 flips %2 face-up.").arg(sanitizeHtml(player->getName())).arg(cardName));
+        appendHtmlServerMessage(tr("%1 turns %2 face-up.").arg(sanitizeHtml(player->getName())).arg(cardName));
     }
 }
 
@@ -777,7 +777,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
             SLOT(logSetAnnotation(Player *, CardItem *, QString)));
     connect(player, SIGNAL(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int)), this,
             SLOT(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int)));
-    connect(player, SIGNAL(logFlipCard(Player *, QString, bool)), this, SLOT(logFlipCard(Player *, QString, bool)));
+    connect(player, SIGNAL(logTurnCardOver(Player *, QString, bool)), this, SLOT(logTurnCardOver(Player *, QString, bool)));
     connect(player, SIGNAL(logDestroyCard(Player *, QString)), this, SLOT(logDestroyCard(Player *, QString)));
     connect(player, SIGNAL(logAttachCard(Player *, QString, Player *, QString)), this,
             SLOT(logAttachCard(Player *, QString, Player *, QString)));

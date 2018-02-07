@@ -30,7 +30,7 @@
 #include "pb/command_change_zone_properties.pb.h"
 #include "pb/command_create_token.pb.h"
 #include "pb/command_draw_cards.pb.h"
-#include "pb/command_flip_card.pb.h"
+#include "pb/command_turn_card_over.pb.h"
 #include "pb/command_game_say.pb.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/command_mulligan.pb.h"
@@ -52,7 +52,7 @@
 #include "pb/event_destroy_card.pb.h"
 #include "pb/event_draw_cards.pb.h"
 #include "pb/event_dump_zone.pb.h"
-#include "pb/event_flip_card.pb.h"
+#include "pb/event_turn_card_over.pb.h"
 #include "pb/event_game_say.pb.h"
 #include "pb/event_move_card.pb.h"
 #include "pb/event_reveal_cards.pb.h"
@@ -391,9 +391,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     connect(aSetPT, SIGNAL(triggered()), this, SLOT(actSetPT()));
     aSetAnnotation = new QAction(this);
     connect(aSetAnnotation, SIGNAL(triggered()), this, SLOT(actSetAnnotation()));
-    aFlip = new QAction(this);
-    aFlip->setData(cmFlip);
-    connect(aFlip, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    aTurnOver = new QAction(this);
+    aTurnOver->setData(cmTurnOver);
+    connect(aTurnOver, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     aPeek = new QAction(this);
     aPeek->setData(cmPeek);
     connect(aPeek, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
@@ -684,7 +684,7 @@ void Player::retranslateUi()
     aPlayFacedown->setText(tr("Play &Face Down"));
     aTap->setText(tr("&Tap / Untap"));
     aDoesntUntap->setText(tr("Toggle &normal untapping"));
-    aFlip->setText(tr("&Flip"));
+    aTurnOver->setText(tr("&Turn Over"));
     aPeek->setText(tr("&Peek at card face"));
     aClone->setText(tr("&Clone"));
     aAttach->setText(tr("Attac&h to card..."));
@@ -733,7 +733,7 @@ void Player::setShortcutsActive()
     aPlay->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aPlay"));
     aTap->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aTap"));
     aDoesntUntap->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDoesntUntap"));
-    aFlip->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aFlip"));
+    aTurnOver->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aTurnOver"));
     aPeek->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aPeek"));
     aClone->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aClone"));
     aAttach->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aAttach"));
@@ -1585,7 +1585,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     }
 }
 
-void Player::eventFlipCard(const Event_FlipCard &event)
+void Player::eventTurnCardOver(const Event_TurnCardOver &event)
 {
     CardZone *zone = zones.value(QString::fromStdString(event.zone_name()), 0);
     if (!zone)
@@ -1593,7 +1593,7 @@ void Player::eventFlipCard(const Event_FlipCard &event)
     CardItem *card = zone->getCard(event.card_id(), QString::fromStdString(event.card_name()));
     if (!card)
         return;
-    emit logFlipCard(this, card->getName(), event.face_down());
+    emit logTurnCardOver(this, card->getName(), event.face_down());
     card->setFaceDown(event.face_down());
 }
 
@@ -1786,8 +1786,8 @@ void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &ev
         case GameEvent::MOVE_CARD:
             eventMoveCard(event.GetExtension(Event_MoveCard::ext), context);
             break;
-        case GameEvent::FLIP_CARD:
-            eventFlipCard(event.GetExtension(Event_FlipCard::ext));
+        case GameEvent::TURN_CARD_OVER:
+            eventTurnCardOver(event.GetExtension(Event_TurnCardOver::ext));
             break;
         case GameEvent::DESTROY_CARD:
             eventDestroyCard(event.GetExtension(Event_DestroyCard::ext));
@@ -2199,8 +2199,8 @@ void Player::cardMenuAction()
                     commandList.append(cmd);
                     break;
                 }
-                case cmFlip: {
-                    Command_FlipCard *cmd = new Command_FlipCard;
+                case cmTurnOver: {
+                    Command_TurnCardOver *cmd = new Command_TurnCardOver;
                     cmd->set_zone(card->getZone()->getName().toStdString());
                     cmd->set_card_id(card->getId());
                     cmd->set_face_down(!card->getFaceDown());
@@ -2626,7 +2626,7 @@ void Player::updateCardMenu(const CardItem *card)
 
                 cardMenu->addAction(aTap);
                 cardMenu->addAction(aDoesntUntap);
-                cardMenu->addAction(aFlip);
+                cardMenu->addAction(aTurnOver);
                 if (card->getFaceDown()) {
                     cardMenu->addAction(aPeek);
                 }
