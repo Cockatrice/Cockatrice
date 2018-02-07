@@ -12,7 +12,7 @@ class QNetworkAccessManager;
 class Release
 {
     friend class StableReleaseChannel;
-    friend class DevReleaseChannel;
+    friend class BetaReleaseChannel;
 
 public:
     Release(){};
@@ -129,12 +129,12 @@ protected slots:
     virtual void fileListFinished();
 };
 
-class DevReleaseChannel : public ReleaseChannel
+class BetaReleaseChannel : public ReleaseChannel
 {
     Q_OBJECT
 public:
-    DevReleaseChannel(){};
-    ~DevReleaseChannel(){};
+    BetaReleaseChannel(){};
+    ~BetaReleaseChannel(){};
     virtual QString getManualDownloadUrl() const;
     virtual QString getName() const;
 

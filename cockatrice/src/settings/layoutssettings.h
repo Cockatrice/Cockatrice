@@ -8,6 +8,7 @@ class LayoutsSettings : public SettingsManager
 {
     Q_OBJECT
     friend class SettingsCache;
+
 public:
     void setDeckEditorLayoutState(const QByteArray &value);
     void setDeckEditorGeometry(const QByteArray &value);
@@ -53,11 +54,8 @@ signals:
 public slots:
 
 private:
-    LayoutsSettings(QString settingPath,QObject *parent = 0);
-    LayoutsSettings( const LayoutsSettings& /*other*/ );
-    LayoutsSettings( LayoutsSettings& /*other*/ );
-    LayoutsSettings( volatile const LayoutsSettings& /*other*/ );
-    LayoutsSettings( volatile LayoutsSettings& /*other*/ );
+    explicit LayoutsSettings(QString settingPath, QObject *parent = nullptr);
+    LayoutsSettings(const LayoutsSettings & /*other*/);
 };
 
 #endif // LAYOUTSSETTINGS_H
