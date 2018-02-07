@@ -233,6 +233,7 @@ bool FilterItem::acceptCmc(const CardInfoPtr info) const
 {
     bool convertSuccess;
     int cmcInt = info->getCmc().toInt(&convertSuccess);
+    // if conversion failed, check for the "//" separator used in split cards
     if (!convertSuccess) {
         int cmcSum = 0;
         foreach (QString cmc, info->getCmc().split("//")) {
@@ -242,7 +243,7 @@ bool FilterItem::acceptCmc(const CardInfoPtr info) const
                 return true;
             }
         }
-        return (cmcSum > 1 ? relationCheck(cmcSum) : false);
+        return relationCheck(cmcSum);
     } else {
         return relationCheck(cmcInt);
     }
