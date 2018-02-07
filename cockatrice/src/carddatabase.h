@@ -131,7 +131,6 @@ private:
     QString cardtype;
     QString powtough;
     QString text;
-    QString loyalty;
     QStringList colors;
 
     // the cards i'm related to
@@ -146,6 +145,7 @@ private:
     QString setsNames;
 
     bool upsideDownArt;
+    QString loyalty;
     QStringMap customPicURLs;
     MuidMap muIds;
     QStringMap collectorNumbers;
