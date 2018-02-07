@@ -66,7 +66,7 @@ private:
                         QString &cmc,
                         const QString &cardType,
                         const QString &cardPT,
-                        int cardLoyalty,
+                        const QString &cardLoyalty,
                         const QString &cardText,
                         const QStringList &colors,
                         const QList<CardRelation *> &relatedCards,

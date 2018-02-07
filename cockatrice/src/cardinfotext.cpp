@@ -63,7 +63,7 @@ void CardInfoText::setCard(CardInfoPtr card)
         colorLabel2->setText(card->getColors().join(""));
         cardtypeLabel2->setText(card->getCardType());
         powtoughLabel2->setText(card->getPowTough());
-        loyaltyLabel2->setText(card->getLoyalty() > 0 ? QString::number(card->getLoyalty()) : QString());
+        loyaltyLabel2->setText(card->getLoyalty());
         textLabel->setText(card->getText());
     } else {
         nameLabel2->setText("");

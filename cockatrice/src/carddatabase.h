@@ -145,7 +145,7 @@ private:
     QString setsNames;
 
     bool upsideDownArt;
-    int loyalty;
+    QString loyalty;
     QStringMap customPicURLs;
     MuidMap muIds;
     QStringMap collectorNumbers;
@@ -166,7 +166,7 @@ public:
                       const QList<CardRelation *> &_relatedCards = QList<CardRelation *>(),
                       const QList<CardRelation *> &_reverseRelatedCards = QList<CardRelation *>(),
                       bool _upsideDownArt = false,
-                      int _loyalty = 0,
+                      const QString &_loyalty = QString(),
                       bool _cipt = false,
                       int _tableRow = 0,
                       const SetList &_sets = SetList(),
@@ -187,7 +187,7 @@ public:
                                    const QList<CardRelation *> &_relatedCards = QList<CardRelation *>(),
                                    const QList<CardRelation *> &_reverseRelatedCards = QList<CardRelation *>(),
                                    bool _upsideDownArt = false,
-                                   int _loyalty = 0,
+                                   const QString &_loyalty = QString(),
                                    bool _cipt = false,
                                    int _tableRow = 0,
                                    const SetList &_sets = SetList(),
@@ -245,7 +245,7 @@ public:
     {
         return pixmapCacheKey;
     }
-    const int &getLoyalty() const
+    const QString &getLoyalty() const
     {
         return loyalty;
     }

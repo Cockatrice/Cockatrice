@@ -60,7 +60,7 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
                                     QString &cmc,
                                     const QString &cardType,
                                     const QString &cardPT,
-                                    int cardLoyalty,
+                                    const QString &cardLoyalty,
                                     const QString &cardText,
                                     const QStringList &colors,
                                     const QList<CardRelation *> &relatedCards,
@@ -152,7 +152,7 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
     int cardId;
     QString setNumber;
     QString rarity;
-    int cardLoyalty;
+    QString cardLoyalty;
     bool upsideDown = false;
     QMap<int, QVariantMap> splitCards;
 
@@ -184,7 +184,7 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
         cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
         setNumber = map.contains("number") ? map.value("number").toString() : QString("");
         rarity = map.contains("rarity") ? map.value("rarity").toString() : QString("");
-        cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toInt() : 0;
+        cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toString() : QString("");
         relatedCards = QList<CardRelation *>();
         if (map.contains("names"))
             foreach (const QString &name, map.value("names").toStringList()) {
@@ -237,9 +237,8 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
         cardText = "";
         setNumber = "";
         rarity = "";
+        cardLoyalty = "";
         colors.clear();
-        // this is currently an integer; can't accept 2 values
-        cardLoyalty = 0;
 
         // loop cards and merge their contents
         QString prefix = QString(" // ");

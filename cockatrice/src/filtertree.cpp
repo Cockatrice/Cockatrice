@@ -234,6 +234,22 @@ bool FilterItem::acceptCmc(const CardInfoPtr info) const
     return relationCheck(info->getCmc().toInt());
 }
 
+bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
+{
+    if (info->getLoyalty().isEmpty()) {
+        return false;
+    } else {
+        bool success;
+        // if loyalty can't be converted to "int" it must be "X"
+        int loyalty = info->getLoyalty().toInt(&success);
+        if (success) {
+            return relationCheck(loyalty);
+        } else {
+            return term.trimmed().toUpper() == info->getLoyalty();
+        }
+    }
+}
+
 bool FilterItem::acceptPower(const CardInfoPtr info) const
 {
     int slash = info->getPowTough().indexOf("/");
@@ -287,7 +303,7 @@ bool FilterItem::acceptRarity(const CardInfoPtr info) const
         }
     }
 
-    foreach (QString rareLevel, info->getRarities()) {
+    for (const QString &rareLevel : info->getRarities()) {
         if (rareLevel.compare(converted_term, Qt::CaseInsensitive) == 0) {
             return true;
         }
@@ -351,6 +367,8 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) c
             return acceptPower(info);
         case CardFilter::AttrTough:
             return acceptToughness(info);
+        case CardFilter::AttrLoyalty:
+            return acceptLoyalty(info);
         default:
             return true; /* ignore this attribute */
     }
