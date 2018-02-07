@@ -231,7 +231,21 @@ bool FilterItem::acceptManaCost(const CardInfoPtr info) const
 
 bool FilterItem::acceptCmc(const CardInfoPtr info) const
 {
-    return relationCheck(info->getCmc().toInt());
+    bool convertSuccess;
+    int cmcInt = info->getCmc().toInt(&convertSuccess);
+    if (!convertSuccess) {
+        int cmcSum = 0;
+        foreach (QString cmc, info->getCmc().split("//")) {
+            cmcInt = cmc.toInt();
+            cmcSum += cmcInt;
+            if (relationCheck(cmcInt)) {
+                return true;
+            }
+        }
+        return (cmcSum > 1 ? relationCheck(cmcSum) : false);
+    } else {
+        return relationCheck(cmcInt);
+    }
 }
 
 bool FilterItem::acceptPower(const CardInfoPtr info) const
