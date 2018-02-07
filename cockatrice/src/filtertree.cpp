@@ -236,7 +236,7 @@ bool FilterItem::acceptCmc(const CardInfoPtr info) const
     // if conversion failed, check for the "//" separator used in split cards
     if (!convertSuccess) {
         int cmcSum = 0;
-        foreach (QString cmc, info->getCmc().split("//")) {
+        for (QString cmc : info->getCmc().split("//")) {
             cmcInt = cmc.toInt();
             cmcSum += cmcInt;
             if (relationCheck(cmcInt)) {
