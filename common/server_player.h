@@ -203,7 +203,8 @@ public:
     Response::ResponseCode cmdDrawCards(const Command_DrawCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdUndoDraw(const Command_UndoDraw &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer &rc, GameEventStorage &ges);
-    Response::ResponseCode cmdTurnCardOver(const Command_TurnCardOver &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    Response::ResponseCode
+    cmdTurnCardOver(const Command_TurnCardOver &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdCreateArrow(const Command_CreateArrow &cmd, ResponseContainer &rc, GameEventStorage &ges);
