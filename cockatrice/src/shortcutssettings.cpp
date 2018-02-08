@@ -1,5 +1,6 @@
 #include "shortcutssettings.h"
 #include <QFile>
+#include <QMessageBox>
 #include <QStringList>
 #include <utility>
 
@@ -18,23 +19,39 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
         shortCutsFile.beginGroup("Custom");
         const QStringList customKeys = shortCutsFile.allKeys();
 
-        QStringList invalidKeys = QStringList();
+        QMap<QString, QString> invalidItems;
         for (QStringList::const_iterator it = customKeys.constBegin(); it != customKeys.constEnd(); ++it) {
             QString stringSequence = shortCutsFile.value(*it).toString();
-            // check whether shortcut is valid: neither forbidden keys nor used elsewhere
-            if (isValid(*it, stringSequence)) {
+            // check whether shortcut is forbidden
+            if (isKeyAllowed(stringSequence)) {
                 QList<QKeySequence> SequenceList = parseSequenceString(stringSequence);
                 shortCuts.insert(*it, SequenceList);
             } else {
-                invalidKeys.append(*it);
+                invalidItems.insert(*it, stringSequence);
             }
         }
 
         shortCutsFile.endGroup();
 
-        // set default shortcut where stored value was invalid
-        for (const QString &key : invalidKeys) {
-            setShortcuts(key, getDefaultShortcutString(key));
+        if (!invalidItems.isEmpty()) {
+
+            // warning message in case of invalid items
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.setText(tr("Your configuration file contained invalid shortcuts.\n"
+                              "Please check your shortcut settings!"));
+            QString detailedMessage = QString();
+            for (QMap<QString, QString>::const_iterator item = invalidItems.constBegin();
+                 item != invalidItems.constEnd(); ++item) {
+                detailedMessage += item.key() + " - \"" + item.value() + "\"\n";
+            }
+            msgBox.setDetailedText(detailedMessage);
+            msgBox.exec();
+
+            // set default shortcut where stored value was invalid
+            for (const QString &key : invalidItems.keys()) {
+                setShortcuts(key, getDefaultShortcutString(key));
+            }
         }
     }
 }
@@ -109,24 +126,28 @@ void ShortcutsSettings::setShortcuts(QString name, QString Sequences)
     setShortcuts(std::move(name), parseSequenceString(std::move(Sequences)));
 }
 
-bool ShortcutsSettings::isValid(QString name, QString Sequences)
+bool ShortcutsSettings::isKeyAllowed(QString Sequences)
 {
-    QString checkKey = name.left(name.indexOf("/"));
-
     QString checkSequence = Sequences.split(";").last();
-
     QStringList forbiddenKeys = (QStringList() << "Del"
+                                               << "Backspace"
                                                << "Down"
                                                << "Up"
                                                << "Left"
                                                << "Right"
                                                << "Return"
                                                << "Enter"
-                                               << "Backspace"
-                                               << "Esc");
+                                               << "Menu");
     if (forbiddenKeys.contains(checkSequence)) {
         return false;
     }
+    return true;
+}
+
+bool ShortcutsSettings::isValid(QString name, QString Sequences)
+{
+    QString checkSequence = Sequences.split(";").last();
+    QString checkKey = name.left(name.indexOf("/"));
 
     QList<QString> allKeys = shortCuts.keys();
     for (const auto &key : allKeys) {

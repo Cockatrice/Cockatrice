@@ -139,19 +139,23 @@ int SequenceEdit::translateModifiers(Qt::KeyboardModifiers state, const QString 
 
 void SequenceEdit::finishShortcut()
 {
-    QKeySequence secuence(keys);
-    if (!secuence.isEmpty() && valid) {
-        QString secuenceString = secuence.toString();
-        if (settingsCache->shortcuts().isValid(shorcutName, secuenceString)) {
-            if (!lineEdit->text().isEmpty()) {
-                if (lineEdit->text().contains(secuenceString)) {
-                    return;
+    QKeySequence sequence(keys);
+    if (!sequence.isEmpty() && valid) {
+        QString sequenceString = sequence.toString();
+        if (settingsCache->shortcuts().isKeyAllowed(sequenceString)) {
+            if (settingsCache->shortcuts().isValid(shorcutName, sequenceString)) {
+                if (!lineEdit->text().isEmpty()) {
+                    if (lineEdit->text().contains(sequenceString)) {
+                        return;
+                    }
+                    lineEdit->setText(lineEdit->text() + ";");
                 }
-                lineEdit->setText(lineEdit->text() + ";");
+                lineEdit->setText(lineEdit->text() + sequenceString);
+            } else {
+                QToolTip::showText(lineEdit->mapToGlobal(QPoint()), tr("Shortcut already in use"));
             }
-            lineEdit->setText(lineEdit->text() + secuenceString);
         } else {
-            QToolTip::showText(lineEdit->mapToGlobal(QPoint()), tr("Shortcut already in use"));
+            QToolTip::showText(lineEdit->mapToGlobal(QPoint()), tr("Invalid key"));
         }
     }
 
