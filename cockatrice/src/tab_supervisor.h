@@ -6,6 +6,8 @@
 #include <QAbstractButton>
 #include <QMap>
 #include <QTabWidget>
+#include <QProxyStyle>
+#include <QCommonStyle>
 
 class QMenu;
 class AbstractClient;
@@ -29,6 +31,13 @@ class ServerInfo_Room;
 class ServerInfo_User;
 class GameReplay;
 class DeckList;
+
+class MacOSTabFixStyle : public QProxyStyle
+{
+    Q_OBJECT
+public:
+    QRect subElementRect(SubElement, const QStyleOption *, const QWidget *) const;
+};
 
 class CloseButton : public QAbstractButton
 {

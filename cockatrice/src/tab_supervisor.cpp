@@ -28,6 +28,19 @@
 #include "pb/serverinfo_room.pb.h"
 #include "pb/serverinfo_user.pb.h"
 
+QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
+{
+    if(element != SE_TabBarTabText)
+    {
+        return QProxyStyle::subElementRect(element, option, widget);
+    }
+
+    // Skip over QProxyStyle handling subElementRect,
+    // This fixes an issue with Qt 5.10 on OSX where the labels for tabs with a button and an icon
+    // get cut-off too early
+    return QCommonStyle::subElementRect(element, option, widget);
+}
+
 CloseButton::CloseButton(QWidget *parent) : QAbstractButton(parent)
 {
     setFocusPolicy(Qt::NoFocus);
@@ -86,6 +99,13 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
     setElideMode(Qt::ElideRight);
     setMovable(true);
     setIconSize(QSize(15, 15));
+
+    #if defined(Q_OS_MAC)
+    // This is necessary to fix an issue on macOS with qt5.10,
+    // where tabs with icons and buttons get drawn incorrectly
+    tabBar()->setStyle(new MacOSTabFixStyle);
+    #endif
+
     connect(this, SIGNAL(currentChanged(int)), this, SLOT(updateCurrent(int)));
 
     connect(client, SIGNAL(roomEventReceived(const RoomEvent &)), this, SLOT(processRoomEvent(const RoomEvent &)));
