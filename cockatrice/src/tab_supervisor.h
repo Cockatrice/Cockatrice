@@ -4,7 +4,9 @@
 #include "chatview/userlistProxy.h"
 #include "deck_loader.h"
 #include <QAbstractButton>
+#include <QCommonStyle>
 #include <QMap>
+#include <QProxyStyle>
 #include <QTabWidget>
 
 class QMenu;
@@ -29,6 +31,13 @@ class ServerInfo_Room;
 class ServerInfo_User;
 class GameReplay;
 class DeckList;
+
+class MacOSTabFixStyle : public QProxyStyle
+{
+    Q_OBJECT
+public:
+    QRect subElementRect(SubElement, const QStyleOption *, const QWidget *) const;
+};
 
 class CloseButton : public QAbstractButton
 {
