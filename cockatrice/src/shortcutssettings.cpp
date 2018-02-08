@@ -17,14 +17,24 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
     if (exists) {
         shortCutsFile.beginGroup("Custom");
         const QStringList customKeys = shortCutsFile.allKeys();
-
+        QStringList invalidKeys = QStringList();
         for (QStringList::const_iterator it = customKeys.constBegin(); it != customKeys.constEnd(); ++it) {
             QString stringSequence = shortCutsFile.value(*it).toString();
-            QList<QKeySequence> SequenceList = parseSequenceString(stringSequence);
-            shortCuts.insert(*it, SequenceList);
+            // check whether shortcut is valid: neither forbidden keys nor used elsewhere
+            if (isValid(*it, stringSequence)) {
+                QList<QKeySequence> SequenceList = parseSequenceString(stringSequence);
+                shortCuts.insert(*it, SequenceList);
+            }
+            else {
+                invalidKeys.append(*it);
+            }
         }
-
         shortCutsFile.endGroup();
+
+        // set default shortcut where stored value was invalid
+        for (QString key : invalidKeys) {
+            setShortcuts(key, getDefaultShortcutString(key));
+        }
     }
 }
 
@@ -104,15 +114,19 @@ bool ShortcutsSettings::isValid(QString name, QString Sequences)
 
     QString checkSequence = Sequences.split(";").last();
 
+    QStringList forbiddenKeys = (QStringList() << "Del" << "Down" << "Up" << "Left" << "Right"
+        << "Return" << "Enter" << "Backspace" << "Esc");
+    if (forbiddenKeys.contains(checkSequence)) {
+        return false;
+    }
+
     QList<QString> allKeys = shortCuts.keys();
     for (const auto &key : allKeys) {
         if (key.startsWith(checkKey) || key.startsWith("MainWindow") || checkKey.startsWith("MainWindow")) {
             QString storedSequence = stringifySequence(shortCuts.value(key));
             QStringList stringSequences = storedSequence.split(";");
-            for (int j = 0; j < stringSequences.size(); j++) {
-                if (checkSequence == stringSequences.at(j)) {
-                    return false;
-                }
+            if (stringSequences.contains(checkSequence)) {
+                return false;
             }
         }
     }
@@ -162,7 +176,7 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["TabDeckEditor/aNewDeck"] = parseSequenceString("Ctrl+N");
     defaultShortCuts["TabDeckEditor/aOpenCustomFolder"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aPrintDeck"] = parseSequenceString("Ctrl+P");
-    defaultShortCuts["TabDeckEditor/aRemoveCard"] = parseSequenceString("Del");
+    defaultShortCuts["TabDeckEditor/aRemoveCard"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aResetLayout"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aSaveDeck"] = parseSequenceString("Ctrl+S");
     defaultShortCuts["TabDeckEditor/aSaveDeckAs"] = parseSequenceString("");
