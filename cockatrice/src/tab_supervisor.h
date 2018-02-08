@@ -4,10 +4,10 @@
 #include "chatview/userlistProxy.h"
 #include "deck_loader.h"
 #include <QAbstractButton>
-#include <QMap>
-#include <QTabWidget>
-#include <QProxyStyle>
 #include <QCommonStyle>
+#include <QMap>
+#include <QProxyStyle>
+#include <QTabWidget>
 
 class QMenu;
 class AbstractClient;

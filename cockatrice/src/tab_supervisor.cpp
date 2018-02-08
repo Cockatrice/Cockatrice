@@ -30,8 +30,7 @@
 
 QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
-    if(element != SE_TabBarTabText)
-    {
+    if (element != SE_TabBarTabText) {
         return QProxyStyle::subElementRect(element, option, widget);
     }
 
@@ -100,11 +99,11 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QWidget *parent)
     setMovable(true);
     setIconSize(QSize(15, 15));
 
-    #if defined(Q_OS_MAC)
+#if defined(Q_OS_MAC)
     // This is necessary to fix an issue on macOS with qt5.10,
     // where tabs with icons and buttons get drawn incorrectly
     tabBar()->setStyle(new MacOSTabFixStyle);
-    #endif
+#endif
 
     connect(this, SIGNAL(currentChanged(int)), this, SLOT(updateCurrent(int)));
 
