@@ -22,7 +22,7 @@ public:
     void setShortcuts(QString name, QKeySequence Sequence);
     void setShortcuts(QString name, QString Sequences);
 
-    bool isKeyAllowed(QString Sequences);
+    bool isKeyAllowed(QString name, QString Sequences);
     bool isValid(QString name, QString Sequences);
 
     void resetAllShortcuts();

@@ -142,7 +142,7 @@ void SequenceEdit::finishShortcut()
     QKeySequence sequence(keys);
     if (!sequence.isEmpty() && valid) {
         QString sequenceString = sequence.toString();
-        if (settingsCache->shortcuts().isKeyAllowed(sequenceString)) {
+        if (settingsCache->shortcuts().isKeyAllowed(shorcutName, sequenceString)) {
             if (settingsCache->shortcuts().isValid(shorcutName, sequenceString)) {
                 if (!lineEdit->text().isEmpty()) {
                     if (lineEdit->text().contains(sequenceString)) {

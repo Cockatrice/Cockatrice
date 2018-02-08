@@ -23,7 +23,7 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
         for (QStringList::const_iterator it = customKeys.constBegin(); it != customKeys.constEnd(); ++it) {
             QString stringSequence = shortCutsFile.value(*it).toString();
             // check whether shortcut is forbidden
-            if (isKeyAllowed(stringSequence)) {
+            if (isKeyAllowed(*it, stringSequence)) {
                 QList<QKeySequence> SequenceList = parseSequenceString(stringSequence);
                 shortCuts.insert(*it, SequenceList);
             } else {
@@ -34,13 +34,12 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
         shortCutsFile.endGroup();
 
         if (!invalidItems.isEmpty()) {
-
             // warning message in case of invalid items
             QMessageBox msgBox;
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.setText(tr("Your configuration file contained invalid shortcuts.\n"
                               "Please check your shortcut settings!"));
-            QString detailedMessage = QString();
+            QString detailedMessage = tr("The following shortcuts have been set to default:\n");
             for (QMap<QString, QString>::const_iterator item = invalidItems.constBegin();
                  item != invalidItems.constEnd(); ++item) {
                 detailedMessage += item.key() + " - \"" + item.value() + "\"\n";
@@ -126,8 +125,12 @@ void ShortcutsSettings::setShortcuts(QString name, QString Sequences)
     setShortcuts(std::move(name), parseSequenceString(std::move(Sequences)));
 }
 
-bool ShortcutsSettings::isKeyAllowed(QString Sequences)
+bool ShortcutsSettings::isKeyAllowed(QString name, QString Sequences)
 {
+    // if the shortcut is not to be used in deck-editor then it doesn't matter
+    if (name.startsWith("Player")) {
+        return true;
+    }
     QString checkSequence = Sequences.split(";").last();
     QStringList forbiddenKeys = (QStringList() << "Del"
                                                << "Backspace"
@@ -137,7 +140,14 @@ bool ShortcutsSettings::isKeyAllowed(QString Sequences)
                                                << "Right"
                                                << "Return"
                                                << "Enter"
-                                               << "Menu");
+                                               << "Menu"
+                                               << "Ctrl+Alt+-"
+                                               << "Ctrl+Alt+="
+                                               << "Ctrl+Alt+["
+                                               << "Ctrl+Alt+]"
+                                               << "Tab"
+                                               << "Space"
+                                               << "S");
     if (forbiddenKeys.contains(checkSequence)) {
         return false;
     }
