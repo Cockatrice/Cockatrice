@@ -31,7 +31,7 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
         shortCutsFile.endGroup();
 
         // set default shortcut where stored value was invalid
-        for (QString key : invalidKeys) {
+        for (const QString &key : invalidKeys) {
             setShortcuts(key, getDefaultShortcutString(key));
         }
     }
