@@ -17,6 +17,7 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
     if (exists) {
         shortCutsFile.beginGroup("Custom");
         const QStringList customKeys = shortCutsFile.allKeys();
+
         QStringList invalidKeys = QStringList();
         for (QStringList::const_iterator it = customKeys.constBegin(); it != customKeys.constEnd(); ++it) {
             QString stringSequence = shortCutsFile.value(*it).toString();
@@ -28,6 +29,7 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
                 invalidKeys.append(*it);
             }
         }
+
         shortCutsFile.endGroup();
 
         // set default shortcut where stored value was invalid
