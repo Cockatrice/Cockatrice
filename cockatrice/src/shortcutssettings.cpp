@@ -24,8 +24,7 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
             if (isValid(*it, stringSequence)) {
                 QList<QKeySequence> SequenceList = parseSequenceString(stringSequence);
                 shortCuts.insert(*it, SequenceList);
-            }
-            else {
+            } else {
                 invalidKeys.append(*it);
             }
         }
@@ -114,8 +113,15 @@ bool ShortcutsSettings::isValid(QString name, QString Sequences)
 
     QString checkSequence = Sequences.split(";").last();
 
-    QStringList forbiddenKeys = (QStringList() << "Del" << "Down" << "Up" << "Left" << "Right"
-        << "Return" << "Enter" << "Backspace" << "Esc");
+    QStringList forbiddenKeys = (QStringList() << "Del"
+                                               << "Down"
+                                               << "Up"
+                                               << "Left"
+                                               << "Right"
+                                               << "Return"
+                                               << "Enter"
+                                               << "Backspace"
+                                               << "Esc");
     if (forbiddenKeys.contains(checkSequence)) {
         return false;
     }
