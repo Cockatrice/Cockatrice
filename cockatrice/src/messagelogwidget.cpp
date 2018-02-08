@@ -778,7 +778,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
     connect(player, SIGNAL(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int)), this,
             SLOT(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int)));
     connect(player, SIGNAL(logTurnCardOver(Player *, QString, bool)), this,
-	        SLOT(logTurnCardOver(Player *, QString, bool)));
+            SLOT(logTurnCardOver(Player *, QString, bool)));
     connect(player, SIGNAL(logDestroyCard(Player *, QString)), this, SLOT(logDestroyCard(Player *, QString)));
     connect(player, SIGNAL(logAttachCard(Player *, QString, Player *, QString)), this,
             SLOT(logAttachCard(Player *, QString, Player *, QString)));
