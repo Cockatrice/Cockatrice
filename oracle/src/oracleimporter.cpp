@@ -278,6 +278,10 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
                 if (setNumber.isEmpty())
                     setNumber = map.value("number").toString();
             }
+            if (map.contains("rarity")) {
+                if (rarity.isEmpty())
+                    rarity = map.value("rarity").toString();
+            }
 
             extractColors(map.value("colors").toStringList(), colors);
         }
