@@ -84,41 +84,45 @@ void TabDeckEditor::createDeckDock()
     commentsLabel->setObjectName("commentsLabel");
     commentsEdit = new QTextEdit;
     commentsEdit->setObjectName("commentsEdit");
-    commentsEdit->setMinimumHeight(30);
     commentsLabel->setBuddy(commentsEdit);
     connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
 
+    QGridLayout *upperLayout = new QGridLayout;
+    upperLayout->setObjectName("upperLayout");
+    upperLayout->addWidget(nameLabel, 0, 0);
+    upperLayout->addWidget(nameEdit, 0, 1);
+
+    upperLayout->addWidget(commentsLabel, 1, 0);
+    upperLayout->addWidget(commentsEdit, 1, 1);
+
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
+    QSizePolicy *hashSizePolicy = new QSizePolicy();
+    hashSizePolicy->setHorizontalPolicy(QSizePolicy::Fixed);
+    hashLabel1->setSizePolicy(*hashSizePolicy);
     hashLabel = new QLabel;
     hashLabel->setObjectName("hashLabel");
 
-    QGridLayout *grid = new QGridLayout;
-    grid->setObjectName("grid");
-    grid->addWidget(nameLabel, 0, 0);
-    grid->addWidget(nameEdit, 0, 1);
+    QGridLayout *lowerLayout = new QGridLayout;
+    lowerLayout->setObjectName("lowerLayout");
+    lowerLayout->addWidget(hashLabel1, 0, 0);
+    lowerLayout->addWidget(hashLabel, 0, 1, Qt::AlignLeft);
+    lowerLayout->addWidget(deckView, 1, 0, 1, 2);
 
-    grid->addWidget(commentsLabel, 1, 0);
-    grid->addWidget(commentsEdit, 1, 1);
-
-    QHBoxLayout *hashLayout = new QHBoxLayout;
-    hashLayout->addWidget(hashLabel1);
-    hashLayout->addWidget(hashLabel);
-
-    QVBoxLayout *lowerLayout = new QVBoxLayout;
-    lowerLayout->addLayout(hashLayout);
-    lowerLayout->addWidget(deckView);
-
-    // Create widgets for both layout to make splitter work correctly
+    // Create widgets for both layouts to make splitter work correctly
     QWidget *topWidget = new QWidget;
-    topWidget->setLayout(grid);
+    topWidget->setLayout(upperLayout);
     QWidget *bottomWidget = new QWidget;
     bottomWidget->setLayout(lowerLayout);
 
     QSplitter *split = new QSplitter;
+    split->setObjectName("deckSplitter");
     split->setOrientation(Qt::Vertical);
+    split->setChildrenCollapsible(false);
     split->addWidget(topWidget);
     split->addWidget(bottomWidget);
+    split->setStretchFactor(0, 1);
+    split->setStretchFactor(1, 4);
 
     QVBoxLayout *rightFrame = new QVBoxLayout;
     rightFrame->setObjectName("rightFrame");
