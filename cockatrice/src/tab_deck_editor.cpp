@@ -106,7 +106,7 @@ void TabDeckEditor::createDeckDock()
     QGridLayout *lowerLayout = new QGridLayout;
     lowerLayout->setObjectName("lowerLayout");
     lowerLayout->addWidget(hashLabel1, 0, 0);
-    lowerLayout->addWidget(hashLabel, 0, 1, Qt::AlignLeft);
+    lowerLayout->addWidget(hashLabel, 0, 1);
     lowerLayout->addWidget(deckView, 1, 0, 1, 2);
 
     // Create widgets for both layouts to make splitter work correctly
