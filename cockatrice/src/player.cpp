@@ -1788,7 +1788,7 @@ void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &ev
         case GameEvent::MOVE_CARD:
             eventMoveCard(event.GetExtension(Event_MoveCard::ext), context);
             break;
-        case GameEvent::TURN_CARD_OVER:
+        case GameEvent::FLIP_CARD:
             eventTurnCardOver(event.GetExtension(Event_TurnCardOver::ext));
             break;
         case GameEvent::DESTROY_CARD:

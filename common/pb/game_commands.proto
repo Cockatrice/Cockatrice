@@ -9,7 +9,7 @@ message GameCommand {
         ROLL_DIE = 1005;
         DRAW_CARDS = 1006;
         UNDO_DRAW = 1007;
-        TURN_CARD_OVER = 1008;
+        FLIP_CARD = 1008;
         ATTACH_CARD = 1009;
         CREATE_TOKEN = 1010;
         CREATE_ARROW = 1011;

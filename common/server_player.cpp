@@ -1750,7 +1750,7 @@ Server_Player::processGameCommand(const GameCommand &command, ResponseContainer 
         case GameCommand::UNDO_DRAW:
             return cmdUndoDraw(command.GetExtension(Command_UndoDraw::ext), rc, ges);
             break;
-        case GameCommand::TURN_CARD_OVER:
+        case GameCommand::FLIP_CARD:
             return cmdTurnCardOver(command.GetExtension(Command_TurnCardOver::ext), rc, ges);
             break;
         case GameCommand::ATTACH_CARD:
