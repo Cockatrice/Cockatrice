@@ -41,6 +41,7 @@
 #include <QTreeView>
 #include <QUrl>
 #include <QVBoxLayout>
+#include <QSplitter>
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
@@ -83,7 +84,7 @@ void TabDeckEditor::createDeckDock()
     commentsLabel->setObjectName("commentsLabel");
     commentsEdit = new QTextEdit;
     commentsEdit->setObjectName("commentsEdit");
-    commentsEdit->setMaximumHeight(70);
+    commentsEdit->setMinimumHeight(30);
     commentsLabel->setBuddy(commentsEdit);
     connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
 
@@ -100,13 +101,28 @@ void TabDeckEditor::createDeckDock()
     grid->addWidget(commentsLabel, 1, 0);
     grid->addWidget(commentsEdit, 1, 1);
 
-    grid->addWidget(hashLabel1, 2, 0);
-    grid->addWidget(hashLabel, 2, 1);
+    QHBoxLayout *hashLayout = new QHBoxLayout;
+    hashLayout->addWidget(hashLabel1);
+    hashLayout->addWidget(hashLabel);
+
+    QVBoxLayout *lowerLayout = new QVBoxLayout;
+    lowerLayout->addLayout(hashLayout);
+    lowerLayout->addWidget(deckView);
+
+    // Create widgets for both layout to make splitter work correctly
+    QWidget *topWidget = new QWidget;
+    topWidget->setLayout(grid);
+    QWidget *bottomWidget = new QWidget;
+    bottomWidget->setLayout(lowerLayout);
+
+    QSplitter *split = new QSplitter;
+    split->setOrientation(Qt::Vertical);
+    split->addWidget(topWidget);
+    split->addWidget(bottomWidget);
 
     QVBoxLayout *rightFrame = new QVBoxLayout;
     rightFrame->setObjectName("rightFrame");
-    rightFrame->addLayout(grid);
-    rightFrame->addWidget(deckView, 10);
+    rightFrame->addWidget(split);
 
     deckDock = new QDockWidget(this);
     deckDock->setObjectName("deckDock");
