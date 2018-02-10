@@ -33,6 +33,7 @@
 #include <QPrintPreviewDialog>
 #include <QProcessEnvironment>
 #include <QPushButton>
+#include <QSplitter>
 #include <QTextEdit>
 #include <QTextStream>
 #include <QTimer>
@@ -41,7 +42,6 @@
 #include <QTreeView>
 #include <QUrl>
 #include <QVBoxLayout>
-#include <QSplitter>
 
 void SearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
