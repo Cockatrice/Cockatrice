@@ -38,6 +38,7 @@ signals:
     void deleteCardInfoPopup(QString cardName);
     void updateCardMenu(AbstractCardItem *card);
     void sigPixmapUpdated();
+    void cardShiftClicked(QString cardName);
 
 public:
     enum
