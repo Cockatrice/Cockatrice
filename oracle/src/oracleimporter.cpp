@@ -84,10 +84,14 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
 
         // detect mana generator artifacts
         bool mArtifact = false;
-        if (cardType.endsWith("Artifact"))
-            for (int i = 0; i < cardTextRows.size(); ++i)
-                if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
+        if (cardType.endsWith("Artifact")) {
+            for (int i = 0; i < cardTextRows.size(); ++i) {
+                cardTextRows[i].remove(QRegularExpression("\\\".*?\\\""));
+                if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool")) {
                     mArtifact = true;
+                }
+            }
+        }
 
         // detect cards that enter the field tapped
         bool cipt =
