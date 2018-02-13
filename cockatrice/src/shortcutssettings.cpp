@@ -1,5 +1,6 @@
 #include "shortcutssettings.h"
 #include <QFile>
+#include <QMessageBox>
 #include <QStringList>
 #include <utility>
 
@@ -18,13 +19,39 @@ ShortcutsSettings::ShortcutsSettings(QString settingsPath, QObject *parent) : QO
         shortCutsFile.beginGroup("Custom");
         const QStringList customKeys = shortCutsFile.allKeys();
 
+        QMap<QString, QString> invalidItems;
         for (QStringList::const_iterator it = customKeys.constBegin(); it != customKeys.constEnd(); ++it) {
             QString stringSequence = shortCutsFile.value(*it).toString();
-            QList<QKeySequence> SequenceList = parseSequenceString(stringSequence);
-            shortCuts.insert(*it, SequenceList);
+            // check whether shortcut is forbidden
+            if (isKeyAllowed(*it, stringSequence)) {
+                QList<QKeySequence> SequenceList = parseSequenceString(stringSequence);
+                shortCuts.insert(*it, SequenceList);
+            } else {
+                invalidItems.insert(*it, stringSequence);
+            }
         }
 
         shortCutsFile.endGroup();
+
+        if (!invalidItems.isEmpty()) {
+            // warning message in case of invalid items
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.setText(tr("Your configuration file contained invalid shortcuts.\n"
+                              "Please check your shortcut settings!"));
+            QString detailedMessage = tr("The following shortcuts have been set to default:\n");
+            for (QMap<QString, QString>::const_iterator item = invalidItems.constBegin();
+                 item != invalidItems.constEnd(); ++item) {
+                detailedMessage += item.key() + " - \"" + item.value() + "\"\n";
+            }
+            msgBox.setDetailedText(detailedMessage);
+            msgBox.exec();
+
+            // set default shortcut where stored value was invalid
+            for (const QString &key : invalidItems.keys()) {
+                setShortcuts(key, getDefaultShortcutString(key));
+            }
+        }
     }
 }
 
@@ -98,21 +125,47 @@ void ShortcutsSettings::setShortcuts(QString name, QString Sequences)
     setShortcuts(std::move(name), parseSequenceString(std::move(Sequences)));
 }
 
+bool ShortcutsSettings::isKeyAllowed(QString name, QString Sequences)
+{
+    // if the shortcut is not to be used in deck-editor then it doesn't matter
+    if (name.startsWith("Player")) {
+        return true;
+    }
+    QString checkSequence = Sequences.split(";").last();
+    QStringList forbiddenKeys = (QStringList() << "Del"
+                                               << "Backspace"
+                                               << "Down"
+                                               << "Up"
+                                               << "Left"
+                                               << "Right"
+                                               << "Return"
+                                               << "Enter"
+                                               << "Menu"
+                                               << "Ctrl+Alt+-"
+                                               << "Ctrl+Alt+="
+                                               << "Ctrl+Alt+["
+                                               << "Ctrl+Alt+]"
+                                               << "Tab"
+                                               << "Space"
+                                               << "S");
+    if (forbiddenKeys.contains(checkSequence)) {
+        return false;
+    }
+    return true;
+}
+
 bool ShortcutsSettings::isValid(QString name, QString Sequences)
 {
-    QString checkKey = name.left(name.indexOf("/"));
-
     QString checkSequence = Sequences.split(";").last();
+    QString checkKey = name.left(name.indexOf("/"));
 
     QList<QString> allKeys = shortCuts.keys();
     for (const auto &key : allKeys) {
         if (key.startsWith(checkKey) || key.startsWith("MainWindow") || checkKey.startsWith("MainWindow")) {
             QString storedSequence = stringifySequence(shortCuts.value(key));
             QStringList stringSequences = storedSequence.split(";");
-            for (int j = 0; j < stringSequences.size(); j++) {
-                if (checkSequence == stringSequences.at(j)) {
-                    return false;
-                }
+            if (stringSequences.contains(checkSequence)) {
+                return false;
             }
         }
     }
@@ -162,7 +215,7 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["TabDeckEditor/aNewDeck"] = parseSequenceString("Ctrl+N");
     defaultShortCuts["TabDeckEditor/aOpenCustomFolder"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aPrintDeck"] = parseSequenceString("Ctrl+P");
-    defaultShortCuts["TabDeckEditor/aRemoveCard"] = parseSequenceString("Del");
+    defaultShortCuts["TabDeckEditor/aRemoveCard"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aResetLayout"] = parseSequenceString("");
     defaultShortCuts["TabDeckEditor/aSaveDeck"] = parseSequenceString("Ctrl+S");
     defaultShortCuts["TabDeckEditor/aSaveDeckAs"] = parseSequenceString("");
