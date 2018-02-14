@@ -78,9 +78,17 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
     if (cards.contains(cardName)) {
         card = cards.value(cardName);
     } else {
-        // Remove {} around mana costs
-        cardCost.remove(QChar('{'));
-        cardCost.remove(QChar('}'));
+        // Remove {} around mana costs, except if it's split cost
+        QStringList symbols = cardCost.split("}");
+        QString formattedCardCost = QString();
+        for (QString symbol : symbols) {
+            if (symbol.contains(QRegExp("[BWUGR]/[BWUGR]"))) {
+                symbol.append("}");
+            } else {
+                symbol.remove(QChar('{'));
+            }
+            formattedCardCost.append(symbol);
+        }
 
         // detect mana generator artifacts
         bool mArtifact = false;
