@@ -55,6 +55,7 @@ private slots:
     void updateCardInfoLeft(const QModelIndex &current, const QModelIndex &previous);
     void updateCardInfoRight(const QModelIndex &current, const QModelIndex &previous);
     void updateSearch(const QString &search);
+    void databaseCustomMenu(QPoint point);
 
     void actNewDeck();
     void actLoadDeck();

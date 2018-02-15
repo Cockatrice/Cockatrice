@@ -33,6 +33,7 @@
 #include <QPrintPreviewDialog>
 #include <QProcessEnvironment>
 #include <QPushButton>
+#include <QSignalMapper>
 #include <QSplitter>
 #include <QTextEdit>
 #include <QTextStream>
@@ -380,6 +381,8 @@ void TabDeckEditor::createCentralFrame()
     databaseView->setSortingEnabled(true);
     databaseView->sortByColumn(0, Qt::AscendingOrder);
     databaseView->setModel(databaseDisplayModel);
+    databaseView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(databaseView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(databaseCustomMenu(QPoint)));
     connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
             SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
     connect(databaseView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actAddCard()));
@@ -438,6 +441,36 @@ void TabDeckEditor::createCentralFrame()
     centralWidget->setLayout(centralFrame);
     setCentralWidget(centralWidget);
     setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
+}
+
+void TabDeckEditor::databaseCustomMenu(QPoint point)
+{
+    QMenu menu;
+    const CardInfoPtr info = currentCardInfo();
+
+    // add to deck and sideboard options
+    QAction *addToDeck, *addToSideboard;
+    addToDeck = menu.addAction(tr("Add to Deck"));
+    addToSideboard = menu.addAction(tr("Add to Sideboard"));
+    connect(addToDeck, SIGNAL(triggered()), this, SLOT(actAddCard()));
+    connect(addToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
+
+    // filling out the related cards submenu
+    auto *relatedMenu = new QMenu(tr("Show Related cards"));
+    menu.addMenu(relatedMenu);
+    if (info->getRelatedCards().isEmpty()) {
+        relatedMenu->setDisabled(true);
+    } else {
+        auto *signalMapper = new QSignalMapper(this);
+        for (const CardRelation *rel : info->getRelatedCards()) {
+            QAction *relatedCard;
+            relatedCard = relatedMenu->addAction(rel->getName());
+            connect(relatedCard, SIGNAL(triggered()), signalMapper, SLOT(map()));
+            signalMapper->setMapping(relatedCard, rel->getName());
+        }
+        connect(signalMapper, SIGNAL(mapped(const QString &)), cardInfo, SLOT(setCard(const QString &)));
+    }
+    menu.exec(databaseView->mapToGlobal(point));
 }
 
 void TabDeckEditor::restartLayout()
