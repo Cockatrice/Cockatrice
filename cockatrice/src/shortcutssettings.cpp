@@ -147,7 +147,9 @@ bool ShortcutsSettings::isKeyAllowed(QString name, QString Sequences)
                                                << "Ctrl+Alt+]"
                                                << "Tab"
                                                << "Space"
-                                               << "S");
+                                               << "Shift+S"
+                                               << "Shift+Left"
+                                               << "Shift+Right");
     if (forbiddenKeys.contains(checkSequence)) {
         return false;
     }
