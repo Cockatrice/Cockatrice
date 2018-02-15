@@ -2702,7 +2702,7 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
     cardMenu->addSeparator();
     auto *signalMapper = new QSignalMapper(this);
     for (const CardRelation *relatedCard : relatedCards) {
-        QAction *viewCard = cardMenu->addAction("Show card: \"" + relatedCard->getName() + "\"");
+        QAction *viewCard = cardMenu->addAction("Show Card: \"" + relatedCard->getName() + "\"");
         connect(viewCard, SIGNAL(triggered()), signalMapper, SLOT(map()));
         signalMapper->setMapping(viewCard, relatedCard->getName());
     }
