@@ -1604,6 +1604,11 @@ void TabGame::createDeckViewContainerWidget(bool bReplay)
     deckViewContainerWidget->setLayout(deckViewContainerLayout);
 }
 
+void TabGame::viewCardInfo(const QString &cardName)
+{
+    cardInfo->setCard(cardName);
+}
+
 void TabGame::createCardInfoDock(bool bReplay)
 {
     Q_UNUSED(bReplay);

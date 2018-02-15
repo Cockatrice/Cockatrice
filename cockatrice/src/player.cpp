@@ -25,6 +25,7 @@
 #include <QMenu>
 #include <QPainter>
 #include <QRegExp>
+#include <QSignalMapper>
 
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_change_zone_properties.pb.h"
@@ -2685,6 +2686,27 @@ void Player::updateCardMenu(const CardItem *card)
             cardMenu->addAction(aClone);
         }
     }
+    addRelatedCardView(card, cardMenu);
+}
+
+void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
+{
+    if (card == nullptr || cardMenu == nullptr || card->getInfo() == nullptr)
+        return;
+
+    QList<CardRelation *> relatedCards = card->getInfo()->getRelatedCards();
+    if (relatedCards.isEmpty()) {
+        return;
+    }
+
+    cardMenu->addSeparator();
+    auto *signalMapper = new QSignalMapper(this);
+    for (const CardRelation *relatedCard : relatedCards) {
+        QAction *viewCard = cardMenu->addAction("Show card: \"" + relatedCard->getName() + "\"");
+        connect(viewCard, SIGNAL(triggered()), signalMapper, SLOT(map()));
+        signalMapper->setMapping(viewCard, relatedCard->getName());
+    }
+    connect(signalMapper, SIGNAL(mapped(const QString &)), game, SLOT(viewCardInfo(const QString &)));
 }
 
 void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)

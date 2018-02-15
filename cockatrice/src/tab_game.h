@@ -306,6 +306,7 @@ public:
 public slots:
     void sendGameCommand(PendingCommand *pend, int playerId = -1);
     void sendGameCommand(const ::google::protobuf::Message &command, int playerId = -1);
+    void viewCardInfo(const QString &cardName);
 };
 
 #endif
