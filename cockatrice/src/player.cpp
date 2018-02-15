@@ -2691,8 +2691,9 @@ void Player::updateCardMenu(const CardItem *card)
 
 void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
 {
-    if (card == nullptr || cardMenu == nullptr || card->getInfo() == nullptr)
+    if (card == nullptr || cardMenu == nullptr || card->getInfo() == nullptr) {
         return;
+    }
 
     QList<CardRelation *> relatedCards = card->getInfo()->getRelatedCards();
     if (relatedCards.isEmpty()) {
