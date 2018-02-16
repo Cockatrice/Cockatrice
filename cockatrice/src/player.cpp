@@ -2612,6 +2612,8 @@ void Player::updateCardMenu(const CardItem *card)
 
         if (card->getZone()) {
             if (card->getZone()->getName() == "table") {
+                // Card is on the battlefield
+
                 if (ptMenu->isEmpty()) {
                     ptMenu->addAction(aIncP);
                     ptMenu->addAction(aDecP);
@@ -2632,6 +2634,7 @@ void Player::updateCardMenu(const CardItem *card)
                     cardMenu->addAction(aPeek);
                 }
 
+                addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
 
                 cardMenu->addSeparator();
@@ -2657,22 +2660,27 @@ void Player::updateCardMenu(const CardItem *card)
                 }
                 cardMenu->addSeparator();
             } else if (card->getZone()->getName() == "stack") {
+                // Card is on the stack
                 cardMenu->addAction(aDrawArrow);
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
 
+                addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
             } else if (card->getZone()->getName() == "rfg" || card->getZone()->getName() == "grave") {
+                // Card is in the graveyard or exile
                 cardMenu->addAction(aPlay);
                 cardMenu->addAction(aPlayFacedown);
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
             } else {
+                // Card is in hand
                 cardMenu->addAction(aPlay);
                 cardMenu->addAction(aPlayFacedown);
                 cardMenu->addMenu(moveMenu);
+                addRelatedCardView(card, cardMenu);
             }
         } else {
             cardMenu->addMenu(moveMenu);
@@ -2681,12 +2689,12 @@ void Player::updateCardMenu(const CardItem *card)
         if (card->getZone() && card->getZone()->getName() != "hand") {
             cardMenu->addAction(aDrawArrow);
             cardMenu->addSeparator();
+            addRelatedCardView(card, cardMenu);
             addRelatedCardActions(card, cardMenu);
             cardMenu->addSeparator();
             cardMenu->addAction(aClone);
         }
     }
-    addRelatedCardView(card, cardMenu);
 }
 
 void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
@@ -2701,7 +2709,7 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
     }
 
     cardMenu->addSeparator();
-    auto viewRelatedCards = new QMenu(tr("View related card info:"));
+    auto viewRelatedCards = new QMenu(tr("View related cards"));
     cardMenu->addMenu(viewRelatedCards);
     auto *signalMapper = new QSignalMapper(this);
     for (const CardRelation *relatedCard : relatedCards) {
