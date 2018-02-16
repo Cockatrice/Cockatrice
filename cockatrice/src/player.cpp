@@ -2701,9 +2701,11 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
     }
 
     cardMenu->addSeparator();
+    auto viewRelatedCards = new QMenu(tr("View related card info:"));
+    cardMenu->addMenu(viewRelatedCards);
     auto *signalMapper = new QSignalMapper(this);
     for (const CardRelation *relatedCard : relatedCards) {
-        QAction *viewCard = cardMenu->addAction("Show Card: \"" + relatedCard->getName() + "\"");
+        QAction *viewCard = viewRelatedCards->addAction(relatedCard->getName());
         connect(viewCard, SIGNAL(triggered()), signalMapper, SLOT(map()));
         signalMapper->setMapping(viewCard, relatedCard->getName());
     }
