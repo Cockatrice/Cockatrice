@@ -2597,6 +2597,7 @@ void Player::updateCardMenu(const CardItem *card)
 
     if (revealedCard) {
         cardMenu->addAction(aHide);
+        addRelatedCardView(card, cardMenu);
     } else if (writeableCard) {
         if (moveMenu->isEmpty()) {
             moveMenu->addAction(aMoveToTopLibrary);
