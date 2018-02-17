@@ -2676,7 +2676,7 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
             } else {
-                // Card is in hand
+                // Card is in hand or a custom zone specified by server
                 cardMenu->addAction(aPlay);
                 cardMenu->addAction(aPlayFacedown);
                 cardMenu->addMenu(moveMenu);
