@@ -139,7 +139,9 @@ int main(int argc, char *argv[])
     qDebug("main(): ui.show() finished");
 
     DlgTipOfTheDay tip;
-    tip.show();
+    if (settingsCache->getShowTipsOnStartup()) {
+        tip.show();
+    }
 
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.exec();

@@ -82,6 +82,7 @@ private:
     QPushButton clearDownloadedPicsButton;
     QPushButton defaultUrlRestoreButton;
     QPushButton fallbackUrlRestoreButton;
+    QCheckBox showTipsOnStartup;
 };
 
 class AppearanceSettingsPage : public AbstractSettingsPage

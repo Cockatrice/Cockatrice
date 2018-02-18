@@ -27,7 +27,6 @@ private:
     QPixmap *image;
 
 private slots:
-    void okClicked();
     void nextOrPrevClicked(QAbstractButton* button);
     void updateTip(int tipId);
 };

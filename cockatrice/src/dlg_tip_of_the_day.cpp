@@ -30,14 +30,15 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     content->addWidget(imageLabel);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(Qt::Horizontal);
-    buttonBox->addButton("Next", QDialogButtonBox::ActionRole);
-    buttonBox->addButton("Previous", QDialogButtonBox::ActionRole);
+    buttonBox->addButton(tr("Next"), QDialogButtonBox::ActionRole);
+    buttonBox->addButton(tr("Previous"), QDialogButtonBox::ActionRole);
     buttonBox->addButton(QDialogButtonBox::Ok);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(okClicked()));
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(nextOrPrevClicked(QAbstractButton*)));
 
     showTipsOnStartupCheck = new QCheckBox("Show tips on startup");
     showTipsOnStartupCheck->setChecked(true);
+    connect(showTipsOnStartupCheck, SIGNAL(clicked(bool)), settingsCache, SLOT(setShowTipsOnStartup(bool)));
     QHBoxLayout *buttonBar = new QHBoxLayout();
     buttonBar->addWidget(showTipsOnStartupCheck);
     buttonBar->addWidget(buttonBox);
@@ -52,12 +53,8 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     setMinimumHeight(300);
 }
 
-void DlgTipOfTheDay::okClicked() {
-    accept();
-}
-
 void DlgTipOfTheDay::nextOrPrevClicked(QAbstractButton* button) {
-    if (button->text().compare("Next") == 0) {
+    if (button->text().compare(tr("Next")) == 0) {
         emit newTipRequested(currentTip + 1);
     }
     else {
