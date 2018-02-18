@@ -17,9 +17,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     imageLabel = new QLabel();
     image = new QPixmap();
 
-    // TODO: read this from settings:
-    currentTip = 0;
-
+    currentTip = settingsCache->getLastShownTip() + 1;
     connect(this, SIGNAL(newTipRequested(int)), this, SLOT(updateTip(int)));
     newTipRequested(currentTip);
 
@@ -30,11 +28,14 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     content->addWidget(imageLabel);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(Qt::Horizontal);
-    buttonBox->addButton(tr("Next"), QDialogButtonBox::ActionRole);
-    buttonBox->addButton(tr("Previous"), QDialogButtonBox::ActionRole);
+    QPushButton *nextButton = new QPushButton(tr("Next"));
+    QPushButton *previousButton = new QPushButton(tr("Previous"));
+    buttonBox->addButton(nextButton, QDialogButtonBox::ActionRole);
+    buttonBox->addButton(previousButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(QDialogButtonBox::Ok);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(nextOrPrevClicked(QAbstractButton*)));
+    connect(nextButton, SIGNAL(clicked()), this, SLOT(nextClicked()));
+    connect(previousButton, SIGNAL(clicked()), this, SLOT(previousClicked()));
 
     showTipsOnStartupCheck = new QCheckBox("Show tips on startup");
     showTipsOnStartupCheck->setChecked(true);
@@ -53,22 +54,22 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     setMinimumHeight(300);
 }
 
-void DlgTipOfTheDay::nextOrPrevClicked(QAbstractButton* button) {
-    if (button->text().compare(tr("Next")) == 0) {
-        emit newTipRequested(currentTip + 1);
-    }
-    else {
-        emit newTipRequested(currentTip - 1);
-    }
+void DlgTipOfTheDay::nextClicked() {
+    emit newTipRequested(currentTip + 1);
+}
+
+void DlgTipOfTheDay::previousClicked() {
+    emit newTipRequested(currentTip - 1);
 }
 
 void DlgTipOfTheDay::updateTip(int tipId) {
     // TODO: these should be parsed from the xml (by tip_of_the_day.cpp)
-    QString *titleText = new QString(tr("Title of the tip"));
+    QString *titleText = new QString("Title: Tip #" + QString::number(tipId));
     QString *contentText = new QString(tr("This is the data part of the tip.\nI hope you found it helpful!\n\nThanks for taking the time to read it!"));
     QString *imagePath = new QString("d:/test_img.png");
 
     *titleText = "<h2>" + *titleText + "</h2>";
+
 
     title->setText(*titleText);
     tipTextContent->setText(*contentText);
@@ -77,6 +78,9 @@ void DlgTipOfTheDay::updateTip(int tipId) {
     int h = imageLabel->height();
     int w = imageLabel->width();
     imageLabel->setPixmap(image->scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    currentTip = tipId;
+    settingsCache->setLastShownTip(currentTip);
 }
 
 void DlgTipOfTheDay::resizeEvent(QResizeEvent *event) {

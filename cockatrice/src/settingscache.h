@@ -68,6 +68,7 @@ private:
         spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     bool showTipsOnStartup;
+    int lastShownTip;
     bool mbDownloadSpoilers;
     int updateReleaseChannel;
     int maxFontSize;
@@ -203,6 +204,10 @@ public:
     bool getShowTipsOnStartup() const
     {
         return showTipsOnStartup;
+    }
+    int getLastShownTip() const
+    {
+        return lastShownTip;
     }
     ReleaseChannel *getUpdateReleaseChannel() const
     {
@@ -439,6 +444,7 @@ public slots:
     void setTokenDialogGeometry(const QByteArray &_tokenDialog);
     void setLang(const QString &_lang);
     void setShowTipsOnStartup(bool _showTipsOnStartup);
+    void setLastShownTip(int _lastShowTip);
     void setDeckPath(const QString &_deckPath);
     void setReplaysPath(const QString &_replaysPath);
     void setPicsPath(const QString &_picsPath);
