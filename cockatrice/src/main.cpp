@@ -43,6 +43,7 @@
 #include <QTextStream>
 #include <QTranslator>
 #include <QtPlugin>
+#include "dlg_tip_of_the_day.h"
 
 CardDatabase *db;
 QTranslator *translator, *qtTranslator;
@@ -136,6 +137,9 @@ int main(int argc, char *argv[])
 
     ui.show();
     qDebug("main(): ui.show() finished");
+
+    DlgTipOfTheDay tip;
+    tip.show();
 
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.exec();
