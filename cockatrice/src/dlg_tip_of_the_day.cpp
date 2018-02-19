@@ -63,6 +63,16 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     successfulInit = true;
 }
 
+DlgTipOfTheDay::~DlgTipOfTheDay()
+{
+    tipDatabase->deleteLater();
+    title->deleteLater();
+    tipTextContent->deleteLater();
+    imageLabel->deleteLater();
+    showTipsOnStartupCheck->deleteLater();
+    delete image;
+}
+
 void DlgTipOfTheDay::nextClicked()
 {
     emit newTipRequested(currentTip + 1);
