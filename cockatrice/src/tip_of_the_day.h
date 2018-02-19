@@ -9,7 +9,6 @@ class TipOfTheDay : public QObject
 public:
     TipOfTheDay(QString _title, QString _content, QString _imagePath);
     TipOfTheDay(const TipOfTheDay &other);
-    ~TipOfTheDay();
     QString getTitle() const
     {
         return title;
@@ -24,9 +23,7 @@ public:
     }
 
 private:
-    QString title;
-    QString content;
-    QString imagePath;
+    QString title, content, imagePath;
 };
 
 class TipsOfTheDay : public QAbstractListModel
@@ -39,11 +36,12 @@ public:
         ContentColumn,
         ImagePathColumn,
     };
-    TipsOfTheDay(QString xmlPath, QObject *parent = 0);
-    ~TipsOfTheDay();
+
+    explicit TipsOfTheDay(QString xmlPath, QObject *parent = nullptr);
+    ~TipsOfTheDay() override;
     TipOfTheDay getTip(int tipId);
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
 
 private:
     QList<TipOfTheDay> *tipList;

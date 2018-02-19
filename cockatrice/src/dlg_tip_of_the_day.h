@@ -14,7 +14,7 @@ class DlgTipOfTheDay : public QDialog
 {
     Q_OBJECT
 public:
-    DlgTipOfTheDay(QWidget *parent = 0);
+    DlgTipOfTheDay(QWidget *parent = nullptr);
     bool successfulInit;
 signals:
     void newTipRequested(int tipId);

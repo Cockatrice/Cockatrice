@@ -68,7 +68,7 @@ private:
         spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     bool showTipsOnStartup;
-    int lastShownTip;
+    unsigned int lastShownTip;
     bool mbDownloadSpoilers;
     int updateReleaseChannel;
     int maxFontSize;
@@ -205,7 +205,7 @@ public:
     {
         return showTipsOnStartup;
     }
-    int getLastShownTip() const
+    unsigned int getLastShownTip() const
     {
         return lastShownTip;
     }

@@ -101,7 +101,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(fallbackUrlEdit, 6, 1, 1, 1);
     personalGrid->addWidget(&fallbackUrlRestoreButton, 6, 2, 1, 1);
     personalGrid->addWidget(&showTipsOnStartup, 7, 0);
-    personalGrid->addWidget(&urlLinkLabel, 8, 1, 1, 1);
+    personalGrid->addWidget(&urlLinkLabel, 7, 1, 1, 1);
     personalGrid->addWidget(&clearDownloadedPicsButton, 9, 0, 1, 3);
 
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);

@@ -30,12 +30,12 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     connect(this, SIGNAL(newTipRequested(int)), this, SLOT(updateTip(int)));
     newTipRequested(currentTip);
 
-    QVBoxLayout *content = new QVBoxLayout();
+    auto *content = new QVBoxLayout();
     content->addWidget(title);
     content->addWidget(tipTextContent);
     content->addWidget(imageLabel);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(Qt::Horizontal);
+    auto *buttonBox = new QDialogButtonBox(Qt::Horizontal);
     QPushButton *nextButton = new QPushButton(tr("Next"));
     QPushButton *previousButton = new QPushButton(tr("Previous"));
     buttonBox->addButton(nextButton, QDialogButtonBox::ActionRole);
@@ -48,11 +48,11 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     showTipsOnStartupCheck = new QCheckBox("Show tips on startup");
     showTipsOnStartupCheck->setChecked(true);
     connect(showTipsOnStartupCheck, SIGNAL(clicked(bool)), settingsCache, SLOT(setShowTipsOnStartup(bool)));
-    QHBoxLayout *buttonBar = new QHBoxLayout();
+    auto *buttonBar = new QHBoxLayout();
     buttonBar->addWidget(showTipsOnStartupCheck);
     buttonBar->addWidget(buttonBox);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(content);
     mainLayout->addLayout(buttonBar);
     setLayout(mainLayout);
@@ -96,7 +96,7 @@ void DlgTipOfTheDay::updateTip(int tipId)
     int w = imageLabel->width();
     imageLabel->setPixmap(image->scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-    currentTip = tipId;
+    currentTip = static_cast<unsigned int>(tipId);
     settingsCache->setLastShownTip(currentTip);
 }
 

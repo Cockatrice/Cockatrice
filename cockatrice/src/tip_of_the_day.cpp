@@ -3,26 +3,19 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QXmlStreamReader>
+#include <utility>
 
 #include "tip_of_the_day.h"
 
 #define TIPDDBMODEL_COLUMNS 3
 
 TipOfTheDay::TipOfTheDay(QString _title, QString _content, QString _imagePath)
+    : title(std::move(_title)), content(std::move(_content)), imagePath(std::move(_imagePath))
 {
-    title = QString(_title);
-    content = QString(_content);
-    imagePath = QString(_imagePath);
 }
 
 TipOfTheDay::TipOfTheDay(const TipOfTheDay &other)
-{
-    title = other.title;
-    content = other.content;
-    imagePath = other.imagePath;
-}
-
-TipOfTheDay::~TipOfTheDay()
+    : title(other.title), content(other.content), imagePath(other.imagePath)
 {
 }
 
@@ -51,6 +44,7 @@ TipsOfTheDay::TipsOfTheDay(QString xmlPath, QObject *parent) : QAbstractListMode
         if (reader.name() == "tip") {
             QString title, content, imagePath;
             QDate date;
+            Q_UNUSED(date);
             reader.readNext();
             while (!reader.atEnd()) {
                 if (reader.readNext() == QXmlStreamReader::EndElement) {
@@ -79,7 +73,7 @@ TipsOfTheDay::~TipsOfTheDay()
     delete tipList;
 }
 
-QVariant TipsOfTheDay::data(const QModelIndex &index, int role) const
+QVariant TipsOfTheDay::data(const QModelIndex &index, int /*role*/) const
 {
     if (!index.isValid() || index.row() >= tipList->size() || index.column() >= TIPDDBMODEL_COLUMNS)
         return QVariant();
@@ -102,7 +96,8 @@ TipOfTheDay TipsOfTheDay::getTip(int tipId)
     return tipList->at(tipId);
 }
 
-int TipsOfTheDay::rowCount(const QModelIndex & /*parent*/) const
+int TipsOfTheDay::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     return tipList->size();
 }
