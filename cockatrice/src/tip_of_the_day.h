@@ -41,7 +41,7 @@ public:
     };
     TipsOfTheDay(QString xmlPath, QObject *parent = 0);
     ~TipsOfTheDay();
-    void getTip(int tipId, QString &title, QString &content, QString &imagePath);
+    TipOfTheDay getTip(int tipId);
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
 

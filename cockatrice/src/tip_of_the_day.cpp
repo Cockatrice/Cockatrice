@@ -84,10 +84,11 @@ QVariant TipsOfTheDay::data(const QModelIndex &index, int role) const
     }
 }
 
-void TipsOfTheDay::getTip(int tipId, QString &title, QString &content, QString &imagePath) {
-    title = QString("Title: Tip #" + QString::number(tipId));
-    content = QString(tr("This is the data part of the tip.\nI hope you found it helpful!\n\nThanks for taking the time to read it!"));
-    imagePath = QString("d:/test_img.png");
+TipOfTheDay TipsOfTheDay::getTip(int tipId) {
+    QString title = QString("Title: Tip #" + QString::number(tipId));
+    QString content = QString(tr("This is the data part of the tip.\nI hope you found it helpful!\n\nThanks for taking the time to read it!"));
+    QString imagePath = QString("d:/test_img.png");
+    return TipOfTheDay(title, content, imagePath);
 }
 
 int TipsOfTheDay::rowCount(const QModelIndex & /*parent*/) const

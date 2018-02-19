@@ -69,7 +69,10 @@ void DlgTipOfTheDay::previousClicked() {
 void DlgTipOfTheDay::updateTip(int tipId) {
     QString titleText, contentText, imagePath;
 
-    tipDatabase->getTip(tipId, titleText, contentText, imagePath);
+    TipOfTheDay tip = tipDatabase->getTip(tipId);
+    titleText = tip.getTitle();
+    contentText = tip.getContent();
+    imagePath = tip.getImagePath();
 
     title->setText("<h2>" + titleText + "</h2>");
     tipTextContent->setText(contentText);
