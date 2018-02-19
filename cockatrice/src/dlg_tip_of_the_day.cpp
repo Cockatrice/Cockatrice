@@ -5,9 +5,9 @@
 #include <QLabel>
 #include <QPushButton>
 
-#include "tip_of_the_day.h"
-#include "settingscache.h"
 #include "dlg_tip_of_the_day.h"
+#include "settingscache.h"
+#include "tip_of_the_day.h"
 
 DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
 {
@@ -29,7 +29,6 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     currentTip = settingsCache->getLastShownTip() + 1;
     connect(this, SIGNAL(newTipRequested(int)), this, SLOT(updateTip(int)));
     newTipRequested(currentTip);
-
 
     QVBoxLayout *content = new QVBoxLayout();
     content->addWidget(title);
@@ -64,21 +63,23 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     successfulInit = true;
 }
 
-void DlgTipOfTheDay::nextClicked() {
+void DlgTipOfTheDay::nextClicked()
+{
     emit newTipRequested(currentTip + 1);
 }
 
-void DlgTipOfTheDay::previousClicked() {
+void DlgTipOfTheDay::previousClicked()
+{
     emit newTipRequested(currentTip - 1);
 }
 
-void DlgTipOfTheDay::updateTip(int tipId) {
+void DlgTipOfTheDay::updateTip(int tipId)
+{
     QString titleText, contentText, imagePath;
-    
+
     if (tipId < 0) {
         tipId = tipDatabase->rowCount() - 1;
-    }
-    else if (tipId >= tipDatabase->rowCount()) {
+    } else if (tipId >= tipDatabase->rowCount()) {
         tipId = tipId % tipDatabase->rowCount();
     }
 
@@ -99,7 +100,8 @@ void DlgTipOfTheDay::updateTip(int tipId) {
     settingsCache->setLastShownTip(currentTip);
 }
 
-void DlgTipOfTheDay::resizeEvent(QResizeEvent *event) {
+void DlgTipOfTheDay::resizeEvent(QResizeEvent *event)
+{
     int h = imageLabel->height();
     int w = imageLabel->width();
     imageLabel->setPixmap(image->scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));

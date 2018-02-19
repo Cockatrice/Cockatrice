@@ -22,6 +22,7 @@
 #include "QtNetwork/QNetworkInterface"
 #include "carddatabase.h"
 #include "dlg_settings.h"
+#include "dlg_tip_of_the_day.h"
 #include "featureset.h"
 #include "logger.h"
 #include "pixmapgenerator.h"
@@ -43,7 +44,6 @@
 #include <QTextStream>
 #include <QTranslator>
 #include <QtPlugin>
-#include "dlg_tip_of_the_day.h"
 
 CardDatabase *db;
 QTranslator *translator, *qtTranslator;

@@ -1,28 +1,30 @@
-#include <QXmlStreamReader>
+#include <QDate>
 #include <QFile>
 #include <QMessageBox>
 #include <QTextStream>
-#include <QDate>
+#include <QXmlStreamReader>
 
 #include "tip_of_the_day.h"
 
 #define TIPDDBMODEL_COLUMNS 3
 
-TipOfTheDay::TipOfTheDay(QString _title, QString _content, QString _imagePath) {
+TipOfTheDay::TipOfTheDay(QString _title, QString _content, QString _imagePath)
+{
     title = QString(_title);
     content = QString(_content);
     imagePath = QString(_imagePath);
 }
 
-TipOfTheDay::TipOfTheDay(const TipOfTheDay &other) {
+TipOfTheDay::TipOfTheDay(const TipOfTheDay &other)
+{
     title = other.title;
     content = other.content;
     imagePath = other.imagePath;
 }
 
-TipOfTheDay::~TipOfTheDay() {
+TipOfTheDay::~TipOfTheDay()
+{
 }
-
 
 TipsOfTheDay::TipsOfTheDay(QString xmlPath, QObject *parent) : QAbstractListModel(parent)
 {
@@ -31,20 +33,17 @@ TipsOfTheDay::TipsOfTheDay(QString xmlPath, QObject *parent) : QAbstractListMode
     QFile xmlFile(xmlPath);
 
     QTextStream errorStream(stderr);
-    if (!QFile::exists(xmlPath))
-    {
+    if (!QFile::exists(xmlPath)) {
         errorStream << tr("File does not exist.\n");
         return;
-    }
-    else if (!xmlFile.open(QIODevice::ReadOnly)) {
+    } else if (!xmlFile.open(QIODevice::ReadOnly)) {
         errorStream << tr("Failed to open file.\n");
         return;
     }
 
     QXmlStreamReader reader(&xmlFile);
-    
-    while (!reader.atEnd())
-    {
+
+    while (!reader.atEnd()) {
         if (reader.readNext() == QXmlStreamReader::EndElement) {
             break;
         }
@@ -60,18 +59,13 @@ TipsOfTheDay::TipsOfTheDay(QString xmlPath, QObject *parent) : QAbstractListMode
 
                 if (reader.name() == "title") {
                     title = reader.readElementText();
-                }
-                else if (reader.name() == "text") {
+                } else if (reader.name() == "text") {
                     content = reader.readElementText();
-                }
-                else if (reader.name() == "image") {
+                } else if (reader.name() == "image") {
                     imagePath = "theme:tips/images/" + reader.readElementText();
-                }
-                else if (reader.name() == "date") {
+                } else if (reader.name() == "date") {
                     date = QDate::fromString(reader.readElementText(), Qt::ISODate);
-                }
-                else
-                {
+                } else {
                     // unkown element, do nothing
                 }
             }
@@ -92,18 +86,19 @@ QVariant TipsOfTheDay::data(const QModelIndex &index, int role) const
 
     TipOfTheDay tip = tipList->at(index.row());
     switch (index.column()) {
-    case TitleColumn:
-        return tip.getTitle();
-    case ContentColumn:
-        return tip.getContent();
-    case ImagePathColumn:
-        return tip.getImagePath();
-    default:
-        return QVariant();
+        case TitleColumn:
+            return tip.getTitle();
+        case ContentColumn:
+            return tip.getContent();
+        case ImagePathColumn:
+            return tip.getImagePath();
+        default:
+            return QVariant();
     }
 }
 
-TipOfTheDay TipsOfTheDay::getTip(int tipId) {
+TipOfTheDay TipsOfTheDay::getTip(int tipId)
+{
     return tipList->at(tipId);
 }
 
@@ -111,5 +106,3 @@ int TipsOfTheDay::rowCount(const QModelIndex & /*parent*/) const
 {
     return tipList->size();
 }
-
-
