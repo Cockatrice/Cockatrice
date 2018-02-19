@@ -1,9 +1,10 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/" >
         <file>resources/cardback.svg</file>
         <file>resources/cockatrice.svg</file>
         <file>resources/hand.svg</file>
         <file>resources/hr.jpg</file>
+
         <file>resources/icons/arrow_bottom_green.svg</file>
         <file>resources/icons/arrow_down_green.svg</file>
         <file>resources/icons/arrow_left_green.svg</file>
@@ -28,6 +29,7 @@
         <file>resources/icons/tab_changed.svg</file>
         <file>resources/icons/update.png</file>
         <file>resources/icons/view.svg</file>
+
         <file>resources/config/general.svg</file>
         <file>resources/config/appearance.svg</file>
         <file>resources/config/interface.svg</file>
@@ -35,6 +37,7 @@
         <file>resources/config/deckeditor.svg</file>
         <file>resources/config/shorcuts.svg</file>
         <file>resources/config/sound.svg</file>
+
         <file>resources/counters/w.svg</file>
         <file>resources/counters/w_highlight.svg</file>
         <file>resources/counters/u.svg</file>
@@ -49,6 +52,7 @@
         <file>resources/counters/storm_highlight.svg</file>
         <file>resources/counters/general.svg</file>
         <file>resources/counters/general_highlight.svg</file>
+
         <file>resources/countries/ad.svg</file>
         <file>resources/countries/ae.svg</file>
         <file>resources/countries/af.svg</file>
@@ -298,9 +302,11 @@
         <file>resources/countries/za.svg</file>
         <file>resources/countries/zm.svg</file>
         <file>resources/countries/zw.svg</file>
+
         <file>resources/genders/male.svg</file>
         <file>resources/genders/female.svg</file>
         <file>resources/genders/unknown.svg</file>
+
         <file>resources/phases/untap.svg</file>
         <file>resources/phases/upkeep.svg</file>
         <file>resources/phases/draw.svg</file>
@@ -313,9 +319,11 @@
         <file>resources/phases/main2.svg</file>
         <file>resources/phases/cleanup.svg</file>
         <file>resources/phases/nextturn.svg</file>
+
         <file>resources/replay/start.svg</file>
         <file>resources/replay/fastforward.svg</file>
         <file>resources/replay/pause.svg</file>
+
         <file>resources/userlevels/normal.svg</file>
         <file>resources/userlevels/registered.svg</file>
         <file>resources/userlevels/registered_buddy.svg</file>
@@ -323,16 +331,19 @@
         <file>resources/userlevels/registered_vip_buddy.svg</file>
         <file>resources/userlevels/registered_donator.svg</file>
         <file>resources/userlevels/registered_donator_buddy.svg</file>
+
         <file>resources/userlevels/moderator.svg</file>
         <file>resources/userlevels/moderator_buddy.svg</file>
         <file>resources/userlevels/moderator_vip.svg</file>
         <file>resources/userlevels/moderator_vip_buddy.svg</file>
+
         <file>resources/userlevels/admin.svg</file>
         <file>resources/userlevels/admin_buddy.svg</file>
         <file>resources/userlevels/admin_vip.svg</file>
         <file>resources/userlevels/admin_vip_buddy.svg</file>
+        
+        <file>resources/tips/tips_of_the_day.xml</file>
         <file>resources/tips/images/context_in_hand.png</file>
         <file>resources/tips/images/test_img.png</file>
-        <file>resources/tips/tips_of_the_day.xml</file>
     </qresource>
 </RCC>
