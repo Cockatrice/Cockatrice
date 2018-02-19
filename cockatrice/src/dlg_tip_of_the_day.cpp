@@ -5,11 +5,15 @@
 #include <QLabel>
 #include <QPushButton>
 
-#include "dlg_tip_of_the_day.h"
+#include "tip_of_the_day.h"
 #include "settingscache.h"
+#include "dlg_tip_of_the_day.h"
 
 DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
 {
+    QString xmlPath = "D:/tips_of_the_day.xml";
+    tipDatabase = new TipsOfTheDay(xmlPath, this);
+
     title = new QLabel();
     title->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     tipTextContent = new QLabel();
@@ -63,18 +67,14 @@ void DlgTipOfTheDay::previousClicked() {
 }
 
 void DlgTipOfTheDay::updateTip(int tipId) {
-    // TODO: these should be parsed from the xml (by tip_of_the_day.cpp)
-    QString *titleText = new QString("Title: Tip #" + QString::number(tipId));
-    QString *contentText = new QString(tr("This is the data part of the tip.\nI hope you found it helpful!\n\nThanks for taking the time to read it!"));
-    QString *imagePath = new QString("d:/test_img.png");
+    QString titleText, contentText, imagePath;
 
-    *titleText = "<h2>" + *titleText + "</h2>";
+    tipDatabase->getTip(tipId, titleText, contentText, imagePath);
 
+    title->setText("<h2>" + titleText + "</h2>");
+    tipTextContent->setText(contentText);
 
-    title->setText(*titleText);
-    tipTextContent->setText(*contentText);
-
-    image->load(*imagePath);
+    image->load(imagePath);
     int h = imageLabel->height();
     int w = imageLabel->width();
     imageLabel->setPixmap(image->scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));

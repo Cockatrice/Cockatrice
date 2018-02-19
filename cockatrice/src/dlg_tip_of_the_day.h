@@ -8,6 +8,7 @@
 class QLabel;
 class QPushButton;
 class QCheckBox;
+class TipsOfTheDay;
 
 class DlgTipOfTheDay : public QDialog
 {
@@ -22,6 +23,7 @@ protected:
 
 private:
     unsigned int currentTip;
+    TipsOfTheDay *tipDatabase;
     QLabel *title, *tipTextContent, *imageLabel;
     QCheckBox *showTipsOnStartupCheck;
     QPixmap *image;
