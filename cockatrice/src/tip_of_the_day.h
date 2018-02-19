@@ -7,8 +7,9 @@ class TipOfTheDay : public QObject
 {
     Q_OBJECT
 public:
-    TipOfTheDay(QString _title, QString _content, QString _imagePath);
+    explicit TipOfTheDay(QString _title, QString _content, QString _imagePath);
     TipOfTheDay(const TipOfTheDay &other);
+    ~TipOfTheDay() override = default;
     QString getTitle() const
     {
         return title;
