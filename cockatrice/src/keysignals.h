@@ -12,14 +12,14 @@ signals:
     void onEnter();
     void onCtrlEnter();
     void onCtrlAltEnter();
-    void onLeft();
-    void onRight();
+    void onShiftLeft();
+    void onShiftRight();
     void onDelete();
     void onCtrlAltMinus();
     void onCtrlAltEqual();
     void onCtrlAltLBracket();
     void onCtrlAltRBracket();
-    void onS();
+    void onShiftS();
 
 protected:
     virtual bool eventFilter(QObject *, QEvent *event);

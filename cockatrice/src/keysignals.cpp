@@ -21,11 +21,13 @@ bool KeySignals::eventFilter(QObject * /*object*/, QEvent *event)
 
             break;
         case Qt::Key_Right:
-            emit onRight();
+            if (kevent->modifiers() & Qt::ShiftModifier)
+                emit onShiftRight();
 
             break;
         case Qt::Key_Left:
-            emit onLeft();
+            if (kevent->modifiers() & Qt::ShiftModifier)
+                emit onShiftLeft();
 
             break;
         case Qt::Key_Delete:
@@ -54,7 +56,8 @@ bool KeySignals::eventFilter(QObject * /*object*/, QEvent *event)
 
             break;
         case Qt::Key_S:
-            emit onS();
+            if (kevent->modifiers() & Qt::ShiftModifier)
+                emit onShiftS();
 
             break;
         default:

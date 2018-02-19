@@ -67,12 +67,12 @@ void TabDeckEditor::createDeckDock()
     connect(deckView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
             SLOT(updateCardInfoRight(const QModelIndex &, const QModelIndex &)));
     connect(deckView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actSwapCard()));
-    connect(&deckViewKeySignals, SIGNAL(onS()), this, SLOT(actSwapCard()));
+    connect(&deckViewKeySignals, SIGNAL(onShiftS()), this, SLOT(actSwapCard()));
     connect(&deckViewKeySignals, SIGNAL(onEnter()), this, SLOT(actIncrement()));
     connect(&deckViewKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actIncrement()));
     connect(&deckViewKeySignals, SIGNAL(onCtrlAltMinus()), this, SLOT(actDecrement()));
-    connect(&deckViewKeySignals, SIGNAL(onRight()), this, SLOT(actIncrement()));
-    connect(&deckViewKeySignals, SIGNAL(onLeft()), this, SLOT(actDecrement()));
+    connect(&deckViewKeySignals, SIGNAL(onShiftRight()), this, SLOT(actIncrement()));
+    connect(&deckViewKeySignals, SIGNAL(onShiftLeft()), this, SLOT(actDecrement()));
     connect(&deckViewKeySignals, SIGNAL(onDelete()), this, SLOT(actRemoveCard()));
 
     nameLabel = new QLabel();
