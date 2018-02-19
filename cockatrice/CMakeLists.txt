@@ -19,7 +19,8 @@ SET(cockatrice_SOURCES
     src/dlg_forgotpasswordreset.cpp
     src/dlg_forgotpasswordchallenge.cpp
     src/dlg_register.cpp 
-    src/dlg_tip_of_the_day.cpp 
+    src/dlg_tip_of_the_day.cpp
+    src/tip_of_the_day.cpp
     src/dlg_update.cpp
     src/dlg_viewlog.cpp
     src/abstractclient.cpp
@@ -81,7 +82,6 @@ SET(cockatrice_SOURCES
     src/tab_userlists.cpp 
     src/tab_deck_editor.cpp
     src/tab_logs.cpp
-    src/tip_of_the_day.cpp
     src/replay_timeline_widget.cpp
     src/deckstats_interface.cpp
     src/tappedout_interface.cpp

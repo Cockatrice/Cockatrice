@@ -1,14 +1,19 @@
 <tips>
-	<tip>
-		<title>Tip #1</title>
-		<text>This is your tip!</text>
-		<image>test_img.png</image>
-		<date>2015-02-02</date>
-	</tip>
-	<tip>
-		<title>Additional tip</title>
-		<text>Another tip!!</text>
-		<image>context_in_hand.png</image>
-		<date>2018-05-05</date>
-	</tip>
+    <tip>
+        <title>Tip #1</title>
+        <text>This is your tip!</text>
+        <image>test_img.png</image>
+        <date>2015-02-02</date>
+    </tip>
+    <tip>
+        <title>Additional tip</title>
+        <text>Another tip!!</text>
+        <image>context_in_hand.png</image>
+        <date>2018-05-05</date>
+    </tip>
+    <tip>
+        <title>Third tip!</title>
+        <text>Yep we're awesome</text>
+        <date>2019-04-08</date>
+    </tip>
 </tips>
