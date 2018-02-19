@@ -38,8 +38,8 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     auto *buttonBox = new QDialogButtonBox(Qt::Horizontal);
     QPushButton *nextButton = new QPushButton(tr("Next"));
     QPushButton *previousButton = new QPushButton(tr("Previous"));
-    buttonBox->addButton(nextButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(previousButton, QDialogButtonBox::ActionRole);
+    buttonBox->addButton(nextButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(QDialogButtonBox::Ok);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(nextButton, SIGNAL(clicked()), this, SLOT(nextClicked()));
