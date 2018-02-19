@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
     qDebug("main(): ui.show() finished");
 
     DlgTipOfTheDay tip;
-    if (settingsCache->getShowTipsOnStartup()) {
+    if (settingsCache->getShowTipsOnStartup() && tip.successfulInit) {
         tip.show();
     }
 

@@ -11,8 +11,13 @@
 
 DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
 {
-    QString xmlPath = "D:/tips_of_the_day.xml";
+    successfulInit = false;
+    QString xmlPath = "theme:tips/tips_of_the_day.xml";
     tipDatabase = new TipsOfTheDay(xmlPath, this);
+
+    if (tipDatabase->rowCount() == 0) {
+        return;
+    }
 
     title = new QLabel();
     title->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -56,6 +61,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     setWindowTitle(tr("Tip of the Day"));
     setMinimumWidth(500);
     setMinimumHeight(300);
+    successfulInit = true;
 }
 
 void DlgTipOfTheDay::nextClicked() {
@@ -68,6 +74,13 @@ void DlgTipOfTheDay::previousClicked() {
 
 void DlgTipOfTheDay::updateTip(int tipId) {
     QString titleText, contentText, imagePath;
+    
+    if (tipId < 0) {
+        tipId = tipDatabase->rowCount() - 1;
+    }
+    else if (tipId >= tipDatabase->rowCount()) {
+        tipId = tipId % tipDatabase->rowCount();
+    }
 
     TipOfTheDay tip = tipDatabase->getTip(tipId);
     titleText = tip.getTitle();

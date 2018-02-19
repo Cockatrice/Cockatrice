@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QDate>
 
 #include "tip_of_the_day.h"
 
@@ -44,19 +45,37 @@ TipsOfTheDay::TipsOfTheDay(QString xmlPath, QObject *parent) : QAbstractListMode
     
     while (!reader.atEnd())
     {
-        reader.readNext();
-
-        if (reader.error())
-        {
-            errorStream << tr("Error: %1 at line %2, column %3.\n").arg(
-                reader.errorString(),
-                QString::number(reader.lineNumber()),
-                QString::number(reader.columnNumber()));
-            return;
+        if (reader.readNext() == QXmlStreamReader::EndElement) {
+            break;
         }
-        else
-        {
-            // process here
+
+        if (reader.name() == "tip") {
+            QString title, content, imagePath;
+            QDate date;
+            reader.readNext();
+            while (!reader.atEnd()) {
+                if (reader.readNext() == QXmlStreamReader::EndElement) {
+                    break;
+                }
+
+                if (reader.name() == "title") {
+                    title = reader.readElementText();
+                }
+                else if (reader.name() == "text") {
+                    content = reader.readElementText();
+                }
+                else if (reader.name() == "image") {
+                    imagePath = "theme:tips/images/" + reader.readElementText();
+                }
+                else if (reader.name() == "date") {
+                    date = QDate::fromString(reader.readElementText(), Qt::ISODate);
+                }
+                else
+                {
+                    // unkown element, do nothing
+                }
+            }
+            tipList->append(TipOfTheDay(title, content, imagePath));
         }
     }
 }
@@ -85,10 +104,7 @@ QVariant TipsOfTheDay::data(const QModelIndex &index, int role) const
 }
 
 TipOfTheDay TipsOfTheDay::getTip(int tipId) {
-    QString title = QString("Title: Tip #" + QString::number(tipId));
-    QString content = QString(tr("This is the data part of the tip.\nI hope you found it helpful!\n\nThanks for taking the time to read it!"));
-    QString imagePath = QString("d:/test_img.png");
-    return TipOfTheDay(title, content, imagePath);
+    return tipList->at(tipId);
 }
 
 int TipsOfTheDay::rowCount(const QModelIndex & /*parent*/) const
