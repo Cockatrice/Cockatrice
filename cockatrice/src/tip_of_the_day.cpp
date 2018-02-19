@@ -14,11 +14,6 @@ TipOfTheDay::TipOfTheDay(QString _title, QString _content, QString _imagePath)
 {
 }
 
-TipOfTheDay::TipOfTheDay(const TipOfTheDay &other)
-    : title(other.title), content(other.content), imagePath(other.imagePath)
-{
-}
-
 TipsOfTheDay::TipsOfTheDay(QString xmlPath, QObject *parent) : QAbstractListModel(parent)
 {
     tipList = new QList<TipOfTheDay>;

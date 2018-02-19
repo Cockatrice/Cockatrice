@@ -3,13 +3,10 @@
 
 #include <QAbstractListModel>
 
-class TipOfTheDay : public QObject
+class TipOfTheDay
 {
-    Q_OBJECT
 public:
     explicit TipOfTheDay(QString _title, QString _content, QString _imagePath);
-    TipOfTheDay(const TipOfTheDay &other);
-    ~TipOfTheDay() override = default;
     QString getTitle() const
     {
         return title;
