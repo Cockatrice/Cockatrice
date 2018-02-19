@@ -244,6 +244,7 @@ private:
                            const QString &avalue,
                            bool allCards);
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
+    void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
     void createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false);
     void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
