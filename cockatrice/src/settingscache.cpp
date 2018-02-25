@@ -11,7 +11,7 @@
 QString SettingsCache::getDataPath()
 {
     if (isPortableBuild)
-        return qApp->applicationDirPath() + "/data/";
+        return qApp->applicationDirPath() + "/data";
     else
         return QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 }
@@ -183,7 +183,11 @@ SettingsCache::SettingsCache()
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
     picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
     // this has never been exposed as an user-configurable setting
-    customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
+    if (picsPath.endsWith("/")) {
+        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");
+    } else {
+        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
+    }
     // this has never been exposed as an user-configurable setting
     customCardDatabasePath = getSafeConfigPath("paths/customsets", dataPath + "/customsets/");
 
