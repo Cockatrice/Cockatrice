@@ -1013,6 +1013,10 @@ Server_Player::cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer & /*rc
     event.set_face_down(faceDown);
     ges.enqueueGameEvent(event, playerId);
 
+    QString ptString = QString::fromStdString(cmd.pt());
+    if (!ptString.isEmpty() && !faceDown)
+        setCardAttrHelper(ges, playerId, zone->getName(), card->getId(), AttrPT, ptString);
+
     return Response::RespOk;
 }
 

@@ -2205,6 +2205,11 @@ void Player::cardMenuAction()
                     cmd->set_zone(card->getZone()->getName().toStdString());
                     cmd->set_card_id(card->getId());
                     cmd->set_face_down(!card->getFaceDown());
+                    if (card->getFaceDown()) {
+                        CardInfoPtr ci = card->getInfo();
+                        if (ci)
+                            cmd->set_pt(ci->getPowTough().toStdString());
+                    }
                     commandList.append(cmd);
                     break;
                 }
