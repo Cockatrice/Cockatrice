@@ -10,18 +10,21 @@ matrix:
     dist: trusty
     group: stable
     env: BUILDTYPE=Debug
+    if: tag IS blank
   - os: linux
     dist: trusty
     group: stable
     env: BUILDTYPE=Release
-    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    if: (branch = master AND type != pull_request) OR tag IS present
   - os: osx
     osx_image: xcode8
     env: BUILDTYPE=Debug
+    if: tag IS blank
   - os: osx
     osx_image: xcode8
     env: BUILDTYPE=Release
-    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    if: (branch = master AND type != pull_request) OR tag IS present
+
 
 #install dependencies for container-based "linux" builds
 addons:
@@ -43,7 +46,10 @@ addons:
     - libqt5svg5-dev
     - libqt5sql5-mysql
 
-before_install: bash ./.ci/travis-dependencies.sh
+
+before_install: bash ./.ci/travis-checks.sh
+
+install: bash ./.ci/travis-dependencies.sh
 
 script: bash ./.ci/travis-compile.sh
 
