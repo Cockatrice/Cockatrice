@@ -5,7 +5,8 @@
 set -e
 
 if hash clang-format 2>/dev/null && hash git 2>/dev/null; then
-	git diff --name-only | xargs -I{} find '{}' \( -name "*.cpp" -o -name "*.h" \) \
+	git diff --name-only $(git merge-base origin/master HEAD) | \
+	xargs -I{} find '{}' \( -name "*.cpp" -o -name "*.h" \) \
 		-not -path "./cockatrice/src/qt-json/*" \
 		-not -path "./servatrice/src/smtp/*" \
 		-not -path "./common/sfmt/*" \
