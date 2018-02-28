@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script will run clang-format on all modified, non-3rd-party, C++/Header files.
+# This script will run clang-format on all modified, non-3rd-party C++/Header files.
 
 set -e
 
