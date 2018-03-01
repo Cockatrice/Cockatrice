@@ -1,10 +1,10 @@
 #include <QCheckBox>
+#include <QDate>
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
-#include <QDate>
 
 #include "dlg_tip_of_the_day.h"
 #include "settingscache.h"
@@ -25,12 +25,14 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     tipTextContent = new QLabel();
     tipTextContent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     tipTextContent->setWordWrap(true);
+    tipTextContent->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    tipTextContent->setOpenExternalLinks(true);
     imageLabel = new QLabel();
     image = new QPixmap();
-	date = new QLabel();
-	date->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	tipNumber = new QLabel();
-	tipNumber->setAlignment(Qt::AlignCenter);
+    date = new QLabel();
+    date->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    tipNumber = new QLabel();
+    tipNumber->setAlignment(Qt::AlignCenter);
 
     currentTip = settingsCache->getLastShownTip() + 1;
     connect(this, SIGNAL(newTipRequested(int)), this, SLOT(updateTip(int)));
@@ -40,7 +42,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     content->addWidget(title);
     content->addWidget(tipTextContent);
     content->addWidget(imageLabel);
-	content->addWidget(date);
+    content->addWidget(date);
 
     auto *buttonBox = new QDialogButtonBox(Qt::Horizontal);
     QPushButton *nextButton = new QPushButton(tr("Next"));
@@ -48,7 +50,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     buttonBox->addButton(previousButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(nextButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(QDialogButtonBox::Ok);
-	buttonBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    buttonBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(nextButton, SIGNAL(clicked()), this, SLOT(nextClicked()));
     connect(previousButton, SIGNAL(clicked()), this, SLOT(previousClicked()));
@@ -58,7 +60,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     connect(showTipsOnStartupCheck, SIGNAL(clicked(bool)), settingsCache, SLOT(setShowTipsOnStartup(bool)));
     auto *buttonBar = new QHBoxLayout();
     buttonBar->addWidget(showTipsOnStartupCheck);
-	buttonBar->addWidget(tipNumber);
+    buttonBar->addWidget(tipNumber);
     buttonBar->addWidget(buttonBox);
 
     auto *mainLayout = new QVBoxLayout;
@@ -78,7 +80,7 @@ DlgTipOfTheDay::~DlgTipOfTheDay()
     title->deleteLater();
     tipTextContent->deleteLater();
     imageLabel->deleteLater();
-	tipNumber->deleteLater();
+    tipNumber->deleteLater();
     showTipsOnStartupCheck->deleteLater();
     delete image;
 }
@@ -116,9 +118,9 @@ void DlgTipOfTheDay::updateTip(int tipId)
     int w = imageLabel->width();
     imageLabel->setPixmap(image->scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-	date->setText("<i>Tip added on: " + tip.getDate().toString("yyyy.MM.dd") + "</i>");
+    date->setText("<i>Tip added on: " + tip.getDate().toString("yyyy.MM.dd") + "</i>");
 
-	tipNumber->setText("Tip " + QString::number(tipId + 1) + " / " + QString::number(tipDatabase->rowCount()));
+    tipNumber->setText("Tip " + QString::number(tipId + 1) + " / " + QString::number(tipDatabase->rowCount()));
 
     currentTip = static_cast<unsigned int>(tipId);
     settingsCache->setLastShownTip(currentTip);

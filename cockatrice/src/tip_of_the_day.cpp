@@ -80,8 +80,8 @@ QVariant TipsOfTheDay::data(const QModelIndex &index, int /*role*/) const
             return tip.getContent();
         case ImagePathColumn:
             return tip.getImagePath();
-		case DateColumn:
-			return tip.getDate();
+        case DateColumn:
+            return tip.getDate();
         default:
             return QVariant();
     }

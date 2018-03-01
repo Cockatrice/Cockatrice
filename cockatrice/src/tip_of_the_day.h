@@ -19,14 +19,14 @@ public:
     {
         return imagePath;
     }
-	QDate getDate() const
-	{
-		return date;
-	}
+    QDate getDate() const
+    {
+        return date;
+    }
 
 private:
     QString title, content, imagePath;
-	QDate date;
+    QDate date;
 };
 
 class TipsOfTheDay : public QAbstractListModel
@@ -38,7 +38,7 @@ public:
         TitleColumn,
         ContentColumn,
         ImagePathColumn,
-		DateColumn,
+        DateColumn,
     };
 
     explicit TipsOfTheDay(QString xmlPath, QObject *parent = nullptr);
