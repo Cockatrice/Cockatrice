@@ -9,8 +9,8 @@
 
 #define TIPDDBMODEL_COLUMNS 3
 
-TipOfTheDay::TipOfTheDay(QString _title, QString _content, QString _imagePath)
-    : title(std::move(_title)), content(std::move(_content)), imagePath(std::move(_imagePath))
+TipOfTheDay::TipOfTheDay(QString _title, QString _content, QString _imagePath, QDate _date)
+    : title(std::move(_title)), content(std::move(_content)), imagePath(std::move(_imagePath)), date(std::move(_date))
 {
 }
 
@@ -39,7 +39,6 @@ TipsOfTheDay::TipsOfTheDay(QString xmlPath, QObject *parent) : QAbstractListMode
         if (reader.name() == "tip") {
             QString title, content, imagePath;
             QDate date;
-            Q_UNUSED(date);
             reader.readNext();
             while (!reader.atEnd()) {
                 if (reader.readNext() == QXmlStreamReader::EndElement) {
@@ -58,7 +57,7 @@ TipsOfTheDay::TipsOfTheDay(QString xmlPath, QObject *parent) : QAbstractListMode
                     // unkown element, do nothing
                 }
             }
-            tipList->append(TipOfTheDay(title, content, imagePath));
+            tipList->append(TipOfTheDay(title, content, imagePath, date));
         }
     }
 }
@@ -81,6 +80,8 @@ QVariant TipsOfTheDay::data(const QModelIndex &index, int /*role*/) const
             return tip.getContent();
         case ImagePathColumn:
             return tip.getImagePath();
+		case DateColumn:
+			return tip.getDate();
         default:
             return QVariant();
     }

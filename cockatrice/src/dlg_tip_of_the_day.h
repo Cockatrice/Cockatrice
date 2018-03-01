@@ -26,7 +26,7 @@ protected:
 private:
     unsigned int currentTip;
     TipsOfTheDay *tipDatabase;
-    QLabel *title, *tipTextContent, *imageLabel;
+    QLabel *title, *tipTextContent, *imageLabel, *tipNumber, *date;
     QCheckBox *showTipsOnStartupCheck;
     QPixmap *image;
 

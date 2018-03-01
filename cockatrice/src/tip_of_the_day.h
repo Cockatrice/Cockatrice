@@ -6,7 +6,7 @@
 class TipOfTheDay
 {
 public:
-    explicit TipOfTheDay(QString _title, QString _content, QString _imagePath);
+    explicit TipOfTheDay(QString _title, QString _content, QString _imagePath, QDate _date);
     QString getTitle() const
     {
         return title;
@@ -19,9 +19,14 @@ public:
     {
         return imagePath;
     }
+	QDate getDate() const
+	{
+		return date;
+	}
 
 private:
     QString title, content, imagePath;
+	QDate date;
 };
 
 class TipsOfTheDay : public QAbstractListModel
@@ -33,6 +38,7 @@ public:
         TitleColumn,
         ContentColumn,
         ImagePathColumn,
+		DateColumn,
     };
 
     explicit TipsOfTheDay(QString xmlPath, QObject *parent = nullptr);
