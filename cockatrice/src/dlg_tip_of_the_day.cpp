@@ -26,7 +26,6 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     tipTextContent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     tipTextContent->setWordWrap(true);
     imageLabel = new QLabel();
-	imageLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     image = new QPixmap();
 	date = new QLabel();
 	date->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
