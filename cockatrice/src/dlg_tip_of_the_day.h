@@ -3,7 +3,11 @@
 
 #include <QComboBox>
 #include <QDialog>
+#include <QDialogButtonBox>
+#include <QHBoxLayout>
 #include <QLineEdit>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 class QLabel;
 class QPushButton;
@@ -15,7 +19,7 @@ class DlgTipOfTheDay : public QDialog
     Q_OBJECT
 public:
     explicit DlgTipOfTheDay(QWidget *parent = nullptr);
-    ~DlgTipOfTheDay();
+    ~DlgTipOfTheDay() override;
     bool successfulInit;
 signals:
     void newTipRequested(int tipId);
@@ -29,6 +33,11 @@ private:
     QLabel *title, *tipTextContent, *imageLabel, *tipNumber, *date;
     QCheckBox *showTipsOnStartupCheck;
     QPixmap *image;
+
+    QVBoxLayout *content, *mainLayout;
+    QDialogButtonBox *buttonBox;
+    QPushButton *nextButton, *previousButton;
+    QHBoxLayout *buttonBar;
 
 private slots:
     void nextClicked();

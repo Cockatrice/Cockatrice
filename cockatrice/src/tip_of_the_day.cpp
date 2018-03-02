@@ -10,7 +10,7 @@
 #define TIPDDBMODEL_COLUMNS 3
 
 TipOfTheDay::TipOfTheDay(QString _title, QString _content, QString _imagePath, QDate _date)
-    : title(std::move(_title)), content(std::move(_content)), imagePath(std::move(_imagePath)), date(std::move(_date))
+    : title(std::move(_title)), content(std::move(_content)), imagePath(std::move(_imagePath)), date(_date)
 {
 }
 

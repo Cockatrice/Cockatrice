@@ -10,6 +10,11 @@
 #include "settingscache.h"
 #include "tip_of_the_day.h"
 
+#define MIN_TIP_IMAGE_HEIGHT 200
+#define MIN_TIP_IMAGE_WIDTH 200
+#define MAX_TIP_IMAGE_HEIGHT 300
+#define MAX_TIP_IMAGE_WIDTH 300
+
 DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
 {
     successfulInit = false;
@@ -28,6 +33,8 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     tipTextContent->setTextInteractionFlags(Qt::TextBrowserInteraction);
     tipTextContent->setOpenExternalLinks(true);
     imageLabel = new QLabel();
+    imageLabel->setFixedHeight(MAX_TIP_IMAGE_HEIGHT + 50);
+    imageLabel->setFixedWidth(MAX_TIP_IMAGE_WIDTH + 50);
     image = new QPixmap();
     date = new QLabel();
     date->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -38,15 +45,15 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     connect(this, SIGNAL(newTipRequested(int)), this, SLOT(updateTip(int)));
     newTipRequested(currentTip);
 
-    auto *content = new QVBoxLayout();
+    content = new QVBoxLayout;
     content->addWidget(title);
     content->addWidget(tipTextContent);
     content->addWidget(imageLabel);
     content->addWidget(date);
 
-    auto *buttonBox = new QDialogButtonBox(Qt::Horizontal);
-    QPushButton *nextButton = new QPushButton(tr("Next"));
-    QPushButton *previousButton = new QPushButton(tr("Previous"));
+    buttonBox = new QDialogButtonBox(Qt::Horizontal);
+    nextButton = new QPushButton(tr("Next"));
+    previousButton = new QPushButton(tr("Previous"));
     buttonBox->addButton(previousButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(nextButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(QDialogButtonBox::Ok);
@@ -58,12 +65,12 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     showTipsOnStartupCheck = new QCheckBox("Show tips on startup");
     showTipsOnStartupCheck->setChecked(true);
     connect(showTipsOnStartupCheck, SIGNAL(clicked(bool)), settingsCache, SLOT(setShowTipsOnStartup(bool)));
-    auto *buttonBar = new QHBoxLayout();
+    buttonBar = new QHBoxLayout();
     buttonBar->addWidget(showTipsOnStartupCheck);
     buttonBar->addWidget(tipNumber);
     buttonBar->addWidget(buttonBox);
 
-    auto *mainLayout = new QVBoxLayout;
+    mainLayout = new QVBoxLayout;
     mainLayout->addLayout(content);
     mainLayout->addLayout(buttonBar);
     setLayout(mainLayout);
@@ -82,6 +89,12 @@ DlgTipOfTheDay::~DlgTipOfTheDay()
     imageLabel->deleteLater();
     tipNumber->deleteLater();
     showTipsOnStartupCheck->deleteLater();
+    content->deleteLater();
+    mainLayout->deleteLater();
+    buttonBox->deleteLater();
+    nextButton->deleteLater();
+    previousButton->deleteLater();
+    buttonBar->deleteLater();
     delete image;
 }
 
@@ -113,10 +126,14 @@ void DlgTipOfTheDay::updateTip(int tipId)
     title->setText("<h2>" + titleText + "</h2>");
     tipTextContent->setText(contentText);
 
-    image->load(imagePath);
-    int h = imageLabel->height();
-    int w = imageLabel->width();
-    imageLabel->setPixmap(image->scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    if (!image->load(imagePath)) {
+        qDebug() << "Image failed to load from" << imagePath;
+        imageLabel->clear();
+    } else {
+        int h = std::min(std::max(image->height(), MIN_TIP_IMAGE_HEIGHT), MAX_TIP_IMAGE_HEIGHT);
+        int w = std::min(std::max(imageLabel->width(), MIN_TIP_IMAGE_WIDTH), MAX_TIP_IMAGE_WIDTH);
+        imageLabel->setPixmap(image->scaled(h, w, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
 
     date->setText("<i>Tip added on: " + tip.getDate().toString("yyyy.MM.dd") + "</i>");
 
