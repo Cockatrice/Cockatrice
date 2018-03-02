@@ -179,6 +179,10 @@ SettingsCache::SettingsCache()
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
 
+    // tip of the day settings
+    showTipsOnStartup = settings->value("tipOfDay/showTips", true).toBool();
+    lastShownTip = settings->value("tipOfDay/lastShown", -1).toInt();
+
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
     picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
@@ -333,6 +337,18 @@ void SettingsCache::setLang(const QString &_lang)
     lang = _lang;
     settings->setValue("personal/lang", lang);
     emit langChanged();
+}
+
+void SettingsCache::setShowTipsOnStartup(bool _showTipsOnStartup)
+{
+    showTipsOnStartup = _showTipsOnStartup;
+    settings->setValue("tipOfDay/showTips", showTipsOnStartup);
+}
+
+void SettingsCache::setLastShownTip(int _lastShownTip)
+{
+    lastShownTip = _lastShownTip;
+    settings->setValue("tipOfDay/lastShown", lastShownTip);
 }
 
 void SettingsCache::setDeckPath(const QString &_deckPath)

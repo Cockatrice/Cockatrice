@@ -67,6 +67,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     defaultUrlEdit = new QLineEdit(settingsCache->getPicUrl());
     fallbackUrlEdit = new QLineEdit(settingsCache->getPicUrlFallback());
 
+    showTipsOnStartup.setChecked(settingsCache->getShowTipsOnStartup());
+
     connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
     connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
@@ -79,6 +81,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(fallbackUrlEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrlFallback(QString)));
     connect(&defaultUrlRestoreButton, SIGNAL(clicked()), this, SLOT(defaultUrlRestoreButtonClicked()));
     connect(&fallbackUrlRestoreButton, SIGNAL(clicked()), this, SLOT(fallbackUrlRestoreButtonClicked()));
+    connect(&showTipsOnStartup, SIGNAL(clicked(bool)), settingsCache, SLOT(setShowTipsOnStartup(bool)));
 
     setEnabledStatus(settingsCache->getPicDownload());
 
@@ -97,6 +100,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&fallbackUrlLabel, 6, 0, 1, 1);
     personalGrid->addWidget(fallbackUrlEdit, 6, 1, 1, 1);
     personalGrid->addWidget(&fallbackUrlRestoreButton, 6, 2, 1, 1);
+    personalGrid->addWidget(&showTipsOnStartup, 7, 0);
     personalGrid->addWidget(&urlLinkLabel, 7, 1, 1, 1);
     personalGrid->addWidget(&clearDownloadedPicsButton, 8, 0, 1, 3);
 
@@ -310,6 +314,7 @@ void GeneralSettingsPage::retranslateUi()
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     defaultUrlRestoreButton.setText(tr("Reset"));
     fallbackUrlRestoreButton.setText(tr("Reset"));
+    showTipsOnStartup.setText(tr("Show tips on startup"));
 }
 
 void GeneralSettingsPage::setEnabledStatus(bool status)

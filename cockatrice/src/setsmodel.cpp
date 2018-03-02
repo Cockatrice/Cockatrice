@@ -220,8 +220,8 @@ void SetsModel::sort(int column, Qt::SortOrder order)
 void SetsModel::save(CardDatabase *db)
 {
     // order
-    for (unsigned int i = 0; i < sets.size(); i++)
-        sets[i]->setSortKey(i + 1);
+    for (int i = 0; i < sets.size(); i++)
+        sets[i]->setSortKey(static_cast<unsigned int>(i + 1));
 
     // enabled sets
     for (const CardSetPtr &set : sets)

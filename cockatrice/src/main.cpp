@@ -22,6 +22,7 @@
 #include "QtNetwork/QNetworkInterface"
 #include "carddatabase.h"
 #include "dlg_settings.h"
+#include "dlg_tip_of_the_day.h"
 #include "featureset.h"
 #include "logger.h"
 #include "pixmapgenerator.h"
@@ -136,6 +137,11 @@ int main(int argc, char *argv[])
 
     ui.show();
     qDebug("main(): ui.show() finished");
+
+    DlgTipOfTheDay tip;
+    if (settingsCache->getShowTipsOnStartup() && tip.successfulInit) {
+        tip.show();
+    }
 
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.exec();
