@@ -299,6 +299,10 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
         }
 
         colors.removeDuplicates();
+        if (colors.length() > 1) {
+            sortColors(colors);
+        }
+
         // Fortunately, there are no split cards that flip, transform or meld.
         relatedCards = QList<CardRelation *>();
         reverseRelatedCards = QList<CardRelation *>();
@@ -316,6 +320,26 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
     }
 
     return cards;
+}
+
+void OracleImporter::sortColors(QStringList &colors)
+{
+    QMap<QString, unsigned int> colorOrder;
+    colorOrder["W"] = 0;
+    colorOrder["U"] = 1;
+    colorOrder["B"] = 2;
+    colorOrder["R"] = 3;
+    colorOrder["G"] = 4;
+    bool correctOrder = false;
+    while (!correctOrder) {
+        correctOrder = true;
+        for (unsigned int i = 0; i < colors.length() - 1; i++) {
+            if (colorOrder[colors[i]] > colorOrder[colors[i + 1]]) {
+                colors.swap(i, i + 1);
+                correctOrder = false;
+            }
+        }
+    }
 }
 
 int OracleImporter::startImport()
