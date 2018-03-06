@@ -324,22 +324,10 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
 
 void OracleImporter::sortColors(QStringList &colors)
 {
-    QMap<QString, unsigned int> colorOrder;
-    colorOrder["W"] = 0;
-    colorOrder["U"] = 1;
-    colorOrder["B"] = 2;
-    colorOrder["R"] = 3;
-    colorOrder["G"] = 4;
-    bool correctOrder = false;
-    while (!correctOrder) {
-        correctOrder = true;
-        for (unsigned int i = 0; i < colors.length() - 1; i++) {
-            if (colorOrder[colors[i]] > colorOrder[colors[i + 1]]) {
-                colors.swap(i, i + 1);
-                correctOrder = false;
-            }
-        }
-    }
+	const QMap<QString, unsigned int> colorOrder{ { "W", 0 },{ "U", 1 },{ "B", 2 },{ "R", 3 },{ "G", 4 } };
+	std::sort(colors.begin(), colors.end(), [&colorOrder](const QString a, const QString b) -> bool {
+		return colorOrder[a] < colorOrder[b];
+	});
 }
 
 int OracleImporter::startImport()
