@@ -326,7 +326,7 @@ void OracleImporter::sortColors(QStringList &colors)
 {
     const QMap<QString, unsigned int> colorOrder{{"W", 0}, {"U", 1}, {"B", 2}, {"R", 3}, {"G", 4}};
     std::sort(colors.begin(), colors.end(),
-              [&colorOrder](const QString a, const QString b) -> bool { return colorOrder[a] < colorOrder[b]; });
+              [&colorOrder](const QString a, const QString b) { return colorOrder[a] < colorOrder[b]; });
 }
 
 int OracleImporter::startImport()
