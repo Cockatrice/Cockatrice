@@ -6,9 +6,11 @@
 #include <QLabel>
 #include <QMainWindow>
 #include <QSet>
+#include <QLineEdit>
 
 class SetsModel;
 class SetsProxyModel;
+class SetsDisplayModel;
 class QPushButton;
 class CardDatabase;
 class QItemSelection;
@@ -19,13 +21,15 @@ class WndSets : public QMainWindow
     Q_OBJECT
 private:
     SetsModel *model;
+	SetsDisplayModel *displayModel;
     QTreeView *view;
     QPushButton *toggleAllButton, *toggleSelectedButton;
     QPushButton *enableAllButton, *disableAllButton, *enableSomeButton, *disableSomeButton;
     QAction *aUp, *aDown, *aBottom, *aTop;
     QToolBar *setsEditToolBar;
     QDialogButtonBox *buttonBox;
-    QLabel *labNotes;
+    QLabel *labNotes, *searchLabel;
+	QLineEdit *searchField;
     QGridLayout *mainLayout;
     void rebuildMainLayout(int actionToTake);
     enum
@@ -41,6 +45,7 @@ public:
 protected:
     void selectRows(QSet<int> rows);
 private slots:
+	void updateSearch(const QString &search);
     void actEnableAll();
     void actDisableAll();
     void actEnableSome();

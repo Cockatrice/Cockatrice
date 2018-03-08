@@ -252,3 +252,61 @@ QStringList SetsModel::mimeTypes() const
 {
     return QStringList() << "application/x-cockatricecardset";
 }
+
+
+
+SetsDisplayModel::SetsDisplayModel(QObject *parent) : QSortFilterProxyModel(parent)
+{
+	setFilterCaseSensitivity(Qt::CaseInsensitive);
+	setSortCaseSensitivity(Qt::CaseInsensitive);
+
+	loadedRowCount = 0;
+}
+
+bool SetsDisplayModel::canFetchMore(const QModelIndex &index) const
+{
+	return loadedRowCount < sourceModel()->rowCount(index);
+}
+
+void SetsDisplayModel::fetchMore(const QModelIndex &index)
+{
+	int remainder = sourceModel()->rowCount(index) - loadedRowCount;
+	int itemsToFetch = qMin(100, remainder);
+
+	beginInsertRows(QModelIndex(), loadedRowCount, loadedRowCount + itemsToFetch - 1);
+
+	loadedRowCount += itemsToFetch;
+	endInsertRows();
+}
+
+bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
+{
+	return true;
+}
+
+int SetsDisplayModel::rowCount(const QModelIndex &parent) const
+{
+	return qMin(QSortFilterProxyModel::rowCount(parent), loadedRowCount);
+}
+
+bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
+{
+	QString searchTerm = "";
+	QString leftString = sourceModel()->data(left, SetsModel::SortRole).toString();
+	QString rightString = sourceModel()->data(right, SetsModel::SortRole).toString();
+
+	if (!searchTerm.isEmpty() && left.column() == SetsModel::LongNameCol) {
+		bool isLeftType = leftString.startsWith(searchTerm, Qt::CaseInsensitive);
+		bool isRightType = rightString.startsWith(searchTerm, Qt::CaseInsensitive);
+
+		// test for an exact match: isLeftType && leftString.size() == cardName.size()
+		// or an exclusive start match: isLeftType && !isRightType
+		if (isLeftType && (!isRightType || leftString.size() == searchTerm.size()))
+			return true;
+
+		// same checks for the right string
+		if (isRightType && (!isLeftType || rightString.size() == searchTerm.size()))
+			return false;
+	}
+	return QString::localeAwareCompare(leftString, rightString) < 0;
+}

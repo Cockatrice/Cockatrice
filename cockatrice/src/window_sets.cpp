@@ -53,10 +53,21 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(aBottom, SIGNAL(triggered()), this, SLOT(actBottom()));
     setsEditToolBar->addAction(aBottom);
 
+	// search field
+	searchField = new QLineEdit;
+	searchField->setObjectName("searchEdit");
+	searchField->setPlaceholderText(tr("Search by card name"));
+	searchField->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+	setFocusProxy(searchField);
+	connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
+
+
     // view
     model = new SetsModel(db, this);
+	displayModel = new SetsDisplayModel(this);
+	displayModel->setSourceModel(model);
     view = new QTreeView;
-    view->setModel(model);
+    view->setModel(displayModel);
 
     view->setAlternatingRowColors(true);
     view->setUniformRowHeights(true);
@@ -111,14 +122,15 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actRestore()));
 
     mainLayout = new QGridLayout;
-    mainLayout->addWidget(setsEditToolBar, 0, 0, 1, 1);
-    mainLayout->addWidget(view, 0, 1, 1, 2);
-    mainLayout->addWidget(enableAllButton, 1, 1);
-    mainLayout->addWidget(disableAllButton, 1, 2);
-    mainLayout->addWidget(enableSomeButton, 1, 1);
-    mainLayout->addWidget(disableSomeButton, 1, 2);
-    mainLayout->addWidget(labNotes, 2, 1, 1, 2);
-    mainLayout->addWidget(buttonBox, 3, 1, 1, 2);
+    mainLayout->addWidget(setsEditToolBar, 0, 0, 2, 1);
+	mainLayout->addWidget(searchField, 0, 1, 1, 2);
+    mainLayout->addWidget(view, 1, 1, 1, 2);
+    mainLayout->addWidget(enableAllButton, 2, 1);
+    mainLayout->addWidget(disableAllButton, 2, 2);
+    mainLayout->addWidget(enableSomeButton, 2, 1);
+    mainLayout->addWidget(disableSomeButton, 2, 2);
+    mainLayout->addWidget(labNotes, 3, 1, 1, 2);
+    mainLayout->addWidget(buttonBox, 4, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
     mainLayout->setColumnStretch(2, 1);
 
@@ -192,6 +204,17 @@ void WndSets::selectRows(QSet<int> rows)
         view->selectionModel()->select(idx, QItemSelectionModel::Select | QItemSelectionModel::Rows);
         view->scrollTo(idx, QAbstractItemView::EnsureVisible);
     }
+}
+
+void WndSets::updateSearch(const QString &search)
+{
+	
+	//databaseDisplayModel->setCardName(search);
+	//QModelIndexList sel = databaseView->selectionModel()->selectedRows();
+	//if (sel.isEmpty() && databaseDisplayModel->rowCount())
+	//	databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
+	//		QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+	return;
 }
 
 void WndSets::actEnableAll()
