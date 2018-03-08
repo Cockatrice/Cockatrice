@@ -259,39 +259,30 @@ SetsDisplayModel::SetsDisplayModel(QObject *parent) : QSortFilterProxyModel(pare
 {
 	setFilterCaseSensitivity(Qt::CaseInsensitive);
 	setSortCaseSensitivity(Qt::CaseInsensitive);
-
-	loadedRowCount = 0;
-}
-
-bool SetsDisplayModel::canFetchMore(const QModelIndex &index) const
-{
-	return loadedRowCount < sourceModel()->rowCount(index);
 }
 
 void SetsDisplayModel::fetchMore(const QModelIndex &index)
 {
-	int remainder = sourceModel()->rowCount(index) - loadedRowCount;
-	int itemsToFetch = qMin(100, remainder);
+	int itemsToFetch = sourceModel()->rowCount(index);
 
-	beginInsertRows(QModelIndex(), loadedRowCount, loadedRowCount + itemsToFetch - 1);
+	beginInsertRows(QModelIndex(), 0, itemsToFetch - 1);
 
-	loadedRowCount += itemsToFetch;
 	endInsertRows();
 }
 
-bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
+bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & sourceParent) const
 {
-	return true;
-}
+	QModelIndex index0 = sourceModel()->index(sourceRow, SetsModel::SetTypeCol, sourceParent);
+	QModelIndex index1 = sourceModel()->index(sourceRow, SetsModel::LongNameCol, sourceParent);
+	QModelIndex index2 = sourceModel()->index(sourceRow, SetsModel::ShortNameCol, sourceParent);
 
-int SetsDisplayModel::rowCount(const QModelIndex &parent) const
-{
-	return qMin(QSortFilterProxyModel::rowCount(parent), loadedRowCount);
+	return (sourceModel()->data(index0).toString().contains(filterRegExp()) ||
+		sourceModel()->data(index1).toString().contains(filterRegExp()) ||
+		sourceModel()->data(index2).toString().contains(filterRegExp()));
 }
 
 bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {
-	QString searchTerm = "";
 	QString leftString = sourceModel()->data(left, SetsModel::SortRole).toString();
 	QString rightString = sourceModel()->data(right, SetsModel::SortRole).toString();
 

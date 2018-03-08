@@ -85,15 +85,13 @@ class SetsDisplayModel : public QSortFilterProxyModel
 {
 	Q_OBJECT
 private:
-	int loadedRowCount;
+	QString searchTerm;
 public:
 	SetsDisplayModel(QObject *parent = NULL);
-	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
 protected:
 	bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
-	bool canFetchMore(const QModelIndex &index) const override;
 	void fetchMore(const QModelIndex &index) override;
 };
 

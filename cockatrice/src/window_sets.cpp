@@ -59,13 +59,13 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 	searchField->setPlaceholderText(tr("Search by card name"));
 	searchField->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
 	setFocusProxy(searchField);
-	connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
-
+	//connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
 
     // view
     model = new SetsModel(db, this);
 	displayModel = new SetsDisplayModel(this);
 	displayModel->setSourceModel(model);
+	connect(searchField, SIGNAL(textChanged(const QString &)), displayModel, SLOT(setFilterRegExp(const QString &)));
     view = new QTreeView;
     view->setModel(displayModel);
 
