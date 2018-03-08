@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QtWidgets>
+#include <climits>
 
 #include "qt-json/json.h"
 
@@ -326,7 +327,7 @@ void OracleImporter::sortColors(QStringList &colors)
 {
     const QHash<QString, unsigned int> colorOrder{{"W", 0}, {"U", 1}, {"B", 2}, {"R", 3}, {"G", 4}};
     std::sort(colors.begin(), colors.end(), [&colorOrder](const QString a, const QString b) {
-        return colorOrder.value(a, 5) < colorOrder.value(b, 5);
+        return colorOrder.value(a, INT_MAX) < colorOrder.value(b, INT_MAX);
     });
 }
 
