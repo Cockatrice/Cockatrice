@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QtWidgets>
+#include <climits>
 
 #include "qt-json/json.h"
 
@@ -299,6 +300,10 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
         }
 
         colors.removeDuplicates();
+        if (colors.length() > 1) {
+            sortColors(colors);
+        }
+
         // Fortunately, there are no split cards that flip, transform or meld.
         relatedCards = QList<CardRelation *>();
         reverseRelatedCards = QList<CardRelation *>();
@@ -316,6 +321,14 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
     }
 
     return cards;
+}
+
+void OracleImporter::sortColors(QStringList &colors)
+{
+    const QHash<QString, unsigned int> colorOrder{{"W", 0}, {"U", 1}, {"B", 2}, {"R", 3}, {"G", 4}};
+    std::sort(colors.begin(), colors.end(), [&colorOrder](const QString a, const QString b) {
+        return colorOrder.value(a, INT_MAX) < colorOrder.value(b, INT_MAX);
+    });
 }
 
 int OracleImporter::startImport()
