@@ -62,10 +62,9 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 	//connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
 
     // view
-    model = new SetsModel(db, this);
+    model = new SetsModel(db);
 	displayModel = new SetsDisplayModel(this);
 	displayModel->setSourceModel(model);
-	connect(searchField, SIGNAL(textChanged(const QString &)), displayModel, SLOT(setFilterRegExp(const QString &)));
     view = new QTreeView;
     view->setModel(displayModel);
 
@@ -73,7 +72,6 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     view->setUniformRowHeights(true);
     view->setAllColumnsShowFocus(true);
     view->setSortingEnabled(true);
-    view->setSelectionMode(QAbstractItemView::SingleSelection);
     view->setSelectionBehavior(QAbstractItemView::SelectRows);
     view->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
@@ -102,6 +100,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(disableSomeButton, SIGNAL(clicked()), this, SLOT(actDisableSome()));
     connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
             SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
+	connect(searchField, SIGNAL(textChanged(const QString &)), displayModel, SLOT(setFilterRegExp(const QString &)));
 
     labNotes = new QLabel;
     labNotes->setWordWrap(true);
@@ -206,17 +205,6 @@ void WndSets::selectRows(QSet<int> rows)
     }
 }
 
-void WndSets::updateSearch(const QString &search)
-{
-	
-	//databaseDisplayModel->setCardName(search);
-	//QModelIndexList sel = databaseView->selectionModel()->selectedRows();
-	//if (sel.isEmpty() && databaseDisplayModel->rowCount())
-	//	databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
-	//		QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
-	return;
-}
-
 void WndSets::actEnableAll()
 {
     model->toggleAll(true);
@@ -252,13 +240,13 @@ void WndSets::actUp()
     if (rows.empty())
         return;
 
-    foreach (QModelIndex i, rows) {
-        int oldRow = i.row();
-        int newRow = oldRow - 1;
-        if (oldRow <= 0)
-            continue;
+    for (auto i : rows) {
+		if (i.row() <= 0)
+			continue;
+        int oldRow = displayModel->mapToSource(i).row();
+        int newRow = i.row() - 1;
 
-        model->swapRows(oldRow, newRow);
+        model->swapRows(oldRow, displayModel->mapToSource(displayModel->index(newRow, 0)).row());
         newRows.insert(newRow);
     }
 
@@ -274,13 +262,13 @@ void WndSets::actDown()
     if (rows.empty())
         return;
 
-    foreach (QModelIndex i, rows) {
-        int oldRow = i.row();
-        int newRow = oldRow + 1;
-        if (oldRow >= model->rowCount() - 1)
-            continue;
+    for (auto i : rows) {
+		if (i.row() >= displayModel->rowCount() - 1)
+			continue;
+        int oldRow = displayModel->mapToSource(i).row();
+        int newRow = i.row() + 1;
 
-        model->swapRows(oldRow, newRow);
+        model->swapRows(oldRow, displayModel->mapToSource(displayModel->index(newRow, 0)).row());
         newRows.insert(newRow);
     }
 
@@ -298,7 +286,7 @@ void WndSets::actTop()
         return;
 
     for (int i = 0; i < rows.length(); i++) {
-        int oldRow = rows.at(i).row();
+        int oldRow = displayModel->mapToSource(rows.at(i)).row();
 
         if (oldRow <= 0) {
             newRow++;
@@ -323,16 +311,17 @@ void WndSets::actBottom()
         return;
 
     for (int i = 0; i < rows.length(); i++) {
-        int oldRow = rows.at(i).row();
+		int oldRow = displayModel->mapToSource(rows.at(i)).row();
 
         if (oldRow >= newRow) {
             newRow--;
             continue;
         }
 
-        newRows.insert(newRow);
+		newRows.insert(newRow);
         model->swapRows(oldRow, newRow--);
     }
 
     selectRows(newRows);
+
 }
