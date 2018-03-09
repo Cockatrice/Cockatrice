@@ -45,7 +45,6 @@ public:
 protected:
     void selectRows(QSet<int> rows);
 private slots:
-	void updateSearch(const QString &search);
     void actEnableAll();
     void actDisableAll();
     void actEnableSome();

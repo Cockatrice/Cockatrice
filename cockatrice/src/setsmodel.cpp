@@ -286,18 +286,5 @@ bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &righ
 	QString leftString = sourceModel()->data(left, SetsModel::SortRole).toString();
 	QString rightString = sourceModel()->data(right, SetsModel::SortRole).toString();
 
-	if (!searchTerm.isEmpty() && left.column() == SetsModel::LongNameCol) {
-		bool isLeftType = leftString.startsWith(searchTerm, Qt::CaseInsensitive);
-		bool isRightType = rightString.startsWith(searchTerm, Qt::CaseInsensitive);
-
-		// test for an exact match: isLeftType && leftString.size() == cardName.size()
-		// or an exclusive start match: isLeftType && !isRightType
-		if (isLeftType && (!isRightType || leftString.size() == searchTerm.size()))
-			return true;
-
-		// same checks for the right string
-		if (isRightType && (!isLeftType || rightString.size() == searchTerm.size()))
-			return false;
-	}
 	return QString::localeAwareCompare(leftString, rightString) < 0;
 }

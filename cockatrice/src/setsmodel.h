@@ -84,8 +84,6 @@ public:
 class SetsDisplayModel : public QSortFilterProxyModel
 {
 	Q_OBJECT
-private:
-	QString searchTerm;
 public:
 	SetsDisplayModel(QObject *parent = NULL);
 
