@@ -316,7 +316,9 @@ void MainWindow::actAbout()
 void MainWindow::actTips()
 {
     DlgTipOfTheDay tip;
-    tip.exec();
+    if (tip.successfulInit) {
+        tip.exec();
+    }
 }
 
 void MainWindow::actUpdate()

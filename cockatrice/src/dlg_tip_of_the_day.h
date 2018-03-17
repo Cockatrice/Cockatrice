@@ -21,6 +21,7 @@ public:
     explicit DlgTipOfTheDay(QWidget *parent = nullptr);
     ~DlgTipOfTheDay() override;
     bool successfulInit;
+    unsigned int getNumberOfTips();
 signals:
     void newTipRequested(int tipId);
 

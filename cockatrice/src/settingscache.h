@@ -69,6 +69,7 @@ private:
     bool notifyAboutUpdates;
     bool showTipsOnStartup;
     unsigned int lastShownTip;
+    QList<int> seenTips;
     bool mbDownloadSpoilers;
     int updateReleaseChannel;
     int maxFontSize;
@@ -208,6 +209,10 @@ public:
     unsigned int getLastShownTip() const
     {
         return lastShownTip;
+    }
+    QList<int> getSeenTips() const
+    {
+        return seenTips;
     }
     ReleaseChannel *getUpdateReleaseChannel() const
     {
@@ -445,6 +450,7 @@ public slots:
     void setLang(const QString &_lang);
     void setShowTipsOnStartup(bool _showTipsOnStartup);
     void setLastShownTip(int _lastShowTip);
+    void setSeenTips(const QList<int> &_seenTips);
     void setDeckPath(const QString &_deckPath);
     void setReplaysPath(const QString &_replaysPath);
     void setPicsPath(const QString &_picsPath);
