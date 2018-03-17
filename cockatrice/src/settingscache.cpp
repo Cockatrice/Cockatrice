@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QMetaType>
 
 QString SettingsCache::getDataPath()
 {
@@ -143,6 +144,12 @@ QString SettingsCache::getSafeConfigFilePath(QString configEntry, QString defaul
         tmp = defaultPath;
     return tmp;
 }
+
+
+
+Q_DECLARE_METATYPE(QList<int>)
+
+
 SettingsCache::SettingsCache()
 {
     // first, figure out if we are running in portable mode
@@ -166,6 +173,9 @@ SettingsCache::SettingsCache()
     if (!QFile(settingsPath + "global.ini").exists())
         translateLegacySettings();
 
+    QDataStream & operator >> (QDataStream &in, QList<int> &value);
+    qRegisterMetaType<QList<int>>("QList<int>");
+    qRegisterMetaTypeStreamOperators<QList<int>>("QList<int>");
     // updates - don't reorder them or their index in the settings won't match
     // append channels one by one, or msvc will add them in the wrong order.
     releaseChannels << new StableReleaseChannel();
@@ -182,6 +192,8 @@ SettingsCache::SettingsCache()
     // tip of the day settings
     showTipsOnStartup = settings->value("tipOfDay/showTips", true).toBool();
     lastShownTip = settings->value("tipOfDay/lastShown", -1).toInt();
+    seenTips = settings->value("tipOfDay/seenTips").value<QList<int>>();
+
 
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
@@ -349,6 +361,12 @@ void SettingsCache::setLastShownTip(int _lastShownTip)
 {
     lastShownTip = _lastShownTip;
     settings->setValue("tipOfDay/lastShown", lastShownTip);
+}
+
+void SettingsCache::setSeenTips(const QList<int> &_seenTips)
+{
+    seenTips = _seenTips;
+    settings->setValue("tipOfDay/seenTips", QVariant::fromValue(seenTips));
 }
 
 void SettingsCache::setDeckPath(const QString &_deckPath)

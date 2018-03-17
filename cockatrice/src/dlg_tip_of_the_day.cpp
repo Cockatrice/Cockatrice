@@ -21,7 +21,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     QString xmlPath = "theme:tips/tips_of_the_day.xml";
     tipDatabase = new TipsOfTheDay(xmlPath, this);
 
-    if (tipDatabase->rowCount() == 0 || tipDatabase->rowCount() == settingsCache->getLastShownTip() + 1) {
+    if (tipDatabase->rowCount() == 0) {
         return;
     }
 
@@ -98,6 +98,11 @@ DlgTipOfTheDay::~DlgTipOfTheDay()
     delete image;
 }
 
+unsigned int DlgTipOfTheDay::getNumberOfTips()
+{
+    return tipDatabase->rowCount();
+}
+
 void DlgTipOfTheDay::nextClicked()
 {
     emit newTipRequested(currentTip + 1);
@@ -116,6 +121,13 @@ void DlgTipOfTheDay::updateTip(int tipId)
         tipId = tipDatabase->rowCount() - 1;
     } else if (tipId >= tipDatabase->rowCount()) {
         tipId = tipId % tipDatabase->rowCount();
+    }
+
+    // Store tip id as seen
+    QList<int> seenTips = settingsCache->getSeenTips();
+    if (!seenTips.contains(tipId)) {
+        seenTips.append(tipId);
+        settingsCache->setSeenTips(seenTips);
     }
 
     TipOfTheDay tip = tipDatabase->getTip(tipId);
