@@ -93,15 +93,15 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&pixmapCacheLabel, 2, 0);
     personalGrid->addWidget(&pixmapCacheEdit, 2, 1);
     personalGrid->addWidget(&updateNotificationCheckBox, 3, 0);
-    personalGrid->addWidget(&picDownloadCheckBox, 4, 0, 1, 3);
-    personalGrid->addWidget(&defaultUrlLabel, 5, 0, 1, 1);
-    personalGrid->addWidget(defaultUrlEdit, 5, 1, 1, 1);
-    personalGrid->addWidget(&defaultUrlRestoreButton, 5, 2, 1, 1);
-    personalGrid->addWidget(&fallbackUrlLabel, 6, 0, 1, 1);
-    personalGrid->addWidget(fallbackUrlEdit, 6, 1, 1, 1);
-    personalGrid->addWidget(&fallbackUrlRestoreButton, 6, 2, 1, 1);
-    personalGrid->addWidget(&showTipsOnStartup, 7, 0);
-    personalGrid->addWidget(&urlLinkLabel, 7, 1, 1, 1);
+    personalGrid->addWidget(&showTipsOnStartup, 4, 0);
+    personalGrid->addWidget(&picDownloadCheckBox, 5, 0);
+    personalGrid->addWidget(&urlLinkLabel, 5, 1);
+    personalGrid->addWidget(&defaultUrlLabel, 6, 0, 1, 1);
+    personalGrid->addWidget(defaultUrlEdit, 6, 1, 1, 1);
+    personalGrid->addWidget(&defaultUrlRestoreButton, 6, 2, 1, 1);
+    personalGrid->addWidget(&fallbackUrlLabel, 7, 0, 1, 1);
+    personalGrid->addWidget(fallbackUrlEdit, 7, 1, 1, 1);
+    personalGrid->addWidget(&fallbackUrlRestoreButton, 7, 2, 1, 1);
     personalGrid->addWidget(&clearDownloadedPicsButton, 8, 0, 1, 3);
 
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
