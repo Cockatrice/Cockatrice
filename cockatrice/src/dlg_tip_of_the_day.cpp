@@ -21,7 +21,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     QString xmlPath = "theme:tips/tips_of_the_day.xml";
     tipDatabase = new TipsOfTheDay(xmlPath, this);
 
-    if (tipDatabase->rowCount() == 0) {
+    if (tipDatabase->rowCount() == 0 || tipDatabase->rowCount() == settingsCache->getLastShownTip() + 1) {
         return;
     }
 
