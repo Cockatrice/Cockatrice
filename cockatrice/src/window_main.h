@@ -72,6 +72,7 @@ private slots:
     void actExit();
     void actForgotPasswordRequest();
     void actAbout();
+    void actTips();
     void actUpdate();
     void actViewLog();
     void forgotPasswordSuccess();
@@ -115,7 +116,7 @@ private:
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
+        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
 
