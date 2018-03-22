@@ -41,7 +41,19 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     tipNumber = new QLabel();
     tipNumber->setAlignment(Qt::AlignCenter);
 
-    currentTip = settingsCache->getLastShownTip() + 1;
+    if (settingsCache->getSeenTips().size() != tipDatabase->rowCount()) {
+        newTipsAvailable = true;
+        QList<int> rangeToMaxTips;
+        for (int i = 0; i < tipDatabase->rowCount(); i++) {
+            rangeToMaxTips.append(i);
+        }
+        QSet<int> unseenTips = rangeToMaxTips.toSet() - settingsCache->getSeenTips().toSet();
+        currentTip = *std::min_element(unseenTips.begin(), unseenTips.end());
+    } else {
+        newTipsAvailable = false;
+        currentTip = settingsCache->getLastShownTip() + 1;
+    }
+
     connect(this, SIGNAL(newTipRequested(int)), this, SLOT(updateTip(int)));
     newTipRequested(currentTip);
 
@@ -96,11 +108,6 @@ DlgTipOfTheDay::~DlgTipOfTheDay()
     previousButton->deleteLater();
     buttonBar->deleteLater();
     delete image;
-}
-
-unsigned int DlgTipOfTheDay::getNumberOfTips()
-{
-    return tipDatabase->rowCount();
 }
 
 void DlgTipOfTheDay::nextClicked()
