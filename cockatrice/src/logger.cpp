@@ -89,11 +89,12 @@ QString Logger::getSystemArchitecture()
     QString result;
 
     if (!getClientOperatingSystem().isEmpty()) {
-        result.append(tr("Client Operating System") + ": " + getClientOperatingSystem() + "\n");
+        result.append("Client Operating System: " + getClientOperatingSystem() + "\n");
     }
 
-    result.append(tr("Build Architecture") + ": " + QString::fromStdString(BUILD_ARCHITECTURE) + "\n");
-    result.append(tr("Qt Version") + ": " + QT_VERSION_STR);
+    result.append("Build Architecture: " + QString::fromStdString(BUILD_ARCHITECTURE) + "\n");
+    result.append("Qt Version: " + QT_VERSION_STR + "\n");
+    result.append("------------------------------------------------");
 
     return result;
 }
