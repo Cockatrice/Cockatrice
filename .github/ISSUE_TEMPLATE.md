@@ -1,11 +1,6 @@
-<b>OS:</b>
-*Put your operating system here! For example: "Win 7 SP2", "macOS 10.12.3", "Ubuntu 16.10" etc.*
+<b>System Information:</b>
+   <!-- Go to "Help → View Debug Log" and copy the top few lines here! -->
 
-<b>Cockatrice version:</b>
-*Put your Cockatrice version number & build date here! For example: "2d53ce9 (2016-02-18)"
-You find them inside the app under `Help → About Cockatrice` (Windows & Linux), or `Cockatrice → About Cockatrice` (macOS).*
+_________________________________________________________________________________
 
-__________
-
-
-*Explain your issue/request/suggestion in detail here!*
+   <!-- Explain your issue/request/suggestion in detail here! -->
