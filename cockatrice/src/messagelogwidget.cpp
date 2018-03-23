@@ -363,9 +363,9 @@ void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCar
 void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
 {
     if (faceDown) {
-        appendHtmlServerMessage(tr("%1 flips %2 face-down.").arg(sanitizeHtml(player->getName())).arg(cardName));
+        appendHtmlServerMessage(tr("%1 turns %2 face-down.").arg(sanitizeHtml(player->getName())).arg(cardName));
     } else {
-        appendHtmlServerMessage(tr("%1 flips %2 face-up.").arg(sanitizeHtml(player->getName())).arg(cardName));
+        appendHtmlServerMessage(tr("%1 turns %2 face-up.").arg(sanitizeHtml(player->getName())).arg(cardName));
     }
 }
 
