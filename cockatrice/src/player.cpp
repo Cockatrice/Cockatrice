@@ -687,7 +687,7 @@ void Player::retranslateUi()
     aTap->setText(tr("&Tap / Untap"));
     aDoesntUntap->setText(tr("Toggle &normal untapping"));
     //: Turn face up/face down
-    aTurnOver->setText(tr("&Turn Over"));
+    aTurnOver->setText(tr("T&urn Over"));
     aPeek->setText(tr("&Peek at card face"));
     aClone->setText(tr("&Clone"));
     aAttach->setText(tr("Attac&h to card..."));
