@@ -55,7 +55,7 @@ class Event_DelCounter;
 class Event_DumpZone;
 class Event_StopDumpZone;
 class Event_MoveCard;
-class Event_TurnCardOver;
+class Event_FlipCard;
 class Event_DestroyCard;
 class Event_AttachCard;
 class Event_DrawCards;
@@ -115,7 +115,7 @@ signals:
     void logDrawCards(Player *player, int number);
     void logUndoDraw(Player *player, QString cardName);
     void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
-    void logTurnCardOver(Player *player, QString cardName, bool faceDown);
+    void logFlipCard(Player *player, QString cardName, bool faceDown);
     void logDestroyCard(Player *player, QString cardName);
     void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
     void logUnattachCard(Player *player, QString cardName);
@@ -207,7 +207,7 @@ private:
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aIncP,
-        *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aTurnOver, *aPeek, *aClone, *aMoveToTopLibrary,
+        *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aPeek, *aClone, *aMoveToTopLibrary,
         *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile, *aMoveToXfromTopOfLibrary;
 
     bool shortcutsActive;
@@ -244,6 +244,7 @@ private:
                            const QString &avalue,
                            bool allCards);
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
+    void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
     void createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false);
     void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
@@ -272,7 +273,7 @@ private:
     void eventDumpZone(const Event_DumpZone &event);
     void eventStopDumpZone(const Event_StopDumpZone &event);
     void eventMoveCard(const Event_MoveCard &event, const GameEventContext &context);
-    void eventTurnCardOver(const Event_TurnCardOver &event);
+    void eventFlipCard(const Event_FlipCard &event);
     void eventDestroyCard(const Event_DestroyCard &event);
     void eventAttachCard(const Event_AttachCard &event);
     void eventDrawCards(const Event_DrawCards &event);
@@ -286,7 +287,7 @@ public:
         cmTap,
         cmUntap,
         cmDoesntUntap,
-        cmTurnOver,
+        cmFlip,
         cmPeek,
         cmClone,
         cmMoveToTopLibrary,

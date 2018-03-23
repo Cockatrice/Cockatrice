@@ -431,6 +431,12 @@ void TabGame::addMentionTag(QString value)
     sayEdit->setFocus();
 }
 
+void TabGame::linkCardToChat(QString cardName)
+{
+    sayEdit->insert("[[" + cardName + "]] ");
+    sayEdit->setFocus();
+}
+
 void TabGame::emitUserEvent()
 {
     bool globalEvent = !spectator || settingsCache->getSpectatorNotificationsEnabled();
@@ -1224,6 +1230,7 @@ void TabGame::newCardAdded(AbstractCardItem *card)
     connect(card, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
     connect(card, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(card, SIGNAL(updateCardMenu(AbstractCardItem *)), this, SLOT(updateCardMenu(AbstractCardItem *)));
+    connect(card, SIGNAL(cardShiftClicked(QString)), this, SLOT(linkCardToChat(QString)));
 }
 
 CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) const
@@ -1595,6 +1602,11 @@ void TabGame::createDeckViewContainerWidget(bool bReplay)
     deckViewContainerLayout = new QVBoxLayout;
     deckViewContainerLayout->setContentsMargins(0, 0, 0, 0);
     deckViewContainerWidget->setLayout(deckViewContainerLayout);
+}
+
+void TabGame::viewCardInfo(const QString &cardName)
+{
+    cardInfo->setCard(cardName);
 }
 
 void TabGame::createCardInfoDock(bool bReplay)

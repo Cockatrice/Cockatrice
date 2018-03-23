@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QtWidgets>
+#include <climits>
 
 #include "qt-json/json.h"
 
@@ -78,16 +79,28 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
     if (cards.contains(cardName)) {
         card = cards.value(cardName);
     } else {
-        // Remove {} around mana costs
-        cardCost.remove(QChar('{'));
-        cardCost.remove(QChar('}'));
+        // Remove {} around mana costs, except if it's split cost
+        QStringList symbols = cardCost.split("}");
+        QString formattedCardCost = QString();
+        for (QString symbol : symbols) {
+            if (symbol.contains(QRegExp("[BWUGR]/[BWUGR]"))) {
+                symbol.append("}");
+            } else {
+                symbol.remove(QChar('{'));
+            }
+            formattedCardCost.append(symbol);
+        }
 
         // detect mana generator artifacts
         bool mArtifact = false;
-        if (cardType.endsWith("Artifact"))
-            for (int i = 0; i < cardTextRows.size(); ++i)
-                if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool"))
+        if (cardType.endsWith("Artifact")) {
+            for (int i = 0; i < cardTextRows.size(); ++i) {
+                cardTextRows[i].remove(QRegularExpression("\\\".*?\\\""));
+                if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool")) {
                     mArtifact = true;
+                }
+            }
+        }
 
         // detect cards that enter the field tapped
         bool cipt =
@@ -278,11 +291,19 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
                 if (setNumber.isEmpty())
                     setNumber = map.value("number").toString();
             }
+            if (map.contains("rarity")) {
+                if (rarity.isEmpty())
+                    rarity = map.value("rarity").toString();
+            }
 
             extractColors(map.value("colors").toStringList(), colors);
         }
 
         colors.removeDuplicates();
+        if (colors.length() > 1) {
+            sortColors(colors);
+        }
+
         // Fortunately, there are no split cards that flip, transform or meld.
         relatedCards = QList<CardRelation *>();
         reverseRelatedCards = QList<CardRelation *>();
@@ -300,6 +321,14 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
     }
 
     return cards;
+}
+
+void OracleImporter::sortColors(QStringList &colors)
+{
+    const QHash<QString, unsigned int> colorOrder{{"W", 0}, {"U", 1}, {"B", 2}, {"R", 3}, {"G", 4}};
+    std::sort(colors.begin(), colors.end(), [&colorOrder](const QString a, const QString b) {
+        return colorOrder.value(a, INT_MAX) < colorOrder.value(b, INT_MAX);
+    });
 }
 
 int OracleImporter::startImport()

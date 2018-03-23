@@ -36,7 +36,7 @@ class Command_Mulligan;
 class Command_RollDie;
 class Command_DrawCards;
 class Command_UndoDraw;
-class Command_TurnCardOver;
+class Command_FlipCard;
 class Command_AttachCard;
 class Command_CreateToken;
 class Command_CreateArrow;
@@ -203,8 +203,7 @@ public:
     Response::ResponseCode cmdDrawCards(const Command_DrawCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdUndoDraw(const Command_UndoDraw &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer &rc, GameEventStorage &ges);
-    Response::ResponseCode
-    cmdTurnCardOver(const Command_TurnCardOver &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    Response::ResponseCode cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdCreateArrow(const Command_CreateArrow &cmd, ResponseContainer &rc, GameEventStorage &ges);

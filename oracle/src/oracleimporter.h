@@ -93,6 +93,7 @@ public:
 
 protected:
     void extractColors(const QStringList &in, QStringList &out);
+    void sortColors(QStringList &colors);
 };
 
 #endif

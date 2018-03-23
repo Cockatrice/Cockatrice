@@ -25,6 +25,7 @@
 #include <QMenu>
 #include <QPainter>
 #include <QRegExp>
+#include <QSignalMapper>
 
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_change_zone_properties.pb.h"
@@ -391,9 +392,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     connect(aSetPT, SIGNAL(triggered()), this, SLOT(actSetPT()));
     aSetAnnotation = new QAction(this);
     connect(aSetAnnotation, SIGNAL(triggered()), this, SLOT(actSetAnnotation()));
-    aTurnOver = new QAction(this);
-    aTurnOver->setData(cmTurnOver);
-    connect(aTurnOver, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    aFlip = new QAction(this);
+    aFlip->setData(cmFlip);
+    connect(aFlip, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     aPeek = new QAction(this);
     aPeek->setData(cmPeek);
     connect(aPeek, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
@@ -682,11 +683,9 @@ void Player::retranslateUi()
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
-    //: Turn sideways or back again
     aTap->setText(tr("&Tap / Untap"));
     aDoesntUntap->setText(tr("Toggle &normal untapping"));
-    //: Turn face up/face down
-    aTurnOver->setText(tr("&Turn Over"));
+    aFlip->setText(tr("&Flip"));
     aPeek->setText(tr("&Peek at card face"));
     aClone->setText(tr("&Clone"));
     aAttach->setText(tr("Attac&h to card..."));
@@ -735,7 +734,7 @@ void Player::setShortcutsActive()
     aPlay->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aPlay"));
     aTap->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aTap"));
     aDoesntUntap->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDoesntUntap"));
-    aTurnOver->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aTurnOver"));
+    aFlip->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aFlip"));
     aPeek->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aPeek"));
     aClone->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aClone"));
     aAttach->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aAttach"));
@@ -1587,7 +1586,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     }
 }
 
-void Player::eventTurnCardOver(const Event_TurnCardOver &event)
+void Player::eventFlipCard(const Event_FlipCard &event)
 {
     CardZone *zone = zones.value(QString::fromStdString(event.zone_name()), 0);
     if (!zone)
@@ -1595,7 +1594,7 @@ void Player::eventTurnCardOver(const Event_TurnCardOver &event)
     CardItem *card = zone->getCard(event.card_id(), QString::fromStdString(event.card_name()));
     if (!card)
         return;
-    emit logTurnCardOver(this, card->getName(), event.face_down());
+    emit logFlipCard(this, card->getName(), event.face_down());
     card->setFaceDown(event.face_down());
 }
 
@@ -1789,7 +1788,7 @@ void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &ev
             eventMoveCard(event.GetExtension(Event_MoveCard::ext), context);
             break;
         case GameEvent::FLIP_CARD:
-            eventTurnCardOver(event.GetExtension(Event_TurnCardOver::ext));
+            eventFlipCard(event.GetExtension(Event_FlipCard::ext));
             break;
         case GameEvent::DESTROY_CARD:
             eventDestroyCard(event.GetExtension(Event_DestroyCard::ext));
@@ -2201,11 +2200,16 @@ void Player::cardMenuAction()
                     commandList.append(cmd);
                     break;
                 }
-                case cmTurnOver: {
-                    Command_TurnCardOver *cmd = new Command_TurnCardOver;
+                case cmFlip: {
+                    Command_FlipCard *cmd = new Command_FlipCard;
                     cmd->set_zone(card->getZone()->getName().toStdString());
                     cmd->set_card_id(card->getId());
                     cmd->set_face_down(!card->getFaceDown());
+                    if (card->getFaceDown()) {
+                        CardInfoPtr ci = card->getInfo();
+                        if (ci)
+                            cmd->set_pt(ci->getPowTough().toStdString());
+                    }
                     commandList.append(cmd);
                     break;
                 }
@@ -2598,6 +2602,7 @@ void Player::updateCardMenu(const CardItem *card)
 
     if (revealedCard) {
         cardMenu->addAction(aHide);
+        addRelatedCardView(card, cardMenu);
     } else if (writeableCard) {
         if (moveMenu->isEmpty()) {
             moveMenu->addAction(aMoveToTopLibrary);
@@ -2613,6 +2618,8 @@ void Player::updateCardMenu(const CardItem *card)
 
         if (card->getZone()) {
             if (card->getZone()->getName() == "table") {
+                // Card is on the battlefield
+
                 if (ptMenu->isEmpty()) {
                     ptMenu->addAction(aIncP);
                     ptMenu->addAction(aDecP);
@@ -2628,11 +2635,12 @@ void Player::updateCardMenu(const CardItem *card)
 
                 cardMenu->addAction(aTap);
                 cardMenu->addAction(aDoesntUntap);
-                cardMenu->addAction(aTurnOver);
+                cardMenu->addAction(aFlip);
                 if (card->getFaceDown()) {
                     cardMenu->addAction(aPeek);
                 }
 
+                addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
 
                 cardMenu->addSeparator();
@@ -2658,22 +2666,27 @@ void Player::updateCardMenu(const CardItem *card)
                 }
                 cardMenu->addSeparator();
             } else if (card->getZone()->getName() == "stack") {
+                // Card is on the stack
                 cardMenu->addAction(aDrawArrow);
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
 
+                addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
             } else if (card->getZone()->getName() == "rfg" || card->getZone()->getName() == "grave") {
+                // Card is in the graveyard or exile
                 cardMenu->addAction(aPlay);
                 cardMenu->addAction(aPlayFacedown);
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
             } else {
+                // Card is in hand or a custom zone specified by server
                 cardMenu->addAction(aPlay);
                 cardMenu->addAction(aPlayFacedown);
                 cardMenu->addMenu(moveMenu);
+                addRelatedCardView(card, cardMenu);
             }
         } else {
             cardMenu->addMenu(moveMenu);
@@ -2682,11 +2695,35 @@ void Player::updateCardMenu(const CardItem *card)
         if (card->getZone() && card->getZone()->getName() != "hand") {
             cardMenu->addAction(aDrawArrow);
             cardMenu->addSeparator();
+            addRelatedCardView(card, cardMenu);
             addRelatedCardActions(card, cardMenu);
             cardMenu->addSeparator();
             cardMenu->addAction(aClone);
         }
     }
+}
+
+void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
+{
+    if (card == nullptr || cardMenu == nullptr || card->getInfo() == nullptr) {
+        return;
+    }
+
+    QList<CardRelation *> relatedCards = card->getInfo()->getRelatedCards();
+    if (relatedCards.isEmpty()) {
+        return;
+    }
+
+    cardMenu->addSeparator();
+    auto viewRelatedCards = new QMenu(tr("View related cards"));
+    cardMenu->addMenu(viewRelatedCards);
+    auto *signalMapper = new QSignalMapper(this);
+    for (const CardRelation *relatedCard : relatedCards) {
+        QAction *viewCard = viewRelatedCards->addAction(relatedCard->getName());
+        connect(viewCard, SIGNAL(triggered()), signalMapper, SLOT(map()));
+        signalMapper->setMapping(viewCard, relatedCard->getName());
+    }
+    connect(signalMapper, SIGNAL(mapped(const QString &)), game, SLOT(viewCardInfo(const QString &)));
 }
 
 void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)

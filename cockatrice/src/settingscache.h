@@ -67,6 +67,8 @@ private:
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath,
         spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
+    bool showTipsOnStartup;
+    unsigned int lastShownTip;
     bool mbDownloadSpoilers;
     int updateReleaseChannel;
     int maxFontSize;
@@ -198,6 +200,14 @@ public:
     bool getNotifyAboutUpdates() const
     {
         return notifyAboutUpdates;
+    }
+    bool getShowTipsOnStartup() const
+    {
+        return showTipsOnStartup;
+    }
+    unsigned int getLastShownTip() const
+    {
+        return lastShownTip;
     }
     ReleaseChannel *getUpdateReleaseChannel() const
     {
@@ -433,6 +443,8 @@ public slots:
     void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
     void setTokenDialogGeometry(const QByteArray &_tokenDialog);
     void setLang(const QString &_lang);
+    void setShowTipsOnStartup(bool _showTipsOnStartup);
+    void setLastShownTip(int _lastShowTip);
     void setDeckPath(const QString &_deckPath);
     void setReplaysPath(const QString &_replaysPath);
     void setPicsPath(const QString &_picsPath);

@@ -70,7 +70,7 @@ public slots:
     void logDoMoveCard(LogMoveCard &lmc);
     void logDrawCards(Player *player, int number);
     void logDumpZone(Player *player, CardZone *zone, int numberCards);
-    void logTurnCardOver(Player *player, QString cardName, bool faceDown);
+    void logFlipCard(Player *player, QString cardName, bool faceDown);
     void logGameClosed();
     void logGameStart();
     void logJoin(Player *player);

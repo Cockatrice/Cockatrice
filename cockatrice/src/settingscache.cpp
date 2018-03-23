@@ -11,7 +11,7 @@
 QString SettingsCache::getDataPath()
 {
     if (isPortableBuild)
-        return qApp->applicationDirPath() + "/data/";
+        return qApp->applicationDirPath() + "/data";
     else
         return QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 }
@@ -179,11 +179,19 @@ SettingsCache::SettingsCache()
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 5).toInt();
 
+    // tip of the day settings
+    showTipsOnStartup = settings->value("tipOfDay/showTips", true).toBool();
+    lastShownTip = settings->value("tipOfDay/lastShown", -1).toInt();
+
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
     picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
     // this has never been exposed as an user-configurable setting
-    customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
+    if (picsPath.endsWith("/")) {
+        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");
+    } else {
+        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
+    }
     // this has never been exposed as an user-configurable setting
     customCardDatabasePath = getSafeConfigPath("paths/customsets", dataPath + "/customsets/");
 
@@ -329,6 +337,18 @@ void SettingsCache::setLang(const QString &_lang)
     lang = _lang;
     settings->setValue("personal/lang", lang);
     emit langChanged();
+}
+
+void SettingsCache::setShowTipsOnStartup(bool _showTipsOnStartup)
+{
+    showTipsOnStartup = _showTipsOnStartup;
+    settings->setValue("tipOfDay/showTips", showTipsOnStartup);
+}
+
+void SettingsCache::setLastShownTip(int _lastShownTip)
+{
+    lastShownTip = _lastShownTip;
+    settings->setValue("tipOfDay/lastShown", lastShownTip);
 }
 
 void SettingsCache::setDeckPath(const QString &_deckPath)

@@ -219,14 +219,21 @@ bool FilterItem::acceptSet(const CardInfoPtr info) const
 bool FilterItem::acceptManaCost(const CardInfoPtr info) const
 {
     QString partialCost = term.toUpper();
-    QString fullManaCost = info->getManaCost();
 
-    // Sort the mana costs so they can be easily compared
+    // Sort the mana cost so it will be easy to find
     std::sort(partialCost.begin(), partialCost.end());
-    std::sort(fullManaCost.begin(), fullManaCost.end());
 
-    // If the partial is found in the full, return true
-    return (fullManaCost.indexOf(partialCost) > -1);
+    // Try to seperate the mana cost in case it's a split card
+    // if it's not a split card the loop will run only once
+    for (QString fullManaCost : info->getManaCost().split("//")) {
+        std::sort(fullManaCost.begin(), fullManaCost.end());
+
+        // If the partial is found in the full, return true
+        if (fullManaCost.contains(partialCost)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool FilterItem::acceptCmc(const CardInfoPtr info) const

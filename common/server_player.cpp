@@ -979,7 +979,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
 }
 
 Response::ResponseCode
-Server_Player::cmdTurnCardOver(const Command_TurnCardOver &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
     if (spectator)
         return Response::RespFunctionNotAllowed;
@@ -1005,13 +1005,17 @@ Server_Player::cmdTurnCardOver(const Command_TurnCardOver &cmd, ResponseContaine
 
     card->setFaceDown(faceDown);
 
-    Event_TurnCardOver event;
+    Event_FlipCard event;
     event.set_zone_name(zone->getName().toStdString());
     event.set_card_id(card->getId());
     if (!faceDown)
         event.set_card_name(card->getName().toStdString());
     event.set_face_down(faceDown);
     ges.enqueueGameEvent(event, playerId);
+
+    QString ptString = QString::fromStdString(cmd.pt());
+    if (!ptString.isEmpty() && !faceDown)
+        setCardAttrHelper(ges, playerId, zone->getName(), card->getId(), AttrPT, ptString);
 
     return Response::RespOk;
 }
@@ -1751,7 +1755,7 @@ Server_Player::processGameCommand(const GameCommand &command, ResponseContainer 
             return cmdUndoDraw(command.GetExtension(Command_UndoDraw::ext), rc, ges);
             break;
         case GameCommand::FLIP_CARD:
-            return cmdTurnCardOver(command.GetExtension(Command_TurnCardOver::ext), rc, ges);
+            return cmdFlipCard(command.GetExtension(Command_FlipCard::ext), rc, ges);
             break;
         case GameCommand::ATTACH_CARD:
             return cmdAttachCard(command.GetExtension(Command_AttachCard::ext), rc, ges);
