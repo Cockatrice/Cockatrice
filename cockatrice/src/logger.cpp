@@ -94,7 +94,6 @@ QString Logger::getSystemArchitecture()
 
     result.append("Build Architecture: " + QString::fromStdString(BUILD_ARCHITECTURE) + "\n");
     result.append("Qt Version: " + QT_VERSION_STR + "\n");
-    result.append("------------------------------------------------");
 
     return result;
 }
