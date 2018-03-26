@@ -51,7 +51,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
         currentTip = *std::min_element(unseenTips.begin(), unseenTips.end());
     } else {
         newTipsAvailable = false;
-        currentTip = settingsCache->getLastShownTip() + 1;
+        currentTip = 0;
     }
 
     connect(this, SIGNAL(newTipRequested(int)), this, SLOT(updateTip(int)));
@@ -157,9 +157,6 @@ void DlgTipOfTheDay::updateTip(int tipId)
     date->setText("<i>Tip added on: " + tip.getDate().toString("yyyy.MM.dd") + "</i>");
 
     tipNumber->setText("Tip " + QString::number(tipId + 1) + " / " + QString::number(tipDatabase->rowCount()));
-
-    currentTip = static_cast<unsigned int>(tipId);
-    settingsCache->setLastShownTip(currentTip);
 }
 
 void DlgTipOfTheDay::resizeEvent(QResizeEvent *event)

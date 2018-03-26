@@ -182,7 +182,6 @@ SettingsCache::SettingsCache()
 
     // tip of the day settings
     showTipsOnStartup = settings->value("tipOfDay/showTips", true).toBool();
-    lastShownTip = settings->value("tipOfDay/lastShown", -1).toInt();
     for (auto tipNumber : settings->value("tipOfDay/seenTips").toList()) {
         seenTips.append(tipNumber.toInt());
     }
@@ -347,12 +346,6 @@ void SettingsCache::setShowTipsOnStartup(bool _showTipsOnStartup)
 {
     showTipsOnStartup = _showTipsOnStartup;
     settings->setValue("tipOfDay/showTips", showTipsOnStartup);
-}
-
-void SettingsCache::setLastShownTip(int _lastShownTip)
-{
-    lastShownTip = _lastShownTip;
-    settings->setValue("tipOfDay/lastShown", lastShownTip);
 }
 
 void SettingsCache::setSeenTips(const QList<int> &_seenTips)

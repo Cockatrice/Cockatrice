@@ -68,7 +68,6 @@ private:
         spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
     bool showTipsOnStartup;
-    unsigned int lastShownTip;
     QList<int> seenTips;
     bool mbDownloadSpoilers;
     int updateReleaseChannel;
@@ -205,10 +204,6 @@ public:
     bool getShowTipsOnStartup() const
     {
         return showTipsOnStartup;
-    }
-    unsigned int getLastShownTip() const
-    {
-        return lastShownTip;
     }
     QList<int> getSeenTips() const
     {
@@ -449,7 +444,6 @@ public slots:
     void setTokenDialogGeometry(const QByteArray &_tokenDialog);
     void setLang(const QString &_lang);
     void setShowTipsOnStartup(bool _showTipsOnStartup);
-    void setLastShownTip(int _lastShowTip);
     void setSeenTips(const QList<int> &_seenTips);
     void setDeckPath(const QString &_deckPath);
     void setReplaysPath(const QString &_replaysPath);
