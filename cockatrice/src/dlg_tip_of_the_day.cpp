@@ -158,7 +158,7 @@ void DlgTipOfTheDay::updateTip(int tipId)
 
     tipNumber->setText("Tip " + QString::number(tipId + 1) + " / " + QString::number(tipDatabase->rowCount()));
 
-	currentTip = static_cast<unsigned int>(tipId);
+    currentTip = static_cast<unsigned int>(tipId);
 }
 
 void DlgTipOfTheDay::resizeEvent(QResizeEvent *event)
