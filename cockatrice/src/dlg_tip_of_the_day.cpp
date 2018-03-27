@@ -75,7 +75,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     connect(previousButton, SIGNAL(clicked()), this, SLOT(previousClicked()));
 
     showTipsOnStartupCheck = new QCheckBox("Show tips on startup");
-    showTipsOnStartupCheck->setChecked(true);
+    showTipsOnStartupCheck->setChecked(settingsCache->getShowTipsOnStartup());
     connect(showTipsOnStartupCheck, SIGNAL(clicked(bool)), settingsCache, SLOT(setShowTipsOnStartup(bool)));
     buttonBar = new QHBoxLayout();
     buttonBar->addWidget(showTipsOnStartupCheck);
