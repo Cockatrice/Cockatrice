@@ -41,7 +41,19 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     tipNumber = new QLabel();
     tipNumber->setAlignment(Qt::AlignCenter);
 
-    currentTip = settingsCache->getLastShownTip() + 1;
+    if (settingsCache->getSeenTips().size() != tipDatabase->rowCount()) {
+        newTipsAvailable = true;
+        QList<int> rangeToMaxTips;
+        for (int i = 0; i < tipDatabase->rowCount(); i++) {
+            rangeToMaxTips.append(i);
+        }
+        QSet<int> unseenTips = rangeToMaxTips.toSet() - settingsCache->getSeenTips().toSet();
+        currentTip = *std::min_element(unseenTips.begin(), unseenTips.end());
+    } else {
+        newTipsAvailable = false;
+        currentTip = 0;
+    }
+
     connect(this, SIGNAL(newTipRequested(int)), this, SLOT(updateTip(int)));
     newTipRequested(currentTip);
 
@@ -63,7 +75,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     connect(previousButton, SIGNAL(clicked()), this, SLOT(previousClicked()));
 
     showTipsOnStartupCheck = new QCheckBox("Show tips on startup");
-    showTipsOnStartupCheck->setChecked(true);
+    showTipsOnStartupCheck->setChecked(settingsCache->getShowTipsOnStartup());
     connect(showTipsOnStartupCheck, SIGNAL(clicked(bool)), settingsCache, SLOT(setShowTipsOnStartup(bool)));
     buttonBar = new QHBoxLayout();
     buttonBar->addWidget(showTipsOnStartupCheck);
@@ -118,6 +130,13 @@ void DlgTipOfTheDay::updateTip(int tipId)
         tipId = tipId % tipDatabase->rowCount();
     }
 
+    // Store tip id as seen
+    QList<int> seenTips = settingsCache->getSeenTips();
+    if (!seenTips.contains(tipId)) {
+        seenTips.append(tipId);
+        settingsCache->setSeenTips(seenTips);
+    }
+
     TipOfTheDay tip = tipDatabase->getTip(tipId);
     titleText = tip.getTitle();
     contentText = tip.getContent();
@@ -140,7 +159,6 @@ void DlgTipOfTheDay::updateTip(int tipId)
     tipNumber->setText("Tip " + QString::number(tipId + 1) + " / " + QString::number(tipDatabase->rowCount()));
 
     currentTip = static_cast<unsigned int>(tipId);
-    settingsCache->setLastShownTip(currentTip);
 }
 
 void DlgTipOfTheDay::resizeEvent(QResizeEvent *event)

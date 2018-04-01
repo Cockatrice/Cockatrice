@@ -143,6 +143,7 @@ QString SettingsCache::getSafeConfigFilePath(QString configEntry, QString defaul
         tmp = defaultPath;
     return tmp;
 }
+
 SettingsCache::SettingsCache()
 {
     // first, figure out if we are running in portable mode
@@ -181,7 +182,9 @@ SettingsCache::SettingsCache()
 
     // tip of the day settings
     showTipsOnStartup = settings->value("tipOfDay/showTips", true).toBool();
-    lastShownTip = settings->value("tipOfDay/lastShown", -1).toInt();
+    for (auto tipNumber : settings->value("tipOfDay/seenTips").toList()) {
+        seenTips.append(tipNumber.toInt());
+    }
 
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
@@ -345,10 +348,14 @@ void SettingsCache::setShowTipsOnStartup(bool _showTipsOnStartup)
     settings->setValue("tipOfDay/showTips", showTipsOnStartup);
 }
 
-void SettingsCache::setLastShownTip(int _lastShownTip)
+void SettingsCache::setSeenTips(const QList<int> &_seenTips)
 {
-    lastShownTip = _lastShownTip;
-    settings->setValue("tipOfDay/lastShown", lastShownTip);
+    seenTips = _seenTips;
+    QList<QVariant> storedTipList;
+    for (auto tipNumber : seenTips) {
+        storedTipList.append(tipNumber);
+    }
+    settings->setValue("tipOfDay/seenTips", storedTipList);
 }
 
 void SettingsCache::setDeckPath(const QString &_deckPath)

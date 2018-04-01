@@ -41,6 +41,7 @@
 #include "dlg_forgotpasswordreset.h"
 #include "dlg_register.h"
 #include "dlg_settings.h"
+#include "dlg_tip_of_the_day.h"
 #include "dlg_update.h"
 #include "dlg_viewlog.h"
 #include "localclient.h"
@@ -310,6 +311,14 @@ void MainWindow::actAbout()
     mb.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64));
     mb.setTextInteractionFlags(Qt::TextBrowserInteraction);
     mb.exec();
+}
+
+void MainWindow::actTips()
+{
+    DlgTipOfTheDay tip;
+    if (tip.successfulInit) {
+        tip.exec();
+    }
 }
 
 void MainWindow::actUpdate()
@@ -627,6 +636,7 @@ void MainWindow::retranslateUi()
     aEditTokens->setText(tr("Edit &tokens..."));
 
     aAbout->setText(tr("&About Cockatrice"));
+    aTips->setText(tr("&Tip of the Day"));
     aUpdate->setText(tr("Check for Client Updates"));
     aViewLog->setText(tr("View &debug log"));
     helpMenu->setTitle(tr("&Help"));
@@ -659,6 +669,8 @@ void MainWindow::createActions()
 
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
+    aTips = new QAction(this);
+    connect(aTips, SIGNAL(triggered()), this, SLOT(actTips()));
     aUpdate = new QAction(this);
     connect(aUpdate, SIGNAL(triggered()), this, SLOT(actUpdate()));
     aViewLog = new QAction(this);
@@ -729,6 +741,7 @@ void MainWindow::createMenus()
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
+    helpMenu->addAction(aTips);
     helpMenu->addAction(aUpdate);
     helpMenu->addAction(aViewLog);
 }
