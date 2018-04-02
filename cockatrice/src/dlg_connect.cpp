@@ -167,10 +167,14 @@ void DlgConnect::rebuildComboBoxList()
     savedHostList = uci.getServerInfo();
 
     if (savedHostList.size() == 1) {
-        settingsCache->servers().addNewServer("Woogerworks", "cockatrice.woogerworks.com", "4747", "", "", false);
+        settingsCache->servers().addNewServer("Rooster Ranges", "server.cockatrice.us", "4747", "", "", false);
         settingsCache->servers().addNewServer("Chickatrice", "chickatrice.net", "4747", "", "", false);
         settingsCache->servers().addNewServer("dr4ft", "cockatrice.dr4ft.com", "4747", "", "", false);
         settingsCache->servers().addNewServer("Tetrarch", "mtg.tetrarch.co", "4747", "", "", false);
+    }
+    else if (! savedHostList.contains("Rooster Ranges")) // If Rooster Ranges not in the list
+    {
+        settingsCache->servers().addNewServer("Rooster Ranges", "server.cockatrice.us", "4747", "", "", false);
     }
     savedHostList = uci.getServerInfo();
 
