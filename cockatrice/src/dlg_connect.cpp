@@ -225,9 +225,10 @@ void DlgConnect::actFinishParsingDownloadedData()
 
         for (auto server : savedHostList)
         {
-            if (serversOnWiki.indexOf(server.getSaveName()) < 0)
+            QString serverName = server.getSaveName();
+            if (serversOnWiki.indexOf(serverName) < 0)
             {
-                settingsCache->servers().deleteSer
+                settingsCache->servers().removeServer(serverName);
             }
         }
 
@@ -260,8 +261,6 @@ void DlgConnect::rebuildComboBoxList()
 
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
-
-
 
     int i = 0;
     for (UserConnection_Information tmp : savedHostList) {
