@@ -92,9 +92,12 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     newHostLayout->addWidget(newHostButton, 0, 1);
     newHostLayout->addWidget(publicServersLabel, 0, 2);
 
+    auto *newHolderLayout = new QHBoxLayout;
+    newHolderLayout->addWidget(previousHostButton);
+    newHolderLayout->addWidget(btnRefreshServers);
+
     auto *connectionLayout = new QGridLayout;
-    connectionLayout->addWidget(previousHostButton, 0, 1);
-    connectionLayout->addWidget(btnRefreshServers, 0, 2);
+    connectionLayout->addLayout(newHolderLayout, 0, 1, 1, 2);
     connectionLayout->addWidget(previousHosts, 1, 1);
     connectionLayout->addLayout(newHostLayout, 2, 1, 1, 2);
     connectionLayout->addWidget(saveLabel, 3, 0);
@@ -286,6 +289,7 @@ void DlgConnect::previousHostSelected(bool state)
     if (state) {
         saveEdit->setDisabled(true);
         previousHosts->setDisabled(false);
+        btnRefreshServers->setDisabled(false);
     }
 }
 
@@ -315,6 +319,7 @@ void DlgConnect::newHostSelected(bool state)
 {
     if (state) {
         previousHosts->setDisabled(true);
+        btnRefreshServers->setDisabled(true);
         hostEdit->clear();
         portEdit->clear();
         playernameEdit->clear();
