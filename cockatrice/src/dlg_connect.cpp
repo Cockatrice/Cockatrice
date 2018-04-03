@@ -167,7 +167,6 @@ void DlgConnect::actSaveConfig()
 
 void DlgConnect::downloadPublicServers()
 {
-    qDebug() << "DOWNLOAD 123";
     QUrl url(QString(PUBLIC_SERVERS_URL));
     auto *nam = new QNetworkAccessManager(this);
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
@@ -180,6 +179,9 @@ void DlgConnect::actFinishParsingDownloadedData()
     QNetworkReply::NetworkError errorCode = reply->error();
 
     if (errorCode == QNetworkReply::NoError) {
+        UserConnection_Information uci;
+        savedHostList = uci.getServerInfo();
+
         QStringList serversOnWiki;
 
         // This will get all the data from the GitHub page and just give us the table data
@@ -217,12 +219,14 @@ void DlgConnect::actFinishParsingDownloadedData()
             }
 
             serversOnWiki.append(serverName);
-            settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
+            if (! savedHostList.contains(serverName))
+            {
+                // Adds new servers to list (if exists, skip it)
+                settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
+            }
         }
 
-        UserConnection_Information uci;
-        savedHostList = uci.getServerInfo();
-
+        // Now that we added the new servers, we can remove all servers that were not on the public page
         for (auto server : savedHostList)
         {
             QString serverName = server.getSaveName();
