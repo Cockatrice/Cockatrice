@@ -10,6 +10,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMessageBox>
+#include <QNetworkReply>
 #include <QPushButton>
 #include <QRadioButton>
 
@@ -21,7 +22,8 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     previousHosts = new QComboBox(this);
     previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
 
-    rebuildComboBoxList();
+    connect(this, SIGNAL(sigPublicServersDownloaded()), this, SLOT(rebuildComboBoxList()));
+    preRebuildComboBoxList();
 
     newHostButton = new QRadioButton(tr("New Host"), this);
 
@@ -156,7 +158,79 @@ void DlgConnect::actSaveConfig()
                                               passwordEdit->text(), savePasswordCheckBox->isChecked());
     }
 
-    rebuildComboBoxList();
+    preRebuildComboBoxList();
+}
+
+void DlgConnect::downloadPublicServers(QUrl url)
+{
+    auto *nam = new QNetworkAccessManager(this);
+    QNetworkReply *reply = nam->get(QNetworkRequest(url));
+    connect(reply, SIGNAL(finished()), this, SLOT(actFinishParsingDownloadedData()));
+}
+
+void DlgConnect::actFinishParsingDownloadedData()
+{
+    auto *reply = dynamic_cast<QNetworkReply *>(sender());
+    QNetworkReply::NetworkError errorCode = reply->error();
+
+    if (errorCode == QNetworkReply::NoError) {
+        // This will get all the data from the GitHub page and just give us the table data
+        QString stringData =
+            QString(reply->readAll()).remove(QRegExp(R"([\n\t\r])")).split("<tbody>").at(1).split("</tbody>").at(0);
+
+        // [Server1 Details], [Server2 Details], ...
+        QStringList serverList = stringData.split(QRegExp("<tr[^>]*>"));
+        serverList.removeAt(0);
+
+        for (const auto &server : serverList) {
+            QStringList serverValues = server.split(QRegExp("<td[^>]*>"));
+            QString serverName, serverAddress, serverPort;
+
+            for (int fieldCheck = 1; fieldCheck < serverValues.size(); fieldCheck++) {
+                // The fields correspond with the headers on the server list (index starting at 1)
+                switch (fieldCheck) {
+                    case 1: // Server Name
+                        serverName =
+                            QString(serverValues.at(fieldCheck)).remove(QRegExp("<a[^>]*>")).split("</a>").at(0);
+                        break;
+
+                    case 5: // Server Address
+                        serverAddress =
+                            QString(serverValues.at(fieldCheck)).remove("<strong>").split("</strong>").at(0);
+                        break;
+
+                    case 6: // Server Port
+                        serverPort = QString(serverValues.at(fieldCheck)).remove("<strong>").split("</strong>").at(0);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
+        }
+
+        reply->deleteLater();
+    } else {
+        // Respond that an error occurred
+        qDebug() << "ERROR DOWNLOADING PUBLIC SERVERS" << errorCode;
+    }
+
+    emit sigPublicServersDownloaded();
+}
+
+void DlgConnect::preRebuildComboBoxList()
+{
+    UserConnection_Information uci;
+    savedHostList = uci.getServerInfo();
+
+    if (savedHostList.size() == 1) {
+        previousHosts->addItem("Downloading...");
+        downloadPublicServers(QString(PUBLIC_SERVERS_URL));
+    } else {
+        emit sigPublicServersDownloaded();
+    }
 }
 
 void DlgConnect::rebuildComboBoxList()
@@ -164,14 +238,6 @@ void DlgConnect::rebuildComboBoxList()
     previousHosts->clear();
 
     UserConnection_Information uci;
-    savedHostList = uci.getServerInfo();
-
-    if (savedHostList.size() == 1) {
-        settingsCache->servers().addNewServer("Woogerworks", "cockatrice.woogerworks.com", "4747", "", "", false);
-        settingsCache->servers().addNewServer("Chickatrice", "chickatrice.net", "4747", "", "", false);
-        settingsCache->servers().addNewServer("dr4ft", "cockatrice.dr4ft.com", "4747", "", "", false);
-        settingsCache->servers().addNewServer("Tetrarch", "mtg.tetrarch.co", "4747", "", "", false);
-    }
     savedHostList = uci.getServerInfo();
 
     int i = 0;
@@ -232,7 +298,7 @@ void DlgConnect::newHostSelected(bool state)
         saveEdit->setPlaceholderText("New Menu Name");
         saveEdit->setDisabled(false);
     } else {
-        rebuildComboBoxList();
+        preRebuildComboBoxList();
     }
 }
 

@@ -4,6 +4,7 @@
 #include "userconnection_information.h"
 #include <QDialog>
 #include <QLineEdit>
+#include <QUrl>
 
 class QLabel;
 class QPushButton;
@@ -15,7 +16,7 @@ class DeleteHighlightedItemWhenShiftDelPressedEventFilter : public QObject
 {
     Q_OBJECT
 protected:
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 };
 
 class DlgConnect : public QDialog
@@ -23,9 +24,10 @@ class DlgConnect : public QDialog
     Q_OBJECT
 signals:
     void sigStartForgotPasswordRequest();
+    void sigPublicServersDownloaded();
 
 public:
-    DlgConnect(QWidget *parent = 0);
+    explicit DlgConnect(QWidget *parent = nullptr);
     QString getHost() const;
     int getPort() const
     {
@@ -48,7 +50,9 @@ private slots:
     void newHostSelected(bool state);
     void actForgotPassword();
     void updateDisplayInfo(const QString &saveName);
+    void preRebuildComboBoxList();
     void rebuildComboBoxList();
+    void actFinishParsingDownloadedData();
 
 private:
     QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel, *publicServersLabel;
@@ -58,5 +62,6 @@ private:
     QRadioButton *newHostButton, *previousHostButton;
     QPushButton *btnOk, *btnCancel, *btnForgotPassword;
     QMap<QString, UserConnection_Information> savedHostList;
+    void downloadPublicServers(QUrl url);
 };
 #endif
