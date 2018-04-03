@@ -39,6 +39,7 @@ public:
     void setFPPlayerName(QString playerName);
     void
     addNewServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword);
+    void removeServer(QString saveName);
     bool updateExistingServer(QString saveName,
                               QString serv,
                               QString port,

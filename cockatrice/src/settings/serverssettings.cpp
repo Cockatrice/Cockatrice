@@ -196,6 +196,23 @@ void ServersSettings::addNewServer(QString saveName,
     setValue(password, QString("password%1").arg(index), "server", "server_details");
 }
 
+void ServersSettings::removeServer(QString saveName)
+{
+    int size = getValue("totalServers", "server", "server_details").toInt() + 1;
+
+    for (int i = 0; i < size; i++) {
+        if (saveName == getValue(QString("saveName%1").arg(i), "server", "server_details").toString()) {
+            deleteValue(QString("server%1").arg(i), "server", "server_details");
+            deleteValue(QString("port%1").arg(i), "server", "server_details");
+            deleteValue(QString("username%1").arg(i), "server", "server_details");
+            deleteValue(QString("savePassword%1").arg(i), "server", "server_details");
+            deleteValue(QString("password%1").arg(i), "server", "server_details");
+            deleteValue(QString("saveName%1").arg(i), "server", "server_details");
+            return;
+        }
+    }
+}
+
 bool ServersSettings::updateExistingServer(QString saveName,
                                            QString serv,
                                            QString port,
