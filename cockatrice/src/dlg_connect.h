@@ -4,7 +4,6 @@
 #include "userconnection_information.h"
 #include <QDialog>
 #include <QLineEdit>
-#include <QUrl>
 
 class QLabel;
 class QPushButton;
@@ -53,6 +52,7 @@ private slots:
     void preRebuildComboBoxList();
     void rebuildComboBoxList();
     void actFinishParsingDownloadedData();
+    void downloadPublicServers();
 
 private:
     QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel, *publicServersLabel;
@@ -60,8 +60,7 @@ private:
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;
     QRadioButton *newHostButton, *previousHostButton;
-    QPushButton *btnOk, *btnCancel, *btnForgotPassword;
+    QPushButton *btnOk, *btnCancel, *btnForgotPassword, *btnRefreshServers;
     QMap<QString, UserConnection_Information> savedHostList;
-    void downloadPublicServers(QUrl url);
 };
 #endif

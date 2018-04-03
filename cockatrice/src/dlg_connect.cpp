@@ -22,6 +22,9 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     previousHosts = new QComboBox(this);
     previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
 
+    btnRefreshServers = new QPushButton(tr("Refresh Servers"), this);
+    connect(btnRefreshServers, SIGNAL(released()), this, SLOT(downloadPublicServers()));
+
     connect(this, SIGNAL(sigPublicServersDownloaded()), this, SLOT(rebuildComboBoxList()));
     preRebuildComboBoxList();
 
@@ -91,6 +94,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     auto *connectionLayout = new QGridLayout;
     connectionLayout->addWidget(previousHostButton, 0, 1);
+    connectionLayout->addWidget(btnRefreshServers, 0, 2);
     connectionLayout->addWidget(previousHosts, 1, 1);
     connectionLayout->addLayout(newHostLayout, 2, 1, 1, 2);
     connectionLayout->addWidget(saveLabel, 3, 0);
@@ -161,8 +165,10 @@ void DlgConnect::actSaveConfig()
     preRebuildComboBoxList();
 }
 
-void DlgConnect::downloadPublicServers(QUrl url)
+void DlgConnect::downloadPublicServers()
 {
+    qDebug() << "DOWNLOAD 123";
+    QUrl url(QString(PUBLIC_SERVERS_URL));
     auto *nam = new QNetworkAccessManager(this);
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), this, SLOT(actFinishParsingDownloadedData()));
@@ -174,6 +180,8 @@ void DlgConnect::actFinishParsingDownloadedData()
     QNetworkReply::NetworkError errorCode = reply->error();
 
     if (errorCode == QNetworkReply::NoError) {
+        QStringList serversOnWiki;
+
         // This will get all the data from the GitHub page and just give us the table data
         QString stringData =
             QString(reply->readAll()).remove(QRegExp(R"([\n\t\r])")).split("<tbody>").at(1).split("</tbody>").at(0);
@@ -208,7 +216,19 @@ void DlgConnect::actFinishParsingDownloadedData()
                 }
             }
 
+            serversOnWiki.append(serverName);
             settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
+        }
+
+        UserConnection_Information uci;
+        savedHostList = uci.getServerInfo();
+
+        for (auto server : savedHostList)
+        {
+            if (serversOnWiki.indexOf(server.getSaveName()) < 0)
+            {
+                settingsCache->servers().deleteSer
+            }
         }
 
         reply->deleteLater();
@@ -226,8 +246,8 @@ void DlgConnect::preRebuildComboBoxList()
     savedHostList = uci.getServerInfo();
 
     if (savedHostList.size() == 1) {
-        previousHosts->addItem("Downloading...");
-        downloadPublicServers(QString(PUBLIC_SERVERS_URL));
+        previousHosts->addItem(tr("Downloading..."));
+        downloadPublicServers();
     } else {
         emit sigPublicServersDownloaded();
     }
@@ -235,10 +255,13 @@ void DlgConnect::preRebuildComboBoxList()
 
 void DlgConnect::rebuildComboBoxList()
 {
+    int prevHostSize = previousHosts->count();
     previousHosts->clear();
 
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
+
+
 
     int i = 0;
     for (UserConnection_Information tmp : savedHostList) {
