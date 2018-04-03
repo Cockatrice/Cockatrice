@@ -263,7 +263,6 @@ void DlgConnect::preRebuildComboBoxList()
 
 void DlgConnect::rebuildComboBoxList()
 {
-    int prevHostSize = previousHosts->count();
     previousHosts->clear();
 
     UserConnection_Information uci;
