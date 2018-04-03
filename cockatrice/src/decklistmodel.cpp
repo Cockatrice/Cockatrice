@@ -106,7 +106,10 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                     case 0:
                         return node->recursiveCount(true);
                     case 1:
-                        return node->getVisibleName();
+                        if (role == Qt::DisplayRole)
+                            return node->getVisibleName();
+                        else
+                            return node->getName();
                     default:
                         return QVariant();
                 }
