@@ -222,19 +222,16 @@ void DlgConnect::actFinishParsingDownloadedData()
             }
 
             serversOnWiki.append(serverName);
-            if (! savedHostList.contains(serverName))
-            {
+            if (!savedHostList.contains(serverName)) {
                 // Adds new servers to list (if exists, skip it)
                 settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
             }
         }
 
         // Now that we added the new servers, we can remove all servers that were not on the public page
-        for (auto server : savedHostList)
-        {
+        for (auto server : savedHostList) {
             QString serverName = server.getSaveName();
-            if (serversOnWiki.indexOf(serverName) < 0)
-            {
+            if (serversOnWiki.indexOf(serverName) < 0) {
                 settingsCache->servers().removeServer(serverName);
             }
         }
