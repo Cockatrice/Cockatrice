@@ -192,20 +192,26 @@ connection=tcp
 ; Accept all certificates: in ssl mode, enable this if your server is using an invalid/self signed certificate
 acceptallcerts=false;
 
+; The host, port, username, password, and email fields can be expanded with the next
+; sequential inter to have multiple accounts to choose from, which will be done
+; at random. (Ex: host1, host2, ...)
+; This var, emailaccounts, should specify how many accounts you're using (Default: 1)
+emailaccounts=1
+
 ; Hostname or IP addres of the smtp server
-host=localhost
+host1=localhost
 
 ; Smtp port number of the smtp server. Usual values are 25 or 587 for tcp, 465 for ssl
-port=25
+port1=25
 
 ; Username: this typically matches the "from" email address
-username=root@localhost
+username1=root@localhost
 
 ; Password for the username
-password=foobar
+password1=foobar
 
 ; Sender email address: the "from" email address
-email=root@localhost
+email1=root@localhost
 
 ; Sender email name
 name="Cockatrice server"

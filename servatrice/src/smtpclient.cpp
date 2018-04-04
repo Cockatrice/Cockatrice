@@ -35,9 +35,18 @@ SmtpClient::~SmtpClient()
     }
 }
 
+QString SmtpClient::selectRandomAccount()
+{
+    // Allow for any number of email accounts
+    int totalEmails = settingsCache->value("smtp/emailaccounts", 1).toInt();
+    qsrand(static_cast<uint>(time(nullptr)));
+    return QString(qrand() % totalEmails + 1);
+}
+
 bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token)
 {
-    QString email = settingsCache->value("smtp/email", "").toString();
+    QString randomAccount = selectRandomAccount();
+    QString email = settingsCache->value(QString("smtp/email%1").arg(randomAccount), "").toString();
     QString name = settingsCache->value("smtp/name", "").toString();
     QString subject = settingsCache->value("smtp/subject", "").toString();
     QString body = settingsCache->value("smtp/body", "").toString();
@@ -80,7 +89,9 @@ bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QStri
 
 bool SmtpClient::enqueueForgotPasswordTokenMail(const QString &nickname, const QString &recipient, const QString &token)
 {
-    QString email = settingsCache->value("smtp/email", "").toString();
+    QString randomAccount = selectRandomAccount();
+
+    QString email = settingsCache->value(QString("smtp/email%1").arg(randomAccount), "").toString();
     QString name = settingsCache->value("smtp/name", "").toString();
     QString subject = settingsCache->value("forgotpassword/subject", "").toString();
     QString body = settingsCache->value("forgotpassword/body", "").toString();
@@ -130,12 +141,14 @@ void SmtpClient::sendAllEmails()
     if (smtp->pendingMessages() == 0)
         return;
 
-    QString connectionType = settingsCache->value("smtp/connection", "tcp").toString();
-    QString host = settingsCache->value("smtp/host", "localhost").toString();
-    int port = settingsCache->value("smtp/port", 25).toInt();
-    QByteArray username = settingsCache->value("smtp/username", "").toByteArray();
-    QByteArray password = settingsCache->value("smtp/password", "").toByteArray();
-    bool acceptAllCerts = settingsCache->value("smtp/acceptallcerts", false).toBool();
+    QString randomAccount = selectRandomAccount();
+
+    QString connectionType = settingsCache->value(QString("smtp/connection"), "tcp").toString();
+    QString host = settingsCache->value(QString("smtp/host%1").arg(randomAccount), "localhost").toString();
+    int port = settingsCache->value(QString("smtp/port%1").arg(randomAccount), 25).toInt();
+    QByteArray username = settingsCache->value(QString("smtp/username%1").arg(randomAccount), "").toByteArray();
+    QByteArray password = settingsCache->value(QString("smtp/password%1").arg(randomAccount), "").toByteArray();
+    bool acceptAllCerts = settingsCache->value(QString("smtp/acceptallcerts"), false).toBool();
 
     smtp->setUsername(username);
     smtp->setPassword(password);
