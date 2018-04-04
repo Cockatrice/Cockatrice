@@ -40,6 +40,7 @@ public:
     {
         return passwordEdit->text();
     }
+
 private slots:
     void actOk();
     void actCancel();
@@ -62,5 +63,6 @@ private:
     QRadioButton *newHostButton, *previousHostButton;
     QPushButton *btnOk, *btnCancel, *btnForgotPassword, *btnRefreshServers;
     QMap<QString, UserConnection_Information> savedHostList;
+    const QString placeHolderText = tr("Downloading...");
 };
 #endif

@@ -170,6 +170,9 @@ void DlgConnect::actSaveConfig()
 
 void DlgConnect::downloadPublicServers()
 {
+    previousHosts->clear();
+    previousHosts->addItem(placeHolderText);
+
     QUrl url(QString(PUBLIC_SERVERS_URL));
     auto *nam = new QNetworkAccessManager(this);
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
@@ -199,27 +202,12 @@ void DlgConnect::actFinishParsingDownloadedData()
             QStringList serverValues = server.split(QRegExp("<td[^>]*>"));
             QString serverName, serverAddress, serverPort;
 
-            for (int fieldCheck = 1; fieldCheck < serverValues.size(); fieldCheck++) {
-                // The fields correspond with the headers on the server list (index starting at 1)
-                switch (fieldCheck) {
-                    case 1: // Server Name
-                        serverName =
-                            QString(serverValues.at(fieldCheck)).remove(QRegExp("<a[^>]*>")).split("</a>").at(0);
-                        break;
+            // The fields correspond with the headers on the server list (index starting at 1)
+            short serverNameField = 1, serverAddressField = 5, serverPortField = 6;
 
-                    case 5: // Server Address
-                        serverAddress =
-                            QString(serverValues.at(fieldCheck)).remove("<strong>").split("</strong>").at(0);
-                        break;
-
-                    case 6: // Server Port
-                        serverPort = QString(serverValues.at(fieldCheck)).remove("<strong>").split("</strong>").at(0);
-                        break;
-
-                    default:
-                        break;
-                }
-            }
+            serverName = QString(serverValues.at(serverNameField)).remove(QRegExp("<a[^>]*>")).split("</a>").at(0);
+            serverAddress = QString(serverValues.at(serverAddressField)).remove("<strong>").split("</strong>").at(0);
+            serverPort = QString(serverValues.at(serverPortField)).remove("<strong>").split("</strong>").at(0);
 
             serversOnWiki.append(serverName);
             if (!savedHostList.contains(serverName)) {
@@ -251,7 +239,6 @@ void DlgConnect::preRebuildComboBoxList()
     savedHostList = uci.getServerInfo();
 
     if (savedHostList.size() == 1) {
-        previousHosts->addItem(tr("Downloading..."));
         downloadPublicServers();
     } else {
         emit sigPublicServersDownloaded();
@@ -291,7 +278,7 @@ void DlgConnect::previousHostSelected(bool state)
 
 void DlgConnect::updateDisplayInfo(const QString &saveName)
 {
-    if (saveEdit == nullptr) {
+    if (saveEdit == nullptr || saveName == placeHolderText) {
         return;
     }
 
