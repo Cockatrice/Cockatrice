@@ -545,7 +545,7 @@ void DeckEditorSettingsPage::updateSpoilers()
 {
     // Disable the button so the user can only press it once at a time
     updateNowButton->setDisabled(true);
-    updateNowButton->setText(tr("Updating Spoilers"));
+    updateNowButton->setText(tr("Updating..."));
 
     // Create a new SBU that will act as if the client was just reloaded
     auto *sbu = new SpoilerBackgroundUpdater();
