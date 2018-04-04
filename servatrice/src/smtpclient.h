@@ -32,6 +32,9 @@ protected slots:
     void mailSent(int mailID);
     void recipientRejected(int mailID, const QString &address, const QByteArray &msg);
     void senderRejected(int mailID, const QString &address, const QByteArray &msg);
+
+private:
+    QString selectRandomAccount();
 };
 
 #endif
