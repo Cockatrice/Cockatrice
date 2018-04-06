@@ -683,9 +683,13 @@ void Player::retranslateUi()
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
+    //: Turn sideways or back again
     aTap->setText(tr("&Tap / Untap"));
     aDoesntUntap->setText(tr("Toggle &normal untapping"));
-    aFlip->setText(tr("&Flip"));
+    //: Turn face up/face down
+    aFlip->setText(tr("T&urn Over")); // Only the user facing names in client got renamed to "turn over"
+                                      // All code and proto bits are still unchanged (flip) for compatibility reasons
+                                      // A protocol rewrite with v3 could incorporate that, see #3100
     aPeek->setText(tr("&Peek at card face"));
     aClone->setText(tr("&Clone"));
     aAttach->setText(tr("Attac&h to card..."));
