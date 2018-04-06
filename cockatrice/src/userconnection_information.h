@@ -16,10 +16,11 @@ private:
     QString username;
     QString password;
     bool savePassword;
+    bool isCustom;
 
 public:
     UserConnection_Information();
-    UserConnection_Information(QString, QString, QString, QString, QString, bool);
+    UserConnection_Information(QString, QString, QString, QString, QString, bool, bool _isCustom = false);
     QString getSaveName()
     {
         return saveName;
@@ -43,6 +44,10 @@ public:
     bool getSavePassword()
     {
         return savePassword;
+    }
+    bool isCustomServer()
+    {
+        return isCustom;
     }
     QMap<QString, UserConnection_Information> getServerInfo();
     QStringList getServerInfo(const QString &find);

@@ -1,19 +1,19 @@
 #include "userconnection_information.h"
 #include "settingscache.h"
 #include <QDebug>
+#include <utility>
 
-UserConnection_Information::UserConnection_Information()
-{
-}
+UserConnection_Information::UserConnection_Information() = default;
 
 UserConnection_Information::UserConnection_Information(QString _saveName,
                                                        QString _serverName,
                                                        QString _portNum,
                                                        QString _userName,
                                                        QString _pass,
-                                                       bool _savePass)
-    : saveName(_saveName), server(_serverName), port(_portNum), username(_userName), password(_pass),
-      savePassword(_savePass)
+                                                       bool _savePass,
+                                                       bool _isCustom)
+    : saveName(std::move(_saveName)), server(std::move(_serverName)), port(std::move(_portNum)),
+      username(std::move(_userName)), password(std::move(_pass)), savePassword(_savePass), isCustom(_isCustom)
 {
 }
 
@@ -36,8 +36,10 @@ QMap<QString, UserConnection_Information> UserConnection_Information::getServerI
             settingsCache->servers().getValue(QString("password%1").arg(i), "server", "server_details").toString();
         bool savePass =
             settingsCache->servers().getValue(QString("savePassword%1").arg(i), "server", "server_details").toBool();
+        bool isCustom =
+            settingsCache->servers().getValue(QString("isCustom%1").arg(i), "server", "server_details").toBool();
 
-        UserConnection_Information userInfo(saveName, serverName, portNum, userName, pass, savePass);
+        UserConnection_Information userInfo(saveName, serverName, portNum, userName, pass, savePass, isCustom);
         serverList.insert(saveName, userInfo);
     }
 
@@ -66,6 +68,8 @@ QStringList UserConnection_Information::getServerInfo(const QString &find)
             settingsCache->servers().getValue(QString("password%1").arg(i), "server", "server_details").toString();
         bool savePass =
             settingsCache->servers().getValue(QString("savePassword%1").arg(i), "server", "server_details").toBool();
+        bool isCustom =
+            settingsCache->servers().getValue(QString("isCustom%1").arg(i), "server", "server_details").toBool();
 
         server.append(saveName);
         server.append(serverName);
@@ -73,10 +77,11 @@ QStringList UserConnection_Information::getServerInfo(const QString &find)
         server.append(userName);
         server.append(pass);
         server.append(savePass ? "1" : "0");
+        server.append(isCustom ? "1" : "0");
         break;
     }
 
-    if (!server.size())
+    if (server.empty())
         qDebug() << "There was a problem!";
 
     return server;

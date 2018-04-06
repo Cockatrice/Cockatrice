@@ -195,6 +195,7 @@ void DlgConnect::actFinishParsingDownloadedData()
         // List of public servers
         // Will be populated below
         QStringList publicServersAvailable;
+        QStringList publicServersToRemove;
 
         // Downloaded data from GitHub
         QString jsonData = QString(reply->readAll());
@@ -208,25 +209,32 @@ void DlgConnect::actFinishParsingDownloadedData()
             const auto serverMap = server.toMap();
 
             QString serverName = serverMap["name"].toString();
+
+            if (serverMap["isInactive"].toBool()) {
+                publicServersToRemove.append(serverName);
+                continue;
+            }
+
             QString serverAddress = serverMap["host"].toString();
             QString serverPort = serverMap["port"].toString();
 
             publicServersAvailable.append(serverName);
 
-            // If this server is not found in the old list, add it
-            // Otherwise, do nothing (as the user already saved their
-            // information they want for this server!)
             if (!savedHostList.contains(serverName)) {
                 settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
+            } else {
+                settingsCache->servers().updateExistingServerWithoutLoss(serverName, serverAddress, serverPort);
             }
         }
 
         // If a server was removed from the public list,
-        // we will delete it from the local system
-        // as that server is no longer around.
+        // we will delete it from the local system.
+        // Will not delete "unofficial" servers
         for (auto server : savedHostList) {
             QString serverName = server.getSaveName();
-            if (publicServersAvailable.indexOf(serverName) < 0) {
+            bool isCustom = server.isCustomServer();
+
+            if (!isCustom && publicServersToRemove.indexOf(serverName) != -1) {
                 settingsCache->servers().removeServer(serverName);
             }
         }
@@ -345,7 +353,7 @@ void DlgConnect::actOk()
 
         settingsCache->servers().addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
                                               portEdit->text().trimmed(), playernameEdit->text().trimmed(),
-                                              passwordEdit->text(), savePasswordCheckBox->isChecked());
+                                              passwordEdit->text(), savePasswordCheckBox->isChecked(), true);
     } else {
         settingsCache->servers().updateExistingServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
                                                       portEdit->text().trimmed(), playernameEdit->text().trimmed(),
