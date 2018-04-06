@@ -1,4 +1,5 @@
 #include "dlg_connect.h"
+#include "qt-json/json.h"
 #include "settingscache.h"
 #include "userconnection_information.h"
 #include <QCheckBox>
@@ -15,6 +16,8 @@
 #include <QRadioButton>
 
 #define PUBLIC_SERVERS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers"
+#define PUBLIC_SERVERS_JSON                                                                                            \
+    "https://raw.githubusercontent.com/Cockatrice/cockatrice.github.io/master/public-servers.json"
 
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
@@ -173,7 +176,7 @@ void DlgConnect::downloadPublicServers()
     previousHosts->clear();
     previousHosts->addItem(placeHolderText);
 
-    QUrl url(QString(PUBLIC_SERVERS_URL));
+    QUrl url(QString(PUBLIC_SERVERS_JSON));
     auto *nam = new QNetworkAccessManager(this);
     QNetworkReply *reply = nam->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), this, SLOT(actFinishParsingDownloadedData()));
@@ -185,51 +188,56 @@ void DlgConnect::actFinishParsingDownloadedData()
     QNetworkReply::NetworkError errorCode = reply->error();
 
     if (errorCode == QNetworkReply::NoError) {
+        // Get current saved hosts
         UserConnection_Information uci;
         savedHostList = uci.getServerInfo();
 
-        QStringList serversOnWiki;
+        // List of public servers
+        // Will be populated below
+        QStringList publicServersAvailable;
 
-        // This will get all the data from the GitHub page and just give us the table data
-        QString stringData =
-            QString(reply->readAll()).remove(QRegExp(R"([\n\t\r])")).split("<tbody>").at(1).split("</tbody>").at(0);
+        // Downloaded data from GitHub
+        QString jsonData = QString(reply->readAll());
+        auto jsonMap = QtJson::Json::parse(jsonData).toMap();
 
-        // [Server1 Details], [Server2 Details], ...
-        QStringList serverList = stringData.split(QRegExp("<tr[^>]*>"));
-        serverList.removeAt(0);
+        // Servers available
+        auto publicServersJSONList = jsonMap["servers"].toList();
+        for (const auto &server : publicServersJSONList) {
+            // Data inside one server at a time
+            // server: [{ ... }, ..., { ... }]
+            const auto serverMap = server.toMap();
 
-        for (const auto &server : serverList) {
-            QStringList serverValues = server.split(QRegExp("<td[^>]*>"));
-            QString serverName, serverAddress, serverPort;
+            QString serverName = serverMap["name"].toString();
+            QString serverAddress = serverMap["host"].toString();
+            QString serverPort = serverMap["port"].toString();
 
-            // The fields correspond with the headers on the server list (index starting at 1)
-            short serverNameField = 1, serverAddressField = 5, serverPortField = 6;
+            publicServersAvailable.append(serverName);
 
-            serverName = QString(serverValues.at(serverNameField)).remove(QRegExp("<a[^>]*>")).split("</a>").at(0);
-            serverAddress = QString(serverValues.at(serverAddressField)).remove("<strong>").split("</strong>").at(0);
-            serverPort = QString(serverValues.at(serverPortField)).remove("<strong>").split("</strong>").at(0);
-
-            serversOnWiki.append(serverName);
+            // If this server is not found in the old list, add it
+            // Otherwise, do nothing (as the user already saved their
+            // information they want for this server!)
             if (!savedHostList.contains(serverName)) {
-                // Adds new servers to list (if exists, skip it)
                 settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
             }
         }
 
-        // Now that we added the new servers, we can remove all servers that were not on the public page
+        // If a server was removed from the public list,
+        // we will delete it from the local system
+        // as that server is no longer around.
         for (auto server : savedHostList) {
             QString serverName = server.getSaveName();
-            if (serversOnWiki.indexOf(serverName) < 0) {
+            if (publicServersAvailable.indexOf(serverName) < 0) {
                 settingsCache->servers().removeServer(serverName);
             }
         }
 
         reply->deleteLater();
     } else {
-        // Respond that an error occurred
-        qDebug() << "ERROR DOWNLOADING PUBLIC SERVERS" << errorCode;
+        qDebug() << "[CONNECTION DIALOG]"
+                 << "Error Downloading Public Servers" << errorCode;
     }
 
+    // Signal that we're done with updating the combo box
     emit sigPublicServersDownloaded();
 }
 
