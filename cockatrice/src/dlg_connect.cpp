@@ -16,8 +16,7 @@
 #include <QRadioButton>
 
 #define PUBLIC_SERVERS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers"
-#define PUBLIC_SERVERS_JSON                                                                                            \
-    "https://raw.githubusercontent.com/Cockatrice/cockatrice.github.io/master/public-servers.json"
+#define PUBLIC_SERVERS_JSON "https://cockatrice.github.io/public-servers.json"
 
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
