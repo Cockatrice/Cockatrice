@@ -199,12 +199,12 @@ ${If} $PortableMode = 0
 
 	IfFileExists "$INSTDIR\vc_redist.x86.exe" VcRedist86Exists PastVcRedist86Check
 	VcRedist86Exists:
-		ExecWait '"$INSTDIR\vc_redist.x86.exe"  /norestart'
+		ExecWait '"$INSTDIR\vc_redist.x86.exe" /passive /norestart'
 	PastVcRedist86Check:
 
 	IfFileExists "$INSTDIR\vc_redist.x64.exe" VcRedist64Exists PastVcRedist64Check
 	VcRedist64Exists:
-		ExecWait '"$INSTDIR\vc_redist.x64.exe"  /norestart'
+		ExecWait '"$INSTDIR\vc_redist.x64.exe" /passive /norestart'
 	PastVcRedist64Check:
 
 ${Else}
