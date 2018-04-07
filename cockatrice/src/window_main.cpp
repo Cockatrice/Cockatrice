@@ -208,21 +208,17 @@ void MainWindow::actRegister()
 void MainWindow::actRefreshServers()
 {
     hps->downloadPublicServers();
-
 }
 
 void MainWindow::alertUser(int errorCode)
 {
-    if (errorCode != -1)
-    {
-        QMessageBox::warning(nullptr, tr("Public Servers NOT Refreshed"), tr("Failed to refresh public servers:")+errorCode);
-    }
-    else
-    {
+    if (errorCode != -1) {
+        QMessageBox::warning(nullptr, tr("Public Servers NOT Refreshed"),
+                             tr("Failed to refresh public servers:") + errorCode);
+    } else {
         QMessageBox::information(nullptr, tr("Public Servers Refreshed"), tr("Public Servers Refreshed"));
     }
 }
-
 
 void MainWindow::actDisconnect()
 {
