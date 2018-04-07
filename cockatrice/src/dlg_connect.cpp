@@ -26,7 +26,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     hps = new HandlePublicServers(this);
     btnRefreshServers = new QPushButton(tr("Refresh Servers"), this);
     connect(hps, SIGNAL(sigPublicServersDownloadedSuccessfully()), this, SLOT(rebuildComboBoxList()));
-    connect(hps, SIGNAL(sigPublicServersDownloadedUnsuccessfully()), this, SLOT(rebuildComboBoxList()));
+    connect(hps, SIGNAL(sigPublicServersDownloadedUnsuccessfully(int)), this, SLOT(rebuildComboBoxList(int)));
     connect(btnRefreshServers, SIGNAL(released()), this, SLOT(downloadThePublicServers()));
 
     connect(this, SIGNAL(sigPublicServersDownloaded()), this, SLOT(rebuildComboBoxList()));
@@ -211,7 +211,7 @@ void DlgConnect::downloadThePublicServers()
 {
     previousHosts->clear();
     previousHosts->addItem(placeHolderText);
-    hps->downloadPublicServers(); // Refresh the servers
+    hps->downloadPublicServers();
 }
 
 void DlgConnect::preRebuildComboBoxList()
@@ -226,15 +226,18 @@ void DlgConnect::preRebuildComboBoxList()
     }
 }
 
-void DlgConnect::rebuildComboBoxList()
+void DlgConnect::rebuildComboBoxList(int failure)
 {
+    Q_UNUSED(failure);
+
     previousHosts->clear();
 
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
 
     int i = 0;
-    for (UserConnection_Information tmp : savedHostList) {
+    for (auto pair : savedHostList) {
+        auto tmp = pair.second;
         QString saveName = tmp.getSaveName();
         if (saveName.size()) {
             previousHosts->addItem(saveName);

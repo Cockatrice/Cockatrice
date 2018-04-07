@@ -1,6 +1,3 @@
-//
-// Created by Zachary Halpern on 4/6/18.
-//
 #ifndef COCKATRICE_HANDLE_PUBLIC_SERVERS_H
 #define COCKATRICE_HANDLE_PUBLIC_SERVERS_H
 
@@ -17,11 +14,11 @@ class HandlePublicServers : public QObject
     Q_OBJECT
 signals:
     void sigPublicServersDownloadedSuccessfully();
-    void sigPublicServersDownloadedUnsuccessfully();
+    void sigPublicServersDownloadedUnsuccessfully(int);
 
 public:
     explicit HandlePublicServers(QObject *parent = nullptr);
-    ~HandlePublicServers() = default;
+    ~HandlePublicServers() override = default;
 
 public slots:
     void downloadPublicServers();
@@ -30,7 +27,9 @@ private slots:
     void actFinishParsingDownloadedData();
 
 private:
-    QMap<QString, UserConnection_Information> savedHostList;
+    void updateServerINISettings(QMap<QString, QVariant>);
+    QStringList publicServersAvailable, publicServersToRemove;
+    QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
     QNetworkAccessManager *nam;
     QNetworkReply *reply;
 };

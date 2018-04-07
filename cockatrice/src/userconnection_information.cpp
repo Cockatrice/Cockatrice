@@ -17,9 +17,9 @@ UserConnection_Information::UserConnection_Information(QString _saveName,
 {
 }
 
-QMap<QString, UserConnection_Information> UserConnection_Information::getServerInfo()
+QMap<QString, std::pair<QString, UserConnection_Information>> UserConnection_Information::getServerInfo()
 {
-    QMap<QString, UserConnection_Information> serverList;
+    QMap<QString, std::pair<QString, UserConnection_Information>> serverList;
 
     int size = settingsCache->servers().getValue("totalServers", "server", "server_details").toInt() + 1;
 
@@ -40,7 +40,7 @@ QMap<QString, UserConnection_Information> UserConnection_Information::getServerI
             settingsCache->servers().getValue(QString("isCustom%1").arg(i), "server", "server_details").toBool();
 
         UserConnection_Information userInfo(saveName, serverName, portNum, userName, pass, savePass, isCustom);
-        serverList.insert(saveName, userInfo);
+        serverList.insert(saveName, std::make_pair(serverName, userInfo));
     }
 
     return serverList;

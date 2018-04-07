@@ -1,7 +1,3 @@
-//
-// Created by Zachary Halpern on 4/6/18.
-//
-
 #include "handle_public_servers.h"
 #include "qt-json/json.h"
 #include "settingscache.h"
@@ -34,59 +30,78 @@ void HandlePublicServers::actFinishParsingDownloadedData()
         UserConnection_Information uci;
         savedHostList = uci.getServerInfo();
 
-        // List of public servers
-        // Will be populated below
-        QStringList publicServersAvailable;
-        QStringList publicServersToRemove;
-
         // Downloaded data from GitHub
+        bool jsonSuccessful;
         QString jsonData = QString(reply->readAll());
-        auto jsonMap = QtJson::Json::parse(jsonData).toMap();
 
-        // Servers available
-        auto publicServersJSONList = jsonMap["servers"].toList();
-        for (const auto &server : publicServersJSONList) {
-            // Data inside one server at a time
-            // server: [{ ... }, ..., { ... }]
-            const auto serverMap = server.toMap();
+        auto jsonMap = QtJson::Json::parse(jsonData, jsonSuccessful).toMap();
 
-            QString serverName = serverMap["name"].toString();
-
-            if (serverMap["isInactive"].toBool()) {
-                publicServersToRemove.append(serverName);
-                continue;
-            }
-
-            QString serverAddress = serverMap["host"].toString();
-            QString serverPort = serverMap["port"].toString();
-
-            publicServersAvailable.append(serverName);
-
-            if (!savedHostList.contains(serverName)) {
-                settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
-            } else {
-                settingsCache->servers().updateExistingServerWithoutLoss(serverName, serverAddress, serverPort);
-            }
+        if (!jsonSuccessful) {
+            qDebug() << "[PUBLIC SERVER HANDLER]"
+                     << "JSON Parsing Error";
+            emit sigPublicServersDownloadedUnsuccessfully(errorCode);
+        } else {
+            updateServerINISettings(jsonMap);
         }
 
-        // If a server was removed from the public list,
-        // we will delete it from the local system.
-        // Will not delete "unofficial" servers
-        for (auto server : savedHostList) {
-            QString serverName = server.getSaveName();
-            bool isCustom = server.isCustomServer();
-
-            if (!isCustom && publicServersToRemove.indexOf(serverName) != -1) {
-                settingsCache->servers().removeServer(serverName);
-            }
-        }
-
-        emit sigPublicServersDownloadedSuccessfully();
     } else {
-        qDebug() << "[CONNECTION DIALOG]"
+        qDebug() << "[PUBLIC SERVER HANDLER]"
                  << "Error Downloading Public Servers" << errorCode;
-        emit sigPublicServersDownloadedUnsuccessfully();
+        emit sigPublicServersDownloadedUnsuccessfully(errorCode);
     }
 
     reply->deleteLater(); // After an emit() occurs, this object will be deleted
+}
+
+void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMap)
+{
+    // Servers available
+    auto publicServersJSONList = jsonMap["servers"].toList();
+
+    for (const auto &server : publicServersJSONList) {
+        // Data inside one server at a time
+        // server: [{ ... }, ..., { ... }]
+        const auto serverMap = server.toMap();
+
+        QString serverName = serverMap["name"].toString();
+
+        if (serverMap["isInactive"].toBool()) {
+            publicServersToRemove.append(serverName);
+            continue;
+        }
+
+        QString serverAddress = serverMap["host"].toString();
+        QString serverPort = serverMap["port"].toString();
+
+        publicServersAvailable.append(serverName);
+
+        bool serverFound = false;
+        for (const auto &iter : savedHostList) {
+            if (iter.first == serverName) {
+                serverFound = true;
+                break;
+            }
+        }
+
+        if (!serverFound) {
+            settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
+        } else {
+            settingsCache->servers().updateExistingServerWithoutLoss(serverName, serverAddress, serverPort);
+        }
+    }
+
+    // If a server was removed from the public list,
+    // we will delete it from the local system.
+    // Will not delete "unofficial" servers
+    for (const auto &pair : savedHostList) {
+        QString serverAddr = pair.first;
+        QString serverName = pair.second.getSaveName();
+        bool isCustom = pair.second.isCustomServer();
+
+        if (!isCustom && publicServersToRemove.indexOf(serverAddr) != -1) {
+            settingsCache->servers().removeServer(serverName);
+        }
+    }
+
+    emit sigPublicServersDownloadedSuccessfully();
 }

@@ -56,7 +56,7 @@ private slots:
     void actForgotPassword();
     void updateDisplayInfo(const QString &saveName);
     void preRebuildComboBoxList();
-    void rebuildComboBoxList();
+    void rebuildComboBoxList(int failure = -1);
     void downloadThePublicServers();
 
 private:
@@ -70,7 +70,7 @@ private:
     QComboBox *previousHosts;
     QRadioButton *newHostButton, *previousHostButton;
     QPushButton *btnOk, *btnCancel, *btnForgotPassword, *btnRefreshServers;
-    QMap<QString, UserConnection_Information> savedHostList;
+    QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
     HandlePublicServers *hps;
     const QString placeHolderText = tr("Downloading...");
 };
