@@ -38,6 +38,9 @@ class ServerInfo_User;
 class QThread;
 class DlgViewLog;
 class DlgConnect;
+class HandlePublicServers;
+class WndSets;
+class GameReplay;
 
 class MainWindow : public QMainWindow
 {
@@ -69,6 +72,7 @@ private slots:
     void actDeckEditor();
     void actFullScreen(bool checked);
     void actRegister();
+    void actRefreshServers();
     void actSettings();
     void actExit();
     void actForgotPasswordRequest();
@@ -82,6 +86,7 @@ private slots:
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void promptForgotPasswordChallenge();
     void showWindowIfHidden();
+    void alertUser(int errorCode = -1);
 
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -115,13 +120,13 @@ private:
     };
 
     QList<QMenu *> tabMenus;
-    QMenu *cockatriceMenu, *dbMenu, *helpMenu;
+    QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
+        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog, *aRefreshServers;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
 
-    QMenu *trayIconMenu;
+    WndSets *w;
 
     QAction *closeAction;
 
@@ -138,13 +143,17 @@ private:
 
     DlgConnect *dlgConnect;
 
+    GameReplay *replay;
+
+    HandlePublicServers *hps;
+
 public:
-    MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
 
 protected:
-    void closeEvent(QCloseEvent *event);
-    void changeEvent(QEvent *event);
+    void closeEvent(QCloseEvent *event) override;
+    void changeEvent(QEvent *event) override;
     QString extractInvalidUsernameMessage(QString &in);
 };
 

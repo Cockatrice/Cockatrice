@@ -143,12 +143,14 @@ void MainWindow::statusChanged(ClientStatus _status)
             aSinglePlayer->setEnabled(true);
             aConnect->setEnabled(true);
             aRegister->setEnabled(true);
+            aRefreshServers->setEnabled(true);
             aDisconnect->setEnabled(false);
             break;
         case StatusLoggingIn:
             aSinglePlayer->setEnabled(false);
             aConnect->setEnabled(false);
             aRegister->setEnabled(false);
+            aRefreshServers->setEnabled(false);
             aDisconnect->setEnabled(true);
             break;
         case StatusConnecting:
@@ -203,6 +205,25 @@ void MainWindow::actRegister()
     }
 }
 
+void MainWindow::actRefreshServers()
+{
+    hps->downloadPublicServers();
+
+}
+
+void MainWindow::alertUser(int errorCode)
+{
+    if (errorCode != -1)
+    {
+        QMessageBox::warning(nullptr, tr("Public Servers NOT Refreshed"), tr("Failed to refresh public servers:")+errorCode);
+    }
+    else
+    {
+        QMessageBox::information(nullptr, tr("Public Servers Refreshed"), tr("Public Servers Refreshed"));
+    }
+}
+
+
 void MainWindow::actDisconnect()
 {
     client->disconnectFromServer();
@@ -218,6 +239,7 @@ void MainWindow::actSinglePlayer()
 
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
+    aRefreshServers->setEnabled(false);
     aSinglePlayer->setEnabled(false);
 
     localServer = new LocalServer(this);
@@ -236,7 +258,7 @@ void MainWindow::actSinglePlayer()
 
     Command_CreateGame createCommand;
     createCommand.set_max_players(static_cast<google::protobuf::uint32>(numberPlayers));
-    mainClient->sendCommand(mainClient->prepareRoomCommand(createCommand, 0));
+    mainClient->sendCommand(LocalClient::prepareRoomCommand(createCommand, 0));
 }
 
 void MainWindow::actWatchReplay()
@@ -254,7 +276,7 @@ void MainWindow::actWatchReplay()
     QByteArray buf = file.readAll();
     file.close();
 
-    auto *replay = new GameReplay;
+    replay = new GameReplay;
     replay->ParseFromArray(buf.data(), buf.size());
 
     tabSupervisor->openReplay(replay);
@@ -267,6 +289,7 @@ void MainWindow::localGameEnded()
 
     aConnect->setEnabled(true);
     aRegister->setEnabled(true);
+    aRefreshServers->setEnabled(true);
     aSinglePlayer->setEnabled(true);
 }
 
@@ -621,6 +644,7 @@ void MainWindow::retranslateUi()
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
+    aRefreshServers->setText(tr("Refresh servers"));
     aSettings->setText(tr("&Settings..."));
     aSettings->setIcon(QPixmap("theme:icons/settings"));
     aExit->setText(tr("&Exit"));
@@ -665,6 +689,8 @@ void MainWindow::createActions()
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
     aRegister = new QAction(this);
     connect(aRegister, SIGNAL(triggered()), this, SLOT(actRegister()));
+    aRefreshServers = new QAction(this);
+    connect(aRefreshServers, SIGNAL(triggered()), this, SLOT(actRefreshServers())); // TODO
     aSettings = new QAction(this);
     connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
     aExit = new QAction(this);
@@ -719,6 +745,7 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aConnect);
     cockatriceMenu->addAction(aDisconnect);
     cockatriceMenu->addAction(aRegister);
+    cockatriceMenu->addAction(aRefreshServers);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
@@ -820,6 +847,10 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "Spoilers Disabled";
         QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
     }
+
+    hps = new HandlePublicServers();
+    connect(hps, SIGNAL(sigPublicServersDownloadedSuccessfully()), this, SLOT(alertUser()));
+    connect(hps, SIGNAL(sigPublicServersDownloadedUnsuccessfully(int)), this, SLOT(alertUser(int)));
 }
 
 MainWindow::~MainWindow()
@@ -835,7 +866,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::createTrayIcon()
 {
-    auto *trayIconMenu = new QMenu(this);
+    trayIconMenu = new QMenu(this);
     trayIconMenu->addAction(closeAction);
 
     trayIcon = new QSystemTrayIcon(this);
@@ -1208,7 +1239,7 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
 
 void MainWindow::actManageSets()
 {
-    auto *w = new WndSets;
+    w = new WndSets;
     w->setWindowModality(Qt::WindowModal);
     w->show();
 }

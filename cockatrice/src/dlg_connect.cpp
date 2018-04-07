@@ -21,6 +21,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     previousHosts = new QComboBox(this);
     previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
 
+    // TODO: Remove the button at the 2.7.0 release
     hps = new HandlePublicServers(this);
     btnRefreshServers = new QPushButton(tr("Refresh Servers"), this);
     connect(hps, SIGNAL(sigPublicServersDownloadedSuccessfully()), this, SLOT(rebuildComboBoxList()));
