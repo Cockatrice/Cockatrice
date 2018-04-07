@@ -16,7 +16,6 @@
 #include <QRadioButton>
 
 #define PUBLIC_SERVERS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers"
-#define PUBLIC_SERVERS_JSON "https://cockatrice.github.io/public-servers.json"
 
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
@@ -24,8 +23,11 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     previousHosts = new QComboBox(this);
     previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
 
+    hps = new HandlePublicServers(this);
     btnRefreshServers = new QPushButton(tr("Refresh Servers"), this);
-    connect(btnRefreshServers, SIGNAL(released()), this, SLOT(downloadPublicServers()));
+    connect(hps, SIGNAL(sigPublicServersDownloadedSuccessfully()), this, SLOT(rebuildComboBoxList()));
+    connect(hps, SIGNAL(sigPublicServersDownloadedUnsuccessfully()), this, SLOT(rebuildComboBoxList()));
+    connect(btnRefreshServers, SIGNAL(released()), this, SLOT(downloadThePublicServers()));
 
     connect(this, SIGNAL(sigPublicServersDownloaded()), this, SLOT(rebuildComboBoxList()));
     preRebuildComboBoxList();
@@ -90,15 +92,15 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnCancel->setFixedWidth(100);
     connect(btnCancel, SIGNAL(released()), this, SLOT(actCancel()));
 
-    auto *newHostLayout = new QGridLayout;
+    newHostLayout = new QGridLayout;
     newHostLayout->addWidget(newHostButton, 0, 1);
     newHostLayout->addWidget(publicServersLabel, 0, 2);
 
-    auto *newHolderLayout = new QHBoxLayout;
+    newHolderLayout = new QHBoxLayout;
     newHolderLayout->addWidget(previousHostButton);
     newHolderLayout->addWidget(btnRefreshServers);
 
-    auto *connectionLayout = new QGridLayout;
+    connectionLayout = new QGridLayout;
     connectionLayout->addLayout(newHolderLayout, 0, 1, 1, 2);
     connectionLayout->addWidget(previousHosts, 1, 1);
     connectionLayout->addLayout(newHostLayout, 2, 1, 1, 2);
@@ -110,33 +112,33 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     connectionLayout->addWidget(portEdit, 5, 1);
     connectionLayout->addWidget(autoConnectCheckBox, 6, 1);
 
-    auto *buttons = new QGridLayout;
+    buttons = new QGridLayout;
     buttons->addWidget(btnOk, 0, 0);
     buttons->addWidget(btnForgotPassword, 0, 1);
     buttons->addWidget(btnCancel, 0, 2);
 
-    QGroupBox *restrictionsGroupBox = new QGroupBox(tr("Server"));
+    restrictionsGroupBox = new QGroupBox(tr("Server"));
     restrictionsGroupBox->setLayout(connectionLayout);
 
-    auto *loginLayout = new QGridLayout;
+    loginLayout = new QGridLayout;
     loginLayout->addWidget(playernameLabel, 0, 0);
     loginLayout->addWidget(playernameEdit, 0, 1);
     loginLayout->addWidget(passwordLabel, 1, 0);
     loginLayout->addWidget(passwordEdit, 1, 1);
     loginLayout->addWidget(savePasswordCheckBox, 2, 1);
 
-    QGroupBox *loginGroupBox = new QGroupBox(tr("Login"));
+    loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
 
-    QGroupBox *btnGroupBox = new QGroupBox(tr(""));
+    btnGroupBox = new QGroupBox(tr(""));
     btnGroupBox->setLayout(buttons);
 
-    auto *grid = new QGridLayout;
+    grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
     grid->addWidget(loginGroupBox, 1, 0);
     grid->addWidget(btnGroupBox, 2, 0);
 
-    auto *mainLayout = new QVBoxLayout;
+    mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
     setLayout(mainLayout);
 
@@ -155,6 +157,41 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     playernameEdit->setFocus();
 }
 
+DlgConnect::~DlgConnect()
+{
+    hostLabel->deleteLater();
+    portLabel->deleteLater();
+    playernameLabel->deleteLater();
+    passwordLabel->deleteLater();
+    saveLabel->deleteLater();
+    publicServersLabel->deleteLater();
+    hostEdit->deleteLater();
+    portEdit->deleteLater();
+    playernameEdit->deleteLater();
+    passwordEdit->deleteLater();
+    saveEdit->deleteLater();
+    savePasswordCheckBox->deleteLater();
+    autoConnectCheckBox->deleteLater();
+    previousHosts->deleteLater();
+    newHostButton->deleteLater();
+    previousHostButton->deleteLater();
+    btnOk->deleteLater();
+    btnCancel->deleteLater();
+    btnForgotPassword->deleteLater();
+    btnRefreshServers->deleteLater();
+    newHostLayout->deleteLater();
+    connectionLayout->deleteLater();
+    buttons->deleteLater();
+    loginLayout->deleteLater();
+    grid->deleteLater();
+    newHolderLayout->deleteLater();
+    loginGroupBox->deleteLater();
+    btnGroupBox->deleteLater();
+    mainLayout->deleteLater();
+    restrictionsGroupBox->deleteLater();
+    hps->deleteLater();
+}
+
 void DlgConnect::actSaveConfig()
 {
     bool updateSuccess = settingsCache->servers().updateExistingServer(
@@ -170,82 +207,11 @@ void DlgConnect::actSaveConfig()
     preRebuildComboBoxList();
 }
 
-void DlgConnect::downloadPublicServers()
+void DlgConnect::downloadThePublicServers()
 {
     previousHosts->clear();
     previousHosts->addItem(placeHolderText);
-
-    QUrl url(QString(PUBLIC_SERVERS_JSON));
-    auto *nam = new QNetworkAccessManager(this);
-    QNetworkReply *reply = nam->get(QNetworkRequest(url));
-    connect(reply, SIGNAL(finished()), this, SLOT(actFinishParsingDownloadedData()));
-}
-
-void DlgConnect::actFinishParsingDownloadedData()
-{
-    auto *reply = dynamic_cast<QNetworkReply *>(sender());
-    QNetworkReply::NetworkError errorCode = reply->error();
-
-    if (errorCode == QNetworkReply::NoError) {
-        // Get current saved hosts
-        UserConnection_Information uci;
-        savedHostList = uci.getServerInfo();
-
-        // List of public servers
-        // Will be populated below
-        QStringList publicServersAvailable;
-        QStringList publicServersToRemove;
-
-        // Downloaded data from GitHub
-        QString jsonData = QString(reply->readAll());
-        auto jsonMap = QtJson::Json::parse(jsonData).toMap();
-
-        // Servers available
-        auto publicServersJSONList = jsonMap["servers"].toList();
-        for (const auto &server : publicServersJSONList) {
-            // Data inside one server at a time
-            // server: [{ ... }, ..., { ... }]
-            const auto serverMap = server.toMap();
-
-            QString serverName = serverMap["name"].toString();
-
-            if (serverMap["isInactive"].toBool()) {
-                publicServersToRemove.append(serverName);
-                continue;
-            }
-
-            QString serverAddress = serverMap["host"].toString();
-            QString serverPort = serverMap["port"].toString();
-
-            publicServersAvailable.append(serverName);
-
-            if (!savedHostList.contains(serverName)) {
-                settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
-            } else {
-                settingsCache->servers().updateExistingServerWithoutLoss(serverName, serverAddress, serverPort);
-            }
-        }
-
-        // If a server was removed from the public list,
-        // we will delete it from the local system.
-        // Will not delete "unofficial" servers
-        for (auto server : savedHostList) {
-            QString serverName = server.getSaveName();
-            bool isCustom = server.isCustomServer();
-
-            if (!isCustom && publicServersToRemove.indexOf(serverName) != -1) {
-                settingsCache->servers().removeServer(serverName);
-            }
-        }
-
-        reply->deleteLater();
-    } else {
-        qDebug() << "[CONNECTION DIALOG]"
-                 << "Error Downloading Public Servers" << errorCode;
-    }
-
-    // Signal that we're done with updating the combo box
-    emit sigPublicServersDownloaded();
+    hps->downloadPublicServers(); // Refresh the servers
 }
 
 void DlgConnect::preRebuildComboBoxList()
@@ -254,9 +220,9 @@ void DlgConnect::preRebuildComboBoxList()
     savedHostList = uci.getServerInfo();
 
     if (savedHostList.size() == 1) {
-        downloadPublicServers();
+        downloadThePublicServers();
     } else {
-        emit sigPublicServersDownloaded();
+        rebuildComboBoxList();
     }
 }
 

@@ -37,6 +37,7 @@ class LocalServer;
 class ServerInfo_User;
 class QThread;
 class DlgViewLog;
+class DlgConnect;
 
 class MainWindow : public QMainWindow
 {
@@ -134,6 +135,8 @@ private:
     QProcess *cardUpdateProcess;
 
     DlgViewLog *logviewDialog;
+
+    DlgConnect *dlgConnect;
 
 public:
     MainWindow(QWidget *parent = 0);

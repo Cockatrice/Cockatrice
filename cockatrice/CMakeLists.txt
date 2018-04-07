@@ -119,6 +119,7 @@ SET(cockatrice_SOURCES
     src/releasechannel.cpp
     src/userconnection_information.cpp
     src/spoilerbackgroundupdater.cpp
+    src/handle_public_servers.cpp
     ${VERSION_STRING_CPP}
 )
 

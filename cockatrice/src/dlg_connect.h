@@ -1,8 +1,12 @@
 #ifndef DLG_CONNECT_H
 #define DLG_CONNECT_H
 
+#include "handle_public_servers.h"
 #include "userconnection_information.h"
 #include <QDialog>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLineEdit>
 
 class QLabel;
@@ -27,6 +31,7 @@ signals:
 
 public:
     explicit DlgConnect(QWidget *parent = nullptr);
+    ~DlgConnect();
     QString getHost() const;
     int getPort() const
     {
@@ -52,10 +57,13 @@ private slots:
     void updateDisplayInfo(const QString &saveName);
     void preRebuildComboBoxList();
     void rebuildComboBoxList();
-    void actFinishParsingDownloadedData();
-    void downloadPublicServers();
+    void downloadThePublicServers();
 
 private:
+    QGridLayout *newHostLayout, *connectionLayout, *buttons, *loginLayout, *grid;
+    QHBoxLayout *newHolderLayout;
+    QGroupBox *loginGroupBox, *btnGroupBox, *restrictionsGroupBox;
+    QVBoxLayout *mainLayout;
     QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel, *publicServersLabel;
     QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *saveEdit;
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
@@ -63,6 +71,7 @@ private:
     QRadioButton *newHostButton, *previousHostButton;
     QPushButton *btnOk, *btnCancel, *btnForgotPassword, *btnRefreshServers;
     QMap<QString, UserConnection_Information> savedHostList;
+    HandlePublicServers *hps;
     const QString placeHolderText = tr("Downloading...");
 };
 #endif

@@ -183,11 +183,14 @@ void MainWindow::activateAccepted()
 
 void MainWindow::actConnect()
 {
-    auto *dlg = new DlgConnect(this);
-    connect(dlg, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
-    if (dlg->exec())
-        client->connectToServer(dlg->getHost(), static_cast<unsigned int>(dlg->getPort()), dlg->getPlayerName(),
-                                dlg->getPassword());
+    dlgConnect = new DlgConnect(this);
+    dlgConnect->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dlgConnect, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
+
+    if (dlgConnect->exec()) {
+        client->connectToServer(dlgConnect->getHost(), static_cast<unsigned int>(dlgConnect->getPort()),
+                                dlgConnect->getPlayerName(), dlgConnect->getPassword());
+    }
 }
 
 void MainWindow::actRegister()
