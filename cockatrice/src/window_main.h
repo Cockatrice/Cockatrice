@@ -30,17 +30,17 @@
 #include "abstractclient.h"
 #include "pb/response.pb.h"
 
-class TabSupervisor;
-class RemoteClient;
+class DlgConnect;
+class DlgViewLog;
+class GameReplay;
+class HandlePublicServers;
 class LocalClient;
 class LocalServer;
-class ServerInfo_User;
 class QThread;
-class DlgViewLog;
-class DlgConnect;
-class HandlePublicServers;
+class RemoteClient;
+class ServerInfo_User;
+class TabSupervisor;
 class WndSets;
-class GameReplay;
 
 class MainWindow : public QMainWindow
 {

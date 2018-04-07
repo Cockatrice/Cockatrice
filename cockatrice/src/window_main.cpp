@@ -686,7 +686,7 @@ void MainWindow::createActions()
     aRegister = new QAction(this);
     connect(aRegister, SIGNAL(triggered()), this, SLOT(actRegister()));
     aRefreshServers = new QAction(this);
-    connect(aRefreshServers, SIGNAL(triggered()), this, SLOT(actRefreshServers())); // TODO
+    connect(aRefreshServers, SIGNAL(triggered()), this, SLOT(actRefreshServers()));
     aSettings = new QAction(this);
     connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
     aExit = new QAction(this);
