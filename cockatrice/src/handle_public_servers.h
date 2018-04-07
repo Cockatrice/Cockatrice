@@ -28,7 +28,6 @@ public slots:
 
 private slots:
     void actFinishParsingDownloadedData();
-    void clearNAM();
 
 private:
     QMap<QString, UserConnection_Information> savedHostList;

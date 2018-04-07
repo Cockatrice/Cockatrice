@@ -9,7 +9,7 @@
 
 #define PUBLIC_SERVERS_JSON "https://cockatrice.github.io/public-servers.json"
 
-HandlePublicServers::HandlePublicServers(QObject *parent) : QObject(parent)
+HandlePublicServers::HandlePublicServers(QObject *parent) : QObject(parent), nam(nullptr), reply(nullptr)
 {
 }
 
@@ -19,18 +19,15 @@ void HandlePublicServers::downloadPublicServers()
     nam = new QNetworkAccessManager(this);
     reply = nam->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), this, SLOT(actFinishParsingDownloadedData()));
-    connect(reply, SIGNAL(finished()), this, SLOT(clearNAM()));
-}
-
-void HandlePublicServers::clearNAM()
-{
-    nam->deleteLater(); // After finished() is called, this object will be deleted
 }
 
 void HandlePublicServers::actFinishParsingDownloadedData()
 {
     reply = dynamic_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError errorCode = reply->error();
+
+    // After finished() is called, this object will be deleted
+    nam->deleteLater();
 
     if (errorCode == QNetworkReply::NoError) {
         // Get current saved hosts
