@@ -1,18 +1,20 @@
 #include "handle_public_servers.h"
 #include "qt-json/json.h"
 #include "settingscache.h"
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QUrl>
 
 #define PUBLIC_SERVERS_JSON "https://cockatrice.github.io/public-servers.json"
 
-HandlePublicServers::HandlePublicServers(QObject *parent) : QObject(parent), nam(nullptr), reply(nullptr)
+HandlePublicServers::HandlePublicServers(QObject *parent)
+    : QObject(parent), nam(new QNetworkAccessManager(this)), reply(nullptr)
 {
 }
 
 void HandlePublicServers::downloadPublicServers()
 {
     QUrl url(QString(PUBLIC_SERVERS_JSON));
-    nam = new QNetworkAccessManager(this);
     reply = nam->get(QNetworkRequest(url));
     connect(reply, SIGNAL(finished()), this, SLOT(actFinishParsingDownloadedData()));
 }
@@ -21,9 +23,6 @@ void HandlePublicServers::actFinishParsingDownloadedData()
 {
     reply = dynamic_cast<QNetworkReply *>(sender());
     QNetworkReply::NetworkError errorCode = reply->error();
-
-    // After finished() is called, this object will be deleted
-    nam->deleteLater();
 
     if (errorCode == QNetworkReply::NoError) {
         // Get current saved hosts

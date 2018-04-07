@@ -2,7 +2,9 @@
 #define COCKATRICE_HANDLE_PUBLIC_SERVERS_H
 
 #include "userconnection_information.h"
-#include <QNetworkReply>
+
+class QNetworkReply;
+class QNetworkAccessManager;
 
 /**
  * This class is used to update the servers.ini file and ensure
@@ -28,6 +30,7 @@ private slots:
 
 private:
     void updateServerINISettings(QMap<QString, QVariant>);
+
     QStringList publicServersAvailable, publicServersToRemove;
     QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
     QNetworkAccessManager *nam;

@@ -4,16 +4,17 @@
 #include "handle_public_servers.h"
 #include "userconnection_information.h"
 #include <QDialog>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QHBoxLayout>
 #include <QLineEdit>
 
-class QLabel;
-class QPushButton;
 class QCheckBox;
 class QComboBox;
+class QGridLayout;
+class QGroupBox;
+class QHBoxLayout;
+class QLabel;
+class QPushButton;
 class QRadioButton;
+class QVBoxLayout;
 
 class DeleteHighlightedItemWhenShiftDelPressedEventFilter : public QObject
 {
@@ -31,7 +32,7 @@ signals:
 
 public:
     explicit DlgConnect(QWidget *parent = nullptr);
-    ~DlgConnect();
+    ~DlgConnect() override;
     QString getHost() const;
     int getPort() const
     {

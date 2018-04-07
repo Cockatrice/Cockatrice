@@ -1,5 +1,4 @@
 #include "dlg_connect.h"
-#include "qt-json/json.h"
 #include "settingscache.h"
 #include "userconnection_information.h"
 #include <QCheckBox>
@@ -11,7 +10,6 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMessageBox>
-#include <QNetworkReply>
 #include <QPushButton>
 #include <QRadioButton>
 
@@ -157,40 +155,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     playernameEdit->setFocus();
 }
 
-DlgConnect::~DlgConnect()
-{
-    hostLabel->deleteLater();
-    portLabel->deleteLater();
-    playernameLabel->deleteLater();
-    passwordLabel->deleteLater();
-    saveLabel->deleteLater();
-    publicServersLabel->deleteLater();
-    hostEdit->deleteLater();
-    portEdit->deleteLater();
-    playernameEdit->deleteLater();
-    passwordEdit->deleteLater();
-    saveEdit->deleteLater();
-    savePasswordCheckBox->deleteLater();
-    autoConnectCheckBox->deleteLater();
-    previousHosts->deleteLater();
-    newHostButton->deleteLater();
-    previousHostButton->deleteLater();
-    btnOk->deleteLater();
-    btnCancel->deleteLater();
-    btnForgotPassword->deleteLater();
-    btnRefreshServers->deleteLater();
-    newHostLayout->deleteLater();
-    connectionLayout->deleteLater();
-    buttons->deleteLater();
-    loginLayout->deleteLater();
-    grid->deleteLater();
-    newHolderLayout->deleteLater();
-    loginGroupBox->deleteLater();
-    btnGroupBox->deleteLater();
-    mainLayout->deleteLater();
-    restrictionsGroupBox->deleteLater();
-    hps->deleteLater();
-}
+DlgConnect::~DlgConnect() = default;
 
 void DlgConnect::actSaveConfig()
 {
@@ -209,6 +174,7 @@ void DlgConnect::actSaveConfig()
 
 void DlgConnect::downloadThePublicServers()
 {
+    btnRefreshServers->setDisabled(true);
     previousHosts->clear();
     previousHosts->addItem(placeHolderText);
     hps->downloadPublicServers();
@@ -249,6 +215,8 @@ void DlgConnect::rebuildComboBoxList(int failure)
             i++;
         }
     }
+
+    btnRefreshServers->setDisabled(false);
 }
 
 void DlgConnect::previousHostSelected(bool state)
