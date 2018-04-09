@@ -44,7 +44,7 @@ public:
                       QString password,
                       bool savePassword,
                       bool isCustom = false);
-    void removeServer(QString saveName);
+    void removeServer(QString servAddr);
     bool updateExistingServer(QString saveName,
                               QString serv,
                               QString port,

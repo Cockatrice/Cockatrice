@@ -21,7 +21,6 @@ signals:
 public:
     explicit HandlePublicServers(QObject *parent = nullptr);
     ~HandlePublicServers() override = default;
-    void askToClearServerList();
 
 public slots:
     void downloadPublicServers();
@@ -32,7 +31,7 @@ private slots:
 private:
     void updateServerINISettings(QMap<QString, QVariant>);
 
-    QStringList publicServersAvailable, publicServersToRemove;
+    QStringList publicServersToRemove;
     QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
     QNetworkAccessManager *nam;
     QNetworkReply *reply;

@@ -72,7 +72,6 @@ private slots:
     void actDeckEditor();
     void actFullScreen(bool checked);
     void actRegister();
-    void actRefreshServers();
     void actSettings();
     void actExit();
     void actForgotPasswordRequest();
@@ -86,7 +85,6 @@ private slots:
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void promptForgotPasswordChallenge();
     void showWindowIfHidden();
-    void alertUser(int errorCode = -1);
 
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -122,30 +120,19 @@ private:
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
+        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog, *closeAction;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
-
-    WndSets *w;
-
-    QAction *closeAction;
-
+    WndSets *wndSets;
     RemoteClient *client;
     QThread *clientThread;
-
     LocalServer *localServer;
     bool bHasActivated;
-
     QMessageBox serverShutdownMessageBox;
     QProcess *cardUpdateProcess;
-
     DlgViewLog *logviewDialog;
-
     DlgConnect *dlgConnect;
-
     GameReplay *replay;
-
-    HandlePublicServers *hps;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

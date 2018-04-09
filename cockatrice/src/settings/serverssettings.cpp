@@ -196,22 +196,20 @@ void ServersSettings::addNewServer(QString saveName,
     setValue(savePassword, QString("savePassword%1").arg(index), "server", "server_details");
     setValue(index, "totalServers", "server", "server_details");
     setValue(password, QString("password%1").arg(index), "server", "server_details");
-    setValue(isCustom, QString("isCustom%1").arg(index), "server", "server_details");
 }
 
-void ServersSettings::removeServer(QString saveName)
+void ServersSettings::removeServer(QString servAddr)
 {
     int size = getValue("totalServers", "server", "server_details").toInt() + 1;
 
     for (int i = 0; i < size; i++) {
-        if (saveName == getValue(QString("saveName%1").arg(i), "server", "server_details").toString()) {
+        if (servAddr == getValue(QString("server%1").arg(i), "server", "server_details").toString()) {
             deleteValue(QString("server%1").arg(i), "server", "server_details");
             deleteValue(QString("port%1").arg(i), "server", "server_details");
             deleteValue(QString("username%1").arg(i), "server", "server_details");
             deleteValue(QString("savePassword%1").arg(i), "server", "server_details");
             deleteValue(QString("password%1").arg(i), "server", "server_details");
             deleteValue(QString("saveName%1").arg(i), "server", "server_details");
-            deleteValue(QString("isCustom%1").arg(i), "server", "server_details");
             return;
         }
     }
@@ -231,7 +229,7 @@ bool ServersSettings::updateExistingServerWithoutLoss(QString saveName,
     int size = getValue("totalServers", "server", "server_details").toInt() + 1;
 
     for (int i = 0; i < size; i++) {
-        if (saveName == getValue(QString("saveName%1").arg(i), "server", "server_details").toString()) {
+        if (serv == getValue(QString("server%1").arg(i), "server", "server_details").toString()) {
             if (!serv.isEmpty()) {
                 setValue(serv, QString("server%1").arg(i), "server", "server_details");
             }

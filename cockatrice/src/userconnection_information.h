@@ -20,7 +20,7 @@ private:
 
 public:
     UserConnection_Information();
-    UserConnection_Information(QString, QString, QString, QString, QString, bool, bool _isCustom = false);
+    UserConnection_Information(QString, QString, QString, QString, QString, bool);
     QString getSaveName() const
     {
         return saveName;
@@ -44,10 +44,6 @@ public:
     bool getSavePassword() const
     {
         return savePassword;
-    }
-    bool isCustomServer() const
-    {
-        return isCustom;
     }
     QMap<QString, std::pair<QString, UserConnection_Information>> getServerInfo();
     QStringList getServerInfo(const QString &find);

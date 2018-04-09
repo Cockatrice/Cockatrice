@@ -53,34 +53,8 @@ void HandlePublicServers::actFinishParsingDownloadedData()
     reply->deleteLater(); // After an emit() occurs, this object will be deleted
 }
 
-void HandlePublicServers::askToClearServerList()
-{
-    // Give user option to flush old values if they've never done this before
-    QMessageBox messageBox;
-    messageBox.setIconPixmap(QPixmap("theme:icons/update"));
-    messageBox.setWindowTitle(tr("Spring Cleaning"));
-    messageBox.setText(tr("New public server list successfully downloaded.") + "\n" +
-                       tr("Do you want to clear out your old server list?") + "\n" +
-                       tr("This includes saved usernames and passwords"));
-    messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-
-    auto reply = static_cast<QMessageBox::StandardButton>(messageBox.exec());
-
-    if (reply == QMessageBox::Yes) {
-        for (const auto &pair : savedHostList) {
-            QString serverName = pair.second.getSaveName();
-            settingsCache->servers().removeServer(serverName);
-        }
-        savedHostList.clear();
-        qDebug() << "[PUBLIC SERVER HANDLER]"
-                 << "Cleared old saved hosts";
-    }
-}
-
 void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMap)
 {
-    askToClearServerList();
-
     // Servers available
     auto publicServersJSONList = jsonMap["servers"].toList();
 
@@ -89,21 +63,20 @@ void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMa
         // server: [{ ... }, ..., { ... }]
         const auto serverMap = server.toMap();
 
-        QString serverName = serverMap["name"].toString();
+        QString serverAddress = serverMap["host"].toString();
 
         if (serverMap["isInactive"].toBool()) {
-            publicServersToRemove.append(serverName);
+            publicServersToRemove.append(serverAddress);
             continue;
         }
 
-        QString serverAddress = serverMap["host"].toString();
+        QString serverName = serverMap["name"].toString();
         QString serverPort = serverMap["port"].toString();
-
-        publicServersAvailable.append(serverName);
 
         bool serverFound = false;
         for (const auto &iter : savedHostList) {
-            if (iter.first == serverName) {
+            // If the URL/IP matches
+            if (iter.second.getServer() == serverAddress) {
                 serverFound = true;
                 break;
             }
@@ -121,11 +94,9 @@ void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMa
     // Will not delete "unofficial" servers
     for (const auto &pair : savedHostList) {
         QString serverAddr = pair.first;
-        QString serverName = pair.second.getSaveName();
-        bool isCustom = pair.second.isCustomServer();
 
-        if (!isCustom && publicServersToRemove.indexOf(serverAddr) != -1) {
-            settingsCache->servers().removeServer(serverName);
+        if (publicServersToRemove.indexOf(serverAddr) != -1) {
+            settingsCache->servers().removeServer(serverAddr);
         }
     }
 
