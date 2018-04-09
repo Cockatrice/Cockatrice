@@ -522,7 +522,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(&mcSpoilerSaveLabel, 1, 0);
     lpSpoilerGrid->addWidget(mpSpoilerSavePathLineEdit, 1, 1);
     lpSpoilerGrid->addWidget(mpSpoilerPathButton, 1, 2);
-    lpSpoilerGrid->addWidget(lastUpdatedLabel, 2, 0);
+    lpSpoilerGrid->addWidget(&lastUpdatedLabel, 2, 0);
     lpSpoilerGrid->addWidget(updateNowButton, 2, 1);
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
 
