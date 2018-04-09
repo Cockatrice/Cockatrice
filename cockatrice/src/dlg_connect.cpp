@@ -280,7 +280,7 @@ void DlgConnect::actOk()
 
         settingsCache->servers().addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
                                               portEdit->text().trimmed(), playernameEdit->text().trimmed(),
-                                              passwordEdit->text(), savePasswordCheckBox->isChecked(), true);
+                                              passwordEdit->text(), savePasswordCheckBox->isChecked());
     } else {
         settingsCache->servers().updateExistingServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
                                                       portEdit->text().trimmed(), playernameEdit->text().trimmed(),

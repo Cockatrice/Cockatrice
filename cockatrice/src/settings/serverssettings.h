@@ -37,29 +37,22 @@ public:
     void setFPPort(QString port);
     void setSavePassword(int save);
     void setFPPlayerName(QString playerName);
-    void addNewServer(QString saveName,
-                      QString serv,
-                      QString port,
-                      QString username,
-                      QString password,
-                      bool savePassword,
-                      bool isCustom = false);
+    void
+    addNewServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword);
     void removeServer(QString servAddr);
     bool updateExistingServer(QString saveName,
                               QString serv,
                               QString port,
                               QString username,
                               QString password,
-                              bool savePassword,
-                              bool isCustom = false);
+                              bool savePassword);
 
     bool updateExistingServerWithoutLoss(QString saveName,
                                          QString serv = QString(),
                                          QString port = QString(),
                                          QString username = QString(),
                                          QString password = QString(),
-                                         bool savePassword = true,
-                                         bool isCustom = false);
+                                         bool savePassword = true);
     void setClearDebugLogStatus(bool abIsChecked);
     bool getClearDebugLogStatus(bool abDefaultValue);
 

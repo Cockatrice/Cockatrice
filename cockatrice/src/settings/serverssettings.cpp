@@ -181,8 +181,7 @@ void ServersSettings::addNewServer(QString saveName,
                                    QString port,
                                    QString username,
                                    QString password,
-                                   bool savePassword,
-                                   bool isCustom)
+                                   bool savePassword)
 {
     if (updateExistingServer(saveName, serv, port, username, password, savePassword))
         return;
@@ -223,16 +222,12 @@ bool ServersSettings::updateExistingServerWithoutLoss(QString saveName,
                                                       QString port,
                                                       QString username,
                                                       QString password,
-                                                      bool savePassword,
-                                                      bool isCustom)
+                                                      bool savePassword)
 {
     int size = getValue("totalServers", "server", "server_details").toInt() + 1;
 
     for (int i = 0; i < size; i++) {
         if (serv == getValue(QString("server%1").arg(i), "server", "server_details").toString()) {
-            if (!serv.isEmpty()) {
-                setValue(serv, QString("server%1").arg(i), "server", "server_details");
-            }
 
             if (!port.isEmpty()) {
                 setValue(port, QString("port%1").arg(i), "server", "server_details");
@@ -250,7 +245,10 @@ bool ServersSettings::updateExistingServerWithoutLoss(QString saveName,
                 setValue(password, QString("password%1").arg(i), "server", "server_details");
             }
 
-            setValue(isCustom, QString("isCustom%1").arg(i), "server", "server_details");
+            if (!saveName.isEmpty()) {
+                setValue(password, QString("saveName%1").arg(i), "server", "server_details");
+            }
+
             return true;
         }
     }
@@ -262,9 +260,8 @@ bool ServersSettings::updateExistingServer(QString saveName,
                                            QString port,
                                            QString username,
                                            QString password,
-                                           bool savePassword,
-                                           bool isCustom)
+                                           bool savePassword)
 {
     return updateExistingServerWithoutLoss(std::move(saveName), std::move(serv), std::move(port), std::move(username),
-                                           std::move(password), savePassword, isCustom);
+                                           std::move(password), savePassword);
 }
