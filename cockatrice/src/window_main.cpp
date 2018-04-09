@@ -203,7 +203,6 @@ void MainWindow::actRegister()
     }
 }
 
-
 void MainWindow::actDisconnect()
 {
     client->disconnectFromServer();
@@ -758,26 +757,18 @@ MainWindow::MainWindow(QWidget *parent)
     pixmapCacheSizeChanged(settingsCache->getPixmapCacheSize());
 
     client = new RemoteClient;
-    connect(client, SIGNAL(connectionClosedEventReceived(
-                                   const Event_ConnectionClosed &)), this,
-            SLOT(processConnectionClosedEvent(
-                         const Event_ConnectionClosed &)));
-    connect(client, SIGNAL(serverShutdownEventReceived(
-                                   const Event_ServerShutdown &)), this,
-            SLOT(processServerShutdownEvent(
-                         const Event_ServerShutdown &)));
+    connect(client, SIGNAL(connectionClosedEventReceived(const Event_ConnectionClosed &)), this,
+            SLOT(processConnectionClosedEvent(const Event_ConnectionClosed &)));
+    connect(client, SIGNAL(serverShutdownEventReceived(const Event_ServerShutdown &)), this,
+            SLOT(processServerShutdownEvent(const Event_ServerShutdown &)));
     connect(client, SIGNAL(loginError(Response::ResponseCode, QString, quint32, QList<QString>)), this,
             SLOT(loginError(Response::ResponseCode, QString, quint32, QList<QString>)));
-    connect(client, SIGNAL(socketError(
-                                   const QString &)), this, SLOT(socketError(
-                                                                         const QString &)));
+    connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
     connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
     connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
     connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
-    connect(client, SIGNAL(userInfoChanged(
-                                   const ServerInfo_User &)), this,
-            SLOT(userInfoReceived(
-                         const ServerInfo_User &)), Qt::BlockingQueuedConnection);
+    connect(client, SIGNAL(userInfoChanged(const ServerInfo_User &)), this,
+            SLOT(userInfoReceived(const ServerInfo_User &)), Qt::BlockingQueuedConnection);
     connect(client, SIGNAL(notifyUserAboutUpdate()), this, SLOT(notifyUserAboutUpdate()));
     connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
     connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
@@ -807,14 +798,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     retranslateUi();
 
-    if (!restoreGeometry(settingsCache->getMainWindowGeometry()))
-    {
+    if (!restoreGeometry(settingsCache->getMainWindowGeometry())) {
         setWindowState(Qt::WindowMaximized);
     }
     aFullScreen->setChecked(static_cast<bool>(windowState() & Qt::WindowFullScreen));
 
-    if (QSystemTrayIcon::isSystemTrayAvailable())
-    {
+    if (QSystemTrayIcon::isSystemTrayAvailable()) {
         createTrayActions();
         createTrayIcon();
     }
@@ -827,8 +816,7 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(cardDatabaseNewSetsFound(int, QStringList)));
     connect(db, SIGNAL(cardDatabaseAllNewSetsEnabled()), this, SLOT(cardDatabaseAllNewSetsEnabled()));
 
-    if (!settingsCache->getDownloadSpoilersStatus())
-    {
+    if (!settingsCache->getDownloadSpoilersStatus()) {
         qDebug() << "Spoilers Disabled";
         QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
     }
