@@ -522,7 +522,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(&mcSpoilerSaveLabel, 1, 0);
     lpSpoilerGrid->addWidget(mpSpoilerSavePathLineEdit, 1, 1);
     lpSpoilerGrid->addWidget(mpSpoilerPathButton, 1, 2);
-    lpSpoilerGrid->addWidget(lastUpdateLabel, 2, 0);
+    lpSpoilerGrid->addWidget(lastUpdatedLabel, 2, 0);
     lpSpoilerGrid->addWidget(updateNowButton, 2, 1);
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
 
@@ -592,7 +592,7 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
     mcSpoilerSaveLabel.setEnabled(anInput);
     mpSpoilerSavePathLineEdit->setEnabled(anInput);
     mpSpoilerPathButton->setEnabled(anInput);
-	lastUpdateLabel.setEnabled(anInput);
+	lastUpdatedLabel.setEnabled(anInput);
     updateNowButton->setEnabled(anInput);
     infoOnSpoilersLabel.setEnabled(anInput);
 
@@ -607,7 +607,7 @@ void DeckEditorSettingsPage::retranslateUi()
     mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
     mcGeneralMessageLabel.setText(tr("Hey, something's here finally!"));
-	lastUpdateLabel.setText(tr("Last Updated") + ": " + getLastUpdateTime());
+    lastUpdatedLabel.setText(tr("Last Updated") + ": " + getLastUpdateTime());
     infoOnSpoilersLabel.setText(tr("Spoilers download automatically on launch") + "\n" +
                                 tr("Press the button to manually update without relaunching") + "\n\n" +
                                 tr("Do not close settings until manual update complete"));
