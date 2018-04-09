@@ -176,11 +176,11 @@ bool ServersSettings::getClearDebugLogStatus(bool abDefaultValue)
     return cbFlushLog == QVariant() ? abDefaultValue : cbFlushLog.toBool();
 }
 
-void ServersSettings::addNewServer(QString saveName,
-                                   QString serv,
-                                   QString port,
-                                   QString username,
-                                   QString password,
+void ServersSettings::addNewServer(const QString &saveName,
+                                   const QString &serv,
+                                   const QString &port,
+                                   const QString &username,
+                                   const QString &password,
                                    bool savePassword)
 {
     if (updateExistingServer(saveName, serv, port, username, password, savePassword))
@@ -237,17 +237,14 @@ bool ServersSettings::updateExistingServerWithoutLoss(QString saveName,
                 setValue(username, QString("username%1").arg(i), "server", "server_details");
             }
 
-            if (savePassword) {
-                setValue(savePassword, QString("savePassword%1").arg(i), "server", "server_details");
-            }
-
-            if (!password.isEmpty()) {
+            if (savePassword && !password.isEmpty()) {
                 setValue(password, QString("password%1").arg(i), "server", "server_details");
+            } else {
+                setValue(QString(), QString("password%1").arg(i), "server", "server_details");
             }
 
-            if (!saveName.isEmpty()) {
-                setValue(password, QString("saveName%1").arg(i), "server", "server_details");
-            }
+            setValue(savePassword, QString("savePassword%1").arg(i), "server", "server_details");
+            setValue(saveName, QString("saveName%1").arg(i), "server", "server_details");
 
             return true;
         }

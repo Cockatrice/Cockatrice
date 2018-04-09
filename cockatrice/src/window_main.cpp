@@ -184,7 +184,6 @@ void MainWindow::activateAccepted()
 void MainWindow::actConnect()
 {
     dlgConnect = new DlgConnect(this);
-    dlgConnect->setAttribute(Qt::WA_DeleteOnClose);
     connect(dlgConnect, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
 
     if (dlgConnect->exec()) {
