@@ -65,7 +65,7 @@ private:
     QHBoxLayout *newHolderLayout;
     QGroupBox *loginGroupBox, *btnGroupBox, *restrictionsGroupBox;
     QVBoxLayout *mainLayout;
-    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel, *publicServersLabel;
+    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel;
     QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *saveEdit;
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;

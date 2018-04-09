@@ -21,6 +21,7 @@ signals:
 public:
     explicit HandlePublicServers(QObject *parent = nullptr);
     ~HandlePublicServers() override = default;
+    void askToClearServerList();
 
 public slots:
     void downloadPublicServers();

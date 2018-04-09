@@ -21,9 +21,12 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     previousHosts = new QComboBox(this);
     previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
 
-    // TODO: Remove the button at the 2.7.0 release
     hps = new HandlePublicServers(this);
-    btnRefreshServers = new QPushButton(tr("Refresh Servers"), this);
+    btnRefreshServers = new QPushButton(this);
+    btnRefreshServers->setIcon(QPixmap("theme:icons/update"));
+    btnRefreshServers->setToolTip(tr("Refresh the server list with known public servers"));
+    btnRefreshServers->setFixedWidth(50);
+
     connect(hps, SIGNAL(sigPublicServersDownloadedSuccessfully()), this, SLOT(rebuildComboBoxList()));
     connect(hps, SIGNAL(sigPublicServersDownloadedUnsuccessfully(int)), this, SLOT(rebuildComboBoxList(int)));
     connect(btnRefreshServers, SIGNAL(released()), this, SLOT(downloadThePublicServers()));
@@ -60,15 +63,6 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
     autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
 
-    publicServersLabel =
-        new QLabel(QString("(<a href=\"%1\">%2</a>)").arg(PUBLIC_SERVERS_URL).arg(tr("Public Servers")));
-    publicServersLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
-    publicServersLabel->setWordWrap(true);
-    publicServersLabel->setTextFormat(Qt::RichText);
-    publicServersLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    publicServersLabel->setOpenExternalLinks(true);
-    publicServersLabel->setAlignment(Qt::AlignCenter);
-
     if (savePasswordCheckBox->isChecked()) {
         autoConnectCheckBox->setChecked(static_cast<bool>(settingsCache->servers().getAutoConnect()));
         autoConnectCheckBox->setEnabled(true);
@@ -91,18 +85,14 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnCancel->setFixedWidth(100);
     connect(btnCancel, SIGNAL(released()), this, SLOT(actCancel()));
 
-    newHostLayout = new QGridLayout;
-    newHostLayout->addWidget(newHostButton, 0, 1);
-    newHostLayout->addWidget(publicServersLabel, 0, 2);
-
     newHolderLayout = new QHBoxLayout;
-    newHolderLayout->addWidget(previousHostButton);
+    newHolderLayout->addWidget(previousHosts);
     newHolderLayout->addWidget(btnRefreshServers);
 
     connectionLayout = new QGridLayout;
-    connectionLayout->addLayout(newHolderLayout, 0, 1, 1, 2);
-    connectionLayout->addWidget(previousHosts, 1, 1);
-    connectionLayout->addLayout(newHostLayout, 2, 1, 1, 2);
+    connectionLayout->addWidget(previousHostButton, 0, 1);
+    connectionLayout->addLayout(newHolderLayout, 1, 1, 1, 2);
+    connectionLayout->addWidget(newHostButton, 2, 1);
     connectionLayout->addWidget(saveLabel, 3, 0);
     connectionLayout->addWidget(saveEdit, 3, 1);
     connectionLayout->addWidget(hostLabel, 4, 0);

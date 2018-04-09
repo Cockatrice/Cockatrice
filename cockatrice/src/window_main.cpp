@@ -143,14 +143,12 @@ void MainWindow::statusChanged(ClientStatus _status)
             aSinglePlayer->setEnabled(true);
             aConnect->setEnabled(true);
             aRegister->setEnabled(true);
-            aRefreshServers->setEnabled(true);
             aDisconnect->setEnabled(false);
             break;
         case StatusLoggingIn:
             aSinglePlayer->setEnabled(false);
             aConnect->setEnabled(false);
             aRegister->setEnabled(false);
-            aRefreshServers->setEnabled(false);
             aDisconnect->setEnabled(true);
             break;
         case StatusConnecting:
@@ -235,7 +233,6 @@ void MainWindow::actSinglePlayer()
 
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
-    aRefreshServers->setEnabled(false);
     aSinglePlayer->setEnabled(false);
 
     localServer = new LocalServer(this);
@@ -285,7 +282,6 @@ void MainWindow::localGameEnded()
 
     aConnect->setEnabled(true);
     aRegister->setEnabled(true);
-    aRefreshServers->setEnabled(true);
     aSinglePlayer->setEnabled(true);
 }
 
@@ -640,7 +636,6 @@ void MainWindow::retranslateUi()
     aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
-    aRefreshServers->setText(tr("Refresh servers"));
     aSettings->setText(tr("&Settings..."));
     aSettings->setIcon(QPixmap("theme:icons/settings"));
     aExit->setText(tr("&Exit"));
@@ -685,8 +680,6 @@ void MainWindow::createActions()
     connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
     aRegister = new QAction(this);
     connect(aRegister, SIGNAL(triggered()), this, SLOT(actRegister()));
-    aRefreshServers = new QAction(this);
-    connect(aRefreshServers, SIGNAL(triggered()), this, SLOT(actRefreshServers()));
     aSettings = new QAction(this);
     connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
     aExit = new QAction(this);
@@ -741,7 +734,6 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aConnect);
     cockatriceMenu->addAction(aDisconnect);
     cockatriceMenu->addAction(aRegister);
-    cockatriceMenu->addAction(aRefreshServers);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);

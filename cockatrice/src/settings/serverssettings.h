@@ -63,10 +63,6 @@ public:
     void setClearDebugLogStatus(bool abIsChecked);
     bool getClearDebugLogStatus(bool abDefaultValue);
 
-signals:
-
-public slots:
-
 private:
     explicit ServersSettings(QString settingPath, QObject *parent = nullptr);
     ServersSettings(const ServersSettings & /*other*/);

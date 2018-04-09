@@ -1,6 +1,7 @@
 #include "handle_public_servers.h"
 #include "qt-json/json.h"
 #include "settingscache.h"
+#include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QUrl>
@@ -35,12 +36,12 @@ void HandlePublicServers::actFinishParsingDownloadedData()
 
         auto jsonMap = QtJson::Json::parse(jsonData, jsonSuccessful).toMap();
 
-        if (!jsonSuccessful) {
+        if (jsonSuccessful) {
+            updateServerINISettings(jsonMap);
+        } else {
             qDebug() << "[PUBLIC SERVER HANDLER]"
                      << "JSON Parsing Error";
             emit sigPublicServersDownloadedUnsuccessfully(errorCode);
-        } else {
-            updateServerINISettings(jsonMap);
         }
 
     } else {
@@ -52,8 +53,34 @@ void HandlePublicServers::actFinishParsingDownloadedData()
     reply->deleteLater(); // After an emit() occurs, this object will be deleted
 }
 
+void HandlePublicServers::askToClearServerList()
+{
+    // Give user option to flush old values if they've never done this before
+    QMessageBox messageBox;
+    messageBox.setIconPixmap(QPixmap("theme:icons/update"));
+    messageBox.setWindowTitle(tr("Spring Cleaning"));
+    messageBox.setText(tr("New public server list successfully downloaded.") + "\n" +
+                       tr("Do you want to clear out your old server list?") + "\n" +
+                       tr("This includes saved usernames and passwords"));
+    messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+    auto reply = static_cast<QMessageBox::StandardButton>(messageBox.exec());
+
+    if (reply == QMessageBox::Yes) {
+        for (const auto &pair : savedHostList) {
+            QString serverName = pair.second.getSaveName();
+            settingsCache->servers().removeServer(serverName);
+        }
+        savedHostList.clear();
+        qDebug() << "[PUBLIC SERVER HANDLER]"
+                 << "Cleared old saved hosts";
+    }
+}
+
 void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMap)
 {
+    askToClearServerList();
+
     // Servers available
     auto publicServersJSONList = jsonMap["servers"].toList();
 
@@ -82,10 +109,10 @@ void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMa
             }
         }
 
-        if (!serverFound) {
-            settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
-        } else {
+        if (serverFound) {
             settingsCache->servers().updateExistingServerWithoutLoss(serverName, serverAddress, serverPort);
+        } else {
+            settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
         }
     }
 
