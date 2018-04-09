@@ -592,7 +592,7 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
     mcSpoilerSaveLabel.setEnabled(anInput);
     mpSpoilerSavePathLineEdit->setEnabled(anInput);
     mpSpoilerPathButton->setEnabled(anInput);
-	lastUpdatedLabel.setEnabled(anInput);
+    lastUpdatedLabel.setEnabled(anInput);
     updateNowButton->setEnabled(anInput);
     infoOnSpoilersLabel.setEnabled(anInput);
 
