@@ -509,6 +509,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(mpSpoilerPathButton, SIGNAL(clicked()), this, SLOT(spoilerPathButtonClicked()));
 
     updateNowButton = new QPushButton(tr("Update Spoilers"));
+    updateNowButton->setFixedWidth(200);
     connect(updateNowButton, SIGNAL(clicked()), this, SLOT(updateSpoilers()));
 
     // Update the GUI depending on if the box is ticked or not
@@ -556,7 +557,6 @@ void DeckEditorSettingsPage::updateSpoilers()
 void DeckEditorSettingsPage::unlockSettings()
 {
     updateNowButton->setDisabled(false);
-    updateNowButton->setFixedWidth(200);
     updateNowButton->setText(tr("Update Spoilers"));
 }
 
