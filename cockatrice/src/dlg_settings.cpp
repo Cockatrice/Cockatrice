@@ -556,6 +556,7 @@ void DeckEditorSettingsPage::updateSpoilers()
 void DeckEditorSettingsPage::unlockSettings()
 {
     updateNowButton->setDisabled(false);
+    updateNowButton->setFixedWidth(200);
     updateNowButton->setText(tr("Update Spoilers"));
 }
 
