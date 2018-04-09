@@ -301,3 +301,5 @@ The preferred flow of operations is:
  * tag the release following the previously described syntax in order to get it built by CI;
  * wait for CI to upload the binaries, double check if everything is in order
  * after the release is complete, update the version number again to "next targeted beta version", typically increasing `PROJECT_VERSION_PATCH` by one.
+
+**NOTE 3:** When releasing a new stable version, all the previous beta versions should be deleted. This is needed for Cockatrice to pick up the stable release also for users that chose the "beta" release channel.
