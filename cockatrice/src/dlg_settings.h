@@ -156,6 +156,7 @@ private:
     QLineEdit *mpSpoilerSavePathLineEdit;
     QLabel mcSpoilerSaveLabel;
     QLabel mcGeneralMessageLabel;
+    QLabel lastUpdatedLabel
     QLabel infoOnSpoilersLabel;
     QPushButton *mpSpoilerPathButton;
     QPushButton *updateNowButton;
