@@ -38,33 +38,32 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     newHostButton = new QRadioButton(tr("New Host"), this);
 
     saveLabel = new QLabel(tr("Name:"));
-    saveEdit = new QLineEdit(settingsCache->servers().getSaveName());
+    saveEdit = new QLineEdit;
     saveLabel->setBuddy(saveEdit);
 
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit(settingsCache->servers().getHostname());
+    hostEdit = new QLineEdit;
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));
-    portEdit = new QLineEdit(settingsCache->servers().getPort("4747"));
+    portEdit = new QLineEdit;
     portLabel->setBuddy(portEdit);
 
     playernameLabel = new QLabel(tr("Player &name:"));
-    playernameEdit = new QLineEdit(settingsCache->servers().getPlayerName("Player"));
+    playernameEdit = new QLineEdit;
     playernameLabel->setBuddy(playernameEdit);
 
     passwordLabel = new QLabel(tr("P&assword:"));
-    passwordEdit = new QLineEdit(settingsCache->servers().getPassword());
+    passwordEdit = new QLineEdit;
     passwordLabel->setBuddy(passwordEdit);
     passwordEdit->setEchoMode(QLineEdit::Password);
 
     savePasswordCheckBox = new QCheckBox(tr("&Save password"));
-    savePasswordCheckBox->setChecked(settingsCache->servers().getSavePassword());
 
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
     autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
 
-    if (savePasswordCheckBox->isChecked()) {
+    if (settingsCache->servers().getSavePassword()) {
         autoConnectCheckBox->setChecked(static_cast<bool>(settingsCache->servers().getAutoConnect()));
         autoConnectCheckBox->setEnabled(true);
     } else {
@@ -74,6 +73,16 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     }
 
     connect(savePasswordCheckBox, SIGNAL(stateChanged(int)), this, SLOT(passwordSaved(int)));
+
+    serverIssuesLabel =
+        new QLabel(tr("If you have any trouble connecting or registering then contact the server staff for help!"));
+    serverIssuesLabel->setWordWrap(true);
+    serverContactLink = new QLabel;
+    serverContactLink->setTextFormat(Qt::RichText);
+    serverContactLink->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    serverContactLink->setOpenExternalLinks(true);
+
+    updateDisplayInfo(previousHosts->currentText());
 
     btnForgotPassword = new QPushButton(tr("Forgot password"));
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
@@ -110,6 +119,10 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     restrictionsGroupBox = new QGroupBox(tr("Server"));
     restrictionsGroupBox->setLayout(connectionLayout);
 
+    serverInfoLayout = new QGridLayout;
+    serverInfoLayout->addWidget(serverIssuesLabel, 0, 0);
+    serverInfoLayout->addWidget(serverContactLink, 1, 0);
+
     loginLayout = new QGridLayout;
     loginLayout->addWidget(playernameLabel, 0, 0);
     loginLayout->addWidget(playernameEdit, 0, 1);
@@ -120,13 +133,17 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
 
+    serverInfoGroupBox = new QGroupBox(tr("Server info"));
+    serverInfoGroupBox->setLayout(serverInfoLayout);
+
     btnGroupBox = new QGroupBox(tr(""));
     btnGroupBox->setLayout(buttons);
 
     grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
     grid->addWidget(loginGroupBox, 1, 0);
-    grid->addWidget(btnGroupBox, 2, 0);
+    grid->addWidget(serverInfoGroupBox, 2, 0);
+    grid->addWidget(btnGroupBox, 3, 0);
 
     mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -239,6 +256,13 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
 
     if (savePasswordStatus) {
         passwordEdit->setText(data.at(4));
+    }
+
+    if (!data.at(6).isEmpty()) {
+        QString formattedLink = "<a href=\"" + data.at(6) + "\">" + data.at(0) + "</a>";
+        serverContactLink->setText(formattedLink);
+    } else {
+        serverContactLink->setText("");
     }
 }
 
