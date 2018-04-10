@@ -61,11 +61,11 @@ private slots:
     void downloadThePublicServers();
 
 private:
-    QGridLayout *newHostLayout, *connectionLayout, *buttons, *loginLayout, *grid;
+    QGridLayout *newHostLayout, *connectionLayout, *buttons, *loginLayout, *serverInfoLayout, *grid;
     QHBoxLayout *newHolderLayout;
-    QGroupBox *loginGroupBox, *btnGroupBox, *restrictionsGroupBox;
+    QGroupBox *loginGroupBox, *serverInfoGroupBox, *btnGroupBox, *restrictionsGroupBox;
     QVBoxLayout *mainLayout;
-    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel;
+    QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel, *serverIssuesLabel, *serverContactLink;
     QLineEdit *hostEdit, *portEdit, *playernameEdit, *passwordEdit, *saveEdit;
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;

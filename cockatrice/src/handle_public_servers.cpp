@@ -72,6 +72,7 @@ void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMa
 
         QString serverName = serverMap["name"].toString();
         QString serverPort = serverMap["port"].toString();
+        QString serverSite = serverMap["site"].toString();
 
         bool serverFound = false;
         for (const auto &iter : savedHostList) {
@@ -83,7 +84,7 @@ void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMa
         }
 
         if (serverFound) {
-            settingsCache->servers().updateExistingServerWithoutLoss(serverName, serverAddress, serverPort);
+            settingsCache->servers().updateExistingServerWithoutLoss(serverName, serverAddress, serverPort, serverSite);
         } else {
             settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
         }

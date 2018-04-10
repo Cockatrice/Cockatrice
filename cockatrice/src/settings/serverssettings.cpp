@@ -40,6 +40,13 @@ QString ServersSettings::getSaveName(QString defaultname)
     return saveName == QVariant() ? std::move(defaultname) : saveName.toString();
 }
 
+QString ServersSettings::getSite(QString defaultSite)
+{
+    int index = getPrevioushostindex(getPrevioushostName());
+    QVariant site = getValue(QString("site%1").arg(index), "server", "server_details");
+    return site == QVariant() ? std::move(defaultSite) : site.toString();
+}
+
 QString ServersSettings::getPrevioushostName()
 {
     return getValue("previoushostName", "server").toString();
@@ -181,9 +188,10 @@ void ServersSettings::addNewServer(const QString &saveName,
                                    const QString &port,
                                    const QString &username,
                                    const QString &password,
-                                   bool savePassword)
+                                   bool savePassword,
+                                   const QString &site)
 {
-    if (updateExistingServer(saveName, serv, port, username, password, savePassword))
+    if (updateExistingServer(saveName, serv, port, username, password, savePassword, site))
         return;
 
     int index = getValue("totalServers", "server", "server_details").toInt() + 1;
@@ -195,6 +203,7 @@ void ServersSettings::addNewServer(const QString &saveName,
     setValue(savePassword, QString("savePassword%1").arg(index), "server", "server_details");
     setValue(index, "totalServers", "server", "server_details");
     setValue(password, QString("password%1").arg(index), "server", "server_details");
+    setValue(site, QString("site%1").arg(index), "server", "server_details");
 }
 
 void ServersSettings::removeServer(QString servAddr)
@@ -209,6 +218,7 @@ void ServersSettings::removeServer(QString servAddr)
             deleteValue(QString("savePassword%1").arg(i), "server", "server_details");
             deleteValue(QString("password%1").arg(i), "server", "server_details");
             deleteValue(QString("saveName%1").arg(i), "server", "server_details");
+            deleteValue(QString("site%1").arg(i), "server", "server_details");
             return;
         }
     }
@@ -220,6 +230,7 @@ void ServersSettings::removeServer(QString servAddr)
 bool ServersSettings::updateExistingServerWithoutLoss(QString saveName,
                                                       QString serv,
                                                       QString port,
+                                                      QString site,
                                                       QString username,
                                                       QString password,
                                                       bool savePassword)
@@ -243,6 +254,10 @@ bool ServersSettings::updateExistingServerWithoutLoss(QString saveName,
                 setValue(QString(), QString("password%1").arg(i), "server", "server_details");
             }
 
+            if (!site.isEmpty()) {
+                setValue(site, QString("site%1").arg(i), "server", "server_details");
+            }
+
             setValue(savePassword, QString("savePassword%1").arg(i), "server", "server_details");
             setValue(saveName, QString("saveName%1").arg(i), "server", "server_details");
 
@@ -257,8 +272,9 @@ bool ServersSettings::updateExistingServer(QString saveName,
                                            QString port,
                                            QString username,
                                            QString password,
-                                           bool savePassword)
+                                           bool savePassword,
+                                           QString site)
 {
-    return updateExistingServerWithoutLoss(std::move(saveName), std::move(serv), std::move(port), std::move(username),
-                                           std::move(password), savePassword);
+    return updateExistingServerWithoutLoss(std::move(saveName), std::move(serv), std::move(port), std::move(site),
+                                           std::move(username), std::move(password), savePassword);
 }

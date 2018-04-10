@@ -15,12 +15,13 @@ private:
     QString port;
     QString username;
     QString password;
+    QString site;
     bool savePassword;
     bool isCustom;
 
 public:
     UserConnection_Information();
-    UserConnection_Information(QString, QString, QString, QString, QString, bool);
+    UserConnection_Information(QString, QString, QString, QString, QString, bool, QString);
     QString getSaveName() const
     {
         return saveName;
@@ -44,6 +45,10 @@ public:
     bool getSavePassword() const
     {
         return savePassword;
+    }
+    QString getSite() const
+    {
+        return site;
     }
     QMap<QString, std::pair<QString, UserConnection_Information>> getServerInfo();
     QStringList getServerInfo(const QString &find);
