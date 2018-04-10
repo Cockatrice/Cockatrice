@@ -183,11 +183,13 @@ void MainWindow::activateAccepted()
 
 void MainWindow::actConnect()
 {
-    auto *dlg = new DlgConnect(this);
-    connect(dlg, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
-    if (dlg->exec())
-        client->connectToServer(dlg->getHost(), static_cast<unsigned int>(dlg->getPort()), dlg->getPlayerName(),
-                                dlg->getPassword());
+    dlgConnect = new DlgConnect(this);
+    connect(dlgConnect, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
+
+    if (dlgConnect->exec()) {
+        client->connectToServer(dlgConnect->getHost(), static_cast<unsigned int>(dlgConnect->getPort()),
+                                dlgConnect->getPlayerName(), dlgConnect->getPassword());
+    }
 }
 
 void MainWindow::actRegister()
@@ -233,7 +235,7 @@ void MainWindow::actSinglePlayer()
 
     Command_CreateGame createCommand;
     createCommand.set_max_players(static_cast<google::protobuf::uint32>(numberPlayers));
-    mainClient->sendCommand(mainClient->prepareRoomCommand(createCommand, 0));
+    mainClient->sendCommand(LocalClient::prepareRoomCommand(createCommand, 0));
 }
 
 void MainWindow::actWatchReplay()
@@ -251,7 +253,7 @@ void MainWindow::actWatchReplay()
     QByteArray buf = file.readAll();
     file.close();
 
-    auto *replay = new GameReplay;
+    replay = new GameReplay;
     replay->ParseFromArray(buf.data(), buf.size());
 
     tabSupervisor->openReplay(replay);
@@ -832,7 +834,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::createTrayIcon()
 {
-    auto *trayIconMenu = new QMenu(this);
+    trayIconMenu = new QMenu(this);
     trayIconMenu->addAction(closeAction);
 
     trayIcon = new QSystemTrayIcon(this);
@@ -1205,9 +1207,9 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
 
 void MainWindow::actManageSets()
 {
-    auto *w = new WndSets;
-    w->setWindowModality(Qt::WindowModal);
-    w->show();
+    wndSets = new WndSets;
+    wndSets->setWindowModality(Qt::WindowModal);
+    wndSets->show();
 }
 
 void MainWindow::actEditTokens()

@@ -16,35 +16,36 @@ private:
     QString username;
     QString password;
     bool savePassword;
+    bool isCustom;
 
 public:
     UserConnection_Information();
     UserConnection_Information(QString, QString, QString, QString, QString, bool);
-    QString getSaveName()
+    QString getSaveName() const
     {
         return saveName;
     }
-    QString getServer()
+    QString getServer() const
     {
         return server;
     }
-    QString getPort()
+    QString getPort() const
     {
         return port;
     }
-    QString getUsername()
+    QString getUsername() const
     {
         return username;
     }
-    QString getPassword()
+    QString getPassword() const
     {
         return password;
     }
-    bool getSavePassword()
+    bool getSavePassword() const
     {
         return savePassword;
     }
-    QMap<QString, UserConnection_Information> getServerInfo();
+    QMap<QString, std::pair<QString, UserConnection_Information>> getServerInfo();
     QStringList getServerInfo(const QString &find);
 };
 #endif
