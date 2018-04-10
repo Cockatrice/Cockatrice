@@ -9,6 +9,6 @@ ________________________________________________________________________________
 
    <!-- This repository is ONLY about development of the Cockatrice app.
         If you have any problems with a server (e.g. registering, connecting, ban...)
-        you have to contact that servers owner/admin. 
+        you have to contact that server's owner/admin. 
         Check this list of public servers with webpage links and contact detalis:
         https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers -->
