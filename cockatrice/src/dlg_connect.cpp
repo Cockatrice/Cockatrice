@@ -75,7 +75,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     connect(savePasswordCheckBox, SIGNAL(stateChanged(int)), this, SLOT(passwordSaved(int)));
 
     serverIssuesLabel =
-        new QLabel(tr("If you have any trouble connecting or registering the you should contact the server staff."));
+        new QLabel(tr("If you have any trouble connecting or registering then contact the server staff for help!"));
     serverIssuesLabel->setWordWrap(true);
     serverContactLink = new QLabel;
     serverContactLink->setTextFormat(Qt::RichText);

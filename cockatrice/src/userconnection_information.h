@@ -15,8 +15,8 @@ private:
     QString port;
     QString username;
     QString password;
-    QString site;
     bool savePassword;
+    QString site;
     bool isCustom;
 
 public:
