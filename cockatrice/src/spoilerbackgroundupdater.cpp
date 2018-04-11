@@ -162,17 +162,31 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
     // If the user has notifications enabled, let them know
     // when the database was last updated
     if (trayIcon) {
+        qDebug() << "[SBU]"
+                 << "Attempting to display";
         QList<QByteArray> lines = data.split('\n');
 
-        foreach (QByteArray line, lines) {
+        for (const QByteArray &line : lines) {
+            qDebug() << "[SBU]"
+                     << "LINE:" << line;
             if (line.indexOf("created:") > -1) {
                 QString timeStamp = QString(line).replace("created:", "").trimmed();
+                qDebug() << "[SBU]"
+                         << "TIMESTAMP BEFORE CHOMP:" << timeStamp;
                 timeStamp.chop(6); // Remove " (UTC)"
+                qDebug() << "[SBU]"
+                         << "TIMESTAMP AFTER CHOMP:" << timeStamp;
 
                 auto utcTime = QDateTime::fromString(timeStamp, QString("ddd, MMM dd yyyy, hh:mm:ss"));
+                qDebug() << "[SBU]"
+                         << "TIME BEFORE TIMEZONE" << utcTime;
                 utcTime.setTimeSpec(Qt::UTC);
+                qDebug() << "[SBU]"
+                         << "TIME AFTER TIMEZONE" << utcTime;
 
                 QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");
+                qDebug() << "[SBU]"
+                         << "LOCAL TIME (WHAT SHOULD BE CORRECT):" << localTime;
 
                 trayIcon->showMessage(tr("Spoilers have been updated!"), tr("Last change:") + " " + localTime);
                 emit spoilersUpdatedSuccessfully();
