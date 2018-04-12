@@ -63,6 +63,7 @@ Cockatrice uses the [Google Developer Documentation Style Guide](https://develop
 
 - [Cockatrice Official Site](https://cockatrice.github.io)
 - [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
+- [Cockatrice Official Discord](https://discord.gg/3Z9yzmA)
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
 
