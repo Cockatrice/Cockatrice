@@ -92,7 +92,6 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(CockatriceLogger);
     if (app.arguments().contains("--debug-output"))
         Logger::getInstance().logToFile(true);
-    QLocale::setDefault(QLocale::English);
 
 #ifdef Q_OS_WIN
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
@@ -123,6 +122,8 @@ int main(int argc, char *argv[])
     qtTranslator = new QTranslator;
     translator = new QTranslator;
     installNewTranslator();
+
+    QLocale::setDefault(QLocale::English);
 
     qsrand(QDateTime::currentDateTime().toTime_t());
     qDebug("main(): starting main program");
