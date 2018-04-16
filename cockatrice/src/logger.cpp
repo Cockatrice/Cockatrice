@@ -1,6 +1,7 @@
 #include "logger.h"
 #include "version_string.h"
 #include <QDateTime>
+#include <QLocale>
 #include <iostream>
 
 #define LOGGER_MAX_ENTRIES 128
@@ -14,6 +15,7 @@ Logger::Logger() : logToFileEnabled(false)
 {
     logBuffer.append(getClientVersion());
     logBuffer.append(getSystemArchitecture());
+    logBuffer.append(getSystemLocale());
     std::cerr << getClientVersion().toStdString() << std::endl;
     std::cerr << getSystemArchitecture().toStdString() << std::endl;
 }
@@ -105,4 +107,11 @@ QString Logger::getClientOperatingSystem()
 #endif
 
     return {};
+}
+
+QString Logger::getSystemLocale()
+{
+    QString result;
+    result.append(tr("System Locale") + ": " + QLocale().name());
+    return result;
 }

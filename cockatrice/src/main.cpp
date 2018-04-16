@@ -70,6 +70,7 @@ void installNewTranslator()
     qApp->installTranslator(qtTranslator);
     translator->load(translationPrefix + "_" + lang, translationPath);
     qApp->installTranslator(translator);
+    qDebug() << "Language changed: " << lang;
 }
 
 QString const generateClientID()
@@ -86,12 +87,12 @@ QString const generateClientID()
 
 int main(int argc, char *argv[])
 {
-    QLocale::setDefault(QLocale::English);
     QApplication app(argc, argv);
 
     qInstallMessageHandler(CockatriceLogger);
     if (app.arguments().contains("--debug-output"))
         Logger::getInstance().logToFile(true);
+    QLocale::setDefault(QLocale::English);
 
 #ifdef Q_OS_WIN
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
