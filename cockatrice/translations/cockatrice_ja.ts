@@ -424,7 +424,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_settings.cpp" line="573"/>
         <source>Choose path</source>
-        <translation type="unfinished"/>
+        <translation>パスを選ぶ</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="598"/>
@@ -444,7 +444,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_settings.cpp" line="601"/>
         <source>Hey, something&apos;s here finally!</source>
-        <translation type="unfinished"/>
+        <translation>ようやくなんか出来たらしいぞ↓</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="602"/>
@@ -1020,7 +1020,8 @@ To remove your current avatar, confirm without choosing a new image.</source>
         <location filename="../src/dlg_edit_tokens.cpp" line="150"/>
         <source>The chosen name conflicts with an existing card or token.
 Make sure to enable the &apos;Token&apos; set in the &quot;Manage sets&quot; dialog to display them correctly.</source>
-        <translation type="unfinished"/>
+        <translation>選択された名前は、既存のカードやトークンと競合しています。
+正しく表示するためにセットの設定ダイアログでトークンの設定を有効にしていることを確認してください。</translation>
     </message>
 </context>
 <context>
@@ -1605,7 +1606,7 @@ Please visit the download page to update manually.</source>
         <location filename="../src/dlg_update.cpp" line="148"/>
         <location filename="../src/dlg_update.cpp" line="159"/>
         <source>Changelog</source>
-        <translation type="unfinished"/>
+        <translation>変更履歴</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="149"/>
@@ -1677,7 +1678,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_viewlog.cpp" line="18"/>
         <source>Clear log when closing</source>
-        <translation type="unfinished"/>
+        <translation>閉じるときにログをクリアする</translation>
     </message>
     <message>
         <location filename="../src/dlg_viewlog.cpp" line="25"/>
@@ -1690,7 +1691,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/filterbuilder.cpp" line="28"/>
         <source>Type your filter here</source>
-        <translation type="unfinished"/>
+        <translation>ここにフィルタを入力</translation>
     </message>
 </context>
 <context>
@@ -2006,7 +2007,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/logger.cpp" line="92"/>
         <source>Client Operating System</source>
-        <translation type="unfinished"/>
+        <translation>クライアントのOS</translation>
     </message>
     <message>
         <location filename="../src/logger.cpp" line="95"/>
@@ -2739,7 +2740,9 @@ Cockatrice will now reload the card database.</source>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Manage Sets&quot; dialog.</source>
-        <translation type="unfinished"/>
+        <translation>こんにちは！　現行バージョンのCockatriceの最初の起動です。
+カードデータベースのすべてのセットが有効化されています。
+「セットの設定」ウィンドウ内の特定のセットを無効にしたり、順序を変更をする方法の詳細をお読みください。</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1083"/>
@@ -2875,7 +2878,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="321"/>
         <source>%1 puts %2%3 into their library %4 cards from the top.</source>
-        <translation type="unfinished"/>
+        <translation>%1は%2を%3ライブラリーの一番上から%4枚目に置いた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="324"/>
@@ -2900,17 +2903,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="546"/>
         <source>Untap</source>
-        <translation>アンタップ</translation>
+        <translation>アンタップ・ステップ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="551"/>
         <source>Upkeep</source>
-        <translation>アップキープ</translation>
+        <translation>アップキープ・ステップ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="556"/>
         <source>Draw</source>
-        <translation>ドロー</translation>
+        <translation>ドロー・ステップ</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="561"/>
@@ -3827,12 +3830,12 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="2127"/>
         <source>Place card X cards from top of library</source>
-        <translation>ライブラリーの一番上からX枚を置く</translation>
+        <translation>ライブラリーの一番上からX枚目にカードを置く</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2128"/>
         <source>How many cards from the top of the deck should this card be placed:</source>
-        <translation type="unfinished"/>
+        <translation>このカードを上から何枚目に置くか</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2707"/>
@@ -3853,7 +3856,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="685"/>
         <source>&amp;Tap / Untap</source>
-        <translation type="unfinished"/>
+        <translation>タップ / アンタップ</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="708"/>
@@ -4232,7 +4235,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="115"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="136"/>
@@ -5005,7 +5008,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="148"/>
         <source>Private message from</source>
-        <translation type="unfinished"/>
+        <translation>個人チャット:</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="165"/>
@@ -5773,12 +5776,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/window_sets.cpp" line="106"/>
         <source>Enabled Sets (Top to Bottom)</source>
-        <translation type="unfinished"/>
+        <translation>有効なセット（昇順）</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="107"/>
         <source>Disabled Sets (Top to Bottom)</source>
-        <translation type="unfinished"/>
+        <translation>無効なセット（昇順）</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="132"/>
@@ -6223,17 +6226,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1772"/>
         <source>Save deck (clip)</source>
-        <translation type="unfinished"/>
+        <translation>クリップボードにコピー</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1773"/>
         <source>Save deck (clip; no annotations)</source>
-        <translation type="unfinished"/>
+        <translation>アノテーションなしでコピー</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1851"/>
         <source>Tap / Untap Card</source>
-        <translation type="unfinished"/>
+        <translation>タップ / アンタップ</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1852"/>
