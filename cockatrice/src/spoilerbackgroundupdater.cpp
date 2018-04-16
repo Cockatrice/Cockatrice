@@ -3,6 +3,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
+#include <QLocale>
 #include <QMessageBox>
 #include <QNetworkReply>
 #include <QUrl>
@@ -165,11 +166,11 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
         QList<QByteArray> lines = data.split('\n');
 
         foreach (QByteArray line, lines) {
-            if (line.indexOf("created:") > -1) {
+            if (line.contains("created:")) {
                 QString timeStamp = QString(line).replace("created:", "").trimmed();
                 timeStamp.chop(6); // Remove " (UTC)"
 
-                auto utcTime = QDateTime::fromString(timeStamp, QString("ddd, MMM dd yyyy, hh:mm:ss"));
+                auto utcTime = QLocale().toDateTime(timeStamp, "ddd, MMM dd yyyy, hh:mm:ss");
                 utcTime.setTimeSpec(Qt::UTC);
 
                 QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");

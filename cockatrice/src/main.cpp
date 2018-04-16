@@ -39,6 +39,7 @@
 #include <QDir>
 #include <QFile>
 #include <QLibraryInfo>
+#include <QLocale>
 #include <QSystemTrayIcon>
 #include <QTextCodec>
 #include <QTextStream>
@@ -85,6 +86,7 @@ QString const generateClientID()
 
 int main(int argc, char *argv[])
 {
+    QLocale::setDefault(QLocale::English);
     QApplication app(argc, argv);
 
     qInstallMessageHandler(CockatriceLogger);
