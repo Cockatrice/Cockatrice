@@ -414,57 +414,57 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
         <location filename="../src/dlg_settings.cpp" line="506"/>
         <location filename="../src/dlg_settings.cpp" line="554"/>
         <source>Update Spoilers</source>
-        <translation type="unfinished"/>
+        <translation>Atualizar &apos;spoilers&apos;</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="543"/>
         <source>Updating Spoilers</source>
-        <translation type="unfinished"/>
+        <translation>Atualizando &apos;spoilers&apos;</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="573"/>
         <source>Choose path</source>
-        <translation type="unfinished"/>
+        <translation>Selecione o caminho</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="598"/>
         <source>Spoilers</source>
-        <translation type="unfinished"/>
+        <translation>&apos;Spoilers&apos;</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="599"/>
         <source>Download Spoilers Automatically</source>
-        <translation type="unfinished"/>
+        <translation>Baixar &apos;spoilers&apos; automaticamente</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="600"/>
         <source>Spoiler Location:</source>
-        <translation type="unfinished"/>
+        <translation>Localização do &apos;spoiler&apos;:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="601"/>
         <source>Hey, something&apos;s here finally!</source>
-        <translation type="unfinished"/>
+        <translation>Ei, finalmente tem algo aqui!</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="602"/>
         <source>Last Updated</source>
-        <translation type="unfinished"/>
+        <translation>Atualizado por último</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="603"/>
         <source>Spoilers download automatically on launch</source>
-        <translation type="unfinished"/>
+        <translation>Baixar automaticamente &apos;spoilers&apos; ao iniciar</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="604"/>
         <source>Press the button to manually update without relaunching</source>
-        <translation type="unfinished"/>
+        <translation>Pressione o botão para atualizar manualmente sem reinicializar</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="605"/>
         <source>Do not close settings until manual update complete</source>
-        <translation type="unfinished"/>
+        <translation>Não feche as configurações até que a atualização manual se complete</translation>
     </message>
 </context>
 <context>
@@ -1020,7 +1020,7 @@ Para remover o avatar atual, confirme sem escolher uma nova imagem.</translation
         <location filename="../src/dlg_edit_tokens.cpp" line="150"/>
         <source>The chosen name conflicts with an existing card or token.
 Make sure to enable the &apos;Token&apos; set in the &quot;Manage sets&quot; dialog to display them correctly.</source>
-        <translation type="unfinished"/>
+        <translation>O nome escolhido está em conflito com uma carta ou ficha existente. Tenha certeza de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar expansões&quot; para mostrá-las corretamente.</translation>
     </message>
 </context>
 <context>
@@ -1523,7 +1523,7 @@ Você gostaria de alterar seu local de configuração do banco de dados?</transl
     <message>
         <location filename="../src/dlg_update.cpp" line="26"/>
         <source>Current release channel</source>
-        <translation type="unfinished"/>
+        <translation>Canal de lançamento atual</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="35"/>
@@ -1544,12 +1544,12 @@ Você gostaria de alterar seu local de configuração do banco de dados?</transl
         <location filename="../src/dlg_update.cpp" line="60"/>
         <source>Cockatrice was not built with SSL support, therefore you cannot download updates automatically! 
 Please visit the download page to update manually.</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice não possui suporte a SSL, por causa disso você não pode baixar updates automaticamente! Por favor visite a página de downloads para atualizar manualmente. </translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="119"/>
         <source>Finished checking for updates</source>
-        <translation type="unfinished"/>
+        <translation>Busca por atualizações concluída</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="129"/>
@@ -1564,7 +1564,7 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="131"/>
         <source>You are already running the latest version available in the chosen release channel.</source>
-        <translation type="unfinished"/>
+        <translation>Você já está executando a última versão disponível no canal de lançamento escolhido.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="132"/>
@@ -1574,7 +1574,7 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="133"/>
         <source>Selected release channel</source>
-        <translation type="unfinished"/>
+        <translation>Canal de lançamento selecionado</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="145"/>
@@ -1615,12 +1615,12 @@ Please visit the download page to update manually.</source>
         <location filename="../src/dlg_update.cpp" line="161"/>
         <source>Unfortunately there are no download packages available for your operating system. 
 You may have to build from source yourself.</source>
-        <translation type="unfinished"/>
+        <translation>Infelizmente não há pacotes de download disponíveis para o seu sistema operacional. Você precisará montar da fonte.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="164"/>
         <source>Please check the download page manually and visit the wiki for instructions on compiling.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor verificar a página de download manualmente e acesse a wiki para instruções sobre compilação.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="200"/>
@@ -1630,7 +1630,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="208"/>
         <source>An error occurred while downloading an update:</source>
-        <translation type="unfinished"/>
+        <translation>Um erro ocorreu enquanto uma atualização era baixada:</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="222"/>
@@ -1640,12 +1640,12 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="223"/>
         <source>Try to update manually by closing Cockatrice and running the installer.</source>
-        <translation type="unfinished"/>
+        <translation>Tente atualizar o Cockatrice manualmente fechando-o e rodando o instalador.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="224"/>
         <source>Download location</source>
-        <translation type="unfinished"/>
+        <translation>Localização do download</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="91"/>
@@ -1688,7 +1688,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/filterbuilder.cpp" line="28"/>
         <source>Type your filter here</source>
-        <translation type="unfinished"/>
+        <translation>Digite seu filtro aqui</translation>
     </message>
 </context>
 <context>
@@ -1925,7 +1925,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_settings.cpp" line="293"/>
         <source>Paths (editing disabled in portable mode)</source>
-        <translation type="unfinished"/>
+        <translation>Caminhos (edição desabilitada no modo portátil)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="295"/>
@@ -2004,12 +2004,12 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/logger.cpp" line="92"/>
         <source>Client Operating System</source>
-        <translation type="unfinished"/>
+        <translation>Sistema Operacional do Cliente</translation>
     </message>
     <message>
         <location filename="../src/logger.cpp" line="95"/>
         <source>Build Architecture</source>
-        <translation type="unfinished"/>
+        <translation>Construir Arquitetura</translation>
     </message>
     <message>
         <location filename="../src/logger.cpp" line="96"/>
@@ -2405,7 +2405,7 @@ Você precisa fornecer o código de ativação recebido por email.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="497"/>
         <source>It appears you are attempting to register a new account on this server yet you already have an account registered with the email provided. This server restricts the number of accounts a user can register per address.  Please contact the server operator for further assistance or to obtain your credential information.</source>
-        <translation type="unfinished"/>
+        <translation>Aparentemente você está tentando registrar uma nova conta nesse servidor, porém você já tem uma conta registrada com o e-mail fornecido. Este servidor restringe a quantidade de contas que podem ser registradas por endereço. Por favor contate o operador do servidor para assistência posterior ou para obter informações das suas credenciais.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="503"/>
@@ -2562,7 +2562,7 @@ A versão local é %1 e a versão remota é %2.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="630"/>
         <source>Check for Client Updates</source>
-        <translation type="unfinished"/>
+        <translation>Checando por Atualizações do Cliente</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="631"/>
@@ -2732,14 +2732,16 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas</translation>
     <message>
         <location filename="../src/window_main.cpp" line="626"/>
         <source>&amp;Manage sets...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Gerenciar expansões...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="968"/>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Manage Sets&quot; dialog.</source>
-        <translation type="unfinished"/>
+        <translation>Olá! Aparentemente você está rodando essa versão do Cockatrice pela primeira vez.
+Todas as expansões do banco de dados de cartas foram habilitadas.
+Leia mais sobre mudar a ordem das expansões ou desabilitando expansões específicas na aba &quot;Gerenciar Expansões&quot;.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1083"/>
@@ -2876,7 +2878,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="321"/>
         <source>%1 puts %2%3 into their library %4 cards from the top.</source>
-        <translation type="unfinished"/>
+        <translation>%1 coloca %2%3 do seu grimório %4 cartas abaixo do topo.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="324"/>
@@ -2911,7 +2913,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="556"/>
         <source>Draw</source>
-        <translation type="unfinished"/>
+        <translation>Compra</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="561"/>
@@ -2951,7 +2953,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="596"/>
         <source>End/Cleanup</source>
-        <translation type="unfinished"/>
+        <translation>Final/Limpeza</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="601"/>
@@ -3808,12 +3810,12 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
         <location filename="../src/player.cpp" line="1080"/>
         <location filename="../src/player.cpp" line="2834"/>
         <source>C&amp;reate another %1 token</source>
-        <translation type="unfinished"/>
+        <translation>Criar outra ficha %1</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1223"/>
         <source>Create tokens</source>
-        <translation type="unfinished"/>
+        <translation>Criar fichas</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1350"/>
@@ -3828,18 +3830,18 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="2127"/>
         <source>Place card X cards from top of library</source>
-        <translation type="unfinished"/>
+        <translation>Colocar a carta X cartas do topo do grimório</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2128"/>
         <source>How many cards from the top of the deck should this card be placed:</source>
-        <translation type="unfinished"/>
+        <translation>Quantas cartas do topo do grimório esse card deve ser posto:</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2707"/>
         <location filename="../src/player.cpp" line="2733"/>
         <source>Attach to </source>
-        <translation type="unfinished"/>
+        <translation>Anexar à</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2749"/>
@@ -3854,7 +3856,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="685"/>
         <source>&amp;Tap / Untap</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Virar / Desvirar</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="708"/>
@@ -4212,48 +4214,48 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="98"/>
         <source>Spoilers season has ended</source>
-        <translation type="unfinished"/>
+        <translation>Temporada de &apos;spoilers&apos; encerrada</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="98"/>
         <source>Deleting spoiler.xml. Please run Oracle</source>
-        <translation type="unfinished"/>
+        <translation>Deletando spoiler.xml. Favor rodar o Oracle</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="108"/>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="115"/>
         <source>Spoilers download failed</source>
-        <translation type="unfinished"/>
+        <translation>Falha no download de &apos;spoilers&apos;</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="108"/>
         <source>No internet connection</source>
-        <translation type="unfinished"/>
+        <translation>Sem conexão com a internet</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="115"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="136"/>
         <source>Spoilers already up to date</source>
-        <translation type="unfinished"/>
+        <translation>&apos;Spoilers&apos; já atualizados</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="136"/>
         <source>No new spoilers added</source>
-        <translation type="unfinished"/>
+        <translation>Nenhum &apos;spoiler&apos; novo adicionado</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="177"/>
         <source>Spoilers have been updated!</source>
-        <translation type="unfinished"/>
+        <translation>&apos;Spoilers&apos; foram adicionados!</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="177"/>
         <source>Last change:</source>
-        <translation type="unfinished"/>
+        <translation>Última alteração:</translation>
     </message>
 </context>
 <context>
@@ -4382,42 +4384,42 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="326"/>
         <source>Search by card name</source>
-        <translation type="unfinished"/>
+        <translation>Procurar pelo nome da carta</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="570"/>
         <source>Save deck to clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Salvar grimório da área de colagem</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="571"/>
         <source>Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Anotado</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="572"/>
         <source>Not Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Não anotado</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="576"/>
         <source>&amp;Send deck to online service</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Enviar grimório para serviço online</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="577"/>
         <source>Create decklist (decklist.org)</source>
-        <translation type="unfinished"/>
+        <translation>Criar decklist (decklist.org)</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="578"/>
         <source>Analyze deck (deckstats.net)</source>
-        <translation type="unfinished"/>
+        <translation>Analisar grimório (deckstats.net)</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="579"/>
         <source>Analyze deck (tappedout.net)</source>
-        <translation type="unfinished"/>
+        <translation>Analisar grimório (tappedout.net)</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="581"/>
@@ -4548,12 +4550,12 @@ Por favor, verifique se o diretório não é somente leitura e tente novamente.<
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="824"/>
         <source>There are no cards in your deck to be exported</source>
-        <translation type="unfinished"/>
+        <translation>Não há cartas em seu grimório a serem exportadas</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="836"/>
         <source>No deck was selected to be saved.</source>
-        <translation type="unfinished"/>
+        <translation>Nenhum grimório selecionado para ser salvo.</translation>
     </message>
 </context>
 <context>
@@ -4804,7 +4806,7 @@ Por favor, entre um nome:</translation>
     <message>
         <location filename="../src/tab_game.cpp" line="1099"/>
         <source>player left the game</source>
-        <translation type="unfinished"/>
+        <translation>jogador deixou o jogo</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1102"/>
@@ -5006,7 +5008,7 @@ Quanto mais informação você inserir, mais específicos seus resultados serão
     <message>
         <location filename="../src/tab_message.cpp" line="148"/>
         <source>Private message from</source>
-        <translation type="unfinished"/>
+        <translation>Mensagem privada de</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="165"/>
@@ -5749,42 +5751,42 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/window_sets.cpp" line="101"/>
         <source>Only cards in enabled sets will appear in the deck editor card list</source>
-        <translation type="unfinished"/>
+        <translation>Apenas cartas de expansões habilitadas irão aparecer na lista de cartas do editor de grimório</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="101"/>
         <source>Card Art</source>
-        <translation type="unfinished"/>
+        <translation>Arte da Carta</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="102"/>
         <source>Image priority is decided in the following order</source>
-        <translation type="unfinished"/>
+        <translation>Prioridade da imagem é decidida na seguinte ordem</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="102"/>
         <source>The</source>
-        <translation type="unfinished"/>
+        <translation>O/A</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="106"/>
         <source>CUSTOM Folder</source>
-        <translation type="unfinished"/>
+        <translation>Pasta CUSTOMIZADA</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="106"/>
         <source>Enabled Sets (Top to Bottom)</source>
-        <translation type="unfinished"/>
+        <translation>Expansões Habilitadas (Cima para Baixo)</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="107"/>
         <source>Disabled Sets (Top to Bottom)</source>
-        <translation type="unfinished"/>
+        <translation>Expansões Desabilitadas (Cima para Baixo)</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="132"/>
         <source>Manage sets</source>
-        <translation type="unfinished"/>
+        <translation>Gerenciar expansões</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="166"/>
@@ -6048,37 +6050,37 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1792"/>
         <source>Storm</source>
-        <translation type="unfinished"/>
+        <translation>Tempestade</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1796"/>
         <source>W</source>
-        <translation type="unfinished"/>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1800"/>
         <source>U</source>
-        <translation type="unfinished"/>
+        <translation>U</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1804"/>
         <source>B</source>
-        <translation type="unfinished"/>
+        <translation>B</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1808"/>
         <source>R</source>
-        <translation type="unfinished"/>
+        <translation>R</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1812"/>
         <source>G</source>
-        <translation type="unfinished"/>
+        <translation>G</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1816"/>
         <source>X</source>
-        <translation type="unfinished"/>
+        <translation>X</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1824"/>
@@ -6214,27 +6216,27 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1762"/>
         <source>Manage sets</source>
-        <translation type="unfinished"/>
+        <translation>Gerenciar Expansões</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1768"/>
         <source>Export deck</source>
-        <translation type="unfinished"/>
+        <translation>Exportar grimório</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1772"/>
         <source>Save deck (clip)</source>
-        <translation type="unfinished"/>
+        <translation>Salvar grimório (clip)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1773"/>
         <source>Save deck (clip; no annotations)</source>
-        <translation type="unfinished"/>
+        <translation>Salvar grimório (clip; sem anotações)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1851"/>
         <source>Tap / Untap Card</source>
-        <translation type="unfinished"/>
+        <translation>Virar / Desvirar Carta</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1852"/>
