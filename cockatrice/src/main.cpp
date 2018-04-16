@@ -70,7 +70,7 @@ void installNewTranslator()
     qApp->installTranslator(qtTranslator);
     translator->load(translationPrefix + "_" + lang, translationPath);
     qApp->installTranslator(translator);
-    qDebug() << "Language changed: " << lang;
+    qDebug() << "Language changed:" << lang;
 }
 
 QString const generateClientID()
