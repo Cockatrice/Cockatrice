@@ -26,7 +26,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnRefreshServers = new QPushButton(this);
     btnRefreshServers->setIcon(QPixmap("theme:icons/update"));
     btnRefreshServers->setToolTip(tr("Refresh the server list with known public servers"));
-    btnRefreshServers->setFixedWidth(50);
+    btnRefreshServers->setFixedWidth(40);
 
     connect(hps, SIGNAL(sigPublicServersDownloadedSuccessfully()), this, SLOT(rebuildComboBoxList()));
     connect(hps, SIGNAL(sigPublicServersDownloadedUnsuccessfully(int)), this, SLOT(rebuildComboBoxList(int)));
@@ -232,6 +232,8 @@ void DlgConnect::previousHostSelected(bool state)
 {
     if (state) {
         saveEdit->setDisabled(true);
+        hostEdit->setDisabled(true);
+        portEdit->setDisabled(true);
         previousHosts->setDisabled(false);
         btnRefreshServers->setDisabled(false);
     }
@@ -272,12 +274,16 @@ void DlgConnect::newHostSelected(bool state)
         previousHosts->setDisabled(true);
         btnRefreshServers->setDisabled(true);
         hostEdit->clear();
+        hostEdit->setPlaceholderText("Server URL for Connecting");
+        hostEdit->setDisabled(false);
         portEdit->clear();
+        portEdit->setPlaceholderText("Communication Port");
+        portEdit->setDisabled(false);
         playernameEdit->clear();
         passwordEdit->clear();
         savePasswordCheckBox->setChecked(false);
         saveEdit->clear();
-        saveEdit->setPlaceholderText("New Menu Name");
+        saveEdit->setPlaceholderText("New Name in Server List");
         saveEdit->setDisabled(false);
     } else {
         preRebuildComboBoxList();
