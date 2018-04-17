@@ -135,7 +135,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
 
-    serverInfoGroupBox = new QGroupBox(tr("Server info"));
+    serverInfoGroupBox = new QGroupBox(tr("Contact Hint"));
     serverInfoGroupBox->setLayout(serverInfoLayout);
 
     btnGroupBox = new QGroupBox(tr(""));
@@ -143,8 +143,8 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
-    grid->addWidget(loginGroupBox, 1, 0);
-    grid->addWidget(serverInfoGroupBox, 2, 0);
+    grid->addWidget(serverInfoGroupBox, 1, 0);
+    grid->addWidget(loginGroupBox, 2, 0);
     grid->addWidget(btnGroupBox, 3, 0);
 
     mainLayout = new QVBoxLayout;
