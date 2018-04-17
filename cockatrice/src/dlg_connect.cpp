@@ -77,6 +77,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     serverIssuesLabel =
         new QLabel(tr("If you have any trouble connecting or registering then contact the server staff for help!"));
     serverIssuesLabel->setWordWrap(true);
+    serverContactLabel = new QLabel (tr("Webpage") + ":");
     serverContactLink = new QLabel;
     serverContactLink->setTextFormat(Qt::RichText);
     serverContactLink->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -121,7 +122,8 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     serverInfoLayout = new QGridLayout;
     serverInfoLayout->addWidget(serverIssuesLabel, 0, 0);
-    serverInfoLayout->addWidget(serverContactLink, 1, 0);
+    serverInfoLayout->addWidget(serverContactLabel, 1, 0);
+    serverInfoLayout->addWidget(serverContactLink, 1, 1);
 
     loginLayout = new QGridLayout;
     loginLayout->addWidget(playernameLabel, 0, 0);
