@@ -26,6 +26,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnRefreshServers = new QPushButton(this);
     btnRefreshServers->setIcon(QPixmap("theme:icons/update"));
     btnRefreshServers->setToolTip(tr("Refresh the server list with known public servers"));
+    btnRefreshServers->setFixedWidth(30);
 
     connect(hps, SIGNAL(sigPublicServersDownloadedSuccessfully()), this, SLOT(rebuildComboBoxList()));
     connect(hps, SIGNAL(sigPublicServersDownloadedUnsuccessfully(int)), this, SLOT(rebuildComboBoxList(int)));
