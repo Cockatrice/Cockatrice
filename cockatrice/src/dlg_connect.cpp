@@ -26,7 +26,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnRefreshServers = new QPushButton(this);
     btnRefreshServers->setIcon(QPixmap("theme:icons/update"));
     btnRefreshServers->setToolTip(tr("Refresh the server list with known public servers"));
-    btnRefreshServers->setFixedWidth(40);
+    btnRefreshServers->setFixedWidth(30);
 
     connect(hps, SIGNAL(sigPublicServersDownloadedSuccessfully()), this, SLOT(rebuildComboBoxList()));
     connect(hps, SIGNAL(sigPublicServersDownloadedUnsuccessfully(int)), this, SLOT(rebuildComboBoxList(int)));
@@ -121,7 +121,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     restrictionsGroupBox->setLayout(connectionLayout);
 
     serverInfoLayout = new QGridLayout;
-    serverInfoLayout->addWidget(serverIssuesLabel, 0, 0);
+    serverInfoLayout->addWidget(serverIssuesLabel, 0, 0, 1, 3, Qt::AlignTop);
     serverInfoLayout->addWidget(serverContactLabel, 1, 0);
     serverInfoLayout->addWidget(serverContactLink, 1, 1);
 
@@ -238,6 +238,7 @@ void DlgConnect::previousHostSelected(bool state)
         portEdit->setDisabled(true);
         previousHosts->setDisabled(false);
         btnRefreshServers->setDisabled(false);
+        savePasswordCheckBox->setChecked(false);
     }
 }
 
@@ -276,7 +277,7 @@ void DlgConnect::newHostSelected(bool state)
         previousHosts->setDisabled(true);
         btnRefreshServers->setDisabled(true);
         hostEdit->clear();
-        hostEdit->setPlaceholderText("Server URL for Connecting");
+        hostEdit->setPlaceholderText("Server URL");
         hostEdit->setDisabled(false);
         portEdit->clear();
         portEdit->setPlaceholderText("Communication Port");
@@ -285,7 +286,7 @@ void DlgConnect::newHostSelected(bool state)
         passwordEdit->clear();
         savePasswordCheckBox->setChecked(false);
         saveEdit->clear();
-        saveEdit->setPlaceholderText("New Name in Server List");
+        saveEdit->setPlaceholderText("Unique Server Name");
         saveEdit->setDisabled(false);
     } else {
         preRebuildComboBoxList();
