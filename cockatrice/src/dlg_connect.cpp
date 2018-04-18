@@ -267,6 +267,7 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
         QString formattedLink = "<a href=\"" + data.at(6) + "\">" + data.at(0) + "</a>";
         serverContactLink->setText(formattedLink);
     } else {
+        serverContactLabel->setText("");
         serverContactLink->setText("");
     }
 }
@@ -288,6 +289,8 @@ void DlgConnect::newHostSelected(bool state)
         saveEdit->clear();
         saveEdit->setPlaceholderText("Unique Server Name");
         saveEdit->setDisabled(false);
+        serverContactLabel->setText("");
+        serverContactLink->setText("");
     } else {
         preRebuildComboBoxList();
     }
