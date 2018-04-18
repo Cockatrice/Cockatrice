@@ -135,7 +135,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
 
-    serverInfoGroupBox = new QGroupBox(tr("Contact Hint"));
+    serverInfoGroupBox = new QGroupBox(tr("Server Contact"));
     serverInfoGroupBox->setLayout(serverInfoLayout);
 
     btnGroupBox = new QGroupBox(tr(""));
@@ -264,7 +264,8 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     }
 
     if (!data.at(6).isEmpty()) {
-        QString formattedLink = "<a href=\"" + data.at(6) + "\">" + data.at(0) + "</a>";
+        QString formattedLink = "<a href=\"" + data.at(6) + "\">" + data.at(6) + "</a>";
+        serverContactLabel->setText(tr("Webpage") + ":");
         serverContactLink->setText(formattedLink);
     } else {
         serverContactLabel->setText("");
