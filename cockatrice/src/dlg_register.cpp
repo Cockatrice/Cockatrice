@@ -13,7 +13,7 @@
 DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 {
     hostLabel = new QLabel(tr("&Host:"));
-    hostEdit = new QLineEdit(settingsCache->servers().getHostname("cockatrice.woogerworks.com"));
+    hostEdit = new QLineEdit(settingsCache->servers().getHostname("server.cockatrice.us"));
     hostLabel->setBuddy(hostEdit);
 
     portLabel = new QLabel(tr("&Port:"));

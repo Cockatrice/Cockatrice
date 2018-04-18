@@ -9,4 +9,4 @@
 - and this
 
 ## Screenshots
-*(simply drag & drop image files directly into this description!)*
+<!-- simply drag & drop image files directly into this description! -->

@@ -15,7 +15,7 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
     QString lastfphost;
     QString lastfpport;
     QString lastfpplayername;
-    lastfphost = settingsCache->servers().getHostname("cockatrice.woogerworks.com");
+    lastfphost = settingsCache->servers().getHostname("server.cockatrice.us");
     lastfpport = settingsCache->servers().getPort("4747");
     lastfpplayername = settingsCache->servers().getPlayerName("Player");
 

@@ -150,7 +150,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="602"/>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>Descargando (%1MB)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="612"/>
@@ -166,27 +166,27 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="672"/>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>La URL suministrada no es válida.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="676"/>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>Descargando (0MB)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="693"/>
         <source>Spoilers source selection</source>
-        <translation type="unfinished"/>
+        <translation>Selección de origen de destripe</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="694"/>
         <source>Please specify a spoiler source.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor elija un origen de destripe</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="696"/>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>URL de descarga:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="697"/>

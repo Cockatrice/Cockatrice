@@ -9,7 +9,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="181"/>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.</source>
-        <translation type="unfinished"/>
+        <translation>Esse recurso irá importar a lista de coleções, cartas e fichas que serão utilizadas pelo Cokatrice.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="183"/>
@@ -19,7 +19,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="184"/>
         <source>Version:</source>
-        <translation type="unfinished"/>
+        <translation>Versão:</translation>
     </message>
 </context>
 <context>
@@ -52,7 +52,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="239"/>
         <source>Choose file...</source>
-        <translation>Escolher arquivo...</translation>
+        <translation>Escolha o arquivo...</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="249"/>
@@ -150,48 +150,48 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="602"/>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>Baixando (%1MB)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="612"/>
         <location filename="../src/oraclewizard.cpp" line="672"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="612"/>
         <source>Network error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Erro de conexão: %1</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="672"/>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>A URL escolhida não é valida.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="676"/>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>Baixando (0MB)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="693"/>
         <source>Spoilers source selection</source>
-        <translation type="unfinished"/>
+        <translation>Selecione a fonte de spoilers</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="694"/>
         <source>Please specify a spoiler source.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor, escolha uma fonte de spoiler.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="696"/>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Endereço para download:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="697"/>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Restaurar URL padrão</translation>
     </message>
 </context>
 <context>
@@ -204,7 +204,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="732"/>
         <source>Please specify a source for the list of tokens.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor especifique uma fonte para a lista de fichas.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="734"/>
@@ -335,37 +335,37 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="849"/>
         <source>Spoilers imported</source>
-        <translation type="unfinished"/>
+        <translation>&apos;Spoilers&apos; importados.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="850"/>
         <source>The spoilers file has been imported. Press &quot;Save&quot; to save the imported spoilers to the Cockatrice card database.</source>
-        <translation type="unfinished"/>
+        <translation>Os arquivos de &apos;spoilers&apos; foram importados. Clique em &quot;Salvar&quot; para salvar os &apos;spoiler&apos; importados para a base de dados de cartas do Cockatrice.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="853"/>
         <source>Save to the default path (recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Salvar para o caminho padrão (recomendado)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="860"/>
         <source>Save spoiler database</source>
-        <translation type="unfinished"/>
+        <translation>Salvar base de dados de &apos;spoiler&apos;</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="861"/>
         <source>XML; card database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; base de dados de cartas (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="884"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="884"/>
         <source>The file could not be saved to %1</source>
-        <translation type="unfinished"/>
+        <translation>O arquivo não pôde ser salvo em %1</translation>
     </message>
 </context>
 <context>
@@ -521,7 +521,7 @@
     <message>
         <location filename="../src/zip/zip.cpp" line="1606"/>
         <source>zlib library error.</source>
-        <translation>Erro biblioteca zlib.</translation>
+        <translation>Erro na biblioteca &quot;zlib&quot;.</translation>
     </message>
     <message>
         <location filename="../src/zip/zip.cpp" line="1607"/>
@@ -572,7 +572,7 @@
     <message>
         <location filename="../src/main.cpp" line="42"/>
         <source>Only run in spoiler mode</source>
-        <translation type="unfinished"/>
+        <translation>Rodar apenas em modo de &apos;spoiler&apos;</translation>
     </message>
 </context>
 </TS>

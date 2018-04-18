@@ -41,6 +41,7 @@
 #include "dlg_forgotpasswordreset.h"
 #include "dlg_register.h"
 #include "dlg_settings.h"
+#include "dlg_tip_of_the_day.h"
 #include "dlg_update.h"
 #include "dlg_viewlog.h"
 #include "localclient.h"
@@ -182,11 +183,13 @@ void MainWindow::activateAccepted()
 
 void MainWindow::actConnect()
 {
-    auto *dlg = new DlgConnect(this);
-    connect(dlg, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
-    if (dlg->exec())
-        client->connectToServer(dlg->getHost(), static_cast<unsigned int>(dlg->getPort()), dlg->getPlayerName(),
-                                dlg->getPassword());
+    dlgConnect = new DlgConnect(this);
+    connect(dlgConnect, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
+
+    if (dlgConnect->exec()) {
+        client->connectToServer(dlgConnect->getHost(), static_cast<unsigned int>(dlgConnect->getPort()),
+                                dlgConnect->getPlayerName(), dlgConnect->getPassword());
+    }
 }
 
 void MainWindow::actRegister()
@@ -232,7 +235,7 @@ void MainWindow::actSinglePlayer()
 
     Command_CreateGame createCommand;
     createCommand.set_max_players(static_cast<google::protobuf::uint32>(numberPlayers));
-    mainClient->sendCommand(mainClient->prepareRoomCommand(createCommand, 0));
+    mainClient->sendCommand(LocalClient::prepareRoomCommand(createCommand, 0));
 }
 
 void MainWindow::actWatchReplay()
@@ -250,7 +253,7 @@ void MainWindow::actWatchReplay()
     QByteArray buf = file.readAll();
     file.close();
 
-    auto *replay = new GameReplay;
+    replay = new GameReplay;
     replay->ParseFromArray(buf.data(), buf.size());
 
     tabSupervisor->openReplay(replay);
@@ -310,6 +313,14 @@ void MainWindow::actAbout()
     mb.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64));
     mb.setTextInteractionFlags(Qt::TextBrowserInteraction);
     mb.exec();
+}
+
+void MainWindow::actTips()
+{
+    DlgTipOfTheDay tip;
+    if (tip.successfulInit) {
+        tip.exec();
+    }
 }
 
 void MainWindow::actUpdate()
@@ -627,6 +638,7 @@ void MainWindow::retranslateUi()
     aEditTokens->setText(tr("Edit &tokens..."));
 
     aAbout->setText(tr("&About Cockatrice"));
+    aTips->setText(tr("&Tip of the Day"));
     aUpdate->setText(tr("Check for Client Updates"));
     aViewLog->setText(tr("View &debug log"));
     helpMenu->setTitle(tr("&Help"));
@@ -659,6 +671,8 @@ void MainWindow::createActions()
 
     aAbout = new QAction(this);
     connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
+    aTips = new QAction(this);
+    connect(aTips, SIGNAL(triggered()), this, SLOT(actTips()));
     aUpdate = new QAction(this);
     connect(aUpdate, SIGNAL(triggered()), this, SLOT(actUpdate()));
     aViewLog = new QAction(this);
@@ -729,6 +743,7 @@ void MainWindow::createMenus()
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
+    helpMenu->addAction(aTips);
     helpMenu->addAction(aUpdate);
     helpMenu->addAction(aViewLog);
 }
@@ -819,7 +834,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::createTrayIcon()
 {
-    auto *trayIconMenu = new QMenu(this);
+    trayIconMenu = new QMenu(this);
     trayIconMenu->addAction(closeAction);
 
     trayIcon = new QSystemTrayIcon(this);
@@ -1192,9 +1207,9 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
 
 void MainWindow::actManageSets()
 {
-    auto *w = new WndSets;
-    w->setWindowModality(Qt::WindowModal);
-    w->show();
+    wndSets = new WndSets;
+    wndSets->setWindowModality(Qt::WindowModal);
+    wndSets->show();
 }
 
 void MainWindow::actEditTokens()

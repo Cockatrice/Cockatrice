@@ -962,9 +962,9 @@ void TabDeckEditor::actSwapCard()
     if (!gparent.isValid())
         return;
 
-    const QString zoneName = gparent.sibling(gparent.row(), 1).data().toString();
+    const QString zoneName = gparent.sibling(gparent.row(), 1).data(Qt::EditRole).toString();
     actDecrement();
-    const QString otherZoneName = zoneName == "Maindeck" ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
+    const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
     // Third argument (true) says create the card no mater what, even if not in DB
     QModelIndex newCardIndex = deckModel->addCard(cardName, otherZoneName, true);

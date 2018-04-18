@@ -93,15 +93,15 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&pixmapCacheLabel, 2, 0);
     personalGrid->addWidget(&pixmapCacheEdit, 2, 1);
     personalGrid->addWidget(&updateNotificationCheckBox, 3, 0);
-    personalGrid->addWidget(&picDownloadCheckBox, 4, 0, 1, 3);
-    personalGrid->addWidget(&defaultUrlLabel, 5, 0, 1, 1);
-    personalGrid->addWidget(defaultUrlEdit, 5, 1, 1, 1);
-    personalGrid->addWidget(&defaultUrlRestoreButton, 5, 2, 1, 1);
-    personalGrid->addWidget(&fallbackUrlLabel, 6, 0, 1, 1);
-    personalGrid->addWidget(fallbackUrlEdit, 6, 1, 1, 1);
-    personalGrid->addWidget(&fallbackUrlRestoreButton, 6, 2, 1, 1);
-    personalGrid->addWidget(&showTipsOnStartup, 7, 0);
-    personalGrid->addWidget(&urlLinkLabel, 7, 1, 1, 1);
+    personalGrid->addWidget(&showTipsOnStartup, 4, 0);
+    personalGrid->addWidget(&picDownloadCheckBox, 5, 0);
+    personalGrid->addWidget(&urlLinkLabel, 5, 1);
+    personalGrid->addWidget(&defaultUrlLabel, 6, 0, 1, 1);
+    personalGrid->addWidget(defaultUrlEdit, 6, 1, 1, 1);
+    personalGrid->addWidget(&defaultUrlRestoreButton, 6, 2, 1, 1);
+    personalGrid->addWidget(&fallbackUrlLabel, 7, 0, 1, 1);
+    personalGrid->addWidget(fallbackUrlEdit, 7, 1, 1, 1);
+    personalGrid->addWidget(&fallbackUrlRestoreButton, 7, 2, 1, 1);
     personalGrid->addWidget(&clearDownloadedPicsButton, 8, 0, 1, 3);
 
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
@@ -509,6 +509,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(mpSpoilerPathButton, SIGNAL(clicked()), this, SLOT(spoilerPathButtonClicked()));
 
     updateNowButton = new QPushButton(tr("Update Spoilers"));
+    updateNowButton->setFixedWidth(150);
     connect(updateNowButton, SIGNAL(clicked()), this, SLOT(updateSpoilers()));
 
     // Update the GUI depending on if the box is ticked or not
@@ -518,11 +519,12 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpGeneralGrid->addWidget(&mcGeneralMessageLabel, 0, 0);
 
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
-    lpSpoilerGrid->addWidget(updateNowButton, 0, 2);
     lpSpoilerGrid->addWidget(&mcSpoilerSaveLabel, 1, 0);
     lpSpoilerGrid->addWidget(mpSpoilerSavePathLineEdit, 1, 1);
     lpSpoilerGrid->addWidget(mpSpoilerPathButton, 1, 2);
-    lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 2, 0, 1, 3, Qt::AlignTop);
+    lpSpoilerGrid->addWidget(&lastUpdatedLabel, 2, 0);
+    lpSpoilerGrid->addWidget(updateNowButton, 2, 1);
+    lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
 
     // On a change to the check box, hide/unhide the other fields
     connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), settingsCache, SLOT(setDownloadSpoilerStatus(bool)));
@@ -545,7 +547,7 @@ void DeckEditorSettingsPage::updateSpoilers()
 {
     // Disable the button so the user can only press it once at a time
     updateNowButton->setDisabled(true);
-    updateNowButton->setText(tr("Updating Spoilers"));
+    updateNowButton->setText(tr("Updating..."));
 
     // Create a new SBU that will act as if the client was just reloaded
     auto *sbu = new SpoilerBackgroundUpdater();
@@ -590,6 +592,7 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
     mcSpoilerSaveLabel.setEnabled(anInput);
     mpSpoilerSavePathLineEdit->setEnabled(anInput);
     mpSpoilerPathButton->setEnabled(anInput);
+    lastUpdatedLabel.setEnabled(anInput);
     updateNowButton->setEnabled(anInput);
     infoOnSpoilersLabel.setEnabled(anInput);
 
@@ -604,8 +607,8 @@ void DeckEditorSettingsPage::retranslateUi()
     mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
     mcGeneralMessageLabel.setText(tr("Hey, something's here finally!"));
-    infoOnSpoilersLabel.setText(tr("Last Updated") + ": " + getLastUpdateTime() + "\n\n" +
-                                tr("Spoilers download automatically on launch") + "\n" +
+    lastUpdatedLabel.setText(tr("Last Updated") + ": " + getLastUpdateTime());
+    infoOnSpoilersLabel.setText(tr("Spoilers download automatically on launch") + "\n" +
                                 tr("Press the button to manually update without relaunching") + "\n\n" +
                                 tr("Do not close settings until manual update complete"));
 }

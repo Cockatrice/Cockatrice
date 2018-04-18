@@ -22,6 +22,7 @@ public:
     QString getFPPlayerName(QString defaultName = "");
     QString getPassword();
     QString getSaveName(QString defaultname = "");
+    QString getSite(QString defaultName = "");
     bool getSavePassword();
     int getAutoConnect();
 
@@ -32,25 +33,37 @@ public:
     void setPort(QString port);
     void setPlayerName(QString playerName);
     void setAutoConnect(int autoconnect);
+    void setSite(QString site);
     void setFPHostName(QString hostname);
     void setPassword(QString password);
     void setFPPort(QString port);
     void setSavePassword(int save);
     void setFPPlayerName(QString playerName);
-    void
-    addNewServer(QString saveName, QString serv, QString port, QString username, QString password, bool savePassword);
+    void addNewServer(const QString &saveName,
+                      const QString &serv,
+                      const QString &port,
+                      const QString &username,
+                      const QString &password,
+                      bool savePassword,
+                      const QString &site = QString());
+    void removeServer(QString servAddr);
     bool updateExistingServer(QString saveName,
                               QString serv,
                               QString port,
                               QString username,
                               QString password,
-                              bool savePassword);
+                              bool savePassword,
+                              QString site = QString());
+
+    bool updateExistingServerWithoutLoss(QString saveName,
+                                         QString serv = QString(),
+                                         QString port = QString(),
+                                         QString site = QString(),
+                                         QString username = QString(),
+                                         QString password = QString(),
+                                         bool savePassword = true);
     void setClearDebugLogStatus(bool abIsChecked);
     bool getClearDebugLogStatus(bool abDefaultValue);
-
-signals:
-
-public slots:
 
 private:
     explicit ServersSettings(QString settingPath, QObject *parent = nullptr);

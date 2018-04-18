@@ -26,6 +26,27 @@ void SettingsManager::setValue(QVariant value, QString name, QString group, QStr
     }
 }
 
+void SettingsManager::deleteValue(QString name, QString group, QString subGroup)
+{
+    if (!group.isEmpty()) {
+        settings.beginGroup(group);
+    }
+
+    if (!subGroup.isEmpty()) {
+        settings.beginGroup(subGroup);
+    }
+
+    settings.remove(name);
+
+    if (!subGroup.isEmpty()) {
+        settings.endGroup();
+    }
+
+    if (!group.isEmpty()) {
+        settings.endGroup();
+    }
+}
+
 QVariant SettingsManager::getValue(QString name, QString group, QString subGroup)
 {
     if (!group.isEmpty()) {

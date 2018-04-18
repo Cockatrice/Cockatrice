@@ -39,6 +39,7 @@
 #include <QDir>
 #include <QFile>
 #include <QLibraryInfo>
+#include <QLocale>
 #include <QSystemTrayIcon>
 #include <QTextCodec>
 #include <QTextStream>
@@ -69,6 +70,7 @@ void installNewTranslator()
     qApp->installTranslator(qtTranslator);
     translator->load(translationPrefix + "_" + lang, translationPath);
     qApp->installTranslator(translator);
+    qDebug() << "Language changed:" << lang;
 }
 
 QString const generateClientID()
@@ -121,6 +123,8 @@ int main(int argc, char *argv[])
     translator = new QTranslator;
     installNewTranslator();
 
+    QLocale::setDefault(QLocale::English);
+
     qsrand(QDateTime::currentDateTime().toTime_t());
     qDebug("main(): starting main program");
 
@@ -139,7 +143,7 @@ int main(int argc, char *argv[])
     qDebug("main(): ui.show() finished");
 
     DlgTipOfTheDay tip;
-    if (settingsCache->getShowTipsOnStartup() && tip.successfulInit) {
+    if (tip.successfulInit && settingsCache->getShowTipsOnStartup() && tip.newTipsAvailable) {
         tip.show();
     }
 

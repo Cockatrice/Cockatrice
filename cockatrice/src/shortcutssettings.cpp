@@ -150,10 +150,7 @@ bool ShortcutsSettings::isKeyAllowed(QString name, QString Sequences)
                                                << "Shift+S"
                                                << "Shift+Left"
                                                << "Shift+Right");
-    if (forbiddenKeys.contains(checkSequence)) {
-        return false;
-    }
-    return true;
+    return !forbiddenKeys.contains(checkSequence);
 }
 
 bool ShortcutsSettings::isValid(QString name, QString Sequences)

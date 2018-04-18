@@ -30,13 +30,17 @@
 #include "abstractclient.h"
 #include "pb/response.pb.h"
 
-class TabSupervisor;
-class RemoteClient;
+class DlgConnect;
+class DlgViewLog;
+class GameReplay;
+class HandlePublicServers;
 class LocalClient;
 class LocalServer;
-class ServerInfo_User;
 class QThread;
-class DlgViewLog;
+class RemoteClient;
+class ServerInfo_User;
+class TabSupervisor;
+class WndSets;
 
 class MainWindow : public QMainWindow
 {
@@ -72,6 +76,7 @@ private slots:
     void actExit();
     void actForgotPasswordRequest();
     void actAbout();
+    void actTips();
     void actUpdate();
     void actViewLog();
     void forgotPasswordSuccess();
@@ -113,34 +118,29 @@ private:
     };
 
     QList<QMenu *> tabMenus;
-    QMenu *cockatriceMenu, *dbMenu, *helpMenu;
+    QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog;
+        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aUpdate, *aViewLog, *closeAction;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet;
     TabSupervisor *tabSupervisor;
-
-    QMenu *trayIconMenu;
-
-    QAction *closeAction;
-
+    WndSets *wndSets;
     RemoteClient *client;
     QThread *clientThread;
-
     LocalServer *localServer;
     bool bHasActivated;
-
     QMessageBox serverShutdownMessageBox;
     QProcess *cardUpdateProcess;
-
     DlgViewLog *logviewDialog;
+    DlgConnect *dlgConnect;
+    GameReplay *replay;
 
 public:
-    MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
 
 protected:
-    void closeEvent(QCloseEvent *event);
-    void changeEvent(QEvent *event);
+    void closeEvent(QCloseEvent *event) override;
+    void changeEvent(QEvent *event) override;
     QString extractInvalidUsernameMessage(QString &in);
 };
 
