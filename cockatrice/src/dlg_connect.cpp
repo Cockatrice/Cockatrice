@@ -77,7 +77,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     serverIssuesLabel =
         new QLabel(tr("If you have any trouble connecting or registering then contact the server staff for help!"));
     serverIssuesLabel->setWordWrap(true);
-    serverContactLabel = new QLabel (tr("Webpage") + ":");
+    serverContactLabel = new QLabel(tr("Webpage") + ":");
     serverContactLink = new QLabel;
     serverContactLink->setTextFormat(Qt::RichText);
     serverContactLink->setTextInteractionFlags(Qt::TextBrowserInteraction);
