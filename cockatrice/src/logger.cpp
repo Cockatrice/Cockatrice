@@ -92,6 +92,7 @@ QString Logger::getSystemArchitecture()
     QString result;
 
     if (!getClientOperatingSystem().isEmpty()) {
+		// we don't want translatable strings in the 'Debug Log' for easier troubleshooting
         result.append(QString("Client Operating System: ") + getClientOperatingSystem() + "\n");
     }
 
