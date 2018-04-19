@@ -16,6 +16,7 @@ Logger::Logger() : logToFileEnabled(false)
     logBuffer.append(getClientVersion());
     logBuffer.append(getSystemArchitecture());
     logBuffer.append(getSystemLocale());
+    logBuffer.append(QString("-").repeated(75));
     std::cerr << getClientVersion().toStdString() << std::endl;
     std::cerr << getSystemArchitecture().toStdString() << std::endl;
 }
