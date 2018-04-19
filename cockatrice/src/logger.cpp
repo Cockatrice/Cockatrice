@@ -114,6 +114,6 @@ QString Logger::getClientOperatingSystem()
 QString Logger::getSystemLocale()
 {
     QString result;
-    result.append(QString("System Locale") + ": " + QLocale().name());
+    result.append(QString("System Locale: ") + QLocale().name());
     return result;
 }
