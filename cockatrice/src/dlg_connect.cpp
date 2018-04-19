@@ -123,7 +123,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     serverInfoLayout = new QGridLayout;
     serverInfoLayout->addWidget(serverIssuesLabel, 0, 0, 1, 3, Qt::AlignTop);
     serverInfoLayout->addWidget(serverContactLabel, 1, 0);
-    serverInfoLayout->addWidget(serverContactLink, 1, 1, 1, 3, Qt::AlignLeft);
+    serverInfoLayout->addWidget(serverContactLink, 1, 1, 1, 2, Qt::AlignLeft);
 
     loginLayout = new QGridLayout;
     loginLayout->addWidget(playernameLabel, 0, 0);
