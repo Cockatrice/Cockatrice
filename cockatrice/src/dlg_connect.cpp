@@ -121,9 +121,9 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     restrictionsGroupBox->setLayout(connectionLayout);
 
     serverInfoLayout = new QGridLayout;
-    serverInfoLayout->addWidget(serverIssuesLabel, 0, 0, 1, 3, Qt::AlignTop);
+    serverInfoLayout->addWidget(serverIssuesLabel, 0, 0, 1, 4, Qt::AlignTop);
     serverInfoLayout->addWidget(serverContactLabel, 1, 0);
-    serverInfoLayout->addWidget(serverContactLink, 1, 1, 1, 2, Qt::AlignLeft);
+    serverInfoLayout->addWidget(serverContactLink, 1, 1, 1, 3);
 
     loginLayout = new QGridLayout;
     loginLayout->addWidget(playernameLabel, 0, 0);
