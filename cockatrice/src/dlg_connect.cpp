@@ -238,7 +238,6 @@ void DlgConnect::previousHostSelected(bool state)
         portEdit->setDisabled(true);
         previousHosts->setDisabled(false);
         btnRefreshServers->setDisabled(false);
-        savePasswordCheckBox->setChecked(false);
     }
 }
 
@@ -286,7 +285,6 @@ void DlgConnect::newHostSelected(bool state)
         portEdit->setDisabled(false);
         playernameEdit->clear();
         passwordEdit->clear();
-        savePasswordCheckBox->setChecked(false);
         saveEdit->clear();
         saveEdit->setPlaceholderText("Unique Server Name");
         saveEdit->setDisabled(false);
