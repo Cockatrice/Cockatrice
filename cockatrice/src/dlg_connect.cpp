@@ -26,7 +26,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnRefreshServers = new QPushButton(this);
     btnRefreshServers->setIcon(QPixmap("theme:icons/update"));
     btnRefreshServers->setToolTip(tr("Refresh the server list with known public servers"));
-    btnRefreshServers->setFixedWidth(50);
+    btnRefreshServers->setFixedWidth(30);
 
     connect(hps, SIGNAL(sigPublicServersDownloadedSuccessfully()), this, SLOT(rebuildComboBoxList()));
     connect(hps, SIGNAL(sigPublicServersDownloadedUnsuccessfully(int)), this, SLOT(rebuildComboBoxList(int)));
@@ -77,6 +77,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     serverIssuesLabel =
         new QLabel(tr("If you have any trouble connecting or registering then contact the server staff for help!"));
     serverIssuesLabel->setWordWrap(true);
+    serverContactLabel = new QLabel(tr("Webpage") + ":");
     serverContactLink = new QLabel;
     serverContactLink->setTextFormat(Qt::RichText);
     serverContactLink->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -120,8 +121,9 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     restrictionsGroupBox->setLayout(connectionLayout);
 
     serverInfoLayout = new QGridLayout;
-    serverInfoLayout->addWidget(serverIssuesLabel, 0, 0);
-    serverInfoLayout->addWidget(serverContactLink, 1, 0);
+    serverInfoLayout->addWidget(serverIssuesLabel, 0, 0, 1, 4, Qt::AlignTop);
+    serverInfoLayout->addWidget(serverContactLabel, 1, 0);
+    serverInfoLayout->addWidget(serverContactLink, 1, 1, 1, 3);
 
     loginLayout = new QGridLayout;
     loginLayout->addWidget(playernameLabel, 0, 0);
@@ -133,7 +135,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
 
-    serverInfoGroupBox = new QGroupBox(tr("Server info"));
+    serverInfoGroupBox = new QGroupBox(tr("Server Contact"));
     serverInfoGroupBox->setLayout(serverInfoLayout);
 
     btnGroupBox = new QGroupBox(tr(""));
@@ -141,8 +143,8 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
-    grid->addWidget(loginGroupBox, 1, 0);
-    grid->addWidget(serverInfoGroupBox, 2, 0);
+    grid->addWidget(serverInfoGroupBox, 1, 0);
+    grid->addWidget(loginGroupBox, 2, 0);
     grid->addWidget(btnGroupBox, 3, 0);
 
     mainLayout = new QVBoxLayout;
@@ -232,6 +234,8 @@ void DlgConnect::previousHostSelected(bool state)
 {
     if (state) {
         saveEdit->setDisabled(true);
+        hostEdit->setDisabled(true);
+        portEdit->setDisabled(true);
         previousHosts->setDisabled(false);
         btnRefreshServers->setDisabled(false);
     }
@@ -259,9 +263,11 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     }
 
     if (!data.at(6).isEmpty()) {
-        QString formattedLink = "<a href=\"" + data.at(6) + "\">" + data.at(0) + "</a>";
+        QString formattedLink = "<a href=\"" + data.at(6) + "\">" + data.at(6) + "</a>";
+        serverContactLabel->setText(tr("Webpage") + ":");
         serverContactLink->setText(formattedLink);
     } else {
+        serverContactLabel->setText("");
         serverContactLink->setText("");
     }
 }
@@ -272,13 +278,18 @@ void DlgConnect::newHostSelected(bool state)
         previousHosts->setDisabled(true);
         btnRefreshServers->setDisabled(true);
         hostEdit->clear();
+        hostEdit->setPlaceholderText("Server URL");
+        hostEdit->setDisabled(false);
         portEdit->clear();
+        portEdit->setPlaceholderText("Communication Port");
+        portEdit->setDisabled(false);
         playernameEdit->clear();
         passwordEdit->clear();
-        savePasswordCheckBox->setChecked(false);
         saveEdit->clear();
-        saveEdit->setPlaceholderText("New Menu Name");
+        saveEdit->setPlaceholderText("Unique Server Name");
         saveEdit->setDisabled(false);
+        serverContactLabel->setText("");
+        serverContactLink->setText("");
     } else {
         preRebuildComboBoxList();
     }
