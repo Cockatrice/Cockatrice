@@ -58,7 +58,7 @@ public:
     ~Servatrice_GameServer();
 
 protected:
-    void incomingConnection(qintptr socketDescriptor);
+    void incomingConnection(const int &socketDescriptor);
     Servatrice_ConnectionPool *findLeastUsedConnectionPool();
 };
 

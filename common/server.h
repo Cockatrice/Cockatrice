@@ -87,7 +87,7 @@ public:
     }
     void addClient(Server_ProtocolHandler *player);
     void removeClient(Server_ProtocolHandler *player);
-    QList<QString> getOnlineModeratorList();
+    QList<QString> getOnlineModeratorList() const;
     virtual QString getLoginMessage() const
     {
         return QString();
@@ -187,8 +187,9 @@ public:
     void sendIsl_GameCommand(const CommandContainer &item, int serverId, qint64 sessionId, int roomId, int playerId);
     void sendIsl_RoomCommand(const CommandContainer &item, int serverId, qint64 sessionId, int roomId);
 
-    void addExternalUser(const ServerInfo_User &userInfo);
-    void removeExternalUser(const QString &userName);
+    virtual void addExternalUser(const ServerInfo_User &userInfo) = delete;
+    virtual void removeExternalUser(const QString &userName) = delete;
+
     const QMap<QString, Server_AbstractUserInterface *> &getExternalUsers() const
     {
         return externalUsers;
