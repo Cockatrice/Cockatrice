@@ -85,7 +85,10 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     updateDisplayInfo(previousHosts->currentText());
 
-    btnForgotPassword = new QPushButton(tr("Forgot password"));
+    btnForgotPassword = new QPushButton(this);
+    btnForgotPassword->setIcon(QPixmap("theme:icons/forgot-pw"));
+    btnForgotPassword->setToolTip(tr("Forgot Password"));
+    btnForgotPassword->setFixedWidth(30);
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
 
     btnOk = new QPushButton(tr("Connect"));
@@ -112,10 +115,16 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     connectionLayout->addWidget(portEdit, 5, 1);
     connectionLayout->addWidget(autoConnectCheckBox, 6, 1);
 
-    buttons = new QGridLayout;
-    buttons->addWidget(btnOk, 0, 0);
-    buttons->addWidget(btnForgotPassword, 0, 1);
-    buttons->addWidget(btnCancel, 0, 2);
+//    buttons = new QGridLayout;
+//    buttons->addWidget(btnOk, 0, 0);
+//    buttons->addWidget(btnCancel, 0, 2);
+// connectButton = new QPushButton(tr("&Connect"));
+// connectButton->setDefault(true);
+
+// QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
+// buttonBox->addButton(connectButton, QDialogButtonBox::AcceptRole);
+// connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
+// connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
 
     restrictionsGroupBox = new QGroupBox(tr("Server"));
     restrictionsGroupBox->setLayout(connectionLayout);
@@ -127,9 +136,10 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     loginLayout = new QGridLayout;
     loginLayout->addWidget(playernameLabel, 0, 0);
-    loginLayout->addWidget(playernameEdit, 0, 1);
+    loginLayout->addWidget(playernameEdit, 0, 1, 1, 2);
     loginLayout->addWidget(passwordLabel, 1, 0);
     loginLayout->addWidget(passwordEdit, 1, 1);
+    loginLayout->addWidget(btnForgotPassword, 1, 2);
     loginLayout->addWidget(savePasswordCheckBox, 2, 1);
 
     loginGroupBox = new QGroupBox(tr("Login"));
@@ -138,20 +148,20 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     serverInfoGroupBox = new QGroupBox(tr("Server Contact"));
     serverInfoGroupBox->setLayout(serverInfoLayout);
 
-    btnGroupBox = new QGroupBox(tr(""));
-    btnGroupBox->setLayout(buttons);
+//    btnGroupBox = new QGroupBox(tr(""));
+//    btnGroupBox->setLayout(buttons);
 
     grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
     grid->addWidget(serverInfoGroupBox, 1, 0);
     grid->addWidget(loginGroupBox, 2, 0);
-    grid->addWidget(btnGroupBox, 3, 0);
+//    grid->addWidget(btnGroupBox, 3, 0);
 
     mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Connect to server"));
+    setWindowTitle(tr("Connect to Server"));
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 

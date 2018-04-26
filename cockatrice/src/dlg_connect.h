@@ -61,7 +61,7 @@ private slots:
     void downloadThePublicServers();
 
 private:
-    QGridLayout *newHostLayout, *connectionLayout, *buttons, *loginLayout, *serverInfoLayout, *grid;
+    QGridLayout *newHostLayout, *connectionLayout, *loginLayout, *serverInfoLayout, *grid;
     QHBoxLayout *newHolderLayout;
     QGroupBox *loginGroupBox, *serverInfoGroupBox, *btnGroupBox, *restrictionsGroupBox;
     QVBoxLayout *mainLayout;
