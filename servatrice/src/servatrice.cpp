@@ -74,7 +74,7 @@ Servatrice_GameServer::~Servatrice_GameServer()
     }
 }
 
-void Servatrice_GameServer::incomingConnection(const int &socketDescriptor)
+void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
 {
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
@@ -515,8 +515,8 @@ QList<AbstractServerSocketInterface *> Servatrice::getUsersWithAddressAsList(con
     QList<AbstractServerSocketInterface *> result;
     QReadLocker locker(&clientsLock);
     for (auto client : clients)
-        if (dynamic_cast<AbstractServerSocketInterface *>(client)->getPeerAddress() == address)
-            result.append(dynamic_cast<AbstractServerSocketInterface *>(client));
+        if (static_cast<AbstractServerSocketInterface *>(client)->getPeerAddress() == address)
+            result.append(static_cast<AbstractServerSocketInterface *>(client));
     return result;
 }
 
@@ -585,9 +585,8 @@ void Servatrice::statusUpdate()
 
     QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
         "insert into {prefix}_uptime (id_server, timest, uptime, users_count, mods_count, mods_list, games_count, "
-        "tx_bytes, "
-        "rx_bytes) "
-        "values(:id, NOW(), :uptime, :users_count, :mods_count, :mods_list, :games_count, :tx, :rx)");
+        "tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :mods_count, :mods_list, :games_count, :tx, "
+        ":rx)");
     query->bindValue(":id", serverId);
     query->bindValue(":uptime", uptime);
     query->bindValue(":users_count", uc);

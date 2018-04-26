@@ -53,8 +53,6 @@ Server::Server(QObject *parent) : QObject(parent), nextLocalGameId(0), tcpUserCo
             Qt::QueuedConnection);
 }
 
-Server::~Server() = default;
-
 void Server::prepareDestroy()
 {
     roomsLock.lockForWrite();

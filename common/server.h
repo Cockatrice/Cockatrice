@@ -56,8 +56,8 @@ private slots:
 
 public:
     mutable QReadWriteLock clientsLock, roomsLock; // locking order: roomsLock before clientsLock
-    Server(QObject *parent = 0);
-    ~Server();
+    Server(QObject *parent = nullptr);
+    Server::~Server() = default;
     AuthenticationResult loginUser(Server_ProtocolHandler *session,
                                    QString &name,
                                    const QString &password,
@@ -186,9 +186,6 @@ public:
     void sendIsl_RoomEvent(const RoomEvent &item, int serverId = -1, qint64 sessionId = -1);
     void sendIsl_GameCommand(const CommandContainer &item, int serverId, qint64 sessionId, int roomId, int playerId);
     void sendIsl_RoomCommand(const CommandContainer &item, int serverId, qint64 sessionId, int roomId);
-
-    virtual void addExternalUser(const ServerInfo_User &userInfo) = delete;
-    virtual void removeExternalUser(const QString &userName) = delete;
 
     const QMap<QString, Server_AbstractUserInterface *> &getExternalUsers() const
     {
