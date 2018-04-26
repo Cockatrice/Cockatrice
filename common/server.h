@@ -57,7 +57,7 @@ private slots:
 public:
     mutable QReadWriteLock clientsLock, roomsLock; // locking order: roomsLock before clientsLock
     Server(QObject *parent = nullptr);
-    Server::~Server() = default;
+    ~Server() = default;
     AuthenticationResult loginUser(Server_ProtocolHandler *session,
                                    QString &name,
                                    const QString &password,
