@@ -5,12 +5,12 @@
 PROJECT(Cockatrice)
 
 SET(cockatrice_SOURCES
-    src/abstractcounter.cpp 
+    src/abstractcounter.cpp
     src/counter_general.cpp
     src/dlg_creategame.cpp
     src/dlg_filter_games.cpp
-    src/dlg_connect.cpp 
-    src/dlg_create_token.cpp 
+    src/dlg_connect.cpp
+    src/dlg_create_token.cpp
     src/dlg_edit_avatar.cpp
     src/dlg_edit_password.cpp
     src/dlg_edit_tokens.cpp
@@ -18,35 +18,35 @@ SET(cockatrice_SOURCES
     src/dlg_forgotpasswordrequest.cpp
     src/dlg_forgotpasswordreset.cpp
     src/dlg_forgotpasswordchallenge.cpp
-    src/dlg_register.cpp 
+    src/dlg_register.cpp
     src/dlg_tip_of_the_day.cpp
     src/tip_of_the_day.cpp
     src/dlg_update.cpp
     src/dlg_viewlog.cpp
     src/abstractclient.cpp
-    src/remoteclient.cpp 
-    src/main.cpp 
-    src/window_main.cpp 
-    src/gamesmodel.cpp 
-    src/player.cpp 
-    src/playertarget.cpp 
-    src/cardzone.cpp 
-    src/selectzone.cpp 
-    src/cardlist.cpp 
-    src/abstractcarditem.cpp 
-    src/carditem.cpp 
-    src/tablezone.cpp 
-    src/handzone.cpp 
-    src/handcounter.cpp 
-    src/carddatabase.cpp 
+    src/remoteclient.cpp
+    src/main.cpp
+    src/window_main.cpp
+    src/gamesmodel.cpp
+    src/player.cpp
+    src/playertarget.cpp
+    src/cardzone.cpp
+    src/selectzone.cpp
+    src/cardlist.cpp
+    src/abstractcarditem.cpp
+    src/carditem.cpp
+    src/tablezone.cpp
+    src/handzone.cpp
+    src/handcounter.cpp
+    src/carddatabase.cpp
     src/keysignals.cpp
-    src/gameview.cpp 
-    src/gameselector.cpp 
-    src/decklistmodel.cpp 
-    src/deck_loader.cpp 
-    src/dlg_load_deck_from_clipboard.cpp 
-    src/dlg_load_remote_deck.cpp 
-    src/cardinfowidget.cpp 
+    src/gameview.cpp
+    src/gameselector.cpp
+    src/decklistmodel.cpp
+    src/deck_loader.cpp
+    src/dlg_load_deck_from_clipboard.cpp
+    src/dlg_load_remote_deck.cpp
+    src/cardinfowidget.cpp
     src/cardframe.cpp
     src/cardinfopicture.cpp
     src/cardinfotext.cpp
@@ -54,32 +54,32 @@ SET(cockatrice_SOURCES
     src/cardfilter.cpp
     src/filtertreemodel.cpp
     src/filtertree.cpp
-    src/messagelogwidget.cpp 
-    src/zoneviewzone.cpp 
-    src/zoneviewwidget.cpp 
-    src/pilezone.cpp 
-    src/stackzone.cpp 
-    src/carddragitem.cpp 
-    src/carddatabasemodel.cpp 
-    src/setsmodel.cpp 
-    src/window_sets.cpp 
-    src/abstractgraphicsitem.cpp 
-    src/abstractcarddragitem.cpp 
-    src/dlg_settings.cpp 
-    src/phasestoolbar.cpp 
-    src/gamescene.cpp 
-    src/arrowitem.cpp 
-    src/arrowtarget.cpp 
-    src/tab.cpp 
-    src/tab_server.cpp 
-    src/tab_room.cpp 
-    src/tab_message.cpp 
-    src/tab_game.cpp 
-    src/tab_deck_storage.cpp 
-    src/tab_replays.cpp 
-    src/tab_supervisor.cpp 
-    src/tab_admin.cpp 
-    src/tab_userlists.cpp 
+    src/messagelogwidget.cpp
+    src/zoneviewzone.cpp
+    src/zoneviewwidget.cpp
+    src/pilezone.cpp
+    src/stackzone.cpp
+    src/carddragitem.cpp
+    src/carddatabasemodel.cpp
+    src/setsmodel.cpp
+    src/window_sets.cpp
+    src/abstractgraphicsitem.cpp
+    src/abstractcarddragitem.cpp
+    src/dlg_settings.cpp
+    src/phasestoolbar.cpp
+    src/gamescene.cpp
+    src/arrowitem.cpp
+    src/arrowtarget.cpp
+    src/tab.cpp
+    src/tab_server.cpp
+    src/tab_room.cpp
+    src/tab_message.cpp
+    src/tab_game.cpp
+    src/tab_deck_storage.cpp
+    src/tab_replays.cpp
+    src/tab_supervisor.cpp
+    src/tab_admin.cpp
+    src/tab_userlists.cpp
     src/tab_deck_editor.cpp
     src/tab_logs.cpp
     src/replay_timeline_widget.cpp
@@ -87,18 +87,18 @@ SET(cockatrice_SOURCES
     src/tappedout_interface.cpp
     src/chatview/chatview.cpp
     src/chatview/userlistProxy.h
-    src/userlist.cpp 
-    src/userinfobox.cpp 
+    src/userlist.cpp
+    src/userinfobox.cpp
     src/user_context_menu.cpp
-    src/remotedecklist_treewidget.cpp 
-    src/remotereplaylist_treewidget.cpp 
-    src/deckview.cpp 
-    src/playerlistwidget.cpp 
-    src/pixmapgenerator.cpp 
-    src/settingscache.cpp 
-    src/thememanager.cpp 
-    src/localserver.cpp 
-    src/localserverinterface.cpp 
+    src/remotedecklist_treewidget.cpp
+    src/remotereplaylist_treewidget.cpp
+    src/deckview.cpp
+    src/playerlistwidget.cpp
+    src/pixmapgenerator.cpp
+    src/settingscache.cpp
+    src/thememanager.cpp
+    src/localserver.cpp
+    src/localserverinterface.cpp
     src/localclient.cpp
     src/qt-json/json.cpp
     src/soundengine.cpp
@@ -239,7 +239,7 @@ if(UNIX)
         set_target_properties(cockatrice PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
         INSTALL(TARGETS cockatrice BUNDLE DESTINATION ./)
-        INSTALL(FILES ${cockatrice_QM} DESTINATION ./Cockatrice.app/Contents/Resources/translations)
+        INSTALL(FILES ${cockatrice_QM} DESTINATION ./cockatrice.app/Contents/Resources/translations)
     else()
         # Assume linux
         INSTALL(TARGETS cockatrice RUNTIME DESTINATION bin/)
@@ -255,14 +255,21 @@ endif()
 
 if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
-    set(plugin_dest_dir Cockatrice.app/Contents/Plugins)
-    set(qtconf_dest_dir Cockatrice.app/Contents/Resources)
+    set(plugin_dest_dir cockatrice.app/Contents/Plugins)
+    set(qtconf_dest_dir cockatrice.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt5 plugins: audio, iconengines, imageformats, platforms, printsupport
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(audio|iconengines|imageformats|platforms|printsupport)/.*\\.dylib"
-        REGEX ".*_debug\\.dylib" EXCLUDE)
+        FILES_MATCHING
+        PATTERN "*.dSYM" EXCLUDE
+        PATTERN "*_debug.dylib" EXCLUDE
+        PATTERN "audio/*.dylib"
+        PATTERN "iconengines/*.dylib"
+        PATTERN "imageformats/*.dylib"
+        PATTERN "platforms/*.dylib"
+        PATTERN "printsupport/*.dylib"
+    )
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
@@ -276,7 +283,7 @@ Data = Resources\")
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/cockatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
 endif()
 
