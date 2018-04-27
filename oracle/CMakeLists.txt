@@ -156,8 +156,9 @@ if(APPLE)
         FILES_MATCHING
         PATTERN "*.dSYM" EXCLUDE
         PATTERN "*_debug.dylib" EXCLUDE
-        PATTERN "platforms/*.dylib"
         PATTERN "iconengines/*.dylib"
+        PATTERN "platforms/*.dylib"
+        PATTERN "styles/*.dylib"
     )
 
     install(CODE "

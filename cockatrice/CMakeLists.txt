@@ -269,6 +269,7 @@ if(APPLE)
         PATTERN "imageformats/*.dylib"
         PATTERN "platforms/*.dylib"
         PATTERN "printsupport/*.dylib"
+        PATTERN "styles/*.dylib"
     )
 
     install(CODE "
