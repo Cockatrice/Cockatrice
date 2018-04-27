@@ -20,7 +20,10 @@ if [[ $BUILDTYPE == "Debug" ]]; then
   cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=$BUILDTYPE $prefix -DTEST=1
   make -j2
   make test
-  make install
+
+  if [[ $TRAVIS_OS_NAME == "osx" ]]; then
+    make install
+  fi
 
   if [[ $TRAVIS_OS_NAME == "linux" ]]; then
     cd ..
