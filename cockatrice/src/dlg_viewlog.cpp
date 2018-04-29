@@ -16,7 +16,7 @@ DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 
     coClearLog = new QCheckBox;
     coClearLog->setText(tr("Clear log when closing"));
-    coClearLog->setChecked(settingsCache->servers().getClearDebugLogStatus(true));
+    coClearLog->setChecked(settingsCache->servers().getClearDebugLogStatus(false));
     connect(coClearLog, SIGNAL(toggled(bool)), this, SLOT(actCheckBoxChanged(bool)));
     mainLayout->addWidget(coClearLog);
 
@@ -50,8 +50,8 @@ void DlgViewLog::closeEvent(QCloseEvent * /* event */)
 {
     if (coClearLog->isChecked()) {
         logArea->clear();
-    }
 
-    logArea->appendPlainText(Logger::getInstance().getClientVersion());
-    logArea->appendPlainText(Logger::getInstance().getSystemArchitecture());
+        logArea->appendPlainText(Logger::getInstance().getClientVersion());
+        logArea->appendPlainText(Logger::getInstance().getSystemArchitecture());
+    }
 }
