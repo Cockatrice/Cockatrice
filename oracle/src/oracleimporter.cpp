@@ -83,7 +83,7 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
         QStringList symbols = cardCost.split("}");
         QString formattedCardCost = QString();
         for (QString symbol : symbols) {
-            if (symbol.contains(QRegExp("[BWUGR]/[BWUGR]"))) {
+            if (symbol.contains(QChar('/'))) {
                 symbol.append("}");
             } else {
                 symbol.remove(QChar('{'));
@@ -108,8 +108,8 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
                                               !cardText.contains(cardName + " enters the battlefield tapped unless"));
 
         // insert the card and its properties
-        card = CardInfo::newInstance(cardName, isToken, cardCost, cmc, cardType, cardPT, cardText, colors, relatedCards,
-                                     reverseRelatedCards, upsideDown, cardLoyalty, cipt);
+        card = CardInfo::newInstance(cardName, isToken, formattedCardCost, cmc, cardType, cardPT, cardText, colors,
+                                     relatedCards, reverseRelatedCards, upsideDown, cardLoyalty, cipt);
         int tableRow = 1;
         QString mainCardType = card->getMainCardType();
         if ((mainCardType == "Land") || mArtifact)
