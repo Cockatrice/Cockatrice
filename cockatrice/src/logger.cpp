@@ -16,6 +16,7 @@ Logger::Logger() : logToFileEnabled(false)
     logBuffer.append(getClientVersion());
     logBuffer.append(getSystemArchitecture());
     logBuffer.append(getSystemLocale());
+    logBuffer.append(QString("-").repeated(75));
     std::cerr << getClientVersion().toStdString() << std::endl;
     std::cerr << getSystemArchitecture().toStdString() << std::endl;
 }
@@ -91,11 +92,12 @@ QString Logger::getSystemArchitecture()
     QString result;
 
     if (!getClientOperatingSystem().isEmpty()) {
-        result.append(tr("Client Operating System") + ": " + getClientOperatingSystem() + "\n");
+        // We don't want translatable strings in the 'Debug Log' for easier troubleshooting
+        result.append(QString("Client Operating System: ") + getClientOperatingSystem() + "\n");
     }
 
-    result.append(tr("Build Architecture") + ": " + QString::fromStdString(BUILD_ARCHITECTURE) + "\n");
-    result.append(tr("Qt Version") + ": " + QT_VERSION_STR);
+    result.append(QString("Build Architecture: ") + QString::fromStdString(BUILD_ARCHITECTURE) + "\n");
+    result.append(QString("Qt Version: ") + QT_VERSION_STR);
 
     return result;
 }
@@ -112,6 +114,6 @@ QString Logger::getClientOperatingSystem()
 QString Logger::getSystemLocale()
 {
     QString result;
-    result.append(tr("System Locale") + ": " + QLocale().name());
+    result.append(QString("System Locale: ") + QLocale().name());
     return result;
 }
