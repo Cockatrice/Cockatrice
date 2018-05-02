@@ -37,6 +37,7 @@
 #include <QFile>
 #include <QSqlQuery>
 #include <QString>
+#include <QStringList>
 #include <QTimer>
 #include <iostream>
 
@@ -566,7 +567,7 @@ void Servatrice::statusUpdate()
 
     const int uc = getUsersCount(); // for correct mutex locking order
 
-    const QList<QString> mods_info = getOnlineModeratorList();
+    const QStringList mods_info = getOnlineModeratorList();
     const int mc = mods_info.size();
     const QString ml = mods_info.join(", ");
 
