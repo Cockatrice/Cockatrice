@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(24);
+INSERT INTO cockatrice_schema_version VALUES(25);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -164,6 +164,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_uptime` (
   `timest` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `uptime` int(11) NOT NULL,
   `users_count` int(11) NOT NULL,
+  `mods_count` int(11) NOT NULL DEFAULT 0,
+  `mods_list` TEXT,
   `games_count` int(11) NOT NULL,
   `rx_bytes` int(11) NOT NULL,
   `tx_bytes` int(11) NOT NULL,

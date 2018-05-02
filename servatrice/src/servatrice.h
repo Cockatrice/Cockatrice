@@ -32,6 +32,7 @@
 #include <QSqlDatabase>
 #include <QSslCertificate>
 #include <QSslKey>
+#include <utility>
 
 Q_DECLARE_METATYPE(QSqlDatabase)
 
@@ -54,11 +55,14 @@ private:
     QList<Servatrice_ConnectionPool *> connectionPools;
 
 public:
-    Servatrice_GameServer(Servatrice *_server, int _numberPools, const QSqlDatabase &_sqlDatabase, QObject *parent = 0);
-    ~Servatrice_GameServer();
+    Servatrice_GameServer(Servatrice *_server,
+                          int _numberPools,
+                          const QSqlDatabase &_sqlDatabase,
+                          QObject *parent = nullptr);
+    ~Servatrice_GameServer() override;
 
 protected:
-    void incomingConnection(qintptr socketDescriptor);
+    void incomingConnection(qintptr socketDescriptor) override;
     Servatrice_ConnectionPool *findLeastUsedConnectionPool();
 };
 
@@ -74,8 +78,8 @@ public:
     Servatrice_WebsocketGameServer(Servatrice *_server,
                                    int _numberPools,
                                    const QSqlDatabase &_sqlDatabase,
-                                   QObject *parent = 0);
-    ~Servatrice_WebsocketGameServer();
+                                   QObject *parent = nullptr);
+    ~Servatrice_WebsocketGameServer() override;
 
 protected:
     Servatrice_ConnectionPool *findLeastUsedConnectionPool();
@@ -96,13 +100,13 @@ public:
     Servatrice_IslServer(Servatrice *_server,
                          const QSslCertificate &_cert,
                          const QSslKey &_privateKey,
-                         QObject *parent = 0)
+                         QObject *parent = nullptr)
         : QTcpServer(parent), server(_server), cert(_cert), privateKey(_privateKey)
     {
     }
 
 protected:
-    void incomingConnection(qintptr socketDescriptor);
+    void incomingConnection(qintptr socketDescriptor) override;
 };
 
 class ServerProperties
@@ -117,11 +121,12 @@ public:
 
     ServerProperties(int _id,
                      const QSslCertificate &_cert,
-                     const QString &_hostname,
+                     QString _hostname,
                      const QHostAddress &_address,
                      int _gamePort,
                      int _controlPort)
-        : id(_id), cert(_cert), hostname(_hostname), address(_address), gamePort(_gamePort), controlPort(_controlPort)
+        : id(_id), cert(_cert), hostname(std::move(_hostname)), address(_address), gamePort(_gamePort),
+          controlPort(_controlPort)
     {
     }
 };
@@ -141,7 +146,7 @@ private slots:
     void shutdownTimeout();
 
 protected:
-    void doSendIslMessage(const IslMessage &msg, int serverId);
+    void doSendIslMessage(const IslMessage &msg, int serverId) override;
 
 private:
     enum DatabaseType
@@ -201,13 +206,13 @@ private:
 public slots:
     void scheduleShutdown(const QString &reason, int minutes);
     void updateLoginMessage();
-    void setRequiredFeatures(const QString featureList);
+    void setRequiredFeatures(QString featureList);
 
 public:
-    Servatrice(QObject *parent = 0);
-    ~Servatrice();
+    explicit Servatrice(QObject *parent = nullptr);
+    ~Servatrice() override;
     bool initServer();
-    QMap<QString, bool> getServerRequiredFeatureList() const
+    QMap<QString, bool> getServerRequiredFeatureList() const override
     {
         return serverRequiredFeatureList;
     }
@@ -216,12 +221,12 @@ public:
         return officialWarnings;
     }
     QString getServerName() const;
-    QString getLoginMessage() const
+    QString getLoginMessage() const override
     {
         QMutexLocker locker(&loginMessageMutex);
         return loginMessage;
     }
-    QString getRequiredFeatures() const;
+    QString getRequiredFeatures() const override;
     QString getAuthenticationMethodString() const;
     QString getDBTypeString() const;
     QString getDbPrefix() const
@@ -233,40 +238,40 @@ public:
     {
         return authenticationMethod;
     }
-    bool permitUnregisteredUsers() const
+    bool permitUnregisteredUsers() const override
     {
         return authenticationMethod != AuthenticationNone;
     }
-    bool getGameShouldPing() const
+    bool getGameShouldPing() const override
     {
         return true;
     }
-    bool getClientIDRequiredEnabled() const;
-    bool getRegOnlyServerEnabled() const;
-    bool getMaxUserLimitEnabled() const;
-    bool getStoreReplaysEnabled() const;
+    bool getClientIDRequiredEnabled() const override;
+    bool getRegOnlyServerEnabled() const override;
+    bool getMaxUserLimitEnabled() const override;
+    bool getStoreReplaysEnabled() const override;
     bool getRegistrationEnabled() const;
     bool getRequireEmailForRegistrationEnabled() const;
     bool getRequireEmailActivationEnabled() const;
-    bool getEnableLogQuery() const;
+    bool getEnableLogQuery() const override;
     bool getEnableForgotPassword() const;
     bool getEnableForgotPasswordChallenge() const;
     bool getEnableAudit() const;
     bool getEnableRegistrationAudit() const;
     bool getEnableForgotPasswordAudit() const;
-    int getIdleClientTimeout() const;
-    int getServerID() const;
-    int getMaxGameInactivityTime() const;
-    int getMaxPlayerInactivityTime() const;
-    int getClientKeepAlive() const;
+    int getIdleClientTimeout() const override;
+    int getServerID() const override;
+    int getMaxGameInactivityTime() const override;
+    int getMaxPlayerInactivityTime() const override;
+    int getClientKeepAlive() const override;
     int getMaxUsersPerAddress() const;
-    int getMessageCountingInterval() const;
-    int getMaxMessageCountPerInterval() const;
-    int getMaxMessageSizePerInterval() const;
-    int getMaxGamesPerUser() const;
-    int getCommandCountingInterval() const;
-    int getMaxCommandCountPerInterval() const;
-    int getMaxUserTotal() const;
+    int getMessageCountingInterval() const override;
+    int getMaxMessageCountPerInterval() const override;
+    int getMaxMessageSizePerInterval() const override;
+    int getMaxGamesPerUser() const override;
+    int getCommandCountingInterval() const override;
+    int getMaxCommandCountPerInterval() const override;
+    int getMaxUserTotal() const override;
     int getMaxTcpUserLimit() const;
     int getMaxWebSocketUserLimit() const;
     int getUsersWithAddress(const QHostAddress &address) const;
