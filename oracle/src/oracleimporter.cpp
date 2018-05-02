@@ -83,7 +83,7 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
         QStringList symbols = cardCost.split("}");
         QString formattedCardCost = QString();
         for (QString symbol : symbols) {
-            if (symbol.contains(QChar('/'))) {
+            if (symbol.contains(QRegExp("[0-9WUBGRP]/[0-9WUBGRP]"))) {
                 symbol.append("}");
             } else {
                 symbol.remove(QChar('{'));
