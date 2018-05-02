@@ -10,7 +10,7 @@ prefix=""
 
 if [[ $TRAVIS_OS_NAME == "osx" ]]; then
   export PATH="/usr/local/opt/ccache/bin:$PATH"
-  prefix="-DCMAKE_PREFIX_PATH=$(echo /usr/local/opt/qt*/)"
+  prefix="-DCMAKE_PREFIX_PATH=$(echo /usr/local/opt/qt5/)"
 fi
 if [[ $TRAVIS_OS_NAME == "linux" ]]; then
   prefix="-DCMAKE_PREFIX_PATH=$(echo /opt/qt5*/lib/cmake/)"
@@ -20,6 +20,10 @@ if [[ $BUILDTYPE == "Debug" ]]; then
   cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=$BUILDTYPE $prefix -DTEST=1
   make -j2
   make test
+
+  if [[ $TRAVIS_OS_NAME == "osx" ]]; then
+    make install
+  fi
 
   if [[ $TRAVIS_OS_NAME == "linux" ]]; then
     cd ..
@@ -32,7 +36,7 @@ if [[ $BUILDTYPE == "Debug" ]]; then
       oracle/src/*.cpp \
       servatrice/src/*.h \
       servatrice/src/*.cpp
-    
+
     git clean -f
     git diff --quiet || (
       echo "*****************************************************";
