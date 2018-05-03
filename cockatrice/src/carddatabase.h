@@ -7,8 +7,7 @@
 #include <QList>
 #include <QMap>
 #include <QMetaType>
-#include <QPixmap>
-#include <QXmlStreamReader>
+#include <QSharedPointer>
 
 class CardDatabase;
 class CardInfo;

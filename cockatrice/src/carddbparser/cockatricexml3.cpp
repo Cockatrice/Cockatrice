@@ -1,6 +1,8 @@
 #include "cockatricexml3.h"
 
 #include <QDebug>
+#include <QFile>
+#include <QXmlStreamReader>
 
 #define COCKATRICE_XML3_TAGNAME "cockatrice_carddatabase"
 #define COCKATRICE_XML3_TAGVER 3
