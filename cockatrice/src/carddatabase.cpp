@@ -2,6 +2,7 @@
 #include "pictureloader.h"
 #include "settingscache.h"
 #include "spoilerbackgroundupdater.h"
+#include "carddbparser/cockatricexml3.h"
 
 #include <QCryptographicHash>
 #include <QDebug>
@@ -10,25 +11,7 @@
 #include <QMessageBox>
 #include <utility>
 
-const int CardDatabase::versionNeeded = 3;
 const char *CardDatabase::TOKENS_SETNAME = "TK";
-
-static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set)
-{
-    if (set.isNull()) {
-        qDebug() << "&operator<< set is nullptr";
-        return xml;
-    }
-
-    xml.writeStartElement("set");
-    xml.writeTextElement("name", set->getShortName());
-    xml.writeTextElement("longname", set->getLongName());
-    xml.writeTextElement("settype", set->getSetType());
-    xml.writeTextElement("releasedate", set->getReleaseDate().toString(Qt::ISODate));
-    xml.writeEndElement();
-
-    return xml;
-}
 
 CardSet::CardSet(const QString &_shortName,
                  const QString &_longName,
@@ -396,123 +379,26 @@ const QChar CardInfo::getColorChar() const
     }
 }
 
-static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &info)
-{
-    if (info.isNull()) {
-        qDebug() << "operator<< info is nullptr";
-        return xml;
-    }
-
-    xml.writeStartElement("card");
-    xml.writeTextElement("name", info->getName());
-
-    const SetList &sets = info->getSets();
-    QString tmpString;
-    QString tmpSet;
-    for (int i = 0; i < sets.size(); i++) {
-        xml.writeStartElement("set");
-
-        tmpSet = sets[i]->getShortName();
-        xml.writeAttribute("rarity", info->getRarity(tmpSet));
-        xml.writeAttribute("muId", QString::number(info->getMuId(tmpSet)));
-
-        tmpString = info->getCollectorNumber(tmpSet);
-        if (!tmpString.isEmpty()) {
-            xml.writeAttribute("num", info->getCollectorNumber(tmpSet));
-        }
-
-        tmpString = info->getCustomPicURL(tmpSet);
-        if (!tmpString.isEmpty()) {
-            xml.writeAttribute("picURL", tmpString);
-        }
-
-        xml.writeCharacters(tmpSet);
-        xml.writeEndElement();
-    }
-    const QStringList &colors = info->getColors();
-    for (int i = 0; i < colors.size(); i++) {
-        xml.writeTextElement("color", colors[i]);
-    }
-
-    const QList<CardRelation *> related = info->getRelatedCards();
-    for (auto i : related) {
-        xml.writeStartElement("related");
-        if (i->getDoesAttach()) {
-            xml.writeAttribute("attach", "attach");
-        }
-        if (i->getIsCreateAllExclusion()) {
-            xml.writeAttribute("exclude", "exclude");
-        }
-
-        if (i->getIsVariable()) {
-            if (1 == i->getDefaultCount()) {
-                xml.writeAttribute("count", "x");
-            } else {
-                xml.writeAttribute("count", "x=" + QString::number(i->getDefaultCount()));
-            }
-        } else if (1 != i->getDefaultCount()) {
-            xml.writeAttribute("count", QString::number(i->getDefaultCount()));
-        }
-        xml.writeCharacters(i->getName());
-        xml.writeEndElement();
-    }
-    const QList<CardRelation *> reverseRelated = info->getReverseRelatedCards();
-    for (auto i : reverseRelated) {
-        xml.writeStartElement("reverse-related");
-        if (i->getDoesAttach()) {
-            xml.writeAttribute("attach", "attach");
-        }
-
-        if (i->getIsCreateAllExclusion()) {
-            xml.writeAttribute("exclude", "exclude");
-        }
-
-        if (i->getIsVariable()) {
-            if (1 == i->getDefaultCount()) {
-                xml.writeAttribute("count", "x");
-            } else {
-                xml.writeAttribute("count", "x=" + QString::number(i->getDefaultCount()));
-            }
-        } else if (1 != i->getDefaultCount()) {
-            xml.writeAttribute("count", QString::number(i->getDefaultCount()));
-        }
-        xml.writeCharacters(i->getName());
-        xml.writeEndElement();
-    }
-    xml.writeTextElement("manacost", info->getManaCost());
-    xml.writeTextElement("cmc", info->getCmc());
-    xml.writeTextElement("type", info->getCardType());
-    if (!info->getPowTough().isEmpty()) {
-        xml.writeTextElement("pt", info->getPowTough());
-    }
-    xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
-    xml.writeTextElement("text", info->getText());
-    if (info->getMainCardType() == "Planeswalker") {
-        xml.writeTextElement("loyalty", info->getLoyalty());
-    }
-    if (info->getCipt()) {
-        xml.writeTextElement("cipt", "1");
-    }
-    if (info->getIsToken()) {
-        xml.writeTextElement("token", "1");
-    }
-    if (info->getUpsideDownArt()) {
-        xml.writeTextElement("upsidedown", "1");
-    }
-
-    xml.writeEndElement(); // card
-
-    return xml;
-}
-
 CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoaded)
 {
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");
+    qRegisterMetaType<CardInfoPtr>("CardSetPtr");
+
+    // add new parsers here
+    parsers << new CockatriceXml3Parser;
+
+    for(auto &parser: parsers)
+    {
+        connect(parser, SIGNAL(addCard(CardInfoPtr)), this, SLOT(addCard(CardInfoPtr)));
+        connect(parser, SIGNAL(addSet(CardSetPtr)), this, SLOT(addSet(CardSetPtr)));
+    }
+
     connect(settingsCache, SIGNAL(cardDatabasePathChanged()), this, SLOT(loadCardDatabases()));
 }
 
 CardDatabase::~CardDatabase()
 {
+    qDeleteAll(parsers);
     clear();
 }
 
@@ -609,6 +495,11 @@ CardSetPtr CardDatabase::getSet(const QString &setName)
     }
 }
 
+void CardDatabase::addSet(CardSetPtr set)
+{
+    sets.insert(set->getShortName(), set);
+}
+
 SetList CardDatabase::getSetList() const
 {
     SetList result;
@@ -618,159 +509,6 @@ SetList CardDatabase::getSetList() const
         result << i.value();
     }
     return result;
-}
-
-void CardDatabase::loadSetsFromXml(QXmlStreamReader &xml)
-{
-    while (!xml.atEnd()) {
-        if (xml.readNext() == QXmlStreamReader::EndElement) {
-            break;
-        }
-
-        if (xml.name() == "set") {
-            QString shortName, longName, setType;
-            QDate releaseDate;
-            while (!xml.atEnd()) {
-                if (xml.readNext() == QXmlStreamReader::EndElement) {
-                    break;
-                }
-
-                if (xml.name() == "name") {
-                    shortName = xml.readElementText();
-                } else if (xml.name() == "longname") {
-                    longName = xml.readElementText();
-                } else if (xml.name() == "settype") {
-                    setType = xml.readElementText();
-                } else if (xml.name() == "releasedate") {
-                    releaseDate = QDate::fromString(xml.readElementText(), Qt::ISODate);
-                } else if (xml.name() != "") {
-                    qDebug() << "[XMLReader] Unknown set property" << xml.name() << ", trying to continue anyway";
-                    xml.skipCurrentElement();
-                }
-            }
-
-            CardSetPtr newSet = getSet(shortName);
-            newSet->setLongName(longName);
-            newSet->setSetType(setType);
-            newSet->setReleaseDate(releaseDate);
-        }
-    }
-}
-
-void CardDatabase::loadCardsFromXml(QXmlStreamReader &xml)
-{
-    while (!xml.atEnd()) {
-        if (xml.readNext() == QXmlStreamReader::EndElement) {
-            break;
-        }
-
-        if (xml.name() == "card") {
-            QString name, manacost, cmc, type, pt, text, loyalty;
-            QStringList colors;
-            QList<CardRelation *> relatedCards, reverseRelatedCards;
-            QStringMap customPicURLs;
-            MuidMap muids;
-            QStringMap collectorNumbers, rarities;
-            SetList sets;
-            int tableRow = 0;
-            bool cipt = false;
-            bool isToken = false;
-            bool upsideDown = false;
-            while (!xml.atEnd()) {
-                if (xml.readNext() == QXmlStreamReader::EndElement) {
-                    break;
-                }
-
-                if (xml.name() == "name") {
-                    name = xml.readElementText();
-                } else if (xml.name() == "manacost") {
-                    manacost = xml.readElementText();
-                } else if (xml.name() == "cmc") {
-                    cmc = xml.readElementText();
-                } else if (xml.name() == "type") {
-                    type = xml.readElementText();
-                } else if (xml.name() == "pt") {
-                    pt = xml.readElementText();
-                } else if (xml.name() == "text") {
-                    text = xml.readElementText();
-                } else if (xml.name() == "set") {
-                    QXmlStreamAttributes attrs = xml.attributes();
-                    QString setName = xml.readElementText();
-                    sets.append(getSet(setName));
-                    if (attrs.hasAttribute("muId")) {
-                        muids[setName] = attrs.value("muId").toString().toInt();
-                    }
-
-                    if (attrs.hasAttribute("picURL")) {
-                        customPicURLs[setName] = attrs.value("picURL").toString();
-                    }
-
-                    if (attrs.hasAttribute("num")) {
-                        collectorNumbers[setName] = attrs.value("num").toString();
-                    }
-
-                    if (attrs.hasAttribute("rarity")) {
-                        rarities[setName] = attrs.value("rarity").toString();
-                    }
-                } else if (xml.name() == "color") {
-                    colors << xml.readElementText();
-                } else if (xml.name() == "related" || xml.name() == "reverse-related") {
-                    bool attach = false;
-                    bool exclude = false;
-                    bool variable = false;
-                    int count = 1;
-                    QXmlStreamAttributes attrs = xml.attributes();
-                    QString cardName = xml.readElementText();
-                    if (attrs.hasAttribute("count")) {
-                        if (attrs.value("count").toString().indexOf("x=") == 0) {
-                            variable = true;
-                            count = attrs.value("count").toString().remove(0, 2).toInt();
-                        } else if (attrs.value("count").toString().indexOf("x") == 0) {
-                            variable = true;
-                        } else {
-                            count = attrs.value("count").toString().toInt();
-                        }
-
-                        if (count < 1) {
-                            count = 1;
-                        }
-                    }
-
-                    if (attrs.hasAttribute("attach")) {
-                        attach = true;
-                    }
-
-                    if (attrs.hasAttribute("exclude")) {
-                        exclude = true;
-                    }
-
-                    auto *relation = new CardRelation(cardName, attach, exclude, variable, count);
-                    if (xml.name() == "reverse-related") {
-                        reverseRelatedCards << relation;
-                    } else {
-                        relatedCards << relation;
-                    }
-                } else if (xml.name() == "tablerow") {
-                    tableRow = xml.readElementText().toInt();
-                } else if (xml.name() == "cipt") {
-                    cipt = (xml.readElementText() == "1");
-                } else if (xml.name() == "upsidedown") {
-                    upsideDown = (xml.readElementText() == "1");
-                } else if (xml.name() == "loyalty") {
-                    loyalty = xml.readElementText();
-                } else if (xml.name() == "token") {
-                    isToken = static_cast<bool>(xml.readElementText().toInt());
-                } else if (xml.name() != "") {
-                    qDebug() << "[XMLReader] Unknown card property" << xml.name() << ", trying to continue anyway";
-                    xml.skipCurrentElement();
-                }
-            }
-
-            addCard(CardInfo::newInstance(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards,
-                                          reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs,
-                                          muids, collectorNumbers, rarities));
-        }
-    }
 }
 
 CardInfoPtr CardDatabase::getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const
@@ -789,81 +527,18 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName)
         return FileError;
     }
 
-    QXmlStreamReader xml(&file);
-    while (!xml.atEnd()) {
-        if (xml.readNext() == QXmlStreamReader::StartElement) {
-            if (xml.name() != "cockatrice_carddatabase") {
-                return Invalid;
-            }
-
-            int version = xml.attributes().value("version").toString().toInt();
-            if (version < versionNeeded) {
-                qDebug() << "[XMLReader] Version too old: " << version;
-                return VersionTooOld;
-            }
-
-            while (!xml.atEnd()) {
-                if (xml.readNext() == QXmlStreamReader::EndElement) {
-                    break;
-                }
-
-                if (xml.name() == "sets") {
-                    loadSetsFromXml(xml);
-                } else if (xml.name() == "cards") {
-                    loadCardsFromXml(xml);
-                } else if (xml.name() != "") {
-                    qDebug() << "[XMLReader] Unknown item" << xml.name() << ", trying to continue anyway";
-                    xml.skipCurrentElement();
-                }
-            }
+    for(auto parser : parsers)
+    {
+        file.reset();
+        if(parser->getCanParseFile(fileName, file))
+        {
+            file.reset();
+            parser->parseFile(file);
+            return Ok;
         }
     }
 
-    if (cards.isEmpty()) {
-        return NoCards;
-    }
-
-    return Ok;
-}
-
-bool CardDatabase::saveToFile(const QString &fileName, bool tokens)
-{
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly)) {
-        return false;
-    }
-
-    QXmlStreamWriter xml(&file);
-
-    xml.setAutoFormatting(true);
-    xml.writeStartDocument();
-    xml.writeStartElement("cockatrice_carddatabase");
-    xml.writeAttribute("version", QString::number(versionNeeded));
-
-    if (!tokens) {
-        xml.writeStartElement("sets");
-        QHashIterator<QString, CardSetPtr> setIterator(sets);
-        while (setIterator.hasNext()) {
-            xml << setIterator.next().value();
-        }
-
-        xml.writeEndElement(); // sets
-    }
-
-    xml.writeStartElement("cards");
-    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
-    while (cardIterator.hasNext()) {
-        CardInfoPtr card = cardIterator.next().value();
-        if (tokens == card->getIsToken()) {
-            xml << card;
-        }
-    }
-    xml.writeEndElement(); // cards
-
-    xml.writeEndElement(); // cockatrice_carddatabase
-    xml.writeEndDocument();
-
-    return true;
+    return Invalid;
 }
 
 LoadStatus CardDatabase::loadCardDatabase(const QString &path)
@@ -1031,33 +706,21 @@ void CardDatabase::notifyEnabledSetsChanged()
 
 bool CardDatabase::saveCustomTokensToFile()
 {
-    CardSetPtr customTokensSet = getSet(CardDatabase::TOKENS_SETNAME);
     QString fileName = settingsCache->getCustomCardDatabasePath() + "/" + CardDatabase::TOKENS_SETNAME + ".xml";
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly)) {
-        return false;
-    }
 
-    QXmlStreamWriter xml(&file);
+    SetNameMap tmpSets;
+    CardSetPtr customTokensSet = getSet(CardDatabase::TOKENS_SETNAME);
+    tmpSets.insert(CardDatabase::TOKENS_SETNAME, customTokensSet);
 
-    xml.setAutoFormatting(true);
-    xml.writeStartDocument();
-    xml.writeStartElement("cockatrice_carddatabase");
-    xml.writeAttribute("version", QString::number(versionNeeded));
-
-    xml.writeStartElement("cards");
-    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
-    while (cardIterator.hasNext()) {
-        CardInfoPtr card = cardIterator.next().value();
+    CardNameMap tmpCards;
+    for(CardInfoPtr card : cards)
+    {
         if (card->getSets().contains(customTokensSet)) {
-            xml << card;
+            tmpCards.insert(card->getName(), card);
         }
     }
-    xml.writeEndElement(); // cards
 
-    xml.writeEndElement(); // cockatrice_carddatabase
-    xml.writeEndDocument();
-
+    parsers.first()->saveToFile(tmpSets, tmpCards, fileName);
     return true;
 }
 

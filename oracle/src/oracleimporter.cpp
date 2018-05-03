@@ -1,4 +1,5 @@
 #include "oracleimporter.h"
+#include "carddbparser/cockatricexml3.h"
 
 #include <QDebug>
 #include <QtWidgets>
@@ -174,6 +175,7 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
 
         QString layout = map.value("layout").toString();
 
+        // don't import tokens from the json file
         if (layout == "token")
             continue;
 
@@ -361,4 +363,10 @@ int OracleImporter::startImport()
 
     // total number of sets
     return setIndex;
+}
+
+bool OracleImporter::saveToFile(const QString &fileName)
+{
+    CockatriceXml3Parser parser;
+    return parser.saveToFile(sets, cards, fileName);
 }

@@ -2,7 +2,6 @@
 #define CARDDATABASE_H
 
 #include <QBasicMutex>
-#include <QDataStream>
 #include <QDate>
 #include <QHash>
 #include <QList>
@@ -15,6 +14,7 @@ class CardDatabase;
 class CardInfo;
 class CardSet;
 class CardRelation;
+class ICardDatabaseParser;
 
 typedef QMap<QString, QString> QStringMap;
 typedef QMap<QString, int> MuidMap;
@@ -58,15 +58,15 @@ public:
     {
         return releaseDate;
     }
-    void setLongName(QString &_longName)
+    void setLongName(const QString &_longName)
     {
         longName = _longName;
     }
-    void setSetType(QString &_setType)
+    void setSetType(const QString &_setType)
     {
         setType = _setType;
     }
-    void setReleaseDate(QDate &_releaseDate)
+    void setReleaseDate(const QDate &_releaseDate)
     {
         releaseDate = _releaseDate;
     }
@@ -398,11 +398,11 @@ protected:
 
     LoadStatus loadStatus;
 
+    /*
+     * The available card database parsers
+     */
+    QVector<ICardDatabaseParser *> parsers;
 private:
-    static const int versionNeeded;
-    void loadCardsFromXml(QXmlStreamReader &xml);
-    void loadSetsFromXml(QXmlStreamReader &xml);
-
     CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     void checkUnknownSets();
     void refreshCachedReverseRelatedCards();
@@ -417,7 +417,6 @@ public:
     explicit CardDatabase(QObject *parent = nullptr);
     ~CardDatabase() override;
     void clear();
-    void addCard(CardInfoPtr card);
     void removeCard(CardInfoPtr card);
     CardInfoPtr getCard(const QString &cardName) const;
     QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
@@ -435,7 +434,6 @@ public:
     }
     SetList getSetList() const;
     LoadStatus loadFromFile(const QString &fileName);
-    bool saveToFile(const QString &fileName, bool tokens = false);
     bool saveCustomTokensToFile();
     QStringList getAllColors() const;
     QStringList getAllMainCardTypes() const;
@@ -449,6 +447,8 @@ public:
 
 public slots:
     LoadStatus loadCardDatabases();
+    void addCard(CardInfoPtr card);
+    void addSet(CardSetPtr set);
 private slots:
     LoadStatus loadCardDatabase(const QString &path);
 signals:
