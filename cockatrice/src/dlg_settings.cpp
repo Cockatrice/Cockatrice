@@ -92,8 +92,6 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&updateReleaseChannelBox, 1, 1);
     personalGrid->addWidget(&updateNotificationCheckBox, 2, 0);
     personalGrid->addWidget(&showTipsOnStartup, 3, 0);
-    personalGrid->addWidget(&pixmapCacheLabel, 4, 0);
-    personalGrid->addWidget(&pixmapCacheEdit, 4, 1);
     personalGrid->addWidget(&picDownloadCheckBox, 5, 0);
     personalGrid->addWidget(&urlLinkLabel, 5, 1);
     personalGrid->addWidget(&defaultUrlLabel, 6, 0, 1, 1);
@@ -103,6 +101,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(fallbackUrlEdit, 7, 1, 1, 1);
     personalGrid->addWidget(&fallbackUrlRestoreButton, 7, 2, 1, 1);
     personalGrid->addWidget(&clearDownloadedPicsButton, 8, 1);
+    personalGrid->addWidget(&pixmapCacheLabel, 9, 0);
+    personalGrid->addWidget(&pixmapCacheEdit, 9, 1);
 
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     urlLinkLabel.setOpenExternalLinks(true);
