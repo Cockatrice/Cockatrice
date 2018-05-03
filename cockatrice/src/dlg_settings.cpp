@@ -323,7 +323,7 @@ void GeneralSettingsPage::setEnabledStatus(bool status)
     fallbackUrlEdit->setEnabled(status);
     defaultUrlRestoreButton.setEnabled(status);
     fallbackUrlRestoreButton.setEnabled(status);
-    pixmapCacheEdit.setEnabled(status);
+    pixmapCacheEdit->setEnabled(status);
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()
