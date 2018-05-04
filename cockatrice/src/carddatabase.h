@@ -8,6 +8,8 @@
 #include <QMap>
 #include <QMetaType>
 #include <QSharedPointer>
+#include <QStringList>
+#include <QVector>
 
 class CardDatabase;
 class CardInfo;
