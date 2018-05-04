@@ -1,8 +1,8 @@
 #include "carddatabase.h"
+#include "carddbparser/cockatricexml3.h"
 #include "pictureloader.h"
 #include "settingscache.h"
 #include "spoilerbackgroundupdater.h"
-#include "carddbparser/cockatricexml3.h"
 
 #include <QCryptographicHash>
 #include <QDebug>
@@ -387,8 +387,7 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
     // add new parsers here
     parsers << new CockatriceXml3Parser;
 
-    for(auto &parser: parsers)
-    {
+    for (auto &parser : parsers) {
         connect(parser, SIGNAL(addCard(CardInfoPtr)), this, SLOT(addCard(CardInfoPtr)));
         connect(parser, SIGNAL(addSet(CardSetPtr)), this, SLOT(addSet(CardSetPtr)));
     }
@@ -527,11 +526,9 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName)
         return FileError;
     }
 
-    for(auto parser : parsers)
-    {
+    for (auto parser : parsers) {
         file.reset();
-        if(parser->getCanParseFile(fileName, file))
-        {
+        if (parser->getCanParseFile(fileName, file)) {
             file.reset();
             parser->parseFile(file);
             return Ok;
@@ -713,8 +710,7 @@ bool CardDatabase::saveCustomTokensToFile()
     tmpSets.insert(CardDatabase::TOKENS_SETNAME, customTokensSet);
 
     CardNameMap tmpCards;
-    for(CardInfoPtr card : cards)
-    {
+    for (CardInfoPtr card : cards) {
         if (card->getSets().contains(customTokensSet)) {
             tmpCards.insert(card->getName(), card);
         }

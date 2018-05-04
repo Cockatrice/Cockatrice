@@ -401,6 +401,7 @@ protected:
      * The available card database parsers
      */
     QVector<ICardDatabaseParser *> parsers;
+
 private:
     CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     void checkUnknownSets();

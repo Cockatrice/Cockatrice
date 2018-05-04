@@ -11,10 +11,9 @@ bool CockatriceXml3Parser::getCanParseFile(const QString &fileName, QIODevice &d
 {
     qDebug() << "[CockatriceXml3Parser] Trying to parse: " << fileName;
 
-	if(!fileName.endsWith(".xml", Qt::CaseInsensitive))
-    {
+    if (!fileName.endsWith(".xml", Qt::CaseInsensitive)) {
         qDebug() << "[CockatriceXml3Parser] Parsing failed: wrong extension";
-		return false;
+        return false;
     }
 
     QXmlStreamReader xml(&device);
@@ -36,7 +35,7 @@ bool CockatriceXml3Parser::getCanParseFile(const QString &fileName, QIODevice &d
         }
     }
 
-	return true;
+    return true;
 }
 
 void CockatriceXml3Parser::parseFile(QIODevice &device)
@@ -62,7 +61,10 @@ void CockatriceXml3Parser::parseFile(QIODevice &device)
     }
 }
 
-CardSetPtr CockatriceXml3Parser::internalAddSet(const QString &setName, const QString &longName, const QString &setType, const QDate &releaseDate)
+CardSetPtr CockatriceXml3Parser::internalAddSet(const QString &setName,
+                                                const QString &longName,
+                                                const QString &setType,
+                                                const QDate &releaseDate)
 {
     if (sets.contains(setName)) {
         return sets.value(setName);
@@ -102,7 +104,8 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
                 } else if (xml.name() == "releasedate") {
                     releaseDate = QDate::fromString(xml.readElementText(), Qt::ISODate);
                 } else if (xml.name() != "") {
-                    qDebug() << "[CockatriceXml3Parser] Unknown set property" << xml.name() << ", trying to continue anyway";
+                    qDebug() << "[CockatriceXml3Parser] Unknown set property" << xml.name()
+                             << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
@@ -216,14 +219,15 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                 } else if (xml.name() == "token") {
                     isToken = static_cast<bool>(xml.readElementText().toInt());
                 } else if (xml.name() != "") {
-                    qDebug() << "[CockatriceXml3Parser] Unknown card property" << xml.name() << ", trying to continue anyway";
+                    qDebug() << "[CockatriceXml3Parser] Unknown card property" << xml.name()
+                             << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
 
-            CardInfoPtr newCard = CardInfo::newInstance(name, isToken, manacost, cmc, type, pt, text, colors, relatedCards,
-                                          reverseRelatedCards, upsideDown, loyalty, cipt, tableRow, sets, customPicURLs,
-                                          muids, collectorNumbers, rarities);
+            CardInfoPtr newCard = CardInfo::newInstance(
+                name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown,
+                loyalty, cipt, tableRow, sets, customPicURLs, muids, collectorNumbers, rarities);
             emit addCard(newCard);
         }
     }
@@ -369,21 +373,17 @@ bool CockatriceXml3Parser::saveToFile(SetNameMap sets, CardNameMap cards, const 
     xml.writeStartElement(COCKATRICE_XML3_TAGNAME);
     xml.writeAttribute("version", QString::number(COCKATRICE_XML3_TAGVER));
 
-    if(sets.count() > 0)
-    {
+    if (sets.count() > 0) {
         xml.writeStartElement("sets");
-        for(CardSetPtr set : sets)
-        {
+        for (CardSetPtr set : sets) {
             xml << set;
         }
         xml.writeEndElement();
     }
 
-    if(cards.count() > 0)
-    {
+    if (cards.count() > 0) {
         xml.writeStartElement("cards");
-        for(CardInfoPtr card : cards)
-        {
+        for (CardInfoPtr card : cards) {
             xml << card;
         }
         xml.writeEndElement();
