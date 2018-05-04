@@ -115,16 +115,16 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     connectionLayout->addWidget(portEdit, 5, 1);
     connectionLayout->addWidget(autoConnectCheckBox, 6, 1);
 
-//    buttons = new QGridLayout;
-//    buttons->addWidget(btnOk, 0, 0);
-//    buttons->addWidget(btnCancel, 0, 2);
-// connectButton = new QPushButton(tr("&Connect"));
-// connectButton->setDefault(true);
+    //    buttons = new QGridLayout;
+    //    buttons->addWidget(btnOk, 0, 0);
+    //    buttons->addWidget(btnCancel, 0, 2);
+    // connectButton = new QPushButton(tr("&Connect"));
+    // connectButton->setDefault(true);
 
-// QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
-// buttonBox->addButton(connectButton, QDialogButtonBox::AcceptRole);
-// connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-// connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
+    // QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
+    // buttonBox->addButton(connectButton, QDialogButtonBox::AcceptRole);
+    // connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
+    // connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
 
     restrictionsGroupBox = new QGroupBox(tr("Server"));
     restrictionsGroupBox->setLayout(connectionLayout);
@@ -148,15 +148,15 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     serverInfoGroupBox = new QGroupBox(tr("Server Contact"));
     serverInfoGroupBox->setLayout(serverInfoLayout);
 
-//    btnGroupBox = new QGroupBox(tr(""));
-//    btnGroupBox->setLayout(buttons);
+    //    btnGroupBox = new QGroupBox(tr(""));
+    //    btnGroupBox->setLayout(buttons);
 
     grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
     grid->addWidget(serverInfoGroupBox, 1, 0);
     grid->addWidget(loginGroupBox, 2, 0);
 
-//    grid->addWidget(btnGroupBox, 3, 0);
+    //    grid->addWidget(btnGroupBox, 3, 0);
 
     mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
