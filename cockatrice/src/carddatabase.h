@@ -397,10 +397,7 @@ protected:
 
     LoadStatus loadStatus;
 
-    /*
-     * The available card database parsers
-     */
-    QVector<ICardDatabaseParser *> parsers;
+    QVector<ICardDatabaseParser *> availableParsers;
 
 private:
     CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;

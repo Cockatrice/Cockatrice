@@ -10,8 +10,8 @@ class CockatriceXml3Parser : public ICardDatabaseParser
     Q_OBJECT
     Q_INTERFACES(ICardDatabaseParser)
 public:
-    CockatriceXml3Parser(){};
-    ~CockatriceXml3Parser(){};
+    CockatriceXml3Parser() = default;
+    ~CockatriceXml3Parser() = default;
     bool getCanParseFile(const QString &name, QIODevice &device);
     void parseFile(QIODevice &device);
     bool saveToFile(SetNameMap sets, CardNameMap cards, const QString &fileName);

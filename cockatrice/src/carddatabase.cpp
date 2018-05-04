@@ -385,9 +385,9 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
     qRegisterMetaType<CardInfoPtr>("CardSetPtr");
 
     // add new parsers here
-    parsers << new CockatriceXml3Parser;
+    availableParsers << new CockatriceXml3Parser;
 
-    for (auto &parser : parsers) {
+    for (auto &parser : availableParsers) {
         connect(parser, SIGNAL(addCard(CardInfoPtr)), this, SLOT(addCard(CardInfoPtr)));
         connect(parser, SIGNAL(addSet(CardSetPtr)), this, SLOT(addSet(CardSetPtr)));
     }
@@ -397,7 +397,7 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
 
 CardDatabase::~CardDatabase()
 {
-    qDeleteAll(parsers);
+    qDeleteAll(availableParsers);
     clear();
 }
 
@@ -526,7 +526,7 @@ LoadStatus CardDatabase::loadFromFile(const QString &fileName)
         return FileError;
     }
 
-    for (auto parser : parsers) {
+    for (auto parser : availableParsers) {
         file.reset();
         if (parser->getCanParseFile(fileName, file)) {
             file.reset();
@@ -716,7 +716,7 @@ bool CardDatabase::saveCustomTokensToFile()
         }
     }
 
-    parsers.first()->saveToFile(tmpSets, tmpCards, fileName);
+    availableParsers.first()->saveToFile(tmpSets, tmpCards, fileName);
     return true;
 }
 
