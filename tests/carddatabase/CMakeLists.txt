@@ -2,6 +2,7 @@ ADD_DEFINITIONS("-DCARDDB_DATADIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"")
 add_executable(carddatabase_test
     carddatabase_test.cpp
     ../../cockatrice/src/carddatabase.cpp
+    ../../cockatrice/src/carddbparser/cockatricexml3.cpp
 
 )
 if(NOT GTEST_FOUND)
