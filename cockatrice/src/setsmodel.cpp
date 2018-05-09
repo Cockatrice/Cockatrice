@@ -270,13 +270,13 @@ void SetsDisplayModel::fetchMore(const QModelIndex &index)
 
 bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    QModelIndex index0 = sourceModel()->index(sourceRow, SetsModel::SetTypeCol, sourceParent);
-    QModelIndex index1 = sourceModel()->index(sourceRow, SetsModel::LongNameCol, sourceParent);
-    QModelIndex index2 = sourceModel()->index(sourceRow, SetsModel::ShortNameCol, sourceParent);
+    auto typeIndex = sourceModel()->index(sourceRow, SetsModel::SetTypeCol, sourceParent);
+    auto nameIndex = sourceModel()->index(sourceRow, SetsModel::LongNameCol, sourceParent);
+    auto shortNameIndex = sourceModel()->index(sourceRow, SetsModel::ShortNameCol, sourceParent);
 
-    return (sourceModel()->data(index0).toString().contains(filterRegExp()) ||
-            sourceModel()->data(index1).toString().contains(filterRegExp()) ||
-            sourceModel()->data(index2).toString().contains(filterRegExp()));
+    return (sourceModel()->data(typeIndex).toString().contains(filterRegExp()) ||
+            sourceModel()->data(nameIndex).toString().contains(filterRegExp()) ||
+            sourceModel()->data(shortNameIndex).toString().contains(filterRegExp()));
 }
 
 bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
