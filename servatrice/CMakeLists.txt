@@ -36,42 +36,14 @@ if(APPLE)
     set(servatrice_SOURCES ${servatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 
-set(SERVATRICE_LIBS)
-
-# qt5 stuff
-if(Qt5Widgets_FOUND)
-    include_directories(${Qt5Widgets_INCLUDE_DIRS})
-    list(APPEND SERVATRICE_LIBS Widgets)
-
-    # QtNetwork
-    find_package(Qt5Network)
-    if(Qt5Network_FOUND)
-        include_directories(${Qt5Network_INCLUDE_DIRS})
-        list(APPEND SERVATRICE_LIBS Network)
-    endif()
-
-    # QtSql
-    find_package(Qt5Sql)
-    if(Qt5Sql_FOUND)
-        include_directories(${Qt5Sql_INCLUDE_DIRS})
-        list(APPEND SERVATRICE_LIBS Sql)
-    endif()
-
-    # QtWebsockets
-    find_package(Qt5WebSockets)
-    if(Qt5WebSockets_FOUND)
-        include_directories(${Qt5WebSockets_INCLUDE_DIRS})
-        list(APPEND SERVATRICE_LIBS WebSockets)
-    endif()
-
-    QT5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
-
-    # guess plugins and libraries directory
-    set(QT_PLUGINS_DIR "${Qt5Widgets_DIR}/../../../plugins")
-    get_target_property(QT_LIBRARY_DIR Qt5::Core LOCATION)
-    get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
-endif()
-
+# Qt5
+find_package(Qt5 COMPONENTS Network Sql WebSockets REQUIRED)
+include_directories(${Qt5Core_INCLUDE_DIRS})
+include_directories(${Qt5Network_INCLUDE_DIRS})
+include_directories(${Qt5Sql_INCLUDE_DIRS})
+include_directories(${Qt5WebSockets_INCLUDE_DIRS})
+set(SERVATRICE_QT_MODULES Core Network Sql WebSockets)
+QT5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
 SET(QT_DONT_USE_QTGUI TRUE)
 
 # Mysql connector
@@ -114,7 +86,7 @@ if(MSVC)
 else()
     TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${CMAKE_THREAD_LIBS_INIT})
 endif()
-qt5_use_modules(servatrice ${SERVATRICE_LIBS})
+qt5_use_modules(servatrice ${SERVATRICE_QT_MODULES})
 
 # install rules
 if(UNIX)

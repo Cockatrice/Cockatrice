@@ -130,29 +130,23 @@ OPTION(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
 MESSAGE(STATUS "UPDATE TRANSLATIONS: ${UPDATE_TRANSLATIONS}")
 
 IF(WIN32)
-    FIND_PACKAGE(Qt5Widgets 5.4.0 REQUIRED)  # For QSysInfo::buildAbi()
+    FIND_PACKAGE(Qt5Core 5.4.0 REQUIRED)  # For QSysInfo::buildAbi()
 ELSE()
-    FIND_PACKAGE(Qt5Widgets 5.0.3 REQUIRED)
+    FIND_PACKAGE(Qt5Core 5.0.3 REQUIRED)
 ENDIF()
 
-IF(Qt5Widgets_FOUND)
-    MESSAGE(STATUS "Found Qt ${Qt5Widgets_VERSION_STRING}")
+IF(Qt5Core_FOUND)
+    MESSAGE(STATUS "Found Qt ${Qt5Core_VERSION_STRING}")
 
     # FIX: Qt was built with -reduce-relocations
     if (Qt5_POSITION_INDEPENDENT_CODE)
         SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
     endif()
 
-    FIND_PACKAGE(Qt5LinguistTools)
-    IF(UPDATE_TRANSLATIONS)
-        IF(NOT Qt5_LUPDATE_EXECUTABLE)
-            MESSAGE(WARNING "Qt's lupdate not found.")
-        ENDIF()
-    ENDIF()
-
-    IF(NOT Qt5_LRELEASE_EXECUTABLE)
-        MESSAGE(WARNING "Qt's lrelease not found.")
-    ENDIF()
+    # guess plugins and libraries directory
+    set(QT_PLUGINS_DIR "${Qt5Core_DIR}/../../../plugins")
+    get_target_property(QT_LIBRARY_DIR Qt5::Core LOCATION)
+    get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
 
 ELSE()
     MESSAGE(FATAL_ERROR "No Qt5 found!")

@@ -33,7 +33,7 @@ set(ORACLE_LIBS)
 INCLUDE_DIRECTORIES(pb)
 INCLUDE_DIRECTORIES(sfmt)
 INCLUDE_DIRECTORIES(${PROTOBUF_INCLUDE_DIR})
-include_directories(${Qt5Widgets_INCLUDE_DIRS})
+include_directories(${Qt5Core_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(cockatrice_common ${common_SOURCES} ${common_MOC_SRCS})
