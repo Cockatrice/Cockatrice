@@ -17,6 +17,8 @@
 #include <QToolBar>
 #include <QTreeView>
 
+#define SORT_RESET -1
+
 WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 {
     // left toolbar
@@ -60,7 +62,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     searchField->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
     setFocusProxy(searchField);
 
-    resetSortButton = new QPushButton(tr("Disable sorting"));
+    resetSortButton = new QPushButton(tr("Restore order"));
     resetSortButton->setDisabled(true);
 
     filterBox = new QHBoxLayout;
@@ -195,12 +197,12 @@ void WndSets::actRestore()
 
 void WndSets::actResetSort()
 {
-    view->header()->setSortIndicator(-1, Qt::DescendingOrder);
+    view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
 }
 
 void WndSets::actDisableSortButtons(int index)
 {
-    if (index != -1) {
+    if (index != SORT_RESET) {
         view->setDragEnabled(false);
         actToggleButtons(QItemSelection(), QItemSelection());
         disconnect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
