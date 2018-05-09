@@ -21,7 +21,7 @@
 #define SERVERSOCKETINTERFACE_H
 
 #include <QTcpSocket>
-#if QT_VERSION > 0x050300
+#ifdef QT_WEBSOCKETS_LIB
 #include <QWebSocket>
 #endif
 #include "server_protocolhandler.h"
@@ -181,7 +181,7 @@ public slots:
     void initConnection(int socketDescriptor);
 };
 
-#if QT_VERSION > 0x050300
+#ifdef QT_WEBSOCKETS_LIB
 class WebsocketServerSocketInterface : public AbstractServerSocketInterface
 {
     Q_OBJECT

@@ -104,7 +104,7 @@ Servatrice_ConnectionPool *Servatrice_GameServer::findLeastUsedConnectionPool()
     return connectionPools[poolIndex];
 }
 
-#if QT_VERSION > 0x050300
+#ifdef QT_WEBSOCKETS_LIB
 #define WEBSOCKET_POOL_NUMBER 999
 
 Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_server,
@@ -430,7 +430,7 @@ bool Servatrice::initServer()
         }
     }
 
-#if QT_VERSION > 0x050300
+#ifdef QT_WEBSOCKETS_LIB
     // WEBSOCKET SERVER
     if (getNumberOfWebSocketPools() > 0) {
         websocketGameServer = new Servatrice_WebsocketGameServer(this, getNumberOfWebSocketPools(),

@@ -21,7 +21,7 @@
 #define SERVATRICE_H
 
 #include <QTcpServer>
-#if QT_VERSION > 0x050300
+#ifdef QT_WEBSOCKETS_LIB
 #include <QWebSocketServer>
 #endif
 #include "server.h"
@@ -66,7 +66,7 @@ protected:
     Servatrice_ConnectionPool *findLeastUsedConnectionPool();
 };
 
-#if QT_VERSION > 0x050300
+#ifdef QT_WEBSOCKETS_LIB
 class Servatrice_WebsocketGameServer : public QWebSocketServer
 {
     Q_OBJECT
@@ -158,7 +158,7 @@ private:
     DatabaseType databaseType;
     QTimer *pingClock, *statusUpdateClock;
     Servatrice_GameServer *gameServer;
-#if QT_VERSION > 0x050300
+#ifdef QT_WEBSOCKETS_LIB
     Servatrice_WebsocketGameServer *websocketGameServer;
 #endif
     Servatrice_IslServer *islServer;
