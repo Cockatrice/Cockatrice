@@ -25,12 +25,14 @@ private:
     QTreeView *view;
     QPushButton *toggleAllButton, *toggleSelectedButton;
     QPushButton *enableAllButton, *disableAllButton, *enableSomeButton, *disableSomeButton;
+    QPushButton *resetSortButton;
     QAction *aUp, *aDown, *aBottom, *aTop;
     QToolBar *setsEditToolBar;
     QDialogButtonBox *buttonBox;
     QLabel *labNotes, *searchLabel;
     QLineEdit *searchField;
     QGridLayout *mainLayout;
+    QHBoxLayout *filterBox;
     void rebuildMainLayout(int actionToTake);
     enum
     {
@@ -56,6 +58,8 @@ private slots:
     void actTop();
     void actBottom();
     void actToggleButtons(const QItemSelection &selected, const QItemSelection &deselected);
+    void actDisableSortButtons(int index);
+    void actResetSort();
 };
 
 #endif

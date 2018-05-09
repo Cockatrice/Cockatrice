@@ -15,7 +15,7 @@
 #include <QPushButton>
 #include <QToolBar>
 #include <QTreeView>
-#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 {
@@ -59,7 +59,13 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     searchField->setPlaceholderText(tr("Search by card name"));
     searchField->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
     setFocusProxy(searchField);
-    // connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
+
+    resetSortButton = new QPushButton(tr("Disable sorting"));
+    resetSortButton->setDisabled(true);
+
+    filterBox = new QHBoxLayout;
+    filterBox->addWidget(searchField);
+    filterBox->addWidget(resetSortButton);
 
     // view
     model = new SetsModel(db, this);
@@ -102,6 +108,8 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
             SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
     connect(searchField, SIGNAL(textChanged(const QString &)), displayModel, SLOT(setFilterRegExp(const QString &)));
+    connect(view->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(actDisableSortButtons(int)));
+    connect(resetSortButton, SIGNAL(clicked()), this, SLOT(actResetSort()));
 
     labNotes = new QLabel;
     labNotes->setWordWrap(true);
@@ -123,7 +131,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 
     mainLayout = new QGridLayout;
     mainLayout->addWidget(setsEditToolBar, 0, 0, 2, 1);
-    mainLayout->addWidget(searchField, 0, 1, 1, 2);
+    mainLayout->addLayout(filterBox, 0, 1, 1, 2);
     mainLayout->addWidget(view, 1, 1, 1, 2);
     mainLayout->addWidget(enableAllButton, 2, 1);
     mainLayout->addWidget(disableAllButton, 2, 2);
@@ -185,6 +193,27 @@ void WndSets::actRestore()
     close();
 }
 
+void WndSets::actResetSort() {
+    view->header()->setSortIndicator(-1, Qt::DescendingOrder);
+}
+
+void WndSets::actDisableSortButtons(int index)
+{
+    if (index != -1) {
+        actToggleButtons(QItemSelection(), QItemSelection());
+        disconnect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
+            SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
+        resetSortButton->setEnabled(true);
+    }
+    else {
+        resetSortButton->setEnabled(false);
+        actToggleButtons(view->selectionModel()->selection(), QItemSelection());
+        connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
+            SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
+        view->scrollTo(view->selectionModel()->selectedRows().first());
+    }
+}
+
 void WndSets::actToggleButtons(const QItemSelection &selected, const QItemSelection &)
 {
     bool disabled = selected.empty();
@@ -220,16 +249,18 @@ void WndSets::actEnableSome()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
 
-    foreach (QModelIndex i, rows)
-        model->toggleRow(i.row(), true);
+    for (auto i : rows) {
+        model->toggleRow(displayModel->mapToSource(i).row(), true);
+    }
 }
 
 void WndSets::actDisableSome()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
 
-    foreach (QModelIndex i, rows)
-        model->toggleRow(i.row(), false);
+    for (auto i : rows) {
+        model->toggleRow(displayModel->mapToSource(i).row(), false);
+    }
 }
 
 void WndSets::actUp()
