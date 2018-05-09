@@ -200,6 +200,7 @@ void WndSets::actResetSort() {
 void WndSets::actDisableSortButtons(int index)
 {
     if (index != -1) {
+        view->setDragEnabled(false);
         actToggleButtons(QItemSelection(), QItemSelection());
         disconnect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
             SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
@@ -210,7 +211,10 @@ void WndSets::actDisableSortButtons(int index)
         actToggleButtons(view->selectionModel()->selection(), QItemSelection());
         connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
             SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
-        view->scrollTo(view->selectionModel()->selectedRows().first());
+        if (!view->selectionModel()->selection().empty()) {
+            view->scrollTo(view->selectionModel()->selectedRows().first());
+        }
+        view->setDragEnabled(true);
     }
 }
 
