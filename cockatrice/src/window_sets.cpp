@@ -8,6 +8,7 @@
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QHeaderView>
 #include <QItemSelection>
 #include <QLabel>
@@ -15,7 +16,6 @@
 #include <QPushButton>
 #include <QToolBar>
 #include <QTreeView>
-#include <QHBoxLayout>
 
 WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 {
@@ -193,7 +193,8 @@ void WndSets::actRestore()
     close();
 }
 
-void WndSets::actResetSort() {
+void WndSets::actResetSort()
+{
     view->header()->setSortIndicator(-1, Qt::DescendingOrder);
 }
 
@@ -202,15 +203,14 @@ void WndSets::actDisableSortButtons(int index)
     if (index != -1) {
         view->setDragEnabled(false);
         actToggleButtons(QItemSelection(), QItemSelection());
-        disconnect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
-            SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
+        disconnect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+                   this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
         resetSortButton->setEnabled(true);
-    }
-    else {
+    } else {
         resetSortButton->setEnabled(false);
         actToggleButtons(view->selectionModel()->selection(), QItemSelection());
         connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
-            SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
+                SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
         if (!view->selectionModel()->selection().empty()) {
             view->scrollTo(view->selectionModel()->selectedRows().first());
         }
