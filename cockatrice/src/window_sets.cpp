@@ -232,7 +232,7 @@ void WndSets::actToggleButtons(const QItemSelection &selected, const QItemSelect
 
 void WndSets::selectRows(QSet<int> rows)
 {
-    foreach (int i, rows) {
+    for (auto i : rows) {
         QModelIndex idx = model->index(i, 0);
         view->selectionModel()->select(idx, QItemSelectionModel::Select | QItemSelectionModel::Rows);
         view->scrollTo(idx, QAbstractItemView::EnsureVisible);
