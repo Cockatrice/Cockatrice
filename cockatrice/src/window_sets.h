@@ -4,9 +4,9 @@
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMainWindow>
 #include <QSet>
-#include <QLineEdit>
 
 class SetsModel;
 class SetsProxyModel;
@@ -21,7 +21,7 @@ class WndSets : public QMainWindow
     Q_OBJECT
 private:
     SetsModel *model;
-	SetsDisplayModel *displayModel;
+    SetsDisplayModel *displayModel;
     QTreeView *view;
     QPushButton *toggleAllButton, *toggleSelectedButton;
     QPushButton *enableAllButton, *disableAllButton, *enableSomeButton, *disableSomeButton;
@@ -29,7 +29,7 @@ private:
     QToolBar *setsEditToolBar;
     QDialogButtonBox *buttonBox;
     QLabel *labNotes, *searchLabel;
-	QLineEdit *searchField;
+    QLineEdit *searchField;
     QGridLayout *mainLayout;
     void rebuildMainLayout(int actionToTake);
     enum

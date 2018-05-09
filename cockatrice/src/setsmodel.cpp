@@ -253,38 +253,36 @@ QStringList SetsModel::mimeTypes() const
     return QStringList() << "application/x-cockatricecardset";
 }
 
-
-
 SetsDisplayModel::SetsDisplayModel(QObject *parent) : QSortFilterProxyModel(parent)
 {
-	setFilterCaseSensitivity(Qt::CaseInsensitive);
-	setSortCaseSensitivity(Qt::CaseInsensitive);
+    setFilterCaseSensitivity(Qt::CaseInsensitive);
+    setSortCaseSensitivity(Qt::CaseInsensitive);
 }
 
 void SetsDisplayModel::fetchMore(const QModelIndex &index)
 {
-	int itemsToFetch = sourceModel()->rowCount(index);
+    int itemsToFetch = sourceModel()->rowCount(index);
 
-	beginInsertRows(QModelIndex(), 0, itemsToFetch - 1);
+    beginInsertRows(QModelIndex(), 0, itemsToFetch - 1);
 
-	endInsertRows();
+    endInsertRows();
 }
 
-bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & sourceParent) const
+bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-	QModelIndex index0 = sourceModel()->index(sourceRow, SetsModel::SetTypeCol, sourceParent);
-	QModelIndex index1 = sourceModel()->index(sourceRow, SetsModel::LongNameCol, sourceParent);
-	QModelIndex index2 = sourceModel()->index(sourceRow, SetsModel::ShortNameCol, sourceParent);
+    QModelIndex index0 = sourceModel()->index(sourceRow, SetsModel::SetTypeCol, sourceParent);
+    QModelIndex index1 = sourceModel()->index(sourceRow, SetsModel::LongNameCol, sourceParent);
+    QModelIndex index2 = sourceModel()->index(sourceRow, SetsModel::ShortNameCol, sourceParent);
 
-	return (sourceModel()->data(index0).toString().contains(filterRegExp()) ||
-		sourceModel()->data(index1).toString().contains(filterRegExp()) ||
-		sourceModel()->data(index2).toString().contains(filterRegExp()));
+    return (sourceModel()->data(index0).toString().contains(filterRegExp()) ||
+            sourceModel()->data(index1).toString().contains(filterRegExp()) ||
+            sourceModel()->data(index2).toString().contains(filterRegExp()));
 }
 
 bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {
-	QString leftString = sourceModel()->data(left, SetsModel::SortRole).toString();
-	QString rightString = sourceModel()->data(right, SetsModel::SortRole).toString();
+    QString leftString = sourceModel()->data(left, SetsModel::SortRole).toString();
+    QString rightString = sourceModel()->data(right, SetsModel::SortRole).toString();
 
-	return QString::localeAwareCompare(leftString, rightString) < 0;
+    return QString::localeAwareCompare(leftString, rightString) < 0;
 }

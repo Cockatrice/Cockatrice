@@ -83,14 +83,14 @@ public:
 
 class SetsDisplayModel : public QSortFilterProxyModel
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	SetsDisplayModel(QObject *parent = NULL);
+    SetsDisplayModel(QObject *parent = NULL);
 
 protected:
-	bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
-	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
-	void fetchMore(const QModelIndex &index) override;
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    void fetchMore(const QModelIndex &index) override;
 };
 
 #endif

@@ -53,18 +53,19 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(aBottom, SIGNAL(triggered()), this, SLOT(actBottom()));
     setsEditToolBar->addAction(aBottom);
 
-	// search field
-	searchField = new QLineEdit;
-	searchField->setObjectName("searchEdit");
-	searchField->setPlaceholderText(tr("Search by card name"));
-	searchField->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-	setFocusProxy(searchField);
-	//connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
+    // search field
+    searchField = new QLineEdit;
+    searchField->setObjectName("searchEdit");
+    searchField->setPlaceholderText(tr("Search by card name"));
+    searchField->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+    setFocusProxy(searchField);
+    // connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
 
     // view
-    model = new SetsModel(db);
-	displayModel = new SetsDisplayModel(this);
-	displayModel->setSourceModel(model);
+    model = new SetsModel(db, this);
+    displayModel = new SetsDisplayModel(this);
+    displayModel->setSourceModel(model);
+    displayModel->setDynamicSortFilter(false);
     view = new QTreeView;
     view->setModel(displayModel);
 
@@ -100,7 +101,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(disableSomeButton, SIGNAL(clicked()), this, SLOT(actDisableSome()));
     connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
             SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
-	connect(searchField, SIGNAL(textChanged(const QString &)), displayModel, SLOT(setFilterRegExp(const QString &)));
+    connect(searchField, SIGNAL(textChanged(const QString &)), displayModel, SLOT(setFilterRegExp(const QString &)));
 
     labNotes = new QLabel;
     labNotes->setWordWrap(true);
@@ -122,7 +123,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 
     mainLayout = new QGridLayout;
     mainLayout->addWidget(setsEditToolBar, 0, 0, 2, 1);
-	mainLayout->addWidget(searchField, 0, 1, 1, 2);
+    mainLayout->addWidget(searchField, 0, 1, 1, 2);
     mainLayout->addWidget(view, 1, 1, 1, 2);
     mainLayout->addWidget(enableAllButton, 2, 1);
     mainLayout->addWidget(disableAllButton, 2, 2);
@@ -241,8 +242,8 @@ void WndSets::actUp()
         return;
 
     for (auto i : rows) {
-		if (i.row() <= 0)
-			continue;
+        if (i.row() <= 0)
+            continue;
         int oldRow = displayModel->mapToSource(i).row();
         int newRow = i.row() - 1;
 
@@ -263,8 +264,8 @@ void WndSets::actDown()
         return;
 
     for (auto i : rows) {
-		if (i.row() >= displayModel->rowCount() - 1)
-			continue;
+        if (i.row() >= displayModel->rowCount() - 1)
+            continue;
         int oldRow = displayModel->mapToSource(i).row();
         int newRow = i.row() + 1;
 
@@ -311,17 +312,16 @@ void WndSets::actBottom()
         return;
 
     for (int i = 0; i < rows.length(); i++) {
-		int oldRow = displayModel->mapToSource(rows.at(i)).row();
+        int oldRow = displayModel->mapToSource(rows.at(i)).row();
 
         if (oldRow >= newRow) {
             newRow--;
             continue;
         }
 
-		newRows.insert(newRow);
+        newRows.insert(newRow);
         model->swapRows(oldRow, newRow--);
     }
 
     selectRows(newRows);
-
 }
