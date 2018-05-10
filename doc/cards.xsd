@@ -13,7 +13,7 @@
       <xs:all>
         <xs:element name="sets" minOccurs="0">
             <xs:complexType>
-                <xs:sequence>
+                <xs:all>
                     <xs:element name="set" maxOccurs="unbounded" minOccurs="0">
                         <xs:complexType>
                             <xs:all>
@@ -24,15 +24,15 @@
                             </xs:all>
                         </xs:complexType>
                     </xs:element>
-                </xs:sequence>
+                </xs:all>
             </xs:complexType>
         </xs:element>
         <xs:element name="cards" minOccurs="0">
             <xs:complexType>
-                <xs:sequence>
+                <xs:all>
                     <xs:element name="card" maxOccurs="unbounded" minOccurs="0">
                         <xs:complexType>
-                            <xs:sequence>
+                            <xs:all>
                                     <xs:element type="xs:string" name="name" />
                                     <xs:element name="set" maxOccurs="unbounded" minOccurs="1">
                                         <xs:complexType>
@@ -62,10 +62,10 @@
                                         <xs:element type="relatedType" name="related" />
                                         <xs:element type="relatedType" name="reverse-related" />
                                     </xs:choice>
-                            </xs:sequence>
+                            </xs:all>
                         </xs:complexType>
                     </xs:element>
-                </xs:sequence>
+                </xs:all>
             </xs:complexType>
         </xs:element>
       </xs:all>
