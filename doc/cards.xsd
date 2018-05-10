@@ -13,7 +13,7 @@
       <xs:all>
         <xs:element name="sets" minOccurs="0">
             <xs:complexType>
-                <xs:all>
+                <xs:sequence>
                     <xs:element name="set" maxOccurs="unbounded" minOccurs="0">
                         <xs:complexType>
                             <xs:all>
@@ -24,48 +24,48 @@
                             </xs:all>
                         </xs:complexType>
                     </xs:element>
-                </xs:all>
+                </xs:sequence>
             </xs:complexType>
         </xs:element>
         <xs:element name="cards" minOccurs="0">
             <xs:complexType>
-                <xs:all>
+                <xs:sequence>
                     <xs:element name="card" maxOccurs="unbounded" minOccurs="0">
                         <xs:complexType>
-                            <xs:all>
-                                    <xs:element type="xs:string" name="name" />
-                                    <xs:element name="set" maxOccurs="unbounded" minOccurs="1">
-                                        <xs:complexType>
-                                            <xs:simpleContent>
-                                                <xs:extension base="xs:string">
-                                                    <xs:attribute type="xs:int" name="muId" use="optional" />
-                                                    <xs:attribute type="xs:anyURI" name="picURL" use="optional" />
-                                                    <xs:attribute type="xs:string" name="num"  use="optional" />
-                                                    <xs:attribute type="xs:string" name="rarity" use="optional" />
-                                                </xs:extension>
-                                            </xs:simpleContent>
-                                        </xs:complexType>
-                                    </xs:element>
-                                    <xs:element type="xs:string" name="color" minOccurs="0" maxOccurs="5" />
-                                    <xs:element type="relatedType" name="related" minOccurs="0" maxOccurs="unbounded" />
-                                    <xs:element type="xs:string" name="manacost" minOccurs="0" maxOccurs="1" />
-                                    <xs:element type="xs:string" name="cmc" minOccurs="0" maxOccurs="1" default="0" />
-                                    <xs:element type="xs:string" name="type" minOccurs="1" maxOccurs="1" />
-                                    <xs:element type="xs:string" name="pt" minOccurs="0" maxOccurs="1" />
-                                    <xs:element type="xs:integer" name="tablerow" maxOccurs="1" />
-                                    <xs:element type="xs:string" name="text" minOccurs="0" maxOccurs="1" />
-                                    <xs:element type="xs:boolean" name="cipt" minOccurs="0" maxOccurs="1" />
-                                    <xs:element type="xs:string" name="loyalty" minOccurs="0"  maxOccurs="1" />
-                                    <xs:element type="xs:boolean" name="upsidedown" minOccurs="0" maxOccurs="1" />
-                                    <xs:element type="xs:boolean" name="token" minOccurs="0" maxOccurs="1" />
-                                    <xs:choice minOccurs="0" maxOccurs="unbounded">
-                                        <xs:element type="relatedType" name="related" />
-                                        <xs:element type="relatedType" name="reverse-related" />
-                                    </xs:choice>
-                            </xs:all>
+                            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                <xs:element type="xs:string" name="name" />
+                                <xs:element name="set" maxOccurs="unbounded" minOccurs="1">
+                                    <xs:complexType>
+                                        <xs:simpleContent>
+                                            <xs:extension base="xs:string">
+                                                <xs:attribute type="xs:int" name="muId" use="optional" />
+                                                <xs:attribute type="xs:anyURI" name="picURL" use="optional" />
+                                                <xs:attribute type="xs:string" name="num"  use="optional" />
+                                                <xs:attribute type="xs:string" name="rarity" use="optional" />
+                                            </xs:extension>
+                                        </xs:simpleContent>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element type="xs:string" name="color" minOccurs="0" maxOccurs="5" />
+                                <xs:element type="relatedType" name="related" minOccurs="0" maxOccurs="unbounded" />
+                                <xs:element type="xs:string" name="manacost" minOccurs="0" maxOccurs="1" />
+                                <xs:element type="xs:string" name="cmc" minOccurs="0" maxOccurs="1" default="0" />
+                                <xs:element type="xs:string" name="type" minOccurs="1" maxOccurs="1" />
+                                <xs:element type="xs:string" name="pt" minOccurs="0" maxOccurs="1" />
+                                <xs:element type="xs:integer" name="tablerow" maxOccurs="1" />
+                                <xs:element type="xs:string" name="text" minOccurs="0" maxOccurs="1" />
+                                <xs:element type="xs:boolean" name="cipt" minOccurs="0" maxOccurs="1" />
+                                <xs:element type="xs:string" name="loyalty" minOccurs="0"  maxOccurs="1" />
+                                <xs:element type="xs:boolean" name="upsidedown" minOccurs="0" maxOccurs="1" />
+                                <xs:element type="xs:boolean" name="token" minOccurs="0" maxOccurs="1" />
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element type="relatedType" name="related" />
+                                    <xs:element type="relatedType" name="reverse-related" />
+                                </xs:choice>
+                            </xs:choice>
                         </xs:complexType>
                     </xs:element>
-                </xs:all>
+                </xs:sequence>
             </xs:complexType>
         </xs:element>
       </xs:all>
