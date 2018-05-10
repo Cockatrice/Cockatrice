@@ -150,7 +150,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                 } else if (xml.name() == "pt") {
                     pt = xml.readElementText();
                 } else if (xml.name() == "text") {
-                    text = xml.readElementText();
+                    text = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                 } else if (xml.name() == "set") {
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString setName = xml.readElementText();
