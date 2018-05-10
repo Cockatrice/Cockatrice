@@ -37,13 +37,14 @@ if(APPLE)
 ENDIF(APPLE)
 
 # Qt5
-find_package(Qt5 COMPONENTS Network Sql REQUIRED OPTIONAL_COMPONENTS WebSockets)
+find_package(Qt5 COMPONENTS Network Sql REQUIRED)
 include_directories(${Qt5Core_INCLUDE_DIRS})
 include_directories(${Qt5Network_INCLUDE_DIRS})
 include_directories(${Qt5Sql_INCLUDE_DIRS})
 set(SERVATRICE_QT_MODULES Core Network Sql)
 
 # Qt Websockets
+find_package(Qt5WebSockets)
 if(Qt5WebSockets_FOUND)
     include_directories(${Qt5WebSockets_INCLUDE_DIRS})
      list(APPEND SERVATRICE_QT_MODULES WebSockets)
