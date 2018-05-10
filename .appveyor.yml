@@ -1,17 +1,19 @@
 version: 2.5.2-branch-{branch}-build-{build}
 
-# Skipping commits affecting specific files (GitHub only). More details here: https://www.appveyor.com/docs/appveyor-yml
+# Skipping commits affecting specific files (GitHub only).
+# More details here: https://www.appveyor.com/docs/appveyor-yml and https://www.appveyor.com/docs/how-to/filtering-commits
 skip_commits:
   files:
-    - .github/*
-    - .travis/*
-    - .tx/*
-    - webclient/*
+    - .ci/travis-*
+    - .github/
+    - .tx/
+    - webclient/
+    - .clang-format
     - .*ignore
     - .codacy.yml
     - .gitlab-ci.yml
     - .travis.yml
-    - '*.md'
+    - '**/*.md'
     - Dockerfile
     - LICENSE
 
