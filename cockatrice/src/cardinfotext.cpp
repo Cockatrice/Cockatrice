@@ -105,7 +105,7 @@ void CardInfoText::setCard(CardInfoPtr card)
         else
         {
             loyaltyLabel1->hide();
-            loyaltyLabel1->hide();
+            loyaltyLabel2->hide();
         }
         textLabel->setText(card->getText());
     } else {
