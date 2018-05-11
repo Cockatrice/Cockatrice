@@ -22,6 +22,8 @@ private:
 
     CardInfoPtr info;
 
+    void resetLabels();
+
 public:
     CardInfoText(QWidget *parent = 0);
     void retranslateUi();

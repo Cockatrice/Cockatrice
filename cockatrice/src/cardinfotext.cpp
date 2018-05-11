@@ -54,16 +54,59 @@ CardInfoText::CardInfoText(QWidget *parent) : QFrame(parent), info(nullptr)
 
     retranslateUi();
 }
-
+// Reset every label which is optionally hidden
+void CardInfoText::resetLabels()
+{
+    manacostLabel1->show();
+    manacostLabel2->show();
+    powtoughLabel1->show();
+    powtoughLabel2->show();
+    loyaltyLabel1->show();
+    loyaltyLabel2->show();
+}
 void CardInfoText::setCard(CardInfoPtr card)
 {
     if (card) {
+
+        resetLabels();
+
         nameLabel2->setText(card->getName());
-        manacostLabel2->setText(card->getManaCost());
-        colorLabel2->setText(card->getColors().join(""));
+        if(!card->getManaCost().isEmpty())
+        {
+            manacostLabel2->setText(card->getManaCost());
+        }
+        else
+        {
+            manacostLabel1->hide();
+            manacostLabel2->hide();
+        }
+        if(!card->getColors().isEmpty())
+        {
+            colorLabel2->setText(card->getColors().join(""));
+        }
+        else
+        {
+            colorLabel2->setText("Colorless");
+        }
         cardtypeLabel2->setText(card->getCardType());
-        powtoughLabel2->setText(card->getPowTough());
-        loyaltyLabel2->setText(card->getLoyalty());
+        if(!card->getPowTough().isEmpty())
+        {
+            powtoughLabel2->setText(card->getPowTough());
+        }
+        else
+        {
+            powtoughLabel1->hide();
+            powtoughLabel2->hide();
+        }
+        if(!card->getLoyalty().isEmpty())
+        {
+            loyaltyLabel2->setText(card->getLoyalty());
+        }
+        else
+        {
+            loyaltyLabel1->hide();
+            loyaltyLabel1->hide();
+        }
         textLabel->setText(card->getText());
     } else {
         nameLabel2->setText("");
