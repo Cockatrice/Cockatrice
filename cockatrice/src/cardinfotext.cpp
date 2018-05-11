@@ -71,39 +71,27 @@ void CardInfoText::setCard(CardInfoPtr card)
         resetLabels();
 
         nameLabel2->setText(card->getName());
-        if(!card->getManaCost().isEmpty())
-        {
+        if (!card->getManaCost().isEmpty()) {
             manacostLabel2->setText(card->getManaCost());
-        }
-        else
-        {
+        } else {
             manacostLabel1->hide();
             manacostLabel2->hide();
         }
-        if(!card->getColors().isEmpty())
-        {
+        if (!card->getColors().isEmpty()) {
             colorLabel2->setText(card->getColors().join(""));
-        }
-        else
-        {
+        } else {
             colorLabel2->setText("Colorless");
         }
         cardtypeLabel2->setText(card->getCardType());
-        if(!card->getPowTough().isEmpty())
-        {
+        if (!card->getPowTough().isEmpty()) {
             powtoughLabel2->setText(card->getPowTough());
-        }
-        else
-        {
+        } else {
             powtoughLabel1->hide();
             powtoughLabel2->hide();
         }
-        if(!card->getLoyalty().isEmpty())
-        {
+        if (!card->getLoyalty().isEmpty()) {
             loyaltyLabel2->setText(card->getLoyalty());
-        }
-        else
-        {
+        } else {
             loyaltyLabel1->hide();
             loyaltyLabel2->hide();
         }
