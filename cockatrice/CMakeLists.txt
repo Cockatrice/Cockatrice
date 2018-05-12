@@ -148,70 +148,32 @@ if(APPLE)
     set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 
-set(COCKATRICE_LIBS)
+# Qt5
+find_package(Qt5 COMPONENTS Concurrent Multimedia Network PrintSupport Svg Widgets REQUIRED)
+include_directories(${Qt5Concurrent_INCLUDE_DIRS} ${Qt5Multimedia_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS} ${Qt5PrintSupport_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS})
+set(COCKATRICE_QT_MODULES Concurrent Multimedia Network PrintSupport Svg Widgets)
 
-# qt5 stuff
-if(Qt5Widgets_FOUND)
-    include_directories(${Qt5Widgets_INCLUDE_DIRS})
-    list(APPEND COCKATRICE_LIBS Widgets)
+# Qt5LinguistTools
+find_package(Qt5LinguistTools)
+if(Qt5LinguistTools_FOUND)
+    include_directories(${Qt5LinguistTools_INCLUDE_DIRS})
+    list(APPEND COCKATRICE_LIBS LinguistTools)
 
-    # QtConcurrent
-    find_package(Qt5Concurrent)
-    if(Qt5Concurrent_FOUND)
-        include_directories(${Qt5Concurrent_INCLUDE_DIRS})
-        list(APPEND ORACLE_LIBS Concurrent)
+    if(NOT Qt5_LRELEASE_EXECUTABLE)
+        MESSAGE(WARNING "Qt's lrelease not found.")
     endif()
 
-    # QtNetwork
-    find_package(Qt5Network)
-    if(Qt5Network_FOUND)
-        include_directories(${Qt5Network_INCLUDE_DIRS})
-        list(APPEND COCKATRICE_LIBS Network)
-    endif()
-
-    # QtMultimedia
-    find_package(Qt5Multimedia)
-    if(Qt5Multimedia_FOUND)
-        include_directories(${Qt5Multimedia_INCLUDE_DIRS})
-        list(APPEND COCKATRICE_LIBS Multimedia)
-    endif()
-
-    # QtPrinter
-    find_package(Qt5PrintSupport)
-    if(Qt5PrintSupport_FOUND)
-        include_directories(${Qt5PrintSupport_INCLUDE_DIRS})
-        list(APPEND COCKATRICE_LIBS PrintSupport)
-    endif()
-
-    # QtSvg
-    find_package(Qt5Svg)
-    if(Qt5Svg_FOUND)
-        include_directories(${Qt5Svg_INCLUDE_DIRS})
-        list(APPEND COCKATRICE_LIBS Svg)
-    endif()
-
-    # Qt5LinguistTools
-    find_package(Qt5LinguistTools)
-    if(Qt5LinguistTools_FOUND)
-        include_directories(${Qt5LinguistTools_INCLUDE_DIRS})
-        list(APPEND COCKATRICE_LIBS LinguistTools)
-    endif()
-
-    # Let cmake chew Qt5's translations and resource files
-    # Note: header files are MOC-ed automatically by cmake
-    IF(UPDATE_TRANSLATIONS)
+    if(UPDATE_TRANSLATIONS)
+        if(NOT Qt5_LUPDATE_EXECUTABLE)
+            MESSAGE(WARNING "Qt's lupdate not found.")
+        endif()
         QT5_CREATE_TRANSLATION(cockatrice_QM ${translate_SRCS} ${cockatrice_TS})
-    ELSE()
+    else()
         QT5_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
-    ENDIF()
-
-    QT5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
-
-    # guess plugins and libraries directory
-    set(QT_PLUGINS_DIR "${Qt5Widgets_DIR}/../../../plugins")
-    get_target_property(QT_LIBRARY_DIR Qt5::Core LOCATION)
-    get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
+    endif()
 endif()
+
+QT5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 
 # Declare path variables
 set(ICONDIR share/icons CACHE STRING "icon dir")
@@ -227,7 +189,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 ADD_EXECUTABLE(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS})
 
 TARGET_LINK_LIBRARIES(cockatrice cockatrice_common)
-qt5_use_modules(cockatrice ${COCKATRICE_LIBS})
+qt5_use_modules(cockatrice ${COCKATRICE_QT_MODULES})
 
 if(UNIX)
     if(APPLE)
