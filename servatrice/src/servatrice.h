@@ -202,6 +202,8 @@ private:
     int getISLNetworkPort() const;
     bool getISLNetworkEnabled() const;
     bool getEnableInternalSMTPClient() const;
+    QHostAddress getServerTCPHost() const;
+    QHostAddress getServerWebSocketHost() const;
 
 public slots:
     void scheduleShutdown(const QString &reason, int minutes);
