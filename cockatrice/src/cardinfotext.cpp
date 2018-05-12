@@ -102,6 +102,8 @@ void CardInfoText::setCard(CardInfoPtr card)
         }
         textLabel->setText(card->getText());
     } else {
+        nameLabel1->hide();
+        nameLabel2->hide();
         manacostLabel1->hide();
         manacostLabel2->hide();
         colorLabel1->hide();
@@ -119,7 +121,9 @@ void CardInfoText::setCard(CardInfoPtr card)
 void CardInfoText::setInvalidCardName(const QString &cardName)
 {
     nameLabel1->setText(tr("Unknown card:"));
+    nameLabel1->show();
     nameLabel2->setText(cardName);
+    nameLabel2->show();
 }
 
 void CardInfoText::retranslateUi()
