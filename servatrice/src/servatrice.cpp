@@ -438,7 +438,8 @@ bool Servatrice::initServer()
                                                                  servatriceDatabaseInterface->getDatabase(), this);
         websocketGameServer->setMaxPendingConnections(1000);
         QHostAddress webSocketHost = getServerWebSocketHost();
-        qDebug() << "Starting websocket server on host" << webSocketHost.toString() << "port" << getServerWebSocketPort();
+        qDebug() << "Starting websocket server on host" << webSocketHost.toString() << "port"
+                 << getServerWebSocketPort();
         if (websocketGameServer->listen(webSocketHost, static_cast<quint16>(getServerWebSocketPort())))
             qDebug() << "Websocket server listening.";
         else {
@@ -929,7 +930,7 @@ int Servatrice::getNumberOfTCPPools() const
 QHostAddress Servatrice::getServerTCPHost() const
 {
     QString host = settingsCache->value("server/host", "any").toString();
-    if(host == "any")
+    if (host == "any")
         return QHostAddress::Any;
     else
         return QHostAddress(host);
@@ -948,7 +949,7 @@ int Servatrice::getNumberOfWebSocketPools() const
 QHostAddress Servatrice::getServerWebSocketHost() const
 {
     QString host = settingsCache->value("server/websocket_host", "any").toString();
-    if(host == "any")
+    if (host == "any")
         return QHostAddress::Any;
     else
         return QHostAddress(host);
