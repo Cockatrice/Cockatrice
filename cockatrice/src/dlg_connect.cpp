@@ -18,7 +18,7 @@
 
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
-    previousHostButton = new QRadioButton(tr("Known Hosts") + QString("(<a href=\"%1\">%2</a>)").arg(PUBLIC_SERVERS_URL).arg(tr("Public Servers")), this);
+    previousHostButton = new QRadioButton(tr("Known Hosts"), this);
     previousHosts = new QComboBox(this);
     previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
 

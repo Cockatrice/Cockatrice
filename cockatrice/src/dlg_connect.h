@@ -74,6 +74,7 @@ private:
     QPushButton *btnOk, *btnCancel, *btnForgotPassword, *btnRefreshServers;
     QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
     HandlePublicServers *hps;
+    QDialogButtonBox *buttonBox;
     const QString placeHolderText = tr("Downloading...");
 };
 #endif
