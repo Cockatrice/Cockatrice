@@ -91,9 +91,9 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnForgotPassword->setFixedWidth(30);
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
 
-    btnOk = new QPushButton(tr("Connect"));
+    // btnOk = new QPushButton(tr("Connect"));
     // btnOk->setFixedWidth(100);
-    connect(btnOk, SIGNAL(released()), this, SLOT(actOk()));
+    // connect(btnOk, SIGNAL(released()), this, SLOT(actOk()));
 
     // btnCancel = new QPushButton(tr("Cancel"));
     // btnCancel->setFixedWidth(100);
@@ -119,12 +119,12 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     //    buttons->addWidget(btnOk, 0, 0);
     //    buttons->addWidget(btnCancel, 0, 2);
 
-    // connectButton = new QPushButton(tr("&Connect"));
+    connectButton = new QPushButton(tr("&Connect"));
     // connectButton->setDefault(true);
+	connect(connectButton, SIGNAL(released()), this, SLOT(actOk()));
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
-    buttonBox->addButton(btnOk, QDialogButtonBox::AcceptRole);
-    //connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    buttonBox->addButton(connectButton, QDialogButtonBox::AcceptRole);
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     restrictionsGroupBox = new QGroupBox(tr("Server"));
