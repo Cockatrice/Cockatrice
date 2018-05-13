@@ -122,7 +122,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     // connectButton = new QPushButton(tr("&Connect"));
     // connectButton->setDefault(true);
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
+    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
     buttonBox->addButton(btnOk, QDialogButtonBox::AcceptRole);
     //connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -161,6 +161,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
+    mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Connect to Server"));
