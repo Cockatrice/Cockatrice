@@ -15,6 +15,11 @@ name="My Cockatrice server"
 ; must have a different id; the default id is 1
 id=1
 
+; The IP address servatrice will listen on for clients; defaults to "any" to listen on all the interfaces,
+; a specific IPv4/v6 addresses can be used, eg for localhost-only 127.0.0.1 for IPv4 or ::1 for IPv6.
+
+host=any
+
 ; The TCP port number servatrice will listen on for clients; default is 4747
 port=4747
 
@@ -27,6 +32,10 @@ number_pools=1
 ; Servatrice can listen for clients on websockets, too. Unfortunately it can't support more than one thread.
 ; Set to 0 to disable the websocket server.
 websocket_number_pools=1
+
+; The IP address servatrice will listen on for websockets clients; defaults to "any"
+
+websocket_host=any
 
 ; The TCP port number servatrice will listen on for websockets clients; default is 4748
 websocket_port=4748
@@ -44,7 +53,7 @@ writelog=1
 ; [ex: C:\\Temp\\server.log ]
 logfile=server.log
 
-; You may want to log only certain messages in the logfile. The default log level is extremely verbose. 
+; You may want to log only certain messages in the logfile. The default log level is extremely verbose.
 ; This setting should contain a comma-separated list of strings that will be selectively logged.
 ; All other lines will be excluded from the log. Default is empty; example: "Registration,_Login,foobar"
 logfilters=""
@@ -147,7 +156,7 @@ disallowedregexp=""
 ; You can prevent users from using certain mail domains for registration.  This setting contains a
 ; comma-seperated list of email provider domains that you would like to prevent users from using
 ; during registration. Comparison's are implicit, so placing an entry such as mail.com will also
-; prevent users from registering accounts with providers such as gmail.com and hotmail.com  
+; prevent users from registering accounts with providers such as gmail.com and hotmail.com
 ; Example: "10minutemail.com,gmail.com"
 ;emailproviderblacklist=""
 
@@ -338,7 +347,7 @@ max_command_count_per_interval=20
 
 [logging]
 ; Admin/Moderators can query the stored logs for information when looking up reports by various players. This
-; option can allow or disallow them from doing so. 
+; option can allow or disallow them from doing so.
 ; !!NOTE!! Enabling this feature puts a very high CPU and DISK load on the server, enable with caution.
 enablelogquery=false
 

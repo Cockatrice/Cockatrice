@@ -104,7 +104,7 @@ Servatrice_ConnectionPool *Servatrice_GameServer::findLeastUsedConnectionPool()
     return connectionPools[poolIndex];
 }
 
-#if QT_VERSION > 0x050300
+#ifdef QT_WEBSOCKETS_LIB
 #define WEBSOCKET_POOL_NUMBER 999
 
 Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_server,
@@ -421,8 +421,9 @@ bool Servatrice::initServer()
         gameServer =
             new Servatrice_GameServer(this, getNumberOfTCPPools(), servatriceDatabaseInterface->getDatabase(), this);
         gameServer->setMaxPendingConnections(1000);
-        qDebug() << "Starting server on port" << getServerTCPPort();
-        if (gameServer->listen(QHostAddress::Any, static_cast<quint16>(getServerTCPPort())))
+        QHostAddress tcpHost = getServerTCPHost();
+        qDebug() << "Starting server on host" << tcpHost.toString() << "port" << getServerTCPPort();
+        if (gameServer->listen(tcpHost, static_cast<quint16>(getServerTCPPort())))
             qDebug() << "Server listening.";
         else {
             qDebug() << "gameServer->listen(): Error:" << gameServer->errorString();
@@ -430,14 +431,16 @@ bool Servatrice::initServer()
         }
     }
 
-#if QT_VERSION > 0x050300
+#ifdef QT_WEBSOCKETS_LIB
     // WEBSOCKET SERVER
     if (getNumberOfWebSocketPools() > 0) {
         websocketGameServer = new Servatrice_WebsocketGameServer(this, getNumberOfWebSocketPools(),
                                                                  servatriceDatabaseInterface->getDatabase(), this);
         websocketGameServer->setMaxPendingConnections(1000);
-        qDebug() << "Starting websocket server on port" << getServerWebSocketPort();
-        if (websocketGameServer->listen(QHostAddress::Any, static_cast<quint16>(getServerWebSocketPort())))
+        QHostAddress webSocketHost = getServerWebSocketHost();
+        qDebug() << "Starting websocket server on host" << webSocketHost.toString() << "port"
+                 << getServerWebSocketPort();
+        if (websocketGameServer->listen(webSocketHost, static_cast<quint16>(getServerWebSocketPort())))
             qDebug() << "Websocket server listening.";
         else {
             qDebug() << "websocketGameServer->listen(): Error:" << websocketGameServer->errorString();
@@ -924,6 +927,15 @@ int Servatrice::getNumberOfTCPPools() const
     return settingsCache->value("server/number_pools", 1).toInt();
 }
 
+QHostAddress Servatrice::getServerTCPHost() const
+{
+    QString host = settingsCache->value("server/host", "any").toString();
+    if (host == "any")
+        return QHostAddress::Any;
+    else
+        return QHostAddress(host);
+}
+
 int Servatrice::getServerTCPPort() const
 {
     return settingsCache->value("server/port", 4747).toInt();
@@ -932,6 +944,15 @@ int Servatrice::getServerTCPPort() const
 int Servatrice::getNumberOfWebSocketPools() const
 {
     return settingsCache->value("server/websocket_number_pools", 1).toInt();
+}
+
+QHostAddress Servatrice::getServerWebSocketHost() const
+{
+    QString host = settingsCache->value("server/websocket_host", "any").toString();
+    if (host == "any")
+        return QHostAddress::Any;
+    else
+        return QHostAddress(host);
 }
 
 int Servatrice::getServerWebSocketPort() const
