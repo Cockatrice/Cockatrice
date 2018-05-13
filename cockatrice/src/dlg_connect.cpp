@@ -118,7 +118,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     //    buttons = new QGridLayout;
     //    buttons->addWidget(btnOk, 0, 0);
     //    buttons->addWidget(btnCancel, 0, 2);
-	
+
     // connectButton = new QPushButton(tr("&Connect"));
     // connectButton->setDefault(true);
 
