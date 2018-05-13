@@ -103,9 +103,9 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     newHolderLayout->addWidget(btnRefreshServers);
 
     connectionLayout = new QGridLayout;
-    connectionLayout->addWidget(previousHostButton, 0, 1);
-    connectionLayout->addLayout(newHolderLayout, 1, 1, 1, 2);
-    connectionLayout->addWidget(newHostButton, 2, 1);
+    connectionLayout->addWidget(previousHostButton, 0, 0);
+    connectionLayout->addLayout(newHolderLayout, 1, 0, 1, 2);
+    connectionLayout->addWidget(newHostButton, 2, 0);
     connectionLayout->addWidget(saveLabel, 3, 0);
     connectionLayout->addWidget(saveEdit, 3, 1);
     connectionLayout->addWidget(hostLabel, 4, 0);
