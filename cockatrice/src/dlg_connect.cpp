@@ -92,7 +92,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
 
     btnConnect = new QPushButton(tr("&Connect"));
-	connect(btnConnect, SIGNAL(released()), this, SLOT(actOk()));
+    connect(btnConnect, SIGNAL(released()), this, SLOT(actOk()));
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
     buttonBox->addButton(btnConnect, QDialogButtonBox::AcceptRole);
