@@ -119,11 +119,11 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     //    buttons->addWidget(btnOk, 0, 0);
     //    buttons->addWidget(btnCancel, 0, 2);
 	
-    connectButton = new QPushButton(tr("&Connect"));
-    connectButton->setDefault(true);
+    // connectButton = new QPushButton(tr("&Connect"));
+    // connectButton->setDefault(true);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
-    buttonBox->addButton(connectButton, QDialogButtonBox::AcceptRole);
+    // buttonBox->addButton(connectButton, QDialogButtonBox::AcceptRole);
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     restrictionsGroupBox = new QGroupBox(tr("Server"));
