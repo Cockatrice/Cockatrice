@@ -122,8 +122,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     // connectButton = new QPushButton(tr("&Connect"));
     // connectButton->setDefault(true);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-                                                       | QDialogButtonBox::Cancel);
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     // buttonBox->addButton(connectButton, QDialogButtonBox::AcceptRole);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
