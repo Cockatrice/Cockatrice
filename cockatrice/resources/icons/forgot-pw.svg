@@ -32,7 +32,7 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="2"
-     inkscape:cx="64.546482"
+     inkscape:cx="-44.703518"
      inkscape:cy="65.348138"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
@@ -44,7 +44,7 @@
     <rdf:RDF>
       <cc:Work
          rdf:about="">
-        <dc:title></dc:title>
+        <dc:title />
         <dc:description />
         <dc:subject>
           <rdf:Bag>
@@ -748,17 +748,17 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:85.24023438px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
-       x="56.077385"
-       y="108.11224"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:94.33287811px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="48.120476"
+       y="110.2993"
        id="text3408"
        sodipodi:linespacing="125%"
-       transform="scale(0.93200199,1.0729591)"><tspan
+       transform="scale(0.93079569,1.0743496)"><tspan
          sodipodi:role="line"
          id="tspan3410"
-         x="56.077385"
-         y="108.11224"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:127.86035156px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#0000ff;">?</tspan></text>
+         x="48.120476"
+         y="110.2993"
+         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:141.49932861px;font-family:Arial;-inkscape-font-specification:'Arial Heavy';fill:#0000ff">?</tspan></text>
     <flowRoot
        xml:space="preserve"
        id="flowRoot3412"
@@ -769,5 +769,5 @@
            height="62.5"
            x="93.25"
            y="24.5" /></flowRegion><flowPara
-         id="flowPara3418"></flowPara></flowRoot>  </g>
+         id="flowPara3418" /></flowRoot>  </g>
 </svg>
