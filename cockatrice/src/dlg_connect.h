@@ -71,7 +71,7 @@ private:
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;
     QRadioButton *newHostButton, *previousHostButton;
-    QPushButton *btnOk, *btnCancel, *btnForgotPassword, *btnRefreshServers;
+    QPushButton *btnConnect, *btnForgotPassword, *btnRefreshServers;
     QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
     HandlePublicServers *hps;
     const QString placeHolderText = tr("Downloading...");

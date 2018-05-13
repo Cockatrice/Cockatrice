@@ -91,13 +91,12 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnForgotPassword->setFixedWidth(30);
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
 
-    // btnOk = new QPushButton(tr("Connect"));
-    // btnOk->setFixedWidth(100);
-    // connect(btnOk, SIGNAL(released()), this, SLOT(actOk()));
+    btnConnect = new QPushButton(tr("&Connect"));
+	connect(btnConnect, SIGNAL(released()), this, SLOT(actOk()));
 
-    // btnCancel = new QPushButton(tr("Cancel"));
-    // btnCancel->setFixedWidth(100);
-    // connect(btnCancel, SIGNAL(released()), this, SLOT(actCancel()));
+    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
+    buttonBox->addButton(btnConnect, QDialogButtonBox::AcceptRole);
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     newHolderLayout = new QHBoxLayout;
     newHolderLayout->addWidget(previousHosts);
@@ -114,18 +113,6 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     connectionLayout->addWidget(portLabel, 5, 0);
     connectionLayout->addWidget(portEdit, 5, 1);
     connectionLayout->addWidget(autoConnectCheckBox, 6, 1);
-
-    //    buttons = new QGridLayout;
-    //    buttons->addWidget(btnOk, 0, 0);
-    //    buttons->addWidget(btnCancel, 0, 2);
-
-    connectButton = new QPushButton(tr("&Connect"));
-    // connectButton->setDefault(true);
-	connect(connectButton, SIGNAL(released()), this, SLOT(actOk()));
-
-    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
-    buttonBox->addButton(connectButton, QDialogButtonBox::AcceptRole);
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     restrictionsGroupBox = new QGroupBox(tr("Server"));
     restrictionsGroupBox->setLayout(connectionLayout);
@@ -149,15 +136,10 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     serverInfoGroupBox = new QGroupBox(tr("Server Contact"));
     serverInfoGroupBox->setLayout(serverInfoLayout);
 
-    //    btnGroupBox = new QGroupBox(tr(""));
-    //    btnGroupBox->setLayout(buttons);
-
     grid = new QGridLayout;
     grid->addWidget(restrictionsGroupBox, 0, 0);
     grid->addWidget(serverInfoGroupBox, 1, 0);
     grid->addWidget(loginGroupBox, 2, 0);
-
-    //    grid->addWidget(btnGroupBox, 3, 0);
 
     mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
