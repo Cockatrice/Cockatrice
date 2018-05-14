@@ -914,7 +914,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(vboxLayout);
-    mainLayout->addSpacing(6);
+    mainLayout->addSpacing(2);
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
