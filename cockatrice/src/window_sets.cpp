@@ -90,7 +90,9 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     view->setDropIndicatorShown(true);
     view->setDragDropMode(QAbstractItemView::InternalMove);
 
-    view->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    view->header()->setSectionResizeMode(QHeaderView::Stretch);
+    view->header()->setSectionResizeMode(SetsModel::EnabledCol, QHeaderView::ResizeToContents);
+    view->header()->setSectionResizeMode(SetsModel::LongNameCol, QHeaderView::ResizeToContents);
 
     view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
     view->setColumnHidden(SetsModel::SortKeyCol, true);
