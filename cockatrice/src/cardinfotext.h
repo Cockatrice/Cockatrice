@@ -22,9 +22,12 @@ private:
 
     CardInfoPtr info;
 
+    void resetLabels();
+
 public:
     CardInfoText(QWidget *parent = 0);
     void retranslateUi();
+    void setInvalidCardName(const QString &cardName);
 
 public slots:
     void setCard(CardInfoPtr card);
