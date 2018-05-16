@@ -8,6 +8,9 @@
 -- regardless of age. Future migrations should take care to ensure this
 -- ordering stays consistent.
 
+-- cockatrice_users.id cannot be modified because its used in a foreign key constraint
+-- it should be first anyway, so this isnt a big deal
+-- ALTER TABLE cockatrice_users MODIFY `id` int(7) unsigned zerofill NOT NULL FIRST;
 ALTER TABLE cockatrice_users MODIFY COLUMN `admin` tinyint(1) NOT NULL AFTER `id`;
 ALTER TABLE cockatrice_users MODIFY COLUMN `name` varchar(35) NOT NULL AFTER `admin`;
 ALTER TABLE cockatrice_users MODIFY COLUMN `realname` varchar(255) NOT NULL AFTER `name`;
