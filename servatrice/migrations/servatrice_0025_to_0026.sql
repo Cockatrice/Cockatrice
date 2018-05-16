@@ -42,7 +42,7 @@ ALTER TABLE cockatrice_ignorelist MODIFY COLUMN `id_user2` int(7) unsigned NOT N
 ALTER TABLE cockatrice_buddylist MODIFY COLUMN `id_user1` int(7) unsigned NOT NULL FIRST;
 ALTER TABLE cockatrice_buddylist MODIFY COLUMN `id_user2` int(7) unsigned NOT NULL AFTER `id_user1`;
 
-ALTER TABLE cockatrice_rooms MODIFY COLUMN `id` int(7) unsigned NOT NULL auto_increment FIRsT;
+ALTER TABLE cockatrice_rooms MODIFY COLUMN `id` int(7) unsigned NOT NULL auto_increment FIRST;
 ALTER TABLE cockatrice_rooms MODIFY COLUMN `name` varchar(50) NOT NULL AFTER `id`;
 ALTER TABLE cockatrice_rooms MODIFY COLUMN `descr` varchar(255) NOT NULL AFTER `name`;
 ALTER TABLE cockatrice_rooms MODIFY COLUMN `permissionlevel` enum('NONE','REGISTERED','MODERATOR','ADMINISTRATOR') NOT NULL AFTER `descr`;
