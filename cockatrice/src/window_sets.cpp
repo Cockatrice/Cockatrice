@@ -64,11 +64,16 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     setFocusProxy(searchField);
 
     resetSortButton = new QPushButton(tr("Restore order"));
+    resetSortButton->setToolTip(tr("Revert displayed set order to your customized picture load priority"));
     resetSortButton->setDisabled(true);
+
+    defaultSortButton = new QPushButton(tr("Default order"));
+    defaultSortButton->setToolTip(tr("Restore original art priority order"));
 
     filterBox = new QHBoxLayout;
     filterBox->addWidget(searchField);
     filterBox->addWidget(resetSortButton);
+    filterBox->addWidget(defaultSortButton);
 
     // view
     model = new SetsModel(db, this);
@@ -114,6 +119,8 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(searchField, SIGNAL(textChanged(const QString &)), displayModel, SLOT(setFilterRegExp(const QString &)));
     connect(view->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(actDisableSortButtons(int)));
     connect(resetSortButton, SIGNAL(clicked()), this, SLOT(actResetSort()));
+    connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(actDisableResetButton(const QString &)));
+    connect(defaultSortButton, SIGNAL(clicked()), this, SLOT(actRestoreOriginalOrder()));
 
     labNotes = new QLabel;
     labNotes->setWordWrap(true);
@@ -200,6 +207,21 @@ void WndSets::actRestore()
 void WndSets::actResetSort()
 {
     view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
+}
+
+void WndSets::actRestoreOriginalOrder()
+{
+    actResetSort();
+    model->sort(model->ReleaseDateCol, Qt::DescendingOrder);
+}
+
+void WndSets::actDisableResetButton(const QString &filterString)
+{
+    if (filterString.isEmpty()) {
+        defaultSortButton->setEnabled(true);
+    } else {
+        defaultSortButton->setEnabled(false);
+    }
 }
 
 void WndSets::actDisableSortButtons(int index)

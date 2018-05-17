@@ -25,7 +25,7 @@ private:
     QTreeView *view;
     QPushButton *toggleAllButton, *toggleSelectedButton;
     QPushButton *enableAllButton, *disableAllButton, *enableSomeButton, *disableSomeButton;
-    QPushButton *resetSortButton;
+    QPushButton *resetSortButton, *defaultSortButton;
     QAction *aUp, *aDown, *aBottom, *aTop;
     QToolBar *setsEditToolBar;
     QDialogButtonBox *buttonBox;
@@ -60,6 +60,8 @@ private slots:
     void actToggleButtons(const QItemSelection &selected, const QItemSelection &deselected);
     void actDisableSortButtons(int index);
     void actResetSort();
+    void actRestoreOriginalOrder();
+    void actDisableResetButton(const QString &filterText);
 };
 
 #endif
