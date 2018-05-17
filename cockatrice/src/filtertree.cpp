@@ -272,16 +272,22 @@ bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
     }
 }
 
-bool FilterItem::acceptPower(const CardInfoPtr info) const
+bool FilterItem::acceptPowerToughness(const CardInfoPtr info, CardFilter::Attr attr) const
 {
     int slash = info->getPowTough().indexOf("/");
-    return (slash != -1) ? (relationCheck(info->getPowTough().mid(0, slash).toInt())) : false;
-}
-
-bool FilterItem::acceptToughness(const CardInfoPtr info) const
-{
-    int slash = info->getPowTough().indexOf("/");
-    return (slash != -1) ? (relationCheck(info->getPowTough().mid(slash + 1).toInt())) : false;
+    if (slash == -1)
+        return false;
+    QString valueString;
+    if (attr == CardFilter::AttrPow)
+        valueString = info->getPowTough().mid(0, slash);
+    else
+        valueString = info->getPowTough().mid(slash + 1);
+    if (term == valueString)
+        return true;
+    // advanced filtering should only happen after fast string comparison failed
+    bool conversion;
+    int value = valueString.toInt(&conversion);
+    return conversion ? relationCheck(value) : false;
 }
 
 bool FilterItem::acceptRarity(const CardInfoPtr info) const
@@ -337,7 +343,7 @@ bool FilterItem::relationCheck(int cardInfo) const
 {
     bool result, conversion;
 
-    // if int conversion fails, there must be either an operator at the start
+    // if int conversion fails, there's probably an operator at the start
     result = (cardInfo == term.toInt(&conversion));
     if (!conversion) {
         // leading whitespaces could cause indexing to fail
@@ -358,8 +364,11 @@ bool FilterItem::relationCheck(int cardInfo) const
                 result = (cardInfo < termInt);
             } else if (trimmedTerm.startsWith('>')) {
                 result = (cardInfo > termInt);
-            } else {
+            } else if (trimmedTerm.startsWith("=")) {
                 result = (cardInfo == termInt);
+            } else {
+                // the int conversion hasn't failed due to an operator at the start
+                result = false;
             }
         }
     }
@@ -386,9 +395,9 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) c
         case CardFilter::AttrRarity:
             return acceptRarity(info);
         case CardFilter::AttrPow:
-            return acceptPower(info);
         case CardFilter::AttrTough:
-            return acceptToughness(info);
+            // intentional fallthrough
+            return acceptPowerToughness(info, attr);
         case CardFilter::AttrLoyalty:
             return acceptLoyalty(info);
         default:
