@@ -23,7 +23,7 @@ If you have any questions on IDEs, feel free to chat with us on [Gitter](https:/
 
 ### Compatibility ###
 
-Cockatrice is currently compiled on all platforms using <kbd>C++11</kbd>. You'll notice <kbd>C++03</kbd> code throughout the codebase. Please feel free to help convert it over! 
+Cockatrice is currently compiled on all platforms using <kbd>C++11</kbd>. You'll notice <kbd>C++03</kbd> code throughout the codebase. Please feel free to help convert it over!
 
 For consistency, we use Qt data structures where possible. For example, `QString` over
 `std::string` and `QList` over `std::vector`.
@@ -72,7 +72,7 @@ prefix those arguments with underscores:
 ```c++
 MyClass::MyClass(int _myData) : myData(_myData)
 {
- 
+
 }
 ```
 Pointers and references should be denoted with the `*` or `&` going with the
@@ -139,7 +139,7 @@ int main()
     Card card;
     showCard(card);
 }
- 
+
 // Bad: relies on manual memory management and doesn't give us much
 // null-safety.
 void showCard(const Card *card);
@@ -164,8 +164,10 @@ Everytime the schema gets modified, some other steps are due:
  2. Increment the value of `DATABASE_SCHEMA_VERSION` in `servatrice_database_interface.h` accordingly;
  3. Create a new migration file inside the `servatrice/migrations` directory named after the new schema version.
  4. Run the `servatrice/check_schema_version.sh` script to ensure everything is fine.
- 
+
 The migration file should include the sql statements needed to migrate the database schema and data from the previous to the new version, and an additional statement that updates `cockatrice_schema_version` to the correct value.
+
+Ensure that the migration produces the expected effects; e.g. if you add a new column, make sure the migration places it in the same order as servatrice.sql.
 
 ### Protocol buffer ###
 
@@ -194,7 +196,7 @@ Translations to other languages are managed using [Transifex](https://www.transi
 
 If you're about to propose a change that adds or modifies any translatable string
 in the code, you don't need to take care of adding the new strings to the
-translation files. Every few days, or when a lot of new strings have been added, 
+translation files. Every few days, or when a lot of new strings have been added,
 someone from the development team will take care of extracing all the new strings,
 adding them to the english translation files and making them available to
 translators on Transifex.
@@ -245,8 +247,8 @@ translations from Transifex and commit them into the Cockatrice source code.
 This can be done manually from the Transifex web interface, but it's quite time
 consuming.
 
-As an alternative, you can install the Transifex CLI: 
-    
+As an alternative, you can install the Transifex CLI:
+
     http://docs.transifex.com/developer/client/
 
 You'll then be able to use a git-like cli command to push and pull translations
@@ -273,7 +275,7 @@ git checkout master
 git remote update -p
 git pull
 git tag $TAG_NAME
-git push upstream $TAG_NAME 
+git push upstream $TAG_NAME
 ```
 You should define the variables as such:
 ```
