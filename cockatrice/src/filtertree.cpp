@@ -275,15 +275,18 @@ bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
 bool FilterItem::acceptPowerToughness(const CardInfoPtr info, CardFilter::Attr attr) const
 {
     int slash = info->getPowTough().indexOf("/");
-    if (slash == -1)
+    if (slash == -1) {
         return false;
+    }
     QString valueString;
-    if (attr == CardFilter::AttrPow)
+    if (attr == CardFilter::AttrPow) {
         valueString = info->getPowTough().mid(0, slash);
-    else
+    } else {
         valueString = info->getPowTough().mid(slash + 1);
-    if (term == valueString)
+    }
+    if (term == valueString) {
         return true;
+    }
     // advanced filtering should only happen after fast string comparison failed
     bool conversion;
     int value = valueString.toInt(&conversion);
