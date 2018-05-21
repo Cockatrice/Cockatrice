@@ -232,7 +232,7 @@ void WndSets::actSort(int index)
         sortOrder = Qt::AscendingOrder;
         sortIndex = index;
         sortWarning->setVisible(true);
-    } else if (sortIndex == index) {
+    } else {
         if (sortOrder == Qt::AscendingOrder) {
             view->sortByColumn(index, Qt::DescendingOrder);
             sortOrder = Qt::DescendingOrder;
