@@ -63,16 +63,13 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     searchField->setClearButtonEnabled(true);
     setFocusProxy(searchField);
 
-    resetSortButton = new QPushButton(tr("Restore order"));
-    resetSortButton->setToolTip(tr("Revert displayed set order to your customized picture load priority"));
-    resetSortButton->setDisabled(true);
-
     defaultSortButton = new QPushButton(tr("Default order"));
     defaultSortButton->setToolTip(tr("Restore original art priority order"));
 
+    connect(defaultSortButton, SIGNAL(clicked()), this, SLOT(actRestoreOriginalOrder()));
+
     filterBox = new QHBoxLayout;
     filterBox->addWidget(searchField);
-    filterBox->addWidget(resetSortButton);
     filterBox->addWidget(defaultSortButton);
 
     // view
@@ -104,6 +101,8 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     view->setColumnHidden(SetsModel::IsKnownCol, true);
     view->setRootIsDecorated(false);
 
+    connect(view->header(), SIGNAL(sectionClicked(int)), this, SLOT(actSort(int)));
+
     // bottom buttons
     enableAllButton = new QPushButton(tr("Enable all sets"));
     disableAllButton = new QPushButton(tr("Disable all sets"));
@@ -118,9 +117,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
             SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
     connect(searchField, SIGNAL(textChanged(const QString &)), displayModel, SLOT(setFilterRegExp(const QString &)));
     connect(view->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(actDisableSortButtons(int)));
-    connect(resetSortButton, SIGNAL(clicked()), this, SLOT(actResetSort()));
     connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(actDisableResetButton(const QString &)));
-    connect(defaultSortButton, SIGNAL(clicked()), this, SLOT(actRestoreOriginalOrder()));
 
     labNotes = new QLabel;
     labNotes->setWordWrap(true);
@@ -136,6 +133,14 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
         tr("CUSTOM Folder") + "</a></li><li>" + tr("Enabled Sets (Top to Bottom)") + "</li><li>" +
         tr("Disabled Sets (Top to Bottom)") + "</li></ol>");
 
+    sortWarning = new QLabel;
+    sortWarning->setWordWrap(true);
+    sortWarning->setText(
+        "<b>" + tr("Warning: ") + "</b>" +
+        tr("While the the set-list is sorted by any of the columns, custom art priority setting is disabled. ") +
+        tr("To disable sorting click on the same column header again."));
+    sortWarning->setVisible(false);
+
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actRestore()));
@@ -149,7 +154,8 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     mainLayout->addWidget(enableSomeButton, 2, 1);
     mainLayout->addWidget(disableSomeButton, 2, 2);
     mainLayout->addWidget(labNotes, 3, 1, 1, 2);
-    mainLayout->addWidget(buttonBox, 4, 1, 1, 2);
+    mainLayout->addWidget(sortWarning, 4, 1, 1, 2);
+    mainLayout->addWidget(buttonBox, 5, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
     mainLayout->setColumnStretch(2, 1);
 
@@ -204,14 +210,9 @@ void WndSets::actRestore()
     close();
 }
 
-void WndSets::actResetSort()
-{
-    view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
-}
-
 void WndSets::actRestoreOriginalOrder()
 {
-    actResetSort();
+    view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
     model->sort(model->ReleaseDateCol, Qt::DescendingOrder);
 }
 
@@ -224,6 +225,27 @@ void WndSets::actDisableResetButton(const QString &filterString)
     }
 }
 
+void WndSets::actSort(int index)
+{
+    if (sortIndex != index) {
+        view->sortByColumn(index, Qt::AscendingOrder);
+        sortOrder = Qt::AscendingOrder;
+        sortIndex = index;
+        sortWarning->setVisible(true);
+    } else if (sortIndex == index) {
+        if (sortOrder == Qt::AscendingOrder) {
+            view->sortByColumn(index, Qt::DescendingOrder);
+            sortOrder = Qt::DescendingOrder;
+            sortIndex = index;
+            sortWarning->setVisible(true);
+        } else {
+            view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
+            sortIndex = -1;
+            sortWarning->setVisible(false);
+        }
+    }
+}
+
 void WndSets::actDisableSortButtons(int index)
 {
     if (index != SORT_RESET) {
@@ -231,9 +253,7 @@ void WndSets::actDisableSortButtons(int index)
         actToggleButtons(QItemSelection(), QItemSelection());
         disconnect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
                    this, SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
-        resetSortButton->setEnabled(true);
     } else {
-        resetSortButton->setEnabled(false);
         actToggleButtons(view->selectionModel()->selection(), QItemSelection());
         connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
                 SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
