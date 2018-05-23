@@ -36,42 +36,23 @@ if(APPLE)
     set(servatrice_SOURCES ${servatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 
-set(SERVATRICE_LIBS)
+# Qt5
+find_package(Qt5 COMPONENTS Network Sql REQUIRED)
+include_directories(${Qt5Core_INCLUDE_DIRS})
+include_directories(${Qt5Network_INCLUDE_DIRS})
+include_directories(${Qt5Sql_INCLUDE_DIRS})
+set(SERVATRICE_QT_MODULES Core Network Sql)
 
-# qt5 stuff
-if(Qt5Widgets_FOUND)
-    include_directories(${Qt5Widgets_INCLUDE_DIRS})
-    list(APPEND SERVATRICE_LIBS Widgets)
-
-    # QtNetwork
-    find_package(Qt5Network)
-    if(Qt5Network_FOUND)
-        include_directories(${Qt5Network_INCLUDE_DIRS})
-        list(APPEND SERVATRICE_LIBS Network)
-    endif()
-
-    # QtSql
-    find_package(Qt5Sql)
-    if(Qt5Sql_FOUND)
-        include_directories(${Qt5Sql_INCLUDE_DIRS})
-        list(APPEND SERVATRICE_LIBS Sql)
-    endif()
-
-    # QtWebsockets
-    find_package(Qt5WebSockets)
-    if(Qt5WebSockets_FOUND)
-        include_directories(${Qt5WebSockets_INCLUDE_DIRS})
-        list(APPEND SERVATRICE_LIBS WebSockets)
-    endif()
-
-    QT5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
-
-    # guess plugins and libraries directory
-    set(QT_PLUGINS_DIR "${Qt5Widgets_DIR}/../../../plugins")
-    get_target_property(QT_LIBRARY_DIR Qt5::Core LOCATION)
-    get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
+# Qt Websockets
+find_package(Qt5WebSockets)
+if(Qt5WebSockets_FOUND)
+    include_directories(${Qt5WebSockets_INCLUDE_DIRS})
+     list(APPEND SERVATRICE_QT_MODULES WebSockets)
+else()
+    MESSAGE(WARNING "Qt5 websocket module not found")
 endif()
 
+QT5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
 SET(QT_DONT_USE_QTGUI TRUE)
 
 # Mysql connector
@@ -114,7 +95,7 @@ if(MSVC)
 else()
     TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${CMAKE_THREAD_LIBS_INIT})
 endif()
-qt5_use_modules(servatrice ${SERVATRICE_LIBS})
+qt5_use_modules(servatrice ${SERVATRICE_QT_MODULES})
 
 # install rules
 if(UNIX)
@@ -127,8 +108,8 @@ if(UNIX)
         set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
 
         INSTALL(TARGETS servatrice BUNDLE DESTINATION ./)
-        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./Servatrice.app/Contents/Resources/)
-        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./Servatrice.app/Contents/Resources/)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./servatrice.app/Contents/Resources/)
+        INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./servatrice.app/Contents/Resources/)
     else()
         # Assume linux
         INSTALL(TARGETS servatrice RUNTIME DESTINATION bin/)
@@ -147,14 +128,18 @@ endif()
 
 if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
-    set(plugin_dest_dir Servatrice.app/Contents/Plugins)
-    set(qtconf_dest_dir Servatrice.app/Contents/Resources)
+    set(plugin_dest_dir servatrice.app/Contents/Plugins)
+    set(qtconf_dest_dir servatrice.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt5 plugins: platforms, sqldrivers/mysql
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(platforms/.*|sqldrivers/libqsqlmysql)\\.dylib"
-        REGEX ".*_debug\\.dylib" EXCLUDE)
+        FILES_MATCHING
+        PATTERN "*.dSYM" EXCLUDE
+        PATTERN "*_debug.dylib" EXCLUDE
+        PATTERN "platforms/*.dylib"
+        PATTERN "sqldrivers/libqsqlmysql*.dylib"
+    )
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
@@ -167,7 +152,7 @@ Translations = Resources/translations\")
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
     set(BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/servatrice.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
     " COMPONENT Runtime)
 endif()
 

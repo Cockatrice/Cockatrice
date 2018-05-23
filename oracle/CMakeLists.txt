@@ -13,6 +13,7 @@ SET(oracle_SOURCES
     src/oracleimporter.cpp
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/pictureloader.cpp
+    ../cockatrice/src/carddbparser/cockatricexml3.cpp
     ../cockatrice/src/settingscache.cpp
     ../cockatrice/src/shortcutssettings.cpp
     ../cockatrice/src/settings/carddatabasesettings.cpp
@@ -21,7 +22,7 @@ SET(oracle_SOURCES
     ../cockatrice/src/settings/messagesettings.cpp
     ../cockatrice/src/settings/gamefilterssettings.cpp
     ../cockatrice/src/settings/layoutssettings.cpp
-    ../cockatrice/src/thememanager.cpp 
+    ../cockatrice/src/thememanager.cpp
     ../cockatrice/src/qt-json/json.cpp
     ../cockatrice/src/releasechannel.cpp
      ${VERSION_STRING_CPP}
@@ -47,49 +48,32 @@ if(APPLE)
     set(oracle_SOURCES ${oracle_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 ENDIF(APPLE)
 
-set(ORACLE_LIBS)
+# Qt5
+find_package(Qt5 COMPONENTS Concurrent Network Svg Widgets REQUIRED)
+include_directories(${Qt5Concurrent_INCLUDE_DIRS} ${Qt5Multimedia_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS} ${Qt5PrintSupport_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS})
+set(ORACLE_QT_MODULES Concurrent Multimedia Network PrintSupport Svg Widgets)
 
-# qt5 stuff
-if(Qt5Widgets_FOUND)
-    include_directories(${Qt5Widgets_INCLUDE_DIRS})
-    list(APPEND ORACLE_LIBS Widgets)
+# Qt5LinguistTools
+find_package(Qt5LinguistTools)
+if(Qt5LinguistTools_FOUND)
+    include_directories(${Qt5LinguistTools_INCLUDE_DIRS})
+    list(APPEND ORACLE_LIBS LinguistTools)
 
-    # QtConcurrent
-    find_package(Qt5Concurrent)
-    if(Qt5Concurrent_FOUND)
-        include_directories(${Qt5Concurrent_INCLUDE_DIRS})
-        list(APPEND ORACLE_LIBS Concurrent)
+    if(NOT Qt5_LRELEASE_EXECUTABLE)
+        MESSAGE(WARNING "Qt's lrelease not found.")
     endif()
 
-    # QtNetwork
-    find_package(Qt5Network)
-    if(Qt5Network_FOUND)
-        include_directories(${Qt5Network_INCLUDE_DIRS})
-        list(APPEND ORACLE_LIBS Network)
-    endif()
-
-    # QtSvg
-    find_package(Qt5Svg)
-    if(Qt5Svg_FOUND)
-        include_directories(${Qt5Svg_INCLUDE_DIRS})
-        list(APPEND ORACLE_LIBS Svg)
-    endif()
-
-    # Let cmake chew Qt5's translations and resource files
-    # Note: header files are MOC-ed automatically by cmake
-    IF(UPDATE_TRANSLATIONS)
+    if(UPDATE_TRANSLATIONS)
+        if(NOT Qt5_LUPDATE_EXECUTABLE)
+            MESSAGE(WARNING "Qt's lupdate not found.")
+        endif()
         QT5_CREATE_TRANSLATION(oracle_QM ${translate_SRCS} ${oracle_TS})
-    ELSE()
+    else()
         QT5_ADD_TRANSLATION(oracle_QM ${oracle_TS})
-    ENDIF()
-
-    QT5_ADD_RESOURCES(oracle_RESOURCES_RCC ${oracle_RESOURCES})
-
-    # guess plugins and libraries directory
-    set(QT_PLUGINS_DIR "${Qt5Widgets_DIR}/../../../plugins")
-    get_target_property(QT_LIBRARY_DIR Qt5::Core LOCATION)
-    get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} PATH)
+    endif()
 endif()
+
+QT5_ADD_RESOURCES(oracle_RESOURCES_RCC ${oracle_RESOURCES})
 
 INCLUDE_DIRECTORIES(../cockatrice/src)
 
@@ -111,7 +95,7 @@ ENDIF()
 # Build oracle binary and link it
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
 
-qt5_use_modules(oracle ${ORACLE_LIBS})
+qt5_use_modules(oracle ${ORACLE_QT_MODULES})
 
 IF(ZLIB_FOUND)
     TARGET_LINK_LIBRARIES(oracle ${ZLIB_LIBRARIES})
@@ -128,7 +112,7 @@ if(UNIX)
         set_target_properties(oracle PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
         INSTALL(TARGETS oracle BUNDLE DESTINATION ./)
-        INSTALL(FILES ${oracle_QM} DESTINATION ./Oracle.app/Contents/Resources/translations)
+        INSTALL(FILES ${oracle_QM} DESTINATION ./oracle.app/Contents/Resources/translations)
     else()
         # Assume linux
         INSTALL(TARGETS oracle RUNTIME DESTINATION bin/)
@@ -147,14 +131,19 @@ ENDIF (NOT WIN32 AND NOT APPLE)
 
 if(APPLE)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
-    set(plugin_dest_dir Oracle.app/Contents/Plugins)
-    set(qtconf_dest_dir Oracle.app/Contents/Resources)
+    set(plugin_dest_dir oracle.app/Contents/Plugins)
+    set(qtconf_dest_dir oracle.app/Contents/Resources)
     get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/.." ABSOLUTE)
 
     # qt5 plugins: iconengines, platforms
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(iconengines|platforms)/.*\\.dylib"
-        REGEX ".*_debug\\.dylib" EXCLUDE)
+        FILES_MATCHING
+        PATTERN "*.dSYM" EXCLUDE
+        PATTERN "*_debug.dylib" EXCLUDE
+        PATTERN "iconengines/*.dylib"
+        PATTERN "platforms/*.dylib"
+        PATTERN "styles/*.dylib"
+    )
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
@@ -167,7 +156,7 @@ Translations = Resources/translations\")
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         " COMPONENT Runtime)
 endif()
 
@@ -203,4 +192,4 @@ Translations = Resources/translations\")
         include(BundleUtilities)
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
         " COMPONENT Runtime)
-endif() 
+endif()

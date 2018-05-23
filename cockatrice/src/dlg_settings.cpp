@@ -102,7 +102,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&fallbackUrlLabel, 7, 0, 1, 1);
     personalGrid->addWidget(fallbackUrlEdit, 7, 1, 1, 1);
     personalGrid->addWidget(&fallbackUrlRestoreButton, 7, 2, 1, 1);
-    personalGrid->addWidget(&clearDownloadedPicsButton, 8, 0, 1, 3);
+    personalGrid->addWidget(&clearDownloadedPicsButton, 8, 1);
 
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     urlLinkLabel.setOpenExternalLinks(true);
@@ -914,7 +914,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(vboxLayout);
-    mainLayout->addSpacing(12);
+    mainLayout->addSpacing(2);
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 

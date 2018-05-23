@@ -1629,7 +1629,7 @@ bool TcpServerSocketInterface::initTcpSession()
     return true;
 }
 
-#if QT_VERSION > 0x050300
+#ifdef QT_WEBSOCKETS_LIB
 WebsocketServerSocketInterface::WebsocketServerSocketInterface(Servatrice *_server,
                                                                Servatrice_DatabaseInterface *_databaseInterface,
                                                                QObject *parent)
