@@ -136,9 +136,9 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     sortWarning = new QLabel;
     sortWarning->setWordWrap(true);
     sortWarning->setText(
-        "<b>" + tr("Warning: ") + "</b>" +
-        tr("While the the set-list is sorted by any of the columns, custom art priority setting is disabled. ") +
-        tr("To disable sorting click on the same column header again."));
+        "<b>" + tr("Warning: ") + "</b><br>" +
+        tr("While the set list is sorted by any of the columns, custom art priority setting is disabled.") + "<br>" +
+        tr("To disable sorting click on the same column header again until this message disappears."));
     sortWarning->setVisible(false);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
