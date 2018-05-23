@@ -150,14 +150,12 @@ ENDIF(APPLE)
 
 # Qt5
 find_package(Qt5 COMPONENTS Concurrent Multimedia Network PrintSupport Svg Widgets REQUIRED)
-include_directories(${Qt5Concurrent_INCLUDE_DIRS} ${Qt5Multimedia_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS} ${Qt5PrintSupport_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS})
-set(COCKATRICE_QT_MODULES Concurrent Multimedia Network PrintSupport Svg Widgets)
+set(COCKATRICE_QT_MODULES Qt5::Concurrent Qt5::Multimedia Qt5::Network Qt5::PrintSupport Qt5::Svg Qt5::Widgets)
 
 # Qt5LinguistTools
 find_package(Qt5LinguistTools)
 if(Qt5LinguistTools_FOUND)
-    include_directories(${Qt5LinguistTools_INCLUDE_DIRS})
-    list(APPEND COCKATRICE_LIBS LinguistTools)
+    list(APPEND COCKATRICE_LIBS Qt5::LinguistTools)
 
     if(NOT Qt5_LRELEASE_EXECUTABLE)
         MESSAGE(WARNING "Qt's lrelease not found.")
@@ -188,8 +186,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 # Build cockatrice binary and link it
 ADD_EXECUTABLE(cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_SOURCES} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC} ${cockatrice_MOC_SRCS})
 
-TARGET_LINK_LIBRARIES(cockatrice cockatrice_common)
-qt5_use_modules(cockatrice ${COCKATRICE_QT_MODULES})
+TARGET_LINK_LIBRARIES(cockatrice cockatrice_common ${COCKATRICE_QT_MODULES})
 
 if(UNIX)
     if(APPLE)
