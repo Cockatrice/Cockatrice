@@ -39,7 +39,7 @@ DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -61,9 +61,4 @@ void DlgEditPassword::actOk()
     // always save the password so it will be picked up by the connect dialog
     settingsCache->servers().setPassword(newPasswordEdit->text());
     accept();
-}
-
-void DlgEditPassword::actCancel()
-{
-    reject();
 }

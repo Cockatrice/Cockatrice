@@ -45,7 +45,7 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -60,9 +60,4 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
 void DlgEditUser::actOk()
 {
     accept();
-}
-
-void DlgEditUser::actCancel()
-{
-    reject();
 }
