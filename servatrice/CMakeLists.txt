@@ -38,16 +38,12 @@ ENDIF(APPLE)
 
 # Qt5
 find_package(Qt5 COMPONENTS Network Sql REQUIRED)
-include_directories(${Qt5Core_INCLUDE_DIRS})
-include_directories(${Qt5Network_INCLUDE_DIRS})
-include_directories(${Qt5Sql_INCLUDE_DIRS})
-set(SERVATRICE_QT_MODULES Core Network Sql)
+set(SERVATRICE_QT_MODULES Qt5::Core Qt5::Network Qt5::Sql)
 
 # Qt Websockets
 find_package(Qt5WebSockets)
 if(Qt5WebSockets_FOUND)
-    include_directories(${Qt5WebSockets_INCLUDE_DIRS})
-     list(APPEND SERVATRICE_QT_MODULES WebSockets)
+    list(APPEND SERVATRICE_QT_MODULES Qt5::WebSockets)
 else()
     MESSAGE(WARNING "Qt5 websocket module not found")
 endif()
@@ -91,11 +87,10 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 ADD_EXECUTABLE(servatrice MACOSX_BUNDLE ${servatrice_SOURCES} ${servatrice_RESOURCES_RCC} ${servatrice_MOC_SRCS})
 
 if(MSVC)
-    TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${CMAKE_THREAD_LIBS_INIT} Qt5::WinMain)
+    TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${CMAKE_THREAD_LIBS_INIT} ${SERVATRICE_QT_MODULES} Qt5::WinMain)
 else()
-    TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${CMAKE_THREAD_LIBS_INIT})
+    TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${CMAKE_THREAD_LIBS_INIT} ${SERVATRICE_QT_MODULES})
 endif()
-qt5_use_modules(servatrice ${SERVATRICE_QT_MODULES})
 
 # install rules
 if(UNIX)
