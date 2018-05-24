@@ -50,14 +50,12 @@ ENDIF(APPLE)
 
 # Qt5
 find_package(Qt5 COMPONENTS Concurrent Network Svg Widgets REQUIRED)
-include_directories(${Qt5Concurrent_INCLUDE_DIRS} ${Qt5Multimedia_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS} ${Qt5PrintSupport_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS})
-set(ORACLE_QT_MODULES Concurrent Multimedia Network PrintSupport Svg Widgets)
+set(ORACLE_QT_MODULES Qt5::Concurrent Qt5::Network Qt5::Svg Qt5::Widgets)
 
 # Qt5LinguistTools
 find_package(Qt5LinguistTools)
 if(Qt5LinguistTools_FOUND)
-    include_directories(${Qt5LinguistTools_INCLUDE_DIRS})
-    list(APPEND ORACLE_LIBS LinguistTools)
+    list(APPEND ORACLE_LIBS Qt5::LinguistTools)
 
     if(NOT Qt5_LRELEASE_EXECUTABLE)
         MESSAGE(WARNING "Qt's lrelease not found.")
@@ -95,10 +93,10 @@ ENDIF()
 # Build oracle binary and link it
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
 
-qt5_use_modules(oracle ${ORACLE_QT_MODULES})
-
 IF(ZLIB_FOUND)
-    TARGET_LINK_LIBRARIES(oracle ${ZLIB_LIBRARIES})
+    TARGET_LINK_LIBRARIES(oracle ${ORACLE_QT_MODULES} ${ZLIB_LIBRARIES})
+ELSE()
+    TARGET_LINK_LIBRARIES(oracle ${ORACLE_QT_MODULES})
 ENDIF()
 
 if(UNIX)
