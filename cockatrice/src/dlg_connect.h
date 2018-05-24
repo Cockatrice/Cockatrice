@@ -49,7 +49,6 @@ public:
 
 private slots:
     void actOk();
-    void actCancel();
     void actSaveConfig();
     void passwordSaved(int state);
     void previousHostSelected(bool state);

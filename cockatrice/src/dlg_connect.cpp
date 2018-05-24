@@ -334,13 +334,6 @@ QString DlgConnect::getHost() const
     return hostEdit->text().trimmed();
 }
 
-void DlgConnect::actCancel()
-{
-    settingsCache->servers().setSavePassword(savePasswordCheckBox->isChecked());
-    settingsCache->servers().setAutoConnect(autoConnectCheckBox->isChecked());
-    reject();
-}
-
 bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {
