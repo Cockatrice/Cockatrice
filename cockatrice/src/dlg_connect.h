@@ -49,7 +49,6 @@ public:
 
 private slots:
     void actOk();
-    void actCancel();
     void actSaveConfig();
     void passwordSaved(int state);
     void previousHostSelected(bool state);
@@ -61,7 +60,7 @@ private slots:
     void downloadThePublicServers();
 
 private:
-    QGridLayout *newHostLayout, *connectionLayout, *buttons, *loginLayout, *serverInfoLayout, *grid;
+    QGridLayout *newHostLayout, *connectionLayout, *loginLayout, *serverInfoLayout, *grid;
     QHBoxLayout *newHolderLayout;
     QGroupBox *loginGroupBox, *serverInfoGroupBox, *btnGroupBox, *restrictionsGroupBox;
     QVBoxLayout *mainLayout;
@@ -71,7 +70,7 @@ private:
     QCheckBox *savePasswordCheckBox, *autoConnectCheckBox;
     QComboBox *previousHosts;
     QRadioButton *newHostButton, *previousHostButton;
-    QPushButton *btnOk, *btnCancel, *btnForgotPassword, *btnRefreshServers;
+    QPushButton *btnConnect, *btnForgotPassword, *btnRefreshServers;
     QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
     HandlePublicServers *hps;
     const QString placeHolderText = tr("Downloading...");
