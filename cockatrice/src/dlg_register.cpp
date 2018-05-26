@@ -326,7 +326,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -360,9 +360,4 @@ void DlgRegister::actOk()
     settingsCache->servers().setPassword(passwordEdit->text());
 
     accept();
-}
-
-void DlgRegister::actCancel()
-{
-    reject();
 }

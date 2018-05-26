@@ -24,7 +24,6 @@ public:
     }
 private slots:
     void actOk();
-    void actCancel();
 
 private:
     QLabel *oldPasswordLabel, *newPasswordLabel, *newPasswordLabel2;

@@ -17,7 +17,6 @@ public:
     QByteArray getImage();
 private slots:
     void actOk();
-    void actCancel();
     void actBrowse();
 
 private:

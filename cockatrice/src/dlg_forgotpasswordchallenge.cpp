@@ -31,7 +31,7 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
         QMessageBox::warning(this, tr("Forgot Password Challenge Warning"),
                              tr("Oops, looks like something has gone wrong.  Please restart the forgot password "
                                 "process by using the forgot password button on the connection screen."));
-        actCancel();
+        reject();
     }
 
     hostLabel = new QLabel(tr("&Host:"));
@@ -72,7 +72,7 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -96,9 +96,4 @@ void DlgForgotPasswordChallenge::actOk()
     settingsCache->servers().setFPPlayerName(playernameEdit->text());
 
     accept();
-}
-
-void DlgForgotPasswordChallenge::actCancel()
-{
-    reject();
 }

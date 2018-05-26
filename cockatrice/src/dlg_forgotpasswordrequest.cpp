@@ -48,7 +48,7 @@ DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(pa
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -72,9 +72,4 @@ void DlgForgotPasswordRequest::actOk()
     settingsCache->servers().setFPPlayerName(playernameEdit->text());
 
     accept();
-}
-
-void DlgForgotPasswordRequest::actCancel()
-{
-    reject();
 }

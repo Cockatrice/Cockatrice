@@ -35,7 +35,6 @@ public:
     }
 private slots:
     void actOk();
-    void actCancel();
 
 private:
     QLabel *emailLabel, *countryLabel, *realnameLabel;

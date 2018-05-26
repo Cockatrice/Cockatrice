@@ -29,7 +29,7 @@ DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent)
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actCancel()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -44,11 +44,6 @@ DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent)
 void DlgEditAvatar::actOk()
 {
     accept();
-}
-
-void DlgEditAvatar::actCancel()
-{
-    reject();
 }
 
 void DlgEditAvatar::actBrowse()

@@ -48,7 +48,6 @@ public:
     }
 private slots:
     void actOk();
-    void actCancel();
 
 private:
     QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *passwordConfirmationLabel, *emailLabel,
