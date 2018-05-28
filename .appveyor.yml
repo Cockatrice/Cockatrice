@@ -17,6 +17,8 @@ skip_commits:
     - Dockerfile
     - LICENSE
 
+skip_branch_with_pr: true
+
 image: Visual Studio 2017
 
 cache:
