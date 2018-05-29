@@ -10,7 +10,7 @@ matrix:
     dist: trusty
     group: stable
     env: BUILDTYPE=Debug
-    # if: tag IS NOT present    see https://github.com/travis-ci/travis-conditions/pull/1
+    if: tag IS NOT present
   - os: linux
     dist: trusty
     group: stable
@@ -19,7 +19,7 @@ matrix:
   - os: osx
     osx_image: xcode8
     env: BUILDTYPE=Debug
-    # if: tag IS NOT present    see https://github.com/travis-ci/travis-conditions/pull/1
+    if: tag IS NOT present
   - os: osx
     osx_image: xcode8
     env: BUILDTYPE=Release
