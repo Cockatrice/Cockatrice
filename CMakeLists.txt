@@ -162,6 +162,11 @@ IF(WIN32)
     FIND_PACKAGE(Win32SslRuntime)
 ENDIF()
 
+#Find VCredist
+IF(MSVC)
+    FIND_PACKAGE(VCredistRuntime)
+ENDIF()
+
 # Package builder
 set(CPACK_PACKAGE_CONTACT "Gavin Bisesi <Daenyth+github@gmail.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_NAME})
@@ -206,13 +211,9 @@ elseif(WIN32)
     )
 
     # include vcredist into the package; NSIS will take care of running it
-    IF(MSVC)
-        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-            INSTALL(FILES "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/redist/MSVC/14.14.26405/vc_redist.x64.exe" DESTINATION ./)
-        else()
-            INSTALL(FILES "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/redist/MSVC/14.14.26405/vc_redist.x86.exe" DESTINATION ./)
-        endif()
-    ENDIF()
+    if(VCREDISTRUNTIME_FOUND)
+        INSTALL(FILES "${VCREDISTRUNTIME_FILE}" DESTINATION ./)
+    endif()
 endif()
 
 include(CPack)
