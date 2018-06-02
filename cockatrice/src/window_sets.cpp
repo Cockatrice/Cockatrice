@@ -215,6 +215,7 @@ void WndSets::actRestoreOriginalOrder()
 {
     view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
     model->sort(model->ReleaseDateCol, Qt::DescendingOrder);
+    sortWarning->setVisible(false);
 }
 
 void WndSets::actDisableResetButton(const QString &filterString)
