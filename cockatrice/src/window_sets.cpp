@@ -139,6 +139,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
         "<b>" + tr("Warning: ") + "</b><br>" +
         tr("While the set list is sorted by any of the columns, custom art priority setting is disabled.") + "<br>" +
         tr("To disable sorting click on the same column header again until this message disappears."));
+    sortWarning->setStyleSheet("QLabel { background-color:red;}");
     sortWarning->setVisible(false);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -153,8 +154,8 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     mainLayout->addWidget(disableAllButton, 2, 2);
     mainLayout->addWidget(enableSomeButton, 2, 1);
     mainLayout->addWidget(disableSomeButton, 2, 2);
-    mainLayout->addWidget(labNotes, 3, 1, 1, 2);
-    mainLayout->addWidget(sortWarning, 4, 1, 1, 2);
+    mainLayout->addWidget(sortWarning, 3, 1, 1, 2);
+    mainLayout->addWidget(labNotes, 4, 1, 1, 2);
     mainLayout->addWidget(buttonBox, 5, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
     mainLayout->setColumnStretch(2, 1);
