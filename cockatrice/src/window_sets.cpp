@@ -147,7 +147,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actRestore()));
 
     mainLayout = new QGridLayout;
-    mainLayout->addWidget(setsEditToolBar, 0, 0, 2, 1);
+    mainLayout->addWidget(setsEditToolBar, 1, 0, 2, 1);
     mainLayout->addLayout(filterBox, 0, 1, 1, 2);
     mainLayout->addWidget(view, 1, 1, 1, 2);
     mainLayout->addWidget(enableAllButton, 2, 1);
