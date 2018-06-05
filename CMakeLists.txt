@@ -92,6 +92,9 @@ elseif(WIN32)
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
 endif()
 
+# Treat warnings as errors (Debug builds only)
+option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
+
 # Define proper compilation flags
 IF(MSVC)
     # Visual Studio:
@@ -104,7 +107,11 @@ ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
     include(CheckCXXCompilerFlag)
 
     set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
-    set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -Werror")
+    if(WARNING_AS_ERROR)
+        set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -Werror")
+    else()
+        set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra")
+    endif()
 
     set(ADDITIONAL_DEBUG_FLAGS -Wcast-align -Wmissing-declarations -Wno-long-long -Wno-error=extra -Wno-error=delete-non-virtual-dtor -Wno-error=sign-compare -Wno-error=missing-declarations)
 

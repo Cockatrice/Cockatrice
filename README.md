@@ -70,7 +70,7 @@ Cockatrice uses the [Google Developer Documentation Style Guide](https://develop
 # Translations [![Cockatrice on Transiflex](https://tx-assets.scdn5.secure.raxcdn.com/static/charts/images/tx-logo-micro.c5603f91c780.png)](https://www.transifex.com/projects/p/cockatrice/)
 
 Cockatrice uses Transifex for translations. You can help us bring Cockatrice and Oracle to your language or just edit single wordings right from within your browser by visiting our [Transifex project page](https://www.transifex.com/projects/p/cockatrice/).<br>
-   
+
 | Cockatrice | Oracle |
 |:-:|:-:|
 | [![Cockatrice Translation Status](https://www.transifex.com/projects/p/cockatrice/resource/cockatrice/chart/image_png/)](https://www.transifex.com/projects/p/cockatrice/) | [![Oracle Translation Status](https://www.transifex.com/projects/p/cockatrice/resource/oracle/chart/image_png/)](https://www.transifex.com/projects/p/cockatrice/) |
@@ -83,7 +83,7 @@ Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Tra
 **Detailed compiling instructions are on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 
 Dependencies:
-- [Qt](https://www.qt.io/developers/) 
+- [Qt](https://www.qt.io/developers/)
 - [protobuf](https://github.com/google/protobuf)
 - [CMake](https://www.cmake.org/)
 
@@ -96,7 +96,7 @@ To compile:
     cd build
     cmake ..
     make
-    
+
 You can then run
 
     make install
@@ -113,14 +113,15 @@ The following flags can be passed to `cmake`:
 - `-DWITH_CLIENT=0` Whether to build the client (default 1 = yes).
 - `-DWITH_ORACLE=0` Whether to build oracle (default 1 = yes).
 - `-DCMAKE_BUILD_TYPE=Debug` Compile in debug mode. Enables extra logging output, debug symbols, and much more verbose compiler warnings (default `Release`).
+- `-DWARNING_AS_ERROR=0` Whether to treat compilation warnings as errors in debug mode (default 1 = yes).
 - `-DUPDATE_TRANSLATIONS=1` Configure `make` to update the translation .ts files for new strings in the source code. Note: Running `make clean` will remove the .ts files (default 0 = no).
 - `-DTEST=1` Enable regression tests (default 0 = no). Note: needs googletest, will be downloaded on the fly if unavailable. To run tests: ```make test```.
 
 
 # Run
 
-`Cockatrice` is the game client    
-`Oracle` fetches card data    
+`Cockatrice` is the game client
+`Oracle` fetches card data
 `Servatrice` is the server<br>
 
 
