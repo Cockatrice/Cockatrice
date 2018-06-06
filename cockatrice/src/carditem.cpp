@@ -317,7 +317,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             2 * QApplication::startDragDistance())
             return;
         if (zone->getIsView()) {
-            const ZoneViewZone *const view = static_cast<const ZoneViewZone *const>(zone);
+            const ZoneViewZone *view = static_cast<const ZoneViewZone *>(zone);
             if (view->getRevealZone() && !view->getWriteableRevealZone())
                 return;
         } else if (!owner->getLocal())

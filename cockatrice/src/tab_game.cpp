@@ -1029,7 +1029,7 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
     playerListWidget->updatePlayerProperties(prop, eventPlayerId);
 
     const GameEventContext::ContextType contextType =
-        static_cast<const GameEventContext::ContextType>(getPbExtension(context));
+        static_cast<GameEventContext::ContextType>(getPbExtension(context));
     switch (contextType) {
         case GameEventContext::READY_START: {
             bool ready = prop.ready_start();
