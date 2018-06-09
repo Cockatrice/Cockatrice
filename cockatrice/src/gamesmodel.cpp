@@ -196,6 +196,8 @@ QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, in
                     return tr("Age");
                 case Qt::TextAlignmentRole:
                     return Qt::AlignCenter;
+                default:
+                    return QVariant();
             }
         }
         case DESCRIPTION:
@@ -212,6 +214,8 @@ QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, in
                     return tr("Players");
                 case Qt::TextAlignmentRole:
                     return Qt::AlignCenter;
+                default:
+                    return QVariant();
             }
         }
         case SPECTATORS:
