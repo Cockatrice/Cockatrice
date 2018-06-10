@@ -252,3 +252,37 @@ QStringList SetsModel::mimeTypes() const
 {
     return QStringList() << "application/x-cockatricecardset";
 }
+
+SetsDisplayModel::SetsDisplayModel(QObject *parent) : QSortFilterProxyModel(parent)
+{
+    setFilterCaseSensitivity(Qt::CaseInsensitive);
+    setSortCaseSensitivity(Qt::CaseInsensitive);
+}
+
+void SetsDisplayModel::fetchMore(const QModelIndex &index)
+{
+    int itemsToFetch = sourceModel()->rowCount(index);
+
+    beginInsertRows(QModelIndex(), 0, itemsToFetch - 1);
+
+    endInsertRows();
+}
+
+bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
+{
+    auto typeIndex = sourceModel()->index(sourceRow, SetsModel::SetTypeCol, sourceParent);
+    auto nameIndex = sourceModel()->index(sourceRow, SetsModel::LongNameCol, sourceParent);
+    auto shortNameIndex = sourceModel()->index(sourceRow, SetsModel::ShortNameCol, sourceParent);
+
+    return (sourceModel()->data(typeIndex).toString().contains(filterRegExp()) ||
+            sourceModel()->data(nameIndex).toString().contains(filterRegExp()) ||
+            sourceModel()->data(shortNameIndex).toString().contains(filterRegExp()));
+}
+
+bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
+{
+    QString leftString = sourceModel()->data(left, SetsModel::SortRole).toString();
+    QString rightString = sourceModel()->data(right, SetsModel::SortRole).toString();
+
+    return QString::localeAwareCompare(leftString, rightString) < 0;
+}

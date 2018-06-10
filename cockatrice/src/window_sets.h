@@ -4,11 +4,13 @@
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMainWindow>
 #include <QSet>
 
 class SetsModel;
 class SetsProxyModel;
+class SetsDisplayModel;
 class QPushButton;
 class CardDatabase;
 class QItemSelection;
@@ -19,14 +21,20 @@ class WndSets : public QMainWindow
     Q_OBJECT
 private:
     SetsModel *model;
+    SetsDisplayModel *displayModel;
     QTreeView *view;
     QPushButton *toggleAllButton, *toggleSelectedButton;
     QPushButton *enableAllButton, *disableAllButton, *enableSomeButton, *disableSomeButton;
+    QPushButton *defaultSortButton;
     QAction *aUp, *aDown, *aBottom, *aTop;
     QToolBar *setsEditToolBar;
     QDialogButtonBox *buttonBox;
-    QLabel *labNotes;
+    QLabel *labNotes, *searchLabel, *sortWarning;
+    QLineEdit *searchField;
     QGridLayout *mainLayout;
+    QHBoxLayout *filterBox;
+    int sortIndex;
+    Qt::SortOrder sortOrder;
     void rebuildMainLayout(int actionToTake);
     enum
     {
@@ -52,6 +60,10 @@ private slots:
     void actTop();
     void actBottom();
     void actToggleButtons(const QItemSelection &selected, const QItemSelection &deselected);
+    void actDisableSortButtons(int index);
+    void actRestoreOriginalOrder();
+    void actDisableResetButton(const QString &filterText);
+    void actSort(int index);
 };
 
 #endif

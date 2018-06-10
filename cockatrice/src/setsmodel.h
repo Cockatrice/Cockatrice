@@ -5,6 +5,7 @@
 #include <QAbstractTableModel>
 #include <QMimeData>
 #include <QSet>
+#include <QSortFilterProxyModel>
 
 class SetsProxyModel;
 
@@ -78,6 +79,18 @@ public:
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
     void save(CardDatabase *db);
     void restore(CardDatabase *db);
+};
+
+class SetsDisplayModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+public:
+    SetsDisplayModel(QObject *parent = NULL);
+
+protected:
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    void fetchMore(const QModelIndex &index) override;
 };
 
 #endif
