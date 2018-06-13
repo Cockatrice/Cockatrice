@@ -444,19 +444,18 @@ void CardDatabase::removeCard(CardInfoPtr card)
         return;
     }
 
-    foreach (CardRelation *cardRelation, card->getRelatedCards())
+    for (auto *cardRelation : card->getRelatedCards())
         cardRelation->deleteLater();
 
-    foreach (CardRelation *cardRelation, card->getReverseRelatedCards())
+    for (auto *cardRelation : card->getReverseRelatedCards())
         cardRelation->deleteLater();
 
-    foreach (CardRelation *cardRelation, card->getReverseRelatedCards2Me())
+    for (auto *cardRelation : card->getReverseRelatedCards2Me())
         cardRelation->deleteLater();
 
     removeCardMutex->lock();
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
-    card.clear();
     removeCardMutex->unlock();
     emit cardRemoved(card);
 }
@@ -567,8 +566,7 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     // load custom card databases
     QDir dir(settingsCache->getCustomCardDatabasePath());
-    foreach (QString fileName,
-             dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
+    for (QString fileName : dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
         loadCardDatabase(dir.absoluteFilePath(fileName));
     }
 
