@@ -566,7 +566,8 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     // load custom card databases
     QDir dir(settingsCache->getCustomCardDatabasePath());
-    for (QString fileName : dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
+    for (QString fileName :
+         dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
         loadCardDatabase(dir.absoluteFilePath(fileName));
     }
 
