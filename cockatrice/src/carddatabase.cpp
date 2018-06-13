@@ -397,8 +397,8 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
 
 CardDatabase::~CardDatabase()
 {
-    qDeleteAll(availableParsers);
     clear();
+    qDeleteAll(availableParsers);
 }
 
 void CardDatabase::clear()
@@ -417,6 +417,9 @@ void CardDatabase::clear()
     simpleNameCards.clear();
 
     sets.clear();
+    for (auto parser : availableParsers) {
+        parser->clearSetlist();
+    }
 
     loadStatus = NotLoaded;
 
@@ -442,6 +445,10 @@ void CardDatabase::removeCard(CardInfoPtr card)
     if (card.isNull()) {
         qDebug() << "removeCard(nullptr)";
         return;
+    }
+
+    if (card->getName() == QString("Act of Treason")) {
+        qDebug() << "vagyok";
     }
 
     for (auto *cardRelation : card->getRelatedCards())
@@ -573,14 +580,6 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     // AFTER all the cards have been loaded
 
-    // reorder sets (TODO: refactor, this smells)
-    SetList allSets;
-    QHashIterator<QString, CardSetPtr> setsIterator(sets);
-    while (setsIterator.hasNext()) {
-        allSets.append(setsIterator.next().value());
-    }
-    allSets.sortByKey();
-
     // resolve the reverse-related tags
     refreshCachedReverseRelatedCards();
 
@@ -659,7 +658,7 @@ void CardDatabase::checkUnknownSets()
     SetList sets = getSetList();
 
     if (sets.getEnabledSetsNum()) {
-        // if some sets are first found on thus run, ask the user
+        // if some sets are first found on this run, ask the user
         int numUnknownSets = sets.getUnknownSetsNum();
         QStringList unknownSetNames = sets.getUnknownSetsNames();
         if (numUnknownSets > 0) {
