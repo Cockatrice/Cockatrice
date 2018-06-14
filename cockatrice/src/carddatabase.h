@@ -335,6 +335,11 @@ public:
     // void setLoyalty(int _loyalty) { loyalty = _loyalty; emit cardInfoChanged(smartThis); }
     // void setCustomPicURL(const QString &_set, const QString &_customPicURL) { customPicURLs.insert(_set,
     // _customPicURL); }
+    void setSet(const CardSetPtr &_set)
+    {
+        sets.append(_set);
+        refreshCachedSetNames();
+    }
     void setMuId(const QString &_set, const int &_muId)
     {
         muIds.insert(_set, _muId);

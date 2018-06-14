@@ -433,6 +433,19 @@ void CardDatabase::addCard(CardInfoPtr card)
         return;
     }
 
+    // if card already exists just add the new set property
+    if (cards.contains(card->getName())) {
+        CardInfoPtr sameCard = cards[card->getName()];
+        for (auto set : card->getSets()) {
+            QString setName = set->getCorrectedShortName();
+            sameCard->setSet(set);
+            sameCard->setMuId(setName, card->getMuId(setName));
+            sameCard->setRarity(setName, card->getRarity(setName));
+            sameCard->setSetNumber(setName, card->getCollectorNumber(setName));
+        }
+        return;
+    }
+
     addCardMutex->lock();
     cards.insert(card->getName(), card);
     simpleNameCards.insert(card->getSimpleName(), card);
@@ -445,10 +458,6 @@ void CardDatabase::removeCard(CardInfoPtr card)
     if (card.isNull()) {
         qDebug() << "removeCard(nullptr)";
         return;
-    }
-
-    if (card->getName() == QString("Act of Treason")) {
-        qDebug() << "vagyok";
     }
 
     for (auto *cardRelation : card->getRelatedCards())
