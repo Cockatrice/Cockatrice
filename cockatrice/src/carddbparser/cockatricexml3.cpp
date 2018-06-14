@@ -80,7 +80,8 @@ CardSetPtr CockatriceXml3Parser::internalAddSet(const QString &setName,
     return newSet;
 }
 
-void CockatriceXml3Parser::clearSetlist() {
+void CockatriceXml3Parser::clearSetlist()
+{
     sets.clear();
 }
 
