@@ -52,7 +52,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="421"/>
         <source>Display hand horizontally (wastes space)</source>
-        <translation type="unfinished"/>
+        <translation>Eli yatay göster (Daha fazla yer kaplar)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="422"/>
@@ -1817,7 +1817,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gamesmodel.cpp" line="196"/>
         <source>Age</source>
-        <translation>Zaman</translation>
+        <translation>Yaş</translation>
     </message>
     <message>
         <location filename="../src/gamesmodel.cpp" line="206"/>

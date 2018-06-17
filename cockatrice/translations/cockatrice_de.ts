@@ -414,37 +414,37 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
         <location filename="../src/dlg_settings.cpp" line="506"/>
         <location filename="../src/dlg_settings.cpp" line="554"/>
         <source>Update Spoilers</source>
-        <translation type="unfinished"/>
+        <translation>Spoiler aktualisieren</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="543"/>
         <source>Updating Spoilers</source>
-        <translation type="unfinished"/>
+        <translation>Spoiler werden aktualisiert</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="573"/>
         <source>Choose path</source>
-        <translation type="unfinished"/>
+        <translation>Pfad auswählen</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="598"/>
         <source>Spoilers</source>
-        <translation type="unfinished"/>
+        <translation>Spoiler</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="599"/>
         <source>Download Spoilers Automatically</source>
-        <translation type="unfinished"/>
+        <translation>Lade Spoiler automatisch herunter</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="600"/>
         <source>Spoiler Location:</source>
-        <translation type="unfinished"/>
+        <translation>Spoiler Verzeichnis:</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="601"/>
         <source>Hey, something&apos;s here finally!</source>
-        <translation type="unfinished"/>
+        <translation>Hey, es gibt hier endlich etwas!</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="602"/>
@@ -454,17 +454,17 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="../src/dlg_settings.cpp" line="603"/>
         <source>Spoilers download automatically on launch</source>
-        <translation type="unfinished"/>
+        <translation>Spoiler werden beim Start automatisch heruntergeladen</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="604"/>
         <source>Press the button to manually update without relaunching</source>
-        <translation type="unfinished"/>
+        <translation>Drücke den Knopf um manuell zu aktualisieren ohne neu zu starten</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="605"/>
         <source>Do not close settings until manual update complete</source>
-        <translation type="unfinished"/>
+        <translation>Schließe die Einstellungen nicht bis das Update abgeschlossen ist</translation>
     </message>
 </context>
 <context>
@@ -1020,7 +1020,8 @@ Um Ihren derzeitigen Avatar zu entfernen, bestätigen Sie, ohne ein neues Bild z
         <location filename="../src/dlg_edit_tokens.cpp" line="150"/>
         <source>The chosen name conflicts with an existing card or token.
 Make sure to enable the &apos;Token&apos; set in the &quot;Manage sets&quot; dialog to display them correctly.</source>
-        <translation type="unfinished"/>
+        <translation>Es existiert bereits eine Karte oder ein Spielstein mit dem gewählten Namen.
+Aktivieren Sie die Edition „Token&quot; im „Editionen verwalten...“ Menü um Spielsteine korrekt anzuzeigen.</translation>
     </message>
 </context>
 <context>
@@ -1677,7 +1678,7 @@ Eventuell müssen Sie die Quellen selbst kompilieren.</translation>
     <message>
         <location filename="../src/dlg_viewlog.cpp" line="18"/>
         <source>Clear log when closing</source>
-        <translation type="unfinished"/>
+        <translation>Lösche den Log beim Schließen</translation>
     </message>
     <message>
         <location filename="../src/dlg_viewlog.cpp" line="25"/>
@@ -1690,7 +1691,7 @@ Eventuell müssen Sie die Quellen selbst kompilieren.</translation>
     <message>
         <location filename="../src/filterbuilder.cpp" line="28"/>
         <source>Type your filter here</source>
-        <translation type="unfinished"/>
+        <translation>Gib hier deine Filter ein</translation>
     </message>
 </context>
 <context>
@@ -2006,17 +2007,17 @@ Eventuell müssen Sie die Quellen selbst kompilieren.</translation>
     <message>
         <location filename="../src/logger.cpp" line="92"/>
         <source>Client Operating System</source>
-        <translation type="unfinished"/>
+        <translation>Client-Betriebssysteme</translation>
     </message>
     <message>
         <location filename="../src/logger.cpp" line="95"/>
         <source>Build Architecture</source>
-        <translation type="unfinished"/>
+        <translation>Softwarearchitektur</translation>
     </message>
     <message>
         <location filename="../src/logger.cpp" line="96"/>
         <source>Qt Version</source>
-        <translation type="unfinished"/>
+        <translation>Qt Version</translation>
     </message>
 </context>
 <context>
@@ -2734,14 +2735,16 @@ Cockatrice wird die Kartendatenbank jetzt neu laden.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="626"/>
         <source>&amp;Manage sets...</source>
-        <translation type="unfinished"/>
+        <translation>Editionen &amp;verwalten...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="968"/>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Manage Sets&quot; dialog.</source>
-        <translation type="unfinished"/>
+        <translation>Hi! Es scheint, als würden Sie diese Version von Cochatrice das erste Mal starten.
+Alle Editionen der Kartendatenbank wurden aktiviert.
+Lesen Sie mehr über das Ändern der Editionsreihenfolge oder die Deaktivierung bestimmter Editionen im „Editionen verwalten...“ Fenster.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1083"/>
@@ -3856,7 +3859,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="../src/player.cpp" line="685"/>
         <source>&amp;Tap / Untap</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Tappen / Enttappen</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="708"/>
@@ -4214,48 +4217,48 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="98"/>
         <source>Spoilers season has ended</source>
-        <translation type="unfinished"/>
+        <translation>Spoiler Saison ist beendet</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="98"/>
         <source>Deleting spoiler.xml. Please run Oracle</source>
-        <translation type="unfinished"/>
+        <translation>spoiler.xml gelöscht. Bitte führe Oracle aus</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="108"/>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="115"/>
         <source>Spoilers download failed</source>
-        <translation type="unfinished"/>
+        <translation>Spoiler Download fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="108"/>
         <source>No internet connection</source>
-        <translation type="unfinished"/>
+        <translation>Keine Internetverbindung</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="115"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Fehler</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="136"/>
         <source>Spoilers already up to date</source>
-        <translation type="unfinished"/>
+        <translation>Spoiler bereits aktuell</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="136"/>
         <source>No new spoilers added</source>
-        <translation type="unfinished"/>
+        <translation>Keine neuen Spoiler hinzugefügt</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="177"/>
         <source>Spoilers have been updated!</source>
-        <translation type="unfinished"/>
+        <translation>Spoiler wurden aktualisiert!</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="177"/>
         <source>Last change:</source>
-        <translation type="unfinished"/>
+        <translation>Letzte Änderung:</translation>
     </message>
 </context>
 <context>
@@ -4384,42 +4387,42 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="326"/>
         <source>Search by card name</source>
-        <translation type="unfinished"/>
+        <translation>Suche anhand des Kartennamens</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="570"/>
         <source>Save deck to clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Deck in Zwischenablage speichern</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="571"/>
         <source>Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Kommentiert</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="572"/>
         <source>Not Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Nicht kommentiert</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="576"/>
         <source>&amp;Send deck to online service</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Sende Deck an Onlineservice</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="577"/>
         <source>Create decklist (decklist.org)</source>
-        <translation type="unfinished"/>
+        <translation>Erstelle Deckliste (decklist.org)</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="578"/>
         <source>Analyze deck (deckstats.net)</source>
-        <translation type="unfinished"/>
+        <translation>Analysiere Deck (deckstats.net)</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="579"/>
         <source>Analyze deck (tappedout.net)</source>
-        <translation type="unfinished"/>
+        <translation>Analysiere Deck (tappedout.net)</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="581"/>
@@ -4550,12 +4553,12 @@ Bitte überprüfen Sie, dass Sie Schreibrechte in dem Verzeichnis haben, und ver
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="824"/>
         <source>There are no cards in your deck to be exported</source>
-        <translation type="unfinished"/>
+        <translation>Es werden in Ihrem Deck keine Karten exportiert werden</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="836"/>
         <source>No deck was selected to be saved.</source>
-        <translation type="unfinished"/>
+        <translation>Es wurde kein Deck zum Speichern ausgewählt.</translation>
     </message>
 </context>
 <context>
@@ -5008,7 +5011,7 @@ Je mehr Informationen Sie angeben, desto spezifischer fallen die Ergebnisse aus.
     <message>
         <location filename="../src/tab_message.cpp" line="148"/>
         <source>Private message from</source>
-        <translation type="unfinished"/>
+        <translation>Private Nachricht von</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="165"/>
@@ -5786,7 +5789,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="../src/window_sets.cpp" line="132"/>
         <source>Manage sets</source>
-        <translation type="unfinished"/>
+        <translation>Editionen verwalten</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="166"/>
@@ -6216,27 +6219,27 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1762"/>
         <source>Manage sets</source>
-        <translation type="unfinished"/>
+        <translation>Editionen verwalten</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1768"/>
         <source>Export deck</source>
-        <translation type="unfinished"/>
+        <translation>Deck exportieren</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1772"/>
         <source>Save deck (clip)</source>
-        <translation type="unfinished"/>
+        <translation>Deck speichern (Zwischenablage)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1773"/>
         <source>Save deck (clip; no annotations)</source>
-        <translation type="unfinished"/>
+        <translation>Deck speichern (Zwischenablage, ohne Anmerkungen)</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1851"/>
         <source>Tap / Untap Card</source>
-        <translation type="unfinished"/>
+        <translation>Tappe / Enttappe Karte</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1852"/>

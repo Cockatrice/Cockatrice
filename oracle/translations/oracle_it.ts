@@ -9,7 +9,8 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="181"/>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.</source>
-        <translation type="unfinished"/>
+        <translation>Questo wizard impoertà la lista di set, carte
+e pedine che verranno usate da Cockatrice.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="183"/>
@@ -150,48 +151,48 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="602"/>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>Download in corso (%1MB)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="612"/>
         <location filename="../src/oraclewizard.cpp" line="672"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Errore</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="612"/>
         <source>Network error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Errore di rete: %1.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="672"/>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;indirizzo specificato non è valido.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="676"/>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>Download in corso (0MB)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="693"/>
         <source>Spoilers source selection</source>
-        <translation type="unfinished"/>
+        <translation>Selezione sorgente spoiler</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="694"/>
         <source>Please specify a spoiler source.</source>
-        <translation type="unfinished"/>
+        <translation>Specifica una sorgente per gli spoiler.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="696"/>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Indirizzo download:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="697"/>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Usa l&apos;indirizzo predefinito</translation>
     </message>
 </context>
 <context>
@@ -204,7 +205,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="732"/>
         <source>Please specify a source for the list of tokens.</source>
-        <translation type="unfinished"/>
+        <translation>Specifica una sorgente per le pedine.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="734"/>
@@ -335,37 +336,37 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="849"/>
         <source>Spoilers imported</source>
-        <translation type="unfinished"/>
+        <translation>Spoiler importati</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="850"/>
         <source>The spoilers file has been imported. Press &quot;Save&quot; to save the imported spoilers to the Cockatrice card database.</source>
-        <translation type="unfinished"/>
+        <translation>Gli spoiler sono stati importati. Premi &quot;Salva&quot; per salvare gli spoiler importati nell&apos;archivio delle carte di Cockatrice.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="853"/>
         <source>Save to the default path (recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Salva nel percorso predefinito (raccomandato)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="860"/>
         <source>Save spoiler database</source>
-        <translation type="unfinished"/>
+        <translation>Salva archivio spoiler</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="861"/>
         <source>XML; card database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; archivio delle carte (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="884"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Errore</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="884"/>
         <source>The file could not be saved to %1</source>
-        <translation type="unfinished"/>
+        <translation>Il file non può essere salvato su %1</translation>
     </message>
 </context>
 <context>
@@ -572,7 +573,7 @@
     <message>
         <location filename="../src/main.cpp" line="42"/>
         <source>Only run in spoiler mode</source>
-        <translation type="unfinished"/>
+        <translation>Avvia solo in modalità spoiler</translation>
     </message>
 </context>
 </TS>

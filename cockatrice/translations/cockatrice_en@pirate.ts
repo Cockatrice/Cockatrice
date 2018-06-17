@@ -22,7 +22,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="413"/>
         <source>Theme settings</source>
-        <translation type="unfinished"/>
+        <translation>Theme settin&apos;s</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="414"/>
@@ -32,7 +32,7 @@
     <message>
         <location filename="../src/dlg_settings.cpp" line="416"/>
         <source>Card rendering</source>
-        <translation type="unfinished"/>
+        <translation>C-arrr-d Scribblin&apos;</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="417"/>
@@ -424,7 +424,7 @@ This be only saved for captains and cannot be seen by t&apos; brutally banned sc
     <message>
         <location filename="../src/dlg_settings.cpp" line="573"/>
         <source>Choose path</source>
-        <translation type="unfinished"/>
+        <translation>Map yer scurvy way</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="598"/>
@@ -444,7 +444,7 @@ This be only saved for captains and cannot be seen by t&apos; brutally banned sc
     <message>
         <location filename="../src/dlg_settings.cpp" line="601"/>
         <source>Hey, something&apos;s here finally!</source>
-        <translation type="unfinished"/>
+        <translation>YARR CAP&apos;N, THAR BE A NEW SHIP SAILIN&apos;!</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="602"/>
@@ -2008,7 +2008,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/window_main.cpp" line="98"/>
         <source>Banned by moderator</source>
-        <translation type="unfinished"/>
+        <translation>Cap&apos;n&apos;s thrown ye outta tha ship!</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="101"/>
@@ -2029,7 +2029,7 @@ You may have to build from source yourself.</source>
         <location filename="../src/window_main.cpp" line="112"/>
         <location filename="../src/window_main.cpp" line="435"/>
         <source>Invalid username.</source>
-        <translation type="unfinished"/>
+        <translation>Yarrr, that ain&apos;t ye name ye scurvy landlubber!</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="115"/>
@@ -2438,7 +2438,7 @@ Local version is %1, remote version is %2.</source>
     <message>
         <location filename="../src/window_main.cpp" line="605"/>
         <source>&amp;Connect...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Board ye ship...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="606"/>
@@ -2557,13 +2557,13 @@ If unsure or first time user, choose &quot;Yes&quot;</source>
         <location filename="../src/window_main.cpp" line="921"/>
         <location filename="../src/window_main.cpp" line="946"/>
         <source>Yes</source>
-        <translation type="unfinished"/>
+        <translation>AYE!</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="922"/>
         <location filename="../src/window_main.cpp" line="947"/>
         <source>No</source>
-        <translation type="unfinished"/>
+        <translation>NAY!</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="923"/>
@@ -2954,7 +2954,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="451"/>
         <source>%1 is ready to start the game.</source>
-        <translation type="unfinished"/>
+        <translation>Yer mate %1 wants a duel!</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="415"/>
