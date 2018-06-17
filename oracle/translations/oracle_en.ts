@@ -150,48 +150,48 @@
 <context>
     <name>LoadSpoilersPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="602"/>
+        <location filename="../src/oraclewizard.cpp" line="603"/>
         <source>Downloading (%1MB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="612"/>
-        <location filename="../src/oraclewizard.cpp" line="672"/>
+        <location filename="../src/oraclewizard.cpp" line="613"/>
+        <location filename="../src/oraclewizard.cpp" line="673"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="612"/>
+        <location filename="../src/oraclewizard.cpp" line="613"/>
         <source>Network error: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="672"/>
+        <location filename="../src/oraclewizard.cpp" line="673"/>
         <source>The provided URL is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="676"/>
+        <location filename="../src/oraclewizard.cpp" line="677"/>
         <source>Downloading (0MB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="693"/>
+        <location filename="../src/oraclewizard.cpp" line="694"/>
         <source>Spoilers source selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="694"/>
+        <location filename="../src/oraclewizard.cpp" line="695"/>
         <source>Please specify a spoiler source.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="696"/>
+        <location filename="../src/oraclewizard.cpp" line="697"/>
         <source>Download URL:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="697"/>
+        <location filename="../src/oraclewizard.cpp" line="698"/>
         <source>Restore default URL</source>
         <translation type="unfinished"></translation>
     </message>
@@ -199,48 +199,48 @@
 <context>
     <name>LoadTokensPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="731"/>
+        <location filename="../src/oraclewizard.cpp" line="732"/>
         <source>Tokens source selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="732"/>
+        <location filename="../src/oraclewizard.cpp" line="733"/>
         <source>Please specify a source for the list of tokens.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="734"/>
+        <location filename="../src/oraclewizard.cpp" line="735"/>
         <source>Download URL:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="735"/>
+        <location filename="../src/oraclewizard.cpp" line="736"/>
         <source>Restore default URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="752"/>
-        <location filename="../src/oraclewizard.cpp" line="797"/>
+        <location filename="../src/oraclewizard.cpp" line="753"/>
+        <location filename="../src/oraclewizard.cpp" line="798"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="752"/>
+        <location filename="../src/oraclewizard.cpp" line="753"/>
         <source>The provided URL is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="756"/>
+        <location filename="../src/oraclewizard.cpp" line="757"/>
         <source>Downloading (0MB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="788"/>
+        <location filename="../src/oraclewizard.cpp" line="789"/>
         <source>Downloading (%1MB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="797"/>
+        <location filename="../src/oraclewizard.cpp" line="798"/>
         <source>Network error: %1.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -248,7 +248,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="../src/oracleimporter.cpp" line="315"/>
+        <location filename="../src/oracleimporter.cpp" line="345"/>
         <source>Dummy set containing tokens</source>
         <translation type="unfinished"></translation>
     </message>
@@ -270,7 +270,7 @@
     <name>SaveSetsPage</name>
     <message>
         <location filename="../src/oraclewizard.cpp" line="497"/>
-        <location filename="../src/oraclewizard.cpp" line="552"/>
+        <location filename="../src/oraclewizard.cpp" line="553"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -295,38 +295,43 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="513"/>
+        <location filename="../src/oraclewizard.cpp" line="508"/>
+        <source>&amp;Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/oraclewizard.cpp" line="514"/>
         <source>Import finished: %1 cards.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="516"/>
+        <location filename="../src/oraclewizard.cpp" line="517"/>
         <source>%1: %2 cards imported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="526"/>
+        <location filename="../src/oraclewizard.cpp" line="527"/>
         <source>Save card database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="527"/>
+        <location filename="../src/oraclewizard.cpp" line="528"/>
         <source>XML; card database (*.xml)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="549"/>
+        <location filename="../src/oraclewizard.cpp" line="550"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="550"/>
+        <location filename="../src/oraclewizard.cpp" line="551"/>
         <source>The card database has been saved successfully to
 %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="552"/>
+        <location filename="../src/oraclewizard.cpp" line="553"/>
         <source>The file could not be saved to %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -334,37 +339,37 @@
 <context>
     <name>SaveSpoilersPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="849"/>
+        <location filename="../src/oraclewizard.cpp" line="850"/>
         <source>Spoilers imported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="850"/>
+        <location filename="../src/oraclewizard.cpp" line="851"/>
         <source>The spoilers file has been imported. Press &quot;Save&quot; to save the imported spoilers to the Cockatrice card database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="853"/>
+        <location filename="../src/oraclewizard.cpp" line="854"/>
         <source>Save to the default path (recommended)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="860"/>
+        <location filename="../src/oraclewizard.cpp" line="861"/>
         <source>Save spoiler database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="861"/>
+        <location filename="../src/oraclewizard.cpp" line="862"/>
         <source>XML; card database (*.xml)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="884"/>
+        <location filename="../src/oraclewizard.cpp" line="885"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="884"/>
+        <location filename="../src/oraclewizard.cpp" line="885"/>
         <source>The file could not be saved to %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -372,48 +377,48 @@
 <context>
     <name>SaveTokensPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="908"/>
+        <location filename="../src/oraclewizard.cpp" line="909"/>
         <source>Tokens imported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="909"/>
+        <location filename="../src/oraclewizard.cpp" line="910"/>
         <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="912"/>
+        <location filename="../src/oraclewizard.cpp" line="913"/>
         <source>Save to the default path (recommended)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="919"/>
+        <location filename="../src/oraclewizard.cpp" line="920"/>
         <source>Save token database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="920"/>
+        <location filename="../src/oraclewizard.cpp" line="921"/>
         <source>XML; token database (*.xml)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="942"/>
+        <location filename="../src/oraclewizard.cpp" line="943"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="943"/>
+        <location filename="../src/oraclewizard.cpp" line="944"/>
         <source>The token database has been saved successfully to
 %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="945"/>
+        <location filename="../src/oraclewizard.cpp" line="946"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="945"/>
+        <location filename="../src/oraclewizard.cpp" line="946"/>
         <source>The file could not be saved to %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -562,7 +567,7 @@
 <context>
     <name>i18n</name>
     <message>
-        <location filename="../../cockatrice/src/settingscache.cpp" line="154"/>
+        <location filename="../../cockatrice/src/settingscache.cpp" line="156"/>
         <source>English</source>
         <translation type="unfinished"></translation>
     </message>
