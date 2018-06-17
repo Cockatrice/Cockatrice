@@ -15,6 +15,7 @@ public:
     bool getCanParseFile(const QString &name, QIODevice &device);
     void parseFile(QIODevice &device);
     bool saveToFile(SetNameMap sets, CardNameMap cards, const QString &fileName);
+    void clearSetlist();
 
 private:
     /*

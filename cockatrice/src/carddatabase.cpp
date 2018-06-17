@@ -397,8 +397,8 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
 
 CardDatabase::~CardDatabase()
 {
-    qDeleteAll(availableParsers);
     clear();
+    qDeleteAll(availableParsers);
 }
 
 void CardDatabase::clear()
@@ -417,6 +417,9 @@ void CardDatabase::clear()
     simpleNameCards.clear();
 
     sets.clear();
+    for (auto parser : availableParsers) {
+        parser->clearSetlist();
+    }
 
     loadStatus = NotLoaded;
 
@@ -427,6 +430,19 @@ void CardDatabase::addCard(CardInfoPtr card)
 {
     if (card == nullptr) {
         qDebug() << "addCard(nullptr)";
+        return;
+    }
+
+    // if card already exists just add the new set property
+    if (cards.contains(card->getName())) {
+        CardInfoPtr sameCard = cards[card->getName()];
+        for (auto set : card->getSets()) {
+            QString setName = set->getCorrectedShortName();
+            sameCard->setSet(set);
+            sameCard->setMuId(setName, card->getMuId(setName));
+            sameCard->setRarity(setName, card->getRarity(setName));
+            sameCard->setSetNumber(setName, card->getCollectorNumber(setName));
+        }
         return;
     }
 
@@ -444,19 +460,18 @@ void CardDatabase::removeCard(CardInfoPtr card)
         return;
     }
 
-    foreach (CardRelation *cardRelation, card->getRelatedCards())
+    for (auto *cardRelation : card->getRelatedCards())
         cardRelation->deleteLater();
 
-    foreach (CardRelation *cardRelation, card->getReverseRelatedCards())
+    for (auto *cardRelation : card->getReverseRelatedCards())
         cardRelation->deleteLater();
 
-    foreach (CardRelation *cardRelation, card->getReverseRelatedCards2Me())
+    for (auto *cardRelation : card->getReverseRelatedCards2Me())
         cardRelation->deleteLater();
 
     removeCardMutex->lock();
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
-    card.clear();
     removeCardMutex->unlock();
     emit cardRemoved(card);
 }
@@ -567,20 +582,12 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     // load custom card databases
     QDir dir(settingsCache->getCustomCardDatabasePath());
-    foreach (QString fileName,
-             dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
+    for (QString fileName :
+         dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
         loadCardDatabase(dir.absoluteFilePath(fileName));
     }
 
     // AFTER all the cards have been loaded
-
-    // reorder sets (TODO: refactor, this smells)
-    SetList allSets;
-    QHashIterator<QString, CardSetPtr> setsIterator(sets);
-    while (setsIterator.hasNext()) {
-        allSets.append(setsIterator.next().value());
-    }
-    allSets.sortByKey();
 
     // resolve the reverse-related tags
     refreshCachedReverseRelatedCards();
@@ -660,7 +667,7 @@ void CardDatabase::checkUnknownSets()
     SetList sets = getSetList();
 
     if (sets.getEnabledSetsNum()) {
-        // if some sets are first found on thus run, ask the user
+        // if some sets are first found on this run, ask the user
         int numUnknownSets = sets.getUnknownSetsNum();
         QStringList unknownSetNames = sets.getUnknownSetsNames();
         if (numUnknownSets > 0) {
