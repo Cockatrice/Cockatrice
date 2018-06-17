@@ -424,32 +424,32 @@ Informacja ta zachowywana jest dla moderatorów i nie jest widoczna dla zbanowan
     <message>
         <location filename="../src/dlg_settings.cpp" line="573"/>
         <source>Choose path</source>
-        <translation type="unfinished"/>
+        <translation>Wybierz ścieżkę</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="598"/>
         <source>Spoilers</source>
-        <translation type="unfinished"/>
+        <translation>Spoilery</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="599"/>
         <source>Download Spoilers Automatically</source>
-        <translation type="unfinished"/>
+        <translation>Pobierz spoilery automatycznie</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="600"/>
         <source>Spoiler Location:</source>
-        <translation type="unfinished"/>
+        <translation>Lokalizacja spoilera</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="601"/>
         <source>Hey, something&apos;s here finally!</source>
-        <translation type="unfinished"/>
+        <translation>Hej, w końcu coś się tutaj dzieje!</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="602"/>
         <source>Last Updated</source>
-        <translation type="unfinished"/>
+        <translation>Ostatnio aktualizowano</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="603"/>
@@ -2724,7 +2724,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/window_main.cpp" line="626"/>
         <source>&amp;Manage sets...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Zarządzaj dodatkami...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="968"/>
@@ -3625,7 +3625,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="660"/>
         <source>Reveal random card to...</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż losową kartę...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="661"/>
@@ -3801,7 +3801,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="1223"/>
         <source>Create tokens</source>
-        <translation type="unfinished"/>
+        <translation>Stwórz tokeny</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1350"/>
@@ -3811,7 +3811,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="2733"/>
         <location filename="../src/player.cpp" line="2736"/>
         <source>Token: </source>
-        <translation type="unfinished"/>
+        <translation>Token:</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2127"/>
@@ -3827,12 +3827,12 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="2707"/>
         <location filename="../src/player.cpp" line="2733"/>
         <source>Attach to </source>
-        <translation type="unfinished"/>
+        <translation>Załącz do</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2749"/>
         <source>All tokens</source>
-        <translation type="unfinished"/>
+        <translation>Wszystkie tokeny</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="870"/>
@@ -3842,7 +3842,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="685"/>
         <source>&amp;Tap / Untap</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Zatapuj / Odtapuj</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="708"/>
@@ -3988,17 +3988,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../../common/decklist.cpp" line="100"/>
         <source>Maindeck</source>
-        <translation type="unfinished"/>
+        <translation>Maindeck</translation>
     </message>
     <message>
         <location filename="../../common/decklist.cpp" line="102"/>
         <source>Sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Sideboard</translation>
     </message>
     <message>
         <location filename="../../common/decklist.cpp" line="104"/>
         <source>Tokens</source>
-        <translation type="unfinished"/>
+        <translation>Tokeny</translation>
     </message>
 </context>
 <context>
@@ -4095,7 +4095,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/sequenceEdit/sequenceedit.cpp" line="176"/>
         <source>Shortcut already in use</source>
-        <translation type="unfinished"/>
+        <translation>Skróty aktualnie w użyciu</translation>
     </message>
 </context>
 <context>
@@ -4141,12 +4141,12 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/sequenceEdit/shortcutstab.cpp" line="46"/>
         <source>Clear all default shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Wyczyść wszystkie domyślne skróty</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/shortcutstab.cpp" line="47"/>
         <source>Do you really want to clear all shortcuts?</source>
-        <translation type="unfinished"/>
+        <translation>Czy na pewno chcesz wyczyścić wszystkie skróty?</translation>
     </message>
 </context>
 <context>
@@ -4221,7 +4221,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="115"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="136"/>
@@ -4241,7 +4241,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="177"/>
         <source>Last change:</source>
-        <translation type="unfinished"/>
+        <translation>Ostatnia zmiana:</translation>
     </message>
 </context>
 <context>
@@ -4249,7 +4249,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/releasechannel.cpp" line="90"/>
         <source>Stable releases</source>
-        <translation type="unfinished"/>
+        <translation>Stabilne wersje</translation>
     </message>
     <message>
         <location filename="../src/releasechannel.cpp" line="108"/>
@@ -4320,7 +4320,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="558"/>
         <source>Delete selected</source>
-        <translation type="unfinished"/>
+        <translation>Usuń zaznaczone</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="560"/>
@@ -4370,7 +4370,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="326"/>
         <source>Search by card name</source>
-        <translation type="unfinished"/>
+        <translation>Szukaj po nazwie karty</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="570"/>
@@ -4395,17 +4395,17 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="577"/>
         <source>Create decklist (decklist.org)</source>
-        <translation type="unfinished"/>
+        <translation>Stwórz spis talii (decklist.org)</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="578"/>
         <source>Analyze deck (deckstats.net)</source>
-        <translation type="unfinished"/>
+        <translation>Analizuj talię (deckstats.net)</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="579"/>
         <source>Analyze deck (tappedout.net)</source>
-        <translation type="unfinished"/>
+        <translation>Analizuj talię (tappedout.net)</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="581"/>
@@ -4452,13 +4452,13 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/tab_deck_editor.cpp" line="595"/>
         <location filename="../src/tab_deck_editor.cpp" line="600"/>
         <source>Deck</source>
-        <translation type="unfinished"/>
+        <translation>Talia</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="596"/>
         <location filename="../src/tab_deck_editor.cpp" line="601"/>
         <source>Filters</source>
-        <translation type="unfinished"/>
+        <translation>Filtry</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="598"/>
@@ -4647,7 +4647,7 @@ Wprowadź nazwę:</translation>
         <location filename="../src/tab_game.cpp" line="457"/>
         <location filename="../src/tab_game.cpp" line="465"/>
         <source>Game</source>
-        <translation type="unfinished"/>
+        <translation>Gra</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="468"/>
@@ -4665,7 +4665,7 @@ Wprowadź nazwę:</translation>
         <location filename="../src/tab_game.cpp" line="469"/>
         <location filename="../src/tab_game.cpp" line="512"/>
         <source>Messages</source>
-        <translation type="unfinished"/>
+        <translation>Wiadomości</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="471"/>

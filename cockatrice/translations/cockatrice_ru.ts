@@ -1542,7 +1542,7 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="129"/>
         <source>No Update Available</source>
-        <translation type="unfinished"/>
+        <translation>Нет доступных обновлений</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="130"/>
@@ -1557,7 +1557,7 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="132"/>
         <source>Current version</source>
-        <translation type="unfinished"/>
+        <translation>Текущая версия</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="133"/>
@@ -1574,7 +1574,7 @@ Please visit the download page to update manually.</source>
         <location filename="../src/dlg_update.cpp" line="146"/>
         <location filename="../src/dlg_update.cpp" line="157"/>
         <source>A new version of Cockatrice is available!</source>
-        <translation type="unfinished"/>
+        <translation>Доступна новая версия Cockatrice!</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="146"/>
@@ -1597,7 +1597,7 @@ Please visit the download page to update manually.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="149"/>
         <source>Do you want to update now?</source>
-        <translation type="unfinished"/>
+        <translation>Вы хотите обновить сейчас?</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="161"/>
@@ -1613,12 +1613,12 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="200"/>
         <source>An error occurred while checking for updates:</source>
-        <translation type="unfinished"/>
+        <translation>В процессе проверки обновлений произошла ошибка:</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="208"/>
         <source>An error occurred while downloading an update:</source>
-        <translation type="unfinished"/>
+        <translation>В процессе загрузки обновления произошла ошибка:</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="222"/>
@@ -1628,7 +1628,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_update.cpp" line="223"/>
         <source>Try to update manually by closing Cockatrice and running the installer.</source>
-        <translation type="unfinished"/>
+        <translation>Попробуйте обновить вручную, закрыв Cockatrice и запустив инсталлятор.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="224"/>
@@ -1663,7 +1663,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/dlg_viewlog.cpp" line="18"/>
         <source>Clear log when closing</source>
-        <translation type="unfinished"/>
+        <translation>Очистить лог при закрытии</translation>
     </message>
     <message>
         <location filename="../src/dlg_viewlog.cpp" line="25"/>
@@ -4542,7 +4542,7 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="../src/tab_deck_editor.cpp" line="836"/>
         <source>No deck was selected to be saved.</source>
-        <translation type="unfinished"/>
+        <translation>Для сохранения не выбрано ни одной колоды</translation>
     </message>
 </context>
 <context>
@@ -4793,17 +4793,17 @@ Please enter a name:</source>
     <message>
         <location filename="../src/tab_game.cpp" line="1099"/>
         <source>player left the game</source>
-        <translation type="unfinished"/>
+        <translation>игрок покинул игру</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1102"/>
         <source>player disconnected from server</source>
-        <translation type="unfinished"/>
+        <translation>игрок отсоединился от сервера</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1106"/>
         <source>reason unknown</source>
-        <translation type="unfinished"/>
+        <translation>причина неизвестна</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="1143"/>
@@ -4995,7 +4995,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="148"/>
         <source>Private message from</source>
-        <translation type="unfinished"/>
+        <translation>Личное сообщение от</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="165"/>
@@ -5732,12 +5732,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/window_sets.cpp" line="100"/>
         <source>Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Редактор колод</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="101"/>
         <source>Only cards in enabled sets will appear in the deck editor card list</source>
-        <translation type="unfinished"/>
+        <translation>Только карты включенных изданий появятся в редакторе колод</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="101"/>
@@ -6041,27 +6041,27 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1796"/>
         <source>W</source>
-        <translation type="unfinished"/>
+        <translation>Белый</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1800"/>
         <source>U</source>
-        <translation type="unfinished"/>
+        <translation>Синий</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1804"/>
         <source>B</source>
-        <translation type="unfinished"/>
+        <translation>Черный</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1808"/>
         <source>R</source>
-        <translation type="unfinished"/>
+        <translation>Красный</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1812"/>
         <source>G</source>
-        <translation type="unfinished"/>
+        <translation>Зеленый</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1816"/>
@@ -6207,7 +6207,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1768"/>
         <source>Export deck</source>
-        <translation type="unfinished"/>
+        <translation>Экспортировать колоду</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1772"/>
@@ -6222,7 +6222,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1851"/>
         <source>Tap / Untap Card</source>
-        <translation type="unfinished"/>
+        <translation>Повернуть / развернуть карту</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1852"/>
