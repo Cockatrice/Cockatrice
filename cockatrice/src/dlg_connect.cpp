@@ -24,7 +24,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     hps = new HandlePublicServers(this);
     btnRefreshServers = new QPushButton(this);
-    btnRefreshServers->setIcon(QPixmap("theme:icons/update"));
+    btnRefreshServers->setIcon(QPixmap("theme:icons/sync"));
     btnRefreshServers->setToolTip(tr("Refresh the server list with known public servers"));
     btnRefreshServers->setFixedWidth(30);
 
@@ -86,7 +86,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     updateDisplayInfo(previousHosts->currentText());
 
     btnForgotPassword = new QPushButton(this);
-    btnForgotPassword->setIcon(QPixmap("theme:icons/lock"));
+    btnForgotPassword->setIcon(QPixmap("theme:icons/forgot_password"));
     btnForgotPassword->setToolTip(tr("Forgot Password"));
     btnForgotPassword->setFixedWidth(30);
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));

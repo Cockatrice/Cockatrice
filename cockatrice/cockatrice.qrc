@@ -16,6 +16,7 @@
         <file>resources/icons/conceded.svg</file>
         <file>resources/icons/decrement.svg</file>
         <file>resources/icons/delete.svg</file>
+        <file>resources/icons/forgot_password.svg</file>
         <file>resources/icons/increment.svg</file>
         <file>resources/icons/lock.svg</file>
         <file>resources/icons/not_ready_start.svg</file>
@@ -26,6 +27,7 @@
         <file>resources/icons/search.svg</file>
         <file>resources/icons/settings.svg</file>
         <file>resources/icons/spectator.svg</file>
+        <file>resources/icons/sync.svg</file>
         <file>resources/icons/tab_changed.svg</file>
         <file>resources/icons/update.png</file>
         <file>resources/icons/view.svg</file>
