@@ -1,4 +1,4 @@
-version: 2.5.2-branch-{branch}-build-{build}
+version: 2.6.0-branch-{branch}-build-{build}
 
 # Skipping commits affecting specific files (GitHub only). More details here: https://www.appveyor.com/docs/appveyor-yml
 skip_commits:
