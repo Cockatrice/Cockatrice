@@ -34,7 +34,7 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-PROJECT("Cockatrice" VERSION 2.5.2)
+PROJECT("Cockatrice" VERSION 2.6.0)
 
 # Use c++11 for all targets
 set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ ISO Standard")
