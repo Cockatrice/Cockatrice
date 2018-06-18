@@ -120,8 +120,8 @@ The following flags can be passed to `cmake`:
 
 # Run
 
-`Cockatrice` is the game client
-`Oracle` fetches card data
+`Cockatrice` is the game client<br>
+`Oracle` fetches card data<br>
 `Servatrice` is the server<br>
 
 
