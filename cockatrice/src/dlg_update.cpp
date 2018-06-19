@@ -121,6 +121,11 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
     // If there are no available builds, then they can't auto update.
     enableUpdateButton(isCompatible);
 
+    if (isCompatible) {
+        // If there is an update, save its URL and work out its name
+        updateUrl = release->getDownloadUrl();
+    }
+
     // Give the user the appropriate message
     if (!needToUpdate) {
         // If there's no need to update, tell them that. However we still allow them to run the
@@ -137,9 +142,6 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
 
     publishDate = release->getPublishDate().toString(Qt::DefaultLocaleLongDate);
     if (isCompatible) {
-        // If there is an update, save its URL and work out its name
-        updateUrl = release->getDownloadUrl();
-
         int reply;
         reply = QMessageBox::question(
             this, tr("Update Available"),
