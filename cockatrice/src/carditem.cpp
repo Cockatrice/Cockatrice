@@ -402,10 +402,19 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 bool CardItem::animationEvent()
 {
     int rotation = ROTATION_DEGREES_PER_FRAME;
+    bool animationIncomplete = true;
     if (!tapped)
         rotation *= -1;
 
     tapAngle += rotation;
+    if (tapped && (tapAngle > 90)) {
+        tapAngle = 90;
+        animationIncomplete = false;
+    }
+    if (!tapped && (tapAngle < 0)) {
+        tapAngle = 0;
+        animationIncomplete = false;
+    }
 
     setTransform(QTransform()
                      .translate(CARD_WIDTH_HALF, CARD_HEIGHT_HALF)
@@ -414,9 +423,7 @@ bool CardItem::animationEvent()
     setHovered(false);
     update();
 
-    if ((tapped && (tapAngle >= 90)) || (!tapped && (tapAngle <= 0)))
-        return false;
-    return true;
+    return animationIncomplete;
 }
 
 QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
