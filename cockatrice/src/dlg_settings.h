@@ -171,6 +171,7 @@ public:
 
 private slots:
     void actAdd();
+    void actEdit();
     void actRemove();
     void updateColor(const QString &value);
     void updateHighlightColor(const QString &value);
@@ -180,6 +181,7 @@ private slots:
 private:
     QListWidget *messageList;
     QAction *aAdd;
+    QAction *aEdit;
     QAction *aRemove;
     QCheckBox chatMentionCheckBox;
     QCheckBox chatMentionCompleterCheckbox;
