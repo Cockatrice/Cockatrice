@@ -690,6 +690,9 @@ MessagesSettingsPage::MessagesSettingsPage()
     aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
     connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
+    aEdit = new QAction(this);
+    aEdit->setIcon(QPixmap("theme:icons/pencil"));
+    connect(aEdit, SIGNAL(triggered()), this, SLOT(actEdit()));
     aRemove = new QAction(this);
     aRemove->setIcon(QPixmap("theme:icons/decrement"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
@@ -698,6 +701,8 @@ MessagesSettingsPage::MessagesSettingsPage()
     messageToolBar->setOrientation(Qt::Vertical);
     messageToolBar->addAction(aAdd);
     messageToolBar->addAction(aRemove);
+    messageToolBar->addAction(aEdit);
+    messageToolBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
     auto *messageListLayout = new QHBoxLayout;
     messageListLayout->addWidget(messageToolBar);
@@ -775,6 +780,19 @@ void MessagesSettingsPage::actAdd()
     if (ok) {
         messageList->addItem(msg);
         storeSettings();
+    }
+}
+
+void MessagesSettingsPage::actEdit()
+{
+    if (messageList->currentItem()) {
+        QString oldText = messageList->currentItem()->text();
+        bool ok;
+        QString msg = QInputDialog::getText(this, tr("Edit message"), tr("Message:"), QLineEdit::Normal, oldText, &ok);
+        if (ok) {
+            messageList->currentItem()->setText(msg);
+            storeSettings();
+        }
     }
 }
 
