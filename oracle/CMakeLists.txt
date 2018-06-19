@@ -2,7 +2,7 @@
 #
 # provides the oracle binary
 
-PROJECT(Oracle)
+PROJECT(Oracle VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # paths
 set(DESKTOPDIR share/applications CACHE STRING "path to .desktop files")

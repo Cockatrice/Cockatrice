@@ -2,7 +2,7 @@
 #
 # provides the cockatrice binary
 
-PROJECT(Cockatrice)
+PROJECT(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 SET(cockatrice_SOURCES
     src/abstractcounter.cpp
@@ -196,6 +196,7 @@ if(UNIX)
         set(MACOSX_BUNDLE_BUNDLE_NAME "${PROJECT_NAME}")
         set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
         set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
+
         set_target_properties(cockatrice PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
 
         INSTALL(TARGETS cockatrice BUNDLE DESTINATION ./)
