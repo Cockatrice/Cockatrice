@@ -210,6 +210,11 @@ if(UNIX)
     endif()
 elseif(WIN32)
     set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
+    if("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+        set(TRICE_IS_64_BIT 1)
+    else()
+        set(TRICE_IS_64_BIT 0)
+    endif()
 
     # Configure file with custom definitions for NSIS.
     configure_file(

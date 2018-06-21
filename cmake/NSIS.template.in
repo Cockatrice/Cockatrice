@@ -3,9 +3,6 @@ Name "@CPACK_PACKAGE_NAME@"
 BrandingText "@CPACK_PACKAGE_FILE_NAME@"
 OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 
-!define UNINSTKEY "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
-!define DEFAULTNORMALDESTINATON "$ProgramFiles\Cockatrice"
-!define DEFAULTPORTABLEDESTINATON "$Desktop\CockatricePortable"
 !define INST_DIR "@CPACK_TEMPORARY_DIRECTORY@"
 
 RequestExecutionlevel highest
@@ -18,6 +15,9 @@ Var PortableMode
 !include LogicLib.nsh
 !include FileFunc.nsh
 !include MUI2.nsh
+!if NSIS_IS_64_BIT
+    !include "x64.nsh"
+!endif
 
 !define MUI_ABORTWARNING
 !define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\leftimage.bmp"
@@ -46,8 +46,19 @@ Page Custom PortableModePageCreate PortableModePageLeave
 !insertmacro MUI_LANGUAGE English
 
 Function .onInit
-StrCpy $NormalDestDir "${DEFAULTNORMALDESTINATON}"
-StrCpy $PortableDestDir "${DEFAULTPORTABLEDESTINATON}"
+
+!if NSIS_IS_64_BIT
+    ${IfNot} ${RunningX64}
+        MessageBox MB_OK|MB_ICONEXCLAMATION "This version of Cockatrice requires a 64-bit Windows system."
+        Abort
+    ${EndIf}
+    StrCpy $NormalDestDir "$ProgramFiles64\Cockatrice"
+    SetRegView 64
+!else
+    StrCpy $NormalDestDir "$ProgramFiles\Cockatrice"
+!endif
+
+StrCpy $PortableDestDir "$Desktop\CockatricePortable"
 
 ${GetParameters} $9
 
