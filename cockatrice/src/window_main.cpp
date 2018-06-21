@@ -317,9 +317,10 @@ void MainWindow::actAbout()
 
 void MainWindow::actTips()
 {
-    DlgTipOfTheDay tip;
-    if (tip.successfulInit) {
-        tip.exec();
+    delete tip;
+    tip = new DlgTipOfTheDay();
+    if (tip->successfulInit) {
+        tip->show();
     }
 }
 
@@ -819,10 +820,16 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "Spoilers Disabled";
         QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
     }
+
+    tip = new DlgTipOfTheDay();
+    if (tip->successfulInit && settingsCache->getShowTipsOnStartup() && tip->newTipsAvailable) {
+        tip->show();
+    }
 }
 
 MainWindow::~MainWindow()
 {
+    delete tip;
     if (trayIcon) {
         trayIcon->hide();
         trayIcon->deleteLater();
@@ -885,6 +892,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         bClosingDown = false;
         return;
     }
+    tip->close();
 
     event->accept();
     settingsCache->setMainWindowGeometry(saveGeometry());

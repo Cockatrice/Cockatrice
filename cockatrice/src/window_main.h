@@ -41,6 +41,7 @@ class RemoteClient;
 class ServerInfo_User;
 class TabSupervisor;
 class WndSets;
+class DlgTipOfTheDay;
 
 class MainWindow : public QMainWindow
 {
@@ -133,6 +134,7 @@ private:
     DlgViewLog *logviewDialog;
     DlgConnect *dlgConnect;
     GameReplay *replay;
+    DlgTipOfTheDay *tip;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
