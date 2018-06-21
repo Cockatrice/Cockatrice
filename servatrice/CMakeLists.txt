@@ -2,7 +2,7 @@
 #
 # provides the servatrice binary
 
-PROJECT(Servatrice)
+PROJECT(Servatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 SET(servatrice_SOURCES
     src/main.cpp
