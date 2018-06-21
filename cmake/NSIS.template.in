@@ -15,7 +15,7 @@ Var PortableMode
 !include LogicLib.nsh
 !include FileFunc.nsh
 !include MUI2.nsh
-!if NSIS_IS_64_BIT
+!if $NSIS_IS_64_BIT
     !include "x64.nsh"
 !endif
 
@@ -47,7 +47,7 @@ Page Custom PortableModePageCreate PortableModePageLeave
 
 Function .onInit
 
-!if NSIS_IS_64_BIT
+!if $NSIS_IS_64_BIT
     ${IfNot} ${RunningX64}
         MessageBox MB_OK|MB_ICONEXCLAMATION "This version of Cockatrice requires a 64-bit Windows system."
         Abort
