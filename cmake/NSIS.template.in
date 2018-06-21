@@ -15,9 +15,7 @@ Var PortableMode
 !include LogicLib.nsh
 !include FileFunc.nsh
 !include MUI2.nsh
-!if $NSIS_IS_64_BIT
-    !include "x64.nsh"
-!endif
+!include x64.nsh
 
 !define MUI_ABORTWARNING
 !define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_SOURCE_PATH}\cmake\leftimage.bmp"
@@ -47,16 +45,16 @@ Page Custom PortableModePageCreate PortableModePageLeave
 
 Function .onInit
 
-!if $NSIS_IS_64_BIT
+${If} ${NSIS_IS_64_BIT} == 1
     ${IfNot} ${RunningX64}
         MessageBox MB_OK|MB_ICONEXCLAMATION "This version of Cockatrice requires a 64-bit Windows system."
         Abort
     ${EndIf}
     StrCpy $NormalDestDir "$ProgramFiles64\Cockatrice"
     SetRegView 64
-!else
+${Else}
     StrCpy $NormalDestDir "$ProgramFiles\Cockatrice"
-!endif
+${EndIf}
 
 StrCpy $PortableDestDir "$Desktop\CockatricePortable"
 
