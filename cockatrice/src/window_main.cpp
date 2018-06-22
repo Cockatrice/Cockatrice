@@ -317,7 +317,10 @@ void MainWindow::actAbout()
 
 void MainWindow::actTips()
 {
-    delete tip;
+    if (tip != NULL) {
+        delete tip;
+        tip = NULL;
+    }
     tip = new DlgTipOfTheDay();
     if (tip->successfulInit) {
         tip->show();
@@ -829,7 +832,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete tip;
+    if (tip != NULL) {
+        delete tip;
+        tip = NULL;
+    }
     if (trayIcon) {
         trayIcon->hide();
         trayIcon->deleteLater();
