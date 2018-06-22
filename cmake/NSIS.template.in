@@ -92,6 +92,13 @@ Call SetModeDestinationFromInstdir
 
 FunctionEnd
 
+Function un.onInit
+
+${If} ${NSIS_IS_64_BIT} == 1
+    SetRegView 64
+${EndIf}
+
+FunctionEnd
 
 Function RequireAdmin
 UserInfo::GetAccountType
