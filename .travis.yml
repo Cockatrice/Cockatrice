@@ -9,12 +9,12 @@ matrix:
   fast_finish: true
   include:
   - os: linux
-    dist: trusty
+    dist: xenial
     group: stable
     env: BUILDTYPE=Debug
     if: tag IS NOT present
   - os: linux
-    dist: trusty
+    dist: xenial
     group: stable
     env: BUILDTYPE=Release
     if: (branch = master AND NOT type = pull_request) OR tag IS present
