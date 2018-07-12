@@ -1,4 +1,4 @@
-version: branch:{branch} (build {build})
+version: build {build}
 
 # Skipping commits affecting specific files (GitHub only).
 # More details here: https://www.appveyor.com/docs/appveyor-yml and https://www.appveyor.com/docs/how-to/filtering-commits
