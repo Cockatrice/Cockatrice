@@ -154,17 +154,39 @@ FunctionEnd
 Function componentsPagePre
 ${If} $PortableMode = 0
     SetShellVarContext all
-    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
-    StrCmp $R0 "" done
 
-    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst
+    # uninstall 32bit version
+    SetRegView 32
+
+    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
+    StrCmp $R0 "" done32
+
+    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst32
     Abort
 
-    uninst:
+    uninst32:
     ClearErrors
     ExecWait "$R0"
 
-	done:
+	done32:
+
+	# uninstall 64bit version
+	${If} ${NSIS_IS_64_BIT} == 1
+	    SetRegView 64
+
+	    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
+	    StrCmp $R0 "" done64
+
+	    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst64
+	    Abort
+
+	    uninst64:
+	    ClearErrors
+	    ExecWait "$R0"
+
+		done64:
+	${EndIf}
+
 ${Else}
     Abort
 ${EndIf}
