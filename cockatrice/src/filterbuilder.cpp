@@ -26,9 +26,7 @@ FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
     edit = new QLineEdit;
     edit->setObjectName("edit");
     edit->setPlaceholderText(tr("Type your filter here"));
-#if QT_VERSION >= 0x050200
     edit->setClearButtonEnabled(true);
-#endif
     edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     QGridLayout *layout = new QGridLayout;
