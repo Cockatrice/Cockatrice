@@ -245,7 +245,7 @@ ${If} $PortableMode = 0
 	VcRedist86Exists:
 		ExecWait '"$INSTDIR\vc_redist.x86.exe" /passive /norestart'
 		DetailPrint "Sleep to ensure unlock of vc_redist file after installation..."
-		Sleep 4000
+		Sleep 3000
 		Delete "$INSTDIR\vc_redist.x86.exe"
 	PastVcRedist86Check:
 
@@ -253,7 +253,7 @@ ${If} $PortableMode = 0
 	VcRedist64Exists:
 		ExecWait '"$INSTDIR\vc_redist.x64.exe" /passive /norestart'
 		DetailPrint "Sleep to ensure unlock of vc_redist file after installation..."
-		Sleep 4000
+		Sleep 3000
 		Delete "$INSTDIR\vc_redist.x64.exe"
 	PastVcRedist64Check:
 
