@@ -88,6 +88,8 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+
     qInstallMessageHandler(CockatriceLogger);
     if (app.arguments().contains("--debug-output"))
         Logger::getInstance().logToFile(true);
