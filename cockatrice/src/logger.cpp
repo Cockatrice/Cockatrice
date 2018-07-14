@@ -8,8 +8,6 @@
 #define LOGGER_MAX_ENTRIES 128
 #define LOGGER_FILENAME "qdebug.txt"
 
-
-
 Logger::Logger() : logToFileEnabled(false)
 {
     logBuffer.append(getClientVersion());
