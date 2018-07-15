@@ -47,14 +47,17 @@ Function .onInit
 
 ${If} ${NSIS_IS_64_BIT} == 1
     ${IfNot} ${RunningX64}
-        MessageBox MB_OK | MB_ICONERROR "This version of Cockatrice requires a 64-bit Windows system."
+        MessageBox MB_OK|MB_ICONERROR "This version of Cockatrice requires a 64-bit Windows system."
         Abort
     ${EndIf}
     StrCpy $NormalDestDir "$ProgramFiles64\Cockatrice"
     SetRegView 64
 ${Else}   #NSIS 32bit
     ${If} ${RunningX64}
-        MessageBox MB_OKCANCEL | MB_ICONWARNING "You are about to install a 32-bit version of Cockatrice on a 64-bit Windows system.\n\nWe advise you to use the correct 64-bit installer instead to get around potential issues." IDOK ok IDCANCEL cancel
+        MessageBox MB_OKCANCEL|MB_ICONWARNING \
+        "You are about to install a 32-bit version of Cockatrice on a 64-bit Windows system.$\n$\n \
+        We advise you to use the correct 64-bit installer instead to get around potential issues." \
+        IDOK ok IDCANCEL cancel
         cancel: Abort
     ${EndIf}
     StrCpy $NormalDestDir "$ProgramFiles\Cockatrice"
