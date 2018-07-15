@@ -56,9 +56,7 @@ ${Else}   #NSIS 32bit
     ${If} ${RunningX64}
         MessageBox MB_OKCANCEL|MB_ICONWARNING \
         "You are about to install a 32-bit version of Cockatrice on a 64-bit Windows system.$\n$\n \
-        We advise you to use the correct 64-bit installer instead to get around potential issues." \
-        IDOK ok IDCANCEL cancel
-        cancel: Abort
+        We advise you to use the correct 64-bit installer instead to get around potential issues."
     ${EndIf}
     StrCpy $NormalDestDir "$ProgramFiles\Cockatrice"
 ${EndIf}
