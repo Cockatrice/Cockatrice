@@ -102,7 +102,6 @@ QString Logger::getSystemArchitecture()
 QString Logger::getClientOperatingSystem()
 {
     return QSysInfo::prettyProductName();
-    return {};
 }
 
 QString Logger::getSystemLocale()
