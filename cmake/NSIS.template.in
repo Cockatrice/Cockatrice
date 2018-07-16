@@ -59,7 +59,8 @@ ${Else}   #NSIS 32bit
         We advise you to use the 64-bit installer instead." \
         IDOK ok IDCANCEL cancel
         ok:
-        cancel: Abort
+	    ExecShell "open" "https://cockatrice.github.io/"
+	    Abort
     ${EndIf}
     StrCpy $NormalDestDir "$ProgramFiles\Cockatrice"
 ${EndIf}
