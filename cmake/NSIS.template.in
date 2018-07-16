@@ -54,7 +54,9 @@ ${If} ${NSIS_IS_64_BIT} == 1
     SetRegView 64
 ${Else}   #NSIS 32bit
     ${If} ${RunningX64}
-        MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "You are about to install a 32-bit version of Cockatrice on a 64-bit Windows system. \nWe advise you to use the 64-bit installer instead."
+        MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+        "You are about to install a 32-bit version of Cockatrice on a 64-bit Windows system.$\n \
+        We advise you to use the 64-bit installer instead."
     ${EndIf}
     StrCpy $NormalDestDir "$ProgramFiles\Cockatrice"
 ${EndIf}
