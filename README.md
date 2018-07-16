@@ -83,9 +83,9 @@ Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Tra
 **Detailed compiling instructions are on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 
 Dependencies:
-- [Qt](https://www.qt.io/developers/) (≥ v5.5.x)
+- [Qt](https://www.qt.io/developers/)
 - [protobuf](https://github.com/google/protobuf)
-- [CMake](https://www.cmake.org/) (≥ 3.1.x)
+- [CMake](https://www.cmake.org/)
 
 Oracle can optionally use zlib to load zipped files:
 - [zlib](https://www.zlib.net/)
