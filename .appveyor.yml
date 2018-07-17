@@ -24,7 +24,7 @@ clone_depth: 50    #same as travis, see https://www.appveyor.com/blog/2014/06/04
 image: Visual Studio 2017
 
 cache:
-#    - c:\openssl-release
+    - c:\openssl-release
     - c:\protobuf-release
     - c:\zlib-release
 # TODO: set dependency on ps skript file (in ./ci) / "-> appveyor.yml" maybe not ideal
@@ -57,8 +57,10 @@ install:
             echo "using openssl from cache"
         } else {
             if ($target_arch -eq "win64") {    # 64bit filename
+                echo "64bit"
                 Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-x64_86-win64.zip" -OutFile c:\openssl-$env:openssl_ver.zip
             } else {    # 32bit filename
+                echo "32bit"
                 Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-i386-win32.zip" -OutFile c:\openssl-$env:openssl_ver.zip
             }
             Expand-Archive -Path c:\openssl-$env:openssl_ver.zip -DestinationPath c:\openssl-release
