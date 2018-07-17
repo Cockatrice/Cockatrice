@@ -28,22 +28,21 @@ cache:
 
 
 environment:
+    openssl_ver: 1.0.2o
     protobuf_ver: 3.6.0
     zlib_ver: 1.2.11
 
     matrix:
-        - qt_ver: 5.9\msvc2017_64
-          openssl_ver: 1.0.2o-x64_86-win64
+        - target_arch: win64
+          qt_ver: 5.9\msvc2017_64
           cmake_generator: Visual Studio 15 2017 Win64
           cmake_toolset: v141,host=x64
-          target_arch: win64
           vc_arch: amd64
 
-        - qt_ver: 5.9\msvc2015 # Qt doesn't provide a msvc2017_32
-          openssl_ver: 1.0.2o-i386-win32
+        - target_arch: win32
+          qt_ver: 5.9\msvc2015 # Qt doesn't provide a msvc2017_32
           cmake_generator: Visual Studio 15 2017
           cmake_toolset: v141
-          target_arch: win32
           vc_arch: amd64_x86
 
 
@@ -52,7 +51,11 @@ install:
         if (Test-Path c:\openssl-release) {
             echo "using openssl from cache"
         } else {
-            Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver.zip" -OutFile c:\openssl-$env:openssl_ver.zip
+            if (target_arch == win64) {    # 64bit filename
+                Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-x64_86-win64.zip" -OutFile c:\openssl-$env:openssl_ver.zip
+            } else {    # 32bit filename
+                Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-i386-win32.zip" -OutFile c:\openssl-$env:openssl_ver.zip
+            }
             Expand-Archive -Path c:\openssl-$env:openssl_ver.zip -DestinationPath c:\openssl-release
             Set-Location -Path C:\openssl-release
         }
