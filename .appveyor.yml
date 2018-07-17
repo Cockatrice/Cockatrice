@@ -24,7 +24,7 @@ clone_depth: 50    #same as travis, see https://www.appveyor.com/blog/2014/06/04
 image: Visual Studio 2017
 
 cache:
-    - c:\openssl-release
+#    - c:\openssl-release
     - c:\protobuf-release
     - c:\zlib-release
 # TODO: set dependency on ps skript file (in ./ci) / "-> appveyor.yml" maybe not ideal
@@ -33,7 +33,7 @@ cache:
 
 
 environment:
-    openssl_ver: 1.0.2n
+    openssl_ver: 1.0.2o
     protobuf_ver: 3.6.0
     zlib_ver: 1.2.11
 
