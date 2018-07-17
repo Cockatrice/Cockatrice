@@ -51,7 +51,7 @@ install:
         if (Test-Path c:\openssl-release) {
             echo "using openssl from cache"
         } else {
-            if (target_arch == win64) {    # 64bit filename
+            if ($env:target_arch == win64) {    # 64bit filename
                 Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-x64_86-win64.zip" -OutFile c:\openssl-$env:openssl_ver.zip
             } else {    # 32bit filename
                 Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-i386-win32.zip" -OutFile c:\openssl-$env:openssl_ver.zip
