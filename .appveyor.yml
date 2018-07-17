@@ -30,7 +30,7 @@ environment:
     matrix:
         - qt_ver: 5.11\msvc2017_64
           openssl_ver: 1.0.2o-x64_86-win64
-          protobuf_ver: 3.6
+          protobuf_ver: 3.5.1
           zlib_ver: 1.2.11
           cmake_generator: Visual Studio 15 2017 Win64
           cmake_toolset: v141,host=x64
@@ -38,7 +38,7 @@ environment:
           vc_arch: amd64
         - qt_ver: 5.11\msvc2015 # AppVeyor doesn't provide a msvc2017_32
           openssl_ver: 1.0.2o-i386-win32
-          protobuf_ver: 3.6
+          protobuf_ver: 3.5.1
           zlib_ver: 1.2.11
           cmake_generator: Visual Studio 15 2017
           cmake_toolset: v141
