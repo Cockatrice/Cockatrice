@@ -36,6 +36,7 @@ private:
     int sortIndex;
     Qt::SortOrder sortOrder;
     void rebuildMainLayout(int actionToTake);
+    bool setOrderIsSorted;
     enum
     {
         NO_SETS_SELECTED,
@@ -59,7 +60,7 @@ private slots:
     void actDown();
     void actTop();
     void actBottom();
-    void actToggleButtons(const QItemSelection &selected, const QItemSelection &deselected);
+    void actSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     void actDisableSortButtons(int index);
     void actRestoreOriginalOrder();
     void actDisableResetButton(const QString &filterText);
