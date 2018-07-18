@@ -19,38 +19,50 @@ skip_commits:
 
 skip_branch_with_pr: true
 
+clone_depth: 50    #same as travis, see https://www.appveyor.com/blog/2014/06/04/shallow-clone-for-git-repositories/
+
 image: Visual Studio 2017
 
 cache:
     - c:\openssl-release
     - c:\protobuf-release
     - c:\zlib-release
+# TODO: set dependency on ps skript file (in ./ci) / "-> appveyor.yml" maybe not ideal
+# that way when we update specific cached tools there (like protobuf or zlib), cache will be newly created automatically
+# https://www.appveyor.com/docs/build-cache/#cleaning-up-cache
+
 
 environment:
+    openssl_ver: 1.0.2o
+    protobuf_ver: 3.6.0
+    zlib_ver: 1.2.11
+
     matrix:
-        - qt_ver: 5.9\msvc2017_64
-          openssl_ver: 1.0.2n-x64_86-win64
-          protobuf_ver: 3.5.1
-          zlib_ver: 1.2.11
+        - target_arch: win64
+          qt_ver: 5.9\msvc2017_64
           cmake_generator: Visual Studio 15 2017 Win64
           cmake_toolset: v141,host=x64
-          target_arch: win64
           vc_arch: amd64
-        - qt_ver: 5.9\msvc2015 # Qt doesn't provide a msvc2017_32
-          openssl_ver: 1.0.2n-i386-win32
-          protobuf_ver: 3.5.1
-          zlib_ver: 1.2.11
+
+        - target_arch: win32
+          qt_ver: 5.9\msvc2015 # Qt doesn't provide a msvc2017_32
           cmake_generator: Visual Studio 15 2017
           cmake_toolset: v141
-          target_arch: win32
           vc_arch: amd64_x86
+
 
 install:
     - ps: |
         if (Test-Path c:\openssl-release) {
             echo "using openssl from cache"
         } else {
-            Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver.zip" -OutFile c:\openssl-$env:openssl_ver.zip
+            if ($env:target_arch -eq "win64") {    # 64bit filename
+                # echo "downloading 64bit version of openssl"
+                Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-x64_86-win64.zip" -OutFile c:\openssl-$env:openssl_ver.zip
+            } else {    # 32bit filename
+                # echo "downloading 32bit version of openssl"
+                Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-i386-win32.zip" -OutFile c:\openssl-$env:openssl_ver.zip
+            }
             Expand-Archive -Path c:\openssl-$env:openssl_ver.zip -DestinationPath c:\openssl-release
             Set-Location -Path C:\openssl-release
         }
