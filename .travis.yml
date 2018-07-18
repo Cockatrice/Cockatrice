@@ -36,9 +36,9 @@ addons:
     packages:
     - libprotobuf-dev
     - protobuf-compiler
-#    - qt5-default
-#    - qttools5-dev
-#    - qttools5-dev-tools
+    - qt5-default
+    - qttools5-dev
+    - qttools5-dev-tools
 
 before_install: bash ./.ci/travis-dependencies.sh
 
