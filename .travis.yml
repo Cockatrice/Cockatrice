@@ -2,8 +2,6 @@ language: cpp
 
 cache: ccache
 
-conditions: v1
-
 
 matrix:
   fast_finish: true
