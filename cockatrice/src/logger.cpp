@@ -2,14 +2,11 @@
 #include "version_string.h"
 #include <QDateTime>
 #include <QLocale>
+#include <QSysInfo>
 #include <iostream>
 
 #define LOGGER_MAX_ENTRIES 128
 #define LOGGER_FILENAME "qdebug.txt"
-
-#if QT_VERSION >= 0x050400
-#include <QSysInfo>
-#endif
 
 Logger::Logger() : logToFileEnabled(false)
 {
@@ -104,11 +101,7 @@ QString Logger::getSystemArchitecture()
 
 QString Logger::getClientOperatingSystem()
 {
-#if QT_VERSION >= 0x050400
     return QSysInfo::prettyProductName();
-#endif
-
-    return {};
 }
 
 QString Logger::getSystemLocale()
