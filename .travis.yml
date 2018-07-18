@@ -34,6 +34,8 @@ addons:
     - sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-5.0 main'
       key_url: 'http://llvm.org/apt/llvm-snapshot.gpg.key'
     packages:
+    - libprotobuf-dev
+    - protobuf-compiler
     - qt5-default
     - qttools5-dev
     - qttools5-dev-tools
