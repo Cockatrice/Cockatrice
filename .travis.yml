@@ -99,5 +99,6 @@ notifications:
     on_error: change
 
 
-# official validator for ".travis.yml" config file: https://yaml.travis-ci.org
-# travis config documentation: https://docs.travis-ci.com/user/customizing-the-build
+# Announcements of build image updates: https://docs.travis-ci.com/user/build-environment-updates/
+# Official validator for ".travis.yml" config file: https://yaml.travis-ci.org
+# Travis CI config documentation: https://docs.travis-ci.com/user/customizing-the-build
