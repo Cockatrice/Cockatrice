@@ -116,7 +116,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(enableSomeButton, SIGNAL(clicked()), this, SLOT(actEnableSome()));
     connect(disableSomeButton, SIGNAL(clicked()), this, SLOT(actDisableSome()));
     connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
-            SLOT(actSelectionChanged(const QItemSelection &, const QItemSelection &)));
+            SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
     connect(searchField, SIGNAL(textChanged(const QString &)), displayModel, SLOT(setFilterRegExp(const QString &)));
     connect(view->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(actDisableSortButtons(int)));
     connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(actDisableResetButton(const QString &)));
@@ -262,10 +262,10 @@ void WndSets::actDisableSortButtons(int index)
     if (!view->selectionModel()->selection().empty()) {
         view->scrollTo(view->selectionModel()->selectedRows().first());
     }
-    actSelectionChanged(view->selectionModel()->selection(), QItemSelection());
+    actToggleButtons(view->selectionModel()->selection(), QItemSelection());
 }
 
-void WndSets::actSelectionChanged(const QItemSelection &selected, const QItemSelection &)
+void WndSets::actToggleButtons(const QItemSelection &selected, const QItemSelection &)
 {
     bool emptySelection = selected.empty();
     aTop->setDisabled(emptySelection || setOrderIsSorted);

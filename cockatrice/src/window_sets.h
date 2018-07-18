@@ -60,7 +60,7 @@ private slots:
     void actDown();
     void actTop();
     void actBottom();
-    void actSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void actToggleButtons(const QItemSelection &selected, const QItemSelection &deselected);
     void actDisableSortButtons(int index);
     void actRestoreOriginalOrder();
     void actDisableResetButton(const QString &filterText);
