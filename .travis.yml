@@ -36,7 +36,6 @@ addons:
     packages:
     - bc
     - clang-format-5.0
-    - cmake
     - libprotobuf-dev
     - protobuf-compiler
     - qt5-default
