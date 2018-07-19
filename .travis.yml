@@ -6,21 +6,25 @@ cache: ccache
 matrix:
   fast_finish: true
   include:
-  - os: linux
+  - name: Ubuntu (Debug)
+    os: linux
     dist: xenial
     group: stable
     env: BUILDTYPE=Debug
     if: tag IS NOT present
-  - os: linux
+  - name: Ubuntu (Release)
+    os: linux
     dist: xenial
     group: stable
     env: BUILDTYPE=Release
     if: (branch = master AND NOT type = pull_request) OR tag IS present
-  - os: osx
+  - name: macOS (Debug)
+    os: osx
     osx_image: xcode8
     env: BUILDTYPE=Debug
     if: tag IS NOT present
-  - os: osx
+  - name: macOS (Release)
+    os: osx
     osx_image: xcode8
     env: BUILDTYPE=Release
     if: (branch = master AND NOT type = pull_request) OR tag IS present
