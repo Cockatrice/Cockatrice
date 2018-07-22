@@ -61,6 +61,7 @@ message Response {
         FORGOT_PASSWORD_REQUEST = 1016;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
+        SERVER_STATUS = 1200;
     }
     required uint64 cmd_id = 1;
     optional ResponseCode response_code = 2;

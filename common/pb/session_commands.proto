@@ -31,6 +31,7 @@ message SessionCommand {
         REPLAY_DOWNLOAD = 1101;
         REPLAY_MODIFY_MATCH = 1102;
         REPLAY_DELETE_MATCH = 1103;
+        SERVER_STATUS = 1200;
     }
     extensions 100 to max;
 }
@@ -190,4 +191,10 @@ message Command_ForgotPasswordChallenge {
     required string user_name = 1;
     optional string clientid = 2;
     optional string email = 3;
+}
+
+message Command_Server_Status {
+    extend SessionCommand {
+        optional Command_Server_Status ext = 1200;
+    }
 }

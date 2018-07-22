@@ -1,0 +1,30 @@
+// Response for Command_Server_Status
+syntax = "proto2";
+import "response.proto";
+
+message Response_Server_Status {
+    extend Response {
+        optional Response_Server_Status ext = 1200;
+    }
+    required RegistrationStatus registration_status = 1;
+    required bool password_enabled = 2;
+
+    required int32 connected_users = 3;
+    optional int32 max_users = 4;
+
+    required string server_name = 5;
+    optional string server_description = 6;
+    optional string server_admin_contact = 7;
+    optional string server_website = 8;
+
+    repeated string required_features = 9;
+    repeated int32 cockatrice_ports = 10;
+    repeated int32 webatrice_ports = 11;
+
+}
+
+enum RegistrationStatus {
+    disabled = 1;
+    enabled = 2;
+    required = 3;
+}
