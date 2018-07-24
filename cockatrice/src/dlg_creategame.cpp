@@ -80,11 +80,11 @@ void DlgCreateGame::sharedCtor()
     spectatorsNeedPasswordCheckBox = new QCheckBox(tr("Spectators &need a password to watch"));
     spectatorsCanTalkCheckBox = new QCheckBox(tr("Spectators can &chat"));
     spectatorsSeeEverythingCheckBox = new QCheckBox(tr("Spectators can see &hands"));
-    QGridLayout *spectatorsLayout = new QVBoxLayout;
-    spectatorsLayout->addWidget(spectatorsAllowedCheckBox, 0, 0);
-    spectatorsLayout->addWidget(spectatorsNeedPasswordCheckBox, 1, 0);
-    spectatorsLayout->addWidget(spectatorsCanTalkCheckBox, 2, 0);
-    spectatorsLayout->addWidget(spectatorsSeeEverythingCheckBox, 3, 0);
+    QVBoxLayout *spectatorsLayout = new QVBoxLayout;
+    spectatorsLayout->addWidget(spectatorsAllowedCheckBox);
+    spectatorsLayout->addWidget(spectatorsNeedPasswordCheckBox);
+    spectatorsLayout->addWidget(spectatorsCanTalkCheckBox);
+    spectatorsLayout->addWidget(spectatorsSeeEverythingCheckBox);
     spectatorsGroupBox = new QGroupBox(tr("Spectators"));
     spectatorsGroupBox->setLayout(spectatorsLayout);
 
