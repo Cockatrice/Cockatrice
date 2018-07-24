@@ -133,6 +133,11 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
         tr("CUSTOM Folder") + "</a></li><li>" + tr("Enabled Sets (Top to Bottom)") + "</li><li>" +
         tr("Disabled Sets (Top to Bottom)") + "</li></ol>");
 
+    QGridLayout *hintsGrid = new QGridLayout;
+    hintsGrid->addWidget(labNotes, 0, 0);
+    hintsGroupBox = new QGroupBox(tr("Hints"));
+    hintsGroupBox->setLayout(hintsGrid);
+
     sortWarning = new QLabel;
     sortWarning->setWordWrap(true);
     sortWarning->setText(
@@ -155,7 +160,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     mainLayout->addWidget(enableSomeButton, 2, 1);
     mainLayout->addWidget(disableSomeButton, 2, 2);
     mainLayout->addWidget(sortWarning, 3, 1, 1, 2);
-    mainLayout->addWidget(labNotes, 4, 1, 1, 2);
+    mainLayout->addWidget(hintsGroupBox, 4, 1, 1, 2);
     mainLayout->addWidget(buttonBox, 5, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
     mainLayout->setColumnStretch(2, 1);
