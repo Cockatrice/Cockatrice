@@ -94,7 +94,7 @@ void DlgCreateGame::sharedCtor()
     grid->addWidget(spectatorsGroupBox, 1, 0);
     grid->addWidget(joinRestrictionsGroupBox, 0, 1);
     grid->addWidget(gameTypeGroupBox, 1, 1);
-    grid->addWidget(rememberGameSettings, 2, 1);
+    grid->addWidget(rememberGameSettings, 2, 0);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
