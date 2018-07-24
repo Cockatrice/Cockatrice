@@ -32,16 +32,6 @@ void DlgCreateGame::sharedCtor()
     maxPlayersEdit->setValue(2);
     maxPlayersLabel->setBuddy(maxPlayersEdit);
 
-    QGridLayout *generalGrid = new QGridLayout;
-    generalGrid->addWidget(descriptionLabel, 0, 0);
-    generalGrid->addWidget(descriptionEdit, 0, 1);
-    generalGrid->addWidget(maxPlayersLabel, 1, 0);
-    generalGrid->addWidget(maxPlayersEdit, 1, 1);
-    generalGrid->addWidget(gameTypeGroupBox, 2, 0, 1, 2);
-    generalGroupBox = new QGroupBox(tr("General"));
-
-    grid->addWidget(gameTypeGroupBox, 1, 0);
-
     QVBoxLayout *gameTypeLayout = new QVBoxLayout;
     QMapIterator<int, QString> gameTypeIterator(gameTypes);
     while (gameTypeIterator.hasNext()) {
@@ -52,8 +42,17 @@ void DlgCreateGame::sharedCtor()
         bool isChecked = settingsCache->getGameTypes().contains(gameTypeIterator.value() + ", ");
         gameTypeCheckBoxes[gameTypeIterator.key()]->setChecked(isChecked);
     }
+
     QGroupBox *gameTypeGroupBox = new QGroupBox(tr("Game type"));
     gameTypeGroupBox->setLayout(gameTypeLayout);
+
+    QGridLayout *generalGrid = new QGridLayout;
+    generalGrid->addWidget(descriptionLabel, 0, 0);
+    generalGrid->addWidget(descriptionEdit, 0, 1);
+    generalGrid->addWidget(maxPlayersLabel, 1, 0);
+    generalGrid->addWidget(maxPlayersEdit, 1, 1);
+    generalGrid->addWidget(gameTypeGroupBox, 2, 0, 1, 2);
+    generalGroupBox = new QGroupBox(tr("General"));
 
     passwordLabel = new QLabel(tr("&Password:"));
     passwordEdit = new QLineEdit;
