@@ -34,7 +34,7 @@ private:
     QMap<int, QString> gameTypes;
     QMap<int, QRadioButton *> gameTypeCheckBoxes;
 
-    QGroupBox *spectatorsGroupBox;
+    QGroupBox *generalGroupBox, *spectatorsGroupBox;
     QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;
     QLineEdit *descriptionEdit, *passwordEdit;
     QSpinBox *maxPlayersEdit;
