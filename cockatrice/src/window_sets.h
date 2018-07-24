@@ -23,6 +23,7 @@ class WndSets : public QMainWindow
 private:
     SetsModel *model;
     SetsDisplayModel *displayModel;
+    QGroupBox *hintsGroupBox;
     QTreeView *view;
     QPushButton *toggleAllButton, *toggleSelectedButton;
     QPushButton *enableAllButton, *disableAllButton, *enableSomeButton, *disableSomeButton;
