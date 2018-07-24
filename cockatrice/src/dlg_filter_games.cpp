@@ -93,8 +93,6 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
 
     QGridLayout *leftGrid = new QGridLayout;
     leftGrid->addWidget(generalGroupBox, 0, 0);
-    leftGrid->addWidget(creatorNameFilterLabel, 1, 0);
-    leftGrid->addWidget(creatorNameFilterEdit, 1, 1);
     leftGrid->addWidget(maxPlayersGroupBox, 2, 0, 1, 2);
     leftGrid->addWidget(restrictionsGroupBox, 3, 0, 1, 2);
 
