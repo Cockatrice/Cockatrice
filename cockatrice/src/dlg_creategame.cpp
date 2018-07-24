@@ -37,8 +37,10 @@ void DlgCreateGame::sharedCtor()
     generalGrid->addWidget(descriptionEdit, 0, 1);
     generalGrid->addWidget(maxPlayersLabel, 1, 0);
     generalGrid->addWidget(maxPlayersEdit, 1, 1);
+    generalGrid->addWidget(gameTypeGroupBox, 2, 0, 1, 2);
     generalGroupBox = new QGroupBox(tr("General"));
-    generalGroupBox->setLayout(generalGrid);
+
+    grid->addWidget(gameTypeGroupBox, 1, 0);
 
     QVBoxLayout *gameTypeLayout = new QVBoxLayout;
     QMapIterator<int, QString> gameTypeIterator(gameTypes);
@@ -90,9 +92,8 @@ void DlgCreateGame::sharedCtor()
     spectatorsGroupBox->setLayout(spectatorsLayout);
 
     QGridLayout *grid = new QGridLayout;
-    grid->addWidget(generalGroupBox, 0, 0);
+    grid->addWidget(generalGroupBox, 0, 0, 2, 1);
     grid->addWidget(joinRestrictionsGroupBox, 0, 1);
-    grid->addWidget(gameTypeGroupBox, 1, 0);
     grid->addWidget(spectatorsGroupBox, 1, 1);
     grid->addWidget(rememberGameSettings, 2, 0);
 
