@@ -91,7 +91,7 @@ void DlgCreateGame::sharedCtor()
     spectatorsGroupBox->setLayout(spectatorsLayout);
 
     QGridLayout *grid = new QGridLayout;
-    grid->addLayout(generalGroupBox, 0, 0);
+    grid->addWidget(generalGroupBox, 0, 0);
     grid->addWidget(spectatorsGroupBox, 1, 0);
     grid->addWidget(joinRestrictionsGroupBox, 0, 1);
     grid->addWidget(gameTypeGroupBox, 1, 1);
