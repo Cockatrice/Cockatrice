@@ -15,7 +15,7 @@ class DlgFilterGames : public QDialog
 {
     Q_OBJECT
 private:
-    QGroupBox *generalGroupBox
+    QGroupBox *generalGroupBox;
     QCheckBox *showBuddiesOnlyGames;
     QCheckBox *unavailableGamesVisibleCheckBox;
     QCheckBox *showPasswordProtectedGames;
