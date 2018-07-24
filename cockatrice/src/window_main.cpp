@@ -366,8 +366,8 @@ void MainWindow::loginError(Response::ResponseCode r,
             QMessageBox msgBox;
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.setWindowTitle(tr("Failed Login"));
-            msgBox.setText(tr("Your client seems to be missing features this server requires for connection.") + "\n\n"
-                            + tr("To update your client, go to 'Help -> Check for Client Updates'."));
+            msgBox.setText(tr("Your client seems to be missing features this server requires for connection.") +
+                           "\n\n" + tr("To update your client, go to 'Help -> Check for Client Updates'."));
             msgBox.setDetailedText(formattedMissingFeatures);
             msgBox.exec();
             break;
