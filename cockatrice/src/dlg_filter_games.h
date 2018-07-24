@@ -8,6 +8,7 @@
 #include <QSet>
 
 class QCheckBox;
+class QGroupBox;
 class QLineEdit;
 class QSpinBox;
 
