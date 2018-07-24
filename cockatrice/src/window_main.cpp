@@ -362,12 +362,12 @@ void MainWindow::loginError(Response::ResponseCode r,
             for (int i = 0; i < missingFeatures.size(); ++i)
                 formattedMissingFeatures.append(QString("\n     %1").arg(QChar(0x2022)) + " " +
                                                 missingFeatures.value(i));
-            formattedMissingFeatures.append("\nTo update your client, go to Help -> Check for Updates.");
 
             QMessageBox msgBox;
             msgBox.setIcon(QMessageBox::Critical);
             msgBox.setWindowTitle(tr("Failed Login"));
-            msgBox.setText(tr("Your client seems to be missing features this server requires for connection."));
+            msgBox.setText(tr("Your client seems to be missing features this server requires for connection.") +
+                           "\n\n" + tr("To update your client, go to 'Help -> Check for Client Updates'."));
             msgBox.setDetailedText(formattedMissingFeatures);
             msgBox.exec();
             break;
