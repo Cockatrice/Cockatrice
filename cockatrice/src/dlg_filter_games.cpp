@@ -37,6 +37,8 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     QGridLayout *generalGrid = new QGridLayout;
     generalGrid->addWidget(gameNameFilterLabel, 0, 0);
     generalGrid->addWidget(gameNameFilterEdit, 0, 1);
+    generalGrid->addWidget(creatorNameFilterLabel, 1, 0);
+    generalGrid->addWidget(creatorNameFilterEdit, 1, 1);
     generalGroupBox = new QGroupBox(tr("General"));
     generalGroupBox->setLayout(generalGrid);
 
