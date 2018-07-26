@@ -2,32 +2,33 @@ language: cpp
 
 cache: ccache
 
-
 matrix:
   fast_finish: true
   include:
+  #Ubuntu
   - name: Ubuntu (Debug)
+    if: tag IS NOT present
     os: linux
     dist: xenial
     group: stable
     env: BUILDTYPE=Debug
-    if: tag IS NOT present
   - name: Ubuntu (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: linux
     dist: xenial
     group: stable
     env: BUILDTYPE=Release
-    if: (branch = master AND NOT type = pull_request) OR tag IS present
+  #macOS
   - name: macOS (Debug)
+    if: tag IS NOT present
     os: osx
     osx_image: xcode8
     env: BUILDTYPE=Debug
-    if: tag IS NOT present
   - name: macOS (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode8
     env: BUILDTYPE=Release
-    if: (branch = master AND NOT type = pull_request) OR tag IS present
 
 #install dependencies for container-based "linux" builds
 addons:
@@ -46,6 +47,7 @@ addons:
     - libqt5svg5-dev
     - libqt5sql5-mysql
     - libqt5websockets5-dev
+
 
 before_install: bash ./.ci/travis-dependencies.sh
 
@@ -88,6 +90,7 @@ deploy:
 
 
 notifications:
+  email: false
   webhooks:
     urls:
     - https://webhooks.gitter.im/e/d94969c3b01b22cbdcb7
