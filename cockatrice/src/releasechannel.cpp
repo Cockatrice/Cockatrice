@@ -9,8 +9,8 @@
 #include <QNetworkReply>
 
 #define STABLERELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases/latest"
-#define STABLETAG_URL "https://api.github.com/repos/Cockatrice/Cockatrice/git/refs/tags/"
 #define STABLEMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/latest"
+#define STABLETAG_URL "https://api.github.com/repos/Cockatrice/Cockatrice/git/refs/tags/"
 
 #define BETARELEASE_URL "https://api.github.com/repos/Cockatrice/Cockatrice/releases"
 #define BETAMANUALDOWNLOAD_URL "https://github.com/Cockatrice/Cockatrice/releases/"
@@ -53,22 +53,18 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 {
     QString wordSize = QSysInfo::buildAbi().split('-')[2];
     QString arch;
-    QString betaEnd;
 
     if (wordSize == "llp64") {
         arch = "win64";
-        betaEnd = "-x86_64_qt5";
     } else if (wordSize == "ilp32") {
         arch = "win32";
-        betaEnd = "-x86_qt5";
     } else {
         qWarning() << "Error checking for upgrade version: wordSize is" << wordSize;
         return false;
     }
 
     auto exeName = arch + ".exe";
-    auto exeBetaName = betaEnd + ".exe";
-    return (fileName.endsWith(exeName) || fileName.endsWith(exeBetaName));
+    return (fileName.endsWith(exeName));
 }
 #else
 
