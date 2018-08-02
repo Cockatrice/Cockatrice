@@ -27,6 +27,7 @@ if [[ $BUILDTYPE == "Debug" ]]; then
 
   if [[ $TRAVIS_OS_NAME == "linux" ]]; then
     cd ..
+    clang-format -version
     clang-format -i \
       common/*.h \
       common/*.cpp \
