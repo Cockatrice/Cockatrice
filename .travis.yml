@@ -1,5 +1,5 @@
 language: cpp
-
+compiler: gcc
 cache: ccache
 
 matrix:
