@@ -99,5 +99,6 @@ notifications:
 
 
 # Announcements of build image updates: https://docs.travis-ci.com/user/build-environment-updates/
+# For precise versions of preinstalled tools on the VM, check “Build system information” in the build log!
 # Official validator for ".travis.yml" config file: https://yaml.travis-ci.org
 # Travis CI config documentation: https://docs.travis-ci.com/user/customizing-the-build
