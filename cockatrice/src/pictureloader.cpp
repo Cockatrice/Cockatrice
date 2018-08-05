@@ -197,51 +197,70 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
     return false;
 }
 
-QString PictureLoaderWorker::getPicUrl()
+QList<QString> PictureLoaderWorker::getAllPicUrls()
 {
     if (!picDownload)
-        return QString();
+        return QList<QString>();
 
     CardInfoPtr card = cardBeingDownloaded.getCard();
     CardSetPtr set = cardBeingDownloaded.getCurrentSet();
-    QString picUrl = QString("");
+    QList<QString> urls = QList<QString>();
 
     // if sets have been defined for the card, they can contain custom picUrls
     if (set) {
-        picUrl = card->getCustomPicURL(set->getShortName());
-        if (!picUrl.isEmpty())
-            return picUrl;
+        QString setCustomURL = card->getCustomPicURL(set->getShortName());
+
+        if (!setCustomURL.isEmpty()) {
+            urls.append(setCustomURL);
+            return urls;
+        }
     }
 
     // if a card has a muid, use the default url; if not, use the fallback
     int muid = set ? card->getMuId(set->getShortName()) : 0;
-    picUrl = muid ? settingsCache->getPicUrl() : settingsCache->getPicUrlFallback();
 
-    picUrl.replace("!name!", QUrl::toPercentEncoding(card->getName()));
-    picUrl.replace("!name_lower!", QUrl::toPercentEncoding(card->getName().toLower()));
-    picUrl.replace("!corrected_name!", QUrl::toPercentEncoding(card->getCorrectedName()));
-    picUrl.replace("!corrected_name_lower!", QUrl::toPercentEncoding(card->getCorrectedName().toLower()));
-    picUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
-    if (set) {
-        // renamed from !setnumber! to !collectornumber! on 20160819. Remove the old one when convenient.
-        picUrl.replace("!setnumber!", QUrl::toPercentEncoding(card->getCollectorNumber(set->getShortName())));
-        picUrl.replace("!collectornumber!", QUrl::toPercentEncoding(card->getCollectorNumber(set->getShortName())));
+    QList<QString> urlArray = QList<QString>();
+    urlArray.append(settingsCache->getPicUrl());
+    urlArray.append(settingsCache->getPicUrlFallback());
 
-        picUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
-        picUrl.replace("!setcode_lower!", QUrl::toPercentEncoding(set->getShortName().toLower()));
-        picUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
-        picUrl.replace("!setname_lower!", QUrl::toPercentEncoding(set->getLongName().toLower()));
+    for(int i=0; i < 2; i++) {
+        QString originalUrl = urlArray[i];
+        QString thisUrl = urlArray[i];
+        thisUrl.replace("!name!", QUrl::toPercentEncoding(card->getName()));
+        thisUrl.replace("!name_lower!", QUrl::toPercentEncoding(card->getName().toLower()));
+        thisUrl.replace("!corrected_name!", QUrl::toPercentEncoding(card->getCorrectedName()));
+        thisUrl.replace("!corrected_name_lower!", QUrl::toPercentEncoding(card->getCorrectedName().toLower()));
+        thisUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
+        if (set) {
+            // renamed from !setnumber! to !collectornumber! on 20160819. Remove the old one when convenient.
+            thisUrl.replace("!setnumber!", QUrl::toPercentEncoding(card->getCollectorNumber(set->getShortName())));
+            thisUrl.replace("!collectornumber!", QUrl::toPercentEncoding(card->getCollectorNumber(set->getShortName())));
+
+            thisUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
+            thisUrl.replace("!setcode_lower!", QUrl::toPercentEncoding(set->getShortName().toLower()));
+            thisUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
+            thisUrl.replace("!setname_lower!", QUrl::toPercentEncoding(set->getLongName().toLower()));
+        }
+
+        if (thisUrl.contains("!name!") ||
+                thisUrl.contains("!name_lower!") ||
+                thisUrl.contains("!corrected_name!") ||
+                thisUrl.contains("!corrected_name_lower!") ||
+                thisUrl.contains("!setnumber!") ||
+                thisUrl.contains("!setcode!") ||
+                thisUrl.contains("!setcode_lower!") ||
+                thisUrl.contains("!setname!") ||
+                thisUrl.contains("!setname_lower!") ||
+                thisUrl.contains("!cardid!")) {
+            qDebug() << "Insufficient card data to download" << card->getName() << "Url:" << originalUrl;
+        }
+        else {
+            urls.append(thisUrl);
+        }
+
     }
 
-    if (picUrl.contains("!name!") || picUrl.contains("!name_lower!") || picUrl.contains("!corrected_name!") ||
-        picUrl.contains("!corrected_name_lower!") || picUrl.contains("!setnumber!") || picUrl.contains("!setcode!") ||
-        picUrl.contains("!setcode_lower!") || picUrl.contains("!setname!") || picUrl.contains("!setname_lower!") ||
-        picUrl.contains("!cardid!")) {
-        qDebug() << "Insufficient card data to download" << card->getName() << "Url:" << picUrl;
-        return QString();
-    }
-
-    return picUrl;
+    return urls;
 }
 
 void PictureLoaderWorker::startNextPicDownload()
@@ -256,12 +275,12 @@ void PictureLoaderWorker::startNextPicDownload()
 
     cardBeingDownloaded = cardsToDownload.takeFirst();
 
-    QString picUrl = getPicUrl();
-    if (picUrl.isEmpty()) {
+    QList<QString> picUrls = getAllPicUrls();
+    if (picUrls.isEmpty()) {
         downloadRunning = false;
         picDownloadFailed();
     } else {
-        QUrl url(picUrl);
+        QUrl url(picUrls[0]); // For now, just use the first one, like always.
 
         QNetworkRequest req(url);
         qDebug() << "starting picture download:" << cardBeingDownloaded.getCard()->getName() << "Url:" << req.url();
