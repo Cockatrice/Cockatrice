@@ -45,19 +45,39 @@ public:
 
 PictureToLoad::PictureToLoad(CardInfoPtr _card) :
     card(std::move(_card)),
-    customSetPicturesChecked(false),
-    urlInitialized(false),
     setIndex(0),
     urlIndex(0)
 {
-    if (card) {
-        sortedSets = card->getSets();
-        qSort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
-    }
-
     // This will be replaced with an expandable list ideally
     urlTemplates.append(settingsCache->getPicUrl());
     urlTemplates.append(settingsCache->getPicUrlFallback());
+
+    if (card) {
+        sortedSets = card->getSets();
+        qSort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
+        populateSetUrls();
+    }
+}
+
+void PictureToLoad::populateSetUrls()
+{
+    currentSetUrls.clear();
+
+    QString setCustomURL = card->getCustomPicURL(getCurrentSet()->getShortName());
+
+    if (!setCustomURL.isEmpty()) {
+        currentSetUrls.append(setCustomURL);
+    }
+
+    for (int i; i< urlTemplates.size(); i++) {
+        QString transformedUrl = transformUrl(urlTemplates[i]);
+
+        if (!transformedUrl.isEmpty()) {
+            currentSetUrls.append(transformedUrl);
+        }
+    }
+
+    urlIndex = 0;
 }
 
 bool PictureToLoad::nextSet()
@@ -65,40 +85,52 @@ bool PictureToLoad::nextSet()
     if (setIndex == sortedSets.size() - 1)
         return false;
     ++setIndex;
-    customSetPicturesChecked = false;
+    populateSetUrls();
     return true;
 }
 
 bool PictureToLoad::nextUrl()
 {
-    if (!customSetPicturesChecked) {
-        customSetPicturesChecked = true;
-
-        QString setCustomURL = card->getCustomPicURL(getCurrentSet()->getShortName());
-
-        if (!setCustomURL.isEmpty()) {
-            currentUrl = setCustomURL;
-            return true;
+    /* If we are past the list of urls currently populated
+     * for this set, try to move to the next set.  This
+     * will repopulate the list of urls.
+     */
+    if (urlIndex == currentSetUrls.size() - 1) {
+        if (nextSet()){
+            // There is a new set to check, so test the Url again
+            // UrlIndex would have been reset inside nextSet()
+            if (urlIndex == currentSetUrls.size() - 1) {
+                // The newly populated set did not yield any usable Urls.
+                return false;
+            }
+            else
+            {
+                // Set was updated, UrlIndex is reset, proceed checking Urls.
+                return true;
+            }
+        }
+        else
+        {
+            // Because there is not another set, there are not more Urls to check.
+            return false;
         }
     }
-
-    for ( ; urlIndex < urlTemplates.size(); ) {
-        currentUrl = transformUrl();
-        urlIndex++;
-
-        if (!currentUrl.isEmpty())
-            return true;
+    else
+    {
+        // We are still in the middle of the list, increment and return
+        // This must be inside the else to protect against UrlIndex being incremented
+        // when the set is moved to the next set.
+        ++urlIndex;
+        return true;
     }
-
-    return false;
 }
 
-QString PictureToLoad::getCurrentUrl()
+QString PictureToLoad::getCurrentUrl() const
 {
-    if (!urlInitialized)
-        nextUrl();
-
-    return currentUrl;
+    if (urlIndex < currentSetUrls.size())
+        return currentSetUrls[urlIndex];
+    else
+        return QString("");
 }
 
 QString PictureToLoad::getSetName() const
@@ -163,13 +195,13 @@ void PictureLoaderWorker::processLoadQueue()
         QString setName = cardBeingLoaded.getSetName();
         QString cardName = cardBeingLoaded.getCard()->getName();
         QString correctedCardName = cardBeingLoaded.getCard()->getCorrectedName();
-        qDebug() << "Trying to load picture (set: " << setName << " card: " << cardName << ")";
+        qDebug() << "Trying to load picture for card:" << cardName << " from set:" << setName;
 
         if (cardImageExistsOnDisk(setName, correctedCardName))
             continue;
 
         if (picDownload) {
-            qDebug() << "Picture NOT found, trying to download (set: " << setName << " card: " << cardName << ")";
+            qDebug() << "Picture not found, trying to download";
             cardsToDownload.append(cardBeingLoaded);
             cardBeingLoaded.clear();
             if (!downloadRunning)
@@ -239,9 +271,9 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
     return false;
 }
 
-QString PictureToLoad::transformUrl() const
+QString PictureToLoad::transformUrl(QString urlTemplate) const
 {
-    QString transformedUrl = urlTemplates[urlIndex];
+    QString transformedUrl = urlTemplate;
     CardSetPtr set = getCurrentSet();
 
     // if a card has a muid, use the default url; if not, use the fallback
@@ -257,6 +289,7 @@ QString PictureToLoad::transformUrl() const
         // renamed from !setnumber! to !collectornumber! on 20160819. Remove the old one when convenient.
         transformedUrl.replace("!setnumber!", QUrl::toPercentEncoding(card->getCollectorNumber(set->getShortName())));
         transformedUrl.replace("!collectornumber!", QUrl::toPercentEncoding(card->getCollectorNumber(set->getShortName())));
+
         transformedUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
         transformedUrl.replace("!setcode_lower!", QUrl::toPercentEncoding(set->getShortName().toLower()));
         transformedUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
@@ -301,7 +334,8 @@ void PictureLoaderWorker::startNextPicDownload()
         QUrl url(picUrl); // For now, just use the first one, like always.
 
         QNetworkRequest req(url);
-        qDebug() << "starting picture download:" << cardBeingDownloaded.getCard()->getName() << "Url:" << req.url().toString();
+        qDebug() << "Trying to download picture for card:" << cardBeingDownloaded.getCard()->getName()
+                 << " from set:" << cardBeingDownloaded.getSetName() << "from url:" << picUrl;
         networkManager->get(req);
     }
 }
@@ -309,14 +343,15 @@ void PictureLoaderWorker::startNextPicDownload()
 void PictureLoaderWorker::picDownloadFailed()
 {
     if (cardBeingDownloaded.nextUrl()) {
-        qDebug() << "Picture NOT found, download failed, moving to next url (newurl: " << cardBeingDownloaded.getCurrentUrl()  << "set: "
-                 << cardBeingDownloaded.getSetName() << " card: " << cardBeingDownloaded.getCard()->getName() << ")";
+        //qDebug() << "Picture NOT found, download failed, moving to next url (url: " << cardBeingDownloaded.getCurrentUrl()
+        //         << " set: " << cardBeingDownloaded.getSetName()
+        //         << " card: " << cardBeingDownloaded.getCard()->getName() << ")";
         mutex.lock();
         loadQueue.prepend(cardBeingDownloaded);
         mutex.unlock();
     } else {
-        qDebug() << "Picture NOT found, download failed, no more url combinations to try: BAILING OUT (oldset: "
-                 << cardBeingDownloaded.getSetName() << " card: " << cardBeingDownloaded.getCard()->getName() << ")";
+        qDebug() << "Picture NOT found, download failed, no more url combinations to try: BAILING OUT for card: "
+                 << cardBeingDownloaded.getCard()->getName() << ")";
         imageLoaded(cardBeingDownloaded.getCard(), QImage());
         cardBeingDownloaded.clear();
     }
@@ -339,7 +374,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     if (statusCode == 301 || statusCode == 302) {
         QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
         QNetworkRequest req(redirectUrl);
-        qDebug() << "following redirect:" << cardBeingDownloaded.getCard()->getName() << "Url:" << req.url();
+        qDebug() << "following redirect:" << cardBeingDownloaded.getCard()->getName() << "Url:" << req.url().toString();
         networkManager->get(req);
         return;
     }
@@ -382,7 +417,9 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
         }
 
         imageLoaded(cardBeingDownloaded.getCard(), testImage);
+        qDebug() << "Image successfully downloaded from " << reply->request().url().toString();
     } else {
+        qDebug() << "Possible picture at " << reply->request().url().toString() << " could not be loaded";
         picDownloadFailed();
     }
 

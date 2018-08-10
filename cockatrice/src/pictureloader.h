@@ -19,9 +19,7 @@ private:
     CardInfoPtr card;
     QList<CardSetPtr> sortedSets;
     QList<QString> urlTemplates;
-    QString currentUrl;
-    bool customSetPicturesChecked;
-    bool urlInitialized;
+    QList<QString> currentSetUrls;
     int setIndex;
     int urlIndex;
 
@@ -36,11 +34,12 @@ public:
         card.clear();
     }
     CardSetPtr getCurrentSet() const;
-    QString getCurrentUrl();
+    QString getCurrentUrl() const;
     QString getSetName() const;
-    QString transformUrl() const;
+    QString transformUrl(QString urlTemplate) const;
     bool nextSet();
     bool nextUrl();
+    void populateSetUrls();
 };
 
 class PictureLoaderWorker : public QObject
