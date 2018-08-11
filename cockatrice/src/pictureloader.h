@@ -18,10 +18,7 @@ private:
 
     CardInfoPtr card;
     QList<CardSetPtr> sortedSets;
-    QList<QString> urlTemplates;
-    QList<QString> currentSetUrls;
     int setIndex;
-    int urlIndex;
 
 public:
     PictureToLoad(CardInfoPtr _card = CardInfoPtr());
@@ -34,12 +31,8 @@ public:
         card.clear();
     }
     CardSetPtr getCurrentSet() const;
-    QString getCurrentUrl() const;
     QString getSetName() const;
-    QString transformUrl(QString urlTemplate) const;
     bool nextSet();
-    bool nextUrl();
-    void populateSetUrls();
 };
 
 class PictureLoaderWorker : public QObject
@@ -64,7 +57,7 @@ private:
     PictureToLoad cardBeingDownloaded;
     bool picDownload, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
-    QList<QString> getAllPicUrls();
+    QString getPicUrl();
     bool cardImageExistsOnDisk(QString &setName, QString &correctedCardname);
     bool imageIsBlackListed(const QByteArray &picData);
 private slots:
