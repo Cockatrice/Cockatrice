@@ -3,7 +3,6 @@ compiler: gcc
 cache: ccache
 
 matrix:
-  fast_finish: true
   include:
   #Ubuntu
   - name: Ubuntu (Debug)
