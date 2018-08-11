@@ -43,7 +43,7 @@ public:
     }
 };
 
-PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card)), setIndex(0), urlIndex(0)
+PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
 {
     // This will be replaced with an expandable list ideally
     urlTemplates.append(settingsCache->getPicUrl());
@@ -52,93 +52,73 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card)), setInd
     if (card) {
         sortedSets = card->getSets();
         qSort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
-        populateSetUrls();
     }
+
+    nextSet(); // First item in both sets and Urls needed to be loaded, even if card is not
+    nextUrl(); // valid.  If sets were not populated, they will both be empty values
 }
 
 void PictureToLoad::populateSetUrls()
 {
     currentSetUrls.clear();
 
-    QString setCustomURL = card->getCustomPicURL(getCurrentSet()->getShortName());
+    if (card && currentSet) {
+        QString setCustomURL = card->getCustomPicURL(currentSet->getShortName());
 
-    if (!setCustomURL.isEmpty()) {
-        currentSetUrls.append(setCustomURL);
+        if (!setCustomURL.isEmpty()) {
+            currentSetUrls.append(setCustomURL);
+        }
     }
 
-    for (int i; i < urlTemplates.size(); i++) {
-        QString transformedUrl = transformUrl(urlTemplates[i]);
+    foreach (QString urlTemplate, urlTemplates) {
+        QString transformedUrl = transformUrl(urlTemplate);
 
         if (!transformedUrl.isEmpty()) {
             currentSetUrls.append(transformedUrl);
         }
     }
-
-    urlIndex = 0;
 }
 
 bool PictureToLoad::nextSet()
 {
-    if (setIndex == sortedSets.size() - 1)
-        return false;
-    ++setIndex;
-    populateSetUrls();
-    return true;
+    if (!sortedSets.isEmpty()) {
+        currentSet = sortedSets.takeFirst();
+        populateSetUrls();
+        return true;
+    }
+    currentSet = {};
+    return false;
 }
 
 bool PictureToLoad::nextUrl()
 {
-    /* If we are past the list of urls currently populated
-     * for this set, try to move to the next set.  This
-     * will repopulate the list of urls.
-     */
-    if (urlIndex == currentSetUrls.size() - 1) {
-        if (nextSet()) {
-            // There is a new set to check, so test the Url again
-            // UrlIndex would have been reset inside nextSet()
-            if (urlIndex == currentSetUrls.size() - 1) {
-                // The newly populated set did not yield any usable Urls.
-                return false;
-            } else {
-                // Set was updated, UrlIndex is reset, proceed checking Urls.
-                return true;
-            }
+    forever
+    {
+        if (!currentSetUrls.isEmpty()) {
+            // There are still more Urls to check here, continue taking them
+            // in order.
+            currentUrl = currentSetUrls.takeFirst();
+            return true;
         } else {
-            // Because there is not another set, there are not more Urls to check.
-            return false;
+            // All of this set's Urls have been checked,
+            // move on to the next set.
+            if (!nextSet()) {
+                // If there are no more sets to check, return false, there is
+                // no next Url.
+                currentUrl = QString();
+                return false;
+            }
         }
-    } else {
-        // We are still in the middle of the list, increment and return
-        // This must be inside the else to protect against UrlIndex being
-        // incremented
-        // when the set is moved to the next set.
-        ++urlIndex;
-        return true;
     }
-}
-
-QString PictureToLoad::getCurrentUrl() const
-{
-    if (urlIndex < currentSetUrls.size())
-        return currentSetUrls[urlIndex];
-    else
-        return QString("");
 }
 
 QString PictureToLoad::getSetName() const
 {
-    if (setIndex < sortedSets.size())
-        return sortedSets[setIndex]->getCorrectedShortName();
-    else
-        return QString("");
-}
-
-CardSetPtr PictureToLoad::getCurrentSet() const
-{
-    if (setIndex < sortedSets.size())
-        return sortedSets[setIndex];
-    else
-        return {};
+    if (currentSet) {
+        return currentSet->getCorrectedShortName();
+    } else {
+        return QString();
+    }
 }
 
 QStringList PictureLoaderWorker::md5Blacklist = QStringList()
@@ -300,7 +280,7 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
         transformedUrl.contains("!setnumber!") || transformedUrl.contains("!setcode!") ||
         transformedUrl.contains("!setcode_lower!") || transformedUrl.contains("!setname!") ||
         transformedUrl.contains("!setname_lower!") || transformedUrl.contains("!cardid!")) {
-        qDebug() << "Insufficient card data to download" << card->getName() << "Url:" << urlTemplates[urlIndex];
+        qDebug() << "Insufficient card data to download" << card->getName() << "Url:" << urlTemplate;
         return QString();
     }
 

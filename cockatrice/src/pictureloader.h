@@ -20,8 +20,8 @@ private:
     QList<CardSetPtr> sortedSets;
     QList<QString> urlTemplates;
     QList<QString> currentSetUrls;
-    int setIndex;
-    int urlIndex;
+    QString currentUrl;
+    CardSetPtr currentSet;
 
 public:
     PictureToLoad(CardInfoPtr _card = CardInfoPtr());
@@ -33,8 +33,14 @@ public:
     {
         card.clear();
     }
-    CardSetPtr getCurrentSet() const;
-    QString getCurrentUrl() const;
+    QString getCurrentUrl() const
+    {
+        return currentUrl;
+    }
+    CardSetPtr getCurrentSet() const
+    {
+        return currentSet;
+    }
     QString getSetName() const;
     QString transformUrl(QString urlTemplate) const;
     bool nextSet();
