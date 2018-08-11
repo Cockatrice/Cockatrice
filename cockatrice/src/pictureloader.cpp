@@ -43,10 +43,7 @@ public:
     }
 };
 
-PictureToLoad::PictureToLoad(CardInfoPtr _card) :
-    card(std::move(_card)),
-    setIndex(0),
-    urlIndex(0)
+PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card)), setIndex(0), urlIndex(0)
 {
     // This will be replaced with an expandable list ideally
     urlTemplates.append(settingsCache->getPicUrl());
@@ -69,7 +66,7 @@ void PictureToLoad::populateSetUrls()
         currentSetUrls.append(setCustomURL);
     }
 
-    for (int i; i< urlTemplates.size(); i++) {
+    for (int i; i < urlTemplates.size(); i++) {
         QString transformedUrl = transformUrl(urlTemplates[i]);
 
         if (!transformedUrl.isEmpty()) {
@@ -96,29 +93,24 @@ bool PictureToLoad::nextUrl()
      * will repopulate the list of urls.
      */
     if (urlIndex == currentSetUrls.size() - 1) {
-        if (nextSet()){
+        if (nextSet()) {
             // There is a new set to check, so test the Url again
             // UrlIndex would have been reset inside nextSet()
             if (urlIndex == currentSetUrls.size() - 1) {
                 // The newly populated set did not yield any usable Urls.
                 return false;
-            }
-            else
-            {
+            } else {
                 // Set was updated, UrlIndex is reset, proceed checking Urls.
                 return true;
             }
-        }
-        else
-        {
+        } else {
             // Because there is not another set, there are not more Urls to check.
             return false;
         }
-    }
-    else
-    {
+    } else {
         // We are still in the middle of the list, increment and return
-        // This must be inside the else to protect against UrlIndex being incremented
+        // This must be inside the else to protect against UrlIndex being
+        // incremented
         // when the set is moved to the next set.
         ++urlIndex;
         return true;
@@ -149,8 +141,10 @@ CardSetPtr PictureToLoad::getCurrentSet() const
         return {};
 }
 
-QStringList PictureLoaderWorker::md5Blacklist =
-    QStringList() << "db0c48db407a907c16ade38de048a441"; // card back returned by gatherer when card is not found
+QStringList PictureLoaderWorker::md5Blacklist = QStringList()
+                                                << "db0c48db407a907c16ade38de048a441"; // card back returned
+                                                                                       // by gatherer when
+                                                                                       // card is not found
 
 PictureLoaderWorker::PictureLoaderWorker() : QObject(nullptr), downloadRunning(false), loadQueueRunning(false)
 {
@@ -208,14 +202,16 @@ void PictureLoaderWorker::processLoadQueue()
                 startNextPicDownload();
         } else {
             if (cardBeingLoaded.nextSet()) {
-                qDebug() << "Picture NOT found and download disabled, moving to next set (newset: " << setName
-                         << " card: " << cardName << ")";
+                qDebug() << "Picture NOT found and download disabled, moving to next "
+                            "set (newset: "
+                         << setName << " card: " << cardName << ")";
                 mutex.lock();
                 loadQueue.prepend(cardBeingLoaded);
                 cardBeingLoaded.clear();
                 mutex.unlock();
             } else {
-                qDebug() << "Picture NOT found, download disabled, no more sets to try: BAILING OUT (oldset: "
+                qDebug() << "Picture NOT found, download disabled, no more sets to "
+                            "try: BAILING OUT (oldset: "
                          << setName << " card: " << cardName << ")";
                 imageLoaded(cardBeingLoaded.getCard(), QImage());
             }
@@ -245,7 +241,8 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
                   << picsPath + "/downloadedPics/" + setName + "/" + correctedCardname;
     }
 
-    // Iterates through the list of paths, searching for images with the desired name with any QImageReader-supported
+    // Iterates through the list of paths, searching for images with the desired
+    // name with any QImageReader-supported
     // extension
     for (int i = 0; i < picsPaths.length(); i++) {
         imgReader.setFileName(picsPaths.at(i));
@@ -286,9 +283,11 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
     transformedUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
 
     if (set) {
-        // renamed from !setnumber! to !collectornumber! on 20160819. Remove the old one when convenient.
+        // renamed from !setnumber! to !collectornumber! on 20160819. Remove the old
+        // one when convenient.
         transformedUrl.replace("!setnumber!", QUrl::toPercentEncoding(card->getCollectorNumber(set->getShortName())));
-        transformedUrl.replace("!collectornumber!", QUrl::toPercentEncoding(card->getCollectorNumber(set->getShortName())));
+        transformedUrl.replace("!collectornumber!",
+                               QUrl::toPercentEncoding(card->getCollectorNumber(set->getShortName())));
 
         transformedUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
         transformedUrl.replace("!setcode_lower!", QUrl::toPercentEncoding(set->getShortName().toLower()));
@@ -296,16 +295,11 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
         transformedUrl.replace("!setname_lower!", QUrl::toPercentEncoding(set->getLongName().toLower()));
     }
 
-    if (transformedUrl.contains("!name!") ||
-            transformedUrl.contains("!name_lower!") ||
-            transformedUrl.contains("!corrected_name!") ||
-            transformedUrl.contains("!corrected_name_lower!") ||
-            transformedUrl.contains("!setnumber!") ||
-            transformedUrl.contains("!setcode!") ||
-            transformedUrl.contains("!setcode_lower!") ||
-            transformedUrl.contains("!setname!") ||
-            transformedUrl.contains("!setname_lower!") ||
-            transformedUrl.contains("!cardid!")) {
+    if (transformedUrl.contains("!name!") || transformedUrl.contains("!name_lower!") ||
+        transformedUrl.contains("!corrected_name!") || transformedUrl.contains("!corrected_name_lower!") ||
+        transformedUrl.contains("!setnumber!") || transformedUrl.contains("!setcode!") ||
+        transformedUrl.contains("!setcode_lower!") || transformedUrl.contains("!setname!") ||
+        transformedUrl.contains("!setname_lower!") || transformedUrl.contains("!cardid!")) {
         qDebug() << "Insufficient card data to download" << card->getName() << "Url:" << urlTemplates[urlIndex];
         return QString();
     }
@@ -343,14 +337,16 @@ void PictureLoaderWorker::startNextPicDownload()
 void PictureLoaderWorker::picDownloadFailed()
 {
     if (cardBeingDownloaded.nextUrl()) {
-        //qDebug() << "Picture NOT found, download failed, moving to next url (url: " << cardBeingDownloaded.getCurrentUrl()
+        // qDebug() << "Picture NOT found, download failed, moving to next url (url:
+        // " << cardBeingDownloaded.getCurrentUrl()
         //         << " set: " << cardBeingDownloaded.getSetName()
         //         << " card: " << cardBeingDownloaded.getCard()->getName() << ")";
         mutex.lock();
         loadQueue.prepend(cardBeingDownloaded);
         mutex.unlock();
     } else {
-        qDebug() << "Picture NOT found, download failed, no more url combinations to try: BAILING OUT for card: "
+        qDebug() << "Picture NOT found, download failed, no more url combinations "
+                    "to try: BAILING OUT for card: "
                  << cardBeingDownloaded.getCard()->getName() << ")";
         imageLoaded(cardBeingDownloaded.getCard(), QImage());
         cardBeingDownloaded.clear();
@@ -379,8 +375,8 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
         return;
     }
 
-    const QByteArray &picData =
-        reply->peek(reply->size()); // peek is used to keep the data in the buffer for use by QImageReader
+    const QByteArray &picData = reply->peek(reply->size()); // peek is used to keep the data in the buffer
+                                                            // for use by QImageReader
 
     if (imageIsBlackListed(picData)) {
         qDebug() << "Picture downloaded, but blacklisted, will consider it as not found";
@@ -395,8 +391,10 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
     imgReader.setDevice(reply);
-    QString extension = "." + imgReader.format(); // the format is determined prior to reading the QImageReader data
-                                                  // into a QImage object, as that wipes the QImageReader buffer
+    QString extension = "." + imgReader.format(); // the format is determined
+                                                  // prior to reading the
+                                                  // QImageReader data
+    // into a QImage object, as that wipes the QImageReader buffer
     if (extension == ".jpeg")
         extension = ".jpg";
 
