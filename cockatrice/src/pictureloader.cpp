@@ -315,8 +315,7 @@ void PictureLoaderWorker::startNextPicDownload()
         downloadRunning = false;
         picDownloadFailed();
     } else {
-        QUrl url(picUrl); // For now, just use the first one, like always.
-
+        QUrl url(picUrl);
         QNetworkRequest req(url);
         qDebug() << "PictureLoader: Trying to download picture for card:" << cardBeingDownloaded.getCard()->getName()
                  << " from set:" << cardBeingDownloaded.getSetName() << "from url:" << picUrl;
