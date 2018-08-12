@@ -268,8 +268,9 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
             if (!cardProperties[prop].isEmpty()) {
                 transformedUrl.replace(prop, QUrl::toPercentEncoding(cardProperties[prop]));
             } else {
-                /* This means the template is requesting information that is not populated
-                 * in this card, so it should return an empty string, indicating an invalid Url.
+                /* This means the template is requesting information that is not
+                 * populated in this card, so it should return an empty string,
+                 * indicating an invalid Url.
                  */
                 qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
                          << "]: Requested information (" << prop << ") for Url template (" << urlTemplate
@@ -291,8 +292,9 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
             if (set && !setProperties[prop].isEmpty()) {
                 transformedUrl.replace(prop, QUrl::toPercentEncoding(setProperties[prop]));
             } else {
-                /* This means the template is requesting information that is not populated
-                 * in this card, so it should return an empty string, indicating an invalid Url.
+                /* This means the template is requesting information that is not
+                 * populated in this card, so it should return an empty string,
+                 * indicating an invalid Url.
                  */
                 qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
                          << "]: Requested information (" << prop << ") for Url template (" << urlTemplate
@@ -378,7 +380,8 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     if (imageIsBlackListed(picData)) {
         qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
                  << " set: " << cardBeingDownloaded.getSetName()
-                 << "]:Picture downloaded, but blacklisted, will consider it as not found";
+                 << "]:Picture downloaded, but blacklisted, will consider it as "
+                    "not found";
         picDownloadFailed();
         reply->deleteLater();
         startNextPicDownload();
