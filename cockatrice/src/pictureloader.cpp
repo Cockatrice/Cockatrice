@@ -52,10 +52,8 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
     if (card) {
         sortedSets = card->getSets();
         qSort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
+        nextSet();
     }
-
-    nextSet(); // First item in both sets and Urls needed to be loaded, even if card is not
-    nextUrl(); // valid.  If sets were not populated, they will both be empty values
 }
 
 void PictureToLoad::populateSetUrls()
@@ -77,6 +75,12 @@ void PictureToLoad::populateSetUrls()
             currentSetUrls.append(transformedUrl);
         }
     }
+
+    if (!currentSetUrls.isEmpty()) {
+        currentUrl = currentSetUrls.takeFirst();
+    } else {
+        currentUrl = QString();
+    }
 }
 
 bool PictureToLoad::nextSet()
@@ -92,24 +96,12 @@ bool PictureToLoad::nextSet()
 
 bool PictureToLoad::nextUrl()
 {
-    forever
-    {
-        if (!currentSetUrls.isEmpty()) {
-            // There are still more Urls to check here, continue taking them
-            // in order.
-            currentUrl = currentSetUrls.takeFirst();
-            return true;
-        } else {
-            // All of this set's Urls have been checked,
-            // move on to the next set.
-            if (!nextSet()) {
-                // If there are no more sets to check, return false, there is
-                // no next Url.
-                currentUrl = QString();
-                return false;
-            }
-        }
+    if (!currentSetUrls.isEmpty()) {
+        currentUrl = currentSetUrls.takeFirst();
+        return true;
     }
+    currentUrl = QString();
+    return false;
 }
 
 QString PictureToLoad::getSetName() const
@@ -175,7 +167,7 @@ void PictureLoaderWorker::processLoadQueue()
             continue;
 
         if (picDownload) {
-            qDebug() << "Picture not found, trying to download";
+            qDebug() << "Picture not found on disk, trying to download";
             cardsToDownload.append(cardBeingLoaded);
             cardBeingLoaded.clear();
             if (!downloadRunning)
@@ -250,38 +242,57 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
 
 QString PictureToLoad::transformUrl(QString urlTemplate) const
 {
+    QString muid = QString();
     QString transformedUrl = urlTemplate;
     CardSetPtr set = getCurrentSet();
 
-    // if a card has a muid, use the default url; if not, use the fallback
-    int muid = set ? card->getMuId(set->getShortName()) : 0;
-
-    transformedUrl.replace("!name!", QUrl::toPercentEncoding(card->getName()));
-    transformedUrl.replace("!name_lower!", QUrl::toPercentEncoding(card->getName().toLower()));
-    transformedUrl.replace("!corrected_name!", QUrl::toPercentEncoding(card->getCorrectedName()));
-    transformedUrl.replace("!corrected_name_lower!", QUrl::toPercentEncoding(card->getCorrectedName().toLower()));
-    transformedUrl.replace("!cardid!", QUrl::toPercentEncoding(QString::number(muid)));
-
     if (set) {
-        // renamed from !setnumber! to !collectornumber! on 20160819. Remove the old
-        // one when convenient.
-        transformedUrl.replace("!setnumber!", QUrl::toPercentEncoding(card->getCollectorNumber(set->getShortName())));
-        transformedUrl.replace("!collectornumber!",
-                               QUrl::toPercentEncoding(card->getCollectorNumber(set->getShortName())));
-
-        transformedUrl.replace("!setcode!", QUrl::toPercentEncoding(set->getShortName()));
-        transformedUrl.replace("!setcode_lower!", QUrl::toPercentEncoding(set->getShortName().toLower()));
-        transformedUrl.replace("!setname!", QUrl::toPercentEncoding(set->getLongName()));
-        transformedUrl.replace("!setname_lower!", QUrl::toPercentEncoding(set->getLongName().toLower()));
+        muid = QString::number(card->getMuId(set->getShortName()));
     }
 
-    if (transformedUrl.contains("!name!") || transformedUrl.contains("!name_lower!") ||
-        transformedUrl.contains("!corrected_name!") || transformedUrl.contains("!corrected_name_lower!") ||
-        transformedUrl.contains("!setnumber!") || transformedUrl.contains("!setcode!") ||
-        transformedUrl.contains("!setcode_lower!") || transformedUrl.contains("!setname!") ||
-        transformedUrl.contains("!setname_lower!") || transformedUrl.contains("!cardid!")) {
-        qDebug() << "Insufficient card data to download" << card->getName() << "Url:" << urlTemplate;
-        return QString();
+    QMap<QString, QString> cardProperties = QMap<QString, QString>();
+    cardProperties["!name!"] = card->getName();
+    cardProperties["!name_lower!"] = card->getName().toLower();
+    cardProperties["!corrected_name!"] = card->getCorrectedName();
+    cardProperties["!corrected_name_lower!"] = card->getCorrectedName().toLower();
+    cardProperties["!cardid"] = muid;
+
+    foreach (QString prop, cardProperties.keys()) {
+        if (transformedUrl.contains(prop)) {
+            if (!cardProperties[prop].isEmpty()) {
+                transformedUrl.replace(prop, QUrl::toPercentEncoding(cardProperties[prop]));
+            } else {
+                /* This means the template is requesting information that is not populated
+                 * in this card, so it should return an empty string, indicating an invalid Url.
+                 */
+                qDebug() << "Requested information (" << prop << ") for Url template (" << urlTemplate << ") is not available for card:" << card->getName();
+                return QString();
+            }
+        }
+    }
+
+    QMap<QString, QString> setProperties = QMap<QString, QString>();
+    setProperties["!collectornumber!"] = card->getCollectorNumber(set->getShortName());
+    setProperties["!setcode!"] = set->getShortName();
+    setProperties["!setcode_lower!"] = set->getShortName().toLower();
+    setProperties["!setname!"] = set->getLongName();
+    setProperties["!setname_lower"] = set->getLongName().toLower();
+
+    foreach (QString prop, setProperties.keys()) {
+        if (transformedUrl.contains(prop)) {
+            if (set && !setProperties[prop].isEmpty()) {
+                transformedUrl.replace(prop, QUrl::toPercentEncoding(setProperties[prop]));
+            } else {
+                /* This means the template is requesting information that is not populated
+                 * in this card, so it should return an empty string, indicating an invalid Url.
+                 */
+                qDebug() << "Requested information (" << prop <<
+                            ") for Url template (" << urlTemplate <<
+                            ") is not available for card (" << card->getName() <<
+                            ") in set (" << getSetName() << ")";
+                return QString();
+            }
+        }
     }
 
     return transformedUrl;
@@ -316,11 +327,7 @@ void PictureLoaderWorker::startNextPicDownload()
 
 void PictureLoaderWorker::picDownloadFailed()
 {
-    if (cardBeingDownloaded.nextUrl()) {
-        // qDebug() << "Picture NOT found, download failed, moving to next url (url:
-        // " << cardBeingDownloaded.getCurrentUrl()
-        //         << " set: " << cardBeingDownloaded.getSetName()
-        //         << " card: " << cardBeingDownloaded.getCard()->getName() << ")";
+    if (cardBeingDownloaded.nextUrl() || cardBeingDownloaded.nextSet()) {
         mutex.lock();
         loadQueue.prepend(cardBeingDownloaded);
         mutex.unlock();
