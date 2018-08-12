@@ -255,7 +255,7 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
     cardProperties["!name_lower!"] = card->getName().toLower();
     cardProperties["!corrected_name!"] = card->getCorrectedName();
     cardProperties["!corrected_name_lower!"] = card->getCorrectedName().toLower();
-    cardProperties["!cardid"] = muid;
+    cardProperties["!cardid!"] = muid;
 
     foreach (QString prop, cardProperties.keys()) {
         if (transformedUrl.contains(prop)) {
@@ -277,7 +277,7 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
     setProperties["!setcode!"] = set->getShortName();
     setProperties["!setcode_lower!"] = set->getShortName().toLower();
     setProperties["!setname!"] = set->getLongName();
-    setProperties["!setname_lower"] = set->getLongName().toLower();
+    setProperties["!setname_lower!"] = set->getLongName().toLower();
 
     foreach (QString prop, setProperties.keys()) {
         if (transformedUrl.contains(prop)) {
