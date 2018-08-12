@@ -265,7 +265,8 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
                 /* This means the template is requesting information that is not populated
                  * in this card, so it should return an empty string, indicating an invalid Url.
                  */
-                qDebug() << "Requested information (" << prop << ") for Url template (" << urlTemplate << ") is not available for card:" << card->getName();
+                qDebug() << "Requested information (" << prop << ") for Url template (" << urlTemplate
+                         << ") is not available for card:" << card->getName();
                 return QString();
             }
         }
@@ -286,10 +287,8 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
                 /* This means the template is requesting information that is not populated
                  * in this card, so it should return an empty string, indicating an invalid Url.
                  */
-                qDebug() << "Requested information (" << prop <<
-                            ") for Url template (" << urlTemplate <<
-                            ") is not available for card (" << card->getName() <<
-                            ") in set (" << getSetName() << ")";
+                qDebug() << "Requested information (" << prop << ") for Url template (" << urlTemplate
+                         << ") is not available for card (" << card->getName() << ") in set (" << getSetName() << ")";
                 return QString();
             }
         }
