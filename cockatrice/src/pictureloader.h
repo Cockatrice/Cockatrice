@@ -70,7 +70,6 @@ private:
     PictureToLoad cardBeingDownloaded;
     bool picDownload, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
-    QList<QString> getAllPicUrls();
     bool cardImageExistsOnDisk(QString &setName, QString &correctedCardname);
     bool imageIsBlackListed(const QByteArray &picData);
 private slots:
