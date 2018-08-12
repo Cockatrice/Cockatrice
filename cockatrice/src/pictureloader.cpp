@@ -161,20 +161,22 @@ void PictureLoaderWorker::processLoadQueue()
         QString setName = cardBeingLoaded.getSetName();
         QString cardName = cardBeingLoaded.getCard()->getName();
         QString correctedCardName = cardBeingLoaded.getCard()->getCorrectedName();
-        qDebug() << "PictureLoader: Trying to load picture for card:" << cardName << " from set:" << setName;
+        qDebug() << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Trying to load picture";
 
         if (cardImageExistsOnDisk(setName, correctedCardName))
             continue;
 
         if (picDownload) {
-            qDebug() << "PictureLoader: Picture not found on disk, trying to download";
+            qDebug() << "PictureLoader: [card: " << cardName << " set: " << setName
+                     << "]: Picture not found on disk, trying to download";
             cardsToDownload.append(cardBeingLoaded);
             cardBeingLoaded.clear();
             if (!downloadRunning)
                 startNextPicDownload();
         } else {
             if (cardBeingLoaded.nextSet()) {
-                qDebug() << "PictureLoader: Picture NOT found and download disabled, moving to next "
+                qDebug() << "PictureLoader: [card: " << cardName << " set: " << setName
+                         << "]: Picture NOT found and download disabled, moving to next "
                             "set (newset: "
                          << setName << " card: " << cardName << ")";
                 mutex.lock();
@@ -182,7 +184,8 @@ void PictureLoaderWorker::processLoadQueue()
                 cardBeingLoaded.clear();
                 mutex.unlock();
             } else {
-                qDebug() << "PictureLoader: Picture NOT found, download disabled, no more sets to "
+                qDebug() << "PictureLoader: [card: " << cardName << " set: " << setName
+                         << "]: Picture NOT found, download disabled, no more sets to "
                             "try: BAILING OUT (oldset: "
                          << setName << " card: " << cardName << ")";
                 imageLoaded(cardBeingLoaded.getCard(), QImage());
@@ -219,19 +222,22 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
     for (int i = 0; i < picsPaths.length(); i++) {
         imgReader.setFileName(picsPaths.at(i));
         if (imgReader.read(&image)) {
-            qDebug() << "PictureLoader: Picture found on disk (set: " << setName << " file: " << correctedCardname << ")";
+            qDebug() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
+                     << "]: Picture found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
         imgReader.setFileName(picsPaths.at(i) + ".full");
         if (imgReader.read(&image)) {
-            qDebug() << "PictureLoader: Picture.full found on disk (set: " << setName << " file: " << correctedCardname << ")";
+            qDebug() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
+                     << "]: Picture.full found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
         imgReader.setFileName(picsPaths.at(i) + ".xlhq");
         if (imgReader.read(&image)) {
-            qDebug() << "PictureLoader: Picture.xlhq found on disk (set: " << setName << " file: " << correctedCardname << ")";
+            qDebug() << "PictureLoader: [card: " << correctedCardname << " set: " << setName
+                     << "]: Picture.xlhq found on disk.";
             imageLoaded(cardBeingLoaded.getCard(), image);
             return true;
         }
@@ -265,8 +271,9 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
                 /* This means the template is requesting information that is not populated
                  * in this card, so it should return an empty string, indicating an invalid Url.
                  */
-                qDebug() << "PictureLoader: Requested information (" << prop << ") for Url template (" << urlTemplate
-                         << ") is not available for card:" << card->getName();
+                qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
+                         << "]: Requested information (" << prop << ") for Url template (" << urlTemplate
+                         << ") is not available";
                 return QString();
             }
         }
@@ -287,8 +294,9 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
                 /* This means the template is requesting information that is not populated
                  * in this card, so it should return an empty string, indicating an invalid Url.
                  */
-                qDebug() << "PictureLoader: Requested information (" << prop << ") for Url template (" << urlTemplate
-                         << ") is not available for card (" << card->getName() << ") in set (" << getSetName() << ")";
+                qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
+                         << "]: Requested information (" << prop << ") for Url template (" << urlTemplate
+                         << ") is not available";
                 return QString();
             }
         }
@@ -317,8 +325,9 @@ void PictureLoaderWorker::startNextPicDownload()
     } else {
         QUrl url(picUrl);
         QNetworkRequest req(url);
-        qDebug() << "PictureLoader: Trying to download picture for card:" << cardBeingDownloaded.getCard()->getName()
-                 << " from set:" << cardBeingDownloaded.getSetName() << "from url:" << picUrl;
+        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+                 << " set: " << cardBeingDownloaded.getSetName()
+                 << "]: Trying to download picture from url:" << url.toDisplayString();
         networkManager->get(req);
     }
 }
@@ -330,9 +339,10 @@ void PictureLoaderWorker::picDownloadFailed()
         loadQueue.prepend(cardBeingDownloaded);
         mutex.unlock();
     } else {
-        qDebug() << "PictureLoader: Picture NOT found, download failed, no more url combinations "
-                    "to try: BAILING OUT for card: "
-                 << cardBeingDownloaded.getCard()->getName() << ")";
+        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getCorrectedName()
+                 << " set: " << cardBeingDownloaded.getSetName()
+                 << "]:  Picture NOT found, download failed, no more url combinations "
+                    "to try: BAILING OUT";
         imageLoaded(cardBeingDownloaded.getCard(), QImage());
         cardBeingDownloaded.clear();
     }
@@ -348,14 +358,16 @@ bool PictureLoaderWorker::imageIsBlackListed(const QByteArray &picData)
 void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
 {
     if (reply->error()) {
-        qDebug() << "PictureLoader: Download failed:" << reply->errorString();
+        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                 << " set: " << cardBeingDownloaded.getSetName() << "]:  Download failed:" << reply->errorString();
     }
 
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (statusCode == 301 || statusCode == 302) {
         QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
         QNetworkRequest req(redirectUrl);
-        qDebug() << "PictureLoader: following redirect:" << cardBeingDownloaded.getCard()->getName() << "Url:" << req.url().toString();
+        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                 << " set: " << cardBeingDownloaded.getSetName() << "]: following redirect:" << req.url().toString();
         networkManager->get(req);
         return;
     }
@@ -364,7 +376,9 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
                                                             // for use by QImageReader
 
     if (imageIsBlackListed(picData)) {
-        qDebug() << "PictureLoader: Picture downloaded, but blacklisted, will consider it as not found";
+        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                 << " set: " << cardBeingDownloaded.getSetName()
+                 << "]:Picture downloaded, but blacklisted, will consider it as not found";
         picDownloadFailed();
         reply->deleteLater();
         startNextPicDownload();
@@ -387,7 +401,9 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
         QString setName = cardBeingDownloaded.getSetName();
         if (!setName.isEmpty()) {
             if (!QDir().mkpath(picsPath + "/downloadedPics/" + setName)) {
-                qDebug() << "PictureLoader: " << picsPath + "/downloadedPics/" + setName + " could not be created.";
+                qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                         << " set: " << cardBeingDownloaded.getSetName()
+                         << "]: " << picsPath + "/downloadedPics/" + setName + " could not be created.";
                 return;
             }
 
@@ -400,9 +416,13 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
         }
 
         imageLoaded(cardBeingDownloaded.getCard(), testImage);
-        qDebug() << "PictureLoader: Image successfully downloaded from " << reply->request().url().toString();
+        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                 << " set: " << cardBeingDownloaded.getSetName() << "]: Image successfully downloaded from "
+                 << reply->request().url().toDisplayString();
     } else {
-        qDebug() << "PictureLoader: Possible picture at " << reply->request().url().toString() << " could not be loaded";
+        qDebug() << "PictureLoader: [card: " << cardBeingDownloaded.getCard()->getName()
+                 << " set: " << cardBeingDownloaded.getSetName() << "]: Possible picture at "
+                 << reply->request().url().toDisplayString() << " could not be loaded";
         picDownloadFailed();
     }
 
