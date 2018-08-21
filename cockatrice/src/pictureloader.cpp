@@ -255,49 +255,36 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
        for downloading images.  If information is requested by the template that is
        not populated for this specific card/set combination, an empty string is returned.*/
 
-    QString muid = QString();
     QString transformedUrl = urlTemplate;
     CardSetPtr set = getCurrentSet();
 
+    QMap<QString, QString> transformMap = QMap<QString, QString>();
+
+    transformMap["!name!"] = card->getName();
+    transformMap["!name_lower!"] = card->getName().toLower();
+    transformMap["!corrected_name!"] = card->getCorrectedName();
+    transformMap["!corrected_name_lower!"] = card->getCorrectedName().toLower();
+
     if (set) {
-        muid = QString::number(card->getMuId(set->getShortName()));
+        transformMap["!cardid!"] = QString::number(card->getMuId(set->getShortName()));
+        transformMap["!collectornumber!"] = card->getCollectorNumber(set->getShortName());
+        transformMap["!setcode!"] = set->getShortName();
+        transformMap["!setcode_lower!"] = set->getShortName().toLower();
+        transformMap["!setname!"] = set->getLongName();
+        transformMap["!setname_lower!"] = set->getLongName().toLower();
+    } else {
+        transformMap["!cardid!"] = QString();
+        transformMap["!collectornumber!"] = QString();
+        transformMap["!setcode!"] = QString();
+        transformMap["!setcode_lower!"] = QString();
+        transformMap["!setname!"] = QString();
+        transformMap["!setname_lower!"] = QString();
     }
 
-    QMap<QString, QString> cardProperties = QMap<QString, QString>();
-    cardProperties["!name!"] = card->getName();
-    cardProperties["!name_lower!"] = card->getName().toLower();
-    cardProperties["!corrected_name!"] = card->getCorrectedName();
-    cardProperties["!corrected_name_lower!"] = card->getCorrectedName().toLower();
-    cardProperties["!cardid!"] = muid;
-
-    foreach (QString prop, cardProperties.keys()) {
+    foreach (QString prop, transformMap.keys()) {
         if (transformedUrl.contains(prop)) {
-            if (!cardProperties[prop].isEmpty()) {
-                transformedUrl.replace(prop, QUrl::toPercentEncoding(cardProperties[prop]));
-            } else {
-                /* This means the template is requesting information that is not
-                 * populated in this card, so it should return an empty string,
-                 * indicating an invalid Url.
-                 */
-                qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
-                         << "]: Requested information (" << prop << ") for Url template (" << urlTemplate
-                         << ") is not available";
-                return QString();
-            }
-        }
-    }
-
-    QMap<QString, QString> setProperties = QMap<QString, QString>();
-    setProperties["!collectornumber!"] = card->getCollectorNumber(set->getShortName());
-    setProperties["!setcode!"] = set->getShortName();
-    setProperties["!setcode_lower!"] = set->getShortName().toLower();
-    setProperties["!setname!"] = set->getLongName();
-    setProperties["!setname_lower!"] = set->getLongName().toLower();
-
-    foreach (QString prop, setProperties.keys()) {
-        if (transformedUrl.contains(prop)) {
-            if (set && !setProperties[prop].isEmpty()) {
-                transformedUrl.replace(prop, QUrl::toPercentEncoding(setProperties[prop]));
+            if (!transformMap[prop].isEmpty()) {
+                transformedUrl.replace(prop, QUrl::toPercentEncoding(transformMap[prop]));
             } else {
                 /* This means the template is requesting information that is not
                  * populated in this card, so it should return an empty string,
