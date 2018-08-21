@@ -52,12 +52,16 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
     if (card) {
         sortedSets = card->getSets();
         qSort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
+        // The first time called, nextSet will also populate the Urls for the first set.
         nextSet();
     }
 }
 
 void PictureToLoad::populateSetUrls()
 {
+    /* currentSetUrls is a list, populated each time a new set is requested for a particular card
+       and Urls are removed from it as a download is attempted from each one.  Custom Urls for
+       a set are given higher priority, so should be placed first in the list. */
     currentSetUrls.clear();
 
     if (card && currentSet) {
@@ -246,6 +250,11 @@ bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &corre
 
 QString PictureToLoad::transformUrl(QString urlTemplate) const
 {
+    /* This function takes Url templates and substitutes actual card details
+       into the url.  This is used for making Urls with follow a predictable format
+       for downloading images.  If information is requested by the template that is
+       not populated for this specific card/set combination, an empty string is returned.*/
+
     QString muid = QString();
     QString transformedUrl = urlTemplate;
     CardSetPtr set = getCurrentSet();
@@ -334,6 +343,10 @@ void PictureLoaderWorker::startNextPicDownload()
 
 void PictureLoaderWorker::picDownloadFailed()
 {
+    /* Take advantage of short circuiting here to call the nextUrl until one
+       is not available.  Only once nextUrl evaluates to false will this move
+       on to nextSet.  If the Urls for a particular card are empty, this will
+       effectively go through the sets for that card. */
     if (cardBeingDownloaded.nextUrl() || cardBeingDownloaded.nextSet()) {
         mutex.lock();
         loadQueue.prepend(cardBeingDownloaded);
