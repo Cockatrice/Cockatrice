@@ -45,7 +45,7 @@ public:
 
 PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
 {
-    // This will be replaced with an expandable list ideally
+    /* #2479 will expand this into a list of Urls */
     urlTemplates.append(settingsCache->getPicUrl());
     urlTemplates.append(settingsCache->getPicUrlFallback());
 
@@ -76,11 +76,9 @@ void PictureToLoad::populateSetUrls()
         }
     }
 
-    if (!currentSetUrls.isEmpty()) {
-        currentUrl = currentSetUrls.takeFirst();
-    } else {
-        currentUrl = QString();
-    }
+    /* Call nextUrl to make sure currentUrl is up-to-date
+       but we don't need the result here. */
+    (void)nextUrl();
 }
 
 bool PictureToLoad::nextSet()
