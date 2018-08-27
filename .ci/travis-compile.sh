@@ -16,6 +16,8 @@ if [[ $TRAVIS_OS_NAME == "linux" ]]; then
   prefix="-DCMAKE_PREFIX_PATH=$(echo /opt/qt5*/lib/cmake/)"
 fi
 
+cmake --version
+
 if [[ $BUILDTYPE == "Debug" ]]; then
   cmake .. -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=$BUILDTYPE $prefix -DTEST=1
   make -j2
@@ -27,6 +29,7 @@ if [[ $BUILDTYPE == "Debug" ]]; then
 
   if [[ $TRAVIS_OS_NAME == "linux" ]]; then
     cd ..
+    clang-format -version
     clang-format -i \
       common/*.h \
       common/*.cpp \

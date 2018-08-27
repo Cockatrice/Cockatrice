@@ -97,6 +97,7 @@ build_script:
         $protodir = "c:\protobuf-release"
         $protoc = "c:\protobuf-release\bin\protoc.exe"
         $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
+        cmake --version
         cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir;$zlibdir;$openssldir" "-DWITH_SERVER=1" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
     - msbuild PACKAGE.vcxproj /p:Configuration=Release
     - ps: |
@@ -145,5 +146,6 @@ deploy:
       APPVEYOR_REPO_TAG_NAME: /([0-9]|[1-9][0-9])(\.([0-9]|[1-9][0-9])){2}$/    # regex to match semver naming convention for stable full releases
 
 
-# official validator for ".appveyor.yml" config file: https://ci.appveyor.com/tools/validate-yaml
-# appveyor config documentation: https://www.appveyor.com/docs/build-configuration/
+# Announcements of build image updates: https://www.appveyor.com/updates/
+# Official validator for ".appveyor.yml" config file: https://ci.appveyor.com/tools/validate-yaml
+# AppVeyor config documentation: https://www.appveyor.com/docs/build-configuration/
