@@ -29,6 +29,12 @@ if(WIN32)
     set(servatrice_SOURCES ${servatrice_SOURCES} servatrice.rc)
 endif(WIN32)
 
+# Under FreeBSD we need libexecinfo to use backtrace_symbols_fd()
+if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
+  find_package(LibExecInfo REQUIRED)
+  set(SYSTEM_LIBRARIES ${EXECINFO_LIBRARY} ${SYSTEM_LIBRARIES})
+endif()
+
 
 if(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE appicon.icns)
@@ -88,6 +94,8 @@ ADD_EXECUTABLE(servatrice MACOSX_BUNDLE ${servatrice_SOURCES} ${servatrice_RESOU
 
 if(MSVC)
     TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${CMAKE_THREAD_LIBS_INIT} ${SERVATRICE_QT_MODULES} Qt5::WinMain)
+elseif(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
+    TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${CMAKE_THREAD_LIBS_INIT} ${SERVATRICE_QT_MODULES} ${LIBEXECINFO_LIBRARY})
 else()
     TARGET_LINK_LIBRARIES(servatrice cockatrice_common ${CMAKE_THREAD_LIBS_INIT} ${SERVATRICE_QT_MODULES})
 endif()
