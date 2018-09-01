@@ -69,7 +69,7 @@ install:
         if (Test-Path c:\protobuf-release) {
             echo "using protobuf from cache"
         } else {
-            Invoke-WebRequest "https://github.com/google/protobuf/releases/download/v$env:protobuf_ver/protobuf-cpp-$env:protobuf_ver.zip" -OutFile c:\protobuf-cpp-$env:protobuf_ver.zip
+            Invoke-WebRequest "https://github.com/protocolbuffers/protobuf/releases/download/v$env:protobuf_ver/protobuf-cpp-$env:protobuf_ver.zip" -OutFile c:\protobuf-cpp-$env:protobuf_ver.zip
             Expand-Archive -Path c:\protobuf-cpp-$env:protobuf_ver.zip -DestinationPath c:\
             Set-Location -Path C:\protobuf-$env:protobuf_ver\cmake
             cmake . -G "$env:cmake_generator" -T "$env:cmake_toolset" -Dprotobuf_BUILD_TESTS=0 -Dprotobuf_MSVC_STATIC_RUNTIME=0 -DCMAKE_INSTALL_PREFIX=c:/protobuf-release
