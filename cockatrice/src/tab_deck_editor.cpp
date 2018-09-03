@@ -756,12 +756,10 @@ void TabDeckEditor::actLoadDeck()
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
     auto *l = new DeckLoader;
-    if (l->loadFromFile(fileName, fmt))
-    {
+    if (l->loadFromFile(fileName, fmt)) {
         setSaveStatus(false);
         setDeck(l);
-    }
-    else
+    } else
         delete l;
 }
 
@@ -999,13 +997,9 @@ void TabDeckEditor::actRemoveCard()
     deckModel->removeRow(currentIndex.row(), currentIndex.parent());
 
     DeckLoader *const deck = deckModel->getDeckList();
-    QString decklistUrlString;
-    if (deck->isEmpty())
-    {
+    if (deck->isEmpty()) {
         setSaveStatus(false);
-    }
-    else
-    {
+    } else {
         setSaveStatus(true);
     }
     setModified(true);
