@@ -989,7 +989,7 @@ void TabDeckEditor::actAddCardToSideboard()
 void TabDeckEditor::actRemoveCard()
 {
     const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
-    if (!currentIndex.isValid() || deckModel->hasChildren(currentIndex)) 
+    if (!currentIndex.isValid() || deckModel->hasChildren(currentIndex))
         return;
     deckModel->removeRow(currentIndex.row(), currentIndex.parent());
 
