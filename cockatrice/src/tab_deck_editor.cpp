@@ -241,11 +241,9 @@ void TabDeckEditor::createMenus()
 
     aSaveDeck = new QAction(QString(), this);
     connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
-    aSaveDeck->setEnabled(false);
 
     aSaveDeckAs = new QAction(QString(), this);
     connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
-    aSaveDeckAs->setEnabled(false);
 
     aLoadDeckFromClipboard = new QAction(QString(), this);
     connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
@@ -255,6 +253,8 @@ void TabDeckEditor::createMenus()
 
     aSaveDeckToClipboardRaw = new QAction(QString(), this);
     connect(aSaveDeckToClipboardRaw, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboardRaw()));
+
+    setSaveStatus(false);
 
     aPrintDeck = new QAction(QString(), this);
     connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
@@ -741,6 +741,7 @@ void TabDeckEditor::actNewDeck()
     commentsEdit->setText(QString());
     hashLabel->setText(QString());
     setModified(false);
+    setSaveStatus(false);
 }
 
 void TabDeckEditor::actLoadDeck()
@@ -756,7 +757,10 @@ void TabDeckEditor::actLoadDeck()
 
     auto *l = new DeckLoader;
     if (l->loadFromFile(fileName, fmt))
+    {
+        setSaveStatus(false);
         setDeck(l);
+    }
     else
         delete l;
 }
@@ -830,6 +834,7 @@ void TabDeckEditor::actLoadDeckFromClipboard()
         return;
 
     setDeck(dlg.getDeckList());
+    setSaveStatus(false);
     setModified(true);
 }
 
@@ -968,6 +973,7 @@ void TabDeckEditor::actSwapCard()
     QModelIndex newCardIndex = deckModel->addCard(cardName, otherZoneName, true);
     recursiveExpand(newCardIndex);
 
+    setSaveStatus(true);
     setModified(true);
 }
 
@@ -977,8 +983,7 @@ void TabDeckEditor::actAddCard()
         actAddCardToSideboard();
     else
         addCardHelper(DECK_ZONE_MAIN);
-    aSaveDeck->setEnabled(true);
-    aSaveDeckAs->setEnabled(true);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::actAddCardToSideboard()
@@ -993,15 +998,15 @@ void TabDeckEditor::actRemoveCard()
         return;
     deckModel->removeRow(currentIndex.row(), currentIndex.parent());
 
-    // Disable saving if the deck is empty
     DeckLoader *const deck = deckModel->getDeckList();
     QString decklistUrlString;
-    if (deck) {
-        decklistUrlString = deck->exportDeckToDecklist();
-        if (QString::compare(decklistUrlString, "", Qt::CaseInsensitive) == 0) {
-            aSaveDeck->setEnabled(false);
-            aSaveDeckAs->setEnabled(false);
-        }
+    if (deck->isEmpty())
+    {
+        setSaveStatus(false);
+    }
+    else
+    {
+        setSaveStatus(true);
     }
     setModified(true);
 }
@@ -1201,4 +1206,12 @@ void TabDeckEditor::dockTopLevelChanged(bool topLevel)
 void TabDeckEditor::saveDbHeaderState()
 {
     settingsCache->layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
+}
+
+void TabDeckEditor::setSaveStatus(bool newStatus)
+{
+    aSaveDeck->setEnabled(newStatus);
+    aSaveDeckAs->setEnabled(newStatus);
+    aSaveDeckToClipboard->setEnabled(newStatus);
+    aSaveDeckToClipboardRaw->setEnabled(newStatus);
 }

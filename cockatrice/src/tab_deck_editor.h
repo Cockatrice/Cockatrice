@@ -95,6 +95,7 @@ private slots:
     void dockFloatingTriggered();
     void dockTopLevelChanged(bool topLevel);
     void saveDbHeaderState();
+    void setSaveStatus(bool newStatus);
 
 private:
     CardInfoPtr currentCardInfo() const;
