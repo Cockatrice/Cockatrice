@@ -241,9 +241,11 @@ void TabDeckEditor::createMenus()
 
     aSaveDeck = new QAction(QString(), this);
     connect(aSaveDeck, SIGNAL(triggered()), this, SLOT(actSaveDeck()));
+	aSaveDeck->setEnabled(false);
 
     aSaveDeckAs = new QAction(QString(), this);
     connect(aSaveDeckAs, SIGNAL(triggered()), this, SLOT(actSaveDeckAs()));
+	aSaveDeckAs->setEnabled(false);
 
     aLoadDeckFromClipboard = new QAction(QString(), this);
     connect(aLoadDeckFromClipboard, SIGNAL(triggered()), this, SLOT(actLoadDeckFromClipboard()));
@@ -975,6 +977,8 @@ void TabDeckEditor::actAddCard()
         actAddCardToSideboard();
     else
         addCardHelper(DECK_ZONE_MAIN);
+	aSaveDeck->setEnabled(true);
+	aSaveDeckAs->setEnabled(true);
 }
 
 void TabDeckEditor::actAddCardToSideboard()
@@ -985,9 +989,20 @@ void TabDeckEditor::actAddCardToSideboard()
 void TabDeckEditor::actRemoveCard()
 {
     const QModelIndex &currentIndex = deckView->selectionModel()->currentIndex();
-    if (!currentIndex.isValid() || deckModel->hasChildren(currentIndex))
-        return;
+	if (!currentIndex.isValid() || deckModel->hasChildren(currentIndex)) 
+		return;
     deckModel->removeRow(currentIndex.row(), currentIndex.parent());
+
+	// Disable saving if the deck is empty
+	DeckLoader *const deck = deckModel->getDeckList();
+	QString decklistUrlString;
+	if (deck) {
+		decklistUrlString = deck->exportDeckToDecklist();
+		if (QString::compare(decklistUrlString, "", Qt::CaseInsensitive) == 0) {
+			aSaveDeck->setEnabled(false);
+			aSaveDeckAs->setEnabled(false);
+		}
+	}
     setModified(true);
 }
 
