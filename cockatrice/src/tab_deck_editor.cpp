@@ -832,7 +832,7 @@ void TabDeckEditor::actLoadDeckFromClipboard()
         return;
 
     setDeck(dlg.getDeckList());
-    setSaveStatus(false);
+    setSaveStatus(true);
     setModified(true);
 }
 
