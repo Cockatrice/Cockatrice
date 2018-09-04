@@ -997,11 +997,7 @@ void TabDeckEditor::actRemoveCard()
     deckModel->removeRow(currentIndex.row(), currentIndex.parent());
 
     DeckLoader *const deck = deckModel->getDeckList();
-    if (deck->isEmpty()) {
-        setSaveStatus(false);
-    } else {
-        setSaveStatus(true);
-    }
+    setSaveStatus(!deck->isEmpty());
     setModified(true);
 }
 
