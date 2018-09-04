@@ -254,8 +254,6 @@ void TabDeckEditor::createMenus()
     aSaveDeckToClipboardRaw = new QAction(QString(), this);
     connect(aSaveDeckToClipboardRaw, SIGNAL(triggered()), this, SLOT(actSaveDeckToClipboardRaw()));
 
-    setSaveStatus(false);
-
     aPrintDeck = new QAction(QString(), this);
     connect(aPrintDeck, SIGNAL(triggered()), this, SLOT(actPrintDeck()));
 
@@ -338,6 +336,8 @@ void TabDeckEditor::createMenus()
     aResetLayout = viewMenu->addAction(QString());
     connect(aResetLayout, SIGNAL(triggered()), this, SLOT(restartLayout()));
     viewMenu->addAction(aResetLayout);
+
+    setSaveStatus(false);
 
     addTabMenu(viewMenu);
 }
@@ -1208,4 +1208,7 @@ void TabDeckEditor::setSaveStatus(bool newStatus)
     aSaveDeckAs->setEnabled(newStatus);
     aSaveDeckToClipboard->setEnabled(newStatus);
     aSaveDeckToClipboardRaw->setEnabled(newStatus);
+    saveDeckToClipboardMenu->setEnabled(newStatus);
+    aPrintDeck->setEnabled(newStatus);
+    analyzeDeckMenu->setEnabled(newStatus);
 }
