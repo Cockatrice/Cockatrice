@@ -801,6 +801,7 @@ void Player::setShortcutsActive()
     aCreateToken->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateToken"));
     aCreateAnotherToken->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateAnotherToken"));
     aAlwaysRevealTopCard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aAlwaysRevealTopCard"));
+    aMoveTopToPlayFaceDown->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopToPlayFaceDown"));
 }
 
 void Player::setShortcutsInactive()
