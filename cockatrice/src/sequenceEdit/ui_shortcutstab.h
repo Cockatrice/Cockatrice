@@ -289,6 +289,8 @@ public:
     SequenceEdit *Player_aMoveToExile;
     QLabel *lbl_Player_aMoveToHand;
     SequenceEdit *Player_aMoveToHand;
+    QLabel *lbl_Player_aMoveTopToPlayFaceDown;
+    SequenceEdit *Player_aMoveTopToPlayFaceDown;
     QGroupBox *groupBox_16;
     QGridLayout *gridLayout_16;
     QLabel *lbl_Player_aViewGraveyard;
@@ -1446,6 +1448,18 @@ public:
 
         gridLayout_15->addWidget(Player_aMoveToHand, 4, 1, 1, 1);
 
+        lbl_Player_aMoveTopToPlayFaceDown = new QLabel(groupBox_15);
+        lbl_Player_aMoveTopToPlayFaceDown->setObjectName("lbl_Player_aMoveTopToPlayFaceDown");
+
+        gridLayout_15->addWidget(lbl_Player_aMoveTopToPlayFaceDown, 5, 0, 1, 1);
+
+        Player_aMoveTopToPlayFaceDown = new SequenceEdit("Player/aMoveTopToPlayFaceDown", groupBox_15);
+        Player_aMoveTopToPlayFaceDown->setObjectName("Player_aMoveTopToPlayFaceDown");
+
+        gridLayout_15->addWidget(Player_aMoveTopToPlayFaceDown, 5, 1, 1, 1);
+
+
+
         gridLayout_20->addWidget(groupBox_15, 0, 1, 1, 1);
 
         groupBox_16 = new QGroupBox(tab_3);
@@ -1874,6 +1888,7 @@ public:
         lbl_Player_aMoveToGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard", 0));
         lbl_Player_aMoveToExile->setText(QApplication::translate("shortcutsTab", "Exile", 0));
         lbl_Player_aMoveToHand->setText(QApplication::translate("shortcutsTab", "Hand", 0));
+        lbl_Player_aMoveTopToPlayFaceDown->setText(QApplication::translate("shortcutsTab", "Play face down"));
         groupBox_16->setTitle(QApplication::translate("shortcutsTab", "View", 0));
         lbl_Player_aViewGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard", 0));
         lbl_Player_aViewLibrary->setText(QApplication::translate("shortcutsTab", "Library", 0));

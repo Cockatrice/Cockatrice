@@ -337,6 +337,8 @@ void TabDeckEditor::createMenus()
     connect(aResetLayout, SIGNAL(triggered()), this, SLOT(restartLayout()));
     viewMenu->addAction(aResetLayout);
 
+    setSaveStatus(false);
+
     addTabMenu(viewMenu);
 }
 
@@ -739,6 +741,7 @@ void TabDeckEditor::actNewDeck()
     commentsEdit->setText(QString());
     hashLabel->setText(QString());
     setModified(false);
+    setSaveStatus(false);
 }
 
 void TabDeckEditor::actLoadDeck()
@@ -753,9 +756,10 @@ void TabDeckEditor::actLoadDeck()
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
     auto *l = new DeckLoader;
-    if (l->loadFromFile(fileName, fmt))
+    if (l->loadFromFile(fileName, fmt)) {
+        setSaveStatus(false);
         setDeck(l);
-    else
+    } else
         delete l;
 }
 
@@ -828,6 +832,7 @@ void TabDeckEditor::actLoadDeckFromClipboard()
         return;
 
     setDeck(dlg.getDeckList());
+    setSaveStatus(true);
     setModified(true);
 }
 
@@ -966,6 +971,7 @@ void TabDeckEditor::actSwapCard()
     QModelIndex newCardIndex = deckModel->addCard(cardName, otherZoneName, true);
     recursiveExpand(newCardIndex);
 
+    setSaveStatus(true);
     setModified(true);
 }
 
@@ -975,6 +981,7 @@ void TabDeckEditor::actAddCard()
         actAddCardToSideboard();
     else
         addCardHelper(DECK_ZONE_MAIN);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::actAddCardToSideboard()
@@ -988,6 +995,9 @@ void TabDeckEditor::actRemoveCard()
     if (!currentIndex.isValid() || deckModel->hasChildren(currentIndex))
         return;
     deckModel->removeRow(currentIndex.row(), currentIndex.parent());
+
+    DeckLoader *const deck = deckModel->getDeckList();
+    setSaveStatus(!deck->isEmpty());
     setModified(true);
 }
 
@@ -1186,4 +1196,15 @@ void TabDeckEditor::dockTopLevelChanged(bool topLevel)
 void TabDeckEditor::saveDbHeaderState()
 {
     settingsCache->layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
+}
+
+void TabDeckEditor::setSaveStatus(bool newStatus)
+{
+    aSaveDeck->setEnabled(newStatus);
+    aSaveDeckAs->setEnabled(newStatus);
+    aSaveDeckToClipboard->setEnabled(newStatus);
+    aSaveDeckToClipboardRaw->setEnabled(newStatus);
+    saveDeckToClipboardMenu->setEnabled(newStatus);
+    aPrintDeck->setEnabled(newStatus);
+    analyzeDeckMenu->setEnabled(newStatus);
 }
