@@ -31,7 +31,7 @@ endif(WIN32)
 
 # Under FreeBSD we need libexecinfo to use backtrace_symbols_fd()
 if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
-  find_package(LibExecInfo REQUIRED)
+  find_package(Libexecinfo REQUIRED)
   set(SYSTEM_LIBRARIES ${EXECINFO_LIBRARY} ${SYSTEM_LIBRARIES})
 endif()
 
