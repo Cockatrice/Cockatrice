@@ -325,4 +325,5 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["tab_room/aClearChat"] = parseSequenceString("F12");
     defaultShortCuts["DlgLoadDeckFromClipboard/refreshButton"] = parseSequenceString("F5");
     defaultShortCuts["Player/aResetLayout"] = parseSequenceString("");
+    defaultShortCuts["Player/aMoveTopToPlayFaceDown"] = parseSequenceString("Ctrl+Shift+E");
 }
