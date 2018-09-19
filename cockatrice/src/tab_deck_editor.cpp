@@ -675,12 +675,14 @@ void TabDeckEditor::updateName(const QString &name)
 {
     deckModel->getDeckList()->setName(name);
     setModified(true);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::updateComments()
 {
     deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
     setModified(true);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::updateCardInfoLeft(const QModelIndex &current, const QModelIndex & /*previous*/)
@@ -761,6 +763,7 @@ void TabDeckEditor::actLoadDeck()
         setDeck(l);
     } else
         delete l;
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::saveDeckRemoteFinished(const Response &response)
@@ -832,8 +835,8 @@ void TabDeckEditor::actLoadDeckFromClipboard()
         return;
 
     setDeck(dlg.getDeckList());
-    setSaveStatus(true);
     setModified(true);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::actSaveDeckToClipboard()
@@ -971,8 +974,8 @@ void TabDeckEditor::actSwapCard()
     QModelIndex newCardIndex = deckModel->addCard(cardName, otherZoneName, true);
     recursiveExpand(newCardIndex);
 
-    setSaveStatus(true);
     setModified(true);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::actAddCard()
@@ -987,6 +990,7 @@ void TabDeckEditor::actAddCard()
 void TabDeckEditor::actAddCardToSideboard()
 {
     addCardHelper(DECK_ZONE_SIDE);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::actRemoveCard()
