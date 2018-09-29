@@ -700,9 +700,7 @@ void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 
 void TabDeckEditor::updateSearch(const QString &search)
 {
-    QString sanitizedInput = QString(search);
-    sanitizedInput.replace("’", "'");
-    databaseDisplayModel->setCardName(sanitizedInput);
+    databaseDisplayModel->setCardName(search);
     QModelIndexList sel = databaseView->selectionModel()->selectedRows();
     if (sel.isEmpty() && databaseDisplayModel->rowCount())
         databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),

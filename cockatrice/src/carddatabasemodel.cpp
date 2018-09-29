@@ -3,6 +3,7 @@
 
 #define CARDDBMODEL_COLUMNS 6
 
+
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromEnabledSets, QObject *parent)
     : QAbstractListModel(parent), db(_db), showOnlyCardsFromEnabledSets(_showOnlyCardsFromEnabledSets)
 {
@@ -16,6 +17,16 @@ CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromE
 CardDatabaseModel::~CardDatabaseModel()
 {
 }
+
+// The implementation is done in strings rather than characters is because the curly apostrophes and quotes
+// are considered multi-characters.
+QStringMap CardDatabaseDisplayModel::characterTranslation =
+{
+    { "“", "\"" },
+    { "”", "\"" },
+    { "‘", "\'"},
+    { "’", "\'"}
+};
 
 int CardDatabaseModel::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -322,6 +333,16 @@ void CardDatabaseDisplayModel::setFilterTree(FilterTree *filterTree)
 void CardDatabaseDisplayModel::filterTreeChanged()
 {
     invalidate();
+}
+
+const QString CardDatabaseDisplayModel::sanitizeCardName(const QString &dirtyName, const QStringMap &table)
+{
+    QString toReturn(dirtyName);
+    for (QStringMap::const_iterator item = table.constBegin(); item != table.constEnd(); ++item)
+    {
+        toReturn.replace(item.key(), item.value());
+    }
+    return toReturn;
 }
 
 TokenDisplayModel::TokenDisplayModel(QObject *parent) : CardDatabaseDisplayModel(parent)

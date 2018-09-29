@@ -73,6 +73,9 @@ private:
     FilterTree *filterTree;
     int loadedRowCount;
 
+    /** The translation table that will be used for sanitizeCardName. */
+    static QStringMap characterTranslation;
+
 public:
     CardDatabaseDisplayModel(QObject *parent = 0);
     void setFilterTree(FilterTree *filterTree);
@@ -88,7 +91,7 @@ public:
     }
     void setCardName(const QString &_cardName)
     {
-        cardName = _cardName;
+        cardName = sanitizeCardName(_cardName, characterTranslation);
         invalidate();
     }
     void setCardNameSet(const QSet<QString> &_cardNameSet)
@@ -127,6 +130,8 @@ protected:
     void fetchMore(const QModelIndex &parent);
 private slots:
     void filterTreeChanged();
+    /** Will translate all undesirable characters in DIRTYNAME according to the TABLE. */
+    const QString sanitizeCardName(const QString &dirtyName, const QStringMap &table);
 };
 
 class TokenDisplayModel : public CardDatabaseDisplayModel
