@@ -1,5 +1,6 @@
 #include "carddatabasemodel.h"
 #include "filtertree.h"
+#include <QMap>
 
 #define CARDDBMODEL_COLUMNS 6
 
@@ -17,9 +18,10 @@ CardDatabaseModel::~CardDatabaseModel()
 {
 }
 
-// The implementation is done in strings rather than characters is because the curly apostrophes and quotes
-// are considered multi-characters.
-QStringMap CardDatabaseDisplayModel::characterTranslation = {{"“", "\""}, {"”", "\""}, {"‘", "\'"}, {"’", "\'"}};
+QMap<wchar_t, wchar_t> CardDatabaseDisplayModel::wideCharacterTranslation = {{u'“', u'\"'},
+                                                                             {u'”', u'\"'},
+                                                                             {u'‘', u'\''},
+                                                                             {u'’', u'\''}};
 
 int CardDatabaseModel::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -328,15 +330,17 @@ void CardDatabaseDisplayModel::filterTreeChanged()
     invalidate();
 }
 
-const QString CardDatabaseDisplayModel::sanitizeCardName(const QString &dirtyName, const QStringMap &table)
+const QString CardDatabaseDisplayModel::charSanitizeCardName(const QString &dirtyName,
+                                                             const QMap<wchar_t, wchar_t> &table)
 {
-    QString toReturn(dirtyName);
-    for (QStringMap::const_iterator item = table.constBegin(); item != table.constEnd(); ++item) {
-        toReturn.replace(item.key(), item.value());
+    std::wstring toReturn = dirtyName.toStdWString();
+    for (wchar_t &ch : toReturn) {
+        if (table.contains(ch)) {
+            ch = table.value(ch);
+        }
     }
-    return toReturn;
+    return QString::fromStdWString(toReturn);
 }
-
 TokenDisplayModel::TokenDisplayModel(QObject *parent) : CardDatabaseDisplayModel(parent)
 {
 }
