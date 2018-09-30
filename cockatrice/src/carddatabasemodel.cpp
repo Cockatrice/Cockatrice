@@ -18,10 +18,10 @@ CardDatabaseModel::~CardDatabaseModel()
 {
 }
 
-QMap<wchar_t, wchar_t> CardDatabaseDisplayModel::wideCharacterTranslation = {{u'“', u'\"'},
-                                                                             {u'”', u'\"'},
-                                                                             {u'‘', u'\''},
-                                                                             {u'’', u'\''}};
+QMap<wchar_t, wchar_t> CardDatabaseDisplayModel::characterTranslation = {{u'“', u'\"'},
+                                                                         {u'”', u'\"'},
+                                                                         {u'‘', u'\''},
+                                                                         {u'’', u'\''}};
 
 int CardDatabaseModel::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -330,8 +330,7 @@ void CardDatabaseDisplayModel::filterTreeChanged()
     invalidate();
 }
 
-const QString CardDatabaseDisplayModel::charSanitizeCardName(const QString &dirtyName,
-                                                             const QMap<wchar_t, wchar_t> &table)
+const QString CardDatabaseDisplayModel::sanitizeCardName(const QString &dirtyName, const QMap<wchar_t, wchar_t> &table)
 {
     std::wstring toReturn = dirtyName.toStdWString();
     for (wchar_t &ch : toReturn) {
