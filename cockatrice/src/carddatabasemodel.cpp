@@ -18,10 +18,10 @@ CardDatabaseModel::~CardDatabaseModel()
 {
 }
 
-QMap<wchar_t, wchar_t> CardDatabaseDisplayModel::characterTranslation = {{u'“', u'\"'},
-                                                                         {u'”', u'\"'},
-                                                                         {u'‘', u'\''},
-                                                                         {u'’', u'\''}};
+QMap<wchar_t, wchar_t> CardDatabaseDisplayModel::characterTranslation = {{L'“', L'\"'},
+                                                                         {L'”', L'\"'},
+                                                                         {L'‘', L'\''},
+                                                                         {L'’', L'\''}};
 
 int CardDatabaseModel::rowCount(const QModelIndex & /*parent*/) const
 {
