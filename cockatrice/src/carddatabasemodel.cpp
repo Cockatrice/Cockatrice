@@ -1,5 +1,6 @@
 #include "carddatabasemodel.h"
 #include "filtertree.h"
+#include <QMap>
 
 #define CARDDBMODEL_COLUMNS 6
 
@@ -16,6 +17,11 @@ CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromE
 CardDatabaseModel::~CardDatabaseModel()
 {
 }
+
+QMap<wchar_t, wchar_t> CardDatabaseDisplayModel::characterTranslation = {{L'“', L'\"'},
+                                                                         {L'”', L'\"'},
+                                                                         {L'‘', L'\''},
+                                                                         {L'’', L'\''}};
 
 int CardDatabaseModel::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -324,6 +330,16 @@ void CardDatabaseDisplayModel::filterTreeChanged()
     invalidate();
 }
 
+const QString CardDatabaseDisplayModel::sanitizeCardName(const QString &dirtyName, const QMap<wchar_t, wchar_t> &table)
+{
+    std::wstring toReturn = dirtyName.toStdWString();
+    for (wchar_t &ch : toReturn) {
+        if (table.contains(ch)) {
+            ch = table.value(ch);
+        }
+    }
+    return QString::fromStdWString(toReturn);
+}
 TokenDisplayModel::TokenDisplayModel(QObject *parent) : CardDatabaseDisplayModel(parent)
 {
 }
