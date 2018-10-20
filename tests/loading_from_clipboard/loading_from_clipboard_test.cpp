@@ -228,6 +228,21 @@ TEST(LoadingFromClipboardTest, LotsOfStuffInBulkTesting)
     ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
     ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
 }
+
+TEST(LoadingFromClipboardTest, CommentsBeforeCardsTesting)
+{
+    QString *clipboard = new QString("//NAME: Title from Website.com\n"
+                                     "\n"
+                                     "//Main\n"
+                                     "1 test1\n");
+    DeckList *decklist = fromClipboard(clipboard);
+    DecklistBuilder decklistBuilder = DecklistBuilder();
+    decklist->forEachCard(decklistBuilder);
+    CardRows expectedMainboard = CardRows({{"test1", 1}});
+    CardRows expectedSideboard = CardRows({});
+    ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
+    ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+}
 } // namespace
 
 int main(int argc, char **argv)
