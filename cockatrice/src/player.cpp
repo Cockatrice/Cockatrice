@@ -2356,8 +2356,7 @@ void Player::actResetPT()
     int playerid = id;
     QList<const ::google::protobuf::Message *> commandList;
     QListIterator<QGraphicsItem *> selected(scene()->selectedItems());
-    while (selected.hasNext())
-    {
+    while (selected.hasNext()) {
         CardItem *card = static_cast<CardItem *>(selected.next());
         CardInfoPtr info = card->getInfo();
         Command_SetCardAttr *cmd = new Command_SetCardAttr;
@@ -2369,8 +2368,7 @@ void Player::actResetPT()
         cmd->set_attr_value(ptString.toStdString());
         commandList.append(cmd);
 
-        if (local)
-        {
+        if (local) {
             playerid = card->getZone()->getPlayer()->getId();
         }
     }

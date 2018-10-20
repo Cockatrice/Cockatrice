@@ -1470,8 +1470,6 @@ public:
 
         gridLayout_15->addWidget(Player_aMoveTopToPlayFaceDown, 5, 1, 1, 1);
 
-
-
         gridLayout_20->addWidget(groupBox_15, 0, 1, 1, 1);
 
         groupBox_16 = new QGroupBox(tab_3);
