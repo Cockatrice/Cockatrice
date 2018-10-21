@@ -390,6 +390,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     connect(aDecPT, SIGNAL(triggered()), this, SLOT(actDecPT()));
     aSetPT = new QAction(this);
     connect(aSetPT, SIGNAL(triggered()), this, SLOT(actSetPT()));
+    aResetPT = new QAction(this);
+    connect(aResetPT, SIGNAL(triggered()), this, SLOT(actResetPT()));
     aSetAnnotation = new QAction(this);
     connect(aSetAnnotation, SIGNAL(triggered()), this, SLOT(actSetAnnotation()));
     aFlip = new QAction(this);
@@ -702,6 +704,7 @@ void Player::retranslateUi()
     aIncPT->setText(tr("In&crease power and toughness"));
     aDecPT->setText(tr("Dec&rease power and toughness"));
     aSetPT->setText(tr("Set &power and toughness..."));
+    aResetPT->setText(tr("Reset p&ower and toughness"));
     aSetAnnotation->setText(tr("&Set annotation..."));
 
     QStringList counterColors;
@@ -751,6 +754,7 @@ void Player::setShortcutsActive()
     aIncPT->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncPT"));
     aDecPT->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecPT"));
     aSetPT->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetPT"));
+    aResetPT->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aResetPT"));
     aSetAnnotation->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetAnnotation"));
     aMoveToTopLibrary->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aMoveToTopLibrary"));
     aMoveToBottomLibrary->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aMoveToBottomLibrary"));
@@ -2347,6 +2351,31 @@ void Player::actIncPT(int deltaP, int deltaT)
     game->sendGameCommand(prepareGameCommand(commandList), playerid);
 }
 
+void Player::actResetPT()
+{
+    int playerid = id;
+    QList<const ::google::protobuf::Message *> commandList;
+    QListIterator<QGraphicsItem *> selected(scene()->selectedItems());
+    while (selected.hasNext()) {
+        CardItem *card = static_cast<CardItem *>(selected.next());
+        CardInfoPtr info = card->getInfo();
+        Command_SetCardAttr *cmd = new Command_SetCardAttr;
+        QString zoneName = card->getZone()->getName();
+        cmd->set_zone(zoneName.toStdString());
+        cmd->set_card_id(card->getId());
+        cmd->set_attribute(AttrPT);
+        QString ptString = info->getPowTough();
+        cmd->set_attr_value(ptString.toStdString());
+        commandList.append(cmd);
+
+        if (local) {
+            playerid = card->getZone()->getPlayer()->getId();
+        }
+    }
+
+    game->sendGameCommand(prepareGameCommand(commandList), playerid);
+}
+
 void Player::actSetPT()
 {
     QString oldPT;
@@ -2636,6 +2665,7 @@ void Player::updateCardMenu(const CardItem *card)
                     ptMenu->addAction(aDecPT);
                     ptMenu->addSeparator();
                     ptMenu->addAction(aSetPT);
+                    ptMenu->addAction(aResetPT);
                 }
 
                 cardMenu->addAction(aTap);
