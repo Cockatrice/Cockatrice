@@ -33,7 +33,7 @@ cache:
 environment:
     APPVEYOR_YML_DISABLE_PS_LINUX: true
     openssl_ver: 1.0.2p
-    protobuf_ver: 3.6.0
+    protobuf_ver: 3.6.1
     zlib_ver: 1.2.11
 
     matrix:
