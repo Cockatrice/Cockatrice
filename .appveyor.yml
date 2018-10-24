@@ -21,10 +21,6 @@ skip_branch_with_pr: true
 
 clone_depth: 50    #same as travis, see https://www.appveyor.com/blog/2014/06/04/shallow-clone-for-git-repositories/
 
-image:
-    - Visual Studio 2017
-    - Ubuntu1804
-
 cache:
     - c:\openssl-release
     - c:\protobuf-release
