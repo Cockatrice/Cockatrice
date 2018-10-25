@@ -91,41 +91,39 @@ If you find any usage of the old keywords, we encourage you to fix it.
 
 ### Braces ###
 
-Braces should almost always go on their own line:
+Braces should go on their own line except for control statements, the use of braces around single line statements is preferred.
+See the following example:
 ```c++
 int main()
-{
-    if (someCondition)
-    {
-        doSomething();
-    }
-    else if (someOtherCondition1)
-    {
-        for (int i = 0; i < 100; i++)
-        {
+{ // function or class: own line
+    if (someCondition) { // control statement: same line
+        doSomething(); // single line statement, braces preferred
+    } else if (someOtherCondition1) { // else goes after closing brace
+        for (int i = 0; i < 100; i++) {
             doSomethingElse();
         }
-    }
-    else
-    {
-        while (someOtherCondition2)
-        {
+    } else {
+        while (someOtherCondition2) {
             doSomethingElse();
         }
     }
 }
 ```
-Braces should never be omitted for single-statement. Keeping the code legibile is a high priority of ours and we hope you share a similar belief :)
 
-### Tabs vs Spaces ###
+### Indentation ###
 
-We _highly_ encourate the use of spaces. If you use tabs, please readjust them to 4 spaces per tab before submitting.
+Always indent using 4 spaces, do not use tabs. Opening and closing braces should be on the same indentation layer, member access specifiers in classes or structs should not be indented.
 
 ### Lines ###
 
 Do not have trailing whitespace in your lines, if possible. Most IDEs check for this nowadays and clean it up for you.
 
 Lines should be 120 characters or less, but you can exceed this if you find it necessary.
+
+### Automatic Formatting ###
+
+The handy tool `clang-format` can format your code for you, a special `.clang-format` configuration file is included [here](https://github.com/Cockatrice/Cockatrice/blob/master/.clang-format).
+See [the clang-format documentation](https://clang.llvm.org/docs/ClangFormat.html) for more information.
 
 ### Memory Management ###
 
