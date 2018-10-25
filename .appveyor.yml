@@ -118,10 +118,10 @@ build_script:
     - sh: make package -j2
 
 artifacts:
-  - path: '**/*.exe'
+  - path: 'build/Cockatrice*.exe'
     name: Cockatrice-win
 
-  - path: '**/*.deb'
+  - path: 'build/Cockatrice*.deb'
     name: Cockatrice-ubuntu1804
 
 test: off
