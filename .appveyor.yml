@@ -24,7 +24,6 @@ clone_depth: 50    #same as travis, see https://www.appveyor.com/blog/2014/06/04
 image: Visual Studio 2017
 
 cache:
-    - c:\openssl-release
     - c:\protobuf-release
     - c:\zlib-release
 # TODO: set dependency on ps skript file (in ./ci) / "-> appveyor.yml" maybe not ideal
@@ -33,7 +32,6 @@ cache:
 
 
 environment:
-    openssl_ver: 1.0.2o
     protobuf_ver: 3.6.0
     zlib_ver: 1.2.11
 
@@ -53,19 +51,6 @@ environment:
 
 install:
     - ps: |
-        if (Test-Path c:\openssl-release) {
-            echo "using openssl from cache"
-        } else {
-            if ($env:target_arch -eq "win64") {    # 64bit filename
-                # echo "downloading 64bit version of openssl"
-                Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-x64_86-win64.zip" -OutFile c:\openssl-$env:openssl_ver.zip
-            } else {    # 32bit filename
-                # echo "downloading 32bit version of openssl"
-                Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-i386-win32.zip" -OutFile c:\openssl-$env:openssl_ver.zip
-            }
-            Expand-Archive -Path c:\openssl-$env:openssl_ver.zip -DestinationPath c:\openssl-release
-            Set-Location -Path C:\openssl-release
-        }
         if (Test-Path c:\protobuf-release) {
             echo "using protobuf from cache"
         } else {
@@ -93,12 +78,11 @@ build_script:
         New-Item -ItemType directory -Path $env:APPVEYOR_BUILD_FOLDER\build
         Set-Location -Path $env:APPVEYOR_BUILD_FOLDER\build
         $zlibdir = "c:\zlib-release"
-        $openssldir = "C:\openssl-release"
         $protodir = "c:\protobuf-release"
         $protoc = "c:\protobuf-release\bin\protoc.exe"
         $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
         cmake --version
-        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir;$zlibdir;$openssldir" "-DWITH_SERVER=1" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
+        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir;$zlibdir" "-DWITH_SERVER=1" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
     - msbuild PACKAGE.vcxproj /p:Configuration=Release
     - ps: |
         $exe = dir -name *.exe
