@@ -32,7 +32,7 @@ cache:
 
 
 environment:
-    protobuf_ver: 3.6.0
+    protobuf_ver: 3.6.1
     zlib_ver: 1.2.11
 
     matrix:
