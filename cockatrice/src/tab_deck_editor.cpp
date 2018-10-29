@@ -337,6 +337,8 @@ void TabDeckEditor::createMenus()
     connect(aResetLayout, SIGNAL(triggered()), this, SLOT(restartLayout()));
     viewMenu->addAction(aResetLayout);
 
+    setSaveStatus(false);
+
     addTabMenu(viewMenu);
 }
 
@@ -673,12 +675,14 @@ void TabDeckEditor::updateName(const QString &name)
 {
     deckModel->getDeckList()->setName(name);
     setModified(true);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::updateComments()
 {
     deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
     setModified(true);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::updateCardInfoLeft(const QModelIndex &current, const QModelIndex & /*previous*/)
@@ -739,6 +743,7 @@ void TabDeckEditor::actNewDeck()
     commentsEdit->setText(QString());
     hashLabel->setText(QString());
     setModified(false);
+    setSaveStatus(false);
 }
 
 void TabDeckEditor::actLoadDeck()
@@ -753,10 +758,12 @@ void TabDeckEditor::actLoadDeck()
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
     auto *l = new DeckLoader;
-    if (l->loadFromFile(fileName, fmt))
+    if (l->loadFromFile(fileName, fmt)) {
+        setSaveStatus(false);
         setDeck(l);
-    else
+    } else
         delete l;
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::saveDeckRemoteFinished(const Response &response)
@@ -829,6 +836,7 @@ void TabDeckEditor::actLoadDeckFromClipboard()
 
     setDeck(dlg.getDeckList());
     setModified(true);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::actSaveDeckToClipboard()
@@ -967,6 +975,7 @@ void TabDeckEditor::actSwapCard()
     recursiveExpand(newCardIndex);
 
     setModified(true);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::actAddCard()
@@ -975,11 +984,13 @@ void TabDeckEditor::actAddCard()
         actAddCardToSideboard();
     else
         addCardHelper(DECK_ZONE_MAIN);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::actAddCardToSideboard()
 {
     addCardHelper(DECK_ZONE_SIDE);
+    setSaveStatus(true);
 }
 
 void TabDeckEditor::actRemoveCard()
@@ -988,6 +999,9 @@ void TabDeckEditor::actRemoveCard()
     if (!currentIndex.isValid() || deckModel->hasChildren(currentIndex))
         return;
     deckModel->removeRow(currentIndex.row(), currentIndex.parent());
+
+    DeckLoader *const deck = deckModel->getDeckList();
+    setSaveStatus(!deck->isEmpty());
     setModified(true);
 }
 
@@ -1186,4 +1200,15 @@ void TabDeckEditor::dockTopLevelChanged(bool topLevel)
 void TabDeckEditor::saveDbHeaderState()
 {
     settingsCache->layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
+}
+
+void TabDeckEditor::setSaveStatus(bool newStatus)
+{
+    aSaveDeck->setEnabled(newStatus);
+    aSaveDeckAs->setEnabled(newStatus);
+    aSaveDeckToClipboard->setEnabled(newStatus);
+    aSaveDeckToClipboardRaw->setEnabled(newStatus);
+    saveDeckToClipboardMenu->setEnabled(newStatus);
+    aPrintDeck->setEnabled(newStatus);
+    analyzeDeckMenu->setEnabled(newStatus);
 }

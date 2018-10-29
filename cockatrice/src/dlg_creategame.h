@@ -4,18 +4,17 @@
 #include <QDialog>
 #include <QMap>
 
+class QCheckBox;
+class QDialogButtonBox;
+class QGroupBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
-class QCheckBox;
 class QRadioButton;
-class QGroupBox;
 class QSpinBox;
-class QDialogButtonBox;
-class TabRoom;
-
 class Response;
 class ServerInfo_Game;
+class TabRoom;
 
 class DlgCreateGame : public QDialog
 {
@@ -34,7 +33,7 @@ private:
     QMap<int, QString> gameTypes;
     QMap<int, QRadioButton *> gameTypeCheckBoxes;
 
-    QGroupBox *spectatorsGroupBox;
+    QGroupBox *generalGroupBox, *spectatorsGroupBox;
     QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel;
     QLineEdit *descriptionEdit, *passwordEdit;
     QSpinBox *maxPlayersEdit;

@@ -205,6 +205,8 @@ public:
     QLabel *lbl_Player_aDecPT;
     SequenceEdit *Player_aSetPT;
     QLabel *lbl_Player_aSetPT;
+    SequenceEdit *Player_aResetPT;
+    QLabel *lbl_Player_aResetPT;
     QGroupBox *groupBox_11;
     QGridLayout *gridLayout_11;
     QLabel *lbl_Player_aDecT;
@@ -289,6 +291,8 @@ public:
     SequenceEdit *Player_aMoveToExile;
     QLabel *lbl_Player_aMoveToHand;
     SequenceEdit *Player_aMoveToHand;
+    QLabel *lbl_Player_aMoveTopToPlayFaceDown;
+    SequenceEdit *Player_aMoveTopToPlayFaceDown;
     QGroupBox *groupBox_16;
     QGridLayout *gridLayout_16;
     QLabel *lbl_Player_aViewGraveyard;
@@ -1028,22 +1032,22 @@ public:
         Player_aDecPT = new SequenceEdit("Player/aDecPT", groupBox_12);
         Player_aDecPT->setObjectName("Player_aDecPT");
 
-        gridLayout_12->addWidget(Player_aDecPT, 2, 1, 1, 1);
+        gridLayout_12->addWidget(Player_aDecPT, 3, 1, 1, 1);
 
         Player_aIncPT = new SequenceEdit("Player/aIncPT", groupBox_12);
         Player_aIncPT->setObjectName("Player_aIncPT");
 
-        gridLayout_12->addWidget(Player_aIncPT, 1, 1, 1, 1);
+        gridLayout_12->addWidget(Player_aIncPT, 2, 1, 1, 1);
 
         lbl_Player_aIncPT = new QLabel(groupBox_12);
         lbl_Player_aIncPT->setObjectName("lbl_Player_aIncPT");
 
-        gridLayout_12->addWidget(lbl_Player_aIncPT, 1, 0, 1, 1);
+        gridLayout_12->addWidget(lbl_Player_aIncPT, 2, 0, 1, 1);
 
         lbl_Player_aDecPT = new QLabel(groupBox_12);
         lbl_Player_aDecPT->setObjectName("lbl_Player_aDecPT");
 
-        gridLayout_12->addWidget(lbl_Player_aDecPT, 2, 0, 1, 1);
+        gridLayout_12->addWidget(lbl_Player_aDecPT, 3, 0, 1, 1);
 
         Player_aSetPT = new SequenceEdit("Player/aSetPT", groupBox_12);
         Player_aSetPT->setObjectName("Player_aSetPT");
@@ -1054,6 +1058,16 @@ public:
         lbl_Player_aSetPT->setObjectName("lbl_Player_aSetPT");
 
         gridLayout_12->addWidget(lbl_Player_aSetPT, 0, 0, 1, 1);
+
+        Player_aResetPT = new SequenceEdit("Player/aResetPT", groupBox_12);
+        Player_aResetPT->setObjectName("Player_aResetPT");
+
+        gridLayout_12->addWidget(Player_aResetPT, 1, 1, 1, 1);
+
+        lbl_Player_aResetPT = new QLabel(groupBox_12);
+        lbl_Player_aResetPT->setObjectName("lbl_Player_aResetPT");
+
+        gridLayout_12->addWidget(lbl_Player_aResetPT, 1, 0, 1, 1);
 
         verticalLayout->addWidget(groupBox_12);
 
@@ -1446,6 +1460,16 @@ public:
 
         gridLayout_15->addWidget(Player_aMoveToHand, 4, 1, 1, 1);
 
+        lbl_Player_aMoveTopToPlayFaceDown = new QLabel(groupBox_15);
+        lbl_Player_aMoveTopToPlayFaceDown->setObjectName("lbl_Player_aMoveTopToPlayFaceDown");
+
+        gridLayout_15->addWidget(lbl_Player_aMoveTopToPlayFaceDown, 5, 0, 1, 1);
+
+        Player_aMoveTopToPlayFaceDown = new SequenceEdit("Player/aMoveTopToPlayFaceDown", groupBox_15);
+        Player_aMoveTopToPlayFaceDown->setObjectName("Player_aMoveTopToPlayFaceDown");
+
+        gridLayout_15->addWidget(Player_aMoveTopToPlayFaceDown, 5, 1, 1, 1);
+
         gridLayout_20->addWidget(groupBox_15, 0, 1, 1, 1);
 
         groupBox_16 = new QGroupBox(tab_3);
@@ -1830,6 +1854,7 @@ public:
         groupBox_12->setTitle(QApplication::translate("shortcutsTab", "Power and Toughness", 0));
         lbl_Player_aIncPT->setText(QApplication::translate("shortcutsTab", "Add (+1/+1)", 0));
         lbl_Player_aDecPT->setText(QApplication::translate("shortcutsTab", "Remove (-1/-1)", 0));
+        lbl_Player_aResetPT->setText(QApplication::translate("shortcutsTab", "Reset", 0));
         lbl_Player_aSetPT->setText(QApplication::translate("shortcutsTab", "Set", 0));
         groupBox_11->setTitle(QApplication::translate("shortcutsTab", "Toughness", 0));
         lbl_Player_aDecT->setText(QApplication::translate("shortcutsTab", "Remove (-0/-1)", 0));
@@ -1874,6 +1899,7 @@ public:
         lbl_Player_aMoveToGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard", 0));
         lbl_Player_aMoveToExile->setText(QApplication::translate("shortcutsTab", "Exile", 0));
         lbl_Player_aMoveToHand->setText(QApplication::translate("shortcutsTab", "Hand", 0));
+        lbl_Player_aMoveTopToPlayFaceDown->setText(QApplication::translate("shortcutsTab", "Play face down"));
         groupBox_16->setTitle(QApplication::translate("shortcutsTab", "View", 0));
         lbl_Player_aViewGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard", 0));
         lbl_Player_aViewLibrary->setText(QApplication::translate("shortcutsTab", "Library", 0));

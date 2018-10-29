@@ -265,6 +265,7 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/aSCYellow"] = parseSequenceString("");
     defaultShortCuts["Player/aSetAnnotation"] = parseSequenceString("");
     defaultShortCuts["Player/aSetPT"] = parseSequenceString("Ctrl+P");
+    defaultShortCuts["Player/aResetPT"] = parseSequenceString("Ctrl+Alt+0");
     defaultShortCuts["Player/aShuffle"] = parseSequenceString("Ctrl+S");
     defaultShortCuts["Player/aTap"] = parseSequenceString("");
     defaultShortCuts["Player/aUnattach"] = parseSequenceString("");
@@ -325,4 +326,5 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["tab_room/aClearChat"] = parseSequenceString("F12");
     defaultShortCuts["DlgLoadDeckFromClipboard/refreshButton"] = parseSequenceString("F5");
     defaultShortCuts["Player/aResetLayout"] = parseSequenceString("");
+    defaultShortCuts["Player/aMoveTopToPlayFaceDown"] = parseSequenceString("Ctrl+Shift+E");
 }

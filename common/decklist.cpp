@@ -542,10 +542,11 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         }
 
         // If we have a blank line and it's the _ONLY_ blank line in the paste
+        // and it follows at least one valid card
         // Then we assume it means to start the sideboard section of the paste.
         // If we have the word "Sideboard" appear on any line, then that will
         // also indicate the start of the sideboard.
-        if ((line.isEmpty() && blankLines == 1) || line.startsWith("sideboard")) {
+        if ((line.isEmpty() && blankLines == 1 && okRows > 0) || line.startsWith("sideboard")) {
             inSideboard = true;
             continue; // The line isn't actually a card
         }

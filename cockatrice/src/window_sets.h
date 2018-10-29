@@ -38,6 +38,7 @@ private:
     int sortIndex;
     Qt::SortOrder sortOrder;
     void rebuildMainLayout(int actionToTake);
+    bool setOrderIsSorted;
     enum
     {
         NO_SETS_SELECTED,

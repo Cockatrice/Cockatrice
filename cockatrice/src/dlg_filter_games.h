@@ -8,6 +8,7 @@
 #include <QSet>
 
 class QCheckBox;
+class QGroupBox;
 class QLineEdit;
 class QSpinBox;
 
@@ -15,6 +16,7 @@ class DlgFilterGames : public QDialog
 {
     Q_OBJECT
 private:
+    QGroupBox *generalGroupBox;
     QCheckBox *showBuddiesOnlyGames;
     QCheckBox *unavailableGamesVisibleCheckBox;
     QCheckBox *showPasswordProtectedGames;
