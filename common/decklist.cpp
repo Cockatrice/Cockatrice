@@ -487,7 +487,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     // simplified matches
     const QRegularExpression reMultiplier("^[xX\\(\\[]*(\\d+)[xX\\*\\)\\]]* ?(.+)");
     const QRegularExpression reBrace(" ?[\\[\\{][^\\]\\}]*[\\]\\}] ?"); // not nested
-    const QRegularExpression reRoundBrace("^\\([^\\)]*\\) ?"); // () are only matched at start of string
+    const QRegularExpression reRoundBrace("^\\([^\\)]*\\) ?");          // () are only matched at start of string
     const QRegularExpression reApostrophe("’");
     const QString apostrophe("'");
     const QRegularExpression reAE("Æ");
@@ -540,7 +540,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
             comments += match.captured() + '\n';
         }
     }
-    comments.chop(1); //remove last newline
+    comments.chop(1); // remove last newline
 
     // parse decklist
     for (; index < inputs.size(); ++index) {
