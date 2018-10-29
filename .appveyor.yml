@@ -33,8 +33,8 @@ cache:
 
 
 environment:
-    openssl_ver: 1.0.2o
-    protobuf_ver: 3.6.0
+    openssl_ver: 1.0.2p
+    protobuf_ver: 3.6.1
     zlib_ver: 1.2.11
 
     matrix:
