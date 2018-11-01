@@ -8,13 +8,14 @@
 #include <QMainWindow>
 #include <QSet>
 
+class CardDatabase;
+class QGroupBox;
+class QItemSelection;
+class QPushButton;
+class QTreeView;
+class SetsDisplayModel;
 class SetsModel;
 class SetsProxyModel;
-class SetsDisplayModel;
-class QPushButton;
-class CardDatabase;
-class QItemSelection;
-class QTreeView;
 
 class WndSets : public QMainWindow
 {
@@ -22,6 +23,7 @@ class WndSets : public QMainWindow
 private:
     SetsModel *model;
     SetsDisplayModel *displayModel;
+    QGroupBox *hintsGroupBox;
     QTreeView *view;
     QPushButton *toggleAllButton, *toggleSelectedButton;
     QPushButton *enableAllButton, *disableAllButton, *enableSomeButton, *disableSomeButton;
