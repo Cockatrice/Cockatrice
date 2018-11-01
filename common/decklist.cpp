@@ -488,9 +488,10 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     const QRegularExpression reMultiplier("^[xX\\(\\[]*(\\d+)[xX\\*\\)\\]]* ?(.+)");
     const QRegularExpression reBrace(" ?[\\[\\{][^\\]\\}]*[\\]\\}] ?"); // not nested
     const QRegularExpression reRoundBrace("^\\([^\\)]*\\) ?");          // () are only matched at start of string
+    const QRegularExpression reDigitBrace(" ?\\(\\d*\\) ?");            // () are matched if containing digits
     const QRegularExpression reApostrophe("’");
     const QString apostrophe("'");
-    const QRegularExpression reAE("Æ");
+    const QRegularExpression reAE("[Æ|æ]");
     const QString ae("ae");
     const QRegularExpression reSplit(" ?[|/]+ ?");
     const QRegularExpression reAndSplit("(?<![A-Z]) ?& ?");
@@ -499,25 +500,31 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     cleanList();
 
     QStringList inputs = in.readAll().trimmed().split('\n');
+    int max_line = inputs.size();
     QRegularExpressionMatch match;
 
+    // start at the first empty line before the first cardline
     int deckStart = inputs.indexOf(reCardLine);
-    if (deckStart == -1) {
-        updateDeckHash();
-        return false;
-    }
-    deckStart = inputs.lastIndexOf(reEmpty, deckStart);
-    if (deckStart == -1) {
-        deckStart = 0;
+    if (deckStart == -1) { // there are no cards?
+        deckStart = max_line;
+    } else {
+        deckStart = inputs.lastIndexOf(reEmpty, deckStart);
+        if (deckStart == -1) {
+            deckStart = 0;
+        }
     }
 
-    int sBStart = 0;
+    // find sideboard position, if marks are used this won't be needed
+    int sBStart = -1;
     if (inputs.indexOf(reSBMark) == -1) {
         sBStart = inputs.indexOf(reSBComment, deckStart);
         if (sBStart == -1) {
-            sBStart = inputs.lastIndexOf(reEmpty);
-            if (sBStart < deckStart) {
-                sBStart = 0;
+            sBStart = inputs.indexOf(reEmpty, deckStart + 1);
+            if (sBStart == -1) {
+                sBStart = max_line;
+            }
+            if (inputs.indexOf(reEmpty, inputs.indexOf(reCardLine, sBStart + 1) + 1) != -1) {
+                sBStart = max_line; // if there is another empty line all cards are mainboard
             }
         }
     }
@@ -543,7 +550,8 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     comments.chop(1); // remove last newline
 
     // parse decklist
-    for (; index < inputs.size(); ++index) {
+    for (; index < max_line; ++index) {
+
         // check if line is a card
         match = reCardLine.match(inputs.at(index));
         if (!match.hasMatch())
@@ -552,14 +560,16 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 
         // check if card should be sideboard
         bool sideboard = false;
-        if (sBStart) {
-            sideboard = index > sBStart;
-        } else {
+        if (sBStart < 0) {
             match = reSBMark.match(cardName);
             if (match.hasMatch()) {
                 sideboard = true;
                 cardName = match.captured(1);
             }
+        } else {
+            if (index == sBStart) // skip sideboard line itself
+                continue;
+            sideboard = index > sBStart;
         }
 
         // check if a specific amount is mentioned
@@ -572,13 +582,17 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 
         // remove stuff inbetween braces
         cardName.remove(reBrace);
-        cardName.remove(reRoundBrace);
+        cardName.remove(reRoundBrace); // I'll be entirely honest here, these are split to accommodate just three cards
+        cardName.remove(reDigitBrace); // all cards from un-sets that have a word in between round braces at the end
 
         // replace common differences in cardnames
         cardName.replace(reApostrophe, apostrophe);
         cardName.replace(reAE, ae);
         cardName.replace(reSplit, splitSeparator);
         cardName.replace(reAndSplit, splitSeparator);
+
+        // this is required by the load_card_from_clipboard test only, the client doesn't care
+        cardName = cardName.toLower();
 
         // get cardname?
         cardName = getCompleteCardName(cardName);
