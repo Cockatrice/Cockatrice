@@ -1,18 +1,9 @@
-#include "loading_from_clipboard_test.h"
 #include "../../common/decklist.h"
 #include "gtest/gtest.h"
 #include <QTextStream>
 
-DeckList *fromClipboard(QString *clipboard);
-DeckList *fromClipboard(QString *clipboard)
-{
-    DeckList *deckList = new DeckList;
-    QTextStream *stream = new QTextStream(clipboard);
-    deckList->loadFromStream_Plain(*stream);
-    return deckList;
-}
-
-using CardRows = QMap<QString, int>;
+// using std types because qt types aren't understood by gtest (without this you'll get less nice errors)
+using CardRows = QList<std::pair<std::string, int>>;
 
 struct DecklistBuilder
 {
@@ -26,9 +17,9 @@ struct DecklistBuilder
     void operator()(const InnerDecklistNode *innerDecklistNode, const DecklistCardNode *card)
     {
         if (innerDecklistNode->getName() == DECK_ZONE_MAIN) {
-            actualMainboard[card->getName()] += card->getNumber();
+            actualMainboard += {card->getName().toStdString(), card->getNumber()};
         } else if (innerDecklistNode->getName() == DECK_ZONE_SIDE) {
-            actualSideboard[card->getName()] += card->getNumber();
+            actualSideboard += {card->getName().toStdString(), card->getNumber()};
         } else {
             FAIL();
         }
@@ -49,25 +40,33 @@ namespace
 {
 TEST(LoadingFromClipboardTest, EmptyDeck)
 {
-    DeckList *deckList = fromClipboard(new QString(""));
-    ASSERT_TRUE(deckList->getCardList().isEmpty());
+    DeckList deckList;
+    QString clipboard("");
+    QTextStream stream(&clipboard);
+    deckList.loadFromStream_Plain(stream);
+    ASSERT_TRUE(deckList.getCardList().isEmpty());
 }
 
 TEST(LoadingFromClipboardTest, EmptySideboard)
 {
-    DeckList *deckList = fromClipboard(new QString("Sideboard"));
-    ASSERT_TRUE(deckList->getCardList().isEmpty());
+    DeckList deckList;
+    QString clipboard("Sideboard");
+    QTextStream stream(&clipboard);
+    deckList.loadFromStream_Plain(stream);
+    ASSERT_TRUE(deckList.getCardList().isEmpty());
 }
 
 TEST(LoadingFromClipboardTest, QuantityPrefixed)
 {
-    QString *clipboard = new QString("1 Mountain\n"
-                                     "2x Island\n"
-                                     "3X FOREST\n");
-    DeckList *deckList = fromClipboard(clipboard);
+    QString clipboard("1 Mountain\n"
+                      "2x Island\n"
+                      "3X FOREST\n");
+    DeckList deckList;
+    QTextStream stream(&clipboard);
+    deckList.loadFromStream_Plain(stream);
 
     DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
+    deckList.forEachCard(decklistBuilder);
 
     CardRows expectedMainboard = CardRows({{"mountain", 1}, {"island", 2}, {"forest", 3}});
     CardRows expectedSideboard = CardRows({});
@@ -78,14 +77,16 @@ TEST(LoadingFromClipboardTest, QuantityPrefixed)
 
 TEST(LoadingFromClipboardTest, CommentsAreIgnored)
 {
-    QString *clipboard = new QString("//1 Mountain\n"
-                                     "//2x Island\n"
-                                     "//SB:2x Island\n");
+    QString clipboard("//1 Mountain\n"
+                      "//2x Island\n"
+                      "//SB:2x Island\n");
 
-    DeckList *deckList = fromClipboard(clipboard);
+    DeckList deckList;
+    QTextStream stream(&clipboard);
+    deckList.loadFromStream_Plain(stream);
 
     DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
+    deckList.forEachCard(decklistBuilder);
 
     CardRows expectedMainboard = CardRows({});
     CardRows expectedSideboard = CardRows({});
@@ -96,13 +97,15 @@ TEST(LoadingFromClipboardTest, CommentsAreIgnored)
 
 TEST(LoadingFromClipboardTest, SideboardPrefix)
 {
-    QString *clipboard = new QString("1 Mountain\n"
-                                     "SB: 1 Mountain\n"
-                                     "SB: 2x Island\n");
-    DeckList *deckList = fromClipboard(clipboard);
+    QString clipboard("1 Mountain\n"
+                      "SB: 1 Mountain\n"
+                      "SB: 2x Island\n");
+    DeckList deckList;
+    QTextStream stream(&clipboard);
+    deckList.loadFromStream_Plain(stream);
 
     DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
+    deckList.forEachCard(decklistBuilder);
 
     CardRows expectedMainboard = CardRows({{"mountain", 1}});
     CardRows expectedSideboard = CardRows({{"mountain", 1}, {"island", 2}});
@@ -113,11 +116,13 @@ TEST(LoadingFromClipboardTest, SideboardPrefix)
 
 TEST(LoadingFromClipboardTest, UnknownCardsAreNotDiscarded)
 {
-    QString *clipboard = new QString("1 CardThatDoesNotExistInCardsXml\n");
-    DeckList *deckList = fromClipboard(clipboard);
+    QString clipboard("1 CardThatDoesNotExistInCardsXml\n");
+    DeckList deckList;
+    QTextStream stream(&clipboard);
+    deckList.loadFromStream_Plain(stream);
 
     DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
+    deckList.forEachCard(decklistBuilder);
 
     CardRows expectedMainboard = CardRows({{"cardthatdoesnotexistincardsxml", 1}});
     CardRows expectedSideboard = CardRows({});
@@ -128,19 +133,21 @@ TEST(LoadingFromClipboardTest, UnknownCardsAreNotDiscarded)
 
 TEST(LoadingFromClipboardTest, RemoveBlankEntriesFromBeginningAndEnd)
 {
-    QString *clipboard = new QString("\n"
-                                     "\n"
-                                     "\n"
-                                     "1x Algae Gharial\n"
-                                     "3x CardThatDoesNotExistInCardsXml\n"
-                                     "2x Phelddagrif\n"
-                                     "\n"
-                                     "\n");
+    QString clipboard("\n"
+                      "\n"
+                      "\n"
+                      "1x Algae Gharial\n"
+                      "3x CardThatDoesNotExistInCardsXml\n"
+                      "2x Phelddagrif\n"
+                      "\n"
+                      "\n");
 
-    DeckList *deckList = fromClipboard(clipboard);
+    DeckList deckList;
+    QTextStream stream(&clipboard);
+    deckList.loadFromStream_Plain(stream);
 
     DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
+    deckList.forEachCard(decklistBuilder);
 
     CardRows expectedMainboard =
         CardRows({{"algae gharial", 1}, {"cardthatdoesnotexistincardsxml", 3}, {"phelddagrif", 2}});
@@ -152,15 +159,17 @@ TEST(LoadingFromClipboardTest, RemoveBlankEntriesFromBeginningAndEnd)
 
 TEST(LoadingFromClipboardTest, UseFirstBlankIfOnlyOneBlankToSplitSideboard)
 {
-    QString *clipboard = new QString("1x Algae Gharial\n"
-                                     "3x CardThatDoesNotExistInCardsXml\n"
-                                     "\n"
-                                     "2x Phelddagrif\n");
+    QString clipboard("1x Algae Gharial\n"
+                      "3x CardThatDoesNotExistInCardsXml\n"
+                      "\n"
+                      "2x Phelddagrif\n");
 
-    DeckList *deckList = fromClipboard(clipboard);
+    DeckList deckList;
+    QTextStream stream(&clipboard);
+    deckList.loadFromStream_Plain(stream);
 
     DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
+    deckList.forEachCard(decklistBuilder);
 
     CardRows expectedMainboard = CardRows({{"algae gharial", 1}, {"cardthatdoesnotexistincardsxml", 3}});
     CardRows expectedSideboard = CardRows({{"phelddagrif", 2}});
@@ -171,17 +180,19 @@ TEST(LoadingFromClipboardTest, UseFirstBlankIfOnlyOneBlankToSplitSideboard)
 
 TEST(LoadingFromClipboardTest, IfMultipleScatteredBlanksAllMainBoard)
 {
-    QString *clipboard = new QString("1x Algae Gharial\n"
-                                     "3x CardThatDoesNotExistInCardsXml\n"
-                                     "\n"
-                                     "2x Phelddagrif\n"
-                                     "\n"
-                                     "3 Giant Growth\n");
+    QString clipboard("1x Algae Gharial\n"
+                      "3x CardThatDoesNotExistInCardsXml\n"
+                      "\n"
+                      "2x Phelddagrif\n"
+                      "\n"
+                      "3 Giant Growth\n");
 
-    DeckList *deckList = fromClipboard(clipboard);
+    DeckList deckList;
+    QTextStream stream(&clipboard);
+    deckList.loadFromStream_Plain(stream);
 
     DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
+    deckList.forEachCard(decklistBuilder);
 
     CardRows expectedMainboard = CardRows(
         {{"algae gharial", 1}, {"cardthatdoesnotexistincardsxml", 3}, {"phelddagrif", 2}, {"giant growth", 3}});
@@ -193,53 +204,63 @@ TEST(LoadingFromClipboardTest, IfMultipleScatteredBlanksAllMainBoard)
 
 TEST(LoadingFromClipboardTest, LotsOfStuffInBulkTesting)
 {
-    QString *clipboard = new QString("\n"
-                                     "\n"
-                                     "\n"
-                                     "1x test1\n"
-                                     "testNoValueMB\n"
-                                     "2x test2\n"
-                                     "SB: 10 testSB\n"
-                                     "3 test3\n"
-                                     "4X test4\n"
-                                     "\n"
-                                     "\n"
-                                     "\n"
-                                     "\n"
-                                     "5x test5\n"
-                                     "6X test6\n"
-                                     "testNoValueSB\n"
-                                     "\n"
-                                     "\n"
-                                     "\n"
-                                     "\n");
+    QString clipboard("\n"
+                      "\n"
+                      "\n"
+                      "1x aether adept\n" // "1x Æther Adept\n" // bugged
+                      "2x Fire & Ice\n"
+                      "3 Pain/Suffering\n"
+                      "4X [B] FOREST (3)\n"
+                      "testNoValueMB\n"
+                      "\n"
+                      "\n"
+                      "\n"
+                      "\n"
+                      "5x [WTH] nature’s resurgence\n"
+                      "6X Gaea's skYFOLK\n"
+                      "testNoValueSB\n"
+                      "\n"
+                      "\n"
+                      "\n"
+                      "\n");
 
-    DeckList *deckList = fromClipboard(clipboard);
+    DeckList deckList;
+    QTextStream stream(&clipboard);
+    deckList.loadFromStream_Plain(stream);
 
     DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
+    deckList.forEachCard(decklistBuilder);
 
-    CardRows expectedMainboard = CardRows({{"test1", 1}, {"test2", 2}, {"test3", 3}, {"test4", 4}, {"testnovaluemb", 1}
-
-    });
-    CardRows expectedSideboard = CardRows({{"testsb", 10}, {"test5", 5}, {"test6", 6}, {"testnovaluesb", 1}
-
-    });
+    CardRows expectedMainboard = CardRows(
+        {{"aether adept", 1}, {"fire // ice", 2}, {"pain // suffering", 3}, {"forest", 4}, {"testnovaluemb", 1}});
+    CardRows expectedSideboard = CardRows({{"nature's resurgence", 5}, {"gaea's skyfolk", 6}, {"testnovaluesb", 1}});
     ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
     ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
 }
 
 TEST(LoadingFromClipboardTest, CommentsBeforeCardsTesting)
 {
-    QString *clipboard = new QString("//NAME: Title from Website.com\n"
-                                     "\n"
-                                     "//Main\n"
-                                     "1 test1\n");
-    DeckList *decklist = fromClipboard(clipboard);
+    QString clipboard("// title from website.com\n"
+                      "// a nice deck\n"
+                      "// with nice cards\n"
+                      "\n"
+                      "1 test1\n"
+                      "sideboard\n"
+                      "2 test2\n");
+
+    DeckList deckList;
+    QTextStream stream(&clipboard);
+    deckList.loadFromStream_Plain(stream);
+
+    ASSERT_EQ(deckList.getName().toStdString(), "title from website.com");
+    ASSERT_EQ(deckList.getComments().toStdString(), "a nice deck\nwith nice cards\n");
+
     DecklistBuilder decklistBuilder = DecklistBuilder();
-    decklist->forEachCard(decklistBuilder);
+    deckList.forEachCard(decklistBuilder);
+
     CardRows expectedMainboard = CardRows({{"test1", 1}});
-    CardRows expectedSideboard = CardRows({});
+    CardRows expectedSideboard = CardRows({{"test2", 2}});
+
     ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
     ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
 }

@@ -38,25 +38,25 @@ Use header guards in the form of `FILE_NAME_H`.
 Simple functions, such as getters, may be written inline in the header file,
 but other functions should be written in the source file.
 
-Keep library includes and project includes grouped together. So this is okay:
+Group library includes after project includes, and in alphabetic order. Like this:
 ```c++
 // Good
-#include <QList>
-#include <QString>
-#include "card.h"
-#include "deck.h"
-
-// Good
 #include "card.h"
 #include "deck.h"
 #include <QList>
 #include <QString>
 
-// Bad:
+// Bad
 #include <QList>
 #include "card.h"
 #include <QString>
 #include "deck.h"
+
+// Bad
+#include "card.h"
+#include "deck.h"
+#include <QString>
+#include <QList>
 ```
 
 ### Naming ###
@@ -95,10 +95,10 @@ Braces should go on their own line except for control statements, the use of bra
 See the following example:
 ```c++
 int main()
-{ // function or class: own line
-    if (someCondition) { // control statement: same line
-        doSomething(); // single line statement, braces preferred
-    } else if (someOtherCondition1) { // else goes after closing brace
+{                                     // function or class: own line
+    if (someCondition) {              // control statement: same line
+        doSomething();                // single line statement, braces preferred
+    } else if (someOtherCondition1) { // else goes on the same line as a closing brace
         for (int i = 0; i < 100; i++) {
             doSomethingElse();
         }
@@ -110,9 +110,11 @@ int main()
 }
 ```
 
-### Indentation ###
+### Indentation and Spacing ###
 
 Always indent using 4 spaces, do not use tabs. Opening and closing braces should be on the same indentation layer, member access specifiers in classes or structs should not be indented.
+All operators and braces should be separated by spaces, do not add a space next to the inside of a brace.
+If multiple lines of code that follow eachother have single line comments behind them, place all of them on the same indentation level. This indentation level should be equal to the longest line of code for each of these comments, without added spacing.
 
 ### Lines ###
 
@@ -177,35 +179,32 @@ You can find more information on how we use Protobuf on [our wiki!](https://gith
 
 # Translations #
 
-**Basic workflow for translations:**
+Basic workflow for translations:
  1. Developer adds a `tr("foo")` string in the code;
  2. Every few days, a maintainer updates the `*_en.ts files` with the new strings;
  3. Transifex picks up the new files from github every 24 hours;
- 4. Translators translate the new untraslated strings on Transifex;
+ 4. Translators translate the new untranslated strings on Transifex;
  5. Before a release, a maintainer fetches the updated translations from Transifex.
 
-### Translations (for developers) ###
+### Using Translations (for developers) ###
 
-**Step 1: Adding translatable strings to the code (`tr("foo")`)**
-
-All the user-interface strings inside Cockatrice's source code must be written in
-english language.<br>
+All the user-interface strings inside Cockatrice's source code must be written in english.
 Translations to other languages are managed using [Transifex](https://www.transifex.com/projects/p/cockatrice/).
 
-If you're about to propose a change that adds or modifies any translatable string
-in the code, you don't need to take care of adding the new strings to the
-translation files. Every few days, or when a lot of new strings have been added,
-someone from the development team will take care of extracing all the new strings,
-adding them to the english translation files and making them available to
-translators on Transifex.
+Adding a new string to translate is as easy as adding the string in the 'tr("")' function, the string will be picked up as translatable automatically and translated as needed.
+For example setting the text of this label in a way that the string "My name is:" can be translated:
+```c++
+nameLabel.setText(tr("My name is:"));
+```
 
-### Translations (for maintainers) ###
+If you're about to propose a change that adds or modifies any translatable string in the code, you don't need to take care of adding the new strings to the translation files.
+Every few days, or when a lot of new strings have been added, someone from the development team will take care of extracting all the new strings and adding them to the english translation files and making them available to translators on Transifex.
 
-**Step 2: Updating `*_en.ts` files with new strings**
+### Maintaining Translations (for maintainers) ###
 
-When new translatable strings have been added to the code, it would be nice to
+When new translatable strings have been added to the code, a maintainer should
 make them available to translators on Transifex. Every few days, or when a lot
-of new strings have been added, a maintainer should take care of extracing all
+of new strings have been added, a maintainer should take care of extracting all
 the new strings and add them to the english translation files.
 
 To update the english translation files, re-run cmake enabling the appropriate
@@ -227,20 +226,18 @@ You should then notice that the following files have uncommitted changes:
     cockatrice/translations/cockatrice_en.ts
     oracle/translations/oracle_en.ts
 
-It's now suggested to disable the parameter using:
+It is recommended to disable the parameter afterwards using:
 ```sh
 cmake .. -DUPDATE_TRANSLATIONS=OFF
 ```
 Now you are ready to propose your change.
 
-**Step 3: Automatic pushing to Transifex**
-
-Once your change gets merged, Transifex will pick up the modified files automatically (checks every 24 hours)
+Once your change gets merged, Transifex will pick up the modified files automatically (checked every 24 hours)
 and update the interface where translators will be able to translate the new strings.
 
-**Step 5: Fetching new translations from Transifex**
+### Releasing Translations (for maintainers) ###
 
-Before rushing out a new release, it would be nice to fetch the most up to date
+Before rushing out a new release, a maintainer should fetch the most up to date
 translations from Transifex and commit them into the Cockatrice source code.
 This can be done manually from the Transifex web interface, but it's quite time
 consuming.
@@ -252,10 +249,9 @@ As an alternative, you can install the Transifex CLI:
 You'll then be able to use a git-like cli command to push and pull translations
 from Transifex to the source code and vice versa.
 
-### Translations (for translators) ###
+### Adding Translations (for translators) ###
 
-**Step 4: Editing translations at Transifex**
-
+As a translator you can help translate the new strings on [Transifex](https://www.transifex.com/projects/p/cockatrice/).
 Please have a look at the specific [FAQ for translators](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
 
 
@@ -295,11 +291,11 @@ git tag -d $TAG_NAME
 
 **NOTE:** Unfortunately, due to the method of how Travis and AppVeyor work, to publish a stable release you will need to make a copy of the release notes locally and then paste them into the GitHub GUI once the binaries have been uploaded by them. These CI services will automatically overwrite the name of the release (to "Cockatrice $TAG_NAME"), the status of the release (to "Pre-release"), and the release body (to "Beta build of Cockatrice").
 
-**NOTE 2:** In the first lines of https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt there's an hardcoded version number used when compiling custom (not tagged) versions. While on tagged versions these numbers are overriden by the version numbers coming from the tag title, it's a good practice to keep them aligned with the real ones.
-The preferred flow of operations is:
+**NOTE 2:** In the first lines of https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt there's an hardcoded version number used when compiling custom (not tagged) versions. While on tagged versions these numbers are overridden by the version numbers coming from the tag title, it's good practice to keep them aligned with the real ones.
+The preferred flow of operation is:
  * just before a release, update the version number in CMakeLists.txt to "next release version";
  * tag the release following the previously described syntax in order to get it built by CI;
  * wait for CI to upload the binaries, double check if everything is in order
  * after the release is complete, update the version number again to "next targeted beta version", typically increasing `PROJECT_VERSION_PATCH` by one.
 
-**NOTE 3:** When releasing a new stable version, all the previous beta versions should be deleted. This is needed for Cockatrice to pick up the stable release also for users that chose the "beta" release channel.
+**NOTE 3:** When releasing a new stable version, all the previous beta versions should be deleted. This is needed for Cockatrice to update users of the "beta" release channel to the latest version like other users.
