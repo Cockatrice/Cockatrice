@@ -481,7 +481,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     const QRegularExpression reCardLine("^\\s*[\\w\\[\\(\\{].*$", QRegularExpression::UseUnicodePropertiesOption);
     const QRegularExpression reEmpty("^\\s*$");
     const QRegularExpression reComment("[\\w\\[\\(\\{].*$", QRegularExpression::UseUnicodePropertiesOption);
-    const QRegularExpression reSBMark("^sb:\\s*(.+)", QRegularExpression::CaseInsensitiveOption);
+    const QRegularExpression reSBMark("^\\s*sb:\\s*(.+)", QRegularExpression::CaseInsensitiveOption);
     const QRegularExpression reSBComment("sideboard", QRegularExpression::CaseInsensitiveOption);
 
     // simplified matches
@@ -489,23 +489,22 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     const QRegularExpression reBrace(" ?[\\[\\{][^\\]\\}]*[\\]\\}] ?"); // not nested
     const QRegularExpression reRoundBrace("^\\([^\\)]*\\) ?");          // () are only matched at start of string
     const QRegularExpression reDigitBrace(" ?\\(\\d*\\) ?");            // () are matched if containing digits
-    const QRegularExpression reApostrophe("’");
-    const QString apostrophe("'");
-    const QRegularExpression reAE("[Æ|æ]");
-    const QString ae("ae");
-    const QRegularExpression reSplit(" ?[|/]+ ?");
-    const QRegularExpression reAndSplit("(?<![A-Z]) ?& ?");
-    const QString splitSeparator(" // ");
+    const QHash<QRegularExpression, QString> differences{{QRegularExpression("’"), QString("'")},
+                                                         {QRegularExpression("Æ"), QString("Ae")},
+                                                         {QRegularExpression("æ"), QString("ae")},
+                                                         {QRegularExpression(" ?[|/]+ ?"), QString(" // ")},
+                                                         {QRegularExpression("(?<![A-Z]) ?& ?"), QString(" // ")}};
 
     cleanList();
 
     QStringList inputs = in.readAll().trimmed().split('\n');
     int max_line = inputs.size();
-    QRegularExpressionMatch match;
 
     // start at the first empty line before the first cardline
     int deckStart = inputs.indexOf(reCardLine);
     if (deckStart == -1) { // there are no cards?
+        if (inputs.indexOf(reComment) == -1)
+            return false; // input is empty
         deckStart = max_line;
     } else {
         deckStart = inputs.lastIndexOf(reEmpty, deckStart);
@@ -516,34 +515,36 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
 
     // find sideboard position, if marks are used this won't be needed
     int sBStart = -1;
-    if (inputs.indexOf(reSBMark) == -1) {
+    if (inputs.indexOf(reSBMark, deckStart) == -1) {
         sBStart = inputs.indexOf(reSBComment, deckStart);
         if (sBStart == -1) {
             sBStart = inputs.indexOf(reEmpty, deckStart + 1);
             if (sBStart == -1) {
                 sBStart = max_line;
             }
-            if (inputs.indexOf(reEmpty, inputs.indexOf(reCardLine, sBStart + 1) + 1) != -1) {
+            int nextCard = inputs.indexOf(reCardLine, sBStart + 1);
+            if (inputs.indexOf(reEmpty, nextCard + 1) != -1) {
                 sBStart = max_line; // if there is another empty line all cards are mainboard
             }
         }
     }
 
     int index = 0;
+    QRegularExpressionMatch match;
 
     // parse name and comments
     while (index < deckStart) {
-        match = reComment.match(inputs.at(index));
-        ++index;
-        if (match.hasMatch()) {
+        const QString current = inputs.at(index++);
+        if (!current.contains(reEmpty)) {
+            match = reComment.match(current);
             name = match.captured();
             break;
         }
     }
     while (index < deckStart) {
-        match = reComment.match(inputs.at(index));
-        ++index;
-        if (match.hasMatch()) {
+        const QString current = inputs.at(index++);
+        if (!current.contains(reEmpty)) {
+            match = reComment.match(current);
             comments += match.captured() + '\n';
         }
     }
@@ -586,15 +587,11 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         cardName.remove(reDigitBrace); // all cards from un-sets that have a word in between round braces at the end
 
         // replace common differences in cardnames
-        cardName.replace(reApostrophe, apostrophe);
-        cardName.replace(reAE, ae);
-        cardName.replace(reSplit, splitSeparator);
-        cardName.replace(reAndSplit, splitSeparator);
+        for (auto diff = differences.constBegin(); diff != differences.constEnd(); ++diff) {
+            cardName.replace(diff.key(), diff.value());
+        }
 
-        // this is required by the load_card_from_clipboard test only, the client doesn't care
-        cardName = cardName.toLower();
-
-        // get cardname?
+        // get cardname, this function does nothing if the name is not found
         cardName = getCompleteCardName(cardName);
 
         // get zone name based on if it's in sideboard
