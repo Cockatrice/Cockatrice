@@ -82,7 +82,7 @@ Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Tra
 
 **Detailed compiling instructions are on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 
-Dependencies:
+Dependencies: *(for minimum requirements search our [CMake file](https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt))*
 - [Qt](https://www.qt.io/developers/)
 - [protobuf](https://github.com/google/protobuf)
 - [CMake](https://www.cmake.org/)
