@@ -489,11 +489,21 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     const QRegularExpression reBrace(" ?[\\[\\{][^\\]\\}]*[\\]\\}] ?"); // not nested
     const QRegularExpression reRoundBrace("^\\([^\\)]*\\) ?");          // () are only matched at start of string
     const QRegularExpression reDigitBrace(" ?\\(\\d*\\) ?");            // () are matched if containing digits
+#if QT_VERSION < 0x050905
+    // this is outdated, current QT versions support initializer lists
+    QHash<QRegularExpression, QString> differences;
+    differences.insert(QRegularExpression("’"), QString("'"));
+    differences.insert(QRegularExpression("Æ"), QString("Ae"));
+    differences.insert(QRegularExpression("æ"), QString("ae"));
+    differences.insert(QRegularExpression(" ?[|/]+ ?"), QString(" // "));
+    differences.insert(QRegularExpression("(?<![A-Z]) ?& ?"), QString(" // "));
+#else
     const QHash<QRegularExpression, QString> differences{{QRegularExpression("’"), QString("'")},
                                                          {QRegularExpression("Æ"), QString("Ae")},
                                                          {QRegularExpression("æ"), QString("ae")},
                                                          {QRegularExpression(" ?[|/]+ ?"), QString(" // ")},
                                                          {QRegularExpression("(?<![A-Z]) ?& ?"), QString(" // ")}};
+#endif
 
     cleanList();
 
