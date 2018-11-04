@@ -5,6 +5,14 @@
 #include <QRegularExpression>
 #include <QTextStream>
 
+#if QT_VERSION < 0x050600
+// qHash on QRegularExpression was added in 5.6, FIX IT
+uint qHash(const QRegularExpression &key, uint seed) noexcept
+{
+    return qHash(key.pattern(), seed); // call qHash on pattern QString instead
+}
+#endif
+
 SideboardPlan::SideboardPlan(const QString &_name, const QList<MoveCard_ToZone> &_moveList)
     : name(_name), moveList(_moveList)
 {
@@ -489,21 +497,11 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
     const QRegularExpression reBrace(" ?[\\[\\{][^\\]\\}]*[\\]\\}] ?"); // not nested
     const QRegularExpression reRoundBrace("^\\([^\\)]*\\) ?");          // () are only matched at start of string
     const QRegularExpression reDigitBrace(" ?\\(\\d*\\) ?");            // () are matched if containing digits
-#if QT_VERSION < 0x050600
-    // this is outdated, current QT versions support initializer lists
-    QHash<QRegularExpression, QString> differences;
-    differences[QRegularExpression("’")] = QString("'");
-    differences[QRegularExpression("Æ")] = QString("Ae");
-    differences[QRegularExpression("æ")] = QString("ae");
-    differences[QRegularExpression(" ?[|/]+ ?")] = QString(" // ");
-    differences[QRegularExpression("(?<![A-Z]) ?& ?")] = QString(" // ");
-#else
     const QHash<QRegularExpression, QString> differences{{QRegularExpression("’"), QString("'")},
                                                          {QRegularExpression("Æ"), QString("Ae")},
                                                          {QRegularExpression("æ"), QString("ae")},
                                                          {QRegularExpression(" ?[|/]+ ?"), QString(" // ")},
                                                          {QRegularExpression("(?<![A-Z]) ?& ?"), QString(" // ")}};
-#endif
 
     cleanList();
 
