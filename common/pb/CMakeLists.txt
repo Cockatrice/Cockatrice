@@ -169,15 +169,11 @@ if (UNIX)
 endif (UNIX)
 target_link_libraries(cockatrice_protocol ${cockatrice_protocol_LIBS})
 
-# ubuntu uses an outdated package for protobuf1
-exec_program(
-    protoc
-    ARGS --version
-    OUTPUT_VARIABLE protoc_version)
-if(${protoc_version} MATCHES "^libprotoc (3\\.0\\.[0-9]+|[0-2]+\\.[0-9]+\\.[0-9]+)$")
+# ubuntu uses an outdated package for protobuf, 3.5.0 is required
+# see https://bugs.launchpad.net/ubuntu/+source/protobuf/+bug/1732566
+if(${Protobuf_VERSION} VERSION_LESS "3.5.0")
     # set debug flags to release flags, avoiding failures on warnings
     set(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_RELEASE})
-    # this should be resolved on further releases of protobuf
-    message(WARNING "Outdated protobuf version found (${protoc_version}), "
+    message(WARNING "Outdated protobuf version found (${Protobuf_VERSION} < 3.5.0), "
         "disabled warnings to avoid compilation errors.")
 endif()
