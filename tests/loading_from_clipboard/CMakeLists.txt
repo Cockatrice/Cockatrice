@@ -1,6 +1,7 @@
 ADD_DEFINITIONS("-DCARDDB_DATADIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"")
 add_executable(loading_from_clipboard_test
         loading_from_clipboard_test.cpp
+        clipboard_testing.cpp
         ../../common/decklist.cpp
         )
 
