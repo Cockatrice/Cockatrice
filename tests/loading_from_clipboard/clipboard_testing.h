@@ -1,3 +1,6 @@
+#ifndef CLIPBOARD_TESTING_H
+#define CLIPBOARD_TESTING_H
+
 #include "../../common/decklist.h"
 #include "gtest/gtest.h"
 
@@ -25,3 +28,5 @@ struct Result
 void testEmpty(const QString &clipboard);
 
 void testDeck(const QString &clipboard, const Result &result);
+
+#endif // CLIPBOARD_TESTING_H
