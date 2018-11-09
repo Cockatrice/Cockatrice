@@ -168,3 +168,12 @@ if (UNIX)
     set(cockatrice_protocol_LIBS ${cockatrice_protocol_LIBS} -lpthread)
 endif (UNIX)
 target_link_libraries(cockatrice_protocol ${cockatrice_protocol_LIBS})
+
+# ubuntu uses an outdated package for protobuf, 3.1.0 is required
+if(${Protobuf_VERSION} VERSION_LESS "3.1.0")
+    # remove unused parameter and misleading indentation warnings when compiling to avoid errors
+    set(CMAKE_CXX_FLAGS_DEBUG 
+        "${CMAKE_CXX_FLAGS_DEBUG} -Wno-unused-parameter -Wno-misleading-indentation")
+    message(WARNING "Outdated protobuf version found (${Protobuf_VERSION} < 3.1.0), "
+        "disabled warnings to avoid compilation errors.")
+endif()
