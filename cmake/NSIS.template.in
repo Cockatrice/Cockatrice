@@ -247,20 +247,20 @@ ${If} $PortableMode = 0
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMajor" "@CPACK_PACKAGE_VERSION_MAJOR@"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMinor" "@CPACK_PACKAGE_VERSION_MINOR@"
 
-	IfFileExists "$INSTDIR\vc_redist.x86.exe" VcRedist86Exists PastVcRedist86Check
+	IfFileExists "$INSTDIR\vcredist_x86.exe" VcRedist86Exists PastVcRedist86Check
 	VcRedist86Exists:
-		ExecWait '"$INSTDIR\vc_redist.x86.exe" /passive /norestart'
+		ExecWait '"$INSTDIR\vcredist_x86.exe" /passive /norestart'
 		DetailPrint "Sleep to ensure unlock of vc_redist file after installation..."
 		Sleep 3000
-		Delete "$INSTDIR\vc_redist.x86.exe"
+		Delete "$INSTDIR\vcredist_x86.exe"
 	PastVcRedist86Check:
 
-	IfFileExists "$INSTDIR\vc_redist.x64.exe" VcRedist64Exists PastVcRedist64Check
+	IfFileExists "$INSTDIR\vcredist_x64.exe" VcRedist64Exists PastVcRedist64Check
 	VcRedist64Exists:
-		ExecWait '"$INSTDIR\vc_redist.x64.exe" /passive /norestart'
+		ExecWait '"$INSTDIR\vcredist_x64.exe" /passive /norestart'
 		DetailPrint "Sleep to ensure unlock of vc_redist file after installation..."
 		Sleep 3000
-		Delete "$INSTDIR\vc_redist.x64.exe"
+		Delete "$INSTDIR\vcredist_x64.exe"
 	PastVcRedist64Check:
 
 ${Else}
