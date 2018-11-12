@@ -33,6 +33,11 @@ while [[ $@ ]]; do
       set_branch=1
       shift 2
       ;;
+    '-c'|'--color-diff')
+      color=" --color=always"
+      mode=diff
+      shift
+      ;;
     '-d'|'--diff')
       mode=diff
       shift
@@ -59,8 +64,12 @@ OPTIONS:
         To not compare to a branch this has to be explicitly set to "".
         When not comparing to a branch git will not be used at all and all valid files will be parsed.
 
+    -c, --color-diff
+        Display a colored diff. Implies --diff.
+        Only available on systems which support 'diff --color'.
+
     -d, --diff
-        Display a colored diff. Implies --test.
+        Display a diff. Implies --test.
 
     -h, --help
         Display this message and exit.
@@ -148,7 +157,7 @@ case $mode in
   diff)
     declare -i code=0
     for name in ${names[@]}; do
-      if ! $cf_cmd "$name" | diff "$name" - -p --color=always; then
+      if ! $cf_cmd "$name" | diff "$name" - -p $color; then
         code=1
       fi
     done
