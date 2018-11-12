@@ -43,7 +43,7 @@ A bash script to format your code using clang-format.
 If no options are given, all dirty files are edited in place.
 If <dir>s are given, all source files in those directories are checked, recursively.
 
-USAGE: $0 [option] [-b <git branch or object>] [<dir> ...]
+USAGE: $0 [option] [-b[ranch] <git branch or object>] [<dir> ...]
 
 DEFAULTS:
 Default includes are:
@@ -53,25 +53,25 @@ Default excludes are:
   ${exclude[@]/%/
  }
 OPTIONS:
-    -h, --help
-        Display this message and exit.
-
     -b, --branch <branch>
         Compare to this git branch and format only files that differ.
         If unspecified it defaults to origin/master.
         To not compare to a branch this has to be explicitly set to "".
         When not comparing to a branch git will not be used at all and all valid files will be parsed.
 
-    -t, --test
-        Do not edit files in place. Set exit code to 1 if changes are required.
-
     -d, --diff
         Display a colored diff. Implies --test.
+
+    -h, --help
+        Display this message and exit.
 
     -n, --names
         Display a list of filenames that require formatting. Implies --test.
 
-ERROR CODES:
+    -t, --test
+        Do not edit files in place. Set exit code to 1 if changes are required.
+
+EXIT CODES:
     0 on a successful format or if no files require formatting.
     1 if a file requires formatting.
     2 if given incorrect arguments.
@@ -146,25 +146,27 @@ fi
 # format
 case $mode in
   diff)
+    declare -i code=0
     for name in ${names[@]}; do
-      $cf_cmd $name | diff $name - -p --color=always
+      if ! $cf_cmd "$name" | diff "$name" - -p --color=always; then
+        code=1
+      fi
     done
+    exit $code
     ;;
   name)
-    code=0
+    declare -i code=0
     for name in ${names[@]}; do
-      if $cf_cmd $name | diff $name - -q >/dev/null; then
+      if ! $cf_cmd "$name" | diff "$name" - -q >/dev/null; then
+        echo "$name"
         code=1
-        echo $name
       fi
     done
     exit $code
     ;;
   code)
     for name in ${names[@]}; do
-      if $cf_cmd $name | diff $name - -q >/dev/null; then
-        exit 1
-      fi
+      $cf_cmd "$name" | diff "$name" - -q >/dev/null || exit 1
     done
     ;;
   *)
