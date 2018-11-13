@@ -4,50 +4,65 @@ cache: ccache
 
 matrix:
   include:
-  #Ubuntu
-  - name: Ubuntu (Debug)
+  #Ubuntu Bionic (on docker)
+  - name: Ubuntu Bionic (Debug)
+    if: tag IS NOT present
+    services: docker
+    before_install: docker build -t img .ci
+    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src" img
+          bash .ci/travis-compile.sh --server "Debug"
+  - name: Ubuntu Bionic (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    services: docker
+    script: docker build -t img .ci &&
+        docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src" img
+          bash .ci/travis-compile.sh --server --package "Release"
+
+  #Ubuntu Xenial (Debug only)
+  - name: Ubuntu Xenial (Debug)
     if: tag IS NOT present
     os: linux
     dist: xenial
     group: stable
-    env: BUILDTYPE=Debug
-  - name: Ubuntu (Release)
-    if: (branch = master AND NOT type = pull_request) OR tag IS present
-    os: linux
-    dist: xenial
-    group: stable
-    env: BUILDTYPE=Release
+    addons:
+      apt:
+        packages:
+        - libprotobuf-dev
+        - protobuf-compiler
+        - qt5-default
+        - qttools5-dev
+        - qttools5-dev-tools
+        - qtmultimedia5-dev
+        - libqt5multimedia5-plugins
+        - libqt5svg5-dev
+        - libqt5sql5-mysql
+        - libqt5websockets5-dev
+    script: bash ./.ci/travis-compile.sh --format --server --test
+
   #macOS
   - name: macOS (Debug)
-    if: tag IS NOT present
     os: osx
     osx_image: xcode8
-    env: BUILDTYPE=Debug
+    before_install:
+      - brew update
+      - brew update
+      - brew install ccache
+      - brew unlink python # protobuf python2 install requires this link to be removed
+      - brew install protobuf
+      - brew install qt
+    script: bash ./.ci/travis-compile.sh --server --install "Debug"
   - name: macOS (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode8
-    env: BUILDTYPE=Release
-
-#install dependencies for container-based "linux" builds
-addons:
-  apt:
-    packages:
-    - libprotobuf-dev
-    - protobuf-compiler
-    - qt5-default
-    - qttools5-dev
-    - qttools5-dev-tools
-    - qtmultimedia5-dev
-    - libqt5multimedia5-plugins
-    - libqt5svg5-dev
-    - libqt5sql5-mysql
-    - libqt5websockets5-dev
-
-
-before_install: bash ./.ci/travis-dependencies.sh
-
-script: bash ./.ci/travis-compile.sh
+    before_install:
+      - brew update
+      - brew update
+      - brew install ccache
+      - brew unlink python # protobuf python2 install requires this link to be removed
+      - brew install protobuf
+      - brew install qt
+    script: bash ./.ci/travis-compile.sh --server --package "Release"
 
 
 # Builds for pull requests skip the deployment step altogether

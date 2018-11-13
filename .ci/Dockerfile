@@ -1,0 +1,20 @@
+FROM ubuntu:bionic
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        bc \
+        build-essential \
+        clang-format \
+        g++ \
+        git \
+        cmake \
+        libprotobuf-dev \
+        libqt5multimedia5-plugins \
+        libqt5svg5-dev \
+        libqt5sql5-mysql \
+        libqt5websockets5-dev \
+        protobuf-compiler \
+        qt5-default \
+        qttools5-dev \
+        qttools5-dev-tools \
+        qtmultimedia5-dev \
+    && rm -rf /var/lib/apt/lists/*
