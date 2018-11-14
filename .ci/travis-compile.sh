@@ -2,7 +2,7 @@
 
 # This script is to be used in .travis.yaml from the project root directory, do not use it from somewhere else.
 
-set -e
+set -ex
 
 while [[ "$@" ]]; do
   case "$1" in
@@ -68,7 +68,7 @@ fi
 
 # Add qt install location when using brew
 if [[ $(uname) == "Darwin" ]]; then
-  export PATH="/usr/local/opt/ccache/bin:$PATH"
+  PATH="/usr/local/opt/ccache/bin:$PATH"
   flags+=" -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5/"
 fi
 
