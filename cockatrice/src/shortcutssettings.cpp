@@ -253,6 +253,10 @@ void ShortcutsSettings::fillDefaultShorcuts()
     defaultShortCuts["Player/aMoveToGraveyard"] = parseSequenceString("Ctrl+Del");
     defaultShortCuts["Player/aMoveToHand"] = parseSequenceString("");
     defaultShortCuts["Player/aMoveToTopLibrary"] = parseSequenceString("");
+    defaultShortCuts["Player/aMoveTopCardToGraveyard"] = parseSequenceString("Ctrl+Alt+D");
+    defaultShortCuts["Player/aMoveTopCardsToGraveyard"] = parseSequenceString("Ctrl+Alt+E");
+    defaultShortCuts["Player/aMoveTopCardToExile"] = parseSequenceString("");
+    defaultShortCuts["Player/aMoveTopCardsToExile"] = parseSequenceString("");
     defaultShortCuts["Player/aMulligan"] = parseSequenceString("Ctrl+M");
     defaultShortCuts["Player/aPeek"] = parseSequenceString("");
     defaultShortCuts["Player/aPlay"] = parseSequenceString("");

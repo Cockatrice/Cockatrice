@@ -219,6 +219,10 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         connect(aMulligan, SIGNAL(triggered()), this, SLOT(actMulligan()));
         aMoveTopToPlayFaceDown = new QAction(this);
         connect(aMoveTopToPlayFaceDown, SIGNAL(triggered()), this, SLOT(actMoveTopCardToPlayFaceDown()));
+        aMoveTopCardToGrave = new QAction(this);
+        connect(aMoveTopCardToGrave, SIGNAL(triggered()), this, SLOT(actMoveTopCardToGrave()));
+        aMoveTopCardToExile = new QAction(this);
+        connect(aMoveTopCardToExile, SIGNAL(triggered()), this, SLOT(actMoveTopCardToExile()));
         aMoveTopCardsToGrave = new QAction(this);
         connect(aMoveTopCardsToGrave, SIGNAL(triggered()), this, SLOT(actMoveTopCardsToGrave()));
         aMoveTopCardsToExile = new QAction(this);
@@ -266,6 +270,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         libraryMenu->addAction(aMoveTopCardToBottom);
         libraryMenu->addAction(aMoveBottomCardToGrave);
         libraryMenu->addSeparator();
+        libraryMenu->addAction(aMoveTopCardToGrave);
+        libraryMenu->addAction(aMoveTopCardToExile);
         libraryMenu->addAction(aMoveTopCardsToGrave);
         libraryMenu->addAction(aMoveTopCardsToExile);
         libraryMenu->addSeparator();
@@ -652,6 +658,8 @@ void Player::retranslateUi()
         aMulligan->setText(tr("Take &mulligan"));
         aShuffle->setText(tr("&Shuffle"));
         aMoveTopToPlayFaceDown->setText(tr("Play top card &face down"));
+        aMoveTopCardToGrave->setText(tr("Move top card to &graveyard"));
+        aMoveTopCardToExile->setText(tr("Move top card to &exile"));
         aMoveTopCardsToGrave->setText(tr("Move top cards to &graveyard..."));
         aMoveTopCardsToExile->setText(tr("Move top cards to &exile..."));
         aMoveTopCardToBottom->setText(tr("Put top card on &bottom"));
@@ -956,6 +964,38 @@ void Player::actDrawCards()
 void Player::actUndoDraw()
 {
     sendGameCommand(Command_UndoDraw());
+}
+
+void Player::actMoveTopCardToGrave()
+{
+    if (zones.value("deck")->getCards().size() == 0)
+      return;
+
+    Command_MoveCard cmd;
+    cmd.set_start_zone("deck");
+    cmd.mutable_cards_to_move()->add_card()->set_card_id(0);
+    cmd.set_target_player_id(getId());
+    cmd.set_target_zone("grave");
+    cmd.set_x(0);
+    cmd.set_y(0);
+
+    sendGameCommand(cmd);
+}
+
+void Player::actMoveTopCardToExile()
+{
+    if (zones.value("deck")->getCards().size() == 0)
+      return;
+
+    Command_MoveCard cmd;
+    cmd.set_start_zone("deck");
+    cmd.mutable_cards_to_move()->add_card()->set_card_id(0);
+    cmd.set_target_player_id(getId());
+    cmd.set_target_zone("rfg");
+    cmd.set_x(0);
+    cmd.set_y(0);
+
+    sendGameCommand(cmd);
 }
 
 void Player::actMoveTopCardsToGrave()
