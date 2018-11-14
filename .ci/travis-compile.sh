@@ -26,6 +26,14 @@ while [[ "$@" ]]; do
       MAKE_TEST=1
       shift
       ;;
+    '--debug')
+      BUILDTYPE="Debug"
+      shift
+      ;;
+    '--release')
+      BUILDTYPE="Release"
+      shift
+      ;;
     *)
       BUILDTYPE="$1"
       shift
@@ -55,12 +63,13 @@ fi
 mkdir -p build
 cd build
 
-# Add flags
+# Add cmake flags
 if [[ $MAKE_SERVER ]]; then
   flags+=" -DWITH_SERVER=1"
 fi
 if [[ $MAKE_TEST ]]; then
   flags+=" -DTEST=1"
+  BUILDTYPE="Debug" # test requires buildtype Debug
 fi
 if [[ $BUILDTYPE ]]; then
   flags+=" -DCMAKE_BUILD_TYPE=$BUILDTYPE"
