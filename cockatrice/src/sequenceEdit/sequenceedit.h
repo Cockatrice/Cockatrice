@@ -12,8 +12,8 @@ class SequenceEdit : public QWidget
 {
     Q_OBJECT
 public:
-    SequenceEdit(QString _shorcutName, QWidget *parent = nullptr);
-    QString getSecuence();
+    SequenceEdit(QString _shortcutName, QWidget *parent = nullptr);
+    QString getSequence();
     void refreshShortcut();
     void clear();
 
@@ -25,7 +25,7 @@ protected:
     bool eventFilter(QObject *, QEvent *event);
 
 private:
-    QString shorcutName;
+    QString shortcutName;
     QLineEdit *lineEdit;
     QPushButton *clearButton;
     QPushButton *defaultButton;

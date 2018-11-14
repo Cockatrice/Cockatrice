@@ -8,9 +8,9 @@
 #include <QToolTip>
 #include <utility>
 
-SequenceEdit::SequenceEdit(QString _shorcutName, QWidget *parent) : QWidget(parent)
+SequenceEdit::SequenceEdit(QString _shortcutName, QWidget *parent) : QWidget(parent)
 {
-    shorcutName = std::move(_shorcutName);
+    shortcutName = std::move(_shortcutName);
     currentKey = 0;
     keys = 0;
     valid = false;
@@ -42,10 +42,10 @@ SequenceEdit::SequenceEdit(QString _shorcutName, QWidget *parent) : QWidget(pare
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(restoreDefault()));
     lineEdit->installEventFilter(this);
 
-    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shorcutName));
+    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shortcutName));
 }
 
-QString SequenceEdit::getSecuence()
+QString SequenceEdit::getSequence()
 {
     return lineEdit->text();
 }
@@ -67,13 +67,13 @@ void SequenceEdit::removeLastShortcut()
 
 void SequenceEdit::restoreDefault()
 {
-    lineEdit->setText(settingsCache->shortcuts().getDefaultShortcutString(shorcutName));
+    lineEdit->setText(settingsCache->shortcuts().getDefaultShortcutString(shortcutName));
     updateSettings();
 }
 
 void SequenceEdit::refreshShortcut()
 {
-    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shorcutName));
+    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shortcutName));
 }
 
 void SequenceEdit::clear()
@@ -142,8 +142,8 @@ void SequenceEdit::finishShortcut()
     QKeySequence sequence(keys);
     if (!sequence.isEmpty() && valid) {
         QString sequenceString = sequence.toString();
-        if (settingsCache->shortcuts().isKeyAllowed(shorcutName, sequenceString)) {
-            if (settingsCache->shortcuts().isValid(shorcutName, sequenceString)) {
+        if (settingsCache->shortcuts().isKeyAllowed(shortcutName, sequenceString)) {
+            if (settingsCache->shortcuts().isValid(shortcutName, sequenceString)) {
                 if (!lineEdit->text().isEmpty()) {
                     if (lineEdit->text().contains(sequenceString)) {
                         return;
@@ -167,5 +167,5 @@ void SequenceEdit::finishShortcut()
 
 void SequenceEdit::updateSettings()
 {
-    settingsCache->shortcuts().setShortcuts(shorcutName, lineEdit->text());
+    settingsCache->shortcuts().setShortcuts(shortcutName, lineEdit->text());
 }
