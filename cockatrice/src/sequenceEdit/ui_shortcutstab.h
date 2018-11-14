@@ -1962,9 +1962,10 @@ public:
         groupBox_view->setTitle(QApplication::translate("shortcutsTab", "View", 0));
         lbl_Player_aViewGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard", 0));
         lbl_Player_aViewLibrary->setText(QApplication::translate("shortcutsTab", "Library", 0));
-        lbl_Player_aViewTopCards->setText(QApplication::translate("shortcutsTab", "Tops card of library", 0));
+        lbl_Player_aViewTopCards->setText(QApplication::translate("shortcutsTab", "Top cards of library", 0));
         lbl_Player_aViewSideboard->setText(QApplication::translate("shortcutsTab", "Sideboard", 0));
         lbl_Player_aViewRfg->setText(QApplication::translate("shortcutsTab", "Exile", 0));
+        lbl_GameView_aCloseMostRecentZoneView->setText(QApplication::translate("shortcutsTab", "Close recent view", 0));
         groupBox_moveDeck->setTitle(QApplication::translate("shortcutsTab", "Move top card to", 0));
         lbl_Player_aMoveTopCardToGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard Once", 0));
         lbl_Player_aMoveTopCardsToGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard Multiple", 0));
