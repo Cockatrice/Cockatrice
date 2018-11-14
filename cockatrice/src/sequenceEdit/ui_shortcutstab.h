@@ -1431,16 +1431,6 @@ public:
 
         gridLayout_gameplay->addWidget(Player_aDrawArrow, 0, 1, 1, 1);
 
-        lbl_TabGame_aLeaveGame = new QLabel(groupBox_gameplay);
-        lbl_TabGame_aLeaveGame->setObjectName("lbl_TabGame_aLeaveGame");
-
-        gridLayout_gameplay->addWidget(lbl_TabGame_aLeaveGame, 0, 2, 1, 1);
-
-        TabGame_aLeaveGame = new SequenceEdit("Player/aLeaveGame", groupBox_gameplay);
-        TabGame_aLeaveGame->setObjectName("TabGame_aLeaveGame");
-
-        gridLayout_gameplay->addWidget(TabGame_aLeaveGame, 0, 3, 1, 1);
-
         lbl_TabGame_aRemoveLocalArrows = new QLabel(groupBox_gameplay);
         lbl_TabGame_aRemoveLocalArrows->setObjectName("lbl_TabGame_aRemoveLocalArrows");
 
@@ -1454,54 +1444,64 @@ public:
         lbl_TabGame_aConcede = new QLabel(groupBox_gameplay);
         lbl_TabGame_aConcede->setObjectName("lbl_TabGame_aConcede");
 
-        gridLayout_gameplay->addWidget(lbl_TabGame_aConcede, 1, 2, 1, 1);
+        gridLayout_gameplay->addWidget(lbl_TabGame_aConcede, 2, 0, 1, 1);
 
         TabGame_aConcede = new SequenceEdit("Player/aConcede", groupBox_gameplay);
         TabGame_aConcede->setObjectName("TabGame_aConcede");
 
-        gridLayout_gameplay->addWidget(TabGame_aConcede, 1, 3, 1, 1);
+        gridLayout_gameplay->addWidget(TabGame_aConcede, 2, 1, 1, 1);
+
+        lbl_TabGame_aLeaveGame = new QLabel(groupBox_gameplay);
+        lbl_TabGame_aLeaveGame->setObjectName("lbl_TabGame_aLeaveGame");
+
+        gridLayout_gameplay->addWidget(lbl_TabGame_aLeaveGame, 3, 0, 1, 1);
+
+        TabGame_aLeaveGame = new SequenceEdit("Player/aLeaveGame", groupBox_gameplay);
+        TabGame_aLeaveGame->setObjectName("TabGame_aLeaveGame");
+
+        gridLayout_gameplay->addWidget(TabGame_aLeaveGame, 3, 1, 1, 1);
 
         lbl_Player_aRollDie = new QLabel(groupBox_gameplay);
         lbl_Player_aRollDie->setObjectName("lbl_Player_aRollDie");
 
-        gridLayout_gameplay->addWidget(lbl_Player_aRollDie, 2, 0, 1, 1);
+        gridLayout_gameplay->addWidget(lbl_Player_aRollDie, 4, 0, 1, 1);
 
         Player_aRollDie = new SequenceEdit("Player/aRollDie", groupBox_gameplay);
         Player_aRollDie->setObjectName("Player_aRollDie");
 
-        gridLayout_gameplay->addWidget(Player_aRollDie, 2, 1, 1, 1);
-
-        lbl_TabGame_aRotateViewCW = new QLabel(groupBox_gameplay);
-        lbl_TabGame_aRotateViewCW->setObjectName("lbl_TabGame_aRotateViewCW");
-
-        gridLayout_gameplay->addWidget(lbl_TabGame_aRotateViewCW, 2, 2, 1, 1);
-
-        TabGame_aRotateViewCW = new SequenceEdit("Player/aRotateViewCW", groupBox_gameplay);
-        TabGame_aRotateViewCW->setObjectName("TabGame_aRotateViewCW");
-
-        gridLayout_gameplay->addWidget(TabGame_aRotateViewCW, 2, 3, 1, 1);
+        gridLayout_gameplay->addWidget(Player_aRollDie, 4, 1, 1, 1);
 
         lbl_Player_aShuffle = new QLabel(groupBox_gameplay);
         lbl_Player_aShuffle->setObjectName("lbl_Player_aShuffle");
 
-        gridLayout_gameplay->addWidget(lbl_Player_aShuffle, 3, 0, 1, 1);
+        gridLayout_gameplay->addWidget(lbl_Player_aShuffle, 5, 0, 1, 1);
 
         Player_aShuffle = new SequenceEdit("Player/aShuffle", groupBox_gameplay);
         Player_aShuffle->setObjectName("Player_aShuffle");
 
-        gridLayout_gameplay->addWidget(Player_aShuffle, 3, 1, 1, 1);
+        gridLayout_gameplay->addWidget(Player_aShuffle, 5, 1, 1, 1);
+
+        lbl_TabGame_aRotateViewCW = new QLabel(groupBox_gameplay);
+        lbl_TabGame_aRotateViewCW->setObjectName("lbl_TabGame_aRotateViewCW");
+
+        gridLayout_gameplay->addWidget(lbl_TabGame_aRotateViewCW, 6, 0, 1, 1);
+
+        TabGame_aRotateViewCW = new SequenceEdit("Player/aRotateViewCW", groupBox_gameplay);
+        TabGame_aRotateViewCW->setObjectName("TabGame_aRotateViewCW");
+
+        gridLayout_gameplay->addWidget(TabGame_aRotateViewCW, 6, 1, 1, 1);
 
         lbl_TabGame_aRotateViewCCW = new QLabel(groupBox_gameplay);
         lbl_TabGame_aRotateViewCCW->setObjectName("lbl_TabGame_aRotateViewCCW");
 
-        gridLayout_gameplay->addWidget(lbl_TabGame_aRotateViewCCW, 3, 2, 1, 1);
+        gridLayout_gameplay->addWidget(lbl_TabGame_aRotateViewCCW, 7, 0, 1, 1);
 
         TabGame_aRotateViewCCW = new SequenceEdit("Player/aRotateViewCCW", groupBox_gameplay);
         TabGame_aRotateViewCCW->setObjectName("TabGame_aRotateViewCCW");
 
-        gridLayout_gameplay->addWidget(TabGame_aRotateViewCCW, 3, 3, 1, 1);
+        gridLayout_gameplay->addWidget(TabGame_aRotateViewCCW, 7, 1, 1, 1);
 
-        gridLayout_20->addWidget(groupBox_gameplay, 0, 0, 1, 2);
+        gridLayout_20->addWidget(groupBox_gameplay, 0, 0, 1, 1);
 
         groupBox_moveCard = new QGroupBox(tab_3);
         groupBox_moveCard->setObjectName("groupBox_moveCard");
@@ -1688,7 +1688,7 @@ public:
         Player_aAlwaysRevealTopCard->setObjectName("Player_aAlwaysRevealTopCard");
 
         gridLayout_draw->addWidget(Player_aAlwaysRevealTopCard, 3, 1, 1, 1);
-        gridLayout_20->addWidget(groupBox_draw, 0, 1, 1, 1);
+        gridLayout_20->addWidget(groupBox_draw, 1, 0, 1, 1);
 
         groupBox_moveDeck = new QGroupBox(tab_3);
         groupBox_moveDeck->setObjectName("groupBox_moveDeck");
@@ -1699,20 +1699,40 @@ public:
 
         gridLayout_moveDeck->addWidget(lbl_Player_aMoveTopCardToGraveyard, 0, 0, 1, 1);
 
+        Player_aMoveTopCardToGraveyard = new SequenceEdit("Player/aMoveTopCardToGraveyard", groupBox_moveDeck);
+        Player_aMoveTopCardToGraveyard->setObjectName("Player_aMoveTopCardToGraveyard");
+
+        gridLayout_moveDeck->addWidget(Player_aMoveTopCardToGraveyard, 0, 1, 1, 1);
+
+        lbl_Player_aMoveTopCardsToGraveyard = new QLabel(groupBox_moveDeck);
+        lbl_Player_aMoveTopCardsToGraveyard->setObjectName("lbl_Player_aMoveTopCardsToGraveyard");
+
+        gridLayout_moveDeck->addWidget(lbl_Player_aMoveTopCardsToGraveyard, 1, 0, 1, 1);
+
+        Player_aMoveTopCardsToGraveyard = new SequenceEdit("Player/aMoveTopCardsToGraveyard", groupBox_moveDeck);
+        Player_aMoveTopCardsToGraveyard->setObjectName("Player_aMoveTopCardsToGraveyard");
+
+        gridLayout_moveDeck->addWidget(Player_aMoveTopCardsToGraveyard, 1, 1, 1, 1);
+
         lbl_Player_aMoveTopCardToExile = new QLabel(groupBox_moveDeck);
         lbl_Player_aMoveTopCardToExile->setObjectName("lbl_Player_aMoveTopCardToExile");
 
-        gridLayout_moveDeck->addWidget(lbl_Player_aMoveTopCardToGraveyard, 1, 0, 1, 1);
+        gridLayout_moveDeck->addWidget(lbl_Player_aMoveTopCardToExile, 2, 0, 1, 1);
 
-        lbl_Player_aMoveTopCardsToGraveyard = new QLabel(groupBox_moveDeck);
-        lbl_Player_aMoveTopCardsToGraveyard->setObjectName("lbl_Player_aMoveTopCardToGraveyard");
+        Player_aMoveTopCardToExile = new SequenceEdit("Player/aMoveTopCardToExile", groupBox_moveDeck);
+        Player_aMoveTopCardToExile->setObjectName("Player_aMoveTopCardToExile");
 
-        gridLayout_moveDeck->addWidget(lbl_Player_aMoveTopCardsToGraveyard, 2, 0, 1, 1);
+        gridLayout_moveDeck->addWidget(Player_aMoveTopCardToExile, 2, 1, 1, 1);
 
         lbl_Player_aMoveTopCardsToExile = new QLabel(groupBox_moveDeck);
-        lbl_Player_aMoveTopCardsToExile->setObjectName("lbl_Player_aMoveTopCardToExile");
+        lbl_Player_aMoveTopCardsToExile->setObjectName("lbl_Player_aMoveTopCardsToExile");
 
-        gridLayout_moveDeck->addWidget(lbl_Player_aMoveTopCardsToGraveyard, 3, 0, 1, 1);
+        gridLayout_moveDeck->addWidget(lbl_Player_aMoveTopCardsToExile, 3, 0, 1, 1);
+
+        Player_aMoveTopCardsToExile = new SequenceEdit("Player/aMoveTopCardsToExile", groupBox_moveDeck);
+        Player_aMoveTopCardsToExile->setObjectName("Player_aMoveTopCardsToExile");
+
+        gridLayout_moveDeck->addWidget(Player_aMoveTopCardsToExile, 3, 1, 1, 1);
 
         gridLayout_20->addWidget(groupBox_moveDeck, 1, 1, 1, 1);
 

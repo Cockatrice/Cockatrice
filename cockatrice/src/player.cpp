@@ -969,7 +969,7 @@ void Player::actUndoDraw()
 void Player::actMoveTopCardToGrave()
 {
     if (zones.value("deck")->getCards().size() == 0)
-      return;
+        return;
 
     Command_MoveCard cmd;
     cmd.set_start_zone("deck");
@@ -985,7 +985,7 @@ void Player::actMoveTopCardToGrave()
 void Player::actMoveTopCardToExile()
 {
     if (zones.value("deck")->getCards().size() == 0)
-      return;
+        return;
 
     Command_MoveCard cmd;
     cmd.set_start_zone("deck");
