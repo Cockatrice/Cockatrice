@@ -455,7 +455,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 
     rearrangeZones();
     retranslateUi();
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 }
 

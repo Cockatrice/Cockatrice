@@ -1,20 +1,12 @@
 #include "sequenceedit.h"
 #include "../settingscache.h"
-#include <QEvent>
 #include <QHBoxLayout>
 #include <QKeyEvent>
-#include <QLineEdit>
-#include <QPushButton>
 #include <QToolTip>
 #include <utility>
 
-SequenceEdit::SequenceEdit(QString _shortcutName, QWidget *parent) : QWidget(parent)
+SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWidget(parent), shortcutName(_shortcutName)
 {
-    shortcutName = std::move(_shortcutName);
-    currentKey = 0;
-    keys = 0;
-    valid = false;
-
     lineEdit = new QLineEdit(this);
     clearButton = new QPushButton("", this);
     defaultButton = new QPushButton("", this);
@@ -52,10 +44,10 @@ QString SequenceEdit::getSequence()
 
 void SequenceEdit::removeLastShortcut()
 {
-    QString secuences = lineEdit->text();
-    if (!secuences.isEmpty()) {
-        if (secuences.lastIndexOf(";") > 0) {
-            QString valid = secuences.left(secuences.lastIndexOf(";"));
+    QString sequences = lineEdit->text();
+    if (!sequences.isEmpty()) {
+        if (sequences.lastIndexOf(";") > 0) {
+            QString valid = sequences.left(sequences.lastIndexOf(";"));
             lineEdit->setText(valid);
         } else {
             lineEdit->clear();
@@ -78,7 +70,7 @@ void SequenceEdit::refreshShortcut()
 
 void SequenceEdit::clear()
 {
-    this->lineEdit->setText("");
+    lineEdit->setText("");
 }
 
 bool SequenceEdit::eventFilter(QObject *, QEvent *event)
