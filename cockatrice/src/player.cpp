@@ -814,6 +814,10 @@ void Player::setShortcutsActive()
     aCreateAnotherToken->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateAnotherToken"));
     aAlwaysRevealTopCard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aAlwaysRevealTopCard"));
     aMoveTopToPlayFaceDown->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopToPlayFaceDown"));
+    aMoveTopCardToGraveyard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopCardToGraveyard"));
+    aMoveTopCardsToGraveyard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopCardsToGraveyard"));
+    aMoveTopCardToExile->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopCardToExile"));
+    aMoveTopCardsToExile->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopCardsToExile"));
 }
 
 void Player::setShortcutsInactive()
@@ -834,6 +838,11 @@ void Player::setShortcutsInactive()
     aCreateToken->setShortcut(QKeySequence());
     aCreateAnotherToken->setShortcut(QKeySequence());
     aAlwaysRevealTopCard->setShortcut(QKeySequence());
+    aMoveTopToPlayFaceDown->setShortcut(QKeySequence());
+    aMoveTopCardToGraveyard->setShortcut(QKeySequence());
+    aMoveTopCardsToGraveyard->setShortcut(QKeySequence());
+    aMoveTopCardToExile->setShortcut(QKeySequence());
+    aMoveTopCardsToExile->setShortcut(QKeySequence());
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
     while (counterIterator.hasNext())
