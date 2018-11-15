@@ -4,13 +4,8 @@
 # Never, ever, should this recieve a path with a newline in it. Don't bother proofing it for that.
 
 
-# use script dir and return on exit
-current=$PWD
-function cleanup {
-  cd $current
-}
-trap cleanup EXIT
-cd "${BASH_SOURCE%/*}/"
+# go to the project root directory, this file should be located in the project root directory
+cd "${BASH_SOURCE%/*}/" || exit 2 # could not find path, this could happen with special links etc.
 
 # defaults
 include=("common" \
@@ -80,6 +75,9 @@ OPTIONS:
     -t, --test
         Do not edit files in place. Set exit code to 1 if changes are required.
 
+    --cf-version
+        Print the version of clang-format being used before continuing.
+
 EXIT CODES:
     0 on a successful format or if no files require formatting.
     1 if a file requires formatting.
@@ -96,6 +94,8 @@ EOM
       mode=code
       shift
       ;;
+    '--cf-version')
+      print_version=1
     '--')
       shift
       ;;
@@ -151,6 +151,9 @@ names=$(<<<"$names" grep -v ${exclude[@]/#/-e ^})
 if ! [[ $names ]]; then
   exit 0 # nothing to format means format is successful!
 fi
+
+# optionally print version
+[[ $print_version ]] || $cf_cmd -version
 
 # format
 case $mode in

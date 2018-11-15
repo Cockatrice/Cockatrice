@@ -2,8 +2,9 @@
 
 # This script is to be used in .travis.yaml from the project root directory, do not use it from somewhere else.
 
-set -ex
+set -e
 
+# Read arguments
 while [[ "$@" ]]; do
   case "$1" in
     '--format')
@@ -41,25 +42,36 @@ while [[ "$@" ]]; do
   esac
 done
 
-./servatrice/check_schema_version.sh
-
 # Check formatting using clang-format
 if [[ $CHECK_FORMAT ]]; then
-  if ! files="$(./clangify.sh --names)"; then
+  echo "Checking your code using clang-format..."
+  if ! diff="$(./clangify.sh --color-diff --cf-version)"; then
     cat <<EOM
-*****************************************************
-***  This PR does not comply with our code style  ***
-***  Run ./clangify.sh to fix up any differences  ***
-***  Check our CONTRIBUTING.md file for details!  ***
-***                  Thank you ♥                  ***
-*****************************************************
-The following files should be reformatted:
-$files
+***********************************************************
+***                                                     ***
+***    Your code does not comply with our styleguide.   ***
+***                                                     ***
+***  Please correct it or run the "clangify.sh" script. ***
+***  Then commit and push those changes to this branch. ***
+***   Check our CONTRIBUTING.md file for more details.  ***
+***                                                     ***
+***                     Thank you ♥                     ***
+***                                                     ***
+***********************************************************
+
+The following changes should be made:
+$diff
+
+Exiting...
 EOM
     exit 2
+  else
+    echo "Thank you for complying with our code standards."
   fi
 fi
 
+# Setup
+./servatrice/check_schema_version.sh
 mkdir -p build
 cd build
 
@@ -81,6 +93,7 @@ if [[ $(uname) == "Darwin" ]]; then
   flags+=" -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5/"
 fi
 
+# Compile
 cmake --version
 cmake .. $flags
 make -j2
