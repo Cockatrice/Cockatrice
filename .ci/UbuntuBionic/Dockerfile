@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         bc \
         build-essential \
         clang-format \
+        file \
         g++ \
         git \
         cmake \
