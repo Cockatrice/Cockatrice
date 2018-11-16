@@ -16,7 +16,7 @@ matrix:
     services: docker
     script: docker build -t img .ci &&
         docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src" img
-          bash .ci/travis-compile.sh --server --package --release
+          bash .ci/travis-compile.sh --server --package "Ubuntu18.04" --release
 
   #Ubuntu Xenial (Debug only)
   - name: Ubuntu Xenial (Debug)
@@ -62,7 +62,7 @@ matrix:
       - brew unlink python # protobuf python2 install requires this link to be removed
       - brew install protobuf
       - brew install qt
-    script: bash ./.ci/travis-compile.sh --server --package --release
+    script: bash ./.ci/travis-compile.sh --server --package "" --release
 
 
 # Builds for pull requests skip the deployment step altogether
