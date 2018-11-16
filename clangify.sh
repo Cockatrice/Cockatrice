@@ -39,14 +39,19 @@ while [[ $@ ]]; do
       ;;
     '-h'|'--help')
       cat <<EOM
-A bash script to format your code using clang-format.
-If no options are given, all dirty files are edited in place.
-If <dir>s are given, all source files in those directories are checked, recursively.
+A bash script to automatically format your code using clang-format.
 
-USAGE: $0 [option] [-b[ranch] <git branch or object>] [<dir> ...]
+If no options are given, all dirty source files are edited in place.
+If <dir>s are given, all source files in those directories of the project root
+path are formatted. To only format changed files in these directories use the
+--branch option in combination. <dir> has to be a path relative to the project
+root path or a full path inside $PWD.
+. can not be specified as a dir, if you really want to format everything use */.
+
+USAGE: $0 [option] [--branch <git branch or object>] [<dir> ...]
 
 DEFAULTS:
-Default includes are:
+Current includes are:
   ${include[@]/%/
  }
 Default excludes are:
@@ -57,7 +62,8 @@ OPTIONS:
         Compare to this git branch and format only files that differ.
         If unspecified it defaults to origin/master.
         To not compare to a branch this has to be explicitly set to "".
-        When not comparing to a branch git will not be used at all and all valid files will be parsed.
+        When not comparing to a branch, git will not be used at all and every
+        source file in the entire project will be parsed.
 
     -c, --color-diff
         Display a colored diff. Implies --diff.
@@ -83,6 +89,15 @@ EXIT CODES:
     1 if a file requires formatting.
     2 if given incorrect arguments.
     3 if clang-format could not be found.
+
+EXAMPLES:
+    $0 --test \$PWD || echo "code requires formatting"
+        Tests if the source files in the current directory are correctly
+        formatted and prints an error message if formatting is required.
+
+    $0 --branch $USER/patch-2 ${include[0]}
+        Formats all changed files compared to the git branch "$USER/patch-2"
+        in the directory ${include[0]}.
 EOM
       exit 0
       ;;
@@ -96,24 +111,29 @@ EOM
       ;;
     '--cf-version')
       print_version=1
+      shift
+      ;;
     '--')
       shift
       ;;
     *)
-      include=() # empty includes
-      while [[ $@ ]]; do
-        if [[ -d $1 ]]; then
-          include+=("$1")
-          shift
-        else
-          echo "error in parsing arguments of $0: $1 is not a directory" >&2
+      if next_dir=$(cd "$1" && pwd); then
+        if [[ ${next_dir#$PWD/} == /* ]]; then
+          echo "error in parsing arguments of $0: $next_dir is not in $PWD" >&2
           exit 2 # input error
+        elif ! [[ $set_include ]]; then
+          include=() # remove default includes
+          set_include=1
         fi
-      done
+        include+=("${next_dir#$PWD/}")
+      else
+        echo "error in parsing arguments of $0: $PWD/$1 is not a directory" >&2
+        exit 2 # input error
+      fi
       if ! [[ $set_branch ]]; then
         unset branch # unset branch if not set explicitly
       fi
-      break
+      shift
       ;;
   esac
 done
@@ -153,7 +173,7 @@ if ! [[ $names ]]; then
 fi
 
 # optionally print version
-[[ $print_version ]] || $cf_cmd -version
+[[ $print_version ]] && $cf_cmd -version
 
 # format
 case $mode in
