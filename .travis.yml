@@ -8,14 +8,14 @@ matrix:
   - name: Ubuntu Bionic (Debug)
     if: tag IS NOT present
     services: docker
-    before_install: docker build -t img .ci
+    before_install: docker build -t img .ci/UbuntuBionic
     script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src" img
           bash .ci/travis-compile.sh --server --debug
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     services: docker
-    script: docker build -t img .ci &&
-        docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src" img
+    before_install: docker build -t img .ci/UbuntuBionic
+    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src" img
           bash .ci/travis-compile.sh --server --package "Ubuntu18.04" --release
 
   #Ubuntu Xenial (Debug only)
@@ -45,10 +45,8 @@ matrix:
     osx_image: xcode8
     before_install:
       - brew update
-      - brew update
       - brew install ccache
-      - brew unlink python # protobuf python2 install requires this link to be removed
-      - brew install protobuf
+      - brew install protobuf --without-python@2
       - brew install qt
     script: bash ./.ci/travis-compile.sh --server --install --debug
   - name: macOS (Release)
@@ -57,10 +55,8 @@ matrix:
     osx_image: xcode8
     before_install:
       - brew update
-      - brew update
       - brew install ccache
-      - brew unlink python # protobuf python2 install requires this link to be removed
-      - brew install protobuf
+      - brew install protobuf --without-python@2
       - brew install qt
     script: bash ./.ci/travis-compile.sh --server --package "" --release
 
