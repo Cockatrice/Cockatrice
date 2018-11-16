@@ -44,9 +44,9 @@ For consistency, we use Qt data structures where possible. For example, `QString
 
 ### Formatting ###
 
-The handy tool `clang-format` can format your code for you, a special `.clang-format` configuration file is included in the project that will be used for formatting. This tool is available for almost any environment.
+The handy tool `clang-format` can format your code for you, it is available for almost any environment. A special `.clang-format` configuration file is included in the project and is used to format your code.
 
-We've also included a bash script `clangify.sh` that will use clang-format to format all files in one go. Use `./clangify --help` to show a full help page.
+We've also included a bash script, `clangify.sh`, that will use clang-format to format all files in one go. Use `./clangify.sh --help` to show a full help page.
 
 To run clang-format on a single source file simply use the command `clang-format -i <filename>` to format it in place. (some systems install clang-format with a specific version number appended, `find /usr/bin -name clang-format*` should find it for you)
 
