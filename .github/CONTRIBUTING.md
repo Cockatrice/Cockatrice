@@ -25,7 +25,7 @@ If you have any questions on IDEs, feel free to chat with us on [Gitter](https:/
 
 We currently use Travis CI to check your code for formatting issues, if your pull request was rejected because of this it would show a message in the logs. Click on "Details" next to the failed Travis CI build and then click on the failed build (most likely the fastest one) to see the log.
 
-The message will look somewhat similar this:
+The message will look somewhat similar to this:
 ```
 ************************************************************
 *** Your code does not meet our formatting guidelines.   ***
