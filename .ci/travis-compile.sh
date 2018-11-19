@@ -46,7 +46,7 @@ done
 if [[ $CHECK_FORMAT ]]; then
   echo "Checking your code using clang-format..."
   if ! diff="$(./clangify.sh --color-diff --cf-version)"; then
-    cat <<EOM
+    [[ $? == 1 ]] && cat <<EOM
 ***********************************************************
 ***                                                     ***
 ***    Your code does not comply with our styleguide.   ***
