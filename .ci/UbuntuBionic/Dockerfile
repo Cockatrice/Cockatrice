@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         file \
         g++ \
         git \
+        ccache \
         cmake \
         libprotobuf-dev \
         libqt5multimedia5-plugins \
