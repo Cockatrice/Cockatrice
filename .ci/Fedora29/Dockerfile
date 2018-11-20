@@ -1,6 +1,6 @@
 FROM fedora:29
 
-RUN dnf install \
+RUN dnf install -y \
         ccache \
         cmake \
         desktop-file-utils \
