@@ -36,6 +36,10 @@ while [[ "$@" ]]; do
       shift
       ;;
     *)
+      if [[ $1 == -* ]]; then
+        echo "unrecognized option: $1"
+        exit 3
+      fi
       BUILDTYPE="$1"
       shift
       ;;
@@ -45,7 +49,7 @@ done
 # Check formatting using clang-format
 if [[ $CHECK_FORMAT ]]; then
   echo "Checking your code using clang-format..."
-  if ! diff="$(./clangify.sh --color-diff --cf-version)"; then
+  if ! diff="$(./clangify.sh --diff --cf-version)"; then
     cat <<EOM
 ***********************************************************
 ***                                                     ***
@@ -59,8 +63,13 @@ if [[ $CHECK_FORMAT ]]; then
 ***                                                     ***
 ***********************************************************
 
+Used clang-format version:
+${diff%%
+*}
+
 The following changes should be made:
-$diff
+${diff#*
+}
 
 Exiting...
 EOM
