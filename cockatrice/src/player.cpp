@@ -2815,70 +2815,46 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     if (card == nullptr || cardMenu == nullptr || card->getInfo() == nullptr)
         return;
 
-    QList<CardRelation *> relatedCards = QList<CardRelation *>();
-    relatedCards.append(card->getInfo()->getRelatedCards());
+    QList<CardRelation *> relatedCards(card->getInfo()->getRelatedCards());
     relatedCards.append(card->getInfo()->getReverseRelatedCards2Me());
+    if (relatedCards.empty())
+        return;
 
-    switch (relatedCards.length()) {
-        case 0:
-            break;
-        case 1: {
-            cardMenu->addSeparator();
-            QAction *createRelatedCards;
-            if (relatedCards.at(0)->getDoesAttach()) {
-                createRelatedCards =
-                    new QAction(tr("Token: ") + tr("Attach to ") + "\"" + relatedCards.at(0)->getName() + "\"", this);
-            } else
-                createRelatedCards = new QAction(
-                    tr("Token: ") +
-                        (relatedCards.at(0)->getIsVariable()
-                             ? "X "
-                             : QString(relatedCards.at(0)->getDefaultCount() == 1
-                                           ? QString()
-                                           : QString::number(relatedCards.at(0)->getDefaultCount()) + "x ")) +
-                        relatedCards.at(0)->getName(),
-                    this);
-            connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
-            if (shortcutsActive) {
-                createRelatedCards->setShortcut(
-                    settingsCache->shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
+    cardMenu->addSeparator();
+    int index = 0;
+    QAction *createRelatedCards = nullptr;
+    for (const CardRelation *cardRelation : relatedCards) {
+        QString cardName = cardRelation->getName();
+        QString text = tr("Token: ");
+        if (cardRelation->getDoesAttach())
+            text += tr("Attach to ") + "\"" + cardName + "\"";
+        else if (cardRelation->getIsVariable())
+            text += "X " + cardName;
+        else if (cardRelation->getDefaultCount() != 1)
+            text += QString(cardRelation->getDefaultCount()) + "x " + cardName;
+        else
+            text += cardName;
+
+        if (createRelatedCards == nullptr) {
+            if (relatedCards.length() == 1) {
+                createRelatedCards = new QAction(text, this); // set actCreateAllRelatedCards with this text
+                break; // do not set an individual entry as there is only one entry
+            } else {
+                createRelatedCards = new QAction(tr("All tokens"), this);
             }
-            cardMenu->addAction(createRelatedCards);
-            break;
         }
-        default: {
-            cardMenu->addSeparator();
-            int i = 0;
-            foreach (CardRelation *cardRelation, relatedCards) {
-                QString cardName = cardRelation->getName();
-                QAction *createRelated;
-                if (cardRelation->getDoesAttach())
-                    createRelated = new QAction(tr("Token: ") + tr("Attach to ") + "\"" + cardName + "\"", this);
-                else
-                    createRelated =
-                        new QAction(tr("Token: ") +
-                                        (cardRelation->getIsVariable()
-                                             ? "X "
-                                             : QString(cardRelation->getDefaultCount() == 1
-                                                           ? QString()
-                                                           : QString::number(cardRelation->getDefaultCount()) + "x ")) +
-                                        cardName,
-                                    this);
-                createRelated->setData(QVariant(i));
-                connect(createRelated, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
-                cardMenu->addAction(createRelated);
-                i++;
-            }
-            QAction *createRelatedCards = new QAction(tr("All tokens"), this);
-            connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
-            if (shortcutsActive) {
-                createRelatedCards->setShortcut(
-                    settingsCache->shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
-            }
-            cardMenu->addAction(createRelatedCards);
-            break;
-        }
+
+        QAction *createRelated = new QAction(text, this);
+        createRelated->setData(QVariant(index++));
+        connect(createRelated, SIGNAL(triggered()), this, SLOT(actCreateRelatedCard()));
+        cardMenu->addAction(createRelated);
     }
+
+    if (shortcutsActive) {
+        createRelatedCards->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
+    }
+    connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
+    cardMenu->addAction(createRelatedCards);
 }
 
 void Player::setCardMenu(QMenu *menu)
