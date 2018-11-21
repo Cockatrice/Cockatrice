@@ -45,6 +45,7 @@ matrix:
 
   #macOS
   - name: macOS (Debug)
+    if: tag IS NOT present
     os: osx
     osx_image: xcode8
     before_install:
