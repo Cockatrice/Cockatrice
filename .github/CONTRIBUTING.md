@@ -21,6 +21,20 @@ If you have any questions on IDEs, feel free to chat with us on [Gitter](https:/
 
 # Code Style Guide #
 
+### Formatting and continuous integration (ci) ###
+
+We currently use Travis CI to check your code for formatting issues, if your pull request was rejected because of this it would show a message in the logs. Click on "Details" next to the failed Travis CI build and then click on the failed build (most likely the fastest one) to see the log.
+
+The message will look somewhat similar to this:
+```
+************************************************************
+*** Your code does not meet our formatting guidelines.   ***
+*** Please correct it then commit and push your changes. ***
+*** See our CONTRIBUTING.md file for more information.   ***
+************************************************************
+```
+The CONTRIBUTING.md file mentioned is this file. Please read [this section](#Formatting) for full information on our formatting guidelines.
+
 ### Compatibility ###
 
 Cockatrice is currently compiled on all platforms using <kbd>C++11</kbd>. You'll notice <kbd>C++03</kbd> code throughout the codebase. Please feel free to help convert it over!
@@ -28,7 +42,17 @@ Cockatrice is currently compiled on all platforms using <kbd>C++11</kbd>. You'll
 For consistency, we use Qt data structures where possible. For example, `QString` over
 `std::string` and `QList` over `std::vector`.
 
-### Header files ###
+### Formatting ###
+
+The handy tool `clang-format` can format your code for you, it is available for almost any environment. A special `.clang-format` configuration file is included in the project and is used to format your code.
+
+We've also included a bash script, `clangify.sh`, that will use clang-format to format all files in one go. Use `./clangify.sh --help` to show a full help page.
+
+To run clang-format on a single source file simply use the command `clang-format -i <filename>` to format it in place. (some systems install clang-format with a specific version number appended, `find /usr/bin -name clang-format*` should find it for you)
+
+See [the clang-format documentation](https://clang.llvm.org/docs/ClangFormat.html) for more information about the tool.
+
+#### Header files ####
 
 Use header files with the extension `.h` and source files with the extension
 `.cpp`.
@@ -59,7 +83,7 @@ Group library includes after project includes, and in alphabetic order. Like thi
 #include <QList>
 ```
 
-### Naming ###
+#### Naming ####
 
 Use `UpperCamelCase` for classes, structs, enums, etc. and `lowerCamelCase` for
 function and variable names.
@@ -89,7 +113,7 @@ Bar& bar2 = *bar1;
 Use `nullptr` instead of `NULL` (or `0`) for null pointers.
 If you find any usage of the old keywords, we encourage you to fix it.
 
-### Braces ###
+#### Braces ####
 
 Braces should go on their own line except for control statements, the use of braces around single line statements is preferred.
 See the following example:
@@ -110,22 +134,19 @@ int main()
 }
 ```
 
-### Indentation and Spacing ###
+#### Indentation and Spacing ####
 
 Always indent using 4 spaces, do not use tabs. Opening and closing braces should be on the same indentation layer, member access specifiers in classes or structs should not be indented.
+
 All operators and braces should be separated by spaces, do not add a space next to the inside of a brace.
+
 If multiple lines of code that follow eachother have single line comments behind them, place all of them on the same indentation level. This indentation level should be equal to the longest line of code for each of these comments, without added spacing.
 
-### Lines ###
+#### Lines ####
 
-Do not have trailing whitespace in your lines, if possible. Most IDEs check for this nowadays and clean it up for you.
+Do not have trailing whitespace in your lines. Most IDEs check for this nowadays and clean it up for you.
 
-Lines should be 120 characters or less, but you can exceed this if you find it necessary.
-
-### Automatic Formatting ###
-
-The handy tool `clang-format` can format your code for you, a special `.clang-format` configuration file is included [here](https://github.com/Cockatrice/Cockatrice/blob/master/.clang-format).
-See [the clang-format documentation](https://clang.llvm.org/docs/ClangFormat.html) for more information.
+Lines should be 120 characters or less. Please break up lines that are too long into smaller parts, for example at spaces or after opening a brace.
 
 ### Memory Management ###
 
