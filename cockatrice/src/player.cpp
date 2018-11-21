@@ -745,45 +745,46 @@ void Player::retranslateUi()
 void Player::setShortcutsActive()
 {
     shortcutsActive = true;
+    ShortcutsSettings &shortcuts = settingsCache->shortcuts();
 
-    aPlay->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aPlay"));
-    aTap->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aTap"));
-    aDoesntUntap->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDoesntUntap"));
-    aFlip->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aFlip"));
-    aPeek->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aPeek"));
-    aClone->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aClone"));
-    aAttach->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aAttach"));
-    aUnattach->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aUnattach"));
-    aDrawArrow->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDrawArrow"));
-    aIncP->setShortcuts(settingsCache->shortcuts().getShortcut("Player/IncP"));
-    aDecP->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecP"));
-    aIncT->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncT"));
-    aDecT->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecT"));
-    aIncPT->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aIncPT"));
-    aDecPT->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aDecPT"));
-    aSetPT->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetPT"));
-    aResetPT->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aResetPT"));
-    aSetAnnotation->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aSetAnnotation"));
-    aMoveToTopLibrary->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aMoveToTopLibrary"));
-    aMoveToBottomLibrary->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aMoveToBottomLibrary"));
-    aMoveToHand->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aMoveToHand"));
-    aMoveToGraveyard->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aMoveToGraveyard"));
-    aMoveToExile->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aMoveToExile"));
+    aPlay->setShortcuts(shortcuts.getShortcut("Player/aPlay"));
+    aTap->setShortcuts(shortcuts.getShortcut("Player/aTap"));
+    aDoesntUntap->setShortcuts(shortcuts.getShortcut("Player/aDoesntUntap"));
+    aFlip->setShortcuts(shortcuts.getShortcut("Player/aFlip"));
+    aPeek->setShortcuts(shortcuts.getShortcut("Player/aPeek"));
+    aClone->setShortcuts(shortcuts.getShortcut("Player/aClone"));
+    aAttach->setShortcuts(shortcuts.getShortcut("Player/aAttach"));
+    aUnattach->setShortcuts(shortcuts.getShortcut("Player/aUnattach"));
+    aDrawArrow->setShortcuts(shortcuts.getShortcut("Player/aDrawArrow"));
+    aIncP->setShortcuts(shortcuts.getShortcut("Player/IncP"));
+    aDecP->setShortcuts(shortcuts.getShortcut("Player/aDecP"));
+    aIncT->setShortcuts(shortcuts.getShortcut("Player/aIncT"));
+    aDecT->setShortcuts(shortcuts.getShortcut("Player/aDecT"));
+    aIncPT->setShortcuts(shortcuts.getShortcut("Player/aIncPT"));
+    aDecPT->setShortcuts(shortcuts.getShortcut("Player/aDecPT"));
+    aSetPT->setShortcuts(shortcuts.getShortcut("Player/aSetPT"));
+    aResetPT->setShortcuts(shortcuts.getShortcut("Player/aResetPT"));
+    aSetAnnotation->setShortcuts(shortcuts.getShortcut("Player/aSetAnnotation"));
+    aMoveToTopLibrary->setShortcuts(shortcuts.getShortcut("Player/aMoveToTopLibrary"));
+    aMoveToBottomLibrary->setShortcuts(shortcuts.getShortcut("Player/aMoveToBottomLibrary"));
+    aMoveToHand->setShortcuts(shortcuts.getShortcut("Player/aMoveToHand"));
+    aMoveToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveToGraveyard"));
+    aMoveToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveToExile"));
 
     QList<QKeySequence> addCCShortCuts;
-    addCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut("Player/aCCRed"));
-    addCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut("Player/aCCYellow"));
-    addCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut("Player/aCCGreen"));
+    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCRed"));
+    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCYellow"));
+    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCGreen"));
 
     QList<QKeySequence> removeCCShortCuts;
-    removeCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut("Player/aRCRed"));
-    removeCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut("Player/aRCYellow"));
-    removeCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut("Player/aRCGreen"));
+    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCRed"));
+    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCYellow"));
+    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCGreen"));
 
     QList<QKeySequence> setCCShortCuts;
-    setCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut("Player/aSCRed"));
-    setCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut("Player/aSCYellow"));
-    setCCShortCuts.append(settingsCache->shortcuts().getSingleShortcut("Player/aSCGreen"));
+    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCRed"));
+    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCYellow"));
+    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCGreen"));
 
     for (int i = 0; i < aAddCounter.size(); ++i) {
         aAddCounter[i]->setShortcut(addCCShortCuts.at(i));
@@ -799,25 +800,25 @@ void Player::setShortcutsActive()
     while (counterIterator.hasNext())
         counterIterator.next().value()->setShortcutsActive();
 
-    aViewSideboard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aViewSideboard"));
-    aViewLibrary->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aViewLibrary"));
-    aViewTopCards->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aViewTopCards"));
-    aViewGraveyard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aViewGraveyard"));
-    aDrawCard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aDrawCard"));
-    aDrawCards->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aDrawCards"));
-    aUndoDraw->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aUndoDraw"));
-    aMulligan->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMulligan"));
-    aShuffle->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aShuffle"));
-    aUntapAll->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aUntapAll"));
-    aRollDie->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aRollDie"));
-    aCreateToken->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateToken"));
-    aCreateAnotherToken->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateAnotherToken"));
-    aAlwaysRevealTopCard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aAlwaysRevealTopCard"));
-    aMoveTopToPlayFaceDown->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopToPlayFaceDown"));
-    aMoveTopCardToGraveyard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopCardToGraveyard"));
-    aMoveTopCardsToGraveyard->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopCardsToGraveyard"));
-    aMoveTopCardToExile->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopCardToExile"));
-    aMoveTopCardsToExile->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aMoveTopCardsToExile"));
+    aViewSideboard->setShortcut(shortcuts.getSingleShortcut("Player/aViewSideboard"));
+    aViewLibrary->setShortcut(shortcuts.getSingleShortcut("Player/aViewLibrary"));
+    aViewTopCards->setShortcut(shortcuts.getSingleShortcut("Player/aViewTopCards"));
+    aViewGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aViewGraveyard"));
+    aDrawCard->setShortcut(shortcuts.getSingleShortcut("Player/aDrawCard"));
+    aDrawCards->setShortcut(shortcuts.getSingleShortcut("Player/aDrawCards"));
+    aUndoDraw->setShortcut(shortcuts.getSingleShortcut("Player/aUndoDraw"));
+    aMulligan->setShortcut(shortcuts.getSingleShortcut("Player/aMulligan"));
+    aShuffle->setShortcut(shortcuts.getSingleShortcut("Player/aShuffle"));
+    aUntapAll->setShortcut(shortcuts.getSingleShortcut("Player/aUntapAll"));
+    aRollDie->setShortcut(shortcuts.getSingleShortcut("Player/aRollDie"));
+    aCreateToken->setShortcut(shortcuts.getSingleShortcut("Player/aCreateToken"));
+    aCreateAnotherToken->setShortcut(shortcuts.getSingleShortcut("Player/aCreateAnotherToken"));
+    aAlwaysRevealTopCard->setShortcut(shortcuts.getSingleShortcut("Player/aAlwaysRevealTopCard"));
+    aMoveTopToPlayFaceDown->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopToPlayFaceDown"));
+    aMoveTopCardToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToGraveyard"));
+    aMoveTopCardsToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToGraveyard"));
+    aMoveTopCardToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToExile"));
+    aMoveTopCardsToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToExile"));
 }
 
 void Player::setShortcutsInactive()
