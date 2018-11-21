@@ -20,7 +20,7 @@ matrix:
     script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src" 
           --mount "type=bind,source=$HOME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
           img
-          bash .ci/travis-compile.sh --server --package --release
+          bash .ci/travis-compile.sh --server --package "Ubuntu18.04" --release
 
   #Ubuntu Xenial (Debug only)
   - name: Ubuntu Xenial (Debug)
@@ -63,7 +63,7 @@ matrix:
       - brew install ccache
       - brew install protobuf --without-python@2
       - brew install qt
-    script: bash ./.ci/travis-compile.sh --server --package --release
+    script: bash ./.ci/travis-compile.sh --server --package "" --release
 
 
 # Builds for pull requests skip the deployment step altogether
