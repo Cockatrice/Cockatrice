@@ -2716,6 +2716,9 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
+
+                addRelatedCardView(card, cardMenu);
+                addRelatedCardActions(card, cardMenu);
             } else {
                 // Card is in hand or a custom zone specified by server
                 cardMenu->addAction(aPlay);
