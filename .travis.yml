@@ -1,6 +1,5 @@
 language: cpp
 compiler: gcc
-cache: ccache
 
 matrix:
   include:
@@ -10,6 +9,7 @@ matrix:
     os: linux
     dist: xenial
     group: stable
+    cache: ccache
     addons:
       apt:
         packages:
@@ -29,17 +29,24 @@ matrix:
   - name: Ubuntu Bionic (Debug)
     if: tag IS NOT present
     services: docker
-    before_install: docker build -t img .ci/UbuntuBionic
+    cache:
+      directories:
+        - $HOME/UbuntuBionic/
+    before_install: docker build -t img .ci/UbuntuBionic && mkdir -p $HOME/UbuntuBionic/.ccache
     script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          --mount "type=bind,source=$HOME/UbuntuBionic/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
           img
           bash .ci/travis-compile.sh --server --debug
+
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     services: docker
-    before_install: docker build -t img .ci/UbuntuBionic
+    cache:
+      directories:
+        - $HOME/UbuntuBionic/
+    before_install: docker build -t img .ci/UbuntuBionic && mkdir -p $HOME/UbuntuBionic/.ccache
     script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          --mount "type=bind,source=$HOME/UbuntuBionic/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
           img
           bash .ci/travis-compile.sh --server --package --release
 
@@ -47,17 +54,24 @@ matrix:
   - name: Fedora 29 (Debug)
     if: tag IS NOT present
     services: docker
-    before_install: docker build -t img .ci/Fedora29
+    cache:
+      directories:
+        - $HOME/Fedora29/
+    before_install: docker build -t img .ci/Fedora29 && mkdir -p $HOME/Fedora29/.ccache
     script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          --mount "type=bind,source=$HOME/Fedora29/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
           img
           bash .ci/travis-compile.sh --server --debug
+
   - name: Fedora 29 (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     services: docker
-    before_install: docker build -t img .ci/Fedora29
+    cache:
+      directories:
+        - $HOME/Fedora29/
+    before_install: docker build -t img .ci/Fedora29 && mkdir -p $HOME/Fedora29/.ccache
     script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          --mount "type=bind,source=$HOME/Fedora29/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
           img
           bash .ci/travis-compile.sh --server --package --release
 
@@ -66,16 +80,19 @@ matrix:
     if: tag IS NOT present
     os: osx
     osx_image: xcode8
+    cache: ccache
     before_install:
       - brew update
       - brew install ccache
       - brew install protobuf --without-python@2
       - brew install qt
     script: bash ./.ci/travis-compile.sh --server --install --debug
+
   - name: macOS (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode8
+    cache: ccache
     before_install:
       - brew update
       - brew install ccache
