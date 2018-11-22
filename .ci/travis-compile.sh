@@ -122,11 +122,13 @@ fi
 if [[ $MAKE_PACKAGE ]]; then
   make package
   if [[ $PACKAGE_NAME ]]; then
-    file=$(find . -maxdepth 1 -type f -name "Cockatrice-*.*" -print -quit)
-    if [[ $file == "" ]]; then
+    found=$(find . -maxdepth 1 -type f -name "Cockatrice-*.*" -print -quit)
+    path=${found%/*}
+    file=${found##*/}
+    if [[ $file != *.* ]]; then
       echo "could not find package" >&2
       exit 1
     fi
-    mv "$file" "${file%%.*}-$PACKAGE_NAME.${file#*.}"
+    mv "$path/$file" "$path/${file%%.*}-$PACKAGE_NAME.${file#*.}"
   fi
 fi
