@@ -96,7 +96,7 @@ QString ShortcutsSettings::stringifySequence(const QList<QKeySequence> &Sequence
 QList<QKeySequence> ShortcutsSettings::parseSequenceString(const QString &stringSequence) const
 {
     QList<QKeySequence> SequenceList;
-    for (QString &shortcut : stringSequence.split(sep)) {
+    for (const QString &shortcut : stringSequence.split(sep)) {
         SequenceList.append(QKeySequence(shortcut, QKeySequence::PortableText));
     }
 
