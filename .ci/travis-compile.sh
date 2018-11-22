@@ -2,8 +2,6 @@
 
 # This script is to be used in .travis.yaml from the project root directory, do not use it from somewhere else.
 
-set -e
-
 # Read arguments
 while [[ "$@" ]]; do
   case "$1" in
@@ -50,8 +48,11 @@ done
 # Check formatting using clang-format
 if [[ $CHECK_FORMAT ]]; then
   echo "Checking your code using clang-format..."
-  if ! diff="$(./clangify.sh --diff --cf-version)"; then
-    [[ $? == 1 ]] && cat <<EOM
+  diff="$(./clangify.sh --diff --cf-version)"
+  ok=$?
+  case $ok in
+    1)
+      cat <<EOM
 ***********************************************************
 ***                                                     ***
 ***    Your code does not comply with our styleguide.   ***
@@ -74,11 +75,18 @@ ${diff#*
 
 Exiting...
 EOM
-    exit 2
-  else
-    echo "Thank you for complying with our code standards."
-  fi
+      exit 2
+      ;;
+    0)
+      echo "Thank you for complying with our code standards."
+      ;;
+    *)
+      echo "Something went wrong in our formatting checks: clangify returned $err" >&2
+      ;;
+  esac
 fi
+
+set -e
 
 # Setup
 ./servatrice/check_schema_version.sh
