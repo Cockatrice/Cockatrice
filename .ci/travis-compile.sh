@@ -17,8 +17,11 @@ while [[ "$@" ]]; do
       ;;
     '--package')
       MAKE_PACKAGE=1
-      PACKAGE_NAME="$2"
-      shift 2
+      shift
+      if [[ $1 != -* ]]; then
+        PACKAGE_NAME="$1"
+        shift
+      fi
       ;;
     '--server')
       MAKE_SERVER=1
