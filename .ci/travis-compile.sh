@@ -17,8 +17,11 @@ while [[ "$@" ]]; do
       ;;
     '--package')
       MAKE_PACKAGE=1
-      PACKAGE_NAME="$2"
-      shift 2
+      shift
+      if [[ $1 != -* ]]; then
+        PACKAGE_NAME="$1"
+        shift
+      fi
       ;;
     '--server')
       MAKE_SERVER=1
@@ -119,11 +122,13 @@ fi
 if [[ $MAKE_PACKAGE ]]; then
   make package
   if [[ $PACKAGE_NAME ]]; then
-    if file=$(find . -maxdepth 1 -type f -name Cockatrice-*.* -print -quit); then
-      mv "$file" "${file%%.*}-$PACKAGE_NAME.${file#*.}"
-    else
+    found=$(find . -maxdepth 1 -type f -name "Cockatrice-*.*" -print -quit)
+    path=${found%/*}
+    file=${found##*/}
+    if [[ $file != *.* ]]; then
       echo "could not find package" >&2
       exit 1
     fi
+    mv "$path/$file" "$path/${file%%.*}-$PACKAGE_NAME.${file#*.}"
   fi
 fi
