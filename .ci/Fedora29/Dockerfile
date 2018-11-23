@@ -5,6 +5,7 @@ RUN dnf install -y \
         ccache \
         cmake \
         desktop-file-utils \
+        file \
         gcc-c++ \
         hicolor-icon-theme \
         libappstream-glib \
