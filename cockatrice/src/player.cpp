@@ -2359,6 +2359,9 @@ void Player::actResetPT()
     while (selected.hasNext()) {
         CardItem *card = static_cast<CardItem *>(selected.next());
         CardInfoPtr info = card->getInfo();
+        if (!info) {
+            continue;
+        }
         Command_SetCardAttr *cmd = new Command_SetCardAttr;
         QString zoneName = card->getZone()->getName();
         cmd->set_zone(zoneName.toStdString());
