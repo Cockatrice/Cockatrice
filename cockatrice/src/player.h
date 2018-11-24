@@ -144,6 +144,8 @@ public slots:
     void actUndoDraw();
     void actMulligan();
     void actMoveTopCardToPlayFaceDown();
+    void actMoveTopCardToGrave();
+    void actMoveTopCardToExile();
     void actMoveTopCardsToGrave();
     void actMoveTopCardsToExile();
     void actMoveTopCardToBottom();
@@ -201,10 +203,10 @@ private:
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
         *aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg, *aMoveRfgToTopLibrary,
         *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave, *aViewLibrary, *aViewTopCards,
-        *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardsToGrave, *aMoveTopCardsToExile,
-        *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg, *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw,
-        *aMulligan, *aShuffle, *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
-        *aCardMenu, *aMoveBottomCardToGrave;
+        *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardToGraveyard, *aMoveTopCardToExile,
+        *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile, *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg,
+        *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlayFaceDown,
+        *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aCardMenu, *aMoveBottomCardToGrave;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,

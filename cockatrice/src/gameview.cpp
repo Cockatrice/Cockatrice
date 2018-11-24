@@ -22,7 +22,7 @@ GameView::GameView(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene
 
     connect(aCloseMostRecentZoneView, SIGNAL(triggered()), scene, SLOT(closeMostRecentZoneView()));
     addAction(aCloseMostRecentZoneView);
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
     rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 }

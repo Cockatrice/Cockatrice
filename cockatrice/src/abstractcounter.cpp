@@ -46,7 +46,7 @@ AbstractCounter::AbstractCounter(Player *_player,
     } else
         menu = nullptr;
 
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
     retranslateUi();
 }

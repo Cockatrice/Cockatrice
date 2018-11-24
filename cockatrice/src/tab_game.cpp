@@ -130,7 +130,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     setLayout(deckViewLayout);
 
     retranslateUi();
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 }
 
@@ -375,7 +375,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     createReplayMenuItems();
     createViewMenuItems();
     retranslateUi();
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
     messageLog->logReplayStarted(gameInfo.game_id());
 
@@ -414,7 +414,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     createMenuItems();
     createViewMenuItems();
     retranslateUi();
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 
     // append game to rooms game list for others to see
