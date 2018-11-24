@@ -4,7 +4,7 @@ set -e
 
 version_line="$(grep 'INSERT INTO cockatrice_schema_version' servatrice/servatrice.sql)"
 version_line="${version_line#*VALUES(}"
-declare -i schema_ver="${version_line%)*}"
+declare -i schema_ver="${version_line%%)*}"
 
 latest_migration="$(ls -1 servatrice/migrations/ | tail -n1)"
 xtoysql="${latest_migration#servatrice_}"
