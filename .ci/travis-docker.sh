@@ -69,7 +69,12 @@ if ! [[ -d $CACHE ]]; then
   echo "could not find cache dir: $CACHE" >&2
   unset CACHE
 else
-  img_save="$CACHE/$img.tar.gz"
+  img_dir="$CACHE/image"
+  img_save="$img_dir/$img.tar.gz"
+  if ! [[ -d $img_dir ]]; then
+    echo "could not find image dir: $img_dir" >&2
+    mkdir -p "$img_dir"
+  fi
   ccache_dir="$CACHE/.ccache"
   if ! [[ -d $ccache_dir ]]; then
     echo "could not find ccache dir: $ccache_dir" >&2
@@ -85,6 +90,8 @@ if [[ $GET ]]; then
     docker images
     unset BUILD # do not overwrite the loaded image with build
     unset SAVE # do not overwrite the stored image with the same image
+    cp -r "$ccache_dir" "$HOME/.ccache" # move our ccache dir to not change its contents
+    ccache_dir="$HOME/.ccache"
   else
     echo "could not load cached image, building instead" >&2
     BUILD=1
@@ -100,6 +107,7 @@ fi
 
 # Run compilation on the docker image
 if [[ $RUN ]]; then
+  echo "running image:"
   if docker images | grep "$img"; then
     args="--mount type=bind,source=$(pwd),target=/src -w=/src"
     if [[ $ccache_dir ]]; then
@@ -115,6 +123,7 @@ fi
 if [[ $SAVE ]]; then
   if [[ $img_save ]]; then
     docker save --output "$img_save" "$img"
+    echo "saved image to: $img_save"
   else
     echo "could not save image $img" >&2
   fi

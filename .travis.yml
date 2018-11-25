@@ -1,5 +1,3 @@
-language: cpp
-compiler: gcc
 
 git:
   depth: 15
@@ -12,6 +10,8 @@ matrix:
     os: linux
     dist: xenial
     group: stable
+    language: cpp
+    compiler: gcc
     cache: ccache
     addons:
       apt:
@@ -33,20 +33,24 @@ matrix:
   - name: Ubuntu Bionic (Debug)
     if: tag IS NOT present
     services: docker
+    language: minimal
     env: NAME=UbuntuBionic
     cache:
       directories:
-        - $HOME/$NAME/
+        - $HOME/$NAME/.ccache
+        - $HOME/$NAME/image
     before_install: bash .ci/travis-docker.sh --get --save
     script: bash .ci/travis-docker.sh --run "--server --debug"
 
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     services: docker
+    language: minimal
     env: NAME=UbuntuBionic
     cache:
       directories:
-        - $HOME/$NAME/
+        - $HOME/$NAME/.ccache
+        - $HOME/$NAME/image
     before_install: bash .ci/travis-docker.sh --build --save
     script: bash .ci/travis-docker.sh --run "--server --package $NAME --release"
 
@@ -54,20 +58,24 @@ matrix:
   - name: Fedora 29 (Debug)
     if: tag IS NOT present
     services: docker
+    language: minimal
     env: NAME=Fedora29
     cache:
       directories:
-        - $HOME/$NAME/
+        - $HOME/$NAME/.ccache
+        - $HOME/$NAME/image
     before_install: bash .ci/travis-docker.sh --get --save
     script: bash .ci/travis-docker.sh --run "--server --debug"
 
   - name: Fedora 29 (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     services: docker
+    language: minimal
     env: NAME=Fedora29
     cache:
       directories:
-        - $HOME/$NAME/
+        - $HOME/$NAME/.ccache
+        - $HOME/$NAME/image
     before_install: bash .ci/travis-docker.sh --build --save
     script: bash .ci/travis-docker.sh --run "--server --package $NAME RPM --release"
 
