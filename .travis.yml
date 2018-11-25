@@ -33,11 +33,8 @@ matrix:
     cache:
       directories:
         - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --debug
+    before_install: bash .ci/travis-docker.sh --get --save
+    script: bash .ci/travis-docker.sh --run "--server --debug"
 
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
@@ -46,11 +43,8 @@ matrix:
     cache:
       directories:
         - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --package "$NAME" --release
+    before_install: bash .ci/travis-docker.sh --build --save
+    script: bash .ci/travis-docker.sh --run "--server --package $NAME --release"
 
   #Fedora 29 (on docker)
   - name: Fedora 29 (Debug)
@@ -60,11 +54,8 @@ matrix:
     cache:
       directories:
         - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --debug
+    before_install: bash .ci/travis-docker.sh --get --save
+    script: bash .ci/travis-docker.sh --run "--server --debug"
 
   - name: Fedora 29 (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
@@ -73,18 +64,19 @@ matrix:
     cache:
       directories:
         - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --package "$NAME" --release
+    before_install: bash .ci/travis-docker.sh --build --save
+    script: bash .ci/travis-docker.sh --run "--server --package $NAME --release"
 
   #macOS
   - name: macOS (Debug)
     if: tag IS NOT present
     os: osx
     osx_image: xcode8
-    cache: ccache
+    cache:
+      - ccache
+      - directories:
+        - /usr/local/Cellar/protobuf
+        - /usr/local/Cellar/qt
     before_install:
       - brew update
       - brew install ccache
@@ -96,7 +88,11 @@ matrix:
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode8
-    cache: ccache
+    cache:
+      - ccache
+      - directories:
+        - /usr/local/Cellar/protobuf
+        - /usr/local/Cellar/qt
     before_install:
       - brew update
       - brew install ccache
