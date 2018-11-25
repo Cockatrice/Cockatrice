@@ -1,33 +1,15 @@
 language: cpp
 compiler: gcc
-cache: ccache
 
 matrix:
   include:
-  #Ubuntu Bionic (on docker)
-  - name: Ubuntu Bionic (Debug)
-    if: tag IS NOT present
-    services: docker
-    before_install: docker build -t img .ci/UbuntuBionic
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src" 
-          --mount "type=bind,source=$HOME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          img
-          bash .ci/travis-compile.sh --server --debug
-  - name: Ubuntu Bionic (Release)
-    if: (branch = master AND NOT type = pull_request) OR tag IS present
-    services: docker
-    before_install: docker build -t img .ci/UbuntuBionic
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src" 
-          --mount "type=bind,source=$HOME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          img
-          bash .ci/travis-compile.sh --server --package "Ubuntu18.04" --release
-
   #Ubuntu Xenial (Debug only)
   - name: Ubuntu Xenial (Debug)
     if: tag IS NOT present
     os: linux
     dist: xenial
     group: stable
+    cache: ccache
     addons:
       apt:
         packages:
@@ -43,27 +25,84 @@ matrix:
         - libqt5websockets5-dev
     script: bash ./.ci/travis-compile.sh --format --server --test --debug
 
+  #Ubuntu Bionic (on docker)
+  - name: Ubuntu Bionic (Debug)
+    if: tag IS NOT present
+    services: docker
+    env: NAME=UbuntuBionic
+    cache:
+      directories:
+        - $HOME/$NAME/
+    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
+    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
+          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          "cockatrice_${NAME,,}"
+          bash .ci/travis-compile.sh --server --debug
+
+  - name: Ubuntu Bionic (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    services: docker
+    env: NAME=UbuntuBionic
+    cache:
+      directories:
+        - $HOME/$NAME/
+    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
+    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
+          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          "cockatrice_${NAME,,}"
+          bash .ci/travis-compile.sh --server --package "$NAME" --release
+
+  #Fedora 29 (on docker)
+  - name: Fedora 29 (Debug)
+    if: tag IS NOT present
+    services: docker
+    env: NAME=Fedora29
+    cache:
+      directories:
+        - $HOME/$NAME/
+    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
+    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
+          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          "cockatrice_${NAME,,}"
+          bash .ci/travis-compile.sh --server --debug
+
+  - name: Fedora 29 (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    services: docker
+    env: NAME=Fedora29
+    cache:
+      directories:
+        - $HOME/$NAME/
+    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
+    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
+          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          "cockatrice_${NAME,,}"
+          bash .ci/travis-compile.sh --server --package "$NAME" --release
+
   #macOS
   - name: macOS (Debug)
     if: tag IS NOT present
     os: osx
     osx_image: xcode8
+    cache: ccache
     before_install:
       - brew update
       - brew install ccache
       - brew install protobuf --without-python@2
       - brew install qt
     script: bash ./.ci/travis-compile.sh --server --install --debug
+
   - name: macOS (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode8
+    cache: ccache
     before_install:
       - brew update
       - brew install ccache
       - brew install protobuf --without-python@2
       - brew install qt
-    script: bash ./.ci/travis-compile.sh --server --package "" --release
+    script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
 
 
 # Builds for pull requests skip the deployment step altogether

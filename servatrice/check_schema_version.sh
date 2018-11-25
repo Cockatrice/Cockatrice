@@ -2,13 +2,15 @@
 
 set -e
 
-schema_ver="$(grep 'INSERT INTO cockatrice_schema_version' servatrice/servatrice.sql | sed 's/.*VALUES(//' | sed 's/).*//')"
+version_line="$(grep 'INSERT INTO cockatrice_schema_version' servatrice/servatrice.sql)"
+version_line="${version_line#*VALUES(}"
+declare -i schema_ver="${version_line%%)*}"
 
 latest_migration="$(ls -1 servatrice/migrations/ | tail -n1)"
 xtoysql="${latest_migration#servatrice_}"
 xtoy="${xtoysql%.sql}"
-old_ver="$(echo ${xtoy%%_to_*} | bc)"
-new_ver="$(echo ${xtoy##*_to_} | bc)"
+declare -i old_ver="10#${xtoy%_to_*}" #declare as integer with base 10, numbers with a leading 0 are normally interpreted as base 16
+declare -i new_ver="10#${xtoy#*_to_}"
 
 if ((old_ver >= new_ver)); then
     echo "New version $new_ver is not newer than $old_ver"
