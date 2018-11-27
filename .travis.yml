@@ -79,37 +79,30 @@ matrix:
   - name: macOS (Debug)
     if: tag IS NOT present
     os: osx
-    osx_image: xcode8
+    osx_image: xcode9.2
     language: cpp
     compiler: gcc
     cache:
       - ccache
       - directories:
         - /usr/local/Cellar/protobuf
-        - /usr/local/Cellar/qt
     before_install:
       - brew update
       - brew install ccache
       - brew install protobuf --without-python@2
-      - bash -c "sleep 500; echo keep going" &
-      - bash -c "sleep 1000; echo you can do it" &
-      - bash -c "sleep 1500; echo I believe" &
-      - bash -c "sleep 2000; echo please" &
       - brew install qt
-      - kill %4 && kill %3 && kill %2 && kill %1 || true
     script: bash ./.ci/travis-compile.sh --server --install --debug
 
   - name: macOS (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
-    osx_image: xcode8
+    osx_image: xcode9.2
     language: cpp
     compiler: gcc
     cache:
       - ccache
       - directories:
         - /usr/local/Cellar/protobuf
-        - /usr/local/Cellar/qt
     before_install:
       - brew update
       - brew install ccache
