@@ -113,7 +113,6 @@ function RUN ()
     if [[ $CCACHE_DIR ]]; then
       args+=" --mount type=bind,source=$CCACHE_DIR,target=/.ccache -e CCACHE_DIR=/.ccache"
     fi
-    echo $args #debug
     docker run $args $RUN_ARGS "$IMAGE_NAME" bash ".ci/travis-compile.sh" $RUN_OPTS $@
     return $?
   else
