@@ -90,9 +90,11 @@ if [[ $GET ]]; then
     docker images
     unset BUILD # do not overwrite the loaded image with build
     unset SAVE # do not overwrite the stored image with the same image
-    export CACHE="/tmp/cache" # do not overwrite ccache and save it in tmp
-    mkdir -p "$CACHE"
-    cp -rn "$ccache_dir" "$CACHE/.ccache"
+    if [[ $(find "$ccache_dir" -print -quit) ]]; then
+      export CACHE="/tmp/cache" # do not overwrite ccache and save it in tmp
+      mkdir -p "$CACHE"
+      cp -rn "$ccache_dir" "$CACHE/.ccache"
+    fi
   else
     echo "could not load cached image, building instead" >&2
     BUILD=1
@@ -114,9 +116,12 @@ if [[ $RUN ]]; then
     if [[ $ccache_dir ]]; then
       args+=" --mount type=bind,source=$ccache_dir,target=/.ccache -e CCACHE_DIR=/.ccache"
     fi
+    set -x
     docker run $args $RUN_ARGS "$img" bash "$compile" $RUN_OPTS
+    set +x
   else
     echo "could not find docker image: $img" >&2
+    exit 1
   fi
 fi
 
