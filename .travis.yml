@@ -83,14 +83,10 @@ matrix:
     language: cpp
     compiler: gcc
     env: HOMEBREW_NO_AUTO_UPDATE=1
-    cache:
-      - ccache
-      - directories:
-        - /usr/local/Cellar/protobuf
-        - /usr/local/Homebrew/Library/Taps/
+    cache: ccache
     before_install:
       - brew install ccache
-      - brew link protobuf || brew install protobuf --without-python@2
+      - brew install protobuf
       - brew install qt
     script: bash .ci/travis-compile.sh --server --install --debug
 
@@ -100,15 +96,11 @@ matrix:
     osx_image: xcode9.2
     language: cpp
     compiler: gcc
-    cache:
-      - ccache
-      - directories:
-        - /usr/local/Cellar/protobuf
-        - /usr/local/Homebrew/Library/Taps/
+    cache: ccache
     before_install:
       - brew update
       - brew install ccache
-      - brew link protobuf || brew install protobuf --without-python@2
+      - brew install protobuf
       - brew install qt
     script: bash .ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
 
