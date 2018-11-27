@@ -91,6 +91,7 @@ if [[ $BUILD ]]; then
     docker images
   else
     echo "could not build image $IMAGE_NAME" >&2
+    return 1
   fi
 fi
 
