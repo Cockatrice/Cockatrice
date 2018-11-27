@@ -90,8 +90,9 @@ if [[ $GET ]]; then
     docker images
     unset BUILD # do not overwrite the loaded image with build
     unset SAVE # do not overwrite the stored image with the same image
-    if [[ $(find "$ccache_dir" -print -quit) ]]; then
+    if find "$ccache_dir/*" -print -quit; then
       export CACHE="/tmp/cache" # do not overwrite ccache and save it in tmp
+      echo "preserving cache to $CACHE"
       mkdir -p "$CACHE"
       cp -rn "$ccache_dir" "$CACHE/.ccache"
     fi
