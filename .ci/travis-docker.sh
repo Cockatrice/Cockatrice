@@ -70,11 +70,7 @@ if [[ $GET ]]; then
     unset BUILD # do not overwrite the loaded image with build
     unset SAVE # do not overwrite the stored image with the same image
     if [[ $(find "$CCACHE_DIR" -type f -print -quit) ]]; then # check contents of ccache
-      old_ccache="$CCACHE_DIR"
-      export CCACHE_DIR="/tmp/.ccache" # do not overwrite ccache and save it in tmp
-      echo "preserving ccache to $CCACHE_DIR"
-      mkdir -p "$CCACHE_DIR"
-      cp -rn "$old_ccache" "$CCACHE_DIR" # copy ccache to new dir
+      export RUN_ARGS="$RUN_ARGS -e CCACHE_READONLY=1" # do not overwrite ccache and save it in tmp
     else
       echo "ccache is empty: $(find "$CCACHE_DIR")" >&2
     fi
