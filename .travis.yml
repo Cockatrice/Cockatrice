@@ -23,7 +23,7 @@ matrix:
         - libqt5svg5-dev
         - libqt5sql5-mysql
         - libqt5websockets5-dev
-    script: bash ./.ci/travis-compile.sh --format --server --test --debug
+    script: bash .ci/travis-compile.sh --format --server --test --debug
 
   #Ubuntu Bionic (on docker)
   - name: Ubuntu Bionic (Debug)
@@ -35,8 +35,8 @@ matrix:
       directories:
         - $HOME/$NAME/.ccache
         - $HOME/$NAME/image
-    before_install: bash .ci/travis-docker.sh --get --save
-    script: bash .ci/travis-docker.sh --run "--server --debug"
+    before_install: source .ci/travis-docker.sh --get --save
+    script: RUN --server --debug
 
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
@@ -47,8 +47,8 @@ matrix:
       directories:
         - $HOME/$NAME/.ccache
         - $HOME/$NAME/image
-    before_install: bash .ci/travis-docker.sh --build --save
-    script: bash .ci/travis-docker.sh --run "--server --package $NAME --release"
+    before_install: source .ci/travis-docker.sh --build --save
+    script: RUN --server --package $NAME --release
 
   #Fedora 29 (on docker)
   - name: Fedora 29 (Debug)
@@ -60,8 +60,8 @@ matrix:
       directories:
         - $HOME/$NAME/.ccache
         - $HOME/$NAME/image
-    before_install: bash .ci/travis-docker.sh --get --save
-    script: bash .ci/travis-docker.sh --run "--server --debug"
+    before_install: source .ci/travis-docker.sh --get --save
+    script: RUN --server --debug
 
   - name: Fedora 29 (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
@@ -72,8 +72,8 @@ matrix:
       directories:
         - $HOME/$NAME/.ccache
         - $HOME/$NAME/image
-    before_install: bash .ci/travis-docker.sh --build --save
-    script: bash .ci/travis-docker.sh --run "--server --package $NAME --release"
+    before_install: source .ci/travis-docker.sh --build --save
+    script: RUN --server --package $NAME --release
 
   #macOS
   - name: macOS (Debug)
@@ -88,11 +88,11 @@ matrix:
         - /usr/local/Cellar/protobuf
         - /usr/local/Homebrew/Library/Taps/
     before_install:
-      - brew update --verbose
+      - HOMEBREW_NO_AUTO_UPDATE=1
       - brew install ccache
       - brew link protobuf || brew install protobuf --without-python@2
       - brew install qt
-    script: bash ./.ci/travis-compile.sh --server --install --debug
+    script: bash .ci/travis-compile.sh --server --install --debug
 
   - name: macOS (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
@@ -110,7 +110,7 @@ matrix:
       - brew install ccache
       - brew link protobuf || brew install protobuf --without-python@2
       - brew install qt
-    script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
+    script: bash .ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
 
 
 # Builds for pull requests skip the deployment step altogether
