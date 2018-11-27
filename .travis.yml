@@ -87,7 +87,7 @@ matrix:
       - directories:
         - /usr/local/Cellar/protobuf
     before_install:
-      - brew update ruby --verbose
+      - brew upgrade ruby --verbose
       - brew install ccache --verbose
       - brew link protobuf || brew install protobuf --without-python@2
       - brew install qt
