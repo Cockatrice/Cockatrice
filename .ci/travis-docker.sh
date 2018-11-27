@@ -90,6 +90,9 @@ if [[ $GET ]]; then
     docker images
     unset BUILD # do not overwrite the loaded image with build
     unset SAVE # do not overwrite the stored image with the same image
+    export CACHE="/tmp/cache" # do not overwrite ccache and save it in tmp
+    mkdir -p "$CACHE"
+    cp -rn "$ccache_dir" "$CACHE/.ccache"
   else
     echo "could not load cached image, building instead" >&2
     BUILD=1

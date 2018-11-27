@@ -89,7 +89,7 @@ matrix:
     before_install:
       - brew update
       - brew install ccache
-      - brew install protobuf --without-python@2
+      - brew link protobuf || brew install protobuf --without-python@2
       - brew install qt
     script: bash ./.ci/travis-compile.sh --server --install --debug
 
@@ -106,7 +106,7 @@ matrix:
     before_install:
       - brew update
       - brew install ccache
-      - brew install protobuf --without-python@2
+      - brew link protobuf || brew install protobuf --without-python@2
       - brew install qt
     script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
 
