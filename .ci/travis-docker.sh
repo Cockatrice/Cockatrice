@@ -44,7 +44,6 @@ if ! [[ -r $docker_dir/Dockerfile ]]; then
   return 2 # even if the image is cached, we do not want to run if there is no build file associated with this image
 fi
 
-[[ $CACHE ]] || export CACHE="$HOME/$NAME"
 if ! [[ -d $CACHE ]]; then
   echo "could not find cache dir: $CACHE" >&2
   unset CACHE
@@ -70,11 +69,12 @@ if [[ $GET ]]; then
     docker images
     unset BUILD # do not overwrite the loaded image with build
     unset SAVE # do not overwrite the stored image with the same image
-    if [[ $(find "$CCACHE_DIR" -type f -print -quit) ]]; then
-      export CACHE="/tmp/cache" # do not overwrite ccache and save it in tmp
-      echo "preserving cache to $CACHE"
-      mkdir -p "$CACHE"
-      cp -rn "$CCACHE_DIR" "$CACHE/.ccache"
+    if [[ $(find "$CCACHE_DIR" -type f -print -quit) ]]; then # check contents of ccache
+      old_ccache="$CCACHE_DIR"
+      export CCACHE_DIR="/tmp/.ccache" # do not overwrite ccache and save it in tmp
+      echo "preserving ccache to $CCACHE_DIR"
+      mkdir -p "$CCACHE_DIR"
+      cp -rn "$old_ccache" "$CCACHE_DIR" # copy ccache to new dir
     else
       echo "ccache is empty: $(find "$CCACHE_DIR")" >&2
     fi
@@ -112,7 +112,7 @@ function RUN ()
     if [[ $CCACHE_DIR ]]; then
       args+=" --mount type=bind,source=$CCACHE_DIR,target=/.ccache -e CCACHE_DIR=/.ccache"
     fi
-    set -x
+    echo $args #debug
     docker run $args $RUN_ARGS "$IMAGE_NAME" bash ".ci/travis-compile.sh" $RUN_OPTS $@
     return $?
   else
