@@ -34,11 +34,11 @@ matrix:
     if: tag IS NOT present
     services: docker
     language: minimal
-    env: NAME=UbuntuBionic
+    env: NAME=UbuntuBionic CACHE=$HOME/$NAME
     cache:
       directories:
-        - $HOME/$NAME/.ccache
-        - $HOME/$NAME/image
+        - $CACHE/.ccache
+        - $CACHE/image
     before_install: source .ci/travis-docker.sh --get --save
     script: RUN --server --debug
 
@@ -46,11 +46,11 @@ matrix:
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     services: docker
     language: minimal
-    env: NAME=UbuntuBionic
+    env: NAME=UbuntuBionic CACHE=$HOME/$NAME
     cache:
       directories:
-        - $HOME/$NAME/.ccache
-        - $HOME/$NAME/image
+        - $CACHE/.ccache
+        - $CACHE/image
     before_install: source .ci/travis-docker.sh --build --save
     script: RUN --server --package $NAME --release
 
@@ -59,11 +59,11 @@ matrix:
     if: tag IS NOT present
     services: docker
     language: minimal
-    env: NAME=Fedora29
+    env: NAME=Fedora29 CACHE=$HOME/$NAME
     cache:
       directories:
-        - $HOME/$NAME/.ccache
-        - $HOME/$NAME/image
+        - $CACHE/.ccache
+        - $CACHE/image
     before_install: source .ci/travis-docker.sh --get --save
     script: RUN --server --debug
 
@@ -71,11 +71,11 @@ matrix:
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     services: docker
     language: minimal
-    env: NAME=Fedora29
+    env: NAME=Fedora29 CACHE=$HOME/$NAME
     cache:
       directories:
-        - $HOME/$NAME/.ccache
-        - $HOME/$NAME/image
+        - $CACHE/.ccache
+        - $CACHE/image
     before_install: source .ci/travis-docker.sh --build --save
     script: RUN --server --package $NAME RPM --release
 
