@@ -80,14 +80,11 @@ else
     echo "could not find ccache dir: $ccache_dir" >&2
     mkdir -p "$ccache_dir"
   fi
-  cp -rn "$ccache_dir" "$HOME/.ccache" # move our ccache dir to not change its contents
-  ccache_dir="$HOME/.ccache"
 fi
 
 
 # Get the docker image
 if [[ $GET ]]; then
-
   if [[ $img_save ]] && docker load --input "$img_save"; then
     echo "loaded image"
     docker images
