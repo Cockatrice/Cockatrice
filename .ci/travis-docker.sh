@@ -1,11 +1,8 @@
 #!/bin/bash
 
-# This script is to be used in .travis.yaml from the project root directory, do not use it from somewhere else.
-
-set -e
+# This script is to be sourced in .travis.yaml from the project root directory, do not use it from somewhere else.
 
 project_name="cockatrice"
-compile=".ci/travis-compile.sh"
 
 # Read arguments
 while [[ "$@" ]]; do
@@ -18,31 +15,14 @@ while [[ "$@" ]]; do
       GET=1
       shift
       ;;
-    '--run' | '--run-arg')
-      RUN=1
-      if [[ $1 == --run-arg ]]; then
-        RUN_ARGS="$RUN_ARGS $2"
-      else
-        RUN_OPTS="$RUN_OPTS $2"
-      fi
-      shift 2
-      ;;
     '--save')
       SAVE=1
       shift
       ;;
-    '--set-cache')
-      CACHE=$2
-      if ! [[ -d $CACHE ]]; then
-        echo "could not find cache path: $CACHE" >&2
-        exit 3
-      fi
-      shift 2
-      ;;
     *)
       if [[ $1 == -* ]]; then
         echo "unrecognized option: $1"
-        exit 3
+        return 3
       fi
       NAME="$1"
       shift
@@ -53,32 +33,32 @@ done
 # Setup
 if ! [[ $NAME ]]; then
   echo "no build name given" >&2
-  exit 3
+  return 3
 fi
+
+export IMAGE_NAME="${project_name,,}_${NAME,,}"
 
 docker_dir=".ci/$NAME"
 if ! [[ -r $docker_dir/Dockerfile ]]; then
   echo "could not find dockerfile in $docker_dir" >&2
-  exit 2 # even if the image is cached, we do not want to run if there is no build file associated with this image
+  return 2 # even if the image is cached, we do not want to run if there is no build file associated with this image
 fi
 
-img="${project_name,,}_${NAME,,}"
-
-[[ $CACHE ]] || CACHE="$HOME/$NAME"
+[[ $CACHE ]] || export CACHE="$HOME/$NAME"
 if ! [[ -d $CACHE ]]; then
   echo "could not find cache dir: $CACHE" >&2
   unset CACHE
 else
   img_dir="$CACHE/image"
-  img_save="$img_dir/$img.tar.gz"
+  img_save="$img_dir/$IMAGE_NAME.tar.gz"
   if ! [[ -d $img_dir ]]; then
     echo "could not find image dir: $img_dir" >&2
     mkdir -p "$img_dir"
   fi
-  ccache_dir="$CACHE/.ccache"
-  if ! [[ -d $ccache_dir ]]; then
-    echo "could not find ccache dir: $ccache_dir" >&2
-    mkdir -p "$ccache_dir"
+  export CCACHE_DIR="$CACHE/.ccache"
+  if ! [[ -d $CCACHE_DIR ]]; then
+    echo "could not find ccache dir: $CCACHE_DIR" >&2
+    mkdir -p "$CCACHE_DIR"
   fi
 fi
 
@@ -90,13 +70,13 @@ if [[ $GET ]]; then
     docker images
     unset BUILD # do not overwrite the loaded image with build
     unset SAVE # do not overwrite the stored image with the same image
-    if [[ $(find "$ccache_dir" -type f -print -quit) ]]; then
+    if [[ $(find "$CCACHE_DIR" -type f -print -quit) ]]; then
       export CACHE="/tmp/cache" # do not overwrite ccache and save it in tmp
       echo "preserving cache to $CACHE"
       mkdir -p "$CACHE"
-      cp -rn "$ccache_dir" "$CACHE/.ccache"
+      cp -rn "$CCACHE_DIR" "$CACHE/.ccache"
     else
-      echo "ccache is empty: $(find "$ccache_dir")" >&2
+      echo "ccache is empty: $(find "$CCACHE_DIR")" >&2
     fi
   else
     echo "could not load cached image, building instead" >&2
@@ -106,34 +86,37 @@ fi
 
 # Build the docker image
 if [[ $BUILD ]]; then
-  docker build --tag "$img" "$docker_dir"
-  echo "built image"
-  docker images
-fi
-
-# Run compilation on the docker image
-if [[ $RUN ]]; then
-  echo "running image:"
-  if docker images | grep "$img"; then
-    args="--mount type=bind,source=$(pwd),target=/src -w=/src"
-    if [[ $ccache_dir ]]; then
-      args+=" --mount type=bind,source=$ccache_dir,target=/.ccache -e CCACHE_DIR=/.ccache"
-    fi
-    set -x
-    docker run $args $RUN_ARGS "$img" bash "$compile" $RUN_OPTS
-    set +x
+  if docker build --tag "$IMAGE_NAME" "$docker_dir"; then
+    echo "built image"
+    docker images
   else
-    echo "could not find docker image: $img" >&2
-    exit 1
+    echo "could not build image $IMAGE_NAME" >&2
   fi
 fi
 
 # Save to cache
 if [[ $SAVE ]]; then
-  if [[ $img_save ]]; then
-    docker save --output "$img_save" "$img"
+  if [[ $img_save ]] && docker save --output "$img_save" "$IMAGE_NAME"; then
     echo "saved image to: $img_save"
   else
-    echo "could not save image $img" >&2
+    echo "could not save image $IMAGE_NAME" >&2
   fi
 fi
+
+# Set compile function
+function RUN ()
+{
+  echo "running image:"
+  if docker images | grep "$IMAGE_NAME"; then
+    args="--mount type=bind,source=$(pwd),target=/src -w=/src"
+    if [[ $CCACHE_DIR ]]; then
+      args+=" --mount type=bind,source=$CCACHE_DIR,target=/.ccache -e CCACHE_DIR=/.ccache"
+    fi
+    set -x
+    docker run $args $RUN_ARGS "$IMAGE_NAME" bash ".ci/travis-compile.sh" $RUN_OPTS $@
+    return $?
+  else
+    echo "could not find docker image: $IMAGE_NAME" >&2
+    return 1
+  fi
+}

@@ -27,7 +27,7 @@ matrix:
         - libqt5svg5-dev
         - libqt5sql5-mysql
         - libqt5websockets5-dev
-    script: bash ./.ci/travis-compile.sh --format --server --test --debug
+    script: bash .ci/travis-compile.sh --format --server --test --debug
 
   #Ubuntu Bionic (on docker)
   - name: Ubuntu Bionic (Debug)
@@ -39,8 +39,8 @@ matrix:
       directories:
         - $HOME/$NAME/.ccache
         - $HOME/$NAME/image
-    before_install: bash .ci/travis-docker.sh --get --save
-    script: bash .ci/travis-docker.sh --run "--server --debug"
+    before_install: source .ci/travis-docker.sh --get --save
+    script: RUN --server --debug
 
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
@@ -51,8 +51,8 @@ matrix:
       directories:
         - $HOME/$NAME/.ccache
         - $HOME/$NAME/image
-    before_install: bash .ci/travis-docker.sh --build --save
-    script: bash .ci/travis-docker.sh --run "--server --package $NAME --release"
+    before_install: source .ci/travis-docker.sh --build --save
+    script: RUN --server --package $NAME --release
 
   #Fedora 29 (on docker)
   - name: Fedora 29 (Debug)
@@ -64,8 +64,8 @@ matrix:
       directories:
         - $HOME/$NAME/.ccache
         - $HOME/$NAME/image
-    before_install: bash .ci/travis-docker.sh --get --save
-    script: bash .ci/travis-docker.sh --run "--server --debug"
+    before_install: source .ci/travis-docker.sh --get --save
+    script: RUN --server --debug
 
   - name: Fedora 29 (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
@@ -76,8 +76,8 @@ matrix:
       directories:
         - $HOME/$NAME/.ccache
         - $HOME/$NAME/image
-    before_install: bash .ci/travis-docker.sh --build --save
-    script: bash .ci/travis-docker.sh --run "--server --package $NAME RPM --release"
+    before_install: source .ci/travis-docker.sh --build --save
+    script: RUN --server --package $NAME RPM --release
 
   #macOS
   - name: macOS (Debug)
