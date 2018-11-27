@@ -80,18 +80,19 @@ else
     echo "could not find ccache dir: $ccache_dir" >&2
     mkdir -p "$ccache_dir"
   fi
+  cp -rn "$ccache_dir" "$HOME/.ccache" # move our ccache dir to not change its contents
+  ccache_dir="$HOME/.ccache"
 fi
 
 
 # Get the docker image
 if [[ $GET ]]; then
+
   if [[ $img_save ]] && docker load --input "$img_save"; then
     echo "loaded image"
     docker images
     unset BUILD # do not overwrite the loaded image with build
     unset SAVE # do not overwrite the stored image with the same image
-    cp -r "$ccache_dir" "$HOME/.ccache" # move our ccache dir to not change its contents
-    ccache_dir="$HOME/.ccache"
   else
     echo "could not load cached image, building instead" >&2
     BUILD=1
