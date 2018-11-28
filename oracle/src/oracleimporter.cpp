@@ -36,7 +36,10 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         edition = map.value("code").toString().toUpper();
         editionLong = map.value("name").toString();
         editionCards = map.value("cards");
-        setType = map.value("type").toString().toUpper();
+        setType = map.value("type").toString();
+        // capitalize set type
+        if (setType.length() > 0)
+            setType[0] = setType[0].toUpper();
         releaseDate = map.value("releaseDate").toDate();
 
         newSetList.append(SetToDownload(edition, editionLong, editionCards, setType, releaseDate));
