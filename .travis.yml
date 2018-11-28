@@ -83,24 +83,24 @@ matrix:
   - name: macOS (Debug)
     if: tag IS NOT present
     os: osx
-    osx_image: xcode8
+    osx_image: xcode9.2
+    env: HOMEBREW_NO_AUTO_UPDATE=1
     cache: ccache
     before_install:
-      - brew update
       - brew install ccache
-      - brew install protobuf --without-python@2
+      - brew install protobuf
       - brew install qt
     script: bash ./.ci/travis-compile.sh --server --install --debug
 
   - name: macOS (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
-    osx_image: xcode8
+    osx_image: xcode9.2
+    env: HOMEBREW_NO_AUTO_UPDATE=1
     cache: ccache
     before_install:
-      - brew update
       - brew install ccache
-      - brew install protobuf --without-python@2
+      - brew install protobuf
       - brew install qt
     script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
 
