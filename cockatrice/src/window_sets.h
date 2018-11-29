@@ -31,7 +31,10 @@ private:
     QAction *aUp, *aDown, *aBottom, *aTop;
     QToolBar *setsEditToolBar;
     QDialogButtonBox *buttonBox;
-    QLabel *labNotes, *searchLabel, *sortWarning;
+    QLabel *labNotes, *searchLabel;
+    QGroupBox *sortWarning;
+    QLabel *sortWarningText;
+    QPushButton *sortWarningButton;
     QLineEdit *searchField;
     QGridLayout *mainLayout;
     QHBoxLayout *filterBox;
@@ -67,6 +70,7 @@ private slots:
     void actRestoreOriginalOrder();
     void actDisableResetButton(const QString &filterText);
     void actSort(int index);
+    void actIgnoreWarning();
 };
 
 #endif

@@ -139,13 +139,22 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     hintsGroupBox = new QGroupBox(tr("Hints"));
     hintsGroupBox->setLayout(hintsGrid);
 
-    sortWarning = new QLabel;
-    sortWarning->setWordWrap(true);
-    sortWarning->setText(
-        "<b>" + tr("Warning: ") + "</b><br>" +
+    sortWarning = new QGroupBox(tr("Warning"));
+    QGridLayout *sortWarningLayout = new QGridLayout;
+    sortWarningText = new QLabel;
+    sortWarningText->setWordWrap(true);
+    sortWarningText->setText(
         tr("While the set list is sorted by any of the columns, custom art priority setting is disabled.") + "<br>" +
         tr("To disable sorting click on the same column header again until this message disappears."));
-    sortWarning->setStyleSheet("QLabel { background-color:red;}");
+    sortWarningLayout->addWidget(sortWarningText, 0, 0);
+    sortWarningButton = new QPushButton;
+    sortWarningButton->setText(tr("Ignore"));
+    sortWarningButton->setToolTip(tr("Ignore this warning and keep current sorting"));
+    sortWarningButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    connect(sortWarningButton, SIGNAL(released()), this, SLOT(actIgnoreWarning()));
+    sortWarningLayout->addWidget(sortWarningButton, 0, 1);
+    sortWarning->setStyleSheet("QGroupBox { background-color:red;}");
+    sortWarning->setLayout(sortWarningLayout);
     sortWarning->setVisible(false);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -252,6 +261,17 @@ void WndSets::actSort(int index)
             sortWarning->setVisible(false);
         }
     }
+}
+
+void WndSets::actIgnoreWarning()
+{
+    if (sortIndex < 0) {
+        return;
+    }
+    model->sort(sortIndex, sortOrder);
+    view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
+    sortIndex = -1;
+    sortWarning->setVisible(false);
 }
 
 void WndSets::actDisableSortButtons(int index)
