@@ -143,8 +143,8 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     QGridLayout *sortWarningLayout = new QGridLayout;
     sortWarningText = new QLabel;
     sortWarningText->setWordWrap(true);
-    sortWarningText->setText(tr("Sorting by column allows you to find a set while not changing set priority.") +
-        " " + tr("To enable ordering again, click the column header until this message disappears."));
+    sortWarningText->setText(tr("Sorting by column allows you to find a set while not changing set priority.") + " " +
+                             tr("To enable ordering again, click the column header until this message disappears."));
     sortWarningLayout->addWidget(sortWarningText, 0, 0, 1, 2);
     sortWarningButton = new QPushButton;
     sortWarningButton->setText(tr("Use the current sorting as the set priority instead"));
