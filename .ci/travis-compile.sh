@@ -137,6 +137,6 @@ if [[ $MAKE_PACKAGE ]]; then
       echo "could not find package" >&2
       exit 1
     fi
-    mv "$path/$file" "$path/${file%%.*}-$PACKAGE_NAME.${file#*.}"
+    mv "$path/$file" "$path/${file%.*}-$PACKAGE_NAME.${file##*.}"
   fi
 fi
