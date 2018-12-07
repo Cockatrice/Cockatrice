@@ -20,12 +20,12 @@
 #include <QtConcurrent>
 #include <QtGui>
 
+#include "lzma/decompress.h"
 #include "main.h"
 #include "oracleimporter.h"
 #include "oraclewizard.h"
 #include "settingscache.h"
 #include "version_string.h"
-#include "lzma/decompress.h"
 
 // Xz stream header: 0xFD + "7zXZ"
 #define XZ_SIGNATURE "\xFD\x37\x7A\x58\x5A"
@@ -392,7 +392,7 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
         inBuffer->open(QBuffer::ReadOnly);
         outBuffer->open(QBuffer::WriteOnly);
         XzDecompressor xz;
-        if(!xz.decompress(inBuffer, outBuffer)) {
+        if (!xz.decompress(inBuffer, outBuffer)) {
             zipDownloadFailed(tr("Xz extraction failed."));
             return;
         }
