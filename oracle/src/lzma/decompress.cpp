@@ -24,14 +24,13 @@ XzDecompressor::XzDecompressor(QObject *parent)
 bool XzDecompressor::decompress(QBuffer *in, QBuffer *out)
 {
 	lzma_stream strm = LZMA_STREAM_INIT;
-
-	bool success = true;
+	bool success;
 
 	if (!init_decoder(&strm)) {
 		return false;
 	}
 
-	success &= internal_decompress(&strm, in, out);
+	success = internal_decompress(&strm, in, out);
 
 	// Free the memory allocated for the decoder. This only needs to be
 	// done after the last file.
@@ -132,24 +131,29 @@ bool XzDecompressor::internal_decompress(lzma_stream *strm, QBuffer *in, QBuffer
 
 	uint8_t inbuf[BUFSIZ];
 	uint8_t outbuf[BUFSIZ];
+	qint64 bytesAvailable;
 
 	strm->next_in = NULL;
 	strm->avail_in = 0;
 	strm->next_out = outbuf;
 	strm->avail_out = sizeof(outbuf);
-qDebug() << "size" << in->size();
 	while (true) {
-		if (strm->avail_in == 0 && in->size() > 0) {
+		if (strm->avail_in == 0) {
 			strm->next_in = inbuf;
-			strm->avail_in = in->read((char*) inbuf, BUFSIZ);
-qDebug() << "read " << strm->avail_in << "/" << BUFSIZ << "remaining" << in->bytesAvailable();
-			if(in->size() <= 0) {
+			bytesAvailable = in->bytesAvailable();
+			if(bytesAvailable == 0) {
 				// Once the end of the input file has been reached,
 				// we need to tell lzma_code() that no more input
 				// will be coming. As said before, this isn't required
 				// if the LZMA_CONCATENATED flag isn't used when
 				// initializing the decoder.
 				action = LZMA_FINISH;
+			} else if(bytesAvailable >= BUFSIZ) {
+				in->read((char*) inbuf, BUFSIZ);
+				strm->avail_in = BUFSIZ;
+			} else {
+				in->read((char*) inbuf, bytesAvailable);
+				strm->avail_in = bytesAvailable;
 			}
 		}
 
@@ -162,9 +166,6 @@ qDebug() << "read " << strm->avail_in << "/" << BUFSIZ << "remaining" << in->byt
 				qDebug() << "Write error";
 				return false;
 			}
-
-qDebug() << "write " << write_size << "tot_size=" << out->size();
-qDebug() << (char*) outbuf;
 
 			strm->next_out = outbuf;
 			strm->avail_out = sizeof(outbuf);
