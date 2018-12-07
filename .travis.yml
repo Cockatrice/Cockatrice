@@ -122,7 +122,7 @@ deploy:
     on:
       tags: true
       repo: Cockatrice/Cockatrice
-      condition: $BUILDTYPE = Release && $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(\.([0-9]|[1-9][0-9])){2}-beta(\.([2-9]|[1-9][0-9]))?$     # regex to match semver naming convention for beta pre-releases
+      condition: $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(\.([0-9]|[1-9][0-9])){2}-beta(\.([2-9]|[1-9][0-9]))?$     # regex to match semver naming convention for beta pre-releases
 
 # Deploy configuration for "stable" releases
   - provider: releases
@@ -137,7 +137,7 @@ deploy:
     on:
       tags: true
       repo: Cockatrice/Cockatrice
-      condition: $BUILDTYPE = Release && $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(\.([0-9]|[1-9][0-9])){2}$    # regex to match semver naming convention for stable full releases
+      condition: $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(\.([0-9]|[1-9][0-9])){2}$    # regex to match semver naming convention for stable full releases
 
 
 notifications:
