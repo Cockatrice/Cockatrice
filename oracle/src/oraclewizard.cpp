@@ -25,13 +25,14 @@
 #include "oraclewizard.h"
 #include "settingscache.h"
 #include "version_string.h"
+#include "lzma/decompress.h"
 
-#define ZIP_SIGNATURE "PK"
+// Xz stream header: 0xFD + "7zXZ"
+#define XZ_SIGNATURE "\xFD\x37\x7A\x58\x5A"
 #define ALLSETS_URL_FALLBACK "https://mtgjson.com/v4/json/AllSets.json"
 
-#ifdef HAS_ZLIB
-#include "zip/unzip.h"
-#define ALLSETS_URL "https://mtgjson.com/v4/json/AllSets.json.zip"
+#ifdef HAS_LZMA
+#define ALLSETS_URL "https://mtgjson.com/v4/json/AllSets.json.xz"
 #else
 #define ALLSETS_URL "https://mtgjson.com/v4/json/AllSets.json"
 #endif
@@ -249,8 +250,8 @@ void LoadSetsPage::actLoadSetsFile()
     QFileDialog dialog(this, tr("Load sets file"));
     dialog.setFileMode(QFileDialog::ExistingFile);
 
-#ifdef HAS_ZLIB
-    dialog.setNameFilter(tr("Sets JSON file (*.json *.zip)"));
+#ifdef HAS_LZMA
+    dialog.setNameFilter(tr("Sets JSON file (*.json *.xz)"));
 #else
     dialog.setNameFilter(tr("Sets JSON file (*.json)"));
 #endif
@@ -383,32 +384,16 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
     progressBar->show();
 
     // unzip the file if needed
-    if (data.startsWith(ZIP_SIGNATURE)) {
-#ifdef HAS_ZLIB
+    if (data.startsWith(XZ_SIGNATURE)) {
+#ifdef HAS_LZMA
         // zipped file
         auto *inBuffer = new QBuffer(&data);
         auto *outBuffer = new QBuffer(this);
-        QString fileName;
-        UnZip::ErrorCode ec;
-        UnZip uz;
-
-        ec = uz.openArchive(inBuffer);
-        if (ec != UnZip::Ok) {
-            zipDownloadFailed(tr("Failed to open Zip archive: %1.").arg(uz.formatError(ec)));
-            return;
-        }
-
-        if (uz.fileList().size() != 1) {
-            zipDownloadFailed(tr("Zip extraction failed: the Zip archive doesn't contain exactly one file."));
-            return;
-        }
-        fileName = uz.fileList().at(0);
-
-        outBuffer->open(QBuffer::ReadWrite);
-        ec = uz.extractFile(fileName, outBuffer);
-        if (ec != UnZip::Ok) {
-            zipDownloadFailed(tr("Zip extraction failed: %1.").arg(uz.formatError(ec)));
-            uz.closeArchive();
+        inBuffer->open(QBuffer::ReadOnly);
+        outBuffer->open(QBuffer::WriteOnly);
+        XzDecompressor xz;
+        if(!xz.decompress(inBuffer, outBuffer)) {
+            zipDownloadFailed(tr("Xz extraction failed."));
             return;
         }
 
@@ -416,7 +401,7 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
         watcher.setFuture(future);
         return;
 #else
-        zipDownloadFailed(tr("Sorry, this version of Oracle does not support zipped files."));
+        zipDownloadFailed(tr("Sorry, this version of Oracle does not support xz compressed files."));
 
         wizard()->enableButtons();
         setEnabled(true);

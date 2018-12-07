@@ -76,25 +76,23 @@ QT5_ADD_RESOURCES(oracle_RESOURCES_RCC ${oracle_RESOURCES})
 INCLUDE_DIRECTORIES(../cockatrice/src)
 
 # Libz is required to support zipped files
-FIND_PACKAGE(ZLIB)
-IF(ZLIB_FOUND)
-    INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
-    ADD_DEFINITIONS("-DHAS_ZLIB")
+FIND_PACKAGE(LibLZMA)
+IF(LIBLZMA_FOUND)
+    INCLUDE_DIRECTORIES(${LIBLZMA_INCLUDE_DIRS})
+    ADD_DEFINITIONS("-DHAS_LZMA")
 
     set(oracle_SOURCES ${oracle_SOURCES}
-        src/zip/unzip.cpp
-        src/zip/zipglobal.cpp
+        src/lzma/decompress.cpp
     )
-
 ELSE()
-    MESSAGE(STATUS "Oracle: zlib not found; ZIP support disabled")
+    MESSAGE(STATUS "Oracle: LibLZMA not found; xz support disabled")
 ENDIF()
 
 # Build oracle binary and link it
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
 
-IF(ZLIB_FOUND)
-    TARGET_LINK_LIBRARIES(oracle ${ORACLE_QT_MODULES} ${ZLIB_LIBRARIES})
+IF(LIBLZMA_FOUND)
+    TARGET_LINK_LIBRARIES(oracle ${ORACLE_QT_MODULES} ${LIBLZMA_LIBRARIES})
 ELSE()
     TARGET_LINK_LIBRARIES(oracle ${ORACLE_QT_MODULES})
 ENDIF()
@@ -163,14 +161,6 @@ IF(WIN32)
     set(plugin_dest_dir Plugins)
     set(qtconf_dest_dir .)
     list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
-    IF(ZLIB_FOUND)
-        # look for dll in the bin/ directory (gnuwin32 package)
-        get_filename_component(ZLIB_DLL_DIR "${ZLIB_INCLUDE_DIRS}/../bin/" REALPATH)
-        list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
-        # look for dll in the lib/ directory (nuget package)
-        get_filename_component(ZLIB_DLL_DIR "${ZLIB_LIBRARY}" DIRECTORY)
-        list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
-    ENDIF()
 
     # qt5 plugins: iconengines, platforms
 
