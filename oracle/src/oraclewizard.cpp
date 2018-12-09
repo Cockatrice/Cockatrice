@@ -20,19 +20,29 @@
 #include <QtConcurrent>
 #include <QtGui>
 
-#include "lzma/decompress.h"
 #include "main.h"
 #include "oracleimporter.h"
 #include "oraclewizard.h"
 #include "settingscache.h"
 #include "version_string.h"
 
+#ifdef HAS_LZMA
+#include "lzma/decompress.h"
+#endif
+
+#ifdef HAS_ZLIB
+#include "zip/unzip.h"
+#endif
+
+#define ZIP_SIGNATURE "PK"
 // Xz stream header: 0xFD + "7zXZ"
 #define XZ_SIGNATURE "\xFD\x37\x7A\x58\x5A"
 #define ALLSETS_URL_FALLBACK "https://mtgjson.com/v4/json/AllSets.json"
 
 #ifdef HAS_LZMA
 #define ALLSETS_URL "https://mtgjson.com/v4/json/AllSets.json.xz"
+#elif defined(HAS_ZLIB)
+#define ALLSETS_URL "https://mtgjson.com/v4/json/AllSets.json.zip"
 #else
 #define ALLSETS_URL "https://mtgjson.com/v4/json/AllSets.json"
 #endif
@@ -250,11 +260,14 @@ void LoadSetsPage::actLoadSetsFile()
     QFileDialog dialog(this, tr("Load sets file"));
     dialog.setFileMode(QFileDialog::ExistingFile);
 
-#ifdef HAS_LZMA
-    dialog.setNameFilter(tr("Sets JSON file (*.json *.xz)"));
-#else
-    dialog.setNameFilter(tr("Sets JSON file (*.json)"));
+    QString extensions = "*.json";
+#ifdef HAS_ZLIB
+    extensions += " *.zip";
 #endif
+#ifdef HAS_LZMA
+    extensions += " *.xz";
+#endif
+    dialog.setNameFilter(tr("Sets JSON file (%1)").arg(extensions));
 
     if (!fileLineEdit->text().isEmpty() && QFile::exists(fileLineEdit->text())) {
         dialog.selectFile(fileLineEdit->text());
@@ -402,6 +415,47 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
         return;
 #else
         zipDownloadFailed(tr("Sorry, this version of Oracle does not support xz compressed files."));
+
+        wizard()->enableButtons();
+        setEnabled(true);
+        progressLabel->hide();
+        progressBar->hide();
+        return;
+#endif
+    } else if (data.startsWith(ZIP_SIGNATURE)) {
+#ifdef HAS_ZLIB
+         // zipped file
+        auto *inBuffer = new QBuffer(&data);
+        auto *outBuffer = new QBuffer(this);
+        QString fileName;
+        UnZip::ErrorCode ec;
+        UnZip uz;
+
+        ec = uz.openArchive(inBuffer);
+        if (ec != UnZip::Ok) {
+            zipDownloadFailed(tr("Failed to open Zip archive: %1.").arg(uz.formatError(ec)));
+            return;
+        }
+
+        if (uz.fileList().size() != 1) {
+            zipDownloadFailed(tr("Zip extraction failed: the Zip archive doesn't contain exactly one file."));
+            return;
+        }
+        fileName = uz.fileList().at(0);
+
+        outBuffer->open(QBuffer::ReadWrite);
+        ec = uz.extractFile(fileName, outBuffer);
+        if (ec != UnZip::Ok) {
+            zipDownloadFailed(tr("Zip extraction failed: %1.").arg(uz.formatError(ec)));
+            uz.closeArchive();
+            return;
+        }
+
+        future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, outBuffer->data());
+        watcher.setFuture(future);
+        return;
+#else
+        zipDownloadFailed(tr("Sorry, this version of Oracle does not support zipped files."));
 
         wizard()->enableButtons();
         setEnabled(true);

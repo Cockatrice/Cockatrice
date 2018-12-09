@@ -87,7 +87,8 @@ Dependencies: *(for minimum requirements search our [CMake file](https://github.
 - [protobuf](https://github.com/google/protobuf)
 - [CMake](https://www.cmake.org/)
 
-Oracle can optionally use xz to load compressed files:
+Oracle can optionally use zlib adndxz to load compressed files:
+- [zlib](https://www.zlib.net/)
 - [xz](https://tukaani.org/xz/)
 
 To compile:

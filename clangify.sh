@@ -15,6 +15,7 @@ include=("common" \
 exclude=("cockatrice/src/qt-json" \
 "servatrice/src/smtp" \
 "common/sfmt" \
+"oracle/src/zip" \
 "oracle/src/lzma")
 exts=("cpp" "h")
 cf_cmd="clang-format"
