@@ -24,78 +24,29 @@ clone_depth: 50    #same as travis, see https://www.appveyor.com/blog/2014/06/04
 image: Visual Studio 2017
 
 cache:
-    - c:\openssl-release
-    - c:\protobuf-release
-    - c:\zlib-release
-    - c:\xz-release
-# TODO: set dependency on ps skript file (in ./ci) / "-> appveyor.yml" maybe not ideal
-# that way when we update specific cached tools there (like protobuf or zlib), cache will be newly created automatically
-# https://www.appveyor.com/docs/build-cache/#cleaning-up-cache
-
+    - c:\Tools\vcpkg\installed
 
 environment:
-    openssl_ver: 1.0.2q
-    protobuf_ver: 3.6.1
-    zlib_ver: 1.2.11
-    libxz_ver: 5.2.4
-
     matrix:
         - target_arch: win64
           qt_ver: 5.9\msvc2017_64
           cmake_generator: Visual Studio 15 2017 Win64
           cmake_toolset: v141,host=x64
           vc_arch: amd64
-          xz_subdir: bin_x86-64
-          lib_machine: x64
+          vcpkg_arch: x64-windows
 
         - target_arch: win32
           qt_ver: 5.9\msvc2015 # Qt doesn't provide a msvc2017_32
           cmake_generator: Visual Studio 15 2017
           cmake_toolset: v141
           vc_arch: amd64_x86
-          xz_subdir: bin_i686
-          lib_machine: x86
+          vcpkg_arch: x86-windows
 
 install:
-    - ps: |
-        if (Test-Path c:\openssl-release) {
-            echo "using openssl from cache"
-        } else {
-            if ($env:target_arch -eq "win64") {    # 64bit filename
-                # echo "downloading 64bit version of openssl"
-                Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-x64_86-win64.zip" -OutFile c:\openssl-$env:openssl_ver.zip
-            } else {    # 32bit filename
-                # echo "downloading 32bit version of openssl"
-                Invoke-WebRequest "https://indy.fulgan.com/SSL/openssl-$env:openssl_ver-i386-win32.zip" -OutFile c:\openssl-$env:openssl_ver.zip
-            }
-            Expand-Archive -Path c:\openssl-$env:openssl_ver.zip -DestinationPath c:\openssl-release
-            Set-Location -Path C:\openssl-release
-        }
-        if (Test-Path c:\protobuf-release) {
-            echo "using protobuf from cache"
-        } else {
-            Invoke-WebRequest "https://github.com/protocolbuffers/protobuf/releases/download/v$env:protobuf_ver/protobuf-cpp-$env:protobuf_ver.zip" -OutFile c:\protobuf-cpp-$env:protobuf_ver.zip
-            Expand-Archive -Path c:\protobuf-cpp-$env:protobuf_ver.zip -DestinationPath c:\
-            Set-Location -Path C:\protobuf-$env:protobuf_ver\cmake
-            cmake . -G "$env:cmake_generator" -T "$env:cmake_toolset" -Dprotobuf_BUILD_TESTS=0 -Dprotobuf_MSVC_STATIC_RUNTIME=0 -DCMAKE_INSTALL_PREFIX=c:/protobuf-release
-            msbuild INSTALL.vcxproj /p:Configuration=Release
-        }
-        if (Test-Path c:\zlib-release) {
-            echo "using zlib from cache"
-        } else {
-            Invoke-WebRequest "https://github.com/madler/zlib/archive/v$env:zlib_ver.zip" -OutFile c:\zlib-$env:zlib_ver.zip
-            Expand-Archive -Path c:\zlib-$env:zlib_ver.zip -DestinationPath c:\
-            Set-Location -Path C:\zlib-$env:zlib_ver
-            cmake . -G "$env:cmake_generator" -T "$env:cmake_toolset" -DCMAKE_INSTALL_PREFIX=c:/zlib-release
-            msbuild INSTALL.vcxproj /p:Configuration=Release
-        }
-        if (Test-Path c:\xz-$env:libxz_ver-windows) {
-            echo "using libxz from cache"
-        } else {
-            Invoke-WebRequest "https://tukaani.org/xz/xz-$env:libxz_ver-windows.zip" -OutFile c:\xz-$env:libxz_ver-windows.zip
-            Expand-Archive -Path c:\xz-$env:libxz_ver-windows.zip -DestinationPath c:\xz-release
-            lib /def c:\xz-release\doc\liblzma.def /out c:\xz-release\$env:xz_subdir\liblzma.lib /machine:$env:lib_machine
-        }
+    - vcpkg install openssl:$env:vcpkg_arch
+    - vcpkg install protobuf:$env:vcpkg_arch
+    - vcpkg install liblzma:$env:vcpkg_arch
+    - vcpkg install zlib:$env:vcpkg_arch
 
 services:
     - mysql
@@ -104,15 +55,9 @@ build_script:
     - ps: |
         New-Item -ItemType directory -Path $env:APPVEYOR_BUILD_FOLDER\build
         Set-Location -Path $env:APPVEYOR_BUILD_FOLDER\build
-        $zlibdir = "c:\zlib-release"
-        $libxzdir = "c:\xz-release"
-        $libxzbindir = "c:\xz-release\$env:xz_subdir"
-        $openssldir = "C:\openssl-release"
-        $protodir = "c:\protobuf-release"
-        $protoc = "c:\protobuf-release\bin\protoc.exe"
         $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
         cmake --version
-        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir;$zlibdir;$libxzdir;$libxzbindir;$openssldir" "-DWITH_SERVER=1" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
+        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake" -DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver" "-DWITH_SERVER=1" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
     - msbuild PACKAGE.vcxproj /p:Configuration=Release
     - ps: |
         $exe = dir -name *.exe
