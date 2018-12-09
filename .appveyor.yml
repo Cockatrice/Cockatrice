@@ -33,20 +33,20 @@ environment:
           cmake_generator: Visual Studio 15 2017 Win64
           cmake_toolset: v141,host=x64
           vc_arch: amd64
-          vcpkg_arch: x64-windows
+          vcpkg_arch: x64
 
         - target_arch: win32
           qt_ver: 5.9\msvc2015 # Qt doesn't provide a msvc2017_32
           cmake_generator: Visual Studio 15 2017
           cmake_toolset: v141
           vc_arch: amd64_x86
-          vcpkg_arch: x86-windows
+          vcpkg_arch: x86
 
 install:
-    - vcpkg install openssl:$env:vcpkg_arch
-    - vcpkg install protobuf:$env:vcpkg_arch
-    - vcpkg install liblzma:$env:vcpkg_arch
-    - vcpkg install zlib:$env:vcpkg_arch
+    - vcpkg install openssl:%vcpkg_arch%-windows
+    - vcpkg install protobuf:%vcpkg_arch%-windows
+    - vcpkg install liblzma:%vcpkg_arch%-windows
+    - vcpkg install zlib:%vcpkg_arch%-windows
 
 services:
     - mysql
