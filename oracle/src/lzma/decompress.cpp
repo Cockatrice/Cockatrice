@@ -36,7 +36,7 @@ bool XzDecompressor::decompress(QBuffer *in, QBuffer *out)
 	// done after the last file.
 	lzma_end(&strm);
 
-	return true;
+	return success;
 }
 
 bool XzDecompressor::init_decoder(lzma_stream *strm)
@@ -160,7 +160,7 @@ bool XzDecompressor::internal_decompress(lzma_stream *strm, QBuffer *in, QBuffer
 		lzma_ret ret = lzma_code(strm, action);
 
 		if (strm->avail_out == 0 || ret == LZMA_STREAM_END) {
-			size_t write_size = sizeof(outbuf) - strm->avail_out;
+			qint64 write_size = sizeof(outbuf) - strm->avail_out;
 
 			if (out->write((char *) outbuf, write_size) != write_size) {
 				qDebug() << "Write error";
