@@ -27,7 +27,7 @@ cache:
     - c:\openssl-release
     - c:\protobuf-release
     - c:\zlib-release
-    - c:\xz-*-windows
+    - c:\xz-release
 # TODO: set dependency on ps skript file (in ./ci) / "-> appveyor.yml" maybe not ideal
 # that way when we update specific cached tools there (like protobuf or zlib), cache will be newly created automatically
 # https://www.appveyor.com/docs/build-cache/#cleaning-up-cache
@@ -90,7 +90,7 @@ install:
             echo "using libxz from cache"
         } else {
             Invoke-WebRequest "https://tukaani.org/xz/xz-$env:libxz_ver-windows.zip" -OutFile c:\xz-$env:libxz_ver-windows.zip
-            Expand-Archive -Path c:\xz-$env:libxz_ver-windows.zip -DestinationPath c:\
+            Expand-Archive -Path c:\xz-$env:libxz_ver-windows.zip -DestinationPath c:\xz-release
         }
 
 services:
@@ -101,7 +101,7 @@ build_script:
         New-Item -ItemType directory -Path $env:APPVEYOR_BUILD_FOLDER\build
         Set-Location -Path $env:APPVEYOR_BUILD_FOLDER\build
         $zlibdir = "c:\zlib-release"
-        $libxzdir = "c:\xz-$env:libxz_ver-windows"
+        $libxzdir = "c:\xz-release"
         $openssldir = "C:\openssl-release"
         $protodir = "c:\protobuf-release"
         $protoc = "c:\protobuf-release\bin\protoc.exe"
