@@ -88,8 +88,7 @@ matrix:
     cache: ccache
     before_install:
       - brew update
-      - brew install ccache qt xz
-      - brew install protobuf --without-python@2
+      - brew install ccache protobuf qt xz
     script: bash ./.ci/travis-compile.sh --server --install --debug
 
   - name: macOS (Release)
@@ -99,8 +98,7 @@ matrix:
     cache: ccache
     before_install:
       - brew update
-      - brew install ccache qt xz
-      - brew install protobuf --without-python@2
+      - brew install ccache protobuf qt xz
     script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
 
 
