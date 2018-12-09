@@ -16,7 +16,7 @@ skip_commits:
     - '**/*.md'
     - Dockerfile
     - LICENSE
- 
+
 skip_branch_with_pr: true
 
 clone_depth: 50    #same as travis, see https://www.appveyor.com/blog/2014/06/04/shallow-clone-for-git-repositories/
@@ -45,13 +45,14 @@ environment:
           cmake_generator: Visual Studio 15 2017 Win64
           cmake_toolset: v141,host=x64
           vc_arch: amd64
+          xz_subdir: bin_x86-64
 
         - target_arch: win32
           qt_ver: 5.9\msvc2015 # Qt doesn't provide a msvc2017_32
           cmake_generator: Visual Studio 15 2017
           cmake_toolset: v141
           vc_arch: amd64_x86
-
+          xz_subdir: bin_i686
 
 install:
     - ps: |
@@ -102,12 +103,13 @@ build_script:
         Set-Location -Path $env:APPVEYOR_BUILD_FOLDER\build
         $zlibdir = "c:\zlib-release"
         $libxzdir = "c:\xz-release"
+        $libxzbindir = "c:\xz-release\$env:xz_subdir"
         $openssldir = "C:\openssl-release"
         $protodir = "c:\protobuf-release"
         $protoc = "c:\protobuf-release\bin\protoc.exe"
         $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
         cmake --version
-        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir;$zlibdir;$libxzdir;$openssldir" "-DWITH_SERVER=1" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
+        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$protodir;$zlibdir;$libxzdir;$libxzbindir;$openssldir" "-DWITH_SERVER=1" "-DPROTOBUF_PROTOC_EXECUTABLE=$protoc" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
     - msbuild PACKAGE.vcxproj /p:Configuration=Release
     - ps: |
         $exe = dir -name *.exe
