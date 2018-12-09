@@ -34,7 +34,7 @@ cache:
 
 
 environment:
-    openssl_ver: 1.0.2p
+    openssl_ver: 1.0.2q
     protobuf_ver: 3.6.1
     zlib_ver: 1.2.11
     libxz_ver: 5.2.4
