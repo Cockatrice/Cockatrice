@@ -424,7 +424,7 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
 #endif
     } else if (data.startsWith(ZIP_SIGNATURE)) {
 #ifdef HAS_ZLIB
-         // zipped file
+        // zipped file
         auto *inBuffer = new QBuffer(&data);
         auto *outBuffer = new QBuffer(this);
         QString fileName;

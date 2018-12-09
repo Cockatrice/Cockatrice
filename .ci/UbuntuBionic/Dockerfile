@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         ccache \
         cmake \
+        liblzma-dev \
         libprotobuf-dev \
         libqt5multimedia5-plugins \
         libqt5svg5-dev \

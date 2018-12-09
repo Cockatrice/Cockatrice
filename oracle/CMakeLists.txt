@@ -188,6 +188,11 @@ IF(WIN32)
         list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
     ENDIF()
 
+    IF(LIBLZMA_FOUND)
+        get_filename_component(LIBLZMA_DLL_DIR "${LIBLZMA_LIBRARIES}" DIRECTORY)
+        list(APPEND libSearchDirs ${LIBLZMA_DLL_DIR})
+    ENDIF()
+
     # qt5 plugins: iconengines, platforms
 
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
