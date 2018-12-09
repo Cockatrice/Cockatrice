@@ -46,6 +46,7 @@ environment:
           cmake_toolset: v141,host=x64
           vc_arch: amd64
           xz_subdir: bin_x86-64
+          lib_machine: x64
 
         - target_arch: win32
           qt_ver: 5.9\msvc2015 # Qt doesn't provide a msvc2017_32
@@ -53,6 +54,7 @@ environment:
           cmake_toolset: v141
           vc_arch: amd64_x86
           xz_subdir: bin_i686
+          lib_machine: x86
 
 install:
     - ps: |
@@ -92,6 +94,7 @@ install:
         } else {
             Invoke-WebRequest "https://tukaani.org/xz/xz-$env:libxz_ver-windows.zip" -OutFile c:\xz-$env:libxz_ver-windows.zip
             Expand-Archive -Path c:\xz-$env:libxz_ver-windows.zip -DestinationPath c:\xz-release
+            lib /def c:\xz-release\doc\liblzma.def /out c:\xz-release\$env:xz_subdir\liblzma.lib /machine:$env:lib_machine
         }
 
 services:
