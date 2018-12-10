@@ -27,19 +27,19 @@ cache:
     - c:\Tools\vcpkg\installed
 
 environment:
+    APPVEYOR_SAVE_CACHE_ON_ERROR: true
+
     matrix:
         - target_arch: win64
           qt_ver: 5.9\msvc2017_64
           cmake_generator: Visual Studio 15 2017 Win64
           cmake_toolset: v141,host=x64
-          vc_arch: amd64
           vcpkg_arch: x64
 
         - target_arch: win32
           qt_ver: 5.9\msvc2015 # Qt doesn't provide a msvc2017_32
           cmake_generator: Visual Studio 15 2017
           cmake_toolset: v141
-          vc_arch: amd64_x86
           vcpkg_arch: x86
 
 install:
@@ -58,7 +58,7 @@ build_script:
         $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
         cmake --version
         cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver" "-DWITH_SERVER=1" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
-    - msbuild PACKAGE.vcxproj /p:Configuration=Release /p:NoWarn=4251
+    - msbuild PACKAGE.vcxproj /p:Configuration=Release
     - ps: |
         $exe = dir -name *.exe
         $new_name = $exe.Replace(".exe", "-${env:target_arch}.exe")
