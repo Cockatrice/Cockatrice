@@ -179,20 +179,6 @@ IF(WIN32)
     set(qtconf_dest_dir .)
     list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
 
-    IF(ZLIB_FOUND)
-        # look for dll in the bin/ directory (gnuwin32 package)
-        get_filename_component(ZLIB_DLL_DIR "${ZLIB_INCLUDE_DIRS}/../bin/" REALPATH)
-        list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
-        # look for dll in the lib/ directory (nuget package)
-        get_filename_component(ZLIB_DLL_DIR "${ZLIB_LIBRARY}" DIRECTORY)
-        list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
-    ENDIF()
-
-    IF(LIBLZMA_FOUND)
-        get_filename_component(LIBLZMA_DLL_DIR "${LIBLZMA_LIBRARIES}" DIRECTORY)
-        list(APPEND libSearchDirs ${LIBLZMA_DLL_DIR})
-    ENDIF()
-
     # qt5 plugins: iconengines, platforms
 
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime

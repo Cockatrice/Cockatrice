@@ -44,9 +44,9 @@ environment:
 
 install:
     - vcpkg install openssl:%vcpkg_arch%-windows
-    - vcpkg install protobuf:%vcpkg_arch%-windows
-    - vcpkg install liblzma:%vcpkg_arch%-windows
-    - vcpkg install zlib:%vcpkg_arch%-windows
+    - vcpkg install protobuf:%vcpkg_arch%-windows-static
+    - vcpkg install liblzma:%vcpkg_arch%-windows-static
+    - vcpkg install zlib:%vcpkg_arch%-windows-static
 
 services:
     - mysql
