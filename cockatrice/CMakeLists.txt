@@ -254,6 +254,8 @@ if(WIN32)
     set(plugin_dest_dir Plugins)
     set(qtconf_dest_dir .)
 
+    install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION "${CMAKE_INSTALL_PREFIX}" FILES_MATCHING PATTERN "*.dll")
+
     # qt5 plugins: audio, iconengines, imageformats, platforms, printsupport
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
         FILES_MATCHING REGEX "(audio|iconengines|imageformats|platforms|printsupport)/.*[^d]\\.dll")
