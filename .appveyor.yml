@@ -27,8 +27,6 @@ cache:
     - c:\Tools\vcpkg\installed
 
 environment:
-    APPVEYOR_SAVE_CACHE_ON_ERROR: true
-
     matrix:
         - target_arch: win64
           qt_ver: 5.9\msvc2017_64
