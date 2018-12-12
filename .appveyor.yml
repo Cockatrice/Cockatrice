@@ -41,15 +41,8 @@ environment:
           vcpkg_arch: x86
 
 install:
-    - ps: |
-        if (Test-Path C:\Tools\vcpkg\installed\x64-windows) {
-          echo "using vcpkg packages from cache"
-        } else {
-          vcpkg install openssl:$env:vcpkg_arch-windows
-          vcpkg install protobuf:$env:vcpkg_arch-windows
-          vcpkg install liblzma:$env:vcpkg_arch-windows
-          vcpkg install zlib:$env:vcpkg_arch-windows
-        }
+    - vcpkg remove --outdated --recurse
+    - vcpkg install openssl protobuf liblzma zlib --triplet $env:vcpkg_arch-windows
 
 services:
     - mysql
