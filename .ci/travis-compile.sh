@@ -16,10 +16,10 @@ while [[ "$@" ]]; do
     '--package')
       MAKE_PACKAGE=1
       shift
-      if [[ $1 && $1 != -* ]]; then
+      if [[ $# != 0 && $1 != -* ]]; then
         PACKAGE_NAME="$1"
         shift
-        if [[ $1 && $1 != -* ]]; then
+        if [[ $# != 0 && $1 != -* ]]; then
           PACKAGE_TYPE="$1"
           shift
         fi
