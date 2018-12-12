@@ -148,8 +148,8 @@ private:
     bool upsideDownArt;
     QString loyalty;
     QStringMap customPicURLs;
-    QStringMap uuIds;
     MuidMap muIds;
+    QStringMap uuIds;
     QStringMap collectorNumbers;
     QStringMap rarities;
     bool cipt;

@@ -19,7 +19,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     setsMap = QtJson::Json::parse(QString(data), ok).toMap();
     if (!ok) {
         qDebug() << "error: QtJson::Json::parse()";
-        return 0;
+        return false;
     }
 
     QListIterator<QVariant> it(setsMap.values());
