@@ -41,10 +41,15 @@ environment:
           vcpkg_arch: x86
 
 install:
-    - vcpkg install openssl:%vcpkg_arch%-windows
-    - vcpkg install protobuf:%vcpkg_arch%-windows
-    - vcpkg install liblzma:%vcpkg_arch%-windows
-    - vcpkg install zlib:%vcpkg_arch%-windows
+    - ps: |
+        if (Test-Path C:\Tools\vcpkg\installed\x64-windows) {
+          echo "using vcpkg packages from cache"
+        } else {
+          vcpkg install openssl:$env:vcpkg_arch-windows
+          vcpkg install protobuf:$env:vcpkg_arch-windows
+          vcpkg install liblzma:$env:vcpkg_arch-windows
+          vcpkg install zlib:$env:vcpkg_arch-windows
+        }
 
 services:
     - mysql
@@ -53,9 +58,10 @@ build_script:
     - ps: |
         New-Item -ItemType directory -Path $env:APPVEYOR_BUILD_FOLDER\build
         Set-Location -Path $env:APPVEYOR_BUILD_FOLDER\build
+        $vcpkgbindir = "C:\Tools\vcpkg\installed\$env:vcpkg_arch-windows\bin"
         $mysqldll = "c:\Program Files\MySQL\MySQL Server 5.7\lib\libmysql.dll"
         cmake --version
-        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver" "-DWITH_SERVER=1" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
+        cmake .. -G "$env:cmake_generator" -T "$env:cmake_toolset" "-DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake" "-DCMAKE_PREFIX_PATH=c:/Qt/$env:qt_ver;$vcpkgbindir" "-DWITH_SERVER=1" "-DMYSQLCLIENT_LIBRARIES=$mysqldll"
     - msbuild PACKAGE.vcxproj /p:Configuration=Release
     - ps: |
         $exe = dir -name *.exe
