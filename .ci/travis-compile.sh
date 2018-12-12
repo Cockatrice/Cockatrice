@@ -16,9 +16,13 @@ while [[ "$@" ]]; do
     '--package')
       MAKE_PACKAGE=1
       shift
-      if [[ $1 != -* ]]; then
+      if [[ $1 && $1 != -* ]]; then
         PACKAGE_NAME="$1"
         shift
+        if [[ $1 && $1 != -* ]]; then
+          PACKAGE_TYPE="$1"
+          shift
+        fi
       fi
       ;;
     '--server')
@@ -107,6 +111,9 @@ fi
 if [[ $BUILDTYPE ]]; then
   flags+=" -DCMAKE_BUILD_TYPE=$BUILDTYPE"
 fi
+if [[ $PACKAGE_TYPE ]]; then
+  flags+=" -DCPACK_GENERATOR=$PACKAGE_TYPE"
+fi
 
 # Add qt install location when using brew
 if [[ $(uname) == "Darwin" ]]; then
@@ -133,7 +140,7 @@ if [[ $MAKE_PACKAGE ]]; then
     found=$(find . -maxdepth 1 -type f -name "Cockatrice-*.*" -print -quit)
     path=${found%/*}
     file=${found##*/}
-    if [[ $file != *.* ]]; then
+    if [[ ! $file ]]; then
       echo "could not find package" >&2
       exit 1
     fi

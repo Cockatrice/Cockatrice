@@ -11,6 +11,7 @@ RUN dnf install -y \
         libappstream-glib \
         protobuf-devel \
         qt5-{qttools,qtsvg,qtmultimedia,qtwebsockets}-devel \
+        rpm-build \
         sqlite-devel \
         wget \
         zlib-devel \
