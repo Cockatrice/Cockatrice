@@ -267,6 +267,7 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
 
     if (set) {
         transformMap["!cardid!"] = QString::number(card->getMuId(set->getShortName()));
+        transformMap["!uuid!"] = card->getUuId(set->getShortName());
         transformMap["!collectornumber!"] = card->getCollectorNumber(set->getShortName());
         transformMap["!setcode!"] = set->getShortName();
         transformMap["!setcode_lower!"] = set->getShortName().toLower();
@@ -274,6 +275,7 @@ QString PictureToLoad::transformUrl(QString urlTemplate) const
         transformMap["!setname_lower!"] = set->getLongName().toLower();
     } else {
         transformMap["!cardid!"] = QString();
+        transformMap["!uuid!"] = QString();
         transformMap["!collectornumber!"] = QString();
         transformMap["!setcode!"] = QString();
         transformMap["!setcode_lower!"] = QString();

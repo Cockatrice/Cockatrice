@@ -61,6 +61,7 @@ private:
                         QString cardName,
                         bool isToken,
                         int cardId,
+                        QString &cardUuId,
                         QString &setNumber,
                         QString &cardCost,
                         QString &cmc,

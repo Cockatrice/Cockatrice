@@ -324,7 +324,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName, const QString &zoneN
             // and default values for all fields
             info = CardInfo::newInstance(cardName, false, nullptr, nullptr, "unknown", nullptr, nullptr, QStringList(),
                                          QList<CardRelation *>(), QList<CardRelation *>(), false, 0, false, 0,
-                                         SetList(), QStringMap(), MuidMap(), QStringMap(), QStringMap());
+                                         SetList(), QStringMap(), MuidMap(), QStringMap(), QStringMap(), QStringMap());
         } else {
             return {};
         }
