@@ -16,6 +16,7 @@ class ReleaseChannel;
 // Fallbacks used for cards w/o MultiverseId
 #define PIC_URL_DEFAULT "https://api.scryfall.com/cards/multiverse/!cardid!?format=image"
 #define PIC_URL_FALLBACK "https://api.scryfall.com/cards/named?fuzzy=!name!&format=image"
+
 // size should be a multiple of 64
 #define PIXMAPCACHE_SIZE_DEFAULT 2047
 #define PIXMAPCACHE_SIZE_MIN 64
