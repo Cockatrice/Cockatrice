@@ -37,14 +37,14 @@
 #define ZIP_SIGNATURE "PK"
 // Xz stream header: 0xFD + "7zXZ"
 #define XZ_SIGNATURE "\xFD\x37\x7A\x58\x5A"
-#define ALLSETS_URL_FALLBACK "https://mtgjson.com/v4/json/AllSets.json"
+#define ALLSETS_URL_FALLBACK "https://mtgjson.com/json/AllSets.json"
 
 #ifdef HAS_LZMA
-#define ALLSETS_URL "https://mtgjson.com/v4/json/AllSets.json.xz"
+#define ALLSETS_URL "https://mtgjson.com/json/AllSets.json.xz"
 #elif defined(HAS_ZLIB)
-#define ALLSETS_URL "https://mtgjson.com/v4/json/AllSets.json.zip"
+#define ALLSETS_URL "https://mtgjson.com/json/AllSets.json.zip"
 #else
-#define ALLSETS_URL "https://mtgjson.com/v4/json/AllSets.json"
+#define ALLSETS_URL "https://mtgjson.com/json/AllSets.json"
 #endif
 
 #define TOKENS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml"
