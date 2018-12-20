@@ -61,6 +61,7 @@ private:
                         QString cardName,
                         bool isToken,
                         int cardId,
+                        QString &cardUuId,
                         QString &setNumber,
                         QString &cardCost,
                         QString &cmc,
@@ -93,7 +94,6 @@ public:
     }
 
 protected:
-    void extractColors(const QStringList &in, QStringList &out);
     void sortColors(QStringList &colors);
 };
 

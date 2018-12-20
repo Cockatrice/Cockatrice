@@ -149,6 +149,7 @@ private:
     QString loyalty;
     QStringMap customPicURLs;
     MuidMap muIds;
+    QStringMap uuIds;
     QStringMap collectorNumbers;
     QStringMap rarities;
     bool cipt;
@@ -172,7 +173,8 @@ public:
                       int _tableRow = 0,
                       const SetList &_sets = SetList(),
                       const QStringMap &_customPicURLs = QStringMap(),
-                      MuidMap muids = MuidMap(),
+                      MuidMap _muids = MuidMap(),
+                      QStringMap _uuIds = QStringMap(),
                       QStringMap _collectorNumbers = QStringMap(),
                       QStringMap _rarities = QStringMap());
     ~CardInfo() override;
@@ -193,7 +195,8 @@ public:
                                    int _tableRow = 0,
                                    const SetList &_sets = SetList(),
                                    const QStringMap &_customPicURLs = QStringMap(),
-                                   MuidMap muids = MuidMap(),
+                                   MuidMap _muids = MuidMap(),
+                                   QStringMap _uuIds = QStringMap(),
                                    QStringMap _collectorNumbers = QStringMap(),
                                    QStringMap _rarities = QStringMap());
 
@@ -310,6 +313,10 @@ public:
     {
         return muIds.value(set);
     }
+    QString getUuId(const QString &set) const
+    {
+        return uuIds.value(set);
+    }
     QString getCollectorNumber(const QString &set) const
     {
         return collectorNumbers.value(set);
@@ -343,6 +350,10 @@ public:
     void setMuId(const QString &_set, const int &_muId)
     {
         muIds.insert(_set, _muId);
+    }
+    void setUuId(const QString &_set, const QString &_uuId)
+    {
+        uuIds.insert(_set, _uuId);
     }
     void setSetNumber(const QString &_set, const QString &_setNumber)
     {

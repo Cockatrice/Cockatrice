@@ -26,11 +26,22 @@
 #include "settingscache.h"
 #include "version_string.h"
 
-#define ZIP_SIGNATURE "PK"
-#define ALLSETS_URL_FALLBACK "https://mtgjson.com/json/AllSets.json"
+#ifdef HAS_LZMA
+#include "lzma/decompress.h"
+#endif
 
 #ifdef HAS_ZLIB
 #include "zip/unzip.h"
+#endif
+
+#define ZIP_SIGNATURE "PK"
+// Xz stream header: 0xFD + "7zXZ"
+#define XZ_SIGNATURE "\xFD\x37\x7A\x58\x5A"
+#define ALLSETS_URL_FALLBACK "https://mtgjson.com/json/AllSets.json"
+
+#ifdef HAS_LZMA
+#define ALLSETS_URL "https://mtgjson.com/json/AllSets.json.xz"
+#elif defined(HAS_ZLIB)
 #define ALLSETS_URL "https://mtgjson.com/json/AllSets.json.zip"
 #else
 #define ALLSETS_URL "https://mtgjson.com/json/AllSets.json"
@@ -249,11 +260,14 @@ void LoadSetsPage::actLoadSetsFile()
     QFileDialog dialog(this, tr("Load sets file"));
     dialog.setFileMode(QFileDialog::ExistingFile);
 
+    QString extensions = "*.json";
 #ifdef HAS_ZLIB
-    dialog.setNameFilter(tr("Sets JSON file (*.json *.zip)"));
-#else
-    dialog.setNameFilter(tr("Sets JSON file (*.json)"));
+    extensions += " *.zip";
 #endif
+#ifdef HAS_LZMA
+    extensions += " *.xz";
+#endif
+    dialog.setNameFilter(tr("Sets JSON file (%1)").arg(extensions));
 
     if (!fileLineEdit->text().isEmpty() && QFile::exists(fileLineEdit->text())) {
         dialog.selectFile(fileLineEdit->text());
@@ -383,7 +397,32 @@ void LoadSetsPage::readSetsFromByteArray(QByteArray data)
     progressBar->show();
 
     // unzip the file if needed
-    if (data.startsWith(ZIP_SIGNATURE)) {
+    if (data.startsWith(XZ_SIGNATURE)) {
+#ifdef HAS_LZMA
+        // zipped file
+        auto *inBuffer = new QBuffer(&data);
+        auto *outBuffer = new QBuffer(this);
+        inBuffer->open(QBuffer::ReadOnly);
+        outBuffer->open(QBuffer::WriteOnly);
+        XzDecompressor xz;
+        if (!xz.decompress(inBuffer, outBuffer)) {
+            zipDownloadFailed(tr("Xz extraction failed."));
+            return;
+        }
+
+        future = QtConcurrent::run(wizard()->importer, &OracleImporter::readSetsFromByteArray, outBuffer->data());
+        watcher.setFuture(future);
+        return;
+#else
+        zipDownloadFailed(tr("Sorry, this version of Oracle does not support xz compressed files."));
+
+        wizard()->enableButtons();
+        setEnabled(true);
+        progressLabel->hide();
+        progressBar->hide();
+        return;
+#endif
+    } else if (data.startsWith(ZIP_SIGNATURE)) {
 #ifdef HAS_ZLIB
         // zipped file
         auto *inBuffer = new QBuffer(&data);

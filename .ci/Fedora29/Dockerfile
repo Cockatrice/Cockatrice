@@ -15,4 +15,5 @@ RUN dnf install -y \
         sqlite-devel \
         wget \
         zlib-devel \
+        xz-devel \
     && dnf clean all

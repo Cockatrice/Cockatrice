@@ -224,13 +224,14 @@ CardInfo::CardInfo(const QString &_name,
                    const SetList &_sets,
                    const QStringMap &_customPicURLs,
                    MuidMap _muIds,
+                   QStringMap _uuIds,
                    QStringMap _collectorNumbers,
                    QStringMap _rarities)
     : name(_name), isToken(_isToken), sets(_sets), manacost(_manacost), cmc(_cmc), cardtype(_cardtype),
       powtough(_powtough), text(_text), colors(_colors), relatedCards(_relatedCards),
       reverseRelatedCards(_reverseRelatedCards), setsNames(), upsideDownArt(_upsideDownArt), loyalty(_loyalty),
-      customPicURLs(_customPicURLs), muIds(std::move(_muIds)), collectorNumbers(std::move(_collectorNumbers)),
-      rarities(std::move(_rarities)), cipt(_cipt), tableRow(_tableRow)
+      customPicURLs(_customPicURLs), muIds(std::move(_muIds)), uuIds(std::move(_uuIds)),
+      collectorNumbers(std::move(_collectorNumbers)), rarities(std::move(_rarities)), cipt(_cipt), tableRow(_tableRow)
 {
     pixmapCacheKey = QLatin1String("card_") + name;
     simpleName = CardInfo::simplifyName(name);
@@ -260,12 +261,13 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const SetList &_sets,
                                   const QStringMap &_customPicURLs,
                                   MuidMap _muIds,
+                                  QStringMap _uuIds,
                                   QStringMap _collectorNumbers,
                                   QStringMap _rarities)
 {
     CardInfoPtr ptr(new CardInfo(_name, _isToken, _manacost, _cmc, _cardtype, _powtough, _text, _colors, _relatedCards,
                                  _reverseRelatedCards, _upsideDownArt, _loyalty, _cipt, _tableRow, _sets,
-                                 _customPicURLs, std::move(_muIds), std::move(_collectorNumbers),
+                                 _customPicURLs, std::move(_muIds), std::move(_uuIds), std::move(_collectorNumbers),
                                  std::move(_rarities)));
     ptr->setSmartPointer(ptr);
 
@@ -440,6 +442,7 @@ void CardDatabase::addCard(CardInfoPtr card)
             QString setName = set->getCorrectedShortName();
             sameCard->setSet(set);
             sameCard->setMuId(setName, card->getMuId(setName));
+            sameCard->setUuId(setName, card->getUuId(setName));
             sameCard->setRarity(setName, card->getRarity(setName));
             sameCard->setSetNumber(setName, card->getCollectorNumber(setName));
         }

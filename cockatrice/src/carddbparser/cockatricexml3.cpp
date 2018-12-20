@@ -133,7 +133,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             QStringMap customPicURLs;
             MuidMap muids;
-            QStringMap collectorNumbers, rarities;
+            QStringMap uuids, collectorNumbers, rarities;
             SetList sets;
             int tableRow = 0;
             bool cipt = false;
@@ -162,6 +162,10 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     sets.append(internalAddSet(setName));
                     if (attrs.hasAttribute("muId")) {
                         muids[setName] = attrs.value("muId").toString().toInt();
+                    }
+
+                    if (attrs.hasAttribute("muId")) {
+                        uuids[setName] = attrs.value("uuId").toString();
                     }
 
                     if (attrs.hasAttribute("picURL")) {
@@ -232,7 +236,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
 
             CardInfoPtr newCard = CardInfo::newInstance(
                 name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown,
-                loyalty, cipt, tableRow, sets, customPicURLs, muids, collectorNumbers, rarities);
+                loyalty, cipt, tableRow, sets, customPicURLs, muids, uuids, collectorNumbers, rarities);
             emit addCard(newCard);
         }
     }
@@ -274,6 +278,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
         tmpSet = sets[i]->getShortName();
         xml.writeAttribute("rarity", info->getRarity(tmpSet));
         xml.writeAttribute("muId", QString::number(info->getMuId(tmpSet)));
+        xml.writeAttribute("uuId", info->getUuId(tmpSet));
 
         tmpString = info->getCollectorNumber(tmpSet);
         if (!tmpString.isEmpty()) {

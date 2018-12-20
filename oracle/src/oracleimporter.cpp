@@ -19,7 +19,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     setsMap = QtJson::Json::parse(QString(data), ok).toMap();
     if (!ok) {
         qDebug() << "error: QtJson::Json::parse()";
-        return 0;
+        return false;
     }
 
     QListIterator<QVariant> it(setsMap.values());
@@ -33,7 +33,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
 
     while (it.hasNext()) {
         map = it.next().toMap();
-        edition = map.value("code").toString();
+        edition = map.value("code").toString().toUpper();
         editionLong = map.value("name").toString();
         editionCards = map.value("cards");
         setType = map.value("type").toString();
@@ -57,6 +57,7 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
                                     QString cardName,
                                     bool isToken,
                                     int cardId,
+                                    QString &cardUuId,
                                     QString &setNumber,
                                     QString &cardCost,
                                     QString &cmc,
@@ -124,28 +125,11 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
         cards.insert(cardName, card);
     }
     card->setMuId(setName, cardId);
+    card->setUuId(setName, cardUuId);
     card->setSetNumber(setName, setNumber);
     card->setRarity(setName, rarity);
 
     return card;
-}
-
-void OracleImporter::extractColors(const QStringList &in, QStringList &out)
-{
-    foreach (QString c, in) {
-        if (c == "White")
-            out << "W";
-        else if (c == "Blue")
-            out << "U";
-        else if (c == "Black")
-            out << "B";
-        else if (c == "Red")
-            out << "R";
-        else if (c == "Green")
-            out << "G";
-        else
-            qDebug() << "error: unknown color:" << c;
-    }
 }
 
 int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
@@ -164,6 +148,7 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
     QList<CardRelation *> relatedCards;
     QList<CardRelation *> reverseRelatedCards; // dummy
     int cardId;
+    QString cardUuId;
     QString setNumber;
     QString rarity;
     QString cardLoyalty;
@@ -173,15 +158,20 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
     while (it.hasNext()) {
         map = it.next().toMap();
 
+        /* Currently used layouts are:
+         * augment, double_faced_token, flip, host, leveler, meld, normal, planar,
+         * saga, scheme, split, token, transform, vanguard
+         */
         QString layout = map.value("layout").toString();
 
         // don't import tokens from the json file
         if (layout == "token")
             continue;
 
-        if (layout == "split" || layout == "aftermath") {
+        // Aftermath card layout seems to have been integrated in "split"
+        if (layout == "split") {
             // Enqueue split card for later handling
-            cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
+            cardId = map.contains("multiverseId") ? map.value("multiverseId").toInt() : 0;
             if (cardId)
                 splitCards.insertMulti(cardId, map);
             continue;
@@ -190,16 +180,18 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
         // normal cards handling
         cardName = map.contains("name") ? map.value("name").toString() : QString("");
         cardCost = map.contains("manaCost") ? map.value("manaCost").toString() : QString("");
-        cmc = map.contains("cmc") ? map.value("cmc").toString() : QString("0");
+        cmc = map.contains("convertedManaCost") ? map.value("convertedManaCost").toString() : QString("0");
         cardType = map.contains("type") ? map.value("type").toString() : QString("");
         cardPT = map.contains("power") || map.contains("toughness")
                      ? map.value("power").toString() + QString('/') + map.value("toughness").toString()
                      : QString("");
         cardText = map.contains("text") ? map.value("text").toString() : QString("");
-        cardId = map.contains("multiverseid") ? map.value("multiverseid").toInt() : 0;
+        cardId = map.contains("multiverseId") ? map.value("multiverseId").toInt() : 0;
+        cardUuId = map.contains("uuid") ? map.value("uuid").toString() : QString("");
         setNumber = map.contains("number") ? map.value("number").toString() : QString("");
         rarity = map.contains("rarity") ? map.value("rarity").toString() : QString("");
         cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toString() : QString("");
+        colors = map.contains("colors") ? map.value("colors").toStringList() : QStringList();
         relatedCards = QList<CardRelation *>();
         if (map.contains("names"))
             foreach (const QString &name, map.value("names").toStringList()) {
@@ -214,11 +206,8 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
             upsideDown = false;
         }
 
-        colors.clear();
-        extractColors(map.value("colors").toStringList(), colors);
-
         CardInfoPtr card =
-            addCard(set->getShortName(), cardName, false, cardId, setNumber, cardCost, cmc, cardType, cardPT,
+            addCard(set->getShortName(), cardName, false, cardId, cardUuId, setNumber, cardCost, cmc, cardType, cardPT,
                     cardLoyalty, cardText, colors, relatedCards, reverseRelatedCards, upsideDown, rarity);
 
         if (!set->contains(card)) {
@@ -250,6 +239,7 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
         cardType = "";
         cardPT = "";
         cardText = "";
+        cardUuId = "";
         setNumber = "";
         rarity = "";
         cardLoyalty = "";
@@ -269,10 +259,10 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
                     cardCost += prefix;
                 cardCost += map.value("manaCost").toString();
             }
-            if (map.contains("cmc")) {
+            if (map.contains("convertedManaCost")) {
                 if (!cmc.isEmpty())
                     cmc += prefix;
-                cmc += map.value("cmc").toString();
+                cmc += map.value("convertedManaCost").toString();
             }
             if (map.contains("type")) {
                 if (!cardType.isEmpty())
@@ -289,6 +279,10 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
                     cardText += prefix2;
                 cardText += map.value("text").toString();
             }
+            if (map.contains("uuid")) {
+                if (cardUuId.isEmpty())
+                    cardUuId = map.value("uuid").toString();
+            }
             if (map.contains("number")) {
                 if (setNumber.isEmpty())
                     setNumber = map.value("number").toString();
@@ -298,7 +292,7 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
                     rarity = map.value("rarity").toString();
             }
 
-            extractColors(map.value("colors").toStringList(), colors);
+            colors << map.value("colors").toStringList();
         }
 
         colors.removeDuplicates();
@@ -313,8 +307,8 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
 
         // add the card
         CardInfoPtr card =
-            addCard(set->getShortName(), cardName, false, muid, setNumber, cardCost, cmc, cardType, cardPT, cardLoyalty,
-                    cardText, colors, relatedCards, reverseRelatedCards, upsideDown, rarity);
+            addCard(set->getShortName(), cardName, false, muid, cardUuId, setNumber, cardCost, cmc, cardType, cardPT,
+                    cardLoyalty, cardText, colors, relatedCards, reverseRelatedCards, upsideDown, rarity);
 
         if (!set->contains(card)) {
             card->addToSet(set);

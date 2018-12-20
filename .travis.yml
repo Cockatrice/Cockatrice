@@ -15,6 +15,7 @@ matrix:
         packages:
         - libprotobuf-dev
         - protobuf-compiler
+        - liblzma-dev
         - qt5-default
         - qttools5-dev
         - qttools5-dev-tools
@@ -87,9 +88,7 @@ matrix:
     env: HOMEBREW_NO_AUTO_UPDATE=1
     cache: ccache
     before_install:
-      - brew install ccache
-      - brew install protobuf
-      - brew install qt
+      - brew install ccache protobuf qt xz
     script: bash ./.ci/travis-compile.sh --server --install --debug
 
   - name: macOS (Release)
@@ -99,9 +98,7 @@ matrix:
     env: HOMEBREW_NO_AUTO_UPDATE=1
     cache: ccache
     before_install:
-      - brew install ccache
-      - brew install protobuf
-      - brew install qt
+      - brew install ccache protobuf qt xz
     script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
 
 
