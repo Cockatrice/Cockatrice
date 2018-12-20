@@ -418,13 +418,13 @@ void SettingsCache::setPicDownload(int _picDownload)
 void SettingsCache::setPicUrl(const QString &_picUrl)
 {
     picUrl = _picUrl;
-    settings->setValue("personal/picUrl", picUrl);
+    settings->setValue("personal/picUrlNew", picUrl);
 }
 
 void SettingsCache::setPicUrlFallback(const QString &_picUrlFallback)
 {
     picUrlFallback = _picUrlFallback;
-    settings->setValue("personal/picUrlFallback", picUrlFallback);
+    settings->setValue("personal/picUrlFallbackNew", picUrlFallback);
 }
 
 void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
