@@ -220,8 +220,8 @@ SettingsCache::SettingsCache()
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
 
-    picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
-    picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
+    picUrl = settings->value("personal/picUrlNew", PIC_URL_DEFAULT).toString();
+    picUrlFallback = settings->value("personal/picUrlFallbackNew", PIC_URL_FALLBACK).toString();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
