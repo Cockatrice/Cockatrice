@@ -295,7 +295,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="508"/>
         <source>&amp;Save</source>
-        <translation type="unfinished"/>
+        <translation>保存</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="514"/>
