@@ -25,6 +25,10 @@
 // never cache more than 300 cards at once for a single deck
 #define CACHED_CARD_PER_DECK_MAX 300
 
+// Other URLs we can use (TODO: Make this less messy)
+#define GATHERER_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
+#define GATHERER_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"
+
 class PictureToLoad::SetDownloadPriorityComparator
 {
 public:
@@ -48,6 +52,8 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
     /* #2479 will expand this into a list of Urls */
     urlTemplates.append(settingsCache->getPicUrl());
     urlTemplates.append(settingsCache->getPicUrlFallback());
+    urlTemplates.append(GATHERER_DEFAULT);
+    urlTemplates.append(GATHERER_FALLBACK);
 
     if (card) {
         sortedSets = card->getSets();
