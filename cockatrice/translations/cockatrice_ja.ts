@@ -267,7 +267,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/cardinfotext.cpp" line="123"/>
         <source>Unknown card:</source>
-        <translation type="unfinished"/>
+        <translation>謎のカード:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="131"/>
@@ -585,7 +585,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_connect.cpp" line="28"/>
         <source>Refresh the server list with known public servers</source>
-        <translation type="unfinished"/>
+        <translation>デフォルトの公開サーバーリストに更新します</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="40"/>
@@ -625,33 +625,33 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_connect.cpp" line="78"/>
         <source>If you have any trouble connecting or registering then contact the server staff for help!</source>
-        <translation type="unfinished"/>
+        <translation>接続や登録に問題がある場合は、サーバー管理者にお問い合わせください。</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="80"/>
         <location filename="../src/dlg_connect.cpp" line="262"/>
         <source>Webpage</source>
-        <translation type="unfinished"/>
+        <translation>ウェブページ</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="90"/>
         <source>Forgot Password</source>
-        <translation type="unfinished"/>
+        <translation>パスワード忘れちゃった</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="94"/>
         <source>&amp;Connect</source>
-        <translation type="unfinished"/>
+        <translation>接続</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="136"/>
         <source>Server Contact</source>
-        <translation type="unfinished"/>
+        <translation>サーバーの連絡先</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="149"/>
         <source>Connect to Server</source>
-        <translation type="unfinished"/>
+        <translation>サーバーに接続</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="117"/>
@@ -1030,7 +1030,7 @@ To remove your current avatar, confirm without choosing a new image.</source>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="145"/>
         <source>Please enter the name of the token:</source>
-        <translation>トークン名を入力してください:</translation>
+        <translation>トークン名を入力:</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="149"/>
@@ -1771,7 +1771,7 @@ You may have to build from source yourself.</source>
     <message>
         <location filename="../src/gameselector.cpp" line="169"/>
         <source>The game does not exist any more.</source>
-        <translation>このゲームは既に存在しません。</translation>
+        <translation>このゲームはすでに存在しません。</translation>
     </message>
     <message>
         <location filename="../src/gameselector.cpp" line="172"/>
@@ -2818,12 +2818,12 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="391"/>
         <source>%1 is now watching the game.</source>
-        <translation>%1が観戦に参加した。</translation>
+        <translation>%1 が観戦に参加した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="251"/>
         <source>%1 has loaded a deck (%2).</source>
-        <translation>%1はデッキをロードした。ハッシュ:%2</translation>
+        <translation>%1 はデッキをロードした。ハッシュ:%2</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="253"/>
@@ -2889,57 +2889,57 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="290"/>
         <source>%1 gives %2 control over %3.</source>
-        <translation>%1は、%2に《%3》のコントロールを渡した。</translation>
+        <translation>%1 は %2 に %3 のコントロールを渡した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="302"/>
         <source>%1 puts %2 into play tapped%3.</source>
-        <translation>%1は《%2》を%3タップ状態でプレイした。</translation>
+        <translation>%1 は %2 を%3タップ状態でプレイした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="304"/>
         <source>%1 puts %2 into play%3.</source>
-        <translation>%1は《%2》を%3プレイした。</translation>
+        <translation>%1 は %2 を%3プレイした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="308"/>
         <source>%1 exiles %2%3.</source>
-        <translation>%1は《%2》を%3追放した。</translation>
+        <translation>%1 は %2 を%3追放した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="321"/>
         <source>%1 puts %2%3 into their library %4 cards from the top.</source>
-        <translation>%1は《%2》を%3ライブラリーの一番上から%4枚目に置いた。</translation>
+        <translation>%1 は %2 を%3ライブラリーの一番上から%4枚目に置いた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="324"/>
         <source>%1 moves %2%3 to sideboard.</source>
-        <translation>%1は《%2》を%3サイドボードに置いた。</translation>
+        <translation>%1 は %2 を%3サイドボードに置いた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="327"/>
         <source>%1 plays %2%3.</source>
-        <translation>%1は《%2》を%3プレイした。</translation>
+        <translation>%1 は %2 を%3プレイした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="366"/>
         <source>%1 turns %2 face-down.</source>
-        <translation>%1は《%2》を裏向きにした。</translation>
+        <translation>%1 は %2 を裏向きにした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="368"/>
         <source>%1 turns %2 face-up.</source>
-        <translation>%1は《%2》を表向きにした。</translation>
+        <translation>%1 は %2 を表向きにした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="402"/>
         <source>%1 has left the game (%2).</source>
-        <translation>%1はゲームから離脱した（%2）。</translation>
+        <translation>%1 はゲームから離脱した（%2）。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="410"/>
         <source>%1 is not watching the game any more (%2).</source>
-        <translation>%1が観戦から離脱した（%2）。</translation>
+        <translation>%1 が観戦から離脱した（%2）。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="546"/>
@@ -3004,7 +3004,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="612"/>
         <source>%1&apos;s turn.</source>
-        <translation>■%1のターン■</translation>
+        <translation>■ %1 のターン■</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="636"/>
@@ -3024,12 +3024,12 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="151"/>
         <source>%1 is now keeping the top card %2 revealed.</source>
-        <translation>%1は、%2一番上のカードを公開した状態でゲームをプレイしている。</translation>
+        <translation>%1 は%2一番上のカードを公開した状態でゲームをプレイしている。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="152"/>
         <source>%1 is not revealing the top card %2 any longer.</source>
-        <translation>%1は、%2一番上のカードの公開を終えた。</translation>
+        <translation>%1 は%2一番上のカードの公開を終えた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="446"/>
@@ -3039,47 +3039,47 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="385"/>
         <source>%1 has joined the game.</source>
-        <translation>%1がゲームに参加した。</translation>
+        <translation>%1 がゲームに参加した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="451"/>
         <source>%1 is ready to start the game.</source>
-        <translation>%1はゲーム開始の準備が完了した！！</translation>
+        <translation>%1 はゲーム開始の準備が完了した！！</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="415"/>
         <source>%1 is not ready to start the game any more.</source>
-        <translation>%1は準備完了を解除した。</translation>
+        <translation>%1 は準備完了を解除した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="691"/>
         <source>%1 has locked their sideboard.</source>
-        <translation>%1はサイドボードをロックした。</translation>
+        <translation>%1 はサイドボードをロックした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="693"/>
         <source>%1 has unlocked their sideboard.</source>
-        <translation>%1はサイドボードを解禁した。</translation>
+        <translation>%1 はサイドボードを解禁した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="169"/>
         <source>%1 has conceded the game.</source>
-        <translation>%1が投了した！！！</translation>
+        <translation>%1 が投了した！！！</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="176"/>
         <source>%1 has restored connection to the game.</source>
-        <translation>%1がゲームに再接続した。</translation>
+        <translation>%1 がゲームに再接続した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="180"/>
         <source>%1 has lost connection to the game.</source>
-        <translation>%1はゲームから切断された。</translation>
+        <translation>%1 はゲームから切断された。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="721"/>
         <source>%1 shuffles %2.</source>
-        <translation>%1は%2を切り直した。</translation>
+        <translation>%1 は%2を切り直した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="522"/>
@@ -3094,27 +3094,27 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="523"/>
         <source>%1 flipped a coin. It landed as %2.</source>
-        <translation>%1はコインを投げた。結果は……【%2】だ！</translation>
+        <translation>%1 はコインを投げた。結果は……【%2】だ！</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="527"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
-        <translation>%1は%3面ダイスをふり、【%2】を出した。</translation>
+        <translation>%1 は%3面ダイスをふり、【%2】を出した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="344"/>
         <source>%1 draws %2 card(s).</source>
-        <translation>%1は%2枚カードを引いた。</translation>
+        <translation>%1 は%2枚カードを引いた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="749"/>
         <source>%1 undoes their last draw.</source>
-        <translation>%1は最後に引いたカードを戻した。</translation>
+        <translation>%1 は最後に引いたカードを戻した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="752"/>
         <source>%1 undoes their last draw (%2).</source>
-        <translation>%1は最後に引いたカード (《%2》) を戻した 。</translation>
+        <translation>%1 は最後に引いたカード ( %2 ) を戻した 。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="72"/>
@@ -3154,202 +3154,202 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="306"/>
         <source>%1 puts %2%3 into their graveyard.</source>
-        <translation>%1は《%2》を%3墓地に置いた。</translation>
+        <translation>%1 は %2 を%3墓地に置いた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="310"/>
         <source>%1 moves %2%3 to their hand.</source>
-        <translation>%1は《%2》を%3手札に加えた。</translation>
+        <translation>% 1は %2 を%3手札に加えた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="313"/>
         <source>%1 puts %2%3 into their library.</source>
-        <translation>%1は《%2》を%3ライブラリーに加えた。</translation>
+        <translation>%1 は %2 を%3ライブラリーに加えた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="315"/>
         <source>%1 puts %2%3 on bottom of their library.</source>
-        <translation>%1は《%2》を%3ライブラリーの一番下に置いた。</translation>
+        <translation>%1 は %2 を%3ライブラリーの一番下に置いた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="317"/>
         <source>%1 puts %2%3 on top of their library.</source>
-        <translation>%1は《%2》を%3ライブラリーの一番上に置いた。</translation>
+        <translation>%1 は %2 を%3ライブラリーの一番上に置いた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="439"/>
         <source>%1 takes a mulligan to %2.</source>
-        <translation>%1は%2枚にマリガンした。</translation>
+        <translation>%1 は%2枚にマリガンした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="441"/>
         <source>%1 draws their initial hand.</source>
-        <translation>%1は初期手札を引いた。</translation>
+        <translation>%1 は初期手札を引いた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="261"/>
         <source>%1 destroys %2.</source>
-        <translation>%1は《%2》を取り除いた。</translation>
+        <translation>%1 は %2 を取り除いた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="743"/>
         <source>%1 unattaches %2.</source>
-        <translation>%1は《%2》をはずした。</translation>
+        <translation>%1 は %2 をはずした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="242"/>
         <source>%1 creates token: %2%3.</source>
-        <translation>%1はトークン:《%2》を%3作成した。</translation>
+        <translation>%1 はトークン: %2 を%3作成した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="196"/>
         <source>%1 points from their %2 to themselves.</source>
-        <translation>%1は《%2》から自分自身へ対象を指定した。</translation>
+        <translation>%1 は %2 から自分自身へ対象を指定した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="199"/>
         <source>%1 points from their %2 to %3.</source>
-        <translation>%1は、《%2》から%3へ対象を指定した。</translation>
+        <translation>%1 は %2 から %3 へ対象を指定した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="203"/>
         <source>%1 points from %2&apos;s %3 to themselves.</source>
-        <translation>%1は、%2の《%3》から自分自身へ対象を指定した。</translation>
+        <translation>%1 は %2 の %3 から自分自身へ対象を指定した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="207"/>
         <source>%1 points from %2&apos;s %3 to %4.</source>
-        <translation>%1は、%2の《%3》から%4へ対象を指定した。</translation>
+        <translation>%1 は %2 の %3 から %4 へ対象を指定した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="215"/>
         <source>%1 points from their %2 to their %3.</source>
-        <translation>%1は、《%2》から%3へ対象を指定した。</translation>
+        <translation>%1 は %2 から %3 へ対象を指定した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="218"/>
         <source>%1 points from their %2 to %3&apos;s %4.</source>
-        <translation>%1は、《%2》から%3の《%4》へ対象を指定した。</translation>
+        <translation>%1 は %2 から %3 の %4 へ対象を指定した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="224"/>
         <source>%1 points from %2&apos;s %3 to their own %4.</source>
-        <translation>%1は、%2の《%3》から《%4》へ対象を指定した。</translation>
+        <translation>%1 は %2 の %3 から %4 へ対象を指定した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="230"/>
         <source>%1 points from %2&apos;s %3 to %4&apos;s %5.</source>
-        <translation>%1は、%2の《%3》から%4の《%5》へ対象を指定した。</translation>
+        <translation>%1 は %2 の %3 から %4 の %5 へ対象を指定した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="629"/>
         <source>%1 places %2 %3 counter(s) on %4 (now %5).</source>
-        <translation>%1は《%4》の上に%3カウンターを%2個置いた (計%5個) 。</translation>
+        <translation>%1 は %4 の上に%3カウンターを%2個置いた (計%5個) 。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="631"/>
         <source>%1 removes %2 %3 counter(s) from %4 (now %5).</source>
-        <translation>%1は《%4》の上から%3カウンターを%2個取り除いた (計%5個) 。</translation>
+        <translation>%1 は %4 の上から%3カウンターを%2個取り除いた (計%5個) 。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="708"/>
         <source>%1 taps their permanents.</source>
-        <translation>%1は自分のコントロールするパーマネントをタップした。</translation>
+        <translation>%1 は自分のコントロールするパーマネントをタップした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="708"/>
         <source>%1 untaps their permanents.</source>
-        <translation>%1は自分のコントロールするパーマネントをアンタップした。</translation>
+        <translation>%1 は自分のコントロールするパーマネントをアンタップした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="711"/>
         <source>%1 taps %2.</source>
-        <translation>%1は《%2》をタップした。</translation>
+        <translation>%1 は %2 をタップした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="711"/>
         <source>%1 untaps %2.</source>
-        <translation>%1は《%2》をアンタップした。</translation>
+        <translation>%1 は %2 をアンタップした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="659"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
-        <translation>%1は%2カウンターを%3に設定した (%4%5)。</translation>
+        <translation>%1 は%2カウンターを%3に設定した (%4%5)。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="671"/>
         <source>%1 sets %2 to not untap normally.</source>
-        <translation>%1は《%2》をアンタップ・ステップの間にアンタップしないようにした。</translation>
+        <translation>%1 は %2 をアンタップ・ステップの間にアンタップしないようにした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="673"/>
         <source>%1 sets %2 to untap normally.</source>
-        <translation>%1は《%2》を通常どおりアンタップするように設定した。</translation>
+        <translation>%1 は %2 を通常どおりアンタップするように設定した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="682"/>
         <source>%1 sets PT of %2 to %3.</source>
-        <translation>%1は《%2》のP/Tを%3にした。</translation>
+        <translation>%1 は %2 のP/Tを%3にした。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="618"/>
         <source>%1 sets annotation of %2 to %3.</source>
-        <translation>%1は《%2》に注釈をつけた (%3)。</translation>
+        <translation>%1 は %2 に注釈をつけた (%3)。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="353"/>
         <source>%1 is looking at %2.</source>
-        <translation>%1は%2を見ている。</translation>
+        <translation>%1 は%2を見ている。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="357"/>
         <source>%1 is looking at the top %2 card(s) %3.</source>
-        <translation>%1は%3上から%2枚のカードを見ている。</translation>
+        <translation>%1 は%3上から%2枚のカードを見ている。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="736"/>
         <source>%1 stops looking at %2.</source>
-        <translation>%1は%2を見るのをやめた。</translation>
+        <translation>%1 は%2を見るのをやめた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="479"/>
         <source>%1 reveals %2 to %3.</source>
-        <translation>%1は、%3に%2を見せた。</translation>
+        <translation>%1 は %3 に%2を見せた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="484"/>
         <source>%1 reveals %2.</source>
-        <translation>%1は%2を公開した。</translation>
+        <translation>%1 は%2を公開した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="489"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
-        <translation>%1は%3無作為に《%2》を選び、%4に見せた。</translation>
+        <translation>%1 は%3無作為に %2 を選び、%4に見せた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="496"/>
         <source>%1 randomly reveals %2%3.</source>
-        <translation>%1は%3無作為に《%2》を選び、公開した。</translation>
+        <translation>%1 は%3無作為に %2 を選び、公開した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="501"/>
         <source>%1 peeks at face down card #%2.</source>
-        <translation>%1は裏向きのカード#%2の表面を確認した。</translation>
+        <translation>%1 は裏向きのカード#%2の表面を確認した。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="503"/>
         <source>%1 peeks at face down card #%2: %3.</source>
-        <translation>%1は裏向きのカード#%2の表面を確認した (《%3》) 。</translation>
+        <translation>%1 は裏向きのカード#%2の表面を確認した ( %3 ) 。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="508"/>
         <source>%1 reveals %2%3 to %4.</source>
-        <translation>%1は%3《%2》を%4に見せた。</translation>
+        <translation>%1 は%3 %2 を %4 に見せた。</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="515"/>
         <source>%1 reveals %2%3.</source>
-        <translation>%1は%3《%2》を公開した</translation>
+        <translation>%1 は%3 %2 を公開した。</translation>
     </message>
 </context>
 <context>
@@ -3515,7 +3515,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="617"/>
         <source>Player &quot;%1&quot;</source>
-        <translation>プレイヤー &quot;%1&quot;</translation>
+        <translation>プレイヤー: %1</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="618"/>
@@ -3836,7 +3836,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="1085"/>
         <location filename="../src/player.cpp" line="2877"/>
         <source>C&amp;reate another %1 token</source>
-        <translation>別の%1トークンを出す</translation>
+        <translation>別の %1 トークンを出す</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1228"/>
@@ -4274,7 +4274,7 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="99"/>
         <source>Spoilers season has ended</source>
-        <translation type="unfinished"/>
+        <translation>スポイラーシーズンが終了しました</translation>
     </message>
     <message>
         <location filename="../src/spoilerbackgroundupdater.cpp" line="99"/>
@@ -5063,7 +5063,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="66"/>
         <source>Private &amp;chat</source>
-        <translation>プライベートチャット</translation>
+        <translation>個人チャット</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="67"/>
@@ -5073,7 +5073,7 @@ The more information you put in, the more specific your results will be.</source
     <message>
         <location filename="../src/tab_message.cpp" line="83"/>
         <source>%1 - Private chat</source>
-        <translation>%1 - プライベートチャット</translation>
+        <translation>%1 - 個人チャット</translation>
     </message>
     <message>
         <location filename="../src/tab_message.cpp" line="110"/>
@@ -5893,17 +5893,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/window_sets.cpp" line="139"/>
         <source>Warning: </source>
-        <translation type="unfinished"/>
+        <translation>警告:</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="140"/>
         <source>While the set list is sorted by any of the columns, custom art priority setting is disabled.</source>
-        <translation type="unfinished"/>
+        <translation>セットリストがいずれかの列でソートされている間、セット読み込み順の優先度設定は無効です。</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="141"/>
         <source>To disable sorting click on the same column header again until this message disappears.</source>
-        <translation type="unfinished"/>
+        <translation>このメッセージが消えるまで同じ列見出しをクリックし続けると、ソートを無効にすることができます。</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="170"/>
