@@ -1983,7 +1983,7 @@ public:
         lbl_TabGame_aRotateViewCW->setText(QApplication::translate("shortcutsTab", "Rotate view CW", 0));
         lbl_Player_aShuffle->setText(QApplication::translate("shortcutsTab", "Shuffle library", 0));
         lbl_TabGame_aRotateViewCCW->setText(QApplication::translate("shortcutsTab", "Rotate view CCW", 0));
-        groupBox_draw->setTitle(QApplication::translate("shortcutsTab", "Draw", 0));
+        groupBox_draw->setTitle(QApplication::translate("shortcutsTab", "Drawing", 0));
         lbl_Player_aMulligan->setText(QApplication::translate("shortcutsTab", "Mulligan", 0));
         lbl_Player_aDrawCard->setText(QApplication::translate("shortcutsTab", "Draw card", 0));
         lbl_Player_aDrawCards->setText(QApplication::translate("shortcutsTab", "Draw cards", 0));
