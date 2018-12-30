@@ -139,13 +139,20 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     hintsGroupBox = new QGroupBox(tr("Hints"));
     hintsGroupBox->setLayout(hintsGrid);
 
-    sortWarning = new QLabel;
-    sortWarning->setWordWrap(true);
-    sortWarning->setText(
-        "<b>" + tr("Warning: ") + "</b><br>" +
-        tr("While the set list is sorted by any of the columns, custom art priority setting is disabled.") + "<br>" +
-        tr("To disable sorting click on the same column header again until this message disappears."));
-    sortWarning->setStyleSheet("QLabel { background-color:red;}");
+    sortWarning = new QGroupBox(tr("Note"));
+    QGridLayout *sortWarningLayout = new QGridLayout;
+    sortWarningText = new QLabel;
+    sortWarningText->setWordWrap(true);
+    sortWarningText->setText(tr("Sorting by column allows you to find a set while not changing set priority.") + " " +
+                             tr("To enable ordering again, click the column header until this message disappears."));
+    sortWarningLayout->addWidget(sortWarningText, 0, 0, 1, 2);
+    sortWarningButton = new QPushButton;
+    sortWarningButton->setText(tr("Use the current sorting as the set priority instead"));
+    sortWarningButton->setToolTip(tr("Sorts the set priority using the same column"));
+    sortWarningButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    connect(sortWarningButton, SIGNAL(released()), this, SLOT(actIgnoreWarning()));
+    sortWarningLayout->addWidget(sortWarningButton, 1, 0);
+    sortWarning->setLayout(sortWarningLayout);
     sortWarning->setVisible(false);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -252,6 +259,17 @@ void WndSets::actSort(int index)
             sortWarning->setVisible(false);
         }
     }
+}
+
+void WndSets::actIgnoreWarning()
+{
+    if (sortIndex < 0) {
+        return;
+    }
+    model->sort(sortIndex, sortOrder);
+    view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
+    sortIndex = -1;
+    sortWarning->setVisible(false);
 }
 
 void WndSets::actDisableSortButtons(int index)
