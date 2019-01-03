@@ -354,10 +354,11 @@ void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCar
                                     .arg(sanitizeHtml(player->getName()))
                                     .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
     else
-        appendHtmlServerMessage(tr("%1 is looking at the top %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone))
-                                    .arg("<font color=\"blue\">" + QString::number(numberCards) + "</font>"));
+         appendHtmlServerMessage(
+             tr("%1 is looking at the top %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
+                 .arg(sanitizeHtml(player->getName()))
+                 .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone))
+                 .arg("<font color=\"blue\">" + QString::number(numberCards) + "</font>"));
 }
 
 void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
