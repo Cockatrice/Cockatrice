@@ -156,7 +156,7 @@ void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZone *zone, bo
 
 void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName)
 {
-    appendHtmlServerMessage(QString("%1 attaches %2 to %3's %4.")
+    appendHtmlServerMessage(tr("%1 attaches %2 to %3's %4.")
                                 .arg(sanitizeHtml(player->getName()))
                                 .arg(cardLink(cardName))
                                 .arg(sanitizeHtml(targetPlayer->getName()))
