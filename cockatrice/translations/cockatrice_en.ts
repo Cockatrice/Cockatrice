@@ -248,6 +248,30 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardFilter</name>
     <message>
+        <location filename="../src/cardfilter.cpp" line="7"/>
+        <source>AND</source>
+        <comment>Logical conjunction operator used in card filter</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="9"/>
+        <source>OR</source>
+        <comment>Logical disjunction operator used in card filter</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="11"/>
+        <source>AND NOT</source>
+        <comment>Negated logical conjunction operator used in card filter</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="13"/>
+        <source>OR NOT</source>
+        <comment>Negated logical disjunction operator used in card filter</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/cardfilter.cpp" line="23"/>
         <source>Name</source>
         <translation type="unfinished"></translation>

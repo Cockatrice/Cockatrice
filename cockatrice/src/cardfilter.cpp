@@ -4,13 +4,13 @@ const QString CardFilter::typeName(Type t)
 {
     switch (t) {
         case TypeAnd:
-            return QString("AND");
+            return tr("AND", "Logical conjunction operator used in card filter");
         case TypeOr:
-            return QString("OR");
+            return tr("OR", "Logical disjunction operator used in card filter");
         case TypeAndNot:
-            return QString("AND NOT");
+            return tr("AND NOT", "Negated logical conjunction operator used in card filter");
         case TypeOrNot:
-            return QString("OR NOT");
+            return tr("OR NOT", "Negated logical disjunction operator used in card filter");
         default:
             return QString("");
     }
