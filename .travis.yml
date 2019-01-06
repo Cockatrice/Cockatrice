@@ -85,7 +85,6 @@ matrix:
     if: tag IS NOT present
     os: osx
     osx_image: xcode9.2
-    env: HOMEBREW_NO_AUTO_UPDATE=1
     cache: ccache
     before_install:
       - brew install ccache protobuf qt xz
@@ -95,7 +94,6 @@ matrix:
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode9.2
-    env: HOMEBREW_NO_AUTO_UPDATE=1
     cache: ccache
     before_install:
       - brew install ccache protobuf qt xz
