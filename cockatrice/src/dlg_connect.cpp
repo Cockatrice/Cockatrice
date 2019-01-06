@@ -273,15 +273,15 @@ void DlgConnect::newHostSelected(bool state)
         previousHosts->setDisabled(true);
         btnRefreshServers->setDisabled(true);
         hostEdit->clear();
-        hostEdit->setPlaceholderText("Server URL");
+        hostEdit->setPlaceholderText(tr("Server URL"));
         hostEdit->setDisabled(false);
         portEdit->clear();
-        portEdit->setPlaceholderText("Communication Port");
+        portEdit->setPlaceholderText(tr("Communication Port"));
         portEdit->setDisabled(false);
         playernameEdit->clear();
         passwordEdit->clear();
         saveEdit->clear();
-        saveEdit->setPlaceholderText("Unique Server Name");
+        saveEdit->setPlaceholderText(tr("Unique Server Name"));
         saveEdit->setDisabled(false);
         serverContactLabel->setText("");
         serverContactLink->setText("");

@@ -649,7 +649,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&roomHistory, SIGNAL(stateChanged(int)), settingsCache, SLOT(setRoomHistory(int)));
 
     customAlertString = new QLineEdit();
-    customAlertString->setPlaceholderText("Word1 Word2 Word3");
+    customAlertString->setPlaceholderText(tr("Word1 Word2 Word3"));
     customAlertString->setText(settingsCache->getHighlightWords());
     connect(customAlertString, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighlightWords(QString)));
 
