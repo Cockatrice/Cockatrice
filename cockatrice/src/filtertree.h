@@ -54,17 +54,13 @@ public:
     {
         return (parent() != NULL) ? parent()->childIndex(this) : -1;
     }
-    virtual QString text() const
+    virtual const QString text() const
     {
-        return QString(textCStr());
+        return QString("");
     }
     virtual bool isLeaf() const
     {
         return false;
-    }
-    virtual const char *textCStr() const
-    {
-        return "";
     }
     virtual void nodeChanged() const
     {
@@ -126,7 +122,7 @@ public:
     const FilterItemList *findTypeList(CardFilter::Type type) const;
     FilterItemList *typeList(CardFilter::Type type);
     FilterTreeNode *parent() const;
-    const char *textCStr() const
+    const QString text() const
     {
         return CardFilter::attrName(attr);
     }
@@ -154,7 +150,7 @@ public:
     }
     int termIndex(const QString &term) const;
     FilterTreeNode *termNode(const QString &term);
-    const char *textCStr() const
+    const QString text() const
     {
         return CardFilter::typeName(type);
     }
@@ -190,13 +186,9 @@ public:
     {
         return p;
     }
-    QString text() const
+    const QString text() const
     {
         return term;
-    }
-    const char *textCStr() const
-    {
-        return term.toStdString().c_str();
     }
     bool isLeaf() const
     {
@@ -263,9 +255,9 @@ public:
     FilterTreeNode *termNode(CardFilter::Attr attr, CardFilter::Type type, const QString &term);
     FilterTreeNode *termNode(const CardFilter *f);
     FilterTreeNode *attrTypeNode(CardFilter::Attr attr, CardFilter::Type type);
-    const char *textCStr() const
+    const QString text() const
     {
-        return "root";
+        return QString("root");
     }
     int index() const
     {

@@ -128,10 +128,7 @@ QVariant FilterTreeModel::data(const QModelIndex &index, int role) const
         case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
-            if (!node->isLeaf())
-                return tr(node->textCStr());
-            else
-                return node->text();
+            return node->text();
         case Qt::CheckStateRole:
             if (node->isEnabled())
                 return Qt::Checked;

@@ -1,10 +1,13 @@
 #ifndef CARDFILTER_H
 #define CARDFILTER_H
 
+#include <QObject>
 #include <QString>
 
-class CardFilter
+class CardFilter : public QObject
 {
+    Q_OBJECT
+
 public:
     enum Type
     {
@@ -54,8 +57,8 @@ public:
         return a;
     }
 
-    static const char *typeName(Type t);
-    static const char *attrName(Attr a);
+    static const QString typeName(Type t);
+    static const QString attrName(Attr a);
 };
 
 #endif
