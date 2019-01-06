@@ -156,7 +156,7 @@ void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZone *zone, bo
 
 void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName)
 {
-    appendHtmlServerMessage(QString("%1 attaches %2 to %3's %4.")
+    appendHtmlServerMessage(tr("%1 attaches %2 to %3's %4.")
                                 .arg(sanitizeHtml(player->getName()))
                                 .arg(cardLink(cardName))
                                 .arg(sanitizeHtml(targetPlayer->getName()))
@@ -341,7 +341,7 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
         mulliganPlayer = player;
     else {
         soundEngine->playSound("draw_card");
-        appendHtmlServerMessage(tr("%1 draws %2 card(s).")
+        appendHtmlServerMessage(tr("%1 draws %2 card(s).", "", number)
                                     .arg(sanitizeHtml(player->getName()))
                                     .arg("<font color=\"blue\">" + QString::number(number) + "</font>"));
     }
@@ -354,10 +354,11 @@ void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCar
                                     .arg(sanitizeHtml(player->getName()))
                                     .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
     else
-        appendHtmlServerMessage(tr("%1 is looking at the top %2 card(s) %3.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg("<font color=\"blue\">" + QString::number(numberCards) + "</font>")
-                                    .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone)));
+        appendHtmlServerMessage(
+            tr("%1 is looking at the top %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
+                .arg(sanitizeHtml(player->getName()))
+                .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone))
+                .arg("<font color=\"blue\">" + QString::number(numberCards) + "</font>"));
 }
 
 void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
@@ -626,20 +627,20 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
     QString finalStr;
     int delta = abs(oldValue - value);
     if (value > oldValue)
-        finalStr = tr("%1 places %2 %3 counter(s) on %4 (now %5).");
+        finalStr = tr("%1 places %2 %3 on %4 (now %5).");
     else
-        finalStr = tr("%1 removes %2 %3 counter(s) from %4 (now %5).");
+        finalStr = tr("%1 removes %2 %3 from %4 (now %5).");
 
     QString colorStr;
     switch (counterId) {
         case 0:
-            colorStr = tr("red", "", delta);
+            colorStr = tr("red counter(s)", "", delta);
             break;
         case 1:
-            colorStr = tr("yellow", "", delta);
+            colorStr = tr("yellow counter(s)", "", delta);
             break;
         case 2:
-            colorStr = tr("green", "", delta);
+            colorStr = tr("green counter(s)", "", delta);
             break;
         default:;
     }
