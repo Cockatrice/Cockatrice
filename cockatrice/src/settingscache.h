@@ -2,6 +2,7 @@
 #define SETTINGSCACHE_H
 
 #include "settings/carddatabasesettings.h"
+#include "settings/downloadsettings.h"
 #include "settings/gamefilterssettings.h"
 #include "settings/layoutssettings.h"
 #include "settings/messagesettings.h"
@@ -12,10 +13,6 @@
 #include <QStringList>
 
 class ReleaseChannel;
-
-// Fallbacks used for cards w/o MultiverseId
-#define PIC_URL_DEFAULT "https://api.scryfall.com/cards/multiverse/!cardid!?format=image"
-#define PIC_URL_FALLBACK "https://api.scryfall.com/cards/named?fuzzy=!name!&format=image"
 
 // size should be a multiple of 64
 #define PIXMAPCACHE_SIZE_DEFAULT 2047
@@ -61,6 +58,7 @@ private:
     MessageSettings *messageSettings;
     GameFiltersSettings *gameFiltersSettings;
     LayoutsSettings *layoutsSettings;
+    DownloadSettings *downloadSettings;
 
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
@@ -303,14 +301,6 @@ public:
     {
         return ignoreUnregisteredUserMessages;
     }
-    QString getPicUrl() const
-    {
-        return picUrl;
-    }
-    QString getPicUrlFallback() const
-    {
-        return picUrlFallback;
-    }
     int getPixmapCacheSize() const
     {
         return pixmapCacheSize;
@@ -430,6 +420,10 @@ public:
     {
         return *layoutsSettings;
     }
+    DownloadSettings &downloads() const
+    {
+        return *downloadSettings;
+    }
     bool getIsPortableBuild() const
     {
         return isPortableBuild;
@@ -478,8 +472,6 @@ public slots:
     void setSoundThemeName(const QString &_soundThemeName);
     void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
     void setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages);
-    void setPicUrl(const QString &_picUrl);
-    void setPicUrlFallback(const QString &_picUrlFallback);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setCardScaling(const int _scaleCards);
     void setShowMessagePopups(const int _showMessagePopups);

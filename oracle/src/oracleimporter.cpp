@@ -97,7 +97,7 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
         bool mArtifact = false;
         if (cardType.endsWith("Artifact")) {
             for (int i = 0; i < cardTextRows.size(); ++i) {
-                cardTextRows[i].remove(QRegularExpression("\\\".*?\\\""));
+                cardTextRows[i].remove(QRegularExpression(R"(\".*?\")"));
                 if (cardTextRows[i].contains("{T}") && cardTextRows[i].contains("to your mana pool")) {
                     mArtifact = true;
                 }
@@ -124,6 +124,7 @@ CardInfoPtr OracleImporter::addCard(const QString &setName,
 
         cards.insert(cardName, card);
     }
+
     card->setMuId(setName, cardId);
     card->setUuId(setName, cardUuId);
     card->setSetNumber(setName, setNumber);
@@ -152,7 +153,7 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
     QString setNumber;
     QString rarity;
     QString cardLoyalty;
-    bool upsideDown = false;
+    bool upsideDown;
     QMap<int, QVariantMap> splitCards;
 
     while (it.hasNext()) {
@@ -187,14 +188,14 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
                      : QString("");
         cardText = map.contains("text") ? map.value("text").toString() : QString("");
         cardId = map.contains("multiverseId") ? map.value("multiverseId").toInt() : 0;
-        cardUuId = map.contains("uuid") ? map.value("uuid").toString() : QString("");
+        cardUuId = map.contains("scryfallId") ? map.value("scryfallId").toString() : QString("");
         setNumber = map.contains("number") ? map.value("number").toString() : QString("");
         rarity = map.contains("rarity") ? map.value("rarity").toString() : QString("");
         cardLoyalty = map.contains("loyalty") ? map.value("loyalty").toString() : QString("");
         colors = map.contains("colors") ? map.value("colors").toStringList() : QStringList();
         relatedCards = QList<CardRelation *>();
         if (map.contains("names"))
-            foreach (const QString &name, map.value("names").toStringList()) {
+            for (const QString &name : map.value("names").toStringList()) {
                 if (name != cardName)
                     relatedCards.append(new CardRelation(name, true));
             }
@@ -218,18 +219,18 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
 
     // split cards handling - get all unique card muids
     QList<int> muids = splitCards.uniqueKeys();
-    foreach (int muid, muids) {
+    for (int muid : muids) {
         // get all cards for this specific muid
         QList<QVariantMap> maps = splitCards.values(muid);
         QStringList names;
         // now, reorder the cards using the ordered list of names
         QMap<int, QVariantMap> orderedMaps;
-        foreach (QVariantMap map, maps) {
+        for (const QVariantMap &inner_map : maps) {
             if (names.isEmpty())
-                names = map.contains("names") ? map.value("names").toStringList() : QStringList();
-            QString name = map.value("name").toString();
+                names = inner_map.contains("names") ? inner_map.value("names").toStringList() : QStringList();
+            QString name = inner_map.value("name").toString();
             int index = names.indexOf(name);
-            orderedMaps.insertMulti(index, map);
+            orderedMaps.insertMulti(index, inner_map);
         }
 
         // clean variables
@@ -248,51 +249,51 @@ int OracleImporter::importTextSpoiler(CardSetPtr set, const QVariant &data)
         // loop cards and merge their contents
         QString prefix = QString(" // ");
         QString prefix2 = QString("\n\n---\n\n");
-        foreach (QVariantMap map, orderedMaps.values()) {
-            if (map.contains("name")) {
+        for (const QVariantMap &inner_map : orderedMaps.values()) {
+            if (inner_map.contains("name")) {
                 if (!cardName.isEmpty())
                     cardName += (orderedMaps.count() > 2) ? QString("/") : prefix;
-                cardName += map.value("name").toString();
+                cardName += inner_map.value("name").toString();
             }
-            if (map.contains("manaCost")) {
+            if (inner_map.contains("manaCost")) {
                 if (!cardCost.isEmpty())
                     cardCost += prefix;
-                cardCost += map.value("manaCost").toString();
+                cardCost += inner_map.value("manaCost").toString();
             }
-            if (map.contains("convertedManaCost")) {
+            if (inner_map.contains("convertedManaCost")) {
                 if (!cmc.isEmpty())
                     cmc += prefix;
-                cmc += map.value("convertedManaCost").toString();
+                cmc += inner_map.value("convertedManaCost").toString();
             }
-            if (map.contains("type")) {
+            if (inner_map.contains("type")) {
                 if (!cardType.isEmpty())
                     cardType += prefix;
-                cardType += map.value("type").toString();
+                cardType += inner_map.value("type").toString();
             }
-            if (map.contains("power") || map.contains("toughness")) {
+            if (inner_map.contains("power") || inner_map.contains("toughness")) {
                 if (!cardPT.isEmpty())
                     cardPT += prefix;
-                cardPT += map.value("power").toString() + QString('/') + map.value("toughness").toString();
+                cardPT += inner_map.value("power").toString() + QString('/') + inner_map.value("toughness").toString();
             }
-            if (map.contains("text")) {
+            if (inner_map.contains("text")) {
                 if (!cardText.isEmpty())
                     cardText += prefix2;
-                cardText += map.value("text").toString();
+                cardText += inner_map.value("text").toString();
             }
-            if (map.contains("uuid")) {
+            if (inner_map.contains("uuid")) {
                 if (cardUuId.isEmpty())
-                    cardUuId = map.value("uuid").toString();
+                    cardUuId = inner_map.value("uuid").toString();
             }
-            if (map.contains("number")) {
+            if (inner_map.contains("number")) {
                 if (setNumber.isEmpty())
-                    setNumber = map.value("number").toString();
+                    setNumber = inner_map.value("number").toString();
             }
-            if (map.contains("rarity")) {
+            if (inner_map.contains("rarity")) {
                 if (rarity.isEmpty())
-                    rarity = map.value("rarity").toString();
+                    rarity = inner_map.value("rarity").toString();
             }
 
-            colors << map.value("colors").toStringList();
+            colors << inner_map.value("colors").toStringList();
         }
 
         colors.removeDuplicates();

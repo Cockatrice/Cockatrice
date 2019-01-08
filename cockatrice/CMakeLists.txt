@@ -114,6 +114,7 @@ SET(cockatrice_SOURCES
     src/settings/messagesettings.cpp
     src/settings/gamefilterssettings.cpp
     src/settings/layoutssettings.cpp
+    src/settings/downloadsettings.cpp
     src/update_downloader.cpp
     src/logger.cpp
     src/releasechannel.cpp
@@ -122,7 +123,7 @@ SET(cockatrice_SOURCES
     src/handle_public_servers.cpp
     src/carddbparser/cockatricexml3.cpp
     ${VERSION_STRING_CPP}
-)
+    )
 
 add_subdirectory(sounds)
 add_subdirectory(themes)
