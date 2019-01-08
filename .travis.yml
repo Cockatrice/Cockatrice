@@ -84,10 +84,15 @@ matrix:
   - name: macOS (Debug)
     if: tag IS NOT present
     os: osx
-    osx_image: xcode9.2
+    osx_image: xcode10.1
     cache: ccache
-    before_install:
-      - brew install ccache protobuf qt xz
+    addons:
+      homebrew:
+        packages:
+        - ccache
+        - protobuf
+        - qt
+        - xz
     script: bash ./.ci/travis-compile.sh --server --install --debug
 
   - name: macOS (Release)
@@ -95,10 +100,15 @@ matrix:
     os: osx
     osx_image: xcode9.2
     cache: ccache
-    before_install:
-      - brew install ccache protobuf qt xz
+    addons:
+      homebrew:
+        packages:
+        - ccache
+        - protobuf
+        - qt
+        - xz
+        update: true
     script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
-
 
 # Builds for pull requests skip the deployment step altogether
 deploy:
