@@ -131,7 +131,7 @@ public:
 
 private slots:
     void storeSettings();
-    void urlListChanged(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
+    void urlListChanged(const QModelIndex &, int, int, const QModelIndex &, int);
     void setSpoilersEnabled(bool);
     void spoilerPathButtonClicked();
     void updateSpoilers();
