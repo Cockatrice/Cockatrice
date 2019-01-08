@@ -1156,7 +1156,7 @@ void DlgSettings::retranslateUi()
     generalButton->setText(tr("General"));
     appearanceButton->setText(tr("Appearance"));
     userInterfaceButton->setText(tr("User Interface"));
-    deckEditorButton->setText(tr("Card Resources"));
+    deckEditorButton->setText(tr("Card Sources"));
     messagesButton->setText(tr("Chat"));
     soundButton->setText(tr("Sound"));
     shortcutsButton->setText(tr("Shortcuts"));
