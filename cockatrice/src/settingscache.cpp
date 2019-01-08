@@ -275,6 +275,7 @@ SettingsCache::SettingsCache()
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", "notset").toString();
+    clientVersion = settings->value("personal/clientversion", "notset").toString();
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
 }
 
@@ -587,6 +588,12 @@ void SettingsCache::setClientID(QString _clientID)
 {
     clientID = std::move(_clientID);
     settings->setValue("personal/clientid", clientID);
+}
+
+void SettingsCache::setClientVersion(QString _clientVersion)
+{
+    clientVersion = std::move(_clientVersion);
+    settings->setValue("personal/clientversion", clientVersion);
 }
 
 QStringList SettingsCache::getCountries() const

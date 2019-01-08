@@ -97,6 +97,7 @@ private:
     QString picUrl;
     QString picUrlFallback;
     QString clientID;
+    QString clientVersion;
     QString knownMissingFeatures;
     int pixmapCacheSize;
     bool scaleCards;
@@ -387,10 +388,15 @@ public:
         return maxFontSize;
     }
     void setClientID(QString clientID);
+    void setClientVersion(QString clientVersion);
     void setKnownMissingFeatures(QString _knownMissingFeatures);
     QString getClientID()
     {
         return clientID;
+    }
+    QString getClientVersion()
+    {
+        return clientVersion;
     }
     QString getKnownMissingFeatures()
     {
