@@ -20,6 +20,9 @@ public:
 
 private:
     QStringList downloadURLs;
+
+private:
+    void populateDefaultURLs();
 };
 
 #endif // COCKATRICE_DOWNLOADSETTINGS_H

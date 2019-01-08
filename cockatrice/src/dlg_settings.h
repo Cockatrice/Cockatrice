@@ -68,8 +68,6 @@ private:
     QLabel picsPathLabel;
     QLabel cardDatabasePathLabel;
     QLabel tokenDatabasePathLabel;
-    QLabel defaultUrlLabel;
-    QLabel fallbackUrlLabel;
     QLabel updateReleaseChannelLabel;
     QCheckBox showTipsOnStartup;
 };

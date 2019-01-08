@@ -240,8 +240,6 @@ void GeneralSettingsPage::retranslateUi()
     cardDatabasePathLabel.setText(tr("Card database:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
-    defaultUrlLabel.setText(tr("Primary download URL:"));
-    fallbackUrlLabel.setText(tr("Fallback download URL:"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
@@ -510,19 +508,12 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     setLayout(lpMainLayout);
 }
 
-/**
- * If reset, this method contains the default URLs we will populate
- */
+
 void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
 {
+    settingsCache->downloads().clear();
     urlList->clear();
-
-    urlList->addItem("https://api.scryfall.com/cards/!uuid!?format=image");
-    urlList->addItem("https://api.scryfall.com/cards/multiverse/!cardid!?format=image");
-    // urlList->addItem("http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card");
-    // urlList->addItem("http://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card");
-
-    storeSettings();
+    urlList->addItems(settingsCache->downloads().getAllURLs());
     QMessageBox::information(this, tr("Success"), tr("Download URLs have been reset."));
 }
 
@@ -531,29 +522,36 @@ void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
     QString picsPath = settingsCache->getPicsPath() + "/downloadedPics/";
     QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     bool outerSuccessRemove = true;
-    for (int i = 0; i < dirs.length(); i++) {
-        QString currentPath = picsPath + dirs.at(i) + "/";
+    for (const auto &dir : dirs) {
+        QString currentPath = picsPath + dir + "/";
         QStringList files = QDir(currentPath).entryList(QDir::Files);
         bool innerSuccessRemove = true;
         for (int j = 0; j < files.length(); j++) {
             if (!QDir(currentPath).remove(files.at(j))) {
-                qDebug() << "Failed to remove " + currentPath.toUtf8() + files.at(j).toUtf8();
+                qInfo() << "Failed to remove " + currentPath.toUtf8() + files.at(j).toUtf8();
                 outerSuccessRemove = false;
                 innerSuccessRemove = false;
             }
+            qInfo() << "Removed " << currentPath << files.at(j);
         }
 
         if (innerSuccessRemove) {
-            bool success = QDir(picsPath).rmdir(dirs.at(i));
+            bool success = QDir(picsPath).rmdir(dir);
             if (!success) {
-                qDebug() << "Failed to delete inner directory" << picsPath;
+                qInfo() << "Failed to remove inner directory" << picsPath;
+            }
+            else
+            {
+                qInfo() << "Removed" << currentPath;
             }
         }
     }
-    if (outerSuccessRemove)
+    if (outerSuccessRemove) {
         QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
-    else
+    }
+    else {
         QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card pictures could not be cleared."));
+    }
 }
 
 void DeckEditorSettingsPage::actAddURL()
@@ -568,7 +566,7 @@ void DeckEditorSettingsPage::actAddURL()
 
 void DeckEditorSettingsPage::actRemoveURL()
 {
-    if (urlList->currentItem()) {
+    if (urlList->currentItem() != nullptr) {
         delete urlList->takeItem(urlList->currentRow());
         storeSettings();
     }
@@ -589,8 +587,10 @@ void DeckEditorSettingsPage::actEditURL()
 
 void DeckEditorSettingsPage::storeSettings()
 {
+    qInfo() << "URL Priority Reset";
     settingsCache->downloads().clear();
     for (int i = 0; i < urlList->count(); i++) {
+        qInfo() << "Priority" << i << ":" << urlList->item(i)->text();
         settingsCache->downloads().setDownloadUrlAt(i, urlList->item(i)->text());
     }
 }
@@ -745,16 +745,16 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
-    aAdd->setStatusTip("Add New URL");
+    aAdd->setStatusTip(tr("Add New URL"));
 
     connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
     aEdit = new QAction(this);
     aEdit->setIcon(QPixmap("theme:icons/pencil"));
-    aEdit->setStatusTip("Edit URL");
+    aEdit->setStatusTip(tr("Edit URL"));
     connect(aEdit, SIGNAL(triggered()), this, SLOT(actEdit()));
     aRemove = new QAction(this);
     aRemove->setIcon(QPixmap("theme:icons/decrement"));
-    aRemove->setStatusTip("Remove URL");
+    aRemove->setStatusTip(tr("Remove URL"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
 
     auto *messageToolBar = new QToolBar;
@@ -762,7 +762,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     messageToolBar->addAction(aAdd);
     messageToolBar->addAction(aRemove);
     messageToolBar->addAction(aEdit);
-    // messageToolBar->setSizePolicy(QSizePolicy::Preferred);
+    messageToolBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
     auto *messageListLayout = new QHBoxLayout;
     messageListLayout->addWidget(messageToolBar);
@@ -858,7 +858,7 @@ void MessagesSettingsPage::actEdit()
 
 void MessagesSettingsPage::actRemove()
 {
-    if (messageList->currentItem()) {
+    if (messageList->currentItem() != nullptr) {
         delete messageList->takeItem(messageList->currentRow());
         storeSettings();
     }

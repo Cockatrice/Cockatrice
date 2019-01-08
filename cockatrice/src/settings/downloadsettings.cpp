@@ -13,9 +13,27 @@ void DownloadSettings::setDownloadUrlAt(int index, const QString &url)
     setValue(QVariant::fromValue(downloadURLs), "urls", "downloads");
 }
 
+/**
+ * If reset or first run, this method contains the default URLs we will populate
+ */
 QStringList DownloadSettings::getAllURLs()
 {
+    // First run, these will be empty
+    if (downloadURLs.count() == 0) {
+        populateDefaultURLs();
+    }
+
     return downloadURLs;
+}
+
+void DownloadSettings::populateDefaultURLs()
+{
+    downloadURLs.clear();
+    downloadURLs.append("https://api.scryfall.com/cards/!uuid!?format=image");
+    downloadURLs.append("https://api.scryfall.com/cards/multiverse/!cardid!?format=image");
+    downloadURLs.append("http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card");
+    downloadURLs.append("http://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card");
+    setValue(QVariant::fromValue(downloadURLs), "urls", "downloads");
 }
 
 QString DownloadSettings::getDownloadUrlAt(int index)
