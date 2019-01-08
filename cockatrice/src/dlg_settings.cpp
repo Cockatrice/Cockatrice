@@ -508,7 +508,6 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     setLayout(lpMainLayout);
 }
 
-
 void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
 {
     settingsCache->downloads().clear();
@@ -539,17 +538,14 @@ void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
             bool success = QDir(picsPath).rmdir(dir);
             if (!success) {
                 qInfo() << "Failed to remove inner directory" << picsPath;
-            }
-            else
-            {
+            } else {
                 qInfo() << "Removed" << currentPath;
             }
         }
     }
     if (outerSuccessRemove) {
         QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
-    }
-    else {
+    } else {
         QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card pictures could not be cleared."));
     }
 }
