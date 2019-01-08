@@ -84,12 +84,8 @@ QString const generateClientID()
     return strClientID;
 }
 
-Q_DECLARE_METATYPE(QList<QString>)
-
 int main(int argc, char *argv[])
 {
-    qRegisterMetaTypeStreamOperators<QList<QString>>("QList<QString>");
-
     QApplication app(argc, argv);
 
     QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));

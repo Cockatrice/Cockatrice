@@ -4,7 +4,7 @@
 DownloadSettings::DownloadSettings(const QString &settingPath, QObject *parent = nullptr)
     : SettingsManager(settingPath + "downloads.ini", parent)
 {
-    downloadURLs = getValue("urls", "downloads").value<QList<QString>>();
+    downloadURLs = getValue("urls", "downloads").value<QStringList>();
 }
 
 void DownloadSettings::setDownloadUrlAt(int index, const QString &url)

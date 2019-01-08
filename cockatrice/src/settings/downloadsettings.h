@@ -19,7 +19,7 @@ public:
     void clear();
 
 private:
-    QList<QString> downloadURLs;
+    QStringList downloadURLs;
 };
 
 #endif // COCKATRICE_DOWNLOADSETTINGS_H
