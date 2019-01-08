@@ -164,6 +164,7 @@ SettingsCache::SettingsCache()
     messageSettings = new MessageSettings(settingsPath, this);
     gameFiltersSettings = new GameFiltersSettings(settingsPath, this);
     layoutsSettings = new LayoutsSettings(settingsPath, this);
+    downloadSettings = new DownloadSettings(settingsPath, this);
 
     if (!QFile(settingsPath + "global.ini").exists())
         translateLegacySettings();
@@ -219,9 +220,6 @@ SettingsCache::SettingsCache()
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
-
-    picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
-    picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
@@ -413,18 +411,6 @@ void SettingsCache::setPicDownload(int _picDownload)
     picDownload = static_cast<bool>(_picDownload);
     settings->setValue("personal/picturedownload", picDownload);
     emit picDownloadChanged();
-}
-
-void SettingsCache::setPicUrl(const QString &_picUrl)
-{
-    picUrl = _picUrl;
-    settings->setValue("personal/picUrl", picUrl);
-}
-
-void SettingsCache::setPicUrlFallback(const QString &_picUrlFallback)
-{
-    picUrlFallback = _picUrlFallback;
-    settings->setValue("personal/picUrlFallback", picUrlFallback);
 }
 
 void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)

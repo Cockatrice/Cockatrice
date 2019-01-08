@@ -43,13 +43,9 @@ private slots:
     void deckPathButtonClicked();
     void replaysPathButtonClicked();
     void picsPathButtonClicked();
-    void clearDownloadedPicsButtonClicked();
     void cardDatabasePathButtonClicked();
     void tokenDatabasePathButtonClicked();
     void languageBoxChanged(int index);
-    void setEnabledStatus(bool);
-    void defaultUrlRestoreButtonClicked();
-    void fallbackUrlRestoreButtonClicked();
 
 private:
     QStringList findQmFiles();
@@ -59,13 +55,10 @@ private:
     QLineEdit *picsPathEdit;
     QLineEdit *cardDatabasePathEdit;
     QLineEdit *tokenDatabasePathEdit;
-    QLineEdit *defaultUrlEdit;
-    QLineEdit *fallbackUrlEdit;
     QSpinBox pixmapCacheEdit;
     QGroupBox *personalGroupBox;
     QGroupBox *pathsGroupBox;
     QComboBox languageBox;
-    QCheckBox picDownloadCheckBox;
     QCheckBox updateNotificationCheckBox;
     QComboBox updateReleaseChannelBox;
     QLabel languageLabel;
@@ -77,11 +70,7 @@ private:
     QLabel tokenDatabasePathLabel;
     QLabel defaultUrlLabel;
     QLabel fallbackUrlLabel;
-    QLabel urlLinkLabel;
     QLabel updateReleaseChannelLabel;
-    QPushButton clearDownloadedPicsButton;
-    QPushButton defaultUrlRestoreButton;
-    QPushButton fallbackUrlRestoreButton;
     QCheckBox showTipsOnStartup;
 };
 
@@ -143,19 +132,29 @@ public:
     QString getLastUpdateTime();
 
 private slots:
+    void storeSettings();
     void setSpoilersEnabled(bool);
     void spoilerPathButtonClicked();
     void updateSpoilers();
     void unlockSettings();
+    void actAddURL();
+    void actRemoveURL();
+    void actEditURL();
+    void clearDownloadedPicsButtonClicked();
+    void resetDownloadedURLsButtonClicked();
 
 private:
+    QPushButton clearDownloadedPicsButton;
+    QPushButton resetDownloadURLs;
+    QLabel urlLinkLabel;
+    QCheckBox picDownloadCheckBox;
+    QListWidget *urlList;
     QCheckBox mcDownloadSpoilersCheckBox;
     QLabel msDownloadSpoilersLabel;
     QGroupBox *mpGeneralGroupBox;
     QGroupBox *mpSpoilerGroupBox;
     QLineEdit *mpSpoilerSavePathLineEdit;
     QLabel mcSpoilerSaveLabel;
-    QLabel mcGeneralMessageLabel;
     QLabel lastUpdatedLabel;
     QLabel infoOnSpoilersLabel;
     QPushButton *mpSpoilerPathButton;

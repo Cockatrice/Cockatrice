@@ -14,7 +14,23 @@ class QThread;
 class PictureToLoad
 {
 private:
-    class SetDownloadPriorityComparator;
+    class SetDownloadPriorityComparator
+    {
+    public:
+        /*
+         * Returns true if a has higher download priority than b
+         * Enabled sets have priority over disabled sets
+         * Both groups follows the user-defined order
+         */
+        inline bool operator()(const CardSetPtr &a, const CardSetPtr &b) const
+        {
+            if (a->getEnabled()) {
+                return !b->getEnabled() || a->getSortKey() < b->getSortKey();
+            } else {
+                return !b->getEnabled() && a->getSortKey() < b->getSortKey();
+            }
+        }
+    };
 
     CardInfoPtr card;
     QList<CardSetPtr> sortedSets;
@@ -24,7 +40,8 @@ private:
     CardSetPtr currentSet;
 
 public:
-    PictureToLoad(CardInfoPtr _card = CardInfoPtr());
+    explicit PictureToLoad(CardInfoPtr _card = CardInfoPtr());
+
     CardInfoPtr getCard() const
     {
         return card;
@@ -42,7 +59,7 @@ public:
         return currentSet;
     }
     QString getSetName() const;
-    QString transformUrl(QString urlTemplate) const;
+    QString transformUrl(const QString &urlTemplate) const;
     bool nextSet();
     bool nextUrl();
     void populateSetUrls();
@@ -52,8 +69,8 @@ class PictureLoaderWorker : public QObject
 {
     Q_OBJECT
 public:
-    PictureLoaderWorker();
-    ~PictureLoaderWorker();
+    explicit PictureLoaderWorker();
+    ~PictureLoaderWorker() override;
 
     void enqueueImageLoad(CardInfoPtr card);
 
@@ -70,8 +87,8 @@ private:
     PictureToLoad cardBeingDownloaded;
     bool picDownload, downloadRunning, loadQueueRunning;
     void startNextPicDownload();
-    bool cardImageExistsOnDisk(QString &setName, QString &correctedCardname);
-    bool imageIsBlackListed(const QByteArray &picData);
+    bool cardImageExistsOnDisk(QString &, QString &);
+    bool imageIsBlackListed(const QByteArray &);
 private slots:
     void picDownloadFinished(QNetworkReply *reply);
     void picDownloadFailed();
@@ -96,8 +113,8 @@ public:
     }
 
 private:
-    PictureLoader();
-    ~PictureLoader();
+    explicit PictureLoader();
+    ~PictureLoader() override;
     // Singleton - Don't implement copy constructor and assign operator
     PictureLoader(PictureLoader const &);
     void operator=(PictureLoader const &);

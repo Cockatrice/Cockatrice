@@ -22,6 +22,7 @@ SET(oracle_SOURCES
     ../cockatrice/src/settings/messagesettings.cpp
     ../cockatrice/src/settings/gamefilterssettings.cpp
     ../cockatrice/src/settings/layoutssettings.cpp
+    ../cockatrice/src/settings/downloadsettings.cpp
     ../cockatrice/src/thememanager.cpp
     ../cockatrice/src/qt-json/json.cpp
     ../cockatrice/src/releasechannel.cpp
