@@ -449,7 +449,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     urlList->setAlternatingRowColors(true);
     urlList->setDragEnabled(true);
     urlList->setDragDropMode(QAbstractItemView::InternalMove);
-    connect(urlList, SIGNAL(itemSelectionChanged()), this, SLOT(storeSettings())); // TODO: Make this signal better
+    connect(urlList->model(),
+            SIGNAL(rowsMoved(const QModelIndex, int, int, const QModelIndex, int)), this,
+            SLOT(urlListChanged(const QModelIndex, int, int, const QModelIndex, int)));
 
     for (int i = 0; i < settingsCache->downloads().getCount(); i++)
         urlList->addItem(settingsCache->downloads().getDownloadUrlAt(i));
@@ -589,6 +591,11 @@ void DeckEditorSettingsPage::storeSettings()
         qInfo() << "Priority" << i << ":" << urlList->item(i)->text();
         settingsCache->downloads().setDownloadUrlAt(i, urlList->item(i)->text());
     }
+}
+
+void DeckEditorSettingsPage::urlListChanged(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
+{
+    storeSettings();
 }
 
 void DeckEditorSettingsPage::updateSpoilers()
