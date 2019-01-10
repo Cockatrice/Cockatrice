@@ -60,6 +60,7 @@ private:
     QGroupBox *pathsGroupBox;
     QComboBox languageBox;
     QCheckBox updateNotificationCheckBox;
+    QCheckBox newVersionOracleCheckBox;
     QComboBox updateReleaseChannelBox;
     QLabel languageLabel;
     QLabel pixmapCacheLabel;

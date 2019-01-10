@@ -156,7 +156,7 @@ signals:
     void newVersionDetected(QString);
 
 public:
-    explicit MainUpdateHelper(QWidget *parent = nullptr) {}
+    explicit MainUpdateHelper() = default;
     ~MainUpdateHelper() override = default;
     void testForNewVersion();
 };

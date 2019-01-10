@@ -66,6 +66,7 @@ private:
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath,
         spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
+    bool notifyAboutNewVersion;
     bool showTipsOnStartup;
     QList<int> seenTips;
     bool mbDownloadSpoilers;
@@ -200,6 +201,10 @@ public:
     bool getNotifyAboutUpdates() const
     {
         return notifyAboutUpdates;
+    }
+    bool getNotifyAboutNewVersion() const
+    {
+        return notifyAboutNewVersion;
     }
     bool getShowTipsOnStartup() const
     {
@@ -498,6 +503,7 @@ public slots:
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(int _notifyaboutupdate);
+    void setNotifyAboutNewVersion(int _notifyaboutnewversion);
     void setUpdateReleaseChannel(int _updateReleaseChannel);
     void setMaxFontSize(int _max);
 };

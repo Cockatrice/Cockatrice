@@ -53,6 +53,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     updateReleaseChannelBox.setCurrentIndex(settingsCache->getUpdateReleaseChannel()->getIndex());
 
     updateNotificationCheckBox.setChecked(settingsCache->getNotifyAboutUpdates());
+    newVersionOracleCheckBox.setChecked(settingsCache->getNotifyAboutNewVersion());
 
     // pixmap cache
     pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
@@ -69,6 +70,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), settingsCache,
             SLOT(setUpdateReleaseChannel(int)));
     connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotifyAboutUpdate(int)));
+    connect(&newVersionOracleCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotifyAboutNewVersion(int)));
     connect(&showTipsOnStartup, SIGNAL(clicked(bool)), settingsCache, SLOT(setShowTipsOnStartup(bool)));
 
     auto *personalGrid = new QGridLayout;
@@ -79,7 +81,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&pixmapCacheLabel, 2, 0);
     personalGrid->addWidget(&pixmapCacheEdit, 2, 1);
     personalGrid->addWidget(&updateNotificationCheckBox, 3, 0);
-    personalGrid->addWidget(&showTipsOnStartup, 4, 0);
+    personalGrid->addWidget(&newVersionOracleCheckBox, 4, 0);
+    personalGrid->addWidget(&showTipsOnStartup, 5, 0);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -242,6 +245,7 @@ void GeneralSettingsPage::retranslateUi()
     pixmapCacheLabel.setText(tr("Picture cache size:"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
+    newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
 }
 

@@ -829,9 +829,12 @@ MainWindow::MainWindow(QWidget *parent)
         tip->show();
     }
 
-    auto versionUpdater = new MainUpdateHelper();
-    connect(versionUpdater, SIGNAL(newVersionDetected(QString)), this, SLOT(alertForcedOracleRun(QString)));
-    QtConcurrent::run(versionUpdater, &MainUpdateHelper::testForNewVersion);
+    // Only run the check updater if the user wants it (defaults to on)
+    if (settingsCache->getNotifyAboutNewVersion()) {
+        auto versionUpdater = new MainUpdateHelper();
+        connect(versionUpdater, SIGNAL(newVersionDetected(QString)), this, SLOT(alertForcedOracleRun(QString)));
+        QtConcurrent::run(versionUpdater, &MainUpdateHelper::testForNewVersion);
+    }
 }
 
 void MainWindow::alertForcedOracleRun(const QString &newVersion)
@@ -839,7 +842,8 @@ void MainWindow::alertForcedOracleRun(const QString &newVersion)
     settingsCache->setClientVersion(newVersion);
     QMessageBox::information(this, tr("New Version"),
                              tr("Congratulations on updating to Cockatrice %1!\n"
-                                "Oracle will now launch to update your card database.").arg(newVersion));
+                                "Oracle will now launch to update your card database.")
+                                 .arg(newVersion));
     actCheckCardUpdates();
 }
 

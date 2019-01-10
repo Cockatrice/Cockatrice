@@ -177,6 +177,7 @@ SettingsCache::SettingsCache()
     mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
 
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
+    notifyAboutNewVersion = settings->value("personal/newversionnotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
 
     lang = settings->value("personal/lang").toString();
@@ -915,6 +916,12 @@ void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
     notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+void SettingsCache::setNotifyAboutNewVersion(int _notifyaboutnewversion)
+{
+    notifyAboutNewVersion = static_cast<bool>(_notifyaboutnewversion);
+    settings->setValue("personal/newversionnotification", notifyAboutNewVersion);
 }
 
 void SettingsCache::setDownloadSpoilerStatus(bool _spoilerStatus)
