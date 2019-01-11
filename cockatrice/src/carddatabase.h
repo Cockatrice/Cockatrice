@@ -9,10 +9,12 @@
 #include <QMetaType>
 #include <QSharedPointer>
 #include <QStringList>
+#include <QVariant>
 #include <QVector>
 
 class CardDatabase;
 class CardInfo;
+class CardInfoPerSet;
 class CardSet;
 class CardRelation;
 class ICardDatabaseParser;
@@ -21,6 +23,7 @@ typedef QMap<QString, QString> QStringMap;
 typedef QMap<QString, int> MuidMap;
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
+typedef QMap<QString, CardInfoPerSet> CardInfoPerSetMap;
 
 Q_DECLARE_METATYPE(CardInfoPtr)
 
@@ -112,178 +115,155 @@ public:
     QStringList getUnknownSetsNames();
 };
 
+class CardInfoPerSet
+{
+public:
+    explicit CardInfoPerSet(const CardSetPtr &_set = nullptr);
+    ~CardInfoPerSet() {};
+
+private:
+    CardSetPtr set;
+    // per-set card properties;
+    QVariantHash properties;
+
+public:
+    const CardSetPtr getPtr() const
+    {
+        return set;
+    }
+
+    const QString getProperty(QString propertyName) const
+    {
+        return properties.value(propertyName).toString();
+    }
+    void setProperty(const QString &_name, const QString &_value)
+    {
+        properties.insert(_name, _value);
+    }
+};
+
 class CardInfo : public QObject
 {
     Q_OBJECT
 private:
     CardInfoPtr smartThis;
+    // The card name
     QString name;
-
-    /*
-     * The name without punctuation or capitalization, for better card tag name
-     * recognition.
-     */
+    // The name without punctuation or capitalization, for better card name recognition.
     QString simpleName;
-
-    bool isToken;
-    SetList sets;
-    QString manacost;
-    QString cmc;
-    QString cardtype;
-    QString powtough;
+    // The key used to identify this card in the cache
+    QString pixmapCacheKey;
+    // card text
     QString text;
-    QStringList colors;
-
+    // wether this is not a "real" card but a token
+    bool isToken;
+    // basic card properties; common for all the sets
+    QVariantHash properties;
     // the cards i'm related to
     QList<CardRelation *> relatedCards;
-
     // the card i'm reverse-related to
     QList<CardRelation *> reverseRelatedCards;
-
     // the cards thare are reverse-related to me
     QList<CardRelation *> reverseRelatedCardsToMe;
-
+    // card sets
+    CardInfoPerSetMap sets;
+    // cached set names
     QString setsNames;
-
-    bool upsideDownArt;
-    QString loyalty;
-    QStringMap customPicURLs;
-    MuidMap muIds;
-    QStringMap uuIds;
-    QStringMap collectorNumbers;
-    QStringMap rarities;
+    // positioning properties; used by UI
     bool cipt;
     int tableRow;
-    QString pixmapCacheKey;
+    bool upsideDownArt;
 
 public:
     explicit CardInfo(const QString &_name = QString(),
-                      bool _isToken = false,
-                      const QString &_manacost = QString(),
-                      const QString &_cmc = QString(),
-                      const QString &_cardtype = QString(),
-                      const QString &_powtough = QString(),
                       const QString &_text = QString(),
-                      const QStringList &_colors = QStringList(),
+                      bool _isToken = false,
+                      QVariantHash _properties = QVariantHash(),
                       const QList<CardRelation *> &_relatedCards = QList<CardRelation *>(),
                       const QList<CardRelation *> &_reverseRelatedCards = QList<CardRelation *>(),
-                      bool _upsideDownArt = false,
-                      const QString &_loyalty = QString(),
+                      CardInfoPerSetMap _sets = CardInfoPerSetMap(),
                       bool _cipt = false,
                       int _tableRow = 0,
-                      const SetList &_sets = SetList(),
-                      const QStringMap &_customPicURLs = QStringMap(),
-                      MuidMap _muids = MuidMap(),
-                      QStringMap _uuIds = QStringMap(),
-                      QStringMap _collectorNumbers = QStringMap(),
-                      QStringMap _rarities = QStringMap());
+                      bool _upsideDownArt = false);
     ~CardInfo() override;
 
     static CardInfoPtr newInstance(const QString &_name = QString(),
-                                   bool _isToken = false,
-                                   const QString &_manacost = QString(),
-                                   const QString &_cmc = QString(),
-                                   const QString &_cardtype = QString(),
-                                   const QString &_powtough = QString(),
                                    const QString &_text = QString(),
-                                   const QStringList &_colors = QStringList(),
+                                   bool _isToken = false,
+                                   QVariantHash _properties = QVariantHash(),
                                    const QList<CardRelation *> &_relatedCards = QList<CardRelation *>(),
                                    const QList<CardRelation *> &_reverseRelatedCards = QList<CardRelation *>(),
-                                   bool _upsideDownArt = false,
-                                   const QString &_loyalty = QString(),
+                                   CardInfoPerSetMap _sets = CardInfoPerSetMap(),
                                    bool _cipt = false,
                                    int _tableRow = 0,
-                                   const SetList &_sets = SetList(),
-                                   const QStringMap &_customPicURLs = QStringMap(),
-                                   MuidMap _muids = MuidMap(),
-                                   QStringMap _uuIds = QStringMap(),
-                                   QStringMap _collectorNumbers = QStringMap(),
-                                   QStringMap _rarities = QStringMap());
+                                   bool _upsideDownArt = false);
 
     void setSmartPointer(CardInfoPtr _ptr)
     {
         smartThis = _ptr;
     }
 
+    // basic properties
     inline const QString &getName() const
     {
         return name;
-    }
-    inline const QString &getSetsNames() const
-    {
-        return setsNames;
     }
     const QString &getSimpleName() const
     {
         return simpleName;
     }
-    bool getIsToken() const
-    {
-        return isToken;
-    }
-    const SetList &getSets() const
-    {
-        return sets;
-    }
-    inline const QString &getManaCost() const
-    {
-        return manacost;
-    }
-    inline const QString &getCmc() const
-    {
-        return cmc;
-    }
-    inline const QString &getCardType() const
-    {
-        return cardtype;
-    }
-    inline const QString &getPowTough() const
-    {
-        return powtough;
-    }
-    const QString &getText() const
-    {
-        return text;
-    }
     const QString &getPixmapCacheKey() const
     {
         return pixmapCacheKey;
     }
-    const QString &getLoyalty() const
+
+    const QString &getText() const
     {
-        return loyalty;
-    }
-    bool getCipt() const
-    {
-        return cipt;
-    }
-    // void setManaCost(const QString &_manaCost) { manacost = _manaCost; emit cardInfoChanged(smartThis); }
-    // void setCmc(const QString &_cmc) { cmc = _cmc; emit cardInfoChanged(smartThis); }
-    void setCardType(const QString &_cardType)
-    {
-        cardtype = _cardType;
-        emit cardInfoChanged(smartThis);
-    }
-    void setPowTough(const QString &_powTough)
-    {
-        powtough = _powTough;
-        emit cardInfoChanged(smartThis);
+        return text;
     }
     void setText(const QString &_text)
     {
         text = _text;
         emit cardInfoChanged(smartThis);
     }
-    void setColors(const QStringList &_colors)
+
+    bool getIsToken() const
     {
-        colors = _colors;
+        return isToken;
+    }
+    const QString getProperty(QString propertyName) const
+    {
+        return properties.value(propertyName).toString();
+    }
+    void setProperty(const QString &_name, const QString &_value)
+    {
+        properties.insert(_name, _value);
         emit cardInfoChanged(smartThis);
     }
-    const QChar getColorChar() const;
-    const QStringList &getColors() const
+    const CardInfoPerSetMap &getSets() const
     {
-        return colors;
+        return sets;
     }
+    const QString &getSetsNames() const
+    {
+        return setsNames;
+    }
+    const QString getSetProperty(QString setName, QString propertyName) const
+    {
+        if(!sets.contains(setName))
+            return "";
+        return sets[setName].getProperty(propertyName);
+    }
+    void setSetProperty(const QString setName, const QString &_name, const QString &_value)
+    {
+        if(!sets.contains(setName))
+            return;
+
+        sets[setName].setProperty(_name, _value);
+        emit cardInfoChanged(smartThis);
+    }
+
+    // related cards
     const QList<CardRelation *> &getRelatedCards() const
     {
         return relatedCards;
@@ -301,36 +281,12 @@ public:
     {
         reverseRelatedCardsToMe.append(cardRelation);
     }
-    bool getUpsideDownArt() const
+
+    // positioning
+    bool getCipt() const
     {
-        return upsideDownArt;
+        return cipt;
     }
-    QString getCustomPicURL(const QString &set) const
-    {
-        return customPicURLs.value(set);
-    }
-    int getMuId(const QString &set) const
-    {
-        return muIds.value(set);
-    }
-    QString getUuId(const QString &set) const
-    {
-        return uuIds.value(set);
-    }
-    QString getCollectorNumber(const QString &set) const
-    {
-        return collectorNumbers.value(set);
-    }
-    QString getRarity(const QString &set) const
-    {
-        return rarities.value(set);
-    }
-    QStringMap getRarities() const
-    {
-        return rarities;
-    }
-    QString getMainCardType() const;
-    QString getCorrectedName() const;
     int getTableRow() const
     {
         return tableRow;
@@ -339,31 +295,90 @@ public:
     {
         tableRow = _tableRow;
     }
-    // void setLoyalty(int _loyalty) { loyalty = _loyalty; emit cardInfoChanged(smartThis); }
-    // void setCustomPicURL(const QString &_set, const QString &_customPicURL) { customPicURLs.insert(_set,
-    // _customPicURL); }
-    void setSet(const CardSetPtr &_set)
+    bool getUpsideDownArt() const
     {
-        sets.append(_set);
-        refreshCachedSetNames();
+        return upsideDownArt;
     }
-    void setMuId(const QString &_set, const int &_muId)
+
+    // Back-compatibility methods. Remove ASAP
+    inline const QString getCardType() const
     {
-        muIds.insert(_set, _muId);
+        return getProperty("type");
     }
-    void setUuId(const QString &_set, const QString &_uuId)
+    inline void setCardType(const QString &value)
     {
-        uuIds.insert(_set, _uuId);
+        setProperty("type", value);
     }
-    void setSetNumber(const QString &_set, const QString &_setNumber)
+    inline const QString getCmc() const
     {
-        collectorNumbers.insert(_set, _setNumber);
+        return getProperty("cmc");
     }
-    void setRarity(const QString &_set, const QString &_setNumber)
+    inline void setCmc(const QString &value)
     {
-        rarities.insert(_set, _setNumber);
+        setProperty("cmc", value);
     }
-    void addToSet(CardSetPtr set);
+    inline const QStringList getColors() const
+    {
+        return properties.value("colors").toStringList();
+    }
+    inline void setColors(const QStringList &value)
+    {
+        properties.insert("colors", value);
+        emit cardInfoChanged(smartThis);
+    }
+    inline const QString getLoyalty() const
+    {
+        return getProperty("loyalty");
+    }
+    inline void setLoyalty(const QString &value)
+    {
+        setProperty("loyalty", value);
+    }
+    inline const QString getMainCardType() const
+    {
+        return getProperty("maintype");
+    }
+    inline void setMainCardType(const QString &value)
+    {
+        setProperty("maintype", value);
+    }
+    inline const QString getManaCost() const
+    {
+        return getProperty("manacost");
+    }
+    inline void setManaCost(const QString &value)
+    {
+        setProperty("manacost", value);
+    }
+    inline const QString getPowTough() const
+    {
+        return getProperty("pt");
+    }
+    inline void setPowTough(const QString &value)
+    {
+        setProperty("pt", value);
+    }
+    const QChar getColorChar() const;
+
+    // methods using per-set properties
+    QString getCustomPicURL(const QString &set) const
+    {
+        return getSetProperty(set, "picurl");
+    }
+    QString getMuId(const QString &set) const
+    {
+        return getSetProperty(set, "muid");
+    }
+    QString getUuId(const QString &set) const
+    {
+        return getSetProperty(set, "uuid");
+    }
+    QString getCollectorNumber(const QString &set) const
+    {
+        return getSetProperty(set, "num");
+    }
+    QString getCorrectedName() const;
+    void addToSet(const CardSetPtr &_set, const CardInfoPerSet _info = CardInfoPerSet());
     void emitPixmapUpdated()
     {
         emit pixmapUpdated();

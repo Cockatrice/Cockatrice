@@ -154,9 +154,10 @@ void DlgEditTokens::actAddToken()
         }
     } while (askAgain);
 
-    CardInfoPtr card = CardInfo::newInstance(name, true);
-    card->addToSet(databaseModel->getDatabase()->getSet(CardDatabase::TOKENS_SETNAME));
+    CardInfoPtr card = CardInfo::newInstance(name, "", true);
     card->setCardType("Token");
+    card->addToSet(databaseModel->getDatabase()->getSet(CardDatabase::TOKENS_SETNAME));
+
     databaseModel->getDatabase()->addCard(card);
 }
 

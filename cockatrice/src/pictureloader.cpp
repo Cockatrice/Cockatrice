@@ -30,7 +30,9 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
     urlTemplates = settingsCache->downloads().getAllURLs();
 
     if (card) {
-        sortedSets = card->getSets();
+        for(auto set : card->getSets()) {
+            sortedSets << set.getPtr();
+        }
         qSort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
         // The first time called, nextSet will also populate the Urls for the first set.
         nextSet();
@@ -247,7 +249,7 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
     transformMap["!corrected_name_lower!"] = card->getCorrectedName().toLower();
 
     if (set) {
-        transformMap["!cardid!"] = QString::number(card->getMuId(set->getShortName()));
+        transformMap["!cardid!"] = card->getMuId(set->getShortName());
         transformMap["!uuid!"] = card->getUuId(set->getShortName());
         transformMap["!collectornumber!"] = card->getCollectorNumber(set->getShortName());
         transformMap["!setcode!"] = set->getShortName();
