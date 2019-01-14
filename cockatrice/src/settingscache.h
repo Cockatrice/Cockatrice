@@ -66,6 +66,7 @@ private:
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath,
         spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
+    bool notifyAboutNewVersion;
     bool showTipsOnStartup;
     QList<int> seenTips;
     bool mbDownloadSpoilers;
@@ -97,6 +98,7 @@ private:
     QString picUrl;
     QString picUrlFallback;
     QString clientID;
+    QString clientVersion;
     QString knownMissingFeatures;
     int pixmapCacheSize;
     bool scaleCards;
@@ -199,6 +201,10 @@ public:
     bool getNotifyAboutUpdates() const
     {
         return notifyAboutUpdates;
+    }
+    bool getNotifyAboutNewVersion() const
+    {
+        return notifyAboutNewVersion;
     }
     bool getShowTipsOnStartup() const
     {
@@ -387,10 +393,15 @@ public:
         return maxFontSize;
     }
     void setClientID(QString clientID);
+    void setClientVersion(QString clientVersion);
     void setKnownMissingFeatures(QString _knownMissingFeatures);
     QString getClientID()
     {
         return clientID;
+    }
+    QString getClientVersion()
+    {
+        return clientVersion;
     }
     QString getKnownMissingFeatures()
     {
@@ -492,6 +503,7 @@ public slots:
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(int _notifyaboutupdate);
+    void setNotifyAboutNewVersion(int _notifyaboutnewversion);
     void setUpdateReleaseChannel(int _updateReleaseChannel);
     void setMaxFontSize(int _max);
 };

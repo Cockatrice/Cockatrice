@@ -317,9 +317,9 @@ void MainWindow::actAbout()
 
 void MainWindow::actTips()
 {
-    if (tip != NULL) {
+    if (tip != nullptr) {
         delete tip;
-        tip = NULL;
+        tip = nullptr;
     }
     tip = new DlgTipOfTheDay();
     if (tip->successfulInit) {
@@ -828,13 +828,30 @@ MainWindow::MainWindow(QWidget *parent)
     if (tip->successfulInit && settingsCache->getShowTipsOnStartup() && tip->newTipsAvailable) {
         tip->show();
     }
+
+    // Only run the check updater if the user wants it (defaults to on)
+    if (settingsCache->getNotifyAboutNewVersion()) {
+        auto versionUpdater = new MainUpdateHelper();
+        connect(versionUpdater, SIGNAL(newVersionDetected(QString)), this, SLOT(alertForcedOracleRun(QString)));
+        QtConcurrent::run(versionUpdater, &MainUpdateHelper::testForNewVersion);
+    }
+}
+
+void MainWindow::alertForcedOracleRun(const QString &newVersion)
+{
+    settingsCache->setClientVersion(newVersion);
+    QMessageBox::information(this, tr("New Version"),
+                             tr("Congratulations on updating to Cockatrice %1!\n"
+                                "Oracle will now launch to update your card database.")
+                                 .arg(newVersion));
+    actCheckCardUpdates();
 }
 
 MainWindow::~MainWindow()
 {
-    if (tip != NULL) {
+    if (tip != nullptr) {
         delete tip;
-        tip = NULL;
+        tip = nullptr;
     }
     if (trayIcon) {
         trayIcon->hide();
@@ -1269,5 +1286,12 @@ void MainWindow::promptForgotPasswordReset()
     if (dlg.exec()) {
         client->submitForgotPasswordResetToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
                                                   dlg.getPlayerName(), dlg.getToken(), dlg.getPassword());
+    }
+}
+
+void MainUpdateHelper::testForNewVersion()
+{
+    if (settingsCache->getClientVersion() != VERSION_STRING) {
+        emit newVersionDetected(VERSION_STRING);
     }
 }

@@ -177,6 +177,7 @@ SettingsCache::SettingsCache()
     mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
 
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
+    notifyAboutNewVersion = settings->value("personal/newversionnotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
 
     lang = settings->value("personal/lang").toString();
@@ -275,6 +276,7 @@ SettingsCache::SettingsCache()
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", "notset").toString();
+    clientVersion = settings->value("personal/clientversion", "notset").toString();
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
 }
 
@@ -587,6 +589,12 @@ void SettingsCache::setClientID(QString _clientID)
 {
     clientID = std::move(_clientID);
     settings->setValue("personal/clientid", clientID);
+}
+
+void SettingsCache::setClientVersion(QString _clientVersion)
+{
+    clientVersion = std::move(_clientVersion);
+    settings->setValue("personal/clientversion", clientVersion);
 }
 
 QStringList SettingsCache::getCountries() const
@@ -908,6 +916,12 @@ void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
     notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+void SettingsCache::setNotifyAboutNewVersion(int _notifyaboutnewversion)
+{
+    notifyAboutNewVersion = static_cast<bool>(_notifyaboutnewversion);
+    settings->setValue("personal/newversionnotification", notifyAboutNewVersion);
 }
 
 void SettingsCache::setDownloadSpoilerStatus(bool _spoilerStatus)
