@@ -763,7 +763,7 @@ void Player::setShortcutsActive()
     aAttach->setShortcuts(shortcuts.getShortcut("Player/aAttach"));
     aUnattach->setShortcuts(shortcuts.getShortcut("Player/aUnattach"));
     aDrawArrow->setShortcuts(shortcuts.getShortcut("Player/aDrawArrow"));
-    aIncP->setShortcuts(shortcuts.getShortcut("Player/IncP"));
+    aIncP->setShortcuts(shortcuts.getShortcut("Player/aIncP"));
     aDecP->setShortcuts(shortcuts.getShortcut("Player/aDecP"));
     aIncT->setShortcuts(shortcuts.getShortcut("Player/aIncT"));
     aDecT->setShortcuts(shortcuts.getShortcut("Player/aDecT"));
