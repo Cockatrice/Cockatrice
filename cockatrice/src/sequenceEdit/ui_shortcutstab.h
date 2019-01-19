@@ -217,8 +217,8 @@ public:
     QGridLayout *gridLayout_10;
     QLabel *lbl_Player_aDecP;
     SequenceEdit *Player_aDecP;
-    SequenceEdit *Player_IncP;
-    QLabel *lbl_Player_IncP;
+    SequenceEdit *Player_aIncP;
+    QLabel *lbl_Player_aIncP;
     QGroupBox *groupBox_8;
     QGridLayout *gridLayout_5;
     QLabel *lbl_TabGame_phase0;
@@ -1121,15 +1121,15 @@ public:
 
         gridLayout_10->addWidget(Player_aDecP, 1, 1, 1, 1);
 
-        Player_IncP = new SequenceEdit("Player/IncP", groupBox_10);
-        Player_IncP->setObjectName("Player_IncP");
+        Player_aIncP = new SequenceEdit("Player/aIncP", groupBox_10);
+        Player_aIncP->setObjectName("Player_aIncP");
 
-        gridLayout_10->addWidget(Player_IncP, 0, 1, 1, 1);
+        gridLayout_10->addWidget(Player_aIncP, 0, 1, 1, 1);
 
-        lbl_Player_IncP = new QLabel(groupBox_10);
-        lbl_Player_IncP->setObjectName("lbl_Player_IncP");
+        lbl_Player_aIncP = new QLabel(groupBox_10);
+        lbl_Player_aIncP->setObjectName("lbl_Player_aIncP");
 
-        gridLayout_10->addWidget(lbl_Player_IncP, 0, 0, 1, 1);
+        gridLayout_10->addWidget(lbl_Player_aIncP, 0, 0, 1, 1);
 
         verticalLayout->addWidget(groupBox_10);
 
@@ -1920,7 +1920,7 @@ public:
         lbl_Player_aIncT->setText(QApplication::translate("shortcutsTab", "Add (+0/+1)", 0));
         groupBox_10->setTitle(QApplication::translate("shortcutsTab", "Power", 0));
         lbl_Player_aDecP->setText(QApplication::translate("shortcutsTab", "Remove (-1/-0)", 0));
-        lbl_Player_IncP->setText(QApplication::translate("shortcutsTab", "Add (+1/+0)", 0));
+        lbl_Player_aIncP->setText(QApplication::translate("shortcutsTab", "Add (+1/+0)", 0));
         groupBox_8->setTitle(QApplication::translate("shortcutsTab", "Game Phases", 0));
         lbl_TabGame_phase0->setText(QApplication::translate("shortcutsTab", "Untap", 0));
         lbl_TabGame_phase1->setText(QApplication::translate("shortcutsTab", "Upkeep", 0));
