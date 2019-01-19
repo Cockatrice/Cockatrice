@@ -119,7 +119,7 @@ class CardInfoPerSet
 {
 public:
     explicit CardInfoPerSet(const CardSetPtr &_set = nullptr);
-    ~CardInfoPerSet() {};
+    ~CardInfoPerSet(){};
 
 private:
     CardSetPtr set;
@@ -250,13 +250,13 @@ public:
     }
     const QString getSetProperty(QString setName, QString propertyName) const
     {
-        if(!sets.contains(setName))
+        if (!sets.contains(setName))
             return "";
         return sets[setName].getProperty(propertyName);
     }
     void setSetProperty(const QString setName, const QString &_name, const QString &_value)
     {
-        if(!sets.contains(setName))
+        if (!sets.contains(setName))
             return;
 
         sets[setName].setProperty(_name, _value);

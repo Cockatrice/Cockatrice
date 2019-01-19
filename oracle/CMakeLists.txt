@@ -11,6 +11,7 @@ SET(oracle_SOURCES
     src/main.cpp
     src/oraclewizard.cpp
     src/oracleimporter.cpp
+    src/qt-json/json.cpp
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/pictureloader.cpp
     ../cockatrice/src/carddbparser/cockatricexml3.cpp
@@ -24,7 +25,6 @@ SET(oracle_SOURCES
     ../cockatrice/src/settings/layoutssettings.cpp
     ../cockatrice/src/settings/downloadsettings.cpp
     ../cockatrice/src/thememanager.cpp
-    ../cockatrice/src/qt-json/json.cpp
     ../cockatrice/src/releasechannel.cpp
      ${VERSION_STRING_CPP}
 )

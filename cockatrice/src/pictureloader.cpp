@@ -30,7 +30,7 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
     urlTemplates = settingsCache->downloads().getAllURLs();
 
     if (card) {
-        for(auto set : card->getSets()) {
+        for (auto set : card->getSets()) {
             sortedSets << set.getPtr();
         }
         qSort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());

@@ -1,5 +1,6 @@
 #include "carddatabase.h"
 #include "carddbparser/cockatricexml3.h"
+#include "carddbparser/cockatricexml4.h"
 #include "pictureloader.h"
 #include "settingscache.h"
 #include "spoilerbackgroundupdater.h"
@@ -207,22 +208,23 @@ void SetList::guessSortKeys()
     }
 }
 
-CardInfoPerSet::CardInfoPerSet(const CardSetPtr &_set)
-    : set(_set)
+CardInfoPerSet::CardInfoPerSet(const CardSetPtr &_set) : set(_set)
 {
 }
 
 CardInfo::CardInfo(const QString &_name,
-                      const QString &_text,
-                      bool _isToken,
-                      QVariantHash _properties,
-                      const QList<CardRelation *> &_relatedCards,
-                      const QList<CardRelation *> &_reverseRelatedCards,
-                      CardInfoPerSetMap _sets,
-                      bool _cipt,
-                      int _tableRow,
-                      bool _upsideDownArt)
-    : name(_name), text(_text), isToken(_isToken), properties(_properties), relatedCards(_relatedCards), reverseRelatedCards(_reverseRelatedCards), sets(_sets), cipt(_cipt), tableRow(_tableRow), upsideDownArt(_upsideDownArt)
+                   const QString &_text,
+                   bool _isToken,
+                   QVariantHash _properties,
+                   const QList<CardRelation *> &_relatedCards,
+                   const QList<CardRelation *> &_reverseRelatedCards,
+                   CardInfoPerSetMap _sets,
+                   bool _cipt,
+                   int _tableRow,
+                   bool _upsideDownArt)
+    : name(_name), text(_text), isToken(_isToken), properties(_properties), relatedCards(_relatedCards),
+      reverseRelatedCards(_reverseRelatedCards), sets(_sets), cipt(_cipt), tableRow(_tableRow),
+      upsideDownArt(_upsideDownArt)
 {
     pixmapCacheKey = QLatin1String("card_") + name;
     simpleName = CardInfo::simplifyName(name);
@@ -236,20 +238,21 @@ CardInfo::~CardInfo()
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name,
-                      const QString &_text,
-                      bool _isToken,
-                      QVariantHash _properties,
-                      const QList<CardRelation *> &_relatedCards,
-                      const QList<CardRelation *> &_reverseRelatedCards,
-                      CardInfoPerSetMap _sets,
-                      bool _cipt,
-                      int _tableRow,
-                      bool _upsideDownArt)
+                                  const QString &_text,
+                                  bool _isToken,
+                                  QVariantHash _properties,
+                                  const QList<CardRelation *> &_relatedCards,
+                                  const QList<CardRelation *> &_reverseRelatedCards,
+                                  CardInfoPerSetMap _sets,
+                                  bool _cipt,
+                                  int _tableRow,
+                                  bool _upsideDownArt)
 {
-    CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, _properties, _relatedCards, _reverseRelatedCards, _sets, _cipt, _tableRow, _upsideDownArt));
+    CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, _properties, _relatedCards, _reverseRelatedCards, _sets, _cipt,
+                                 _tableRow, _upsideDownArt));
     ptr->setSmartPointer(ptr);
 
-    for(CardInfoPerSet set : _sets) {
+    for (CardInfoPerSet set : _sets) {
         set.getPtr()->append(ptr);
     }
 
@@ -275,7 +278,7 @@ void CardInfo::refreshCachedSetNames()
 {
     QStringList setList;
     // update the cached list of set names
-    for(auto set : sets) {
+    for (auto set : sets) {
         if (set.getPtr()->getEnabled()) {
             setList << set.getPtr()->getShortName();
         }
@@ -324,6 +327,7 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
 
     // add new parsers here
     availableParsers << new CockatriceXml3Parser;
+    availableParsers << new CockatriceXml4Parser;
 
     for (auto &parser : availableParsers) {
         connect(parser, SIGNAL(addCard(CardInfoPtr)), this, SLOT(addCard(CardInfoPtr)), Qt::DirectConnection);
@@ -375,7 +379,7 @@ void CardDatabase::addCard(CardInfoPtr card)
     if (cards.contains(card->getName())) {
         CardInfoPtr sameCard = cards[card->getName()];
         for (CardInfoPerSet set : card->getSets()) {
-            sameCard->addToSet(set.getPtr());
+            sameCard->addToSet(set.getPtr(), set);
         }
         return;
     }
