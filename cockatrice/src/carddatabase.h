@@ -306,65 +306,19 @@ public:
     {
         return upsideDownArt;
     }
+    const QChar getColorChar() const;
 
     // Back-compatibility methods. Remove ASAP
-    inline const QString getCardType() const
-    {
-        return getProperty("type");
-    }
-    inline void setCardType(const QString &value)
-    {
-        setProperty("type", value);
-    }
-    inline const QString getCmc() const
-    {
-        return getProperty("cmc");
-    }
-    inline void setCmc(const QString &value)
-    {
-        setProperty("cmc", value);
-    }
-    inline const QString getColors() const
-    {
-        return getProperty("colors");
-    }
-    inline void setColors(const QString &value)
-    {
-        setProperty("colors", value);
-    }
-    inline const QString getLoyalty() const
-    {
-        return getProperty("loyalty");
-    }
-    inline void setLoyalty(const QString &value)
-    {
-        setProperty("loyalty", value);
-    }
-    inline const QString getMainCardType() const
-    {
-        return getProperty("maintype");
-    }
-    inline void setMainCardType(const QString &value)
-    {
-        setProperty("maintype", value);
-    }
-    inline const QString getManaCost() const
-    {
-        return getProperty("manacost");
-    }
-    inline void setManaCost(const QString &value)
-    {
-        setProperty("manacost", value);
-    }
-    inline const QString getPowTough() const
-    {
-        return getProperty("pt");
-    }
-    inline void setPowTough(const QString &value)
-    {
-        setProperty("pt", value);
-    }
-    const QChar getColorChar() const;
+    const QString getCardType() const;
+    void setCardType(const QString &value);
+    const QString getCmc() const;
+    const QString getColors() const;
+    void setColors(const QString &value);
+    const QString getLoyalty() const;
+    const QString getMainCardType() const;
+    const QString getManaCost() const;
+    const QString getPowTough() const;
+    void setPowTough(const QString &value);
 
     // methods using per-set properties
     QString getCustomPicURL(const QString &set) const

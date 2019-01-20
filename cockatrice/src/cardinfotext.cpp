@@ -1,7 +1,8 @@
 #include "cardinfotext.h"
-
 #include "carditem.h"
+#include "game_specific_terms.h"
 #include "main.h"
+
 #include <QGridLayout>
 #include <QLabel>
 #include <QTextEdit>
@@ -38,7 +39,7 @@ void CardInfoText::setCard(CardInfoPtr card)
     QStringList cardProps = card->getProperties();
     foreach(QString key, cardProps)
     {
-        QString keyText = tr(qPrintable(key)).toHtmlEscaped() + ":";
+        QString keyText = Mtg::getNicePropertyName(key).toHtmlEscaped() + ":";
         text += QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(
             keyText,
             card->getProperty(key).toHtmlEscaped()

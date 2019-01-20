@@ -127,7 +127,10 @@ QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &x
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
         }
-        properties.insert(xml.name().toString(), xml.readElementText());
+
+        if(xml.name() != "") {
+            properties.insert(xml.name().toString(), xml.readElementText());
+        }
     }
     return properties;
 }

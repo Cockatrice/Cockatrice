@@ -1,6 +1,7 @@
 #include "carddatabase.h"
 #include "carddbparser/cockatricexml3.h"
 #include "carddbparser/cockatricexml4.h"
+#include "game_specific_terms.h"
 #include "pictureloader.h"
 #include "settingscache.h"
 #include "spoilerbackgroundupdater.h"
@@ -657,4 +658,46 @@ void CardInfo::resetReverseRelatedCards2Me()
         cardRelation->deleteLater();
     }
     reverseRelatedCardsToMe = QList<CardRelation *>();
+}
+
+// Back-compatibility methods. Remove ASAP
+const QString CardInfo::getCardType() const
+{
+    return getProperty(Mtg::CardType);
+}
+void CardInfo::setCardType(const QString &value)
+{
+    setProperty(Mtg::CardType, value);
+}
+const QString CardInfo::getCmc() const
+{
+    return getProperty(Mtg::ConvertedManaCost);
+}
+const QString CardInfo::getColors() const
+{
+    return getProperty(Mtg::Colors);
+}
+void CardInfo::setColors(const QString &value)
+{
+    setProperty(Mtg::Colors, value);
+}
+const QString CardInfo::getLoyalty() const
+{
+    return getProperty(Mtg::Loyalty);
+}
+const QString CardInfo::getMainCardType() const
+{
+    return getProperty(Mtg::MainCardType);
+}
+const QString CardInfo::getManaCost() const
+{
+    return getProperty(Mtg::ManaCost);
+}
+const QString CardInfo::getPowTough() const
+{
+    return getProperty(Mtg::PowTough);
+}
+void CardInfo::setPowTough(const QString &value)
+{
+    setProperty(Mtg::PowTough, value);
 }
