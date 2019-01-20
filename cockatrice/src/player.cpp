@@ -1211,7 +1211,7 @@ void Player::actCreateRelatedCard()
      * then let's allow it to be created via "create another token"
      */
     if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
-        CardInfoPtr cardInfo = db->getCard(dbNameFromTokenDisplayName(cardRelation->getName()));
+        CardInfoPtr cardInfo = db->getCard(cardRelation->getName());
         setLastToken(cardInfo);
     }
 }
@@ -1257,7 +1257,7 @@ void Player::actCreateAllRelatedCards()
             case 0: // else if nonExcludedRelatedCards == 0
                 for (CardRelation *cardRelationAll : relatedCards) {
                     if (!cardRelationAll->getDoesAttach() && !cardRelationAll->getIsVariable()) {
-                        dbName = dbNameFromTokenDisplayName(cardRelationAll->getName());
+                        dbName = cardRelationAll->getName();
                         for (int i = 0; i < cardRelationAll->getDefaultCount(); ++i) {
                             createCard(sourceCard, dbName);
                         }
@@ -1271,7 +1271,7 @@ void Player::actCreateAllRelatedCards()
             default: // else
                 for (CardRelation *cardRelationNotExcluded : nonExcludedRelatedCards) {
                     if (!cardRelationNotExcluded->getDoesAttach() && !cardRelationNotExcluded->getIsVariable()) {
-                        dbName = dbNameFromTokenDisplayName(cardRelationNotExcluded->getName());
+                        dbName = cardRelationNotExcluded->getName();
                         for (int i = 0; i < cardRelationNotExcluded->getDefaultCount(); ++i) {
                             createCard(sourceCard, dbName);
                         }
@@ -1290,7 +1290,7 @@ void Player::actCreateAllRelatedCards()
      * then assign the first to the "Create another" shortcut.
      */
     if (cardRelation != nullptr && cardRelation->getCanCreateAnother()) {
-        CardInfoPtr cardInfo = db->getCard(dbNameFromTokenDisplayName(cardRelation->getName()));
+        CardInfoPtr cardInfo = db->getCard(cardRelation->getName());
         setLastToken(cardInfo);
     }
 }
@@ -1300,7 +1300,7 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
     if (sourceCard == nullptr || cardRelation == nullptr) {
         return false;
     }
-    QString dbName = dbNameFromTokenDisplayName(cardRelation->getName());
+    QString dbName = cardRelation->getName();
     if (cardRelation->getIsVariable()) {
         bool ok;
         dialogSemaphore = true;
@@ -1437,22 +1437,6 @@ void Player::setCardAttrHelper(const GameEventContext &context,
             card->setPT(avalue);
             break;
         }
-    }
-}
-
-// token names take the form of "<Descriptors> <Power>/<Toughness> <Card Name>   " or "<Card Name>   ".
-// dbName for tokens should take the form of "<Card Name>   ".
-// trailing whitespace is significant; it is hacked on at the end as an additional identifier in our single key database
-QString Player::dbNameFromTokenDisplayName(const QString &tokenName)
-{
-    QRegularExpression tokenNamePattern(".*/\\S+\\s+(.*)");
-    QRegularExpressionMatch match = tokenNamePattern.match(tokenName);
-    if (match.hasMatch()) {
-        return match.captured(1);
-    } else if (tokenName.indexOf(tr("Token: ")) != -1) {
-        return tokenName.mid(tr("Token: ").length());
-    } else {
-        return tokenName;
     }
 }
 
@@ -2968,16 +2952,25 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     int index = 0;
     QAction *createRelatedCards = nullptr;
     for (const CardRelation *cardRelation : relatedCards) {
-        QString cardName = cardRelation->getName();
+        CardInfoPtr relatedCard = db->getCard(cardRelation->getName());
+        if(relatedCard == nullptr)
+            continue;
+        QString relatedCardName;
+        if (relatedCard->getPowTough().size() > 0) {
+            relatedCardName = relatedCard->getPowTough() + " " + relatedCard->getName(); // "n/n name"
+        } else {
+            relatedCardName = relatedCard->getName(); // "name"
+        }
+
         QString text = tr("Token: ");
         if (cardRelation->getDoesAttach()) {
-            text += tr("Attach to ") + "\"" + cardName + "\"";
+            text += tr("Attach to ") + "\"" + relatedCardName + "\"";
         } else if (cardRelation->getIsVariable()) {
-            text += "X " + cardName;
+            text += "X " + relatedCardName;
         } else if (cardRelation->getDefaultCount() != 1) {
-            text += QString(cardRelation->getDefaultCount()) + "x " + cardName;
+            text += QString::number(cardRelation->getDefaultCount()) + "x " + relatedCardName;
         } else {
-            text += cardName;
+            text += relatedCardName;
         }
 
         if (createRelatedCards == nullptr) {

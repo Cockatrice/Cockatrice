@@ -251,7 +251,6 @@ private:
     void createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false);
     void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
-    QString dbNameFromTokenDisplayName(const QString &tokenName);
 
     QRectF bRect;
 

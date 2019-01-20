@@ -552,20 +552,13 @@ void CardDatabase::refreshCachedReverseRelatedCards()
             continue;
         }
 
-        QString relatedCardName;
-        if (card->getPowTough().size() > 0) {
-            relatedCardName = card->getPowTough() + " " + card->getName(); // "n/n name"
-        } else {
-            relatedCardName = card->getName(); // "name"
-        }
-
         foreach (CardRelation *cardRelation, card->getReverseRelatedCards()) {
             const QString &targetCard = cardRelation->getName();
             if (!cards.contains(targetCard)) {
                 continue;
             }
 
-            auto *newCardRelation = new CardRelation(relatedCardName, cardRelation->getDoesAttach(),
+            auto *newCardRelation = new CardRelation(card->getName(), cardRelation->getDoesAttach(),
                                                      cardRelation->getIsCreateAllExclusion(),
                                                      cardRelation->getIsVariable(), cardRelation->getDefaultCount());
             cards.value(targetCard)->addReverseRelatedCards2Me(newCardRelation);
