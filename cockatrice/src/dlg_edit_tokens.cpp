@@ -173,7 +173,7 @@ void DlgEditTokens::actRemoveToken()
 void DlgEditTokens::colorChanged(int colorIndex)
 {
     if (currentCard)
-        currentCard->setColors(QStringList() << QString(colorEdit->itemData(colorIndex).toChar()));
+        currentCard->setColors(QString(colorEdit->itemData(colorIndex).toChar()));
 }
 
 void DlgEditTokens::ptChanged(const QString &_pt)

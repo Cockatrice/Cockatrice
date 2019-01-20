@@ -120,6 +120,18 @@ void CockatriceXml4Parser::loadSetsFromXml(QXmlStreamReader &xml)
     }
 }
 
+QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &xml)
+{
+    QVariantHash properties = QVariantHash();
+    while (!xml.atEnd()) {
+        if (xml.readNext() == QXmlStreamReader::EndElement) {
+            break;
+        }
+        properties.insert(xml.name().toString(), xml.readElementText());
+    }
+    return properties;
+}
+
 void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
     while (!xml.atEnd()) {
@@ -131,7 +143,6 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QString name = QString("");
             QString text = QString("");
             QVariantHash properties = QVariantHash();
-            QStringList colors = QStringList();
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             CardInfoPerSetMap sets = CardInfoPerSetMap();
             int tableRow = 0;
@@ -148,21 +159,11 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     name = xml.readElementText();
                 } else if (xml.name() == "text") {
                     text = xml.readElementText();
-                } else if (xml.name() == "color") {
-                    colors << xml.readElementText();
                 } else if (xml.name() == "token") {
                     isToken = static_cast<bool>(xml.readElementText().toInt());
                 // generic properties
-                } else if (xml.name() == "manacost") {
-                    properties.insert("manacost", xml.readElementText());
-                } else if (xml.name() == "cmc") {
-                    properties.insert("cmc", xml.readElementText());
-                } else if (xml.name() == "type") {
-                    properties.insert("type", xml.readElementText());
-                } else if (xml.name() == "pt") {
-                    properties.insert("pt", xml.readElementText());
-                } else if (xml.name() == "loyalty") {
-                    properties.insert("loyalty", xml.readElementText());
+                } else if (xml.name() == "prop") {
+                    properties = loadCardPropertiesFromXml(xml);
                 // positioning info
                 } else if (xml.name() == "tablerow") {
                     tableRow = xml.readElementText().toInt();
@@ -176,24 +177,9 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString setName = xml.readElementText();
                     CardInfoPerSet setInfo(internalAddSet(setName));
-                    if (attrs.hasAttribute("muId")) {
-                        setInfo.setProperty("muid", attrs.value("muId").toString());
-                    }
-
-                    if (attrs.hasAttribute("muId")) {
-                        setInfo.setProperty("uuid", attrs.value("uuId").toString());
-                    }
-
-                    if (attrs.hasAttribute("picURL")) {
-                        setInfo.setProperty("picurl", attrs.value("picURL").toString());
-                    }
-
-                    if (attrs.hasAttribute("num")) {
-                        setInfo.setProperty("num", attrs.value("num").toString());
-                    }
-
-                    if (attrs.hasAttribute("rarity")) {
-                        setInfo.setProperty("rarity", attrs.value("rarity").toString());
+                    for(QXmlStreamAttribute attr : attrs)
+                    {
+                        setInfo.setProperty(attr.name().toString(), attr.value().toString());
                     }
                     sets.insert(setName, setInfo);
                 // relatd cards
@@ -240,7 +226,6 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                 }
             }
 
-            properties.insert("colors", colors);
             CardInfoPtr newCard = CardInfo::newInstance(
                 name, text, isToken, properties, relatedCards, reverseRelatedCards, sets, cipt, tableRow, upsideDown);
             emit addCard(newCard);
@@ -284,40 +269,19 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     }
 
     // generic properties
-    xml.writeTextElement("manacost", info->getProperty("manacost"));
-    xml.writeTextElement("cmc", info->getProperty("cmc"));
-    xml.writeTextElement("type", info->getProperty("type"));
-
-    for(QString color : info->getColors()) {
-        xml.writeTextElement("color", color);
+    xml.writeStartElement("prop");
+    for(QString propName : info->getProperties())
+    {
+        xml.writeTextElement(propName, info->getProperty(propName));
     }
-
-    tmpString = info->getProperty("pt");
-    if (!tmpString.isEmpty()) {
-        xml.writeTextElement("pt", tmpString);
-    }
-
-    tmpString = info->getProperty("loyalty");
-    if (!tmpString.isEmpty()) {
-        xml.writeTextElement("loyalty", tmpString);
-    }
+    xml.writeEndElement();
 
     // sets
-    const CardInfoPerSetMap sets = info->getSets();
-    for(CardInfoPerSet set : sets) {
+    for(CardInfoPerSet set : info->getSets()) {
         xml.writeStartElement("set");
-        xml.writeAttribute("rarity", set.getProperty("rarity"));
-        xml.writeAttribute("muId", set.getProperty("muid"));
-        xml.writeAttribute("uuId", set.getProperty("uuid"));
-
-        tmpString = set.getProperty("num");
-        if (!tmpString.isEmpty()) {
-            xml.writeAttribute("num", tmpString);
-        }
-
-        tmpString = set.getProperty("picurl");
-        if (!tmpString.isEmpty()) {
-            xml.writeAttribute("picURL", tmpString);
+        for(QString propName : set.getProperties())
+        {
+            xml.writeAttribute(propName, set.getProperty(propName));
         }
 
         xml.writeCharacters(set.getPtr()->getShortName());

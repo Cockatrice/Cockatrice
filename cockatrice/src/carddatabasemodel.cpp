@@ -53,7 +53,7 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
         case PTColumn:
             return card->getPowTough();
         case ColorColumn:
-            return card->getColors().join("");
+            return card->getColors();
         default:
             return QVariant();
     }

@@ -1343,13 +1343,17 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, b
     Command_CreateToken cmd;
     cmd.set_zone("table");
     cmd.set_card_name(cardInfo->getName().toStdString());
-    if (cardInfo->getColors().length() > 1) // Multicoloured
+    switch(cardInfo->getColors().size())
     {
-        cmd.set_color("m");
-    } else if (cardInfo->getColors().isEmpty()) {
-        cmd.set_color("");
-    } else {
-        cmd.set_color(cardInfo->getColors().first().toLower().toStdString());
+        case 0:
+            cmd.set_color("");
+            break;
+        case 1:
+            cmd.set_color("m");
+            break;
+        default:
+            cmd.set_color(cardInfo->getColors().left(1).toLower().toStdString());
+            break;
     }
 
     cmd.set_pt(cardInfo->getPowTough().toStdString());
@@ -3072,7 +3076,7 @@ void Player::setLastToken(CardInfoPtr cardInfo)
     }
 
     lastTokenName = cardInfo->getName();
-    lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().first().toLower();
+    lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().left(1).toLower();
     lastTokenPT = cardInfo->getPowTough();
     lastTokenAnnotation = settingsCache->getAnnotateTokens() ? cardInfo->getText() : "";
     lastTokenTableRow = table->clampValidTableRow(2 - cardInfo->getTableRow());

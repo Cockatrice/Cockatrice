@@ -83,7 +83,7 @@ void CardInfoText::setCard(CardInfoPtr card)
             manacostLabel2->hide();
         }
         if (!card->getColors().isEmpty()) {
-            colorLabel2->setText(card->getColors().join(""));
+            colorLabel2->setText(card->getColors());
         } else {
             colorLabel2->setText("Colorless");
         }

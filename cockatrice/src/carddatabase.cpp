@@ -309,12 +309,12 @@ QString CardInfo::simplifyName(const QString &name)
 
 const QChar CardInfo::getColorChar() const
 {
-    QStringList colors = getColors();
+    QString colors = getColors();
     switch (colors.size()) {
         case 0:
             return QChar();
         case 1:
-            return colors.first().isEmpty() ? QChar() : colors.first().at(0);
+            return colors.at(0);
         default:
             return QChar('m');
     }
@@ -571,23 +571,6 @@ void CardDatabase::refreshCachedReverseRelatedCards()
             cards.value(targetCard)->addReverseRelatedCards2Me(newCardRelation);
         }
     }
-}
-
-QStringList CardDatabase::getAllColors() const
-{
-    QSet<QString> colors;
-    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
-    while (cardIterator.hasNext()) {
-        const QStringList &cardColors = cardIterator.next().value()->getColors();
-        if (cardColors.isEmpty()) {
-            colors.insert("X");
-        } else {
-            for (int i = 0; i < cardColors.size(); ++i) {
-                colors.insert(cardColors[i]);
-            }
-        }
-    }
-    return colors.toList();
 }
 
 QStringList CardDatabase::getAllMainCardTypes() const

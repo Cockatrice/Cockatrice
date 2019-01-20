@@ -131,7 +131,10 @@ public:
     {
         return set;
     }
-
+    const QStringList getProperties() const
+    {
+        return properties.keys();
+    }
     const QString getProperty(QString propertyName) const
     {
         return properties.value(propertyName).toString();
@@ -231,6 +234,10 @@ public:
     {
         return isToken;
     }
+    const QStringList getProperties() const
+    {
+        return properties.keys();
+    }
     const QString getProperty(QString propertyName) const
     {
         return properties.value(propertyName).toString();
@@ -317,14 +324,13 @@ public:
     {
         setProperty("cmc", value);
     }
-    inline const QStringList getColors() const
+    inline const QString getColors() const
     {
-        return properties.value("colors").toStringList();
+        return getProperty("colors");
     }
-    inline void setColors(const QStringList &value)
+    inline void setColors(const QString &value)
     {
-        properties.insert("colors", value);
-        emit cardInfoChanged(smartThis);
+        setProperty("colors", value);
     }
     inline const QString getLoyalty() const
     {
@@ -465,7 +471,6 @@ public:
     SetList getSetList() const;
     LoadStatus loadFromFile(const QString &fileName);
     bool saveCustomTokensToFile();
-    QStringList getAllColors() const;
     QStringList getAllMainCardTypes() const;
     LoadStatus getLoadStatus() const
     {

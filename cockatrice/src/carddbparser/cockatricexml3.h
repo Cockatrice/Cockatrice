@@ -29,6 +29,7 @@ private:
                               const QDate &releaseDate = QDate());
     void loadCardsFromXml(QXmlStreamReader &xml);
     void loadSetsFromXml(QXmlStreamReader &xml);
+    QString getMainCardType(QString &type);
 signals:
     void addCard(CardInfoPtr card);
     void addSet(CardSetPtr set);

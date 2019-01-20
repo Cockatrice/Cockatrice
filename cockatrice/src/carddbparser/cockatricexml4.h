@@ -27,6 +27,7 @@ private:
                               const QString &longName = "",
                               const QString &setType = "",
                               const QDate &releaseDate = QDate());
+    QVariantHash loadCardPropertiesFromXml(QXmlStreamReader &xml);
     void loadCardsFromXml(QXmlStreamReader &xml);
     void loadSetsFromXml(QXmlStreamReader &xml);
 signals:
