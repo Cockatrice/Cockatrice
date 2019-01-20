@@ -127,12 +127,20 @@ CardInfoPtr OracleImporter::addCard(QString name,
     else if (mainCardType == "Creature")
         tableRow = 2;
 
+    // card side
+    QString side = properties.value("side").toString() == "b" ? "back" : "front";
+    properties.insert("side", side);
+
     // upsideDown (flip cards)
     bool upsideDown = false;
     QStringList additionalNames = properties.value("names").toStringList();
     QString layout = properties.value("layout").toString();
-    if (layout == "flip" && properties.value("side").toString() != "a") {
-        upsideDown = true;
+    if (layout == "flip") {
+        if(properties.value("side").toString() != "front") {
+            upsideDown = true;
+        }
+        // reset the side property, since the card has no back image
+        properties.insert("side", "front");
     }
 
     // insert the card and its properties
