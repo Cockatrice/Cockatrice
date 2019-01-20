@@ -14,6 +14,7 @@ CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::Win
     pic->setObjectName("pic");
     text = new CardInfoText();
     text->setObjectName("text");
+    connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setObjectName("layout");

@@ -16,6 +16,7 @@ CardFrame::CardFrame(const QString &cardName, QWidget *parent) : QTabWidget(pare
     pic->setObjectName("pic");
     text = new CardInfoText();
     text->setObjectName("text");
+    connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
 
     tab1 = new QWidget(this);
     tab2 = new QWidget(this);
