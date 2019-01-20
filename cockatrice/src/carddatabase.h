@@ -371,18 +371,6 @@ public:
     {
         return getSetProperty(set, "picurl");
     }
-    QString getMuId(const QString &set) const
-    {
-        return getSetProperty(set, "muid");
-    }
-    QString getUuId(const QString &set) const
-    {
-        return getSetProperty(set, "uuid");
-    }
-    QString getCollectorNumber(const QString &set) const
-    {
-        return getSetProperty(set, "num");
-    }
     QString getCorrectedName() const;
     void addToSet(const CardSetPtr &_set, const CardInfoPerSet _info = CardInfoPerSet());
     void emitPixmapUpdated()

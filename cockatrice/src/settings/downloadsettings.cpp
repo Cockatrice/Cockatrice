@@ -29,9 +29,9 @@ QStringList DownloadSettings::getAllURLs()
 void DownloadSettings::populateDefaultURLs()
 {
     downloadURLs.clear();
-    downloadURLs.append("https://api.scryfall.com/cards/!uuid!?format=image&face=!side!");
-    downloadURLs.append("https://api.scryfall.com/cards/multiverse/!cardid!?format=image&face=!side!");
-    downloadURLs.append("http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card");
+    downloadURLs.append("https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!");
+    downloadURLs.append("https://api.scryfall.com/cards/multiverse/!set:muid!?format=image");
+    downloadURLs.append("http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card");
     downloadURLs.append("http://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card");
     setValue(QVariant::fromValue(downloadURLs), "urls", "downloads");
 }
