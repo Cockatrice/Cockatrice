@@ -328,10 +328,8 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     xml.writeTextElement("cmc", info->getProperty("cmc"));
     xml.writeTextElement("type", info->getProperty("type"));
 
-
     int colorSize = info->getColors().size();
-    for(int i = 0; i < colorSize; ++i)
-    {
+    for (int i = 0; i < colorSize; ++i) {
         xml.writeTextElement("color", info->getColors().at(i));
     }
 

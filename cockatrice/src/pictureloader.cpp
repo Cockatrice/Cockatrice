@@ -255,8 +255,7 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
         QString propertyName = rxCardProp.cap(1);
         pos += rxCardProp.matchedLength();
         QString propertyValue = card->getProperty(propertyName);
-        if(propertyValue.isEmpty())
-        {
+        if (propertyValue.isEmpty()) {
             qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
                      << "]: Requested property (" << propertyName << ") for Url template (" << urlTemplate
                      << ") is not available";
@@ -278,8 +277,7 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
             QString propertyName = rxSetProp.cap(1);
             pos += rxSetProp.matchedLength();
             QString propertyValue = card->getSetProperty(set->getShortName(), propertyName);
-            if(propertyValue.isEmpty())
-            {
+            if (propertyValue.isEmpty()) {
                 qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
                          << "]: Requested set property (" << propertyName << ") for Url template (" << urlTemplate
                          << ") is not available";

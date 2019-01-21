@@ -187,7 +187,7 @@ bool FilterItem::acceptColor(const CardInfoPtr info) const
      */
     int match_count = 0;
     for (auto &it : converted_term) {
-        if(info->getColors().contains(it, Qt::CaseInsensitive))
+        if (info->getColors().contains(it, Qt::CaseInsensitive))
             match_count++;
     }
 

@@ -128,7 +128,7 @@ QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &x
             break;
         }
 
-        if(xml.name() != "") {
+        if (xml.name() != "") {
             properties.insert(xml.name().toString(), xml.readElementText());
         }
     }
@@ -164,28 +164,27 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     text = xml.readElementText();
                 } else if (xml.name() == "token") {
                     isToken = static_cast<bool>(xml.readElementText().toInt());
-                // generic properties
+                    // generic properties
                 } else if (xml.name() == "prop") {
                     properties = loadCardPropertiesFromXml(xml);
-                // positioning info
+                    // positioning info
                 } else if (xml.name() == "tablerow") {
                     tableRow = xml.readElementText().toInt();
                 } else if (xml.name() == "cipt") {
                     cipt = (xml.readElementText() == "1");
                 } else if (xml.name() == "upsidedown") {
                     upsideDown = (xml.readElementText() == "1");
-                // sets
+                    // sets
                 } else if (xml.name() == "set") {
                     // NOTE: attributes but be read before readElementText()
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString setName = xml.readElementText();
                     CardInfoPerSet setInfo(internalAddSet(setName));
-                    for(QXmlStreamAttribute attr : attrs)
-                    {
+                    for (QXmlStreamAttribute attr : attrs) {
                         setInfo.setProperty(attr.name().toString(), attr.value().toString());
                     }
                     sets.insert(setName, setInfo);
-                // relatd cards
+                    // relatd cards
                 } else if (xml.name() == "related" || xml.name() == "reverse-related") {
                     bool attach = false;
                     bool exclude = false;
@@ -229,8 +228,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                 }
             }
 
-            CardInfoPtr newCard = CardInfo::newInstance(
-                name, text, isToken, properties, relatedCards, reverseRelatedCards, sets, cipt, tableRow, upsideDown);
+            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
+                                                        reverseRelatedCards, sets, cipt, tableRow, upsideDown);
             emit addCard(newCard);
         }
     }
@@ -273,17 +272,15 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
 
     // generic properties
     xml.writeStartElement("prop");
-    for(QString propName : info->getProperties())
-    {
+    for (QString propName : info->getProperties()) {
         xml.writeTextElement(propName, info->getProperty(propName));
     }
     xml.writeEndElement();
 
     // sets
-    for(CardInfoPerSet set : info->getSets()) {
+    for (CardInfoPerSet set : info->getSets()) {
         xml.writeStartElement("set");
-        for(QString propName : set.getProperties())
-        {
+        for (QString propName : set.getProperties()) {
             xml.writeAttribute(propName, set.getProperty(propName));
         }
 

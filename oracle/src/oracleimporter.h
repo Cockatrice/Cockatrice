@@ -53,9 +53,9 @@ class SplitCardPart
 {
 public:
     SplitCardPart(const int _index,
-        const QString &_text,
-        const QVariantHash &_properties,
-        const CardInfoPerSet setInfo);
+                  const QString &_text,
+                  const QVariantHash &_properties,
+                  const CardInfoPerSet setInfo);
     inline const int getIndex() const
     {
         return index;
@@ -72,6 +72,7 @@ public:
     {
         return setInfo;
     }
+
 private:
     int index;
     QString text;

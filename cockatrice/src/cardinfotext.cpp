@@ -34,32 +34,27 @@ void CardInfoText::setCard(CardInfoPtr card)
     }
 
     QString text = "<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>";
-    text += QString("<tr><td>%1</td><td width=\"5\"></td><td>%2</td></tr>").arg(tr("Name:"), card->getName().toHtmlEscaped());
+    text += QString("<tr><td>%1</td><td width=\"5\"></td><td>%2</td></tr>")
+                .arg(tr("Name:"), card->getName().toHtmlEscaped());
 
     QStringList cardProps = card->getProperties();
-    foreach(QString key, cardProps)
-    {
+    foreach (QString key, cardProps) {
         QString keyText = Mtg::getNicePropertyName(key).toHtmlEscaped() + ":";
-        text += QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(
-            keyText,
-            card->getProperty(key).toHtmlEscaped()
-            );
+        text +=
+            QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(keyText, card->getProperty(key).toHtmlEscaped());
     }
 
     auto relatedCards = card->getRelatedCards();
     auto reverserelatedCards2Me = card->getReverseRelatedCards2Me();
-    if(relatedCards.size() || reverserelatedCards2Me.size())
-    {
+    if (relatedCards.size() || reverserelatedCards2Me.size()) {
         text += QString("<tr><td>%1</td><td width=\"5\"></td><td>").arg(tr("Related cards:"));
 
-        for (int i = 0; i < relatedCards.size(); ++i)
-        {
+        for (int i = 0; i < relatedCards.size(); ++i) {
             QString tmp = relatedCards.at(i)->getName().toHtmlEscaped();
             text += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
         }
 
-        for (int i = 0; i < reverserelatedCards2Me.size(); ++i)
-        {
+        for (int i = 0; i < reverserelatedCards2Me.size(); ++i) {
             QString tmp = reverserelatedCards2Me.at(i)->getName().toHtmlEscaped();
             text += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
         }

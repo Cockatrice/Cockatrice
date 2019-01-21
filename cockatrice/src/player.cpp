@@ -1343,8 +1343,7 @@ void Player::createCard(const CardItem *sourceCard, const QString &dbCardName, b
     Command_CreateToken cmd;
     cmd.set_zone("table");
     cmd.set_card_name(cardInfo->getName().toStdString());
-    switch(cardInfo->getColors().size())
-    {
+    switch (cardInfo->getColors().size()) {
         case 0:
             cmd.set_color("");
             break;
@@ -2953,7 +2952,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     QAction *createRelatedCards = nullptr;
     for (const CardRelation *cardRelation : relatedCards) {
         CardInfoPtr relatedCard = db->getCard(cardRelation->getName());
-        if(relatedCard == nullptr)
+        if (relatedCard == nullptr)
             continue;
         QString relatedCardName;
         if (relatedCard->getPowTough().size() > 0) {
