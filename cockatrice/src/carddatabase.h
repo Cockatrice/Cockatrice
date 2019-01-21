@@ -118,7 +118,7 @@ public:
 class CardInfoPerSet
 {
 public:
-    explicit CardInfoPerSet(const CardSetPtr &_set = nullptr);
+    explicit CardInfoPerSet(const CardSetPtr &_set = QSharedPointer<CardSet>(nullptr));
     ~CardInfoPerSet(){};
 
 private:

@@ -56,7 +56,7 @@ public:
                   const QString &_text,
                   const QVariantHash &_properties,
                   const CardInfoPerSet setInfo);
-    inline const int getIndex() const
+    inline const int &getIndex() const
     {
         return index;
     }

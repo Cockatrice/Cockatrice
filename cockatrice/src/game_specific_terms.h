@@ -22,7 +22,7 @@ QString const PowTough("pt");
 QString const Side("side");
 QString const Layout("layout");
 
-static const QString getNicePropertyName(QString key)
+inline static const QString getNicePropertyName(QString key)
 {
     if (key == CardType)
         return QCoreApplication::translate("Mtg", "Card type");
