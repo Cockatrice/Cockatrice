@@ -16,6 +16,7 @@ public:
     virtual void parseFile(QIODevice &device) = 0;
     virtual bool saveToFile(SetNameMap sets, CardNameMap cards, const QString &fileName) = 0;
     static void clearSetlist();
+
 protected:
     /*
      * A cached list of the available sets, needed to cross-reference sets from cards.
@@ -28,7 +29,7 @@ protected:
                               const QString &setType = "",
                               const QDate &releaseDate = QDate());
 signals:
-	virtual void addCard(CardInfoPtr card) = 0;
+    virtual void addCard(CardInfoPtr card) = 0;
     virtual void addSet(CardSetPtr set) = 0;
 };
 
