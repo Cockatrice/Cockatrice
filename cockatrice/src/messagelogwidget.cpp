@@ -169,6 +169,12 @@ void MessageLogWidget::logConcede(Player *player)
     appendHtmlServerMessage(tr("%1 has conceded the game.").arg(sanitizeHtml(player->getName())), true);
 }
 
+void MessageLogWidget::logUnconcede(Player *player)
+{
+    soundEngine->playSound("player_concede");
+    appendHtmlServerMessage(tr("%1 has unconceded the game.").arg(sanitizeHtml(player->getName())), true);
+}
+
 void MessageLogWidget::logConnectionStateChanged(Player *player, bool connectionState)
 {
     if (connectionState) {

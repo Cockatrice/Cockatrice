@@ -46,6 +46,7 @@ class Command_SetCardCounter;
 class Command_IncCardCounter;
 class Command_ReadyStart;
 class Command_Concede;
+class Command_Unconcede;
 class Command_IncCounter;
 class Command_CreateCounter;
 class Command_SetCounter;
@@ -190,6 +191,7 @@ public:
     Response::ResponseCode
     cmdKickFromGame(const Command_KickFromGame &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdConcede(const Command_Concede &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    Response::ResponseCode cmdUnconcede(const Command_Unconcede &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode

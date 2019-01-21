@@ -33,6 +33,8 @@ message GameCommand {
         DECK_SELECT = 1029;
         SET_SIDEBOARD_LOCK = 1030;
         CHANGE_ZONE_PROPERTIES = 1031;
+        UNCONCEDE = 1032;
+
     }
     extensions 100 to max;
 }
