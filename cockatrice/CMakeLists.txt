@@ -120,6 +120,7 @@ SET(cockatrice_SOURCES
     src/userconnection_information.cpp
     src/spoilerbackgroundupdater.cpp
     src/handle_public_servers.cpp
+    src/carddbparser/carddatabaseparser.cpp
     src/carddbparser/cockatricexml3.cpp
     src/carddbparser/cockatricexml4.cpp
     ${VERSION_STRING_CPP}

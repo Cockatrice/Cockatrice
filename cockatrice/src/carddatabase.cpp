@@ -360,9 +360,7 @@ void CardDatabase::clear()
     simpleNameCards.clear();
 
     sets.clear();
-    for (auto parser : availableParsers) {
-        parser->clearSetlist();
-    }
+    ICardDatabaseParser::clearSetlist();
 
     loadStatus = NotLoaded;
 

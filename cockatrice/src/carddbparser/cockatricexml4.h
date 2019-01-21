@@ -15,18 +15,8 @@ public:
     bool getCanParseFile(const QString &name, QIODevice &device);
     void parseFile(QIODevice &device);
     bool saveToFile(SetNameMap sets, CardNameMap cards, const QString &fileName);
-    void clearSetlist();
 
 private:
-    /*
-     * A cached list of the available sets, needed to cross-reference sets from cards.
-     */
-    SetNameMap sets;
-
-    CardSetPtr internalAddSet(const QString &setName,
-                              const QString &longName = "",
-                              const QString &setType = "",
-                              const QDate &releaseDate = QDate());
     QVariantHash loadCardPropertiesFromXml(QXmlStreamReader &xml);
     void loadCardsFromXml(QXmlStreamReader &xml);
     void loadSetsFromXml(QXmlStreamReader &xml);
