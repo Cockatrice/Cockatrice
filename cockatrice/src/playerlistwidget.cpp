@@ -58,6 +58,7 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
     notReadyIcon = QPixmap("theme:icons/not_ready_start");
     concededIcon = QPixmap("theme:icons/conceded");
     playerIcon = QPixmap("theme:icons/player");
+    judgeIcon = QPixmap("theme:icons/gavel");
     spectatorIcon = QPixmap("theme:icons/spectator");
     lockIcon = QPixmap("theme:icons/lock");
 
@@ -113,7 +114,7 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
     bool isSpectator = prop.has_spectator() && prop.spectator();
     if (prop.has_judge() || prop.has_spectator()) {
         if (prop.has_judge() && prop.judge()) {
-            player->setIcon(1, lockIcon);
+            player->setIcon(1, judgeIcon);
         } else if (isSpectator) {
             player->setIcon(1, spectatorIcon);
         } else {

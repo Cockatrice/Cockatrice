@@ -37,7 +37,7 @@ private:
     AbstractClient *client;
     TabGame *game;
     UserContextMenu *userContextMenu;
-    QIcon readyIcon, notReadyIcon, concededIcon, playerIcon, spectatorIcon, lockIcon;
+    QIcon readyIcon, notReadyIcon, concededIcon, playerIcon, judgeIcon, spectatorIcon, lockIcon;
     bool gameStarted;
 signals:
     void openMessageDialog(const QString &userName, bool focus);
