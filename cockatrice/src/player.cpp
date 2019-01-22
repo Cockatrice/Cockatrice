@@ -30,6 +30,7 @@
 
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_change_zone_properties.pb.h"
+#include "pb/command_concede.pb.h"
 #include "pb/command_create_token.pb.h"
 #include "pb/command_draw_cards.pb.h"
 #include "pb/command_flip_card.pb.h"
@@ -91,10 +92,11 @@ void PlayerArea::setSize(qreal width, qreal height)
     bRect = QRectF(0, 0, width, height);
 }
 
-Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_parent)
+Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
     : QObject(_parent), game(_parent), shortcutsActive(false), defaultNumberTopCards(1),
       defaultNumberTopCardsToPlaceBelow(1), lastTokenDestroy(true), lastTokenTableRow(0), id(_id), active(false),
-      local(_local), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false), deck(nullptr)
+      local(_local), judge(_judge), mirrored(false), handVisible(false), conceded(false), dialogSemaphore(false),
+      deck(nullptr)
 {
     userInfo = new ServerInfo_User;
     userInfo->CopyFrom(info);
@@ -140,10 +142,12 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
 
     updateBoundingRect();
 
-    if (local) {
+    if (local || judge) {
         connect(_parent, SIGNAL(playerAdded(Player *)), this, SLOT(addPlayer(Player *)));
         connect(_parent, SIGNAL(playerRemoved(Player *)), this, SLOT(removePlayer(Player *)));
+    }
 
+    if (local || judge) {
         aMoveHandToTopLibrary = new QAction(this);
         aMoveHandToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
         aMoveHandToBottomLibrary = new QAction(this);
@@ -204,7 +208,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     aViewRfg = new QAction(this);
     connect(aViewRfg, SIGNAL(triggered()), this, SLOT(actViewRfg()));
 
-    if (local) {
+    if (local || judge) {
         aViewSideboard = new QAction(this);
         connect(aViewSideboard, SIGNAL(triggered()), this, SLOT(actViewSideboard()));
 
@@ -237,7 +241,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     playerMenu = new QMenu(QString());
     table->setMenu(playerMenu);
 
-    if (local) {
+    if (local || judge) {
         handMenu = playerMenu->addMenu(QString());
         playerLists.append(mRevealHand = handMenu->addMenu(QString()));
         playerLists.append(mRevealRandomHandCard = handMenu->addMenu(QString()));
@@ -286,7 +290,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     graveMenu = playerMenu->addMenu(QString());
     graveMenu->addAction(aViewGraveyard);
 
-    if (local) {
+    if (local || judge) {
         mRevealRandomGraveyardCard = graveMenu->addMenu(QString());
         QAction *newAction = mRevealRandomGraveyardCard->addAction(QString());
         newAction->setData(-1);
@@ -300,7 +304,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
     rfgMenu->addAction(aViewRfg);
     rfg->setMenu(rfgMenu, aViewRfg);
 
-    if (local) {
+    if (local || judge) {
         graveMenu->addSeparator();
         moveGraveMenu = graveMenu->addMenu(QString());
         moveGraveMenu->addAction(aMoveGraveToTopLibrary);
@@ -349,12 +353,22 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
         playerMenu->addAction(aCreateAnotherToken);
         playerMenu->addMenu(createPredefinedTokenMenu);
         playerMenu->addSeparator();
+    }
+
+    if (local) {
         sayMenu = playerMenu->addMenu(QString());
         initSayMenu();
+    }
 
+    if (local || judge) {
         aCardMenu = new QAction(this);
         playerMenu->addSeparator();
         playerMenu->addAction(aCardMenu);
+    } else {
+        aCardMenu = nullptr;
+    }
+
+    if (local || judge) {
 
         for (auto &playerList : playerLists) {
             QAction *newAction = playerList->addAction(QString());
@@ -363,12 +377,13 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_pare
             allPlayersActions.append(newAction);
             playerList->addSeparator();
         }
-    } else {
+    }
+
+    if (!local && !judge) {
         countersMenu = nullptr;
         sbMenu = nullptr;
         aCreateAnotherToken = nullptr;
         createPredefinedTokenMenu = nullptr;
-        aCardMenu = nullptr;
     }
 
     aTap = new QAction(this);
@@ -632,7 +647,7 @@ void Player::retranslateUi()
     graveMenu->setTitle(tr("&Graveyard"));
     rfgMenu->setTitle(tr("&Exile"));
 
-    if (local) {
+    if (local || judge) {
         moveHandMenu->setTitle(tr("&Move hand to..."));
         aMoveHandToTopLibrary->setText(tr("&Top of library"));
         aMoveHandToBottomLibrary->setText(tr("&Bottom of library"));
@@ -684,7 +699,6 @@ void Player::retranslateUi()
         aCreateToken->setText(tr("&Create token..."));
         aCreateAnotherToken->setText(tr("C&reate another token"));
         createPredefinedTokenMenu->setTitle(tr("Cr&eate predefined token"));
-        sayMenu->setTitle(tr("S&ay"));
 
         QMapIterator<int, AbstractCounter *> counterIterator(counters);
         while (counterIterator.hasNext())
@@ -694,6 +708,10 @@ void Player::retranslateUi()
 
         for (auto &allPlayersAction : allPlayersActions)
             allPlayersAction->setText(tr("&All players"));
+    }
+
+    if (local) {
+        sayMenu->setTitle(tr("S&ay"));
     }
 
     aPlay->setText(tr("&Play"));
@@ -2122,7 +2140,7 @@ AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor c
         ctr = new GeneralCounter(this, counterId, name, color, radius, value, true, this);
     }
     counters.insert(counterId, ctr);
-    if (countersMenu) {
+    if (countersMenu && ctr->getMenu()) {
         countersMenu->addMenu(ctr->getMenu());
     }
     if (shortcutsActive) {
@@ -2254,17 +2272,47 @@ void Player::rearrangeCounters()
 
 PendingCommand *Player::prepareGameCommand(const google::protobuf::Message &cmd)
 {
-    return game->prepareGameCommand(cmd);
+
+    if (judge && !local) {
+        Command_Judge base;
+        GameCommand *c = base.add_game_command();
+        base.set_target_id(id);
+        c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
+        return game->prepareGameCommand(base);
+    } else {
+        return game->prepareGameCommand(cmd);
+    }
 }
 
 PendingCommand *Player::prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList)
 {
-    return game->prepareGameCommand(cmdList);
+    if (judge && !local) {
+        Command_Judge base;
+        base.set_target_id(id);
+        for (int i = 0; i < cmdList.size(); ++i) {
+            GameCommand *c = base.add_game_command();
+            c->GetReflection()
+                ->MutableMessage(c, cmdList[i]->GetDescriptor()->FindExtensionByName("ext"))
+                ->CopyFrom(*cmdList[i]);
+            delete cmdList[i];
+        }
+        return game->prepareGameCommand(base);
+    } else {
+        return game->prepareGameCommand(cmdList);
+    }
 }
 
 void Player::sendGameCommand(const google::protobuf::Message &command)
 {
-    game->sendGameCommand(command, id);
+    if (judge && !local) {
+        Command_Judge base;
+        GameCommand *c = base.add_game_command();
+        base.set_target_id(id);
+        c->GetReflection()->MutableMessage(c, command.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(command);
+        game->sendGameCommand(base, id);
+    } else {
+        game->sendGameCommand(command, id);
+    }
 }
 
 void Player::sendGameCommand(PendingCommand *pend)

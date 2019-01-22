@@ -815,6 +815,11 @@ void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
                 .arg(QString("<a href=\"card://%1\">%2</a>").arg(sanitizeHtml(cardName)).arg(sanitizeHtml(cardName))));
 }
 
+void MessageLogWidget::logForcedByJudge(Player *player)
+{
+    appendHtmlServerMessage(tr("%1 compelled a player to act.").arg(sanitizeHtml(player->getName())));
+}
+
 void MessageLogWidget::connectToPlayer(Player *player)
 {
     connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));

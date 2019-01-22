@@ -228,6 +228,7 @@ private:
     int id;
     bool active;
     bool local;
+    bool judge;
     bool mirrored;
     bool handVisible;
     bool conceded;
@@ -339,8 +340,9 @@ public:
         return playerTarget;
     }
 
-    Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_parent);
+    Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent);
     ~Player() override;
+
     void retranslateUi();
     void clear();
     TabGame *getGame() const
@@ -364,6 +366,14 @@ public:
     bool getLocal() const
     {
         return local;
+    }
+    bool getLocalOrJudge() const
+    {
+        return local || judge;
+    }
+    bool getJudge() const
+    {
+        return judge;
     }
     bool getMirrored() const
     {

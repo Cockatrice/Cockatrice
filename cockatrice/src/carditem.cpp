@@ -321,7 +321,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             const ZoneViewZone *view = static_cast<const ZoneViewZone *>(zone);
             if (view->getRevealZone() && !view->getWriteableRevealZone())
                 return;
-        } else if (!owner->getLocal())
+        } else if (!owner->getLocalOrJudge())
             return;
 
         bool forceFaceDown = event->modifiers().testFlag(Qt::ShiftModifier);
@@ -352,7 +352,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void CardItem::playCard(bool faceDown)
 {
     // Do nothing if the card belongs to another player
-    if (!owner->getLocal())
+    if (!owner->getLocalOrJudge())
         return;
 
     TableZone *tz = qobject_cast<TableZone *>(zone);

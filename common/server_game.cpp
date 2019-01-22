@@ -390,8 +390,11 @@ void Server_Game::stopGameIfFinished()
     emit gameInfoChanged(gameInfo);
 }
 
-Response::ResponseCode
-Server_Game::checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions)
+Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
+                                              const QString &_password,
+                                              bool spectator,
+                                              bool overrideRestrictions,
+                                              bool asJudge)
 {
     Server_DatabaseInterface *databaseInterface = room->getServer()->getDatabaseInterface();
     {
@@ -399,6 +402,10 @@ Server_Game::checkJoin(ServerInfo_User *user, const QString &_password, bool spe
         while (playerIterator.hasNext())
             if (playerIterator.next().value()->getUserInfo()->name() == user->name())
                 return Response::RespContextError;
+    }
+
+    if (asJudge && !(user->user_level() & ServerInfo_User::IsModerator)) {
+        return Response::RespUserLevelTooLow;
     }
     if (!(overrideRestrictions && (user->user_level() & ServerInfo_User::IsModerator))) {
         if ((_password != password) && !(spectator && !spectatorsNeedPassword))
@@ -437,12 +444,14 @@ bool Server_Game::containsUser(const QString &userName) const
 void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
                             ResponseContainer &rc,
                             bool spectator,
+                            bool judge,
                             bool broadcastUpdate)
 {
     QMutexLocker locker(&gameMutex);
 
     Server_Player *newPlayer = new Server_Player(this, nextPlayerId++, userInterface->copyUserInfo(true, true, true),
-                                                 spectator, userInterface);
+                                                 spectator, judge, userInterface);
+
     newPlayer->moveToThread(thread());
 
     Event_Join joinEvent;
@@ -663,6 +672,7 @@ void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer
     event1.set_host_id(hostId);
     event1.set_player_id(player->getPlayerId());
     event1.set_spectator(player->getSpectator());
+    event1.set_judge(player->getJudge());
     event1.set_resuming(resuming);
     if (resuming) {
         const QStringList &allGameTypes = room->getGameTypes();

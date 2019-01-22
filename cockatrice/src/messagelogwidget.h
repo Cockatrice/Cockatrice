@@ -108,6 +108,7 @@ public slots:
     void logStopDumpZone(Player *player, CardZone *zone);
     void logUnattachCard(Player *player, QString cardName);
     void logUndoDraw(Player *player, QString cardName);
+    void logForcedByJudge(Player *player);
 
 public:
     void connectToPlayer(Player *player);

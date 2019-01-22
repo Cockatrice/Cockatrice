@@ -87,10 +87,11 @@ Server_Player::Server_Player(Server_Game *_game,
                              int _playerId,
                              const ServerInfo_User &_userInfo,
                              bool _spectator,
+                             bool _judge,
                              Server_AbstractUserInterface *_userInterface)
     : ServerInfo_User_Container(_userInfo), game(_game), userInterface(_userInterface), deck(nullptr), pingTime(0),
       playerId(_playerId), spectator(_spectator), initialCards(0), nextCardId(0), readyStart(false), conceded(false),
-      sideboardLocked(true)
+      sideboardLocked(true), judge(_judge)
 {
 }
 
@@ -251,6 +252,7 @@ void Server_Player::getProperties(ServerInfo_PlayerProperties &result, bool with
         result.set_sideboard_locked(sideboardLocked);
         result.set_ready_start(readyStart);
     }
+    result.set_judge(judge);
     if (deck)
         result.set_deck_hash(deck->getDeckHash().toStdString());
     result.set_ping_seconds(pingTime);
@@ -793,6 +795,24 @@ Server_Player::cmdUnconcede(const Command_Unconcede & /*cmd*/, ResponseContainer
     setupZones();
 
     game->sendGameStateToPlayers();
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode Server_Player::cmdJudge(const Command_Judge &cmd, ResponseContainer &rc, GameEventStorage &ges)
+{
+    if (!judge)
+        return Response::RespFunctionNotAllowed;
+
+    Server_Player *player = this->game->getPlayers()[cmd.target_id()];
+
+    ges.setForcedByJudge(playerId);
+    if (player == nullptr)
+        return Response::RespContextError;
+
+    for (int i = 0; i < cmd.game_command_size(); ++i) {
+        player->processGameCommand(cmd.game_command(i), rc, ges);
+    }
 
     return Response::RespOk;
 }
@@ -1857,6 +1877,9 @@ Server_Player::processGameCommand(const GameCommand &command, ResponseContainer 
             break;
         case GameCommand::UNCONCEDE:
             return cmdUnconcede(command.GetExtension(Command_Unconcede::ext), rc, ges);
+            break;
+        case GameCommand::JUDGE:
+            return cmdJudge(command.GetExtension(Command_Judge::ext), rc, ges);
             break;
 
         default:

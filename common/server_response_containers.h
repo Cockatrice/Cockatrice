@@ -48,6 +48,7 @@ private:
     ::google::protobuf::Message *gameEventContext;
     QList<GameEventStorageItem *> gameEventList;
     int privatePlayerId;
+    int forcedByJudge = -1;
 
 public:
     GameEventStorage();
@@ -65,6 +66,10 @@ public:
     int getPrivatePlayerId() const
     {
         return privatePlayerId;
+    }
+    void setForcedByJudge(int playerId)
+    {
+        forcedByJudge = playerId;
     }
 
     void enqueueGameEvent(const ::google::protobuf::Message &event,

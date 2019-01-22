@@ -157,11 +157,12 @@ public:
         return spectatorsSeeEverything;
     }
     Response::ResponseCode
-    checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions);
+    checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions, bool asJudge);
     bool containsUser(const QString &userName) const;
     void addPlayer(Server_AbstractUserInterface *userInterface,
                    ResponseContainer &rc,
                    bool spectator,
+                   bool judge,
                    bool broadcastUpdate = true);
     void removePlayer(Server_Player *player, Event_Leave::LeaveReason reason);
     void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Player *player);

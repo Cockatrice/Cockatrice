@@ -8,6 +8,7 @@
 #include "pending_command.h"
 #include "tab_room.h"
 #include "tab_supervisor.h"
+#include <QApplication>
 #include <QCheckBox>
 #include <QDebug>
 #include <QHBoxLayout>
@@ -205,6 +206,7 @@ void GameSelector::actJoin()
     cmd.set_password(password.toStdString());
     cmd.set_spectator(spectator);
     cmd.set_override_restrictions(overrideRestrictions);
+    cmd.set_join_as_judge((QApplication::keyboardModifiers() & Qt::ShiftModifier) != 0);
 
     TabRoom *r = tabSupervisor->getRoomTabs().value(game.room_id());
     if (!r) {

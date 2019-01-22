@@ -332,8 +332,8 @@ void DeckViewContainer::setDeck(const DeckLoader &deck)
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), secondsElapsed(0), hostId(-1), localPlayerId(-1),
-      isLocalGame(_tabSupervisor->getIsLocalGame()), spectator(true), gameStateKnown(false), resuming(false),
-      currentPhase(-1), activeCard(nullptr), gameClosed(false), replay(_replay), currentReplayStep(0),
+      isLocalGame(_tabSupervisor->getIsLocalGame()), spectator(true), judge(false), gameStateKnown(false),
+      resuming(false), currentPhase(-1), activeCard(nullptr), gameClosed(false), replay(_replay), currentReplayStep(0),
       sayLabel(nullptr), sayEdit(nullptr)
 {
     // THIS CTOR IS USED ON REPLAY
@@ -393,8 +393,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
                  const QMap<int, QString> &_roomGameTypes)
     : Tab(_tabSupervisor), clients(_clients), gameInfo(event.game_info()), roomGameTypes(_roomGameTypes),
       hostId(event.host_id()), localPlayerId(event.player_id()), isLocalGame(_tabSupervisor->getIsLocalGame()),
-      spectator(event.spectator()), gameStateKnown(false), resuming(event.resuming()), currentPhase(-1),
-      activeCard(nullptr), gameClosed(false), replay(nullptr), replayDock(nullptr)
+      spectator(event.spectator()), judge(event.judge()), gameStateKnown(false), resuming(event.resuming()),
+      currentPhase(-1), activeCard(nullptr), gameClosed(false), replay(nullptr), replayDock(nullptr)
 {
     // THIS CTOR IS USED ON GAMES
     gameInfo.set_started(false);
@@ -751,7 +751,7 @@ void TabGame::actCompleterChanged()
 Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
 {
     bool local = ((clients.size() > 1) || (playerId == localPlayerId));
-    auto *newPlayer = new Player(info, playerId, local, this);
+    auto *newPlayer = new Player(info, playerId, local, judge, this);
     connect(newPlayer, SIGNAL(openDeckEditor(const DeckLoader *)), this, SIGNAL(openDeckEditor(const DeckLoader *)));
     QString newPlayerName = "@" + newPlayer->getName();
     if (sayEdit && !autocompleteUserList.contains(newPlayerName)) {
@@ -789,6 +789,14 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
         const GameEvent &event = cont.event_list(i);
         const int playerId = event.player_id();
         const auto eventType = static_cast<GameEvent::GameEventType>(getPbExtension(event));
+
+        if (cont.has_forced_by_judge()) {
+            Player *judge = players.value(cont.forced_by_judge(), 0);
+            if (judge) {
+                messageLog->logForcedByJudge(judge);
+            }
+        }
+
         if (spectators.contains(playerId)) {
             switch (eventType) {
                 case GameEvent::GAME_SAY:

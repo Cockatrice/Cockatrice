@@ -1,6 +1,7 @@
 #include "dlg_creategame.h"
 #include "settingscache.h"
 #include "tab_room.h"
+#include <QApplication>
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -223,6 +224,7 @@ void DlgCreateGame::actOK()
     cmd.set_spectators_need_password(spectatorsNeedPasswordCheckBox->isChecked());
     cmd.set_spectators_can_talk(spectatorsCanTalkCheckBox->isChecked());
     cmd.set_spectators_see_everything(spectatorsSeeEverythingCheckBox->isChecked());
+    cmd.set_join_as_judge(QApplication::keyboardModifiers() & Qt::ShiftModifier);
 
     QString gameTypes = QString();
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);

@@ -53,6 +53,10 @@ void GameEventStorage::sendToGame(Server_Game *game)
 
     GameEventContainer *contPrivate = new GameEventContainer;
     GameEventContainer *contOthers = new GameEventContainer;
+    if (forcedByJudge != -1) {
+        contPrivate->set_forced_by_judge(forcedByJudge);
+        contOthers->set_forced_by_judge(forcedByJudge);
+    }
     for (int i = 0; i < gameEventList.size(); ++i) {
         const GameEvent &event = gameEventList[i]->getGameEvent();
         const GameEventStorageItem::EventRecipients recipients = gameEventList[i]->getRecipients();

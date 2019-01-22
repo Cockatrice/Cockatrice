@@ -262,9 +262,9 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
     QMutexLocker gameLocker(&g->gameMutex);
 
     Response::ResponseCode result = g->checkJoin(userInterface->getUserInfo(), QString::fromStdString(cmd.password()),
-                                                 cmd.spectator(), cmd.override_restrictions());
+                                                 cmd.spectator(), cmd.override_restrictions(), cmd.join_as_judge());
     if (result == Response::RespOk)
-        g->addPlayer(userInterface, rc, cmd.spectator());
+        g->addPlayer(userInterface, rc, cmd.spectator(), cmd.join_as_judge());
 
     return result;
 }
