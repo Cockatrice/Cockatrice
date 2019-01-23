@@ -14,9 +14,7 @@ CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromE
     cardDatabaseEnabledSetsChanged();
 }
 
-CardDatabaseModel::~CardDatabaseModel()
-{
-}
+CardDatabaseModel::~CardDatabaseModel() = default;
 
 QMap<wchar_t, wchar_t> CardDatabaseDisplayModel::characterTranslation = {{L'“', L'\"'},
                                                                          {L'”', L'\"'},
@@ -53,7 +51,7 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
         case PTColumn:
             return card->getPowTough();
         case ColorColumn:
-            return card->getColors().join("");
+            return card->getColors();
         default:
             return QVariant();
     }
@@ -97,8 +95,8 @@ bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
     if (!showOnlyCardsFromEnabledSets)
         return true;
 
-    for (CardSetPtr set : card->getSets()) {
-        if (set->getEnabled())
+    for (const auto &set : card->getSets()) {
+        if (set.getPtr()->getEnabled())
             return true;
     }
 

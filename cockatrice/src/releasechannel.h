@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QString>
 #include <QVariantMap>
+#include <utility>
 
 class QNetworkReply;
 class QNetworkAccessManager;
@@ -15,8 +16,8 @@ class Release
     friend class BetaReleaseChannel;
 
 public:
-    Release(){};
-    ~Release(){};
+    Release() = default;
+    ~Release() = default;
 
 private:
     QString name, descriptionUrl, downloadUrl, commitHash;
@@ -26,20 +27,20 @@ private:
 protected:
     void setName(QString _name)
     {
-        name = _name;
+        name = std::move(_name);
     }
     void setDescriptionUrl(QString _descriptionUrl)
     {
-        descriptionUrl = _descriptionUrl;
+        descriptionUrl = std::move(_descriptionUrl);
     }
     void setDownloadUrl(QString _downloadUrl)
     {
-        downloadUrl = _downloadUrl;
+        downloadUrl = std::move(_downloadUrl);
         compatibleVersionFound = true;
     }
     void setCommitHash(QString _commitHash)
     {
-        commitHash = _commitHash;
+        commitHash = std::move(_commitHash);
     }
     void setPublishDate(QDate _publishDate)
     {
@@ -78,7 +79,7 @@ class ReleaseChannel : public QObject
     Q_OBJECT
 public:
     ReleaseChannel();
-    ~ReleaseChannel();
+    ~ReleaseChannel() override;
 
 protected:
     // shared by all instances
@@ -116,33 +117,41 @@ class StableReleaseChannel : public ReleaseChannel
 {
     Q_OBJECT
 public:
-    StableReleaseChannel(){};
-    ~StableReleaseChannel(){};
-    virtual QString getManualDownloadUrl() const;
-    virtual QString getName() const;
+    StableReleaseChannel() = default;
+    ~StableReleaseChannel() override = default;
+
+    QString getManualDownloadUrl() const override;
+
+    QString getName() const override;
 
 protected:
-    virtual QString getReleaseChannelUrl() const;
+    QString getReleaseChannelUrl() const override;
 protected slots:
-    virtual void releaseListFinished();
+
+    void releaseListFinished() override;
     void tagListFinished();
-    virtual void fileListFinished();
+
+    void fileListFinished() override;
 };
 
 class BetaReleaseChannel : public ReleaseChannel
 {
     Q_OBJECT
 public:
-    BetaReleaseChannel(){};
-    ~BetaReleaseChannel(){};
-    virtual QString getManualDownloadUrl() const;
-    virtual QString getName() const;
+    BetaReleaseChannel() = default;
+    ~BetaReleaseChannel() override = default;
+
+    QString getManualDownloadUrl() const override;
+
+    QString getName() const override;
 
 protected:
-    virtual QString getReleaseChannelUrl() const;
+    QString getReleaseChannelUrl() const override;
 protected slots:
-    virtual void releaseListFinished();
-    virtual void fileListFinished();
+
+    void releaseListFinished() override;
+
+    void fileListFinished() override;
 };
 
 #endif

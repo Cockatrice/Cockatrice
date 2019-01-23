@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "cardframe.h"
 
 #include "cardinfopicture.h"
@@ -16,6 +18,7 @@ CardFrame::CardFrame(const QString &cardName, QWidget *parent) : QTabWidget(pare
     pic->setObjectName("pic");
     text = new CardInfoText();
     text->setObjectName("text");
+    connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
 
     tab1 = new QWidget(this);
     tab2 = new QWidget(this);
@@ -93,10 +96,10 @@ void CardFrame::setCard(CardInfoPtr card)
         disconnect(info.data(), nullptr, this, nullptr);
     }
 
-    info = card;
+    info = std::move(card);
 
     if (info) {
-        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clear()));
+        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clearCard()));
     }
 
     text->setCard(info);
@@ -115,7 +118,7 @@ void CardFrame::setCard(AbstractCardItem *card)
     }
 }
 
-void CardFrame::clear()
+void CardFrame::clearCard()
 {
     setCard((CardInfoPtr) nullptr);
 }

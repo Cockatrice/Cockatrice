@@ -100,7 +100,6 @@ SET(cockatrice_SOURCES
     src/localserver.cpp
     src/localserverinterface.cpp
     src/localclient.cpp
-    src/qt-json/json.cpp
     src/soundengine.cpp
     src/pending_command.cpp
     src/pictureloader.cpp
@@ -121,7 +120,9 @@ SET(cockatrice_SOURCES
     src/userconnection_information.cpp
     src/spoilerbackgroundupdater.cpp
     src/handle_public_servers.cpp
+    src/carddbparser/carddatabaseparser.cpp
     src/carddbparser/cockatricexml3.cpp
+    src/carddbparser/cockatricexml4.cpp
     ${VERSION_STRING_CPP}
     )
 

@@ -1,35 +1,35 @@
-#include "cockatricexml3.h"
+#include "cockatricexml4.h"
 
 #include <QDebug>
 #include <QFile>
 #include <QXmlStreamReader>
 
-#define COCKATRICE_XML3_TAGNAME "cockatrice_carddatabase"
-#define COCKATRICE_XML3_TAGVER 3
+#define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase"
+#define COCKATRICE_XML4_TAGVER 4
 
-bool CockatriceXml3Parser::getCanParseFile(const QString &fileName, QIODevice &device)
+bool CockatriceXml4Parser::getCanParseFile(const QString &fileName, QIODevice &device)
 {
-    qDebug() << "[CockatriceXml3Parser] Trying to parse: " << fileName;
+    qDebug() << "[CockatriceXml4Parser] Trying to parse: " << fileName;
 
     if (!fileName.endsWith(".xml", Qt::CaseInsensitive)) {
-        qDebug() << "[CockatriceXml3Parser] Parsing failed: wrong extension";
+        qDebug() << "[CockatriceXml4Parser] Parsing failed: wrong extension";
         return false;
     }
 
     QXmlStreamReader xml(&device);
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::StartElement) {
-            if (xml.name() == COCKATRICE_XML3_TAGNAME) {
+            if (xml.name() == COCKATRICE_XML4_TAGNAME) {
                 int version = xml.attributes().value("version").toString().toInt();
-                if (version == COCKATRICE_XML3_TAGVER) {
+                if (version == COCKATRICE_XML4_TAGVER) {
                     return true;
                 } else {
-                    qDebug() << "[CockatriceXml3Parser] Parsing failed: wrong version" << version;
+                    qDebug() << "[CockatriceXml4Parser] Parsing failed: wrong version" << version;
                     return false;
                 }
 
             } else {
-                qDebug() << "[CockatriceXml3Parser] Parsing failed: wrong element tag" << xml.name();
+                qDebug() << "[CockatriceXml4Parser] Parsing failed: wrong element tag" << xml.name();
                 return false;
             }
         }
@@ -38,7 +38,7 @@ bool CockatriceXml3Parser::getCanParseFile(const QString &fileName, QIODevice &d
     return true;
 }
 
-void CockatriceXml3Parser::parseFile(QIODevice &device)
+void CockatriceXml4Parser::parseFile(QIODevice &device)
 {
     QXmlStreamReader xml(&device);
     while (!xml.atEnd()) {
@@ -53,7 +53,7 @@ void CockatriceXml3Parser::parseFile(QIODevice &device)
                 } else if (xml.name() == "cards") {
                     loadCardsFromXml(xml);
                 } else if (xml.name() != "") {
-                    qDebug() << "[CockatriceXml3Parser] Unknown item" << xml.name() << ", trying to continue anyway";
+                    qDebug() << "[CockatriceXml4Parser] Unknown item" << xml.name() << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
@@ -61,7 +61,7 @@ void CockatriceXml3Parser::parseFile(QIODevice &device)
     }
 }
 
-void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
+void CockatriceXml4Parser::loadSetsFromXml(QXmlStreamReader &xml)
 {
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
@@ -85,7 +85,7 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
                 } else if (xml.name() == "releasedate") {
                     releaseDate = QDate::fromString(xml.readElementText(), Qt::ISODate);
                 } else if (xml.name() != "") {
-                    qDebug() << "[CockatriceXml3Parser] Unknown set property" << xml.name()
+                    qDebug() << "[CockatriceXml4Parser] Unknown set property" << xml.name()
                              << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
@@ -96,45 +96,22 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
     }
 }
 
-QString CockatriceXml3Parser::getMainCardType(QString &type)
+QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &xml)
 {
-    QString result = type;
-    /*
-    Legendary Artifact Creature - Golem
-    Instant // Instant
-    */
+    QVariantHash properties = QVariantHash();
+    while (!xml.atEnd()) {
+        if (xml.readNext() == QXmlStreamReader::EndElement) {
+            break;
+        }
 
-    int pos;
-    if ((pos = result.indexOf('-')) != -1) {
-        result.remove(pos, result.length());
+        if (xml.name() != "") {
+            properties.insert(xml.name().toString(), xml.readElementText());
+        }
     }
-
-    if ((pos = result.indexOf("—")) != -1) {
-        result.remove(pos, result.length());
-    }
-
-    if ((pos = result.indexOf("//")) != -1) {
-        result.remove(pos, result.length());
-    }
-
-    result = result.simplified();
-    /*
-    Legendary Artifact Creature
-    Instant
-    */
-
-    if ((pos = result.lastIndexOf(' ')) != -1) {
-        result = result.mid(pos + 1);
-    }
-    /*
-    Creature
-    Instant
-    */
-
-    return result;
+    return properties;
 }
 
-void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
+void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
@@ -145,7 +122,6 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QString name = QString("");
             QString text = QString("");
             QVariantHash properties = QVariantHash();
-            QString colors = QString("");
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             CardInfoPerSetMap sets = CardInfoPerSetMap();
             int tableRow = 0;
@@ -162,23 +138,11 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     name = xml.readElementText();
                 } else if (xml.name() == "text") {
                     text = xml.readElementText();
-                } else if (xml.name() == "color") {
-                    colors.append(xml.readElementText());
                 } else if (xml.name() == "token") {
                     isToken = static_cast<bool>(xml.readElementText().toInt());
                     // generic properties
-                } else if (xml.name() == "manacost") {
-                    properties.insert("manacost", xml.readElementText());
-                } else if (xml.name() == "cmc") {
-                    properties.insert("cmc", xml.readElementText());
-                } else if (xml.name() == "type") {
-                    QString type = xml.readElementText();
-                    properties.insert("type", type);
-                    properties.insert("maintype", getMainCardType(type));
-                } else if (xml.name() == "pt") {
-                    properties.insert("pt", xml.readElementText());
-                } else if (xml.name() == "loyalty") {
-                    properties.insert("loyalty", xml.readElementText());
+                } else if (xml.name() == "prop") {
+                    properties = loadCardPropertiesFromXml(xml);
                     // positioning info
                 } else if (xml.name() == "tablerow") {
                     tableRow = xml.readElementText().toInt();
@@ -188,28 +152,12 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     upsideDown = (xml.readElementText() == "1");
                     // sets
                 } else if (xml.name() == "set") {
-                    // NOTE: attributes must be read before readElementText()
+                    // NOTE: attributes but be read before readElementText()
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString setName = xml.readElementText();
                     CardInfoPerSet setInfo(internalAddSet(setName));
-                    if (attrs.hasAttribute("muId")) {
-                        setInfo.setProperty("muid", attrs.value("muId").toString());
-                    }
-
-                    if (attrs.hasAttribute("muId")) {
-                        setInfo.setProperty("uuid", attrs.value("uuId").toString());
-                    }
-
-                    if (attrs.hasAttribute("picURL")) {
-                        setInfo.setProperty("picurl", attrs.value("picURL").toString());
-                    }
-
-                    if (attrs.hasAttribute("num")) {
-                        setInfo.setProperty("num", attrs.value("num").toString());
-                    }
-
-                    if (attrs.hasAttribute("rarity")) {
-                        setInfo.setProperty("rarity", attrs.value("rarity").toString());
+                    for (QXmlStreamAttribute attr : attrs) {
+                        setInfo.setProperty(attr.name().toString(), attr.value().toString());
                     }
                     sets.insert(setName, setInfo);
                     // relatd cards
@@ -250,13 +198,12 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         relatedCards << relation;
                     }
                 } else if (xml.name() != "") {
-                    qDebug() << "[CockatriceXml3Parser] Unknown card property" << xml.name()
+                    qDebug() << "[CockatriceXml4Parser] Unknown card property" << xml.name()
                              << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
 
-            properties.insert("colors", colors);
             CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
                                                         reverseRelatedCards, sets, cipt, tableRow, upsideDown);
             emit addCard(newCard);
@@ -300,41 +247,17 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     }
 
     // generic properties
-    xml.writeTextElement("manacost", info->getProperty("manacost"));
-    xml.writeTextElement("cmc", info->getProperty("cmc"));
-    xml.writeTextElement("type", info->getProperty("type"));
-
-    int colorSize = info->getColors().size();
-    for (int i = 0; i < colorSize; ++i) {
-        xml.writeTextElement("color", info->getColors().at(i));
+    xml.writeStartElement("prop");
+    for (QString propName : info->getProperties()) {
+        xml.writeTextElement(propName, info->getProperty(propName));
     }
-
-    tmpString = info->getProperty("pt");
-    if (!tmpString.isEmpty()) {
-        xml.writeTextElement("pt", tmpString);
-    }
-
-    tmpString = info->getProperty("loyalty");
-    if (!tmpString.isEmpty()) {
-        xml.writeTextElement("loyalty", tmpString);
-    }
+    xml.writeEndElement();
 
     // sets
-    const CardInfoPerSetMap sets = info->getSets();
-    for (CardInfoPerSet set : sets) {
+    for (CardInfoPerSet set : info->getSets()) {
         xml.writeStartElement("set");
-        xml.writeAttribute("rarity", set.getProperty("rarity"));
-        xml.writeAttribute("muId", set.getProperty("muid"));
-        xml.writeAttribute("uuId", set.getProperty("uuid"));
-
-        tmpString = set.getProperty("num");
-        if (!tmpString.isEmpty()) {
-            xml.writeAttribute("num", tmpString);
-        }
-
-        tmpString = set.getProperty("picurl");
-        if (!tmpString.isEmpty()) {
-            xml.writeAttribute("picURL", tmpString);
+        for (QString propName : set.getProperties()) {
+            xml.writeAttribute(propName, set.getProperty(propName));
         }
 
         xml.writeCharacters(set.getPtr()->getShortName());
@@ -402,7 +325,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     return xml;
 }
 
-bool CockatriceXml3Parser::saveToFile(SetNameMap sets, CardNameMap cards, const QString &fileName)
+bool CockatriceXml4Parser::saveToFile(SetNameMap sets, CardNameMap cards, const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
@@ -413,8 +336,8 @@ bool CockatriceXml3Parser::saveToFile(SetNameMap sets, CardNameMap cards, const 
 
     xml.setAutoFormatting(true);
     xml.writeStartDocument();
-    xml.writeStartElement(COCKATRICE_XML3_TAGNAME);
-    xml.writeAttribute("version", QString::number(COCKATRICE_XML3_TAGVER));
+    xml.writeStartElement(COCKATRICE_XML4_TAGNAME);
+    xml.writeAttribute("version", QString::number(COCKATRICE_XML4_TAGVER));
 
     if (sets.count() > 0) {
         xml.writeStartElement("sets");
