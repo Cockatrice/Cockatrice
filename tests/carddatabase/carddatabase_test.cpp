@@ -64,7 +64,6 @@ TEST(CardDatabaseTest, LoadXml)
     // ensure the card database is empty at start
     ASSERT_EQ(0, db->getCardList().size()) << "Cards not empty at start";
     ASSERT_EQ(0, db->getSetList().size()) << "Sets not empty at start";
-    ASSERT_EQ(0, db->getAllColors().size()) << "Colors not empty at start";
     ASSERT_EQ(0, db->getAllMainCardTypes().size()) << "Types not empty at start";
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status at start";
 
@@ -72,7 +71,6 @@ TEST(CardDatabaseTest, LoadXml)
     db->loadCardDatabases();
     ASSERT_EQ(6, db->getCardList().size()) << "Wrong card count after load";
     ASSERT_EQ(3, db->getSetList().size()) << "Wrong sets count after load";
-    ASSERT_EQ(4, db->getAllColors().size()) << "Wrong colors count after load";
     ASSERT_EQ(2, db->getAllMainCardTypes().size()) << "Wrong types count after load";
     ASSERT_EQ(Ok, db->getLoadStatus()) << "Wrong status after load";
 
@@ -80,7 +78,6 @@ TEST(CardDatabaseTest, LoadXml)
     db->clear();
     ASSERT_EQ(0, db->getCardList().size()) << "Cards not empty after clear";
     ASSERT_EQ(0, db->getSetList().size()) << "Sets not empty after clear";
-    ASSERT_EQ(0, db->getAllColors().size()) << "Colors not empty after clear";
     ASSERT_EQ(0, db->getAllMainCardTypes().size()) << "Types not empty after clear";
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status after clear";
 }

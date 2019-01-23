@@ -12,11 +12,11 @@ include=("common" \
 "cockatrice/src" \
 "oracle/src" \
 "servatrice/src")
-exclude=("cockatrice/src/qt-json" \
-"servatrice/src/smtp" \
+exclude=("servatrice/src/smtp" \
 "common/sfmt" \
 "oracle/src/zip" \
-"oracle/src/lzma")
+"oracle/src/lzma" \
+"oracle/src/qt-json")
 exts=("cpp" "h")
 cf_cmd="clang-format"
 branch="origin/master"

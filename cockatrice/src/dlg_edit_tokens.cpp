@@ -17,7 +17,7 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 
-DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(0)
+DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nullptr)
 {
     nameLabel = new QLabel(tr("&Name:"));
     nameEdit = new QLineEdit;
@@ -46,7 +46,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(0)
     annotationLabel->setBuddy(annotationEdit);
     connect(annotationEdit, SIGNAL(textChanged(QString)), this, SLOT(annotationChanged(QString)));
 
-    QGridLayout *grid = new QGridLayout;
+    auto *grid = new QGridLayout;
     grid->addWidget(nameLabel, 0, 0);
     grid->addWidget(nameEdit, 0, 1);
     grid->addWidget(colorLabel, 1, 0);
@@ -89,15 +89,15 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(0)
     aRemoveToken->setIcon(QPixmap("theme:icons/decrement"));
     connect(aRemoveToken, SIGNAL(triggered()), this, SLOT(actRemoveToken()));
 
-    QToolBar *databaseToolBar = new QToolBar;
+    auto *databaseToolBar = new QToolBar;
     databaseToolBar->addAction(aAddToken);
     databaseToolBar->addAction(aRemoveToken);
 
-    QVBoxLayout *leftVBox = new QVBoxLayout;
+    auto *leftVBox = new QVBoxLayout;
     leftVBox->addWidget(chooseTokenView);
     leftVBox->addWidget(databaseToolBar);
 
-    QHBoxLayout *hbox = new QHBoxLayout;
+    auto *hbox = new QHBoxLayout;
     hbox->addLayout(leftVBox);
     hbox->addWidget(tokenDataGroupBox);
 
@@ -105,7 +105,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(0)
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(hbox);
     mainLayout->addWidget(buttonBox);
 
@@ -154,9 +154,10 @@ void DlgEditTokens::actAddToken()
         }
     } while (askAgain);
 
-    CardInfoPtr card = CardInfo::newInstance(name, true);
-    card->addToSet(databaseModel->getDatabase()->getSet(CardDatabase::TOKENS_SETNAME));
+    CardInfoPtr card = CardInfo::newInstance(name, "", true);
     card->setCardType("Token");
+    card->addToSet(databaseModel->getDatabase()->getSet(CardDatabase::TOKENS_SETNAME));
+
     databaseModel->getDatabase()->addCard(card);
 }
 
@@ -172,7 +173,7 @@ void DlgEditTokens::actRemoveToken()
 void DlgEditTokens::colorChanged(int colorIndex)
 {
     if (currentCard)
-        currentCard->setColors(QStringList() << QString(colorEdit->itemData(colorIndex).toChar()));
+        currentCard->setColors(QString(colorEdit->itemData(colorIndex).toChar()));
 }
 
 void DlgEditTokens::ptChanged(const QString &_pt)

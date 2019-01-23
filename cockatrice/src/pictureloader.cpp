@@ -30,7 +30,9 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
     urlTemplates = settingsCache->downloads().getAllURLs();
 
     if (card) {
-        sortedSets = card->getSets();
+        for (const auto &set : card->getSets()) {
+            sortedSets << set.getPtr();
+        }
         qSort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
         // The first time called, nextSet will also populate the Urls for the first set.
         nextSet();
@@ -240,28 +242,50 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
     CardSetPtr set = getCurrentSet();
 
     QMap<QString, QString> transformMap = QMap<QString, QString>();
-
+    // name
     transformMap["!name!"] = card->getName();
     transformMap["!name_lower!"] = card->getName().toLower();
     transformMap["!corrected_name!"] = card->getCorrectedName();
     transformMap["!corrected_name_lower!"] = card->getCorrectedName().toLower();
 
+    // card properties
+    QRegExp rxCardProp("!prop:([^!]+)!");
+    int pos = 0;
+    while ((pos = rxCardProp.indexIn(transformedUrl, pos)) != -1) {
+        QString propertyName = rxCardProp.cap(1);
+        pos += rxCardProp.matchedLength();
+        QString propertyValue = card->getProperty(propertyName);
+        if (propertyValue.isEmpty()) {
+            qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
+                     << "]: Requested property (" << propertyName << ") for Url template (" << urlTemplate
+                     << ") is not available";
+            return QString();
+        } else {
+            transformMap["!prop:" + propertyName + "!"] = propertyValue;
+        }
+    }
+
     if (set) {
-        transformMap["!cardid!"] = QString::number(card->getMuId(set->getShortName()));
-        transformMap["!uuid!"] = card->getUuId(set->getShortName());
-        transformMap["!collectornumber!"] = card->getCollectorNumber(set->getShortName());
         transformMap["!setcode!"] = set->getShortName();
         transformMap["!setcode_lower!"] = set->getShortName().toLower();
         transformMap["!setname!"] = set->getLongName();
         transformMap["!setname_lower!"] = set->getLongName().toLower();
-    } else {
-        transformMap["!cardid!"] = QString();
-        transformMap["!uuid!"] = QString();
-        transformMap["!collectornumber!"] = QString();
-        transformMap["!setcode!"] = QString();
-        transformMap["!setcode_lower!"] = QString();
-        transformMap["!setname!"] = QString();
-        transformMap["!setname_lower!"] = QString();
+
+        QRegExp rxSetProp("!set:([^!]+)!");
+        pos = 0; // Defined above
+        while ((pos = rxSetProp.indexIn(transformedUrl, pos)) != -1) {
+            QString propertyName = rxSetProp.cap(1);
+            pos += rxSetProp.matchedLength();
+            QString propertyValue = card->getSetProperty(set->getShortName(), propertyName);
+            if (propertyValue.isEmpty()) {
+                qDebug() << "PictureLoader: [card: " << card->getName() << " set: " << getSetName()
+                         << "]: Requested set property (" << propertyName << ") for Url template (" << urlTemplate
+                         << ") is not available";
+                return QString();
+            } else {
+                transformMap["!set:" + propertyName + "!"] = propertyValue;
+            }
+        }
     }
 
     for (const QString &prop : transformMap.keys()) {
@@ -483,7 +507,7 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
         return;
     }
 
-    // search for an exact size copy of the picure in cache
+    // search for an exact size copy of the picture in cache
     QString key = card->getPixmapCacheKey();
     QString sizeKey = key + QLatin1Char('_') + QString::number(size.width()) + QString::number(size.height());
     if (QPixmapCache::find(sizeKey, &pixmap))
