@@ -223,8 +223,8 @@ CardInfo::CardInfo(const QString &_name,
                    bool _cipt,
                    int _tableRow,
                    bool _upsideDownArt)
-    : name(_name), text(_text), isToken(_isToken), properties(_properties), relatedCards(_relatedCards),
-      reverseRelatedCards(_reverseRelatedCards), sets(_sets), cipt(_cipt), tableRow(_tableRow),
+    : name(_name), text(_text), isToken(_isToken), properties(std::move(_properties)), relatedCards(_relatedCards),
+      reverseRelatedCards(_reverseRelatedCards), sets(std::move(_sets)), cipt(_cipt), tableRow(_tableRow),
       upsideDownArt(_upsideDownArt)
 {
     pixmapCacheKey = QLatin1String("card_") + name;
@@ -249,11 +249,11 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   int _tableRow,
                                   bool _upsideDownArt)
 {
-    CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, _properties, _relatedCards, _reverseRelatedCards, _sets, _cipt,
-                                 _tableRow, _upsideDownArt));
+    CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, std::move(_properties), _relatedCards, _reverseRelatedCards,
+                                 _sets, _cipt, _tableRow, _upsideDownArt));
     ptr->setSmartPointer(ptr);
 
-    for (CardInfoPerSet set : _sets) {
+    for (const CardInfoPerSet &set : _sets) {
         set.getPtr()->append(ptr);
     }
 
@@ -279,7 +279,7 @@ void CardInfo::refreshCachedSetNames()
 {
     QStringList setList;
     // update the cached list of set names
-    for (auto set : sets) {
+    for (const auto &set : sets) {
         if (set.getPtr()->getEnabled()) {
             setList << set.getPtr()->getShortName();
         }
@@ -377,7 +377,7 @@ void CardDatabase::addCard(CardInfoPtr card)
     // if card already exists just add the new set property
     if (cards.contains(card->getName())) {
         CardInfoPtr sameCard = cards[card->getName()];
-        for (CardInfoPerSet set : card->getSets()) {
+        for (const CardInfoPerSet &set : card->getSets()) {
             sameCard->addToSet(set.getPtr(), set);
         }
         return;
@@ -519,7 +519,7 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     // load custom card databases
     QDir dir(settingsCache->getCustomCardDatabasePath());
-    for (QString fileName :
+    for (const QString &fileName :
          dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
         loadCardDatabase(dir.absoluteFilePath(fileName));
     }
@@ -630,7 +630,7 @@ bool CardDatabase::saveCustomTokensToFile()
     tmpSets.insert(CardDatabase::TOKENS_SETNAME, customTokensSet);
 
     CardNameMap tmpCards;
-    for (CardInfoPtr card : cards) {
+    for (const CardInfoPtr &card : cards) {
         if (card->getSets().contains(CardDatabase::TOKENS_SETNAME)) {
             tmpCards.insert(card->getName(), card);
         }

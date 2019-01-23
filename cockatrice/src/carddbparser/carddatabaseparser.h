@@ -9,9 +9,8 @@
 class ICardDatabaseParser : public QObject
 {
 public:
-    virtual ~ICardDatabaseParser()
-    {
-    }
+    ~ICardDatabaseParser() override = default;
+
     virtual bool getCanParseFile(const QString &name, QIODevice &device) = 0;
     virtual void parseFile(QIODevice &device) = 0;
     virtual bool saveToFile(SetNameMap sets, CardNameMap cards, const QString &fileName) = 0;

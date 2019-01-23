@@ -92,8 +92,8 @@ QString StableReleaseChannel::getReleaseChannelUrl() const
 
 void StableReleaseChannel::releaseListFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
-    QJsonParseError parseError;
+    auto *reply = static_cast<QNetworkReply *>(sender());
+    QJsonParseError parseError{};
     QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
     if (parseError.error != QJsonParseError::NoError) {
@@ -156,8 +156,8 @@ void StableReleaseChannel::releaseListFinished()
 
 void StableReleaseChannel::tagListFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
-    QJsonParseError parseError;
+    auto *reply = static_cast<QNetworkReply *>(sender());
+    QJsonParseError parseError{};
     QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
     if (parseError.error != QJsonParseError::NoError) {
@@ -187,7 +187,6 @@ void StableReleaseChannel::tagListFinished()
 void StableReleaseChannel::fileListFinished()
 {
     // Only implemented to satisfy interface
-    return;
 }
 
 QString BetaReleaseChannel::getManualDownloadUrl() const
@@ -207,7 +206,7 @@ QString BetaReleaseChannel::getReleaseChannelUrl() const
 
 void BetaReleaseChannel::releaseListFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
+    auto *reply = static_cast<QNetworkReply *>(sender());
     QByteArray jsonData = reply->readAll();
     reply->deleteLater();
 
@@ -221,7 +220,7 @@ void BetaReleaseChannel::releaseListFinished()
      */
     QVariantMap resultMap = array.at(0).toObject().toVariantMap();
 
-    if (array.size() == 0 || resultMap.size() == 0) {
+    if (array.empty() || resultMap.empty()) {
         qWarning() << "No reply received from the release update server:" << QString(jsonData);
         emit error(tr("No reply received from the release update server."));
         return;
@@ -259,8 +258,8 @@ void BetaReleaseChannel::releaseListFinished()
 
 void BetaReleaseChannel::fileListFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
-    QJsonParseError parseError;
+    auto *reply = static_cast<QNetworkReply *>(sender());
+    QJsonParseError parseError{};
     QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
     if (parseError.error != QJsonParseError::NoError) {

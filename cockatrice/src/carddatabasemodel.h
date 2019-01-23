@@ -26,12 +26,12 @@ public:
     {
         SortRole = Qt::UserRole
     };
-    CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromEnabledSets, QObject *parent = 0);
-    ~CardDatabaseModel();
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromEnabledSets, QObject *parent = nullptr);
+    ~CardDatabaseModel() override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     CardDatabase *getDatabase() const
     {
         return db;
@@ -77,7 +77,7 @@ private:
     static QMap<wchar_t, wchar_t> characterTranslation;
 
 public:
-    CardDatabaseDisplayModel(QObject *parent = 0);
+    explicit CardDatabaseDisplayModel(QObject *parent = nullptr);
     void setFilterTree(FilterTree *filterTree);
     void setIsToken(FilterBool _isToken)
     {
@@ -119,15 +119,15 @@ public:
         invalidate();
     }
     void clearFilterAll();
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
 protected:
-    bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
     static int lessThanNumerically(const QString &left, const QString &right);
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     bool rowMatchesCardName(CardInfoPtr info) const;
-    bool canFetchMore(const QModelIndex &parent) const;
-    void fetchMore(const QModelIndex &parent);
+    bool canFetchMore(const QModelIndex &parent) const override;
+    void fetchMore(const QModelIndex &parent) override;
 private slots:
     void filterTreeChanged();
     /** Will translate all undesirable characters in DIRTYNAME according to the TABLE. */
@@ -138,11 +138,11 @@ class TokenDisplayModel : public CardDatabaseDisplayModel
 {
     Q_OBJECT
 public:
-    TokenDisplayModel(QObject *parent = 0);
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    explicit TokenDisplayModel(QObject *parent = nullptr);
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
 protected:
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 };
 
 #endif

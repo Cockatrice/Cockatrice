@@ -1,3 +1,5 @@
+#include <utility>
+
 #ifndef CARDDATABASE_H
 #define CARDDATABASE_H
 
@@ -119,7 +121,7 @@ class CardInfoPerSet
 {
 public:
     explicit CardInfoPerSet(const CardSetPtr &_set = QSharedPointer<CardSet>(nullptr));
-    ~CardInfoPerSet(){};
+    ~CardInfoPerSet() = default;
 
 private:
     CardSetPtr set;
@@ -135,7 +137,7 @@ public:
     {
         return properties.keys();
     }
-    const QString getProperty(QString propertyName) const
+    const QString getProperty(const QString &propertyName) const
     {
         return properties.value(propertyName).toString();
     }
@@ -203,7 +205,7 @@ public:
 
     void setSmartPointer(CardInfoPtr _ptr)
     {
-        smartThis = _ptr;
+        smartThis = std::move(_ptr);
     }
 
     // basic properties
@@ -238,7 +240,7 @@ public:
     {
         return properties.keys();
     }
-    const QString getProperty(QString propertyName) const
+    const QString getProperty(const QString &propertyName) const
     {
         return properties.value(propertyName).toString();
     }
@@ -255,13 +257,13 @@ public:
     {
         return setsNames;
     }
-    const QString getSetProperty(QString setName, QString propertyName) const
+    const QString getSetProperty(const QString &setName, const QString &propertyName) const
     {
         if (!sets.contains(setName))
             return "";
         return sets[setName].getProperty(propertyName);
     }
-    void setSetProperty(const QString setName, const QString &_name, const QString &_value)
+    void setSetProperty(const QString &setName, const QString &_name, const QString &_value)
     {
         if (!sets.contains(setName))
             return;
@@ -326,7 +328,7 @@ public:
         return getSetProperty(set, "picurl");
     }
     QString getCorrectedName() const;
-    void addToSet(const CardSetPtr &_set, const CardInfoPerSet _info = CardInfoPerSet());
+    void addToSet(const CardSetPtr &_set, CardInfoPerSet _info = CardInfoPerSet());
     void emitPixmapUpdated()
     {
         emit pixmapUpdated();

@@ -1,3 +1,5 @@
+#include <utility>
+
 #ifndef ORACLEIMPORTER_H
 #define ORACLEIMPORTER_H
 
@@ -35,12 +37,13 @@ public:
     {
         return releaseDate;
     }
-    SetToDownload(const QString &_shortName,
-                  const QString &_longName,
-                  const QList<QVariant> &_cards,
-                  const QString &_setType = QString(),
+    SetToDownload(QString _shortName,
+                  QString _longName,
+                  QList<QVariant> _cards,
+                  QString _setType = QString(),
                   const QDate &_releaseDate = QDate())
-        : shortName(_shortName), longName(_longName), cards(_cards), releaseDate(_releaseDate), setType(_setType)
+        : shortName(std::move(_shortName)), longName(std::move(_longName)), cards(std::move(_cards)),
+          releaseDate(_releaseDate), setType(std::move(_setType))
     {
     }
     bool operator<(const SetToDownload &set) const
@@ -52,10 +55,7 @@ public:
 class SplitCardPart
 {
 public:
-    SplitCardPart(const int _index,
-                  const QString &_text,
-                  const QVariantHash &_properties,
-                  const CardInfoPerSet setInfo);
+    SplitCardPart(int _index, const QString &_text, const QVariantHash &_properties, CardInfoPerSet setInfo);
     inline const int &getIndex() const
     {
         return index;
@@ -99,7 +99,7 @@ signals:
     void dataReadProgress(int bytesRead, int totalBytes);
 
 public:
-    OracleImporter(const QString &_dataDir, QObject *parent = 0);
+    explicit OracleImporter(const QString &_dataDir, QObject *parent = nullptr);
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
     bool saveToFile(const QString &fileName);

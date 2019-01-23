@@ -185,7 +185,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
     CardInfoPerSet setInfo;
     QList<CardRelation *> relatedCards;
 
-    for (QVariant cardVar : cardsList) {
+    for (const QVariant &cardVar : cardsList) {
         card = cardVar.toMap();
 
         /* Currently used layouts are:
@@ -254,7 +254,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
             // relations
             relatedCards.clear();
             if (additionalNames.size() > 1) {
-                for (QString additionalName : additionalNames) {
+                for (const QString &additionalName : additionalNames) {
                     if (additionalName != name)
                         relatedCards.append(new CardRelation(additionalName, true));
                 }
@@ -268,9 +268,9 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
     // split cards handling
     QString splitCardPropSeparator = QString(" // ");
     QString splitCardTextSeparator = QString("\n\n---\n\n");
-    for (QString name : splitCards.uniqueKeys()) {
+    for (const QString &nameSplit : splitCards.uniqueKeys()) {
         // get all parts for this specific card
-        QList<SplitCardPart> splitCardParts = splitCards.values(name);
+        QList<SplitCardPart> splitCardParts = splitCards.values(nameSplit);
         // sort them by index (aka position)
         qSort(splitCardParts.begin(), splitCardParts.end(),
               [](const SplitCardPart &a, const SplitCardPart &b) -> bool { return a.getIndex() < b.getIndex(); });
@@ -281,7 +281,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         relatedCards.clear();
 
         int lastIndex = -1;
-        for (SplitCardPart tmp : splitCardParts) {
+        for (const SplitCardPart &tmp : splitCardParts) {
             // some sets have 2 different variations of the same split card,
             // eg. Fire // Ice in WC02. Avoid adding duplicates.
             if (lastIndex == tmp.getIndex())
@@ -296,8 +296,8 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
                 properties = tmp.getProperties();
                 setInfo = tmp.getSetInfo();
             } else {
-                QVariantHash props = tmp.getProperties();
-                for (QString prop : props.keys()) {
+                const QVariantHash &props = tmp.getProperties();
+                for (const QString &prop : props.keys()) {
                     QString originalPropertyValue = properties.value(prop).toString();
                     QString thisCardPropertyValue = props.value(prop).toString();
                     if (originalPropertyValue != thisCardPropertyValue) {
@@ -345,7 +345,7 @@ int OracleImporter::startImport()
     CardSetPtr tokenSet = CardSet::newInstance(TOKENS_SETNAME, tr("Dummy set containing tokens"), "Tokens");
     sets.insert(TOKENS_SETNAME, tokenSet);
 
-    for (SetToDownload curSetToParse : allSets) {
+    for (const SetToDownload &curSetToParse : allSets) {
         CardSetPtr newSet = CardSet::newInstance(curSetToParse.getShortName(), curSetToParse.getLongName(),
                                                  curSetToParse.getSetType(), curSetToParse.getReleaseDate());
         if (!sets.contains(newSet->getShortName()))

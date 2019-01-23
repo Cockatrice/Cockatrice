@@ -30,7 +30,7 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
     urlTemplates = settingsCache->downloads().getAllURLs();
 
     if (card) {
-        for (auto set : card->getSets()) {
+        for (const auto &set : card->getSets()) {
             sortedSets << set.getPtr();
         }
         qSort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
@@ -272,7 +272,7 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
         transformMap["!setname_lower!"] = set->getLongName().toLower();
 
         QRegExp rxSetProp("!set:([^!]+)!");
-        int pos = 0;
+        pos = 0; // Defined above
         while ((pos = rxSetProp.indexIn(transformedUrl, pos)) != -1) {
             QString propertyName = rxSetProp.cap(1);
             pos += rxSetProp.matchedLength();
@@ -507,7 +507,7 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
         return;
     }
 
-    // search for an exact size copy of the picure in cache
+    // search for an exact size copy of the picture in cache
     QString key = card->getPixmapCacheKey();
     QString sizeKey = key + QLatin1Char('_') + QString::number(size.width()) + QString::number(size.height());
     if (QPixmapCache::find(sizeKey, &pixmap))

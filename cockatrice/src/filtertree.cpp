@@ -202,7 +202,7 @@ bool FilterItem::acceptText(const CardInfoPtr info) const
 bool FilterItem::acceptSet(const CardInfoPtr info) const
 {
     bool status = false;
-    for (auto set : info->getSets()) {
+    for (const auto &set : info->getSets()) {
         if (set.getPtr()->getShortName().compare(term, Qt::CaseInsensitive) == 0 ||
             set.getPtr()->getLongName().compare(term, Qt::CaseInsensitive) == 0) {
             status = true;
@@ -296,7 +296,7 @@ bool FilterItem::acceptRarity(const CardInfoPtr info) const
 
     /*
      * The purpose of this loop is to only apply one of the replacement
-     * policies and then escape. If we attempt to layer them ontop of
+     * policies and then escape. If we attempt to layer them on top of
      * each other, we will get awkward results (i.e. comythic rare mythic rareon)
      * Conditional statement will exit once a case is successful in
      * replacement OR we go through all possible cases.
@@ -331,7 +331,7 @@ bool FilterItem::acceptRarity(const CardInfoPtr info) const
         }
     }
 
-    for (auto set : info->getSets()) {
+    for (const auto &set : info->getSets()) {
         if (set.getProperty("rarity").compare(converted_term, Qt::CaseInsensitive) == 0) {
             return true;
         }

@@ -31,7 +31,7 @@ void HandlePublicServers::actFinishParsingDownloadedData()
         savedHostList = uci.getServerInfo();
 
         // Downloaded data from GitHub
-        QJsonParseError parseError;
+        QJsonParseError parseError{};
         QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
         if (parseError.error == QJsonParseError::NoError) {
             QVariantMap jsonMap = jsonResponse.toVariant().toMap();

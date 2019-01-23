@@ -14,9 +14,7 @@ CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromE
     cardDatabaseEnabledSetsChanged();
 }
 
-CardDatabaseModel::~CardDatabaseModel()
-{
-}
+CardDatabaseModel::~CardDatabaseModel() = default;
 
 QMap<wchar_t, wchar_t> CardDatabaseDisplayModel::characterTranslation = {{L'“', L'\"'},
                                                                          {L'”', L'\"'},
@@ -97,7 +95,7 @@ bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
     if (!showOnlyCardsFromEnabledSets)
         return true;
 
-    for (auto set : card->getSets()) {
+    for (const auto &set : card->getSets()) {
         if (set.getPtr()->getEnabled())
             return true;
     }
