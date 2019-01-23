@@ -1,5 +1,3 @@
-#include <utility>
-
 #ifndef CARDDATABASE_H
 #define CARDDATABASE_H
 
@@ -13,6 +11,7 @@
 #include <QStringList>
 #include <QVariant>
 #include <QVector>
+#include <utility>
 
 class CardDatabase;
 class CardInfo;

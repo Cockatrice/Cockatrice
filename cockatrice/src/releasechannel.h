@@ -1,5 +1,3 @@
-#include <utility>
-
 #ifndef RELEASECHANNEL_H
 #define RELEASECHANNEL_H
 
@@ -7,6 +5,7 @@
 #include <QObject>
 #include <QString>
 #include <QVariantMap>
+#include <utility>
 
 class QNetworkReply;
 class QNetworkAccessManager;

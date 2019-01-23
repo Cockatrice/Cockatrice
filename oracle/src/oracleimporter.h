@@ -1,12 +1,10 @@
-#include <utility>
-
 #ifndef ORACLEIMPORTER_H
 #define ORACLEIMPORTER_H
 
 #include <QMap>
 #include <QVariant>
-
 #include <carddatabase.h>
+#include <utility>
 
 class SetToDownload
 {

@@ -1,14 +1,14 @@
-#include <utility>
+
 
 #ifndef FILTERTREE_H
 #define FILTERTREE_H
 
+#include "carddatabase.h"
+#include "cardfilter.h"
 #include <QList>
 #include <QMap>
 #include <QObject>
-
-#include "carddatabase.h"
-#include "cardfilter.h"
+#include <utility>
 
 class FilterTreeNode
 {
