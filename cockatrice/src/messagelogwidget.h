@@ -83,8 +83,13 @@ public slots:
     void logMulligan(Player *player, int number);
     void logReplayStarted(int gameId);
     void logReadyStart(Player *player);
-    void
-    logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown);
+    void logRevealCards(Player *player,
+                        CardZone *zone,
+                        int cardId,
+                        QString cardName,
+                        Player *otherPlayer,
+                        bool faceDown,
+                        int amount);
     void logRollDie(Player *player, int sides, int roll);
     void logSay(Player *player, QString message);
     void logSetActivePhase(int phase);

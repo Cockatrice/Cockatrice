@@ -457,9 +457,11 @@ void MessageLogWidget::logRevealCards(Player *player,
                                       int cardId,
                                       QString cardName,
                                       Player *otherPlayer,
-                                      bool faceDown)
+                                      bool faceDown,
+                                      int amount)
 {
-    QPair<QString, QString> temp = getFromStr(zone, cardName, cardId, false);
+    // getFromStr uses cardame.empty() to check if it should contain the start zone, it's not actually used
+    QPair<QString, QString> temp = getFromStr(zone, amount == 1 ? cardName : QString::number(amount), cardId, false);
     bool cardNameContainsStartZone = false;
     if (!temp.first.isEmpty()) {
         cardNameContainsStartZone = true;
@@ -468,52 +470,57 @@ void MessageLogWidget::logRevealCards(Player *player,
     QString fromStr = temp.second;
 
     QString cardStr;
-    if (cardNameContainsStartZone)
+    if (cardNameContainsStartZone) {
         cardStr = cardName;
-    else if (cardName.isEmpty())
-        cardStr = tr("a card");
-    else
+    } else if (cardName.isEmpty()) {
+        cardStr = tr("%1 card(s)", "a card for singular, %1 cards for plural", amount)
+                      .arg("<font color=\"blue\">" + QString::number(amount) + "</font>");
+    } else {
         cardStr = cardLink(cardName);
-
+    }
     if (cardId == -1) {
-        if (otherPlayer)
+        if (otherPlayer) {
             appendHtmlServerMessage(tr("%1 reveals %2 to %3.")
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg(zone->getTranslatedName(true, CaseRevealZone))
                                         .arg(sanitizeHtml(otherPlayer->getName())));
-        else
+        } else {
             appendHtmlServerMessage(tr("%1 reveals %2.")
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg(zone->getTranslatedName(true, CaseRevealZone)));
+        }
     } else if (cardId == -2) {
-        if (otherPlayer)
+        if (otherPlayer) {
             appendHtmlServerMessage(tr("%1 randomly reveals %2%3 to %4.")
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg(cardStr)
                                         .arg(fromStr)
                                         .arg(sanitizeHtml(otherPlayer->getName())));
-        else
+        } else {
             appendHtmlServerMessage(
                 tr("%1 randomly reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+        }
     } else {
         if (faceDown && player == otherPlayer) {
-            if (cardName.isEmpty())
+            if (cardName.isEmpty()) {
                 appendHtmlServerMessage(
                     tr("%1 peeks at face down card #%2.").arg(sanitizeHtml(player->getName())).arg(cardId));
-            else
+            } else {
                 appendHtmlServerMessage(tr("%1 peeks at face down card #%2: %3.")
                                             .arg(sanitizeHtml(player->getName()))
                                             .arg(cardId)
                                             .arg(cardStr));
-        } else if (otherPlayer)
+            }
+        } else if (otherPlayer) {
             appendHtmlServerMessage(tr("%1 reveals %2%3 to %4.")
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg(cardStr)
                                         .arg(fromStr)
                                         .arg(sanitizeHtml(otherPlayer->getName())));
-        else
+        } else {
             appendHtmlServerMessage(
                 tr("%1 reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+        }
     }
 }
 
@@ -787,8 +794,8 @@ void MessageLogWidget::connectToPlayer(Player *player)
     connect(player, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));
     connect(player, SIGNAL(logDrawCards(Player *, int)), this, SLOT(logDrawCards(Player *, int)));
     connect(player, SIGNAL(logUndoDraw(Player *, QString)), this, SLOT(logUndoDraw(Player *, QString)));
-    connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool)), this,
-            SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *, bool)));
+    connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int)), this,
+            SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int)));
     connect(player, SIGNAL(logAlwaysRevealTopCard(Player *, CardZone *, bool)), this,
             SLOT(logAlwaysRevealTopCard(Player *, CardZone *, bool)));
 }
