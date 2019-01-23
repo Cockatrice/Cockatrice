@@ -460,7 +460,7 @@ void MessageLogWidget::logRevealCards(Player *player,
                                       bool faceDown,
                                       int amount)
 {
-    // getFromStr uses cardame.empty() to check if it should contain the start zone, it's not actually used
+    // getFromStr uses cardname.empty() to check if it should contain the start zone, it's not actually used
     QPair<QString, QString> temp = getFromStr(zone, amount == 1 ? cardName : QString::number(amount), cardId, false);
     bool cardNameContainsStartZone = false;
     if (!temp.first.isEmpty()) {
