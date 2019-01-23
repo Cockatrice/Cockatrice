@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "cardframe.h"
 
 #include "cardinfopicture.h"
@@ -94,10 +96,10 @@ void CardFrame::setCard(CardInfoPtr card)
         disconnect(info.data(), nullptr, this, nullptr);
     }
 
-    info = card;
+    info = std::move(card);
 
     if (info) {
-        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clear()));
+        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clearCard()));
     }
 
     text->setCard(info);
@@ -116,7 +118,7 @@ void CardFrame::setCard(AbstractCardItem *card)
     }
 }
 
-void CardFrame::clear()
+void CardFrame::clearCard()
 {
     setCard((CardInfoPtr) nullptr);
 }

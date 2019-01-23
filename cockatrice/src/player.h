@@ -79,17 +79,17 @@ public:
     {
         Type = typeOther
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }
 
-    PlayerArea(QGraphicsItem *parent = 0);
-    QRectF boundingRect() const
+    explicit PlayerArea(QGraphicsItem *parent = nullptr);
+    QRectF boundingRect() const override
     {
         return bRect;
     }
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void setSize(qreal width, qreal height);
 };
@@ -307,12 +307,12 @@ public:
     {
         Type = typeOther
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void playCard(CardItem *c, bool faceDown, bool tapped);
     void addCard(CardItem *c);
@@ -335,7 +335,7 @@ public:
     }
 
     Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_parent);
-    ~Player();
+    ~Player() override;
     void retranslateUi();
     void clear();
     TabGame *getGame() const
@@ -379,7 +379,7 @@ public:
     {
         return active;
     }
-    void setActive(bool _active);
+    void setActivePlayer(bool _active);
     void setShortcutsActive();
     void setShortcutsInactive();
     void updateZones();
