@@ -159,7 +159,7 @@ private:
     QString pixmapCacheKey;
     // card text
     QString text;
-    // wether this is not a "real" card but a token
+    // whether this is not a "real" card but a token
     bool isToken;
     // basic card properties; common for all the sets
     QVariantHash properties;
