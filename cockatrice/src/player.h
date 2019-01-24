@@ -127,8 +127,13 @@ signals:
     void logSetAnnotation(Player *player, CardItem *card, QString newAnnotation);
     void logDumpZone(Player *player, CardZone *zone, int numberCards);
     void logStopDumpZone(Player *player, CardZone *zone);
-    void
-    logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown);
+    void logRevealCards(Player *player,
+                        CardZone *zone,
+                        int cardId,
+                        QString cardName,
+                        Player *otherPlayer,
+                        bool faceDown,
+                        int amount);
     void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
 
     void sizeChanged();

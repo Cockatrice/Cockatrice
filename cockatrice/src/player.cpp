@@ -1830,14 +1830,14 @@ void Player::eventRevealCards(const Event_RevealCards &event)
     }
 
     if (peeking) {
-        for (auto i : cardList) {
-            QString cardName = QString::fromStdString(i->name());
-            CardItem *card = zone->getCard(i->id(), QString());
-            if (!card) {
+        for (auto &card : cardList) {
+            QString cardName = QString::fromStdString(card->name());
+            CardItem *cardItem = zone->getCard(card->id(), QString());
+            if (!cardItem) {
                 continue;
             }
-            card->setName(cardName);
-            emit logRevealCards(this, zone, i->id(), cardName, this, true);
+            cardItem->setName(cardName);
+            emit logRevealCards(this, zone, card->id(), cardName, this, true, 1);
         }
     } else {
         bool showZoneView = true;
@@ -1854,7 +1854,7 @@ void Player::eventRevealCards(const Event_RevealCards &event)
             static_cast<GameScene *>(scene())->addRevealedZoneView(this, zone, cardList, event.grant_write_access());
         }
 
-        emit logRevealCards(this, zone, event.card_id(), cardName, otherPlayer, false);
+        emit logRevealCards(this, zone, event.card_id(), cardName, otherPlayer, false, cardList.size());
     }
 }
 

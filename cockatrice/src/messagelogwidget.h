@@ -48,7 +48,7 @@ private:
     const QString stackConstant() const;
 
     QString sanitizeHtml(QString dirty) const;
-    QString cardLink(const QString cardName) const;
+    QString cardLink(QString cardName) const;
     QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const;
 
 public slots:
@@ -83,8 +83,13 @@ public slots:
     void logMulligan(Player *player, int number);
     void logReplayStarted(int gameId);
     void logReadyStart(Player *player);
-    void
-    logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown);
+    void logRevealCards(Player *player,
+                        CardZone *zone,
+                        int cardId,
+                        QString cardName,
+                        Player *otherPlayer,
+                        bool faceDown,
+                        int amount);
     void logRollDie(Player *player, int sides, int roll);
     void logSay(Player *player, QString message);
     void logSetActivePhase(int phase);
@@ -108,7 +113,7 @@ public:
     MessageLogWidget(const TabSupervisor *_tabSupervisor,
                      const UserlistProxy *_userlistProxy,
                      TabGame *_game,
-                     QWidget *parent = 0);
+                     QWidget *parent = nullptr);
 };
 
 #endif
