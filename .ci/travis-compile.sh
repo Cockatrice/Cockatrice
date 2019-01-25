@@ -56,8 +56,8 @@ done
 if [[ $CHECK_FORMAT ]]; then
   echo "Checking your code using clang-format..."
   diff="$(./clangify.sh --diff --cf-version)"
-  ok=$?
-  case $ok in
+  err=$?
+  case $err in
     1)
       cat <<EOM
 ***********************************************************
