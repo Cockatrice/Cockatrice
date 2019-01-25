@@ -172,7 +172,7 @@ IF(MSVC)
 ENDIF()
 
 # Package builder
-set(CPACK_PACKAGE_CONTACT "Gavin Bisesi <Daenyth+github@gmail.com>")
+set(CPACK_PACKAGE_CONTACT "Zach Halpern <zahalpern+github@gmail.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_NAME})
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
