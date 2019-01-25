@@ -1,5 +1,5 @@
 FROM ubuntu:trusty
-MAINTAINER Gavin Bisesi <Daenyth@gmail.com>
+MAINTAINER Zach Halpern <zahalpern+github@gmail.com>
 
 RUN apt-get update && apt-get install -y software-properties-common
 RUN apt-add-repository ppa:ubuntu-sdk-team/ppa
