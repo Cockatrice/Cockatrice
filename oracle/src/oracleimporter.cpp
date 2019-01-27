@@ -311,8 +311,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
                 }
             }
         }
-
-        CardInfoPtr newCard = addCard(name, text, isToken, properties, relatedCards, setInfo);
+        CardInfoPtr newCard = addCard(nameSplit, text, isToken, properties, relatedCards, setInfo);
         numCards++;
     }
 
