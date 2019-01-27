@@ -57,6 +57,7 @@ public slots:
     void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
     void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
     void logConcede(Player *player);
+    void logUnconcede(Player *player);
     void logConnectionStateChanged(Player *player, bool connectionState);
     void logCreateArrow(Player *player,
                         Player *startPlayer,

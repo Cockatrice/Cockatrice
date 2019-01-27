@@ -3037,8 +3037,8 @@ void Player::setConceded(bool _conceded)
     setVisible(!conceded);
     if (conceded) {
         clear();
-        emit gameConceded();
     }
+    emit playerCountChanged();
 }
 
 void Player::setMirrored(bool _mirrored)

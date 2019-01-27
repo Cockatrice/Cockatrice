@@ -620,11 +620,23 @@ void TabGame::actGameInfo()
 
 void TabGame::actConcede()
 {
-    if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"),
-                              QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+    Player *player = players.value(localPlayerId, nullptr);
+    if (player == nullptr)
         return;
+    if (!player->getConceded()) {
+        if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"),
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+            return;
 
-    sendGameCommand(Command_Concede());
+        sendGameCommand(Command_Concede());
+    } else {
+        if (QMessageBox::question(this, tr("Unconcede"),
+                                  tr("You have already conceded.  Do you want to return to this game?"),
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+            return;
+
+        sendGameCommand(Command_Unconcede());
+    }
 }
 
 void TabGame::actLeaveGame()
@@ -1044,6 +1056,16 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
         case GameEventContext::CONCEDE: {
             messageLog->logConcede(player);
             player->setConceded(true);
+
+            QMapIterator<int, Player *> playerIterator(players);
+            while (playerIterator.hasNext())
+                playerIterator.next().value()->updateZones();
+
+            break;
+        }
+        case GameEventContext::UNCONCEDE: {
+            messageLog->logUnconcede(player);
+            player->setConceded(false);
 
             QMapIterator<int, Player *> playerIterator(players);
             while (playerIterator.hasNext())

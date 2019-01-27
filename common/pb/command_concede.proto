@@ -5,3 +5,10 @@ message Command_Concede {
         optional Command_Concede ext = 1017;
     }
 }
+
+
+message Command_Unconcede {
+    extend GameCommand {
+        optional Command_Unconcede ext = 1032;
+    }
+}

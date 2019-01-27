@@ -6,3 +6,9 @@ message Context_Concede {
         optional Context_Concede ext = 1001;
     }
 }
+
+message Context_Unconcede {
+    extend GameEventContext {
+        optional Context_Unconcede ext = 1009;
+    }
+}

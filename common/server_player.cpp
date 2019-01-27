@@ -777,6 +777,30 @@ Server_Player::cmdConcede(const Command_Concede & /*cmd*/, ResponseContainer & /
 }
 
 Response::ResponseCode
+Server_Player::cmdUnconcede(const Command_Unconcede & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    if (spectator)
+        return Response::RespFunctionNotAllowed;
+    if (!game->getGameStarted())
+        return Response::RespGameNotStarted;
+    if (!conceded)
+        return Response::RespContextError;
+
+    setConceded(false);
+
+    Event_PlayerPropertiesChanged event;
+    event.mutable_player_properties()->set_conceded(false);
+    ges.enqueueGameEvent(event, playerId);
+    ges.setGameEventContext(Context_Unconcede());
+
+    setupZones();
+
+    game->sendGameStateToPlayers();
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode
 Server_Player::cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
     if (spectator)
@@ -1826,6 +1850,10 @@ Server_Player::processGameCommand(const GameCommand &command, ResponseContainer 
         case GameCommand::CHANGE_ZONE_PROPERTIES:
             return cmdChangeZoneProperties(command.GetExtension(Command_ChangeZoneProperties::ext), rc, ges);
             break;
+        case GameCommand::UNCONCEDE:
+            return cmdUnconcede(command.GetExtension(Command_Unconcede::ext), rc, ges);
+            break;
+
         default:
             return Response::RespInvalidCommand;
     }

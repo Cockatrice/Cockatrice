@@ -137,7 +137,7 @@ signals:
     void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
 
     void sizeChanged();
-    void gameConceded();
+    void playerCountChanged();
 public slots:
     void actUntapAll();
     void actRollDie();
