@@ -301,14 +301,15 @@ void MainWindow::actAbout()
                 tr("Version") + QString(" %1").arg(VERSION_STRING) + "<br><br><b><a href='" + GITHUB_PAGES_URL + "'>" +
                 tr("Cockatrice Webpage") + "</a></b><br>" + "<br><b>" + tr("Project Manager:") +
                 "</b><br>Zach Halpern<br><br>" + "<b>" + tr("Past Project Managers:") +
-                "</b><br>Gavin Bisesi<br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>" + "<b>" + tr("Developers:") + "</b><br>" +
-                "<a href='" + GITHUB_CONTRIBUTORS_URL + "'>" + tr("Our Developers") + "</a><br>" + "<a href='" +
-                GITHUB_CONTRIBUTE_URL + "'>" + tr("Help Develop!") + "</a><br><br>" + "<b>" + tr("Translators:") +
-                "</b><br>" + "<a href='" + GITHUB_TRANSIFEX_TRANSLATORS_URL + "'>" + tr("Our Translators") +
-                "</a><br>" + "<a href='" + GITHUB_TRANSLATOR_FAQ_URL + "'>" + tr("Help Translate!") + "</a><br><br>" +
-                "<b>" + tr("Support:") + "</b><br>" + "<a href='" + GITHUB_ISSUES_URL + "'>" + tr("Report an Issue") +
-                "</a><br>" + "<a href='" + GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>" +
-                "<a href='" + GITHUB_FAQ_URL + "'>" + tr("F.A.Q.") + "</a><br>"),
+                "</b><br>Gavin Bisesi<br>Max-Wilhelm Bruker<br>Marcus Schütz<br><br>" + "<b>" + tr("Developers:") +
+                "</b><br>" + "<a href='" + GITHUB_CONTRIBUTORS_URL + "'>" + tr("Our Developers") + "</a><br>" +
+                "<a href='" + GITHUB_CONTRIBUTE_URL + "'>" + tr("Help Develop!") + "</a><br><br>" + "<b>" +
+                tr("Translators:") + "</b><br>" + "<a href='" + GITHUB_TRANSIFEX_TRANSLATORS_URL + "'>" +
+                tr("Our Translators") + "</a><br>" + "<a href='" + GITHUB_TRANSLATOR_FAQ_URL + "'>" +
+                tr("Help Translate!") + "</a><br><br>" + "<b>" + tr("Support:") + "</b><br>" + "<a href='" +
+                GITHUB_ISSUES_URL + "'>" + tr("Report an Issue") + "</a><br>" + "<a href='" +
+                GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>" + "<a href='" + GITHUB_FAQ_URL +
+                "'>" + tr("F.A.Q.") + "</a><br>"),
         QMessageBox::Ok, this);
     mb.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64));
     mb.setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -705,15 +706,33 @@ void MainWindow::createActions()
     aExit->setMenuRole(QAction::QuitRole);
     aAbout->setMenuRole(QAction::AboutRole);
 
-    char const *foo; // avoid "warning: expression result unused" under clang
-    foo = QT_TRANSLATE_NOOP("QMenuBar", "Services");
-    foo = QT_TRANSLATE_NOOP("QMenuBar", "Hide %1");
-    foo = QT_TRANSLATE_NOOP("QMenuBar", "Hide Others");
-    foo = QT_TRANSLATE_NOOP("QMenuBar", "Show All");
-    foo = QT_TRANSLATE_NOOP("QMenuBar", "Preferences...");
-    foo = QT_TRANSLATE_NOOP("QMenuBar", "Quit %1");
-    foo = QT_TRANSLATE_NOOP("QMenuBar", "About %1");
+    Q_UNUSED(QT_TRANSLATE_NOOP("QMenuBar", "Services"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QMenuBar", "Hide %1"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QMenuBar", "Hide Others"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QMenuBar", "Show All"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QMenuBar", "Preferences..."));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QMenuBar", "Quit %1"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QMenuBar", "About %1"));
 #endif
+    // translate Qt's dialogs "default button text"; list taken from QPlatformTheme::defaultStandardButtonText()
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "OK"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Save"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Save All"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Open"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "&Yes"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Yes to &All"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "&No"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "N&o to All"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Abort"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Retry"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Ignore"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Close"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Cancel"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Discard"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Help"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Apply"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Reset"));
+    Q_UNUSED(QT_TRANSLATE_NOOP("QPlatformTheme", "Restore Defaults"));
 }
 
 void MainWindow::createMenus()
