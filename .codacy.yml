@@ -1,5 +1,5 @@
 ---
 exclude_paths:
   - '**/translations/*.ts'
-
+  - 'webclient/js/*.js'
 # codacy config documentation: https://support.codacy.com/hc/en-us/articles/115002130625-Codacy-Configuration-File
