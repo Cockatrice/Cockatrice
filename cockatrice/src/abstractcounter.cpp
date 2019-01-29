@@ -5,6 +5,7 @@
 #include "player.h"
 #include "settingscache.h"
 #include <QAction>
+#include <QApplication>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
@@ -115,7 +116,11 @@ void AbstractCounter::setValue(int _value)
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (isUnderMouse() && player->getLocal()) {
-        if (event->button() == Qt::LeftButton) {
+        if (event->button() == Qt::MidButton || (QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
+            if (menu)
+                menu->exec(event->screenPos());
+            event->accept();
+        } else if (event->button() == Qt::LeftButton) {
             Command_IncCounter cmd;
             cmd.set_counter_id(id);
             cmd.set_delta(1);
@@ -126,10 +131,6 @@ void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
             cmd.set_counter_id(id);
             cmd.set_delta(-1);
             player->sendGameCommand(cmd);
-            event->accept();
-        } else if (event->button() == Qt::MidButton) {
-            if (menu)
-                menu->exec(event->screenPos());
             event->accept();
         }
     } else
