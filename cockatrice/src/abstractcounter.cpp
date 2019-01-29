@@ -1,4 +1,5 @@
 #include "abstractcounter.h"
+#include "expression.h"
 #include "pb/command_inc_counter.pb.h"
 #include "pb/command_set_counter.pb.h"
 #include "player.h"
@@ -160,8 +161,12 @@ void AbstractCounter::setCounter()
 {
     bool ok;
     dialogSemaphore = true;
-    int newValue = QInputDialog::getInt(0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value,
-                                        -2000000000, 2000000000, 1, &ok);
+    QString expression = QInputDialog::getText(0, tr("Set counter"), tr("New value for counter '%1':").arg(name),
+                                               QLineEdit::Normal, QString::number(value), &ok);
+
+    Expression exp(value);
+    int newValue = exp.parse(expression);
+
     if (deleteAfterDialog) {
         deleteLater();
         return;
