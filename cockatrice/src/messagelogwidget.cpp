@@ -479,8 +479,12 @@ void MessageLogWidget::logRevealCards(Player *player,
     if (cardNameContainsStartZone) {
         cardStr = cardName;
     } else if (cardName.isEmpty()) {
-        cardStr = tr("%1 card(s)", "a card for singular, %1 cards for plural", amount)
-                      .arg("<font color=\"blue\">" + QString::number(amount) + "</font>");
+        if (amount == 0) {
+            cardStr = tr("cards", "an unknown amount of cards");
+        } else {
+            cardStr = tr("%1 card(s)", "a card for singular, %1 cards for plural", amount)
+                          .arg("<font color=\"blue\">" + QString::number(amount) + "</font>");
+        }
     } else {
         cardStr = cardLink(cardName);
     }
