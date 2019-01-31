@@ -2518,12 +2518,18 @@ void Player::actResetPT()
         if (!info) {
             continue;
         }
-        auto *cmd = new Command_SetCardAttr;
+        QString ptString;
+        if (!card->getFaceDown()) { // leave the pt empty if the card is face down
+            ptString = info->getPowTough();
+        }
+        if (ptString == card->getPT()) {
+            continue;
+        }
         QString zoneName = card->getZone()->getName();
+        auto *cmd = new Command_SetCardAttr;
         cmd->set_zone(zoneName.toStdString());
         cmd->set_card_id(card->getId());
         cmd->set_attribute(AttrPT);
-        QString ptString = info->getPowTough();
         cmd->set_attr_value(ptString.toStdString());
         commandList.append(cmd);
 

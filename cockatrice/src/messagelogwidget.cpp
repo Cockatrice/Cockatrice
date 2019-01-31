@@ -694,13 +694,17 @@ void MessageLogWidget::logSetDoesntUntap(Player *player, CardItem *card, bool do
 
 void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
 {
-    if (currentContext == MessageContext_MoveCard)
+    if (currentContext == MessageContext_MoveCard) {
         moveCardPT.insert(card, newPT);
-    else
+    } else if (newPT.isEmpty()) {
+        appendHtmlServerMessage(
+            tr("%1 removes the PT of %2.").arg(sanitizeHtml(player->getName())).arg(cardLink(card->getName())));
+    } else {
         appendHtmlServerMessage(tr("%1 sets PT of %2 to %3.")
                                     .arg(sanitizeHtml(player->getName()))
                                     .arg(cardLink(card->getName()))
                                     .arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newPT))));
+    }
 }
 
 void MessageLogWidget::logSetSideboardLock(Player *player, bool locked)
