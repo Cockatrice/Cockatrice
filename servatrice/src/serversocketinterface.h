@@ -193,11 +193,11 @@ public:
 
     QHostAddress getPeerAddress() const
     {
-        return socket->peerAddress();
+        return address;
     }
     QString getAddress() const
     {
-        return socket->peerAddress().toString();
+        return address.toString();
     }
     QString getConnectionType() const
     {
@@ -206,6 +206,7 @@ public:
 
 private:
     QWebSocket *socket;
+    QHostAddress address;
 
 protected:
     void writeToSocket(QByteArray &data)

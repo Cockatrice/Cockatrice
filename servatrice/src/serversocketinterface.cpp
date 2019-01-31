@@ -1647,6 +1647,18 @@ WebsocketServerSocketInterface::~WebsocketServerSocketInterface()
 void WebsocketServerSocketInterface::initConnection(void *_socket)
 {
     socket = (QWebSocket *)_socket;
+    address = socket->peerAddress();
+
+    QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
+    if (websocketIPHeader.length() > 0) {
+        if (socket->request().hasRawHeader(websocketIPHeader)) {
+            QString header(socket->request().rawHeader(websocketIPHeader));
+            QHostAddress parsed(header);
+            if (!parsed.isNull())
+                address = parsed;
+        }
+    }
+
     connect(socket, SIGNAL(binaryMessageReceived(const QByteArray &)), this,
             SLOT(binaryMessageReceived(const QByteArray &)));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
@@ -1656,7 +1668,9 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
     // Otherwise, in case a of a socket error, it could be removed from the list before it is added.
     server->addClient(this);
 
-    logger->logMessage(QString("Incoming websocket connection: %1").arg(socket->peerAddress().toString()), this);
+    logger->logMessage(
+        QString("Incoming websocket connection: %1 (%2)").arg(address.toString()).arg(socket->peerAddress().toString()),
+        this);
 
     if (!initWebsocketSession())
         prepareDestroy();
