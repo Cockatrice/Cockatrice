@@ -696,14 +696,19 @@ void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
 {
     if (currentContext == MessageContext_MoveCard) {
         moveCardPT.insert(card, newPT);
-    } else if (newPT.isEmpty()) {
-        appendHtmlServerMessage(
-            tr("%1 removes the PT of %2.").arg(sanitizeHtml(player->getName())).arg(cardLink(card->getName())));
     } else {
-        appendHtmlServerMessage(tr("%1 sets PT of %2 to %3.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg(cardLink(card->getName()))
-                                    .arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newPT))));
+        QString name = card->getName();
+        if (name.isEmpty()) {
+            name = QString("<font color=\"blue\">card %1</font>").arg(sanitizeHtml(QString::number(card->getId())));
+        } else {
+            name = cardLink(name);
+        }
+        if (newPT.isEmpty()) {
+            appendHtmlServerMessage(tr("%1 removes the PT of %2.").arg(sanitizeHtml(player->getName())).arg(name));
+        } else {
+            appendHtmlServerMessage(
+                tr("%1 sets PT of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(name).arg(newPT));
+        }
     }
 }
 
