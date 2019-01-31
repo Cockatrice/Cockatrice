@@ -1,9 +1,8 @@
-FROM ubuntu:trusty
+FROM ubuntu:bionic
 MAINTAINER Zach Halpern <zahalpern+github@gmail.com>
 
 RUN apt-get update && apt-get install -y software-properties-common
-RUN apt-add-repository ppa:ubuntu-sdk-team/ppa
-RUN add-apt-repository -y ppa:smspillaz/cmake-master
+#RUN add-apt-repository -y ppa:smspillaz/cmake-master
 RUN apt-get update && apt-get install -y\
   build-essential g++\
   cmake\
@@ -16,15 +15,10 @@ RUN apt-get update && apt-get install -y\
   qttools5-dev\
   libqt5sql5-mysql
 
-ENV dir /home/servatrice/code
-WORKDIR $dir
+COPY . /home/servatrice/code/
+WORKDIR /home/servatrice/code
+
 RUN mkdir oracle
-COPY LICENSE LICENSE
-COPY CMakeLists.txt CMakeLists.txt
-COPY cmake/ cmake/
-COPY common/ common/
-COPY servatrice/ servatrice/
-COPY README.md README.md
 
 WORKDIR build
 RUN cmake .. -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0 &&\
