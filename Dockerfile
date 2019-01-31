@@ -17,12 +17,6 @@ RUN apt-get update && apt-get install -y\
 COPY . /home/servatrice/code/
 WORKDIR /home/servatrice/code
 
-<<<<<<< HEAD
-=======
-COPY . /home/servatrice/code/
-WORKDIR /home/servatrice/code
-
->>>>>>> 9565b8fa01261d75c26dfae313b05f775d076483
 RUN mkdir oracle
 
 WORKDIR build
