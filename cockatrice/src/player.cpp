@@ -2514,13 +2514,12 @@ void Player::actResetPT()
     QListIterator<QGraphicsItem *> selected(scene()->selectedItems());
     while (selected.hasNext()) {
         auto *card = static_cast<CardItem *>(selected.next());
-        CardInfoPtr info = card->getInfo();
-        if (!info) {
-            continue;
-        }
         QString ptString;
         if (!card->getFaceDown()) { // leave the pt empty if the card is face down
-            ptString = info->getPowTough();
+            CardInfoPtr info = card->getInfo();
+            if (info) {
+                ptString = info->getPowTough();
+            }
         }
         if (ptString == card->getPT()) {
             continue;
