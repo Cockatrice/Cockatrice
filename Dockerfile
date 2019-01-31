@@ -2,7 +2,6 @@ FROM ubuntu:bionic
 MAINTAINER Zach Halpern <zahalpern+github@gmail.com>
 
 RUN apt-get update && apt-get install -y software-properties-common
-#RUN add-apt-repository -y ppa:smspillaz/cmake-master
 RUN apt-get update && apt-get install -y\
   build-essential g++\
   cmake\
