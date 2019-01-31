@@ -1651,12 +1651,16 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 
     QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
     if (websocketIPHeader.length() > 0) {
+#if QT_VERSION > 0x050600
         if (socket->request().hasRawHeader(websocketIPHeader)) {
             QString header(socket->request().rawHeader(websocketIPHeader));
             QHostAddress parsed(header);
             if (!parsed.isNull())
                 address = parsed;
         }
+#else
+        logger->logMessage(QString("Reading the websocket IP header is unsupported on this version of QT."));
+#endif
     }
 
     connect(socket, SIGNAL(binaryMessageReceived(const QByteArray &)), this,
