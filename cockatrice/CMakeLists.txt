@@ -173,6 +173,13 @@ if(Qt5LinguistTools_FOUND)
     endif()
 endif()
 
+find_package(Qt5WebSockets)
+if(Qt5WebSockets_FOUND)
+    list(APPEND COCKATRICE_QT_MODULES Qt5::WebSockets)
+else()
+    MESSAGE(WARNING "Qt5 websocket module not found")
+endif()
+
 QT5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 
 # Declare path variables

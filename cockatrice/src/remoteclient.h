@@ -3,6 +3,7 @@
 
 #include "abstractclient.h"
 #include <QTcpSocket>
+#include <QWebSocket>
 
 class QTimer;
 
@@ -48,7 +49,9 @@ signals:
 private slots:
     void slotConnected();
     void readData();
+    void websocketMessageReceived(const QByteArray &message);
     void slotSocketError(QAbstractSocket::SocketError error);
+    void slotWebSocketError(QAbstractSocket::SocketError error);
     void ping();
     void processServerIdentificationEvent(const Event_ServerIdentification &event);
     void processConnectionClosedEvent(const Event_ConnectionClosed &event);
@@ -89,12 +92,15 @@ private:
     QByteArray inputBuffer;
     bool messageInProgress;
     bool handshakeStarted;
+    bool usingWebSocket;
     bool newMissingFeatureFound(QString _serversMissingFeatures);
     void clearNewClientFeatures();
+    void connectToHost(const QString &hostname, unsigned int port);
     int messageLength;
 
     QTimer *timer;
     QTcpSocket *socket;
+    QWebSocket *websocket;
     QString lastHostname;
     int lastPort;
     QString getSrvClientID(const QString _hostname);
@@ -106,7 +112,11 @@ public:
     ~RemoteClient();
     QString peerName() const
     {
-        return socket->peerName();
+        if (usingWebSocket) {
+            return socket->peerName();
+        } else {
+            return websocket->peerName();
+        }
     }
     void
     connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
