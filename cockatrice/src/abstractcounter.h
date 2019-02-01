@@ -11,6 +11,7 @@ class AbstractCounter : public QObject, public QGraphicsItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
+
 protected:
     Player *player;
     int id;
@@ -18,15 +19,17 @@ protected:
     int value;
     bool useNameForShortcut, hovered;
 
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
 private:
     QAction *aSet, *aDec, *aInc;
     QMenu *menu;
     bool dialogSemaphore, deleteAfterDialog;
     bool shownInCounterArea;
+    bool shortcutActive;
+
 private slots:
     void refreshShortcuts();
     void incrementCounter();
@@ -39,14 +42,19 @@ public:
                     bool _shownInCounterArea,
                     int _value,
                     bool _useNameForShortcut = false,
-                    QGraphicsItem *parent = 0);
-    ~AbstractCounter();
+                    QGraphicsItem *parent = nullptr);
+    ~AbstractCounter() override;
+
+    void retranslateUi();
+    void setValue(int _value);
+    void setShortcutsActive();
+    void setShortcutsInactive();
+    void delCounter();
 
     QMenu *getMenu() const
     {
         return menu;
     }
-    void retranslateUi();
 
     int getId() const
     {
@@ -64,12 +72,6 @@ public:
     {
         return value;
     }
-    void setValue(int _value);
-    void delCounter();
-
-    void setShortcutsActive();
-    void setShortcutsInactive();
-    bool shortcutActive;
 };
 
 #endif

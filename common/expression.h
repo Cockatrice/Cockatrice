@@ -16,7 +16,8 @@ class Expression
 {
 public:
     double value;
-    Expression(double initial = 0);
+
+    explicit Expression(double initial = 0);
     double parse(const QString &expr);
 
 private:

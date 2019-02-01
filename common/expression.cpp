@@ -81,6 +81,9 @@ double Expression::eval(const peg::Ast &ast)
                 case '^':
                     result = pow(result, arg);
                     break;
+                default:
+                    result = 0;
+                    break;
             }
         }
         return result;

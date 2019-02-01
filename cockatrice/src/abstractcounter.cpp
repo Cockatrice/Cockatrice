@@ -19,7 +19,7 @@ AbstractCounter::AbstractCounter(Player *_player,
                                  bool _useNameForShortcut,
                                  QGraphicsItem *parent)
     : QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value),
-      useNameForShortcut(_useNameForShortcut), hovered(false), aDec(0), aInc(0), dialogSemaphore(false),
+      useNameForShortcut(_useNameForShortcut), hovered(false), aDec(nullptr), aInc(nullptr), dialogSemaphore(false),
       deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
 {
     setAcceptHoverEvents(true);
@@ -162,11 +162,11 @@ void AbstractCounter::setCounter()
 {
     bool ok;
     dialogSemaphore = true;
-    QString expression = QInputDialog::getText(0, tr("Set counter"), tr("New value for counter '%1':").arg(name),
+    QString expression = QInputDialog::getText(nullptr, tr("Set counter"), tr("New value for counter '%1':").arg(name),
                                                QLineEdit::Normal, QString::number(value), &ok);
 
     Expression exp(value);
-    int newValue = exp.parse(expression);
+    int newValue = static_cast<int>(exp.parse(expression));
 
     if (deleteAfterDialog) {
         deleteLater();
