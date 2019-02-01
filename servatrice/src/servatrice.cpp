@@ -796,6 +796,9 @@ bool Servatrice::getRegOnlyServerEnabled() const
 
 QString Servatrice::getAuthenticationMethodString() const
 {
+    if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
+        return QString("sql");
+    }
     return settingsCache->value("authentication/method").toString();
 }
 
@@ -885,6 +888,9 @@ QString Servatrice::getDBPasswordString() const
 
 QString Servatrice::getRoomsMethodString() const
 {
+    if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
+        return QString("sql");
+    }
     return settingsCache->value("rooms/method").toString();
 }
 
