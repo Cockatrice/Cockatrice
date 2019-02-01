@@ -1037,14 +1037,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         return Response::RespUserAlreadyExists;
     }
 
-    if (servatrice->getMaxAccountsPerEmail() &&
-        !(sqlInterface->checkNumberOfUserAccounts(emailAddress) < servatrice->getMaxAccountsPerEmail())) {
-        if (servatrice->getEnableRegistrationAudit())
-            sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
-                                         QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
-                                         "Too many usernames registered with this email address", false);
+    if ((sqlInterface->checkNumberOfUserAccounts(emailAddress) >= servatrice->getMaxAccountsPerEmail())) {
+        if (servatrice->getMaxAccountsPerEmail() != 0) {
+            if (servatrice->getEnableRegistrationAudit())
+                sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
+                                             QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
+                                             "Too many usernames registered with this email address", false);
 
-        return Response::RespTooManyRequests;
+            return Response::RespTooManyRequests;
+        }
     }
 
     QString banReason;

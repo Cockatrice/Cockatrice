@@ -235,7 +235,7 @@ void RemoteClient::loginResponse(const Response &response)
                 missingFeatures << QString::fromStdString(resp.missing_features(i));
         }
         emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
-                        resp.denied_end_time(), missingFeatures);
+                        static_cast<quint32>(resp.denied_end_time()), missingFeatures);
         setStatus(StatusDisconnecting);
     }
 }
@@ -254,7 +254,7 @@ void RemoteClient::registerResponse(const Response &response)
             break;
         default:
             emit registerError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
-                               resp.denied_end_time());
+                               static_cast<quint32>(resp.denied_end_time()));
             setStatus(StatusDisconnecting);
             doDisconnectFromServer();
             break;
@@ -333,7 +333,7 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
 void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 {
 
-    unsigned int size = cont.ByteSize();
+    auto size = static_cast<unsigned int>(cont.ByteSize());
 #ifdef QT_DEBUG
     qDebug() << "OUT" << size << QString::fromStdString(cont.ShortDebugString());
 #endif
@@ -362,7 +362,7 @@ void RemoteClient::connectToHost(const QString &hostname, unsigned int port)
         QUrl url(QString("%1://%2:%3").arg(port == 443 ? "wss" : "ws").arg(hostname).arg(port));
         websocket->open(url);
     } else {
-        socket->connectToHost(hostname, port);
+        socket->connectToHost(hostname, static_cast<quint16>(port));
     }
 }
 
@@ -412,7 +412,7 @@ void RemoteClient::doActivateToServer(const QString &_token)
 
     token = _token;
 
-    connectToHost(lastHostname, lastPort);
+    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
     setStatus(StatusActivating);
 }
 
@@ -425,13 +425,13 @@ void RemoteClient::doDisconnectFromServer()
     messageLength = 0;
 
     QList<PendingCommand *> pc = pendingCommands.values();
-    for (int i = 0; i < pc.size(); i++) {
+    for (const auto &i : pc) {
         Response response;
         response.set_response_code(Response::RespNotConnected);
-        response.set_cmd_id(pc[i]->getCommandContainer().cmd_id());
-        pc[i]->processResponse(response);
+        response.set_cmd_id(i->getCommandContainer().cmd_id());
+        i->processResponse(response);
 
-        delete pc[i];
+        delete i;
     }
     pendingCommands.clear();
 
@@ -558,7 +558,7 @@ void RemoteClient::doRequestForgotPasswordToServer(const QString &hostname, unsi
     lastHostname = hostname;
     lastPort = port;
 
-    connectToHost(lastHostname, lastPort);
+    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
     setStatus(StatusRequestingForgotPassword);
 }
 
@@ -590,7 +590,7 @@ void RemoteClient::doSubmitForgotPasswordResetToServer(const QString &hostname,
     token = _token;
     password = _newpassword;
 
-    connectToHost(lastHostname, lastPort);
+    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
     setStatus(StatusSubmitForgotPasswordReset);
 }
 
@@ -624,7 +624,7 @@ void RemoteClient::doSubmitForgotPasswordChallengeToServer(const QString &hostna
     lastPort = port;
     email = _email;
 
-    connectToHost(lastHostname, lastPort);
+    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
     setStatus(StatusSubmitForgotPasswordChallenge);
 }
 
