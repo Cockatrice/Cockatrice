@@ -26,6 +26,7 @@ SET(common_SOURCES
     server_room.cpp
     serverinfo_user_container.cpp
     sfmt/SFMT.c
+    expression.cpp
 )
 
 set(ORACLE_LIBS)

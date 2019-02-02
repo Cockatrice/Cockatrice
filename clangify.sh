@@ -14,6 +14,7 @@ include=("common" \
 "servatrice/src")
 exclude=("servatrice/src/smtp" \
 "common/sfmt" \
+"common/lib" \
 "oracle/src/zip" \
 "oracle/src/lzma" \
 "oracle/src/qt-json")

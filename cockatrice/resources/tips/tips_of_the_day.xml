@@ -83,4 +83,10 @@
         <image>face_down.png</image>
         <date>2018-03-01</date>
     </tip>
+    <tip>
+        <title>Counter expressions</title>
+        <text>When setting a counter value, you can type a math expression in the box and the counter will be set to the result.&lt;br&gt;The "x" variable contains the current counter value.</text>
+        <image>counter_expression.png</image>
+        <date>2019-02-02</date>
+    </tip>
 </tips>
