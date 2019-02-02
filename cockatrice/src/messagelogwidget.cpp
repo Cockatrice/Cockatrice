@@ -732,13 +732,32 @@ void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
     }
 }
 
-void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
+void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int end)
 {
     soundEngine->playSound("shuffle");
-    if (currentContext != MessageContext_Mulligan)
+    if (currentContext == MessageContext_Mulligan)
+        return;
+    if (start == 0 && end == -1) {
         appendHtmlServerMessage(tr("%1 shuffles %2.")
                                     .arg(sanitizeHtml(player->getName()))
                                     .arg(zone->getTranslatedName(true, CaseShuffleZone)));
+    } else if (start < 0 && end == -1) {
+        appendHtmlServerMessage(tr("%1 shuffles the bottom %3 cards of %2.")
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(-start));
+    } else if (start < 0 && end > 0) {
+        appendHtmlServerMessage(tr("%1 shuffles the top %3 cards of %2.")
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(end + 1));
+    } else {
+        appendHtmlServerMessage(tr("%1 shuffles cards %3 - %4 of %2.")
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(start)
+                                    .arg(end));
+    }
 }
 
 void MessageLogWidget::logSpectatorSay(QString spectatorName,
@@ -775,7 +794,7 @@ void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
 void MessageLogWidget::connectToPlayer(Player *player)
 {
     connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
-    connect(player, SIGNAL(logShuffle(Player *, CardZone *)), this, SLOT(logShuffle(Player *, CardZone *)));
+    connect(player, &Player::logShuffle, this, &MessageLogWidget::logShuffle);
     connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));
     connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)), this,
             SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)));

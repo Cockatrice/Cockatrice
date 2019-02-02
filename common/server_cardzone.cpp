@@ -40,13 +40,25 @@ Server_CardZone::~Server_CardZone()
     clear();
 }
 
-void Server_CardZone::shuffle()
+void Server_CardZone::shuffle(int start, int end)
 {
     // Size 0 or 1 decks are sorted
     if (cards.size() < 2)
         return;
-    for (int i = cards.size() - 1; i > 0; i--) {
-        int j = rng->rand(0, i);
+
+    if (end < 0)
+        end += cards.size();
+
+    if (start < 0)
+        start += cards.size();
+
+    if (start < 0)
+        return;
+    if (end < 0)
+        return;
+
+    for (int i = end; i > start; i--) {
+        int j = rng->rand(start, i);
         cards.swap(j, i);
     }
     playersWithWritePermission.clear();

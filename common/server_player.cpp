@@ -844,7 +844,7 @@ Server_Player::cmdGameSay(const Command_GameSay &cmd, ResponseContainer & /*rc*/
 }
 
 Response::ResponseCode
-Server_Player::cmdShuffle(const Command_Shuffle & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::cmdShuffle(const Command_Shuffle &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
     if (spectator)
         return Response::RespFunctionNotAllowed;
@@ -854,18 +854,26 @@ Server_Player::cmdShuffle(const Command_Shuffle & /*cmd*/, ResponseContainer & /
     if (conceded)
         return Response::RespContextError;
 
-    Server_CardZone *deckZone = zones.value("deck");
-    deckZone->shuffle();
+    if (cmd.zone_name() != "deck")
+        return Response::RespFunctionNotAllowed;
+
+    Server_CardZone *zone = zones.value("deck");
+    if (!zone)
+        return Response::RespNameNotFound;
+
+    zone->shuffle(cmd.start(), cmd.end());
 
     Event_Shuffle event;
-    event.set_zone_name("deck");
+    event.set_zone_name(zone->getName().toStdString());
+    event.set_start(cmd.start());
+    event.set_end(cmd.end());
     ges.enqueueGameEvent(event, playerId);
 
-    if (deckZone->getAlwaysRevealTopCard() && !deckZone->getCards().isEmpty()) {
+    if (zone->getAlwaysRevealTopCard() && !zone->getCards().isEmpty()) {
         Event_RevealCards revealEvent;
-        revealEvent.set_zone_name(deckZone->getName().toStdString());
+        revealEvent.set_zone_name(zone->getName().toStdString());
         revealEvent.set_card_id(0);
-        deckZone->getCards().first()->getInfo(revealEvent.add_cards());
+        zone->getCards().first()->getInfo(revealEvent.add_cards());
 
         ges.enqueueGameEvent(revealEvent, playerId);
     }

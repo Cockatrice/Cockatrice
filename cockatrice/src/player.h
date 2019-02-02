@@ -103,7 +103,7 @@ signals:
     void newCardAdded(AbstractCardItem *card);
     // Log events
     void logSay(Player *player, QString message);
-    void logShuffle(Player *player, CardZone *zone);
+    void logShuffle(Player *player, CardZone *zone, int start, int end);
     void logRollDie(Player *player, int sides, int roll);
     void logCreateArrow(Player *player,
                         Player *startPlayer,
