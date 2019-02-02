@@ -699,7 +699,7 @@ void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
     } else {
         QString name = card->getName();
         if (name.isEmpty()) {
-            name = QString("<font color=\"blue\">card %1</font>").arg(sanitizeHtml(QString::number(card->getId())));
+            name = QString("<font color=\"blue\">card #%1</font>").arg(sanitizeHtml(QString::number(card->getId())));
         } else {
             name = cardLink(name);
         }
