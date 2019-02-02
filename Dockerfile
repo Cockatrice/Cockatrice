@@ -7,14 +7,12 @@ RUN apt-get update && apt-get install -y\
   git\
   libprotobuf-dev\
   libqt5sql5-mysql\
+  libqt5websockets5-dev\
   protobuf-compiler\
   qt5-default\
   qtbase5-dev\
   qttools5-dev-tools\
-  qttools5-dev\
-  software-properties-common\
-  libqt5sql5-mysql\
-  libqt5websockets5-dev
+  qttools5-dev
 
 COPY . /home/servatrice/code/
 WORKDIR /home/servatrice/code
