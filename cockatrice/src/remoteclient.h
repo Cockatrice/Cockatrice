@@ -112,9 +112,9 @@ public:
     QString peerName() const
     {
         if (usingWebSocket) {
-            return socket->peerName();
-        } else {
             return websocket->peerName();
+        } else {
+            return socket->peerName();
         }
     }
     void
