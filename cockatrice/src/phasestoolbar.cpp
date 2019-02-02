@@ -232,6 +232,17 @@ void PhasesToolbar::setActivePhase(int phase)
         buttonList[i]->setActive(i == phase);
 }
 
+void PhasesToolbar::triggerPhaseAction(int phase)
+{
+    if (phase >= buttonList.size())
+        return;
+
+    if (phase < 0)
+        return;
+
+    buttonList[phase]->triggerDoubleClickAction();
+}
+
 void PhasesToolbar::phaseButtonClicked()
 {
     PhaseButton *button = qobject_cast<PhaseButton *>(sender());

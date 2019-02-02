@@ -209,6 +209,9 @@ void TabGame::refreshShortcuts()
     if (aNextPhase) {
         aNextPhase->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aNextPhase"));
     }
+    if (aNextPhaseAction) {
+        aNextPhaseAction->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aNextPhaseAction"));
+    }
     if (aNextTurn) {
         aNextTurn->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aNextTurn"));
     }
@@ -486,6 +489,9 @@ void TabGame::retranslateUi()
     if (aNextPhase) {
         aNextPhase->setText(tr("Next &phase"));
     }
+    if (aNextPhaseAction) {
+        aNextPhaseAction->setText(tr("Next phase with &action"));
+    }
     if (aNextTurn) {
         aNextTurn->setText(tr("Next &turn"));
     }
@@ -683,6 +689,24 @@ void TabGame::actNextPhase()
     Command_SetActivePhase cmd;
     cmd.set_phase(phase);
     sendGameCommand(cmd);
+}
+
+void TabGame::actNextPhaseAction()
+{
+    int phase = currentPhase;
+    if (++phase >= phasesToolbar->phaseCount())
+        phase = 0;
+
+    if (phase == 0) {
+        Command_NextTurn cmd;
+        sendGameCommand(cmd);
+    } else {
+        Command_SetActivePhase cmd;
+        cmd.set_phase(phase);
+        sendGameCommand(cmd);
+    }
+
+    phasesToolbar->triggerPhaseAction(phase);
 }
 
 void TabGame::actNextTurn()
@@ -1329,6 +1353,8 @@ void TabGame::createMenuItems()
 {
     aNextPhase = new QAction(this);
     connect(aNextPhase, SIGNAL(triggered()), this, SLOT(actNextPhase()));
+    aNextPhaseAction = new QAction(this);
+    connect(aNextPhaseAction, SIGNAL(triggered()), this, SLOT(actNextPhaseAction()));
     aNextTurn = new QAction(this);
     connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
     aRemoveLocalArrows = new QAction(this);
@@ -1355,6 +1381,7 @@ void TabGame::createMenuItems()
 
     phasesMenu->addSeparator();
     phasesMenu->addAction(aNextPhase);
+    phasesMenu->addAction(aNextPhaseAction);
 
     gameMenu = new QMenu(this);
     playersSeparator = gameMenu->addSeparator();
@@ -1374,6 +1401,7 @@ void TabGame::createMenuItems()
 void TabGame::createReplayMenuItems()
 {
     aNextPhase = 0;
+    aNextPhaseAction = 0;
     aNextTurn = 0;
     aRemoveLocalArrows = 0;
     aRotateViewCW = 0;

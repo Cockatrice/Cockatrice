@@ -82,6 +82,7 @@ public:
     QString getLongPhaseName(int phase) const;
 public slots:
     void setActivePhase(int phase);
+    void triggerPhaseAction(int phase);
 private slots:
     void phaseButtonClicked();
     void actNextTurn();

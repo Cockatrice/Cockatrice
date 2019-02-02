@@ -163,8 +163,8 @@ private:
     QAction *playersSeparator;
     QMenu *gameMenu, *phasesMenu, *viewMenu, *cardInfoDockMenu, *messageLayoutDockMenu, *playerListDockMenu,
         *replayDockMenu;
-    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextTurn, *aRemoveLocalArrows,
-        *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
+    QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextPhaseAction, *aNextTurn,
+        *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aMessageLayoutDockVisible, *aMessageLayoutDockFloating,
         *aPlayerListDockVisible, *aPlayerListDockFloating, *aReplayDockVisible, *aReplayDockFloating;
     QList<QAction *> phaseActions;
@@ -233,6 +233,7 @@ private slots:
     void actSay();
     void actPhaseAction();
     void actNextPhase();
+    void actNextPhaseAction();
     void actNextTurn();
 
     void addMentionTag(QString value);

@@ -246,6 +246,9 @@ public:
     SequenceEdit *TabGame_phase10;
     QLabel *lbl_TabGame_aNextTurn;
     SequenceEdit *TabGame_aNextPhase;
+    QLabel *lbl_TabGame_aNextPhaseAction;
+    SequenceEdit *TabGame_aNextPhaseAction;
+
     SequenceEdit *TabGame_aNextTurn;
     QGroupBox *groupBox_13;
     QGridLayout *gridLayout_13;
@@ -1249,6 +1252,11 @@ public:
 
         gridLayout_5->addWidget(lbl_TabGame_aNextPhase, 11, 0, 1, 1);
 
+        lbl_TabGame_aNextPhaseAction = new QLabel(groupBox_8);
+        lbl_TabGame_aNextPhaseAction->setObjectName("lbl_TabGame_aNextPhaseAction");
+
+        gridLayout_5->addWidget(lbl_TabGame_aNextPhaseAction, 12, 0, 1, 1);
+
         TabGame_phase10 = new SequenceEdit("Player/phase10", groupBox_8);
         TabGame_phase10->setObjectName("TabGame_phase10");
 
@@ -1257,17 +1265,22 @@ public:
         lbl_TabGame_aNextTurn = new QLabel(groupBox_8);
         lbl_TabGame_aNextTurn->setObjectName("lbl_TabGame_aNextTurn");
 
-        gridLayout_5->addWidget(lbl_TabGame_aNextTurn, 12, 0, 1, 1);
+        gridLayout_5->addWidget(lbl_TabGame_aNextTurn, 13, 0, 1, 1);
 
         TabGame_aNextPhase = new SequenceEdit("Player/aNextPhase", groupBox_8);
         TabGame_aNextPhase->setObjectName("TabGame_aNextPhase");
 
         gridLayout_5->addWidget(TabGame_aNextPhase, 11, 1, 1, 1);
 
+        TabGame_aNextPhaseAction = new SequenceEdit("Player/aNextPhaseAction", groupBox_8);
+        TabGame_aNextPhaseAction->setObjectName("TabGame_aaNextPhaseAction");
+
+        gridLayout_5->addWidget(TabGame_aNextPhaseAction, 12, 1, 1, 1);
+
         TabGame_aNextTurn = new SequenceEdit("Player/aNextTurn", groupBox_8);
         TabGame_aNextTurn->setObjectName("TabGame_aNextTurn");
 
-        gridLayout_5->addWidget(TabGame_aNextTurn, 12, 1, 1, 1);
+        gridLayout_5->addWidget(TabGame_aNextTurn, 13, 1, 1, 1);
 
         gridLayout_17->addWidget(groupBox_8, 0, 0, 1, 1);
 
@@ -1934,6 +1947,7 @@ public:
         lbl_TabGame_phase9->setText(QApplication::translate("shortcutsTab", "Main 2", 0));
         lbl_TabGame_phase10->setText(QApplication::translate("shortcutsTab", "End", 0));
         lbl_TabGame_aNextPhase->setText(QApplication::translate("shortcutsTab", "Next phase", 0));
+        lbl_TabGame_aNextPhaseAction->setText(QApplication::translate("shortcutsTab", "Next phase action", 0));
         lbl_TabGame_aNextTurn->setText(QApplication::translate("shortcutsTab", "Next turn", 0));
         groupBox_13->setTitle(QApplication::translate("shortcutsTab", "Playing Area", 0));
         lbl_Player_aTap->setText(QApplication::translate("shortcutsTab", "Tap / Untap Card", 0));

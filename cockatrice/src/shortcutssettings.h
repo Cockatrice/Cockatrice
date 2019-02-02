@@ -143,6 +143,7 @@ private:
         {"Player/aConcede", parseSequenceString("F2")},
         {"Player/aLeaveGame", parseSequenceString("Ctrl+Q")},
         {"Player/aNextPhase", parseSequenceString("Ctrl+Space;Tab")},
+        {"Player/aNextPhaseAction", parseSequenceString("Shift+Tab")},
         {"Player/aNextTurn", parseSequenceString("Ctrl+Return;Ctrl+Enter")},
         {"Player/aRemoveLocalArrows", parseSequenceString("Ctrl+R")},
         {"Player/aRotateViewCCW", parseSequenceString("")},
