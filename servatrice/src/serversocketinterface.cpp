@@ -1630,7 +1630,6 @@ bool TcpServerSocketInterface::initTcpSession()
     return true;
 }
 
-#ifdef QT_WEBSOCKETS_LIB
 WebsocketServerSocketInterface::WebsocketServerSocketInterface(Servatrice *_server,
                                                                Servatrice_DatabaseInterface *_databaseInterface,
                                                                QObject *parent)
@@ -1652,7 +1651,7 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 
     QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
     if (websocketIPHeader.length() > 0) {
-#if QT_VERSION > 0x050600
+#if QT_VERSION >= 0x050600
         if (socket->request().hasRawHeader(websocketIPHeader)) {
             QString header(socket->request().rawHeader(websocketIPHeader));
             QHostAddress parsed(header);
@@ -1765,5 +1764,3 @@ void WebsocketServerSocketInterface::binaryMessageReceived(const QByteArray &mes
 
     processCommandContainer(newCommandContainer);
 }
-
-#endif

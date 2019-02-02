@@ -152,7 +152,8 @@ ENDIF(APPLE)
 
 # Qt5
 find_package(Qt5 COMPONENTS Concurrent Multimedia Network PrintSupport Svg Widgets REQUIRED)
-set(COCKATRICE_QT_MODULES Qt5::Concurrent Qt5::Multimedia Qt5::Network Qt5::PrintSupport Qt5::Svg Qt5::Widgets)
+find_package(Qt5WebSockets REQUIRED)
+set(COCKATRICE_QT_MODULES Qt5::Concurrent Qt5::Multimedia Qt5::Network Qt5::PrintSupport Qt5::Svg Qt5::Widgets Qt5::WebSockets)
 
 # Qt5LinguistTools
 find_package(Qt5LinguistTools)
@@ -171,13 +172,6 @@ if(Qt5LinguistTools_FOUND)
     else()
         QT5_ADD_TRANSLATION(cockatrice_QM ${cockatrice_TS})
     endif()
-endif()
-
-find_package(Qt5WebSockets)
-if(Qt5WebSockets_FOUND)
-    list(APPEND COCKATRICE_QT_MODULES Qt5::WebSockets)
-else()
-    MESSAGE(WARNING "Qt5 websocket module not found")
 endif()
 
 QT5_ADD_RESOURCES(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
