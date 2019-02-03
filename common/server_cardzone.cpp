@@ -46,15 +46,15 @@ void Server_CardZone::shuffle(int start, int end)
     if (cards.size() < 2)
         return;
 
+    // Negative numbers signify positions starting at the end of the
+    // zone convert these to actual indexes.
     if (end < 0)
         end += cards.size();
 
     if (start < 0)
         start += cards.size();
 
-    if (start < 0)
-        return;
-    if (end < 0)
+    if (start < 0 || end < 0 || start >= cards.size() || end >= cards.size())
         return;
 
     for (int i = end; i > start; i--) {

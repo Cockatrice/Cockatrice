@@ -742,6 +742,8 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int
         return;
     }
 
+    // start and end are indexes into the portion of the deck that was shuffled
+    // with negitive numbers counging from the bottom up.
     if (start == 0 && end == -1) {
         appendHtmlServerMessage(tr("%1 shuffles %2.")
                                     .arg(sanitizeHtml(player->getName()))
