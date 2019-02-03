@@ -694,9 +694,10 @@ void TabGame::actNextPhase()
 
 void TabGame::actNextPhaseAction()
 {
-    int phase = currentPhase;
-    if (++phase >= phasesToolbar->phaseCount())
+    int phase = currentPhase + 1;
+    if (phase >= phasesToolbar->phaseCount()) {
         phase = 0;
+    }
 
     if (phase == 0) {
         Command_NextTurn cmd;
