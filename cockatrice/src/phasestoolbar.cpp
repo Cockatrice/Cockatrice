@@ -237,11 +237,9 @@ void PhasesToolbar::setActivePhase(int phase)
 
 void PhasesToolbar::triggerPhaseAction(int phase)
 {
-    if (!(0 <= phase && phase < buttonList.size())) {
-        return;
+    if (0 <= phase && phase < buttonList.size()) {
+        buttonList[phase]->triggerDoubleClickAction();
     }
-
-    buttonList[phase]->triggerDoubleClickAction();
 }
 
 void PhasesToolbar::phaseButtonClicked()
