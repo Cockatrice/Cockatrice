@@ -14,8 +14,6 @@
 #include <QPushButton>
 #include <QRadioButton>
 
-#define PUBLIC_SERVERS_URL "https://github.com/Cockatrice/Cockatrice/wiki/Public-Servers"
-
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
     previousHostButton = new QRadioButton(tr("Known Hosts"), this);

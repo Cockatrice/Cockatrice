@@ -359,7 +359,7 @@ void RemoteClient::connectToHost(const QString &hostname, unsigned int port)
 {
     usingWebSocket = port == 443 || port == 80 || port == 4748 || port == 8080;
     if (usingWebSocket) {
-        QUrl url(QString("%1://%2:%3").arg(port == 443 ? "wss" : "ws").arg(hostname).arg(port));
+        QUrl url(QString("%1://%2:%3/servatrice").arg(port == 443 ? "wss" : "ws").arg(hostname).arg(port));
         websocket->open(url);
     } else {
         socket->connectToHost(hostname, static_cast<quint16>(port));
