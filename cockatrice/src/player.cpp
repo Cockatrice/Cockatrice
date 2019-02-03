@@ -1940,7 +1940,7 @@ void Player::processGameEvent(GameEvent::GameEventType type, const GameEvent &ev
     }
 }
 
-void Player::setActivePlayer(bool _active)
+void Player::setActive(bool _active)
 {
     active = _active;
     table->setActive(active);

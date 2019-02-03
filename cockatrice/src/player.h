@@ -384,7 +384,7 @@ public:
     {
         return active;
     }
-    void setActivePlayer(bool _active);
+    void setActive(bool _active);
     void setShortcutsActive();
     void setShortcutsInactive();
     void updateZones();
