@@ -2052,14 +2052,21 @@ void Player::playCard(CardItem *card, bool faceDown, bool tapped)
     if (!info) {
         return;
     }
-    if (!faceDown && ((!settingsCache->getPlayToStack() && info->getTableRow() == 3) ||
-                      ((settingsCache->getPlayToStack() && info->getTableRow() != 0) &&
-                       card->getZone()->getName().toStdString() != "stack"))) {
+
+    int tableRow = info->getTableRow();
+    bool playToStack = settingsCache->getPlayToStack();
+    QString currentZone = card->getZone()->getName();
+    if (currentZone == "stack" && tableRow == 3) {
+        cmd.set_target_zone("grave");
+        cmd.set_x(0);
+        cmd.set_y(0);
+    } else if (!faceDown &&
+               ((!playToStack && tableRow == 3) || ((playToStack && tableRow != 0) && currentZone != "stack"))) {
         cmd.set_target_zone("stack");
         cmd.set_x(0);
         cmd.set_y(0);
     } else {
-        int tableRow = faceDown ? 2 : info->getTableRow();
+        tableRow = faceDown ? 2 : info->getTableRow();
         QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
         cardToMove->set_face_down(faceDown);
         cardToMove->set_pt(info->getPowTough().toStdString());
