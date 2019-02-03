@@ -7,17 +7,15 @@ RUN apt-get update && apt-get install -y\
   git\
   libprotobuf-dev\
   libqt5sql5-mysql\
+  libqt5websockets5-dev\
   protobuf-compiler\
   qt5-default\
   qtbase5-dev\
   qttools5-dev-tools\
-  qttools5-dev\
-  software-properties-common
+  qttools5-dev
 
 COPY . /home/servatrice/code/
 WORKDIR /home/servatrice/code
-
-RUN mkdir oracle
 
 WORKDIR build
 RUN cmake .. -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0 &&\
@@ -28,4 +26,4 @@ WORKDIR /home/servatrice
 
 EXPOSE 4747
 
-ENTRYPOINT [ "servatrice" ]
+CMD [ "servatrice", "--log-to-console" ]
