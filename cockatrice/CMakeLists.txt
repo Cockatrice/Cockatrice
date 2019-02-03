@@ -151,8 +151,8 @@ if(APPLE)
 ENDIF(APPLE)
 
 # Qt5
-find_package(Qt5 COMPONENTS Concurrent Multimedia Network PrintSupport Svg Widgets REQUIRED)
-set(COCKATRICE_QT_MODULES Qt5::Concurrent Qt5::Multimedia Qt5::Network Qt5::PrintSupport Qt5::Svg Qt5::Widgets)
+find_package(Qt5 COMPONENTS Concurrent Multimedia Network PrintSupport Svg WebSockets Widgets REQUIRED)
+set(COCKATRICE_QT_MODULES Qt5::Concurrent Qt5::Multimedia Qt5::Network Qt5::PrintSupport Qt5::Svg Qt5::Widgets Qt5::WebSockets)
 
 # Qt5LinguistTools
 find_package(Qt5LinguistTools)

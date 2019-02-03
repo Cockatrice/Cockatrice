@@ -1037,8 +1037,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         return Response::RespUserAlreadyExists;
     }
 
-    if (servatrice->getMaxAccountsPerEmail() &&
-        !(sqlInterface->checkNumberOfUserAccounts(emailAddress) < servatrice->getMaxAccountsPerEmail())) {
+    if (servatrice->getMaxAccountsPerEmail() > 0 &&
+        sqlInterface->checkNumberOfUserAccounts(emailAddress) >= servatrice->getMaxAccountsPerEmail()) {
         if (servatrice->getEnableRegistrationAudit())
             sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
                                          QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
@@ -1629,7 +1629,6 @@ bool TcpServerSocketInterface::initTcpSession()
     return true;
 }
 
-#ifdef QT_WEBSOCKETS_LIB
 WebsocketServerSocketInterface::WebsocketServerSocketInterface(Servatrice *_server,
                                                                Servatrice_DatabaseInterface *_databaseInterface,
                                                                QObject *parent)
@@ -1647,6 +1646,22 @@ WebsocketServerSocketInterface::~WebsocketServerSocketInterface()
 void WebsocketServerSocketInterface::initConnection(void *_socket)
 {
     socket = (QWebSocket *)_socket;
+    address = socket->peerAddress();
+
+    QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
+    if (websocketIPHeader.length() > 0) {
+#if QT_VERSION >= 0x050600
+        if (socket->request().hasRawHeader(websocketIPHeader)) {
+            QString header(socket->request().rawHeader(websocketIPHeader));
+            QHostAddress parsed(header);
+            if (!parsed.isNull())
+                address = parsed;
+        }
+#else
+        logger->logMessage(QString("Reading the websocket IP header is unsupported on this version of QT."));
+#endif
+    }
+
     connect(socket, SIGNAL(binaryMessageReceived(const QByteArray &)), this,
             SLOT(binaryMessageReceived(const QByteArray &)));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
@@ -1656,7 +1671,9 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
     // Otherwise, in case a of a socket error, it could be removed from the list before it is added.
     server->addClient(this);
 
-    logger->logMessage(QString("Incoming websocket connection: %1").arg(socket->peerAddress().toString()), this);
+    logger->logMessage(
+        QString("Incoming websocket connection: %1 (%2)").arg(address.toString()).arg(socket->peerAddress().toString()),
+        this);
 
     if (!initWebsocketSession())
         prepareDestroy();
@@ -1746,5 +1763,3 @@ void WebsocketServerSocketInterface::binaryMessageReceived(const QByteArray &mes
 
     processCommandContainer(newCommandContainer);
 }
-
-#endif

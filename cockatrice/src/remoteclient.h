@@ -3,6 +3,7 @@
 
 #include "abstractclient.h"
 #include <QTcpSocket>
+#include <QWebSocket>
 
 class QTimer;
 
@@ -17,7 +18,6 @@ signals:
     void activateError();
     void socketError(const QString &errorString);
     void protocolVersionMismatch(int clientVersion, int serverVersion);
-    void protocolError();
     void
     sigConnectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
     void sigRegisterToServer(const QString &hostname,
@@ -25,7 +25,7 @@ signals:
                              const QString &_userName,
                              const QString &_password,
                              const QString &_email,
-                             const int _gender,
+                             int _gender,
                              const QString &_country,
                              const QString &_realname);
     void sigActivateToServer(const QString &_token);
@@ -48,7 +48,9 @@ signals:
 private slots:
     void slotConnected();
     void readData();
+    void websocketMessageReceived(const QByteArray &message);
     void slotSocketError(QAbstractSocket::SocketError error);
+    void slotWebSocketError(QAbstractSocket::SocketError error);
     void ping();
     void processServerIdentificationEvent(const Event_ServerIdentification &event);
     void processConnectionClosedEvent(const Event_ConnectionClosed &event);
@@ -62,7 +64,7 @@ private slots:
                             const QString &_userName,
                             const QString &_password,
                             const QString &_email,
-                            const int _gender,
+                            int _gender,
                             const QString &_country,
                             const QString &_realname);
     void doLogin();
@@ -85,28 +87,35 @@ private slots:
 private:
     static const int maxTimeout = 10;
     int timeRunning, lastDataReceived;
-
     QByteArray inputBuffer;
     bool messageInProgress;
     bool handshakeStarted;
-    bool newMissingFeatureFound(QString _serversMissingFeatures);
-    void clearNewClientFeatures();
+    bool usingWebSocket;
     int messageLength;
-
     QTimer *timer;
     QTcpSocket *socket;
+    QWebSocket *websocket;
     QString lastHostname;
     int lastPort;
-    QString getSrvClientID(const QString _hostname);
+
+    QString getSrvClientID(QString _hostname);
+    bool newMissingFeatureFound(QString _serversMissingFeatures);
+    void clearNewClientFeatures();
+    void connectToHost(const QString &hostname, unsigned int port);
+
 protected slots:
-    void sendCommandContainer(const CommandContainer &cont);
+    void sendCommandContainer(const CommandContainer &cont) override;
 
 public:
-    RemoteClient(QObject *parent = 0);
-    ~RemoteClient();
+    explicit RemoteClient(QObject *parent = nullptr);
+    ~RemoteClient() override;
     QString peerName() const
     {
-        return socket->peerName();
+        if (usingWebSocket) {
+            return websocket->peerName();
+        } else {
+            return socket->peerName();
+        }
     }
     void
     connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
@@ -115,7 +124,7 @@ public:
                           const QString &_userName,
                           const QString &_password,
                           const QString &_email,
-                          const int _gender,
+                          int _gender,
                           const QString &_country,
                           const QString &_realname);
     void activateToServer(const QString &_token);

@@ -104,7 +104,6 @@ Servatrice_ConnectionPool *Servatrice_GameServer::findLeastUsedConnectionPool()
     return connectionPools[poolIndex];
 }
 
-#ifdef QT_WEBSOCKETS_LIB
 #define WEBSOCKET_POOL_NUMBER 999
 
 Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_server,
@@ -163,7 +162,6 @@ Servatrice_ConnectionPool *Servatrice_WebsocketGameServer::findLeastUsedConnecti
     qDebug() << "Pool utilisation:" << debugStr;
     return connectionPools[poolIndex];
 }
-#endif
 
 void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 {
@@ -431,7 +429,6 @@ bool Servatrice::initServer()
         }
     }
 
-#ifdef QT_WEBSOCKETS_LIB
     // WEBSOCKET SERVER
     if (getNumberOfWebSocketPools() > 0) {
         websocketGameServer = new Servatrice_WebsocketGameServer(this, getNumberOfWebSocketPools(),
@@ -447,7 +444,6 @@ bool Servatrice::initServer()
             return false;
         }
     }
-#endif
 
     if (getIdleClientTimeout() > 0) {
         qDebug() << "Idle client timeout value: " << getIdleClientTimeout();

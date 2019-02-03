@@ -20,13 +20,11 @@
 #ifndef SERVERSOCKETINTERFACE_H
 #define SERVERSOCKETINTERFACE_H
 
-#include <QTcpSocket>
-#ifdef QT_WEBSOCKETS_LIB
-#include <QWebSocket>
-#endif
 #include "server_protocolhandler.h"
 #include <QHostAddress>
 #include <QMutex>
+#include <QTcpSocket>
+#include <QWebSocket>
 
 class Servatrice;
 class Servatrice_DatabaseInterface;
@@ -181,7 +179,6 @@ public slots:
     void initConnection(int socketDescriptor);
 };
 
-#ifdef QT_WEBSOCKETS_LIB
 class WebsocketServerSocketInterface : public AbstractServerSocketInterface
 {
     Q_OBJECT
@@ -193,11 +190,11 @@ public:
 
     QHostAddress getPeerAddress() const
     {
-        return socket->peerAddress();
+        return address;
     }
     QString getAddress() const
     {
-        return socket->peerAddress().toString();
+        return address.toString();
     }
     QString getConnectionType() const
     {
@@ -206,6 +203,7 @@ public:
 
 private:
     QWebSocket *socket;
+    QHostAddress address;
 
 protected:
     void writeToSocket(QByteArray &data)
@@ -223,6 +221,5 @@ protected slots:
 public slots:
     void initConnection(void *_socket);
 };
-#endif
 
 #endif
