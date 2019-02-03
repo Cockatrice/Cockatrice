@@ -38,7 +38,7 @@ public:
                          bool _highlightable = true);
     QRectF boundingRect() const override;
     void setWidth(double _width);
-    void setButtonActive(bool _active);
+    void setActive(bool _active);
     bool getActive() const
     {
         return active;

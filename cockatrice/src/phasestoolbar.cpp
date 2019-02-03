@@ -65,7 +65,7 @@ void PhaseButton::setWidth(double _width)
     width = _width;
 }
 
-void PhaseButton::setButtonActive(bool _active)
+void PhaseButton::setActive(bool _active)
 {
     if ((active == _active) || !highlightable)
         return;
@@ -232,7 +232,7 @@ void PhasesToolbar::setActivePhase(int phase)
         return;
 
     for (int i = 0; i < buttonList.size(); ++i)
-        buttonList[i]->setButtonActive(i == phase);
+        buttonList[i]->setActive(i == phase);
 }
 
 void PhasesToolbar::triggerPhaseAction(int phase)
