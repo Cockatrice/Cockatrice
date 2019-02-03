@@ -43,10 +43,8 @@ if(APPLE)
 ENDIF(APPLE)
 
 # Qt5
-find_package(Qt5 COMPONENTS Network Sql REQUIRED)
-find_package(Qt5WebSockets REQUIRED)
+find_package(Qt5 COMPONENTS Network Sql WebSockets REQUIRED)
 set(SERVATRICE_QT_MODULES Qt5::Core Qt5::Network Qt5::Sql Qt5::WebSockets)
-
 
 QT5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
 SET(QT_DONT_USE_QTGUI TRUE)
