@@ -57,7 +57,7 @@ public:
         return cards;
     }
     int removeCard(Server_Card *card);
-    Server_Card *getCard(int id, int *position = NULL, bool remove = false);
+    Server_Card *getCard(int id, int *position = nullptr, bool remove = false);
 
     int getCardsBeingLookedAt() const
     {
