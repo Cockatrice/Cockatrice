@@ -2066,7 +2066,7 @@ void Player::playCard(CardItem *card, bool faceDown, bool tapped)
         cmd.set_x(0);
         cmd.set_y(0);
     } else {
-        int tableRow = faceDown ? 2 : info->getTableRow();
+        tableRow = faceDown ? 2 : info->getTableRow();
         QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
         cardToMove->set_face_down(faceDown);
         cardToMove->set_pt(info->getPowTough().toStdString());

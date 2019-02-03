@@ -40,7 +40,7 @@ class CommandContainer;
 class GameCommand;
 class GameEvent;
 class GameEventContext;
-class Event_ConnectionStateChanged;
+// class Event_ConnectionStateChanged;
 class Event_GameSay;
 class Event_Shuffle;
 class Event_RollDie;
@@ -265,7 +265,7 @@ private:
 
     void initSayMenu();
 
-    void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
+    // void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
     void eventGameSay(const Event_GameSay &event);
     void eventShuffle(const Event_Shuffle &event);
     void eventRollDie(const Event_RollDie &event);
