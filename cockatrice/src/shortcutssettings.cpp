@@ -86,8 +86,8 @@ QString ShortcutsSettings::getShortcutString(const QString &name) const
 QString ShortcutsSettings::stringifySequence(const QList<QKeySequence> &Sequence) const
 {
     QStringList stringSequence;
-    for (int i = 0; i < Sequence.size(); ++i) {
-        stringSequence.append(Sequence.at(i).toString(QKeySequence::PortableText));
+    for (const auto &i : Sequence) {
+        stringSequence.append(i.toString(QKeySequence::PortableText));
     }
 
     return stringSequence.join(sep);

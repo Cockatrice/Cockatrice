@@ -95,7 +95,7 @@ void ToggleButton::setState(bool _state)
 }
 
 DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
-    : QWidget(0), parentGame(parent), playerId(_playerId)
+    : QWidget(nullptr), parentGame(parent), playerId(_playerId)
 {
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
@@ -112,7 +112,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     connect(sideboardLockButton, SIGNAL(clicked()), this, SLOT(sideboardLockButtonClicked()));
     connect(sideboardLockButton, SIGNAL(stateChanged()), this, SLOT(updateSideboardLockButtonText()));
 
-    QHBoxLayout *buttonHBox = new QHBoxLayout;
+    auto *buttonHBox = new QHBoxLayout;
     buttonHBox->addWidget(loadLocalButton);
     buttonHBox->addWidget(loadRemoteButton);
     buttonHBox->addWidget(readyStartButton);
@@ -123,7 +123,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
     connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
 
-    QVBoxLayout *deckViewLayout = new QVBoxLayout;
+    auto *deckViewLayout = new QVBoxLayout;
     deckViewLayout->addLayout(buttonHBox);
     deckViewLayout->addWidget(deckView);
     deckViewLayout->setContentsMargins(0, 0, 0, 0);
@@ -208,6 +208,9 @@ void TabGame::refreshShortcuts()
 
     if (aNextPhase) {
         aNextPhase->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aNextPhase"));
+    }
+    if (aNextPhaseAction) {
+        aNextPhaseAction->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aNextPhaseAction"));
     }
     if (aNextTurn) {
         aNextTurn->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aNextTurn"));
@@ -299,8 +302,8 @@ void DeckViewContainer::sideboardPlanChanged()
 {
     Command_SetSideboardPlan cmd;
     const QList<MoveCard_ToZone> &newPlan = deckView->getSideboardPlan();
-    for (int i = 0; i < newPlan.size(); ++i)
-        cmd.add_move_list()->CopyFrom(newPlan.at(i));
+    for (const auto &i : newPlan)
+        cmd.add_move_list()->CopyFrom(i);
     parentGame->sendGameCommand(cmd, playerId);
 }
 
@@ -330,7 +333,8 @@ void DeckViewContainer::setDeck(const DeckLoader &deck)
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), secondsElapsed(0), hostId(-1), localPlayerId(-1),
       isLocalGame(_tabSupervisor->getIsLocalGame()), spectator(true), gameStateKnown(false), resuming(false),
-      currentPhase(-1), activeCard(0), gameClosed(false), replay(_replay), currentReplayStep(0), sayLabel(0), sayEdit(0)
+      currentPhase(-1), activeCard(nullptr), gameClosed(false), replay(_replay), currentReplayStep(0),
+      sayLabel(nullptr), sayEdit(nullptr)
 {
     // THIS CTOR IS USED ON REPLAY
     gameInfo.CopyFrom(replay->game_info());
@@ -389,8 +393,8 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
                  const QMap<int, QString> &_roomGameTypes)
     : Tab(_tabSupervisor), clients(_clients), gameInfo(event.game_info()), roomGameTypes(_roomGameTypes),
       hostId(event.host_id()), localPlayerId(event.player_id()), isLocalGame(_tabSupervisor->getIsLocalGame()),
-      spectator(event.spectator()), gameStateKnown(false), resuming(event.resuming()), currentPhase(-1), activeCard(0),
-      gameClosed(false), replay(0), replayDock(0)
+      spectator(event.spectator()), gameStateKnown(false), resuming(event.resuming()), currentPhase(-1),
+      activeCard(nullptr), gameClosed(false), replay(nullptr), replayDock(nullptr)
 {
     // THIS CTOR IS USED ON GAMES
     gameInfo.set_started(false);
@@ -486,6 +490,9 @@ void TabGame::retranslateUi()
     if (aNextPhase) {
         aNextPhase->setText(tr("Next &phase"));
     }
+    if (aNextPhaseAction) {
+        aNextPhaseAction->setText(tr("Next phase with &action"));
+    }
     if (aNextTurn) {
         aNextTurn->setText(tr("Next &turn"));
     }
@@ -554,7 +561,7 @@ void TabGame::closeRequest()
 
 void TabGame::replayNextEvent()
 {
-    processGameEventContainer(replay->event_list(timelineWidget->getCurrentEvent()), 0);
+    processGameEventContainer(replay->event_list(timelineWidget->getCurrentEvent()), nullptr);
 }
 
 void TabGame::replayFinished()
@@ -671,7 +678,7 @@ void TabGame::actPhaseAction()
 {
     int phase = phaseActions.indexOf(static_cast<QAction *>(sender()));
     Command_SetActivePhase cmd;
-    cmd.set_phase(phase);
+    cmd.set_phase(static_cast<google::protobuf::uint32>(phase));
     sendGameCommand(cmd);
 }
 
@@ -681,8 +688,27 @@ void TabGame::actNextPhase()
     if (++phase >= phasesToolbar->phaseCount())
         phase = 0;
     Command_SetActivePhase cmd;
-    cmd.set_phase(phase);
+    cmd.set_phase(static_cast<google::protobuf::uint32>(phase));
     sendGameCommand(cmd);
+}
+
+void TabGame::actNextPhaseAction()
+{
+    int phase = currentPhase + 1;
+    if (phase >= phasesToolbar->phaseCount()) {
+        phase = 0;
+    }
+
+    if (phase == 0) {
+        Command_NextTurn cmd;
+        sendGameCommand(cmd);
+    } else {
+        Command_SetActivePhase cmd;
+        cmd.set_phase(static_cast<google::protobuf::uint32>(phase));
+        sendGameCommand(cmd);
+    }
+
+    phasesToolbar->triggerPhaseAction(phase);
 }
 
 void TabGame::actNextTurn()
@@ -725,7 +751,7 @@ void TabGame::actCompleterChanged()
 Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
 {
     bool local = ((clients.size() > 1) || (playerId == localPlayerId));
-    Player *newPlayer = new Player(info, playerId, local, this);
+    auto *newPlayer = new Player(info, playerId, local, this);
     connect(newPlayer, SIGNAL(openDeckEditor(const DeckLoader *)), this, SIGNAL(openDeckEditor(const DeckLoader *)));
     QString newPlayerName = "@" + newPlayer->getName();
     if (sayEdit && !autocompleteUserList.contains(newPlayerName)) {
@@ -741,7 +767,7 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
         if (clients.size() == 1)
             newPlayer->setShortcutsActive();
 
-        DeckViewContainer *deckView = new DeckViewContainer(playerId, this);
+        auto *deckView = new DeckViewContainer(playerId, this);
         connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
         deckViewContainers.insert(playerId, deckView);
         deckViewContainerLayout->addWidget(deckView);
@@ -762,7 +788,7 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
     for (int i = 0; i < eventListSize; ++i) {
         const GameEvent &event = cont.event_list(i);
         const int playerId = event.player_id();
-        const GameEvent::GameEventType eventType = static_cast<GameEvent::GameEventType>(getPbExtension(event));
+        const auto eventType = static_cast<GameEvent::GameEventType>(getPbExtension(event));
         if (spectators.contains(playerId)) {
             switch (eventType) {
                 case GameEvent::GAME_SAY:
@@ -834,7 +860,7 @@ AbstractClient *TabGame::getClientForPlayer(int playerId) const
 
         return clients.at(playerId);
     } else if (clients.isEmpty())
-        return 0;
+        return nullptr;
     else
         return clients.first();
 }
@@ -871,7 +897,7 @@ void TabGame::commandFinished(const Response &response)
 PendingCommand *TabGame::prepareGameCommand(const ::google::protobuf::Message &cmd)
 {
     CommandContainer cont;
-    cont.set_game_id(gameInfo.game_id());
+    cont.set_game_id(static_cast<google::protobuf::uint32>(gameInfo.game_id()));
     GameCommand *c = cont.add_game_command();
     c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
     return new PendingCommand(cont);
@@ -880,13 +906,11 @@ PendingCommand *TabGame::prepareGameCommand(const ::google::protobuf::Message &c
 PendingCommand *TabGame::prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList)
 {
     CommandContainer cont;
-    cont.set_game_id(gameInfo.game_id());
-    for (int i = 0; i < cmdList.size(); ++i) {
+    cont.set_game_id(static_cast<google::protobuf::uint32>(gameInfo.game_id()));
+    for (auto i : cmdList) {
         GameCommand *c = cont.add_game_command();
-        c->GetReflection()
-            ->MutableMessage(c, cmdList[i]->GetDescriptor()->FindExtensionByName("ext"))
-            ->CopyFrom(*cmdList[i]);
-        delete cmdList[i];
+        c->GetReflection()->MutableMessage(c, i->GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(*i);
+        delete i;
     }
     return new PendingCommand(cont);
 }
@@ -1040,8 +1064,7 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
     const ServerInfo_PlayerProperties &prop = event.player_properties();
     playerListWidget->updatePlayerProperties(prop, eventPlayerId);
 
-    const GameEventContext::ContextType contextType =
-        static_cast<GameEventContext::ContextType>(getPbExtension(context));
+    const auto contextType = static_cast<GameEventContext::ContextType>(getPbExtension(context));
     switch (contextType) {
         case GameEventContext::READY_START: {
             bool ready = prop.ready_start();
@@ -1195,7 +1218,7 @@ Player *TabGame::setActivePlayer(int id)
 {
     Player *player = players.value(id, 0);
     if (!player)
-        return 0;
+        return nullptr;
     activePlayer = id;
     playerListWidget->setActivePlayer(id);
     QMapIterator<int, Player *> i(players);
@@ -1259,11 +1282,11 @@ CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) co
 {
     Player *player = players.value(playerId, 0);
     if (!player)
-        return 0;
+        return nullptr;
 
     CardZone *zone = player->getZones().value(zoneName, 0);
     if (!zone)
-        return 0;
+        return nullptr;
 
     return zone->getCard(cardId, QString());
 }
@@ -1271,7 +1294,7 @@ CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) co
 QString TabGame::getTabText() const
 {
     QString gameTypeInfo;
-    if (gameTypes.size() != 0) {
+    if (!gameTypes.empty()) {
         gameTypeInfo = gameTypes.at(0);
         if (gameTypes.size() > 1)
             gameTypeInfo.append("...");
@@ -1312,7 +1335,7 @@ Player *TabGame::getActiveLocalPlayer() const
             return temp;
     }
 
-    return 0;
+    return nullptr;
 }
 
 void TabGame::updateCardMenu(AbstractCardItem *card)
@@ -1329,6 +1352,8 @@ void TabGame::createMenuItems()
 {
     aNextPhase = new QAction(this);
     connect(aNextPhase, SIGNAL(triggered()), this, SLOT(actNextPhase()));
+    aNextPhaseAction = new QAction(this);
+    connect(aNextPhaseAction, SIGNAL(triggered()), this, SLOT(actNextPhaseAction()));
     aNextTurn = new QAction(this);
     connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
     aRemoveLocalArrows = new QAction(this);
@@ -1343,7 +1368,7 @@ void TabGame::createMenuItems()
     connect(aConcede, SIGNAL(triggered()), this, SLOT(actConcede()));
     aLeaveGame = new QAction(this);
     connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
-    aCloseReplay = 0;
+    aCloseReplay = nullptr;
 
     phasesMenu = new QMenu(this);
     for (int i = 0; i < phasesToolbar->phaseCount(); ++i) {
@@ -1355,6 +1380,7 @@ void TabGame::createMenuItems()
 
     phasesMenu->addSeparator();
     phasesMenu->addAction(aNextPhase);
+    phasesMenu->addAction(aNextPhaseAction);
 
     gameMenu = new QMenu(this);
     playersSeparator = gameMenu->addSeparator();
@@ -1373,19 +1399,20 @@ void TabGame::createMenuItems()
 
 void TabGame::createReplayMenuItems()
 {
-    aNextPhase = 0;
-    aNextTurn = 0;
-    aRemoveLocalArrows = 0;
-    aRotateViewCW = 0;
-    aRotateViewCCW = 0;
-    aResetLayout = 0;
-    aGameInfo = 0;
-    aConcede = 0;
-    aLeaveGame = 0;
+    aNextPhase = nullptr;
+    aNextPhaseAction = nullptr;
+    aNextTurn = nullptr;
+    aRemoveLocalArrows = nullptr;
+    aRotateViewCW = nullptr;
+    aRotateViewCCW = nullptr;
+    aResetLayout = nullptr;
+    aGameInfo = nullptr;
+    aConcede = nullptr;
+    aLeaveGame = nullptr;
     aCloseReplay = new QAction(this);
     connect(aCloseReplay, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
 
-    phasesMenu = 0;
+    phasesMenu = nullptr;
     gameMenu = new QMenu(this);
     gameMenu->addAction(aCloseReplay);
     addTabMenu(gameMenu);
@@ -1659,7 +1686,7 @@ void TabGame::createCardInfoDock(bool bReplay)
 void TabGame::createPlayerListDock(bool bReplay)
 {
     if (bReplay) {
-        playerListWidget = new PlayerListWidget(0, 0, this);
+        playerListWidget = new PlayerListWidget(nullptr, nullptr, this);
     } else {
         playerListWidget = new PlayerListWidget(tabSupervisor, clients.first(), this);
         connect(playerListWidget, SIGNAL(openMessageDialog(QString, bool)), this,
