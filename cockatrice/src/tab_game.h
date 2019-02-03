@@ -247,7 +247,7 @@ private slots:
     void actResetLayout();
     void freeDocksSize();
 
-    bool eventFilter(QObject *o, QEvent *e);
+    bool eventFilter(QObject *o, QEvent *e) override;
     void dockVisibleTriggered();
     void dockFloatingTriggered();
     void dockTopLevelChanged(bool topLevel);
@@ -258,10 +258,10 @@ public:
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
-    ~TabGame();
-    void retranslateUi();
+    ~TabGame() override;
+    void retranslateUi() override;
     void updatePlayerListDockTitle();
-    void closeRequest();
+    void closeRequest() override;
     const QMap<int, Player *> &getPlayers() const
     {
         return players;
@@ -279,7 +279,7 @@ public:
     {
         return gameInfo.game_id();
     }
-    QString getTabText() const;
+    QString getTabText() const override;
     bool getSpectator() const
     {
         return spectator;

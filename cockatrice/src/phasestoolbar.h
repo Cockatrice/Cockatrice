@@ -27,18 +27,18 @@ private:
     QAction *doubleClickAction;
     double width;
 
-    void updatePixmap(QPixmap &pixmap);
+    // void updatePixmap(QPixmap &pixmap);
 private slots:
     void updateAnimation();
 
 public:
-    PhaseButton(const QString &_name,
-                QGraphicsItem *parent = 0,
-                QAction *_doubleClickAction = 0,
-                bool _highlightable = true);
-    QRectF boundingRect() const;
+    explicit PhaseButton(const QString &_name,
+                         QGraphicsItem *parent = nullptr,
+                         QAction *_doubleClickAction = nullptr,
+                         bool _highlightable = true);
+    QRectF boundingRect() const override;
     void setWidth(double _width);
-    void setActive(bool _active);
+    void setButtonActive(bool _active);
     bool getActive() const
     {
         return active;
@@ -48,9 +48,9 @@ signals:
     void clicked();
 
 protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 class PhasesToolbar : public QObject, public QGraphicsItem
@@ -67,8 +67,8 @@ private:
     void rearrangeButtons();
 
 public:
-    PhasesToolbar(QGraphicsItem *parent = 0);
-    QRectF boundingRect() const;
+    explicit PhasesToolbar(QGraphicsItem *parent = nullptr);
+    QRectF boundingRect() const override;
     void retranslateUi();
     void setHeight(double _height);
     double getWidth() const
@@ -92,7 +92,7 @@ signals:
     void sendGameCommand(const ::google::protobuf::Message &command, int playerId);
 
 protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) override;
 };
 
 #endif
