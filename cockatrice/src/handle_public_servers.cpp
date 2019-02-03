@@ -71,6 +71,10 @@ void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMa
         QString serverPort = serverMap["port"].toString();
         QString serverSite = serverMap["site"].toString();
 
+        if (serverMap.contains("websocketPort")) {
+            serverPort = serverMap["websocketPort"].toString();
+        }
+
         bool serverFound = false;
         for (const auto &iter : savedHostList) {
             // If the URL/IP matches
