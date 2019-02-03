@@ -1842,21 +1842,17 @@ public:
         lbl_MainWindow_aRegister->setText(QApplication::translate("shortcutsTab", "Register"));
         lbl_MainWindow_aFullScreen->setText(QApplication::translate("shortcutsTab", "Full screen"));
         lbl_MainWindow_aSettings->setText(QApplication::translate("shortcutsTab", "Settings"));
-        lbl_MainWindow_aCheckCardUpdates->setText(
-            QApplication::translate("shortcutsTab", "Check for card updates"));
+        lbl_MainWindow_aCheckCardUpdates->setText(QApplication::translate("shortcutsTab", "Check for card updates"));
         lbl_MainWindow_aDisconnect->setText(QApplication::translate("shortcutsTab", "Disconnect"));
         lbl_MainWindow_aExit->setText(QApplication::translate("shortcutsTab", "Exit"));
         groupBox_2->setTitle(QApplication::translate("shortcutsTab", "Deck Editor"));
         lbl_TabDeckEditor_aAnalyzeDeck->setText(QApplication::translate("shortcutsTab", "Analyze deck"));
         lbl_TabDeckEditor_aLoadDeckFromClipboard->setText(
             QApplication::translate("shortcutsTab", "Load deck (clipboard)"));
-        lbl_TabDeckEditor_aClearFilterAll->setText(
-            QApplication::translate("shortcutsTab", "Clear all filters"));
+        lbl_TabDeckEditor_aClearFilterAll->setText(QApplication::translate("shortcutsTab", "Clear all filters"));
         lbl_TabDeckEditor_aNewDeck->setText(QApplication::translate("shortcutsTab", "New deck"));
-        lbl_TabDeckEditor_aClearFilterOne->setText(
-            QApplication::translate("shortcutsTab", "Clear selected filter"));
-        lbl_TabDeckEditor_aOpenCustomFolder->setText(
-            QApplication::translate("shortcutsTab", "Open custom pic folder"));
+        lbl_TabDeckEditor_aClearFilterOne->setText(QApplication::translate("shortcutsTab", "Clear selected filter"));
+        lbl_TabDeckEditor_aOpenCustomFolder->setText(QApplication::translate("shortcutsTab", "Open custom pic folder"));
         lbl_TabDeckEditor_aClose->setText(QApplication::translate("shortcutsTab", "Close"));
         lbl_TabDeckEditor_aPrintDeck->setText(QApplication::translate("shortcutsTab", "Print deck"));
         lbl_TabDeckEditor_aManageSets->setText(QApplication::translate("shortcutsTab", "Manage sets"));
@@ -1869,8 +1865,7 @@ public:
         lbl_TabDeckEditor_aDecrement->setText(QApplication::translate("shortcutsTab", "Remove card"));
         lbl_TabDeckEditor_aSaveDeckAs->setText(QApplication::translate("shortcutsTab", "Save deck as"));
         lbl_TabDeckEditor_aLoadDeck->setText(QApplication::translate("shortcutsTab", "Load deck"));
-        lbl_TabDeckEditor_aSaveDeckToClipboard->setText(
-            QApplication::translate("shortcutsTab", "Save deck (clip)"));
+        lbl_TabDeckEditor_aSaveDeckToClipboard->setText(QApplication::translate("shortcutsTab", "Save deck (clip)"));
         lbl_TabDeckEditor_aSaveDeckToClipboardRaw->setText(
             QApplication::translate("shortcutsTab", "Save deck (clip; no annotations)"));
         groupBox_3->setTitle(QApplication::translate("shortcutsTab", "Counters"));
@@ -1963,10 +1958,8 @@ public:
         lbl_Player_aUnattach->setText(QApplication::translate("shortcutsTab", "Unattach card"));
         lbl_Player_aClone->setText(QApplication::translate("shortcutsTab", "Clone card"));
         lbl_Player_aCreateToken->setText(QApplication::translate("shortcutsTab", "Create token"));
-        lbl_Player_aCreateRelatedTokens->setText(
-            QApplication::translate("shortcutsTab", "Create all related tokens"));
-        lbl_Player_aCreateAnotherToken->setText(
-            QApplication::translate("shortcutsTab", "Create another token"));
+        lbl_Player_aCreateRelatedTokens->setText(QApplication::translate("shortcutsTab", "Create all related tokens"));
+        lbl_Player_aCreateAnotherToken->setText(QApplication::translate("shortcutsTab", "Create another token"));
         lbl_Player_aSetAnnotation->setText(QApplication::translate("shortcutsTab", "Set annotation"));
         tabWidget->setTabText(tabWidget->indexOf(tab_2),
                               QApplication::translate("shortcutsTab", "Phases | P/T | Playing Area"));
@@ -1983,24 +1976,19 @@ public:
         lbl_Player_aViewTopCards->setText(QApplication::translate("shortcutsTab", "Top cards of library"));
         lbl_Player_aViewSideboard->setText(QApplication::translate("shortcutsTab", "Sideboard"));
         lbl_Player_aViewRfg->setText(QApplication::translate("shortcutsTab", "Exile"));
-        lbl_GameView_aCloseMostRecentZoneView->setText(
-            QApplication::translate("shortcutsTab", "Close recent view"));
+        lbl_GameView_aCloseMostRecentZoneView->setText(QApplication::translate("shortcutsTab", "Close recent view"));
         groupBox_moveDeck->setTitle(QApplication::translate("shortcutsTab", "Move top card to"));
         lbl_Player_aMoveTopCardToGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard Once"));
-        lbl_Player_aMoveTopCardsToGraveyard->setText(
-            QApplication::translate("shortcutsTab", "Graveyard Multiple"));
+        lbl_Player_aMoveTopCardsToGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard Multiple"));
         lbl_Player_aMoveTopCardToExile->setText(QApplication::translate("shortcutsTab", "Exile Once"));
         lbl_Player_aMoveTopCardsToExile->setText(QApplication::translate("shortcutsTab", "Exile Multiple"));
         groupBox_gameLobby->setTitle(QApplication::translate("shortcutsTab", "Game Lobby"));
-        lbl_DeckViewContainer_loadRemoteButton->setText(
-            QApplication::translate("shortcutsTab", "Load remote deck"));
-        lbl_DeckViewContainer_loadLocalButton->setText(
-            QApplication::translate("shortcutsTab", "Load local deck"));
+        lbl_DeckViewContainer_loadRemoteButton->setText(QApplication::translate("shortcutsTab", "Load remote deck"));
+        lbl_DeckViewContainer_loadLocalButton->setText(QApplication::translate("shortcutsTab", "Load local deck"));
         groupBox_gameplay->setTitle(QApplication::translate("shortcutsTab", "Gameplay"));
         lbl_Player_aDrawArrow->setText(QApplication::translate("shortcutsTab", "Draw arrow"));
         lbl_TabGame_aLeaveGame->setText(QApplication::translate("shortcutsTab", "Leave game"));
-        lbl_TabGame_aRemoveLocalArrows->setText(
-            QApplication::translate("shortcutsTab", "Remove local arrows"));
+        lbl_TabGame_aRemoveLocalArrows->setText(QApplication::translate("shortcutsTab", "Remove local arrows"));
         lbl_TabGame_aConcede->setText(QApplication::translate("shortcutsTab", "Concede"));
         lbl_Player_aRollDie->setText(QApplication::translate("shortcutsTab", "Roll dice"));
         lbl_TabGame_aRotateViewCW->setText(QApplication::translate("shortcutsTab", "Rotate view CW"));
@@ -2011,8 +1999,7 @@ public:
         lbl_Player_aDrawCard->setText(QApplication::translate("shortcutsTab", "Draw card"));
         lbl_Player_aDrawCards->setText(QApplication::translate("shortcutsTab", "Draw cards"));
         lbl_Player_aUndoDraw->setText(QApplication::translate("shortcutsTab", "Undo draw"));
-        lbl_Player_aAlwaysRevealTopCard->setText(
-            QApplication::translate("shortcutsTab", "Always reveal top card"));
+        lbl_Player_aAlwaysRevealTopCard->setText(QApplication::translate("shortcutsTab", "Always reveal top card"));
         tabWidget->setTabText(tabWidget->indexOf(tab_3),
                               QApplication::translate("shortcutsTab", "Gameplay | Draw | Move | View"));
         tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("shortcutsTab", "Counters"));
