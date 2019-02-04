@@ -45,8 +45,6 @@ GeneralSettingsPage::GeneralSettingsPage()
             languageBox.setCurrentIndex(i);
     }
 
-    picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
-
     // updates
     QList<ReleaseChannel *> channels = settingsCache->getUpdateReleaseChannels();
     foreach (ReleaseChannel *chan, channels) {
@@ -55,6 +53,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     updateReleaseChannelBox.setCurrentIndex(settingsCache->getUpdateReleaseChannel()->getIndex());
 
     updateNotificationCheckBox.setChecked(settingsCache->getNotifyAboutUpdates());
+    newVersionOracleCheckBox.setChecked(settingsCache->getNotifyAboutNewVersion());
 
     // pixmap cache
     pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
@@ -64,26 +63,15 @@ GeneralSettingsPage::GeneralSettingsPage()
     pixmapCacheEdit.setValue(settingsCache->getPixmapCacheSize());
     pixmapCacheEdit.setSuffix(" MB");
 
-    defaultUrlEdit = new QLineEdit(settingsCache->getPicUrl());
-    fallbackUrlEdit = new QLineEdit(settingsCache->getPicUrlFallback());
-
     showTipsOnStartup.setChecked(settingsCache->getShowTipsOnStartup());
 
-    connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
     connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
-    connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
     connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setPixmapCacheSize(int)));
     connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), settingsCache,
             SLOT(setUpdateReleaseChannel(int)));
     connect(&updateNotificationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotifyAboutUpdate(int)));
-    connect(&picDownloadCheckBox, SIGNAL(clicked(bool)), this, SLOT(setEnabledStatus(bool)));
-    connect(defaultUrlEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrl(QString)));
-    connect(fallbackUrlEdit, SIGNAL(textChanged(QString)), settingsCache, SLOT(setPicUrlFallback(QString)));
-    connect(&defaultUrlRestoreButton, SIGNAL(clicked()), this, SLOT(defaultUrlRestoreButtonClicked()));
-    connect(&fallbackUrlRestoreButton, SIGNAL(clicked()), this, SLOT(fallbackUrlRestoreButtonClicked()));
+    connect(&newVersionOracleCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setNotifyAboutNewVersion(int)));
     connect(&showTipsOnStartup, SIGNAL(clicked(bool)), settingsCache, SLOT(setShowTipsOnStartup(bool)));
-
-    setEnabledStatus(settingsCache->getPicDownload());
 
     auto *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
@@ -93,19 +81,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&pixmapCacheLabel, 2, 0);
     personalGrid->addWidget(&pixmapCacheEdit, 2, 1);
     personalGrid->addWidget(&updateNotificationCheckBox, 3, 0);
-    personalGrid->addWidget(&showTipsOnStartup, 4, 0);
-    personalGrid->addWidget(&picDownloadCheckBox, 5, 0);
-    personalGrid->addWidget(&urlLinkLabel, 5, 1);
-    personalGrid->addWidget(&defaultUrlLabel, 6, 0, 1, 1);
-    personalGrid->addWidget(defaultUrlEdit, 6, 1, 1, 1);
-    personalGrid->addWidget(&defaultUrlRestoreButton, 6, 2, 1, 1);
-    personalGrid->addWidget(&fallbackUrlLabel, 7, 0, 1, 1);
-    personalGrid->addWidget(fallbackUrlEdit, 7, 1, 1, 1);
-    personalGrid->addWidget(&fallbackUrlRestoreButton, 7, 2, 1, 1);
-    personalGrid->addWidget(&clearDownloadedPicsButton, 8, 1);
-
-    urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
-    urlLinkLabel.setOpenExternalLinks(true);
+    personalGrid->addWidget(&newVersionOracleCheckBox, 4, 0);
+    personalGrid->addWidget(&showTipsOnStartup, 5, 0);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -194,20 +171,6 @@ QString GeneralSettingsPage::languageName(const QString &qmFile)
     return translator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
-void GeneralSettingsPage::defaultUrlRestoreButtonClicked()
-{
-    QString path = PIC_URL_DEFAULT;
-    defaultUrlEdit->setText(path);
-    settingsCache->setPicUrl(path);
-}
-
-void GeneralSettingsPage::fallbackUrlRestoreButtonClicked()
-{
-    QString path = PIC_URL_FALLBACK;
-    fallbackUrlEdit->setText(path);
-    settingsCache->setPicUrlFallback(path);
-}
-
 void GeneralSettingsPage::deckPathButtonClicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
@@ -236,30 +199,6 @@ void GeneralSettingsPage::picsPathButtonClicked()
 
     picsPathEdit->setText(path);
     settingsCache->setPicsPath(path);
-}
-
-void GeneralSettingsPage::clearDownloadedPicsButtonClicked()
-{
-    QString picsPath = settingsCache->getPicsPath() + "/downloadedPics/";
-    QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
-    bool outerSuccessRemove = true;
-    for (int i = 0; i < dirs.length(); i++) {
-        QString currentPath = picsPath + dirs.at(i) + "/";
-        QStringList files = QDir(currentPath).entryList(QDir::Files);
-        bool innerSuccessRemove = true;
-        for (int j = 0; j < files.length(); j++)
-            if (!QDir(currentPath).remove(files.at(j))) {
-                qDebug() << "Failed to remove " + currentPath.toUtf8() + files.at(j).toUtf8();
-                outerSuccessRemove = false;
-                innerSuccessRemove = false;
-            }
-        if (innerSuccessRemove)
-            QDir(picsPath).rmdir(dirs.at(i));
-    }
-    if (outerSuccessRemove)
-        QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
-    else
-        QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card pictures could not be cleared."));
 }
 
 void GeneralSettingsPage::cardDatabasePathButtonClicked()
@@ -291,7 +230,6 @@ void GeneralSettingsPage::retranslateUi()
 {
     personalGroupBox->setTitle(tr("Personal settings"));
     languageLabel.setText(tr("Language:"));
-    picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
 
     if (settingsCache->getIsPortableBuild()) {
         pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
@@ -305,24 +243,10 @@ void GeneralSettingsPage::retranslateUi()
     cardDatabasePathLabel.setText(tr("Card database:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
     pixmapCacheLabel.setText(tr("Picture cache size:"));
-    defaultUrlLabel.setText(tr("Primary download URL:"));
-    fallbackUrlLabel.setText(tr("Fallback download URL:"));
-    urlLinkLabel.setText(
-        QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to set a custom picture url")));
-    clearDownloadedPicsButton.setText(tr("Reset/clear downloaded pictures"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
-    defaultUrlRestoreButton.setText(tr("Reset"));
-    fallbackUrlRestoreButton.setText(tr("Reset"));
+    newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
-}
-
-void GeneralSettingsPage::setEnabledStatus(bool status)
-{
-    defaultUrlEdit->setEnabled(status);
-    fallbackUrlEdit->setEnabled(status);
-    defaultUrlRestoreButton.setEnabled(status);
-    fallbackUrlRestoreButton.setEnabled(status);
 }
 
 AppearanceSettingsPage::AppearanceSettingsPage()
@@ -498,6 +422,15 @@ void UserInterfaceSettingsPage::retranslateUi()
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
+    picDownloadCheckBox.setChecked(settingsCache->getPicDownload());
+    connect(&picDownloadCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setPicDownload(int)));
+
+    urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    urlLinkLabel.setOpenExternalLinks(true);
+
+    connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
+    connect(&resetDownloadURLs, SIGNAL(clicked()), this, SLOT(resetDownloadedURLsButtonClicked()));
+
     auto *lpGeneralGrid = new QGridLayout;
     auto *lpSpoilerGrid = new QGridLayout;
 
@@ -515,9 +448,46 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     // Update the GUI depending on if the box is ticked or not
     setSpoilersEnabled(mcDownloadSpoilersCheckBox.isChecked());
 
-    // Create the layout
-    lpGeneralGrid->addWidget(&mcGeneralMessageLabel, 0, 0);
+    urlList = new QListWidget;
+    urlList->setSelectionMode(QAbstractItemView::SingleSelection);
+    urlList->setAlternatingRowColors(true);
+    urlList->setDragEnabled(true);
+    urlList->setDragDropMode(QAbstractItemView::InternalMove);
+    connect(urlList->model(), SIGNAL(rowsMoved(const QModelIndex, int, int, const QModelIndex, int)), this,
+            SLOT(urlListChanged(const QModelIndex, int, int, const QModelIndex, int)));
 
+    for (int i = 0; i < settingsCache->downloads().getCount(); i++)
+        urlList->addItem(settingsCache->downloads().getDownloadUrlAt(i));
+
+    auto aAdd = new QAction(this);
+    aAdd->setIcon(QPixmap("theme:icons/increment"));
+    connect(aAdd, SIGNAL(triggered()), this, SLOT(actAddURL()));
+    auto aEdit = new QAction(this);
+    aEdit->setIcon(QPixmap("theme:icons/pencil"));
+    connect(aEdit, SIGNAL(triggered()), this, SLOT(actEditURL()));
+    auto aRemove = new QAction(this);
+    aRemove->setIcon(QPixmap("theme:icons/decrement"));
+    connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemoveURL()));
+
+    auto *messageToolBar = new QToolBar;
+    messageToolBar->setOrientation(Qt::Vertical);
+    messageToolBar->addAction(aAdd);
+    messageToolBar->addAction(aRemove);
+    messageToolBar->addAction(aEdit);
+    messageToolBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+
+    auto *messageListLayout = new QHBoxLayout;
+    messageListLayout->addWidget(messageToolBar);
+    messageListLayout->addWidget(urlList);
+
+    // Top Layout
+    lpGeneralGrid->addWidget(&picDownloadCheckBox, 0, 0);
+    lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
+    lpGeneralGrid->addLayout(messageListLayout, 1, 0, 1, 2);
+    lpGeneralGrid->addWidget(&urlLinkLabel, 2, 0);
+    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 2, 1);
+
+    // Spoiler Layout
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
     lpSpoilerGrid->addWidget(&mcSpoilerSaveLabel, 1, 0);
     lpSpoilerGrid->addWidget(mpSpoilerSavePathLineEdit, 1, 1);
@@ -541,6 +511,94 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpMainLayout->addWidget(mpSpoilerGroupBox);
 
     setLayout(lpMainLayout);
+}
+
+void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
+{
+    settingsCache->downloads().clear();
+    urlList->clear();
+    urlList->addItems(settingsCache->downloads().getAllURLs());
+    QMessageBox::information(this, tr("Success"), tr("Download URLs have been reset."));
+}
+
+void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
+{
+    QString picsPath = settingsCache->getPicsPath() + "/downloadedPics/";
+    QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+    bool outerSuccessRemove = true;
+    for (const auto &dir : dirs) {
+        QString currentPath = picsPath + dir + "/";
+        QStringList files = QDir(currentPath).entryList(QDir::Files);
+        bool innerSuccessRemove = true;
+        for (int j = 0; j < files.length(); j++) {
+            if (!QDir(currentPath).remove(files.at(j))) {
+                qInfo() << "Failed to remove " + currentPath.toUtf8() + files.at(j).toUtf8();
+                outerSuccessRemove = false;
+                innerSuccessRemove = false;
+            }
+            qInfo() << "Removed " << currentPath << files.at(j);
+        }
+
+        if (innerSuccessRemove) {
+            bool success = QDir(picsPath).rmdir(dir);
+            if (!success) {
+                qInfo() << "Failed to remove inner directory" << picsPath;
+            } else {
+                qInfo() << "Removed" << currentPath;
+            }
+        }
+    }
+    if (outerSuccessRemove) {
+        QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
+    } else {
+        QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card pictures could not be cleared."));
+    }
+}
+
+void DeckEditorSettingsPage::actAddURL()
+{
+    bool ok;
+    QString msg = QInputDialog::getText(this, tr("Add URL"), tr("URL:"), QLineEdit::Normal, QString(), &ok);
+    if (ok) {
+        urlList->addItem(msg);
+        storeSettings();
+    }
+}
+
+void DeckEditorSettingsPage::actRemoveURL()
+{
+    if (urlList->currentItem() != nullptr) {
+        delete urlList->takeItem(urlList->currentRow());
+        storeSettings();
+    }
+}
+
+void DeckEditorSettingsPage::actEditURL()
+{
+    if (urlList->currentItem()) {
+        QString oldText = urlList->currentItem()->text();
+        bool ok;
+        QString msg = QInputDialog::getText(this, tr("Edit URL"), tr("URL:"), QLineEdit::Normal, oldText, &ok);
+        if (ok) {
+            urlList->currentItem()->setText(msg);
+            storeSettings();
+        }
+    }
+}
+
+void DeckEditorSettingsPage::storeSettings()
+{
+    qInfo() << "URL Priority Reset";
+    settingsCache->downloads().clear();
+    for (int i = 0; i < urlList->count(); i++) {
+        qInfo() << "Priority" << i << ":" << urlList->item(i)->text();
+        settingsCache->downloads().setDownloadUrlAt(i, urlList->item(i)->text());
+    }
+}
+
+void DeckEditorSettingsPage::urlListChanged(const QModelIndex &, int, int, const QModelIndex &, int)
+{
+    storeSettings();
 }
 
 void DeckEditorSettingsPage::updateSpoilers()
@@ -603,14 +661,18 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
 
 void DeckEditorSettingsPage::retranslateUi()
 {
+    mpGeneralGroupBox->setTitle(tr("URL Download Priority"));
     mpSpoilerGroupBox->setTitle(tr("Spoilers"));
     mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
-    mcGeneralMessageLabel.setText(tr("Hey, something's here finally!"));
     lastUpdatedLabel.setText(tr("Last Updated") + ": " + getLastUpdateTime());
     infoOnSpoilersLabel.setText(tr("Spoilers download automatically on launch") + "\n" +
                                 tr("Press the button to manually update without relaunching") + "\n\n" +
                                 tr("Do not close settings until manual update complete"));
+    picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
+    urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
+    clearDownloadedPicsButton.setText(tr("Delete Downloaded Images"));
+    resetDownloadURLs.setText(tr("Reset Download URLs"));
 }
 
 MessagesSettingsPage::MessagesSettingsPage()
@@ -649,7 +711,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&roomHistory, SIGNAL(stateChanged(int)), settingsCache, SLOT(setRoomHistory(int)));
 
     customAlertString = new QLineEdit();
-    customAlertString->setPlaceholderText("Word1 Word2 Word3");
+    customAlertString->setPlaceholderText(tr("Word1 Word2 Word3"));
     customAlertString->setText(settingsCache->getHighlightWords());
     connect(customAlertString, SIGNAL(textChanged(QString)), settingsCache, SLOT(setHighlightWords(QString)));
 
@@ -689,12 +751,16 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
+    aAdd->setStatusTip(tr("Add New URL"));
+
     connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
     aEdit = new QAction(this);
     aEdit->setIcon(QPixmap("theme:icons/pencil"));
+    aEdit->setStatusTip(tr("Edit URL"));
     connect(aEdit, SIGNAL(triggered()), this, SLOT(actEdit()));
     aRemove = new QAction(this);
     aRemove->setIcon(QPixmap("theme:icons/decrement"));
+    aRemove->setStatusTip(tr("Remove URL"));
     connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
 
     auto *messageToolBar = new QToolBar;
@@ -798,7 +864,7 @@ void MessagesSettingsPage::actEdit()
 
 void MessagesSettingsPage::actRemove()
 {
-    if (messageList->currentItem()) {
+    if (messageList->currentItem() != nullptr) {
         delete messageList->takeItem(messageList->currentRow());
         storeSettings();
     }
@@ -1000,7 +1066,7 @@ void DlgSettings::setTab(int index)
 
 void DlgSettings::updateLanguage()
 {
-    qApp->removeTranslator(translator);
+    qApp->removeTranslator(translator); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
     installNewTranslator();
 }
 
@@ -1094,7 +1160,7 @@ void DlgSettings::retranslateUi()
     generalButton->setText(tr("General"));
     appearanceButton->setText(tr("Appearance"));
     userInterfaceButton->setText(tr("User Interface"));
-    deckEditorButton->setText(tr("Deck Editor"));
+    deckEditorButton->setText(tr("Card Sources"));
     messagesButton->setText(tr("Chat"));
     soundButton->setText(tr("Sound"));
     shortcutsButton->setText(tr("Shortcuts"));

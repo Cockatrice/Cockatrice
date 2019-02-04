@@ -34,7 +34,7 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-PROJECT("Cockatrice" VERSION 2.6.1)
+PROJECT("Cockatrice" VERSION 2.6.3)
 
 # Use c++11 for all targets
 set(CMAKE_CXX_STANDARD 11 CACHE STRING "C++ ISO Standard")
@@ -99,7 +99,8 @@ option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 IF(MSVC)
     # Visual Studio:
     # Maximum optimization
-    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
+    # Disable warning C4251
+    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251")
     # Generate complete debugging information
     #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
 ELSEIF (CMAKE_COMPILER_IS_GNUCXX)
@@ -171,7 +172,7 @@ IF(MSVC)
 ENDIF()
 
 # Package builder
-set(CPACK_PACKAGE_CONTACT "Gavin Bisesi <Daenyth+github@gmail.com>")
+set(CPACK_PACKAGE_CONTACT "Zach Halpern <zahalpern+github@gmail.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_NAME})
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")

@@ -12,7 +12,7 @@ FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
     filterCombo = new QComboBox;
     filterCombo->setObjectName("filterCombo");
     for (int i = 0; i < CardFilter::AttrEnd; i++)
-        filterCombo->addItem(tr(CardFilter::attrName(static_cast<CardFilter::Attr>(i))), QVariant(i));
+        filterCombo->addItem(CardFilter::attrName(static_cast<CardFilter::Attr>(i)), QVariant(i));
 
     typeCombo = new QComboBox;
     typeCombo->setObjectName("typeCombo");

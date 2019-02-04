@@ -61,30 +61,6 @@ void CockatriceXml3Parser::parseFile(QIODevice &device)
     }
 }
 
-CardSetPtr CockatriceXml3Parser::internalAddSet(const QString &setName,
-                                                const QString &longName,
-                                                const QString &setType,
-                                                const QDate &releaseDate)
-{
-    if (sets.contains(setName)) {
-        return sets.value(setName);
-    }
-
-    CardSetPtr newSet = CardSet::newInstance(setName);
-    newSet->setLongName(longName);
-    newSet->setSetType(setType);
-    newSet->setReleaseDate(releaseDate);
-
-    sets.insert(setName, newSet);
-    emit addSet(newSet);
-    return newSet;
-}
-
-void CockatriceXml3Parser::clearSetlist()
-{
-    sets.clear();
-}
-
 void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
 {
     while (!xml.atEnd()) {
@@ -120,6 +96,44 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
     }
 }
 
+QString CockatriceXml3Parser::getMainCardType(QString &type)
+{
+    QString result = type;
+    /*
+    Legendary Artifact Creature - Golem
+    Instant // Instant
+    */
+
+    int pos;
+    if ((pos = result.indexOf('-')) != -1) {
+        result.remove(pos, result.length());
+    }
+
+    if ((pos = result.indexOf("—")) != -1) {
+        result.remove(pos, result.length());
+    }
+
+    if ((pos = result.indexOf("//")) != -1) {
+        result.remove(pos, result.length());
+    }
+
+    result = result.simplified();
+    /*
+    Legendary Artifact Creature
+    Instant
+    */
+
+    if ((pos = result.lastIndexOf(' ')) != -1) {
+        result = result.mid(pos + 1);
+    }
+    /*
+    Creature
+    Instant
+    */
+
+    return result;
+}
+
 void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
     while (!xml.atEnd()) {
@@ -128,55 +142,77 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
         }
 
         if (xml.name() == "card") {
-            QString name, manacost, cmc, type, pt, text, loyalty;
-            QStringList colors;
+            QString name = QString("");
+            QString text = QString("");
+            QVariantHash properties = QVariantHash();
+            QString colors = QString("");
             QList<CardRelation *> relatedCards, reverseRelatedCards;
-            QStringMap customPicURLs;
-            MuidMap muids;
-            QStringMap collectorNumbers, rarities;
-            SetList sets;
+            CardInfoPerSetMap sets = CardInfoPerSetMap();
             int tableRow = 0;
             bool cipt = false;
             bool isToken = false;
             bool upsideDown = false;
+
             while (!xml.atEnd()) {
                 if (xml.readNext() == QXmlStreamReader::EndElement) {
                     break;
                 }
-
+                // variable - assigned properties
                 if (xml.name() == "name") {
                     name = xml.readElementText();
-                } else if (xml.name() == "manacost") {
-                    manacost = xml.readElementText();
-                } else if (xml.name() == "cmc") {
-                    cmc = xml.readElementText();
-                } else if (xml.name() == "type") {
-                    type = xml.readElementText();
-                } else if (xml.name() == "pt") {
-                    pt = xml.readElementText();
                 } else if (xml.name() == "text") {
                     text = xml.readElementText();
+                } else if (xml.name() == "color") {
+                    colors.append(xml.readElementText());
+                } else if (xml.name() == "token") {
+                    isToken = static_cast<bool>(xml.readElementText().toInt());
+                    // generic properties
+                } else if (xml.name() == "manacost") {
+                    properties.insert("manacost", xml.readElementText());
+                } else if (xml.name() == "cmc") {
+                    properties.insert("cmc", xml.readElementText());
+                } else if (xml.name() == "type") {
+                    QString type = xml.readElementText();
+                    properties.insert("type", type);
+                    properties.insert("maintype", getMainCardType(type));
+                } else if (xml.name() == "pt") {
+                    properties.insert("pt", xml.readElementText());
+                } else if (xml.name() == "loyalty") {
+                    properties.insert("loyalty", xml.readElementText());
+                    // positioning info
+                } else if (xml.name() == "tablerow") {
+                    tableRow = xml.readElementText().toInt();
+                } else if (xml.name() == "cipt") {
+                    cipt = (xml.readElementText() == "1");
+                } else if (xml.name() == "upsidedown") {
+                    upsideDown = (xml.readElementText() == "1");
+                    // sets
                 } else if (xml.name() == "set") {
+                    // NOTE: attributes must be read before readElementText()
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString setName = xml.readElementText();
-                    sets.append(internalAddSet(setName));
+                    CardInfoPerSet setInfo(internalAddSet(setName));
                     if (attrs.hasAttribute("muId")) {
-                        muids[setName] = attrs.value("muId").toString().toInt();
+                        setInfo.setProperty("muid", attrs.value("muId").toString());
+                    }
+
+                    if (attrs.hasAttribute("muId")) {
+                        setInfo.setProperty("uuid", attrs.value("uuId").toString());
                     }
 
                     if (attrs.hasAttribute("picURL")) {
-                        customPicURLs[setName] = attrs.value("picURL").toString();
+                        setInfo.setProperty("picurl", attrs.value("picURL").toString());
                     }
 
                     if (attrs.hasAttribute("num")) {
-                        collectorNumbers[setName] = attrs.value("num").toString();
+                        setInfo.setProperty("num", attrs.value("num").toString());
                     }
 
                     if (attrs.hasAttribute("rarity")) {
-                        rarities[setName] = attrs.value("rarity").toString();
+                        setInfo.setProperty("rarity", attrs.value("rarity").toString());
                     }
-                } else if (xml.name() == "color") {
-                    colors << xml.readElementText();
+                    sets.insert(setName, setInfo);
+                    // relatd cards
                 } else if (xml.name() == "related" || xml.name() == "reverse-related") {
                     bool attach = false;
                     bool exclude = false;
@@ -213,16 +249,6 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     } else {
                         relatedCards << relation;
                     }
-                } else if (xml.name() == "tablerow") {
-                    tableRow = xml.readElementText().toInt();
-                } else if (xml.name() == "cipt") {
-                    cipt = (xml.readElementText() == "1");
-                } else if (xml.name() == "upsidedown") {
-                    upsideDown = (xml.readElementText() == "1");
-                } else if (xml.name() == "loyalty") {
-                    loyalty = xml.readElementText();
-                } else if (xml.name() == "token") {
-                    isToken = static_cast<bool>(xml.readElementText().toInt());
                 } else if (xml.name() != "") {
                     qDebug() << "[CockatriceXml3Parser] Unknown card property" << xml.name()
                              << ", trying to continue anyway";
@@ -230,9 +256,9 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                 }
             }
 
-            CardInfoPtr newCard = CardInfo::newInstance(
-                name, isToken, manacost, cmc, type, pt, text, colors, relatedCards, reverseRelatedCards, upsideDown,
-                loyalty, cipt, tableRow, sets, customPicURLs, muids, collectorNumbers, rarities);
+            properties.insert("colors", colors);
+            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
+                                                        reverseRelatedCards, sets, cipt, tableRow, upsideDown);
             emit addCard(newCard);
         }
     }
@@ -262,37 +288,60 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
         return xml;
     }
 
-    xml.writeStartElement("card");
-    xml.writeTextElement("name", info->getName());
-
-    const SetList &sets = info->getSets();
     QString tmpString;
-    QString tmpSet;
-    for (int i = 0; i < sets.size(); i++) {
+
+    xml.writeStartElement("card");
+
+    // variable - assigned properties
+    xml.writeTextElement("name", info->getName());
+    xml.writeTextElement("text", info->getText());
+    if (info->getIsToken()) {
+        xml.writeTextElement("token", "1");
+    }
+
+    // generic properties
+    xml.writeTextElement("manacost", info->getProperty("manacost"));
+    xml.writeTextElement("cmc", info->getProperty("cmc"));
+    xml.writeTextElement("type", info->getProperty("type"));
+
+    int colorSize = info->getColors().size();
+    for (int i = 0; i < colorSize; ++i) {
+        xml.writeTextElement("color", info->getColors().at(i));
+    }
+
+    tmpString = info->getProperty("pt");
+    if (!tmpString.isEmpty()) {
+        xml.writeTextElement("pt", tmpString);
+    }
+
+    tmpString = info->getProperty("loyalty");
+    if (!tmpString.isEmpty()) {
+        xml.writeTextElement("loyalty", tmpString);
+    }
+
+    // sets
+    const CardInfoPerSetMap sets = info->getSets();
+    for (CardInfoPerSet set : sets) {
         xml.writeStartElement("set");
+        xml.writeAttribute("rarity", set.getProperty("rarity"));
+        xml.writeAttribute("muId", set.getProperty("muid"));
+        xml.writeAttribute("uuId", set.getProperty("uuid"));
 
-        tmpSet = sets[i]->getShortName();
-        xml.writeAttribute("rarity", info->getRarity(tmpSet));
-        xml.writeAttribute("muId", QString::number(info->getMuId(tmpSet)));
-
-        tmpString = info->getCollectorNumber(tmpSet);
+        tmpString = set.getProperty("num");
         if (!tmpString.isEmpty()) {
-            xml.writeAttribute("num", info->getCollectorNumber(tmpSet));
+            xml.writeAttribute("num", tmpString);
         }
 
-        tmpString = info->getCustomPicURL(tmpSet);
+        tmpString = set.getProperty("picurl");
         if (!tmpString.isEmpty()) {
             xml.writeAttribute("picURL", tmpString);
         }
 
-        xml.writeCharacters(tmpSet);
+        xml.writeCharacters(set.getPtr()->getShortName());
         xml.writeEndElement();
     }
-    const QStringList &colors = info->getColors();
-    for (int i = 0; i < colors.size(); i++) {
-        xml.writeTextElement("color", colors[i]);
-    }
 
+    // related cards
     const QList<CardRelation *> related = info->getRelatedCards();
     for (auto i : related) {
         xml.writeStartElement("related");
@@ -338,22 +387,11 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
         xml.writeCharacters(i->getName());
         xml.writeEndElement();
     }
-    xml.writeTextElement("manacost", info->getManaCost());
-    xml.writeTextElement("cmc", info->getCmc());
-    xml.writeTextElement("type", info->getCardType());
-    if (!info->getPowTough().isEmpty()) {
-        xml.writeTextElement("pt", info->getPowTough());
-    }
+
+    // positioning
     xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
-    xml.writeTextElement("text", info->getText());
-    if (info->getMainCardType() == "Planeswalker") {
-        xml.writeTextElement("loyalty", info->getLoyalty());
-    }
     if (info->getCipt()) {
         xml.writeTextElement("cipt", "1");
-    }
-    if (info->getIsToken()) {
-        xml.writeTextElement("token", "1");
     }
     if (info->getUpsideDownArt()) {
         xml.writeTextElement("upsidedown", "1");

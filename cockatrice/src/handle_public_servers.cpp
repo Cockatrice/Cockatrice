@@ -1,6 +1,6 @@
 #include "handle_public_servers.h"
-#include "qt-json/json.h"
 #include "settingscache.h"
+#include <QJsonDocument>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -31,19 +31,16 @@ void HandlePublicServers::actFinishParsingDownloadedData()
         savedHostList = uci.getServerInfo();
 
         // Downloaded data from GitHub
-        bool jsonSuccessful;
-        QString jsonData = QString(reply->readAll());
-
-        auto jsonMap = QtJson::Json::parse(jsonData, jsonSuccessful).toMap();
-
-        if (jsonSuccessful) {
+        QJsonParseError parseError{};
+        QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
+        if (parseError.error == QJsonParseError::NoError) {
+            QVariantMap jsonMap = jsonResponse.toVariant().toMap();
             updateServerINISettings(jsonMap);
         } else {
             qDebug() << "[PUBLIC SERVER HANDLER]"
-                     << "JSON Parsing Error";
+                     << "JSON Parsing Error:" << parseError.errorString();
             emit sigPublicServersDownloadedUnsuccessfully(errorCode);
         }
-
     } else {
         qDebug() << "[PUBLIC SERVER HANDLER]"
                  << "Error Downloading Public Servers" << errorCode;
@@ -73,6 +70,10 @@ void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMa
         QString serverName = serverMap["name"].toString();
         QString serverPort = serverMap["port"].toString();
         QString serverSite = serverMap["site"].toString();
+
+        if (serverMap.contains("websocketPort")) {
+            serverPort = serverMap["websocketPort"].toString();
+        }
 
         bool serverFound = false;
         for (const auto &iter : savedHostList) {

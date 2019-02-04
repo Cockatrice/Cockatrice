@@ -40,7 +40,7 @@ class CommandContainer;
 class GameCommand;
 class GameEvent;
 class GameEventContext;
-class Event_ConnectionStateChanged;
+// class Event_ConnectionStateChanged;
 class Event_GameSay;
 class Event_Shuffle;
 class Event_RollDie;
@@ -79,17 +79,17 @@ public:
     {
         Type = typeOther
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }
 
-    PlayerArea(QGraphicsItem *parent = 0);
-    QRectF boundingRect() const
+    explicit PlayerArea(QGraphicsItem *parent = nullptr);
+    QRectF boundingRect() const override
     {
         return bRect;
     }
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void setSize(qreal width, qreal height);
 };
@@ -127,12 +127,17 @@ signals:
     void logSetAnnotation(Player *player, CardItem *card, QString newAnnotation);
     void logDumpZone(Player *player, CardZone *zone, int numberCards);
     void logStopDumpZone(Player *player, CardZone *zone);
-    void
-    logRevealCards(Player *player, CardZone *zone, int cardId, QString cardName, Player *otherPlayer, bool faceDown);
+    void logRevealCards(Player *player,
+                        CardZone *zone,
+                        int cardId,
+                        QString cardName,
+                        Player *otherPlayer,
+                        bool faceDown,
+                        int amount);
     void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
 
     void sizeChanged();
-    void gameConceded();
+    void playerCountChanged();
 public slots:
     void actUntapAll();
     void actRollDie();
@@ -144,6 +149,8 @@ public slots:
     void actUndoDraw();
     void actMulligan();
     void actMoveTopCardToPlayFaceDown();
+    void actMoveTopCardToGrave();
+    void actMoveTopCardToExile();
     void actMoveTopCardsToGrave();
     void actMoveTopCardsToExile();
     void actMoveTopCardToBottom();
@@ -201,10 +208,10 @@ private:
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
         *aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg, *aMoveRfgToTopLibrary,
         *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave, *aViewLibrary, *aViewTopCards,
-        *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardsToGrave, *aMoveTopCardsToExile,
-        *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg, *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw,
-        *aMulligan, *aShuffle, *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken,
-        *aCardMenu, *aMoveBottomCardToGrave;
+        *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardToGraveyard, *aMoveTopCardToExile,
+        *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile, *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg,
+        *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlayFaceDown,
+        *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aCardMenu, *aMoveBottomCardToGrave;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
@@ -249,7 +256,6 @@ private:
     void createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false);
     void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
-    QString dbNameFromTokenDisplayName(const QString &tokenName);
 
     QRectF bRect;
 
@@ -259,7 +265,7 @@ private:
 
     void initSayMenu();
 
-    void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
+    // void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
     void eventGameSay(const Event_GameSay &event);
     void eventShuffle(const Event_Shuffle &event);
     void eventRollDie(const Event_RollDie &event);
@@ -306,12 +312,12 @@ public:
     {
         Type = typeOther
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }
-    QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QRectF boundingRect() const override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     void playCard(CardItem *c, bool faceDown, bool tapped);
     void addCard(CardItem *c);
@@ -334,7 +340,7 @@ public:
     }
 
     Player(const ServerInfo_User &info, int _id, bool _local, TabGame *_parent);
-    ~Player();
+    ~Player() override;
     void retranslateUi();
     void clear();
     TabGame *getGame() const

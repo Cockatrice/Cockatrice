@@ -7,3 +7,4 @@ mysql.cnf
 .idea/
 *.aps
 cmake-build-debug/
+preferences

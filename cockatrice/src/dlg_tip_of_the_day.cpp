@@ -13,7 +13,7 @@
 #define MIN_TIP_IMAGE_HEIGHT 200
 #define MIN_TIP_IMAGE_WIDTH 200
 #define MAX_TIP_IMAGE_HEIGHT 300
-#define MAX_TIP_IMAGE_WIDTH 300
+#define MAX_TIP_IMAGE_WIDTH 500
 
 DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
 {
@@ -149,9 +149,9 @@ void DlgTipOfTheDay::updateTip(int tipId)
         qDebug() << "Image failed to load from" << imagePath;
         imageLabel->clear();
     } else {
-        int h = std::min(std::max(image->height(), MIN_TIP_IMAGE_HEIGHT), MAX_TIP_IMAGE_HEIGHT);
+        int h = std::min(std::max(imageLabel->height(), MIN_TIP_IMAGE_HEIGHT), MAX_TIP_IMAGE_HEIGHT);
         int w = std::min(std::max(imageLabel->width(), MIN_TIP_IMAGE_WIDTH), MAX_TIP_IMAGE_WIDTH);
-        imageLabel->setPixmap(image->scaled(h, w, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        imageLabel->setPixmap(image->scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     }
 
     date->setText("<i>Tip added on: " + tip.getDate().toString("yyyy.MM.dd") + "</i>");
@@ -163,9 +163,7 @@ void DlgTipOfTheDay::updateTip(int tipId)
 
 void DlgTipOfTheDay::resizeEvent(QResizeEvent *event)
 {
-    int h = imageLabel->height();
-    int w = imageLabel->width();
-    imageLabel->setPixmap(image->scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    imageLabel->setPixmap(image->scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     QWidget::resizeEvent(event);
 }

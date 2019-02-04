@@ -1,9 +1,11 @@
 #include "abstractcounter.h"
+#include "expression.h"
 #include "pb/command_inc_counter.pb.h"
 #include "pb/command_set_counter.pb.h"
 #include "player.h"
 #include "settingscache.h"
 #include <QAction>
+#include <QApplication>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
@@ -17,7 +19,7 @@ AbstractCounter::AbstractCounter(Player *_player,
                                  bool _useNameForShortcut,
                                  QGraphicsItem *parent)
     : QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value),
-      useNameForShortcut(_useNameForShortcut), hovered(false), aDec(0), aInc(0), dialogSemaphore(false),
+      useNameForShortcut(_useNameForShortcut), hovered(false), aDec(nullptr), aInc(nullptr), dialogSemaphore(false),
       deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
 {
     setAcceptHoverEvents(true);
@@ -46,7 +48,7 @@ AbstractCounter::AbstractCounter(Player *_player,
     } else
         menu = nullptr;
 
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
     retranslateUi();
 }
@@ -114,7 +116,11 @@ void AbstractCounter::setValue(int _value)
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (isUnderMouse() && player->getLocal()) {
-        if (event->button() == Qt::LeftButton) {
+        if (event->button() == Qt::MidButton || (QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
+            if (menu)
+                menu->exec(event->screenPos());
+            event->accept();
+        } else if (event->button() == Qt::LeftButton) {
             Command_IncCounter cmd;
             cmd.set_counter_id(id);
             cmd.set_delta(1);
@@ -125,10 +131,6 @@ void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
             cmd.set_counter_id(id);
             cmd.set_delta(-1);
             player->sendGameCommand(cmd);
-            event->accept();
-        } else if (event->button() == Qt::MidButton) {
-            if (menu)
-                menu->exec(event->screenPos());
             event->accept();
         }
     } else
@@ -160,8 +162,12 @@ void AbstractCounter::setCounter()
 {
     bool ok;
     dialogSemaphore = true;
-    int newValue = QInputDialog::getInt(0, tr("Set counter"), tr("New value for counter '%1':").arg(name), value,
-                                        -2000000000, 2000000000, 1, &ok);
+    QString expression = QInputDialog::getText(nullptr, tr("Set counter"), tr("New value for counter '%1':").arg(name),
+                                               QLineEdit::Normal, QString::number(value), &ok);
+
+    Expression exp(value);
+    int newValue = static_cast<int>(exp.parse(expression));
+
     if (deleteAfterDialog) {
         deleteLater();
         return;

@@ -43,16 +43,8 @@ if(APPLE)
 ENDIF(APPLE)
 
 # Qt5
-find_package(Qt5 COMPONENTS Network Sql REQUIRED)
-set(SERVATRICE_QT_MODULES Qt5::Core Qt5::Network Qt5::Sql)
-
-# Qt Websockets
-find_package(Qt5WebSockets)
-if(Qt5WebSockets_FOUND)
-    list(APPEND SERVATRICE_QT_MODULES Qt5::WebSockets)
-else()
-    MESSAGE(WARNING "Qt5 websocket module not found")
-endif()
+find_package(Qt5 COMPONENTS Network Sql WebSockets REQUIRED)
+set(SERVATRICE_QT_MODULES Qt5::Core Qt5::Network Qt5::Sql Qt5::WebSockets)
 
 QT5_ADD_RESOURCES(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
 SET(QT_DONT_USE_QTGUI TRUE)
@@ -163,6 +155,8 @@ if(WIN32)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir Plugins)
     set(qtconf_dest_dir .)
+
+    install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
     # qt5 plugins: platforms, sqldrivers/mysql
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime

@@ -187,11 +187,8 @@ bool FilterItem::acceptColor(const CardInfoPtr info) const
      */
     int match_count = 0;
     for (auto &it : converted_term) {
-        for (auto i = info->getColors().constBegin(); i != info->getColors().constEnd(); i++) {
-            if ((*i).contains(it, Qt::CaseInsensitive)) {
-                match_count++;
-            }
-        }
+        if (info->getColors().contains(it, Qt::CaseInsensitive))
+            match_count++;
     }
 
     return match_count == converted_term.length();
@@ -205,9 +202,9 @@ bool FilterItem::acceptText(const CardInfoPtr info) const
 bool FilterItem::acceptSet(const CardInfoPtr info) const
 {
     bool status = false;
-    for (auto i = info->getSets().constBegin(); i != info->getSets().constEnd(); i++) {
-        if ((*i)->getShortName().compare(term, Qt::CaseInsensitive) == 0 ||
-            (*i)->getLongName().compare(term, Qt::CaseInsensitive) == 0) {
+    for (const auto &set : info->getSets()) {
+        if (set.getPtr()->getShortName().compare(term, Qt::CaseInsensitive) == 0 ||
+            set.getPtr()->getLongName().compare(term, Qt::CaseInsensitive) == 0) {
             status = true;
             break;
         }
@@ -299,7 +296,7 @@ bool FilterItem::acceptRarity(const CardInfoPtr info) const
 
     /*
      * The purpose of this loop is to only apply one of the replacement
-     * policies and then escape. If we attempt to layer them ontop of
+     * policies and then escape. If we attempt to layer them on top of
      * each other, we will get awkward results (i.e. comythic rare mythic rareon)
      * Conditional statement will exit once a case is successful in
      * replacement OR we go through all possible cases.
@@ -334,8 +331,8 @@ bool FilterItem::acceptRarity(const CardInfoPtr info) const
         }
     }
 
-    for (const QString &rareLevel : info->getRarities()) {
-        if (rareLevel.compare(converted_term, Qt::CaseInsensitive) == 0) {
+    for (const auto &set : info->getSets()) {
+        if (set.getProperty("rarity").compare(converted_term, Qt::CaseInsensitive) == 0) {
             return true;
         }
     }

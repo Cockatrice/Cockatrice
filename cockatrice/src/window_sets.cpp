@@ -127,21 +127,32 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     labNotes->setOpenExternalLinks(true);
     labNotes->setText(
         "<b>" + tr("Deck Editor") + ":</b> " +
-        tr("Only cards in enabled sets will appear in the deck editor card list") + "<br><b>" + tr("Card Art") +
-        ":</b> " + tr("Image priority is decided in the following order") + "<ol><li>" + tr("The") +
-        "<a "
-        "href='https://github.com/Cockatrice/Cockatrice/wiki/"
+        tr("Only cards in enabled sets will appear in the deck editor card list") + "<br><br>" + "<b>" +
+        tr("Card Art") + ":</b> " + tr("Image priority is decided in the following order") + "<ol><li>" + tr("The") +
+        "<a href='https://github.com/Cockatrice/Cockatrice/wiki/"
         "Custom-Cards-%26-Sets#to-add-custom-art-for-cards-the-easiest-way-is-to-use-the-custom-folder'> " +
         tr("CUSTOM Folder") + "</a></li><li>" + tr("Enabled Sets (Top to Bottom)") + "</li><li>" +
         tr("Disabled Sets (Top to Bottom)") + "</li></ol>");
 
-    sortWarning = new QLabel;
-    sortWarning->setWordWrap(true);
-    sortWarning->setText(
-        "<b>" + tr("Warning: ") + "</b><br>" +
-        tr("While the set list is sorted by any of the columns, custom art priority setting is disabled.") + "<br>" +
-        tr("To disable sorting click on the same column header again until this message disappears."));
-    sortWarning->setStyleSheet("QLabel { background-color:red;}");
+    QGridLayout *hintsGrid = new QGridLayout;
+    hintsGrid->addWidget(labNotes, 0, 0);
+    hintsGroupBox = new QGroupBox(tr("Hints"));
+    hintsGroupBox->setLayout(hintsGrid);
+
+    sortWarning = new QGroupBox(tr("Note"));
+    QGridLayout *sortWarningLayout = new QGridLayout;
+    sortWarningText = new QLabel;
+    sortWarningText->setWordWrap(true);
+    sortWarningText->setText(tr("Sorting by column allows you to find a set while not changing set priority.") + " " +
+                             tr("To enable ordering again, click the column header until this message disappears."));
+    sortWarningLayout->addWidget(sortWarningText, 0, 0, 1, 2);
+    sortWarningButton = new QPushButton;
+    sortWarningButton->setText(tr("Use the current sorting as the set priority instead"));
+    sortWarningButton->setToolTip(tr("Sorts the set priority using the same column"));
+    sortWarningButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    connect(sortWarningButton, SIGNAL(released()), this, SLOT(actIgnoreWarning()));
+    sortWarningLayout->addWidget(sortWarningButton, 1, 0);
+    sortWarning->setLayout(sortWarningLayout);
     sortWarning->setVisible(false);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -157,7 +168,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     mainLayout->addWidget(enableSomeButton, 2, 1);
     mainLayout->addWidget(disableSomeButton, 2, 2);
     mainLayout->addWidget(sortWarning, 3, 1, 1, 2);
-    mainLayout->addWidget(labNotes, 4, 1, 1, 2);
+    mainLayout->addWidget(hintsGroupBox, 4, 1, 1, 2);
     mainLayout->addWidget(buttonBox, 5, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
     mainLayout->setColumnStretch(2, 1);
@@ -248,6 +259,17 @@ void WndSets::actSort(int index)
             sortWarning->setVisible(false);
         }
     }
+}
+
+void WndSets::actIgnoreWarning()
+{
+    if (sortIndex < 0) {
+        return;
+    }
+    model->sort(sortIndex, sortOrder);
+    view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
+    sortIndex = -1;
+    sortWarning->setVisible(false);
 }
 
 void WndSets::actDisableSortButtons(int index)

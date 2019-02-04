@@ -18,12 +18,13 @@
 #include <QList>
 #include <QThread>
 #include <QTimer>
+#include <QWebSocket>
 
 static const unsigned int protocolVersion = 14;
 
 RemoteClient::RemoteClient(QObject *parent)
     : AbstractClient(parent), timeRunning(0), lastDataReceived(0), messageInProgress(false), handshakeStarted(false),
-      messageLength(0)
+      usingWebSocket(false), messageLength(0)
 {
 
     clearNewClientFeatures();
@@ -38,6 +39,13 @@ RemoteClient::RemoteClient(QObject *parent)
     connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(slotSocketError(QAbstractSocket::SocketError)));
+
+    websocket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
+    connect(websocket, &QWebSocket::binaryMessageReceived, this, &RemoteClient::websocketMessageReceived);
+    connect(websocket, &QWebSocket::connected, this, &RemoteClient::slotConnected);
+    connect(websocket, SIGNAL(error(QAbstractSocket::SocketError)), this,
+            SLOT(slotWebSocketError(QAbstractSocket::SocketError)));
+
     connect(this, SIGNAL(serverIdentificationEventReceived(const Event_ServerIdentification &)), this,
             SLOT(processServerIdentificationEvent(const Event_ServerIdentification &)));
     connect(this, SIGNAL(connectionClosedEventReceived(Event_ConnectionClosed)), this,
@@ -69,15 +77,25 @@ void RemoteClient::slotSocketError(QAbstractSocket::SocketError /*error*/)
     emit socketError(errorString);
 }
 
+void RemoteClient::slotWebSocketError(QAbstractSocket::SocketError /*error*/)
+{
+
+    QString errorString = websocket->errorString();
+    doDisconnectFromServer();
+    emit socketError(errorString);
+}
+
 void RemoteClient::slotConnected()
 {
     timeRunning = lastDataReceived = 0;
     timer->start();
 
-    // dirty hack to be compatible with v14 server
-    sendCommandContainer(CommandContainer());
-    getNewCmdId();
-    // end of hack
+    if (!usingWebSocket) {
+        // dirty hack to be compatible with v14 server
+        sendCommandContainer(CommandContainer());
+        getNewCmdId();
+        // end of hack
+    }
 }
 
 void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentification &event)
@@ -217,7 +235,7 @@ void RemoteClient::loginResponse(const Response &response)
                 missingFeatures << QString::fromStdString(resp.missing_features(i));
         }
         emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
-                        resp.denied_end_time(), missingFeatures);
+                        static_cast<quint32>(resp.denied_end_time()), missingFeatures);
         setStatus(StatusDisconnecting);
     }
 }
@@ -236,7 +254,7 @@ void RemoteClient::registerResponse(const Response &response)
             break;
         default:
             emit registerError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
-                               resp.denied_end_time());
+                               static_cast<quint32>(resp.denied_end_time()));
             setStatus(StatusDisconnecting);
             doDisconnectFromServer();
             break;
@@ -301,21 +319,51 @@ void RemoteClient::readData()
     } while (!inputBuffer.isEmpty());
 }
 
+void RemoteClient::websocketMessageReceived(const QByteArray &message)
+{
+    lastDataReceived = timeRunning;
+    ServerMessage newServerMessage;
+    newServerMessage.ParseFromArray(message.data(), message.length());
+#ifdef QT_DEBUG
+    qDebug() << "IN" << messageLength << QString::fromStdString(newServerMessage.ShortDebugString());
+#endif
+    processProtocolItem(newServerMessage);
+}
+
 void RemoteClient::sendCommandContainer(const CommandContainer &cont)
 {
-    QByteArray buf;
-    unsigned int size = cont.ByteSize();
+
+    auto size = static_cast<unsigned int>(cont.ByteSize());
 #ifdef QT_DEBUG
     qDebug() << "OUT" << size << QString::fromStdString(cont.ShortDebugString());
 #endif
-    buf.resize(size + 4);
-    cont.SerializeToArray(buf.data() + 4, size);
-    buf.data()[3] = (unsigned char)size;
-    buf.data()[2] = (unsigned char)(size >> 8);
-    buf.data()[1] = (unsigned char)(size >> 16);
-    buf.data()[0] = (unsigned char)(size >> 24);
 
-    socket->write(buf);
+    QByteArray buf;
+    if (usingWebSocket) {
+        buf.resize(size);
+        cont.SerializeToArray(buf.data(), size);
+        websocket->sendBinaryMessage(buf);
+    } else {
+        buf.resize(size + 4);
+        cont.SerializeToArray(buf.data() + 4, size);
+        buf.data()[3] = (unsigned char)size;
+        buf.data()[2] = (unsigned char)(size >> 8);
+        buf.data()[1] = (unsigned char)(size >> 16);
+        buf.data()[0] = (unsigned char)(size >> 24);
+
+        socket->write(buf);
+    }
+}
+
+void RemoteClient::connectToHost(const QString &hostname, unsigned int port)
+{
+    usingWebSocket = port == 443 || port == 80 || port == 4748 || port == 8080;
+    if (usingWebSocket) {
+        QUrl url(QString("%1://%2:%3/servatrice").arg(port == 443 ? "wss" : "ws").arg(hostname).arg(port));
+        websocket->open(url);
+    } else {
+        socket->connectToHost(hostname, static_cast<quint16>(port));
+    }
 }
 
 void RemoteClient::doConnectToServer(const QString &hostname,
@@ -330,7 +378,7 @@ void RemoteClient::doConnectToServer(const QString &hostname,
     lastHostname = hostname;
     lastPort = port;
 
-    socket->connectToHost(hostname, port);
+    connectToHost(hostname, port);
     setStatus(StatusConnecting);
 }
 
@@ -354,7 +402,7 @@ void RemoteClient::doRegisterToServer(const QString &hostname,
     lastHostname = hostname;
     lastPort = port;
 
-    socket->connectToHost(hostname, port);
+    connectToHost(hostname, port);
     setStatus(StatusRegistering);
 }
 
@@ -364,7 +412,7 @@ void RemoteClient::doActivateToServer(const QString &_token)
 
     token = _token;
 
-    socket->connectToHost(lastHostname, lastPort);
+    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
     setStatus(StatusActivating);
 }
 
@@ -377,17 +425,19 @@ void RemoteClient::doDisconnectFromServer()
     messageLength = 0;
 
     QList<PendingCommand *> pc = pendingCommands.values();
-    for (int i = 0; i < pc.size(); i++) {
+    for (const auto &i : pc) {
         Response response;
         response.set_response_code(Response::RespNotConnected);
-        response.set_cmd_id(pc[i]->getCommandContainer().cmd_id());
-        pc[i]->processResponse(response);
+        response.set_cmd_id(i->getCommandContainer().cmd_id());
+        i->processResponse(response);
 
-        delete pc[i];
+        delete i;
     }
     pendingCommands.clear();
 
     setStatus(StatusDisconnected);
+    if (websocket->isValid())
+        websocket->close();
     socket->close();
 }
 
@@ -508,7 +558,7 @@ void RemoteClient::doRequestForgotPasswordToServer(const QString &hostname, unsi
     lastHostname = hostname;
     lastPort = port;
 
-    socket->connectToHost(lastHostname, lastPort);
+    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
     setStatus(StatusRequestingForgotPassword);
 }
 
@@ -540,7 +590,7 @@ void RemoteClient::doSubmitForgotPasswordResetToServer(const QString &hostname,
     token = _token;
     password = _newpassword;
 
-    socket->connectToHost(lastHostname, lastPort);
+    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
     setStatus(StatusSubmitForgotPasswordReset);
 }
 
@@ -574,7 +624,7 @@ void RemoteClient::doSubmitForgotPasswordChallengeToServer(const QString &hostna
     lastPort = port;
     email = _email;
 
-    socket->connectToHost(lastHostname, lastPort);
+    connectToHost(lastHostname, static_cast<unsigned int>(lastPort));
     setStatus(StatusSubmitForgotPasswordChallenge);
 }
 

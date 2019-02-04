@@ -7,7 +7,6 @@
 
 class DeckLoader;
 class CardDatabase;
-class QProgressDialog;
 class QPrinter;
 class QTextCursor;
 
@@ -21,19 +20,19 @@ public:
         : AbstractDecklistCardNode(_parent), dataNode(_dataNode)
     {
     }
-    int getNumber() const
+    int getNumber() const override
     {
         return dataNode->getNumber();
     }
-    void setNumber(int _number)
+    void setNumber(int _number) override
     {
         dataNode->setNumber(_number);
     }
-    QString getName() const
+    QString getName() const override
     {
         return dataNode->getName();
     }
-    void setName(const QString &_name)
+    void setName(const QString &_name) override
     {
         dataNode->setName(_name);
     }
@@ -54,20 +53,20 @@ signals:
     void deckHashChanged();
 
 public:
-    DeckListModel(QObject *parent = 0);
-    ~DeckListModel();
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
-    bool removeRows(int row, int count, const QModelIndex &parent);
+    explicit DeckListModel(QObject *parent = nullptr);
+    ~DeckListModel() override;
+    int rowCount(const QModelIndex &parent) const override;
+    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    QModelIndex parent(const QModelIndex &index) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    bool removeRows(int row, int count, const QModelIndex &parent) override;
     QModelIndex findCard(const QString &cardName, const QString &zoneName) const;
     QModelIndex addCard(const QString &cardName, const QString &zoneName, bool abAddAnyway = false);
-    void sort(int column, Qt::SortOrder order);
+    void sort(int column, Qt::SortOrder order) override;
     void cleanList();
     DeckLoader *getDeckList() const
     {

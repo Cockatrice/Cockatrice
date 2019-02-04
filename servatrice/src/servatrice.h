@@ -20,10 +20,6 @@
 #ifndef SERVATRICE_H
 #define SERVATRICE_H
 
-#include <QTcpServer>
-#ifdef QT_WEBSOCKETS_LIB
-#include <QWebSocketServer>
-#endif
 #include "server.h"
 #include <QHostAddress>
 #include <QMetaType>
@@ -32,6 +28,8 @@
 #include <QSqlDatabase>
 #include <QSslCertificate>
 #include <QSslKey>
+#include <QTcpServer>
+#include <QWebSocketServer>
 #include <utility>
 
 Q_DECLARE_METATYPE(QSqlDatabase)
@@ -66,7 +64,6 @@ protected:
     Servatrice_ConnectionPool *findLeastUsedConnectionPool();
 };
 
-#ifdef QT_WEBSOCKETS_LIB
 class Servatrice_WebsocketGameServer : public QWebSocketServer
 {
     Q_OBJECT
@@ -86,7 +83,6 @@ protected:
 protected slots:
     void onNewConnection();
 };
-#endif
 
 class Servatrice_IslServer : public QTcpServer
 {
@@ -158,9 +154,7 @@ private:
     DatabaseType databaseType;
     QTimer *pingClock, *statusUpdateClock;
     Servatrice_GameServer *gameServer;
-#ifdef QT_WEBSOCKETS_LIB
     Servatrice_WebsocketGameServer *websocketGameServer;
-#endif
     Servatrice_IslServer *islServer;
     mutable QMutex loginMessageMutex;
     QString loginMessage;

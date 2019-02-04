@@ -156,7 +156,7 @@ void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZone *zone, bo
 
 void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName)
 {
-    appendHtmlServerMessage(QString("%1 attaches %2 to %3's %4.")
+    appendHtmlServerMessage(tr("%1 attaches %2 to %3's %4.")
                                 .arg(sanitizeHtml(player->getName()))
                                 .arg(cardLink(cardName))
                                 .arg(sanitizeHtml(targetPlayer->getName()))
@@ -167,6 +167,12 @@ void MessageLogWidget::logConcede(Player *player)
 {
     soundEngine->playSound("player_concede");
     appendHtmlServerMessage(tr("%1 has conceded the game.").arg(sanitizeHtml(player->getName())), true);
+}
+
+void MessageLogWidget::logUnconcede(Player *player)
+{
+    soundEngine->playSound("player_concede");
+    appendHtmlServerMessage(tr("%1 has unconceded the game.").arg(sanitizeHtml(player->getName())), true);
 }
 
 void MessageLogWidget::logConnectionStateChanged(Player *player, bool connectionState)
@@ -341,7 +347,7 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
         mulliganPlayer = player;
     else {
         soundEngine->playSound("draw_card");
-        appendHtmlServerMessage(tr("%1 draws %2 card(s).")
+        appendHtmlServerMessage(tr("%1 draws %2 card(s).", "", number)
                                     .arg(sanitizeHtml(player->getName()))
                                     .arg("<font color=\"blue\">" + QString::number(number) + "</font>"));
     }
@@ -354,10 +360,11 @@ void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCar
                                     .arg(sanitizeHtml(player->getName()))
                                     .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
     else
-        appendHtmlServerMessage(tr("%1 is looking at the top %2 card(s) %3.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg("<font color=\"blue\">" + QString::number(numberCards) + "</font>")
-                                    .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone)));
+        appendHtmlServerMessage(
+            tr("%1 is looking at the top %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
+                .arg(sanitizeHtml(player->getName()))
+                .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone))
+                .arg("<font color=\"blue\">" + QString::number(numberCards) + "</font>"));
 }
 
 void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
@@ -456,9 +463,11 @@ void MessageLogWidget::logRevealCards(Player *player,
                                       int cardId,
                                       QString cardName,
                                       Player *otherPlayer,
-                                      bool faceDown)
+                                      bool faceDown,
+                                      int amount)
 {
-    QPair<QString, QString> temp = getFromStr(zone, cardName, cardId, false);
+    // getFromStr uses cardname.empty() to check if it should contain the start zone, it's not actually used
+    QPair<QString, QString> temp = getFromStr(zone, amount == 1 ? cardName : QString::number(amount), cardId, false);
     bool cardNameContainsStartZone = false;
     if (!temp.first.isEmpty()) {
         cardNameContainsStartZone = true;
@@ -467,52 +476,61 @@ void MessageLogWidget::logRevealCards(Player *player,
     QString fromStr = temp.second;
 
     QString cardStr;
-    if (cardNameContainsStartZone)
+    if (cardNameContainsStartZone) {
         cardStr = cardName;
-    else if (cardName.isEmpty())
-        cardStr = tr("a card");
-    else
+    } else if (cardName.isEmpty()) {
+        if (amount == 0) {
+            cardStr = tr("cards", "an unknown amount of cards");
+        } else {
+            cardStr = tr("%1 card(s)", "a card for singular, %1 cards for plural", amount)
+                          .arg("<font color=\"blue\">" + QString::number(amount) + "</font>");
+        }
+    } else {
         cardStr = cardLink(cardName);
-
+    }
     if (cardId == -1) {
-        if (otherPlayer)
+        if (otherPlayer) {
             appendHtmlServerMessage(tr("%1 reveals %2 to %3.")
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg(zone->getTranslatedName(true, CaseRevealZone))
                                         .arg(sanitizeHtml(otherPlayer->getName())));
-        else
+        } else {
             appendHtmlServerMessage(tr("%1 reveals %2.")
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg(zone->getTranslatedName(true, CaseRevealZone)));
+        }
     } else if (cardId == -2) {
-        if (otherPlayer)
+        if (otherPlayer) {
             appendHtmlServerMessage(tr("%1 randomly reveals %2%3 to %4.")
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg(cardStr)
                                         .arg(fromStr)
                                         .arg(sanitizeHtml(otherPlayer->getName())));
-        else
+        } else {
             appendHtmlServerMessage(
                 tr("%1 randomly reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+        }
     } else {
         if (faceDown && player == otherPlayer) {
-            if (cardName.isEmpty())
+            if (cardName.isEmpty()) {
                 appendHtmlServerMessage(
                     tr("%1 peeks at face down card #%2.").arg(sanitizeHtml(player->getName())).arg(cardId));
-            else
+            } else {
                 appendHtmlServerMessage(tr("%1 peeks at face down card #%2: %3.")
                                             .arg(sanitizeHtml(player->getName()))
                                             .arg(cardId)
                                             .arg(cardStr));
-        } else if (otherPlayer)
+            }
+        } else if (otherPlayer) {
             appendHtmlServerMessage(tr("%1 reveals %2%3 to %4.")
                                         .arg(sanitizeHtml(player->getName()))
                                         .arg(cardStr)
                                         .arg(fromStr)
                                         .arg(sanitizeHtml(otherPlayer->getName())));
-        else
+        } else {
             appendHtmlServerMessage(
                 tr("%1 reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+        }
     }
 }
 
@@ -626,20 +644,20 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
     QString finalStr;
     int delta = abs(oldValue - value);
     if (value > oldValue)
-        finalStr = tr("%1 places %2 %3 counter(s) on %4 (now %5).");
+        finalStr = tr("%1 places %2 %3 on %4 (now %5).");
     else
-        finalStr = tr("%1 removes %2 %3 counter(s) from %4 (now %5).");
+        finalStr = tr("%1 removes %2 %3 from %4 (now %5).");
 
     QString colorStr;
     switch (counterId) {
         case 0:
-            colorStr = tr("red", "", delta);
+            colorStr = tr("red counter(s)", "", delta);
             break;
         case 1:
-            colorStr = tr("yellow", "", delta);
+            colorStr = tr("yellow counter(s)", "", delta);
             break;
         case 2:
-            colorStr = tr("green", "", delta);
+            colorStr = tr("green counter(s)", "", delta);
             break;
         default:;
     }
@@ -676,13 +694,22 @@ void MessageLogWidget::logSetDoesntUntap(Player *player, CardItem *card, bool do
 
 void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
 {
-    if (currentContext == MessageContext_MoveCard)
+    if (currentContext == MessageContext_MoveCard) {
         moveCardPT.insert(card, newPT);
-    else
-        appendHtmlServerMessage(tr("%1 sets PT of %2 to %3.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg(cardLink(card->getName()))
-                                    .arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(newPT))));
+    } else {
+        QString name = card->getName();
+        if (name.isEmpty()) {
+            name = QString("<font color=\"blue\">card #%1</font>").arg(sanitizeHtml(QString::number(card->getId())));
+        } else {
+            name = cardLink(name);
+        }
+        if (newPT.isEmpty()) {
+            appendHtmlServerMessage(tr("%1 removes the PT of %2.").arg(sanitizeHtml(player->getName())).arg(name));
+        } else {
+            appendHtmlServerMessage(
+                tr("%1 sets PT of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(name).arg(newPT));
+        }
+    }
 }
 
 void MessageLogWidget::logSetSideboardLock(Player *player, bool locked)
@@ -786,8 +813,8 @@ void MessageLogWidget::connectToPlayer(Player *player)
     connect(player, SIGNAL(logStopDumpZone(Player *, CardZone *)), this, SLOT(logStopDumpZone(Player *, CardZone *)));
     connect(player, SIGNAL(logDrawCards(Player *, int)), this, SLOT(logDrawCards(Player *, int)));
     connect(player, SIGNAL(logUndoDraw(Player *, QString)), this, SLOT(logUndoDraw(Player *, QString)));
-    connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool)), this,
-            SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *, bool)));
+    connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int)), this,
+            SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int)));
     connect(player, SIGNAL(logAlwaysRevealTopCard(Player *, CardZone *, bool)), this,
             SLOT(logAlwaysRevealTopCard(Player *, CardZone *, bool)));
 }

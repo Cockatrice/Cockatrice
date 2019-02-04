@@ -1,249 +1,169 @@
-#include "loading_from_clipboard_test.h"
-#include "../../common/decklist.h"
-#include "gtest/gtest.h"
-#include <QTextStream>
+#include "clipboard_testing.h"
 
-DeckList *fromClipboard(QString *clipboard);
-DeckList *fromClipboard(QString *clipboard)
-{
-    DeckList *deckList = new DeckList;
-    QTextStream *stream = new QTextStream(clipboard);
-    deckList->loadFromStream_Plain(*stream);
-    return deckList;
-}
+// Testing is done by using the DeckList::loadFromString_Plain function in common/decklist.h
+// It does not check if cards are in the database at all, so no comparisons to the database will be made.
 
-using CardRows = QMap<QString, int>;
-
-struct DecklistBuilder
-{
-    CardRows actualMainboard;
-    CardRows actualSideboard;
-
-    explicit DecklistBuilder() : actualMainboard({}), actualSideboard({})
-    {
-    }
-
-    void operator()(const InnerDecklistNode *innerDecklistNode, const DecklistCardNode *card)
-    {
-        if (innerDecklistNode->getName() == DECK_ZONE_MAIN) {
-            actualMainboard[card->getName()] += card->getNumber();
-        } else if (innerDecklistNode->getName() == DECK_ZONE_SIDE) {
-            actualSideboard[card->getName()] += card->getNumber();
-        } else {
-            FAIL();
-        }
-    }
-
-    CardRows mainboard()
-    {
-        return actualMainboard;
-    }
-
-    CardRows sideboard()
-    {
-        return actualSideboard;
-    }
-};
-
-namespace
-{
 TEST(LoadingFromClipboardTest, EmptyDeck)
 {
-    DeckList *deckList = fromClipboard(new QString(""));
-    ASSERT_TRUE(deckList->getCardList().isEmpty());
+    testEmpty("");
 }
 
 TEST(LoadingFromClipboardTest, EmptySideboard)
 {
-    DeckList *deckList = fromClipboard(new QString("Sideboard"));
-    ASSERT_TRUE(deckList->getCardList().isEmpty());
+    testEmpty("Sideboard");
 }
 
 TEST(LoadingFromClipboardTest, QuantityPrefixed)
 {
-    QString *clipboard = new QString("1 Mountain\n"
-                                     "2x Island\n"
-                                     "3X FOREST\n");
-    DeckList *deckList = fromClipboard(clipboard);
-
-    DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
-
-    CardRows expectedMainboard = CardRows({{"mountain", 1}, {"island", 2}, {"forest", 3}});
-    CardRows expectedSideboard = CardRows({});
-
-    ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
-    ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+    QString clipboard("1 Mountain\n"
+                      "2x Island\n"
+                      "3x Forest\n");
+    Result result("", "", {{"Mountain", 1}, {"Island", 2}, {"Forest", 3}}, {});
+    testDeck(clipboard, result);
 }
 
 TEST(LoadingFromClipboardTest, CommentsAreIgnored)
 {
-    QString *clipboard = new QString("//1 Mountain\n"
-                                     "//2x Island\n"
-                                     "//SB:2x Island\n");
-
-    DeckList *deckList = fromClipboard(clipboard);
-
-    DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
-
-    CardRows expectedMainboard = CardRows({});
-    CardRows expectedSideboard = CardRows({});
-
-    ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
-    ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+    QString clipboard("//1 Mountain\n"
+                      "//2x Island\n"
+                      "//SB:2x Island\n");
+    testEmpty(clipboard);
 }
 
 TEST(LoadingFromClipboardTest, SideboardPrefix)
 {
-    QString *clipboard = new QString("1 Mountain\n"
-                                     "SB: 1 Mountain\n"
-                                     "SB: 2x Island\n");
-    DeckList *deckList = fromClipboard(clipboard);
+    QString clipboard("1 Mountain\n"
+                      "SB: 1 Mountain\n"
+                      "sb: 2x Island\n"
+                      "2 Swamp\n"
+                      "\n"
+                      "3 Plains\n");
+    Result result("", "", {{"Mountain", 1}, {"Swamp", 2}, {"Plains", 3}}, {{"Mountain", 1}, {"Island", 2}});
+    testDeck(clipboard, result);
+}
 
-    DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
-
-    CardRows expectedMainboard = CardRows({{"mountain", 1}});
-    CardRows expectedSideboard = CardRows({{"mountain", 1}, {"island", 2}});
-
-    ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
-    ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+TEST(LoadingFromClipboardTest, SideboardLine)
+{
+    QString clipboard("1 Mountain\n"
+                      "2 Swamp\n"
+                      "\n"
+                      "3 Plains\n"
+                      "sideboard\n"
+                      "1 Mountain\n"
+                      "2x Island\n");
+    Result result("", "", {{"Mountain", 1}, {"Swamp", 2}, {"Plains", 3}}, {{"Mountain", 1}, {"Island", 2}});
+    testDeck(clipboard, result);
 }
 
 TEST(LoadingFromClipboardTest, UnknownCardsAreNotDiscarded)
 {
-    QString *clipboard = new QString("1 CardThatDoesNotExistInCardsXml\n");
-    DeckList *deckList = fromClipboard(clipboard);
+    QString clipboard("1 CardThatDoesNotExistInCardsXml\n");
+    Result result("", "", {{"CardThatDoesNotExistInCardsXml", 1}}, {});
+    testDeck(clipboard, result);
+}
 
-    DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
-
-    CardRows expectedMainboard = CardRows({{"cardthatdoesnotexistincardsxml", 1}});
-    CardRows expectedSideboard = CardRows({});
-
-    ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
-    ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+TEST(LoadingFromClipboardTest, WeirdWhitespaceIsIgnored)
+{
+    QString clipboard(
+        "\t\tSb:\t1\tOur Market   Research Shows That Players Like  Really Long Card Names           So We Made        "
+        "           This Card to Have\tthe Absolute \t Longest Card Name \tEver Elemental\t\n\t");
+    Result result("", "", {},
+                  {{"Our Market Research Shows That Players Like Really Long Card Names So We Made This Card to Have "
+                    "the Absolute Longest Card Name Ever Elemental",
+                    1}});
+    testDeck(clipboard, result);
 }
 
 TEST(LoadingFromClipboardTest, RemoveBlankEntriesFromBeginningAndEnd)
 {
-    QString *clipboard = new QString("\n"
-                                     "\n"
-                                     "\n"
-                                     "1x Algae Gharial\n"
-                                     "3x CardThatDoesNotExistInCardsXml\n"
-                                     "2x Phelddagrif\n"
-                                     "\n"
-                                     "\n");
+    QString clipboard("\n"
+                      "\n"
+                      "\n"
+                      "1x Algae Gharial\n"
+                      "3x CardThatDoesNotExistInCardsXml\n"
+                      "2x Phelddagrif\n"
+                      "\n"
+                      "\n");
 
-    DeckList *deckList = fromClipboard(clipboard);
-
-    DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
-
-    CardRows expectedMainboard =
-        CardRows({{"algae gharial", 1}, {"cardthatdoesnotexistincardsxml", 3}, {"phelddagrif", 2}});
-    CardRows expectedSideboard = CardRows({});
-
-    ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
-    ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+    Result result("", "", {{"Algae Gharial", 1}, {"CardThatDoesNotExistInCardsXml", 3}, {"Phelddagrif", 2}}, {});
+    testDeck(clipboard, result);
 }
 
 TEST(LoadingFromClipboardTest, UseFirstBlankIfOnlyOneBlankToSplitSideboard)
 {
-    QString *clipboard = new QString("1x Algae Gharial\n"
-                                     "3x CardThatDoesNotExistInCardsXml\n"
-                                     "\n"
-                                     "2x Phelddagrif\n");
+    QString clipboard("1x Algae Gharial\n"
+                      "3x CardThatDoesNotExistInCardsXml\n"
+                      "\n"
+                      "2x Phelddagrif\n");
 
-    DeckList *deckList = fromClipboard(clipboard);
-
-    DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
-
-    CardRows expectedMainboard = CardRows({{"algae gharial", 1}, {"cardthatdoesnotexistincardsxml", 3}});
-    CardRows expectedSideboard = CardRows({{"phelddagrif", 2}});
-
-    ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
-    ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+    Result result("", "", {{"Algae Gharial", 1}, {"CardThatDoesNotExistInCardsXml", 3}}, {{"Phelddagrif", 2}});
+    testDeck(clipboard, result);
 }
 
 TEST(LoadingFromClipboardTest, IfMultipleScatteredBlanksAllMainBoard)
 {
-    QString *clipboard = new QString("1x Algae Gharial\n"
-                                     "3x CardThatDoesNotExistInCardsXml\n"
-                                     "\n"
-                                     "2x Phelddagrif\n"
-                                     "\n"
-                                     "3 Giant Growth\n");
+    QString clipboard("1x Algae Gharial\n"
+                      "3x CardThatDoesNotExistInCardsXml\n"
+                      "\n"
+                      "2x Phelddagrif\n"
+                      "\n"
+                      "3 Giant Growth\n");
 
-    DeckList *deckList = fromClipboard(clipboard);
-
-    DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
-
-    CardRows expectedMainboard = CardRows(
-        {{"algae gharial", 1}, {"cardthatdoesnotexistincardsxml", 3}, {"phelddagrif", 2}, {"giant growth", 3}});
-    CardRows expectedSideboard = CardRows({});
-
-    ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
-    ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+    Result result(
+        "", "", {{"Algae Gharial", 1}, {"CardThatDoesNotExistInCardsXml", 3}, {"Phelddagrif", 2}, {"Giant Growth", 3}},
+        {});
+    testDeck(clipboard, result);
 }
 
-TEST(LoadingFromClipboardTest, LotsOfStuffInBulkTesting)
+TEST(LoadingFromClipboardTest, EdgeCaseTesting)
 {
-    QString *clipboard = new QString("\n"
-                                     "\n"
-                                     "\n"
-                                     "1x test1\n"
-                                     "testNoValueMB\n"
-                                     "2x test2\n"
-                                     "SB: 10 testSB\n"
-                                     "3 test3\n"
-                                     "4X test4\n"
-                                     "\n"
-                                     "\n"
-                                     "\n"
-                                     "\n"
-                                     "5x test5\n"
-                                     "6X test6\n"
-                                     "testNoValueSB\n"
-                                     "\n"
-                                     "\n"
-                                     "\n"
-                                     "\n");
+    QString clipboard(R"(
+// DeckName
 
-    DeckList *deckList = fromClipboard(clipboard);
+   // Comment 1
 
-    DecklistBuilder decklistBuilder = DecklistBuilder();
-    deckList->forEachCard(decklistBuilder);
+//
+//Comment [two]
+//(test) Æ ’ | / (3)
 
-    CardRows expectedMainboard = CardRows({{"test1", 1}, {"test2", 2}, {"test3", 3}, {"test4", 4}, {"testnovaluemb", 1}
 
-    });
-    CardRows expectedSideboard = CardRows({{"testsb", 10}, {"test5", 5}, {"test6", 6}, {"testnovaluesb", 1}
+// Mainboard (10 cards)
+Æther Adept
+2x Fire & Ice
+3 Pain/Suffering
+4X [B] Forest (3)
 
-    });
-    ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
-    ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+
+// Sideboard (11 cards)
+
+5x [WTH] Nature’s Resurgence
+6X Gaea's Skyfolk
+7  B.F.M. (Big Furry Monster)
+
+
+
+)");
+
+    Result result("DeckName", "Comment 1\n\nComment [two]\n(test) Æ ’ | / (3)",
+                  {{"Aether Adept", 1}, {"Fire // Ice", 2}, {"Pain // Suffering", 3}, {"Forest", 4}},
+                  {{"Nature's Resurgence", 5}, {"Gaea's Skyfolk", 6}, {"B.F.M. (Big Furry Monster)", 7}});
+    testDeck(clipboard, result);
 }
 
 TEST(LoadingFromClipboardTest, CommentsBeforeCardsTesting)
 {
-    QString *clipboard = new QString("//NAME: Title from Website.com\n"
-                                     "\n"
-                                     "//Main\n"
-                                     "1 test1\n");
-    DeckList *decklist = fromClipboard(clipboard);
-    DecklistBuilder decklistBuilder = DecklistBuilder();
-    decklist->forEachCard(decklistBuilder);
-    CardRows expectedMainboard = CardRows({{"test1", 1}});
-    CardRows expectedSideboard = CardRows({});
-    ASSERT_EQ(expectedMainboard, decklistBuilder.mainboard());
-    ASSERT_EQ(expectedSideboard, decklistBuilder.sideboard());
+    QString clipboard("// Title from website.com\n"
+                      "// A nice deck\n"
+                      "// With nice cards\n"
+                      "\n"
+                      "// Mainboard\n"
+                      "1 test1\n"
+                      "Sideboard\n"
+                      "2 test2\n");
+
+    Result result("Title from website.com", "A nice deck\nWith nice cards", {{"test1", 1}}, {{"test2", 2}});
+    testDeck(clipboard, result);
 }
-} // namespace
 
 int main(int argc, char **argv)
 {

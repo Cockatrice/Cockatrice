@@ -1,5 +1,7 @@
 #include "carddatabase.h"
 #include "carddbparser/cockatricexml3.h"
+#include "carddbparser/cockatricexml4.h"
+#include "game_specific_terms.h"
 #include "pictureloader.h"
 #include "settingscache.h"
 #include "spoilerbackgroundupdater.h"
@@ -207,30 +209,23 @@ void SetList::guessSortKeys()
     }
 }
 
+CardInfoPerSet::CardInfoPerSet(const CardSetPtr &_set) : set(_set)
+{
+}
+
 CardInfo::CardInfo(const QString &_name,
-                   bool _isToken,
-                   const QString &_manacost,
-                   const QString &_cmc,
-                   const QString &_cardtype,
-                   const QString &_powtough,
                    const QString &_text,
-                   const QStringList &_colors,
+                   bool _isToken,
+                   QVariantHash _properties,
                    const QList<CardRelation *> &_relatedCards,
                    const QList<CardRelation *> &_reverseRelatedCards,
-                   bool _upsideDownArt,
-                   const QString &_loyalty,
+                   CardInfoPerSetMap _sets,
                    bool _cipt,
                    int _tableRow,
-                   const SetList &_sets,
-                   const QStringMap &_customPicURLs,
-                   MuidMap _muIds,
-                   QStringMap _collectorNumbers,
-                   QStringMap _rarities)
-    : name(_name), isToken(_isToken), sets(_sets), manacost(_manacost), cmc(_cmc), cardtype(_cardtype),
-      powtough(_powtough), text(_text), colors(_colors), relatedCards(_relatedCards),
-      reverseRelatedCards(_reverseRelatedCards), setsNames(), upsideDownArt(_upsideDownArt), loyalty(_loyalty),
-      customPicURLs(_customPicURLs), muIds(std::move(_muIds)), collectorNumbers(std::move(_collectorNumbers)),
-      rarities(std::move(_rarities)), cipt(_cipt), tableRow(_tableRow)
+                   bool _upsideDownArt)
+    : name(_name), text(_text), isToken(_isToken), properties(std::move(_properties)), relatedCards(_relatedCards),
+      reverseRelatedCards(_reverseRelatedCards), sets(std::move(_sets)), cipt(_cipt), tableRow(_tableRow),
+      upsideDownArt(_upsideDownArt)
 {
     pixmapCacheKey = QLatin1String("card_") + name;
     simpleName = CardInfo::simplifyName(name);
@@ -244,74 +239,25 @@ CardInfo::~CardInfo()
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name,
-                                  bool _isToken,
-                                  const QString &_manacost,
-                                  const QString &_cmc,
-                                  const QString &_cardtype,
-                                  const QString &_powtough,
                                   const QString &_text,
-                                  const QStringList &_colors,
+                                  bool _isToken,
+                                  QVariantHash _properties,
                                   const QList<CardRelation *> &_relatedCards,
                                   const QList<CardRelation *> &_reverseRelatedCards,
-                                  bool _upsideDownArt,
-                                  const QString &_loyalty,
+                                  CardInfoPerSetMap _sets,
                                   bool _cipt,
                                   int _tableRow,
-                                  const SetList &_sets,
-                                  const QStringMap &_customPicURLs,
-                                  MuidMap _muIds,
-                                  QStringMap _collectorNumbers,
-                                  QStringMap _rarities)
+                                  bool _upsideDownArt)
 {
-    CardInfoPtr ptr(new CardInfo(_name, _isToken, _manacost, _cmc, _cardtype, _powtough, _text, _colors, _relatedCards,
-                                 _reverseRelatedCards, _upsideDownArt, _loyalty, _cipt, _tableRow, _sets,
-                                 _customPicURLs, std::move(_muIds), std::move(_collectorNumbers),
-                                 std::move(_rarities)));
+    CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, std::move(_properties), _relatedCards, _reverseRelatedCards,
+                                 _sets, _cipt, _tableRow, _upsideDownArt));
     ptr->setSmartPointer(ptr);
 
-    for (int i = 0; i < _sets.size(); i++) {
-        _sets[i]->append(ptr);
+    for (const CardInfoPerSet &set : _sets) {
+        set.getPtr()->append(ptr);
     }
 
     return ptr;
-}
-
-QString CardInfo::getMainCardType() const
-{
-    QString result = getCardType();
-    /*
-    Legendary Artifact Creature - Golem
-    Instant // Instant
-    */
-
-    int pos;
-    if ((pos = result.indexOf('-')) != -1) {
-        result.remove(pos, result.length());
-    }
-
-    if ((pos = result.indexOf("—")) != -1) {
-        result.remove(pos, result.length());
-    }
-
-    if ((pos = result.indexOf("//")) != -1) {
-        result.remove(pos, result.length());
-    }
-
-    result = result.simplified();
-    /*
-    Legendary Artifact Creature
-    Instant
-    */
-
-    if ((pos = result.lastIndexOf(' ')) != -1) {
-        result = result.mid(pos + 1);
-    }
-    /*
-    Creature
-    Instant
-    */
-
-    return result;
 }
 
 QString CardInfo::getCorrectedName() const
@@ -321,26 +267,21 @@ QString CardInfo::getCorrectedName() const
     return result.remove(" // ").remove(':').remove('"').remove('?').replace('/', ' ');
 }
 
-void CardInfo::addToSet(CardSetPtr set)
+void CardInfo::addToSet(const CardSetPtr &_set, const CardInfoPerSet _info)
 {
-    if (set.isNull()) {
-        qDebug() << "addToSet(nullptr)";
-        return;
-    }
-
-    set->append(smartThis);
-    sets << set;
+    _set->append(smartThis);
+    sets.insert(_set->getShortName(), _info);
 
     refreshCachedSetNames();
 }
 
 void CardInfo::refreshCachedSetNames()
 {
-    // update the cached list of set names
     QStringList setList;
-    for (int i = 0; i < sets.size(); i++) {
-        if (sets[i]->getEnabled()) {
-            setList << sets[i]->getShortName();
+    // update the cached list of set names
+    for (const auto &set : sets) {
+        if (set.getPtr()->getEnabled()) {
+            setList << set.getPtr()->getShortName();
         }
     }
     setsNames = setList.join(", ");
@@ -369,11 +310,12 @@ QString CardInfo::simplifyName(const QString &name)
 
 const QChar CardInfo::getColorChar() const
 {
+    QString colors = getColors();
     switch (colors.size()) {
         case 0:
             return QChar();
         case 1:
-            return colors.first().isEmpty() ? QChar() : colors.first().at(0);
+            return colors.at(0);
         default:
             return QChar('m');
     }
@@ -386,6 +328,7 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
 
     // add new parsers here
     availableParsers << new CockatriceXml3Parser;
+    availableParsers << new CockatriceXml4Parser;
 
     for (auto &parser : availableParsers) {
         connect(parser, SIGNAL(addCard(CardInfoPtr)), this, SLOT(addCard(CardInfoPtr)), Qt::DirectConnection);
@@ -417,9 +360,7 @@ void CardDatabase::clear()
     simpleNameCards.clear();
 
     sets.clear();
-    for (auto parser : availableParsers) {
-        parser->clearSetlist();
-    }
+    ICardDatabaseParser::clearSetlist();
 
     loadStatus = NotLoaded;
 
@@ -436,12 +377,8 @@ void CardDatabase::addCard(CardInfoPtr card)
     // if card already exists just add the new set property
     if (cards.contains(card->getName())) {
         CardInfoPtr sameCard = cards[card->getName()];
-        for (auto set : card->getSets()) {
-            QString setName = set->getCorrectedShortName();
-            sameCard->setSet(set);
-            sameCard->setMuId(setName, card->getMuId(setName));
-            sameCard->setRarity(setName, card->getRarity(setName));
-            sameCard->setSetNumber(setName, card->getCollectorNumber(setName));
+        for (const CardInfoPerSet &set : card->getSets()) {
+            sameCard->addToSet(set.getPtr(), set);
         }
         return;
     }
@@ -582,7 +519,7 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     // load custom card databases
     QDir dir(settingsCache->getCustomCardDatabasePath());
-    for (QString fileName :
+    for (const QString &fileName :
          dir.entryList(QStringList("*.xml"), QDir::Files | QDir::Readable, QDir::Name | QDir::IgnoreCase)) {
         loadCardDatabase(dir.absoluteFilePath(fileName));
     }
@@ -614,42 +551,18 @@ void CardDatabase::refreshCachedReverseRelatedCards()
             continue;
         }
 
-        QString relatedCardName;
-        if (card->getPowTough().size() > 0) {
-            relatedCardName = card->getPowTough() + " " + card->getName(); // "n/n name"
-        } else {
-            relatedCardName = card->getName(); // "name"
-        }
-
         foreach (CardRelation *cardRelation, card->getReverseRelatedCards()) {
             const QString &targetCard = cardRelation->getName();
             if (!cards.contains(targetCard)) {
                 continue;
             }
 
-            auto *newCardRelation = new CardRelation(relatedCardName, cardRelation->getDoesAttach(),
+            auto *newCardRelation = new CardRelation(card->getName(), cardRelation->getDoesAttach(),
                                                      cardRelation->getIsCreateAllExclusion(),
                                                      cardRelation->getIsVariable(), cardRelation->getDefaultCount());
             cards.value(targetCard)->addReverseRelatedCards2Me(newCardRelation);
         }
     }
-}
-
-QStringList CardDatabase::getAllColors() const
-{
-    QSet<QString> colors;
-    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
-    while (cardIterator.hasNext()) {
-        const QStringList &cardColors = cardIterator.next().value()->getColors();
-        if (cardColors.isEmpty()) {
-            colors.insert("X");
-        } else {
-            for (int i = 0; i < cardColors.size(); ++i) {
-                colors.insert(cardColors[i]);
-            }
-        }
-    }
-    return colors.toList();
 }
 
 QStringList CardDatabase::getAllMainCardTypes() const
@@ -717,8 +630,8 @@ bool CardDatabase::saveCustomTokensToFile()
     tmpSets.insert(CardDatabase::TOKENS_SETNAME, customTokensSet);
 
     CardNameMap tmpCards;
-    for (CardInfoPtr card : cards) {
-        if (card->getSets().contains(customTokensSet)) {
+    for (const CardInfoPtr &card : cards) {
+        if (card->getSets().contains(CardDatabase::TOKENS_SETNAME)) {
             tmpCards.insert(card->getName(), card);
         }
     }
@@ -743,4 +656,46 @@ void CardInfo::resetReverseRelatedCards2Me()
         cardRelation->deleteLater();
     }
     reverseRelatedCardsToMe = QList<CardRelation *>();
+}
+
+// Back-compatibility methods. Remove ASAP
+const QString CardInfo::getCardType() const
+{
+    return getProperty(Mtg::CardType);
+}
+void CardInfo::setCardType(const QString &value)
+{
+    setProperty(Mtg::CardType, value);
+}
+const QString CardInfo::getCmc() const
+{
+    return getProperty(Mtg::ConvertedManaCost);
+}
+const QString CardInfo::getColors() const
+{
+    return getProperty(Mtg::Colors);
+}
+void CardInfo::setColors(const QString &value)
+{
+    setProperty(Mtg::Colors, value);
+}
+const QString CardInfo::getLoyalty() const
+{
+    return getProperty(Mtg::Loyalty);
+}
+const QString CardInfo::getMainCardType() const
+{
+    return getProperty(Mtg::MainCardType);
+}
+const QString CardInfo::getManaCost() const
+{
+    return getProperty(Mtg::ManaCost);
+}
+const QString CardInfo::getPowTough() const
+{
+    return getProperty(Mtg::PowTough);
+}
+void CardInfo::setPowTough(const QString &value)
+{
+    setProperty(Mtg::PowTough, value);
 }

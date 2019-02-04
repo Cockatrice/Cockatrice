@@ -1,20 +1,12 @@
 #include "sequenceedit.h"
 #include "../settingscache.h"
-#include <QEvent>
 #include <QHBoxLayout>
 #include <QKeyEvent>
-#include <QLineEdit>
-#include <QPushButton>
 #include <QToolTip>
 #include <utility>
 
-SequenceEdit::SequenceEdit(QString _shorcutName, QWidget *parent) : QWidget(parent)
+SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWidget(parent), shortcutName(_shortcutName)
 {
-    shorcutName = std::move(_shorcutName);
-    currentKey = 0;
-    keys = 0;
-    valid = false;
-
     lineEdit = new QLineEdit(this);
     clearButton = new QPushButton("", this);
     defaultButton = new QPushButton("", this);
@@ -42,20 +34,20 @@ SequenceEdit::SequenceEdit(QString _shorcutName, QWidget *parent) : QWidget(pare
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(restoreDefault()));
     lineEdit->installEventFilter(this);
 
-    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shorcutName));
+    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shortcutName));
 }
 
-QString SequenceEdit::getSecuence()
+QString SequenceEdit::getSequence()
 {
     return lineEdit->text();
 }
 
 void SequenceEdit::removeLastShortcut()
 {
-    QString secuences = lineEdit->text();
-    if (!secuences.isEmpty()) {
-        if (secuences.lastIndexOf(";") > 0) {
-            QString valid = secuences.left(secuences.lastIndexOf(";"));
+    QString sequences = lineEdit->text();
+    if (!sequences.isEmpty()) {
+        if (sequences.lastIndexOf(";") > 0) {
+            QString valid = sequences.left(sequences.lastIndexOf(";"));
             lineEdit->setText(valid);
         } else {
             lineEdit->clear();
@@ -67,18 +59,18 @@ void SequenceEdit::removeLastShortcut()
 
 void SequenceEdit::restoreDefault()
 {
-    lineEdit->setText(settingsCache->shortcuts().getDefaultShortcutString(shorcutName));
+    lineEdit->setText(settingsCache->shortcuts().getDefaultShortcutString(shortcutName));
     updateSettings();
 }
 
 void SequenceEdit::refreshShortcut()
 {
-    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shorcutName));
+    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shortcutName));
 }
 
 void SequenceEdit::clear()
 {
-    this->lineEdit->setText("");
+    lineEdit->setText("");
 }
 
 bool SequenceEdit::eventFilter(QObject *, QEvent *event)
@@ -142,8 +134,8 @@ void SequenceEdit::finishShortcut()
     QKeySequence sequence(keys);
     if (!sequence.isEmpty() && valid) {
         QString sequenceString = sequence.toString();
-        if (settingsCache->shortcuts().isKeyAllowed(shorcutName, sequenceString)) {
-            if (settingsCache->shortcuts().isValid(shorcutName, sequenceString)) {
+        if (settingsCache->shortcuts().isKeyAllowed(shortcutName, sequenceString)) {
+            if (settingsCache->shortcuts().isValid(shortcutName, sequenceString)) {
                 if (!lineEdit->text().isEmpty()) {
                     if (lineEdit->text().contains(sequenceString)) {
                         return;
@@ -167,5 +159,5 @@ void SequenceEdit::finishShortcut()
 
 void SequenceEdit::updateSettings()
 {
-    settingsCache->shortcuts().setShortcuts(shorcutName, lineEdit->text());
+    settingsCache->shortcuts().setShortcuts(shortcutName, lineEdit->text());
 }

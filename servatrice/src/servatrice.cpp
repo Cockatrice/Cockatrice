@@ -35,10 +35,12 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
+#include <QProcessEnvironment>
 #include <QSqlQuery>
 #include <QString>
 #include <QStringList>
 #include <QTimer>
+#include <QUrl>
 #include <iostream>
 
 Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
@@ -104,7 +106,6 @@ Servatrice_ConnectionPool *Servatrice_GameServer::findLeastUsedConnectionPool()
     return connectionPools[poolIndex];
 }
 
-#ifdef QT_WEBSOCKETS_LIB
 #define WEBSOCKET_POOL_NUMBER 999
 
 Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_server,
@@ -163,7 +164,6 @@ Servatrice_ConnectionPool *Servatrice_WebsocketGameServer::findLeastUsedConnecti
     qDebug() << "Pool utilisation:" << debugStr;
     return connectionPools[poolIndex];
 }
-#endif
 
 void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 {
@@ -431,7 +431,6 @@ bool Servatrice::initServer()
         }
     }
 
-#ifdef QT_WEBSOCKETS_LIB
     // WEBSOCKET SERVER
     if (getNumberOfWebSocketPools() > 0) {
         websocketGameServer = new Servatrice_WebsocketGameServer(this, getNumberOfWebSocketPools(),
@@ -447,7 +446,6 @@ bool Servatrice::initServer()
             return false;
         }
     }
-#endif
 
     if (getIdleClientTimeout() > 0) {
         qDebug() << "Idle client timeout value: " << getIdleClientTimeout();
@@ -794,6 +792,9 @@ bool Servatrice::getRegOnlyServerEnabled() const
 
 QString Servatrice::getAuthenticationMethodString() const
 {
+    if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
+        return QString("sql");
+    }
     return settingsCache->value("authentication/method").toString();
 }
 
@@ -834,36 +835,58 @@ QString Servatrice::getRequiredFeatures() const
 
 QString Servatrice::getDBTypeString() const
 {
+    if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
+        return QString("mysql");
+    }
     return settingsCache->value("database/type").toString();
 }
 
 QString Servatrice::getDBPrefixString() const
 {
+    if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
+        return QString("cockatrice");
+    }
     return settingsCache->value("database/prefix").toString();
 }
 
 QString Servatrice::getDBHostNameString() const
 {
+    if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
+        return QUrl(QProcessEnvironment::systemEnvironment().value("DATABASE_URL")).host();
+    }
     return settingsCache->value("database/hostname").toString();
 }
 
 QString Servatrice::getDBDatabaseNameString() const
 {
+    if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
+        QString path = QUrl(QProcessEnvironment::systemEnvironment().value("DATABASE_URL")).path();
+        return path.right(path.length() - 1);
+    }
     return settingsCache->value("database/database").toString();
 }
 
 QString Servatrice::getDBUserNameString() const
 {
+    if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
+        return QUrl(QProcessEnvironment::systemEnvironment().value("DATABASE_URL")).userName();
+    }
     return settingsCache->value("database/user").toString();
 }
 
 QString Servatrice::getDBPasswordString() const
 {
+    if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
+        return QUrl(QProcessEnvironment::systemEnvironment().value("DATABASE_URL")).password();
+    }
     return settingsCache->value("database/password").toString();
 }
 
 QString Servatrice::getRoomsMethodString() const
 {
+    if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {
+        return QString("sql");
+    }
     return settingsCache->value("rooms/method").toString();
 }
 
@@ -957,6 +980,9 @@ QHostAddress Servatrice::getServerWebSocketHost() const
 
 int Servatrice::getServerWebSocketPort() const
 {
+    if (QProcessEnvironment::systemEnvironment().contains("PORT")) {
+        return QProcessEnvironment::systemEnvironment().value("PORT").toInt();
+    }
     return settingsCache->value("server/websocket_port", 4748).toInt();
 }
 

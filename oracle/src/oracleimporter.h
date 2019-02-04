@@ -3,14 +3,14 @@
 
 #include <QMap>
 #include <QVariant>
-
 #include <carddatabase.h>
+#include <utility>
 
 class SetToDownload
 {
 private:
     QString shortName, longName;
-    QVariant cards;
+    QList<QVariant> cards;
     QDate releaseDate;
     QString setType;
 
@@ -23,7 +23,7 @@ public:
     {
         return longName;
     }
-    const QVariant &getCards() const
+    const QList<QVariant> &getCards() const
     {
         return cards;
     }
@@ -35,18 +35,47 @@ public:
     {
         return releaseDate;
     }
-    SetToDownload(const QString &_shortName,
-                  const QString &_longName,
-                  const QVariant &_cards,
-                  const QString &_setType = QString(),
+    SetToDownload(QString _shortName,
+                  QString _longName,
+                  QList<QVariant> _cards,
+                  QString _setType = QString(),
                   const QDate &_releaseDate = QDate())
-        : shortName(_shortName), longName(_longName), cards(_cards), releaseDate(_releaseDate), setType(_setType)
+        : shortName(std::move(_shortName)), longName(std::move(_longName)), cards(std::move(_cards)),
+          releaseDate(_releaseDate), setType(std::move(_setType))
     {
     }
     bool operator<(const SetToDownload &set) const
     {
         return longName.compare(set.longName, Qt::CaseInsensitive) < 0;
     }
+};
+
+class SplitCardPart
+{
+public:
+    SplitCardPart(int _index, const QString &_text, const QVariantHash &_properties, CardInfoPerSet setInfo);
+    inline const int &getIndex() const
+    {
+        return index;
+    }
+    inline const QString &getText() const
+    {
+        return text;
+    }
+    inline const QVariantHash &getProperties() const
+    {
+        return properties;
+    }
+    inline const CardInfoPerSet &getSetInfo() const
+    {
+        return setInfo;
+    }
+
+private:
+    int index;
+    QString text;
+    QVariantHash properties;
+    CardInfoPerSet setInfo;
 };
 
 class OracleImporter : public CardDatabase
@@ -57,32 +86,22 @@ private:
     QVariantMap setsMap;
     QString dataDir;
 
-    CardInfoPtr addCard(const QString &setName,
-                        QString cardName,
+    CardInfoPtr addCard(QString name,
+                        QString text,
                         bool isToken,
-                        int cardId,
-                        QString &setNumber,
-                        QString &cardCost,
-                        QString &cmc,
-                        const QString &cardType,
-                        const QString &cardPT,
-                        const QString &cardLoyalty,
-                        const QString &cardText,
-                        const QStringList &colors,
-                        const QList<CardRelation *> &relatedCards,
-                        const QList<CardRelation *> &reverseRelatedCards,
-                        bool upsideDown,
-                        QString &rarity);
+                        QVariantHash properties,
+                        QList<CardRelation *> &relatedCards,
+                        CardInfoPerSet setInfo);
 signals:
     void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
     void dataReadProgress(int bytesRead, int totalBytes);
 
 public:
-    OracleImporter(const QString &_dataDir, QObject *parent = 0);
+    explicit OracleImporter(const QString &_dataDir, QObject *parent = nullptr);
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
     bool saveToFile(const QString &fileName);
-    int importTextSpoiler(CardSetPtr set, const QVariant &data);
+    int importCardsFromSet(CardSetPtr currentSet, const QList<QVariant> &cards);
     QList<SetToDownload> &getSets()
     {
         return allSets;
@@ -93,8 +112,8 @@ public:
     }
 
 protected:
-    void extractColors(const QStringList &in, QStringList &out);
-    void sortColors(QStringList &colors);
+    inline QString getStringPropertyFromMap(QVariantMap card, QString propertyName);
+    void sortAndReduceColors(QString &colors);
 };
 
 #endif

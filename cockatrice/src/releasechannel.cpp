@@ -1,5 +1,4 @@
 #include "releasechannel.h"
-#include "qt-json/json.h"
 #include "version_string.h"
 
 #include <QJsonArray>
@@ -93,21 +92,20 @@ QString StableReleaseChannel::getReleaseChannelUrl() const
 
 void StableReleaseChannel::releaseListFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
-    bool ok;
-    QString tmp = QString(reply->readAll());
+    auto *reply = static_cast<QNetworkReply *>(sender());
+    QJsonParseError parseError{};
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
-
-    QVariantMap resultMap = QtJson::Json::parse(tmp, ok).toMap();
-    if (!ok) {
-        qWarning() << "No reply received from the release update server:" << tmp;
+    if (parseError.error != QJsonParseError::NoError) {
+        qWarning() << "No reply received from the release update server.";
         emit error(tr("No reply received from the release update server."));
         return;
     }
 
+    QVariantMap resultMap = jsonResponse.toVariant().toMap();
     if (!(resultMap.contains("name") && resultMap.contains("html_url") && resultMap.contains("tag_name") &&
           resultMap.contains("published_at"))) {
-        qWarning() << "Invalid received from the release update server:" << tmp;
+        qWarning() << "Invalid received from the release update server.";
         emit error(tr("Invalid reply received from the release update server."));
         return;
     }
@@ -145,7 +143,7 @@ void StableReleaseChannel::releaseListFinished()
     QString myHash = QString(VERSION_COMMIT);
     qDebug() << "Current hash=" << myHash << "update hash=" << shortHash;
 
-    qDebug() << "Got reply from release server, size=" << tmp.size() << "name=" << lastRelease->getName()
+    qDebug() << "Got reply from release server, name=" << lastRelease->getName()
              << "desc=" << lastRelease->getDescriptionUrl() << "date=" << lastRelease->getPublishDate()
              << "url=" << lastRelease->getDownloadUrl();
 
@@ -158,26 +156,25 @@ void StableReleaseChannel::releaseListFinished()
 
 void StableReleaseChannel::tagListFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
-    bool ok;
-    QString tmp = QString(reply->readAll());
+    auto *reply = static_cast<QNetworkReply *>(sender());
+    QJsonParseError parseError{};
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
-
-    QVariantMap resultMap = QtJson::Json::parse(tmp, ok).toMap();
-    if (!ok) {
-        qWarning() << "No reply received from the tag update server:" << tmp;
+    if (parseError.error != QJsonParseError::NoError) {
+        qWarning() << "No reply received from the tag update server.";
         emit error(tr("No reply received from the tag update server."));
         return;
     }
 
+    QVariantMap resultMap = jsonResponse.toVariant().toMap();
     if (!(resultMap.contains("object") && resultMap["object"].toMap().contains("sha"))) {
-        qWarning() << "Invalid received from the tag update server:" << tmp;
+        qWarning() << "Invalid received from the tag update server.";
         emit error(tr("Invalid reply received from the tag update server."));
         return;
     }
 
     lastRelease->setCommitHash(resultMap["object"].toMap()["sha"].toString());
-    qDebug() << "Got reply from tag server, size=" << tmp.size() << "commit=" << lastRelease->getCommitHash();
+    qDebug() << "Got reply from tag server, commit=" << lastRelease->getCommitHash();
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
     QString myHash = QString(VERSION_COMMIT);
@@ -190,7 +187,6 @@ void StableReleaseChannel::tagListFinished()
 void StableReleaseChannel::fileListFinished()
 {
     // Only implemented to satisfy interface
-    return;
 }
 
 QString BetaReleaseChannel::getManualDownloadUrl() const
@@ -210,7 +206,7 @@ QString BetaReleaseChannel::getReleaseChannelUrl() const
 
 void BetaReleaseChannel::releaseListFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
+    auto *reply = static_cast<QNetworkReply *>(sender());
     QByteArray jsonData = reply->readAll();
     reply->deleteLater();
 
@@ -224,7 +220,7 @@ void BetaReleaseChannel::releaseListFinished()
      */
     QVariantMap resultMap = array.at(0).toObject().toVariantMap();
 
-    if (array.size() == 0 || resultMap.size() == 0) {
+    if (array.empty() || resultMap.empty()) {
         qWarning() << "No reply received from the release update server:" << QString(jsonData);
         emit error(tr("No reply received from the release update server."));
         return;
@@ -262,18 +258,17 @@ void BetaReleaseChannel::releaseListFinished()
 
 void BetaReleaseChannel::fileListFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
-    QByteArray jsonData = reply->readAll();
+    auto *reply = static_cast<QNetworkReply *>(sender());
+    QJsonParseError parseError{};
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
-    bool ok;
-
-    QVariantList resultList = QtJson::Json::parse(jsonData, ok).toList();
-    if (!ok) {
-        qWarning() << "No reply received from the file update server:" << QString(jsonData);
+    if (parseError.error != QJsonParseError::NoError) {
+        qWarning() << "No reply received from the file update server.";
         emit error(tr("No reply received from the file update server."));
         return;
     }
 
+    QVariantList resultList = jsonResponse.toVariant().toList();
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
     QString myHash = QString(VERSION_COMMIT);
     qDebug() << "Current hash=" << myHash << "update hash=" << shortHash;

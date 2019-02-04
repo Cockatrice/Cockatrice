@@ -35,7 +35,7 @@ private:
     QTreeView *chooseTokenView;
 
 public:
-    DlgEditTokens(QWidget *parent = nullptr);
+    explicit DlgEditTokens(QWidget *parent = nullptr);
 };
 
 #endif

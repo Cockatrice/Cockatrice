@@ -217,8 +217,8 @@ public:
     QGridLayout *gridLayout_10;
     QLabel *lbl_Player_aDecP;
     SequenceEdit *Player_aDecP;
-    SequenceEdit *Player_IncP;
-    QLabel *lbl_Player_IncP;
+    SequenceEdit *Player_aIncP;
+    QLabel *lbl_Player_aIncP;
     QGroupBox *groupBox_8;
     QGridLayout *gridLayout_5;
     QLabel *lbl_TabGame_phase0;
@@ -246,12 +246,14 @@ public:
     SequenceEdit *TabGame_phase10;
     QLabel *lbl_TabGame_aNextTurn;
     SequenceEdit *TabGame_aNextPhase;
+    QLabel *lbl_TabGame_aNextPhaseAction;
+    SequenceEdit *TabGame_aNextPhaseAction;
+
     SequenceEdit *TabGame_aNextTurn;
     QGroupBox *groupBox_13;
     QGridLayout *gridLayout_13;
     QLabel *lbl_Player_aTap;
     SequenceEdit *Player_aTap;
-    SequenceEdit *Player_aUntap;
     QLabel *lbl_Player_aUntapAll;
     SequenceEdit *Player_aUntapAll;
     QLabel *lbl_Player_aDoesntUntap;
@@ -279,42 +281,8 @@ public:
     QSpacerItem *verticalSpacer_2;
     QWidget *tab_3;
     QGridLayout *gridLayout_20;
-    QGroupBox *groupBox_15;
-    QGridLayout *gridLayout_15;
-    QLabel *lbl_Player_aMoveToBottomLibrary;
-    SequenceEdit *Player_aMoveToBottomLibrary;
-    QLabel *lbl_Player_aMoveToTopLibrary;
-    SequenceEdit *Player_aMoveToTopLibrary;
-    QLabel *lbl_Player_aMoveToGraveyard;
-    SequenceEdit *Player_aMoveToGraveyard;
-    QLabel *lbl_Player_aMoveToExile;
-    SequenceEdit *Player_aMoveToExile;
-    QLabel *lbl_Player_aMoveToHand;
-    SequenceEdit *Player_aMoveToHand;
-    QLabel *lbl_Player_aMoveTopToPlayFaceDown;
-    SequenceEdit *Player_aMoveTopToPlayFaceDown;
-    QGroupBox *groupBox_16;
-    QGridLayout *gridLayout_16;
-    QLabel *lbl_Player_aViewGraveyard;
-    SequenceEdit *Player_aViewGraveyard;
-    QLabel *lbl_Player_aViewLibrary;
-    SequenceEdit *Player_aViewLibrary;
-    QLabel *lbl_Player_aViewTopCards;
-    SequenceEdit *Player_aViewTopCards;
-    QLabel *lbl_Player_aViewSideboard;
-    SequenceEdit *Player_aViewSideboard;
-    QLabel *lbl_Player_aViewRfg;
-    SequenceEdit *Player_aViewRfg;
-    QLabel *lbl_GameView_aCloseMostRecentZoneView;
-    SequenceEdit *GameView_aCloseMostRecentZoneView;
-    QGroupBox *groupBox_17;
-    QGridLayout *gridLayout_18;
-    SequenceEdit *DeckViewContainer_loadRemoteButton;
-    SequenceEdit *DeckViewContainer_loadLocalButton;
-    QLabel *lbl_DeckViewContainer_loadRemoteButton;
-    QLabel *lbl_DeckViewContainer_loadLocalButton;
-    QGroupBox *groupBox_18;
-    QGridLayout *gridLayout_19;
+    QGroupBox *groupBox_gameplay;
+    QGridLayout *gridLayout_gameplay;
     QLabel *lbl_Player_aDrawArrow;
     SequenceEdit *Player_aDrawArrow;
     QLabel *lbl_TabGame_aLeaveGame;
@@ -331,8 +299,36 @@ public:
     SequenceEdit *Player_aShuffle;
     QLabel *lbl_TabGame_aRotateViewCCW;
     SequenceEdit *TabGame_aRotateViewCCW;
-    QGroupBox *groupBox_14;
-    QGridLayout *gridLayout_14;
+    QGroupBox *groupBox_moveCard;
+    QGridLayout *gridLayout_moveCard;
+    QLabel *lbl_Player_aMoveToBottomLibrary;
+    SequenceEdit *Player_aMoveToBottomLibrary;
+    QLabel *lbl_Player_aMoveToTopLibrary;
+    SequenceEdit *Player_aMoveToTopLibrary;
+    QLabel *lbl_Player_aMoveToGraveyard;
+    SequenceEdit *Player_aMoveToGraveyard;
+    QLabel *lbl_Player_aMoveToExile;
+    SequenceEdit *Player_aMoveToExile;
+    QLabel *lbl_Player_aMoveToHand;
+    SequenceEdit *Player_aMoveToHand;
+    QLabel *lbl_Player_aMoveTopToPlayFaceDown;
+    SequenceEdit *Player_aMoveTopToPlayFaceDown;
+    QGroupBox *groupBox_view;
+    QGridLayout *gridLayout_view;
+    QLabel *lbl_Player_aViewGraveyard;
+    SequenceEdit *Player_aViewGraveyard;
+    QLabel *lbl_Player_aViewLibrary;
+    SequenceEdit *Player_aViewLibrary;
+    QLabel *lbl_Player_aViewTopCards;
+    SequenceEdit *Player_aViewTopCards;
+    QLabel *lbl_Player_aViewSideboard;
+    SequenceEdit *Player_aViewSideboard;
+    QLabel *lbl_Player_aViewRfg;
+    SequenceEdit *Player_aViewRfg;
+    QLabel *lbl_GameView_aCloseMostRecentZoneView;
+    SequenceEdit *GameView_aCloseMostRecentZoneView;
+    QGroupBox *groupBox_draw;
+    QGridLayout *gridLayout_draw;
     QLabel *lbl_Player_aMulligan;
     SequenceEdit *Player_aMulligan;
     QLabel *lbl_Player_aDrawCard;
@@ -343,6 +339,22 @@ public:
     SequenceEdit *Player_aUndoDraw;
     QLabel *lbl_Player_aAlwaysRevealTopCard;
     SequenceEdit *Player_aAlwaysRevealTopCard;
+    QGroupBox *groupBox_moveDeck;
+    QGridLayout *gridLayout_moveDeck;
+    QLabel *lbl_Player_aMoveTopCardToGraveyard;
+    SequenceEdit *Player_aMoveTopCardToGraveyard;
+    QLabel *lbl_Player_aMoveTopCardToExile;
+    SequenceEdit *Player_aMoveTopCardToExile;
+    QLabel *lbl_Player_aMoveTopCardsToGraveyard;
+    SequenceEdit *Player_aMoveTopCardsToGraveyard;
+    QLabel *lbl_Player_aMoveTopCardsToExile;
+    SequenceEdit *Player_aMoveTopCardsToExile;
+    QGroupBox *groupBox_gameLobby;
+    QGridLayout *gridLayout_gameLobby;
+    SequenceEdit *DeckViewContainer_loadRemoteButton;
+    QLabel *lbl_DeckViewContainer_loadRemoteButton;
+    SequenceEdit *DeckViewContainer_loadLocalButton;
+    QLabel *lbl_DeckViewContainer_loadLocalButton;
     QSpacerItem *verticalSpacer_3;
     QWidget *tab_4;
     QLabel *faqLabel;
@@ -1111,15 +1123,15 @@ public:
 
         gridLayout_10->addWidget(Player_aDecP, 1, 1, 1, 1);
 
-        Player_IncP = new SequenceEdit("Player/IncP", groupBox_10);
-        Player_IncP->setObjectName("Player_IncP");
+        Player_aIncP = new SequenceEdit("Player/aIncP", groupBox_10);
+        Player_aIncP->setObjectName("Player_aIncP");
 
-        gridLayout_10->addWidget(Player_IncP, 0, 1, 1, 1);
+        gridLayout_10->addWidget(Player_aIncP, 0, 1, 1, 1);
 
-        lbl_Player_IncP = new QLabel(groupBox_10);
-        lbl_Player_IncP->setObjectName("lbl_Player_IncP");
+        lbl_Player_aIncP = new QLabel(groupBox_10);
+        lbl_Player_aIncP->setObjectName("lbl_Player_aIncP");
 
-        gridLayout_10->addWidget(lbl_Player_IncP, 0, 0, 1, 1);
+        gridLayout_10->addWidget(lbl_Player_aIncP, 0, 0, 1, 1);
 
         verticalLayout->addWidget(groupBox_10);
 
@@ -1239,6 +1251,11 @@ public:
 
         gridLayout_5->addWidget(lbl_TabGame_aNextPhase, 11, 0, 1, 1);
 
+        lbl_TabGame_aNextPhaseAction = new QLabel(groupBox_8);
+        lbl_TabGame_aNextPhaseAction->setObjectName("lbl_TabGame_aNextPhaseAction");
+
+        gridLayout_5->addWidget(lbl_TabGame_aNextPhaseAction, 12, 0, 1, 1);
+
         TabGame_phase10 = new SequenceEdit("Player/phase10", groupBox_8);
         TabGame_phase10->setObjectName("TabGame_phase10");
 
@@ -1247,17 +1264,22 @@ public:
         lbl_TabGame_aNextTurn = new QLabel(groupBox_8);
         lbl_TabGame_aNextTurn->setObjectName("lbl_TabGame_aNextTurn");
 
-        gridLayout_5->addWidget(lbl_TabGame_aNextTurn, 12, 0, 1, 1);
+        gridLayout_5->addWidget(lbl_TabGame_aNextTurn, 13, 0, 1, 1);
 
         TabGame_aNextPhase = new SequenceEdit("Player/aNextPhase", groupBox_8);
         TabGame_aNextPhase->setObjectName("TabGame_aNextPhase");
 
         gridLayout_5->addWidget(TabGame_aNextPhase, 11, 1, 1, 1);
 
+        TabGame_aNextPhaseAction = new SequenceEdit("Player/aNextPhaseAction", groupBox_8);
+        TabGame_aNextPhaseAction->setObjectName("TabGame_aaNextPhaseAction");
+
+        gridLayout_5->addWidget(TabGame_aNextPhaseAction, 12, 1, 1, 1);
+
         TabGame_aNextTurn = new SequenceEdit("Player/aNextTurn", groupBox_8);
         TabGame_aNextTurn->setObjectName("TabGame_aNextTurn");
 
-        gridLayout_5->addWidget(TabGame_aNextTurn, 12, 1, 1, 1);
+        gridLayout_5->addWidget(TabGame_aNextTurn, 13, 1, 1, 1);
 
         gridLayout_17->addWidget(groupBox_8, 0, 0, 1, 1);
 
@@ -1406,309 +1428,357 @@ public:
         tab_3->setObjectName("tab_3");
         gridLayout_20 = new QGridLayout(tab_3);
         gridLayout_20->setObjectName("gridLayout_20");
-        groupBox_15 = new QGroupBox(tab_3);
-        groupBox_15->setObjectName("groupBox_15");
-        gridLayout_15 = new QGridLayout(groupBox_15);
-        gridLayout_15->setObjectName("gridLayout_15");
-        lbl_Player_aMoveToBottomLibrary = new QLabel(groupBox_15);
-        lbl_Player_aMoveToBottomLibrary->setObjectName("lbl_Player_aMoveToBottomLibrary");
 
-        gridLayout_15->addWidget(lbl_Player_aMoveToBottomLibrary, 0, 0, 1, 1);
-
-        Player_aMoveToBottomLibrary = new SequenceEdit("Player/aMoveToBottomLibrary", groupBox_15);
-        Player_aMoveToBottomLibrary->setObjectName("Player_aMoveToBottomLibrary");
-
-        gridLayout_15->addWidget(Player_aMoveToBottomLibrary, 0, 1, 1, 1);
-
-        lbl_Player_aMoveToTopLibrary = new QLabel(groupBox_15);
-        lbl_Player_aMoveToTopLibrary->setObjectName("lbl_Player_aMoveToTopLibrary");
-
-        gridLayout_15->addWidget(lbl_Player_aMoveToTopLibrary, 1, 0, 1, 1);
-
-        Player_aMoveToTopLibrary = new SequenceEdit("Player/aMoveToTopLibrary", groupBox_15);
-        Player_aMoveToTopLibrary->setObjectName("Player_aMoveToTopLibrary");
-
-        gridLayout_15->addWidget(Player_aMoveToTopLibrary, 1, 1, 1, 1);
-
-        lbl_Player_aMoveToGraveyard = new QLabel(groupBox_15);
-        lbl_Player_aMoveToGraveyard->setObjectName("lbl_Player_aMoveToGraveyard");
-
-        gridLayout_15->addWidget(lbl_Player_aMoveToGraveyard, 2, 0, 1, 1);
-
-        Player_aMoveToGraveyard = new SequenceEdit("Player/aMoveToGraveyard", groupBox_15);
-        Player_aMoveToGraveyard->setObjectName("Player_aMoveToGraveyard");
-
-        gridLayout_15->addWidget(Player_aMoveToGraveyard, 2, 1, 1, 1);
-
-        lbl_Player_aMoveToExile = new QLabel(groupBox_15);
-        lbl_Player_aMoveToExile->setObjectName("lbl_Player_aMoveToExile");
-
-        gridLayout_15->addWidget(lbl_Player_aMoveToExile, 3, 0, 1, 1);
-
-        Player_aMoveToExile = new SequenceEdit("Player/aMoveToExile", groupBox_15);
-        Player_aMoveToExile->setObjectName("Player_aMoveToExile");
-
-        gridLayout_15->addWidget(Player_aMoveToExile, 3, 1, 1, 1);
-
-        lbl_Player_aMoveToHand = new QLabel(groupBox_15);
-        lbl_Player_aMoveToHand->setObjectName("lbl_Player_aMoveToHand");
-
-        gridLayout_15->addWidget(lbl_Player_aMoveToHand, 4, 0, 1, 1);
-
-        Player_aMoveToHand = new SequenceEdit("Player/aMoveToHand", groupBox_15);
-        Player_aMoveToHand->setObjectName("Player_aMoveToHand");
-
-        gridLayout_15->addWidget(Player_aMoveToHand, 4, 1, 1, 1);
-
-        lbl_Player_aMoveTopToPlayFaceDown = new QLabel(groupBox_15);
-        lbl_Player_aMoveTopToPlayFaceDown->setObjectName("lbl_Player_aMoveTopToPlayFaceDown");
-
-        gridLayout_15->addWidget(lbl_Player_aMoveTopToPlayFaceDown, 5, 0, 1, 1);
-
-        Player_aMoveTopToPlayFaceDown = new SequenceEdit("Player/aMoveTopToPlayFaceDown", groupBox_15);
-        Player_aMoveTopToPlayFaceDown->setObjectName("Player_aMoveTopToPlayFaceDown");
-
-        gridLayout_15->addWidget(Player_aMoveTopToPlayFaceDown, 5, 1, 1, 1);
-
-        gridLayout_20->addWidget(groupBox_15, 0, 1, 1, 1);
-
-        groupBox_16 = new QGroupBox(tab_3);
-        groupBox_16->setObjectName("groupBox_16");
-        gridLayout_16 = new QGridLayout(groupBox_16);
-        gridLayout_16->setObjectName("gridLayout_16");
-        lbl_Player_aViewGraveyard = new QLabel(groupBox_16);
-        lbl_Player_aViewGraveyard->setObjectName("lbl_Player_aViewGraveyard");
-
-        gridLayout_16->addWidget(lbl_Player_aViewGraveyard, 0, 0, 1, 1);
-
-        Player_aViewGraveyard = new SequenceEdit("Player/aViewGraveyard", groupBox_16);
-        Player_aViewGraveyard->setObjectName("Player_aViewGraveyard");
-
-        gridLayout_16->addWidget(Player_aViewGraveyard, 0, 1, 1, 1);
-
-        lbl_Player_aViewLibrary = new QLabel(groupBox_16);
-        lbl_Player_aViewLibrary->setObjectName("lbl_Player_aViewLibrary");
-
-        gridLayout_16->addWidget(lbl_Player_aViewLibrary, 1, 0, 1, 1);
-
-        Player_aViewLibrary = new SequenceEdit("Player/aViewLibrary", groupBox_16);
-        Player_aViewLibrary->setObjectName("Player_aViewLibrary");
-
-        gridLayout_16->addWidget(Player_aViewLibrary, 1, 1, 1, 1);
-
-        lbl_Player_aViewTopCards = new QLabel(groupBox_16);
-        lbl_Player_aViewTopCards->setObjectName("lbl_Player_aViewTopCards");
-
-        gridLayout_16->addWidget(lbl_Player_aViewTopCards, 2, 0, 1, 1);
-
-        Player_aViewTopCards = new SequenceEdit("Player/aViewTopCards", groupBox_16);
-        Player_aViewTopCards->setObjectName("Player_aViewTopCards");
-
-        gridLayout_16->addWidget(Player_aViewTopCards, 2, 1, 1, 1);
-
-        lbl_Player_aViewSideboard = new QLabel(groupBox_16);
-        lbl_Player_aViewSideboard->setObjectName("lbl_Player_aViewSideboard");
-
-        gridLayout_16->addWidget(lbl_Player_aViewSideboard, 3, 0, 1, 1);
-
-        Player_aViewSideboard = new SequenceEdit("Player/aViewSideboard", groupBox_16);
-        Player_aViewSideboard->setObjectName("Player_aViewSideboard");
-
-        gridLayout_16->addWidget(Player_aViewSideboard, 3, 1, 1, 1);
-
-        lbl_Player_aViewRfg = new QLabel(groupBox_16);
-        lbl_Player_aViewRfg->setObjectName("lbl_Player_aViewRfg");
-
-        gridLayout_16->addWidget(lbl_Player_aViewRfg, 4, 0, 1, 1);
-
-        Player_aViewRfg = new SequenceEdit("Player/aViewRfg", groupBox_16);
-        Player_aViewRfg->setObjectName("Player_aViewRfg");
-
-        gridLayout_16->addWidget(Player_aViewRfg, 4, 1, 1, 1);
-
-        lbl_GameView_aCloseMostRecentZoneView = new QLabel(groupBox_16);
-        lbl_GameView_aCloseMostRecentZoneView->setObjectName("lbl_GameView_aCloseMostRecentZoneView");
-
-        gridLayout_16->addWidget(lbl_GameView_aCloseMostRecentZoneView, 5, 0, 1, 1);
-
-        GameView_aCloseMostRecentZoneView = new SequenceEdit("Player/aCloseMostRecentZoneView", groupBox_16);
-        GameView_aCloseMostRecentZoneView->setObjectName("GameView_aCloseMostRecentZoneView");
-
-        gridLayout_16->addWidget(GameView_aCloseMostRecentZoneView, 5, 1, 1, 1);
-
-        gridLayout_20->addWidget(groupBox_16, 0, 2, 1, 1);
-
-        groupBox_17 = new QGroupBox(tab_3);
-        groupBox_17->setObjectName("groupBox_17");
-        gridLayout_18 = new QGridLayout(groupBox_17);
-        gridLayout_18->setObjectName("gridLayout_18");
-        DeckViewContainer_loadRemoteButton = new SequenceEdit("DeckViewContainer/loadRemoteButton", groupBox_17);
-        DeckViewContainer_loadRemoteButton->setObjectName("DeckViewContainer_loadRemoteButton");
-
-        gridLayout_18->addWidget(DeckViewContainer_loadRemoteButton, 2, 1, 1, 1);
-
-        DeckViewContainer_loadLocalButton = new SequenceEdit("DeckViewContainer/loadLocalButton", groupBox_17);
-        DeckViewContainer_loadLocalButton->setObjectName("DeckViewContainer_loadLocalButton");
-
-        gridLayout_18->addWidget(DeckViewContainer_loadLocalButton, 0, 1, 1, 1);
-
-        lbl_DeckViewContainer_loadRemoteButton = new QLabel(groupBox_17);
-        lbl_DeckViewContainer_loadRemoteButton->setObjectName("lbl_DeckViewContainer_loadRemoteButton");
-
-        gridLayout_18->addWidget(lbl_DeckViewContainer_loadRemoteButton, 2, 0, 1, 1);
-
-        lbl_DeckViewContainer_loadLocalButton = new QLabel(groupBox_17);
-        lbl_DeckViewContainer_loadLocalButton->setObjectName("lbl_DeckViewContainer_loadLocalButton");
-
-        gridLayout_18->addWidget(lbl_DeckViewContainer_loadLocalButton, 0, 0, 1, 1);
-
-        gridLayout_20->addWidget(groupBox_17, 1, 0, 1, 1);
-
-        groupBox_18 = new QGroupBox(tab_3);
-        groupBox_18->setObjectName("groupBox_18");
-        gridLayout_19 = new QGridLayout(groupBox_18);
-        gridLayout_19->setObjectName("gridLayout_19");
-        lbl_Player_aDrawArrow = new QLabel(groupBox_18);
+        groupBox_gameplay = new QGroupBox(tab_3);
+        groupBox_gameplay->setObjectName("groupBox_gameplay");
+        gridLayout_gameplay = new QGridLayout(groupBox_gameplay);
+        gridLayout_gameplay->setObjectName("gridLayout_gameplay");
+        lbl_Player_aDrawArrow = new QLabel(groupBox_gameplay);
         lbl_Player_aDrawArrow->setObjectName("lbl_Player_aDrawArrow");
 
-        gridLayout_19->addWidget(lbl_Player_aDrawArrow, 0, 0, 1, 1);
+        gridLayout_gameplay->addWidget(lbl_Player_aDrawArrow, 0, 0, 1, 1);
 
-        Player_aDrawArrow = new SequenceEdit("Player/aDrawArrow", groupBox_18);
+        Player_aDrawArrow = new SequenceEdit("Player/aDrawArrow", groupBox_gameplay);
         Player_aDrawArrow->setObjectName("Player_aDrawArrow");
 
-        gridLayout_19->addWidget(Player_aDrawArrow, 0, 1, 1, 1);
+        gridLayout_gameplay->addWidget(Player_aDrawArrow, 0, 1, 1, 1);
 
-        lbl_TabGame_aLeaveGame = new QLabel(groupBox_18);
-        lbl_TabGame_aLeaveGame->setObjectName("lbl_TabGame_aLeaveGame");
-
-        gridLayout_19->addWidget(lbl_TabGame_aLeaveGame, 0, 2, 1, 1);
-
-        TabGame_aLeaveGame = new SequenceEdit("Player/aLeaveGame", groupBox_18);
-        TabGame_aLeaveGame->setObjectName("TabGame_aLeaveGame");
-
-        gridLayout_19->addWidget(TabGame_aLeaveGame, 0, 3, 1, 1);
-
-        lbl_TabGame_aRemoveLocalArrows = new QLabel(groupBox_18);
+        lbl_TabGame_aRemoveLocalArrows = new QLabel(groupBox_gameplay);
         lbl_TabGame_aRemoveLocalArrows->setObjectName("lbl_TabGame_aRemoveLocalArrows");
 
-        gridLayout_19->addWidget(lbl_TabGame_aRemoveLocalArrows, 1, 0, 1, 1);
+        gridLayout_gameplay->addWidget(lbl_TabGame_aRemoveLocalArrows, 1, 0, 1, 1);
 
-        TabGame_aRemoveLocalArrows = new SequenceEdit("Player/aRemoveLocalArrows", groupBox_18);
+        TabGame_aRemoveLocalArrows = new SequenceEdit("Player/aRemoveLocalArrows", groupBox_gameplay);
         TabGame_aRemoveLocalArrows->setObjectName("TabGame_aRemoveLocalArrows");
 
-        gridLayout_19->addWidget(TabGame_aRemoveLocalArrows, 1, 1, 1, 1);
+        gridLayout_gameplay->addWidget(TabGame_aRemoveLocalArrows, 1, 1, 1, 1);
 
-        lbl_TabGame_aConcede = new QLabel(groupBox_18);
+        lbl_TabGame_aConcede = new QLabel(groupBox_gameplay);
         lbl_TabGame_aConcede->setObjectName("lbl_TabGame_aConcede");
 
-        gridLayout_19->addWidget(lbl_TabGame_aConcede, 1, 2, 1, 1);
+        gridLayout_gameplay->addWidget(lbl_TabGame_aConcede, 2, 0, 1, 1);
 
-        TabGame_aConcede = new SequenceEdit("Player/aConcede", groupBox_18);
+        TabGame_aConcede = new SequenceEdit("Player/aConcede", groupBox_gameplay);
         TabGame_aConcede->setObjectName("TabGame_aConcede");
 
-        gridLayout_19->addWidget(TabGame_aConcede, 1, 3, 1, 1);
+        gridLayout_gameplay->addWidget(TabGame_aConcede, 2, 1, 1, 1);
 
-        lbl_Player_aRollDie = new QLabel(groupBox_18);
+        lbl_TabGame_aLeaveGame = new QLabel(groupBox_gameplay);
+        lbl_TabGame_aLeaveGame->setObjectName("lbl_TabGame_aLeaveGame");
+
+        gridLayout_gameplay->addWidget(lbl_TabGame_aLeaveGame, 3, 0, 1, 1);
+
+        TabGame_aLeaveGame = new SequenceEdit("Player/aLeaveGame", groupBox_gameplay);
+        TabGame_aLeaveGame->setObjectName("TabGame_aLeaveGame");
+
+        gridLayout_gameplay->addWidget(TabGame_aLeaveGame, 3, 1, 1, 1);
+
+        lbl_Player_aRollDie = new QLabel(groupBox_gameplay);
         lbl_Player_aRollDie->setObjectName("lbl_Player_aRollDie");
 
-        gridLayout_19->addWidget(lbl_Player_aRollDie, 2, 0, 1, 1);
+        gridLayout_gameplay->addWidget(lbl_Player_aRollDie, 4, 0, 1, 1);
 
-        Player_aRollDie = new SequenceEdit("Player/aRollDie", groupBox_18);
+        Player_aRollDie = new SequenceEdit("Player/aRollDie", groupBox_gameplay);
         Player_aRollDie->setObjectName("Player_aRollDie");
 
-        gridLayout_19->addWidget(Player_aRollDie, 2, 1, 1, 1);
+        gridLayout_gameplay->addWidget(Player_aRollDie, 4, 1, 1, 1);
 
-        lbl_TabGame_aRotateViewCW = new QLabel(groupBox_18);
-        lbl_TabGame_aRotateViewCW->setObjectName("lbl_TabGame_aRotateViewCW");
-
-        gridLayout_19->addWidget(lbl_TabGame_aRotateViewCW, 2, 2, 1, 1);
-
-        TabGame_aRotateViewCW = new SequenceEdit("Player/aRotateViewCW", groupBox_18);
-        TabGame_aRotateViewCW->setObjectName("TabGame_aRotateViewCW");
-
-        gridLayout_19->addWidget(TabGame_aRotateViewCW, 2, 3, 1, 1);
-
-        lbl_Player_aShuffle = new QLabel(groupBox_18);
+        lbl_Player_aShuffle = new QLabel(groupBox_gameplay);
         lbl_Player_aShuffle->setObjectName("lbl_Player_aShuffle");
 
-        gridLayout_19->addWidget(lbl_Player_aShuffle, 3, 0, 1, 1);
+        gridLayout_gameplay->addWidget(lbl_Player_aShuffle, 5, 0, 1, 1);
 
-        Player_aShuffle = new SequenceEdit("Player/aShuffle", groupBox_18);
+        Player_aShuffle = new SequenceEdit("Player/aShuffle", groupBox_gameplay);
         Player_aShuffle->setObjectName("Player_aShuffle");
 
-        gridLayout_19->addWidget(Player_aShuffle, 3, 1, 1, 1);
+        gridLayout_gameplay->addWidget(Player_aShuffle, 5, 1, 1, 1);
 
-        lbl_TabGame_aRotateViewCCW = new QLabel(groupBox_18);
+        lbl_TabGame_aRotateViewCW = new QLabel(groupBox_gameplay);
+        lbl_TabGame_aRotateViewCW->setObjectName("lbl_TabGame_aRotateViewCW");
+
+        gridLayout_gameplay->addWidget(lbl_TabGame_aRotateViewCW, 6, 0, 1, 1);
+
+        TabGame_aRotateViewCW = new SequenceEdit("Player/aRotateViewCW", groupBox_gameplay);
+        TabGame_aRotateViewCW->setObjectName("TabGame_aRotateViewCW");
+
+        gridLayout_gameplay->addWidget(TabGame_aRotateViewCW, 6, 1, 1, 1);
+
+        lbl_TabGame_aRotateViewCCW = new QLabel(groupBox_gameplay);
         lbl_TabGame_aRotateViewCCW->setObjectName("lbl_TabGame_aRotateViewCCW");
 
-        gridLayout_19->addWidget(lbl_TabGame_aRotateViewCCW, 3, 2, 1, 1);
+        gridLayout_gameplay->addWidget(lbl_TabGame_aRotateViewCCW, 7, 0, 1, 1);
 
-        TabGame_aRotateViewCCW = new SequenceEdit("Player/aRotateViewCCW", groupBox_18);
+        TabGame_aRotateViewCCW = new SequenceEdit("Player/aRotateViewCCW", groupBox_gameplay);
         TabGame_aRotateViewCCW->setObjectName("TabGame_aRotateViewCCW");
 
-        gridLayout_19->addWidget(TabGame_aRotateViewCCW, 3, 3, 1, 1);
+        gridLayout_gameplay->addWidget(TabGame_aRotateViewCCW, 7, 1, 1, 1);
 
-        gridLayout_20->addWidget(groupBox_18, 1, 1, 1, 2);
+        gridLayout_20->addWidget(groupBox_gameplay, 0, 0, 1, 1);
 
-        groupBox_14 = new QGroupBox(tab_3);
-        groupBox_14->setObjectName("groupBox_14");
-        gridLayout_14 = new QGridLayout(groupBox_14);
-        gridLayout_14->setObjectName("gridLayout_14");
-        lbl_Player_aMulligan = new QLabel(groupBox_14);
+        groupBox_moveCard = new QGroupBox(tab_3);
+        groupBox_moveCard->setObjectName("groupBox_moveCard");
+        gridLayout_moveCard = new QGridLayout(groupBox_moveCard);
+        gridLayout_moveCard->setObjectName("gridLayout_moveCard");
+        lbl_Player_aMoveToBottomLibrary = new QLabel(groupBox_moveCard);
+        lbl_Player_aMoveToBottomLibrary->setObjectName("lbl_Player_aMoveToBottomLibrary");
+
+        gridLayout_moveCard->addWidget(lbl_Player_aMoveToBottomLibrary, 0, 0, 1, 1);
+
+        Player_aMoveToBottomLibrary = new SequenceEdit("Player/aMoveToBottomLibrary", groupBox_moveCard);
+        Player_aMoveToBottomLibrary->setObjectName("Player_aMoveToBottomLibrary");
+
+        gridLayout_moveCard->addWidget(Player_aMoveToBottomLibrary, 0, 1, 1, 1);
+
+        lbl_Player_aMoveToTopLibrary = new QLabel(groupBox_moveCard);
+        lbl_Player_aMoveToTopLibrary->setObjectName("lbl_Player_aMoveToTopLibrary");
+
+        gridLayout_moveCard->addWidget(lbl_Player_aMoveToTopLibrary, 1, 0, 1, 1);
+
+        Player_aMoveToTopLibrary = new SequenceEdit("Player/aMoveToTopLibrary", groupBox_moveCard);
+        Player_aMoveToTopLibrary->setObjectName("Player_aMoveToTopLibrary");
+
+        gridLayout_moveCard->addWidget(Player_aMoveToTopLibrary, 1, 1, 1, 1);
+
+        lbl_Player_aMoveToGraveyard = new QLabel(groupBox_moveCard);
+        lbl_Player_aMoveToGraveyard->setObjectName("lbl_Player_aMoveToGraveyard");
+
+        gridLayout_moveCard->addWidget(lbl_Player_aMoveToGraveyard, 2, 0, 1, 1);
+
+        Player_aMoveToGraveyard = new SequenceEdit("Player/aMoveToGraveyard", groupBox_moveCard);
+        Player_aMoveToGraveyard->setObjectName("Player_aMoveToGraveyard");
+
+        gridLayout_moveCard->addWidget(Player_aMoveToGraveyard, 2, 1, 1, 1);
+
+        lbl_Player_aMoveToExile = new QLabel(groupBox_moveCard);
+        lbl_Player_aMoveToExile->setObjectName("lbl_Player_aMoveToExile");
+
+        gridLayout_moveCard->addWidget(lbl_Player_aMoveToExile, 3, 0, 1, 1);
+
+        Player_aMoveToExile = new SequenceEdit("Player/aMoveToExile", groupBox_moveCard);
+        Player_aMoveToExile->setObjectName("Player_aMoveToExile");
+
+        gridLayout_moveCard->addWidget(Player_aMoveToExile, 3, 1, 1, 1);
+
+        lbl_Player_aMoveToHand = new QLabel(groupBox_moveCard);
+        lbl_Player_aMoveToHand->setObjectName("lbl_Player_aMoveToHand");
+
+        gridLayout_moveCard->addWidget(lbl_Player_aMoveToHand, 4, 0, 1, 1);
+
+        Player_aMoveToHand = new SequenceEdit("Player/aMoveToHand", groupBox_moveCard);
+        Player_aMoveToHand->setObjectName("Player_aMoveToHand");
+
+        gridLayout_moveCard->addWidget(Player_aMoveToHand, 4, 1, 1, 1);
+
+        lbl_Player_aMoveTopToPlayFaceDown = new QLabel(groupBox_moveCard);
+        lbl_Player_aMoveTopToPlayFaceDown->setObjectName("lbl_Player_aMoveTopToPlayFaceDown");
+
+        gridLayout_moveCard->addWidget(lbl_Player_aMoveTopToPlayFaceDown, 5, 0, 1, 1);
+
+        Player_aMoveTopToPlayFaceDown = new SequenceEdit("Player/aMoveTopToPlayFaceDown", groupBox_moveCard);
+        Player_aMoveTopToPlayFaceDown->setObjectName("Player_aMoveTopToPlayFaceDown");
+
+        gridLayout_moveCard->addWidget(Player_aMoveTopToPlayFaceDown, 5, 1, 1, 1);
+
+        gridLayout_20->addWidget(groupBox_moveCard, 0, 1, 1, 1);
+
+        groupBox_view = new QGroupBox(tab_3);
+        groupBox_view->setObjectName("groupBox_view");
+        gridLayout_view = new QGridLayout(groupBox_view);
+        gridLayout_view->setObjectName("gridLayout_view");
+        lbl_Player_aViewGraveyard = new QLabel(groupBox_view);
+        lbl_Player_aViewGraveyard->setObjectName("lbl_Player_aViewGraveyard");
+
+        gridLayout_view->addWidget(lbl_Player_aViewGraveyard, 0, 0, 1, 1);
+
+        Player_aViewGraveyard = new SequenceEdit("Player/aViewGraveyard", groupBox_view);
+        Player_aViewGraveyard->setObjectName("Player_aViewGraveyard");
+
+        gridLayout_view->addWidget(Player_aViewGraveyard, 0, 1, 1, 1);
+
+        lbl_Player_aViewLibrary = new QLabel(groupBox_view);
+        lbl_Player_aViewLibrary->setObjectName("lbl_Player_aViewLibrary");
+
+        gridLayout_view->addWidget(lbl_Player_aViewLibrary, 1, 0, 1, 1);
+
+        Player_aViewLibrary = new SequenceEdit("Player/aViewLibrary", groupBox_view);
+        Player_aViewLibrary->setObjectName("Player_aViewLibrary");
+
+        gridLayout_view->addWidget(Player_aViewLibrary, 1, 1, 1, 1);
+
+        lbl_Player_aViewTopCards = new QLabel(groupBox_view);
+        lbl_Player_aViewTopCards->setObjectName("lbl_Player_aViewTopCards");
+
+        gridLayout_view->addWidget(lbl_Player_aViewTopCards, 2, 0, 1, 1);
+
+        Player_aViewTopCards = new SequenceEdit("Player/aViewTopCards", groupBox_view);
+        Player_aViewTopCards->setObjectName("Player_aViewTopCards");
+
+        gridLayout_view->addWidget(Player_aViewTopCards, 2, 1, 1, 1);
+
+        lbl_Player_aViewSideboard = new QLabel(groupBox_view);
+        lbl_Player_aViewSideboard->setObjectName("lbl_Player_aViewSideboard");
+
+        gridLayout_view->addWidget(lbl_Player_aViewSideboard, 3, 0, 1, 1);
+
+        Player_aViewSideboard = new SequenceEdit("Player/aViewSideboard", groupBox_view);
+        Player_aViewSideboard->setObjectName("Player_aViewSideboard");
+
+        gridLayout_view->addWidget(Player_aViewSideboard, 3, 1, 1, 1);
+
+        lbl_Player_aViewRfg = new QLabel(groupBox_view);
+        lbl_Player_aViewRfg->setObjectName("lbl_Player_aViewRfg");
+
+        gridLayout_view->addWidget(lbl_Player_aViewRfg, 4, 0, 1, 1);
+
+        Player_aViewRfg = new SequenceEdit("Player/aViewRfg", groupBox_view);
+        Player_aViewRfg->setObjectName("Player_aViewRfg");
+
+        gridLayout_view->addWidget(Player_aViewRfg, 4, 1, 1, 1);
+
+        lbl_GameView_aCloseMostRecentZoneView = new QLabel(groupBox_view);
+        lbl_GameView_aCloseMostRecentZoneView->setObjectName("lbl_GameView_aCloseMostRecentZoneView");
+
+        gridLayout_view->addWidget(lbl_GameView_aCloseMostRecentZoneView, 5, 0, 1, 1);
+
+        GameView_aCloseMostRecentZoneView = new SequenceEdit("Player/aCloseMostRecentZoneView", groupBox_view);
+        GameView_aCloseMostRecentZoneView->setObjectName("GameView_aCloseMostRecentZoneView");
+
+        gridLayout_view->addWidget(GameView_aCloseMostRecentZoneView, 5, 1, 1, 1);
+
+        gridLayout_20->addWidget(groupBox_view, 0, 2, 1, 1);
+
+        groupBox_draw = new QGroupBox(tab_3);
+        groupBox_draw->setObjectName("groupBox_draw");
+        gridLayout_draw = new QGridLayout(groupBox_draw);
+        gridLayout_draw->setObjectName("gridLayout_draw");
+        lbl_Player_aMulligan = new QLabel(groupBox_draw);
         lbl_Player_aMulligan->setObjectName("lbl_Player_aMulligan");
 
-        gridLayout_14->addWidget(lbl_Player_aMulligan, 4, 0, 1, 1);
+        gridLayout_draw->addWidget(lbl_Player_aMulligan, 4, 0, 1, 1);
 
-        Player_aMulligan = new SequenceEdit("Player/aMulligan", groupBox_14);
+        Player_aMulligan = new SequenceEdit("Player/aMulligan", groupBox_draw);
         Player_aMulligan->setObjectName("Player_aMulligan");
 
-        gridLayout_14->addWidget(Player_aMulligan, 4, 1, 1, 1);
+        gridLayout_draw->addWidget(Player_aMulligan, 4, 1, 1, 1);
 
-        lbl_Player_aDrawCard = new QLabel(groupBox_14);
+        lbl_Player_aDrawCard = new QLabel(groupBox_draw);
         lbl_Player_aDrawCard->setObjectName("lbl_Player_aDrawCard");
 
-        gridLayout_14->addWidget(lbl_Player_aDrawCard, 0, 0, 1, 1);
+        gridLayout_draw->addWidget(lbl_Player_aDrawCard, 0, 0, 1, 1);
 
-        Player_aDrawCard = new SequenceEdit("Player/aDrawCard", groupBox_14);
+        Player_aDrawCard = new SequenceEdit("Player/aDrawCard", groupBox_draw);
         Player_aDrawCard->setObjectName("Player_aDrawCard");
 
-        gridLayout_14->addWidget(Player_aDrawCard, 0, 1, 1, 1);
+        gridLayout_draw->addWidget(Player_aDrawCard, 0, 1, 1, 1);
 
-        lbl_Player_aDrawCards = new QLabel(groupBox_14);
+        lbl_Player_aDrawCards = new QLabel(groupBox_draw);
         lbl_Player_aDrawCards->setObjectName("lbl_Player_aDrawCards");
 
-        gridLayout_14->addWidget(lbl_Player_aDrawCards, 1, 0, 1, 1);
+        gridLayout_draw->addWidget(lbl_Player_aDrawCards, 1, 0, 1, 1);
 
-        Player_aDrawCards = new SequenceEdit("Player/aDrawCards", groupBox_14);
+        Player_aDrawCards = new SequenceEdit("Player/aDrawCards", groupBox_draw);
         Player_aDrawCards->setObjectName("Player_aDrawCards");
 
-        gridLayout_14->addWidget(Player_aDrawCards, 1, 1, 1, 1);
+        gridLayout_draw->addWidget(Player_aDrawCards, 1, 1, 1, 1);
 
-        lbl_Player_aUndoDraw = new QLabel(groupBox_14);
+        lbl_Player_aUndoDraw = new QLabel(groupBox_draw);
         lbl_Player_aUndoDraw->setObjectName("lbl_Player_aUndoDraw");
 
-        gridLayout_14->addWidget(lbl_Player_aUndoDraw, 2, 0, 1, 1);
+        gridLayout_draw->addWidget(lbl_Player_aUndoDraw, 2, 0, 1, 1);
 
-        Player_aUndoDraw = new SequenceEdit("Player/aUndoDraw", groupBox_14);
+        Player_aUndoDraw = new SequenceEdit("Player/aUndoDraw", groupBox_draw);
         Player_aUndoDraw->setObjectName("Player_aUndoDraw");
 
-        gridLayout_14->addWidget(Player_aUndoDraw, 2, 1, 1, 1);
+        gridLayout_draw->addWidget(Player_aUndoDraw, 2, 1, 1, 1);
 
-        lbl_Player_aAlwaysRevealTopCard = new QLabel(groupBox_14);
+        lbl_Player_aAlwaysRevealTopCard = new QLabel(groupBox_draw);
         lbl_Player_aAlwaysRevealTopCard->setObjectName("lbl_Player_aAlwaysRevealTopCard");
 
-        gridLayout_14->addWidget(lbl_Player_aAlwaysRevealTopCard, 3, 0, 1, 1);
+        gridLayout_draw->addWidget(lbl_Player_aAlwaysRevealTopCard, 3, 0, 1, 1);
 
-        Player_aAlwaysRevealTopCard = new SequenceEdit("Player/aAlwaysRevealTopCard", groupBox_14);
+        Player_aAlwaysRevealTopCard = new SequenceEdit("Player/aAlwaysRevealTopCard", groupBox_draw);
         Player_aAlwaysRevealTopCard->setObjectName("Player_aAlwaysRevealTopCard");
 
-        gridLayout_14->addWidget(Player_aAlwaysRevealTopCard, 3, 1, 1, 1);
-        gridLayout_20->addWidget(groupBox_14, 0, 0, 1, 1);
+        gridLayout_draw->addWidget(Player_aAlwaysRevealTopCard, 3, 1, 1, 1);
+        gridLayout_20->addWidget(groupBox_draw, 1, 0, 1, 1);
+
+        groupBox_moveDeck = new QGroupBox(tab_3);
+        groupBox_moveDeck->setObjectName("groupBox_moveDeck");
+        gridLayout_moveDeck = new QGridLayout(groupBox_moveDeck);
+        gridLayout_moveDeck->setObjectName("gridLayout_moveDeck");
+        lbl_Player_aMoveTopCardToGraveyard = new QLabel(groupBox_moveDeck);
+        lbl_Player_aMoveTopCardToGraveyard->setObjectName("lbl_Player_aMoveTopCardToGraveyard");
+
+        gridLayout_moveDeck->addWidget(lbl_Player_aMoveTopCardToGraveyard, 0, 0, 1, 1);
+
+        Player_aMoveTopCardToGraveyard = new SequenceEdit("Player/aMoveTopCardToGraveyard", groupBox_moveDeck);
+        Player_aMoveTopCardToGraveyard->setObjectName("Player_aMoveTopCardToGraveyard");
+
+        gridLayout_moveDeck->addWidget(Player_aMoveTopCardToGraveyard, 0, 1, 1, 1);
+
+        lbl_Player_aMoveTopCardsToGraveyard = new QLabel(groupBox_moveDeck);
+        lbl_Player_aMoveTopCardsToGraveyard->setObjectName("lbl_Player_aMoveTopCardsToGraveyard");
+
+        gridLayout_moveDeck->addWidget(lbl_Player_aMoveTopCardsToGraveyard, 1, 0, 1, 1);
+
+        Player_aMoveTopCardsToGraveyard = new SequenceEdit("Player/aMoveTopCardsToGraveyard", groupBox_moveDeck);
+        Player_aMoveTopCardsToGraveyard->setObjectName("Player_aMoveTopCardsToGraveyard");
+
+        gridLayout_moveDeck->addWidget(Player_aMoveTopCardsToGraveyard, 1, 1, 1, 1);
+
+        lbl_Player_aMoveTopCardToExile = new QLabel(groupBox_moveDeck);
+        lbl_Player_aMoveTopCardToExile->setObjectName("lbl_Player_aMoveTopCardToExile");
+
+        gridLayout_moveDeck->addWidget(lbl_Player_aMoveTopCardToExile, 2, 0, 1, 1);
+
+        Player_aMoveTopCardToExile = new SequenceEdit("Player/aMoveTopCardToExile", groupBox_moveDeck);
+        Player_aMoveTopCardToExile->setObjectName("Player_aMoveTopCardToExile");
+
+        gridLayout_moveDeck->addWidget(Player_aMoveTopCardToExile, 2, 1, 1, 1);
+
+        lbl_Player_aMoveTopCardsToExile = new QLabel(groupBox_moveDeck);
+        lbl_Player_aMoveTopCardsToExile->setObjectName("lbl_Player_aMoveTopCardsToExile");
+
+        gridLayout_moveDeck->addWidget(lbl_Player_aMoveTopCardsToExile, 3, 0, 1, 1);
+
+        Player_aMoveTopCardsToExile = new SequenceEdit("Player/aMoveTopCardsToExile", groupBox_moveDeck);
+        Player_aMoveTopCardsToExile->setObjectName("Player_aMoveTopCardsToExile");
+
+        gridLayout_moveDeck->addWidget(Player_aMoveTopCardsToExile, 3, 1, 1, 1);
+
+        gridLayout_20->addWidget(groupBox_moveDeck, 1, 1, 1, 1);
+
+        groupBox_gameLobby = new QGroupBox(tab_3);
+        groupBox_gameLobby->setObjectName("groupBox_gameLobby");
+        gridLayout_gameLobby = new QGridLayout(groupBox_gameLobby);
+        gridLayout_gameLobby->setObjectName("gridLayout_gameLobby");
+        DeckViewContainer_loadRemoteButton = new SequenceEdit("DeckViewContainer/loadRemoteButton", groupBox_gameLobby);
+        DeckViewContainer_loadRemoteButton->setObjectName("DeckViewContainer_loadRemoteButton");
+
+        gridLayout_gameLobby->addWidget(DeckViewContainer_loadRemoteButton, 2, 1, 1, 1);
+
+        DeckViewContainer_loadLocalButton = new SequenceEdit("DeckViewContainer/loadLocalButton", groupBox_gameLobby);
+        DeckViewContainer_loadLocalButton->setObjectName("DeckViewContainer_loadLocalButton");
+
+        gridLayout_gameLobby->addWidget(DeckViewContainer_loadLocalButton, 0, 1, 1, 1);
+
+        lbl_DeckViewContainer_loadRemoteButton = new QLabel(groupBox_gameLobby);
+        lbl_DeckViewContainer_loadRemoteButton->setObjectName("lbl_DeckViewContainer_loadRemoteButton");
+
+        gridLayout_gameLobby->addWidget(lbl_DeckViewContainer_loadRemoteButton, 2, 0, 1, 1);
+
+        lbl_DeckViewContainer_loadLocalButton = new QLabel(groupBox_gameLobby);
+        lbl_DeckViewContainer_loadLocalButton->setObjectName("lbl_DeckViewContainer_loadLocalButton");
+
+        gridLayout_gameLobby->addWidget(lbl_DeckViewContainer_loadLocalButton, 0, 0, 1, 1);
+
+        gridLayout_20->addWidget(groupBox_gameLobby, 1, 2, 1, 1);
+
         verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
         gridLayout_20->addItem(verticalSpacer_3, 2, 1, 1, 1);
         tabWidget->addTab(tab_3, QString());
         tab_4 = new QWidget(tabWidget);
-        QGridLayout *grid = new QGridLayout(tab_4);
+        auto *grid = new QGridLayout(tab_4);
         grid->addWidget(groupBox_3);
         grid->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), 1, 0);
 
@@ -1724,7 +1794,7 @@ public:
         btnResetAll->setIcon(QPixmap("theme:icons/update"));
         btnClearAll->setIcon(QPixmap("theme:icons/clearsearch"));
 
-        QHBoxLayout *buttonsLayout = new QHBoxLayout(shortcutsTab);
+        auto *buttonsLayout = new QHBoxLayout(shortcutsTab);
         buttonsLayout->addWidget(btnClearAll);
         buttonsLayout->addWidget(btnResetAll);
 
@@ -1747,12 +1817,13 @@ public:
         gridLayout_11->setSpacing(3);
         gridLayout_12->setSpacing(3);
         gridLayout_13->setSpacing(3);
-        gridLayout_14->setSpacing(3);
-        gridLayout_15->setSpacing(3);
-        gridLayout_16->setSpacing(3);
+        gridLayout_moveDeck->setSpacing(3);
+        gridLayout_draw->setSpacing(3);
+        gridLayout_moveCard->setSpacing(3);
+        gridLayout_view->setSpacing(3);
+        gridLayout_gameLobby->setSpacing(3);
+        gridLayout_gameplay->setSpacing(3);
         gridLayout_17->setSpacing(3);
-        gridLayout_18->setSpacing(3);
-        gridLayout_19->setSpacing(3);
         gridLayout_20->setSpacing(3);
 
         verticalLayout->setSpacing(3);
@@ -1763,176 +1834,180 @@ public:
 
     void retranslateUi(QWidget * /*shortcutsTab */)
     {
-        groupBox->setTitle(QApplication::translate("shortcutsTab", "Main Window", 0));
-        lbl_MainWindow_aDeckEditor->setText(QApplication::translate("shortcutsTab", "Deck editor", 0));
-        lbl_MainWindow_aSinglePlayer->setText(QApplication::translate("shortcutsTab", "Local gameplay", 0));
-        lbl_MainWindow_aWatchReplay->setText(QApplication::translate("shortcutsTab", "Watch replay", 0));
-        lbl_MainWindow_aConnect->setText(QApplication::translate("shortcutsTab", "Connect", 0));
-        lbl_MainWindow_aRegister->setText(QApplication::translate("shortcutsTab", "Register", 0));
-        lbl_MainWindow_aFullScreen->setText(QApplication::translate("shortcutsTab", "Full screen", 0));
-        lbl_MainWindow_aSettings->setText(QApplication::translate("shortcutsTab", "Settings", 0));
-        lbl_MainWindow_aCheckCardUpdates->setText(QApplication::translate("shortcutsTab", "Check for card updates", 0));
-        lbl_MainWindow_aDisconnect->setText(QApplication::translate("shortcutsTab", "Disconnect", 0));
-        lbl_MainWindow_aExit->setText(QApplication::translate("shortcutsTab", "Exit", 0));
-        groupBox_2->setTitle(QApplication::translate("shortcutsTab", "Deck Editor", 0));
-        lbl_TabDeckEditor_aAnalyzeDeck->setText(QApplication::translate("shortcutsTab", "Analyze deck", 0));
+        groupBox->setTitle(QApplication::translate("shortcutsTab", "Main Window"));
+        lbl_MainWindow_aDeckEditor->setText(QApplication::translate("shortcutsTab", "Deck editor"));
+        lbl_MainWindow_aSinglePlayer->setText(QApplication::translate("shortcutsTab", "Local gameplay"));
+        lbl_MainWindow_aWatchReplay->setText(QApplication::translate("shortcutsTab", "Watch replay"));
+        lbl_MainWindow_aConnect->setText(QApplication::translate("shortcutsTab", "Connect"));
+        lbl_MainWindow_aRegister->setText(QApplication::translate("shortcutsTab", "Register"));
+        lbl_MainWindow_aFullScreen->setText(QApplication::translate("shortcutsTab", "Full screen"));
+        lbl_MainWindow_aSettings->setText(QApplication::translate("shortcutsTab", "Settings"));
+        lbl_MainWindow_aCheckCardUpdates->setText(QApplication::translate("shortcutsTab", "Check for card updates"));
+        lbl_MainWindow_aDisconnect->setText(QApplication::translate("shortcutsTab", "Disconnect"));
+        lbl_MainWindow_aExit->setText(QApplication::translate("shortcutsTab", "Exit"));
+        groupBox_2->setTitle(QApplication::translate("shortcutsTab", "Deck Editor"));
+        lbl_TabDeckEditor_aAnalyzeDeck->setText(QApplication::translate("shortcutsTab", "Analyze deck"));
         lbl_TabDeckEditor_aLoadDeckFromClipboard->setText(
-            QApplication::translate("shortcutsTab", "Load deck (clipboard)", 0));
-        lbl_TabDeckEditor_aClearFilterAll->setText(QApplication::translate("shortcutsTab", "Clear all filters", 0));
-        lbl_TabDeckEditor_aNewDeck->setText(QApplication::translate("shortcutsTab", "New deck", 0));
-        lbl_TabDeckEditor_aClearFilterOne->setText(QApplication::translate("shortcutsTab", "Clear selected filter", 0));
-        lbl_TabDeckEditor_aOpenCustomFolder->setText(
-            QApplication::translate("shortcutsTab", "Open custom pic folder", 0));
-        lbl_TabDeckEditor_aClose->setText(QApplication::translate("shortcutsTab", "Close", 0));
-        lbl_TabDeckEditor_aPrintDeck->setText(QApplication::translate("shortcutsTab", "Print deck", 0));
-        lbl_TabDeckEditor_aManageSets->setText(QApplication::translate("shortcutsTab", "Manage sets", 0));
-        lbl_TabDeckEditor_aRemoveCard->setText(QApplication::translate("shortcutsTab", "Delete card", 0));
-        lbl_TabDeckEditor_aEditTokens->setText(QApplication::translate("shortcutsTab", "Edit tokens", 0));
-        lbl_TabDeckEditor_aResetLayout->setText(QApplication::translate("shortcutsTab", "Reset layout", 0));
-        lbl_TabDeckEditor_aIncrement->setText(QApplication::translate("shortcutsTab", "Add card", 0));
-        lbl_TabDeckEditor_aSaveDeck->setText(QApplication::translate("shortcutsTab", "Save deck", 0));
-        lbl_TabDeckEditor_aExportDeckDecklist->setText(QApplication::translate("shortcutsTab", "Export deck", 0));
-        lbl_TabDeckEditor_aDecrement->setText(QApplication::translate("shortcutsTab", "Remove card", 0));
-        lbl_TabDeckEditor_aSaveDeckAs->setText(QApplication::translate("shortcutsTab", "Save deck as", 0));
-        lbl_TabDeckEditor_aLoadDeck->setText(QApplication::translate("shortcutsTab", "Load deck", 0));
-        lbl_TabDeckEditor_aSaveDeckToClipboard->setText(QApplication::translate("shortcutsTab", "Save deck (clip)", 0));
+            QApplication::translate("shortcutsTab", "Load deck (clipboard)"));
+        lbl_TabDeckEditor_aClearFilterAll->setText(QApplication::translate("shortcutsTab", "Clear all filters"));
+        lbl_TabDeckEditor_aNewDeck->setText(QApplication::translate("shortcutsTab", "New deck"));
+        lbl_TabDeckEditor_aClearFilterOne->setText(QApplication::translate("shortcutsTab", "Clear selected filter"));
+        lbl_TabDeckEditor_aOpenCustomFolder->setText(QApplication::translate("shortcutsTab", "Open custom pic folder"));
+        lbl_TabDeckEditor_aClose->setText(QApplication::translate("shortcutsTab", "Close"));
+        lbl_TabDeckEditor_aPrintDeck->setText(QApplication::translate("shortcutsTab", "Print deck"));
+        lbl_TabDeckEditor_aManageSets->setText(QApplication::translate("shortcutsTab", "Manage sets"));
+        lbl_TabDeckEditor_aRemoveCard->setText(QApplication::translate("shortcutsTab", "Delete card"));
+        lbl_TabDeckEditor_aEditTokens->setText(QApplication::translate("shortcutsTab", "Edit tokens"));
+        lbl_TabDeckEditor_aResetLayout->setText(QApplication::translate("shortcutsTab", "Reset layout"));
+        lbl_TabDeckEditor_aIncrement->setText(QApplication::translate("shortcutsTab", "Add card"));
+        lbl_TabDeckEditor_aSaveDeck->setText(QApplication::translate("shortcutsTab", "Save deck"));
+        lbl_TabDeckEditor_aExportDeckDecklist->setText(QApplication::translate("shortcutsTab", "Export deck"));
+        lbl_TabDeckEditor_aDecrement->setText(QApplication::translate("shortcutsTab", "Remove card"));
+        lbl_TabDeckEditor_aSaveDeckAs->setText(QApplication::translate("shortcutsTab", "Save deck as"));
+        lbl_TabDeckEditor_aLoadDeck->setText(QApplication::translate("shortcutsTab", "Load deck"));
+        lbl_TabDeckEditor_aSaveDeckToClipboard->setText(QApplication::translate("shortcutsTab", "Save deck (clip)"));
         lbl_TabDeckEditor_aSaveDeckToClipboardRaw->setText(
-            QApplication::translate("shortcutsTab", "Save deck (clip; no annotations)", 0));
-        groupBox_3->setTitle(QApplication::translate("shortcutsTab", "Counters", 0));
-        groupBox_4->setTitle(QApplication::translate("shortcutsTab", "Life", 0));
-        lbl_abstractCounter_sSet->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_abstractCounter_aInc->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_abstractCounter_aDec->setText(QApplication::translate("shortcutsTab", "Remove", 0));
-        groupBox_5->setTitle(QApplication::translate("shortcutsTab", "Red", 0));
-        lbl_Player_aSCRed->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_Player_aCCRed->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_Player_aRCRed->setText(QApplication::translate("shortcutsTab", "Remove", 0));
-        groupBox_6->setTitle(QApplication::translate("shortcutsTab", "Green", 0));
-        lbl_Player_aSCGreen->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_Player_aCCGreen->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_Player_aRCGreen->setText(QApplication::translate("shortcutsTab", "Remove", 0));
-        groupBox_7->setTitle(QApplication::translate("shortcutsTab", "Yellow", 0));
-        lbl_Player_aSCYellow->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_Player_aCCYellow->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_Player_aRCYellow->setText(QApplication::translate("shortcutsTab", "Remove", 0));
+            QApplication::translate("shortcutsTab", "Save deck (clip; no annotations)"));
+        groupBox_3->setTitle(QApplication::translate("shortcutsTab", "Counters"));
+        groupBox_4->setTitle(QApplication::translate("shortcutsTab", "Life"));
+        lbl_abstractCounter_sSet->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_abstractCounter_aInc->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_abstractCounter_aDec->setText(QApplication::translate("shortcutsTab", "Remove"));
+        groupBox_5->setTitle(QApplication::translate("shortcutsTab", "Red"));
+        lbl_Player_aSCRed->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_Player_aCCRed->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_Player_aRCRed->setText(QApplication::translate("shortcutsTab", "Remove"));
+        groupBox_6->setTitle(QApplication::translate("shortcutsTab", "Green"));
+        lbl_Player_aSCGreen->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_Player_aCCGreen->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_Player_aRCGreen->setText(QApplication::translate("shortcutsTab", "Remove"));
+        groupBox_7->setTitle(QApplication::translate("shortcutsTab", "Yellow"));
+        lbl_Player_aSCYellow->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_Player_aCCYellow->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_Player_aRCYellow->setText(QApplication::translate("shortcutsTab", "Remove"));
 
-        groupBox_counterStorm->setTitle(QApplication::translate("shortcutsTab", "Storm", 0));
-        lbl_Player_aSetCStorm->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_Player_aIncCStorm->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_Player_aDecCStorm->setText(QApplication::translate("shortcutsTab", "Remove", 0));
-        groupBox_counterW->setTitle(QApplication::translate("shortcutsTab", "W", 0));
-        lbl_Player_aSetCW->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_Player_aIncCW->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_Player_aDecCW->setText(QApplication::translate("shortcutsTab", "Remove", 0));
-        groupBox_counterU->setTitle(QApplication::translate("shortcutsTab", "U", 0));
-        lbl_Player_aSetCU->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_Player_aIncCU->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_Player_aDecCU->setText(QApplication::translate("shortcutsTab", "Remove", 0));
-        groupBox_counterB->setTitle(QApplication::translate("shortcutsTab", "B", 0));
-        lbl_Player_aSetCB->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_Player_aIncCB->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_Player_aDecCB->setText(QApplication::translate("shortcutsTab", "Remove", 0));
-        groupBox_counterR->setTitle(QApplication::translate("shortcutsTab", "R", 0));
-        lbl_Player_aSetCR->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_Player_aIncCR->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_Player_aDecCR->setText(QApplication::translate("shortcutsTab", "Remove", 0));
-        groupBox_counterG->setTitle(QApplication::translate("shortcutsTab", "G", 0));
-        lbl_Player_aSetCG->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_Player_aIncCG->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_Player_aDecCG->setText(QApplication::translate("shortcutsTab", "Remove", 0));
-        groupBox_counterX->setTitle(QApplication::translate("shortcutsTab", "X", 0));
-        lbl_Player_aSetCX->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_Player_aIncCX->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_Player_aDecCX->setText(QApplication::translate("shortcutsTab", "Remove", 0));
+        groupBox_counterStorm->setTitle(QApplication::translate("shortcutsTab", "Storm"));
+        lbl_Player_aSetCStorm->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_Player_aIncCStorm->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_Player_aDecCStorm->setText(QApplication::translate("shortcutsTab", "Remove"));
+        groupBox_counterW->setTitle(QApplication::translate("shortcutsTab", "W"));
+        lbl_Player_aSetCW->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_Player_aIncCW->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_Player_aDecCW->setText(QApplication::translate("shortcutsTab", "Remove"));
+        groupBox_counterU->setTitle(QApplication::translate("shortcutsTab", "U"));
+        lbl_Player_aSetCU->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_Player_aIncCU->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_Player_aDecCU->setText(QApplication::translate("shortcutsTab", "Remove"));
+        groupBox_counterB->setTitle(QApplication::translate("shortcutsTab", "B"));
+        lbl_Player_aSetCB->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_Player_aIncCB->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_Player_aDecCB->setText(QApplication::translate("shortcutsTab", "Remove"));
+        groupBox_counterR->setTitle(QApplication::translate("shortcutsTab", "R"));
+        lbl_Player_aSetCR->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_Player_aIncCR->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_Player_aDecCR->setText(QApplication::translate("shortcutsTab", "Remove"));
+        groupBox_counterG->setTitle(QApplication::translate("shortcutsTab", "G"));
+        lbl_Player_aSetCG->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_Player_aIncCG->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_Player_aDecCG->setText(QApplication::translate("shortcutsTab", "Remove"));
+        groupBox_counterX->setTitle(QApplication::translate("shortcutsTab", "X"));
+        lbl_Player_aSetCX->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_Player_aIncCX->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_Player_aDecCX->setText(QApplication::translate("shortcutsTab", "Remove"));
 
-        lbl_Player_aSCYellow->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        lbl_Player_aCCYellow->setText(QApplication::translate("shortcutsTab", "Add", 0));
-        lbl_Player_aRCYellow->setText(QApplication::translate("shortcutsTab", "Remove", 0));
+        lbl_Player_aSCYellow->setText(QApplication::translate("shortcutsTab", "Set"));
+        lbl_Player_aCCYellow->setText(QApplication::translate("shortcutsTab", "Add"));
+        lbl_Player_aRCYellow->setText(QApplication::translate("shortcutsTab", "Remove"));
         tabWidget->setTabText(tabWidget->indexOf(tab),
-                              QApplication::translate("shortcutsTab", "Main Window | Deck Editor", 0));
-        groupBox_9->setTitle(QApplication::translate("shortcutsTab", "Power / Toughness", 0));
-        groupBox_12->setTitle(QApplication::translate("shortcutsTab", "Power and Toughness", 0));
-        lbl_Player_aIncPT->setText(QApplication::translate("shortcutsTab", "Add (+1/+1)", 0));
-        lbl_Player_aDecPT->setText(QApplication::translate("shortcutsTab", "Remove (-1/-1)", 0));
-        lbl_Player_aResetPT->setText(QApplication::translate("shortcutsTab", "Reset", 0));
-        lbl_Player_aSetPT->setText(QApplication::translate("shortcutsTab", "Set", 0));
-        groupBox_11->setTitle(QApplication::translate("shortcutsTab", "Toughness", 0));
-        lbl_Player_aDecT->setText(QApplication::translate("shortcutsTab", "Remove (-0/-1)", 0));
-        lbl_Player_aIncT->setText(QApplication::translate("shortcutsTab", "Add (+0/+1)", 0));
-        groupBox_10->setTitle(QApplication::translate("shortcutsTab", "Power", 0));
-        lbl_Player_aDecP->setText(QApplication::translate("shortcutsTab", "Remove (-1/-0)", 0));
-        lbl_Player_IncP->setText(QApplication::translate("shortcutsTab", "Add (+1/+0)", 0));
-        groupBox_8->setTitle(QApplication::translate("shortcutsTab", "Game Phases", 0));
-        lbl_TabGame_phase0->setText(QApplication::translate("shortcutsTab", "Untap", 0));
-        lbl_TabGame_phase1->setText(QApplication::translate("shortcutsTab", "Upkeep", 0));
-        lbl_TabGame_phase2->setText(QApplication::translate("shortcutsTab", "Draw", 0));
-        lbl_TabGame_phase3->setText(QApplication::translate("shortcutsTab", "Main 1", 0));
-        lbl_TabGame_phase4->setText(QApplication::translate("shortcutsTab", "Start combat", 0));
-        lbl_TabGame_phase5->setText(QApplication::translate("shortcutsTab", "Attack", 0));
-        lbl_TabGame_phase6->setText(QApplication::translate("shortcutsTab", "Block", 0));
-        lbl_TabGame_phase7->setText(QApplication::translate("shortcutsTab", "Damage", 0));
-        lbl_TabGame_phase8->setText(QApplication::translate("shortcutsTab", "End combat", 0));
-        lbl_TabGame_phase9->setText(QApplication::translate("shortcutsTab", "Main 2", 0));
-        lbl_TabGame_phase10->setText(QApplication::translate("shortcutsTab", "End", 0));
-        lbl_TabGame_aNextPhase->setText(QApplication::translate("shortcutsTab", "Next phase", 0));
-        lbl_TabGame_aNextTurn->setText(QApplication::translate("shortcutsTab", "Next turn", 0));
-        groupBox_13->setTitle(QApplication::translate("shortcutsTab", "Playing Area", 0));
-        lbl_Player_aTap->setText(QApplication::translate("shortcutsTab", "Tap / Untap Card", 0));
-        lbl_Player_aUntapAll->setText(QApplication::translate("shortcutsTab", "Untap all", 0));
-        lbl_Player_aDoesntUntap->setText(QApplication::translate("shortcutsTab", "Toggle untap", 0));
-        lbl_Player_aFlip->setText(QApplication::translate("shortcutsTab", "Flip card", 0));
-        lbl_Player_aPeek->setText(QApplication::translate("shortcutsTab", "Peek card", 0));
-        lbl_Player_aPlay->setText(QApplication::translate("shortcutsTab", "Play card", 0));
-        lbl_Player_aAttach->setText(QApplication::translate("shortcutsTab", "Attach card", 0));
-        lbl_Player_aUnattach->setText(QApplication::translate("shortcutsTab", "Unattach card", 0));
-        lbl_Player_aClone->setText(QApplication::translate("shortcutsTab", "Clone card", 0));
-        lbl_Player_aCreateToken->setText(QApplication::translate("shortcutsTab", "Create token", 0));
-        lbl_Player_aCreateRelatedTokens->setText(
-            QApplication::translate("shortcutsTab", "Create all related tokens", 0));
-        lbl_Player_aCreateAnotherToken->setText(QApplication::translate("shortcutsTab", "Create another token", 0));
-        lbl_Player_aSetAnnotation->setText(QApplication::translate("shortcutsTab", "Set annotation", 0));
+                              QApplication::translate("shortcutsTab", "Main Window | Deck Editor"));
+        groupBox_9->setTitle(QApplication::translate("shortcutsTab", "Power / Toughness"));
+        groupBox_12->setTitle(QApplication::translate("shortcutsTab", "Power and Toughness"));
+        lbl_Player_aIncPT->setText(QApplication::translate("shortcutsTab", "Add (+1/+1)"));
+        lbl_Player_aDecPT->setText(QApplication::translate("shortcutsTab", "Remove (-1/-1)"));
+        lbl_Player_aResetPT->setText(QApplication::translate("shortcutsTab", "Reset"));
+        lbl_Player_aSetPT->setText(QApplication::translate("shortcutsTab", "Set"));
+        groupBox_11->setTitle(QApplication::translate("shortcutsTab", "Toughness"));
+        lbl_Player_aDecT->setText(QApplication::translate("shortcutsTab", "Remove (-0/-1)"));
+        lbl_Player_aIncT->setText(QApplication::translate("shortcutsTab", "Add (+0/+1)"));
+        groupBox_10->setTitle(QApplication::translate("shortcutsTab", "Power"));
+        lbl_Player_aDecP->setText(QApplication::translate("shortcutsTab", "Remove (-1/-nullptr)"));
+        lbl_Player_aIncP->setText(QApplication::translate("shortcutsTab", "Add (+1/+nullptr)"));
+        groupBox_8->setTitle(QApplication::translate("shortcutsTab", "Game Phases"));
+        lbl_TabGame_phase0->setText(QApplication::translate("shortcutsTab", "Untap"));
+        lbl_TabGame_phase1->setText(QApplication::translate("shortcutsTab", "Upkeep"));
+        lbl_TabGame_phase2->setText(QApplication::translate("shortcutsTab", "Draw"));
+        lbl_TabGame_phase3->setText(QApplication::translate("shortcutsTab", "Main 1"));
+        lbl_TabGame_phase4->setText(QApplication::translate("shortcutsTab", "Start combat"));
+        lbl_TabGame_phase5->setText(QApplication::translate("shortcutsTab", "Attack"));
+        lbl_TabGame_phase6->setText(QApplication::translate("shortcutsTab", "Block"));
+        lbl_TabGame_phase7->setText(QApplication::translate("shortcutsTab", "Damage"));
+        lbl_TabGame_phase8->setText(QApplication::translate("shortcutsTab", "End combat"));
+        lbl_TabGame_phase9->setText(QApplication::translate("shortcutsTab", "Main 2"));
+        lbl_TabGame_phase10->setText(QApplication::translate("shortcutsTab", "End"));
+        lbl_TabGame_aNextPhase->setText(QApplication::translate("shortcutsTab", "Next phase"));
+        lbl_TabGame_aNextPhaseAction->setText(QApplication::translate("shortcutsTab", "Next phase action"));
+        lbl_TabGame_aNextTurn->setText(QApplication::translate("shortcutsTab", "Next turn"));
+        groupBox_13->setTitle(QApplication::translate("shortcutsTab", "Playing Area"));
+        lbl_Player_aTap->setText(QApplication::translate("shortcutsTab", "Tap / Untap Card"));
+        lbl_Player_aUntapAll->setText(QApplication::translate("shortcutsTab", "Untap all"));
+        lbl_Player_aDoesntUntap->setText(QApplication::translate("shortcutsTab", "Toggle untap"));
+        lbl_Player_aFlip->setText(QApplication::translate("shortcutsTab", "Flip card"));
+        lbl_Player_aPeek->setText(QApplication::translate("shortcutsTab", "Peek card"));
+        lbl_Player_aPlay->setText(QApplication::translate("shortcutsTab", "Play card"));
+        lbl_Player_aAttach->setText(QApplication::translate("shortcutsTab", "Attach card"));
+        lbl_Player_aUnattach->setText(QApplication::translate("shortcutsTab", "Unattach card"));
+        lbl_Player_aClone->setText(QApplication::translate("shortcutsTab", "Clone card"));
+        lbl_Player_aCreateToken->setText(QApplication::translate("shortcutsTab", "Create token"));
+        lbl_Player_aCreateRelatedTokens->setText(QApplication::translate("shortcutsTab", "Create all related tokens"));
+        lbl_Player_aCreateAnotherToken->setText(QApplication::translate("shortcutsTab", "Create another token"));
+        lbl_Player_aSetAnnotation->setText(QApplication::translate("shortcutsTab", "Set annotation"));
         tabWidget->setTabText(tabWidget->indexOf(tab_2),
-                              QApplication::translate("shortcutsTab", "Phases | P/T | Playing Area", 0));
-        groupBox_15->setTitle(QApplication::translate("shortcutsTab", "Move card to", 0));
-        lbl_Player_aMoveToBottomLibrary->setText(QApplication::translate("shortcutsTab", "Bottom library", 0));
-        lbl_Player_aMoveToTopLibrary->setText(QApplication::translate("shortcutsTab", "Top library", 0));
-        lbl_Player_aMoveToGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard", 0));
-        lbl_Player_aMoveToExile->setText(QApplication::translate("shortcutsTab", "Exile", 0));
-        lbl_Player_aMoveToHand->setText(QApplication::translate("shortcutsTab", "Hand", 0));
+                              QApplication::translate("shortcutsTab", "Phases | P/T | Playing Area"));
+        groupBox_moveCard->setTitle(QApplication::translate("shortcutsTab", "Move selected card to"));
+        lbl_Player_aMoveToBottomLibrary->setText(QApplication::translate("shortcutsTab", "Bottom library"));
+        lbl_Player_aMoveToTopLibrary->setText(QApplication::translate("shortcutsTab", "Top library"));
+        lbl_Player_aMoveToGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard"));
+        lbl_Player_aMoveToExile->setText(QApplication::translate("shortcutsTab", "Exile"));
+        lbl_Player_aMoveToHand->setText(QApplication::translate("shortcutsTab", "Hand"));
         lbl_Player_aMoveTopToPlayFaceDown->setText(QApplication::translate("shortcutsTab", "Play face down"));
-        groupBox_16->setTitle(QApplication::translate("shortcutsTab", "View", 0));
-        lbl_Player_aViewGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard", 0));
-        lbl_Player_aViewLibrary->setText(QApplication::translate("shortcutsTab", "Library", 0));
-        lbl_Player_aViewTopCards->setText(QApplication::translate("shortcutsTab", "Tops card of library", 0));
-        lbl_Player_aViewSideboard->setText(QApplication::translate("shortcutsTab", "Sideboard", 0));
-        lbl_Player_aViewRfg->setText(QApplication::translate("shortcutsTab", "Exile", 0));
-        lbl_GameView_aCloseMostRecentZoneView->setText(QApplication::translate("shortcutsTab", "Close recent view", 0));
-        groupBox_17->setTitle(QApplication::translate("shortcutsTab", "Game Lobby", 0));
-        lbl_DeckViewContainer_loadRemoteButton->setText(QApplication::translate("shortcutsTab", "Load remote deck", 0));
-        lbl_DeckViewContainer_loadLocalButton->setText(QApplication::translate("shortcutsTab", "Load local deck", 0));
-        groupBox_18->setTitle(QApplication::translate("shortcutsTab", "Gameplay", 0));
-        lbl_Player_aDrawArrow->setText(QApplication::translate("shortcutsTab", "Draw arrow", 0));
-        lbl_TabGame_aLeaveGame->setText(QApplication::translate("shortcutsTab", "Leave game", 0));
-        lbl_TabGame_aRemoveLocalArrows->setText(QApplication::translate("shortcutsTab", "Remove local arrows", 0));
-        lbl_TabGame_aConcede->setText(QApplication::translate("shortcutsTab", "Concede", 0));
-        lbl_Player_aRollDie->setText(QApplication::translate("shortcutsTab", "Roll dice", 0));
-        lbl_TabGame_aRotateViewCW->setText(QApplication::translate("shortcutsTab", "Rotate view CW", 0));
-        lbl_Player_aShuffle->setText(QApplication::translate("shortcutsTab", "Shuffle library", 0));
-        lbl_TabGame_aRotateViewCCW->setText(QApplication::translate("shortcutsTab", "Rotate view CCW", 0));
-        groupBox_14->setTitle(QApplication::translate("shortcutsTab", "Draw", 0));
-        lbl_Player_aMulligan->setText(QApplication::translate("shortcutsTab", "Mulligan", 0));
-        lbl_Player_aDrawCard->setText(QApplication::translate("shortcutsTab", "Draw card", 0));
-        lbl_Player_aDrawCards->setText(QApplication::translate("shortcutsTab", "Draw cards", 0));
-        lbl_Player_aUndoDraw->setText(QApplication::translate("shortcutsTab", "Undo draw", 0));
-        lbl_Player_aAlwaysRevealTopCard->setText(QApplication::translate("shortcutsTab", "Always reveal top card", 0));
+        groupBox_view->setTitle(QApplication::translate("shortcutsTab", "View"));
+        lbl_Player_aViewGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard"));
+        lbl_Player_aViewLibrary->setText(QApplication::translate("shortcutsTab", "Library"));
+        lbl_Player_aViewTopCards->setText(QApplication::translate("shortcutsTab", "Top cards of library"));
+        lbl_Player_aViewSideboard->setText(QApplication::translate("shortcutsTab", "Sideboard"));
+        lbl_Player_aViewRfg->setText(QApplication::translate("shortcutsTab", "Exile"));
+        lbl_GameView_aCloseMostRecentZoneView->setText(QApplication::translate("shortcutsTab", "Close recent view"));
+        groupBox_moveDeck->setTitle(QApplication::translate("shortcutsTab", "Move top card to"));
+        lbl_Player_aMoveTopCardToGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard Once"));
+        lbl_Player_aMoveTopCardsToGraveyard->setText(QApplication::translate("shortcutsTab", "Graveyard Multiple"));
+        lbl_Player_aMoveTopCardToExile->setText(QApplication::translate("shortcutsTab", "Exile Once"));
+        lbl_Player_aMoveTopCardsToExile->setText(QApplication::translate("shortcutsTab", "Exile Multiple"));
+        groupBox_gameLobby->setTitle(QApplication::translate("shortcutsTab", "Game Lobby"));
+        lbl_DeckViewContainer_loadRemoteButton->setText(QApplication::translate("shortcutsTab", "Load remote deck"));
+        lbl_DeckViewContainer_loadLocalButton->setText(QApplication::translate("shortcutsTab", "Load local deck"));
+        groupBox_gameplay->setTitle(QApplication::translate("shortcutsTab", "Gameplay"));
+        lbl_Player_aDrawArrow->setText(QApplication::translate("shortcutsTab", "Draw arrow"));
+        lbl_TabGame_aLeaveGame->setText(QApplication::translate("shortcutsTab", "Leave game"));
+        lbl_TabGame_aRemoveLocalArrows->setText(QApplication::translate("shortcutsTab", "Remove local arrows"));
+        lbl_TabGame_aConcede->setText(QApplication::translate("shortcutsTab", "Concede"));
+        lbl_Player_aRollDie->setText(QApplication::translate("shortcutsTab", "Roll dice"));
+        lbl_TabGame_aRotateViewCW->setText(QApplication::translate("shortcutsTab", "Rotate view CW"));
+        lbl_Player_aShuffle->setText(QApplication::translate("shortcutsTab", "Shuffle library"));
+        lbl_TabGame_aRotateViewCCW->setText(QApplication::translate("shortcutsTab", "Rotate view CCW"));
+        groupBox_draw->setTitle(QApplication::translate("shortcutsTab", "Drawing"));
+        lbl_Player_aMulligan->setText(QApplication::translate("shortcutsTab", "Mulligan"));
+        lbl_Player_aDrawCard->setText(QApplication::translate("shortcutsTab", "Draw card"));
+        lbl_Player_aDrawCards->setText(QApplication::translate("shortcutsTab", "Draw cards"));
+        lbl_Player_aUndoDraw->setText(QApplication::translate("shortcutsTab", "Undo draw"));
+        lbl_Player_aAlwaysRevealTopCard->setText(QApplication::translate("shortcutsTab", "Always reveal top card"));
         tabWidget->setTabText(tabWidget->indexOf(tab_3),
-                              QApplication::translate("shortcutsTab", "Draw | Move | View | Gameplay", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("shortcutsTab", "Counters", 0));
+                              QApplication::translate("shortcutsTab", "Gameplay | Draw | Move | View"));
+        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("shortcutsTab", "Counters"));
         faqLabel->setText(QString("<a href='%1'>%2</a>")
                               .arg(WIKI)
-                              .arg(QApplication::translate("shortcutsTab", "How to set custom shortcuts", 0)));
-        btnResetAll->setText(QApplication::translate("shortcutsTab", "Restore all default shortcuts", 0));
-        btnClearAll->setText(QApplication::translate("shortcutsTab", "Clear all shortcuts", 0));
+                              .arg(QApplication::translate("shortcutsTab", "How to set custom shortcuts")));
+        btnResetAll->setText(QApplication::translate("shortcutsTab", "Restore all default shortcuts"));
+        btnClearAll->setText(QApplication::translate("shortcutsTab", "Clear all shortcuts"));
     } // retranslateUi
 };
 

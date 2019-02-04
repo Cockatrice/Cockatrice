@@ -1,54 +1,114 @@
 language: cpp
 compiler: gcc
-cache: ccache
 
 matrix:
   include:
-  #Ubuntu
-  - name: Ubuntu (Debug)
+  #Ubuntu Xenial (Debug only)
+  - name: Ubuntu Xenial (Debug)
     if: tag IS NOT present
     os: linux
     dist: xenial
     group: stable
-    env: BUILDTYPE=Debug
-  - name: Ubuntu (Release)
+    cache: ccache
+    addons:
+      apt:
+        packages:
+        - libprotobuf-dev
+        - protobuf-compiler
+        - liblzma-dev
+        - qt5-default
+        - qttools5-dev
+        - qttools5-dev-tools
+        - qtmultimedia5-dev
+        - libqt5multimedia5-plugins
+        - libqt5svg5-dev
+        - libqt5sql5-mysql
+        - libqt5websockets5-dev
+    script: bash ./.ci/travis-compile.sh --format --server --test --debug
+
+  #Ubuntu Bionic (on docker)
+  - name: Ubuntu Bionic (Debug)
+    if: tag IS NOT present
+    services: docker
+    env: NAME=UbuntuBionic
+    cache:
+      directories:
+        - $HOME/$NAME/
+    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
+    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
+          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          "cockatrice_${NAME,,}"
+          bash .ci/travis-compile.sh --server --debug
+
+  - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
-    os: linux
-    dist: xenial
-    group: stable
-    env: BUILDTYPE=Release
+    services: docker
+    env: NAME=UbuntuBionic
+    cache:
+      directories:
+        - $HOME/$NAME/
+    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
+    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
+          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          "cockatrice_${NAME,,}"
+          bash .ci/travis-compile.sh --server --package "$NAME" --release
+
+  #Fedora 29 (on docker)
+  - name: Fedora 29 (Debug)
+    if: tag IS NOT present
+    services: docker
+    env: NAME=Fedora29
+    cache:
+      directories:
+        - $HOME/$NAME/
+    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
+    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
+          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          "cockatrice_${NAME,,}"
+          bash .ci/travis-compile.sh --server --debug
+
+  - name: Fedora 29 (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    services: docker
+    env: NAME=Fedora29
+    cache:
+      directories:
+        - $HOME/$NAME/
+    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
+    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
+          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
+          "cockatrice_${NAME,,}"
+          bash .ci/travis-compile.sh --server --package "$NAME" "RPM" --release
+
   #macOS
   - name: macOS (Debug)
     if: tag IS NOT present
     os: osx
-    osx_image: xcode8
-    env: BUILDTYPE=Debug
+    osx_image: xcode10.1
+    cache: ccache
+    addons:
+      homebrew:
+        packages:
+        - ccache
+        - protobuf
+        - qt
+        - xz
+    script: bash ./.ci/travis-compile.sh --server --install --debug
+
   - name: macOS (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
-    osx_image: xcode8
-    env: BUILDTYPE=Release
-
-#install dependencies for container-based "linux" builds
-addons:
-  apt:
-    packages:
-    - libprotobuf-dev
-    - protobuf-compiler
-    - qt5-default
-    - qttools5-dev
-    - qttools5-dev-tools
-    - qtmultimedia5-dev
-    - libqt5multimedia5-plugins
-    - libqt5svg5-dev
-    - libqt5sql5-mysql
-    - libqt5websockets5-dev
-
-
-before_install: bash ./.ci/travis-dependencies.sh
-
-script: bash ./.ci/travis-compile.sh
-
+    osx_image: xcode9.2
+    cache: ccache
+    addons:
+      homebrew:
+        packages:
+        - ccache
+        - protobuf
+        - qt
+        - xz
+        update: true
+    script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
 
 # Builds for pull requests skip the deployment step altogether
 deploy:
@@ -67,7 +127,7 @@ deploy:
     on:
       tags: true
       repo: Cockatrice/Cockatrice
-      condition: $BUILDTYPE = Release && $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(\.([0-9]|[1-9][0-9])){2}-beta(\.([2-9]|[1-9][0-9]))?$     # regex to match semver naming convention for beta pre-releases
+      condition: $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(\.([0-9]|[1-9][0-9])){2}-beta(\.([2-9]|[1-9][0-9]))?$     # regex to match semver naming convention for beta pre-releases
 
 # Deploy configuration for "stable" releases
   - provider: releases
@@ -82,7 +142,7 @@ deploy:
     on:
       tags: true
       repo: Cockatrice/Cockatrice
-      condition: $BUILDTYPE = Release && $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(\.([0-9]|[1-9][0-9])){2}$    # regex to match semver naming convention for stable full releases
+      condition: $TRAVIS_TAG =~ ([0-9]|[1-9][0-9])(\.([0-9]|[1-9][0-9])){2}$    # regex to match semver naming convention for stable full releases
 
 
 notifications:

@@ -1,6 +1,8 @@
-#include "cardinfowidget.h"
+#include <utility>
+
 #include "cardinfopicture.h"
 #include "cardinfotext.h"
+#include "cardinfowidget.h"
 #include "carditem.h"
 #include "main.h"
 #include <QDesktopWidget>
@@ -14,8 +16,9 @@ CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::Win
     pic->setObjectName("pic");
     text = new CardInfoText();
     text->setObjectName("text");
+    connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
 
-    QVBoxLayout *layout = new QVBoxLayout();
+    auto *layout = new QVBoxLayout();
     layout->setObjectName("layout");
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -26,7 +29,7 @@ CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::Win
     setFrameStyle(QFrame::Panel | QFrame::Raised);
     QDesktopWidget desktopWidget;
     int pixmapHeight = desktopWidget.screenGeometry().height() / 3;
-    int pixmapWidth = pixmapHeight / aspectRatio;
+    int pixmapWidth = static_cast<int>(pixmapHeight / aspectRatio);
     pic->setFixedWidth(pixmapWidth);
     pic->setFixedHeight(pixmapHeight);
     setFixedWidth(pixmapWidth + 150);
@@ -41,7 +44,7 @@ void CardInfoWidget::setCard(CardInfoPtr card)
 {
     if (info)
         disconnect(info.data(), nullptr, this, nullptr);
-    info = card;
+    info = std::move(card);
     if (info)
         connect(info.data(), SIGNAL(destroyed()), this, SLOT(clear()));
 

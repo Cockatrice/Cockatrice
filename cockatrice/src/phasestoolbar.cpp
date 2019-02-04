@@ -24,14 +24,14 @@ PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_
         connect(activeAnimationTimer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
         activeAnimationTimer->setSingleShot(false);
     } else
-        activeAnimationCounter = 9.0;
+        activeAnimationCounter = 9;
 
     setCacheMode(DeviceCoordinateCache);
 }
 
 QRectF PhaseButton::boundingRect() const
 {
-    return QRectF(0, 0, width, width);
+    return {0, 0, width, width};
 }
 
 void PhaseButton::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -39,21 +39,24 @@ void PhaseButton::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     QRectF iconRect = boundingRect().adjusted(3, 3, -3, -3);
     QRectF translatedIconRect = painter->combinedTransform().mapRect(iconRect);
     qreal scaleFactor = translatedIconRect.width() / iconRect.width();
-    QPixmap iconPixmap = PhasePixmapGenerator::generatePixmap(round(translatedIconRect.height()), name);
+    QPixmap iconPixmap =
+        PhasePixmapGenerator::generatePixmap(static_cast<int>(round(translatedIconRect.height())), name);
 
-    painter->setBrush(QColor(220 * (activeAnimationCounter / 10.0), 220 * (activeAnimationCounter / 10.0),
-                             220 * (activeAnimationCounter / 10.0)));
+    painter->setBrush(QColor(static_cast<int>(220 * (activeAnimationCounter / 10.0)),
+                             static_cast<int>(220 * (activeAnimationCounter / 10.0)),
+                             static_cast<int>(220 * (activeAnimationCounter / 10.0))));
     painter->setPen(Qt::gray);
-    painter->drawRect(0, 0, width - 1, width - 1);
+    painter->drawRect(0, 0, static_cast<int>(width - 1), static_cast<int>(width - 1));
     painter->save();
     painter->resetTransform();
-    painter->drawPixmap(iconPixmap.rect().translated(round(3 * scaleFactor), round(3 * scaleFactor)), iconPixmap,
-                        iconPixmap.rect());
+    painter->drawPixmap(iconPixmap.rect().translated(static_cast<int>(round(3 * scaleFactor)),
+                                                     static_cast<int>(round(3 * scaleFactor))),
+                        iconPixmap, iconPixmap.rect());
     painter->restore();
 
-    painter->setBrush(QColor(0, 0, 0, 255 * ((10 - activeAnimationCounter) / 15.0)));
+    painter->setBrush(QColor(0, 0, 0, static_cast<int>(255 * ((10 - activeAnimationCounter) / 15.0))));
     painter->setPen(Qt::gray);
-    painter->drawRect(0, 0, width - 1, width - 1);
+    painter->drawRect(0, 0, static_cast<int>(width - 1), static_cast<int>(width - 1));
 }
 
 void PhaseButton::setWidth(double _width)
@@ -105,9 +108,9 @@ void PhaseButton::triggerDoubleClickAction()
 PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
     : QGraphicsItem(parent), width(100), height(100), ySpacing(1), symbolSize(8)
 {
-    QAction *aUntapAll = new QAction(this);
+    auto *aUntapAll = new QAction(this);
     connect(aUntapAll, SIGNAL(triggered()), this, SLOT(actUntapAll()));
-    QAction *aDrawCard = new QAction(this);
+    auto *aDrawCard = new QAction(this);
     connect(aDrawCard, SIGNAL(triggered()), this, SLOT(actDrawCard()));
 
     PhaseButton *untapButton = new PhaseButton("untap", this, aUntapAll);
@@ -125,10 +128,10 @@ PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
     buttonList << untapButton << upkeepButton << drawButton << main1Button << combatStartButton << combatAttackersButton
                << combatBlockersButton << combatDamageButton << combatEndButton << main2Button << cleanupButton;
 
-    for (int i = 0; i < buttonList.size(); ++i)
-        connect(buttonList[i], SIGNAL(clicked()), this, SLOT(phaseButtonClicked()));
+    for (auto &i : buttonList)
+        connect(i, SIGNAL(clicked()), this, SLOT(phaseButtonClicked()));
 
-    nextTurnButton = new PhaseButton("nextturn", this, 0, false);
+    nextTurnButton = new PhaseButton("nextturn", this, nullptr, false);
     connect(nextTurnButton, SIGNAL(clicked()), this, SLOT(actNextTurn()));
 
     rearrangeButtons();
@@ -138,7 +141,7 @@ PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
 
 QRectF PhasesToolbar::boundingRect() const
 {
-    return QRectF(0, 0, width, height);
+    return {0, 0, width, height};
 }
 
 void PhasesToolbar::retranslateUi()
@@ -186,8 +189,8 @@ const double PhasesToolbar::marginSize = 3;
 
 void PhasesToolbar::rearrangeButtons()
 {
-    for (int i = 0; i < buttonList.size(); ++i)
-        buttonList[i]->setWidth(symbolSize);
+    for (auto &i : buttonList)
+        i->setWidth(symbolSize);
     nextTurnButton->setWidth(symbolSize);
 
     double y = marginSize;
@@ -208,7 +211,7 @@ void PhasesToolbar::rearrangeButtons()
     buttonList[10]->setPos(marginSize, y += symbolSize);
     y += ySpacing;
     y += ySpacing;
-    nextTurnButton->setPos(marginSize, y += symbolSize);
+    nextTurnButton->setPos(marginSize, y + symbolSize);
 }
 
 void PhasesToolbar::setHeight(double _height)
@@ -232,14 +235,21 @@ void PhasesToolbar::setActivePhase(int phase)
         buttonList[i]->setActive(i == phase);
 }
 
+void PhasesToolbar::triggerPhaseAction(int phase)
+{
+    if (0 <= phase && phase < buttonList.size()) {
+        buttonList[phase]->triggerDoubleClickAction();
+    }
+}
+
 void PhasesToolbar::phaseButtonClicked()
 {
-    PhaseButton *button = qobject_cast<PhaseButton *>(sender());
+    auto *button = qobject_cast<PhaseButton *>(sender());
     if (button->getActive())
         button->triggerDoubleClickAction();
 
     Command_SetActivePhase cmd;
-    cmd.set_phase(buttonList.indexOf(button));
+    cmd.set_phase(static_cast<google::protobuf::uint32>(buttonList.indexOf(button)));
 
     emit sendGameCommand(cmd, -1);
 }

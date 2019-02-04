@@ -164,6 +164,7 @@ SettingsCache::SettingsCache()
     messageSettings = new MessageSettings(settingsPath, this);
     gameFiltersSettings = new GameFiltersSettings(settingsPath, this);
     layoutsSettings = new LayoutsSettings(settingsPath, this);
+    downloadSettings = new DownloadSettings(settingsPath, this);
 
     if (!QFile(settingsPath + "global.ini").exists())
         translateLegacySettings();
@@ -176,6 +177,7 @@ SettingsCache::SettingsCache()
     mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
 
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
+    notifyAboutNewVersion = settings->value("personal/newversionnotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
 
     lang = settings->value("personal/lang").toString();
@@ -220,9 +222,6 @@ SettingsCache::SettingsCache()
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
 
-    picUrl = settings->value("personal/picUrl", PIC_URL_DEFAULT).toString();
-    picUrlFallback = settings->value("personal/picUrlFallback", PIC_URL_FALLBACK).toString();
-
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
@@ -234,7 +233,7 @@ SettingsCache::SettingsCache()
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
-    minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 5).toInt();
+    minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionCompleter = settings->value("chat/mentioncompleter", true).toBool();
@@ -277,6 +276,7 @@ SettingsCache::SettingsCache()
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", "notset").toString();
+    clientVersion = settings->value("personal/clientversion", "notset").toString();
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
 }
 
@@ -413,18 +413,6 @@ void SettingsCache::setPicDownload(int _picDownload)
     picDownload = static_cast<bool>(_picDownload);
     settings->setValue("personal/picturedownload", picDownload);
     emit picDownloadChanged();
-}
-
-void SettingsCache::setPicUrl(const QString &_picUrl)
-{
-    picUrl = _picUrl;
-    settings->setValue("personal/picUrl", picUrl);
-}
-
-void SettingsCache::setPicUrlFallback(const QString &_picUrlFallback)
-{
-    picUrlFallback = _picUrlFallback;
-    settings->setValue("personal/picUrlFallback", picUrlFallback);
 }
 
 void SettingsCache::setNotificationsEnabled(int _notificationsEnabled)
@@ -601,6 +589,12 @@ void SettingsCache::setClientID(QString _clientID)
 {
     clientID = std::move(_clientID);
     settings->setValue("personal/clientid", clientID);
+}
+
+void SettingsCache::setClientVersion(QString _clientVersion)
+{
+    clientVersion = std::move(_clientVersion);
+    settings->setValue("personal/clientversion", clientVersion);
 }
 
 QStringList SettingsCache::getCountries() const
@@ -922,6 +916,12 @@ void SettingsCache::setNotifyAboutUpdate(int _notifyaboutupdate)
 {
     notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+void SettingsCache::setNotifyAboutNewVersion(int _notifyaboutnewversion)
+{
+    notifyAboutNewVersion = static_cast<bool>(_notifyaboutnewversion);
+    settings->setValue("personal/newversionnotification", notifyAboutNewVersion);
 }
 
 void SettingsCache::setDownloadSpoilerStatus(bool _spoilerStatus)

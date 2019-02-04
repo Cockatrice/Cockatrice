@@ -11,9 +11,12 @@ SET(oracle_SOURCES
     src/main.cpp
     src/oraclewizard.cpp
     src/oracleimporter.cpp
+    src/qt-json/json.cpp
     ../cockatrice/src/carddatabase.cpp
     ../cockatrice/src/pictureloader.cpp
+    ../cockatrice/src/carddbparser/carddatabaseparser.cpp
     ../cockatrice/src/carddbparser/cockatricexml3.cpp
+    ../cockatrice/src/carddbparser/cockatricexml4.cpp
     ../cockatrice/src/settingscache.cpp
     ../cockatrice/src/shortcutssettings.cpp
     ../cockatrice/src/settings/carddatabasesettings.cpp
@@ -22,8 +25,8 @@ SET(oracle_SOURCES
     ../cockatrice/src/settings/messagesettings.cpp
     ../cockatrice/src/settings/gamefilterssettings.cpp
     ../cockatrice/src/settings/layoutssettings.cpp
+    ../cockatrice/src/settings/downloadsettings.cpp
     ../cockatrice/src/thememanager.cpp
-    ../cockatrice/src/qt-json/json.cpp
     ../cockatrice/src/releasechannel.cpp
      ${VERSION_STRING_CPP}
 )
@@ -85,18 +88,33 @@ IF(ZLIB_FOUND)
         src/zip/unzip.cpp
         src/zip/zipglobal.cpp
     )
-
 ELSE()
     MESSAGE(STATUS "Oracle: zlib not found; ZIP support disabled")
 ENDIF()
 
+# LibLZMA is required to support xz files
+FIND_PACKAGE(LibLZMA)
+IF(LIBLZMA_FOUND)
+    INCLUDE_DIRECTORIES(${LIBLZMA_INCLUDE_DIRS})
+    ADD_DEFINITIONS("-DHAS_LZMA")
+
+    set(oracle_SOURCES ${oracle_SOURCES}
+        src/lzma/decompress.cpp
+    )
+ELSE()
+    MESSAGE(STATUS "Oracle: LibLZMA not found; xz support disabled")
+ENDIF()
+
 # Build oracle binary and link it
 ADD_EXECUTABLE(oracle WIN32 MACOSX_BUNDLE ${oracle_SOURCES} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_MOC_SRCS})
+TARGET_LINK_LIBRARIES(oracle ${ORACLE_QT_MODULES})
 
 IF(ZLIB_FOUND)
-    TARGET_LINK_LIBRARIES(oracle ${ORACLE_QT_MODULES} ${ZLIB_LIBRARIES})
-ELSE()
-    TARGET_LINK_LIBRARIES(oracle ${ORACLE_QT_MODULES})
+    TARGET_LINK_LIBRARIES(oracle ${ZLIB_LIBRARIES})
+ENDIF()
+
+IF(LIBLZMA_FOUND)
+    TARGET_LINK_LIBRARIES(oracle ${LIBLZMA_LIBRARIES})
 ENDIF()
 
 if(UNIX)
@@ -163,14 +181,8 @@ IF(WIN32)
     set(plugin_dest_dir Plugins)
     set(qtconf_dest_dir .)
     list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
-    IF(ZLIB_FOUND)
-        # look for dll in the bin/ directory (gnuwin32 package)
-        get_filename_component(ZLIB_DLL_DIR "${ZLIB_INCLUDE_DIRS}/../bin/" REALPATH)
-        list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
-        # look for dll in the lib/ directory (nuget package)
-        get_filename_component(ZLIB_DLL_DIR "${ZLIB_LIBRARY}" DIRECTORY)
-        list(APPEND libSearchDirs ${ZLIB_DLL_DIR})
-    ENDIF()
+
+    install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
     # qt5 plugins: iconengines, platforms
 

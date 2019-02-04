@@ -2,7 +2,7 @@
 # will be needed by Qt in order to access https urls.
 
 if (WIN32)
-  # Get standard installation paths for OpenSSL under Windows 
+  # Get standard installation paths for OpenSSL under Windows
 
   # http://www.slproweb.com/products/Win32OpenSSL.html
 
@@ -15,6 +15,7 @@ if (WIN32)
       )
     file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
     set(_OPENSSL_ROOT_PATHS
+      "C:/Tools/vcpkg/installed/x64-windows/bin"
       "${_programfiles}/OpenSSL-Win64"
       "C:/OpenSSL-Win64/"
       )
@@ -28,6 +29,7 @@ if (WIN32)
       )
     file(TO_CMAKE_PATH "$ENV{PROGRAMFILES}" _programfiles)
     set(_OPENSSL_ROOT_PATHS
+      "C:/Tools/vcpkg/installed/x86-windows/bin"
       "${_programfiles}/OpenSSL"
       "${_programfiles}/OpenSSL-Win32"
       "C:/OpenSSL/"

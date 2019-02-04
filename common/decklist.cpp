@@ -2,7 +2,16 @@
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QFile>
+#include <QRegularExpression>
 #include <QTextStream>
+
+#if QT_VERSION < 0x050600
+// qHash on QRegularExpression was added in 5.6, FIX IT
+uint qHash(const QRegularExpression &key, uint seed) noexcept
+{
+    return qHash(key.pattern(), seed); // call qHash on pattern QString instead
+}
+#endif
 
 SideboardPlan::SideboardPlan(const QString &_name, const QList<MoveCard_ToZone> &_moveList)
     : name(_name), moveList(_moveList)
@@ -477,161 +486,131 @@ bool DeckList::saveToFile_Native(QIODevice *device)
 
 bool DeckList::loadFromStream_Plain(QTextStream &in)
 {
+    const QRegularExpression reCardLine("^\\s*[\\w\\[\\(\\{].*$", QRegularExpression::UseUnicodePropertiesOption);
+    const QRegularExpression reEmpty("^\\s*$");
+    const QRegularExpression reComment("[\\w\\[\\(\\{].*$", QRegularExpression::UseUnicodePropertiesOption);
+    const QRegularExpression reSBMark("^\\s*sb:\\s*(.+)", QRegularExpression::CaseInsensitiveOption);
+    const QRegularExpression reSBComment("sideboard", QRegularExpression::CaseInsensitiveOption);
+
+    // simplified matches
+    const QRegularExpression reMultiplier("^[xX\\(\\[]*(\\d+)[xX\\*\\)\\]]* ?(.+)");
+    const QRegularExpression reBrace(" ?[\\[\\{][^\\]\\}]*[\\]\\}] ?"); // not nested
+    const QRegularExpression reRoundBrace("^\\([^\\)]*\\) ?");          // () are only matched at start of string
+    const QRegularExpression reDigitBrace(" ?\\(\\d*\\) ?");            // () are matched if containing digits
+    const QHash<QRegularExpression, QString> differences{{QRegularExpression("’"), QString("'")},
+                                                         {QRegularExpression("Æ"), QString("Ae")},
+                                                         {QRegularExpression("æ"), QString("ae")},
+                                                         {QRegularExpression(" ?[|/]+ ?"), QString(" // ")},
+                                                         {QRegularExpression("(?<![A-Z]) ?& ?"), QString(" // ")}};
+
     cleanList();
-    QVector<QString> inputs; // QTextStream -> QVector
 
-    bool priorEntryIsBlank = true, isAtBeginning = true;
-    int blankLines = 0;
-    while (!in.atEnd()) {
-        QString line = in.readLine().simplified().toLower();
+    QStringList inputs = in.readAll().trimmed().split('\n');
+    int max_line = inputs.size();
 
-        /*
-         * Removes all blank lines at start of inputs
-         * Ex: ("", "", "", "Card1", "Card2") => ("Card1", "Card2")
-         *
-         * This will also concise multiple blank lines in a row to just one blank
-         * Ex: ("Card1", "Card2", "", "", "", "Card3") => ("Card1", "Card2", "", "Card3")
-         */
-        if (line.isEmpty()) {
-            if (priorEntryIsBlank || isAtBeginning) {
-                continue;
-            }
-
-            priorEntryIsBlank = true;
-            blankLines++;
-        } else {
-            isAtBeginning = false;
-            priorEntryIsBlank = false;
+    // start at the first empty line before the first cardline
+    int deckStart = inputs.indexOf(reCardLine);
+    if (deckStart == -1) { // there are no cards?
+        if (inputs.indexOf(reComment) == -1)
+            return false; // input is empty
+        deckStart = max_line;
+    } else {
+        deckStart = inputs.lastIndexOf(reEmpty, deckStart);
+        if (deckStart == -1) {
+            deckStart = 0;
         }
-
-        inputs.push_back(line);
     }
 
-    /*
-     * Removes  blank line at end of inputs (if applicable)
-     * Ex: ("Card1", "Card2", "") => ("Card1", "Card2")
-     * NOTE: Any duplicates were taken care of above, so there can be
-     * at most one blank line at the very end
-     */
-    if (!inputs.empty() && inputs.last().isEmpty()) {
-        blankLines--;
-        inputs.erase(inputs.end() - 1);
-    }
-
-    // If "Sideboard" line appears in inputs, then blank lines mean nothing
-    if (inputs.contains("sideboard")) {
-        blankLines = 2;
-    }
-
-    bool inSideboard = false, titleFound = false, isSideboard;
-    int okRows = 0;
-
-    foreach (QString line, inputs) {
-        // This is a comment line, ignore it
-        if (line.startsWith("//")) {
-            if (!titleFound) // Set the title to the first comment
-            {
-                name = line.mid(2).trimmed();
-                titleFound = true;
-            } else if (okRows == 0) // We haven't processed any cards yet
-            {
-                comments += line.mid(2).trimmed() + "\n";
+    // find sideboard position, if marks are used this won't be needed
+    int sBStart = -1;
+    if (inputs.indexOf(reSBMark, deckStart) == -1) {
+        sBStart = inputs.indexOf(reSBComment, deckStart);
+        if (sBStart == -1) {
+            sBStart = inputs.indexOf(reEmpty, deckStart + 1);
+            if (sBStart == -1) {
+                sBStart = max_line;
             }
+            int nextCard = inputs.indexOf(reCardLine, sBStart + 1);
+            if (inputs.indexOf(reEmpty, nextCard + 1) != -1) {
+                sBStart = max_line; // if there is another empty line all cards are mainboard
+            }
+        }
+    }
 
+    int index = 0;
+    QRegularExpressionMatch match;
+
+    // parse name and comments
+    while (index < deckStart) {
+        const QString current = inputs.at(index++);
+        if (!current.contains(reEmpty)) {
+            match = reComment.match(current);
+            name = match.captured();
+            break;
+        }
+    }
+    while (index < deckStart) {
+        const QString current = inputs.at(index++);
+        if (!current.contains(reEmpty)) {
+            match = reComment.match(current);
+            comments += match.captured() + '\n';
+        }
+    }
+    comments.chop(1); // remove last newline
+
+    // parse decklist
+    for (; index < max_line; ++index) {
+
+        // check if line is a card
+        match = reCardLine.match(inputs.at(index));
+        if (!match.hasMatch())
             continue;
-        }
+        QString cardName = match.captured().simplified();
 
-        // If we have a blank line and it's the _ONLY_ blank line in the paste
-        // and it follows at least one valid card
-        // Then we assume it means to start the sideboard section of the paste.
-        // If we have the word "Sideboard" appear on any line, then that will
-        // also indicate the start of the sideboard.
-        if ((line.isEmpty() && blankLines == 1 && okRows > 0) || line.startsWith("sideboard")) {
-            inSideboard = true;
-            continue; // The line isn't actually a card
-        }
-
-        isSideboard = inSideboard;
-
-        if (line.startsWith("sb:")) {
-            line = line.mid(3).trimmed();
-            isSideboard = true;
-        }
-
-        if (line.trimmed().isEmpty()) {
-            continue; // The line was "    " instead of "\n"
-        }
-
-        // Filter out MWS edition symbols and basic land extras
-        QRegExp rx("\\[.*\\]\\s?");
-        line.remove(rx);
-        rx.setPattern("\\s?\\(.*\\)");
-        line.remove(rx);
-
-        // Filter out post card name editions
-        rx.setPattern("\\|.*$");
-        line.remove(rx);
-
-        // If the user inputs "Quicksilver Elemental" then it will cut it off
-        // 1x Squishy Treaker
-        int i = line.indexOf(' ');
-        int cardNameStart = i + 1;
-
-        if (i > 0) {
-            // If the count ends with an 'x', ignore it. For example,
-            // "4x Storm Crow" will count 4 correctly.
-            if (line.at(i - 1) == 'x') {
-                i--;
-            } else if (!line.at(i - 1).isDigit()) {
-                // If the user inputs "Quicksilver Elemental" then it will work as 1x of that card
-                cardNameStart = 0;
+        // check if card should be sideboard
+        bool sideboard = false;
+        if (sBStart < 0) {
+            match = reSBMark.match(cardName);
+            if (match.hasMatch()) {
+                sideboard = true;
+                cardName = match.captured(1);
             }
+        } else {
+            if (index == sBStart) // skip sideboard line itself
+                continue;
+            sideboard = index > sBStart;
         }
 
-        bool ok;
-        int number = line.left(i).toInt(&ok);
-
-        if (!ok) {
-            number = 1; // If input is "cardName" assume it's "1x cardName"
+        // check if a specific amount is mentioned
+        int amount = 1;
+        match = reMultiplier.match(cardName);
+        if (match.hasMatch()) {
+            amount = match.capturedRef(1).toInt();
+            cardName = match.captured(2);
         }
 
-        QString cardName = line.mid(cardNameStart);
+        // remove stuff inbetween braces
+        cardName.remove(reBrace);
+        cardName.remove(reRoundBrace); // I'll be entirely honest here, these are split to accommodate just three cards
+        cardName.remove(reDigitBrace); // all cards from un-sets that have a word in between round braces at the end
 
-        // Common differences between Cockatrice's card names
-        // and what's commonly used in decklists
-        rx.setPattern("’");
-        cardName.replace(rx, "'");
-        rx.setPattern("Æ");
-        cardName.replace(rx, "Ae");
-        rx.setPattern("\\s*[|/]{1,2}\\s*");
-        cardName.replace(rx, " // ");
-
-        // Replace only if the ampersand is preceded by a non-capital letter,
-        // as would happen with acronyms. So 'Fire & Ice' is replaced but not
-        // 'R&D' or 'R & D'.
-        // Qt regexes don't support lookbehind so we capture and replace instead.
-        rx.setPattern("([^A-Z])\\s*&\\s*");
-        if (rx.indexIn(cardName) != -1) {
-            cardName.replace(rx, QString("%1 // ").arg(rx.cap(1)));
+        // replace common differences in cardnames
+        for (auto diff = differences.constBegin(); diff != differences.constEnd(); ++diff) {
+            cardName.replace(diff.key(), diff.value());
         }
 
-        // We need to get the name of the card from the database,
-        // but we can't do that until we get the "real" name
-        // (name stored in database for the card)
-        // and establish a card info that is of the card, then it's
-        // a simple getting the _real_ name of the card
-        // (i.e. "STOrm, CrOW" => "Storm Crow")
+        // get cardname, this function does nothing if the name is not found
         cardName = getCompleteCardName(cardName);
 
-        // Look for the correct card zone of where to place the new card
-        QString zoneName = getCardZoneFromName(cardName, isSideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN);
+        // get zone name based on if it's in sideboard
+        QString zoneName = getCardZoneFromName(cardName, sideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN);
 
-        okRows++;
-        new DecklistCardNode(cardName, number, getZoneObjFromName(zoneName));
+        // make new entry in decklist
+        new DecklistCardNode(cardName, amount, getZoneObjFromName(zoneName));
     }
 
     updateDeckHash();
-    return (okRows > 0);
+    return true;
 }
 
 InnerDecklistNode *DeckList::getZoneObjFromName(const QString zoneName)

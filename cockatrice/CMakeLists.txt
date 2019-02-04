@@ -100,7 +100,6 @@ SET(cockatrice_SOURCES
     src/localserver.cpp
     src/localserverinterface.cpp
     src/localclient.cpp
-    src/qt-json/json.cpp
     src/soundengine.cpp
     src/pending_command.cpp
     src/pictureloader.cpp
@@ -114,15 +113,18 @@ SET(cockatrice_SOURCES
     src/settings/messagesettings.cpp
     src/settings/gamefilterssettings.cpp
     src/settings/layoutssettings.cpp
+    src/settings/downloadsettings.cpp
     src/update_downloader.cpp
     src/logger.cpp
     src/releasechannel.cpp
     src/userconnection_information.cpp
     src/spoilerbackgroundupdater.cpp
     src/handle_public_servers.cpp
+    src/carddbparser/carddatabaseparser.cpp
     src/carddbparser/cockatricexml3.cpp
+    src/carddbparser/cockatricexml4.cpp
     ${VERSION_STRING_CPP}
-)
+    )
 
 add_subdirectory(sounds)
 add_subdirectory(themes)
@@ -149,8 +151,8 @@ if(APPLE)
 ENDIF(APPLE)
 
 # Qt5
-find_package(Qt5 COMPONENTS Concurrent Multimedia Network PrintSupport Svg Widgets REQUIRED)
-set(COCKATRICE_QT_MODULES Qt5::Concurrent Qt5::Multimedia Qt5::Network Qt5::PrintSupport Qt5::Svg Qt5::Widgets)
+find_package(Qt5 COMPONENTS Concurrent Multimedia Network PrintSupport Svg WebSockets Widgets REQUIRED)
+set(COCKATRICE_QT_MODULES Qt5::Concurrent Qt5::Multimedia Qt5::Network Qt5::PrintSupport Qt5::Svg Qt5::Widgets Qt5::WebSockets)
 
 # Qt5LinguistTools
 find_package(Qt5LinguistTools)
@@ -253,6 +255,8 @@ if(WIN32)
     # these needs to be relative to CMAKE_INSTALL_PREFIX
     set(plugin_dest_dir Plugins)
     set(qtconf_dest_dir .)
+
+    install(DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/" DESTINATION ./ FILES_MATCHING PATTERN "*.dll")
 
     # qt5 plugins: audio, iconengines, imageformats, platforms, printsupport
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime

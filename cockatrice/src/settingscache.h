@@ -2,6 +2,7 @@
 #define SETTINGSCACHE_H
 
 #include "settings/carddatabasesettings.h"
+#include "settings/downloadsettings.h"
 #include "settings/gamefilterssettings.h"
 #include "settings/layoutssettings.h"
 #include "settings/messagesettings.h"
@@ -13,9 +14,6 @@
 
 class ReleaseChannel;
 
-// the falbacks are used for cards without a muid
-#define PIC_URL_DEFAULT "http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!cardid!&type=card"
-#define PIC_URL_FALLBACK "http://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"
 // size should be a multiple of 64
 #define PIXMAPCACHE_SIZE_DEFAULT 2047
 #define PIXMAPCACHE_SIZE_MIN 64
@@ -60,6 +58,7 @@ private:
     MessageSettings *messageSettings;
     GameFiltersSettings *gameFiltersSettings;
     LayoutsSettings *layoutsSettings;
+    DownloadSettings *downloadSettings;
 
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
@@ -67,6 +66,7 @@ private:
     QString deckPath, replaysPath, picsPath, customPicsPath, cardDatabasePath, customCardDatabasePath,
         spoilerDatabasePath, tokenDatabasePath, themeName;
     bool notifyAboutUpdates;
+    bool notifyAboutNewVersion;
     bool showTipsOnStartup;
     QList<int> seenTips;
     bool mbDownloadSpoilers;
@@ -98,6 +98,7 @@ private:
     QString picUrl;
     QString picUrlFallback;
     QString clientID;
+    QString clientVersion;
     QString knownMissingFeatures;
     int pixmapCacheSize;
     bool scaleCards;
@@ -201,6 +202,10 @@ public:
     {
         return notifyAboutUpdates;
     }
+    bool getNotifyAboutNewVersion() const
+    {
+        return notifyAboutNewVersion;
+    }
     bool getShowTipsOnStartup() const
     {
         return showTipsOnStartup;
@@ -302,14 +307,6 @@ public:
     {
         return ignoreUnregisteredUserMessages;
     }
-    QString getPicUrl() const
-    {
-        return picUrl;
-    }
-    QString getPicUrlFallback() const
-    {
-        return picUrlFallback;
-    }
     int getPixmapCacheSize() const
     {
         return pixmapCacheSize;
@@ -396,10 +393,15 @@ public:
         return maxFontSize;
     }
     void setClientID(QString clientID);
+    void setClientVersion(QString clientVersion);
     void setKnownMissingFeatures(QString _knownMissingFeatures);
     QString getClientID()
     {
         return clientID;
+    }
+    QString getClientVersion()
+    {
+        return clientVersion;
     }
     QString getKnownMissingFeatures()
     {
@@ -428,6 +430,10 @@ public:
     LayoutsSettings &layouts() const
     {
         return *layoutsSettings;
+    }
+    DownloadSettings &downloads() const
+    {
+        return *downloadSettings;
     }
     bool getIsPortableBuild() const
     {
@@ -477,8 +483,6 @@ public slots:
     void setSoundThemeName(const QString &_soundThemeName);
     void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
     void setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages);
-    void setPicUrl(const QString &_picUrl);
-    void setPicUrlFallback(const QString &_picUrlFallback);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setCardScaling(const int _scaleCards);
     void setShowMessagePopups(const int _showMessagePopups);
@@ -499,6 +503,7 @@ public slots:
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setNotifyAboutUpdate(int _notifyaboutupdate);
+    void setNotifyAboutNewVersion(int _notifyaboutnewversion);
     void setUpdateReleaseChannel(int _updateReleaseChannel);
     void setMaxFontSize(int _max);
 };

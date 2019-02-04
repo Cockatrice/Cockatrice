@@ -1,12 +1,14 @@
+
+
 #ifndef FILTERTREE_H
 #define FILTERTREE_H
 
+#include "carddatabase.h"
+#include "cardfilter.h"
 #include <QList>
 #include <QMap>
 #include <QObject>
-
-#include "carddatabase.h"
-#include "cardfilter.h"
+#include <utility>
 
 class FilterTreeNode
 {
@@ -33,11 +35,11 @@ public:
     }
     virtual FilterTreeNode *parent() const
     {
-        return NULL;
+        return nullptr;
     }
     virtual FilterTreeNode *nodeAt(int /* i */) const
     {
-        return NULL;
+        return nullptr;
     }
     virtual void deleteAt(int /* i */)
     {
@@ -52,43 +54,39 @@ public:
     }
     virtual int index() const
     {
-        return (parent() != NULL) ? parent()->childIndex(this) : -1;
+        return (parent() != nullptr) ? parent()->childIndex(this) : -1;
     }
-    virtual QString text() const
+    virtual const QString text() const
     {
-        return QString(textCStr());
+        return QString("");
     }
     virtual bool isLeaf() const
     {
         return false;
     }
-    virtual const char *textCStr() const
-    {
-        return "";
-    }
     virtual void nodeChanged() const
     {
-        if (parent() != NULL)
+        if (parent() != nullptr)
             parent()->nodeChanged();
     }
     virtual void preInsertChild(const FilterTreeNode *p, int i) const
     {
-        if (parent() != NULL)
+        if (parent() != nullptr)
             parent()->preInsertChild(p, i);
     }
     virtual void postInsertChild(const FilterTreeNode *p, int i) const
     {
-        if (parent() != NULL)
+        if (parent() != nullptr)
             parent()->postInsertChild(p, i);
     }
     virtual void preRemoveChild(const FilterTreeNode *p, int i) const
     {
-        if (parent() != NULL)
+        if (parent() != nullptr)
             parent()->preRemoveChild(p, i);
     }
     virtual void postRemoveChild(const FilterTreeNode *p, int i) const
     {
-        if (parent() != NULL)
+        if (parent() != nullptr)
             parent()->postRemoveChild(p, i);
     }
 };
@@ -100,13 +98,13 @@ protected:
 
 public:
     virtual ~FilterTreeBranch();
-    FilterTreeNode *nodeAt(int i) const;
-    void deleteAt(int i);
-    int childCount() const
+    FilterTreeNode *nodeAt(int i) const override;
+    void deleteAt(int i) override;
+    int childCount() const override
     {
         return childNodes.size();
     }
-    int childIndex(const FilterTreeNode *node) const;
+    int childIndex(const FilterTreeNode *node) const override;
 };
 
 class FilterItemList;
@@ -125,8 +123,8 @@ public:
     }
     const FilterItemList *findTypeList(CardFilter::Type type) const;
     FilterItemList *typeList(CardFilter::Type type);
-    FilterTreeNode *parent() const;
-    const char *textCStr() const
+    FilterTreeNode *parent() const override;
+    const QString text() const override
     {
         return CardFilter::attrName(attr);
     }
@@ -148,21 +146,21 @@ public:
     {
         return p->attr;
     }
-    FilterTreeNode *parent() const
+    FilterTreeNode *parent() const override
     {
         return p;
     }
     int termIndex(const QString &term) const;
     FilterTreeNode *termNode(const QString &term);
-    const char *textCStr() const
+    const QString text() const override
     {
         return CardFilter::typeName(type);
     }
 
-    bool testTypeAnd(const CardInfoPtr info, CardFilter::Attr attr) const;
-    bool testTypeAndNot(const CardInfoPtr info, CardFilter::Attr attr) const;
-    bool testTypeOr(const CardInfoPtr info, CardFilter::Attr attr) const;
-    bool testTypeOrNot(const CardInfoPtr info, CardFilter::Attr attr) const;
+    bool testTypeAnd(CardInfoPtr info, CardFilter::Attr attr) const;
+    bool testTypeAndNot(CardInfoPtr info, CardFilter::Attr attr) const;
+    bool testTypeOr(CardInfoPtr info, CardFilter::Attr attr) const;
+    bool testTypeOrNot(CardInfoPtr info, CardFilter::Attr attr) const;
 };
 
 class FilterItem : public FilterTreeNode
@@ -173,10 +171,10 @@ private:
 public:
     const QString term;
 
-    FilterItem(QString trm, FilterItemList *parent) : p(parent), term(trm)
+    FilterItem(QString trm, FilterItemList *parent) : p(parent), term(std::move(trm))
     {
     }
-    virtual ~FilterItem(){};
+    virtual ~FilterItem() = default;
 
     CardFilter::Attr attr() const
     {
@@ -186,34 +184,30 @@ public:
     {
         return p->type;
     }
-    FilterTreeNode *parent() const
+    FilterTreeNode *parent() const override
     {
         return p;
     }
-    QString text() const
+    const QString text() const override
     {
         return term;
     }
-    const char *textCStr() const
-    {
-        return term.toStdString().c_str();
-    }
-    bool isLeaf() const
+    bool isLeaf() const override
     {
         return true;
     }
 
-    bool acceptName(const CardInfoPtr info) const;
-    bool acceptType(const CardInfoPtr info) const;
-    bool acceptColor(const CardInfoPtr info) const;
-    bool acceptText(const CardInfoPtr info) const;
-    bool acceptSet(const CardInfoPtr info) const;
-    bool acceptManaCost(const CardInfoPtr info) const;
-    bool acceptCmc(const CardInfoPtr info) const;
-    bool acceptPowerToughness(const CardInfoPtr info, CardFilter::Attr attr) const;
-    bool acceptLoyalty(const CardInfoPtr info) const;
-    bool acceptRarity(const CardInfoPtr info) const;
-    bool acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) const;
+    bool acceptName(CardInfoPtr info) const;
+    bool acceptType(CardInfoPtr info) const;
+    bool acceptColor(CardInfoPtr info) const;
+    bool acceptText(CardInfoPtr info) const;
+    bool acceptSet(CardInfoPtr info) const;
+    bool acceptManaCost(CardInfoPtr info) const;
+    bool acceptCmc(CardInfoPtr info) const;
+    bool acceptPowerToughness(CardInfoPtr info, CardFilter::Attr attr) const;
+    bool acceptLoyalty(CardInfoPtr info) const;
+    bool acceptRarity(CardInfoPtr info) const;
+    bool acceptCardAttr(CardInfoPtr info, CardFilter::Attr attr) const;
     bool relationCheck(int cardInfo) const;
 };
 
@@ -232,47 +226,47 @@ private:
     LogicMap *attrLogicMap(CardFilter::Attr attr);
     FilterItemList *attrTypeList(CardFilter::Attr attr, CardFilter::Type type);
 
-    bool testAttr(const CardInfoPtr info, const LogicMap *lm) const;
+    bool testAttr(CardInfoPtr info, const LogicMap *lm) const;
 
-    void nodeChanged() const
+    void nodeChanged() const override
     {
         emit changed();
     }
-    void preInsertChild(const FilterTreeNode *p, int i) const
+    void preInsertChild(const FilterTreeNode *p, int i) const override
     {
         emit preInsertRow(p, i);
     }
-    void postInsertChild(const FilterTreeNode *p, int i) const
+    void postInsertChild(const FilterTreeNode *p, int i) const override
     {
         emit postInsertRow(p, i);
     }
-    void preRemoveChild(const FilterTreeNode *p, int i) const
+    void preRemoveChild(const FilterTreeNode *p, int i) const override
     {
         emit preRemoveRow(p, i);
     }
-    void postRemoveChild(const FilterTreeNode *p, int i) const
+    void postRemoveChild(const FilterTreeNode *p, int i) const override
     {
         emit postRemoveRow(p, i);
     }
 
 public:
     FilterTree();
-    ~FilterTree();
+    ~FilterTree() override;
     int findTermIndex(CardFilter::Attr attr, CardFilter::Type type, const QString &term);
     int findTermIndex(const CardFilter *f);
     FilterTreeNode *termNode(CardFilter::Attr attr, CardFilter::Type type, const QString &term);
     FilterTreeNode *termNode(const CardFilter *f);
     FilterTreeNode *attrTypeNode(CardFilter::Attr attr, CardFilter::Type type);
-    const char *textCStr() const
+    const QString text() const override
     {
-        return "root";
+        return QString("root");
     }
-    int index() const
+    int index() const override
     {
         return 0;
     }
 
-    bool acceptsCard(const CardInfoPtr info) const;
+    bool acceptsCard(CardInfoPtr info) const;
     void clear();
 };
 

@@ -40,7 +40,7 @@ void GameScene::addPlayer(Player *player)
     players << player;
     addItem(player);
     connect(player, SIGNAL(sizeChanged()), this, SLOT(rearrange()));
-    connect(player, SIGNAL(gameConceded()), this, SLOT(rearrange()));
+    connect(player, SIGNAL(playerCountChanged()), this, SLOT(rearrange()));
 }
 
 void GameScene::removePlayer(Player *player)

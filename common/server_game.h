@@ -77,7 +77,6 @@ private:
                                      Server_Player *playerWhosAsking,
                                      bool omniscient,
                                      bool withUserInfo);
-    void sendGameStateToPlayers();
     void storeGameInformation();
 signals:
     void sigStartGameIfReady();
@@ -192,6 +191,7 @@ public:
     prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, GameEventContext *context = 0);
     GameEventContext prepareGameEventContext(const ::google::protobuf::Message &gameEventContext);
 
+    void sendGameStateToPlayers();
     void sendGameEventContainer(GameEventContainer *cont,
                                 GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate |
                                                                                    GameEventStorageItem::SendToOthers,
