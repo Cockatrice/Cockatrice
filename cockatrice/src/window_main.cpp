@@ -948,7 +948,10 @@ void MainWindow::changeEvent(QEvent *event)
     else if (event->type() == QEvent::ActivationChange) {
         if (isActiveWindow() && !bHasActivated) {
             bHasActivated = true;
-            if (settingsCache->servers().getAutoConnect()) {
+            if (!connectTo.isEmpty()) {
+                qDebug() << "Command line connect to " << connectTo;
+                client->connectToServer(connectTo.host(), connectTo.port(), connectTo.userName(), connectTo.password());
+            } else if (settingsCache->servers().getAutoConnect()) {
                 qDebug() << "Attempting auto-connect...";
                 DlgConnect dlg(this);
                 client->connectToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
