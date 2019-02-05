@@ -1660,6 +1660,7 @@ Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer 
     Event_RevealCards eventOthers;
     eventOthers.set_grant_write_access(cmd.grant_write_access());
     eventOthers.set_zone_name(zone->getName().toStdString());
+    eventOthers.set_number_of_cards(cardsToReveal.size());
     if (cmd.has_card_id())
         eventOthers.set_card_id(cmd.card_id());
     if (cmd.has_player_id())

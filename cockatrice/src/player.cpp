@@ -1854,7 +1854,8 @@ void Player::eventRevealCards(const Event_RevealCards &event)
             static_cast<GameScene *>(scene())->addRevealedZoneView(this, zone, cardList, event.grant_write_access());
         }
 
-        emit logRevealCards(this, zone, event.card_id(), cardName, otherPlayer, false, cardList.size());
+        emit logRevealCards(this, zone, event.card_id(), cardName, otherPlayer, false,
+                            event.has_number_of_cards() ? event.number_of_cards() : cardList.size());
     }
 }
 
