@@ -30,6 +30,7 @@
 #include "soundengine.h"
 #include "spoilerbackgroundupdater.h"
 #include "thememanager.h"
+#include "version_string.h"
 #include "window_main.h"
 #include <QApplication>
 #include <QCryptographicHash>
@@ -98,6 +99,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Cockatrice");
     QCoreApplication::setOrganizationDomain("cockatrice.de");
     QCoreApplication::setApplicationName("Cockatrice");
+    QCoreApplication::setApplicationVersion(VERSION_STRING);
 
 #ifdef Q_OS_MAC
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
