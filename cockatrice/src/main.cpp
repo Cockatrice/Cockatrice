@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 #endif
 
     QCoreApplication::setOrganizationName("Cockatrice");
-    QCoreApplication::setOrganizationDomain("cockatrice.de");
+    QCoreApplication::setOrganizationDomain("https://cockatrice.github.io/");
     QCoreApplication::setApplicationName("Cockatrice");
 
 #ifdef Q_OS_MAC
