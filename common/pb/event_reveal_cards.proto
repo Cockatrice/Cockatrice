@@ -11,4 +11,5 @@ message Event_RevealCards {
     optional sint32 other_player_id = 3 [default = -1];
     repeated ServerInfo_Card cards = 4;
     optional bool grant_write_access = 5;
+    optional uint32 number_of_cards = 6;
 }
