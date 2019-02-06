@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 #endif
 
     // These values are only used by the settings loader/saver
-    // Having wrong or outdated values here doesn't hurt too much
+    // Wrong or outdated values are kept to not break things
     QCoreApplication::setOrganizationName("Cockatrice");
     QCoreApplication::setOrganizationDomain("cockatrice.de");
     QCoreApplication::setApplicationName("Cockatrice");
