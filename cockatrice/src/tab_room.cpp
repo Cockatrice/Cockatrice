@@ -121,7 +121,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
 
     sayEdit->setCompleter(completer);
     actCompleterChanged();
-    connect(&settingsCache->shortcuts(), SIGNAL(shortCutchanged()), this, SLOT(refreshShortcuts()));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
 
     retranslateUi();
