@@ -168,8 +168,9 @@ var WebClient = {
         "feature_set",
         "room_chat_history",
         "client_warnings",
-        "2.6.1_min_version",
         "websocket",
+        "2.6.1_min_version",
+        "2.7.0_min_version",
         /* unimplemented features */
         "forgot_password",
         "idle_client",
