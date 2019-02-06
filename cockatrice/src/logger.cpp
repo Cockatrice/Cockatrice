@@ -70,7 +70,7 @@ void Logger::log(QtMsgType /* type */, const QMessageLogContext & /* ctx */, con
     QMetaObject::invokeMethod(this, "internalLog", Qt::QueuedConnection, Q_ARG(const QString &, message));
 }
 
-void Logger::internalLog(const QString message)
+void Logger::internalLog(QString message)
 {
     QMutexLocker locker(&mutex);
 
@@ -108,14 +108,12 @@ QString Logger::getClientOperatingSystem()
 
 QString Logger::getSystemLocale()
 {
-    QString result;
-    result.append(QString("System Locale: ") + QLocale().name());
+    QString result(QString("System Locale: ") + QLocale().name());
     return result;
 }
 
 QString Logger::getClientInstallInfo()
 {
-    QString result;
-    result.append(QString("Install Mode: ") + (settingsCache->getIsPortableBuild() ? "Portable" : "Standard"));
+    QString result(QString("Install Mode: ") + (settingsCache->getIsPortableBuild() ? "Portable" : "Standard"));
     return result;
 }

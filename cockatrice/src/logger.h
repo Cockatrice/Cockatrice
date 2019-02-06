@@ -28,7 +28,7 @@ public:
     }
 
     void logToFile(bool enabled);
-    void log(QtMsgType type, const QMessageLogContext &ctx, const QString message);
+    void log(QtMsgType type, const QMessageLogContext &ctx, QString message);
     QString getClientVersion();
     QString getClientOperatingSystem();
     QString getSystemArchitecture();
@@ -41,7 +41,7 @@ public:
 
 private:
     Logger();
-    ~Logger();
+    ~Logger() override;
     // Singleton - Don't implement copy constructor and assign operator
     Logger(Logger const &);
     void operator=(Logger const &);
@@ -57,7 +57,7 @@ protected:
     void closeLogfileSession();
 
 protected slots:
-    void internalLog(const QString message);
+    void internalLog(QString message);
 
 signals:
     void logEntryAdded(QString message);
