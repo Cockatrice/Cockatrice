@@ -86,7 +86,7 @@ var WebClient = {
 
   resetConnectionvars : function () {
     this.cmdId = 0;
-    this.pendingCommands = {};    
+    this.pendingCommands = {};
   },
 
   sendCommand : function (cmd, callback)
@@ -151,7 +151,7 @@ var WebClient = {
       WebClient.sendSessionCommand(sc, function() {
         WebClient.lastPingPending = false;
       });
-        
+
     }, WebClient.options.keepalive);
   },
 
@@ -168,6 +168,8 @@ var WebClient = {
         "feature_set",
         "room_chat_history",
         "client_warnings",
+        "2.6.1_min_version",
+        "websocket",
         /* unimplemented features */
         "forgot_password",
         "idle_client",
@@ -404,7 +406,7 @@ var WebClient = {
 
     this.socket.onclose = function() {
       WebClient.setStatus(StatusEnum.DISCONNECTED, 'Connection closed');
-    } 
+    }
 
     this.socket.onerror = function() {
       WebClient.setStatus(StatusEnum.DISCONNECTED, 'Connection failed');
@@ -412,7 +414,7 @@ var WebClient = {
 
     this.socket.onopen = function(){
       WebClient.setStatus(StatusEnum.CONNECTED, 'Connected');
-    } 
+    }
 
     this.socket.onmessage = function(event) {
       //console.log("Received " + event.data.byteLength + " bytes");
@@ -431,7 +433,7 @@ var WebClient = {
           {
             str += String.fromCharCode(uint8msg[i]);
           }
-          console.log(str);          
+          console.log(str);
         }
         return;
       }
@@ -456,7 +458,7 @@ var WebClient = {
           WebClient.processRoomEvent(msg.roomEvent);
           break;
       }
-    } 
+    }
   },
 
   disconnect : function() {
