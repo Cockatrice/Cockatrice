@@ -1,5 +1,7 @@
 #include "logger.h"
 #include "version_string.h"
+
+#include <QApplication>
 #include <QDateTime>
 #include <QLocale>
 #include <QSysInfo>
@@ -13,9 +15,12 @@ Logger::Logger() : logToFileEnabled(false)
     logBuffer.append(getClientVersion());
     logBuffer.append(getSystemArchitecture());
     logBuffer.append(getSystemLocale());
+    logBuffer.append(getClientInstallInfo());
     logBuffer.append(QString("-").repeated(75));
     std::cerr << getClientVersion().toStdString() << std::endl;
     std::cerr << getSystemArchitecture().toStdString() << std::endl;
+    std::cerr << getSystemLocale().toStdString() << std::endl;
+    std::cerr << getClientInstallInfo().toStdString() << std::endl;
 }
 
 Logger::~Logger()
@@ -50,6 +55,7 @@ void Logger::openLogfileSession()
     fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << endl;
     fileStream << getClientVersion() << endl;
     fileStream << getSystemArchitecture() << endl;
+    fileStream << getClientInstallInfo() << endl;
     logToFileEnabled = true;
 }
 
@@ -68,7 +74,7 @@ void Logger::log(QtMsgType /* type */, const QMessageLogContext & /* ctx */, con
     QMetaObject::invokeMethod(this, "internalLog", Qt::QueuedConnection, Q_ARG(const QString &, message));
 }
 
-void Logger::internalLog(const QString message)
+void Logger::internalLog(QString message)
 {
     QMutexLocker locker(&mutex);
 
@@ -106,7 +112,14 @@ QString Logger::getClientOperatingSystem()
 
 QString Logger::getSystemLocale()
 {
-    QString result;
-    result.append(QString("System Locale: ") + QLocale().name());
+    QString result(QString("System Locale: ") + QLocale().name());
+    return result;
+}
+
+QString Logger::getClientInstallInfo()
+{
+    // don't rely on settingsCache->getIsPortableBuild() since the logger is initialized earlier
+    bool isPortable = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
+    QString result(QString("Install Mode: ") + (isPortable ? "Portable" : "Standard"));
     return result;
 }
