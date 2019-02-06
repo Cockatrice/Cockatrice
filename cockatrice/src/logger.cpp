@@ -1,4 +1,5 @@
 #include "logger.h"
+#include "settingscache.h"
 #include "version_string.h"
 #include <QDateTime>
 #include <QLocale>
@@ -13,6 +14,7 @@ Logger::Logger() : logToFileEnabled(false)
     logBuffer.append(getClientVersion());
     logBuffer.append(getSystemArchitecture());
     logBuffer.append(getSystemLocale());
+    logBuffer.append(getClientInstallInfo());
     logBuffer.append(QString("-").repeated(75));
     std::cerr << getClientVersion().toStdString() << std::endl;
     std::cerr << getSystemArchitecture().toStdString() << std::endl;
@@ -108,5 +110,12 @@ QString Logger::getSystemLocale()
 {
     QString result;
     result.append(QString("System Locale: ") + QLocale().name());
+    return result;
+}
+
+QString Logger::getClientInstallInfo()
+{
+    QString result;
+    result.append(QString("Install Mode: ") + (settingsCache->getIsPortableBuild() ? "Portable" : "Standard"));
     return result;
 }

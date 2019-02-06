@@ -33,6 +33,7 @@ public:
     QString getClientOperatingSystem();
     QString getSystemArchitecture();
     QString getSystemLocale();
+    QString getClientInstallInfo();
     QList<QString> getLogBuffer()
     {
         return logBuffer;
