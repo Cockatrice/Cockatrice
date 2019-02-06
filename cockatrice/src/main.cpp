@@ -30,6 +30,7 @@
 #include "soundengine.h"
 #include "spoilerbackgroundupdater.h"
 #include "thememanager.h"
+#include "version_string.h"
 #include "window_main.h"
 #include <QApplication>
 #include <QCryptographicHash>
@@ -91,9 +92,6 @@ int main(int argc, char *argv[])
     QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
 
     qInstallMessageHandler(CockatriceLogger);
-    if (app.arguments().contains("--debug-output"))
-        Logger::getInstance().logToFile(true);
-
 #ifdef Q_OS_WIN
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
@@ -103,6 +101,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Cockatrice");
     QCoreApplication::setOrganizationDomain("cockatrice.de");
     QCoreApplication::setApplicationName("Cockatrice");
+    QCoreApplication::setApplicationVersion(VERSION_STRING);
 
 #ifdef Q_OS_MAC
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
@@ -115,6 +114,21 @@ int main(int argc, char *argv[])
 #else // linux
     translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
 #endif
+
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Cockatrice");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    parser.addOptions(
+        {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
+         {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")}});
+
+    parser.process(app);
+
+    if (parser.isSet("debug-output")) {
+        Logger::getInstance().logToFile(true);
+    }
 
     rng = new RNG_SFMT;
     settingsCache = new SettingsCache;
@@ -132,6 +146,9 @@ int main(int argc, char *argv[])
     qDebug("main(): starting main program");
 
     MainWindow ui;
+    if (parser.isSet("connect")) {
+        ui.setConnectTo(parser.value("connect"));
+    }
     qDebug("main(): MainWindow constructor finished");
 
     ui.setWindowIcon(QPixmap("theme:cockatrice"));
