@@ -73,7 +73,7 @@ requireclientid=false
 ; You can limit the types of clients that connect to the server by requiring different features be available
 ; on the client.  This setting can contain a comma-seperated list of features.  if any of the features
 ; listed in this line are not available on the client the client will be denied access to the server upon
-; attempting to log in.  Example: "client_id,client_ver"
+; attempting to log in.  Example: "client_id,client_ver,websocket"
 requiredfeatures=""
 
 ; You can define custom warnings that users are sent when the moderation staff uses the right client warn user
