@@ -1,6 +1,7 @@
 #include "logger.h"
-#include "settingscache.h"
 #include "version_string.h"
+
+#include <QApplication>
 #include <QDateTime>
 #include <QLocale>
 #include <QSysInfo>
@@ -18,6 +19,8 @@ Logger::Logger() : logToFileEnabled(false)
     logBuffer.append(QString("-").repeated(75));
     std::cerr << getClientVersion().toStdString() << std::endl;
     std::cerr << getSystemArchitecture().toStdString() << std::endl;
+    std::cerr << getSystemLocale().toStdString() << std::endl;
+    std::cerr << getClientInstallInfo().toStdString() << std::endl;
 }
 
 Logger::~Logger()
@@ -52,6 +55,7 @@ void Logger::openLogfileSession()
     fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << endl;
     fileStream << getClientVersion() << endl;
     fileStream << getSystemArchitecture() << endl;
+    fileStream << getClientInstallInfo() << endl;
     logToFileEnabled = true;
 }
 
@@ -114,6 +118,8 @@ QString Logger::getSystemLocale()
 
 QString Logger::getClientInstallInfo()
 {
-    QString result(QString("Install Mode: ") + (settingsCache->getIsPortableBuild() ? "Portable" : "Standard"));
+    // don't rely on settingsCache->getIsPortableBuild() since the logger is initialized earlier
+    bool isPortable = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
+    QString result(QString("Install Mode: ") + (isPortable ? "Portable" : "Standard"));
     return result;
 }
