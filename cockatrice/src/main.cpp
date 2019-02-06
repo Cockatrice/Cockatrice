@@ -98,8 +98,10 @@ int main(int argc, char *argv[])
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
 
+    // These values are only used by the settings loader/saver
+    // Having wrong or outdated values here doesn't hurt too much
     QCoreApplication::setOrganizationName("Cockatrice");
-    QCoreApplication::setOrganizationDomain("https://cockatrice.github.io/");
+    QCoreApplication::setOrganizationDomain("cockatrice.de");
     QCoreApplication::setApplicationName("Cockatrice");
 
 #ifdef Q_OS_MAC
