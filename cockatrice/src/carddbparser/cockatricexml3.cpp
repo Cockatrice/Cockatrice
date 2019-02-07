@@ -83,7 +83,8 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
                 } else if (xml.name() == "settype") {
                     setType = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                 } else if (xml.name() == "releasedate") {
-                    releaseDate = QDate::fromString(xml.readElementText(QXmlStreamReader::IncludeChildElements), Qt::ISODate);
+                    releaseDate =
+                        QDate::fromString(xml.readElementText(QXmlStreamReader::IncludeChildElements), Qt::ISODate);
                 } else if (xml.name() != "") {
                     qDebug() << "[CockatriceXml3Parser] Unknown set property" << xml.name()
                              << ", trying to continue anyway";
