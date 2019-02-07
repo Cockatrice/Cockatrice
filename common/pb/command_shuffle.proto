@@ -4,5 +4,8 @@ message Command_Shuffle {
     extend GameCommand {
         optional Command_Shuffle ext = 1003;
     }
+    optional string zone_name = 1;
+    optional sint32 start = 2 [default = 0];
+    optional sint32 end = 3 [default = -1];
 }
 

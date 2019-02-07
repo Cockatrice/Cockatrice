@@ -738,7 +738,7 @@ void Player::retranslateUi()
 
     aMoveToTopLibrary->setText(tr("&Top of library"));
     aMoveToXfromTopOfLibrary->setText(tr("X cards from the top of library..."));
-    aMoveToBottomLibrary->setText(tr("&Bottom of library"));
+    aMoveToBottomLibrary->setText(tr("&Bottom of library in random order"));
     aMoveToHand->setText(tr("&Hand"));
     aMoveToGraveyard->setText(tr("&Graveyard"));
     aMoveToExile->setText(tr("&Exile"));
@@ -1453,7 +1453,7 @@ void Player::eventShuffle(const Event_Shuffle &event)
     if (zone->getView() && zone->getView()->getRevealZone()) {
         zone->getView()->setWriteableRevealZone(false);
     }
-    emit logShuffle(this, zone);
+    emit logShuffle(this, zone, event.start(), event.end());
 }
 
 void Player::eventRollDie(const Event_RollDie &event)
@@ -2440,6 +2440,16 @@ void Player::cardMenuAction()
                 cmd->set_target_zone("deck");
                 cmd->set_x(-1);
                 cmd->set_y(0);
+
+                if (idList.card_size() > 1) {
+                    auto *scmd = new Command_Shuffle;
+                    scmd->set_zone_name("deck");
+                    scmd->set_start(-idList.card_size());
+                    scmd->set_end(-1);
+                    // Server process events backwards, so...
+                    commandList.append(scmd);
+                }
+
                 commandList.append(cmd);
                 break;
             }

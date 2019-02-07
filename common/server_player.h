@@ -90,7 +90,7 @@ public:
                   const ServerInfo_User &_userInfo,
                   bool _spectator,
                   Server_AbstractUserInterface *_handler);
-    ~Server_Player();
+    ~Server_Player() override;
     void prepareDestroy();
     Server_AbstractUserInterface *getUserInterface() const
     {
@@ -99,10 +99,6 @@ public:
     void setUserInterface(Server_AbstractUserInterface *_userInterface);
     void disconnectClient();
 
-    void setPlayerId(int _id)
-    {
-        playerId = _id;
-    }
     bool getReadyStart() const
     {
         return readyStart;
@@ -127,10 +123,7 @@ public:
     {
         conceded = _conceded;
     }
-    DeckList *getDeck() const
-    {
-        return deck;
-    }
+
     Server_Game *getGame() const
     {
         return game;

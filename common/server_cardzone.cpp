@@ -40,13 +40,25 @@ Server_CardZone::~Server_CardZone()
     clear();
 }
 
-void Server_CardZone::shuffle()
+void Server_CardZone::shuffle(int start, int end)
 {
     // Size 0 or 1 decks are sorted
     if (cards.size() < 2)
         return;
-    for (int i = cards.size() - 1; i > 0; i--) {
-        int j = rng->rand(0, i);
+
+    // Negative numbers signify positions starting at the end of the
+    // zone convert these to actual indexes.
+    if (end < 0)
+        end += cards.size();
+
+    if (start < 0)
+        start += cards.size();
+
+    if (start < 0 || end < 0 || start >= cards.size() || end >= cards.size())
+        return;
+
+    for (int i = end; i > start; i--) {
+        int j = rng->rand(start, i);
         cards.swap(j, i);
     }
     playersWithWritePermission.clear();
@@ -108,7 +120,7 @@ int Server_CardZone::removeCard(Server_Card *card)
     cards.removeAt(index);
     if (has_coords)
         removeCardFromCoordMap(card, card->getX(), card->getY());
-    card->setZone(0);
+    card->setZone(nullptr);
 
     return index;
 }
@@ -123,21 +135,21 @@ Server_Card *Server_CardZone::getCard(int id, int *position, bool remove)
                     *position = i;
                 if (remove) {
                     cards.removeAt(i);
-                    tmp->setZone(0);
+                    tmp->setZone(nullptr);
                 }
                 return tmp;
             }
         }
-        return NULL;
+        return nullptr;
     } else {
         if ((id >= cards.size()) || (id < 0))
-            return NULL;
+            return nullptr;
         Server_Card *tmp = cards[id];
         if (position)
             *position = id;
         if (remove) {
             cards.removeAt(id);
-            tmp->setZone(0);
+            tmp->setZone(nullptr);
         }
         return tmp;
     }
@@ -203,7 +215,7 @@ bool Server_CardZone::isColumnEmpty(int x, int y) const
 
 void Server_CardZone::moveCardInRow(GameEventStorage &ges, Server_Card *card, int x, int y)
 {
-    CardToMove *cardToMove = new CardToMove;
+    auto *cardToMove = new CardToMove;
     cardToMove->set_card_id(card->getId());
     player->moveCard(ges, this, QList<const CardToMove *>() << cardToMove, this, x, y, false, false);
     delete cardToMove;
@@ -215,8 +227,8 @@ void Server_CardZone::fixFreeSpaces(GameEventStorage &ges)
         return;
 
     QSet<QPair<int, int>> placesToLook;
-    for (int i = 0; i < cards.size(); ++i)
-        placesToLook.insert(QPair<int, int>((cards[i]->getX() / 3) * 3, cards[i]->getY()));
+    for (auto &card : cards)
+        placesToLook.insert(QPair<int, int>((card->getX() / 3) * 3, card->getY()));
 
     QSetIterator<QPair<int, int>> placeIterator(placesToLook);
     while (placeIterator.hasNext()) {
@@ -266,8 +278,8 @@ void Server_CardZone::insertCard(Server_Card *card, int x, int y)
 
 void Server_CardZone::clear()
 {
-    for (int i = 0; i < cards.size(); i++)
-        delete cards.at(i);
+    for (auto card : cards)
+        delete card;
     cards.clear();
     coordinateMap.clear();
     freePilesMap.clear();

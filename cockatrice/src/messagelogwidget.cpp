@@ -1,6 +1,8 @@
-#include "messagelogwidget.h"
+#include <utility>
+
 #include "carditem.h"
 #include "cardzone.h"
+#include "messagelogwidget.h"
 #include "pb/context_move_card.pb.h"
 #include "pb/context_mulligan.pb.h"
 #include "pb/serverinfo_user.pb.h"
@@ -120,14 +122,14 @@ MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, boo
 void MessageLogWidget::containerProcessingDone()
 {
     if (currentContext == MessageContext_MoveCard) {
-        for (int i = 0; i < moveCardQueue.size(); ++i)
-            logDoMoveCard(moveCardQueue[i]);
+        for (auto &i : moveCardQueue)
+            logDoMoveCard(i);
         moveCardQueue.clear();
         moveCardPT.clear();
         moveCardTapped.clear();
     } else if (currentContext == MessageContext_Mulligan) {
         logMulligan(mulliganPlayer, mulliganNumber);
-        mulliganPlayer = 0;
+        mulliganPlayer = nullptr;
         mulliganNumber = 0;
     }
 
@@ -141,7 +143,7 @@ void MessageLogWidget::containerProcessingStarted(const GameEventContext &contex
     else if (context.HasExtension(Context_Mulligan::ext)) {
         const Context_Mulligan &contextMulligan = context.GetExtension(Context_Mulligan::ext);
         currentContext = MessageContext_Mulligan;
-        mulliganPlayer = 0;
+        mulliganPlayer = nullptr;
         mulliganNumber = contextMulligan.number();
     }
 }
@@ -158,9 +160,9 @@ void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *t
 {
     appendHtmlServerMessage(tr("%1 attaches %2 to %3's %4.")
                                 .arg(sanitizeHtml(player->getName()))
-                                .arg(cardLink(cardName))
+                                .arg(cardLink(std::move(cardName)))
                                 .arg(sanitizeHtml(targetPlayer->getName()))
-                                .arg(cardLink(targetCardName)));
+                                .arg(cardLink(std::move(targetCardName))));
 }
 
 void MessageLogWidget::logConcede(Player *player)
@@ -247,7 +249,7 @@ void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString 
 {
     appendHtmlServerMessage(tr("%1 creates token: %2%3.")
                                 .arg(sanitizeHtml(player->getName()))
-                                .arg(cardLink(cardName))
+                                .arg(cardLink(std::move(cardName)))
                                 .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
 }
 
@@ -264,7 +266,8 @@ void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideb
 
 void MessageLogWidget::logDestroyCard(Player *player, QString cardName)
 {
-    appendHtmlServerMessage(tr("%1 destroys %2.").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
+    appendHtmlServerMessage(
+        tr("%1 destroys %2.").arg(sanitizeHtml(player->getName())).arg(cardLink(std::move(cardName))));
 }
 
 void MessageLogWidget::logDoMoveCard(LogMoveCard &lmc)
@@ -395,7 +398,7 @@ void MessageLogWidget::logJoin(Player *player)
 void MessageLogWidget::logJoinSpectator(QString name)
 {
     soundEngine->playSound("spectator_join");
-    appendHtmlServerMessage(tr("%1 is now watching the game.").arg(sanitizeHtml(name)));
+    appendHtmlServerMessage(tr("%1 is now watching the game.").arg(sanitizeHtml(std::move(name))));
 }
 
 void MessageLogWidget::logKicked()
@@ -406,15 +409,15 @@ void MessageLogWidget::logKicked()
 void MessageLogWidget::logLeave(Player *player, QString reason)
 {
     soundEngine->playSound("player_leave");
-    appendHtmlServerMessage(tr("%1 has left the game (%2).").arg(sanitizeHtml(player->getName()), sanitizeHtml(reason)),
-                            true);
+    appendHtmlServerMessage(
+        tr("%1 has left the game (%2).").arg(sanitizeHtml(player->getName()), sanitizeHtml(std::move(reason))), true);
 }
 
 void MessageLogWidget::logLeaveSpectator(QString name, QString reason)
 {
     soundEngine->playSound("spectator_leave");
-    appendHtmlServerMessage(
-        tr("%1 is not watching the game any more (%2).").arg(sanitizeHtml(name), sanitizeHtml(reason)));
+    appendHtmlServerMessage(tr("%1 is not watching the game any more (%2).")
+                                .arg(sanitizeHtml(std::move(name)), sanitizeHtml(std::move(reason))));
 }
 
 void MessageLogWidget::logNotReadyStart(Player *player)
@@ -551,7 +554,7 @@ void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-    appendMessage(message, 0, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()),
+    appendMessage(std::move(message), nullptr, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()),
                   QString::fromStdString(player->getUserInfo()->privlevel()), true);
 }
 
@@ -636,7 +639,7 @@ void MessageLogWidget::logSetAnnotation(Player *player, CardItem *card, QString 
         QString(tr("%1 sets annotation of %2 to %3."))
             .arg(sanitizeHtml(player->getName()))
             .arg(cardLink(card->getName()))
-            .arg(QString("&quot;<font color=\"blue\">%1</font>&quot;").arg(sanitizeHtml(newAnnotation))));
+            .arg(QString("&quot;<font color=\"blue\">%1</font>&quot;").arg(sanitizeHtml(std::move(newAnnotation)))));
 }
 
 void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue)
@@ -665,7 +668,7 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
     appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getName()))
                                 .arg("<font color=\"blue\">" + QString::number(delta) + "</font>")
                                 .arg(colorStr)
-                                .arg(cardLink(cardName))
+                                .arg(cardLink(std::move(cardName)))
                                 .arg(value));
 }
 
@@ -741,13 +744,36 @@ void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
     }
 }
 
-void MessageLogWidget::logShuffle(Player *player, CardZone *zone)
+void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int end)
 {
     soundEngine->playSound("shuffle");
-    if (currentContext != MessageContext_Mulligan)
+    if (currentContext == MessageContext_Mulligan) {
+        return;
+    }
+
+    // start and end are indexes into the portion of the deck that was shuffled
+    // with negitive numbers counging from the bottom up.
+    if (start == 0 && end == -1) {
         appendHtmlServerMessage(tr("%1 shuffles %2.")
                                     .arg(sanitizeHtml(player->getName()))
                                     .arg(zone->getTranslatedName(true, CaseShuffleZone)));
+    } else if (start < 0 && end == -1) {
+        appendHtmlServerMessage(tr("%1 shuffles the bottom %3 cards of %2.")
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(-start));
+    } else if (start < 0 && end > 0) {
+        appendHtmlServerMessage(tr("%1 shuffles the top %3 cards of %2.")
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(end + 1));
+    } else {
+        appendHtmlServerMessage(tr("%1 shuffles cards %3 - %4 of %2.")
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(start)
+                                    .arg(end));
+    }
 }
 
 void MessageLogWidget::logSpectatorSay(QString spectatorName,
@@ -755,7 +781,7 @@ void MessageLogWidget::logSpectatorSay(QString spectatorName,
                                        QString userPrivLevel,
                                        QString message)
 {
-    appendMessage(message, 0, spectatorName, spectatorUserLevel, userPrivLevel, false);
+    appendMessage(std::move(message), nullptr, spectatorName, spectatorUserLevel, userPrivLevel, false);
 }
 
 void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)
@@ -767,7 +793,8 @@ void MessageLogWidget::logStopDumpZone(Player *player, CardZone *zone)
 
 void MessageLogWidget::logUnattachCard(Player *player, QString cardName)
 {
-    appendHtmlServerMessage(tr("%1 unattaches %2.").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
+    appendHtmlServerMessage(
+        tr("%1 unattaches %2.").arg(sanitizeHtml(player->getName())).arg(cardLink(std::move(cardName))));
 }
 
 void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
@@ -784,7 +811,7 @@ void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
 void MessageLogWidget::connectToPlayer(Player *player)
 {
     connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
-    connect(player, SIGNAL(logShuffle(Player *, CardZone *)), this, SLOT(logShuffle(Player *, CardZone *)));
+    connect(player, &Player::logShuffle, this, &MessageLogWidget::logShuffle);
     connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));
     connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)), this,
             SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)));

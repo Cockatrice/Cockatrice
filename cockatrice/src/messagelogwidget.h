@@ -102,7 +102,7 @@ public slots:
     void logSetPT(Player *player, CardItem *card, QString newPT);
     void logSetSideboardLock(Player *player, bool locked);
     void logSetTapped(Player *player, CardItem *card, bool tapped);
-    void logShuffle(Player *player, CardZone *zone);
+    void logShuffle(Player *player, CardZone *zone, int start, int end);
     void
     logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString userPrivLevel, QString message);
     void logStopDumpZone(Player *player, CardZone *zone);

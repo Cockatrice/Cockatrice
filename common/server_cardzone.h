@@ -57,7 +57,7 @@ public:
         return cards;
     }
     int removeCard(Server_Card *card);
-    Server_Card *getCard(int id, int *position = NULL, bool remove = false);
+    Server_Card *getCard(int id, int *position = nullptr, bool remove = false);
 
     int getCardsBeingLookedAt() const
     {
@@ -92,7 +92,7 @@ public:
     void moveCardInRow(GameEventStorage &ges, Server_Card *card, int x, int y);
     void insertCard(Server_Card *card, int x, int y);
     void updateCardCoordinates(Server_Card *card, int oldX, int oldY);
-    void shuffle();
+    void shuffle(int start = 0, int end = -1);
     void clear();
     void addWritePermission(int playerId);
     const QSet<int> &getPlayersWithWritePermission() const
