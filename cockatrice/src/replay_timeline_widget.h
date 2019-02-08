@@ -2,6 +2,7 @@
 #define REPLAY_TIMELINE_WIDGET
 
 #include <QList>
+#include <QMouseEvent>
 #include <QWidget>
 
 class QPaintEvent;
@@ -42,6 +43,7 @@ public slots:
 
 protected:
     void paintEvent(QPaintEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif

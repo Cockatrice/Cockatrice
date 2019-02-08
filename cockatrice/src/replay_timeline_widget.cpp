@@ -62,6 +62,18 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
     painter.fillRect(0, 0, w, height() - 1, barColor);
 }
 
+void ReplayTimelineWidget::mousePressEvent(QMouseEvent *event)
+{
+    int newTime = maxTime * event->x() / width();
+    if (newTime < currentTime) {
+        currentTime = 0;
+        currentEvent = 0;
+    }
+    currentTime = newTime - 200; // 200 is added back in replayTimerTimeout
+    replayTimerTimeout();
+    update();
+}
+
 QSize ReplayTimelineWidget::sizeHint() const
 {
     return QSize(-1, 50);
