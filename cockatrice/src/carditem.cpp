@@ -142,7 +142,6 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     if (getBeingPointedAt()) {
         painter->fillRect(boundingRect(), QBrush(QColor(255, 0, 0, 100)));
-        painter->restore();
     }
 
     if (doesntUntap) {
@@ -160,6 +159,8 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
         painter->restore();
     }
+
+    painter->restore();
 }
 
 void CardItem::setAttacking(bool _attacking)
