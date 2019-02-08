@@ -29,10 +29,10 @@ private slots:
     void replayTimerTimeout();
 
 public:
-    ReplayTimelineWidget(QWidget *parent = 0);
+    explicit ReplayTimelineWidget(QWidget *parent = nullptr);
     void setTimeline(const QList<int> &_replayTimeline);
-    QSize sizeHint() const;
-    QSize minimumSizeHint() const;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
     void setTimeScaleFactor(qreal _timeScaleFactor);
     int getCurrentEvent() const
     {
@@ -43,8 +43,8 @@ public slots:
     void stopReplay();
 
 protected:
-    void paintEvent(QPaintEvent *event);
-    void mousePressEvent(QMouseEvent *event);
+    void paintEvent(QPaintEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 };
 
 #endif
