@@ -155,9 +155,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
             bool upsideDown = false;
 
             while (!xml.atEnd()) {
-                qDebug() << xml.name();
                 if (xml.readNext() == QXmlStreamReader::EndElement) {
-                    qDebug() << "end";
                     break;
                 }
                 // variable - assigned properties
