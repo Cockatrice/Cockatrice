@@ -14,6 +14,7 @@ class ReplayTimelineWidget : public QWidget
 signals:
     void processNextEvent();
     void replayFinished();
+    void rewound();
 
 private:
     QTimer *replayTimer;

@@ -68,6 +68,7 @@ void ReplayTimelineWidget::mousePressEvent(QMouseEvent *event)
     if (newTime < currentTime) {
         currentTime = 0;
         currentEvent = 0;
+        emit rewound();
     }
     currentTime = newTime - 200; // 200 is added back in replayTimerTimeout
     replayTimerTimeout();
