@@ -1549,6 +1549,7 @@ void Player::eventSetCardCounter(const Event_SetCardCounter &event)
 
     int oldValue = card->getCounters().value(event.counter_id(), 0);
     card->setCounter(event.counter_id(), event.counter_value());
+    updateCardMenu(card);
     emit logSetCardCounter(this, card->getName(), event.counter_id(), event.counter_value(), oldValue);
 }
 
