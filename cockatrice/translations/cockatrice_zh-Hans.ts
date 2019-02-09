@@ -20,62 +20,62 @@
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="418"/>
+        <location filename="../src/dlg_settings.cpp" line="342"/>
         <source>Theme settings</source>
         <translation>主题设置</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="419"/>
+        <location filename="../src/dlg_settings.cpp" line="343"/>
         <source>Current theme:</source>
         <translation>当前主题</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="421"/>
+        <location filename="../src/dlg_settings.cpp" line="345"/>
         <source>Card rendering</source>
         <translation>牌面</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="422"/>
+        <location filename="../src/dlg_settings.cpp" line="346"/>
         <source>Display card names on cards having a picture</source>
         <translation>显示有图卡牌的名称</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="423"/>
+        <location filename="../src/dlg_settings.cpp" line="347"/>
         <source>Scale cards on mouse over</source>
         <translation>卡牌随指针缩放</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="425"/>
+        <location filename="../src/dlg_settings.cpp" line="349"/>
         <source>Hand layout</source>
         <translation>手牌区域布局</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="426"/>
+        <location filename="../src/dlg_settings.cpp" line="350"/>
         <source>Display hand horizontally (wastes space)</source>
         <translation>水平显示手牌区域 (浪费空间)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="427"/>
+        <location filename="../src/dlg_settings.cpp" line="351"/>
         <source>Enable left justification</source>
         <translation>开启左对齐</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="429"/>
+        <location filename="../src/dlg_settings.cpp" line="353"/>
         <source>Table grid layout</source>
         <translation>表格布局</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="430"/>
+        <location filename="../src/dlg_settings.cpp" line="354"/>
         <source>Invert vertical coordinate</source>
         <translation>反转垂直坐标</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="431"/>
+        <location filename="../src/dlg_settings.cpp" line="355"/>
         <source>Minimum player count for multi-column layout:</source>
         <translation>界面布局之内能够容纳的牌手栏数量:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="432"/>
+        <location filename="../src/dlg_settings.cpp" line="356"/>
         <source>Maximum font size for information displayed on cards:</source>
         <translation>卡牌上显示的最大字号</translation>
     </message>
@@ -191,22 +191,22 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>BetaReleaseChannel</name>
     <message>
-        <location filename="../src/releasechannel.cpp" line="207"/>
+        <location filename="../src/releasechannel.cpp" line="199"/>
         <source>Beta Releases</source>
         <translation>测试版本</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="233"/>
+        <location filename="../src/releasechannel.cpp" line="225"/>
         <source>No reply received from the release update server.</source>
         <translation>未收到更新服务器的响应。</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="242"/>
+        <location filename="../src/releasechannel.cpp" line="234"/>
         <source>Invalid reply received from the release update server.</source>
         <translation>收到更新服务器的无效响应</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="277"/>
+        <location filename="../src/releasechannel.cpp" line="267"/>
         <source>No reply received from the file update server.</source>
         <translation>未收到文件更新服务器的响应</translation>
     </message>
@@ -214,50 +214,132 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardDatabaseModel</name>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="64"/>
+        <location filename="../src/carddatabasemodel.cpp" line="68"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="66"/>
+        <location filename="../src/carddatabasemodel.cpp" line="70"/>
         <source>Sets</source>
         <translation>系列</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="68"/>
+        <location filename="../src/carddatabasemodel.cpp" line="72"/>
         <source>Mana cost</source>
         <translation>法术力费用</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="70"/>
+        <location filename="../src/carddatabasemodel.cpp" line="74"/>
         <source>Card type</source>
         <translation>卡牌类别</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="72"/>
+        <location filename="../src/carddatabasemodel.cpp" line="76"/>
         <source>P/T</source>
         <translation>力量/防御力</translation>
     </message>
     <message>
-        <location filename="../src/carddatabasemodel.cpp" line="74"/>
+        <location filename="../src/carddatabasemodel.cpp" line="78"/>
         <source>Color(s)</source>
         <translation>颜色</translation>
     </message>
 </context>
 <context>
+    <name>CardFilter</name>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="7"/>
+        <source>AND</source>
+        <comment>Logical conjunction operator used in card filter</comment>
+        <translation>和</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="9"/>
+        <source>OR</source>
+        <comment>Logical disjunction operator used in card filter</comment>
+        <translation>或</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="11"/>
+        <source>AND NOT</source>
+        <comment>Negated logical conjunction operator used in card filter</comment>
+        <translation>和不是</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="13"/>
+        <source>OR NOT</source>
+        <comment>Negated logical disjunction operator used in card filter</comment>
+        <translation>或不是</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="23"/>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="25"/>
+        <source>Type</source>
+        <translation>类型</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="27"/>
+        <source>Color</source>
+        <translation>颜色</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="29"/>
+        <source>Text</source>
+        <translation>文本</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="31"/>
+        <source>Set</source>
+        <translation>系列</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="33"/>
+        <source>Mana Cost</source>
+        <translation>法术力费用</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="35"/>
+        <source>CMC</source>
+        <translation>总法术力费用</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="37"/>
+        <source>Rarity</source>
+        <translation>稀有度</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="39"/>
+        <source>Power</source>
+        <translation>力量</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="41"/>
+        <source>Toughness</source>
+        <translation>防御力</translation>
+    </message>
+    <message>
+        <location filename="../src/cardfilter.cpp" line="43"/>
+        <source>Loyalty</source>
+        <translation>忠诚值</translation>
+    </message>
+</context>
+<context>
     <name>CardFrame</name>
     <message>
-        <location filename="../src/cardframe.cpp" line="63"/>
+        <location filename="../src/cardframe.cpp" line="66"/>
         <source>Image</source>
         <translation>卡图</translation>
     </message>
     <message>
-        <location filename="../src/cardframe.cpp" line="64"/>
+        <location filename="../src/cardframe.cpp" line="67"/>
         <source>Description</source>
         <translation>描述</translation>
     </message>
     <message>
-        <location filename="../src/cardframe.cpp" line="65"/>
+        <location filename="../src/cardframe.cpp" line="68"/>
         <source>Both</source>
         <translation>完整信息</translation>
     </message>
@@ -265,39 +347,19 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardInfoText</name>
     <message>
-        <location filename="../src/cardinfotext.cpp" line="123"/>
+        <location filename="../src/cardinfotext.cpp" line="50"/>
+        <source>Related cards:</source>
+        <translation>关联牌:</translation>
+    </message>
+    <message>
+        <location filename="../src/cardinfotext.cpp" line="72"/>
         <source>Unknown card:</source>
         <translation>未知牌:</translation>
     </message>
     <message>
-        <location filename="../src/cardinfotext.cpp" line="131"/>
+        <location filename="../src/cardinfotext.cpp" line="38"/>
         <source>Name:</source>
         <translation>名称:</translation>
-    </message>
-    <message>
-        <location filename="../src/cardinfotext.cpp" line="132"/>
-        <source>Mana cost:</source>
-        <translation>法术力费用:</translation>
-    </message>
-    <message>
-        <location filename="../src/cardinfotext.cpp" line="133"/>
-        <source>Color(s):</source>
-        <translation>颜色</translation>
-    </message>
-    <message>
-        <location filename="../src/cardinfotext.cpp" line="134"/>
-        <source>Card type:</source>
-        <translation>卡牌类别:</translation>
-    </message>
-    <message>
-        <location filename="../src/cardinfotext.cpp" line="135"/>
-        <source>P / T:</source>
-        <translation>力量/防御力:</translation>
-    </message>
-    <message>
-        <location filename="../src/cardinfotext.cpp" line="136"/>
-        <source>Loyalty:</source>
-        <translation>忠诚值:</translation>
     </message>
 </context>
 <context>
@@ -439,58 +501,120 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckEditorSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="511"/>
-        <location filename="../src/dlg_settings.cpp" line="561"/>
+        <location filename="../src/dlg_settings.cpp" line="444"/>
+        <location filename="../src/dlg_settings.cpp" line="619"/>
         <source>Update Spoilers</source>
         <translation>更新预览</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="550"/>
+        <location filename="../src/dlg_settings.cpp" line="521"/>
+        <location filename="../src/dlg_settings.cpp" line="552"/>
+        <source>Success</source>
+        <translation>成功</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="521"/>
+        <source>Download URLs have been reset.</source>
+        <translation>下载URL已重置。</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="552"/>
+        <source>Downloaded card pictures have been reset.</source>
+        <translation>下载的卡牌图片已被重置。</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="554"/>
+        <source>Error</source>
+        <translation>错误</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="554"/>
+        <source>One or more downloaded card pictures could not be cleared.</source>
+        <translation>1个或多个卡牌图片未能被清除。</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="561"/>
+        <source>Add URL</source>
+        <translation>添加URL</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="561"/>
+        <location filename="../src/dlg_settings.cpp" line="581"/>
+        <source>URL:</source>
+        <translation>URL:</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="581"/>
+        <source>Edit URL</source>
+        <translation>编辑URL</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="608"/>
         <source>Updating...</source>
         <translation>更新中...</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="580"/>
+        <location filename="../src/dlg_settings.cpp" line="638"/>
         <source>Choose path</source>
         <translation>选择路径</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="606"/>
+        <location filename="../src/dlg_settings.cpp" line="664"/>
+        <source>URL Download Priority</source>
+        <translation>URL下载优先级</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="665"/>
         <source>Spoilers</source>
         <translation>偷跑</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="607"/>
+        <location filename="../src/dlg_settings.cpp" line="666"/>
         <source>Download Spoilers Automatically</source>
         <translation>自动下载预览</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="608"/>
+        <location filename="../src/dlg_settings.cpp" line="667"/>
         <source>Spoiler Location:</source>
         <translation>Spoiler位置:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="609"/>
-        <source>Hey, something&apos;s here finally!</source>
-        <translation>嘿，终于有东西来了！</translation>
+        <location filename="../src/dlg_settings.cpp" line="672"/>
+        <source>Download card pictures on the fly</source>
+        <translation>即时下载卡牌图片</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="610"/>
+        <location filename="../src/dlg_settings.cpp" line="673"/>
+        <source>How to add a custom URL</source>
+        <translation>如何添加自定义URL</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="674"/>
+        <source>Delete Downloaded Images</source>
+        <translation>删除已下载的图片</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="675"/>
+        <source>Reset Download URLs</source>
+        <translation>重置用于下载的URL</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="668"/>
         <source>Last Updated</source>
         <translation>最后更新</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="611"/>
+        <location filename="../src/dlg_settings.cpp" line="669"/>
         <source>Spoilers download automatically on launch</source>
         <translation>自动下载Spoilers运行</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="612"/>
+        <location filename="../src/dlg_settings.cpp" line="670"/>
         <source>Press the button to manually update without relaunching</source>
         <translation>按下按钮手动更新而不重新启动</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="613"/>
+        <location filename="../src/dlg_settings.cpp" line="671"/>
         <source>Do not close settings until manual update complete</source>
         <translation>手动更新完成之前，请勿关闭设置</translation>
     </message>
@@ -664,6 +788,21 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation>登录</translation>
     </message>
     <message>
+        <location filename="../src/dlg_connect.cpp" line="276"/>
+        <source>Server URL</source>
+        <translation>服务器URL</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="279"/>
+        <source>Communication Port</source>
+        <translation>通信端口</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_connect.cpp" line="284"/>
+        <source>Unique Server Name</source>
+        <translation>唯一的服务器名称</translation>
+    </message>
+    <message>
         <location filename="../src/dlg_connect.cpp" line="308"/>
         <source>Connection Warning</source>
         <translation>连接警告</translation>
@@ -707,77 +846,82 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation>玩家:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="52"/>
+        <location filename="../src/dlg_creategame.cpp" line="40"/>
+        <source>General</source>
+        <translation>综合</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_creategame.cpp" line="53"/>
         <source>Game type</source>
         <translation>房间类型</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="55"/>
+        <location filename="../src/dlg_creategame.cpp" line="56"/>
         <source>&amp;Password:</source>
         <translation>密码:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="59"/>
+        <location filename="../src/dlg_creategame.cpp" line="60"/>
         <source>Only &amp;buddies can join</source>
         <translation>只有好友可以加入</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="60"/>
+        <location filename="../src/dlg_creategame.cpp" line="61"/>
         <source>Only &amp;registered users can join</source>
         <translation>只有注册用户可以加入</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="74"/>
+        <location filename="../src/dlg_creategame.cpp" line="75"/>
         <source>Joining restrictions</source>
         <translation>加入条件</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="77"/>
+        <location filename="../src/dlg_creategame.cpp" line="78"/>
         <source>&amp;Spectators can watch</source>
         <translation>允许观看者</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="80"/>
+        <location filename="../src/dlg_creategame.cpp" line="81"/>
         <source>Spectators &amp;need a password to watch</source>
         <translation>观看者需要密码</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="81"/>
+        <location filename="../src/dlg_creategame.cpp" line="82"/>
         <source>Spectators can &amp;chat</source>
         <translation>观看者可以聊天</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="82"/>
+        <location filename="../src/dlg_creategame.cpp" line="83"/>
         <source>Spectators can see &amp;hands</source>
         <translation>观看者可见手牌</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="88"/>
+        <location filename="../src/dlg_creategame.cpp" line="89"/>
         <source>Spectators</source>
         <translation>观看者</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="134"/>
+        <location filename="../src/dlg_creategame.cpp" line="136"/>
         <source>&amp;Clear</source>
         <translation>清除</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="140"/>
+        <location filename="../src/dlg_creategame.cpp" line="142"/>
         <source>Create game</source>
         <translation>创建一个房间</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="183"/>
+        <location filename="../src/dlg_creategame.cpp" line="185"/>
         <source>Game information</source>
         <translation>房间信息</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="261"/>
+        <location filename="../src/dlg_creategame.cpp" line="263"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../src/dlg_creategame.cpp" line="261"/>
+        <location filename="../src/dlg_creategame.cpp" line="263"/>
         <source>Server error.</source>
         <translation>服务器错误.</translation>
     </message>
@@ -1096,37 +1240,42 @@ Make sure to enable the &apos;Token&apos; set in the &quot;Manage sets&quot; dia
         <translation>房间描述:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="35"/>
+        <location filename="../src/dlg_filter_games.cpp" line="34"/>
         <source>&amp;Creator name:</source>
         <translation>创建者名字:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="51"/>
+        <location filename="../src/dlg_filter_games.cpp" line="42"/>
+        <source>General</source>
+        <translation>综合</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_filter_games.cpp" line="58"/>
         <source>&amp;Game types</source>
         <translation>房间类型</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="56"/>
+        <location filename="../src/dlg_filter_games.cpp" line="63"/>
         <source>at &amp;least:</source>
         <translation>至少:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="63"/>
+        <location filename="../src/dlg_filter_games.cpp" line="70"/>
         <source>at &amp;most:</source>
         <translation>最多:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="76"/>
+        <location filename="../src/dlg_filter_games.cpp" line="83"/>
         <source>Maximum player count</source>
         <translation>可容纳牌手数量</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="84"/>
+        <location filename="../src/dlg_filter_games.cpp" line="91"/>
         <source>Restrictions</source>
         <translation>限制</translation>
     </message>
     <message>
-        <location filename="../src/dlg_filter_games.cpp" line="115"/>
+        <location filename="../src/dlg_filter_games.cpp" line="119"/>
         <source>Filter games</source>
         <translation>过滤房间</translation>
     </message>
@@ -1392,12 +1541,12 @@ Make sure to enable the &apos;Token&apos; set in the &quot;Manage sets&quot; dia
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="999"/>
+        <location filename="../src/dlg_settings.cpp" line="1083"/>
         <source>Unknown Error loading card database</source>
         <translation>读取卡牌数据库时出现未知错误</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1007"/>
+        <location filename="../src/dlg_settings.cpp" line="1091"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1414,7 +1563,7 @@ Would you like to change your database location setting?</source>
 您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1013"/>
+        <location filename="../src/dlg_settings.cpp" line="1097"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1431,7 +1580,7 @@ Would you like to change your database location setting?</source>
 您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1019"/>
+        <location filename="../src/dlg_settings.cpp" line="1103"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
@@ -1444,7 +1593,7 @@ Would you like to change your database location setting?</source>
 您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1025"/>
+        <location filename="../src/dlg_settings.cpp" line="1109"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
@@ -1453,7 +1602,7 @@ Would you like to change your database location setting?</source>
 您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1029"/>
+        <location filename="../src/dlg_settings.cpp" line="1113"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
@@ -1462,7 +1611,7 @@ Would you like to change your database location setting?</source>
 您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1033"/>
+        <location filename="../src/dlg_settings.cpp" line="1117"/>
         <source>Unknown card database load status
 
 Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues
@@ -1473,59 +1622,59 @@ Would you like to change your database location setting?</source>
 您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1041"/>
-        <location filename="../src/dlg_settings.cpp" line="1051"/>
-        <location filename="../src/dlg_settings.cpp" line="1061"/>
+        <location filename="../src/dlg_settings.cpp" line="1125"/>
+        <location filename="../src/dlg_settings.cpp" line="1135"/>
+        <location filename="../src/dlg_settings.cpp" line="1145"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1052"/>
+        <location filename="../src/dlg_settings.cpp" line="1136"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>您的套牌路径无效。您想要重新设置正确的路径么?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1062"/>
+        <location filename="../src/dlg_settings.cpp" line="1146"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation>您想要重新设置卡牌数据库路径么?</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1074"/>
+        <location filename="../src/dlg_settings.cpp" line="1158"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1076"/>
+        <location filename="../src/dlg_settings.cpp" line="1160"/>
         <source>General</source>
         <translation>常规</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1077"/>
+        <location filename="../src/dlg_settings.cpp" line="1161"/>
         <source>Appearance</source>
         <translation>外观</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1078"/>
+        <location filename="../src/dlg_settings.cpp" line="1162"/>
         <source>User Interface</source>
         <translation>用户界面</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1079"/>
-        <source>Deck Editor</source>
-        <translation>套牌编辑</translation>
+        <location filename="../src/dlg_settings.cpp" line="1163"/>
+        <source>Card Sources</source>
+        <translation>卡牌的来源</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1080"/>
+        <location filename="../src/dlg_settings.cpp" line="1164"/>
         <source>Chat</source>
         <translation>聊天</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1081"/>
+        <location filename="../src/dlg_settings.cpp" line="1165"/>
         <source>Sound</source>
         <translation>声音</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1082"/>
+        <location filename="../src/dlg_settings.cpp" line="1166"/>
         <source>Shortcuts</source>
         <translation>快捷键</translation>
     </message>
@@ -1552,9 +1701,9 @@ Would you like to change your database location setting?</source>
     <name>DlgUpdate</name>
     <message>
         <location filename="../src/dlg_update.cpp" line="59"/>
-        <location filename="../src/dlg_update.cpp" line="198"/>
-        <location filename="../src/dlg_update.cpp" line="205"/>
-        <location filename="../src/dlg_update.cpp" line="220"/>
+        <location filename="../src/dlg_update.cpp" line="200"/>
+        <location filename="../src/dlg_update.cpp" line="207"/>
+        <location filename="../src/dlg_update.cpp" line="222"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
@@ -1591,99 +1740,99 @@ Please visit the download page to update manually.</source>
         <translation>更新检查完成</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="129"/>
+        <location filename="../src/dlg_update.cpp" line="134"/>
         <source>No Update Available</source>
         <translation>没有更新可用</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="130"/>
+        <location filename="../src/dlg_update.cpp" line="135"/>
         <source>Cockatrice is up to date!</source>
         <translation>鸡蛇已经是最新的了！</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="131"/>
+        <location filename="../src/dlg_update.cpp" line="136"/>
         <source>You are already running the latest version available in the chosen release channel.</source>
         <translation>你运行的已经是最新的发行版本了。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="132"/>
+        <location filename="../src/dlg_update.cpp" line="137"/>
         <source>Current version</source>
         <translation>当前版本</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="133"/>
+        <location filename="../src/dlg_update.cpp" line="138"/>
         <source>Selected release channel</source>
         <translation>选择发行渠道</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="145"/>
-        <location filename="../src/dlg_update.cpp" line="156"/>
+        <location filename="../src/dlg_update.cpp" line="147"/>
+        <location filename="../src/dlg_update.cpp" line="158"/>
         <source>Update Available</source>
         <translation>更新可用</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="146"/>
-        <location filename="../src/dlg_update.cpp" line="157"/>
+        <location filename="../src/dlg_update.cpp" line="148"/>
+        <location filename="../src/dlg_update.cpp" line="159"/>
         <source>A new version of Cockatrice is available!</source>
         <translation>鸡蛇有新版本可用！</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="146"/>
-        <location filename="../src/dlg_update.cpp" line="157"/>
+        <location filename="../src/dlg_update.cpp" line="148"/>
+        <location filename="../src/dlg_update.cpp" line="159"/>
         <source>New version</source>
         <translation>新版本</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="147"/>
-        <location filename="../src/dlg_update.cpp" line="158"/>
+        <location filename="../src/dlg_update.cpp" line="149"/>
+        <location filename="../src/dlg_update.cpp" line="160"/>
         <source>Released</source>
         <translation>发布</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="148"/>
-        <location filename="../src/dlg_update.cpp" line="159"/>
+        <location filename="../src/dlg_update.cpp" line="150"/>
+        <location filename="../src/dlg_update.cpp" line="161"/>
         <source>Changelog</source>
         <translation>更新日志</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="149"/>
+        <location filename="../src/dlg_update.cpp" line="151"/>
         <source>Do you want to update now?</source>
         <translation>你打算现在就更新吗？</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="161"/>
+        <location filename="../src/dlg_update.cpp" line="163"/>
         <source>Unfortunately there are no download packages available for your operating system. 
 You may have to build from source yourself.</source>
         <translation>您的鸡蛇版本太旧，但没有适合您操作系统的更新包。
 您可能需要自行从源码编译鸡蛇。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="164"/>
+        <location filename="../src/dlg_update.cpp" line="166"/>
         <source>Please check the download page manually and visit the wiki for instructions on compiling.</source>
         <translation>请点击检查下载页面，并访问wiki获取编译信息。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="200"/>
+        <location filename="../src/dlg_update.cpp" line="202"/>
         <source>An error occurred while checking for updates:</source>
         <translation>检查更新时发生错误：</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="208"/>
+        <location filename="../src/dlg_update.cpp" line="210"/>
         <source>An error occurred while downloading an update:</source>
         <translation>下载更新时发生错误：</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="222"/>
+        <location filename="../src/dlg_update.cpp" line="224"/>
         <source>Cockatrice is unable to open the installer.</source>
         <translation>鸡蛇无法打开安装程序。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="223"/>
+        <location filename="../src/dlg_update.cpp" line="225"/>
         <source>Try to update manually by closing Cockatrice and running the installer.</source>
         <translation>尝试关闭鸡蛇运行安装程序手动更新。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="224"/>
+        <location filename="../src/dlg_update.cpp" line="226"/>
         <source>Download location</source>
         <translation>下载区域信息</translation>
     </message>
@@ -1698,14 +1847,14 @@ You may have to build from source yourself.</source>
         <translation>正在检查更新...</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="199"/>
-        <location filename="../src/dlg_update.cpp" line="207"/>
-        <location filename="../src/dlg_update.cpp" line="221"/>
+        <location filename="../src/dlg_update.cpp" line="201"/>
+        <location filename="../src/dlg_update.cpp" line="209"/>
+        <location filename="../src/dlg_update.cpp" line="223"/>
         <source>Update Error</source>
         <translation>更新错误</translation>
     </message>
     <message>
-        <location filename="../src/dlg_update.cpp" line="213"/>
+        <location filename="../src/dlg_update.cpp" line="215"/>
         <source>Installing...</source>
         <translation>正在安装...</translation>
     </message>
@@ -1919,127 +2068,81 @@ You may have to build from source yourself.</source>
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="213"/>
-        <location filename="../src/dlg_settings.cpp" line="223"/>
-        <location filename="../src/dlg_settings.cpp" line="233"/>
-        <location filename="../src/dlg_settings.cpp" line="267"/>
-        <location filename="../src/dlg_settings.cpp" line="277"/>
+        <location filename="../src/dlg_settings.cpp" line="176"/>
+        <location filename="../src/dlg_settings.cpp" line="186"/>
+        <location filename="../src/dlg_settings.cpp" line="196"/>
+        <location filename="../src/dlg_settings.cpp" line="206"/>
+        <location filename="../src/dlg_settings.cpp" line="216"/>
         <source>Choose path</source>
         <translation>选择路径</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="260"/>
-        <source>Success</source>
-        <translation>成功</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="260"/>
-        <source>Downloaded card pictures have been reset.</source>
-        <translation>下载的卡牌图片已被重置。</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="262"/>
-        <source>Error</source>
-        <translation>错误</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="262"/>
-        <source>One or more downloaded card pictures could not be cleared.</source>
-        <translation>1个或多个卡牌图片未能被清除。</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="292"/>
+        <location filename="../src/dlg_settings.cpp" line="231"/>
         <source>Personal settings</source>
         <translation>个人设置</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="293"/>
+        <location filename="../src/dlg_settings.cpp" line="232"/>
         <source>Language:</source>
         <translation>语言:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="294"/>
-        <source>Download card pictures on the fly</source>
-        <translation>下载卡牌上的图片</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="297"/>
+        <location filename="../src/dlg_settings.cpp" line="235"/>
         <source>Paths (editing disabled in portable mode)</source>
         <translation>路径(在便携模式下禁止编辑)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="299"/>
+        <location filename="../src/dlg_settings.cpp" line="237"/>
         <source>Paths</source>
         <translation>路径</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="302"/>
+        <location filename="../src/dlg_settings.cpp" line="240"/>
         <source>Decks directory:</source>
         <translation>套牌路径:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="303"/>
+        <location filename="../src/dlg_settings.cpp" line="241"/>
         <source>Replays directory:</source>
         <translation>游戏录像目录:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="304"/>
+        <location filename="../src/dlg_settings.cpp" line="242"/>
         <source>Pictures directory:</source>
         <translation>图片目录:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="305"/>
+        <location filename="../src/dlg_settings.cpp" line="243"/>
         <source>Card database:</source>
         <translation>卡牌数据库:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="306"/>
+        <location filename="../src/dlg_settings.cpp" line="244"/>
         <source>Token database:</source>
         <translation>衍生物数据库：</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="307"/>
+        <location filename="../src/dlg_settings.cpp" line="245"/>
         <source>Picture cache size:</source>
         <translation>图片缓存大小：</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="308"/>
-        <source>Primary download URL:</source>
-        <translation>首选下载链接：</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="309"/>
-        <source>Fallback download URL:</source>
-        <translation>备用下载链接：</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="311"/>
-        <source>How to set a custom picture url</source>
-        <translation>如何设置自定义图片链接</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="312"/>
-        <source>Reset/clear downloaded pictures</source>
-        <translation>重置/清除 已下载的图片</translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="313"/>
+        <location filename="../src/dlg_settings.cpp" line="246"/>
         <source>Update channel</source>
         <translation>更新通道</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="314"/>
+        <location filename="../src/dlg_settings.cpp" line="247"/>
         <source>Notify if a feature supported by the server is missing in my client</source>
         <translation>当客户端缺少服务器支持的特性时提示我</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="315"/>
-        <location filename="../src/dlg_settings.cpp" line="316"/>
-        <source>Reset</source>
-        <translation>重置</translation>
+        <location filename="../src/dlg_settings.cpp" line="248"/>
+        <source>Automatically run Oracle when running a new version of Cockatrice</source>
+        <translation>运行新版本鸡蛇时自动运行Oracle</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="317"/>
+        <location filename="../src/dlg_settings.cpp" line="249"/>
         <source>Show tips on startup</source>
         <translation>显示启动时提示</translation>
     </message>
@@ -2048,7 +2151,7 @@ You may have to build from source yourself.</source>
     <name>MainWindow</name>
     <message>
         <location filename="../src/window_main.cpp" line="93"/>
-        <location filename="../src/window_main.cpp" line="431"/>
+        <location filename="../src/window_main.cpp" line="436"/>
         <source>The server has reached its maximum user capacity, please check back later.</source>
         <translation>服务器已达到最大用户数，请稍微再试。</translation>
     </message>
@@ -2079,7 +2182,7 @@ You may have to build from source yourself.</source>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="113"/>
-        <location filename="../src/window_main.cpp" line="446"/>
+        <location filename="../src/window_main.cpp" line="451"/>
         <source>Invalid username.</source>
         <translation>不可用的用户名。</translation>
     </message>
@@ -2191,12 +2294,12 @@ Will now login.</source>
         <translation>协助开发！</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="306"/>
+        <location filename="../src/window_main.cpp" line="307"/>
         <source>Translators:</source>
         <translation>翻译者：</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="308"/>
+        <location filename="../src/window_main.cpp" line="309"/>
         <source>Help Translate!</source>
         <translation>协助翻译!</translation>
     </message>
@@ -2206,202 +2309,202 @@ Will now login.</source>
         <translation>支持：</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="309"/>
+        <location filename="../src/window_main.cpp" line="310"/>
         <source>Report an Issue</source>
         <translation>报告错误</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="310"/>
+        <location filename="../src/window_main.cpp" line="311"/>
         <source>Troubleshooting</source>
         <translation>排除故障</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="311"/>
+        <location filename="../src/window_main.cpp" line="312"/>
         <source>F.A.Q.</source>
         <translation>问答</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="345"/>
-        <location filename="../src/window_main.cpp" line="373"/>
-        <location filename="../src/window_main.cpp" line="377"/>
-        <location filename="../src/window_main.cpp" line="390"/>
-        <location filename="../src/window_main.cpp" line="394"/>
-        <location filename="../src/window_main.cpp" line="398"/>
-        <location filename="../src/window_main.cpp" line="406"/>
+        <location filename="../src/window_main.cpp" line="350"/>
+        <location filename="../src/window_main.cpp" line="378"/>
+        <location filename="../src/window_main.cpp" line="382"/>
+        <location filename="../src/window_main.cpp" line="395"/>
+        <location filename="../src/window_main.cpp" line="399"/>
+        <location filename="../src/window_main.cpp" line="403"/>
         <location filename="../src/window_main.cpp" line="411"/>
-        <location filename="../src/window_main.cpp" line="435"/>
-        <location filename="../src/window_main.cpp" line="525"/>
-        <location filename="../src/window_main.cpp" line="529"/>
-        <location filename="../src/window_main.cpp" line="533"/>
-        <location filename="../src/window_main.cpp" line="536"/>
-        <location filename="../src/window_main.cpp" line="546"/>
-        <location filename="../src/window_main.cpp" line="553"/>
-        <location filename="../src/window_main.cpp" line="560"/>
-        <location filename="../src/window_main.cpp" line="566"/>
-        <location filename="../src/window_main.cpp" line="1028"/>
-        <location filename="../src/window_main.cpp" line="1064"/>
+        <location filename="../src/window_main.cpp" line="416"/>
+        <location filename="../src/window_main.cpp" line="440"/>
+        <location filename="../src/window_main.cpp" line="530"/>
+        <location filename="../src/window_main.cpp" line="534"/>
+        <location filename="../src/window_main.cpp" line="538"/>
+        <location filename="../src/window_main.cpp" line="541"/>
+        <location filename="../src/window_main.cpp" line="551"/>
+        <location filename="../src/window_main.cpp" line="558"/>
+        <location filename="../src/window_main.cpp" line="565"/>
+        <location filename="../src/window_main.cpp" line="571"/>
+        <location filename="../src/window_main.cpp" line="1078"/>
+        <location filename="../src/window_main.cpp" line="1114"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="345"/>
+        <location filename="../src/window_main.cpp" line="350"/>
         <source>Server timeout</source>
         <translation>服务器超时</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="365"/>
+        <location filename="../src/window_main.cpp" line="369"/>
         <source>Failed Login</source>
         <translation>登录失败</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="374"/>
+        <location filename="../src/window_main.cpp" line="379"/>
         <source>Incorrect username or password. Please check your authentication information and try again.</source>
         <translation>用户名或密码错误。请检查账号信息并重试。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="378"/>
+        <location filename="../src/window_main.cpp" line="383"/>
         <source>There is already an active session using this user name.
 Please close that session first and re-login.</source>
         <translation>已经有一个在线用户正在使用这个用户名.
 首先请关闭这个对话框然后重新登陆.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="384"/>
-        <location filename="../src/window_main.cpp" line="519"/>
+        <location filename="../src/window_main.cpp" line="389"/>
+        <location filename="../src/window_main.cpp" line="524"/>
         <source>You are banned until %1.</source>
         <translation>你被禁止直到: %1.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="386"/>
-        <location filename="../src/window_main.cpp" line="521"/>
+        <location filename="../src/window_main.cpp" line="391"/>
+        <location filename="../src/window_main.cpp" line="526"/>
         <source>You are banned indefinitely.</source>
         <translation>你被永久封禁.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="399"/>
+        <location filename="../src/window_main.cpp" line="404"/>
         <source>This server requires user registration. Do you want to register now?</source>
         <translation>服务器需要注册。现在注册吗？</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="407"/>
+        <location filename="../src/window_main.cpp" line="412"/>
         <source>This server requires client ID's. Your client is either failing to generate an ID or you are running a modified client.
 Please close and reopen your client to try again.</source>
         <translation>服务器需要客户端ID。您的客户端未能生成ID或您正在运行修改过的客户端。
 请关闭并重新打开客户端。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="412"/>
+        <location filename="../src/window_main.cpp" line="417"/>
         <source>An internal error has occurred, please try closing and reopening your client and try again. If the error persists try updating your client to the most recent build and if need be contact your software provider.</source>
         <translation>出现内部错误，请关闭并重启客户端再尝试。如果错误仍然出现请将您的客户端升级到最新版本，如有需要请联系您的软件提供商。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="418"/>
+        <location filename="../src/window_main.cpp" line="423"/>
         <source>Account activation</source>
         <translation>账号激活</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="430"/>
+        <location filename="../src/window_main.cpp" line="435"/>
         <source>Server Full</source>
         <translation>服务器已满</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="436"/>
+        <location filename="../src/window_main.cpp" line="441"/>
         <source>Unknown login error: %1</source>
         <translation>未知的登陆错误: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="437"/>
-        <location filename="../src/window_main.cpp" line="538"/>
+        <location filename="../src/window_main.cpp" line="442"/>
+        <location filename="../src/window_main.cpp" line="543"/>
         <source>
 This usually means that your client version is out of date, and the server sent a reply your client doesn&apos;t understand.</source>
         <translation>
 这通常表示您的客户端已经过于陈旧，未能响应服务器提出的请求。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="449"/>
+        <location filename="../src/window_main.cpp" line="454"/>
         <source>Your username must respect these rules:</source>
         <translation>您的用户名须遵守以下规则：</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="451"/>
+        <location filename="../src/window_main.cpp" line="456"/>
         <source>is %1 - %2 characters long</source>
         <translation>在%1 - %2个字符之间。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="452"/>
+        <location filename="../src/window_main.cpp" line="457"/>
         <source>can %1 contain lowercase characters</source>
         <translation>能包含  %1 个小写字母</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="452"/>
-        <location filename="../src/window_main.cpp" line="454"/>
         <location filename="../src/window_main.cpp" line="457"/>
-        <location filename="../src/window_main.cpp" line="463"/>
+        <location filename="../src/window_main.cpp" line="459"/>
+        <location filename="../src/window_main.cpp" line="462"/>
+        <location filename="../src/window_main.cpp" line="468"/>
         <source>NOT</source>
         <translation>否</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="454"/>
+        <location filename="../src/window_main.cpp" line="459"/>
         <source>can %1 contain uppercase characters</source>
         <translation>能包含%1个小写字母</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="457"/>
+        <location filename="../src/window_main.cpp" line="462"/>
         <source>can %1 contain numeric characters</source>
         <translation>能包含%1个数字</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="460"/>
+        <location filename="../src/window_main.cpp" line="465"/>
         <source>can contain the following punctuation: %1</source>
         <translation>能包含以下符号：%1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="463"/>
+        <location filename="../src/window_main.cpp" line="468"/>
         <source>first character can %1 be a punctuation mark</source>
         <translation>第一个字符不能为%1 标点符号</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="468"/>
+        <location filename="../src/window_main.cpp" line="473"/>
         <source>can not contain any of the following words: %1</source>
         <translation>不能包含以下词：%1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="473"/>
+        <location filename="../src/window_main.cpp" line="478"/>
         <source>can not match any of the following expressions: %1</source>
         <translation>不能包含以下语句：%1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="479"/>
+        <location filename="../src/window_main.cpp" line="484"/>
         <source>You may only use A-Z, a-z, 0-9, _, ., and - in your username.</source>
         <translation>您可以使用A-Z，a-z，0-9，_，.以及-作为用户名。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="489"/>
-        <location filename="../src/window_main.cpp" line="493"/>
-        <location filename="../src/window_main.cpp" line="497"/>
+        <location filename="../src/window_main.cpp" line="494"/>
+        <location filename="../src/window_main.cpp" line="498"/>
         <location filename="../src/window_main.cpp" line="502"/>
         <location filename="../src/window_main.cpp" line="507"/>
-        <location filename="../src/window_main.cpp" line="514"/>
+        <location filename="../src/window_main.cpp" line="512"/>
+        <location filename="../src/window_main.cpp" line="519"/>
         <source>Registration denied</source>
         <translation>注册失败</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="490"/>
+        <location filename="../src/window_main.cpp" line="495"/>
         <source>Registration is currently disabled on this server</source>
         <translation>当前服务器无法注册</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="494"/>
+        <location filename="../src/window_main.cpp" line="499"/>
         <source>There is already an existing account with the same user name.</source>
         <translation>当前用户名已经被使用。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="498"/>
+        <location filename="../src/window_main.cpp" line="503"/>
         <source>It&apos;s mandatory to specify a valid email address when registering.</source>
         <translation>注册时必须提供一个有效的电子邮箱。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="366"/>
+        <location filename="../src/window_main.cpp" line="370"/>
         <source>Your client seems to be missing features this server requires for connection.</source>
         <translation>你的客户端缺少连接这个服务器所需要的要素</translation>
     </message>
@@ -2411,211 +2514,228 @@ This usually means that your client version is out of date, and the server sent 
         <translation>版本</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="307"/>
+        <location filename="../src/window_main.cpp" line="308"/>
         <source>Our Translators</source>
         <translation>翻译者名单</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="419"/>
+        <location filename="../src/window_main.cpp" line="371"/>
+        <source>To update your client, go to &apos;Help -&gt; Check for Client Updates&apos;.</source>
+        <translation>转到帮助-&gt;检查客户端更新，更新你的客户端。</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="424"/>
         <source>Your account has not been activated yet.
 You need to provide the activation token received in the activation email.</source>
         <translation>你的账号还未激活。
 请提供激活邮件中的验证码。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="503"/>
+        <location filename="../src/window_main.cpp" line="508"/>
         <source>The email address provider used during registration has been blacklisted for use on this server.</source>
         <translation>注册时使用的电子邮箱的提供方已被此服务器列入黑名单</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="508"/>
+        <location filename="../src/window_main.cpp" line="513"/>
         <source>It appears you are attempting to register a new account on this server yet you already have an account registered with the email provided. This server restricts the number of accounts a user can register per address.  Please contact the server operator for further assistance or to obtain your credential information.</source>
         <translation>看起来你正试图在这个服务器上注册一个新账户，但是你已经有了一个用提供的邮箱注册的账户。 此服务器限制每个邮箱地址可以注册用户帐户的数量。请联系服务器运营商以获得进一步帮助或获取您的凭据信息。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="514"/>
+        <location filename="../src/window_main.cpp" line="519"/>
         <source>Password too short.</source>
         <translation>密码太短。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="533"/>
+        <location filename="../src/window_main.cpp" line="538"/>
         <source>Registration failed for a technical problem on the server.</source>
         <translation>由于服务器出现技术问题，注册失败。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="537"/>
+        <location filename="../src/window_main.cpp" line="542"/>
         <source>Unknown registration error: %1</source>
         <translation>未知的注册错误：%1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="546"/>
+        <location filename="../src/window_main.cpp" line="551"/>
         <source>Account activation failed</source>
         <translation>账号激活失败</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="553"/>
+        <location filename="../src/window_main.cpp" line="558"/>
         <source>Socket error: %1</source>
         <translation>接口错误: %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="561"/>
+        <location filename="../src/window_main.cpp" line="566"/>
         <source>You are trying to connect to an obsolete server. Please downgrade your Cockatrice version or connect to a suitable server.
 Local version is %1, remote version is %2.</source>
         <translation>你正在连接到一个过时的服务器，请下调你的版本或者连接到一个匹配的服务器.
 你当前的版本 %1, 服务器版本 %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="567"/>
+        <location filename="../src/window_main.cpp" line="572"/>
         <source>Your Cockatrice client is obsolete. Please update your Cockatrice version.
 Local version is %1, remote version is %2.</source>
         <translation>你使用的客户端意见过时，请使用更新你版本.
 你当前的版本 %1, 服务器版本 %2.</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="577"/>
+        <location filename="../src/window_main.cpp" line="582"/>
         <source>Connecting to %1...</source>
         <translation>连接到 %1...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="581"/>
+        <location filename="../src/window_main.cpp" line="586"/>
         <source>Registering to %1 as %2...</source>
         <translation>正在将 %2 注册到  %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="584"/>
+        <location filename="../src/window_main.cpp" line="589"/>
         <source>Disconnected</source>
         <translation>断开连接</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="587"/>
+        <location filename="../src/window_main.cpp" line="592"/>
         <source>Connected, logging in at %1</source>
         <translation>连接登陆到 %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="595"/>
         <location filename="../src/window_main.cpp" line="600"/>
         <location filename="../src/window_main.cpp" line="605"/>
+        <location filename="../src/window_main.cpp" line="610"/>
         <source>Requesting forgot password to %1 as %2...</source>
         <translation>正在将%2向%1申请忘记密码流程。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="616"/>
+        <location filename="../src/window_main.cpp" line="621"/>
         <source>&amp;Connect...</source>
         <translation>连接...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="617"/>
+        <location filename="../src/window_main.cpp" line="622"/>
         <source>&amp;Disconnect</source>
         <translation>断开连接</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="618"/>
+        <location filename="../src/window_main.cpp" line="623"/>
         <source>Start &amp;local game...</source>
         <translation>开始本地游戏...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="619"/>
+        <location filename="../src/window_main.cpp" line="624"/>
         <source>&amp;Watch replay...</source>
         <translation>观看录像...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="620"/>
+        <location filename="../src/window_main.cpp" line="625"/>
         <source>&amp;Deck editor</source>
         <translation>套牌编辑</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="621"/>
+        <location filename="../src/window_main.cpp" line="626"/>
         <source>&amp;Full screen</source>
         <translation>全屏</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="622"/>
+        <location filename="../src/window_main.cpp" line="627"/>
         <source>&amp;Register to server...</source>
         <translation>注册到服务器</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="623"/>
+        <location filename="../src/window_main.cpp" line="628"/>
         <source>&amp;Settings...</source>
         <translation>设置...</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="625"/>
-        <location filename="../src/window_main.cpp" line="871"/>
+        <location filename="../src/window_main.cpp" line="630"/>
+        <location filename="../src/window_main.cpp" line="920"/>
         <source>&amp;Exit</source>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="628"/>
+        <location filename="../src/window_main.cpp" line="633"/>
         <source>A&amp;ctions</source>
         <translation>动作</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="630"/>
+        <location filename="../src/window_main.cpp" line="635"/>
         <source>&amp;Cockatrice</source>
         <translation>Cockatrice鸡蛇</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="633"/>
+        <location filename="../src/window_main.cpp" line="638"/>
         <source>C&amp;ard Database</source>
         <translation>卡牌数据库</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="634"/>
+        <location filename="../src/window_main.cpp" line="639"/>
         <source>Open custom image folder</source>
         <translation>打开自定义图片文件夹</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="635"/>
+        <location filename="../src/window_main.cpp" line="640"/>
         <source>Open custom sets folder</source>
         <translation>打开自定义系列文件夹</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="636"/>
+        <location filename="../src/window_main.cpp" line="641"/>
         <source>Add custom sets/cards</source>
         <translation>添加自定义系列/卡牌</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="638"/>
+        <location filename="../src/window_main.cpp" line="643"/>
         <source>Edit &amp;tokens...</source>
         <translation>编辑衍生物</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="640"/>
+        <location filename="../src/window_main.cpp" line="645"/>
         <source>&amp;About Cockatrice</source>
         <translation>关于Cockatrice鸡蛇</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="641"/>
+        <location filename="../src/window_main.cpp" line="646"/>
         <source>&amp;Tip of the Day</source>
         <translation>&amp;每日提示</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="642"/>
+        <location filename="../src/window_main.cpp" line="647"/>
         <source>Check for Client Updates</source>
         <translation>检查客户端更新</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="643"/>
+        <location filename="../src/window_main.cpp" line="648"/>
         <source>View &amp;debug log</source>
         <translation>查看错误日志</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="644"/>
+        <location filename="../src/window_main.cpp" line="649"/>
         <source>&amp;Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="645"/>
+        <location filename="../src/window_main.cpp" line="650"/>
         <source>Check for card updates...</source>
         <translation>检查卡牌更新</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="930"/>
+        <location filename="../src/window_main.cpp" line="862"/>
+        <source>New Version</source>
+        <translation>新版本</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="863"/>
+        <source>Congratulations on updating to Cockatrice %1!
+Oracle will now launch to update your card database.</source>
+        <translation>恭喜鸡蛇更新到%1！
+现在启动Oracle更新您的卡牌数据库。</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="980"/>
         <source>Card database</source>
         <translation>卡牌数据库</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="932"/>
+        <location filename="../src/window_main.cpp" line="982"/>
         <source>Cockatrice is unable to load the card database.
 Do you want to update your card database now?
 If unsure or first time user, choose &quot;Yes&quot;</source>
@@ -2624,29 +2744,29 @@ If unsure or first time user, choose &quot;Yes&quot;</source>
 如果不确定或者您是第一次使用，请选择“是”</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="936"/>
-        <location filename="../src/window_main.cpp" line="961"/>
+        <location filename="../src/window_main.cpp" line="986"/>
+        <location filename="../src/window_main.cpp" line="1011"/>
         <source>Yes</source>
         <translation>是</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="937"/>
-        <location filename="../src/window_main.cpp" line="962"/>
+        <location filename="../src/window_main.cpp" line="987"/>
+        <location filename="../src/window_main.cpp" line="1012"/>
         <source>No</source>
         <translation>否</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="938"/>
+        <location filename="../src/window_main.cpp" line="988"/>
         <source>Open settings</source>
         <translation>打开设置</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="953"/>
+        <location filename="../src/window_main.cpp" line="1003"/>
         <source>New sets found</source>
         <translation>发现新系列</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="955"/>
+        <location filename="../src/window_main.cpp" line="1005"/>
         <source>%1 new set(s) found in the card database
 Set code(s): %2
 Do you want to enable it/them?</source>
@@ -2655,117 +2775,117 @@ Do you want to enable it/them?</source>
 要将它们生效吗？</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="963"/>
+        <location filename="../src/window_main.cpp" line="1013"/>
         <source>View sets</source>
         <translation>查看系列</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="982"/>
+        <location filename="../src/window_main.cpp" line="1032"/>
         <source>Welcome</source>
         <translation>欢迎</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="993"/>
-        <location filename="../src/window_main.cpp" line="1072"/>
-        <location filename="../src/window_main.cpp" line="1097"/>
+        <location filename="../src/window_main.cpp" line="1043"/>
+        <location filename="../src/window_main.cpp" line="1122"/>
+        <location filename="../src/window_main.cpp" line="1147"/>
         <source>Information</source>
         <translation>信息</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="993"/>
+        <location filename="../src/window_main.cpp" line="1043"/>
         <source>A card database update is already running.</source>
         <translation>数据库更新已经在运行中。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1029"/>
+        <location filename="../src/window_main.cpp" line="1079"/>
         <source>Unable to run the card database updater: </source>
         <translation>无法运行卡组数据库更新器：</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1041"/>
+        <location filename="../src/window_main.cpp" line="1091"/>
         <source>failed to start.</source>
         <translation>无法开始。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1044"/>
+        <location filename="../src/window_main.cpp" line="1094"/>
         <source>crashed.</source>
         <translation>程序崩溃。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1047"/>
+        <location filename="../src/window_main.cpp" line="1097"/>
         <source>timed out.</source>
         <translation>超时</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1050"/>
+        <location filename="../src/window_main.cpp" line="1100"/>
         <source>write error.</source>
         <translation>写入错误。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1053"/>
+        <location filename="../src/window_main.cpp" line="1103"/>
         <source>read error.</source>
         <translation>读取错误。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1057"/>
+        <location filename="../src/window_main.cpp" line="1107"/>
         <source>unknown error.</source>
         <translation>未知错误</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1064"/>
+        <location filename="../src/window_main.cpp" line="1114"/>
         <source>The card database updater exited with an error: %1</source>
         <translation>卡牌数据库更新器退出，错误：%1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1073"/>
+        <location filename="../src/window_main.cpp" line="1123"/>
         <source>Update completed successfully.
 Cockatrice will now reload the card database.</source>
         <translation>更新已完毕。
 Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1157"/>
+        <location filename="../src/window_main.cpp" line="1207"/>
         <source>You can only import XML databases at this time.</source>
         <translation>当前只能导入XML格式数据库。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1233"/>
-        <location filename="../src/window_main.cpp" line="1243"/>
-        <location filename="../src/window_main.cpp" line="1252"/>
+        <location filename="../src/window_main.cpp" line="1283"/>
+        <location filename="../src/window_main.cpp" line="1293"/>
+        <location filename="../src/window_main.cpp" line="1302"/>
         <source>Forgot Password</source>
         <translation>忘记密码</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1234"/>
+        <location filename="../src/window_main.cpp" line="1284"/>
         <source>Your password has been reset successfully, you now may  log in using the new credentials.</source>
         <translation>你的密码已重置，现在你可以使用新密码登录了。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1244"/>
+        <location filename="../src/window_main.cpp" line="1294"/>
         <source>Failed to reset user account password, please contact the server operator to reset your password.</source>
         <translation>重置密码失败，请联系服务器管理员重置密码。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1253"/>
+        <location filename="../src/window_main.cpp" line="1303"/>
         <source>Activation request received, please check your email for an activation token.</source>
         <translation>激活请求已收到，请查看你的电子邮箱获取激活验证码。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1142"/>
-        <location filename="../src/window_main.cpp" line="1151"/>
-        <location filename="../src/window_main.cpp" line="1157"/>
-        <location filename="../src/window_main.cpp" line="1185"/>
-        <location filename="../src/window_main.cpp" line="1189"/>
+        <location filename="../src/window_main.cpp" line="1192"/>
+        <location filename="../src/window_main.cpp" line="1201"/>
+        <location filename="../src/window_main.cpp" line="1207"/>
+        <location filename="../src/window_main.cpp" line="1235"/>
+        <location filename="../src/window_main.cpp" line="1239"/>
         <source>Load sets/cards</source>
         <translation>载入系列/卡牌</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="637"/>
+        <location filename="../src/window_main.cpp" line="642"/>
         <source>&amp;Manage sets...</source>
         <translation>系列管理</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="983"/>
+        <location filename="../src/window_main.cpp" line="1033"/>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Manage Sets&quot; dialog.</source>
@@ -2774,7 +2894,7 @@ Read more about changing the set order or disabling specific sets and consequent
 了解更多用“系列管理”窗口更改系列顺序或者禁用某系列的信息。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1098"/>
+        <location filename="../src/window_main.cpp" line="1148"/>
         <source>This server supports additional features that your client doesn't have.
 This is most likely not a problem, but this message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.
 
@@ -2784,19 +2904,19 @@ To update your client, go to Help -&gt; Check for Updates.</source>
 要升级客户端，请点击 帮助-&gt;检查更新</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1151"/>
+        <location filename="../src/window_main.cpp" line="1201"/>
         <source>Selected file cannot be found.</source>
         <translation>找不到选择的文件。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1186"/>
+        <location filename="../src/window_main.cpp" line="1236"/>
         <source>The new sets/cards have been added successfully.
 Cockatrice will now reload the card database.</source>
         <translation>新的系列/卡牌已添加成功。 
 Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1189"/>
+        <location filename="../src/window_main.cpp" line="1239"/>
         <source>Sets/cards failed to import.</source>
         <translation>系列/卡牌导入失败。</translation>
     </message>
@@ -2804,17 +2924,17 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>MessageLogWidget</name>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="374"/>
+        <location filename="../src/messagelogwidget.cpp" line="375"/>
         <source>The game has been closed.</source>
         <translation>游戏已经关闭。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="396"/>
+        <location filename="../src/messagelogwidget.cpp" line="397"/>
         <source>You have been kicked out of the game.</source>
         <translation>你已被踢出游戏。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="391"/>
+        <location filename="../src/messagelogwidget.cpp" line="392"/>
         <source>%1 is now watching the game.</source>
         <translation>%1 正在旁观游戏。</translation>
     </message>
@@ -2829,7 +2949,7 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>%1已载入含有 %2张备牌的套牌(%3)</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="379"/>
+        <location filename="../src/messagelogwidget.cpp" line="380"/>
         <source>The game has started.</source>
         <translation>游戏已开始。</translation>
     </message>
@@ -2879,8 +2999,12 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>从堆叠中</translation>
     </message>
     <message>
+        <location filename="../src/messagelogwidget.cpp" line="159"/>
+        <source>%1 attaches %2 to %3&apos;s %4.</source>
+        <translation>%1 结附 %2 指向 %3的 %4.</translation>
+    </message>
+    <message>
         <location filename="../src/messagelogwidget.cpp" line="285"/>
-        <location filename="../src/messagelogwidget.cpp" line="473"/>
         <source>a card</source>
         <translation>一张牌</translation>
     </message>
@@ -2919,105 +3043,102 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <source>%1 plays %2%3.</source>
         <translation>%1使用 %2%3。</translation>
     </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="358"/>
+        <source>%1 is looking at the top %3 card(s) %2.</source>
+        <comment>top card for singular, top %3 cards for plural</comment>
+        <translation><numerusform>%1正在%3检视牌库顶的%2张牌。</numerusform></translation>
+    </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="366"/>
+        <location filename="../src/messagelogwidget.cpp" line="367"/>
         <source>%1 turns %2 face-down.</source>
         <translation>%1回合%2翻为面朝下。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="368"/>
+        <location filename="../src/messagelogwidget.cpp" line="369"/>
         <source>%1 turns %2 face-up.</source>
         <translation>%1回合%2翻为面朝上。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="402"/>
+        <location filename="../src/messagelogwidget.cpp" line="403"/>
         <source>%1 has left the game (%2).</source>
         <translation>%1 已经离开了游戏(%2)。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="410"/>
+        <location filename="../src/messagelogwidget.cpp" line="411"/>
         <source>%1 is not watching the game any more (%2).</source>
         <translation>%1 不再旁观游戏(%2)。</translation>
     </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="476"/>
+        <source>%1 card(s)</source>
+        <comment>a card for singular, %1 cards for plural</comment>
+        <translation><numerusform>%1 卡牌</numerusform></translation>
+    </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="546"/>
+        <location filename="../src/messagelogwidget.cpp" line="554"/>
         <source>Untap</source>
         <translation>重置阶段</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="551"/>
+        <location filename="../src/messagelogwidget.cpp" line="559"/>
         <source>Upkeep</source>
         <translation>维持阶段</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="556"/>
+        <location filename="../src/messagelogwidget.cpp" line="564"/>
         <source>Draw</source>
         <translation>抓牌阶段</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="561"/>
+        <location filename="../src/messagelogwidget.cpp" line="569"/>
         <source>First Main</source>
         <translation>主要阶段1</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="566"/>
+        <location filename="../src/messagelogwidget.cpp" line="574"/>
         <source>Beginning of Combat</source>
         <translation>战斗开始阶段</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="571"/>
+        <location filename="../src/messagelogwidget.cpp" line="579"/>
         <source>Declare Attackers</source>
         <translation>宣告进攻阶段</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="576"/>
+        <location filename="../src/messagelogwidget.cpp" line="584"/>
         <source>Declare Blockers</source>
         <translation>宣告阻挡阶段</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="581"/>
+        <location filename="../src/messagelogwidget.cpp" line="589"/>
         <source>Combat Damage</source>
         <translation>战斗伤害阶段</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="586"/>
+        <location filename="../src/messagelogwidget.cpp" line="594"/>
         <source>End of Combat</source>
         <translation>战斗结束阶段</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="591"/>
+        <location filename="../src/messagelogwidget.cpp" line="599"/>
         <source>Second Main</source>
         <translation>主要阶段2</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="596"/>
+        <location filename="../src/messagelogwidget.cpp" line="604"/>
         <source>End/Cleanup</source>
         <translation>结束/清理阶段</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="601"/>
+        <location filename="../src/messagelogwidget.cpp" line="609"/>
         <source>Unknown Phase</source>
         <translation>未知阶段</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="612"/>
+        <location filename="../src/messagelogwidget.cpp" line="620"/>
         <source>%1&apos;s turn.</source>
         <translation>现在是%1的回合。</translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="636"/>
-        <source>red</source>
-        <translation><numerusform>红</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="639"/>
-        <source>yellow</source>
-        <translation><numerusform>黄</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/messagelogwidget.cpp" line="642"/>
-        <source>green</source>
-        <translation><numerusform>绿</numerusform></translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="151"/>
@@ -3030,32 +3151,32 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>%1不再%2展示牌库顶牌。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="446"/>
+        <location filename="../src/messagelogwidget.cpp" line="447"/>
         <source>You are watching a replay of game #%1.</source>
         <translation>你正在观看游戏#%1的录像。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="385"/>
+        <location filename="../src/messagelogwidget.cpp" line="386"/>
         <source>%1 has joined the game.</source>
         <translation>%1 已经加入游戏。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="451"/>
+        <location filename="../src/messagelogwidget.cpp" line="452"/>
         <source>%1 is ready to start the game.</source>
         <translation>%1已准备好开始游戏。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="415"/>
+        <location filename="../src/messagelogwidget.cpp" line="416"/>
         <source>%1 is not ready to start the game any more.</source>
         <translation>%1 还未准备好开始游戏。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="691"/>
+        <location filename="../src/messagelogwidget.cpp" line="699"/>
         <source>%1 has locked their sideboard.</source>
         <translation>%1已锁定他的备牌。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="693"/>
+        <location filename="../src/messagelogwidget.cpp" line="701"/>
         <source>%1 has unlocked their sideboard.</source>
         <translation>%1 解除锁定他的备牌。</translation>
     </message>
@@ -3075,42 +3196,67 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>%1 已失去连接。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="721"/>
+        <location filename="../src/messagelogwidget.cpp" line="637"/>
+        <source>%1 places %2 %3 on %4 (now %5).</source>
+        <translation>%1在%4上放置了%2个%3指示物(现在是%5)。</translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="639"/>
+        <source>%1 removes %2 %3 from %4 (now %5).</source>
+        <translation>%1 从%4上移去了%2个%3指示物 (现在是%5)。</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="644"/>
+        <source>red counter(s)</source>
+        <translation><numerusform>红色指示物</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="647"/>
+        <source>yellow counter(s)</source>
+        <translation><numerusform>黄色指示物</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/messagelogwidget.cpp" line="650"/>
+        <source>green counter(s)</source>
+        <translation><numerusform>绿色指示物</numerusform></translation>
+    </message>
+    <message>
+        <location filename="../src/messagelogwidget.cpp" line="729"/>
         <source>%1 shuffles %2.</source>
         <translation>%1 切洗了%2。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="522"/>
+        <location filename="../src/messagelogwidget.cpp" line="530"/>
         <source>Heads</source>
         <translation>正面</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="522"/>
+        <location filename="../src/messagelogwidget.cpp" line="530"/>
         <source>Tails</source>
         <translation>反面</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="523"/>
+        <location filename="../src/messagelogwidget.cpp" line="531"/>
         <source>%1 flipped a coin. It landed as %2.</source>
         <translation>%1掷硬币。结果为%2。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="527"/>
+        <location filename="../src/messagelogwidget.cpp" line="535"/>
         <source>%1 rolls a %2 with a %3-sided die.</source>
         <translation>%1掷%3面骰子，结果为%2。</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../src/messagelogwidget.cpp" line="344"/>
         <source>%1 draws %2 card(s).</source>
-        <translation>%1 抓了 %2 张牌。</translation>
+        <translation><numerusform>%1 抓了 %2 张牌。</numerusform></translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="749"/>
+        <location filename="../src/messagelogwidget.cpp" line="757"/>
         <source>%1 undoes their last draw.</source>
         <translation>%1撤销了最后的抓牌。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="752"/>
+        <location filename="../src/messagelogwidget.cpp" line="760"/>
         <source>%1 undoes their last draw (%2).</source>
         <translation>%1撤销了最后的抓牌(%2)。</translation>
     </message>
@@ -3175,12 +3321,12 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>%1将%2%3置于其牌库顶。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="439"/>
+        <location filename="../src/messagelogwidget.cpp" line="440"/>
         <source>%1 takes a mulligan to %2.</source>
         <translation>%1重新调度起手牌为%2。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="441"/>
+        <location filename="../src/messagelogwidget.cpp" line="442"/>
         <source>%1 draws their initial hand.</source>
         <translation>%1 抓了起始手牌</translation>
     </message>
@@ -3190,7 +3336,7 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>%1销毁了%2。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="743"/>
+        <location filename="../src/messagelogwidget.cpp" line="751"/>
         <source>%1 unattaches %2.</source>
         <translation>%1 取消了%2的结附。</translation>
     </message>
@@ -3240,57 +3386,47 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>%1 将%2的%3指向%4的%5。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="629"/>
-        <source>%1 places %2 %3 counter(s) on %4 (now %5).</source>
-        <translation>%1在%4上放置了%2个%3指示物(现在是%5)。</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="631"/>
-        <source>%1 removes %2 %3 counter(s) from %4 (now %5).</source>
-        <translation>%1 从%4上移去了%2个%3指示物 (现在是%5)。</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="708"/>
+        <location filename="../src/messagelogwidget.cpp" line="716"/>
         <source>%1 taps their permanents.</source>
         <translation>%1 横置了永久物。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="708"/>
+        <location filename="../src/messagelogwidget.cpp" line="716"/>
         <source>%1 untaps their permanents.</source>
         <translation>%1 重置了永久物。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="711"/>
+        <location filename="../src/messagelogwidget.cpp" line="719"/>
         <source>%1 taps %2.</source>
         <translation>%1 横置了 %2。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="711"/>
+        <location filename="../src/messagelogwidget.cpp" line="719"/>
         <source>%1 untaps %2.</source>
         <translation>%1 重置了 %2。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="659"/>
+        <location filename="../src/messagelogwidget.cpp" line="667"/>
         <source>%1 sets counter %2 to %3 (%4%5).</source>
         <translation>%1 将%2指示物设置为 %3 (%4%5)。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="671"/>
+        <location filename="../src/messagelogwidget.cpp" line="679"/>
         <source>%1 sets %2 to not untap normally.</source>
         <translation>%1 将 %2 设置为不会被通常重置。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="673"/>
+        <location filename="../src/messagelogwidget.cpp" line="681"/>
         <source>%1 sets %2 to untap normally.</source>
         <translation>%1 将 %2 设置为可通常重置。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="682"/>
+        <location filename="../src/messagelogwidget.cpp" line="690"/>
         <source>%1 sets PT of %2 to %3.</source>
         <translation>%1 将 %2 的力量/防御设置为%3</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="618"/>
+        <location filename="../src/messagelogwidget.cpp" line="626"/>
         <source>%1 sets annotation of %2 to %3.</source>
         <translation>%1给%2添加了注释%3。</translation>
     </message>
@@ -3300,52 +3436,47 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>%1 正在查看%2。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="357"/>
-        <source>%1 is looking at the top %2 card(s) %3.</source>
-        <translation>%1正在%3检视牌库顶的%2张牌。</translation>
-    </message>
-    <message>
-        <location filename="../src/messagelogwidget.cpp" line="736"/>
+        <location filename="../src/messagelogwidget.cpp" line="744"/>
         <source>%1 stops looking at %2.</source>
         <translation>%1停止查看%2。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="479"/>
+        <location filename="../src/messagelogwidget.cpp" line="483"/>
         <source>%1 reveals %2 to %3.</source>
         <translation>%1将%2展示给%3。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="484"/>
+        <location filename="../src/messagelogwidget.cpp" line="488"/>
         <source>%1 reveals %2.</source>
         <translation>%1 展示 %2。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="489"/>
+        <location filename="../src/messagelogwidget.cpp" line="494"/>
         <source>%1 randomly reveals %2%3 to %4.</source>
         <translation>%1随机展示%2%3给%4。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="496"/>
+        <location filename="../src/messagelogwidget.cpp" line="501"/>
         <source>%1 randomly reveals %2%3.</source>
         <translation>%1随机展示%2%3。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="501"/>
+        <location filename="../src/messagelogwidget.cpp" line="507"/>
         <source>%1 peeks at face down card #%2.</source>
         <translation>%1查看面朝下的卡牌#%2。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="503"/>
+        <location filename="../src/messagelogwidget.cpp" line="509"/>
         <source>%1 peeks at face down card #%2: %3.</source>
         <translation>%1查看面朝下的卡牌#%2:%3。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="508"/>
+        <location filename="../src/messagelogwidget.cpp" line="515"/>
         <source>%1 reveals %2%3 to %4.</source>
         <translation>%1展示%2%3给%4。</translation>
     </message>
     <message>
-        <location filename="../src/messagelogwidget.cpp" line="515"/>
+        <location filename="../src/messagelogwidget.cpp" line="522"/>
         <source>%1 reveals %2%3.</source>
         <translation>%1展示%2%3。</translation>
     </message>
@@ -3353,81 +3484,155 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="774"/>
+        <location filename="../src/dlg_settings.cpp" line="714"/>
+        <source>Word1 Word2 Word3</source>
+        <translation>词1 词2 词3</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="754"/>
+        <source>Add New URL</source>
+        <translation>添加新的URL</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="759"/>
+        <source>Edit URL</source>
+        <translation>编辑URL</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="763"/>
+        <source>Remove URL</source>
+        <translation>移除URL</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="845"/>
         <source>Add message</source>
         <translation>添加信息</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="774"/>
+        <location filename="../src/dlg_settings.cpp" line="845"/>
+        <location filename="../src/dlg_settings.cpp" line="857"/>
         <source>Message:</source>
         <translation>信息:</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="791"/>
+        <location filename="../src/dlg_settings.cpp" line="857"/>
+        <source>Edit message</source>
+        <translation>编辑消息</translation>
+    </message>
+    <message>
+        <location filename="../src/dlg_settings.cpp" line="875"/>
         <source>Chat settings</source>
         <translation>聊天设置</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="792"/>
+        <location filename="../src/dlg_settings.cpp" line="876"/>
         <source>Custom alert words</source>
         <translation>自定义警告语</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="793"/>
+        <location filename="../src/dlg_settings.cpp" line="877"/>
         <source>Enable chat mentions</source>
         <translation>允许聊天中提到某人</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="794"/>
+        <location filename="../src/dlg_settings.cpp" line="878"/>
         <source>Enable mention completer</source>
         <translation>允许自动完成提名</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="795"/>
+        <location filename="../src/dlg_settings.cpp" line="879"/>
         <source>In-game message macros</source>
         <translation>游戏内消息宏</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="796"/>
+        <location filename="../src/dlg_settings.cpp" line="880"/>
         <source>Ignore chat room messages sent by unregistered users</source>
         <translation>忽略未注册用户的聊天室消息。</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="797"/>
+        <location filename="../src/dlg_settings.cpp" line="881"/>
         <source>Ignore private messages sent by unregistered users</source>
         <translation>忽略未注册用户发出的私人消息</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="798"/>
-        <location filename="../src/dlg_settings.cpp" line="799"/>
+        <location filename="../src/dlg_settings.cpp" line="882"/>
+        <location filename="../src/dlg_settings.cpp" line="883"/>
         <source>Invert text color</source>
         <translation>反转文本颜色</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="800"/>
+        <location filename="../src/dlg_settings.cpp" line="884"/>
         <source>Enable desktop notifications for private messages</source>
         <translation>开启私人消息桌面提醒</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="801"/>
+        <location filename="../src/dlg_settings.cpp" line="885"/>
         <source>Enable desktop notification for mentions</source>
         <translation>开启聊天提名桌面提醒</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="802"/>
+        <location filename="../src/dlg_settings.cpp" line="886"/>
         <source>Enable room message history on join</source>
         <translation>开启加入聊天室时的历史消息</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="803"/>
-        <location filename="../src/dlg_settings.cpp" line="804"/>
+        <location filename="../src/dlg_settings.cpp" line="887"/>
+        <location filename="../src/dlg_settings.cpp" line="888"/>
         <source>(Color is hexadecimal)</source>
         <translation>（颜色为16进制）</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="805"/>
+        <location filename="../src/dlg_settings.cpp" line="889"/>
         <source>Separate words with a space, alphanumeric characters only</source>
         <translation>将单词以空格区分，仅支持字母</translation>
+    </message>
+</context>
+<context>
+    <name>Mtg</name>
+    <message>
+        <location filename="../src/game_specific_terms.h" line="28"/>
+        <source>Card type</source>
+        <translation>牌类型</translation>
+    </message>
+    <message>
+        <location filename="../src/game_specific_terms.h" line="30"/>
+        <source>Converted mana cost</source>
+        <translation>总法术力费用</translation>
+    </message>
+    <message>
+        <location filename="../src/game_specific_terms.h" line="32"/>
+        <source>Color(s)</source>
+        <translation>颜色</translation>
+    </message>
+    <message>
+        <location filename="../src/game_specific_terms.h" line="34"/>
+        <source>Loyalty</source>
+        <translation>忠诚</translation>
+    </message>
+    <message>
+        <location filename="../src/game_specific_terms.h" line="36"/>
+        <source>Main card type</source>
+        <translation>牌的主类型</translation>
+    </message>
+    <message>
+        <location filename="../src/game_specific_terms.h" line="38"/>
+        <source>Mana cost</source>
+        <translation>法术力费用</translation>
+    </message>
+    <message>
+        <location filename="../src/game_specific_terms.h" line="40"/>
+        <source>P / T</source>
+        <translation>攻/防</translation>
+    </message>
+    <message>
+        <location filename="../src/game_specific_terms.h" line="42"/>
+        <source>Side</source>
+        <translation>旁边</translation>
+    </message>
+    <message>
+        <location filename="../src/game_specific_terms.h" line="44"/>
+        <source>Layout</source>
+        <translation>布局</translation>
     </message>
 </context>
 <context>
@@ -3491,485 +3696,494 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>Player</name>
     <message>
-        <location filename="../src/player.cpp" line="525"/>
+        <location filename="../src/player.cpp" line="536"/>
         <source>Reveal top cards of library</source>
         <translation>查看牌库顶的牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="525"/>
+        <location filename="../src/player.cpp" line="537"/>
         <source>Number of cards: (max. %1)</source>
         <translation>卡牌数量：(最大%1)</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="614"/>
+        <location filename="../src/player.cpp" line="628"/>
         <source>&amp;View graveyard</source>
         <translation>查看坟墓场</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="615"/>
+        <location filename="../src/player.cpp" line="629"/>
         <source>&amp;View exile</source>
         <translation>查看放逐区</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="617"/>
+        <location filename="../src/player.cpp" line="631"/>
         <source>Player &quot;%1&quot;</source>
         <translation>玩家 &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="618"/>
-        <location filename="../src/player.cpp" line="625"/>
-        <location filename="../src/player.cpp" line="638"/>
-        <location filename="../src/player.cpp" line="726"/>
+        <location filename="../src/player.cpp" line="632"/>
+        <location filename="../src/player.cpp" line="639"/>
+        <location filename="../src/player.cpp" line="652"/>
+        <location filename="../src/player.cpp" line="743"/>
         <source>&amp;Graveyard</source>
         <translation>坟墓场</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="619"/>
-        <location filename="../src/player.cpp" line="626"/>
-        <location filename="../src/player.cpp" line="632"/>
-        <location filename="../src/player.cpp" line="727"/>
+        <location filename="../src/player.cpp" line="633"/>
+        <location filename="../src/player.cpp" line="640"/>
+        <location filename="../src/player.cpp" line="646"/>
+        <location filename="../src/player.cpp" line="744"/>
         <source>&amp;Exile</source>
         <translation>放逐区</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="622"/>
+        <location filename="../src/player.cpp" line="636"/>
         <source>&amp;Move hand to...</source>
         <translation>将手牌移动到</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="623"/>
-        <location filename="../src/player.cpp" line="629"/>
-        <location filename="../src/player.cpp" line="635"/>
-        <location filename="../src/player.cpp" line="722"/>
+        <location filename="../src/player.cpp" line="637"/>
+        <location filename="../src/player.cpp" line="643"/>
+        <location filename="../src/player.cpp" line="649"/>
+        <location filename="../src/player.cpp" line="739"/>
         <source>&amp;Top of library</source>
         <translation>牌库顶</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="624"/>
-        <location filename="../src/player.cpp" line="630"/>
-        <location filename="../src/player.cpp" line="636"/>
-        <location filename="../src/player.cpp" line="724"/>
+        <location filename="../src/player.cpp" line="638"/>
+        <location filename="../src/player.cpp" line="644"/>
+        <location filename="../src/player.cpp" line="650"/>
+        <location filename="../src/player.cpp" line="741"/>
         <source>&amp;Bottom of library</source>
         <translation>牌库底</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="628"/>
+        <location filename="../src/player.cpp" line="642"/>
         <source>&amp;Move graveyard to...</source>
         <translation>将坟墓场的牌移到</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="631"/>
-        <location filename="../src/player.cpp" line="637"/>
-        <location filename="../src/player.cpp" line="658"/>
-        <location filename="../src/player.cpp" line="725"/>
+        <location filename="../src/player.cpp" line="645"/>
+        <location filename="../src/player.cpp" line="651"/>
+        <location filename="../src/player.cpp" line="674"/>
+        <location filename="../src/player.cpp" line="742"/>
         <source>&amp;Hand</source>
         <translation>手牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="634"/>
+        <location filename="../src/player.cpp" line="648"/>
         <source>&amp;Move exile to...</source>
         <translation>将放逐区的卡移到</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="640"/>
+        <location filename="../src/player.cpp" line="654"/>
         <source>&amp;View library</source>
         <translation>查看套牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="641"/>
+        <location filename="../src/player.cpp" line="655"/>
         <source>View &amp;top cards of library...</source>
         <translation>检视牌库顶的牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="642"/>
+        <location filename="../src/player.cpp" line="656"/>
         <source>Reveal &amp;library to...</source>
         <translation>将套牌展示给</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="643"/>
+        <location filename="../src/player.cpp" line="657"/>
         <source>Reveal t&amp;op cards to...</source>
         <translation>将牌库顶牌展示给</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="644"/>
+        <location filename="../src/player.cpp" line="658"/>
         <source>&amp;Always reveal top card</source>
         <translation>一直展示牌库顶牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="645"/>
+        <location filename="../src/player.cpp" line="659"/>
         <source>O&amp;pen deck in deck editor</source>
         <translation>打开套牌编辑</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="646"/>
+        <location filename="../src/player.cpp" line="660"/>
         <source>&amp;View sideboard</source>
         <translation>查看备牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="647"/>
+        <location filename="../src/player.cpp" line="661"/>
         <source>&amp;Draw card</source>
         <translation>抓牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="648"/>
+        <location filename="../src/player.cpp" line="662"/>
         <source>D&amp;raw cards...</source>
         <translation>抓多张牌...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="649"/>
+        <location filename="../src/player.cpp" line="663"/>
         <source>&amp;Undo last draw</source>
         <translation>撤销最后抓牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="650"/>
+        <location filename="../src/player.cpp" line="664"/>
         <source>Take &amp;mulligan</source>
         <translation>抓起始手牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="651"/>
+        <location filename="../src/player.cpp" line="665"/>
         <source>&amp;Shuffle</source>
         <translation>切洗套牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="652"/>
+        <location filename="../src/player.cpp" line="666"/>
         <source>Play top card &amp;face down</source>
         <translation>将牌库顶牌面朝下打出</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="653"/>
+        <location filename="../src/player.cpp" line="667"/>
+        <source>Move top card to grave&amp;yard</source>
+        <translation>移动牌库顶牌到坟场</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="668"/>
+        <source>Move top card to e&amp;xile</source>
+        <translation>将牌库顶的牌置入放逐区</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="669"/>
         <source>Move top cards to &amp;graveyard...</source>
         <translation>将牌库顶的牌置入坟墓场...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="654"/>
+        <location filename="../src/player.cpp" line="670"/>
         <source>Move top cards to &amp;exile...</source>
         <translation>将牌库顶的牌置入放逐区...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="655"/>
+        <location filename="../src/player.cpp" line="671"/>
         <source>Put top card on &amp;bottom</source>
         <translation>将牌库顶牌放到牌库底</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="656"/>
+        <location filename="../src/player.cpp" line="672"/>
         <source>Put bottom card &amp;in graveyard</source>
         <translation>将牌库底牌置入坟墓场</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="659"/>
+        <location filename="../src/player.cpp" line="675"/>
         <source>&amp;Reveal hand to...</source>
         <translation>将手牌展示给</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="660"/>
+        <location filename="../src/player.cpp" line="676"/>
         <source>Reveal r&amp;andom card to...</source>
         <translation>展示随机卡牌到</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="661"/>
+        <location filename="../src/player.cpp" line="677"/>
         <source>Reveal random card to...</source>
         <translation>随机展示牌给...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="662"/>
+        <location filename="../src/player.cpp" line="678"/>
         <source>&amp;Sideboard</source>
         <translation>备牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="663"/>
+        <location filename="../src/player.cpp" line="679"/>
         <source>&amp;Library</source>
         <translation>牌库</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="664"/>
+        <location filename="../src/player.cpp" line="680"/>
         <source>&amp;Counters</source>
         <translation>数值</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="666"/>
+        <location filename="../src/player.cpp" line="682"/>
         <source>&amp;Untap all permanents</source>
         <translation>重置所有永久物</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="667"/>
+        <location filename="../src/player.cpp" line="683"/>
         <source>R&amp;oll die...</source>
         <translation>抛骰子...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="668"/>
+        <location filename="../src/player.cpp" line="684"/>
         <source>&amp;Create token...</source>
         <translation>创造一个衍生物...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="669"/>
+        <location filename="../src/player.cpp" line="685"/>
         <source>C&amp;reate another token</source>
         <translation>将另一个衍生物放置进场</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="670"/>
+        <location filename="../src/player.cpp" line="686"/>
         <source>Cr&amp;eate predefined token</source>
         <translation>将预设衍生物放置进场</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="671"/>
+        <location filename="../src/player.cpp" line="687"/>
         <source>S&amp;ay</source>
         <translation>说</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="677"/>
+        <location filename="../src/player.cpp" line="693"/>
         <source>C&amp;ard</source>
         <translation>卡牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="680"/>
+        <location filename="../src/player.cpp" line="696"/>
         <source>&amp;All players</source>
         <translation>全部玩家</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="683"/>
+        <location filename="../src/player.cpp" line="699"/>
         <source>&amp;Play</source>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="684"/>
+        <location filename="../src/player.cpp" line="700"/>
         <source>&amp;Hide</source>
         <translation>隐藏</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="685"/>
+        <location filename="../src/player.cpp" line="701"/>
         <source>Play &amp;Face Down</source>
         <translation>面朝下打出</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="688"/>
+        <location filename="../src/player.cpp" line="704"/>
         <source>Toggle &amp;normal untapping</source>
         <translation>锁定通常重置</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="693"/>
+        <location filename="../src/player.cpp" line="709"/>
         <source>&amp;Peek at card face</source>
         <translation>查看卡牌背面</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="694"/>
+        <location filename="../src/player.cpp" line="710"/>
         <source>&amp;Clone</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="695"/>
+        <location filename="../src/player.cpp" line="711"/>
         <source>Attac&amp;h to card...</source>
         <translation>结附卡牌...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="696"/>
+        <location filename="../src/player.cpp" line="712"/>
         <source>Unattac&amp;h</source>
         <translation>取消结附</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="697"/>
+        <location filename="../src/player.cpp" line="713"/>
         <source>&amp;Draw arrow...</source>
         <translation>划箭头...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="698"/>
+        <location filename="../src/player.cpp" line="714"/>
         <source>&amp;Increase power</source>
         <translation>增加力量</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="699"/>
+        <location filename="../src/player.cpp" line="715"/>
         <source>&amp;Decrease power</source>
         <translation>降低防御</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="700"/>
+        <location filename="../src/player.cpp" line="716"/>
         <source>I&amp;ncrease toughness</source>
         <translation>降低防御</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="701"/>
+        <location filename="../src/player.cpp" line="717"/>
         <source>D&amp;ecrease toughness</source>
         <translation>降低防御</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="702"/>
+        <location filename="../src/player.cpp" line="718"/>
         <source>In&amp;crease power and toughness</source>
         <translation>增加力量和防御</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="703"/>
+        <location filename="../src/player.cpp" line="719"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation>降低力量和防御</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="704"/>
+        <location filename="../src/player.cpp" line="720"/>
         <source>Set &amp;power and toughness...</source>
         <translation>设置力量和防御...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="705"/>
+        <location filename="../src/player.cpp" line="721"/>
+        <source>Reset p&amp;ower and toughness</source>
+        <translation>重置力量和防御力</translation>
+    </message>
+    <message>
+        <location filename="../src/player.cpp" line="722"/>
         <source>&amp;Set annotation...</source>
         <translation>设置注释...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="708"/>
+        <location filename="../src/player.cpp" line="725"/>
         <source>Red</source>
         <translation>红</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="709"/>
+        <location filename="../src/player.cpp" line="726"/>
         <source>Yellow</source>
         <translation>黄</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="710"/>
+        <location filename="../src/player.cpp" line="727"/>
         <source>Green</source>
         <translation>绿</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="723"/>
+        <location filename="../src/player.cpp" line="740"/>
         <source>X cards from the top of library...</source>
         <translation>从牌库顶X张牌...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1085"/>
-        <location filename="../src/player.cpp" line="2877"/>
+        <location filename="../src/player.cpp" line="1160"/>
+        <location filename="../src/player.cpp" line="3076"/>
         <source>C&amp;reate another %1 token</source>
         <translation>创造%1个衍生物</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1228"/>
+        <location filename="../src/player.cpp" line="1307"/>
         <source>Create tokens</source>
         <translation>创造一个衍生物</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1355"/>
-        <location filename="../src/player.cpp" line="1356"/>
-        <location filename="../src/player.cpp" line="2750"/>
-        <location filename="../src/player.cpp" line="2753"/>
-        <location filename="../src/player.cpp" line="2776"/>
-        <location filename="../src/player.cpp" line="2779"/>
+        <location filename="../src/player.cpp" line="2964"/>
         <source>Token: </source>
         <translation>衍生物:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2132"/>
+        <location filename="../src/player.cpp" line="2285"/>
         <source>Place card X cards from top of library</source>
         <translation>查看牌库顶X张牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2133"/>
+        <location filename="../src/player.cpp" line="2286"/>
         <source>How many cards from the top of the deck should this card be placed:</source>
         <translation>多少张牌应该放在牌库顶：</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2722"/>
+        <location filename="../src/player.cpp" line="2927"/>
         <source>View related cards</source>
         <translation>查看关联牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2750"/>
-        <location filename="../src/player.cpp" line="2776"/>
+        <location filename="../src/player.cpp" line="2966"/>
         <source>Attach to </source>
         <translation>结附于</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2792"/>
+        <location filename="../src/player.cpp" line="2980"/>
         <source>All tokens</source>
         <translation>所有衍生物</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="875"/>
+        <location filename="../src/player.cpp" line="907"/>
         <source>View top cards of library</source>
         <translation>查看牌库顶的牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="687"/>
+        <location filename="../src/player.cpp" line="703"/>
         <source>&amp;Tap / Untap</source>
         <extracomment>Turn sideways or back again</extracomment>
         <translation>横置/重置</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="690"/>
+        <location filename="../src/player.cpp" line="706"/>
         <source>T&amp;urn Over</source>
         <extracomment>Turn face up/face down</extracomment>
         <translation>回合结束</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="713"/>
+        <location filename="../src/player.cpp" line="730"/>
         <source>&amp;Add counter (%1)</source>
         <translation>增加指示物 (%1)</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="716"/>
+        <location filename="../src/player.cpp" line="733"/>
         <source>&amp;Remove counter (%1)</source>
         <translation>移除指示物 (%1)</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="719"/>
+        <location filename="../src/player.cpp" line="736"/>
         <source>&amp;Set counters (%1)...</source>
         <translation>设置数值 (%1)...</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="875"/>
+        <location filename="../src/player.cpp" line="907"/>
         <source>Number of cards:</source>
         <translation>卡牌数量:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="943"/>
+        <location filename="../src/player.cpp" line="976"/>
         <source>Draw cards</source>
         <translation>抓牌</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="943"/>
-        <location filename="../src/player.cpp" line="958"/>
-        <location filename="../src/player.cpp" line="981"/>
-        <location filename="../src/player.cpp" line="1228"/>
-        <location filename="../src/player.cpp" line="2521"/>
+        <location filename="../src/player.cpp" line="976"/>
+        <location filename="../src/player.cpp" line="1025"/>
+        <location filename="../src/player.cpp" line="1051"/>
+        <location filename="../src/player.cpp" line="1307"/>
+        <location filename="../src/player.cpp" line="2720"/>
         <source>Number:</source>
         <translation>数值:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="958"/>
+        <location filename="../src/player.cpp" line="1025"/>
         <source>Move top cards to grave</source>
         <translation>将牌库顶的牌置入坟墓场</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="981"/>
+        <location filename="../src/player.cpp" line="1051"/>
         <source>Move top cards to exile</source>
         <translation>将牌库顶的牌置入放逐区</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1057"/>
+        <location filename="../src/player.cpp" line="1130"/>
         <source>Roll die</source>
         <translation>抛骰子</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1057"/>
+        <location filename="../src/player.cpp" line="1130"/>
         <source>Number of sides:</source>
         <translation>面数:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2362"/>
+        <location filename="../src/player.cpp" line="2552"/>
         <source>Set power/toughness</source>
         <translation>设置力量和防御</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2362"/>
+        <location filename="../src/player.cpp" line="2552"/>
         <source>Please enter the new PT:</source>
         <translation>请输入力量和防御值:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2438"/>
+        <location filename="../src/player.cpp" line="2633"/>
         <source>Set annotation</source>
         <translation>设置注释</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2438"/>
+        <location filename="../src/player.cpp" line="2633"/>
         <source>Please enter the new annotation:</source>
         <translation>请输入注释:</translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2521"/>
+        <location filename="../src/player.cpp" line="2720"/>
         <source>Set counters</source>
         <translation>设置数值</translation>
     </message>
@@ -3977,37 +4191,37 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>QMenuBar</name>
     <message>
-        <location filename="../src/window_main.cpp" line="705"/>
+        <location filename="../src/window_main.cpp" line="709"/>
         <source>Services</source>
         <translation>服务</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="706"/>
+        <location filename="../src/window_main.cpp" line="710"/>
         <source>Hide %1</source>
         <translation>隐藏 %1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="707"/>
+        <location filename="../src/window_main.cpp" line="711"/>
         <source>Hide Others</source>
         <translation>隐藏其他</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="708"/>
+        <location filename="../src/window_main.cpp" line="712"/>
         <source>Show All</source>
         <translation>展示所有</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="709"/>
+        <location filename="../src/window_main.cpp" line="713"/>
         <source>Preferences...</source>
         <translation>参数</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="710"/>
+        <location filename="../src/window_main.cpp" line="714"/>
         <source>Quit %1</source>
         <translation>退出%1</translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="711"/>
+        <location filename="../src/window_main.cpp" line="715"/>
         <source>About %1</source>
         <translation>关于 %1</translation>
     </message>
@@ -4036,19 +4250,112 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
         <translation>通用套牌格式(*.cod *.dec *.txt *.mwDeck)</translation>
     </message>
     <message>
-        <location filename="../../common/decklist.cpp" line="100"/>
+        <location filename="../../common/decklist.cpp" line="109"/>
         <source>Maindeck</source>
         <translation>主套牌</translation>
     </message>
     <message>
-        <location filename="../../common/decklist.cpp" line="102"/>
+        <location filename="../../common/decklist.cpp" line="111"/>
         <source>Sideboard</source>
         <translation>备牌</translation>
     </message>
     <message>
-        <location filename="../../common/decklist.cpp" line="104"/>
+        <location filename="../../common/decklist.cpp" line="113"/>
         <source>Tokens</source>
         <translation>衍生物</translation>
+    </message>
+</context>
+<context>
+    <name>QPlatformTheme</name>
+    <message>
+        <location filename="../src/window_main.cpp" line="730"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="731"/>
+        <source>Discard</source>
+        <translation>弃牌</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="732"/>
+        <source>Help</source>
+        <translation>帮助</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="733"/>
+        <source>Apply</source>
+        <translation>应用</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="722"/>
+        <source>&amp;Yes</source>
+        <translation>是</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="719"/>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="720"/>
+        <source>Save All</source>
+        <translation>保存全部</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="721"/>
+        <source>Open</source>
+        <translation>打开</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="723"/>
+        <source>Yes to &amp;All</source>
+        <translation>全选是</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="724"/>
+        <source>&amp;No</source>
+        <translation>否</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="725"/>
+        <source>N&amp;o to All</source>
+        <translation>全选否</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="726"/>
+        <source>Abort</source>
+        <translation>退出</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="727"/>
+        <source>Retry</source>
+        <translation>重试</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="728"/>
+        <source>Ignore</source>
+        <translation>忽略</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="729"/>
+        <source>Close</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="734"/>
+        <source>Reset</source>
+        <translation>重置</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="735"/>
+        <source>Restore Defaults</source>
+        <translation>恢复为默认值</translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="718"/>
+        <source>OK</source>
+        <translation>确定</translation>
     </message>
 </context>
 <context>
@@ -4143,12 +4450,12 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>SequenceEdit</name>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="155"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="147"/>
         <source>Shortcut already in use</source>
         <translation>快捷键已被使用</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="158"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="150"/>
         <source>Invalid key</source>
         <translation>无效密钥</translation>
     </message>
@@ -4184,14 +4491,14 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
 <context>
     <name>ShortcutsSettings</name>
     <message>
-        <location filename="../src/shortcutssettings.cpp" line="40"/>
+        <location filename="../src/shortcutssettings.cpp" line="39"/>
         <source>Your configuration file contained invalid shortcuts.
 Please check your shortcut settings!</source>
         <translation>您的配置文件包涵了无效的快捷键
 请检查您的快捷键设置</translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.cpp" line="42"/>
+        <location filename="../src/shortcutssettings.cpp" line="41"/>
         <source>The following shortcuts have been set to default:
 </source>
         <translation>以下快捷方式被设置为默认状态：
@@ -4242,27 +4549,27 @@ Please check your shortcut settings!</source>
 <context>
     <name>SoundSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="873"/>
+        <location filename="../src/dlg_settings.cpp" line="957"/>
         <source>Enable &amp;sounds</source>
         <translation>启用声效</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="874"/>
+        <location filename="../src/dlg_settings.cpp" line="958"/>
         <source>Current sounds theme:</source>
         <translation>当前声效主题：</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="875"/>
+        <location filename="../src/dlg_settings.cpp" line="959"/>
         <source>Test system sound engine</source>
         <translation>测试系统声效</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="876"/>
+        <location filename="../src/dlg_settings.cpp" line="960"/>
         <source>Sound settings</source>
         <translation>声效设置</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="877"/>
+        <location filename="../src/dlg_settings.cpp" line="961"/>
         <source>Master volume</source>
         <translation>主音量</translation>
     </message>
@@ -4319,27 +4626,27 @@ Please check your shortcut settings!</source>
 <context>
     <name>StableReleaseChannel</name>
     <message>
-        <location filename="../src/releasechannel.cpp" line="90"/>
+        <location filename="../src/releasechannel.cpp" line="85"/>
         <source>Stable Releases</source>
         <translation>稳定版本</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="108"/>
+        <location filename="../src/releasechannel.cpp" line="101"/>
         <source>No reply received from the release update server.</source>
         <translation>更新服务器未响应。</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="115"/>
+        <location filename="../src/releasechannel.cpp" line="109"/>
         <source>Invalid reply received from the release update server.</source>
         <translation>收到更新服务器的无效回应。</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="173"/>
+        <location filename="../src/releasechannel.cpp" line="165"/>
         <source>No reply received from the tag update server.</source>
         <translation>未收到标签更新服务器的响应</translation>
     </message>
     <message>
-        <location filename="../src/releasechannel.cpp" line="179"/>
+        <location filename="../src/releasechannel.cpp" line="172"/>
         <source>Invalid reply received from the tag update server.</source>
         <translation>收到标签更新服务器的无效响应</translation>
     </message>
@@ -4385,194 +4692,194 @@ Please check your shortcut settings!</source>
 <context>
     <name>TabDeckEditor</name>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="610"/>
+        <location filename="../src/tab_deck_editor.cpp" line="608"/>
         <source>&amp;Clear all filters</source>
         <translation>清除所有筛选项目</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="611"/>
+        <location filename="../src/tab_deck_editor.cpp" line="609"/>
         <source>Delete selected</source>
         <translation>删除所选项</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="613"/>
+        <location filename="../src/tab_deck_editor.cpp" line="611"/>
         <source>Deck &amp;name:</source>
         <translation>套牌名称:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="614"/>
+        <location filename="../src/tab_deck_editor.cpp" line="612"/>
         <source>&amp;Comments:</source>
         <translation>评论:</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="615"/>
+        <location filename="../src/tab_deck_editor.cpp" line="613"/>
         <source>Hash:</source>
         <translation>哈希值：</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="617"/>
+        <location filename="../src/tab_deck_editor.cpp" line="615"/>
         <source>&amp;New deck</source>
         <translation>创建新套牌</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="618"/>
+        <location filename="../src/tab_deck_editor.cpp" line="616"/>
         <source>&amp;Load deck...</source>
         <translation>读取套牌...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="619"/>
+        <location filename="../src/tab_deck_editor.cpp" line="617"/>
         <source>&amp;Save deck</source>
         <translation>保存套牌</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="620"/>
+        <location filename="../src/tab_deck_editor.cpp" line="618"/>
         <source>Save deck &amp;as...</source>
         <translation>另存为套牌...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="621"/>
+        <location filename="../src/tab_deck_editor.cpp" line="619"/>
         <source>Load deck from cl&amp;ipboard...</source>
         <translation>从剪贴板读取套牌...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="627"/>
+        <location filename="../src/tab_deck_editor.cpp" line="625"/>
         <source>&amp;Print deck...</source>
         <translation>打印套牌...</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="347"/>
+        <location filename="../src/tab_deck_editor.cpp" line="349"/>
         <source>Search by card name</source>
         <translation>按卡牌名称搜索</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="453"/>
+        <location filename="../src/tab_deck_editor.cpp" line="451"/>
         <source>Add to Deck</source>
         <translation>添加至套牌</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="454"/>
+        <location filename="../src/tab_deck_editor.cpp" line="452"/>
         <source>Add to Sideboard</source>
         <translation>添加至备牌</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="459"/>
+        <location filename="../src/tab_deck_editor.cpp" line="457"/>
         <source>Show Related cards</source>
         <translation>显示关联牌</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="623"/>
+        <location filename="../src/tab_deck_editor.cpp" line="621"/>
         <source>Save deck to clipboard</source>
         <translation>保存卡组到剪切板</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="624"/>
+        <location filename="../src/tab_deck_editor.cpp" line="622"/>
         <source>Annotated</source>
         <translation>注释</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="625"/>
+        <location filename="../src/tab_deck_editor.cpp" line="623"/>
         <source>Not Annotated</source>
         <translation>没有注释</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="629"/>
+        <location filename="../src/tab_deck_editor.cpp" line="627"/>
         <source>&amp;Send deck to online service</source>
         <translation>发送卡组到在线服务器</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="630"/>
+        <location filename="../src/tab_deck_editor.cpp" line="628"/>
         <source>Create decklist (decklist.org)</source>
         <translation>创建卡组（decklist.org）</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="631"/>
+        <location filename="../src/tab_deck_editor.cpp" line="629"/>
         <source>Analyze deck (deckstats.net)</source>
         <translation>分析卡组（deckstats.net）</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="632"/>
+        <location filename="../src/tab_deck_editor.cpp" line="630"/>
         <source>Analyze deck (tappedout.net)</source>
         <translation>分析卡组（tappedout.net）</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="634"/>
+        <location filename="../src/tab_deck_editor.cpp" line="632"/>
         <source>&amp;Close</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="636"/>
+        <location filename="../src/tab_deck_editor.cpp" line="634"/>
         <source>Add card to &amp;maindeck</source>
         <translation>添加卡牌到主要套牌</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="637"/>
+        <location filename="../src/tab_deck_editor.cpp" line="635"/>
         <source>Add card to &amp;sideboard</source>
         <translation>添加卡牌到备牌</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="639"/>
+        <location filename="../src/tab_deck_editor.cpp" line="637"/>
         <source>&amp;Remove row</source>
         <translation>移除卡牌</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="641"/>
+        <location filename="../src/tab_deck_editor.cpp" line="639"/>
         <source>&amp;Increment number</source>
         <translation>添加卡牌张数</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="643"/>
+        <location filename="../src/tab_deck_editor.cpp" line="641"/>
         <source>&amp;Decrement number</source>
         <translation>减少卡牌张数</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="645"/>
+        <location filename="../src/tab_deck_editor.cpp" line="643"/>
         <source>&amp;Deck Editor</source>
         <translation>套牌编辑</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="647"/>
-        <location filename="../src/tab_deck_editor.cpp" line="652"/>
+        <location filename="../src/tab_deck_editor.cpp" line="645"/>
+        <location filename="../src/tab_deck_editor.cpp" line="650"/>
         <source>Card Info</source>
         <translation>卡牌信息</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="648"/>
-        <location filename="../src/tab_deck_editor.cpp" line="653"/>
+        <location filename="../src/tab_deck_editor.cpp" line="646"/>
+        <location filename="../src/tab_deck_editor.cpp" line="651"/>
         <source>Deck</source>
         <translation>套牌</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="649"/>
-        <location filename="../src/tab_deck_editor.cpp" line="654"/>
+        <location filename="../src/tab_deck_editor.cpp" line="647"/>
+        <location filename="../src/tab_deck_editor.cpp" line="652"/>
         <source>Filters</source>
         <translation>过滤器</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="651"/>
+        <location filename="../src/tab_deck_editor.cpp" line="649"/>
         <source>&amp;View</source>
         <translation>视图</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="656"/>
-        <location filename="../src/tab_deck_editor.cpp" line="659"/>
-        <location filename="../src/tab_deck_editor.cpp" line="662"/>
+        <location filename="../src/tab_deck_editor.cpp" line="654"/>
+        <location filename="../src/tab_deck_editor.cpp" line="657"/>
+        <location filename="../src/tab_deck_editor.cpp" line="660"/>
         <source>Visible</source>
         <translation>可见</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="657"/>
-        <location filename="../src/tab_deck_editor.cpp" line="660"/>
-        <location filename="../src/tab_deck_editor.cpp" line="663"/>
+        <location filename="../src/tab_deck_editor.cpp" line="655"/>
+        <location filename="../src/tab_deck_editor.cpp" line="658"/>
+        <location filename="../src/tab_deck_editor.cpp" line="661"/>
         <source>Floating</source>
         <translation>移动窗口</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="665"/>
+        <location filename="../src/tab_deck_editor.cpp" line="663"/>
         <source>Reset layout</source>
         <translation>重置界面</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="670"/>
+        <location filename="../src/tab_deck_editor.cpp" line="668"/>
         <source>Deck: %1</source>
         <translation>套牌: %1</translation>
     </message>
@@ -4589,44 +4896,44 @@ Do you want to save the changes?</source>
 你想要保存更改吗?</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="750"/>
+        <location filename="../src/tab_deck_editor.cpp" line="751"/>
         <source>Load deck</source>
         <translation>读取套牌</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="769"/>
-        <location filename="../src/tab_deck_editor.cpp" line="795"/>
-        <location filename="../src/tab_deck_editor.cpp" line="817"/>
-        <location filename="../src/tab_deck_editor.cpp" line="877"/>
-        <location filename="../src/tab_deck_editor.cpp" line="889"/>
+        <location filename="../src/tab_deck_editor.cpp" line="772"/>
+        <location filename="../src/tab_deck_editor.cpp" line="798"/>
+        <location filename="../src/tab_deck_editor.cpp" line="820"/>
+        <location filename="../src/tab_deck_editor.cpp" line="881"/>
+        <location filename="../src/tab_deck_editor.cpp" line="893"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="769"/>
+        <location filename="../src/tab_deck_editor.cpp" line="772"/>
         <source>The deck could not be saved.</source>
         <translation>未能保存套牌。</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="796"/>
-        <location filename="../src/tab_deck_editor.cpp" line="818"/>
+        <location filename="../src/tab_deck_editor.cpp" line="799"/>
+        <location filename="../src/tab_deck_editor.cpp" line="821"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation>套牌未能保存.
 请检查目录是否可用后再重试.</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="802"/>
+        <location filename="../src/tab_deck_editor.cpp" line="805"/>
         <source>Save deck</source>
         <translation>保存套牌</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="877"/>
+        <location filename="../src/tab_deck_editor.cpp" line="881"/>
         <source>There are no cards in your deck to be exported</source>
         <translation>你的卡组中没有卡可以导出</translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="889"/>
+        <location filename="../src/tab_deck_editor.cpp" line="893"/>
         <source>No deck was selected to be saved.</source>
         <translation>没有选择卡组用于保存</translation>
     </message>
@@ -5689,42 +5996,42 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="489"/>
+        <location filename="../src/dlg_settings.cpp" line="413"/>
         <source>General interface settings</source>
         <translation>通用接口设置</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="490"/>
+        <location filename="../src/dlg_settings.cpp" line="414"/>
         <source>Enable notifications in taskbar</source>
         <translation>开启任务栏提醒</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="491"/>
+        <location filename="../src/dlg_settings.cpp" line="415"/>
         <source>Notify in the taskbar for game events while you are spectating</source>
         <translation>观看时在任务栏提示游戏信息</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="492"/>
+        <location filename="../src/dlg_settings.cpp" line="416"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation>双击卡牌开始 (而不是单击开始)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="493"/>
+        <location filename="../src/dlg_settings.cpp" line="417"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
         <translation>默认将所有非地牌加入堆叠(不是战场)</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="494"/>
+        <location filename="../src/dlg_settings.cpp" line="418"/>
         <source>Annotate card text on tokens</source>
         <translation>用卡牌信息给衍生物标注</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="495"/>
+        <location filename="../src/dlg_settings.cpp" line="419"/>
         <source>Animation settings</source>
         <translation>动画设置</translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="496"/>
+        <location filename="../src/dlg_settings.cpp" line="420"/>
         <source>&amp;Tap/untap animation</source>
         <translation>横置/重置 动画</translation>
     </message>
@@ -5794,127 +6101,142 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>WndSets</name>
     <message>
-        <location filename="../src/window_sets.cpp" line="32"/>
+        <location filename="../src/window_sets.cpp" line="34"/>
         <source>Move selected set to the top</source>
         <translation>将选择的系列移到顶端</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="39"/>
+        <location filename="../src/window_sets.cpp" line="41"/>
         <source>Move selected set up</source>
         <translation>将选择的系列上移</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="46"/>
+        <location filename="../src/window_sets.cpp" line="48"/>
         <source>Move selected set down</source>
         <translation>将选择的系列下移</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="53"/>
+        <location filename="../src/window_sets.cpp" line="55"/>
         <source>Move selected set to the bottom</source>
         <translation>将选择的系列移到底部</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="61"/>
+        <location filename="../src/window_sets.cpp" line="63"/>
         <source>Search by set name, code, or type</source>
         <translation>通过系列名、代码或类型搜索</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="66"/>
+        <location filename="../src/window_sets.cpp" line="68"/>
         <source>Default order</source>
         <translation>默认顺序</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="67"/>
+        <location filename="../src/window_sets.cpp" line="69"/>
         <source>Restore original art priority order</source>
         <translation>恢复初始优先顺序</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="107"/>
+        <location filename="../src/window_sets.cpp" line="109"/>
         <source>Enable all sets</source>
         <translation>启用所有系列</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="108"/>
+        <location filename="../src/window_sets.cpp" line="110"/>
         <source>Disable all sets</source>
         <translation>禁用所有系列</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="109"/>
+        <location filename="../src/window_sets.cpp" line="111"/>
         <source>Enable selected set(s)</source>
         <translation>启用所选系列</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="110"/>
+        <location filename="../src/window_sets.cpp" line="112"/>
         <source>Disable selected set(s)</source>
         <translation>禁用所选系列</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="127"/>
+        <location filename="../src/window_sets.cpp" line="129"/>
         <source>Deck Editor</source>
         <translation>套牌编辑器</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="128"/>
+        <location filename="../src/window_sets.cpp" line="130"/>
         <source>Only cards in enabled sets will appear in the deck editor card list</source>
         <translation>套牌编辑器卡牌列表将只显示已启用卡组牌张</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="128"/>
+        <location filename="../src/window_sets.cpp" line="131"/>
         <source>Card Art</source>
         <translation>牌张风格</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="129"/>
+        <location filename="../src/window_sets.cpp" line="131"/>
         <source>Image priority is decided in the following order</source>
         <translation>图片使用的优先级由以下规则决定</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="129"/>
+        <location filename="../src/window_sets.cpp" line="131"/>
         <source>The</source>
         <translation>这个</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="133"/>
+        <location filename="../src/window_sets.cpp" line="134"/>
         <source>CUSTOM Folder</source>
         <translation>自定义文件夹</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="133"/>
+        <location filename="../src/window_sets.cpp" line="134"/>
         <source>Enabled Sets (Top to Bottom)</source>
         <translation>启用的系列(从上到下)</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="134"/>
+        <location filename="../src/window_sets.cpp" line="135"/>
         <source>Disabled Sets (Top to Bottom)</source>
         <translation>禁用的系列(从上到下)</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="139"/>
-        <source>Warning: </source>
-        <translation>警告：</translation>
+        <source>Hints</source>
+        <translation>提示</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="140"/>
-        <source>While the set list is sorted by any of the columns, custom art priority setting is disabled.</source>
-        <translation>虽然所有列以系列列表排序，但是自定义优先设置被禁用。</translation>
+        <location filename="../src/window_sets.cpp" line="142"/>
+        <source>Note</source>
+        <translation>注</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="141"/>
-        <source>To disable sorting click on the same column header again until this message disappears.</source>
-        <translation>若要禁用排序，请再次单击同一列标题，直到该消息消失为止。</translation>
+        <location filename="../src/window_sets.cpp" line="146"/>
+        <source>Sorting by column allows you to find a set while not changing set priority.</source>
+        <translation>按列排序允许您在不更改设置优先级的情况下查找系列。</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="170"/>
+        <location filename="../src/window_sets.cpp" line="147"/>
+        <source>To enable ordering again, click the column header until this message disappears.</source>
+        <translation>要再次启用排序，请单击列标题，直到此消息消失。</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="150"/>
+        <source>Use the current sorting as the set priority instead</source>
+        <translation>使用当前设置的优先级排序</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="151"/>
+        <source>Sorts the set priority using the same column</source>
+        <translation>使用同一列设置的优先级排序</translation>
+    </message>
+    <message>
+        <location filename="../src/window_sets.cpp" line="183"/>
         <source>Manage sets</source>
         <translation>系列管理</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="204"/>
+        <location filename="../src/window_sets.cpp" line="217"/>
         <source>Success</source>
         <translation>成功</translation>
     </message>
     <message>
-        <location filename="../src/window_sets.cpp" line="204"/>
+        <location filename="../src/window_sets.cpp" line="217"/>
         <source>The sets database has been saved successfully.</source>
         <translation>系列数据库已保存。</translation>
     </message>
@@ -5953,635 +6275,674 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>shortcutsTab</name>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1742"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1825"/>
         <source>Main Window</source>
         <translation>主窗口</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1743"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1826"/>
         <source>Deck editor</source>
         <translation>套牌编辑器</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1744"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1827"/>
         <source>Local gameplay</source>
         <translation>本地游戏</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1745"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1828"/>
         <source>Watch replay</source>
         <translation>观看录像</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1746"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1829"/>
         <source>Connect</source>
         <translation>连接</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1747"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1830"/>
         <source>Register</source>
         <translation>注册</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1748"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1831"/>
         <source>Full screen</source>
         <translation>全屏</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1749"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1832"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1750"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1833"/>
         <source>Check for card updates</source>
         <translation>检查卡牌更新</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1751"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1834"/>
         <source>Disconnect</source>
         <translation>断开连接</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1752"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1835"/>
         <source>Exit</source>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1753"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1836"/>
         <source>Deck Editor</source>
         <translation>套牌编辑</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1754"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1837"/>
         <source>Analyze deck</source>
         <translation>分析套牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1756"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1839"/>
         <source>Load deck (clipboard)</source>
         <translation>载入套牌(从剪贴板)</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1757"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1840"/>
         <source>Clear all filters</source>
         <translation>清除所有筛选项目</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1758"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1841"/>
         <source>New deck</source>
         <translation>创建新套牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1759"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1842"/>
         <source>Clear selected filter</source>
         <translation>清除所选的筛选项目</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1761"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1844"/>
         <source>Open custom pic folder</source>
         <translation>打开自定义图片文件夹</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1762"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1845"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1763"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1846"/>
         <source>Print deck</source>
         <translation>打印套牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1765"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1848"/>
         <source>Delete card</source>
         <translation>删除卡牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1766"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1849"/>
         <source>Edit tokens</source>
         <translation>编辑衍生物...</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1767"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1850"/>
         <source>Reset layout</source>
         <translation>重置界面</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1768"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1851"/>
         <source>Add card</source>
         <translation>添加卡牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1769"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1852"/>
         <source>Save deck</source>
         <translation>保存套牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1771"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1854"/>
         <source>Remove card</source>
         <translation>移除卡牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1772"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1855"/>
         <source>Save deck as</source>
         <translation>另存为套牌...</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1773"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1856"/>
         <source>Load deck</source>
         <translation>读取套牌...</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1777"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1904"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1860"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1994"/>
         <source>Counters</source>
         <translation>指示物</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1778"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1861"/>
         <source>Life</source>
         <translation>生命值</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1779"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1783"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1787"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1791"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1796"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1800"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1804"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1808"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1812"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1816"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1820"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1824"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1833"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1862"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1866"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1870"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1874"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1879"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1883"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1887"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1891"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1895"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1899"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1903"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1907"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1917"/>
         <source>Set</source>
         <translation>系列</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1780"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1784"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1788"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1792"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1797"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1801"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1805"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1809"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1813"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1817"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1821"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1825"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1863"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1867"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1871"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1875"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1880"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1884"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1888"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1892"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1896"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1900"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1904"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1908"/>
         <source>Add</source>
         <translation>添加</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1781"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1785"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1789"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1793"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1798"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1802"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1806"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1810"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1814"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1818"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1822"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1826"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1864"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1868"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1872"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1876"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1881"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1885"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1889"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1893"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1897"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1901"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1905"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1909"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1782"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1865"/>
         <source>Red</source>
         <translation>红</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1786"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1869"/>
         <source>Green</source>
         <translation>绿</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1790"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1873"/>
         <source>Yellow</source>
         <translation>黄</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1795"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1878"/>
         <source>Storm</source>
         <translation>风暴</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1799"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1882"/>
         <source>W</source>
         <translation>白</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1803"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1886"/>
         <source>U</source>
         <translation>蓝</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1807"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1890"/>
         <source>B</source>
         <translation>黑</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1811"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1894"/>
         <source>R</source>
         <translation>红</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1815"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1898"/>
         <source>G</source>
         <translation>绿</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1819"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1902"/>
         <source>X</source>
         <translation>可变法术力</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1828"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1911"/>
         <source>Main Window | Deck Editor</source>
         <translation>主窗口 | 套牌编辑器</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1829"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1912"/>
         <source>Power / Toughness</source>
         <translation>力量/防御力</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1830"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1913"/>
         <source>Power and Toughness</source>
         <translation>力量和防御力</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1831"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1914"/>
         <source>Add (+1/+1)</source>
         <translation>添加 (+1/+1)</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1832"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1915"/>
         <source>Remove (-1/-1)</source>
         <translation>移除 (-1/-1)</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1834"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1916"/>
+        <source>Reset</source>
+        <translation>重置</translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1918"/>
         <source>Toughness</source>
         <translation>防御力</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1835"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1919"/>
         <source>Remove (-0/-1)</source>
         <translation>移除 (-1/-0)</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1836"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1920"/>
         <source>Add (+0/+1)</source>
         <translation>添加 (+0/+1)</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1837"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1921"/>
         <source>Power</source>
         <translation>力量</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1838"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1922"/>
         <source>Remove (-1/-0)</source>
         <translation>移除 (-1/-0)</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1839"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1923"/>
         <source>Add (+1/+0)</source>
         <translation>添加 (+1/+0)</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1840"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1924"/>
         <source>Game Phases</source>
         <translation>游戏阶段</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1841"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1925"/>
         <source>Untap</source>
         <translation>重置</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1842"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1926"/>
         <source>Upkeep</source>
         <translation>维持</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1843"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1896"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1927"/>
         <source>Draw</source>
         <translation>抓</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1844"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1928"/>
         <source>Main 1</source>
         <translation>主要阶段1</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1845"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1929"/>
         <source>Start combat</source>
         <translation>开始战斗</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1846"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1930"/>
         <source>Attack</source>
         <translation>攻击</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1847"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1931"/>
         <source>Block</source>
         <translation>阻挡</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1848"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1932"/>
         <source>Damage</source>
         <translation>伤害</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1849"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1933"/>
         <source>End combat</source>
         <translation>结束战斗</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1850"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1934"/>
         <source>Main 2</source>
         <translation>主要阶段2</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1851"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1935"/>
         <source>End</source>
         <translation>回合结束</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1852"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1936"/>
         <source>Next phase</source>
         <translation>下个阶段</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1853"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1937"/>
         <source>Next turn</source>
         <translation>下个回合</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1854"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1938"/>
         <source>Playing Area</source>
         <translation>游戏区域</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1764"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1955"/>
+        <source>Move selected card to</source>
+        <translation>将选择的牌移到</translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1965"/>
+        <source>Top cards of library</source>
+        <translation>牌库顶牌</translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1993"/>
+        <source>Gameplay | Draw | Move | View</source>
+        <translation>游戏｜抓牌｜移动｜视图</translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1847"/>
         <source>Manage sets</source>
         <translation>系列管理</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1770"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1853"/>
         <source>Export deck</source>
         <translation>导出卡组</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1774"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1857"/>
         <source>Save deck (clip)</source>
         <translation>保存卡组（剪切板）</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1776"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1859"/>
         <source>Save deck (clip; no annotations)</source>
         <translation>保存卡组（剪切板，没有注释）</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1855"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1939"/>
         <source>Tap / Untap Card</source>
         <translation>横置/重置卡牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1856"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1940"/>
         <source>Untap all</source>
         <translation>重置所有</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1857"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1941"/>
         <source>Toggle untap</source>
         <translation>锁定重置状态</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1858"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1942"/>
         <source>Flip card</source>
         <translation>翻转卡牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1859"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1943"/>
         <source>Peek card</source>
         <translation>查看卡牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1860"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1944"/>
         <source>Play card</source>
         <translation>使用卡牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1861"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1945"/>
         <source>Attach card</source>
         <translation>结附卡牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1862"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1946"/>
         <source>Unattach card</source>
         <translation>取消结附</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1863"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1947"/>
         <source>Clone card</source>
         <translation>复制卡牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1864"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1948"/>
         <source>Create token</source>
         <translation>创造一个衍生物...</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1866"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1950"/>
         <source>Create all related tokens</source>
         <translation>创造所有相关的衍生物</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1867"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1951"/>
         <source>Create another token</source>
         <translation>创造另一个衍生物</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1868"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1952"/>
         <source>Set annotation</source>
         <translation>设置注释</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1870"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1954"/>
         <source>Phases | P/T | Playing Area</source>
         <translation>阶段 | 力/防 | 游戏区域</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1871"/>
-        <source>Move card to</source>
-        <translation>将卡移到</translation>
-    </message>
-    <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1872"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1956"/>
         <source>Bottom library</source>
         <translation>牌库底</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1873"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1957"/>
         <source>Top library</source>
         <translation>牌库顶</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1874"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1878"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1958"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1963"/>
         <source>Graveyard</source>
         <translation>坟墓场</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1875"/>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1882"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1959"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1967"/>
         <source>Exile</source>
         <translation>放逐区</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1876"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1960"/>
         <source>Hand</source>
         <translation>手牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1877"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1961"/>
+        <source>Play face down</source>
+        <translation>面朝下使用</translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1962"/>
         <source>View</source>
         <translation>查看</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1879"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1964"/>
         <source>Library</source>
         <translation>牌库</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1880"/>
-        <source>Tops card of library</source>
-        <translation>牌库顶的卡牌</translation>
-    </message>
-    <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1881"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1966"/>
         <source>Sideboard</source>
         <translation>备牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1883"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1968"/>
         <source>Close recent view</source>
         <translation>关闭最近的查看</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1884"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1969"/>
+        <source>Move top card to</source>
+        <translation>将牌库顶牌移到</translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1970"/>
+        <source>Graveyard Once</source>
+        <translation>一个坟场</translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1971"/>
+        <source>Graveyard Multiple</source>
+        <translation>多个坟场</translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1972"/>
+        <source>Exile Once</source>
+        <translation>一个放逐区</translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1973"/>
+        <source>Exile Multiple</source>
+        <translation>多个放逐区</translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1974"/>
         <source>Game Lobby</source>
         <translation>游戏大厅</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1885"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1975"/>
         <source>Load remote deck</source>
         <translation>载入服务器上的套牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1886"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1976"/>
         <source>Load local deck</source>
         <translation>从本地载入套牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1887"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1977"/>
         <source>Gameplay</source>
         <translation>游戏</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1888"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1978"/>
         <source>Draw arrow</source>
         <translation>划箭头...</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1889"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1979"/>
         <source>Leave game</source>
         <translation>离开游戏</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1890"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1980"/>
         <source>Remove local arrows</source>
         <translation>移除本地箭头</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1891"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1981"/>
         <source>Concede</source>
         <translation>放弃游戏</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1892"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1982"/>
         <source>Roll dice</source>
         <translation>抛骰子</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1893"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1983"/>
         <source>Rotate view CW</source>
         <translation>顺时针旋转视角</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1894"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1984"/>
         <source>Shuffle library</source>
         <translation>切洗套牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1895"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1985"/>
         <source>Rotate view CCW</source>
         <translation>逆时针旋转视角</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1897"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1986"/>
+        <source>Drawing</source>
+        <translation>绘制</translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1987"/>
         <source>Mulligan</source>
         <translation>起手牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1898"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1988"/>
         <source>Draw card</source>
         <translation>抓牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1899"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1989"/>
         <source>Draw cards</source>
         <translation>抓牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1900"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1990"/>
         <source>Undo draw</source>
         <translation>撤销抓牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1901"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1991"/>
         <source>Always reveal top card</source>
         <translation>一直展示牌库顶牌</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1903"/>
-        <source>Draw | Move | View | Gameplay</source>
-        <translation>抓牌｜移动｜查看｜游戏</translation>
-    </message>
-    <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1907"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1997"/>
         <source>How to set custom shortcuts</source>
         <translation>如何设置自定义快捷键</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1908"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1998"/>
         <source>Restore all default shortcuts</source>
         <translation>恢复所有默认快捷键</translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1909"/>
+        <location filename="../src/sequenceEdit/ui_shortcutstab.h" line="1999"/>
         <source>Clear all shortcuts</source>
         <translation>清除所有快捷键</translation>
     </message>
