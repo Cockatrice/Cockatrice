@@ -2,6 +2,7 @@
 #define REPLAY_TIMELINE_WIDGET
 
 #include <QList>
+#include <QMouseEvent>
 #include <QWidget>
 
 class QPaintEvent;
@@ -13,6 +14,7 @@ class ReplayTimelineWidget : public QWidget
 signals:
     void processNextEvent();
     void replayFinished();
+    void rewound();
 
 private:
     QTimer *replayTimer;
@@ -27,10 +29,10 @@ private slots:
     void replayTimerTimeout();
 
 public:
-    ReplayTimelineWidget(QWidget *parent = 0);
+    explicit ReplayTimelineWidget(QWidget *parent = nullptr);
     void setTimeline(const QList<int> &_replayTimeline);
-    QSize sizeHint() const;
-    QSize minimumSizeHint() const;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
     void setTimeScaleFactor(qreal _timeScaleFactor);
     int getCurrentEvent() const
     {
@@ -41,7 +43,8 @@ public slots:
     void stopReplay();
 
 protected:
-    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 };
 
 #endif

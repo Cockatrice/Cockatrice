@@ -22,12 +22,12 @@ void ReplayTimelineWidget::setTimeline(const QList<int> &_replayTimeline)
     histogram.clear();
     int binEndTime = binLength - 1;
     int binValue = 0;
-    for (int i = 0; i < replayTimeline.size(); ++i) {
-        if (replayTimeline[i] > binEndTime) {
+    for (int i : replayTimeline) {
+        if (i > binEndTime) {
             histogram.append(binValue);
             if (binValue > maxBinValue)
                 maxBinValue = binValue;
-            while (replayTimeline[i] > binEndTime + binLength) {
+            while (i > binEndTime + binLength) {
                 histogram.append(0);
                 binEndTime += binLength;
             }
@@ -59,17 +59,30 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
 
     const QColor barColor = QColor::fromHsv(120, 255, 255, 100);
     quint64 w = (quint64)(width() - 1) * (quint64)currentTime / maxTime;
-    painter.fillRect(0, 0, w, height() - 1, barColor);
+    painter.fillRect(0, 0, static_cast<int>(w), height() - 1, barColor);
+}
+
+void ReplayTimelineWidget::mousePressEvent(QMouseEvent *event)
+{
+    int newTime = static_cast<int>((long)maxTime * (long)event->x() / width());
+    if (newTime < currentTime) {
+        currentTime = 0;
+        currentEvent = 0;
+        emit rewound();
+    }
+    currentTime = newTime - 200; // 200 is added back in replayTimerTimeout
+    replayTimerTimeout();
+    update();
 }
 
 QSize ReplayTimelineWidget::sizeHint() const
 {
-    return QSize(-1, 50);
+    return {-1, 50};
 }
 
 QSize ReplayTimelineWidget::minimumSizeHint() const
 {
-    return QSize(400, 50);
+    return {400, 50};
 }
 
 void ReplayTimelineWidget::replayTimerTimeout()
@@ -91,12 +104,12 @@ void ReplayTimelineWidget::replayTimerTimeout()
 void ReplayTimelineWidget::setTimeScaleFactor(qreal _timeScaleFactor)
 {
     timeScaleFactor = _timeScaleFactor;
-    replayTimer->setInterval(200 / timeScaleFactor);
+    replayTimer->setInterval(static_cast<int>(200 / timeScaleFactor));
 }
 
 void ReplayTimelineWidget::startReplay()
 {
-    replayTimer->start(200 / timeScaleFactor);
+    replayTimer->start(static_cast<int>(200 / timeScaleFactor));
 }
 
 void ReplayTimelineWidget::stopReplay()

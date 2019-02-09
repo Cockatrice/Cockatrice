@@ -1604,6 +1604,7 @@ void TabGame::createReplayDock()
     timelineWidget->setTimeline(replayTimeline);
     connect(timelineWidget, SIGNAL(processNextEvent()), this, SLOT(replayNextEvent()));
     connect(timelineWidget, SIGNAL(replayFinished()), this, SLOT(replayFinished()));
+    connect(timelineWidget, &ReplayTimelineWidget::rewound, messageLog, &ChatView::clearChat);
 
     replayStartButton = new QToolButton;
     replayStartButton->setIconSize(QSize(32, 32));
