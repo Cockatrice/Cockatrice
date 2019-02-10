@@ -10,6 +10,7 @@
 
 #define SETTINGSCACHE_H
 
+
 class CardDatabaseSettings
 {
 public:
@@ -39,6 +40,8 @@ public:
 signals:
     void cardDatabasePathChanged();
 };
+
+extern SettingsCache *settingsCache;
 
 #define PICTURELOADER_H
 
