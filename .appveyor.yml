@@ -18,7 +18,7 @@ skip_commits:
     - LICENSE
 
 skip_branch_with_pr: true
-
+ 
 clone_depth: 15
 
 image: Visual Studio 2017
