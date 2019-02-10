@@ -355,7 +355,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
 {
     // Disallow controller change to other zones than the table.
     if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) &&
-        (startzone->getPlayer() != targetzone->getPlayer()))
+        (startzone->getPlayer() != targetzone->getPlayer()) && !judge)
         return Response::RespContextError;
 
     if (!targetzone->hasCoords() && (x <= -1))
@@ -1008,7 +1008,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
     if (!startZone)
         return Response::RespNameNotFound;
 
-    if ((startPlayer != this) && (!startZone->getPlayersWithWritePermission().contains(playerId)))
+    if ((startPlayer != this) && (!startZone->getPlayersWithWritePermission().contains(playerId)) && !judge)
         return Response::RespContextError;
 
     Server_Player *targetPlayer = game->getPlayers().value(cmd.target_player_id());
@@ -1018,7 +1018,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
     if (!targetZone)
         return Response::RespNameNotFound;
 
-    if ((startPlayer != this) && (targetPlayer != this))
+    if ((startPlayer != this) && (targetPlayer != this) && !judge)
         return Response::RespContextError;
 
     QList<const CardToMove *> cardsToMove;

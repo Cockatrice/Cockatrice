@@ -762,6 +762,11 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
         if (room->getGamesCreatedByUser(QString::fromStdString(userInfo->name())) >= server->getMaxGamesPerUser())
             return Response::RespContextError;
 
+    if (cmd.join_as_judge() && !server->permitCreateGameAsJudge() &&
+        !(userInfo->user_level() & ServerInfo_User::IsJudge)) {
+        return Response::RespContextError;
+    }
+
     QList<int> gameTypes;
     for (int i = cmd.game_type_ids_size() - 1; i >= 0; --i)
         gameTypes.append(cmd.game_type_ids(i));
@@ -776,6 +781,7 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
         copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes,
         cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(),
         cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
+
     game->addPlayer(this, rc, false, cmd.join_as_judge(), false);
     room->addGame(game);
 

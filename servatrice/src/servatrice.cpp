@@ -950,6 +950,11 @@ int Servatrice::getNumberOfTCPPools() const
     return settingsCache->value("server/number_pools", 1).toInt();
 }
 
+bool Servatrice::permitCreateGameAsJudge() const
+{
+    return settingsCache->value("game/allow_create_as_judge", false).toBool();
+}
+
 QHostAddress Servatrice::getServerTCPHost() const
 {
     QString host = settingsCache->value("server/host", "any").toString();

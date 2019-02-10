@@ -404,7 +404,7 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
                 return Response::RespContextError;
     }
 
-    if (asJudge && !(user->user_level() & ServerInfo_User::IsModerator)) {
+    if (asJudge && !(user->user_level() & ServerInfo_User::IsJudge)) {
         return Response::RespUserLevelTooLow;
     }
     if (!(overrideRestrictions && (user->user_level() & ServerInfo_User::IsModerator))) {
