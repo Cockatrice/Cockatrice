@@ -34,6 +34,7 @@ message Command_AdjustMod {
         optional Command_AdjustMod ext = 1003;
     }
     required string user_name = 1;
-    required bool should_be_mod = 2;
+    optional bool should_be_mod = 2;
+    optional bool should_be_judge = 3;
 }
 

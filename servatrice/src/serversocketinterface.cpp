@@ -1415,57 +1415,88 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReloadConfig(const Comm
     return Response::RespOk;
 }
 
+bool AbstractServerSocketInterface::addAdminFlagToUser(const QString &userName, int flag)
+{
+    QSqlQuery *query =
+        sqlInterface->prepareQuery("update {prefix}_users set admin = (admin | :adminlevel) where name = :username");
+    query->bindValue(":adminlevel", flag);
+    query->bindValue(":username", userName);
+    if (!sqlInterface->execSqlQuery(query)) {
+        logger->logMessage(
+            QString::fromStdString("Failed to promote user %1: %2").arg(userName).arg(query->lastError().text()));
+        return false;
+    }
+
+    AbstractServerSocketInterface *user =
+        static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
+    if (user) {
+        Event_NotifyUser event;
+        event.set_type(Event_NotifyUser::PROMOTED);
+        SessionEvent *se = user->prepareSessionEvent(event);
+        user->sendProtocolItem(*se);
+        delete se;
+    }
+
+    return true;
+}
+
+bool AbstractServerSocketInterface::removeAdminFlagFromUser(const QString &userName, int flag)
+{
+    QSqlQuery *query =
+        sqlInterface->prepareQuery("update {prefix}_users set admin = (admin & ~ :adminlevel) where name = :username");
+    query->bindValue(":adminlevel", flag);
+    query->bindValue(":username", userName);
+    if (!sqlInterface->execSqlQuery(query)) {
+        logger->logMessage(
+            QString::fromStdString("Failed to demote user %1: %2").arg(userName).arg(query->lastError().text()));
+        return false;
+    }
+
+    AbstractServerSocketInterface *user =
+        static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
+    if (user) {
+        Event_ConnectionClosed event;
+        event.set_reason(Event_ConnectionClosed::DEMOTED);
+        event.set_reason_str("Your moderator status has been revoked.");
+        event.set_end_time(QDateTime::currentDateTime().toTime_t());
+
+        SessionEvent *se = user->prepareSessionEvent(event);
+        user->sendProtocolItem(*se);
+        delete se;
+    }
+
+    QMetaObject::invokeMethod(user, "prepareDestroy", Qt::QueuedConnection);
+    return true;
+}
+
 Response::ResponseCode AbstractServerSocketInterface::cmdAdjustMod(const Command_AdjustMod &cmd,
                                                                    ResponseContainer & /*rc*/)
 {
 
     QString userName = QString::fromStdString(cmd.user_name());
 
-    if (cmd.should_be_mod()) {
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("update {prefix}_users set admin = :adminlevel where name = :username");
-        query->bindValue(":adminlevel", 2);
-        query->bindValue(":username", userName);
-        if (!sqlInterface->execSqlQuery(query)) {
-            logger->logMessage(
-                QString::fromStdString("Failed to promote user %1: %2").arg(userName).arg(query->lastError().text()));
-            return Response::RespInternalError;
+    if (cmd.has_should_be_mod()) {
+        if (cmd.should_be_mod()) {
+            if (!addAdminFlagToUser(userName, 2)) {
+                return Response::RespInternalError;
+            }
+        } else {
+            if (!removeAdminFlagFromUser(userName, 2)) {
+                return Response::RespInternalError;
+            }
         }
+    }
 
-        AbstractServerSocketInterface *user =
-            static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
-        if (user) {
-            Event_NotifyUser event;
-            event.set_type(Event_NotifyUser::PROMOTED);
-            SessionEvent *se = user->prepareSessionEvent(event);
-            user->sendProtocolItem(*se);
-            delete se;
+    if (cmd.has_should_be_judge()) {
+        if (cmd.should_be_judge()) {
+            if (!addAdminFlagToUser(userName, 4)) {
+                return Response::RespInternalError;
+            }
+        } else {
+            if (!removeAdminFlagFromUser(userName, 4)) {
+                return Response::RespInternalError;
+            }
         }
-    } else {
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("update {prefix}_users set admin = :adminlevel where name = :username");
-        query->bindValue(":adminlevel", 0);
-        query->bindValue(":username", userName);
-        if (!sqlInterface->execSqlQuery(query)) {
-            logger->logMessage(
-                QString::fromStdString("Failed to demote user %1: %2").arg(userName).arg(query->lastError().text()));
-            return Response::RespInternalError;
-        }
-
-        AbstractServerSocketInterface *user =
-            static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
-        if (user) {
-            Event_ConnectionClosed event;
-            event.set_reason(Event_ConnectionClosed::DEMOTED);
-            event.set_reason_str("Your moderator status has been revoked.");
-            event.set_end_time(QDateTime::currentDateTime().toTime_t());
-
-            SessionEvent *se = user->prepareSessionEvent(event);
-            user->sendProtocolItem(*se);
-            delete se;
-        }
-
-        QMetaObject::invokeMethod(user, "prepareDestroy", Qt::QueuedConnection);
     }
 
     return Response::RespOk;

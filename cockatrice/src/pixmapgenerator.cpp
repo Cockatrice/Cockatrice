@@ -143,6 +143,14 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
 
     QPixmap pixmap = QPixmap("theme:userlevels/" + levelString)
                          .scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    if (userLevel.testFlag(ServerInfo_User::IsJudge)) {
+        QPainter painter(&pixmap);
+        QImage gavel = QImage("theme:icons/gavel")
+                           .scaled(height * 0.75, height * 0.75, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        painter.drawImage(0, pixmap.height() - gavel.height(), gavel);
+    }
+
     pmCache.insert(key, pixmap);
     return pixmap;
 }
