@@ -1,6 +1,9 @@
 language: cpp
 compiler: gcc
 
+git:
+  depth: 15
+
 matrix:
   include:
   #Ubuntu Xenial (Debug only)
