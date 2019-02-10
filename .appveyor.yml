@@ -75,7 +75,7 @@ deploy:
 # Deploy configuration for "beta" releases
   - provider: GitHub
     auth_token:
-      secure: p+7wPVry2XEa6TBm9XH8IaQZbBmXQ/J2ldbGmcIxUZD3NkkPrSRRlmE7Of1CBBIO
+      secure: z8Xh1lSCYtvs0SUfhOK6AijCFk0Rgf5jAxu7QvBByR42NG1SxFHPOmyrOllkfy1u
     tag: "$(APPVEYOR_REPO_TAG_NAME)"
     release: "Cockatrice $(APPVEYOR_REPO_TAG_NAME)"
     description: "Beta release of Cockatrice"
@@ -90,7 +90,7 @@ deploy:
 # Deploy configuration for "stable" releases
   - provider: GitHub
     auth_token:
-       secure: p+7wPVry2XEa6TBm9XH8IaQZbBmXQ/J2ldbGmcIxUZD3NkkPrSRRlmE7Of1CBBIO
+       secure: z8Xh1lSCYtvs0SUfhOK6AijCFk0Rgf5jAxu7QvBByR42NG1SxFHPOmyrOllkfy1u
     tag: "$(APPVEYOR_REPO_TAG_NAME)"
     release: "Cockatrice $(APPVEYOR_REPO_TAG_NAME)"
     artifact: /.*\.exe/
