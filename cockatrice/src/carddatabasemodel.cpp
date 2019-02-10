@@ -143,11 +143,15 @@ void CardDatabaseModel::cardRemoved(CardInfoPtr card)
     endRemoveRows();
 }
 
-CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent) : QSortFilterProxyModel(parent), isToken(ShowAll)
+CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
+    : QSortFilterProxyModel(parent), isToken(ShowAll), filterString(nullptr)
 {
     filterTree = nullptr;
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setSortCaseSensitivity(Qt::CaseInsensitive);
+
+    dirtyTimer.setSingleShot(true);
+    connect(&dirtyTimer, &QTimer::timeout, this, &CardDatabaseDisplayModel::invalidate);
 
     loadedRowCount = 0;
 }
@@ -284,6 +288,10 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 
     if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
         return false;
+
+    if (filterString != nullptr) {
+        return filterString->check(info);
+    }
 
     return rowMatchesCardName(info);
 }
