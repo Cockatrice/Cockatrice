@@ -852,7 +852,7 @@ Server_Player::cmdShuffle(const Command_Shuffle &cmd, ResponseContainer & /*rc*/
     if (conceded)
         return Response::RespContextError;
 
-    if (cmd.zone_name() != "deck")
+    if (cmd.has_zone_name() && cmd.zone_name() != "deck")
         return Response::RespFunctionNotAllowed;
 
     Server_CardZone *zone = zones.value("deck");
