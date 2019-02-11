@@ -791,9 +791,12 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
         const auto eventType = static_cast<GameEvent::GameEventType>(getPbExtension(event));
 
         if (cont.has_forced_by_judge()) {
-            Player *judge = players.value(cont.forced_by_judge(), 0);
-            if (judge) {
-                messageLog->logForcedByJudge(judge);
+            auto id = cont.forced_by_judge();
+            Player *judgep = players.value(id, 0);
+            if (judgep) {
+                messageLog->setContextJudgeName(judgep->getName());
+            } else if (spectators.contains(id)) {
+                messageLog->setContextJudgeName(QString::fromStdString(spectators.value(id).name()));
             }
         }
 

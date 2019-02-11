@@ -121,9 +121,11 @@ MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, boo
 
 void MessageLogWidget::containerProcessingDone()
 {
+
     if (currentContext == MessageContext_MoveCard) {
         for (auto &i : moveCardQueue)
             logDoMoveCard(i);
+
         moveCardQueue.clear();
         moveCardTapped.clear();
         moveCardExtras.clear();
@@ -134,6 +136,7 @@ void MessageLogWidget::containerProcessingDone()
     }
 
     currentContext = MessageContext_None;
+    messageSuffix = QString();
 }
 
 void MessageLogWidget::containerProcessingStarted(const GameEventContext &context)
@@ -815,9 +818,15 @@ void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
                 .arg(QString("<a href=\"card://%1\">%2</a>").arg(sanitizeHtml(cardName)).arg(sanitizeHtml(cardName))));
 }
 
-void MessageLogWidget::logForcedByJudge(Player *player)
+void MessageLogWidget::setContextJudgeName(QString name)
 {
-    appendHtmlServerMessage(tr("%1 compelled a player to act.").arg(sanitizeHtml(player->getName())));
+    messageSuffix = QString(" &nbsp; [<img height=12 src=\"theme:icons/gavel\"> %1]").arg(sanitizeHtml(name));
+}
+
+void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optionalIsBold, QString optionalFontColor)
+{
+
+    ChatView::appendHtmlServerMessage(html + messageSuffix, optionalIsBold, optionalFontColor);
 }
 
 void MessageLogWidget::connectToPlayer(Player *player)

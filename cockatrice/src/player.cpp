@@ -2854,7 +2854,7 @@ void Player::refreshShortcuts()
 void Player::updateCardMenu(const CardItem *card)
 {
     // If bad card OR is a spectator (as spectators don't need card menus), return
-    if (card == nullptr || game->isSpectator()) {
+    if (card == nullptr || (game->isSpectator() && !judge)) {
         return;
     }
 
@@ -2865,7 +2865,7 @@ void Player::updateCardMenu(const CardItem *card)
     cardMenu->clear();
 
     bool revealedCard = false;
-    bool writeableCard = getLocal();
+    bool writeableCard = getLocalOrJudge();
     if (card->getZone() && card->getZone()->getIsView()) {
         auto *view = dynamic_cast<ZoneViewZone *>(card->getZone());
         if (view->getRevealZone()) {
