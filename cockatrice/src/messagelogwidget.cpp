@@ -125,8 +125,8 @@ void MessageLogWidget::containerProcessingDone()
         for (auto &i : moveCardQueue)
             logDoMoveCard(i);
         moveCardQueue.clear();
-        moveCardPT.clear();
         moveCardTapped.clear();
+        moveCardExtras.clear();
     } else if (currentContext == MessageContext_Mulligan) {
         logMulligan(mulliganPlayer, mulliganNumber);
         mulliganPlayer = nullptr;
@@ -318,13 +318,15 @@ void MessageLogWidget::logDoMoveCard(LogMoveCard &lmc)
     else if (targetZone == handConstant())
         finalStr = tr("%1 moves %2%3 to their hand.");
     else if (targetZone == deckConstant()) {
-        if (lmc.newX == -1)
+        if (moveCardExtras.contains("shuffle_partial")) {
+            finalStr = tr("%1 puts %2%3 on bottom of their library randomly.");
+        } else if (lmc.newX == -1) {
             finalStr = tr("%1 puts %2%3 into their library.");
-        else if (lmc.newX == lmc.targetZone->getCards().size() - 1)
+        } else if (lmc.newX == lmc.targetZone->getCards().size() - 1) {
             finalStr = tr("%1 puts %2%3 on bottom of their library.");
-        else if (lmc.newX == 0)
+        } else if (lmc.newX == 0) {
             finalStr = tr("%1 puts %2%3 on top of their library.");
-        else {
+        } else {
             lmc.newX++;
             usesNewX = true;
             finalStr = tr("%1 puts %2%3 into their library %4 cards from the top.");
@@ -698,20 +700,20 @@ void MessageLogWidget::logSetDoesntUntap(Player *player, CardItem *card, bool do
 void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
 {
     if (currentContext == MessageContext_MoveCard) {
-        moveCardPT.insert(card, newPT);
+        return;
+    }
+
+    QString name = card->getName();
+    if (name.isEmpty()) {
+        name = QString("<font color=\"blue\">card #%1</font>").arg(sanitizeHtml(QString::number(card->getId())));
     } else {
-        QString name = card->getName();
-        if (name.isEmpty()) {
-            name = QString("<font color=\"blue\">card #%1</font>").arg(sanitizeHtml(QString::number(card->getId())));
-        } else {
-            name = cardLink(name);
-        }
-        if (newPT.isEmpty()) {
-            appendHtmlServerMessage(tr("%1 removes the PT of %2.").arg(sanitizeHtml(player->getName())).arg(name));
-        } else {
-            appendHtmlServerMessage(
-                tr("%1 sets PT of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(name).arg(newPT));
-        }
+        name = cardLink(name);
+    }
+    if (newPT.isEmpty()) {
+        appendHtmlServerMessage(tr("%1 removes the PT of %2.").arg(sanitizeHtml(player->getName())).arg(name));
+    } else {
+        appendHtmlServerMessage(
+            tr("%1 sets PT of %2 to %3.").arg(sanitizeHtml(player->getName())).arg(name).arg(newPT));
     }
 }
 
@@ -748,6 +750,11 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int
 {
     soundEngine->playSound("shuffle");
     if (currentContext == MessageContext_Mulligan) {
+        return;
+    }
+
+    if (currentContext == MessageContext_MoveCard && start == 0 && end == -1) {
+        moveCardExtras.append("shuffle_partial");
         return;
     }
 

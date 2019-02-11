@@ -36,8 +36,8 @@ private:
     Player *mulliganPlayer;
     MessageContext currentContext;
     QList<LogMoveCard> moveCardQueue;
-    QMap<CardItem *, QString> moveCardPT;
     QMap<CardItem *, bool> moveCardTapped;
+    QList<QString> moveCardExtras;
 
     const QString tableConstant() const;
     const QString graveyardConstant() const;

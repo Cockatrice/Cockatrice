@@ -1039,7 +1039,7 @@ void Player::actMoveTopCardsToGrave()
     cmd.set_x(0);
     cmd.set_y(0);
 
-    for (int i = 0; i < number; ++i) {
+    for (int i = number - 1; i >= 0; --i) {
         cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
     }
 
@@ -1065,7 +1065,7 @@ void Player::actMoveTopCardsToExile()
     cmd.set_x(0);
     cmd.set_y(0);
 
-    for (int i = 0; i < number; ++i) {
+    for (int i = number - 1; i >= 0; --i) {
         cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
     }
 
