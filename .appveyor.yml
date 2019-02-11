@@ -19,7 +19,7 @@ skip_commits:
 
 skip_branch_with_pr: true
 
-clone_depth: 50    #same as travis, see https://www.appveyor.com/blog/2014/06/04/shallow-clone-for-git-repositories/
+clone_depth: 15
 
 image: Visual Studio 2017
 
