@@ -38,7 +38,7 @@ private:
     QList<LogMoveCard> moveCardQueue;
     QMap<CardItem *, bool> moveCardTapped;
     QList<QString> moveCardExtras;
-    QString messageSuffix;
+    QString messagePrefix, messageSuffix;
 
     const QString tableConstant() const;
     const QString graveyardConstant() const;

@@ -136,7 +136,7 @@ void MessageLogWidget::containerProcessingDone()
     }
 
     currentContext = MessageContext_None;
-    messageSuffix = QString();
+    messageSuffix = messagePrefix = QString();
 }
 
 void MessageLogWidget::containerProcessingStarted(const GameEventContext &context)
@@ -820,13 +820,14 @@ void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
 
 void MessageLogWidget::setContextJudgeName(QString name)
 {
-    messageSuffix = QString(" &nbsp; [<img height=12 src=\"theme:icons/gavel\"> %1]").arg(sanitizeHtml(name));
+    messagePrefix = QString("<span style=\"color:black\">");
+    messageSuffix = QString("</span> &nbsp; [<img height=12 src=\"theme:icons/gavel\"> %1]").arg(sanitizeHtml(name));
 }
 
 void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optionalIsBold, QString optionalFontColor)
 {
 
-    ChatView::appendHtmlServerMessage(html + messageSuffix, optionalIsBold, optionalFontColor);
+    ChatView::appendHtmlServerMessage(messagePrefix + html + messageSuffix, optionalIsBold, optionalFontColor);
 }
 
 void MessageLogWidget::connectToPlayer(Player *player)
