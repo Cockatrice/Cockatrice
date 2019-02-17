@@ -227,23 +227,41 @@ void ServersSettings::removeServer(QString servAddr)
 /**
  * Will only update fields with new values, ignores empty values
  */
-bool ServersSettings::updateExistingServerWithoutLoss(QString saveName,
-                                                      QString serv,
-                                                      QString port,
-                                                      QString site,
-                                                      QString username,
-                                                      QString password,
-                                                      bool savePassword)
+bool ServersSettings::updateExistingServerWithoutLoss(QString saveName, QString serv, QString port, QString site)
 {
     int size = getValue("totalServers", "server", "server_details").toInt() + 1;
 
     for (int i = 0; i < size; i++) {
         if (serv == getValue(QString("server%1").arg(i), "server", "server_details").toString()) {
-
             if (!port.isEmpty()) {
                 setValue(port, QString("port%1").arg(i), "server", "server_details");
             }
 
+            if (!site.isEmpty()) {
+                setValue(site, QString("site%1").arg(i), "server", "server_details");
+            }
+
+            setValue(saveName, QString("saveName%1").arg(i), "server", "server_details");
+
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ServersSettings::updateExistingServer(QString saveName,
+                                           QString serv,
+                                           QString port,
+                                           QString username,
+                                           QString password,
+                                           bool savePassword,
+                                           QString site)
+{
+    int size = getValue("totalServers", "server", "server_details").toInt() + 1;
+
+    for (int i = 0; i < size; i++) {
+        if (serv == getValue(QString("server%1").arg(i), "server", "server_details").toString()) {
+            setValue(port, QString("port%1").arg(i), "server", "server_details");
             if (!username.isEmpty()) {
                 setValue(username, QString("username%1").arg(i), "server", "server_details");
             }
@@ -265,16 +283,4 @@ bool ServersSettings::updateExistingServerWithoutLoss(QString saveName,
         }
     }
     return false;
-}
-
-bool ServersSettings::updateExistingServer(QString saveName,
-                                           QString serv,
-                                           QString port,
-                                           QString username,
-                                           QString password,
-                                           bool savePassword,
-                                           QString site)
-{
-    return updateExistingServerWithoutLoss(std::move(saveName), std::move(serv), std::move(port), std::move(site),
-                                           std::move(username), std::move(password), savePassword);
 }
