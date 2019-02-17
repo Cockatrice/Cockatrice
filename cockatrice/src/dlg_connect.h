@@ -47,6 +47,9 @@ public:
         return passwordEdit->text();
     }
 
+public slots:
+    void downloadThePublicServers();
+
 private slots:
     void actOk();
     void actSaveConfig();
@@ -57,7 +60,6 @@ private slots:
     void updateDisplayInfo(const QString &saveName);
     void preRebuildComboBoxList();
     void rebuildComboBoxList(int failure = -1);
-    void downloadThePublicServers();
 
 private:
     QGridLayout *newHostLayout, *connectionLayout, *loginLayout, *serverInfoLayout, *grid;

@@ -48,6 +48,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public slots:
     void actCheckCardUpdates();
+    void actCheckServerUpdates();
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
