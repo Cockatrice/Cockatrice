@@ -1511,13 +1511,16 @@ Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & 
 Response::ResponseCode
 Server_Player::cmdNextTurn(const Command_NextTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage & /*ges*/)
 {
-    if (spectator)
-        return Response::RespFunctionNotAllowed;
-
     if (!game->getGameStarted())
         return Response::RespGameNotStarted;
-    if (conceded)
-        return Response::RespContextError;
+
+    if (!judge) {
+        if (spectator)
+            return Response::RespFunctionNotAllowed;
+
+        if (conceded)
+            return Response::RespContextError;
+    }
 
     game->nextTurn();
     return Response::RespOk;
@@ -1527,16 +1530,20 @@ Response::ResponseCode Server_Player::cmdSetActivePhase(const Command_SetActiveP
                                                         ResponseContainer & /*rc*/,
                                                         GameEventStorage & /*ges*/)
 {
-    if (spectator)
-        return Response::RespFunctionNotAllowed;
-
     if (!game->getGameStarted())
         return Response::RespGameNotStarted;
-    if (conceded)
-        return Response::RespContextError;
 
-    if (game->getActivePlayer() != playerId)
-        return Response::RespContextError;
+    if (!judge) {
+        if (spectator)
+            return Response::RespFunctionNotAllowed;
+
+        if (conceded)
+            return Response::RespContextError;
+
+        if (game->getActivePlayer() != playerId)
+            return Response::RespContextError;
+    }
+
     game->setActivePhase(cmd.phase());
 
     return Response::RespOk;
