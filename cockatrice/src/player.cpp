@@ -2912,6 +2912,7 @@ void Player::updateCardMenu(const CardItem *card)
             moveMenu->addAction(aMoveToExile);
         }
 
+
         if (card->getZone()) {
             if (card->getZone()->getName() == "table") {
                 // Card is on the battlefield
@@ -2937,6 +2938,7 @@ void Player::updateCardMenu(const CardItem *card)
                     cardMenu->addAction(aPeek);
                 }
 
+                addCardActions(card, cardMenu);
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
 
@@ -2969,6 +2971,7 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
 
+                addCardActions(card, cardMenu);
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
             } else if (card->getZone()->getName() == "rfg" || card->getZone()->getName() == "grave") {
@@ -2979,6 +2982,7 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
 
+                addCardActions(card, cardMenu);
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);
             } else {
@@ -2986,9 +2990,9 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addAction(aPlay);
                 cardMenu->addAction(aPlayFacedown);
                 cardMenu->addMenu(moveMenu);
+                addCardActions(card, cardMenu);
                 addRelatedCardView(card, cardMenu);
             }
-            addCardActions(card, cardMenu);
         } else {
             cardMenu->addMenu(moveMenu);
         }
@@ -3092,8 +3096,16 @@ void Player::addCardActions(const CardItem *card, QMenu *cardMenu)
         return;
     }
 
+    bool madeSeperator = false;
+
     for (const QString text : card->getInfo()->cardActionNames()) {
         if (text.startsWith("play:")) continue;
+
+        if (!madeSeperator) {
+            cardMenu->addSeparator();
+            madeSeperator = true;
+        }
+
         auto *createAction = new QAction(text, this);
         createAction->setData(text);
         connect(createAction, SIGNAL(triggered()), this, SLOT(actRunCardAction()));

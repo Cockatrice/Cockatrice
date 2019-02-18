@@ -9,22 +9,26 @@
 #include <functional>
 
 peg::parser math(R"(
-    EXPRESSION   <-  P0 / COMPOUND
+    EXPRESSION   <-  P0 / IF / COMPOUND
     P0           <-  P1 (P1_OPERATOR P1)*
     P1           <-  P2 (P2_OPERATOR P2)*
     P2           <-  P3 (P3_OPERATOR P3)*
-    P3           <-  NUMBER / FUNCTION / VARIABLE / '(' P0 ')'
+    P3           <-  LITERAL / FUNCTION / VARIABLE / '(' P0 ')'
 
     P1_OPERATOR  <-  < [-+] >
     P2_OPERATOR  <-  < [/*] >
     P3_OPERATOR  <-  < '^' >
 
+    LITERAL      <-  STRING / NUMBER 
     NUMBER       <-  < '-'? [0-9]+ >
     NAME         <-  < [a-zA-Z][a-zA-Z0-9]* >
     VARIABLE     <-  < [x] >
     FUNCTION     <-  NAME '(' EXPRESSION? ( [,][ \t\r\n]* EXPRESSION )* ')'
 
     COMPOUND     <- '{' EXPRESSION ( [;][ \t\r\n]* EXPRESSION )* '}'
+
+    IF           <- 'if' EXPRESSION EXPRESSION ('else' EXPRESSION)?
+    STRING       <- ['] <(!['].)*> [']
 
     %whitespace  <-  [ \t\r\n]*
     )");
@@ -72,6 +76,8 @@ QVariant Expression::eval(const peg::Ast &ast)
     const auto &nodes = ast.nodes;
     if (ast.name == "NUMBER") {
         return stod(ast.token);
+    } else if (ast.name == "STRING") {
+        return QString::fromStdString(ast.token);
     } else if (ast.name == "FUNCTION") {
         QString name = QString::fromStdString(nodes[0]->token).toLower();
         if (!fns.contains(name)) {
@@ -118,6 +124,15 @@ QVariant Expression::eval(const peg::Ast &ast)
             }
         }
         return result;
+    } else if ( ast.name == "IF") {
+        bool test = eval(*nodes[0]).toBool();
+        if ( test ) {
+            return eval(*nodes[1]);
+        } else if ( nodes.size() > 2 ) {
+            return eval(*nodes[2]);
+        } else {
+            return QVariant();
+        }
     } else {
         std::cerr << "Wat is " << ast.name;
         return -1;
@@ -133,7 +148,7 @@ QVariant Expression::parse(const QString &expr)
     std::shared_ptr<peg::Ast> ast;
     if (math.parse(ba.data(), ast)) {
         ast = peg::AstOptimizer(true, {"FUNCTION"}).optimize(ast);
-        // std::cerr << ast_to_s(ast);
+        std::cerr << ast_to_s(ast);
         return eval(*ast);
     } else {
         std::cerr << "Parse error";

@@ -28,6 +28,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QSignalMapper>
+#include <QMessageBox>
 
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_change_zone_properties.pb.h"
@@ -87,12 +88,30 @@ void Player::runActionCode(QString code, CardItem *card) {
         return QVariant();
     });
 
+    exp.addFunction("Say", [=](QVariantList args) {
+        if (args.size() < 1) return false;
+        Command_GameSay cmd;
+        cmd.set_message(args[0].toString().toStdString());
+        sendGameCommand(cmd);
+        return true;
+    });
+
     exp.addFunction("Life", [=](QVariantList args) {
         int amt = args.size() > 0 ? args[0].toInt() : 1;
         auto ctr = counters.value(0);
         int value = ctr->getValue() + amt;
         if (amt != 0) ctr->setCounterTo(value);
         return value;
+    });
+
+    exp.addFunction("YesNo", [=](QVariantList args) {
+        auto reply = QMessageBox::question(nullptr, "Question", args.size() < 1 ? "Question" : args[0].toString(),
+                                    QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+        if (reply == QMessageBox::Yes) {
+            return true;
+        } else {
+            return false;
+        }
     });
 
     exp.parse(QString("{ %1 }").arg(code));
