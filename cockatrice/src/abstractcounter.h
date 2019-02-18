@@ -30,10 +30,11 @@ private:
     bool shownInCounterArea;
     bool shortcutActive;
 
-private slots:
+public slots:
     void refreshShortcuts();
     void incrementCounter();
     void setCounter();
+    void setCounterTo(int value);
 
 public:
     AbstractCounter(Player *_player,

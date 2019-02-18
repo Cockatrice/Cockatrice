@@ -156,6 +156,11 @@ CardInfoPtr OracleImporter::addCard(QString name,
     CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
                                                 setsInfo, cipt, tableRow, upsideDown);
 
+    if (properties.contains("loyalty")) {
+        newCard->addCardAction("play:table", QString("AddCounter(1,%1)").arg(properties.value("loyalty").toString()));
+    }
+
+
     cards.insert(name, newCard);
     return newCard;
 }

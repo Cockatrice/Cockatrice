@@ -229,7 +229,6 @@ CardInfo::CardInfo(const QString &_name,
 {
     pixmapCacheKey = QLatin1String("card_") + name;
     simpleName = CardInfo::simplifyName(name);
-
     refreshCachedSetNames();
 }
 

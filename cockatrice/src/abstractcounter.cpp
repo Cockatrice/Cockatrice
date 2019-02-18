@@ -167,7 +167,6 @@ void AbstractCounter::setCounter()
 
     Expression exp(value);
     int newValue = exp.parse(expression).toInt();
-
     if (deleteAfterDialog) {
         deleteLater();
         return;
@@ -175,6 +174,13 @@ void AbstractCounter::setCounter()
     dialogSemaphore = false;
     if (!ok)
         return;
+
+    setCounterTo(newValue);
+}
+void AbstractCounter::setCounterTo(int newValue)
+{
+    
+
 
     Command_SetCounter cmd;
     cmd.set_counter_id(id);

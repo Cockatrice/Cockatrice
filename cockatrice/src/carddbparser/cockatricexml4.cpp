@@ -124,6 +124,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QString text = QString("");
             QVariantHash properties = QVariantHash();
             QList<CardRelation *> relatedCards, reverseRelatedCards;
+            QHash<QString, QString> actions;
             CardInfoPerSetMap sets = CardInfoPerSetMap();
             int tableRow = 0;
             bool cipt = false;
@@ -201,6 +202,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     } else {
                         relatedCards << relation;
                     }
+                } else if (xml.name() == "action") {
+                    actions.insert(xml.attributes().value("name").toString(), xml.readElementText(QXmlStreamReader::IncludeChildElements));
                 } else if (xml.name() != "") {
                     qDebug() << "[CockatriceXml4Parser] Unknown card property" << xml.name()
                              << ", trying to continue anyway";
@@ -210,8 +213,9 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 
             CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
                                                         reverseRelatedCards, sets, cipt, tableRow, upsideDown);
+            
             for ( const QString name : actions.keys() ) {
-                newCard->addAction(name, actions.value(name));
+                newCard->addCardAction(name, actions.value(name));
             }
 
             emit addCard(newCard);
@@ -326,6 +330,14 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     }
     if (info->getUpsideDownArt()) {
         xml.writeTextElement("upsidedown", "1");
+    }
+
+    //actions
+    for ( auto name : info->cardActionNames() ) {
+        xml.writeStartElement("action");
+        xml.writeAttribute("name", name);
+        xml.writeCharacters(info->cardActionCode(name));
+        xml.writeEndElement();
     }
 
     xml.writeEndElement(); // card

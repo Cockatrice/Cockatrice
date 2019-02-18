@@ -176,6 +176,7 @@ private slots:
     void actOpenDeckInDeckEditor();
     void actCreatePredefinedToken();
     void actCreateRelatedCard();
+    void actRunCardAction();
     void actCreateAllRelatedCards();
     void cardMenuAction();
     void actMoveCardXCardsFromTop();
@@ -254,6 +255,7 @@ private:
                            bool allCards);
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
     void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
+    void addCardActions(const CardItem *card, QMenu *cardMenu);
     void createCard(const CardItem *sourceCard, const QString &dbCardName, bool attach = false);
     void createAttachedCard(const CardItem *sourceCard, const QString &dbCardName);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
@@ -422,6 +424,7 @@ public:
     void sendGameCommand(const google::protobuf::Message &command);
 
     void setLastToken(CardInfoPtr cardInfo);
+    void runActionCode(QString code, CardItem *card);
 };
 
 #endif

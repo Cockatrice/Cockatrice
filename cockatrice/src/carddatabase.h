@@ -174,6 +174,8 @@ private:
     QString setsNames;
     // positioning properties; used by UI
     bool cipt;
+    // Card action list
+    QHash<QString,QString> cardActions;
     int tableRow;
     bool upsideDownArt;
 
@@ -336,6 +338,19 @@ public:
         emit pixmapUpdated();
     }
     void refreshCachedSetNames();
+
+    QStringList cardActionNames() {
+        return cardActions.keys();
+    }
+    QString cardActionCode(QString name) {
+        return cardActions.value(name);
+    }
+    void addCardAction(QString name, QString code) {
+        cardActions.insert(name, code);
+    }
+    bool hasCardAction(QString name) {
+        return cardActions.contains(name);
+    }
 
     /**
      * Simplify a name to have no punctuation and lowercase all letters, for

@@ -8,6 +8,7 @@
 #include "counter_general.h"
 #include "deck_loader.h"
 #include "dlg_create_token.h"
+#include "expression.h"
 #include "gamescene.h"
 #include "handcounter.h"
 #include "handzone.h"
@@ -1234,6 +1235,19 @@ void Player::actCreateRelatedCard()
     }
 }
 
+void Player::actRunCardAction()
+{
+    CardItem *card = game->getActiveCard();
+    if (!card) {
+        return;
+    }
+    auto *action = static_cast<QAction *>(sender());
+    QString name = action->data().toString();
+    QString code = card->getInfo()->cardActionCode(name);
+    qDebug() << "Executing action!! " << code;
+    runActionCode(code, card);
+}
+
 void Player::actCreateAllRelatedCards()
 {
     CardItem *sourceCard = game->getActiveCard();
@@ -2097,6 +2111,11 @@ void Player::playCard(CardItem *card, bool faceDown, bool tapped)
         cmd.set_y(gridPoint.y());
     }
     sendGameCommand(cmd);
+
+    QString an = QString("play:%1").arg(QString::fromStdString(cmd.target_zone()));
+    if ( card->getInfo()->hasCardAction(an) ) {
+        runActionCode(card->getInfo()->cardActionCode(an), card);
+    }
 }
 
 void Player::addCard(CardItem *card)
@@ -2969,6 +2988,7 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addMenu(moveMenu);
                 addRelatedCardView(card, cardMenu);
             }
+            addCardActions(card, cardMenu);
         } else {
             cardMenu->addMenu(moveMenu);
         }
@@ -3064,6 +3084,21 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     }
     connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
     cardMenu->addAction(createRelatedCards);
+}
+
+void Player::addCardActions(const CardItem *card, QMenu *cardMenu)
+{
+    if (card == nullptr || cardMenu == nullptr || card->getInfo() == nullptr) {
+        return;
+    }
+
+    for (const QString text : card->getInfo()->cardActionNames()) {
+        if (text.startsWith("play:")) continue;
+        auto *createAction = new QAction(text, this);
+        createAction->setData(text);
+        connect(createAction, SIGNAL(triggered()), this, SLOT(actRunCardAction()));
+        cardMenu->addAction(createAction);
+    }
 }
 
 void Player::setCardMenu(QMenu *menu)
