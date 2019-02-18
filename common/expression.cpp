@@ -2,12 +2,14 @@
 #include "./lib/peglib.h"
 
 #include <QByteArray>
+#include <QDebug>
 #include <QString>
+#include <QVariant>
 #include <cmath>
 #include <functional>
 
 peg::parser math(R"(
-    EXPRESSION   <-  P0
+    EXPRESSION   <-  P0 / COMPOUND
     P0           <-  P1 (P1_OPERATOR P1)*
     P1           <-  P2 (P2_OPERATOR P2)*
     P2           <-  P3 (P3_OPERATOR P3)*
@@ -18,52 +20,81 @@ peg::parser math(R"(
     P3_OPERATOR  <-  < '^' >
 
     NUMBER       <-  < '-'? [0-9]+ >
-    NAME         <-  < [a-z][a-z0-9]* >
+    NAME         <-  < [a-zA-Z][a-zA-Z0-9]* >
     VARIABLE     <-  < [x] >
-    FUNCTION     <-  NAME '(' EXPRESSION ( [,\n] EXPRESSION )* ')'
+    FUNCTION     <-  NAME '(' EXPRESSION? ( [,][ \t\r\n]* EXPRESSION )* ')'
 
-    %whitespace  <-  [ \t\r]*
+    COMPOUND     <- '{' EXPRESSION ( [;][ \t\r\n]* EXPRESSION )* '}'
+
+    %whitespace  <-  [ \t\r\n]*
     )");
 
-QMap<QString, std::function<double(double)>> *default_functions = nullptr;
+QMap<QString, std::function<QVariant(QVariantList)>> *default_functions = nullptr;
 
-Expression::Expression(double initial) : value(initial)
+typedef double (*ddfn)(double);
+static std::function<QVariant(QVariantList)> wrap(ddfn f)
 {
-    if (default_functions == nullptr) {
-        default_functions = new QMap<QString, std::function<double(double)>>();
-        default_functions->insert("sin", [](double a) { return sin(a); });
-        default_functions->insert("cos", [](double a) { return cos(a); });
-        default_functions->insert("tan", [](double a) { return tan(a); });
-        default_functions->insert("sqrt", [](double a) { return sqrt(a); });
-        default_functions->insert("log", [](double a) { return log(a); });
-        default_functions->insert("log10", [](double a) { return log(a); });
-        default_functions->insert("trunc", [](double a) { return trunc(a); });
-        default_functions->insert("abs", [](double a) { return abs(a); });
-
-        default_functions->insert("floor", [](double a) { return floor(a); });
-        default_functions->insert("ceil", [](double a) { return ceil(a); });
-        default_functions->insert("round", [](double a) { return round(a); });
-        default_functions->insert("trunc", [](double a) { return trunc(a); });
-    }
-    fns = QMap<QString, std::function<double(double)>>(*default_functions);
+    return [=](QVariantList a) {
+        if (a.size() != 1)
+            return -1.0;
+        return f(a[0].toDouble());
+    };
 }
 
-double Expression::eval(const peg::Ast &ast)
+Expression::Expression(QVariant initial) : value(initial)
+{
+    if (default_functions == nullptr) {
+        default_functions = new QMap<QString, std::function<QVariant(QVariantList)>>();
+        default_functions->insert("sin", wrap(sin));
+        default_functions->insert("cos", wrap(cos));
+        default_functions->insert("tan", wrap(tan));
+        default_functions->insert("sqrt", wrap(sqrt));
+        default_functions->insert("log", wrap(log));
+        default_functions->insert("log10", wrap(log10));
+        default_functions->insert("trunc", wrap(trunc));
+        default_functions->insert("abs", wrap(abs));
+
+        default_functions->insert("floor", wrap(floor));
+        default_functions->insert("ceil", wrap(ceil));
+        default_functions->insert("round", wrap(round));
+        default_functions->insert("trunc", wrap(trunc));
+    }
+    fns = QMap<QString, std::function<QVariant(QVariantList)>>(*default_functions);
+}
+
+void Expression::addFunction(QString name, std::function<QVariant(QVariantList)> fn)
+{
+    fns.insert(name.toLower(), fn);
+}
+
+QVariant Expression::eval(const peg::Ast &ast)
 {
     const auto &nodes = ast.nodes;
     if (ast.name == "NUMBER") {
         return stod(ast.token);
     } else if (ast.name == "FUNCTION") {
-        QString name = QString::fromStdString(nodes[0]->token);
-        if (!fns.contains(name))
+        QString name = QString::fromStdString(nodes[0]->token).toLower();
+        if (!fns.contains(name)) {
             return 0;
-        return fns[name](eval(*nodes[1]));
+        }
+
+        QVariantList values;
+        for (int i = 1; i < nodes.size(); ++i) {
+            values.append(eval(*nodes[i]));
+        }
+        return fns[name](values);
     } else if (ast.name == "VARIABLE") {
         return value;
+    } else if (ast.name == "COMPOUND") {
+        QVariant result;
+        for (int i = 0; i < nodes.size(); ++i) {
+            result = eval(*nodes[i]);
+        }
+        return result;
     } else if (ast.name[0] == 'P') {
-        double result = eval(*nodes[0]);
+        double result = eval(*nodes[0]).toDouble();
         for (int i = 1; i < nodes.size(); i += 2) {
-            double arg = eval(*nodes[i + 1]);
+            double arg = eval(*nodes[i + 1]).toDouble();
             char operation = nodes[i]->token[0];
             switch (operation) {
                 case '+':
@@ -88,11 +119,12 @@ double Expression::eval(const peg::Ast &ast)
         }
         return result;
     } else {
+        std::cerr << "Wat is " << ast.name;
         return -1;
     }
 }
 
-double Expression::parse(const QString &expr)
+QVariant Expression::parse(const QString &expr)
 {
     QByteArray ba = expr.toLocal8Bit();
 
@@ -100,8 +132,11 @@ double Expression::parse(const QString &expr)
 
     std::shared_ptr<peg::Ast> ast;
     if (math.parse(ba.data(), ast)) {
-        ast = peg::AstOptimizer(true).optimize(ast);
+        ast = peg::AstOptimizer(true, {"FUNCTION"}).optimize(ast);
+        // std::cerr << ast_to_s(ast);
         return eval(*ast);
+    } else {
+        std::cerr << "Parse error";
     }
 
     return 0;

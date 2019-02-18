@@ -166,7 +166,7 @@ void AbstractCounter::setCounter()
                                                QLineEdit::Normal, QString::number(value), &ok);
 
     Expression exp(value);
-    int newValue = static_cast<int>(exp.parse(expression));
+    int newValue = exp.parse(expression).toInt();
 
     if (deleteAfterDialog) {
         deleteLater();

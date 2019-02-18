@@ -210,6 +210,10 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 
             CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
                                                         reverseRelatedCards, sets, cipt, tableRow, upsideDown);
+            for ( const QString name : actions.keys() ) {
+                newCard->addAction(name, actions.value(name));
+            }
+
             emit addCard(newCard);
         }
     }

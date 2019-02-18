@@ -5,7 +5,8 @@
 
 #define TEST_EXPR(name,a,b) TEST(name, Works) {  \
     Expression exp(8); \
-	ASSERT_EQ(exp.parse(a), b) << a; \
+    exp.addFunction("add", [](QVariantList args) { return args.size() != 2 ? 0 : args[0].toInt() + args[1].toInt(); }); \
+	ASSERT_EQ(b, exp.parse(a)) << a; \
 }
 
 namespace
@@ -20,6 +21,17 @@ namespace
 	TEST_EXPR(Variable, "x / 2", 4)
 	TEST_EXPR(Negative, "-2 * 2", -4)
 	TEST_EXPR(UnknownFnReturnsZero, "blah(22)", 0)
+
+	TEST_EXPR(TwoArgs, "add(22, 33)", 55)
+	TEST_EXPR(Compound, "{3;3}", 3);
+	TEST_EXPR(Compound1, "{3; 3}", 3)
+	TEST_EXPR(Compound2, "{ 3;3 }", 3)
+
+	TEST_EXPR(ArityError, "1+cos()", 0)
+	TEST_EXPR(ArityError2, "add(10)", 0)
+	TEST_EXPR(ArityError3, "add()", 0)
+
+
 
 } // namespace
 

@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include <QString>
+#include <QVariant>
 #include <functional>
 
 namespace peg
@@ -15,14 +16,15 @@ typedef AstBase<EmptyType> Ast;
 class Expression
 {
 public:
-    double value;
+    QVariant value;
 
-    explicit Expression(double initial = 0);
-    double parse(const QString &expr);
+    explicit Expression(QVariant initial = 0);
+    QVariant parse(const QString &expr);
+    void addFunction(QString name, std::function<QVariant(QVariantList)> fn);
 
 private:
-    double eval(const peg::Ast &ast);
-    QMap<QString, std::function<double(double)>> fns;
+    QVariant eval(const peg::Ast &ast);
+    QMap<QString, std::function<QVariant(QVariantList)>> fns;
 };
 
 #endif
