@@ -821,7 +821,7 @@ void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
 void MessageLogWidget::setContextJudgeName(QString name)
 {
     messagePrefix = QString("<span style=\"color:black\">");
-    messageSuffix = QString("</span> &nbsp; [<img height=12 src=\"theme:icons/gavel\"> %1]").arg(sanitizeHtml(name));
+    messageSuffix = QString("</span> [<img height=12 src=\"theme:icons/scales\"> %1]").arg(sanitizeHtml(name));
 }
 
 void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optionalIsBold, QString optionalFontColor)

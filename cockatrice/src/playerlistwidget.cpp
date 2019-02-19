@@ -58,7 +58,7 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
     notReadyIcon = QPixmap("theme:icons/not_ready_start");
     concededIcon = QPixmap("theme:icons/conceded");
     playerIcon = QPixmap("theme:icons/player");
-    judgeIcon = QPixmap("theme:icons/gavel");
+    judgeIcon = QPixmap("theme:icons/scales");
     spectatorIcon = QPixmap("theme:icons/spectator");
     lockIcon = QPixmap("theme:icons/lock");
 
