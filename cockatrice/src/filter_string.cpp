@@ -117,23 +117,22 @@ FilterString::FilterString(const QString &expr)
         search["NumericExpression"] = [](const peg::SemanticValues &sv) -> NumberMatcher {
             auto arg = sv[1].get<int>();
             auto op = sv[0].get<QString>();
-            return [=](int s) {
-                if (op == ">")
-                    return s > arg;
-                if (op == ">=")
-                    return s >= arg;
-                if (op == "<")
-                    return s < arg;
-                if (op == "<=")
-                    return s <= arg;
-                if (op == "=")
-                    return s == arg;
-                if (op == ":")
-                    return s == arg;
-                if (op == "!=")
-                    return s != arg;
-                return false;
-            };
+
+            if (op == ">")
+                return [=](int s) { return s > arg; };
+            if (op == ">=")
+                return [=](int s) { return s >= arg; };
+            if (op == "<")
+                return [=](int s) { return s < arg; };
+            if (op == "<=")
+                return [=](int s) { return s <= arg; };
+            if (op == "=")
+                return [=](int s) { return s == arg; };
+            if (op == ":")
+                return [=](int s) { return s == arg; };
+            if (op == "!=")
+                return [=](int s) { return s != arg; };
+            return [](int s) { return false; };
         };
 
         search["NumericValue"] = [](const peg::SemanticValues &sv) -> int {
