@@ -792,7 +792,7 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
 
         if (cont.has_forced_by_judge()) {
             auto id = cont.forced_by_judge();
-            Player *judgep = players.value(id, 0);
+            Player *judgep = players.value(id, nullptr);
             if (judgep) {
                 messageLog->setContextJudgeName(judgep->getName());
             } else if (spectators.contains(id)) {

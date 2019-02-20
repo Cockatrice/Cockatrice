@@ -804,7 +804,7 @@ Response::ResponseCode Server_Player::cmdJudge(const Command_Judge &cmd, Respons
     if (!judge)
         return Response::RespFunctionNotAllowed;
 
-    Server_Player *player = this->game->getPlayers()[cmd.target_id()];
+    Server_Player *player = this->game->getPlayers().value(cmd.target_id());
 
     ges.setForcedByJudge(playerId);
     if (player == nullptr)
