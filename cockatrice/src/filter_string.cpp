@@ -132,7 +132,7 @@ FilterString::FilterString(const QString &expr)
                 return [=](int s) { return s == arg; };
             if (op == "!=")
                 return [=](int s) { return s != arg; };
-            return [](int s) { return false; };
+            return [](int) { return false; };
         };
 
         search["NumericValue"] = [](const peg::SemanticValues &sv) -> int {
@@ -183,24 +183,7 @@ FilterString::FilterString(const QString &expr)
             return [=](CardData x) { return matcher(x->getName()); };
         };
 
-        search["Color"] = [](const peg::SemanticValues &sv) -> char {
-            switch (sv.choice()) {
-                case 0:
-                    return 'W';
-                case 1:
-                    return 'U';
-                case 2:
-                    return 'B';
-                case 3:
-                    return 'R';
-                case 4:
-                    return 'G';
-                case 5:
-                    return 'U';
-                default:
-                    return ' ';
-            }
-        };
+        search["Color"] = [](const peg::SemanticValues &sv) -> char { return "WUBRGU"[sv.choice()]; };
         search["ColorEx"] = [](const peg::SemanticValues &sv) -> char {
             return sv.choice() == 0 ? sv[0].get<char>() : *sv.c_str();
         };
