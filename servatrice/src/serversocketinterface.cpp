@@ -1457,7 +1457,7 @@ bool AbstractServerSocketInterface::removeAdminFlagFromUser(const QString &userN
     if (user) {
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::DEMOTED);
-        event.set_reason_str("Your moderator / judge status has been revoked.");
+        event.set_reason_str("Your moderator and/or judge status has been revoked.");
         event.set_end_time(QDateTime::currentDateTime().toTime_t());
 
         SessionEvent *se = user->prepareSessionEvent(event);
