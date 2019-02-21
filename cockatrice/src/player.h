@@ -186,12 +186,15 @@ private slots:
     void actIncPT(int deltaP, int deltaT);
     void actResetPT();
     void actSetPT();
+    void actChangePT();
     void actIncP();
     void actDecP();
     void actIncT();
     void actDecT();
     void actIncPT();
     void actDecPT();
+    void actFlowP();
+    void actFlowT();
     void actSetAnnotation();
     void actPlay();
     void actHide();
@@ -214,9 +217,10 @@ private:
         *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aCardMenu, *aMoveBottomCardToGrave;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
-    QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
-        *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aSetAnnotation, *aFlip, *aPeek, *aClone, *aMoveToTopLibrary,
-        *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile, *aMoveToXfromTopOfLibrary;
+    QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT,
+        *aChangePT, *aResetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation,
+        *aFlip, *aPeek, *aClone, *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard,
+        *aMoveToExile, *aMoveToXfromTopOfLibrary;
 
     bool shortcutsActive;
     int defaultNumberTopCards;

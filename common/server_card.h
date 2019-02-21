@@ -41,7 +41,7 @@ private:
     bool attacking;
     bool facedown;
     QString color;
-    int power, toughness;
+    QString ptString;
     QString annotation;
     bool destroyOnZoneChange;
     bool doesntUntap;
@@ -102,7 +102,10 @@ public:
     {
         return color;
     }
-    QString getPT() const;
+    QString getPT() const
+    {
+        return ptString;
+    }
     QString getAnnotation() const
     {
         return annotation;
@@ -154,7 +157,10 @@ public:
     {
         color = _color;
     }
-    void setPT(const QString &_pt);
+    void setPT(const QString &_pt)
+    {
+        ptString = _pt;
+    }
     void setAnnotation(const QString &_annotation)
     {
         annotation = _annotation;
