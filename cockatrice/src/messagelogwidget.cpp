@@ -735,8 +735,13 @@ void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
         appendHtmlServerMessage(tr("%1 removes the PT of %2.").arg(playerName).arg(name));
     } else {
         QString oldPT = card->getPT();
-        appendHtmlServerMessage(
-            tr("%1 changes the PT of %2 from %3 to %4.").arg(playerName).arg(name).arg(oldPT).arg(newPT));
+        if (oldPT.isEmpty()) {
+            appendHtmlServerMessage(
+                tr("%1 changes the PT of %2 from nothing to %4.").arg(playerName).arg(name).arg(newPT));
+        } else {
+            appendHtmlServerMessage(
+                tr("%1 changes the PT of %2 from %3 to %4.").arg(playerName).arg(name).arg(oldPT).arg(newPT));
+        }
     }
 }
 
