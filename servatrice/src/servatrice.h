@@ -268,6 +268,7 @@ public:
     int getCommandCountingInterval() const override;
     int getMaxCommandCountPerInterval() const override;
     int getMaxUserTotal() const override;
+    bool permitCreateGameAsJudge() const override;
     int getMaxTcpUserLimit() const;
     int getMaxWebSocketUserLimit() const;
     int getUsersWithAddress(const QHostAddress &address) const;

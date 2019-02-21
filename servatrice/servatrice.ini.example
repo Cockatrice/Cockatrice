@@ -304,6 +304,11 @@ max_game_inactivity_time=120
 ; the database.  Default value is true.
 store_replays=true
 
+; Allow users to create a new game and join it as a judge. The host will be able to execute any action on
+; the cards of every player. This is needed in order to support some games (eg. Werewolf).
+; Default off to prevent abuse on servers that are mostly running other games.
+allow_create_as_judge=false
+
 [security]
 ; You may want to restrict the number of users that can connect to your server at any given time.
 enable_max_user_limit=false

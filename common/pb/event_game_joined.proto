@@ -13,4 +13,5 @@ message Event_GameJoined {
     optional sint32 player_id = 4;
     optional bool spectator = 5;
     optional bool resuming = 6;
+    optional bool judge = 7;
 }

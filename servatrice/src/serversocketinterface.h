@@ -119,6 +119,9 @@ private:
     Response::ResponseCode cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdAccountPassword(const Command_AccountPassword &cmd, ResponseContainer &rc);
 
+    bool addAdminFlagToUser(const QString &user, int flag);
+    bool removeAdminFlagFromUser(const QString &user, int flag);
+
 public:
     AbstractServerSocketInterface(Servatrice *_server,
                                   Servatrice_DatabaseInterface *_databaseInterface,

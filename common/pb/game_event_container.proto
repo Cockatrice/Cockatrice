@@ -7,4 +7,5 @@ message GameEventContainer {
     repeated GameEvent event_list = 2;
     optional GameEventContext context = 3;
     optional uint32 seconds_elapsed = 4;
+    optional uint32 forced_by_judge = 5;
 }

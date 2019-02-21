@@ -307,7 +307,7 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
 
     // Sort by user level
     if (data(0, Qt::UserRole) != other.data(0, Qt::UserRole))
-        return data(0, Qt::UserRole).toInt() > other.data(0, Qt::UserRole).toInt();
+        return (data(0, Qt::UserRole).toInt() & 15) > (other.data(0, Qt::UserRole).toInt() & 15);
 
     // Sort by name
     return QString::localeAwareCompare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;

@@ -6,6 +6,7 @@ message ServerInfo_User {
         IsRegistered = 2;
         IsModerator = 4;
         IsAdmin = 8;
+        IsJudge = 16;
     };
     enum Gender {
         GenderUnknown = -1;

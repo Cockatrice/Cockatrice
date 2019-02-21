@@ -109,6 +109,9 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     else
         userLevelText = tr("Unregistered user");
 
+    if (userLevel.testFlag(ServerInfo_User::IsJudge))
+        userLevelText += " | " + tr("Judge");
+
     if (user.has_privlevel() && user.privlevel() != "NONE") {
         userLevelText += " | " + QString("%1").arg(user.privlevel().c_str());
     }

@@ -30,6 +30,7 @@ private:
     QAction *aKick;
     QAction *aBan, *aBanHistory;
     QAction *aPromoteToMod, *aDemoteFromMod;
+    QAction *aPromoteToJudge, *aDemoteFromJudge;
     QAction *aWarnUser, *aWarnHistory;
 signals:
     void openMessageDialog(const QString &userName, bool focus);
