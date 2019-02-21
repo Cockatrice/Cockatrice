@@ -56,7 +56,6 @@ NumericValue <- [0-9]+
 
 std::once_flag init;
 
-
 FilterString::FilterString(const QString &expr)
 {
     QByteArray ba = expr.toLocal8Bit();
@@ -177,7 +176,7 @@ FilterString::FilterString(const QString &expr)
         };
         search["FieldQuery"] = [](const peg::SemanticValues &sv) -> Filter {
             QString field = sv[0].get<QString>();
-            if ( sv.choice() == 0 ) {
+            if (sv.choice() == 0) {
                 StringMatcher matcher = sv[1].get<StringMatcher>();
                 return [=](CardData x) -> bool { return matcher(x->getProperty(field)); };
             } else {
@@ -198,7 +197,7 @@ FilterString::FilterString(const QString &expr)
 
     _error = QString();
 
-    if ( ba.size() == 0 ) {
+    if (ba.size() == 0) {
         result = [](CardData) -> bool { return true; };
         return;
     }

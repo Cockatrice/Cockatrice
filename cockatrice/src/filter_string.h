@@ -29,11 +29,13 @@ public:
         return result(card);
     }
 
-    bool valid() {
+    bool valid()
+    {
         return _error.isEmpty();
     }
 
-    QString error() {
+    QString error()
+    {
         return _error;
     }
 
