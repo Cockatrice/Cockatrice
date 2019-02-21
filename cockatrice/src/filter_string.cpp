@@ -197,7 +197,7 @@ FilterString::FilterString(const QString &expr)
 
     _error = QString();
 
-    if (ba.size() == 0) {
+    if (ba.isEmpty()) {
         result = [](CardData) -> bool { return true; };
         return;
     }
