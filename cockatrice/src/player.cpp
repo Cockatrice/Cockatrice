@@ -2667,6 +2667,10 @@ void Player::actChangePT() // backwards compatible with old "set" flow
             setTou = p2.toInt();
             addTou = false;
         }
+
+        if (addPow && addTou && !setPow && !setTou) { // +0/+0 does nothing
+            return;
+        }
     }
 
     QList<const ::google::protobuf::Message *> commandList;
