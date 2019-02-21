@@ -2523,7 +2523,7 @@ void Player::actIncPT(int deltaP, int deltaT)
         auto *card = static_cast<CardItem *>(item);
         QString pt = card->getPT();
         int sep = pt.indexOf('/');
-        int pow = pt.left(sep).toInt(); // if not found this will be set to 0
+        int pow = pt.left(sep).toInt(); // if not found both are set to full tring
         int tou = pt.mid(sep + 1).toInt();
         QString newpt = QString::number(pow + deltaP) + "/" + QString::number(tou + deltaT);
         auto *cmd = new Command_SetCardAttr;
@@ -2590,10 +2590,7 @@ void Player::actSetPT()
     QString pt = QInputDialog::getText(nullptr, tr("Set power/toughness"), tr("Please enter the new PT:"),
                                        QLineEdit::Normal, oldPT, &ok);
     dialogSemaphore = false;
-    if (clearCardsToDelete()) {
-        return;
-    }
-    if (!ok) {
+    if (clearCardsToDelete() || !ok) {
         return;
     }
 
@@ -2632,39 +2629,42 @@ void Player::actChangePT() // backwards compatible with old "set" flow
     QString pt = QInputDialog::getText(nullptr, tr("Change power/toughness"), tr("Please enter the change to PT:"),
                                        QLineEdit::Normal, oldPT, &ok);
     dialogSemaphore = false;
-    if (clearCardsToDelete()) {
-        return;
-    }
-    if (!ok) {
+    if (clearCardsToDelete() || !ok) {
         return;
     }
 
     bool addPow, addTou;
-    int pow, tou;
-    {
+    int setPow, setTou;
+    bool empty = pt.isEmpty();
+    if (!empty) {
         int sep = pt.indexOf('/');
         QString p1 = pt.left(sep);
         QString p2 = pt.mid(sep + 1);
-
-        if (p1[0] == '+') {
-            pow = p1.mid(1).toInt();
+        if (p1.isEmpty()) {
+            setPow = 0;
+            addPow = true;
+        } else if (p1[0] == '+') {
+            setPow = p1.mid(1).toInt();
             addPow = true;
         } else if (p1[0] == '-') {
-            pow = p1.toInt();
+            setPow = p1.toInt();
             addPow = true;
         } else {
-            pow = p1.toInt();
+            setPow = p1.toInt();
             addPow = false;
         }
 
-        if (p2[0] == '+') {
-            tou = p2.mid(1).toInt();
+        if (p2.isEmpty()) {
+            setTou = 0;
+            addTou = true;
+        } else if (p2[0] == '+') {
+            setTou = p2.mid(1).toInt();
             addTou = true;
         } else if (p2[0] == '-') {
-            tou = p2.toInt();
+            setTou = p2.toInt();
             addTou = true;
         } else {
-            tou = p2.toInt();
+            setTou = p2.toInt();
             addTou = false;
         }
     }
@@ -2673,18 +2673,23 @@ void Player::actChangePT() // backwards compatible with old "set" flow
     for (const auto &item : sel) {
         auto *card = static_cast<CardItem *>(item);
         auto *cmd = new Command_SetCardAttr;
-        int power = 0, toughness = 0;
-        if (addPow || addTou) {
-            QString oldpt = card->getPT();
-            int sep = oldpt.indexOf('/');
-            if (addPow) {
-                power = oldpt.left(sep).toInt();
+        QString newpt;
+        if (empty) {
+            newpt = QString();
+        } else {
+            int power = 0, toughness = 0;
+            if (addPow || addTou) {
+                QString oldpt = card->getPT();
+                int sep = oldpt.indexOf('/');
+                if (addPow) {
+                    power = oldpt.left(sep).toInt();
+                }
+                if (addTou) {
+                    toughness = oldpt.mid(sep + 1).toInt();
+                }
             }
-            if (addTou) {
-                toughness = oldpt.mid(sep + 1).toInt();
-            }
+            newpt = QString::number(setPow + power) + "/" + QString::number(setTou + toughness);
         }
-        QString newpt = QString::number(pow + power) + "/" + QString::number(tou + toughness);
         cmd->set_zone(card->getZone()->getName().toStdString());
         cmd->set_card_id(card->getId());
         cmd->set_attribute(AttrPT);
@@ -2764,10 +2769,7 @@ void Player::actSetAnnotation()
     QString annotation = QInputDialog::getText(nullptr, tr("Set annotation"), tr("Please enter the new annotation:"),
                                                QLineEdit::Normal, oldAnnotation, &ok);
     dialogSemaphore = false;
-    if (clearCardsToDelete()) {
-        return;
-    }
-    if (!ok) {
+    if (clearCardsToDelete() || !ok) {
         return;
     }
 
@@ -3045,11 +3047,15 @@ void Player::updateCardMenu(const CardItem *card)
 
 void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
 {
-    if (card == nullptr || cardMenu == nullptr || card->getInfo() == nullptr) {
+    if (!card || !cardMenu) {
+        return;
+    }
+    auto cardInfo = card->getInfo();
+    if (!cardInfo) {
         return;
     }
 
-    QList<CardRelation *> relatedCards = card->getInfo()->getRelatedCards();
+    QList<CardRelation *> relatedCards = cardInfo->getRelatedCards();
     if (relatedCards.isEmpty()) {
         return;
     }
@@ -3068,13 +3074,16 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
 
 void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
 {
-    if (card == nullptr || cardMenu == nullptr || card->getInfo() == nullptr) {
+    if (!card || !cardMenu) {
+        return;
+    }
+    auto cardInfo = card->getInfo();
+    if (!cardInfo) {
         return;
     }
 
-    QList<CardRelation *> relatedCards(card->getInfo()->getRelatedCards());
-    relatedCards.append(card->getInfo()->getReverseRelatedCards2Me());
-    if (relatedCards.empty()) {
+    QList<CardRelation *> relatedCards = cardInfo->getRelatedCards();
+    if (relatedCards.isEmpty()) {
         return;
     }
 
