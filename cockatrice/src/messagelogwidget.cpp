@@ -39,6 +39,12 @@ const QString MessageLogWidget::deckConstant() const
     return constant;
 }
 
+const QString MessageLogWidget::sharedConstant() const
+{
+    static const QString constant("shared");
+    return constant;
+}
+
 const QString MessageLogWidget::sideboardConstant() const
 {
     static const QString constant("sb");
@@ -76,6 +82,9 @@ MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, boo
         fromStr = tr(" from exile");
     } else if (zoneName == handConstant()) {
         fromStr = tr(" from their hand");
+
+    } else if (zoneName == sharedConstant()) {
+        fromStr = tr(" from their shared");
     } else if (zoneName == deckConstant()) {
         if (position == 0) {
             if (cardName.isEmpty()) {
@@ -318,6 +327,8 @@ void MessageLogWidget::logMoveCard(Player *player,
         finalStr = tr("%1 puts %2%3 into their graveyard.");
     } else if (targetZoneName == exileConstant()) {
         finalStr = tr("%1 exiles %2%3.");
+    } else if (targetZoneName == sharedConstant()) {
+        finalStr = tr("%1 moves to shared %2%3.");
     } else if (targetZoneName == handConstant()) {
         finalStr = tr("%1 moves %2%3 to their hand.");
     } else if (targetZoneName == deckConstant()) {

@@ -31,6 +31,7 @@ private:
     const QString exileConstant() const;
     const QString handConstant() const;
     const QString deckConstant() const;
+    const QString sharedConstant() const;
     const QString sideboardConstant() const;
     const QString stackConstant() const;
 

@@ -211,8 +211,11 @@ void ZoneViewWidget::closeEvent(QCloseEvent *event)
         cmd.set_zone_name(zone->getName().toStdString());
         player->sendGameCommand(cmd);
     }
-    if (shuffleCheckBox.isChecked())
-        player->sendGameCommand(Command_Shuffle());
+    if (shuffleCheckBox.isChecked()) {
+        Command_Shuffle shuffle;
+        shuffle.set_zone_name(zone->getName().toStdString());
+        player->sendGameCommand(shuffle);
+    }
     emit closePressed(this);
     deleteLater();
     event->accept();

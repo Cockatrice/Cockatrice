@@ -160,6 +160,8 @@ void Server_Player::setupZones()
     addZone(new Server_CardZone(this, "grave", false, ServerInfo_Zone::PublicZone));
     addZone(new Server_CardZone(this, "rfg", false, ServerInfo_Zone::PublicZone));
 
+    addZone(new Server_CardZone(this, "shared", false, ServerInfo_Zone::HiddenZone));
+
     addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, 20));
     addCounter(new Server_Counter(1, "w", makeColor(255, 255, 150), 20, 0));
     addCounter(new Server_Counter(2, "u", makeColor(150, 150, 255), 20, 0));
@@ -369,7 +371,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
 {
     // Disallow controller change to other zones than the table.
     if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) &&
-        (startzone->getPlayer() != targetzone->getPlayer()) && !judge) {
+        (startzone->getName() != "shared") && (startzone->getPlayer() != targetzone->getPlayer()) && !judge) {
         return Response::RespContextError;
     }
 
@@ -951,11 +953,11 @@ Server_Player::cmdShuffle(const Command_Shuffle &cmd, ResponseContainer & /*rc*/
         return Response::RespContextError;
     }
 
-    if (cmd.has_zone_name() && cmd.zone_name() != "deck") {
+    if (cmd.has_zone_name() && (cmd.zone_name() == "deck" || cmd.zone_name() == "shared")) {
         return Response::RespFunctionNotAllowed;
     }
 
-    Server_CardZone *zone = zones.value("deck");
+    Server_CardZone *zone = zones.value(cmd.has_zone_name() ? QString::fromStdString(cmd.zone_name()) : "deck");
     if (!zone) {
         return Response::RespNameNotFound;
     }
@@ -1107,11 +1109,13 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
         return Response::RespNameNotFound;
     }
 
-    if ((startPlayer != this) && (!startZone->getPlayersWithWritePermission().contains(playerId)) && !judge) {
+    if ((startPlayer != this) && (cmd.start_zone() != "shared") &&
+        (!startZone->getPlayersWithWritePermission().contains(playerId)) && !judge) {
         return Response::RespContextError;
     }
 
-    Server_Player *targetPlayer = game->getPlayers().value(cmd.target_player_id());
+    Server_Player *targetPlayer =
+        game->getPlayers().value(cmd.has_target_player_id() ? cmd.target_player_id() : playerId);
     if (!targetPlayer) {
         return Response::RespNameNotFound;
     }
@@ -1753,7 +1757,7 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
     if (!zone) {
         return Response::RespNameNotFound;
     }
-    if (!((zone->getType() == ServerInfo_Zone::PublicZone) || (this == otherPlayer))) {
+    if (!((zone->getType() == ServerInfo_Zone::PublicZone) || (this == otherPlayer) || (zone->getName() == "shared"))) {
         return Response::RespContextError;
     }
 

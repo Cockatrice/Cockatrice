@@ -129,6 +129,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     PileZone *sb = new PileZone(this, "sb", false, false, playerArea);
     sb->setVisible(false);
 
+    PileZone *shared = new PileZone(this, "shared", false, false, playerArea);
+    shared->setVisible(false);
+
     table = new TableZone(this, this);
     connect(table, SIGNAL(sizeChanged()), this, SLOT(updateBoundingRect()));
 
@@ -313,7 +316,54 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     rfgMenu->addAction(aViewRfg);
     rfg->setMenu(rfgMenu, aViewRfg);
 
+    sharedMenu = playerMenu->addMenu(QString());
+
+    sharedMenu->addAction(tr("Draw card from shared"), [=]() {
+        Command_MoveCard cmd;
+        cmd.set_start_zone("shared");
+        cmd.set_start_player_id(this->getId());
+        cmd.set_target_zone("hand");
+        cmd.mutable_cards_to_move()->add_card()->set_card_id(0);
+        sendGameCommand(cmd);
+    });
+
+    sharedMenu->addAction(tr("View shared"),
+                          [=]() { static_cast<GameScene *>(scene())->toggleZoneView(this, "shared", -1); });
+
+    sharedMenu->addAction(tr("Move top shared card to table"), [=]() {
+        Command_MoveCard cmd;
+        cmd.set_start_zone("shared");
+        cmd.set_start_player_id(this->getId());
+        cmd.set_target_zone("table");
+        cmd.mutable_cards_to_move()->add_card()->set_card_id(0);
+        sendGameCommand(cmd);
+    });
+    sharedMenu->addAction(tr("Move X card from your library to shared"), [=]() {
+        bool ok;
+        int number = QInputDialog::getInt(nullptr, tr("Place card X cards from library to shared"),
+                                          tr("How many cards from the top of the deck should this card be placed:"),
+                                          defaultNumberTopCardsToPlaceBelow, 1, 2000000000, 1, &ok);
+
+        if (!ok)
+            return;
+
+        Command_MoveCard cmd;
+        cmd.set_start_zone("deck");
+        cmd.set_target_player_id(this->getId());
+        cmd.set_target_zone("shared");
+        for (int i = number - 1; i >= 0; --i) {
+            cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
+        }
+        sendGameCommand(cmd);
+    });
+
     if (local || judge) {
+        sharedMenu->addAction(tr("Shuffle"), [=]() {
+            Command_Shuffle cmd;
+            cmd.set_zone_name("shared");
+            sendGameCommand(cmd);
+        });
+
         graveMenu->addSeparator();
         moveGraveMenu = graveMenu->addMenu(QString());
         moveGraveMenu->setTearOffEnabled(true);
@@ -662,6 +712,7 @@ void Player::retranslateUi()
     playerMenu->setTitle(tr("Player \"%1\"").arg(QString::fromStdString(userInfo->name())));
     graveMenu->setTitle(tr("&Graveyard"));
     rfgMenu->setTitle(tr("&Exile"));
+    sharedMenu->setTitle(tr("&Shared"));
 
     if (local || judge) {
         moveHandMenu->setTitle(tr("&Move hand to..."));

@@ -76,6 +76,8 @@ QString CardZone::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
         return (theirOwn ? tr("their graveyard", "nominative") : tr("%1's graveyard", "nominative").arg(ownerName));
     else if (name == "rfg")
         return (theirOwn ? tr("their exile", "nominative") : tr("%1's exile", "nominative").arg(ownerName));
+    else if (name == "shared")
+        return (theirOwn ? tr("their shared", "nominative") : tr("%1's shared", "nominative").arg(ownerName));
     else if (name == "sb")
         switch (gc) {
             case CaseLookAtZone:

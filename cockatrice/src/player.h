@@ -204,8 +204,8 @@ private slots:
 private:
     TabGame *game;
     QMenu *playerMenu, *handMenu, *moveHandMenu, *graveMenu, *moveGraveMenu, *rfgMenu, *moveRfgMenu, *libraryMenu,
-        *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mRevealTopCard, *mRevealHand,
-        *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
+        *sharedMenu, *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mRevealTopCard,
+        *mRevealHand, *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
