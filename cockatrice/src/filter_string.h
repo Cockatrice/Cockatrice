@@ -29,7 +29,16 @@ public:
         return result(card);
     }
 
+    bool valid() {
+        return _error.isEmpty();
+    }
+
+    QString error() {
+        return _error;
+    }
+
 private:
+    QString _error;
     Filter result;
 };
 

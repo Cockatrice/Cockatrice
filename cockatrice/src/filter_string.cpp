@@ -9,13 +9,13 @@
 peg::parser search(R"(
 Start <- QueryPartList
 ~ws <- [ ]+
-QueryPartList <- ComplexQueryPart ( ws (ws "and ws")? ComplexQueryPart)*
+QueryPartList <- ComplexQueryPart ( ws (ws "and ws")? ComplexQueryPart)* ws*
 
 ComplexQueryPart <- SomewhatComplexQueryPart ws $or<[oO][rR]> ws SomewhatComplexQueryPart / SomewhatComplexQueryPart
 
 SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 
-QueryPart <- NotQuery / SetQuery / CMCQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / GenericQuery
+QueryPart <- NotQuery / SetQuery / CMCQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
 NotQuery <- ('not' ws/'-') QueryPart
 SetQuery <- 'e' [:] FlexStringValue
@@ -34,7 +34,9 @@ ColorEx <- Color / [mc]
 
 ColorQuery <- [cC] 'olor'? [:] ColorEx
 
-NonQuote <- [a-zA-Z0-9 ] / '-'
+FieldQuery <- String [:] RegexString / String ws? NumericExpression
+
+NonQuote <- !["].
 UnescapedStringListPart <- [a-zA-Z]+
 String <- UnescapedStringListPart / ["] <NonQuote*> ["]
 StringValue <- String / [(] StringList [)]
@@ -54,10 +56,6 @@ NumericValue <- [0-9]+
 
 std::once_flag init;
 
-void tracer(const char *name, const char *s, size_t n, const peg::SemanticValues, const peg::Context, const peg::any)
-{
-    std::cerr << "T " << name << "/" << s << "/" << n << std::endl;
-}
 
 FilterString::FilterString(const QString &expr)
 {
@@ -177,7 +175,16 @@ FilterString::FilterString(const QString &expr)
                 return matcher(parts.length() == 2 ? parts[1].toInt() : 0);
             };
         };
-
+        search["FieldQuery"] = [](const peg::SemanticValues &sv) -> Filter {
+            QString field = sv[0].get<QString>();
+            if ( sv.choice() == 0 ) {
+                StringMatcher matcher = sv[1].get<StringMatcher>();
+                return [=](CardData x) -> bool { return matcher(x->getProperty(field)); };
+            } else {
+                NumberMatcher matcher = sv[1].get<NumberMatcher>();
+                return [=](CardData x) -> bool { return matcher(x->getProperty(field).toInt()); };
+            }
+        };
         search["GenericQuery"] = [](const peg::SemanticValues &sv) -> Filter {
             StringMatcher matcher = sv[0].get<StringMatcher>();
             return [=](CardData x) { return matcher(x->getName()); };
@@ -189,11 +196,22 @@ FilterString::FilterString(const QString &expr)
         };
     });
 
+    _error = QString();
+
+    if ( ba.size() == 0 ) {
+        result = [](CardData) -> bool { return true; };
+        return;
+    }
+
+    search.log = [&](size_t ln, size_t col, const std::string &msg) {
+        _error = QString("%1:%2: %3").arg(ln).arg(col).arg(QString::fromStdString(msg));
+    };
+
     // std::shared_ptr<peg::Ast> ast;
     if (search.parse(ba.data(), result)) {
 
     } else {
-        std::cout << "Error!";
-        result = [](CardData) -> bool { return true; };
+        std::cout << "Error!" << _error.toStdString() << std::endl;
+        result = [](CardData) -> bool { return false; };
     }
 }

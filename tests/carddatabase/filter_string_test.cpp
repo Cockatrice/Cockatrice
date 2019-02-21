@@ -46,6 +46,8 @@ class CardQuery : public ::testing::Test {
 
     Query(Quotes, cat, "t:\"creature\"", true);
 
+    Query(Field, cat, "pt:\"3/3\"", true)
+
 } // namespace
 
 int main(int argc, char **argv)
