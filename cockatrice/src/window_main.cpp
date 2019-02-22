@@ -864,6 +864,7 @@ void MainWindow::alertForcedOracleRun(const QString &newVersion)
                                 "Oracle will now launch to update your card database.")
                                  .arg(newVersion));
     actCheckCardUpdates();
+    actCheckServerUpdates();
 }
 
 MainWindow::~MainWindow()
@@ -1125,6 +1126,13 @@ void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
     QMessageBox::information(this, tr("Information"),
                              tr("Update completed successfully.\nCockatrice will now reload the card database."));
     QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+}
+
+void MainWindow::actCheckServerUpdates()
+{
+    auto hps = new HandlePublicServers(this);
+    hps->downloadPublicServers();
+    connect(hps, &HandlePublicServers::sigPublicServersDownloadedSuccessfully, [=]() { hps->deleteLater(); });
 }
 
 void MainWindow::refreshShortcuts()

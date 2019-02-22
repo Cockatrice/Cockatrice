@@ -158,7 +158,10 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     QString setName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                     CardInfoPerSet setInfo(internalAddSet(setName));
                     for (QXmlStreamAttribute attr : attrs) {
-                        setInfo.setProperty(attr.name().toString(), attr.value().toString());
+                        QString attrName = attr.name().toString();
+                        if (attrName == "picURL")
+                            attrName = "picurl";
+                        setInfo.setProperty(attrName, attr.value().toString());
                     }
                     sets.insert(setName, setInfo);
                     // relatd cards

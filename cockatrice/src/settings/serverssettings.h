@@ -58,10 +58,7 @@ public:
     bool updateExistingServerWithoutLoss(QString saveName,
                                          QString serv = QString(),
                                          QString port = QString(),
-                                         QString site = QString(),
-                                         QString username = QString(),
-                                         QString password = QString(),
-                                         bool savePassword = true);
+                                         QString site = QString());
     void setClearDebugLogStatus(bool abIsChecked);
     bool getClearDebugLogStatus(bool abDefaultValue);
 

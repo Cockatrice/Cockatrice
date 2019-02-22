@@ -44,6 +44,8 @@ UserContextMenu::UserContextMenu(const TabSupervisor *_tabSupervisor, QWidget *p
     aBanHistory = new QAction(QString(), this);
     aPromoteToMod = new QAction(QString(), this);
     aDemoteFromMod = new QAction(QString(), this);
+    aPromoteToJudge = new QAction(QString(), this);
+    aDemoteFromJudge = new QAction(QString(), this);
 
     retranslateUi();
 }
@@ -64,6 +66,8 @@ void UserContextMenu::retranslateUi()
     aBanHistory->setText(tr("View user's &ban history"));
     aPromoteToMod->setText(tr("&Promote user to moderator"));
     aDemoteFromMod->setText(tr("Dem&ote user from moderator"));
+    aPromoteToJudge->setText(tr("Promote user to &juge"));
+    aDemoteFromJudge->setText(tr("Demote user from judge"));
 }
 
 void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer)
@@ -220,7 +224,7 @@ void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const 
     const Command_AdjustMod &cmd = commandContainer.admin_command(0).GetExtension(Command_AdjustMod::ext);
 
     if (resp.response_code() == Response::RespOk) {
-        if (cmd.should_be_mod()) {
+        if (cmd.should_be_mod() || cmd.should_be_judge()) {
             QMessageBox::information(static_cast<QWidget *>(parent()), tr("Success"),
                                      tr("Successfully promoted user."));
         } else {
@@ -228,7 +232,7 @@ void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const 
         }
 
     } else {
-        if (cmd.should_be_mod()) {
+        if (cmd.should_be_mod() || cmd.should_be_judge()) {
             QMessageBox::information(static_cast<QWidget *>(parent()), tr("Failed"), tr("Failed to promote user."));
         } else {
             QMessageBox::information(static_cast<QWidget *>(parent()), tr("Failed"), tr("Failed to demote user."));
@@ -312,6 +316,15 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
                    (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
             menu->addAction(aPromoteToMod);
         }
+
+        if (userLevel.testFlag(ServerInfo_User::IsJudge) &&
+            (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+            menu->addAction(aDemoteFromJudge);
+
+        } else if (userLevel.testFlag(ServerInfo_User::IsRegistered) &&
+                   (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+            menu->addAction(aPromoteToJudge);
+        }
     }
     bool anotherUser = userName != tabSupervisor->getOwnUsername();
     aDetails->setEnabled(true);
@@ -388,6 +401,15 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         Command_AdjustMod cmd;
         cmd.set_user_name(userName.toStdString());
         cmd.set_should_be_mod(actionClicked == aPromoteToMod);
+
+        PendingCommand *pend = client->prepareAdminCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(adjustMod_processUserResponse(Response, CommandContainer)));
+        client->sendCommand(pend);
+    } else if (actionClicked == aPromoteToJudge || actionClicked == aDemoteFromJudge) {
+        Command_AdjustMod cmd;
+        cmd.set_user_name(userName.toStdString());
+        cmd.set_should_be_judge(actionClicked == aPromoteToJudge);
 
         PendingCommand *pend = client->prepareAdminCommand(cmd);
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,

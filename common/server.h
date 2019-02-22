@@ -172,6 +172,10 @@ public:
     {
         return 0;
     }
+    virtual bool permitCreateGameAsJudge() const
+    {
+        return false;
+    }
 
     Server_DatabaseInterface *getDatabaseInterface() const;
     int getNextLocalGameId()

@@ -38,6 +38,7 @@ private:
     QList<LogMoveCard> moveCardQueue;
     QMap<CardItem *, bool> moveCardTapped;
     QList<QString> moveCardExtras;
+    QString messagePrefix, messageSuffix;
 
     const QString tableConstant() const;
     const QString graveyardConstant() const;
@@ -108,6 +109,10 @@ public slots:
     void logStopDumpZone(Player *player, CardZone *zone);
     void logUnattachCard(Player *player, QString cardName);
     void logUndoDraw(Player *player, QString cardName);
+    void setContextJudgeName(QString player);
+    void appendHtmlServerMessage(const QString &html,
+                                 bool optionalIsBold = false,
+                                 QString optionalFontColor = QString()) override;
 
 public:
     void connectToPlayer(Player *player);

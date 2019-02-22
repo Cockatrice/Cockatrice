@@ -71,8 +71,9 @@ public:
              QWidget *parent = 0);
     void retranslateUi();
     void appendHtml(const QString &html);
-    void
-    appendHtmlServerMessage(const QString &html, bool optionalIsBold = false, QString optionalFontColor = QString());
+    void virtual appendHtmlServerMessage(const QString &html,
+                                         bool optionalIsBold = false,
+                                         QString optionalFontColor = QString());
     void appendMessage(QString message,
                        RoomMessageTypeFlags messageType = 0,
                        QString sender = QString(),

@@ -549,10 +549,14 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
 
     const int is_admin = query->value(2).toInt();
     int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
-    if (is_admin == 1)
+    if (is_admin & 1)
         userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
-    else if (is_admin == 2)
+    else if (is_admin & 2)
         userLevel |= ServerInfo_User::IsModerator;
+
+    if (is_admin & 4)
+        userLevel |= ServerInfo_User::IsJudge;
+
     result.set_user_level(userLevel);
 
     const QString country = query->value(3).toString();

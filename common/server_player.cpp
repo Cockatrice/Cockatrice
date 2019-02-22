@@ -87,10 +87,11 @@ Server_Player::Server_Player(Server_Game *_game,
                              int _playerId,
                              const ServerInfo_User &_userInfo,
                              bool _spectator,
+                             bool _judge,
                              Server_AbstractUserInterface *_userInterface)
     : ServerInfo_User_Container(_userInfo), game(_game), userInterface(_userInterface), deck(nullptr), pingTime(0),
-      playerId(_playerId), spectator(_spectator), initialCards(0), nextCardId(0), readyStart(false), conceded(false),
-      sideboardLocked(true)
+      playerId(_playerId), spectator(_spectator), judge(_judge), initialCards(0), nextCardId(0), readyStart(false),
+      conceded(false), sideboardLocked(true)
 {
 }
 
@@ -259,6 +260,7 @@ void Server_Player::getProperties(ServerInfo_PlayerProperties &result, bool with
         result.set_sideboard_locked(sideboardLocked);
         result.set_ready_start(readyStart);
     }
+    result.set_judge(judge);
     if (deck) {
         result.set_deck_hash(deck->getDeckHash().toStdString());
     }
@@ -366,7 +368,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
 {
     // Disallow controller change to other zones than the table.
     if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) &&
-        (startzone->getPlayer() != targetzone->getPlayer())) {
+        (startzone->getPlayer() != targetzone->getPlayer()) && !judge) {
         return Response::RespContextError;
     }
 
@@ -868,6 +870,24 @@ Server_Player::cmdUnconcede(const Command_Unconcede & /*cmd*/, ResponseContainer
     return Response::RespOk;
 }
 
+Response::ResponseCode Server_Player::cmdJudge(const Command_Judge &cmd, ResponseContainer &rc, GameEventStorage &ges)
+{
+    if (!judge)
+        return Response::RespFunctionNotAllowed;
+
+    Server_Player *player = this->game->getPlayers().value(cmd.target_id());
+
+    ges.setForcedByJudge(playerId);
+    if (player == nullptr)
+        return Response::RespContextError;
+
+    for (int i = 0; i < cmd.game_command_size(); ++i) {
+        player->processGameCommand(cmd.game_command(i), rc, ges);
+    }
+
+    return Response::RespOk;
+}
+
 Response::ResponseCode
 Server_Player::cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
@@ -1087,7 +1107,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
         return Response::RespNameNotFound;
     }
 
-    if ((startPlayer != this) && (!startZone->getPlayersWithWritePermission().contains(playerId))) {
+    if ((startPlayer != this) && (!startZone->getPlayersWithWritePermission().contains(playerId)) && !judge) {
         return Response::RespContextError;
     }
 
@@ -1100,7 +1120,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
         return Response::RespNameNotFound;
     }
 
-    if ((startPlayer != this) && (targetPlayer != this)) {
+    if ((startPlayer != this) && (targetPlayer != this) && !judge) {
         return Response::RespContextError;
     }
 
@@ -1673,15 +1693,18 @@ Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & 
 Response::ResponseCode
 Server_Player::cmdNextTurn(const Command_NextTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage & /*ges*/)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
-    if (conceded) {
-        return Response::RespContextError;
+
+    if (!judge) {
+        if (spectator) {
+            return Response::RespFunctionNotAllowed;
+        }
+
+        if (conceded) {
+            return Response::RespContextError;
+        }
     }
 
     game->nextTurn();
@@ -1692,20 +1715,24 @@ Response::ResponseCode Server_Player::cmdSetActivePhase(const Command_SetActiveP
                                                         ResponseContainer & /*rc*/,
                                                         GameEventStorage & /*ges*/)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
-    if (conceded) {
-        return Response::RespContextError;
+
+    if (!judge) {
+        if (spectator) {
+            return Response::RespFunctionNotAllowed;
+        }
+
+        if (conceded) {
+            return Response::RespContextError;
+        }
+
+        if (game->getActivePlayer() != playerId) {
+            return Response::RespContextError;
+        }
     }
 
-    if (game->getActivePlayer() != playerId) {
-        return Response::RespContextError;
-    }
     game->setActivePhase(cmd.phase());
 
     return Response::RespOk;
@@ -2068,6 +2095,9 @@ Server_Player::processGameCommand(const GameCommand &command, ResponseContainer 
             break;
         case GameCommand::UNCONCEDE:
             return cmdUnconcede(command.GetExtension(Command_Unconcede::ext), rc, ges);
+            break;
+        case GameCommand::JUDGE:
+            return cmdJudge(command.GetExtension(Command_Judge::ext), rc, ges);
             break;
 
         default:

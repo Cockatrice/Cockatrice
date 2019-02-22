@@ -128,6 +128,7 @@ MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, boo
 
 void MessageLogWidget::containerProcessingDone()
 {
+
     if (currentContext == MessageContext_MoveCard) {
         for (auto &i : moveCardQueue) {
             logDoMoveCard(i);
@@ -142,6 +143,7 @@ void MessageLogWidget::containerProcessingDone()
     }
 
     currentContext = MessageContext_None;
+    messageSuffix = messagePrefix = QString();
 }
 
 void MessageLogWidget::containerProcessingStarted(const GameEventContext &context)
@@ -845,6 +847,18 @@ void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
                 .arg(sanitizeHtml(player->getName()))
                 .arg(QString("<a href=\"card://%1\">%2</a>").arg(sanitizeHtml(cardName)).arg(sanitizeHtml(cardName))));
     }
+}
+
+void MessageLogWidget::setContextJudgeName(QString name)
+{
+    messagePrefix = QString("<span style=\"color:black\">");
+    messageSuffix = QString("</span> [<img height=12 src=\"theme:icons/scales\"> %1]").arg(sanitizeHtml(name));
+}
+
+void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optionalIsBold, QString optionalFontColor)
+{
+
+    ChatView::appendHtmlServerMessage(messagePrefix + html + messageSuffix, optionalIsBold, optionalFontColor);
 }
 
 void MessageLogWidget::connectToPlayer(Player *player)

@@ -26,7 +26,7 @@ AbstractCounter::AbstractCounter(Player *_player,
 
     shortcutActive = false;
 
-    if (player->getLocal()) {
+    if (player->getLocalOrJudge()) {
         menu = new QMenu(name);
         aSet = new QAction(this);
         connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
@@ -115,7 +115,7 @@ void AbstractCounter::setValue(int _value)
 
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (isUnderMouse() && player->getLocal()) {
+    if (isUnderMouse() && player->getLocalOrJudge()) {
         if (event->button() == Qt::MidButton || (QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
             if (menu)
                 menu->exec(event->screenPos());

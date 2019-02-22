@@ -143,6 +143,7 @@ QPixmap UserLevelPixmapGenerator::generatePixmap(int height, UserLevelFlags user
 
     QPixmap pixmap = QPixmap("theme:userlevels/" + levelString)
                          .scaled(height, height, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
     pmCache.insert(key, pixmap);
     return pixmap;
 }

@@ -47,6 +47,7 @@ class Command_IncCardCounter;
 class Command_ReadyStart;
 class Command_Concede;
 class Command_Unconcede;
+class Command_Judge;
 class Command_IncCounter;
 class Command_CreateCounter;
 class Command_SetCounter;
@@ -77,6 +78,7 @@ private:
     int pingTime;
     int playerId;
     bool spectator;
+    bool judge;
     int initialCards;
     int nextCardId;
     bool readyStart;
@@ -89,6 +91,7 @@ public:
                   int _playerId,
                   const ServerInfo_User &_userInfo,
                   bool _spectator,
+                  bool _judge,
                   Server_AbstractUserInterface *_handler);
     ~Server_Player() override;
     void prepareDestroy();
@@ -114,6 +117,10 @@ public:
     bool getSpectator() const
     {
         return spectator;
+    }
+    bool getJudge() const
+    {
+        return judge;
     }
     bool getConceded() const
     {
@@ -185,6 +192,7 @@ public:
     cmdKickFromGame(const Command_KickFromGame &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdConcede(const Command_Concede &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdUnconcede(const Command_Unconcede &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    Response::ResponseCode cmdJudge(const Command_Judge &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode

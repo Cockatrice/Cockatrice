@@ -124,6 +124,7 @@ private:
     int localPlayerId;
     const bool isLocalGame;
     bool spectator;
+    bool judge;
     QMap<int, Player *> players;
     QMap<int, ServerInfo_User> spectators;
     bool gameStateKnown;
