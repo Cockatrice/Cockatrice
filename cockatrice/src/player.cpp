@@ -2571,7 +2571,7 @@ void Player::actIncPT(int deltaP, int deltaT)
         auto *card = static_cast<CardItem *>(item);
         QString pt = card->getPT();
         int sep = pt.indexOf('/');
-        int pow = pt.left(sep).toInt(); // if not found both are set to full tring
+        int pow = pt.left(sep).toInt(); // if not found both are set to full string. so 4 -> 4/4
         int tou = pt.mid(sep + 1).toInt();
         QString newpt = QString::number(pow + deltaP) + "/" + QString::number(tou + deltaT);
         auto *cmd = new Command_SetCardAttr;
