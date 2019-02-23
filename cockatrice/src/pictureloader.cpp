@@ -33,6 +33,9 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
         for (const auto &set : card->getSets()) {
             sortedSets << set.getPtr();
         }
+        if (sortedSets.empty()) {
+            sortedSets << CardSet::newInstance("", "", "", QDate());
+        }
         qSort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
         // The first time called, nextSet will also populate the Urls for the first set.
         nextSet();
