@@ -1221,7 +1221,8 @@ void TabDeckEditor::setSaveStatus(bool newStatus)
     analyzeDeckMenu->setEnabled(newStatus);
 }
 
-void TabDeckEditor::showSearchSyntaxHelp() {
+void TabDeckEditor::showSearchSyntaxHelp()
+{
 
     QFile file("theme:help/search.md");
 
@@ -1234,19 +1235,16 @@ void TabDeckEditor::showSearchSyntaxHelp() {
     file.close();
 
     // Poor Markdown Converter
-    mText = mText
-        .replace(QRegularExpression("^(###)(.*)"), "<h3>\\2</h3>")
-        .replace(QRegularExpression("^(##)(.*)"), "<h2>\\2</h2>")
-        .replace(QRegularExpression("^(#)(.*)"), "<h1>\\2</h1>")
-        .replace(QRegularExpression("\\[([^\[]+)\\]\\(([^\\)]+)\\)"), "<a href=\'\\2\'>\\1</a>");
+    mText = mText.replace(QRegularExpression("^(###)(.*)"), "<h3>\\2</h3>")
+                .replace(QRegularExpression("^(##)(.*)"), "<h2>\\2</h2>")
+                .replace(QRegularExpression("^(#)(.*)"), "<h1>\\2</h1>")
+                .replace(QRegularExpression("\\[([^\[]+)\\]\\(([^\\)]+)\\)"), "<a href=\'\\2\'>\\1</a>");
 
     auto text = new QTextBrowser;
     text->setWindowTitle("Search Help");
     text->setReadOnly(true);
     text->setMinimumSize({500, 600});
     text->setHtml(mText);
-    connect(text, &QTextBrowser::anchorClicked, [=](QUrl link) {
-        searchEdit->setText(link.fragment());
-    });
+    connect(text, &QTextBrowser::anchorClicked, [=](QUrl link) { searchEdit->setText(link.fragment()); });
     text->show();
 }

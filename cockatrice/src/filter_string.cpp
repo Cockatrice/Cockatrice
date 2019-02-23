@@ -56,8 +56,11 @@ NumericValue <- [0-9]+
 
 std::once_flag init;
 
-static void setupParserRules() {
-    auto passthru = [](const peg::SemanticValues &sv) -> Filter { return sv.size() > 0 ? sv[0].get<Filter>() : nullptr; };
+static void setupParserRules()
+{
+    auto passthru = [](const peg::SemanticValues &sv) -> Filter {
+        return sv.size() > 0 ? sv[0].get<Filter>() : nullptr;
+    };
 
     search["Start"] = passthru;
     search["QueryPartList"] = [](const peg::SemanticValues &sv) -> Filter {
@@ -115,9 +118,9 @@ static void setupParserRules() {
             auto target = sv[0].get<QStringList>();
             return [=](const QString &s) {
                 qDebug() << target << " vs " << s;
-                
+
                 for (QString str : target) {
-                    if ( str == s )
+                    if (str == s)
                         return true;
                 }
                 return false;
@@ -127,9 +130,9 @@ static void setupParserRules() {
             return [=](const QString &s) { return s.split(" ").contains(target, Qt::CaseInsensitive); };
         }
     };
-    search["CompactStringSet"] = search["StringList"] = [](const peg::SemanticValues &sv)->QStringList {
+    search["CompactStringSet"] = search["StringList"] = [](const peg::SemanticValues &sv) -> QStringList {
         QStringList result;
-        for ( int i = 0; i < sv.size(); ++i ) {
+        for (int i = 0; i < sv.size(); ++i) {
             result.append(sv[i].get<QString>());
         }
         return result;
