@@ -30,7 +30,7 @@ class CardQuery : public ::testing::Test {
     Query(Typing, cat, "t", true)
 
     Query(NonMatchingType, cat, "t:kithkin", false)
-    Query(MathcingType, cat, "t:creature", true)
+    Query(MatchingType, cat, "t:creature", true)
     Query(Not1, cat, "not t:kithkin", true)
     Query(Not2, cat, "not t:creature", false)
     Query(Case, cat, "t:cReAtUrE", true)
