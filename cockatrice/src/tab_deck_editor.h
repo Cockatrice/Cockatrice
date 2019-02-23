@@ -96,6 +96,7 @@ private slots:
     void dockTopLevelChanged(bool topLevel);
     void saveDbHeaderState();
     void setSaveStatus(bool newStatus);
+    void showSearchSyntaxHelp();
 
 private:
     CardInfoPtr currentCardInfo() const;
