@@ -173,7 +173,7 @@ void PlayerListWidget::setActivePlayer(int playerId)
     while (i.hasNext()) {
         i.next();
         QTreeWidgetItem *twi = i.value();
-        QColor c = i.key() == playerId ? QColor(150, 255, 150) : Qt::white;
+        QColor c = i.key() == playerId ? QColor(150, 255, 150) : palette().base().color();
         twi->setBackground(4, c);
     }
 }
