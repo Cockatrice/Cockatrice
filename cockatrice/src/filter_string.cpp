@@ -117,8 +117,6 @@ static void setupParserRules()
         if (sv.choice() != 1) {
             auto target = sv[0].get<QStringList>();
             return [=](const QString &s) {
-                qDebug() << target << " vs " << s;
-
                 for (QString str : target) {
                     if (str == s)
                         return true;
