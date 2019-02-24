@@ -49,3 +49,8 @@ void AbstractGraphicsItem::paintNumberEllipse(int number,
 
     painter->restore();
 }
+void resetPainterTransform(QPainter *painter)
+{
+    painter->resetTransform();
+    painter->setTransform(painter->deviceTransform().inverted());
+}

@@ -1,4 +1,5 @@
 #include "counter_general.h"
+#include "abstractgraphicsitem.h"
 #include "pixmapgenerator.h"
 #include <QPainter>
 
@@ -28,7 +29,7 @@ void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /
     QPixmap pixmap = CounterPixmapGenerator::generatePixmap(translatedHeight, name, hovered);
 
     painter->save();
-    painter->resetTransform();
+    resetPainterTransform(painter);
     painter->drawPixmap(QPoint(0, 0), pixmap);
 
     if (value) {

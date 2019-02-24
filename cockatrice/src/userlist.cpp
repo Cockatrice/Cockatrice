@@ -10,6 +10,7 @@
 #include "tab_supervisor.h"
 #include "tab_userlists.h"
 #include "user_context_menu.h"
+#include <QApplication>
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -23,6 +24,7 @@
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QVBoxLayout>
+#include <QWidget>
 
 BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(parent)
 {
@@ -296,7 +298,7 @@ void UserListTWI::setUserInfo(const ServerInfo_User &_userInfo)
 void UserListTWI::setOnline(bool online)
 {
     setData(0, Qt::UserRole + 1, online);
-    setData(2, Qt::ForegroundRole, online ? QBrush() : QBrush(Qt::gray));
+    setData(2, Qt::ForegroundRole, online ? qApp->palette().brush(QPalette::WindowText) : QBrush(Qt::gray));
 }
 
 bool UserListTWI::operator<(const QTreeWidgetItem &other) const

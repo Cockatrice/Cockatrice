@@ -34,7 +34,7 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor,
     mentionFormat.setFontWeight(QFont::Bold);
 
     mentionFormatOtherUser.setFontWeight(QFont::Bold);
-    mentionFormatOtherUser.setForeground(Qt::blue);
+    mentionFormatOtherUser.setForeground(palette().link());
     mentionFormatOtherUser.setAnchor(true);
 
     viewport()->setCursor(Qt::IBeamCursor);
@@ -60,7 +60,11 @@ QTextCursor ChatView::prepareBlock(bool same)
     } else {
         QTextBlockFormat blockFormat;
         if ((evenNumber = !evenNumber))
-            blockFormat.setBackground(palette().alternateBase());
+            blockFormat.setBackground(palette().window());
+        else
+            blockFormat.setBackground(palette().base());
+
+        blockFormat.setForeground(palette().text());
         blockFormat.setBottomMargin(4);
         cursor.insertBlock(blockFormat);
     }
@@ -95,7 +99,7 @@ void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 {
     QTextCharFormat oldFormat = cursor.charFormat();
     QTextCharFormat anchorFormat = oldFormat;
-    anchorFormat.setForeground(Qt::blue);
+    anchorFormat.setForeground(palette().link());
     anchorFormat.setAnchor(true);
     anchorFormat.setAnchorHref("card://" + cardName);
     anchorFormat.setFontItalic(true);
@@ -112,10 +116,10 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
 
     QTextCharFormat oldFormat = cursor.charFormat();
     QTextCharFormat anchorFormat = oldFormat;
-    anchorFormat.setForeground(Qt::blue);
+    anchorFormat.setForeground(palette().link());
     anchorFormat.setAnchor(true);
     anchorFormat.setAnchorHref(url);
-    anchorFormat.setUnderlineColor(Qt::blue);
+    anchorFormat.setUnderlineColor(palette().link().color());
     anchorFormat.setFontUnderline(true);
 
     cursor.setCharFormat(anchorFormat);
