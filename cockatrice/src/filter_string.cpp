@@ -15,7 +15,7 @@ ComplexQueryPart <- SomewhatComplexQueryPart ws $or<[oO][rR]> ws SomewhatComplex
 
 SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 
-QueryPart <- NotQuery / SetQuery / CMCQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
+QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
 NotQuery <- ('not' ws/'-') QueryPart
 SetQuery <- 'e' [:] FlexStringValue
@@ -25,6 +25,7 @@ OracleQuery <- 'o' [:] RegexString
 CMCQuery <- 'cmc' ws? NumericExpression
 PowerQuery <- 'pow' ws? NumericExpression
 ToughnessQuery <- 'tou' ws? NumericExpression
+RarityQuery <- 'r' ':' RegexString
 
 
 TypeQuery <- [tT] 'ype'? [:] StringValue
@@ -96,6 +97,16 @@ static void setupParserRules()
         return [=](CardData x) -> bool {
             for (auto set : x->getSets().keys()) {
                 if (matcher(set))
+                    return true;
+            }
+            return false;
+        };
+    };
+    search["RarityQuery"] = [](const peg::SemanticValues &sv) -> Filter {
+        StringMatcher matcher = sv[0].get<StringMatcher>();
+        return [=](CardData x) -> bool {
+            for (auto set : x->getSets().values()) {
+                if (matcher(set.getProperty("rarity")))
                     return true;
             }
             return false;
