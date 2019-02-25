@@ -248,6 +248,10 @@ public:
         properties.insert(_name, _value);
         emit cardInfoChanged(smartThis);
     }
+    bool hasProperty(const QString &propertyName) const
+    {
+        return properties.contains(propertyName);
+    }
     const CardInfoPerSetMap &getSets() const
     {
         return sets;

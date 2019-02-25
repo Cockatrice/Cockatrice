@@ -39,6 +39,8 @@ void CardInfoText::setCard(CardInfoPtr card)
 
     QStringList cardProps = card->getProperties();
     foreach (QString key, cardProps) {
+        if (key.contains("-"))
+            continue;
         QString keyText = Mtg::getNicePropertyName(key).toHtmlEscaped() + ":";
         text +=
             QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(keyText, card->getProperty(key).toHtmlEscaped());

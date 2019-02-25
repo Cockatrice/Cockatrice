@@ -15,7 +15,7 @@ ComplexQueryPart <- SomewhatComplexQueryPart ws $or<[oO][rR]> ws SomewhatComplex
 
 SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 
-QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
+QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
 NotQuery <- ('not' ws/'-') QueryPart
 SetQuery <- 'e' [:] FlexStringValue
@@ -26,6 +26,10 @@ CMCQuery <- 'cmc' ws? NumericExpression
 PowerQuery <- 'pow' ws? NumericExpression
 ToughnessQuery <- 'tou' ws? NumericExpression
 RarityQuery <- 'r' ':' RegexString
+
+FormatQuery <- 'f' ':' Format / Legality ':' Format
+Format <- [Mm] 'odern'? / [Ss] 'tandard'? / [Vv] 'intage'? / [Ll] 'egacy'? / [Cc] 'ommander'?
+Legality <- [Ll] 'egal'? / [Bb] 'anned'? / [Rr] 'estricted'
 
 
 TypeQuery <- [tT] 'ype'? [:] StringValue
@@ -111,6 +115,45 @@ static void setupParserRules()
             }
             return false;
         };
+    };
+    search["FormatQuery"] = [](const peg::SemanticValues &sv) -> Filter {
+        if (sv.choice() == 0) {
+            QString format = sv[0].get<QString>();
+            return [=](CardData x) -> bool { return x->getProperty(QString("format-%1").arg(format)) == "legal"; };
+        } else {
+            QString format = sv[1].get<QString>();
+            QString legality = sv[0].get<QString>();
+            return [=](CardData x) -> bool { return x->getProperty(QString("format-%1").arg(format)) == legality; };
+        }
+    };
+    search["Legality"] = [](const peg::SemanticValues &sv) -> QString {
+        switch (tolower(sv.str()[0])) {
+            case 'l':
+                return "legal";
+            case 'b':
+                return "banned";
+            case 'r':
+                return "restricted";
+            default:
+                return "";
+        }
+    };
+
+    search["Format"] = [](const peg::SemanticValues &sv) -> QString {
+        switch (tolower(sv.str()[0])) {
+            case 'm':
+                return "modern";
+            case 's':
+                return "standard";
+            case 'v':
+                return "vintage";
+            case 'l':
+                return "legacy";
+            case 'c':
+                return "commander";
+            default:
+                return "";
+        }
     };
     search["StringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
         auto target = sv[0].get<QString>();
@@ -217,10 +260,12 @@ static void setupParserRules()
         QString field = sv[0].get<QString>();
         if (sv.choice() == 0) {
             StringMatcher matcher = sv[1].get<StringMatcher>();
-            return [=](CardData x) -> bool { return matcher(x->getProperty(field)); };
+            return [=](CardData x) -> bool { return x->hasProperty(field) ? matcher(x->getProperty(field)) : false; };
         } else {
             NumberMatcher matcher = sv[1].get<NumberMatcher>();
-            return [=](CardData x) -> bool { return matcher(x->getProperty(field).toInt()); };
+            return [=](CardData x) -> bool {
+                return x->hasProperty(field) ? matcher(x->getProperty(field).toInt()) : false;
+            };
         }
     };
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> Filter {
