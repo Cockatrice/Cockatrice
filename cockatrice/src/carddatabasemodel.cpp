@@ -290,6 +290,9 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
         return false;
 
     if (filterString != nullptr) {
+        if (filterTree != nullptr && !filterTree->acceptsCard(info)) {
+            return false;
+        }
         return filterString->check(info);
     }
 
