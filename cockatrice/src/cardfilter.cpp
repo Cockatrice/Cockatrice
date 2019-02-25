@@ -41,6 +41,8 @@ const QString CardFilter::attrName(Attr a)
             return tr("Toughness");
         case AttrLoyalty:
             return tr("Loyalty");
+        case AttrFormat:
+            return tr("Format");
         default:
             return QString("");
     }

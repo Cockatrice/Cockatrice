@@ -253,6 +253,11 @@ bool FilterItem::acceptCmc(const CardInfoPtr info) const
     }
 }
 
+bool FilterItem::acceptFormat(const CardInfoPtr info) const
+{
+    return info->getProperty(QString("format-%1").arg(term.toLower())) == "legal";
+}
+
 bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
 {
     if (info->getLoyalty().isEmpty()) {
@@ -400,6 +405,8 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) c
             return acceptPowerToughness(info, attr);
         case CardFilter::AttrLoyalty:
             return acceptLoyalty(info);
+        case CardFilter::AttrFormat:
+            return acceptFormat(info);
         default:
             return true; /* ignore this attribute */
     }

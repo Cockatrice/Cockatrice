@@ -33,6 +33,7 @@ public:
         AttrText,
         AttrTough,
         AttrType,
+        AttrFormat,
         AttrEnd
     };
 
