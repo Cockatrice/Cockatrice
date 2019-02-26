@@ -48,6 +48,11 @@ class CardQuery : public ::testing::Test {
 
     Query(Field, cat, "pt:\"3/3\"", true)
 
+    Query(Color1, cat, "c:g", true);
+    Query(Color2, cat, "c:gw", true);
+    Query(Color3, cat, "c!g", true);
+    Query(Color4, cat, "c!gw", false);
+
 } // namespace
 
 int main(int argc, char **argv)

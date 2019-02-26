@@ -704,7 +704,7 @@ void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 
 void TabDeckEditor::updateSearch(const QString &search)
 {
-    if (search.contains(QRegularExpression("[:<>=\"]"))) {
+    if (search.contains(QRegularExpression("[:<>=\"!]"))) {
         databaseDisplayModel->setStringFilter(searchEdit->text());
     } else {
         databaseDisplayModel->setCardName(search);

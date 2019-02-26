@@ -98,6 +98,11 @@ CardInfoPtr OracleImporter::addCard(QString name,
         sortAndReduceColors(allColors);
         properties.insert("colors", allColors);
     }
+    QString allColorIdent = properties.value("colorIdenity").toString();
+    if (allColorIdent.size() > 1) {
+        sortAndReduceColors(allColorIdent);
+        properties.insert("coloridentity", allColorIdent);
+    }
 
     // DETECT CARD POSITIONING INFO
 
@@ -178,7 +183,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
     QMap<QString, SplitCardPart> splitCards;
     QString ptSeparator("/");
     QVariantMap card;
-    QString layout, name, text, colors, maintype, power, toughness;
+    QString layout, name, text, colors, colorIdentity, maintype, power, toughness;
     bool isToken;
     QStringList additionalNames;
     QVariantHash properties;
@@ -231,6 +236,11 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         colors = card.value("colors").toStringList().join("");
         if (!colors.isEmpty())
             properties.insert("colors", colors);
+
+        // special handling properties
+        colorIdentity = card.value("colorIdentity").toStringList().join("");
+        if (!colorIdentity.isEmpty())
+            properties.insert("coloridentity", colorIdentity);
 
         maintype = card.value("types").toStringList().first();
         if (!maintype.isEmpty())

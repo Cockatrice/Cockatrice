@@ -37,7 +37,7 @@ TypeQuery <- [tT] 'ype'? [:] StringValue
 Color <- < [Ww] 'hite'? / [Uu] / [Bb] 'lack'? / [Rr] 'ed'? / [Gg] 'reen'?  / [Bb] 'lue'? >
 ColorEx <- Color / [mc]
 
-ColorQuery <- [cC] 'olor'? [:] ColorEx
+ColorQuery <- [cC] 'olor'? <[iI]?> <[:!]> ColorEx*
 
 FieldQuery <- String [:] RegexString / String ws? NumericExpression
 
@@ -233,12 +233,47 @@ static void setupParserRules()
     };
 
     search["ColorQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        char target = sv[0].get<char>();
-        return [=](CardData x) {
-            if (target == 'm')
-                return x->getColors().length() > 1;
-            return x->getColors().contains(target);
-        };
+        QString parts;
+        for (int i = 0; i < sv.size(); ++i) {
+            parts += sv[i].get<char>();
+        }
+        bool idenity = sv.tokens[0].first[0] != 'i';
+        if (sv.tokens[1].first[0] == ':') {
+            return [=](CardData x) {
+                QString match = idenity ? x->getColors() : x->getProperty("coloridentity");
+
+                if (parts.contains("m") && match.length() > 1)
+                    return true;
+
+                if (parts.contains("c") && match.length() == 0)
+                    return true;
+
+                for (int i = 0; i < match.size(); ++i) {
+                    if (parts.contains(match[i]))
+                        return true;
+                }
+                return false;
+            };
+        } else {
+            return [=](CardData x) {
+                QString match = idenity ? x->getColors() : x->getProperty("colorIdentity");
+                if (parts.contains("m") && match.length() < 2)
+                    return false;
+
+                if (parts.contains("c") && match.length() != 0)
+                    return false;
+
+                for (int i = 0; i < parts.size(); ++i) {
+                    if (!match.contains(parts[i]))
+                        return false;
+                }
+                for (int i = 0; i < match.size(); ++i) {
+                    if (!parts.contains(match[i]))
+                        return false;
+                }
+                return true;
+            };
+        }
     };
 
     search["CMCQuery"] = [](const peg::SemanticValues &sv) -> Filter {
