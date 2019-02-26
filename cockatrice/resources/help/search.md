@@ -34,8 +34,8 @@
 <dd>[r:mythic](#r:mythic)</dd>
 
 <dt><u>F</u>ormat:</dt>
-<dd>[f:standard](#f:standard) <small>(extended, vintage, legacy, modern, commander)</small></dd>
-<dd>[banned:extended](#banned:extended) <small>(or legal, restricted)</small></dd>
+<dd>[f:standard](#f:standard) <small>(vintage, legacy, modern, commander)</small></dd>
+<dd>[banned:modern](#banned:modern) <small>(or legal, restricted)</small></dd>
 
 <dt><u>E</u>dition:</dt>
 <dd>[e:lea](#e:lea)</dd>
