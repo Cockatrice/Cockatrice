@@ -161,21 +161,6 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
 DlgConnect::~DlgConnect() = default;
 
-void DlgConnect::actSaveConfig()
-{
-    bool updateSuccess = settingsCache->servers().updateExistingServer(
-        saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
-        playernameEdit->text().trimmed(), passwordEdit->text(), savePasswordCheckBox->isChecked());
-
-    if (!updateSuccess) {
-        settingsCache->servers().addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
-                                              portEdit->text().trimmed(), playernameEdit->text().trimmed(),
-                                              passwordEdit->text(), savePasswordCheckBox->isChecked());
-    }
-
-    preRebuildComboBoxList();
-}
-
 void DlgConnect::downloadThePublicServers()
 {
     btnRefreshServers->setDisabled(true);
@@ -206,7 +191,7 @@ void DlgConnect::rebuildComboBoxList(int failure)
     savedHostList = uci.getServerInfo();
 
     int i = 0;
-    for (auto pair : savedHostList) {
+    for (const auto &pair : savedHostList) {
         auto tmp = pair.second;
         QString saveName = tmp.getSaveName();
         if (saveName.size()) {
@@ -218,6 +203,11 @@ void DlgConnect::rebuildComboBoxList(int failure)
 
             i++;
         }
+    }
+
+    // If first run, set to RR
+    if (settingsCache->servers().getPrevioushostName().isEmpty()) {
+        previousHosts->setCurrentIndex(1);
     }
 
     btnRefreshServers->setDisabled(false);
