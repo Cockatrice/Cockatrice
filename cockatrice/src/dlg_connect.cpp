@@ -206,7 +206,7 @@ void DlgConnect::rebuildComboBoxList(int failure)
     }
 
     // If first run, set to RR
-    if (settingsCache->servers().getPrevioushostName().isEmpty()) {
+    if (settingsCache->servers().getPrevioushostName().isEmpty() && previousHosts->count() >= 2) {
         previousHosts->setCurrentIndex(1);
     }
 
