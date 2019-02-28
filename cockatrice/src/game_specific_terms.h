@@ -21,6 +21,7 @@ QString const ManaCost("manacost");
 QString const PowTough("pt");
 QString const Side("side");
 QString const Layout("layout");
+QString const ColorIdentity("coloridentity");
 
 inline static const QString getNicePropertyName(QString key)
 {
@@ -42,6 +43,8 @@ inline static const QString getNicePropertyName(QString key)
         return QCoreApplication::translate("Mtg", "Side");
     if (key == Layout)
         return QCoreApplication::translate("Mtg", "Layout");
+    if (key == ColorIdentity)
+        return QCoreApplication::translate("Mtg", "Color Identity");
     return key;
 }
 }; // namespace Mtg

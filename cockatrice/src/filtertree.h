@@ -208,6 +208,7 @@ public:
     bool acceptLoyalty(CardInfoPtr info) const;
     bool acceptRarity(CardInfoPtr info) const;
     bool acceptCardAttr(CardInfoPtr info, CardFilter::Attr attr) const;
+    bool acceptFormat(CardInfoPtr info) const;
     bool relationCheck(int cardInfo) const;
 };
 

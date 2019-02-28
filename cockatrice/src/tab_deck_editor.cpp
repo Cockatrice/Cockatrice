@@ -33,8 +33,10 @@
 #include <QPrintPreviewDialog>
 #include <QProcessEnvironment>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QSignalMapper>
 #include <QSplitter>
+#include <QTextBrowser>
 #include <QTextEdit>
 #include <QTextStream>
 #include <QTimer>
@@ -349,6 +351,7 @@ void TabDeckEditor::createCentralFrame()
     searchEdit->setPlaceholderText(tr("Search by card name"));
     searchEdit->setClearButtonEnabled(true);
     searchEdit->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+    auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
     searchEdit->installEventFilter(&searchKeySignals);
 
     setFocusProxy(searchEdit);
@@ -363,6 +366,7 @@ void TabDeckEditor::createCentralFrame()
     connect(&searchKeySignals, SIGNAL(onCtrlAltLBracket()), this, SLOT(actDecrementCardFromSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
+    connect(help, &QAction::triggered, this, &TabDeckEditor::showSearchSyntaxHelp);
 
     databaseModel = new CardDatabaseModel(db, true, this);
     databaseModel->setObjectName("databaseModel");
@@ -700,7 +704,7 @@ void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 
 void TabDeckEditor::updateSearch(const QString &search)
 {
-    databaseDisplayModel->setCardName(search);
+    databaseDisplayModel->setStringFilter(searchEdit->text());
     QModelIndexList sel = databaseView->selectionModel()->selectedRows();
     if (sel.isEmpty() && databaseDisplayModel->rowCount())
         databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
@@ -1211,4 +1215,34 @@ void TabDeckEditor::setSaveStatus(bool newStatus)
     saveDeckToClipboardMenu->setEnabled(newStatus);
     aPrintDeck->setEnabled(newStatus);
     analyzeDeckMenu->setEnabled(newStatus);
+}
+
+void TabDeckEditor::showSearchSyntaxHelp()
+{
+
+    QFile file("theme:help/search.md");
+
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        return;
+    }
+
+    QTextStream in(&file);
+    QString text = in.readAll();
+    file.close();
+
+    // Poor Markdown Converter
+    auto opts = QRegularExpression::MultilineOption;
+    text = text.replace(QRegularExpression("^(###)(.*)", opts), "<h3>\\2</h3>")
+               .replace(QRegularExpression("^(##)(.*)", opts), "<h2>\\2</h2>")
+               .replace(QRegularExpression("^(#)(.*)", opts), "<h1>\\2</h1>")
+               .replace(QRegularExpression("^------*", opts), "<hr />")
+               .replace(QRegularExpression("\\[([^\[]+)\\]\\(([^\\)]+)\\)", opts), "<a href=\'\\2\'>\\1</a>");
+
+    auto browser = new QTextBrowser;
+    browser->setWindowTitle("Search Help");
+    browser->setReadOnly(true);
+    browser->setMinimumSize({500, 600});
+    browser->setHtml(text);
+    connect(browser, &QTextBrowser::anchorClicked, [=](QUrl link) { searchEdit->setText(link.fragment()); });
+    browser->show();
 }
