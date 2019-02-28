@@ -190,23 +190,16 @@ void DlgConnect::rebuildComboBoxList(int failure)
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
 
-    int i = 0;
     for (const auto &pair : savedHostList) {
         auto tmp = pair.second;
         QString saveName = tmp.getSaveName();
         if (saveName.size()) {
             previousHosts->addItem(saveName);
-
-            if (settingsCache->servers().getPrevioushostName() == saveName) {
-                previousHosts->setCurrentIndex(i);
-            }
-
-            i++;
         }
     }
 
-    // If first run, set to RR
-    if (settingsCache->servers().getPrevioushostName().isEmpty() && previousHosts->count() >= 2) {
+    // On rebuild, set to RR
+    if (previousHosts->count() >= 2) {
         previousHosts->setCurrentIndex(1);
     }
 
