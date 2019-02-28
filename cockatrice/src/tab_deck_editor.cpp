@@ -704,11 +704,7 @@ void TabDeckEditor::updateCardInfoRight(const QModelIndex &current, const QModel
 
 void TabDeckEditor::updateSearch(const QString &search)
 {
-    if (search.contains(QRegularExpression("[:<>=\"!]"))) {
-        databaseDisplayModel->setStringFilter(searchEdit->text());
-    } else {
-        databaseDisplayModel->setCardName(search);
-    }
+    databaseDisplayModel->setStringFilter(searchEdit->text());
     QModelIndexList sel = databaseView->selectionModel()->selectedRows();
     if (sel.isEmpty() && databaseDisplayModel->rowCount())
         databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),

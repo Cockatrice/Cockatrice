@@ -20,13 +20,16 @@
 <dd>[c:w](#c:w) <small>(Any card that is white)</small></dd>
 <dd>[c:wu](#c:wu) <small>(Any card that is white or blue)</small></dd>
 <dd>[c:wum](#c:wum) <small>(Any card that is white or blue, and multicolored)</small></dd>
+<!--
 <dd>[c!w](#c!w) <small>(Cards that are only white)</small></dd>
 <dd>[c!wu](#c!wu) <small>(Cards that are only white or blue, or both)</small></dd>
 <dd>[c!wum](#c!wum) <small>(Cards that are only white and blue, and multicolored)</small></dd>
 <dd>[c=wubrg](#c%3Dwubrg) <small>(Cards that are all five colors)</small></dd>
+-->
 <dd>[c:m](#c:m) <small>(Any multicolored card)</small></dd>
 
 <dt><u>Pow</u>er, <u>Tou</u>ghness, <u>C</u>onverted <u>M</u>ana <u>C</u>ost:</dt>
+<dd>[tou:1](#tou:1)</dd>
 <dd>[pow>=8](#pow>=8)</dd>
 <dd>[cmc=7](#cmc=7)</dd>
 
@@ -38,10 +41,8 @@
 <dd>[banned:modern](#banned:modern) <small>(or legal, restricted)</small></dd>
 
 <dt><u>E</u>dition:</dt>
-<dd>[e:lea](#e:lea)</dd>
+<dd>[set:lea](#set:lea)</dd>
 <dd>[e:lea,leb](#e:lea,leb) <small>(Cards that appear in Alpha or Beta)</small></dd>
-
-<dd>[e:lea+leb](#e:al,be) <small>(Cards that appear in Alpha and Beta)</small></dd>
-<dd>[e:lea,leb -e:lea+leb](#e:al,be -e:al,be) <small>(Cards that appear in Alpha or Beta but not in both editions)</small></dd>
+<dd><a href="#e:lea,leb -(e:lea e:leb)">e:lea,leb -(e:lea e:leb)</a> <small>(Cards that appear in Alpha or Beta but not in both editions)</small></dd>
 
 </dl>

@@ -17,15 +17,15 @@ SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 
 QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
-NotQuery <- ('not' ws/'-') QueryPart
-SetQuery <- 'e' [:] FlexStringValue
+NotQuery <- ('not' ws/'-') SomewhatComplexQueryPart
+SetQuery <- ('e'/'set') [:] FlexStringValue
 OracleQuery <- 'o' [:] RegexString
 
 
 CMCQuery <- 'cmc' ws? NumericExpression
-PowerQuery <- 'pow' ws? NumericExpression
-ToughnessQuery <- 'tou' ws? NumericExpression
-RarityQuery <- 'r' ':' RegexString
+PowerQuery <- [Pp] 'ow' 'er'? ws? NumericExpression
+ToughnessQuery <- [Tt] 'ou' 'ghness'? ws? NumericExpression
+RarityQuery <- [rR] ':' RegexString
 
 FormatQuery <- 'f' ':' Format / Legality ':' Format
 Format <- [Mm] 'odern'? / [Ss] 'tandard'? / [Vv] 'intage'? / [Ll] 'egacy'? / [Cc] 'ommander'?
@@ -42,7 +42,7 @@ ColorQuery <- [cC] 'olor'? <[iI]?> <[:!]> ColorEx*
 FieldQuery <- String [:] RegexString / String ws? NumericExpression
 
 NonQuote <- !["].
-UnescapedStringListPart <- [a-zA-Z]+
+UnescapedStringListPart <- [a-zA-Z0-9']+
 String <- UnescapedStringListPart / ["] <NonQuote*> ["]
 StringValue <- String / [(] StringList [)]
 StringList <- StringListString (ws? [,] ws? StringListString)*
@@ -156,8 +156,20 @@ static void setupParserRules()
         }
     };
     search["StringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
-        auto target = sv[0].get<QString>();
-        return [=](const QString &s) { return s.split(" ").contains(target, Qt::CaseInsensitive); };
+        if (sv.choice() == 0) {
+            auto target = sv[0].get<QString>();
+            return [=](const QString &s) { return s.split(" ").contains(target, Qt::CaseInsensitive); };
+        } else {
+            auto target = sv[0].get<QStringList>();
+            return [=](const QString &s) {
+                for (QString str : target) {
+                    if (s.split(" ").contains(str, Qt::CaseInsensitive)) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+        }
     };
 
     search["String"] = [](const peg::SemanticValues &sv) -> QString {
@@ -172,8 +184,9 @@ static void setupParserRules()
             auto target = sv[0].get<QStringList>();
             return [=](const QString &s) {
                 for (QString str : target) {
-                    if (str == s)
+                    if (s.split(" ").contains(str, Qt::CaseInsensitive)) {
                         return true;
+                    }
                 }
                 return false;
             };
@@ -242,8 +255,8 @@ static void setupParserRules()
             return [=](CardData x) {
                 QString match = idenity ? x->getColors() : x->getProperty("coloridentity");
 
-                if (parts.contains("m") && match.length() > 1)
-                    return true;
+                if (parts.contains("m") && match.length() < 2)
+                    return false;
 
                 if (parts.contains("c") && match.length() == 0)
                     return true;
