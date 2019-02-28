@@ -190,17 +190,20 @@ void DlgConnect::rebuildComboBoxList(int failure)
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
 
+    int index = 0;
     for (const auto &pair : savedHostList) {
         auto tmp = pair.second;
         QString saveName = tmp.getSaveName();
         if (saveName.size()) {
             previousHosts->addItem(saveName);
-        }
-    }
 
-    // On rebuild, set to RR
-    if (previousHosts->count() >= 2) {
-        previousHosts->setCurrentIndex(1);
+            // On rebuild, set to RR
+            if (saveName.compare("Rooster Ranges") == 0) {
+                previousHosts->setCurrentIndex(index);
+            }
+
+            ++index;
+        }
     }
 
     btnRefreshServers->setDisabled(false);
