@@ -254,9 +254,11 @@ static void setupParserRules()
         if (sv.tokens[1].first[0] == ':') {
             return [=](CardData x) {
                 QString match = idenity ? x->getColors() : x->getProperty("coloridentity");
-
-                if (parts.contains("m") && match.length() < 2)
+                if (parts.contains("m") && match.length() < 2) {
                     return false;
+                } else if (parts == "m") {
+                    return true;
+                }
 
                 if (parts.contains("c") && match.length() == 0)
                     return true;
