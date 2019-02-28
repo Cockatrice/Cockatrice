@@ -87,7 +87,7 @@ void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMa
         if (serverFound) {
             settingsCache->servers().updateExistingServerWithoutLoss(serverName, serverAddress, serverPort, serverSite);
         } else {
-            settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false);
+            settingsCache->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false, serverSite);
         }
     }
 

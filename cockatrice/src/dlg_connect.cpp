@@ -161,21 +161,6 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
 DlgConnect::~DlgConnect() = default;
 
-void DlgConnect::actSaveConfig()
-{
-    bool updateSuccess = settingsCache->servers().updateExistingServer(
-        saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
-        playernameEdit->text().trimmed(), passwordEdit->text(), savePasswordCheckBox->isChecked());
-
-    if (!updateSuccess) {
-        settingsCache->servers().addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(),
-                                              portEdit->text().trimmed(), playernameEdit->text().trimmed(),
-                                              passwordEdit->text(), savePasswordCheckBox->isChecked());
-    }
-
-    preRebuildComboBoxList();
-}
-
 void DlgConnect::downloadThePublicServers()
 {
     btnRefreshServers->setDisabled(true);
@@ -205,18 +190,19 @@ void DlgConnect::rebuildComboBoxList(int failure)
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
 
-    int i = 0;
-    for (auto pair : savedHostList) {
+    int index = 0;
+    for (const auto &pair : savedHostList) {
         auto tmp = pair.second;
         QString saveName = tmp.getSaveName();
         if (saveName.size()) {
             previousHosts->addItem(saveName);
 
-            if (settingsCache->servers().getPrevioushostName() == saveName) {
-                previousHosts->setCurrentIndex(i);
+            // On rebuild, set to RR
+            if (saveName.compare("Rooster Ranges") == 0) {
+                previousHosts->setCurrentIndex(index);
             }
 
-            i++;
+            ++index;
         }
     }
 
