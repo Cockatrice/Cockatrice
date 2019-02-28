@@ -1239,6 +1239,8 @@ void TabDeckEditor::showSearchSyntaxHelp()
                .replace(QRegularExpression("\\[([^\[]+)\\]\\(([^\\)]+)\\)", opts), "<a href=\'\\2\'>\\1</a>");
 
     auto browser = new QTextBrowser;
+    browser->setParent(this, Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint |
+                                 Qt::WindowCloseButtonHint | Qt::WindowFullscreenButtonHint);
     browser->setWindowTitle("Search Help");
     browser->setReadOnly(true);
     browser->setMinimumSize({500, 600});
