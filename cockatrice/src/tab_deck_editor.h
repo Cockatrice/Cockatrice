@@ -1,31 +1,31 @@
 #ifndef WINDOW_DECKEDITOR_H
 #define WINDOW_DECKEDITOR_H
 
+#include "carddatabase.h"
+#include "carddatabasemodel.h"
+#include "cardframe.h"
+#include "decklistmodel.h"
+#include "deck_loader.h"
+#include "filterbuilder.h"
+#include "filtertreemodel.h"
 #include "keysignals.h"
 #include "tab.h"
+
 #include <QAbstractItemModel>
 #include <QDir>
+#include <QDockWidget>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QLineEdit>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QTreeView>
+#include <QVBoxLayout>
 
-#include "carddatabase.h"
-
-class CardDatabaseModel;
-class CardDatabaseDisplayModel;
-class DeckListModel;
-class QTreeView;
-
-class CardFrame;
-class QTextEdit;
-class QLabel;
-class DeckLoader;
 class Response;
-class FilterTreeModel;
-class FilterBuilder;
-class QGroupBox;
-class QHBoxLayout;
-class QVBoxLayout;
-class QPushButton;
-class QDockWidget;
+
 
 class SearchLineEdit : public QLineEdit
 {
