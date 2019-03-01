@@ -69,8 +69,7 @@ public:
 
 private:
     FilterBool isToken;
-    QString cardNameBeginning, cardName, cardText;
-    QString searchTerm;
+    QString cardName, cardText;
     QSet<QString> cardNameSet, cardTypes, cardColors;
     FilterTree *filterTree;
     FilterString *filterString;
@@ -88,11 +87,7 @@ public:
         isToken = _isToken;
         dirty();
     }
-    void setCardNameBeginning(const QString &_beginning)
-    {
-        cardNameBeginning = _beginning;
-        dirty();
-    }
+
     void setCardName(const QString &_cardName)
     {
         if (filterString != nullptr) {
@@ -104,8 +99,7 @@ public:
     }
     void setStringFilter(const QString &_src)
     {
-        if (filterString != nullptr)
-            delete filterString;
+        delete filterString;
         filterString = new FilterString(_src);
         dirty();
     }
@@ -114,25 +108,7 @@ public:
         cardNameSet = _cardNameSet;
         dirty();
     }
-    void setSearchTerm(const QString &_searchTerm)
-    {
-        searchTerm = _searchTerm;
-    }
-    void setCardText(const QString &_cardText)
-    {
-        cardText = _cardText;
-        dirty();
-    }
-    void setCardTypes(const QSet<QString> &_cardTypes)
-    {
-        cardTypes = _cardTypes;
-        dirty();
-    }
-    void setCardColors(const QSet<QString> &_cardColors)
-    {
-        cardColors = _cardColors;
-        dirty();
-    }
+
     void dirty()
     {
         dirtyTimer.start(20);

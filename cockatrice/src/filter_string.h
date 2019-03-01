@@ -7,9 +7,10 @@
 #include <QMap>
 #include <QString>
 #include <functional>
+#include <utility>
 
 typedef CardInfoPtr CardData;
-typedef std::function<bool(CardData)> Filter;
+typedef std::function<bool(const CardData &)> Filter;
 typedef std::function<bool(const QString &)> StringMatcher;
 typedef std::function<bool(int)> NumberMatcher;
 
@@ -24,7 +25,7 @@ class FilterString
 {
 public:
     explicit FilterString(const QString &exp);
-    bool check(CardData card)
+    bool check(const CardData &card)
     {
         return result(card);
     }

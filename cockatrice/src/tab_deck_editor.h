@@ -13,7 +13,7 @@ class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 class DeckListModel;
 class QTreeView;
-class QTableView;
+
 class CardFrame;
 class QTextEdit;
 class QLabel;
@@ -33,10 +33,10 @@ private:
     QTreeView *treeView;
 
 protected:
-    void keyPressEvent(QKeyEvent *event);
+    void keyPressEvent(QKeyEvent *event) override;
 
 public:
-    SearchLineEdit() : QLineEdit(), treeView(0)
+    SearchLineEdit() : QLineEdit(), treeView(nullptr)
     {
     }
     void setTreeView(QTreeView *_treeView)
@@ -90,7 +90,7 @@ private slots:
     void freeDocksSize();
     void refreshShortcuts();
 
-    bool eventFilter(QObject *o, QEvent *e);
+    bool eventFilter(QObject *o, QEvent *e) override;
     void dockVisibleTriggered();
     void dockFloatingTriggered();
     void dockTopLevelChanged(bool topLevel);
@@ -147,10 +147,10 @@ private:
     QWidget *centralWidget;
 
 public:
-    TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent = 0);
-    ~TabDeckEditor();
-    void retranslateUi();
-    QString getTabText() const;
+    explicit TabDeckEditor(TabSupervisor *_tabSupervisor, QWidget *parent = nullptr);
+    ~TabDeckEditor() override;
+    void retranslateUi() override;
+    QString getTabText() const override;
     void setDeck(DeckLoader *_deckLoader);
     void setModified(bool _windowModified);
     bool confirmClose();
@@ -161,7 +161,7 @@ public:
     void createCentralFrame();
 
 public slots:
-    void closeRequest();
+    void closeRequest() override;
 signals:
     void deckEditorClosing(TabDeckEditor *tab);
 };

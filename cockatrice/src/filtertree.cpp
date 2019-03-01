@@ -446,16 +446,6 @@ FilterItemList *FilterTree::attrTypeList(CardFilter::Attr attr, CardFilter::Type
     return attrLogicMap(attr)->typeList(type);
 }
 
-int FilterTree::findTermIndex(CardFilter::Attr attr, CardFilter::Type type, const QString &term)
-{
-    return attrTypeList(attr, type)->termIndex(term);
-}
-
-int FilterTree::findTermIndex(const CardFilter *f)
-{
-    return findTermIndex(f->attr(), f->type(), f->term());
-}
-
 FilterTreeNode *FilterTree::termNode(CardFilter::Attr attr, CardFilter::Type type, const QString &term)
 {
     return attrTypeList(attr, type)->termNode(term);
@@ -464,11 +454,6 @@ FilterTreeNode *FilterTree::termNode(CardFilter::Attr attr, CardFilter::Type typ
 FilterTreeNode *FilterTree::termNode(const CardFilter *f)
 {
     return termNode(f->attr(), f->type(), f->term());
-}
-
-FilterTreeNode *FilterTree::attrTypeNode(CardFilter::Attr attr, CardFilter::Type type)
-{
-    return attrTypeList(attr, type);
 }
 
 bool FilterTree::testAttr(const CardInfoPtr info, const LogicMap *lm) const
