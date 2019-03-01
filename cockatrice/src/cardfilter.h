@@ -1,3 +1,5 @@
+#include <utility>
+
 #ifndef CARDFILTER_H
 #define CARDFILTER_H
 
@@ -18,7 +20,7 @@ public:
         TypeEnd
     };
 
-    /* if you add an atribute here you also need to
+    /* if you add an attribute here you also need to
      * add its string representation in attrName */
     enum Attr
     {
@@ -43,7 +45,7 @@ private:
     enum Attr a;
 
 public:
-    CardFilter(QString term, Type type, Attr attr) : trm(term), t(type), a(attr){};
+    CardFilter(QString term, Type type, Attr attr) : trm(std::move(term)), t(type), a(attr){};
 
     Type type() const
     {

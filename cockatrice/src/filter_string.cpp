@@ -63,9 +63,7 @@ std::once_flag init;
 
 static void setupParserRules()
 {
-    auto passthru = [](const peg::SemanticValues &sv) -> Filter {
-        return sv.size() > 0 ? sv[0].get<Filter>() : nullptr;
-    };
+    auto passthru = [](const peg::SemanticValues &sv) -> Filter { return !sv.empty() ? sv[0].get<Filter>() : nullptr; };
 
     search["Start"] = passthru;
     search["QueryPartList"] = [](const peg::SemanticValues &sv) -> Filter {
@@ -99,7 +97,7 @@ static void setupParserRules()
     search["SetQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         StringMatcher matcher = sv[0].get<StringMatcher>();
         return [=](CardData x) -> bool {
-            for (auto set : x->getSets().keys()) {
+            for (const auto &set : x->getSets().keys()) {
                 if (matcher(set))
                     return true;
             }
@@ -109,7 +107,7 @@ static void setupParserRules()
     search["RarityQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         StringMatcher matcher = sv[0].get<StringMatcher>();
         return [=](CardData x) -> bool {
-            for (auto set : x->getSets().values()) {
+            for (const auto &set : x->getSets().values()) {
                 if (matcher(set.getProperty("rarity")))
                     return true;
             }
@@ -162,7 +160,7 @@ static void setupParserRules()
         } else {
             auto target = sv[0].get<QStringList>();
             return [=](const QString &s) {
-                for (QString str : target) {
+                for (const QString &str : target) {
                     if (s.split(" ").contains(str, Qt::CaseInsensitive)) {
                         return true;
                     }
@@ -183,7 +181,7 @@ static void setupParserRules()
         if (sv.choice() != 1) {
             auto target = sv[0].get<QStringList>();
             return [=](const QString &s) {
-                for (QString str : target) {
+                for (const QString &str : target) {
                     if (s.split(" ").contains(str, Qt::CaseInsensitive)) {
                         return true;
                     }
@@ -263,8 +261,8 @@ static void setupParserRules()
                 if (parts.contains("c") && match.length() == 0)
                     return true;
 
-                for (int i = 0; i < match.size(); ++i) {
-                    if (parts.contains(match[i]))
+                for (auto i : match) {
+                    if (parts.contains(i))
                         return true;
                 }
                 return false;
@@ -278,12 +276,13 @@ static void setupParserRules()
                 if (parts.contains("c") && match.length() != 0)
                     return false;
 
-                for (int i = 0; i < parts.size(); ++i) {
-                    if (!match.contains(parts[i]))
+                for (auto part : parts) {
+                    if (!match.contains(part))
                         return false;
                 }
-                for (int i = 0; i < match.size(); ++i) {
-                    if (!parts.contains(match[i]))
+
+                for (auto i : match) {
+                    if (!parts.contains(i))
                         return false;
                 }
                 return true;

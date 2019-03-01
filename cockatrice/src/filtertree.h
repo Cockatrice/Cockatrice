@@ -253,11 +253,10 @@ private:
 public:
     FilterTree();
     ~FilterTree() override;
-    int findTermIndex(CardFilter::Attr attr, CardFilter::Type type, const QString &term);
-    int findTermIndex(const CardFilter *f);
+
     FilterTreeNode *termNode(CardFilter::Attr attr, CardFilter::Type type, const QString &term);
     FilterTreeNode *termNode(const CardFilter *f);
-    FilterTreeNode *attrTypeNode(CardFilter::Attr attr, CardFilter::Type type);
+
     const QString text() const override
     {
         return QString("root");

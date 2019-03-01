@@ -16,7 +16,7 @@ CardInfoText::CardInfoText(QWidget *parent) : QFrame(parent), info(nullptr)
     textLabel = new QTextEdit();
     textLabel->setReadOnly(true);
 
-    QGridLayout *grid = new QGridLayout(this);
+    auto *grid = new QGridLayout(this);
     grid->addWidget(nameLabel, 0, 0);
     grid->addWidget(textLabel, 1, 0, -1, 2);
     grid->setRowStretch(1, 1);
@@ -48,16 +48,16 @@ void CardInfoText::setCard(CardInfoPtr card)
 
     auto relatedCards = card->getRelatedCards();
     auto reverserelatedCards2Me = card->getReverseRelatedCards2Me();
-    if (relatedCards.size() || reverserelatedCards2Me.size()) {
+    if (!relatedCards.empty() || !reverserelatedCards2Me.empty()) {
         text += QString("<tr><td>%1</td><td width=\"5\"></td><td>").arg(tr("Related cards:"));
 
-        for (int i = 0; i < relatedCards.size(); ++i) {
-            QString tmp = relatedCards.at(i)->getName().toHtmlEscaped();
+        for (auto relatedCard : relatedCards) {
+            QString tmp = relatedCard->getName().toHtmlEscaped();
             text += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
         }
 
-        for (int i = 0; i < reverserelatedCards2Me.size(); ++i) {
-            QString tmp = reverserelatedCards2Me.at(i)->getName().toHtmlEscaped();
+        for (auto i : reverserelatedCards2Me) {
+            QString tmp = i->getName().toHtmlEscaped();
             text += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
         }
 

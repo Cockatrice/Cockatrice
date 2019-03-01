@@ -17,7 +17,7 @@ private:
     CardInfoPtr info;
 
 public:
-    CardInfoText(QWidget *parent = 0);
+    explicit CardInfoText(QWidget *parent = nullptr);
     void retranslateUi();
     void setInvalidCardName(const QString &cardName);
 

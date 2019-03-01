@@ -1,3 +1,5 @@
+#include <utility>
+
 #ifndef FILTER_STRING_H
 #define FILTER_STRING_H
 
@@ -26,7 +28,7 @@ public:
     explicit FilterString(const QString &exp);
     bool check(CardData card)
     {
-        return result(card);
+        return result(std::move(card));
     }
 
     bool valid()

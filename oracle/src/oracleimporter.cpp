@@ -254,8 +254,8 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         additionalNames = card.value("names").toStringList();
 
         auto legalities = card.value("legalities").toMap();
-        for (QString name : legalities.keys()) {
-            properties.insert(QString("format-%1").arg(name), legalities.value(name).toString().toLower());
+        for (const QString &fmtName : legalities.keys()) {
+            properties.insert(QString("format-%1").arg(fmtName), legalities.value(fmtName).toString().toLower());
         }
 
         // split cards are considered a single card, enqueue for later merging
