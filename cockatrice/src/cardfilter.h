@@ -1,10 +1,9 @@
-#include <utility>
-
 #ifndef CARDFILTER_H
 #define CARDFILTER_H
 
 #include <QObject>
 #include <QString>
+#include <utility>
 
 class CardFilter : public QObject
 {

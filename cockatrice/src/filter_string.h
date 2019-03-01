@@ -1,5 +1,3 @@
-#include <utility>
-
 #ifndef FILTER_STRING_H
 #define FILTER_STRING_H
 
@@ -9,6 +7,7 @@
 #include <QMap>
 #include <QString>
 #include <functional>
+#include <utility>
 
 typedef CardInfoPtr CardData;
 typedef std::function<bool(CardData)> Filter;
