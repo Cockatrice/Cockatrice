@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <utility>
 
 class CardFilter : public QObject
 {
@@ -18,7 +19,7 @@ public:
         TypeEnd
     };
 
-    /* if you add an atribute here you also need to
+    /* if you add an attribute here you also need to
      * add its string representation in attrName */
     enum Attr
     {
@@ -33,6 +34,7 @@ public:
         AttrText,
         AttrTough,
         AttrType,
+        AttrFormat,
         AttrEnd
     };
 
@@ -42,7 +44,7 @@ private:
     enum Attr a;
 
 public:
-    CardFilter(QString term, Type type, Attr attr) : trm(term), t(type), a(attr){};
+    CardFilter(QString &term, Type type, Attr attr) : trm(term), t(type), a(attr){};
 
     Type type() const
     {

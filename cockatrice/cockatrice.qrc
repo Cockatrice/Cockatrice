@@ -18,6 +18,7 @@
         <file>resources/icons/delete.svg</file>
         <file>resources/icons/forgot_password.svg</file>
         <file>resources/icons/increment.svg</file>
+        <file>resources/icons/info.svg</file>
         <file>resources/icons/lock.svg</file>
         <file>resources/icons/not_ready_start.svg</file>
         <file>resources/icons/pencil.svg</file>
@@ -360,5 +361,6 @@
         <file>resources/tips/images/themes.png</file>
         <file>resources/tips/images/tip_of_the_day.png</file>
 
+        <file>resources/help/search.md</file>
     </qresource>
 </RCC>

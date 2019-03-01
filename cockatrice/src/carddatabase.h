@@ -21,7 +21,6 @@ class CardRelation;
 class ICardDatabaseParser;
 
 typedef QMap<QString, QString> QStringMap;
-typedef QMap<QString, int> MuidMap;
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
 typedef QMap<QString, CardInfoPerSet> CardInfoPerSetMap;
@@ -247,6 +246,10 @@ public:
     {
         properties.insert(_name, _value);
         emit cardInfoChanged(smartThis);
+    }
+    bool hasProperty(const QString &propertyName) const
+    {
+        return properties.contains(propertyName);
     }
     const CardInfoPerSetMap &getSets() const
     {
