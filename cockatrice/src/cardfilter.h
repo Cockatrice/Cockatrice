@@ -44,7 +44,7 @@ private:
     enum Attr a;
 
 public:
-    CardFilter(QString term, Type type, Attr attr) : trm(std::move(term)), t(type), a(attr){};
+    CardFilter(QString &term, Type type, Attr attr) : trm(term), t(type), a(attr){};
 
     Type type() const
     {

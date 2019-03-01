@@ -261,7 +261,7 @@ static void setupParserRules()
                 if (parts.contains("c") && match.length() == 0)
                     return true;
 
-                for (auto i : match) {
+                for (const auto &i : match) {
                     if (parts.contains(i))
                         return true;
                 }
@@ -276,12 +276,12 @@ static void setupParserRules()
                 if (parts.contains("c") && match.length() != 0)
                     return false;
 
-                for (auto part : parts) {
+                for (const auto &part : parts) {
                     if (!match.contains(part))
                         return false;
                 }
 
-                for (auto i : match) {
+                for (const auto &i : match) {
                     if (!parts.contains(i))
                         return false;
                 }
