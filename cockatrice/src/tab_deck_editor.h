@@ -4,8 +4,8 @@
 #include "carddatabase.h"
 #include "carddatabasemodel.h"
 #include "cardframe.h"
-#include "decklistmodel.h"
 #include "deck_loader.h"
+#include "decklistmodel.h"
 #include "filterbuilder.h"
 #include "filtertreemodel.h"
 #include "keysignals.h"
@@ -18,14 +18,12 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QLineEdit>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QTreeView>
 #include <QVBoxLayout>
 
 class Response;
-
 
 class SearchLineEdit : public QLineEdit
 {
