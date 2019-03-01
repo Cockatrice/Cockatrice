@@ -81,8 +81,10 @@ void RemoteClient::slotWebSocketError(QAbstractSocket::SocketError /*error*/)
 {
 
     QString errorString = websocket->errorString();
-    doDisconnectFromServer();
-    emit socketError(errorString);
+    if (getStatus() != ClientStatus::StatusDisconnected) {
+        doDisconnectFromServer();
+        emit socketError(errorString);
+    }
 }
 
 void RemoteClient::slotConnected()
