@@ -205,8 +205,6 @@ public:
     SequenceEdit *Player_aDecPT;
     QLabel *lbl_Player_aSetPT;
     SequenceEdit *Player_aSetPT;
-    QLabel *lbl_Player_aChangePT;
-    SequenceEdit *Player_aChangePT;
     QLabel *lbl_Player_aResetPT;
     SequenceEdit *Player_aResetPT;
     QGroupBox *groupBox_11;
@@ -1067,7 +1065,7 @@ public:
 
         gridLayout_12->addWidget(lbl_Player_aDecPT, 3, 0, 1, 1);
 
-        Player_aSetPT = new SequenceEdit("Player/aForcePT", groupBox_12);
+        Player_aSetPT = new SequenceEdit("Player/aSetPT", groupBox_12);
         Player_aSetPT->setObjectName("Player_aSetPT");
 
         gridLayout_12->addWidget(Player_aSetPT, 0, 1, 1, 1);
@@ -1077,25 +1075,15 @@ public:
 
         gridLayout_12->addWidget(lbl_Player_aSetPT, 0, 0, 1, 1);
 
-        Player_aChangePT = new SequenceEdit("Player/aSetPT", groupBox_12);
-        Player_aChangePT->setObjectName("Player_aChangePT");
-
-        gridLayout_12->addWidget(Player_aChangePT, 1, 1, 1, 1);
-
-        lbl_Player_aChangePT = new QLabel(groupBox_12);
-        lbl_Player_aChangePT->setObjectName("lbl_Player_aChangePT");
-
-        gridLayout_12->addWidget(lbl_Player_aChangePT, 1, 0, 1, 1);
-
         Player_aResetPT = new SequenceEdit("Player/aResetPT", groupBox_12);
         Player_aResetPT->setObjectName("Player_aResetPT");
 
-        gridLayout_12->addWidget(Player_aResetPT, 2, 1, 1, 1);
+        gridLayout_12->addWidget(Player_aResetPT, 1, 1, 1, 1);
 
         lbl_Player_aResetPT = new QLabel(groupBox_12);
         lbl_Player_aResetPT->setObjectName("lbl_Player_aResetPT");
 
-        gridLayout_12->addWidget(lbl_Player_aResetPT, 2, 0, 1, 1);
+        gridLayout_12->addWidget(lbl_Player_aResetPT, 1, 0, 1, 1);
 
         verticalLayout->addWidget(groupBox_12);
 
@@ -1962,7 +1950,6 @@ public:
         lbl_Player_aDecPT->setText(QApplication::translate("shortcutsTab", "Remove (-1/-1)"));
         lbl_Player_aResetPT->setText(QApplication::translate("shortcutsTab", "Reset"));
         lbl_Player_aSetPT->setText(QApplication::translate("shortcutsTab", "Set"));
-        lbl_Player_aChangePT->setText(QApplication::translate("shortcutsTab", "Change"));
         groupBox_11->setTitle(QApplication::translate("shortcutsTab", "Toughness"));
         lbl_Player_aDecT->setText(QApplication::translate("shortcutsTab", "Remove (-0/-1)"));
         lbl_Player_aIncT->setText(QApplication::translate("shortcutsTab", "Add (+0/+1)"));

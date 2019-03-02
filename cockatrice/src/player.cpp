@@ -416,8 +416,6 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     connect(aFlowT, SIGNAL(triggered()), this, SLOT(actFlowT()));
     aSetPT = new QAction(this);
     connect(aSetPT, SIGNAL(triggered()), this, SLOT(actSetPT()));
-    aChangePT = new QAction(this);
-    connect(aChangePT, SIGNAL(triggered()), this, SLOT(actChangePT()));
     aResetPT = new QAction(this);
     connect(aResetPT, SIGNAL(triggered()), this, SLOT(actResetPT()));
     aSetAnnotation = new QAction(this);
@@ -746,7 +744,6 @@ void Player::retranslateUi()
     aFlowP->setText(tr("Increase power and decrease toughness"));
     aFlowT->setText(tr("Decrease power and increase toughness"));
     aSetPT->setText(tr("Set &power and toughness..."));
-    aChangePT->setText(tr("Change &power and toughness..."));
     aResetPT->setText(tr("Reset p&ower and toughness"));
     aSetAnnotation->setText(tr("&Set annotation..."));
 
@@ -800,8 +797,7 @@ void Player::setShortcutsActive()
     aDecPT->setShortcuts(shortcuts.getShortcut("Player/aDecPT"));
     aFlowP->setShortcuts(shortcuts.getShortcut("Player/aFlowP"));
     aFlowT->setShortcuts(shortcuts.getShortcut("Player/aFlowT"));
-    aSetPT->setShortcuts(shortcuts.getShortcut("Player/aForcePT"));
-    aChangePT->setShortcuts(shortcuts.getShortcut("Player/aSetPT"));
+    aSetPT->setShortcuts(shortcuts.getShortcut("Player/aSetPT"));
     aResetPT->setShortcuts(shortcuts.getShortcut("Player/aResetPT"));
     aSetAnnotation->setShortcuts(shortcuts.getShortcut("Player/aSetAnnotation"));
     aMoveToTopLibrary->setShortcuts(shortcuts.getShortcut("Player/aMoveToTopLibrary"));
@@ -2570,10 +2566,16 @@ void Player::actIncPT(int deltaP, int deltaT)
     for (const auto &item : scene()->selectedItems()) {
         auto *card = static_cast<CardItem *>(item);
         QString pt = card->getPT();
-        int sep = pt.indexOf('/');
-        int pow = pt.left(sep).toInt(); // if not found both are set to full string. so 4 -> 4/4
-        int tou = pt.mid(sep + 1).toInt();
-        QString newpt = QString::number(pow + deltaP) + "/" + QString::number(tou + deltaT);
+        const auto ptList = parsePT(pt);
+        QString newpt;
+        if (ptList.isEmpty()) {
+            newpt = QString::number(deltaP) + (deltaT ? "/" + QString::number(deltaT) : "");
+        } else if (ptList.size() == 1) {
+            newpt = QString::number(ptList.at(0).toInt() + deltaP) + (deltaT ? "/" + QString::number(deltaT) : "");
+        } else{
+            newpt = QString::number(ptList.at(0).toInt() + deltaP) + "/" + QString::number(ptList.at(1).toInt() + deltaT);
+        }
+
         auto *cmd = new Command_SetCardAttr;
         cmd->set_zone(card->getZone()->getName().toStdString());
         cmd->set_card_id(card->getId());
@@ -2621,6 +2623,39 @@ void Player::actResetPT()
     game->sendGameCommand(prepareGameCommand(commandList), playerid);
 }
 
+QVariantList Player::parsePT(const QString &pt)
+{
+    QVariantList ptList = QVariantList();
+    if (!pt.isEmpty()) {
+        int sep = pt.indexOf('/');
+        if (sep == 0) {
+            ptList.append(QVariant(pt.mid(1))); // cut off starting '/' and take full string
+        } else {
+            int start = 0;
+                qDebug() << "woooo";
+            for (;;){
+                QString item = pt.mid(start, sep - start);
+                qDebug() << item << start << sep;
+                if (item.isEmpty()) {
+                    ptList.append(QVariant(QString()));
+                } else if (item[0] == '+') {
+                    ptList.append(QVariant(item.mid(1).toInt())); // add as int
+                } else if (item[0] == '-') {
+                    ptList.append(QVariant(item.toInt())); // add as int
+                } else {
+                    ptList.append(QVariant(item)); // add as qstring
+                }
+                if (sep == -1) {
+                    break;
+                }
+                start = sep + 1;
+                sep = pt.indexOf('/', start);
+            }
+        }
+    }
+    return ptList;
+}
+
 void Player::actSetPT()
 {
     QString oldPT;
@@ -2635,113 +2670,36 @@ void Player::actSetPT()
     }
     bool ok;
     dialogSemaphore = true;
-    QString pt = QInputDialog::getText(nullptr, tr("Set power/toughness"), tr("Please enter the new PT:"),
-                                       QLineEdit::Normal, oldPT, &ok);
-    dialogSemaphore = false;
-    if (clearCardsToDelete() || !ok) {
-        return;
-    }
-
-    QList<const ::google::protobuf::Message *> commandList;
-    for (const auto &item : sel) {
-        auto *card = static_cast<CardItem *>(item);
-        auto *cmd = new Command_SetCardAttr;
-        cmd->set_zone(card->getZone()->getName().toStdString());
-        cmd->set_card_id(card->getId());
-        cmd->set_attribute(AttrPT);
-        cmd->set_attr_value(pt.toStdString());
-        commandList.append(cmd);
-
-        if (local) {
-            playerid = card->getZone()->getPlayer()->getId();
-        }
-    }
-
-    game->sendGameCommand(prepareGameCommand(commandList), playerid);
-}
-
-void Player::actChangePT() // backwards compatible with old "set" flow
-{
-    QString oldPT;
-    int playerid = id;
-
-    auto sel = scene()->selectedItems();
-    for (const auto &item : sel) {
-        auto *card = static_cast<CardItem *>(item);
-        if (!card->getPT().isEmpty()) {
-            oldPT = card->getPT();
-        }
-    }
-    bool ok;
-    dialogSemaphore = true;
     QString pt = QInputDialog::getText(nullptr, tr("Change power/toughness"), tr("Please enter the change to PT:"),
-                                       QLineEdit::Normal, oldPT, &ok);
+            QLineEdit::Normal, oldPT, &ok);
     dialogSemaphore = false;
     if (clearCardsToDelete() || !ok) {
         return;
     }
 
-    bool addPow, addTou;
-    int setPow, setTou;
-    bool empty = pt.isEmpty();
-    if (!empty) {
-        int sep = pt.indexOf('/');
-        QString p1 = pt.left(sep);
-        QString p2 = pt.mid(sep + 1);
-        if (p1.isEmpty()) {
-            setPow = 0;
-            addPow = true;
-        } else if (p1[0] == '+') {
-            setPow = p1.mid(1).toInt();
-            addPow = true;
-        } else if (p1[0] == '-') {
-            setPow = p1.toInt();
-            addPow = true;
-        } else {
-            setPow = p1.toInt();
-            addPow = false;
-        }
-
-        if (p2.isEmpty()) {
-            setTou = 0;
-            addTou = true;
-        } else if (p2[0] == '+') {
-            setTou = p2.mid(1).toInt();
-            addTou = true;
-        } else if (p2[0] == '-') {
-            setTou = p2.toInt();
-            addTou = true;
-        } else {
-            setTou = p2.toInt();
-            addTou = false;
-        }
-
-        if (addPow && addTou && !setPow && !setTou) { // +0/+0 does nothing
-            return;
-        }
-    }
+    const auto ptList = parsePT(pt);
+    bool empty = ptList.isEmpty();
 
     QList<const ::google::protobuf::Message *> commandList;
     for (const auto &item : sel) {
         auto *card = static_cast<CardItem *>(item);
         auto *cmd = new Command_SetCardAttr;
-        QString newpt;
-        if (empty) {
-            newpt = QString();
-        } else {
-            int power = 0, toughness = 0;
-            if (addPow || addTou) {
-                QString oldpt = card->getPT();
-                int sep = oldpt.indexOf('/');
-                if (addPow) {
-                    power = oldpt.left(sep).toInt();
+        QString newpt = QString();
+        if (!empty) {
+            const auto oldpt = parsePT(card->getPT());
+            int ptIter = 0;
+            for (const auto &item : ptList) {
+                if (item.type() == QVariant::Int) {
+                    int oldItem = ptIter < oldpt.size() ? oldpt.at(ptIter).toInt() : 0;
+                    newpt += '/' + QString::number(oldItem + item.toInt());
+                }else{
+                    newpt += '/' + item.toString();
                 }
-                if (addTou) {
-                    toughness = oldpt.mid(sep + 1).toInt();
-                }
+                ++ptIter;
             }
-            newpt = QString::number(setPow + power) + "/" + QString::number(setTou + toughness);
+            newpt = newpt.mid(1);
         }
+
         cmd->set_zone(card->getZone()->getName().toStdString());
         cmd->set_card_id(card->getId());
         cmd->set_attribute(AttrPT);
@@ -2819,7 +2777,7 @@ void Player::actSetAnnotation()
     bool ok;
     dialogSemaphore = true;
     QString annotation = QInputDialog::getText(nullptr, tr("Set annotation"), tr("Please enter the new annotation:"),
-                                               QLineEdit::Normal, oldAnnotation, &ok);
+            QLineEdit::Normal, oldAnnotation, &ok);
     dialogSemaphore = false;
     if (clearCardsToDelete() || !ok) {
         return;
@@ -2869,54 +2827,54 @@ void Player::actCardCounterTrigger()
     QList<const ::google::protobuf::Message *> commandList;
     switch (action->data().toInt() % 1000) {
         case 9: { // increment counter
-            for (const auto &item : scene()->selectedItems()) {
-                auto *card = static_cast<CardItem *>(item);
-                if (card->getCounters().value(counterId, 0) < MAX_COUNTERS_ON_CARD) {
-                    auto *cmd = new Command_SetCardCounter;
-                    cmd->set_zone(card->getZone()->getName().toStdString());
-                    cmd->set_card_id(card->getId());
-                    cmd->set_counter_id(counterId);
-                    cmd->set_counter_value(card->getCounters().value(counterId, 0) + 1);
-                    commandList.append(cmd);
+                    for (const auto &item : scene()->selectedItems()) {
+                        auto *card = static_cast<CardItem *>(item);
+                        if (card->getCounters().value(counterId, 0) < MAX_COUNTERS_ON_CARD) {
+                            auto *cmd = new Command_SetCardCounter;
+                            cmd->set_zone(card->getZone()->getName().toStdString());
+                            cmd->set_card_id(card->getId());
+                            cmd->set_counter_id(counterId);
+                            cmd->set_counter_value(card->getCounters().value(counterId, 0) + 1);
+                            commandList.append(cmd);
+                        }
+                    }
+                    break;
                 }
-            }
-            break;
-        }
         case 10: { // decrement counter
-            for (const auto &item : scene()->selectedItems()) {
-                auto *card = static_cast<CardItem *>(item);
-                if (card->getCounters().value(counterId, 0)) {
-                    auto *cmd = new Command_SetCardCounter;
-                    cmd->set_zone(card->getZone()->getName().toStdString());
-                    cmd->set_card_id(card->getId());
-                    cmd->set_counter_id(counterId);
-                    cmd->set_counter_value(card->getCounters().value(counterId, 0) - 1);
-                    commandList.append(cmd);
-                }
-            }
-            break;
-        }
+                     for (const auto &item : scene()->selectedItems()) {
+                         auto *card = static_cast<CardItem *>(item);
+                         if (card->getCounters().value(counterId, 0)) {
+                             auto *cmd = new Command_SetCardCounter;
+                             cmd->set_zone(card->getZone()->getName().toStdString());
+                             cmd->set_card_id(card->getId());
+                             cmd->set_counter_id(counterId);
+                             cmd->set_counter_value(card->getCounters().value(counterId, 0) - 1);
+                             commandList.append(cmd);
+                         }
+                     }
+                     break;
+                 }
         case 11: { // set counter with dialog
-            bool ok;
-            dialogSemaphore = true;
-            int number =
-                QInputDialog::getInt(nullptr, tr("Set counters"), tr("Number:"), 0, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
-            dialogSemaphore = false;
-            if (clearCardsToDelete() || !ok) {
-                return;
-            }
+                     bool ok;
+                     dialogSemaphore = true;
+                     int number =
+                         QInputDialog::getInt(nullptr, tr("Set counters"), tr("Number:"), 0, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
+                     dialogSemaphore = false;
+                     if (clearCardsToDelete() || !ok) {
+                         return;
+                     }
 
-            for (const auto &item : scene()->selectedItems()) {
-                auto *card = static_cast<CardItem *>(item);
-                auto *cmd = new Command_SetCardCounter;
-                cmd->set_zone(card->getZone()->getName().toStdString());
-                cmd->set_card_id(card->getId());
-                cmd->set_counter_id(counterId);
-                cmd->set_counter_value(number);
-                commandList.append(cmd);
-            }
-            break;
-        }
+                     for (const auto &item : scene()->selectedItems()) {
+                         auto *card = static_cast<CardItem *>(item);
+                         auto *cmd = new Command_SetCardCounter;
+                         cmd->set_zone(card->getZone()->getName().toStdString());
+                         cmd->set_card_id(card->getId());
+                         cmd->set_counter_id(counterId);
+                         cmd->set_counter_value(number);
+                         commandList.append(cmd);
+                     }
+                     break;
+                 }
         default:;
     }
     sendGameCommand(prepareGameCommand(commandList));
@@ -3019,7 +2977,6 @@ void Player::updateCardMenu(const CardItem *card)
                     ptMenu->addAction(aIncPT);
                     ptMenu->addAction(aDecPT);
                     ptMenu->addSeparator();
-                    ptMenu->addAction(aChangePT);
                     ptMenu->addAction(aSetPT);
                     ptMenu->addAction(aResetPT);
                 }

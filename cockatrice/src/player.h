@@ -186,7 +186,6 @@ private slots:
     void actIncPT(int deltaP, int deltaT);
     void actResetPT();
     void actSetPT();
-    void actChangePT();
     void actIncP();
     void actDecP();
     void actIncT();
@@ -218,7 +217,7 @@ private:
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT,
-        *aChangePT, *aResetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation,
+        *aResetPT, *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation,
         *aFlip, *aPeek, *aClone, *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard,
         *aMoveToExile, *aMoveToXfromTopOfLibrary;
 
@@ -291,6 +290,8 @@ private:
     void eventDrawCards(const Event_DrawCards &event);
     void eventRevealCards(const Event_RevealCards &event);
     void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
+
+    QVariantList parsePT(const QString &pt);
 
 public:
     static const int counterAreaWidth = 55;
