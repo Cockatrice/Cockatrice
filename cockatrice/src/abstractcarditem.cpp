@@ -45,8 +45,14 @@ void AbstractCardItem::pixmapUpdated()
 void AbstractCardItem::cardInfoUpdated()
 {
     info = db->getCard(name);
-    if (info)
-        connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
+
+    if (!info) {
+        QVariantHash properties = QVariantHash();
+
+        info = CardInfo::newInstance(name, "", true, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
+                                     CardInfoPerSetMap(), false, -1, false);
+    }
+    connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
 
     cacheBgColor();
     update();
@@ -71,13 +77,11 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
 
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
 
-    painter->resetTransform();
+    resetPainterTransform(painter);
 
-    QTransform pixmapTransform;
-    pixmapTransform.translate(totalBoundingRect.width() / 2, totalBoundingRect.height() / 2);
-    pixmapTransform.rotate(angle);
-    pixmapTransform.translate(-translatedSize.width() / 2, -translatedSize.height() / 2);
-    painter->setTransform(pixmapTransform);
+    painter->translate(totalBoundingRect.width() / 2, totalBoundingRect.height() / 2);
+    painter->rotate(angle);
+    painter->translate(-translatedSize.width() / 2, -translatedSize.height() / 2);
 
     QFont f;
     f.setPixelSize(fontSize);

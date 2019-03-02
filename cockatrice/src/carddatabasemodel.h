@@ -2,10 +2,12 @@
 #define CARDDATABASEMODEL_H
 
 #include "carddatabase.h"
+#include "filter_string.h"
 #include <QAbstractListModel>
 #include <QList>
 #include <QSet>
 #include <QSortFilterProxyModel>
+#include <QTimer>
 
 class FilterTree;
 
@@ -67,11 +69,12 @@ public:
 
 private:
     FilterBool isToken;
-    QString cardNameBeginning, cardName, cardText;
-    QString searchTerm;
+    QString cardName, cardText;
     QSet<QString> cardNameSet, cardTypes, cardColors;
     FilterTree *filterTree;
+    FilterString *filterString;
     int loadedRowCount;
+    QTimer dirtyTimer;
 
     /** The translation table that will be used for sanitizeCardName. */
     static QMap<wchar_t, wchar_t> characterTranslation;
@@ -82,41 +85,33 @@ public:
     void setIsToken(FilterBool _isToken)
     {
         isToken = _isToken;
-        invalidate();
+        dirty();
     }
-    void setCardNameBeginning(const QString &_beginning)
-    {
-        cardNameBeginning = _beginning;
-        invalidate();
-    }
+
     void setCardName(const QString &_cardName)
     {
+        if (filterString != nullptr) {
+            delete filterString;
+            filterString = nullptr;
+        }
         cardName = sanitizeCardName(_cardName, characterTranslation);
-        invalidate();
+        dirty();
+    }
+    void setStringFilter(const QString &_src)
+    {
+        delete filterString;
+        filterString = new FilterString(_src);
+        dirty();
     }
     void setCardNameSet(const QSet<QString> &_cardNameSet)
     {
         cardNameSet = _cardNameSet;
-        invalidate();
+        dirty();
     }
-    void setSearchTerm(const QString &_searchTerm)
+
+    void dirty()
     {
-        searchTerm = _searchTerm;
-    }
-    void setCardText(const QString &_cardText)
-    {
-        cardText = _cardText;
-        invalidate();
-    }
-    void setCardTypes(const QSet<QString> &_cardTypes)
-    {
-        cardTypes = _cardTypes;
-        invalidate();
-    }
-    void setCardColors(const QSet<QString> &_cardColors)
-    {
-        cardColors = _cardColors;
-        invalidate();
+        dirtyTimer.start(20);
     }
     void clearFilterAll();
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;

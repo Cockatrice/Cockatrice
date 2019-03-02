@@ -33,7 +33,7 @@ void HandCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
         cachedPixmap = QPixmap("theme:hand").scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert("handCounter" + QString::number(translatedSize.width()), cachedPixmap);
     }
-    painter->resetTransform();
+    resetPainterTransform(painter);
     painter->drawPixmap(cachedPixmap.rect(), cachedPixmap, cachedPixmap.rect());
     painter->restore();
 

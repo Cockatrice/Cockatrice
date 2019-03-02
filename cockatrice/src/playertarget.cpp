@@ -110,7 +110,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     }
 
     painter->save();
-    painter->resetTransform();
+    resetPainterTransform(painter);
     painter->translate((translatedSize.width() - cachedPixmap.width()) / 2.0, 0);
     painter->drawPixmap(translatedRect, cachedPixmap, cachedPixmap.rect());
     painter->restore();
@@ -120,7 +120,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     QRectF translatedNameRect = painter->combinedTransform().mapRect(nameRect);
 
     painter->save();
-    painter->resetTransform();
+    resetPainterTransform(painter);
 
     QString name = QString::fromStdString(info->name());
     if (name.size() > 13)

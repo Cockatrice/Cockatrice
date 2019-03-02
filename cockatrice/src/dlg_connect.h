@@ -52,7 +52,7 @@ public slots:
 
 private slots:
     void actOk();
-    void actSaveConfig();
+
     void passwordSaved(int state);
     void previousHostSelected(bool state);
     void newHostSelected(bool state);
@@ -62,9 +62,9 @@ private slots:
     void rebuildComboBoxList(int failure = -1);
 
 private:
-    QGridLayout *newHostLayout, *connectionLayout, *loginLayout, *serverInfoLayout, *grid;
+    QGridLayout *connectionLayout, *loginLayout, *serverInfoLayout, *grid;
     QHBoxLayout *newHolderLayout;
-    QGroupBox *loginGroupBox, *serverInfoGroupBox, *btnGroupBox, *restrictionsGroupBox;
+    QGroupBox *loginGroupBox, *serverInfoGroupBox, *restrictionsGroupBox;
     QVBoxLayout *mainLayout;
     QLabel *hostLabel, *portLabel, *playernameLabel, *passwordLabel, *saveLabel, *serverIssuesLabel,
         *serverContactLabel, *serverContactLink;

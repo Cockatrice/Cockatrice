@@ -26,4 +26,6 @@ public:
     }
 };
 
+void resetPainterTransform(QPainter *painter);
+
 #endif

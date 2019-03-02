@@ -208,6 +208,7 @@ public:
     bool acceptLoyalty(CardInfoPtr info) const;
     bool acceptRarity(CardInfoPtr info) const;
     bool acceptCardAttr(CardInfoPtr info, CardFilter::Attr attr) const;
+    bool acceptFormat(CardInfoPtr info) const;
     bool relationCheck(int cardInfo) const;
 };
 
@@ -252,11 +253,10 @@ private:
 public:
     FilterTree();
     ~FilterTree() override;
-    int findTermIndex(CardFilter::Attr attr, CardFilter::Type type, const QString &term);
-    int findTermIndex(const CardFilter *f);
+
     FilterTreeNode *termNode(CardFilter::Attr attr, CardFilter::Type type, const QString &term);
     FilterTreeNode *termNode(const CardFilter *f);
-    FilterTreeNode *attrTypeNode(CardFilter::Attr attr, CardFilter::Type type);
+
     const QString text() const override
     {
         return QString("root");

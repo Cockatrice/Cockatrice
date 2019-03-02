@@ -1528,7 +1528,7 @@ void Player::eventCreateToken(const Event_CreateToken &event)
     if (!QString::fromStdString(event.pt()).isEmpty()) {
         card->setPT(QString::fromStdString(event.pt()));
     } else {
-        CardInfoPtr dbCard = db->getCard(QString::fromStdString(event.card_name()));
+        CardInfoPtr dbCard = card->getInfo();
         if (dbCard) {
             card->setPT(dbCard->getPowTough());
         }

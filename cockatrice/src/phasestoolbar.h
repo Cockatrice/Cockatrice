@@ -1,6 +1,7 @@
 #ifndef PHASESTOOLBAR_H
 #define PHASESTOOLBAR_H
 
+#include "abstractgraphicsitem.h"
 #include <QFrame>
 #include <QGraphicsObject>
 #include <QList>
