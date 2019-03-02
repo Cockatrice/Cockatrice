@@ -263,7 +263,7 @@ void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideb
     else
         appendHtmlServerMessage(tr("%1 has loaded a deck with %2 sideboard cards (%3).")
                                     .arg(sanitizeHtml(player->getName()))
-                                    .arg("<font color=\"blue\">" + QString::number(sideboardSize) + "</font>")
+                                    .arg("<font class=\"blue\">" + QString::number(sideboardSize) + "</font>")
                                     .arg(deckHash));
 }
 
@@ -357,7 +357,7 @@ void MessageLogWidget::logDrawCards(Player *player, int number)
         soundEngine->playSound("draw_card");
         appendHtmlServerMessage(tr("%1 draws %2 card(s).", "", number)
                                     .arg(sanitizeHtml(player->getName()))
-                                    .arg("<font color=\"blue\">" + QString::number(number) + "</font>"));
+                                    .arg("<font class=\"blue\">" + QString::number(number) + "</font>"));
     }
 }
 
@@ -372,7 +372,7 @@ void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCar
             tr("%1 is looking at the top %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
                 .arg(sanitizeHtml(player->getName()))
                 .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone))
-                .arg("<font color=\"blue\">" + QString::number(numberCards) + "</font>"));
+                .arg("<font class=\"blue\">" + QString::number(numberCards) + "</font>"));
 }
 
 void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDown)
@@ -491,7 +491,7 @@ void MessageLogWidget::logRevealCards(Player *player,
             cardStr = tr("cards", "an unknown amount of cards");
         } else {
             cardStr = tr("%1 card(s)", "a card for singular, %1 cards for plural", amount)
-                          .arg("<font color=\"blue\">" + QString::number(amount) + "</font>");
+                          .arg("<font class=\"blue\">" + QString::number(amount) + "</font>");
         }
     } else {
         cardStr = cardLink(cardName);
@@ -548,12 +548,12 @@ void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
         QString coinOptions[2] = {tr("Heads") + " (1)", tr("Tails") + " (2)"};
         appendHtmlServerMessage(tr("%1 flipped a coin. It landed as %2.")
                                     .arg(sanitizeHtml(player->getName()))
-                                    .arg("<font color=\"blue\">" + coinOptions[roll - 1] + "</font>"));
+                                    .arg("<font class=\"blue\">" + coinOptions[roll - 1] + "</font>"));
     } else
         appendHtmlServerMessage(tr("%1 rolls a %2 with a %3-sided die.")
                                     .arg(sanitizeHtml(player->getName()))
-                                    .arg("<font color=\"blue\">" + QString::number(roll) + "</font>")
-                                    .arg("<font color=\"blue\">" + QString::number(sides) + "</font>"));
+                                    .arg("<font class=\"blue\">" + QString::number(roll) + "</font>")
+                                    .arg("<font class=\"blue\">" + QString::number(sides) + "</font>"));
     soundEngine->playSound("roll_dice");
 }
 
@@ -644,7 +644,7 @@ void MessageLogWidget::logSetAnnotation(Player *player, CardItem *card, QString 
         QString(tr("%1 sets annotation of %2 to %3."))
             .arg(sanitizeHtml(player->getName()))
             .arg(cardLink(card->getName()))
-            .arg(QString("&quot;<font color=\"blue\">%1</font>&quot;").arg(sanitizeHtml(std::move(newAnnotation)))));
+            .arg(QString("&quot;<font class=\"blue\">%1</font>&quot;").arg(sanitizeHtml(std::move(newAnnotation)))));
 }
 
 void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue)
@@ -671,7 +671,7 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
     }
 
     appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getName()))
-                                .arg("<font color=\"blue\">" + QString::number(delta) + "</font>")
+                                .arg("<font class=\"blue\">" + QString::number(delta) + "</font>")
                                 .arg(colorStr)
                                 .arg(cardLink(std::move(cardName)))
                                 .arg(value));
@@ -684,8 +684,8 @@ void MessageLogWidget::logSetCounter(Player *player, QString counterName, int va
 
     appendHtmlServerMessage(tr("%1 sets counter %2 to %3 (%4%5).")
                                 .arg(sanitizeHtml(player->getName()))
-                                .arg(QString("<font color=\"blue\">%1</font>").arg(sanitizeHtml(counterName)))
-                                .arg(QString("<font color=\"blue\">%1</font>").arg(value))
+                                .arg(QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterName)))
+                                .arg(QString("<font class=\"blue\">%1</font>").arg(value))
                                 .arg(value > oldValue ? "+" : "")
                                 .arg(value - oldValue));
 }
@@ -708,7 +708,7 @@ void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
 
     QString name = card->getName();
     if (name.isEmpty()) {
-        name = QString("<font color=\"blue\">card #%1</font>").arg(sanitizeHtml(QString::number(card->getId())));
+        name = QString("<font class=\"blue\">card #%1</font>").arg(sanitizeHtml(QString::number(card->getId())));
     } else {
         name = cardLink(name);
     }
