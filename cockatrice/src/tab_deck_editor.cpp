@@ -1243,7 +1243,11 @@ void TabDeckEditor::showSearchSyntaxHelp()
                                  Qt::WindowCloseButtonHint | Qt::WindowFullscreenButtonHint);
     browser->setWindowTitle("Search Help");
     browser->setReadOnly(true);
-    browser->setMinimumSize({500, 600});
+    browser->setMinimumSize({500, 600});;
+
+    QString sheet = QString("a { text-decoration: underline; color: rgb(71,158,252) };");
+    browser->document()->setDefaultStyleSheet(sheet);
+
     browser->setHtml(text);
     connect(browser, &QTextBrowser::anchorClicked, [=](QUrl link) { searchEdit->setText(link.fragment()); });
     browser->show();
