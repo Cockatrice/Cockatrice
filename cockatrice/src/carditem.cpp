@@ -106,17 +106,12 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->save();
         transformPainter(painter, translatedSize, tapAngle);
 
-        if (info) {
-            QStringList ptSplit = pt.split("/");
-            QStringList ptDbSplit = info->getPowTough().split("/");
-
-            if (getFaceDown() || ptDbSplit.at(0) != ptSplit.at(0) || ptDbSplit.at(1) != ptSplit.at(1))
-                painter->setPen(QColor(255, 150, 0));
-            else
-                painter->setPen(Qt::white);
-        } else {
+        if (!getFaceDown() && info && pt == info->getPowTough()) {
             painter->setPen(Qt::white);
+        } else {
+            painter->setPen(QColor(255, 150, 0)); // dark orange
         }
+
         painter->setBackground(Qt::black);
         painter->setBackgroundMode(Qt::OpaqueMode);
 

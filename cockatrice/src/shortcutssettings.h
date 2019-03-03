@@ -139,6 +139,8 @@ private:
         {"Player/aIncT", parseSequenceString("Alt++")},
         {"Player/aSetPT", parseSequenceString("Ctrl+P")},
         {"Player/aResetPT", parseSequenceString("Ctrl+Alt+0")},
+        {"Player/aFlowP", parseSequenceString("")},
+        {"Player/aFlowT", parseSequenceString("")},
 
         {"Player/aConcede", parseSequenceString("F2")},
         {"Player/aLeaveGame", parseSequenceString("Ctrl+Q")},

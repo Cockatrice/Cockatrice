@@ -63,6 +63,7 @@
             &lt;br&gt;Change Life: CTRL + L
             &lt;br&gt;All shortcuts can be customized via Settings->Shortcuts!
         </text>
+        <image>shortcuts.png</image>
         <date>2018-03-01</date>
     </tip>
     <tip>
@@ -88,5 +89,11 @@
         <text>When setting a counter value, you can type a math expression in the box and the counter will be set to the result.&lt;br&gt;The "x" variable contains the current counter value.</text>
         <image>counter_expression.png</image>
         <date>2019-02-02</date>
+    </tip>
+    <tip>
+        <title>Power and Toughness</title>
+        <text>You can add and subtract to a creature's stats.&lt;br&gt;With a card selected, set the power and toughness ( default: ctrl + p ) and enter +3/-1 to increase power by three while decreasing toughness by one.&lt;br&gt;You can also reset it to the original value ( default: ctrl + alt + 0 ).</text>
+        <image>setpt.png</image>
+        <date>2019-03-02</date>
     </tip>
 </tips>
