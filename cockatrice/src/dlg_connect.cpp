@@ -206,6 +206,10 @@ void DlgConnect::rebuildComboBoxList(int failure)
         }
     }
 
+    // Disable auto connect when updating
+    settingsCache->servers().setAutoConnect(false);
+
+    // Re-enable the refresh server button
     btnRefreshServers->setDisabled(false);
 }
 
