@@ -2669,8 +2669,8 @@ void Player::actSetPT()
     }
     bool ok;
     dialogSemaphore = true;
-    QString pt = QInputDialog::getText(nullptr, tr("Change power/toughness"), tr("Change stats to:"),
-                                       QLineEdit::Normal, oldPT, &ok);
+    QString pt = QInputDialog::getText(nullptr, tr("Change power/toughness"), tr("Change stats to:"), QLineEdit::Normal,
+                                       oldPT, &ok);
     dialogSemaphore = false;
     if (clearCardsToDelete() || !ok) {
         return;
