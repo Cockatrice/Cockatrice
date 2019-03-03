@@ -2633,10 +2633,8 @@ QVariantList Player::parsePT(const QString &pt)
             ptList.append(QVariant(pt.mid(1))); // cut off starting '/' and take full string
         } else {
             int start = 0;
-            qDebug() << "woooo";
             for (;;) {
                 QString item = pt.mid(start, sep - start);
-                qDebug() << item << start << sep;
                 if (item.isEmpty()) {
                     ptList.append(QVariant(QString()));
                 } else if (item[0] == '+') {
