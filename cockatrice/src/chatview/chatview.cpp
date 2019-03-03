@@ -13,8 +13,6 @@
 #include <QTextEdit>
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
-const QColor OTHER_USER_COLOR = QColor(0, 65, 255); // dark blue
-const QString SERVER_MESSAGE_COLOR = "#851515";
 
 ChatView::ChatView(const TabSupervisor *_tabSupervisor,
                    const UserlistProxy *_userlistProxy,
@@ -24,7 +22,20 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor,
     : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game), userlistProxy(_userlistProxy), evenNumber(true),
       showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
 {
-    document()->setDefaultStyleSheet("a { text-decoration: none; color: blue; }");
+    if (palette().windowText().color().lightness() > 200) {
+        document()->setDefaultStyleSheet(R"(
+           a { text-decoration: none; color: rgb(71,158,252); }
+           .blue { color: rgb(71,158,252); }
+        )");
+        serverMessageColor = QColor(0xFF, 0x73, 0x83);
+        otherUserColor = otherUserColor.lighter(150);
+    } else {
+        document()->setDefaultStyleSheet(R"(
+            a { text-decoration: none; color: blue; }
+            .blue { color: blue }
+        )");
+    }
+
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 
@@ -84,8 +95,9 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 {
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
 
-    QString htmlText = "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : SERVER_MESSAGE_COLOR) +
-                       ">" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + html + "</font>";
+    QString htmlText =
+        "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : serverMessageColor.name()) + ">" +
+        QDateTime::currentDateTime().toString("[hh:mm:ss] ") + html + "</font>";
 
     if (optionalIsBold)
         htmlText = "<b>" + htmlText + "</b>";
@@ -142,7 +154,7 @@ void ChatView::appendMessage(QString message,
     // timestamp
     if (showTimestamps && (!sameSender || sender.toLower() == "servatrice") && !sender.isEmpty()) {
         QTextCharFormat timeFormat;
-        timeFormat.setForeground(QColor(SERVER_MESSAGE_COLOR));
+        timeFormat.setForeground(serverMessageColor);
         if (sender.isEmpty())
             timeFormat.setFontWeight(QFont::Bold);
         cursor.setCharFormat(timeFormat);
@@ -156,7 +168,7 @@ void ChatView::appendMessage(QString message,
             senderFormat.setForeground(QBrush(getCustomMentionColor()));
             senderFormat.setFontWeight(QFont::Bold);
         } else {
-            senderFormat.setForeground(QBrush(OTHER_USER_COLOR));
+            senderFormat.setForeground(QBrush(otherUserColor));
             if (playerBold)
                 senderFormat.setFontWeight(QFont::Bold);
         }

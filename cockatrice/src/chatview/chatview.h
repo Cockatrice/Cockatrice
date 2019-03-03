@@ -59,6 +59,10 @@ private:
     void checkMention(QTextCursor &cursor, QString &message, QString &sender, UserLevelFlags userLevel);
     void checkWord(QTextCursor &cursor, QString &message);
     QString extractNextWord(QString &message, QString &rest);
+
+    QColor otherUserColor = QColor(0, 65, 255); // dark blue
+    QColor serverMessageColor = QColor(0x85, 0x15, 0x15);
+
 private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();
