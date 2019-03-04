@@ -586,6 +586,11 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                 setCardAttrHelper(ges, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), card->getId(),
                                   AttrTapped, "1");
             }
+            QString ptString = QString::fromStdString(thisCardProperties->pt());
+            if (!ptString.isEmpty()) {
+            setCardAttrHelper(ges, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), card->getId(), AttrPT,
+                              ptString);
+            }
         }
         if (startzone->getAlwaysRevealTopCard() && !startzone->getCards().isEmpty() && (originalPosition == 0)) {
             Event_RevealCards revealEvent;
