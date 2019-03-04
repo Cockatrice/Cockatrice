@@ -65,6 +65,7 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
 void ReplayTimelineWidget::mousePressEvent(QMouseEvent *event)
 {
     int newTime = static_cast<int>((long)maxTime * (long)event->x() / width());
+    newTime -= newTime % 200; // Time should always be a multiple of 200
     if (newTime < currentTime) {
         currentTime = 0;
         currentEvent = 0;
