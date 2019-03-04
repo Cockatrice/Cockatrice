@@ -2099,7 +2099,9 @@ void Player::playCard(CardItem *card, bool faceDown, bool tapped)
         tableRow = faceDown ? 2 : info->getTableRow();
         QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
         cardToMove->set_face_down(faceDown);
-        cardToMove->set_pt(info->getPowTough().toStdString());
+        if (!faceDown) {
+            cardToMove->set_pt(info->getPowTough().toStdString());
+        }
         cardToMove->set_tapped(faceDown ? false : tapped);
         if (tableRow != 3)
             cmd.set_target_zone("table");
