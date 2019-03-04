@@ -62,7 +62,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="270"/>
         <source>Sets JSON file (%1)</source>
-        <translation type="unfinished"/>
+        <translation>Salvar em arquivo JSON (%1)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="294"/>
@@ -112,12 +112,12 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="409"/>
         <source>Xz extraction failed.</source>
-        <translation type="unfinished"/>
+        <translation>Extração de arquivo .xz falhou</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="417"/>
         <source>Sorry, this version of Oracle does not support xz compressed files.</source>
-        <translation type="unfinished"/>
+        <translation>Desculpe, esta versão do Oracle não suporta arquivos comprimidos no formato .xz</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="436"/>
