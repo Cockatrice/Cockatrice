@@ -77,14 +77,14 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
 
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
 
-    resetPainterTransform(painter);
+    int scale = resetPainterTransform(painter);
 
     painter->translate(totalBoundingRect.width() / 2, totalBoundingRect.height() / 2);
     painter->rotate(angle);
     painter->translate(-translatedSize.width() / 2, -translatedSize.height() / 2);
 
     QFont f;
-    f.setPixelSize(fontSize);
+    f.setPixelSize(fontSize * scale);
 
     painter->setFont(f);
 }
