@@ -190,24 +190,28 @@ void DlgConnect::rebuildComboBoxList(int failure)
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
 
+    bool autoConnectEnabled = static_cast<bool>(settingsCache->servers().getAutoConnect());
+    QString autoConnectSaveName = settingsCache->servers().getSaveName();
+
     int index = 0;
+
     for (const auto &pair : savedHostList) {
         auto tmp = pair.second;
         QString saveName = tmp.getSaveName();
         if (saveName.size()) {
             previousHosts->addItem(saveName);
 
-            // On rebuild, set to RR
-            if (saveName.compare("Rooster Ranges") == 0) {
+            if (autoConnectEnabled) {
+                if (saveName.compare(autoConnectSaveName) == 0) {
+                    previousHosts->setCurrentIndex(index);
+                }
+            } else if (saveName.compare("Rooster Ranges") == 0) {
                 previousHosts->setCurrentIndex(index);
             }
 
             ++index;
         }
     }
-
-    // Disable auto connect when updating
-    settingsCache->servers().setAutoConnect(false);
 
     // Re-enable the refresh server button
     btnRefreshServers->setDisabled(false);
