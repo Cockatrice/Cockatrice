@@ -26,6 +26,6 @@ public:
     }
 };
 
-void resetPainterTransform(QPainter *painter);
+int resetPainterTransform(QPainter *painter);
 
 #endif
