@@ -242,9 +242,17 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         if (!colorIdentity.isEmpty())
             properties.insert("coloridentity", colorIdentity);
 
-        maintype = card.value("types").toStringList().first();
-        if (!maintype.isEmpty())
-            properties.insert("maintype", maintype);
+        {
+            const auto &typeList = card.value("types").toStringList();
+            if (typeList.contains("Creature")) {
+                properties.insert("maintype", "Creature");
+            } else {
+                const auto &maintype = typeList.first();
+                if (!maintype.isEmpty()) {
+                    properties.insert("maintype", maintype);
+                }
+            }
+        }
 
         power = getStringPropertyFromMap(card, "power");
         toughness = getStringPropertyFromMap(card, "toughness");
