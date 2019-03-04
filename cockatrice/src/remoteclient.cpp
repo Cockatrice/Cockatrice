@@ -493,6 +493,7 @@ void RemoteClient::activateToServer(const QString &_token)
 
 void RemoteClient::disconnectFromServer()
 {
+    settingsCache->servers().setAutoConnect(false);
     emit sigDisconnectFromServer();
 }
 
