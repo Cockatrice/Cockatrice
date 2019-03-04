@@ -11,6 +11,7 @@ CardInfoText::CardInfoText(QWidget *parent) : QFrame(parent), info(nullptr)
 {
     nameLabel = new QLabel;
     nameLabel->setOpenExternalLinks(false);
+    nameLabel->setWordWrap(true);
     connect(nameLabel, SIGNAL(linkActivated(const QString &)), this, SIGNAL(linkActivated(const QString &)));
 
     textLabel = new QTextEdit();
@@ -38,7 +39,7 @@ void CardInfoText::setCard(CardInfoPtr card)
                 .arg(tr("Name:"), card->getName().toHtmlEscaped());
 
     QStringList cardProps = card->getProperties();
-    foreach (QString key, cardProps) {
+    for (const QString &key : cardProps) {
         if (key.contains("-"))
             continue;
         QString keyText = Mtg::getNicePropertyName(key).toHtmlEscaped() + ":";
