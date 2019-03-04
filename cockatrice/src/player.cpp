@@ -3065,7 +3065,7 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
         return;
     }
 
-    QList<CardRelation *> relatedCards = cardInfo->getRelatedCards();
+    QList<CardRelation *> relatedCards = cardInfo->getAllRelatedCards();
     if (relatedCards.isEmpty()) {
         return;
     }
@@ -3092,7 +3092,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
         return;
     }
 
-    QList<CardRelation *> relatedCards = cardInfo->getRelatedCards();
+    QList<CardRelation *> relatedCards = cardInfo->getAllRelatedCards();
     if (relatedCards.isEmpty()) {
         return;
     }

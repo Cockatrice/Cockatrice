@@ -287,6 +287,13 @@ public:
     {
         return reverseRelatedCardsToMe;
     }
+    const QList<CardRelation *> getAllRelatedCards() const
+    {
+        QList<CardRelation *> result;
+        result.append(getRelatedCards());
+        result.append(getReverseRelatedCards2Me());
+        return result;
+    }
     void resetReverseRelatedCards2Me();
     void addReverseRelatedCards2Me(CardRelation *cardRelation)
     {
