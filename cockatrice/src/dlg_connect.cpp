@@ -207,7 +207,6 @@ void DlgConnect::rebuildComboBoxList(int failure)
                 }
             } else if (saveName.compare("Rooster Ranges") == 0) {
                 previousHosts->setCurrentIndex(index);
-                settingsCache->servers().setAutoConnect(false);
             }
 
             ++index;
