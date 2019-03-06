@@ -246,6 +246,8 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
             const auto &typeList = card.value("types").toStringList();
             if (typeList.contains("Creature")) {
                 properties.insert("maintype", "Creature");
+            } else if (typeList.contains("Land")) {
+                properties.insert("maintype", "Land");
             } else {
                 const auto &maintype = typeList.first();
                 if (!maintype.isEmpty()) {
