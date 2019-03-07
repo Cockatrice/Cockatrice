@@ -613,7 +613,7 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
         case Event_NotifyUser::PROMOTED:
             QMessageBox::information(
                 this, tr("Promotion"),
-                tr("You have been promoted to moderator. Please log out and back in for changes to take effect."));
+                tr("You have been promoted. Please log out and back in for changes to take effect."));
             break;
         case Event_NotifyUser::WARNING: {
             if (!QString::fromStdString(event.warning_reason()).simplified().isEmpty())
