@@ -308,7 +308,7 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
         return data(0, Qt::UserRole + 1).toBool();
 
     // Sort by user level
-    if (data(0, Qt::UserRole) != other.data(0, Qt::UserRole))
+    if ((data(0, Qt::UserRole).toInt() & 15) != (other.data(0, Qt::UserRole).toInt() & 15))
         return (data(0, Qt::UserRole).toInt() & 15) > (other.data(0, Qt::UserRole).toInt() & 15);
 
     // Sort by name
