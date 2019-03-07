@@ -42,11 +42,11 @@ ColorQuery <- [cC] 'olor'? <[iI]?> <[:!]> ColorEx*
 FieldQuery <- String [:] RegexString / String ws? NumericExpression
 
 NonQuote <- !["].
-UnescapedStringListPart <- [a-zA-Z0-9/\']+
-String <- UnescapedStringListPart / ["] <NonQuote*> ["]
+UnescapedStringListPart <- ![":<>=! ].
+String <- UnescapedStringListPart+ / ["] <NonQuote*> ["]
 StringValue <- String / [(] StringList [)]
 StringList <- StringListString (ws? [,] ws? StringListString)*
-StringListString <- UnescapedStringListPart
+StringListString <- UnescapedStringListPart+
 GenericQuery <- RegexString
 RegexString <- String
 
