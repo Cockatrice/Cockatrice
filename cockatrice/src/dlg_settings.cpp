@@ -2,7 +2,7 @@
 #include "carddatabase.h"
 #include "main.h"
 #include "releasechannel.h"
-#include "sequenceEdit/shortcutstab.h"
+#include "sequenceEdit/sequenceedit.h"
 #include "settingscache.h"
 #include "soundengine.h"
 #include "spoilerbackgroundupdater.h"
@@ -18,6 +18,7 @@
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QHeaderView>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
@@ -28,10 +29,13 @@
 #include <QSlider>
 #include <QSpinBox>
 #include <QStackedWidget>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <QToolBar>
 #include <QTranslator>
 
 #define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Picture-Download-URLs"
+#define WIKI_CUSTOM_SHORTCUTS "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
@@ -961,6 +965,172 @@ void SoundSettingsPage::retranslateUi()
     masterVolumeLabel.setText(tr("Master volume"));
 }
 
+ShortcutSettingsPage::ShortcutSettingsPage()
+{
+    // table
+    shortcutsTable = new QTreeWidget();
+    shortcutsTable->setColumnCount(2);
+    shortcutsTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    shortcutsTable->header()->resizeSection(0, shortcutsTable->width() / 3 * 2);
+
+    // edit widget
+    currentActionGroupLabel = new QLabel(this);
+    currentActionGroupName = new QLabel(this);
+    currentActionLabel = new QLabel(this);
+    currentActionName = new QLabel(this);
+    currentShortcutLabel = new QLabel(this);
+    editTextBox = new SequenceEdit("", this);
+
+    // buttons
+    faqLabel = new QLabel(this);
+    faqLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    faqLabel->setOpenExternalLinks(true);
+
+    btnResetAll = new QPushButton(this);
+    btnClearAll = new QPushButton(this);
+
+    btnResetAll->setIcon(QPixmap("theme:icons/update"));
+    btnClearAll->setIcon(QPixmap("theme:icons/clearsearch"));
+
+    // layout
+    auto *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addWidget(faqLabel);
+    buttonsLayout->addWidget(btnResetAll);
+    buttonsLayout->addWidget(btnClearAll);
+
+    auto *editLayout = new QGridLayout;
+    editLayout->addWidget(currentActionGroupLabel, 0, 0);
+    editLayout->addWidget(currentActionGroupName, 0, 1);
+    editLayout->addWidget(currentActionLabel, 1, 0);
+    editLayout->addWidget(currentActionName, 1, 1);
+    editLayout->addWidget(currentShortcutLabel, 2, 0);
+    editLayout->addWidget(editTextBox, 2, 1);
+    editLayout->addLayout(buttonsLayout, 4, 0, 1, 2);
+
+    editShortcutGroupBox = new QGroupBox;
+    editShortcutGroupBox->setLayout(editLayout);
+
+    auto *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(shortcutsTable);
+    mainLayout->addWidget(editShortcutGroupBox);
+
+    setLayout(mainLayout);
+
+    connect(btnResetAll, SIGNAL(clicked()), this, SLOT(resetShortcuts()));
+    connect(btnClearAll, SIGNAL(clicked()), this, SLOT(clearShortcuts()));
+    connect(shortcutsTable, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
+    connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+
+    createShortcuts();
+}
+
+void ShortcutSettingsPage::currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem * /*previous */)
+{
+    if(current == nullptr)
+    {
+        currentActionGroupName->setText("");
+        currentActionName->setText("");
+        editTextBox->setShortcutName("");
+    } else {
+        QString key = current->data(2, Qt::DisplayRole).toString();
+        QString group = settingsCache->shortcuts().getShortcut(key).getGroupName();
+        QString action = settingsCache->shortcuts().getShortcut(key).getName();
+        currentActionGroupName->setText(group);
+        currentActionName->setText(action);
+        editTextBox->setShortcutName(key);
+    }
+}
+
+void ShortcutSettingsPage::resetShortcuts()
+{
+    if (QMessageBox::question(this, tr("Restore all default shortcuts"),
+                              tr("Do you really want to restore all default shortcuts?")) == QMessageBox::Yes) {
+        settingsCache->shortcuts().resetAllShortcuts();
+    }
+}
+
+void ShortcutSettingsPage::createShortcuts()
+{
+    QHash<QString, QTreeWidgetItem *> parentItems;
+    QTreeWidgetItem *curParent = nullptr;
+    for(const auto &key : settingsCache->shortcuts().getAllShortcutKeys()) {
+        QString name = settingsCache->shortcuts().getShortcut(key).getName();
+        QString group = settingsCache->shortcuts().getShortcut(key).getGroupName();
+        QString shortcut = settingsCache->shortcuts().getShortcutString(key);
+
+        if(parentItems.contains(group))
+        {
+            curParent = parentItems.value(group);
+        } else {
+            curParent = new QTreeWidgetItem((QTreeWidget*) nullptr, QStringList({ group, "", "" }));
+            static QFont font = curParent->font(0);
+            font.setBold(true);
+            curParent->setFont(0, font);
+            parentItems.insert(group, curParent);
+        }
+
+        new QTreeWidgetItem(curParent, QStringList({ name, shortcut, key }));
+    }
+    shortcutsTable->clear();
+    shortcutsTable->insertTopLevelItems(0, parentItems.values());
+    shortcutsTable->setCurrentItem(nullptr);
+    shortcutsTable->expandAll();
+    shortcutsTable->sortItems(0, Qt::AscendingOrder);
+}
+
+void ShortcutSettingsPage::refreshShortcuts()
+{
+    QTreeWidgetItem *curParent = nullptr;
+    QTreeWidgetItem *curChild = nullptr;
+    for(int i = 0; i < shortcutsTable->topLevelItemCount(); ++i)
+    {
+        curParent = shortcutsTable->topLevelItem(i);
+        for(int j = 0; j < curParent->childCount(); ++j)
+        {
+            curChild = curParent->child(j);
+            QString key = curChild->data(2, Qt::DisplayRole).toString();
+            QString name = settingsCache->shortcuts().getShortcut(key).getName();
+            QString shortcut = settingsCache->shortcuts().getShortcutString(key);
+            curChild->setText(0, name);
+            curChild->setText(1, shortcut);
+
+            if(j == 0) {
+                // the first child also updates the parent's group name
+                QString group = settingsCache->shortcuts().getShortcut(key).getGroupName();
+                curParent->setText(0, group);
+            }
+        }
+    }
+    shortcutsTable->sortItems(0, Qt::AscendingOrder);
+}
+
+void ShortcutSettingsPage::clearShortcuts()
+{
+    if (QMessageBox::question(this, tr("Clear all default shortcuts"),
+                              tr("Do you really want to clear all shortcuts?")) == QMessageBox::Yes) {
+        settingsCache->shortcuts().clearAllShortcuts();
+    }
+}
+
+void ShortcutSettingsPage::retranslateUi()
+{
+    shortcutsTable->setHeaderLabels(
+        QStringList()
+        << tr("Action")
+        << tr("Shortcut")
+    );
+    refreshShortcuts();
+
+    currentActionGroupLabel->setText(tr("Section:"));
+    currentActionLabel->setText(tr("Action:"));
+    currentShortcutLabel->setText(tr("Shortcut:"));
+    faqLabel->setText(QString("<a href='%1'>%2</a>")
+                          .arg(WIKI_CUSTOM_SHORTCUTS)
+                          .arg(tr("How to set custom shortcuts")));
+    btnResetAll->setText("Restore all default shortcuts");
+    btnClearAll->setText("Clear all shortcuts");
+}
+
 DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 {
     QRect rec = QApplication::desktop()->availableGeometry();
@@ -984,7 +1154,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     pagesWidget->addWidget(new DeckEditorSettingsPage);
     pagesWidget->addWidget(new MessagesSettingsPage);
     pagesWidget->addWidget(new SoundSettingsPage);
-    pagesWidget->addWidget(new ShortcutsTab);
+    pagesWidget->addWidget(new ShortcutSettingsPage);
 
     createIcons();
     contentsWidget->setCurrentRow(0);

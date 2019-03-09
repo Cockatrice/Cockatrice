@@ -5,7 +5,7 @@
 #include <QToolTip>
 #include <utility>
 
-SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWidget(parent), shortcutName(_shortcutName)
+SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWidget(parent)
 {
     lineEdit = new QLineEdit(this);
     clearButton = new QPushButton("", this);
@@ -34,7 +34,24 @@ SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWid
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(restoreDefault()));
     lineEdit->installEventFilter(this);
 
-    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shortcutName));
+    setShortcutName(_shortcutName);
+}
+
+void SequenceEdit::setShortcutName(const QString &_shortcutName)
+{
+    shortcutName = _shortcutName;
+    if(shortcutName.isEmpty())
+    {
+        clearButton->setEnabled(false);
+        defaultButton->setEnabled(false);
+        lineEdit->setEnabled(false);
+        lineEdit->setText("");
+    } else {
+        clearButton->setEnabled(true);
+        defaultButton->setEnabled(true);
+        lineEdit->setEnabled(true);
+        lineEdit->setText(settingsCache->shortcuts().getShortcutString(shortcutName));
+    }
 }
 
 QString SequenceEdit::getSequence()

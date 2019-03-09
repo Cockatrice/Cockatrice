@@ -4,6 +4,12 @@
 #include <QStringList>
 #include <utility>
 
+ShortcutKey::ShortcutKey(const QString &_name, QList<QKeySequence> _sequence, ShortcutGroup::Groups _group)
+: QList<QKeySequence>(_sequence), name(_name), group(_group)
+{
+
+}
+
 ShortcutsSettings::ShortcutsSettings(const QString &settingsPath, QObject *parent) : QObject(parent)
 {
     shortCuts = defaultShortCuts;
@@ -23,8 +29,8 @@ ShortcutsSettings::ShortcutsSettings(const QString &settingsPath, QObject *paren
             QString stringSequence = shortCutsFile.value(*it).toString();
             // check whether shortcut is forbidden
             if (isKeyAllowed(*it, stringSequence)) {
-                QList<QKeySequence> SequenceList = parseSequenceString(stringSequence);
-                shortCuts.insert(*it, SequenceList);
+                auto shortcut = getShortcut(*it);
+                shortcut.setSequence(parseSequenceString(stringSequence));
             } else {
                 invalidItems.insert(*it, stringSequence);
             }
@@ -45,21 +51,16 @@ ShortcutsSettings::ShortcutsSettings(const QString &settingsPath, QObject *paren
             }
             msgBox.setDetailedText(detailedMessage);
             msgBox.exec();
-
-            // set default shortcut where stored value was invalid
-            for (const QString &key : invalidItems.keys()) {
-                setShortcuts(key, getDefaultShortcutString(key));
-            }
         }
     }
 }
 
-QList<QKeySequence> ShortcutsSettings::getDefaultShortcut(const QString &name) const
+ShortcutKey ShortcutsSettings::getDefaultShortcut(const QString &name) const
 {
-    return defaultShortCuts.value(name, QList<QKeySequence>());
+    return defaultShortCuts.value(name, ShortcutKey());
 }
 
-QList<QKeySequence> ShortcutsSettings::getShortcut(const QString &name) const
+ShortcutKey ShortcutsSettings::getShortcut(const QString &name) const
 {
     if (shortCuts.contains(name)) {
         return shortCuts.value(name);
@@ -105,7 +106,7 @@ QList<QKeySequence> ShortcutsSettings::parseSequenceString(const QString &string
 
 void ShortcutsSettings::setShortcuts(const QString &name, const QList<QKeySequence> &Sequence)
 {
-    shortCuts[name] = Sequence;
+    shortCuts[name].setSequence(Sequence);
 
     QSettings shortCutsFile(settingsFilePath, QSettings::IniFormat);
     shortCutsFile.beginGroup(custom);
@@ -132,7 +133,6 @@ void ShortcutsSettings::resetAllShortcuts()
     shortCutsFile.remove("");
     shortCutsFile.endGroup();
     emit shortCutChanged();
-    emit allShortCutsReset();
 }
 
 void ShortcutsSettings::clearAllShortcuts()
@@ -140,12 +140,11 @@ void ShortcutsSettings::clearAllShortcuts()
     QSettings shortCutsFile(settingsFilePath, QSettings::IniFormat);
     shortCutsFile.beginGroup(custom);
     for (auto it = shortCuts.begin(); it != shortCuts.end(); ++it) {
-        it.value() = parseSequenceString("");
+        it.value().setSequence(parseSequenceString(""));
         shortCutsFile.setValue(it.key(), "");
     }
     shortCutsFile.endGroup();
     emit shortCutChanged();
-    emit allShortCutsClear();
 }
 
 bool ShortcutsSettings::isKeyAllowed(const QString &name, const QString &Sequences) const
