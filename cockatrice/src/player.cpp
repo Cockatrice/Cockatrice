@@ -3137,11 +3137,13 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
         cardMenu->addAction(createRelated);
     }
 
-    if (shortcutsActive) {
-        createRelatedCards->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
+    if (createRelatedCards) {
+        if(shortcutsActive) {
+            createRelatedCards->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
+        }
+        connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
+        cardMenu->addAction(createRelatedCards);
     }
-    connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
-    cardMenu->addAction(createRelatedCards);
 }
 
 void Player::setCardMenu(QMenu *menu)
