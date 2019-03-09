@@ -5,9 +5,8 @@
 #include <utility>
 
 ShortcutKey::ShortcutKey(const QString &_name, QList<QKeySequence> _sequence, ShortcutGroup::Groups _group)
-: QList<QKeySequence>(_sequence), name(_name), group(_group)
+    : QList<QKeySequence>(_sequence), name(_name), group(_group)
 {
-
 }
 
 ShortcutsSettings::ShortcutsSettings(const QString &settingsPath, QObject *parent) : QObject(parent)

@@ -29,10 +29,10 @@
 #include <QSlider>
 #include <QSpinBox>
 #include <QStackedWidget>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
 #include <QToolBar>
 #include <QTranslator>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 
 #define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Picture-Download-URLs"
 #define WIKI_CUSTOM_SHORTCUTS "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"
@@ -1018,7 +1018,8 @@ ShortcutSettingsPage::ShortcutSettingsPage()
 
     connect(btnResetAll, SIGNAL(clicked()), this, SLOT(resetShortcuts()));
     connect(btnClearAll, SIGNAL(clicked()), this, SLOT(clearShortcuts()));
-    connect(shortcutsTable, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
+    connect(shortcutsTable, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this,
+            SLOT(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)));
     connect(&settingsCache->shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
 
     createShortcuts();
@@ -1026,8 +1027,7 @@ ShortcutSettingsPage::ShortcutSettingsPage()
 
 void ShortcutSettingsPage::currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem * /*previous */)
 {
-    if(current == nullptr)
-    {
+    if (current == nullptr) {
         currentActionGroupName->setText("");
         currentActionName->setText("");
         editTextBox->setShortcutName("");
@@ -1053,23 +1053,22 @@ void ShortcutSettingsPage::createShortcuts()
 {
     QHash<QString, QTreeWidgetItem *> parentItems;
     QTreeWidgetItem *curParent = nullptr;
-    for(const auto &key : settingsCache->shortcuts().getAllShortcutKeys()) {
+    for (const auto &key : settingsCache->shortcuts().getAllShortcutKeys()) {
         QString name = settingsCache->shortcuts().getShortcut(key).getName();
         QString group = settingsCache->shortcuts().getShortcut(key).getGroupName();
         QString shortcut = settingsCache->shortcuts().getShortcutString(key);
 
-        if(parentItems.contains(group))
-        {
+        if (parentItems.contains(group)) {
             curParent = parentItems.value(group);
         } else {
-            curParent = new QTreeWidgetItem((QTreeWidget*) nullptr, QStringList({ group, "", "" }));
+            curParent = new QTreeWidgetItem((QTreeWidget *)nullptr, QStringList({group, "", ""}));
             static QFont font = curParent->font(0);
             font.setBold(true);
             curParent->setFont(0, font);
             parentItems.insert(group, curParent);
         }
 
-        new QTreeWidgetItem(curParent, QStringList({ name, shortcut, key }));
+        new QTreeWidgetItem(curParent, QStringList({name, shortcut, key}));
     }
     shortcutsTable->clear();
     shortcutsTable->insertTopLevelItems(0, parentItems.values());
@@ -1082,11 +1081,9 @@ void ShortcutSettingsPage::refreshShortcuts()
 {
     QTreeWidgetItem *curParent = nullptr;
     QTreeWidgetItem *curChild = nullptr;
-    for(int i = 0; i < shortcutsTable->topLevelItemCount(); ++i)
-    {
+    for (int i = 0; i < shortcutsTable->topLevelItemCount(); ++i) {
         curParent = shortcutsTable->topLevelItem(i);
-        for(int j = 0; j < curParent->childCount(); ++j)
-        {
+        for (int j = 0; j < curParent->childCount(); ++j) {
             curChild = curParent->child(j);
             QString key = curChild->data(2, Qt::DisplayRole).toString();
             QString name = settingsCache->shortcuts().getShortcut(key).getName();
@@ -1094,7 +1091,7 @@ void ShortcutSettingsPage::refreshShortcuts()
             curChild->setText(0, name);
             curChild->setText(1, shortcut);
 
-            if(j == 0) {
+            if (j == 0) {
                 // the first child also updates the parent's group name
                 QString group = settingsCache->shortcuts().getShortcut(key).getGroupName();
                 curParent->setText(0, group);
@@ -1114,19 +1111,13 @@ void ShortcutSettingsPage::clearShortcuts()
 
 void ShortcutSettingsPage::retranslateUi()
 {
-    shortcutsTable->setHeaderLabels(
-        QStringList()
-        << tr("Action")
-        << tr("Shortcut")
-    );
+    shortcutsTable->setHeaderLabels(QStringList() << tr("Action") << tr("Shortcut"));
     refreshShortcuts();
 
     currentActionGroupLabel->setText(tr("Section:"));
     currentActionLabel->setText(tr("Action:"));
     currentShortcutLabel->setText(tr("Shortcut:"));
-    faqLabel->setText(QString("<a href='%1'>%2</a>")
-                          .arg(WIKI_CUSTOM_SHORTCUTS)
-                          .arg(tr("How to set custom shortcuts")));
+    faqLabel->setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_SHORTCUTS).arg(tr("How to set custom shortcuts")));
     btnResetAll->setText("Restore all default shortcuts");
     btnClearAll->setText("Clear all shortcuts");
 }

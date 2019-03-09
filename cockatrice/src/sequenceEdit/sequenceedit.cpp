@@ -40,8 +40,7 @@ SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWid
 void SequenceEdit::setShortcutName(const QString &_shortcutName)
 {
     shortcutName = _shortcutName;
-    if(shortcutName.isEmpty())
-    {
+    if (shortcutName.isEmpty()) {
         clearButton->setEnabled(false);
         defaultButton->setEnabled(false);
         lineEdit->setEnabled(false);
