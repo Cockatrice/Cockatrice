@@ -162,7 +162,7 @@ if [[ $branch ]]; then
   for ex in ${exts[@]}; do
     reg+=(${include[@]/%/.*\\.$ex\$})
   done
-  names=$(git diff --name-only $base | grep ${reg[@]/#/-e ^})
+  names=$(git diff --diff-filter=d --name-only $base | grep ${reg[@]/#/-e ^})
 else
   names=$(find ${include[@]} -type f -false ${exts[@]/#/-o -name *\\.})
 fi
