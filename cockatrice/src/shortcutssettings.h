@@ -99,6 +99,8 @@ public:
             case Load_deck:
                 return QApplication::translate("shortcutsTab", "Load deck from clipboard");
         }
+
+        return {};
     }
 };
 
