@@ -5,23 +5,15 @@
 #include <QToolTip>
 #include <utility>
 
-SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWidget(parent), shortcutName(_shortcutName)
+SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWidget(parent)
 {
     lineEdit = new QLineEdit(this);
     clearButton = new QPushButton("", this);
     defaultButton = new QPushButton("", this);
 
     lineEdit->setMinimumWidth(70);
-    clearButton->setMaximumWidth(lineEdit->height());
-    defaultButton->setMaximumWidth(lineEdit->height());
-    clearButton->setMaximumHeight(lineEdit->height());
-    defaultButton->setMaximumHeight(lineEdit->height());
-
     clearButton->setIcon(QPixmap("theme:icons/clearsearch"));
     defaultButton->setIcon(QPixmap("theme:icons/update"));
-
-    clearButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    defaultButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
     auto *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -34,7 +26,26 @@ SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWid
     connect(defaultButton, SIGNAL(clicked()), this, SLOT(restoreDefault()));
     lineEdit->installEventFilter(this);
 
-    lineEdit->setText(settingsCache->shortcuts().getShortcutString(shortcutName));
+    setShortcutName(_shortcutName);
+    retranslateUi();
+}
+
+void SequenceEdit::setShortcutName(const QString &_shortcutName)
+{
+    shortcutName = _shortcutName;
+    if (shortcutName.isEmpty()) {
+        clearButton->setEnabled(false);
+        defaultButton->setEnabled(false);
+        lineEdit->setEnabled(false);
+        lineEdit->setText("");
+        lineEdit->setPlaceholderText(tr("Choose an action from the table"));
+    } else {
+        clearButton->setEnabled(true);
+        defaultButton->setEnabled(true);
+        lineEdit->setEnabled(true);
+        lineEdit->setText(settingsCache->shortcuts().getShortcutString(shortcutName));
+        lineEdit->setPlaceholderText(tr("Hit the key/combination of keys you want to set for this action"));
+    }
 }
 
 QString SequenceEdit::getSequence()
@@ -73,11 +84,23 @@ void SequenceEdit::clear()
     lineEdit->setText("");
 }
 
-bool SequenceEdit::eventFilter(QObject *, QEvent *event)
+bool SequenceEdit::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
         auto *keyEvent = reinterpret_cast<QKeyEvent *>(event);
 
+        // don't filter outside arrow key events
+        if (obj != lineEdit) {
+            switch (keyEvent->key()) {
+                case Qt::Key_Up:
+                case Qt::Key_Down:
+                case Qt::Key_Left:
+                case Qt::Key_Right:
+                    return false;
+                default:
+                    break;
+            }
+        }
         if (event->type() == QEvent::KeyPress && !keyEvent->isAutoRepeat()) {
             processKey(keyEvent);
         } else if (event->type() == QEvent::KeyRelease && !keyEvent->isAutoRepeat()) {
@@ -160,4 +183,11 @@ void SequenceEdit::finishShortcut()
 void SequenceEdit::updateSettings()
 {
     settingsCache->shortcuts().setShortcuts(shortcutName, lineEdit->text());
+}
+
+void SequenceEdit::retranslateUi()
+{
+    clearButton->setText(tr("Clear"));
+    defaultButton->setText(tr("Restore default"));
+    setShortcutName(shortcutName);
 }

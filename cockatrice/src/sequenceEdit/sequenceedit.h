@@ -13,8 +13,10 @@ class SequenceEdit : public QWidget
 public:
     SequenceEdit(const QString &_shortcutName, QWidget *parent = nullptr);
     QString getSequence();
+    void setShortcutName(const QString &_shortcutName);
     void refreshShortcut();
     void clear();
+    void retranslateUi();
 
 private slots:
     void removeLastShortcut();

@@ -10,21 +10,19 @@
 #include <QSpinBox>
 
 class CardDatabase;
+class QCloseEvent;
+class QGridLayout;
+class QHBoxLayout;
+class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
-class QStackedWidget;
-class QLineEdit;
-class QPushButton;
-class QComboBox;
-class QGroupBox;
-class QCheckBox;
-class QLabel;
-class QCloseEvent;
-class QSpinBox;
 class QRadioButton;
-class QSpinBox;
 class QSlider;
-class QSpinBox;
+class QStackedWidget;
+class QTreeWidget;
+class QTreeWidgetItem;
+class QVBoxLayout;
+class SequenceEdit;
 
 class AbstractSettingsPage : public QWidget
 {
@@ -228,6 +226,37 @@ private slots:
     void themeBoxChanged(int index);
 };
 
+class ShortcutSettingsPage : public AbstractSettingsPage
+{
+    Q_OBJECT
+public:
+    ShortcutSettingsPage();
+    void retranslateUi() override;
+
+private:
+    QTreeWidget *shortcutsTable;
+    QVBoxLayout *mainLayout;
+    QHBoxLayout *buttonsLayout;
+    QGroupBox *editShortcutGroupBox;
+    QGridLayout *editLayout;
+    QLabel *currentActionGroupLabel;
+    QLabel *currentActionGroupName;
+    QLabel *currentActionLabel;
+    QLabel *currentActionName;
+    QLabel *currentShortcutLabel;
+    SequenceEdit *editTextBox;
+    QLabel *faqLabel;
+    QPushButton *btnResetAll;
+    QPushButton *btnClearAll;
+
+private slots:
+    void resetShortcuts();
+    void refreshShortcuts();
+    void createShortcuts();
+    void clearShortcuts();
+    void currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+};
+
 class DlgSettings : public QDialog
 {
     Q_OBJECT
@@ -243,8 +272,7 @@ private:
     QListWidget *contentsWidget;
     QStackedWidget *pagesWidget;
     QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton,
-        *soundButton;
-    QListWidgetItem *shortcutsButton;
+        *soundButton, *shortcutsButton;
     void createIcons();
     void retranslateUi();
 

@@ -105,7 +105,6 @@ SET(cockatrice_SOURCES
     src/pictureloader.cpp
     src/shortcutssettings.cpp
     src/sequenceEdit/sequenceedit.cpp
-    src/sequenceEdit/shortcutstab.cpp
     src/lineeditcompleter.cpp
     src/settings/settingsmanager.cpp
     src/settings/carddatabasesettings.cpp
