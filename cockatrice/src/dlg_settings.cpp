@@ -993,11 +993,6 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     btnClearAll->setIcon(QPixmap("theme:icons/clearsearch"));
 
     // layout
-    auto *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addWidget(faqLabel);
-    buttonsLayout->addWidget(btnResetAll);
-    buttonsLayout->addWidget(btnClearAll);
-
     auto *editLayout = new QGridLayout;
     editLayout->addWidget(currentActionGroupLabel, 0, 0);
     editLayout->addWidget(currentActionGroupName, 0, 1);
@@ -1005,14 +1000,19 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     editLayout->addWidget(currentActionName, 1, 1);
     editLayout->addWidget(currentShortcutLabel, 2, 0);
     editLayout->addWidget(editTextBox, 2, 1);
-    editLayout->addLayout(buttonsLayout, 4, 0, 1, 2);
 
     editShortcutGroupBox = new QGroupBox;
     editShortcutGroupBox->setLayout(editLayout);
 
+    auto *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addWidget(faqLabel);
+    buttonsLayout->addWidget(btnResetAll);
+    buttonsLayout->addWidget(btnClearAll);
+
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(shortcutsTable);
     mainLayout->addWidget(editShortcutGroupBox);
+    mainLayout->addLayout(buttonsLayout);
 
     setLayout(mainLayout);
 
