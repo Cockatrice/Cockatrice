@@ -982,6 +982,7 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     currentActionName = new QLabel(this);
     currentShortcutLabel = new QLabel(this);
     editTextBox = new SequenceEdit("", this);
+    shortcutsTable->installEventFilter(editTextBox);
 
     // buttons
     faqLabel = new QLabel(this);
