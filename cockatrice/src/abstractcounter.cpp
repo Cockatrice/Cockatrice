@@ -162,7 +162,6 @@ void AbstractCounter::incrementCounter()
 
 void AbstractCounter::setCounter()
 {
-    bool ok;
     dialogSemaphore = true;
     QInputDialog *dialog = new AbstractCounterDialog(name, QString::number(value));
     dialog->open(this, SLOT(setCounterAccepted(QString)));
@@ -195,6 +194,7 @@ AbstractCounterDialog::AbstractCounterDialog(const QString &name, const QString 
 
 bool AbstractCounterDialog::eventFilter(QObject *obj, QEvent *event)
 {
+    Q_UNUSED(obj);
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         switch (keyEvent->key()) {
