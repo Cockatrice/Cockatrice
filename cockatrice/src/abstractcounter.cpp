@@ -187,6 +187,8 @@ void AbstractCounter::setCounterAccepted(QString expression)
 AbstractCounterDialog::AbstractCounterDialog(const QString &name, const QString &value) : QInputDialog(nullptr)
 {
     setWindowTitle(tr("Set counter"));
+    setWindowModality(Qt::ApplicationModal);
+    setAttribute(Qt::WA_DeleteOnClose, true);
     setLabelText(tr("New value for counter '%1':").arg(name));
     setTextValue(value);
     qApp->installEventFilter(this);
