@@ -2,10 +2,13 @@
 #define COUNTER_H
 
 #include <QGraphicsItem>
+#include <QInputDialog>
 
 class Player;
-class QMenu;
 class QAction;
+class QKeyEvent;
+class QMenu;
+class QString;
 
 class AbstractCounter : public QObject, public QGraphicsItem
 {
@@ -34,6 +37,7 @@ private slots:
     void refreshShortcuts();
     void incrementCounter();
     void setCounter();
+    void setCounterAccepted(QString expression);
 
 public:
     AbstractCounter(Player *_player,
@@ -72,6 +76,16 @@ public:
     {
         return value;
     }
+};
+
+class AbstractCounterDialog: public QInputDialog
+{
+    Q_OBJECT
+public:
+    AbstractCounterDialog(const QString &name, const QString &value);
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+    void changeValue(int diff);
 };
 
 #endif

@@ -8,8 +8,10 @@
 #include <QApplication>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
+#include <QKeyEvent>
 #include <QMenu>
 #include <QPainter>
+#include <QString>
 
 AbstractCounter::AbstractCounter(Player *_player,
                                  int _id,
@@ -162,9 +164,12 @@ void AbstractCounter::setCounter()
 {
     bool ok;
     dialogSemaphore = true;
-    QString expression = QInputDialog::getText(nullptr, tr("Set counter"), tr("New value for counter '%1':").arg(name),
-                                               QLineEdit::Normal, QString::number(value), &ok);
+    QInputDialog *dialog = new AbstractCounterDialog(name, QString::number(value));
+    dialog->open(this, SLOT(setCounterAccepted(QString)));
+}
 
+void AbstractCounter::setCounterAccepted(QString expression)
+{
     Expression exp(value);
     int newValue = static_cast<int>(exp.parse(expression));
 
@@ -173,11 +178,46 @@ void AbstractCounter::setCounter()
         return;
     }
     dialogSemaphore = false;
-    if (!ok)
-        return;
 
     Command_SetCounter cmd;
     cmd.set_counter_id(id);
     cmd.set_value(newValue);
     player->sendGameCommand(cmd);
+}
+
+AbstractCounterDialog::AbstractCounterDialog(const QString &name, const QString &value)
+ : QInputDialog(nullptr)
+{
+    setWindowTitle(tr("Set counter"));
+    setLabelText(tr("New value for counter '%1':").arg(name));
+    setTextValue(value);
+    qApp->installEventFilter(this);
+}
+
+bool AbstractCounterDialog::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        switch(keyEvent->key())
+        {
+            case Qt::Key_Up:
+                changeValue(+1);
+                return true;
+            case Qt::Key_Down:
+                changeValue(-1);
+                return true;
+        }
+    }
+    return false;
+}
+
+void AbstractCounterDialog::changeValue(int diff)
+{
+    bool ok;
+    int curValue = textValue().toInt(&ok);
+    if(!ok)
+        return;
+    curValue += diff;
+    setTextValue(QString::number(curValue));
 }
