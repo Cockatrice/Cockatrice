@@ -47,18 +47,12 @@ void CardInfoText::setCard(CardInfoPtr card)
             QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(keyText, card->getProperty(key).toHtmlEscaped());
     }
 
-    auto relatedCards = card->getRelatedCards();
-    auto reverserelatedCards2Me = card->getReverseRelatedCards2Me();
-    if (!relatedCards.empty() || !reverserelatedCards2Me.empty()) {
+    auto relatedCards = card->getAllRelatedCards();
+    if (!relatedCards.empty()) {
         text += QString("<tr><td>%1</td><td width=\"5\"></td><td>").arg(tr("Related cards:"));
 
         for (auto *relatedCard : relatedCards) {
             QString tmp = relatedCard->getName().toHtmlEscaped();
-            text += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
-        }
-
-        for (auto *i : reverserelatedCards2Me) {
-            QString tmp = i->getName().toHtmlEscaped();
             text += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
         }
 

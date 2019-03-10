@@ -460,11 +460,12 @@ void TabDeckEditor::databaseCustomMenu(QPoint point)
     // filling out the related cards submenu
     auto *relatedMenu = new QMenu(tr("Show Related cards"));
     menu.addMenu(relatedMenu);
-    if (info->getRelatedCards().isEmpty()) {
+    auto relatedCards = info->getAllRelatedCards();
+    if (relatedCards.isEmpty()) {
         relatedMenu->setDisabled(true);
     } else {
         auto *signalMapper = new QSignalMapper(this);
-        for (const CardRelation *rel : info->getRelatedCards()) {
+        for (const CardRelation *rel : relatedCards) {
             QAction *relatedCard;
             relatedCard = relatedMenu->addAction(rel->getName());
             connect(relatedCard, SIGNAL(triggered()), signalMapper, SLOT(map()));
