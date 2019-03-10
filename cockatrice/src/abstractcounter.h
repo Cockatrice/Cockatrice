@@ -37,7 +37,6 @@ private slots:
     void refreshShortcuts();
     void incrementCounter();
     void setCounter();
-    void setCounterAccepted(QString expression);
 
 public:
     AbstractCounter(Player *_player,
