@@ -971,6 +971,8 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     shortcutsTable = new QTreeWidget();
     shortcutsTable->setColumnCount(2);
     shortcutsTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    shortcutsTable->setUniformRowHeights(true);
+    shortcutsTable->setAlternatingRowColors(true);
     shortcutsTable->header()->resizeSection(0, shortcutsTable->width() / 3 * 2);
 
     // edit widget
@@ -1099,6 +1101,7 @@ void ShortcutSettingsPage::refreshShortcuts()
         }
     }
     shortcutsTable->sortItems(0, Qt::AscendingOrder);
+    currentItemChanged(shortcutsTable->currentItem(), nullptr);
 }
 
 void ShortcutSettingsPage::clearShortcuts()
