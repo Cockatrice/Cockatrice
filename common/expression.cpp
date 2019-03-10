@@ -38,7 +38,7 @@ Expression::Expression(double initial) : value(initial)
         default_functions->insert("log", [](double a) { return log(a); });
         default_functions->insert("log10", [](double a) { return log(a); });
         default_functions->insert("trunc", [](double a) { return trunc(a); });
-        default_functions->insert("abs", [](double a) { return abs(a); });
+        default_functions->insert("abs", [](double a) { return fabs(a); });
 
         default_functions->insert("floor", [](double a) { return floor(a); });
         default_functions->insert("ceil", [](double a) { return ceil(a); });
