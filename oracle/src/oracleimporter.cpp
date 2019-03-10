@@ -46,16 +46,22 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         setCards = map.value("cards").toList();
         setType = map.value("type").toString();
         // capitalize set type
-        if (setType.length() > 0)
+        if (setType.length() > 0) {
             setType[0] = setType[0].toUpper();
-        releaseDate = map.value("releaseDate").toDate();
+        }
+        if (!nonEnglishSets.contains(shortName)) {
+            releaseDate = map.value("releaseDate").toDate();
+        } else {
+            releaseDate = QDate();
+        }
         newSetList.append(SetToDownload(shortName, longName, setCards, setType, releaseDate));
     }
 
     qSort(newSetList);
 
-    if (newSetList.isEmpty())
+    if (newSetList.isEmpty()) {
         return false;
+    }
     allSets = newSetList;
     return true;
 }

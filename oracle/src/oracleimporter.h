@@ -6,6 +6,13 @@
 #include <carddatabase.h>
 #include <utility>
 
+// many users prefer not to see these sets with non english arts
+// as a solution we remove the date property on these sets
+// that way they will be sorted last by default
+// this will cause their art to not get priority over english cards
+// users will still be able to find these sets and prioritize them manually
+const QStringList nonEnglishSets = {"FBB", "PS11", "PSAL", "REN"};
+
 class SetToDownload
 {
 private:
