@@ -1229,9 +1229,7 @@ void Player::actCreateRelatedCard()
     }
     auto *action = static_cast<QAction *>(sender());
     // If there is a better way of passing a CardRelation through a QAction, please add it here.
-    QList<CardRelation *> relatedCards = QList<CardRelation *>();
-    relatedCards.append(sourceCard->getInfo()->getRelatedCards());
-    relatedCards.append(sourceCard->getInfo()->getReverseRelatedCards2Me());
+    auto relatedCards = sourceCard->getInfo()->getAllRelatedCards();
     CardRelation *cardRelation = relatedCards.at(action->data().toInt());
 
     /*
@@ -1251,9 +1249,8 @@ void Player::actCreateAllRelatedCards()
         return;
     }
 
-    QList<CardRelation *> relatedCards = sourceCard->getInfo()->getRelatedCards();
-    relatedCards.append(sourceCard->getInfo()->getReverseRelatedCards2Me());
-    if (relatedCards.empty()) {
+    auto relatedCards = sourceCard->getInfo()->getAllRelatedCards();
+    if (relatedCards.isEmpty()) {
         return;
     }
 
