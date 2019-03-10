@@ -185,8 +185,7 @@ void AbstractCounter::setCounterAccepted(QString expression)
     player->sendGameCommand(cmd);
 }
 
-AbstractCounterDialog::AbstractCounterDialog(const QString &name, const QString &value)
- : QInputDialog(nullptr)
+AbstractCounterDialog::AbstractCounterDialog(const QString &name, const QString &value) : QInputDialog(nullptr)
 {
     setWindowTitle(tr("Set counter"));
     setLabelText(tr("New value for counter '%1':").arg(name));
@@ -196,11 +195,9 @@ AbstractCounterDialog::AbstractCounterDialog(const QString &name, const QString 
 
 bool AbstractCounterDialog::eventFilter(QObject *obj, QEvent *event)
 {
-    if (event->type() == QEvent::KeyPress)
-    {
+    if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        switch(keyEvent->key())
-        {
+        switch (keyEvent->key()) {
             case Qt::Key_Up:
                 changeValue(+1);
                 return true;
@@ -216,7 +213,7 @@ void AbstractCounterDialog::changeValue(int diff)
 {
     bool ok;
     int curValue = textValue().toInt(&ok);
-    if(!ok)
+    if (!ok)
         return;
     curValue += diff;
     setTextValue(QString::number(curValue));

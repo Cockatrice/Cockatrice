@@ -78,11 +78,12 @@ public:
     }
 };
 
-class AbstractCounterDialog: public QInputDialog
+class AbstractCounterDialog : public QInputDialog
 {
     Q_OBJECT
 public:
     AbstractCounterDialog(const QString &name, const QString &value);
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void changeValue(int diff);
