@@ -4499,22 +4499,22 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="171"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="170"/>
         <source>Shortcut already in use</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="174"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="173"/>
         <source>Invalid key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="191"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="190"/>
         <source>Clear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="192"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="191"/>
         <source>Restore default</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6394,671 +6394,716 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>shortcutsTab</name>
     <message>
-        <location filename="../src/shortcutssettings.h" line="48"/>
+        <location filename="../src/shortcutssettings.h" line="37"/>
         <source>Main Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="177"/>
+        <location filename="../src/shortcutssettings.h" line="144"/>
         <source>Deck editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="190"/>
+        <location filename="../src/shortcutssettings.h" line="157"/>
         <source>Local gameplay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="192"/>
+        <location filename="../src/shortcutssettings.h" line="159"/>
         <source>Watch replay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="175"/>
+        <location filename="../src/shortcutssettings.h" line="142"/>
         <source>Connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="186"/>
+        <location filename="../src/shortcutssettings.h" line="153"/>
         <source>Register</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="182"/>
+        <location filename="../src/shortcutssettings.h" line="149"/>
         <source>Full screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="188"/>
+        <location filename="../src/shortcutssettings.h" line="155"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="171"/>
+        <location filename="../src/shortcutssettings.h" line="138"/>
         <source>Check for card updates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="179"/>
+        <location filename="../src/shortcutssettings.h" line="146"/>
         <source>Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="181"/>
+        <location filename="../src/shortcutssettings.h" line="148"/>
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="50"/>
+        <location filename="../src/shortcutssettings.h" line="39"/>
         <source>Deck Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="194"/>
+        <location filename="../src/shortcutssettings.h" line="161"/>
         <source>Analyze deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="215"/>
+        <location filename="../src/shortcutssettings.h" line="182"/>
         <source>Load deck (clipboard)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="195"/>
+        <location filename="../src/shortcutssettings.h" line="162"/>
         <source>Clear all filters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="219"/>
+        <location filename="../src/shortcutssettings.h" line="186"/>
         <source>New deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="198"/>
+        <location filename="../src/shortcutssettings.h" line="165"/>
         <source>Clear selected filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="220"/>
+        <location filename="../src/shortcutssettings.h" line="187"/>
         <source>Open custom pic folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="202"/>
+        <location filename="../src/shortcutssettings.h" line="169"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="223"/>
+        <location filename="../src/shortcutssettings.h" line="190"/>
         <source>Print deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="227"/>
+        <location filename="../src/shortcutssettings.h" line="194"/>
         <source>Delete card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="208"/>
+        <location filename="../src/shortcutssettings.h" line="175"/>
         <source>Edit tokens</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="229"/>
-        <location filename="../src/shortcutssettings.h" line="470"/>
+        <location filename="../src/shortcutssettings.h" line="196"/>
+        <location filename="../src/shortcutssettings.h" line="476"/>
         <source>Reset layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="212"/>
+        <location filename="../src/shortcutssettings.h" line="179"/>
         <source>Add card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="231"/>
+        <location filename="../src/shortcutssettings.h" line="198"/>
         <source>Save deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="204"/>
+        <location filename="../src/shortcutssettings.h" line="171"/>
         <source>Remove card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="233"/>
+        <location filename="../src/shortcutssettings.h" line="200"/>
         <source>Save deck as</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="214"/>
+        <location filename="../src/shortcutssettings.h" line="181"/>
         <source>Load deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="251"/>
-        <location filename="../src/shortcutssettings.h" line="257"/>
-        <location filename="../src/shortcutssettings.h" line="263"/>
-        <location filename="../src/shortcutssettings.h" line="269"/>
-        <location filename="../src/shortcutssettings.h" line="275"/>
-        <location filename="../src/shortcutssettings.h" line="281"/>
-        <location filename="../src/shortcutssettings.h" line="287"/>
-        <location filename="../src/shortcutssettings.h" line="293"/>
-        <location filename="../src/shortcutssettings.h" line="299"/>
-        <location filename="../src/shortcutssettings.h" line="305"/>
-        <location filename="../src/shortcutssettings.h" line="311"/>
-        <location filename="../src/shortcutssettings.h" line="332"/>
-        <source>Set</source>
+        <location filename="../src/shortcutssettings.h" line="43"/>
+        <source>Card counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="247"/>
-        <location filename="../src/shortcutssettings.h" line="253"/>
-        <location filename="../src/shortcutssettings.h" line="259"/>
-        <location filename="../src/shortcutssettings.h" line="265"/>
-        <location filename="../src/shortcutssettings.h" line="271"/>
-        <location filename="../src/shortcutssettings.h" line="277"/>
-        <location filename="../src/shortcutssettings.h" line="283"/>
-        <location filename="../src/shortcutssettings.h" line="289"/>
-        <location filename="../src/shortcutssettings.h" line="295"/>
-        <location filename="../src/shortcutssettings.h" line="301"/>
-        <location filename="../src/shortcutssettings.h" line="307"/>
-        <source>Add</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="249"/>
-        <location filename="../src/shortcutssettings.h" line="255"/>
-        <location filename="../src/shortcutssettings.h" line="261"/>
-        <location filename="../src/shortcutssettings.h" line="267"/>
-        <location filename="../src/shortcutssettings.h" line="273"/>
-        <location filename="../src/shortcutssettings.h" line="279"/>
-        <location filename="../src/shortcutssettings.h" line="285"/>
-        <location filename="../src/shortcutssettings.h" line="291"/>
-        <location filename="../src/shortcutssettings.h" line="297"/>
-        <location filename="../src/shortcutssettings.h" line="303"/>
-        <location filename="../src/shortcutssettings.h" line="309"/>
-        <source>Remove</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="80"/>
+        <location filename="../src/shortcutssettings.h" line="47"/>
         <source>Power and Toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="325"/>
-        <source>Add (+1/+1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="328"/>
-        <source>Remove (-1/-1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="333"/>
-        <source>Reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="78"/>
-        <source>Toughness</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="320"/>
-        <source>Remove (-0/-1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="319"/>
-        <source>Add (+0/+1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="54"/>
-        <source>Counters - Life</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="56"/>
-        <source>Counters - Green</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="58"/>
-        <source>Counters - Yellow</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="60"/>
-        <source>Counters - Red</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="62"/>
-        <source>Counters - W</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="64"/>
-        <source>Counters - U</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="66"/>
-        <source>Counters - B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="68"/>
-        <source>Counters - R</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="70"/>
-        <source>Counters - G</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="72"/>
-        <source>Counters - X</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="74"/>
-        <source>Counters - Storm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="76"/>
-        <source>Power</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="82"/>
+        <location filename="../src/shortcutssettings.h" line="49"/>
         <source>Game Phases</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="96"/>
+        <location filename="../src/shortcutssettings.h" line="63"/>
         <source>Chat room</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="98"/>
+        <location filename="../src/shortcutssettings.h" line="65"/>
         <source>Game window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="100"/>
+        <location filename="../src/shortcutssettings.h" line="67"/>
         <source>Load deck from clipboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="234"/>
+        <location filename="../src/shortcutssettings.h" line="201"/>
         <source>Save deck (clipboard; annotated)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="237"/>
+        <location filename="../src/shortcutssettings.h" line="204"/>
         <source>Save deck (clipboard, raw)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="313"/>
-        <source>Add (+1/+0)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="315"/>
-        <source>Remove (-1/-0)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="317"/>
-        <source>Move (+1/-1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="324"/>
-        <source>Move (-1/+1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="337"/>
+        <location filename="../src/shortcutssettings.h" line="343"/>
         <source>Untap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="339"/>
+        <location filename="../src/shortcutssettings.h" line="345"/>
         <source>Upkeep</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="341"/>
+        <location filename="../src/shortcutssettings.h" line="347"/>
         <source>Draw</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="343"/>
+        <location filename="../src/shortcutssettings.h" line="349"/>
         <source>Main 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="345"/>
+        <location filename="../src/shortcutssettings.h" line="351"/>
         <source>Start combat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="347"/>
+        <location filename="../src/shortcutssettings.h" line="353"/>
         <source>Attack</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="349"/>
+        <location filename="../src/shortcutssettings.h" line="355"/>
         <source>Block</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="351"/>
+        <location filename="../src/shortcutssettings.h" line="357"/>
         <source>Damage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="353"/>
+        <location filename="../src/shortcutssettings.h" line="359"/>
         <source>End combat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="355"/>
+        <location filename="../src/shortcutssettings.h" line="361"/>
         <source>Main 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="357"/>
+        <location filename="../src/shortcutssettings.h" line="363"/>
         <source>End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="358"/>
+        <location filename="../src/shortcutssettings.h" line="364"/>
         <source>Next phase</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="364"/>
+        <location filename="../src/shortcutssettings.h" line="370"/>
         <source>Next turn</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="468"/>
+        <location filename="../src/shortcutssettings.h" line="474"/>
         <source>Clear chat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="472"/>
+        <location filename="../src/shortcutssettings.h" line="478"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="84"/>
+        <location filename="../src/shortcutssettings.h" line="51"/>
         <source>Playing Area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="86"/>
+        <location filename="../src/shortcutssettings.h" line="53"/>
         <source>Move selected card to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="423"/>
+        <location filename="../src/shortcutssettings.h" line="429"/>
         <source>Top cards of library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="206"/>
+        <location filename="../src/shortcutssettings.h" line="173"/>
         <source>Manage sets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="210"/>
+        <location filename="../src/shortcutssettings.h" line="177"/>
         <source>Export deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="361"/>
-        <source>Next phase action</source>
+        <location filename="../src/shortcutssettings.h" line="213"/>
+        <location filename="../src/shortcutssettings.h" line="285"/>
+        <source>Add green counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="367"/>
-        <source>Tap / Untap Card</source>
+        <location filename="../src/shortcutssettings.h" line="216"/>
+        <location filename="../src/shortcutssettings.h" line="288"/>
+        <source>Remove green counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="370"/>
-        <source>Untap all</source>
+        <location filename="../src/shortcutssettings.h" line="219"/>
+        <location filename="../src/shortcutssettings.h" line="291"/>
+        <source>Set green counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="374"/>
-        <source>Toggle untap</source>
+        <location filename="../src/shortcutssettings.h" line="222"/>
+        <source>Add yellow counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="376"/>
-        <source>Flip card</source>
+        <location filename="../src/shortcutssettings.h" line="225"/>
+        <source>Remove yellow counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="378"/>
-        <source>Peek card</source>
+        <location filename="../src/shortcutssettings.h" line="228"/>
+        <source>Set yellow counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="380"/>
-        <source>Play card</source>
+        <location filename="../src/shortcutssettings.h" line="231"/>
+        <location filename="../src/shortcutssettings.h" line="276"/>
+        <source>Add red counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="381"/>
-        <source>Attach card</source>
+        <location filename="../src/shortcutssettings.h" line="234"/>
+        <location filename="../src/shortcutssettings.h" line="279"/>
+        <source>Remove red counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="385"/>
-        <source>Unattach card</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="386"/>
-        <source>Clone card</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="389"/>
-        <source>Create token</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="392"/>
-        <source>Create all related tokens</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="395"/>
-        <source>Create another token</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="399"/>
-        <source>Set annotation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="400"/>
-        <source>Bottom library</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="411"/>
-        <source>Top library</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="405"/>
-        <location filename="../src/shortcutssettings.h" line="416"/>
-        <source>Graveyard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="404"/>
-        <location filename="../src/shortcutssettings.h" line="420"/>
-        <source>Exile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="409"/>
-        <source>Hand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="412"/>
-        <source>Play face down</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="88"/>
-        <source>View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="418"/>
-        <source>Library</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="422"/>
-        <source>Sideboard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="427"/>
-        <source>Close recent view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="90"/>
-        <source>Move top card to</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="429"/>
-        <source>Graveyard Once</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="430"/>
-        <source>Graveyard Multiple</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="434"/>
-        <source>Exile Once</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="436"/>
-        <source>Exile Multiple</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="52"/>
-        <source>Game Lobby</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="243"/>
-        <source>Load remote deck</source>
+        <location filename="../src/shortcutssettings.h" line="237"/>
+        <location filename="../src/shortcutssettings.h" line="282"/>
+        <source>Set red counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="240"/>
+        <source>Add life counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="243"/>
+        <source>Remove life counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="246"/>
+        <source>Set life counters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="249"/>
+        <source>Add white counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="252"/>
+        <source>Remove white counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="255"/>
+        <source>Set white counters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="258"/>
+        <source>Add blue counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="261"/>
+        <source>Remove blue counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="264"/>
+        <source>Set blue counters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="267"/>
+        <source>Add black counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="270"/>
+        <source>Remove black counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="273"/>
+        <source>Set black counters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="294"/>
+        <source>Add X counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="297"/>
+        <source>Remove X counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="300"/>
+        <source>Set X counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="303"/>
+        <source>Add storm counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="306"/>
+        <source>Remove storm counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="309"/>
+        <source>Set storm counters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="312"/>
+        <source>Add power (+1/+0)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="315"/>
+        <source>Remove power (-1/-0)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="318"/>
+        <source>Move to power (+1/-1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="321"/>
+        <source>Add toughness (+0/+1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="324"/>
+        <source>Remove toughness (-0/-1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="327"/>
+        <source>Move to toughness (-1/+1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="330"/>
+        <source>Add power and toughness (+1/+1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="333"/>
+        <source>Remove power and toughness (-1/-1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="336"/>
+        <source>Set power and toughness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="339"/>
+        <source>Reset power and toughness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="367"/>
+        <source>Next phase action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="373"/>
+        <source>Tap / Untap Card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="376"/>
+        <source>Untap all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="380"/>
+        <source>Toggle untap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="382"/>
+        <source>Flip card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="384"/>
+        <source>Peek card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="386"/>
+        <source>Play card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="387"/>
+        <source>Attach card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="391"/>
+        <source>Unattach card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="392"/>
+        <source>Clone card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="395"/>
+        <source>Create token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="398"/>
+        <source>Create all related tokens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="401"/>
+        <source>Create another token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="405"/>
+        <source>Set annotation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="406"/>
+        <source>Bottom library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="417"/>
+        <source>Top library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="411"/>
+        <location filename="../src/shortcutssettings.h" line="422"/>
+        <source>Graveyard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="410"/>
+        <location filename="../src/shortcutssettings.h" line="426"/>
+        <source>Exile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="415"/>
+        <source>Hand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="418"/>
+        <source>Play face down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="55"/>
+        <source>View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="424"/>
+        <source>Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="428"/>
+        <source>Sideboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="433"/>
+        <source>Close recent view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="57"/>
+        <source>Move top card to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="435"/>
+        <source>Graveyard Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="436"/>
+        <source>Graveyard Multiple</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="440"/>
+        <source>Exile Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="442"/>
+        <source>Exile Multiple</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="41"/>
+        <source>Game Lobby</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="210"/>
+        <source>Load remote deck</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="207"/>
         <source>Load local deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="92"/>
+        <location filename="../src/shortcutssettings.h" line="59"/>
         <source>Gameplay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="438"/>
+        <location filename="../src/shortcutssettings.h" line="444"/>
         <source>Draw arrow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="443"/>
+        <location filename="../src/shortcutssettings.h" line="449"/>
         <source>Leave game</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="439"/>
+        <location filename="../src/shortcutssettings.h" line="445"/>
         <source>Remove local arrows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="445"/>
+        <location filename="../src/shortcutssettings.h" line="451"/>
         <source>Concede</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="447"/>
+        <location filename="../src/shortcutssettings.h" line="453"/>
         <source>Roll dice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="464"/>
+        <location filename="../src/shortcutssettings.h" line="470"/>
         <source>Rotate view CW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="448"/>
+        <location filename="../src/shortcutssettings.h" line="454"/>
         <source>Shuffle library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="466"/>
+        <location filename="../src/shortcutssettings.h" line="472"/>
         <source>Rotate view CCW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="94"/>
+        <location filename="../src/shortcutssettings.h" line="61"/>
         <source>Drawing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="452"/>
+        <location filename="../src/shortcutssettings.h" line="45"/>
+        <source>Player counters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="458"/>
         <source>Mulligan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="454"/>
+        <location filename="../src/shortcutssettings.h" line="460"/>
         <source>Draw card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="456"/>
+        <location filename="../src/shortcutssettings.h" line="462"/>
         <source>Draw cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="457"/>
+        <location filename="../src/shortcutssettings.h" line="463"/>
         <source>Undo draw</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="460"/>
+        <location filename="../src/shortcutssettings.h" line="466"/>
         <source>Always reveal top card</source>
         <translation type="unfinished"></translation>
     </message>

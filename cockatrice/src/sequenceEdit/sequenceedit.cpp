@@ -90,8 +90,7 @@ bool SequenceEdit::eventFilter(QObject *obj, QEvent *event)
         auto *keyEvent = reinterpret_cast<QKeyEvent *>(event);
 
         // don't filter outside arrow key events
-        if(obj != lineEdit)
-        {
+        if (obj != lineEdit) {
             switch (keyEvent->key()) {
                 case Qt::Key_Up:
                 case Qt::Key_Down:
