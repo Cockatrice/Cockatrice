@@ -3065,8 +3065,18 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
         return;
     }
 
+    bool atLeastOneGoodRelationFound = false;
     QList<CardRelation *> relatedCards = cardInfo->getAllRelatedCards();
-    if (relatedCards.isEmpty()) {
+    for (const CardRelation *cardRelation : relatedCards) {
+        CardInfoPtr relatedCard = db->getCard(cardRelation->getName());
+        if (relatedCard != nullptr)
+        {
+            atLeastOneGoodRelationFound = true;
+            break;
+        }
+    }
+
+    if (!atLeastOneGoodRelationFound) {
         return;
     }
 
