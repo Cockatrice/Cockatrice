@@ -164,16 +164,19 @@ void AbstractCounter::setCounter()
 {
     dialogSemaphore = true;
     AbstractCounterDialog dialog(name, QString::number(value));
-    if(!dialog.exec())
-        return;
-    Expression exp(value);
-    int newValue = static_cast<int>(exp.parse(dialog.textValue()));
+    const int ok = dialog.exec();
 
     if (deleteAfterDialog) {
         deleteLater();
         return;
     }
     dialogSemaphore = false;
+
+    if (!ok)
+        return;
+
+    Expression exp(value);
+    int newValue = static_cast<int>(exp.parse(dialog.textValue()));
 
     Command_SetCounter cmd;
     cmd.set_counter_id(id);
