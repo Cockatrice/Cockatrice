@@ -38,11 +38,13 @@ void SequenceEdit::setShortcutName(const QString &_shortcutName)
         defaultButton->setEnabled(false);
         lineEdit->setEnabled(false);
         lineEdit->setText("");
+        lineEdit->setPlaceholderText(tr("Choose an action from the table"));
     } else {
         clearButton->setEnabled(true);
         defaultButton->setEnabled(true);
         lineEdit->setEnabled(true);
         lineEdit->setText(settingsCache->shortcuts().getShortcutString(shortcutName));
+        lineEdit->setPlaceholderText(tr("Hit the key/combination of keys you want to set for this action"));
     }
 }
 
@@ -82,11 +84,24 @@ void SequenceEdit::clear()
     lineEdit->setText("");
 }
 
-bool SequenceEdit::eventFilter(QObject *, QEvent *event)
+bool SequenceEdit::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
         auto *keyEvent = reinterpret_cast<QKeyEvent *>(event);
 
+        // don't filter outside arrow key events
+        if(obj != lineEdit)
+        {
+            switch (keyEvent->key()) {
+                case Qt::Key_Up:
+                case Qt::Key_Down:
+                case Qt::Key_Left:
+                case Qt::Key_Right:
+                    return false;
+                default:
+                    break;
+            }
+        }
         if (event->type() == QEvent::KeyPress && !keyEvent->isAutoRepeat()) {
             processKey(keyEvent);
         } else if (event->type() == QEvent::KeyRelease && !keyEvent->isAutoRepeat()) {
@@ -175,4 +190,5 @@ void SequenceEdit::retranslateUi()
 {
     clearButton->setText(tr("Clear"));
     defaultButton->setText(tr("Restore default"));
+    setShortcutName(shortcutName);
 }

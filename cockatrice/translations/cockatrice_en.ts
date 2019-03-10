@@ -4489,22 +4489,32 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>SequenceEdit</name>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="156"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="41"/>
+        <source>Choose an action from the table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="47"/>
+        <source>Hit the key/combination of keys you want to set for this action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="171"/>
         <source>Shortcut already in use</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="159"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="174"/>
         <source>Invalid key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="176"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="191"/>
         <source>Clear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="177"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="192"/>
         <source>Restore default</source>
         <translation type="unfinished"></translation>
     </message>
