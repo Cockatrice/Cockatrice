@@ -12,16 +12,8 @@ SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWid
     defaultButton = new QPushButton("", this);
 
     lineEdit->setMinimumWidth(70);
-    clearButton->setMaximumWidth(lineEdit->height());
-    defaultButton->setMaximumWidth(lineEdit->height());
-    clearButton->setMaximumHeight(lineEdit->height());
-    defaultButton->setMaximumHeight(lineEdit->height());
-
     clearButton->setIcon(QPixmap("theme:icons/clearsearch"));
     defaultButton->setIcon(QPixmap("theme:icons/update"));
-
-    clearButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-    defaultButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);
 
     auto *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -35,6 +27,7 @@ SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWid
     lineEdit->installEventFilter(this);
 
     setShortcutName(_shortcutName);
+    retranslateUi();
 }
 
 void SequenceEdit::setShortcutName(const QString &_shortcutName)
@@ -176,4 +169,10 @@ void SequenceEdit::finishShortcut()
 void SequenceEdit::updateSettings()
 {
     settingsCache->shortcuts().setShortcuts(shortcutName, lineEdit->text());
+}
+
+void SequenceEdit::retranslateUi()
+{
+    clearButton->setText(tr("Clear"));
+    defaultButton->setText(tr("Restore default"));
 }

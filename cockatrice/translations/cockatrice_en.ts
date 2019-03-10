@@ -1545,12 +1545,12 @@ Make sure to enable the &apos;Token&apos; set in the &quot;Manage sets&quot; dia
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1247"/>
+        <location filename="../src/dlg_settings.cpp" line="1248"/>
         <source>Unknown Error loading card database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1255"/>
+        <location filename="../src/dlg_settings.cpp" line="1256"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -1561,7 +1561,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1261"/>
+        <location filename="../src/dlg_settings.cpp" line="1262"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -1572,7 +1572,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1267"/>
+        <location filename="../src/dlg_settings.cpp" line="1268"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
@@ -1581,21 +1581,21 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1273"/>
+        <location filename="../src/dlg_settings.cpp" line="1274"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1277"/>
+        <location filename="../src/dlg_settings.cpp" line="1278"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1281"/>
+        <location filename="../src/dlg_settings.cpp" line="1282"/>
         <source>Unknown card database load status
 
 Please file a ticket at http://github.com/Cockatrice/Cockatrice/issues
@@ -1604,59 +1604,59 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1289"/>
-        <location filename="../src/dlg_settings.cpp" line="1299"/>
-        <location filename="../src/dlg_settings.cpp" line="1309"/>
+        <location filename="../src/dlg_settings.cpp" line="1290"/>
+        <location filename="../src/dlg_settings.cpp" line="1300"/>
+        <location filename="../src/dlg_settings.cpp" line="1310"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1300"/>
+        <location filename="../src/dlg_settings.cpp" line="1301"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1310"/>
+        <location filename="../src/dlg_settings.cpp" line="1311"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1322"/>
+        <location filename="../src/dlg_settings.cpp" line="1323"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1324"/>
+        <location filename="../src/dlg_settings.cpp" line="1325"/>
         <source>General</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1325"/>
+        <location filename="../src/dlg_settings.cpp" line="1326"/>
         <source>Appearance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1326"/>
+        <location filename="../src/dlg_settings.cpp" line="1327"/>
         <source>User Interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1327"/>
+        <location filename="../src/dlg_settings.cpp" line="1328"/>
         <source>Card Sources</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1328"/>
+        <location filename="../src/dlg_settings.cpp" line="1329"/>
         <source>Chat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1329"/>
+        <location filename="../src/dlg_settings.cpp" line="1330"/>
         <source>Sound</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1330"/>
+        <location filename="../src/dlg_settings.cpp" line="1331"/>
         <source>Shortcuts</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4489,13 +4489,23 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>SequenceEdit</name>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="163"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="156"/>
         <source>Shortcut already in use</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="166"/>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="159"/>
         <source>Invalid key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="176"/>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/sequenceEdit/sequenceedit.cpp" line="177"/>
+        <source>Restore default</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4575,7 +4585,7 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dlg_settings.cpp" line="1123"/>
+        <location filename="../src/dlg_settings.cpp" line="1124"/>
         <source>How to set custom shortcuts</source>
         <translation type="unfinished"></translation>
     </message>

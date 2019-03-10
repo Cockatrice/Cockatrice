@@ -16,6 +16,7 @@ public:
     void setShortcutName(const QString &_shortcutName);
     void refreshShortcut();
     void clear();
+    void retranslateUi();
 
 private slots:
     void removeLastShortcut();
