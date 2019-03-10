@@ -3065,8 +3065,17 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
         return;
     }
 
+    bool atLeastOneGoodRelationFound = false;
     QList<CardRelation *> relatedCards = cardInfo->getAllRelatedCards();
-    if (relatedCards.isEmpty()) {
+    for (const CardRelation *cardRelation : relatedCards) {
+        CardInfoPtr relatedCard = db->getCard(cardRelation->getName());
+        if (relatedCard != nullptr) {
+            atLeastOneGoodRelationFound = true;
+            break;
+        }
+    }
+
+    if (!atLeastOneGoodRelationFound) {
         return;
     }
 
@@ -3137,11 +3146,14 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
         cardMenu->addAction(createRelated);
     }
 
-    if (shortcutsActive) {
-        createRelatedCards->setShortcut(settingsCache->shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
+    if (createRelatedCards) {
+        if (shortcutsActive) {
+            createRelatedCards->setShortcut(
+                settingsCache->shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
+        }
+        connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
+        cardMenu->addAction(createRelatedCards);
     }
-    connect(createRelatedCards, SIGNAL(triggered()), this, SLOT(actCreateAllRelatedCards()));
-    cardMenu->addAction(createRelatedCards);
 }
 
 void Player::setCardMenu(QMenu *menu)
