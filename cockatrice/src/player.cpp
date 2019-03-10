@@ -2858,8 +2858,14 @@ void Player::actCardCounterTrigger()
         case 11: { // set counter with dialog
             bool ok;
             dialogSemaphore = true;
+
+            int oldValue = 0;
+            if(scene()->selectedItems().size() == 1) {
+                auto *card = static_cast<CardItem *>(scene()->selectedItems().first());
+                oldValue = card->getCounters().value(counterId, 0);
+            }
             int number =
-                QInputDialog::getInt(nullptr, tr("Set counters"), tr("Number:"), 0, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
+                QInputDialog::getInt(nullptr, tr("Set counters"), tr("Number:"), oldValue, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
             dialogSemaphore = false;
             if (clearCardsToDelete() || !ok) {
                 return;
