@@ -29,11 +29,13 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor,
         )");
         serverMessageColor = QColor(0xFF, 0x73, 0x83);
         otherUserColor = otherUserColor.lighter(150);
+        linkColor = QColor(71, 158, 252);
     } else {
         document()->setDefaultStyleSheet(R"(
             a { text-decoration: none; color: blue; }
             .blue { color: blue }
         )");
+        linkColor = palette().link().color();
     }
 
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
@@ -45,7 +47,7 @@ ChatView::ChatView(const TabSupervisor *_tabSupervisor,
     mentionFormat.setFontWeight(QFont::Bold);
 
     mentionFormatOtherUser.setFontWeight(QFont::Bold);
-    mentionFormatOtherUser.setForeground(palette().link());
+    mentionFormatOtherUser.setForeground(linkColor);
     mentionFormatOtherUser.setAnchor(true);
 
     viewport()->setCursor(Qt::IBeamCursor);
@@ -111,7 +113,7 @@ void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 {
     QTextCharFormat oldFormat = cursor.charFormat();
     QTextCharFormat anchorFormat = oldFormat;
-    anchorFormat.setForeground(palette().link());
+    anchorFormat.setForeground(linkColor);
     anchorFormat.setAnchor(true);
     anchorFormat.setAnchorHref("card://" + cardName);
     anchorFormat.setFontItalic(true);
@@ -128,10 +130,10 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
 
     QTextCharFormat oldFormat = cursor.charFormat();
     QTextCharFormat anchorFormat = oldFormat;
-    anchorFormat.setForeground(palette().link());
+    anchorFormat.setForeground(linkColor);
     anchorFormat.setAnchor(true);
     anchorFormat.setAnchorHref(url);
-    anchorFormat.setUnderlineColor(palette().link().color());
+    anchorFormat.setUnderlineColor(linkColor);
     anchorFormat.setFontUnderline(true);
 
     cursor.setCharFormat(anchorFormat);

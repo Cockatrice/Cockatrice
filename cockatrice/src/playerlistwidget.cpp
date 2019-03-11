@@ -57,9 +57,9 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
     readyIcon = QPixmap("theme:icons/ready_start");
     notReadyIcon = QPixmap("theme:icons/not_ready_start");
     concededIcon = QPixmap("theme:icons/conceded");
-    playerIcon = QPixmap("theme:icons/player");
-    judgeIcon = QPixmap("theme:icons/scales");
-    spectatorIcon = QPixmap("theme:icons/spectator");
+    playerIcon = loadColorAdjustedPixmap("theme:icons/player");
+    judgeIcon = loadColorAdjustedPixmap("theme:icons/scales");
+    spectatorIcon = loadColorAdjustedPixmap("theme:icons/spectator");
     lockIcon = QPixmap("theme:icons/lock");
 
     if (tabSupervisor) {
@@ -173,8 +173,13 @@ void PlayerListWidget::setActivePlayer(int playerId)
     while (i.hasNext()) {
         i.next();
         QTreeWidgetItem *twi = i.value();
-        QColor c = i.key() == playerId ? QColor(150, 255, 150) : palette().base().color();
-        twi->setBackground(4, c);
+        if (i.key() == playerId) {
+            twi->setBackground(4, QColor(150, 255, 150));
+            twi->setTextColor(4, QColor(0, 0, 0));
+        } else {
+            twi->setBackground(4, palette().base().color());
+            twi->setTextColor(4, palette().text().color());
+        }
     }
 }
 

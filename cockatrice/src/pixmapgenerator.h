@@ -97,4 +97,6 @@ public:
     }
 };
 
+const QPixmap loadColorAdjustedPixmap(QString name);
+
 #endif
