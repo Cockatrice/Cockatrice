@@ -25,11 +25,14 @@ ELSE()
 ENDIF()
 
 # Early detect ccache
-find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
-    # Support Unix Makefiles and Ninja
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-    MESSAGE(STATUS "Found CCache ${CCACHE_PROGRAM}")
+OPTION(USE_CCACHE "Cache the build results with ccache" ON)
+if(USE_CCACHE)
+    find_program(CCACHE_PROGRAM ccache)
+    if(CCACHE_PROGRAM)
+        # Support Unix Makefiles and Ninja
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+        MESSAGE(STATUS "Found CCache ${CCACHE_PROGRAM}")
+    endif()
 endif()
 
 # A project name is needed for CPack
