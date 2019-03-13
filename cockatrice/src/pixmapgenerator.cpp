@@ -1,6 +1,8 @@
 #include "pixmapgenerator.h"
 #include "pb/serverinfo_user.pb.h"
+#include <QApplication>
 #include <QPainter>
+#include <QPalette>
 #include <cmath>
 #ifdef _WIN32
 #include "round.h"
@@ -163,3 +165,16 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
 }
 
 QMap<int, QPixmap> LockPixmapGenerator::pmCache;
+
+const QPixmap loadColorAdjustedPixmap(QString name)
+{
+    if (qApp->palette().windowText().color().lightness() > 200) {
+        QImage img(name);
+        img.invertPixels();
+        QPixmap result;
+        result.convertFromImage(img);
+        return result;
+    } else {
+        return QPixmap(name);
+    }
+}

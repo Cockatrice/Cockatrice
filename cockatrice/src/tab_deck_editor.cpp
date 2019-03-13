@@ -12,6 +12,7 @@
 #include "pb/response.pb.h"
 #include "pending_command.h"
 #include "pictureloader.h"
+#include "pixmapgenerator.h"
 #include "settingscache.h"
 #include "tab_supervisor.h"
 #include "tappedout_interface.h"
@@ -350,7 +351,7 @@ void TabDeckEditor::createCentralFrame()
     searchEdit->setObjectName("searchEdit");
     searchEdit->setPlaceholderText(tr("Search by card name"));
     searchEdit->setClearButtonEnabled(true);
-    searchEdit->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+    searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
     auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
     searchEdit->installEventFilter(&searchKeySignals);
 
