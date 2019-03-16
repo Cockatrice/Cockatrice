@@ -89,10 +89,13 @@ class OracleImporter : public CardDatabase
 {
     Q_OBJECT
 private:
+    const QStringList mainCardTypes = {"Planeswalker", "Creature", "Land",       "Sorcery",
+                                       "Instant",      "Artifact", "Enchantment"};
     QList<SetToDownload> allSets;
     QVariantMap setsMap;
     QString dataDir;
 
+    QString getMainCardType(const QStringList &typeList);
     CardInfoPtr addCard(QString name,
                         QString text,
                         bool isToken,

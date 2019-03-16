@@ -66,6 +66,16 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     return true;
 }
 
+QString OracleImporter::getMainCardType(const QStringList &typeList)
+{
+    for (const auto &type : mainCardTypes) {
+        if (typeList.contains(type)) {
+            return type;
+        }
+    }
+    return typeList.first();
+}
+
 CardInfoPtr OracleImporter::addCard(QString name,
                                     QString text,
                                     bool isToken,
@@ -248,18 +258,9 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         if (!colorIdentity.isEmpty())
             properties.insert("coloridentity", colorIdentity);
 
-        {
-            const auto &typeList = card.value("types").toStringList();
-            if (typeList.contains("Creature")) {
-                properties.insert("maintype", "Creature");
-            } else if (typeList.contains("Land")) {
-                properties.insert("maintype", "Land");
-            } else {
-                const auto &maintype = typeList.first();
-                if (!maintype.isEmpty()) {
-                    properties.insert("maintype", maintype);
-                }
-            }
+        const auto &mainCardType = getMainCardType(card.value("types").toStringList());
+        if (!mainCardType.isEmpty()) {
+            properties.insert("maintype", mainCardType);
         }
 
         power = getStringPropertyFromMap(card, "power");
