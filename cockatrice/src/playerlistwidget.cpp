@@ -69,8 +69,9 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
         userContextMenu = new UserContextMenu(tabSupervisor, this, game);
         connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this,
                 SIGNAL(openMessageDialog(QString, bool)));
-    } else
-        userContextMenu = 0;
+    } else {
+        userContextMenu = nullptr;
+    }
 
     setMinimumHeight(40);
     setIconSize(QSize(20, 15));

@@ -90,10 +90,12 @@ void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandCon
         gameTypeMap.insert(roomInfo.room_id(), tempMap);
     }
 
-    GameSelector *selector = new GameSelector(client, tabSupervisor, 0, roomMap, gameTypeMap, false, false);
+    GameSelector *selector = new GameSelector(client, tabSupervisor, nullptr, roomMap, gameTypeMap, false, false);
+    selector->setParent(static_cast<QWidget *>(parent()), Qt::Window);
     const int gameListSize = response.game_list_size();
-    for (int i = 0; i < gameListSize; ++i)
+    for (int i = 0; i < gameListSize; ++i) {
         selector->processGameInfo(response.game_list(i));
+    }
 
     selector->setWindowTitle(tr("%1's games").arg(QString::fromStdString(cmd.user_name())));
     selector->setMinimumWidth(800);
