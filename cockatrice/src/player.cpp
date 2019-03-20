@@ -932,7 +932,7 @@ void Player::actViewLibrary()
 void Player::actViewTopCards()
 {
     bool ok;
-    int number = QInputDialog::getInt(static_cast<QWidget *>(parent()), tr("View top cards of library"), tr("Number of cards:"),
+    int number = QInputDialog::getInt(game, tr("View top cards of library"), tr("Number of cards:"),
                                       defaultNumberTopCards, 1, 2000000000, 1, &ok);
     if (ok) {
         defaultNumberTopCards = number;
@@ -1155,8 +1155,7 @@ void Player::actUntapAll()
 void Player::actRollDie()
 {
     bool ok;
-    int sides = QInputDialog::getInt(static_cast<QWidget *>(parent()), tr("Roll die"), tr("Number of sides:"), 20, 2,
-                                     1000, 1, &ok);
+    int sides = QInputDialog::getInt(game, tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
     if (ok) {
         Command_RollDie cmd;
         cmd.set_sides(static_cast<google::protobuf::uint32>(sides));
@@ -1329,8 +1328,8 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
     if (cardRelation->getIsVariable()) {
         bool ok;
         dialogSemaphore = true;
-        int count = QInputDialog::getInt(static_cast<QWidget *>(parent()), tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(),
-                                         1, MAX_TOKENS_PER_DIALOG, 1, &ok);
+        int count = QInputDialog::getInt(game, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1,
+                                         MAX_TOKENS_PER_DIALOG, 1, &ok);
         dialogSemaphore = false;
         if (!ok) {
             return false;
@@ -2861,7 +2860,7 @@ void Player::actCardCounterTrigger()
                 auto *card = static_cast<CardItem *>(scene()->selectedItems().first());
                 oldValue = card->getCounters().value(counterId, 0);
             }
-            int number = QInputDialog::getInt(static_cast<QWidget *>(parent()), tr("Set counters"), tr("Number:"), oldValue, 0,
+            int number = QInputDialog::getInt(game, tr("Set counters"), tr("Number:"), oldValue, 0,
                                               MAX_COUNTERS_ON_CARD, 1, &ok);
             dialogSemaphore = false;
             if (clearCardsToDelete() || !ok) {
