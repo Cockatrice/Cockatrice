@@ -21,7 +21,6 @@ protected:
     QString name;
     int value;
     bool useNameForShortcut, hovered;
-    QWidget *game;
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
@@ -33,6 +32,7 @@ private:
     bool dialogSemaphore, deleteAfterDialog;
     bool shownInCounterArea;
     bool shortcutActive;
+    QWidget *game;
 
 private slots:
     void refreshShortcuts();
