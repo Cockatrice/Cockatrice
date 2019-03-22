@@ -33,7 +33,7 @@ signals:
     void joinRoomRequest(int, bool setCurrent);
 
 public:
-    RoomSelector(AbstractClient *_client, QWidget *parent = 0);
+    RoomSelector(AbstractClient *_client, QWidget *parent = nullptr);
     void retranslateUi();
 };
 
@@ -54,7 +54,7 @@ private:
     bool shouldEmitUpdate = false;
 
 public:
-    TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = 0);
+    TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent = nullptr);
     void retranslateUi();
     QString getTabText() const
     {

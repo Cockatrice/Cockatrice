@@ -95,7 +95,7 @@ protected:
     virtual void sendCommandContainer(const CommandContainer &cont) = 0;
 
 public:
-    AbstractClient(QObject *parent = 0);
+    AbstractClient(QObject *parent = nullptr);
     ~AbstractClient();
 
     ClientStatus getStatus() const

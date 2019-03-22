@@ -55,7 +55,7 @@ public:
         SortRole = Qt::UserRole
     };
 
-    SetsModel(CardDatabase *_db, QObject *parent = 0);
+    SetsModel(CardDatabase *_db, QObject *parent = nullptr);
     ~SetsModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const

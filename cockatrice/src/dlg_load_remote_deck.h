@@ -20,7 +20,7 @@ private slots:
     void currentItemChanged(const QModelIndex &current, const QModelIndex &previous);
 
 public:
-    DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent = 0);
+    DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent = nullptr);
     int getDeckId() const;
 };
 

@@ -20,7 +20,7 @@ public:
                bool _hasCardAttr,
                bool _isShufflable,
                bool _contentsKnown,
-               QGraphicsItem *parent = 0,
+               QGraphicsItem *parent = nullptr,
                bool isView = false);
 };
 

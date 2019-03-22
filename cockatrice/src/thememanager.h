@@ -16,7 +16,7 @@ class ThemeManager : public QObject
 {
     Q_OBJECT
 public:
-    ThemeManager(QObject *parent = 0);
+    ThemeManager(QObject *parent = nullptr);
 
 private:
     QBrush handBgBrush, stackBgBrush, tableBgBrush, playerBgBrush;

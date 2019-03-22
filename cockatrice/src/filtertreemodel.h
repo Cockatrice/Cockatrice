@@ -27,7 +27,7 @@ private:
     QModelIndex nodeIndex(const FilterTreeNode *node, int row, int column) const;
 
 public:
-    FilterTreeModel(QObject *parent = 0);
+    FilterTreeModel(QObject *parent = nullptr);
     ~FilterTreeModel();
     FilterTree *filterTree() const
     {

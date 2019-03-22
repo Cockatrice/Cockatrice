@@ -37,7 +37,7 @@ private slots:
     void enableTemporaryEdits(bool enabled);
 
 public:
-    BanDialog(const ServerInfo_User &info, QWidget *parent = 0);
+    BanDialog(const ServerInfo_User &info, QWidget *parent = nullptr);
     QString getBanName() const;
     QString getBanIP() const;
     QString getBanId() const;
@@ -58,7 +58,7 @@ private slots:
     void okClicked();
 
 public:
-    WarningDialog(const QString userName, const QString clientID, QWidget *parent = 0);
+    WarningDialog(const QString userName, const QString clientID, QWidget *parent = nullptr);
     QString getName() const;
     QString getWarnID() const;
     QString getReason() const;
@@ -122,7 +122,7 @@ signals:
     void removeIgnore(const QString &userName);
 
 public:
-    UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = 0);
+    UserList(TabSupervisor *_tabSupervisor, AbstractClient *_client, UserListType _type, QWidget *parent = nullptr);
     void retranslateUi();
     void processUserInfo(const ServerInfo_User &user, bool online);
     bool deleteUser(const QString &userName);

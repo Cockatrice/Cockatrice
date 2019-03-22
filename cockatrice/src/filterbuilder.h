@@ -21,7 +21,7 @@ private:
     void destroyFilter();
 
 public:
-    FilterBuilder(QWidget *parent = 0);
+    FilterBuilder(QWidget *parent = nullptr);
     ~FilterBuilder();
 
 signals:

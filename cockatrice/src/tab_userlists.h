@@ -49,7 +49,7 @@ public:
     TabUserLists(TabSupervisor *_tabSupervisor,
                  AbstractClient *_client,
                  const ServerInfo_User &userInfo,
-                 QWidget *parent = 0);
+                 QWidget *parent = nullptr);
     void retranslateUi();
     QString getTabText() const
     {

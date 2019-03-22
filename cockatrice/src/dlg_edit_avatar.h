@@ -13,7 +13,7 @@ class DlgEditAvatar : public QDialog
 {
     Q_OBJECT
 public:
-    DlgEditAvatar(QWidget *parent = 0);
+    DlgEditAvatar(QWidget *parent = nullptr);
     QByteArray getImage();
 private slots:
     void actOk();

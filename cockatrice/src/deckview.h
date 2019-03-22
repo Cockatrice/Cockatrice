@@ -24,7 +24,9 @@ private:
     DeckViewCardDragItem *dragItem;
 
 public:
-    DeckViewCard(const QString &_name = QString(), const QString &_originZone = QString(), QGraphicsItem *parent = 0);
+    DeckViewCard(const QString &_name = QString(),
+                 const QString &_originZone = QString(),
+                 QGraphicsItem *parent = nullptr);
     ~DeckViewCard();
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     const QString &getOriginZone() const
@@ -110,7 +112,7 @@ private:
     void rebuildTree();
 
 public:
-    DeckViewScene(QObject *parent = 0);
+    DeckViewScene(QObject *parent = nullptr);
     ~DeckViewScene();
     void setLocked(bool _locked)
     {
@@ -147,7 +149,7 @@ signals:
     void sideboardPlanChanged();
 
 public:
-    DeckView(QWidget *parent = 0);
+    DeckView(QWidget *parent = nullptr);
     void setDeck(const DeckList &_deck);
     void setLocked(bool _locked)
     {

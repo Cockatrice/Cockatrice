@@ -13,7 +13,11 @@ private slots:
     }
 
 public:
-    PileZone(Player *_p, const QString &_name, bool _isShufflable, bool _contentsKnown, QGraphicsItem *parent = 0);
+    PileZone(Player *_p,
+             const QString &_name,
+             bool _isShufflable,
+             bool _contentsKnown,
+             QGraphicsItem *parent = nullptr);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void reorganizeCards();

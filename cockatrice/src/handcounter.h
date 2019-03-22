@@ -29,7 +29,7 @@ public:
     {
         return Type;
     }
-    HandCounter(QGraphicsItem *parent = 0);
+    HandCounter(QGraphicsItem *parent = nullptr);
     ~HandCounter();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

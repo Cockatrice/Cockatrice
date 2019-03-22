@@ -14,7 +14,7 @@ public slots:
     void updateOrientation();
 
 public:
-    HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent = 0);
+    HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent = nullptr);
     void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

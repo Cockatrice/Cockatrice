@@ -69,7 +69,7 @@ signals:
     void stateChanged();
 
 public:
-    ToggleButton(QWidget *parent = 0);
+    ToggleButton(QWidget *parent = nullptr);
     bool getState() const
     {
         return state;

@@ -35,7 +35,7 @@ private slots:
 public:
     DlgFilterGames(const QMap<int, QString> &_allGameTypes,
                    const GamesProxyModel *_gamesProxyModel,
-                   QWidget *parent = 0);
+                   QWidget *parent = nullptr);
 
     bool getUnavailableGamesVisible() const;
     void setUnavailableGamesVisible(bool _unavailableGamesVisible);

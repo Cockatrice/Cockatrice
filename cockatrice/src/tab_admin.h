@@ -19,7 +19,7 @@ private:
     QSpinBox *minutesEdit;
 
 public:
-    ShutdownDialog(QWidget *parent = 0);
+    ShutdownDialog(QWidget *parent = nullptr);
     QString getReason() const;
     int getMinutes() const;
 };
@@ -45,7 +45,7 @@ private slots:
     void actLock();
 
 public:
-    TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _fullAdmin, QWidget *parent = 0);
+    TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _fullAdmin, QWidget *parent = nullptr);
     void retranslateUi();
     QString getTabText() const
     {

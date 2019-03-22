@@ -98,7 +98,7 @@ public:
        @param _p the Player
        @param parent defaults to null
      */
-    TableZone(Player *_p, QGraphicsItem *parent = 0);
+    TableZone(Player *_p, QGraphicsItem *parent = nullptr);
 
     /**
        @return a QRectF of the TableZone bounding box.

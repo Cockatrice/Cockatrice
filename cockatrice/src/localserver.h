@@ -10,7 +10,7 @@ class LocalServer : public Server
 {
     Q_OBJECT
 public:
-    LocalServer(QObject *parent = 0);
+    LocalServer(QObject *parent = nullptr);
     ~LocalServer();
 
     LocalServerInterface *newConnection();

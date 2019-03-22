@@ -52,7 +52,7 @@ public:
              const QString &_name = QString(),
              int _cardid = -1,
              bool revealedCard = false,
-             QGraphicsItem *parent = 0);
+             QGraphicsItem *parent = nullptr);
     ~CardItem();
     void retranslateUi();
     CardZone *getZone() const
