@@ -553,7 +553,7 @@ void Player::playerListActionTriggered()
     } else if (menu == mRevealTopCard) {
         int decksize = zones.value("deck")->getCards().size();
         bool ok;
-        int number = QInputDialog::getInt(static_cast<QWidget *>(parent()), tr("Reveal top cards of library"),
+        int number = QInputDialog::getInt(game, tr("Reveal top cards of library"),
                                           tr("Number of cards: (max. %1)").arg(decksize), defaultNumberTopCards, 1,
                                           decksize, 1, &ok);
         if (ok) {
@@ -1001,7 +1001,7 @@ void Player::actMulligan()
 
 void Player::actDrawCards()
 {
-    int number = QInputDialog::getInt(static_cast<QWidget *>(parent()), tr("Draw cards"), tr("Number:"));
+    int number = QInputDialog::getInt(game, tr("Draw cards"), tr("Number:"));
     if (number) {
         Command_DrawCards cmd;
         cmd.set_number(static_cast<google::protobuf::uint32>(number));
@@ -1050,7 +1050,7 @@ void Player::actMoveTopCardToExile()
 
 void Player::actMoveTopCardsToGrave()
 {
-    int number = QInputDialog::getInt(static_cast<QWidget *>(parent()), tr("Move top cards to grave"), tr("Number:"));
+    int number = QInputDialog::getInt(game, tr("Move top cards to grave"), tr("Number:"));
     if (!number) {
         return;
     }
@@ -1076,7 +1076,7 @@ void Player::actMoveTopCardsToGrave()
 
 void Player::actMoveTopCardsToExile()
 {
-    int number = QInputDialog::getInt(static_cast<QWidget *>(parent()), tr("Move top cards to exile"), tr("Number:"));
+    int number = QInputDialog::getInt(game, tr("Move top cards to exile"), tr("Number:"));
     if (!number) {
         return;
     }
@@ -2145,7 +2145,7 @@ AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor c
     if (name == "life") {
         ctr = playerTarget->addCounter(counterId, name, value);
     } else {
-        ctr = new GeneralCounter(this, counterId, name, color, radius, value, true, this);
+        ctr = new GeneralCounter(this, counterId, name, color, radius, value, true, this, game);
     }
     counters.insert(counterId, ctr);
     if (countersMenu && ctr->getMenu()) {
@@ -2345,7 +2345,7 @@ bool Player::clearCardsToDelete()
 void Player::actMoveCardXCardsFromTop()
 {
     bool ok;
-    int number = QInputDialog::getInt(static_cast<QWidget *>(parent()), tr("Place card X cards from top of library"),
+    int number = QInputDialog::getInt(game, tr("Place card X cards from top of library"),
                                       tr("How many cards from the top of the deck should this card be placed:"),
                                       defaultNumberTopCardsToPlaceBelow, 1, 2000000000, 1, &ok);
     number--;

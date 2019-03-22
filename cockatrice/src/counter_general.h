@@ -18,7 +18,8 @@ public:
                    int _radius,
                    int _value,
                    bool useNameForShortcut = false,
-                   QGraphicsItem *parent = nullptr);
+                   QGraphicsItem *parent = nullptr,
+                   QWidget *game = nullptr);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };

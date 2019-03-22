@@ -21,6 +21,7 @@ protected:
     QString name;
     int value;
     bool useNameForShortcut, hovered;
+    QWidget *game;
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
@@ -45,7 +46,8 @@ public:
                     bool _shownInCounterArea,
                     int _value,
                     bool _useNameForShortcut = false,
-                    QGraphicsItem *parent = nullptr);
+                    QGraphicsItem *parent = nullptr,
+                    QWidget *game = nullptr);
     ~AbstractCounter() override;
 
     void retranslateUi();
@@ -81,7 +83,7 @@ class AbstractCounterDialog : public QInputDialog
 {
     Q_OBJECT
 public:
-    AbstractCounterDialog(const QString &name, const QString &value);
+    AbstractCounterDialog(const QString &name, const QString &value, QWidget *parent = nullptr);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);

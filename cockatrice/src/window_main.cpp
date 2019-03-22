@@ -322,7 +322,7 @@ void MainWindow::actTips()
         delete tip;
         tip = nullptr;
     }
-    tip = new DlgTipOfTheDay();
+    tip = new DlgTipOfTheDay(this);
     if (tip->successfulInit) {
         tip->show();
     }
