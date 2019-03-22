@@ -621,7 +621,7 @@ bool TabGame::isSpectator()
 
 void TabGame::actGameInfo()
 {
-    DlgCreateGame dlg(gameInfo, roomGameTypes);
+    DlgCreateGame dlg(gameInfo, roomGameTypes, this);
     dlg.exec();
 }
 

@@ -20,8 +20,8 @@ class DlgCreateGame : public QDialog
 {
     Q_OBJECT
 public:
-    DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
-    DlgCreateGame(const ServerInfo_Game &game, const QMap<int, QString> &_gameTypes, QWidget *parent = 0);
+    DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameTypes, QWidget *parent = nullptr);
+    DlgCreateGame(const ServerInfo_Game &game, const QMap<int, QString> &_gameTypes, QWidget *parent = nullptr);
 private slots:
     void actOK();
     void actReset();
