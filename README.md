@@ -84,7 +84,7 @@ Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Tra
 
 Dependencies: *(for minimum requirements search our [CMake file](https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt))*
 - [Qt](https://www.qt.io/developers/)
-- [protobuf](https://github.com/google/protobuf)
+- [protobuf](https://github.com/protocolbuffers/protobuf)
 - [CMake](https://www.cmake.org/)
 
 Oracle can optionally use zlib and xz to load compressed files:
