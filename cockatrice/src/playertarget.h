@@ -12,7 +12,7 @@ class PlayerCounter : public AbstractCounter
 {
     Q_OBJECT
 public:
-    PlayerCounter(Player *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent = nullptr);
+    PlayerCounter(Player *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent = nullptr, QWidget *game = nullptr);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };
@@ -23,6 +23,7 @@ class PlayerTarget : public ArrowTarget
 private:
     QPixmap fullPixmap;
     PlayerCounter *playerCounter;
+    QWidget *game;
 public slots:
     void counterDeleted();
 
@@ -36,7 +37,7 @@ public:
         return Type;
     }
 
-    PlayerTarget(Player *_player = 0, QGraphicsItem *parentItem = 0);
+    PlayerTarget(Player *_player = nullptr, QGraphicsItem *parentItem = nullptr, QWidget *_game = nullptr);
     ~PlayerTarget();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

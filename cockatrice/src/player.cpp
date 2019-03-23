@@ -106,7 +106,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     playerArea = new PlayerArea(this);
 
-    playerTarget = new PlayerTarget(this, playerArea);
+    playerTarget = new PlayerTarget(this, playerArea, game);
     qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
     playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
@@ -706,8 +706,9 @@ void Player::retranslateUi()
         createPredefinedTokenMenu->setTitle(tr("Cr&eate predefined token"));
 
         QMapIterator<int, AbstractCounter *> counterIterator(counters);
-        while (counterIterator.hasNext())
+        while (counterIterator.hasNext()) {
             counterIterator.next().value()->retranslateUi();
+        }
 
         aCardMenu->setText(tr("C&ard"));
 
@@ -1585,8 +1586,9 @@ void Player::eventCreateCounter(const Event_CreateCounter &event)
 void Player::eventSetCounter(const Event_SetCounter &event)
 {
     AbstractCounter *ctr = counters.value(event.counter_id(), 0);
-    if (!ctr)
+    if (!ctr) {
         return;
+    }
     int oldValue = ctr->getValue();
     ctr->setValue(event.value());
     emit logSetCounter(this, ctr->getName(), event.value(), oldValue);
