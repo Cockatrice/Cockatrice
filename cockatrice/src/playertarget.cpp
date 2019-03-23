@@ -10,7 +10,12 @@
 #include "round.h"
 #endif /* _WIN32 */
 
-PlayerCounter::PlayerCounter(Player *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent, QWidget *game)
+PlayerCounter::PlayerCounter(Player *_player,
+                             int _id,
+                             const QString &_name,
+                             int _value,
+                             QGraphicsItem *parent,
+                             QWidget *game)
     : AbstractCounter(_player, _id, _name, false, _value, false, parent, game)
 {
 }

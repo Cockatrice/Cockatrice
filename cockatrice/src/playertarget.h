@@ -12,7 +12,12 @@ class PlayerCounter : public AbstractCounter
 {
     Q_OBJECT
 public:
-    PlayerCounter(Player *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent = nullptr, QWidget *game = nullptr);
+    PlayerCounter(Player *_player,
+                  int _id,
+                  const QString &_name,
+                  int _value,
+                  QGraphicsItem *parent = nullptr,
+                  QWidget *game = nullptr);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };
