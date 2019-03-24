@@ -3730,6 +3730,15 @@ Cockatrice鸡蛇现在会重新载入卡组数据库。</translation>
     </message>
 </context>
 <context>
+    <name>PictureLoader</name>
+    <message>
+        <location filename="../src/pictureloader.cpp" line="295"/>
+        <source>en</source>
+        <comment>code for scryfall&apos;s language property, not available for all languages</comment>
+        <translation>zhs</translation>
+    </message>
+</context>
+<context>
     <name>Player</name>
     <message>
         <location filename="../src/player.cpp" line="551"/>

@@ -291,6 +291,10 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
         }
     }
 
+    // language setting
+    transformMap["!sflang!"] = QString(QCoreApplication::translate(
+        "PictureLoader", "en", "code for scryfall's language property, not available for all languages"));
+
     for (const QString &prop : transformMap.keys()) {
         if (transformedUrl.contains(prop)) {
             if (!transformMap[prop].isEmpty()) {
