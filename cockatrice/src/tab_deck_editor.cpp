@@ -836,7 +836,7 @@ void TabDeckEditor::actLoadDeckFromClipboard()
     if (!confirmClose())
         return;
 
-    DlgLoadDeckFromClipboard dlg;
+    DlgLoadDeckFromClipboard dlg(this);
     if (!dlg.exec())
         return;
 

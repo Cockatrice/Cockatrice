@@ -28,7 +28,7 @@ public:
                  int _numberCards = -1,
                  bool _revealZone = false,
                  bool _writeableRevealZone = false,
-                 QGraphicsItem *parent = 0);
+                 QGraphicsItem *parent = nullptr);
     ~ZoneViewZone();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

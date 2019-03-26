@@ -13,7 +13,7 @@ class DlgEditUser : public QDialog
 {
     Q_OBJECT
 public:
-    DlgEditUser(QWidget *parent = 0,
+    DlgEditUser(QWidget *parent = nullptr,
                 QString email = QString(),
                 QString country = QString(),
                 QString realName = QString());

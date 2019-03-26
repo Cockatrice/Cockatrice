@@ -20,7 +20,7 @@ protected:
     void focusOutEvent(QFocusEvent *e);
 
 public:
-    explicit LineEditCompleter(QWidget *parent = 0);
+    explicit LineEditCompleter(QWidget *parent = nullptr);
     void setCompleter(QCompleter *);
     void setCompletionList(QStringList);
 };

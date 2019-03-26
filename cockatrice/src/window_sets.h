@@ -49,7 +49,7 @@ private:
     };
 
 public:
-    WndSets(QWidget *parent = 0);
+    WndSets(QWidget *parent = nullptr);
     ~WndSets();
 
 protected:

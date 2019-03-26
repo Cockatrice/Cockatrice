@@ -43,7 +43,7 @@ signals:
     void openMessageDialog(const QString &userName, bool focus);
 
 public:
-    PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent = 0);
+    PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent = nullptr);
     void retranslateUi();
     void addPlayer(const ServerInfo_PlayerProperties &player);
     void removePlayer(int playerId);

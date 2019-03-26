@@ -81,7 +81,7 @@ private slots:
     void replayListFinished(const Response &r);
 
 public:
-    RemoteReplayList_TreeModel(AbstractClient *_client, QObject *parent = 0);
+    RemoteReplayList_TreeModel(AbstractClient *_client, QObject *parent = nullptr);
     ~RemoteReplayList_TreeModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const
@@ -109,7 +109,7 @@ private:
     ServerInfo_Replay const *getNode(const QModelIndex &ind) const;
 
 public:
-    RemoteReplayList_TreeWidget(AbstractClient *_client, QWidget *parent = 0);
+    RemoteReplayList_TreeWidget(AbstractClient *_client, QWidget *parent = nullptr);
     ServerInfo_Replay const *getCurrentReplay() const;
     ServerInfo_ReplayMatch const *getCurrentReplayMatch() const;
     void refreshTree();

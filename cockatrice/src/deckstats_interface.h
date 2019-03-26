@@ -30,7 +30,7 @@ private slots:
     void getAnalyzeRequestData(DeckList *deck, QByteArray *data);
 
 public:
-    DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent = 0);
+    DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent = nullptr);
     void analyzeDeck(DeckList *deck);
 };
 

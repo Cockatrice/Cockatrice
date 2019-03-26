@@ -33,7 +33,7 @@ private:
     void updateHover(const QPointF &scenePos);
 
 public:
-    GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = 0);
+    GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = nullptr);
     ~GameScene();
     void retranslateUi();
     void processViewSizeChange(const QSize &newSize);

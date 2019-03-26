@@ -23,7 +23,7 @@ public:
         QString name;
 
     public:
-        Node(const QString &_name, DirectoryNode *_parent = 0) : parent(_parent), name(_name)
+        Node(const QString &_name, DirectoryNode *_parent = nullptr) : parent(_parent), name(_name)
         {
         }
         virtual ~Node(){};
@@ -39,7 +39,7 @@ public:
     class DirectoryNode : public Node, public QList<Node *>
     {
     public:
-        DirectoryNode(const QString &_name = QString(), DirectoryNode *_parent = 0);
+        DirectoryNode(const QString &_name = QString(), DirectoryNode *_parent = nullptr);
         ~DirectoryNode();
         void clearTree();
         QString getPath() const;
@@ -53,7 +53,7 @@ public:
         QDateTime uploadTime;
 
     public:
-        FileNode(const QString &_name, int _id, const QDateTime &_uploadTime, DirectoryNode *_parent = 0)
+        FileNode(const QString &_name, int _id, const QDateTime &_uploadTime, DirectoryNode *_parent = nullptr)
             : Node(_name, _parent), id(_id), uploadTime(_uploadTime)
         {
         }
@@ -87,7 +87,7 @@ private slots:
     void deckListFinished(const Response &r);
 
 public:
-    RemoteDeckList_TreeModel(AbstractClient *_client, QObject *parent = 0);
+    RemoteDeckList_TreeModel(AbstractClient *_client, QObject *parent = nullptr);
     ~RemoteDeckList_TreeModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const;
@@ -115,7 +115,7 @@ private:
     QSortFilterProxyModel *proxyModel;
 
 public:
-    RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent = 0);
+    RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent = nullptr);
     RemoteDeckList_TreeModel::Node *getNode(const QModelIndex &ind) const;
     RemoteDeckList_TreeModel::Node *getCurrentItem() const;
     RemoteDeckList_TreeModel::DirectoryNode *getNodeByPath(const QString &path) const;

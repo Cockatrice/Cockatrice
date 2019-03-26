@@ -73,7 +73,7 @@ public:
              const UserlistProxy *_userlistProxy,
              TabGame *_game,
              bool _showTimestamps,
-             QWidget *parent = 0);
+             QWidget *parent = nullptr);
     void retranslateUi();
     void appendHtml(const QString &html);
     void virtual appendHtmlServerMessage(const QString &html,

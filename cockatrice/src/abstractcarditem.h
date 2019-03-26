@@ -49,7 +49,10 @@ public:
     {
         return Type;
     }
-    AbstractCardItem(const QString &_name = QString(), Player *_owner = 0, int _id = -1, QGraphicsItem *parent = 0);
+    AbstractCardItem(const QString &_name = QString(),
+                     Player *_owner = nullptr,
+                     int _id = -1,
+                     QGraphicsItem *parent = nullptr);
     ~AbstractCardItem();
     QRectF boundingRect() const;
     QSizeF getTranslatedSize(QPainter *painter) const;

@@ -24,7 +24,7 @@ public slots:
     void updateSceneRect(const QRectF &rect);
 
 public:
-    GameView(QGraphicsScene *scene, QWidget *parent = 0);
+    GameView(QGraphicsScene *scene, QWidget *parent = nullptr);
 };
 
 #endif

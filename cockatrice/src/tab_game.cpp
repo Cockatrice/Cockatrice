@@ -264,7 +264,7 @@ void DeckViewContainer::loadLocalDeck()
 
 void DeckViewContainer::loadRemoteDeck()
 {
-    DlgLoadRemoteDeck dlg(parentGame->getClientForPlayer(playerId));
+    DlgLoadRemoteDeck dlg(parentGame->getClientForPlayer(playerId), this);
     if (dlg.exec()) {
         Command_DeckSelect cmd;
         cmd.set_deck_id(dlg.getDeckId());
@@ -621,7 +621,7 @@ bool TabGame::isSpectator()
 
 void TabGame::actGameInfo()
 {
-    DlgCreateGame dlg(gameInfo, roomGameTypes);
+    DlgCreateGame dlg(gameInfo, roomGameTypes, this);
     dlg.exec();
 }
 

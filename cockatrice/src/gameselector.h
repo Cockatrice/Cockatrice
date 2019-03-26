@@ -47,7 +47,7 @@ public:
                  const QMap<int, GameTypeMap> &_gameTypes,
                  const bool restoresettings,
                  const bool showfilters,
-                 QWidget *parent = 0);
+                 QWidget *parent = nullptr);
     void retranslateUi();
     void processGameInfo(const ServerInfo_Game &info);
 };

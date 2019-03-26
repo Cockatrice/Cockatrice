@@ -12,7 +12,10 @@ private:
     LocalServerInterface *lsi;
 
 public:
-    LocalClient(LocalServerInterface *_lsi, const QString &_playerName, const QString &_clientId, QObject *parent = 0);
+    LocalClient(LocalServerInterface *_lsi,
+                const QString &_playerName,
+                const QString &_clientId,
+                QObject *parent = nullptr);
     ~LocalClient();
 
     void sendCommandContainer(const CommandContainer &cont);

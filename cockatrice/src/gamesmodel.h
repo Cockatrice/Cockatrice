@@ -24,7 +24,7 @@ private:
 public:
     static const int SORT_ROLE = Qt::UserRole + 1;
 
-    GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent = 0);
+    GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent = nullptr);
     int rowCount(const QModelIndex &parent = QModelIndex()) const
     {
         return parent.isValid() ? 0 : gameList.size();
@@ -75,7 +75,7 @@ private:
     static const int DEFAULT_MAX_PLAYERS_MAX = 99;
 
 public:
-    GamesProxyModel(QObject *parent = 0, bool _ownUserIsRegistered = false);
+    GamesProxyModel(QObject *parent = nullptr, bool _ownUserIsRegistered = false);
 
     bool getShowBuddiesOnlyGames() const
     {

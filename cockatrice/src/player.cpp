@@ -106,7 +106,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     playerArea = new PlayerArea(this);
 
-    playerTarget = new PlayerTarget(this, playerArea);
+    playerTarget = new PlayerTarget(this, playerArea, game);
     qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
     playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
@@ -553,7 +553,7 @@ void Player::playerListActionTriggered()
     } else if (menu == mRevealTopCard) {
         int decksize = zones.value("deck")->getCards().size();
         bool ok;
-        int number = QInputDialog::getInt(nullptr, tr("Reveal top cards of library"),
+        int number = QInputDialog::getInt(game, tr("Reveal top cards of library"),
                                           tr("Number of cards: (max. %1)").arg(decksize), defaultNumberTopCards, 1,
                                           decksize, 1, &ok);
         if (ok) {
@@ -706,8 +706,9 @@ void Player::retranslateUi()
         createPredefinedTokenMenu->setTitle(tr("Cr&eate predefined token"));
 
         QMapIterator<int, AbstractCounter *> counterIterator(counters);
-        while (counterIterator.hasNext())
+        while (counterIterator.hasNext()) {
             counterIterator.next().value()->retranslateUi();
+        }
 
         aCardMenu->setText(tr("C&ard"));
 
@@ -932,7 +933,7 @@ void Player::actViewLibrary()
 void Player::actViewTopCards()
 {
     bool ok;
-    int number = QInputDialog::getInt(nullptr, tr("View top cards of library"), tr("Number of cards:"),
+    int number = QInputDialog::getInt(game, tr("View top cards of library"), tr("Number of cards:"),
                                       defaultNumberTopCards, 1, 2000000000, 1, &ok);
     if (ok) {
         defaultNumberTopCards = number;
@@ -1001,7 +1002,7 @@ void Player::actMulligan()
 
 void Player::actDrawCards()
 {
-    int number = QInputDialog::getInt(nullptr, tr("Draw cards"), tr("Number:"));
+    int number = QInputDialog::getInt(game, tr("Draw cards"), tr("Number:"));
     if (number) {
         Command_DrawCards cmd;
         cmd.set_number(static_cast<google::protobuf::uint32>(number));
@@ -1050,7 +1051,7 @@ void Player::actMoveTopCardToExile()
 
 void Player::actMoveTopCardsToGrave()
 {
-    int number = QInputDialog::getInt(nullptr, tr("Move top cards to grave"), tr("Number:"));
+    int number = QInputDialog::getInt(game, tr("Move top cards to grave"), tr("Number:"));
     if (!number) {
         return;
     }
@@ -1076,7 +1077,7 @@ void Player::actMoveTopCardsToGrave()
 
 void Player::actMoveTopCardsToExile()
 {
-    int number = QInputDialog::getInt(nullptr, tr("Move top cards to exile"), tr("Number:"));
+    int number = QInputDialog::getInt(game, tr("Move top cards to exile"), tr("Number:"));
     if (!number) {
         return;
     }
@@ -1155,8 +1156,7 @@ void Player::actUntapAll()
 void Player::actRollDie()
 {
     bool ok;
-    int sides = QInputDialog::getInt(static_cast<QWidget *>(parent()), tr("Roll die"), tr("Number of sides:"), 20, 2,
-                                     1000, 1, &ok);
+    int sides = QInputDialog::getInt(game, tr("Roll die"), tr("Number of sides:"), 20, 2, 1000, 1, &ok);
     if (ok) {
         Command_RollDie cmd;
         cmd.set_sides(static_cast<google::protobuf::uint32>(sides));
@@ -1166,7 +1166,7 @@ void Player::actRollDie()
 
 void Player::actCreateToken()
 {
-    DlgCreateToken dlg(predefinedTokens);
+    DlgCreateToken dlg(predefinedTokens, game);
     if (!dlg.exec()) {
         return;
     }
@@ -1329,8 +1329,8 @@ bool Player::createRelatedFromRelation(const CardItem *sourceCard, const CardRel
     if (cardRelation->getIsVariable()) {
         bool ok;
         dialogSemaphore = true;
-        int count = QInputDialog::getInt(nullptr, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(),
-                                         1, MAX_TOKENS_PER_DIALOG, 1, &ok);
+        int count = QInputDialog::getInt(game, tr("Create tokens"), tr("Number:"), cardRelation->getDefaultCount(), 1,
+                                         MAX_TOKENS_PER_DIALOG, 1, &ok);
         dialogSemaphore = false;
         if (!ok) {
             return false;
@@ -1586,8 +1586,9 @@ void Player::eventCreateCounter(const Event_CreateCounter &event)
 void Player::eventSetCounter(const Event_SetCounter &event)
 {
     AbstractCounter *ctr = counters.value(event.counter_id(), 0);
-    if (!ctr)
+    if (!ctr) {
         return;
+    }
     int oldValue = ctr->getValue();
     ctr->setValue(event.value());
     emit logSetCounter(this, ctr->getName(), event.value(), oldValue);
@@ -2146,7 +2147,7 @@ AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor c
     if (name == "life") {
         ctr = playerTarget->addCounter(counterId, name, value);
     } else {
-        ctr = new GeneralCounter(this, counterId, name, color, radius, value, true, this);
+        ctr = new GeneralCounter(this, counterId, name, color, radius, value, true, this, game);
     }
     counters.insert(counterId, ctr);
     if (countersMenu && ctr->getMenu()) {
@@ -2346,7 +2347,7 @@ bool Player::clearCardsToDelete()
 void Player::actMoveCardXCardsFromTop()
 {
     bool ok;
-    int number = QInputDialog::getInt(nullptr, tr("Place card X cards from top of library"),
+    int number = QInputDialog::getInt(game, tr("Place card X cards from top of library"),
                                       tr("How many cards from the top of the deck should this card be placed:"),
                                       defaultNumberTopCardsToPlaceBelow, 1, 2000000000, 1, &ok);
     number--;
@@ -2861,7 +2862,7 @@ void Player::actCardCounterTrigger()
                 auto *card = static_cast<CardItem *>(scene()->selectedItems().first());
                 oldValue = card->getCounters().value(counterId, 0);
             }
-            int number = QInputDialog::getInt(nullptr, tr("Set counters"), tr("Number:"), oldValue, 0,
+            int number = QInputDialog::getInt(game, tr("Set counters"), tr("Number:"), oldValue, 0,
                                               MAX_COUNTERS_ON_CARD, 1, &ok);
             dialogSemaphore = false;
             if (clearCardsToDelete() || !ok) {

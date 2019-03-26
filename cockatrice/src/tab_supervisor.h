@@ -43,7 +43,7 @@ class CloseButton : public QAbstractButton
 {
     Q_OBJECT
 public:
-    CloseButton(QWidget *parent = 0);
+    CloseButton(QWidget *parent = nullptr);
     QSize sizeHint() const;
     inline QSize minimumSizeHint() const
     {
@@ -81,7 +81,7 @@ private:
     bool isLocalGame;
 
 public:
-    TabSupervisor(AbstractClient *_client, QWidget *parent = 0);
+    TabSupervisor(AbstractClient *_client, QWidget *parent = nullptr);
     ~TabSupervisor();
     void retranslateUi();
     void start(const ServerInfo_User &userInfo);

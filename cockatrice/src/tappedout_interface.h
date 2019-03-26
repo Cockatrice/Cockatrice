@@ -29,7 +29,7 @@ private slots:
     void getAnalyzeRequestData(DeckList *deck, QByteArray *data);
 
 public:
-    TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent = 0);
+    TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent = nullptr);
     void analyzeDeck(DeckList *deck);
 };
 

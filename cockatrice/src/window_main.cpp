@@ -322,7 +322,7 @@ void MainWindow::actTips()
         delete tip;
         tip = nullptr;
     }
-    tip = new DlgTipOfTheDay();
+    tip = new DlgTipOfTheDay(this);
     if (tip->successfulInit) {
         tip->show();
     }
@@ -1268,14 +1268,13 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
 
 void MainWindow::actManageSets()
 {
-    wndSets = new WndSets;
-    wndSets->setWindowModality(Qt::WindowModal);
+    wndSets = new WndSets(this);
     wndSets->show();
 }
 
 void MainWindow::actEditTokens()
 {
-    DlgEditTokens dlg;
+    DlgEditTokens dlg(this);
     dlg.exec();
     db->saveCustomTokensToFile();
 }
