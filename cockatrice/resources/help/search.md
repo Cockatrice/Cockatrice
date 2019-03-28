@@ -28,6 +28,7 @@ The search bar recognizes a set of special commands similar to some other card d
 <dd>[c=wubrg](#c%3Dwubrg) <small>(Cards that are all five colors)</small></dd>
 -->
 <dd>[c:c](#c:c) <small>(Any colorless card)</small></dd>
+<dd>[ci:w](#ci:w) <small>(Any card that has white in it's color identity)</small></dd>
 
 <dt><u>Pow</u>er, <u>Tou</u>ghness, <u>C</u>onverted <u>M</u>ana <u>C</u>ost:</dt>
 <dd>[tou:1](#tou:1) <small>(Any card with a toughness of 1)</small></dd>
