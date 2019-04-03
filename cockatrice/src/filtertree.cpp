@@ -307,17 +307,16 @@ bool FilterItem::acceptRarity(const CardInfoPtr info) const
      * replacement OR we go through all possible cases.
      * Will also need to replace just "mythic"
      */
-    converted_term.replace("mythic", "mythic rare", Qt::CaseInsensitive);
     for (int i = 0; converted_term.length() <= 3 && i <= 6; i++) {
         switch (i) {
             case 0:
-                converted_term.replace("mr", "mythic rare", Qt::CaseInsensitive);
+                converted_term.replace("mr", "mythic", Qt::CaseInsensitive);
                 break;
             case 1:
-                converted_term.replace("m r", "mythic rare", Qt::CaseInsensitive);
+                converted_term.replace("m r", "mythic", Qt::CaseInsensitive);
                 break;
             case 2:
-                converted_term.replace("m", "mythic rare", Qt::CaseInsensitive);
+                converted_term.replace("m", "mythic", Qt::CaseInsensitive);
                 break;
             case 3:
                 converted_term.replace("c", "common", Qt::CaseInsensitive);
