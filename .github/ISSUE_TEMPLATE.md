@@ -3,7 +3,7 @@
 
   <!-- If you can't install Cockatrice to access that information, make
        sure to include your OS and the app version from the setup file here -->
-__________________________________________________________________________________________
+_______________________________________________________________________________________
 
   <!-- Explain your issue/request/suggestion in detail here! -->
 
