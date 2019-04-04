@@ -124,8 +124,8 @@ CardInfoPtr OracleImporter::addCard(QString name,
 
     // cards that enter the field tapped
     bool cipt = text.contains("Hideaway") || text.contains("If you don't, it enters the battlefield tapped.") ||
-                                            (text.contains(name + " enters the battlefield tapped") &&
-                                            !text.contains(name + " enters the battlefield tapped unless"));
+                (text.contains(name + " enters the battlefield tapped") &&
+                 !text.contains(name + " enters the battlefield tapped unless"));
 
     // detect mana generator artifacts
     QStringList cardTextRows = text.split("\n");
