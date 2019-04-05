@@ -669,7 +669,7 @@ void DeckEditorSettingsPage::retranslateUi()
     mpSpoilerGroupBox->setTitle(tr("Spoilers"));
     mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
-    lastUpdatedLabel.setText(tr("Last Updated") + ": " + getLastUpdateTime());
+    lastUpdatedLabel.setText(tr("Last Change") + ": " + getLastUpdateTime());
     infoOnSpoilersLabel.setText(tr("Spoilers download automatically on launch") + "\n" +
                                 tr("Press the button to manually update without relaunching") + "\n\n" +
                                 tr("Do not close settings until manual update complete"));
