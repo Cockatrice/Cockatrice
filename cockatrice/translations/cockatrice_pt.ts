@@ -3725,6 +3725,15 @@ O Cockatrice irá agora recarregar a base de dados das cartas.</translation>
     </message>
 </context>
 <context>
+    <name>PictureLoader</name>
+    <message>
+        <location filename="../src/pictureloader.cpp" line="295"/>
+        <source>en</source>
+        <comment>code for scryfall&apos;s language property, not available for all languages</comment>
+        <translation>pt</translation>
+    </message>
+</context>
+<context>
     <name>Player</name>
     <message>
         <location filename="../src/player.cpp" line="551"/>
