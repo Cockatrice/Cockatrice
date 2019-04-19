@@ -46,5 +46,5 @@ extern SettingsCache *settingsCache;
 
 class PictureLoader
 {
-    void clearPixmapCache(CardInfoPtr card);
+    static void clearPixmapCache(CardInfoPtr card);
 };

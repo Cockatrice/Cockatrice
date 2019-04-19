@@ -46,7 +46,7 @@ CardDatabaseSettings &SettingsCache::cardDatabase() const
     return *cardDatabaseSettings;
 }
 
-void PictureLoader::clearPixmapCache(class QSharedPointer<class CardInfo> /* card */)
+void PictureLoader::clearPixmapCache(CardInfoPtr /* card */)
 {
 }
 
