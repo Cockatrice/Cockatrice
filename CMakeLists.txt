@@ -163,6 +163,9 @@ set(CMAKE_AUTOMOC TRUE)
 
 # Find other needed libraries
 FIND_PACKAGE(Protobuf REQUIRED)
+IF(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
+  MESSAGE(FATAL_ERROR "No protoc command found!")
+ENDIF()
 
 #Find OpenSSL
 IF(WIN32)
