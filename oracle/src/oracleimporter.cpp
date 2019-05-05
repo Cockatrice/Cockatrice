@@ -249,6 +249,11 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
                 setInfo.setProperty(xmlPropertyName, propertyValue);
         }
 
+        // skip cards containing a star char in the collectors number
+        if(setInfo.getProperty("num").contains("★")) {
+            continue;
+        }
+
         // special handling properties
         colors = card.value("colors").toStringList().join("");
         if (!colors.isEmpty())
