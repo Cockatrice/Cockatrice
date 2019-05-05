@@ -123,7 +123,7 @@ void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QMod
         currentCard.clear();
     }
 
-    if (!currentCard) {
+    if (currentCard) {
         nameEdit->setText(currentCard->getName());
         const QChar cardColor = currentCard->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
@@ -154,9 +154,12 @@ void DlgEditTokens::actAddToken()
         }
     } while (askAgain);
 
-    CardInfoPtr card = CardInfo::newInstance(name, "", true);
+    QString setName = CardDatabase::TOKENS_SETNAME;
+    CardInfoPerSetMap sets;
+    sets.insert(setName, CardInfoPerSet(databaseModel->getDatabase()->getSet(setName)));
+    CardInfoPtr card = CardInfo::newInstance(name, "", true, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
+                                             sets, false, -1, false);
     card->setCardType("Token");
-    card->addToSet(databaseModel->getDatabase()->getSet(CardDatabase::TOKENS_SETNAME));
 
     databaseModel->getDatabase()->addCard(card);
 }
