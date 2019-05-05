@@ -91,6 +91,24 @@ void TabDeckEditor::createDeckDock()
     commentsLabel->setBuddy(commentsEdit);
     connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
 
+    aIncrement = new QAction(QString(), this);
+    aIncrement->setIcon(QPixmap("theme:icons/increment"));
+    connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
+    auto *tbIncrement = new QToolButton(this);
+    tbIncrement->setDefaultAction(aIncrement);
+
+    aDecrement = new QAction(QString(), this);
+    aDecrement->setIcon(QPixmap("theme:icons/decrement"));
+    connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
+    auto *tbDecrement = new QToolButton(this);
+    tbDecrement->setDefaultAction(aDecrement);
+
+    aRemoveCard = new QAction(QString(), this);
+    aRemoveCard->setIcon(QPixmap("theme:icons/remove_row"));
+    connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
+    auto *tbRemoveCard = new QToolButton(this);
+    tbRemoveCard->setDefaultAction(aRemoveCard);
+
     auto *upperLayout = new QGridLayout;
     upperLayout->setObjectName("upperLayout");
     upperLayout->addWidget(nameLabel, 0, 0);
@@ -111,7 +129,10 @@ void TabDeckEditor::createDeckDock()
     lowerLayout->setObjectName("lowerLayout");
     lowerLayout->addWidget(hashLabel1, 0, 0);
     lowerLayout->addWidget(hashLabel, 0, 1);
-    lowerLayout->addWidget(deckView, 1, 0, 1, 2);
+    lowerLayout->addWidget(tbIncrement, 0, 2);
+    lowerLayout->addWidget(tbDecrement, 0, 3);
+    lowerLayout->addWidget(tbRemoveCard, 0, 4);
+    lowerLayout->addWidget(deckView, 1, 0, 1, 5);
 
     // Create widgets for both layouts to make splitter work correctly
     QWidget *topWidget = new QWidget;
@@ -404,35 +425,20 @@ void TabDeckEditor::createCentralFrame()
     aAddCard = new QAction(QString(), this);
     aAddCard->setIcon(QPixmap("theme:icons/arrow_right_green"));
     connect(aAddCard, SIGNAL(triggered()), this, SLOT(actAddCard()));
+    auto *tbAddCard = new QToolButton(this);
+    tbAddCard->setDefaultAction(aAddCard);
+
     aAddCardToSideboard = new QAction(QString(), this);
     aAddCardToSideboard->setIcon(QPixmap("theme:icons/arrow_right_blue"));
     connect(aAddCardToSideboard, SIGNAL(triggered()), this, SLOT(actAddCardToSideboard()));
-    aRemoveCard = new QAction(QString(), this);
-    aRemoveCard->setIcon(QPixmap("theme:icons/remove_row"));
-    connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
-    aIncrement = new QAction(QString(), this);
-    aIncrement->setIcon(QPixmap("theme:icons/increment"));
-    connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
-    aDecrement = new QAction(QString(), this);
-    aDecrement->setIcon(QPixmap("theme:icons/decrement"));
-    connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrement()));
-
-    auto *deckEditToolBar = new QToolBar;
-    deckEditToolBar->setObjectName("deckEditToolBar");
-    deckEditToolBar->setOrientation(Qt::Horizontal);
-    deckEditToolBar->setIconSize(QSize(24, 24));
-
-    deckEditToolBar->addAction(aAddCard);
-    deckEditToolBar->addAction(aAddCardToSideboard);
-    deckEditToolBar->addAction(aRemoveCard);
-    deckEditToolBar->addAction(aDecrement);
-    deckEditToolBar->addAction(aIncrement);
-    deckEditToolBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    auto *tbAddCardToSideboard = new QToolButton(this);
+    tbAddCardToSideboard->setDefaultAction(aAddCardToSideboard);
 
     searchLayout = new QHBoxLayout;
     searchLayout->setObjectName("searchLayout");
-    searchLayout->addWidget(deckEditToolBar);
     searchLayout->addWidget(searchEdit);
+    searchLayout->addWidget(tbAddCard);
+    searchLayout->addWidget(tbAddCardToSideboard);
 
     centralFrame = new QVBoxLayout;
     centralFrame->setObjectName("centralFrame");
