@@ -250,7 +250,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         }
 
         // skip cards containing a star char in the collectors number
-        if(setInfo.getProperty("num").contains("★")) {
+        if (setInfo.getProperty("num").contains("★")) {
             continue;
         }
 
