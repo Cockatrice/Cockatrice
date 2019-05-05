@@ -754,6 +754,9 @@ void TabDeckEditor::actNewDeck()
 
 void TabDeckEditor::actLoadDeck()
 {
+    if (!confirmClose())
+        return;
+
     QFileDialog dialog(this, tr("Load deck"));
     dialog.setDirectory(settingsCache->getDeckPath());
     dialog.setNameFilters(DeckLoader::fileNameFilters);
