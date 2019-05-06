@@ -110,7 +110,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
     mainLayout->addWidget(buttonBox);
 
     setLayout(mainLayout);
-    setWindowTitle(tr("Edit tokens"));
+    setWindowTitle(tr("Edit custom tokens"));
 }
 
 void DlgEditTokens::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /* previous */)

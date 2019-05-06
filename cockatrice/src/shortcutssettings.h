@@ -172,7 +172,7 @@ private:
         {"TabDeckEditor/aManageSets",
          SK(QT_TRANSLATE_NOOP("shortcutsTab", "Manage sets"), parseSequenceString(""), ShortcutGroup::Deck_Editor)},
         {"TabDeckEditor/aEditTokens",
-         SK(QT_TRANSLATE_NOOP("shortcutsTab", "Edit tokens"), parseSequenceString(""), ShortcutGroup::Deck_Editor)},
+         SK(QT_TRANSLATE_NOOP("shortcutsTab", "Edit custom tokens"), parseSequenceString(""), ShortcutGroup::Deck_Editor)},
         {"TabDeckEditor/aExportDeckDecklist",
          SK(QT_TRANSLATE_NOOP("shortcutsTab", "Export deck"), parseSequenceString(""), ShortcutGroup::Deck_Editor)},
         {"TabDeckEditor/aIncrement",
