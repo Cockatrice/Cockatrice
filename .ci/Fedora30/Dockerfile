@@ -10,7 +10,7 @@ RUN dnf install -y \
         hicolor-icon-theme \
         libappstream-glib \
         protobuf-devel \
-        qt5-{qttools,qtsvg,qtmultimedia,qtwebsockets}-devel-5.11.1-2.fc29 \
+        qt5-{qttools,qtsvg,qtmultimedia,qtwebsockets}-devel \
         rpm-build \
         sqlite-devel \
         wget \
