@@ -56,11 +56,11 @@ matrix:
           "cockatrice_${NAME,,}"
           bash .ci/travis-compile.sh --server --package "$NAME" --release
 
-  #Fedora 29 (on docker)
-  - name: Fedora 29 (Debug)
+  #Fedora 30 (on docker)
+  - name: Fedora 30 (Debug)
     if: tag IS NOT present
     services: docker
-    env: NAME=Fedora29
+    env: NAME=Fedora30
     cache:
       directories:
         - $HOME/$NAME/
@@ -70,10 +70,10 @@ matrix:
           "cockatrice_${NAME,,}"
           bash .ci/travis-compile.sh --server --debug
 
-  - name: Fedora 29 (Release)
+  - name: Fedora 30 (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     services: docker
-    env: NAME=Fedora29
+    env: NAME=Fedora30
     cache:
       directories:
         - $HOME/$NAME/
