@@ -61,7 +61,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
 
     databaseModel = new CardDatabaseModel(db, false, this);
     databaseModel->setObjectName("databaseModel");
-    cardDatabaseDisplayModel = new TokenDisplayModel(this);
+    cardDatabaseDisplayModel = new TokenEditModel(this);
     cardDatabaseDisplayModel->setSourceModel(databaseModel);
     cardDatabaseDisplayModel->setIsToken(CardDatabaseDisplayModel::ShowTrue);
 
