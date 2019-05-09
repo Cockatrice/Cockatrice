@@ -327,8 +327,8 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
     qRegisterMetaType<CardInfoPtr>("CardSetPtr");
 
     // add new parsers here
-    availableParsers << new CockatriceXml3Parser;
     availableParsers << new CockatriceXml4Parser;
+    availableParsers << new CockatriceXml3Parser;
 
     for (auto &parser : availableParsers) {
         connect(parser, SIGNAL(addCard(CardInfoPtr)), this, SLOT(addCard(CardInfoPtr)), Qt::DirectConnection);
