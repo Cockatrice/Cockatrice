@@ -253,7 +253,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="../src/oracleimporter.cpp" line="377"/>
+        <location filename="../src/oracleimporter.cpp" line="396"/>
         <source>Dummy set containing tokens</source>
         <translation type="unfinished"></translation>
     </message>

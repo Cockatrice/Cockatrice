@@ -252,7 +252,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="../src/oracleimporter.cpp" line="344"/>
+        <location filename="../src/oracleimporter.cpp" line="396"/>
         <source>Dummy set containing tokens</source>
         <translation>토큰 정보가 들어있는 더미 확장판</translation>
     </message>

@@ -4,7 +4,7 @@
 <context>
     <name>AbstractCounter</name>
     <message>
-        <location filename="../src/abstractcounter.cpp" line="74"/>
+        <location filename="../src/abstractcounter.cpp" line="75"/>
         <source>&amp;Set counter...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -12,12 +12,12 @@
 <context>
     <name>AbstractCounterDialog</name>
     <message>
-        <location filename="../src/abstractcounter.cpp" line="189"/>
+        <location filename="../src/abstractcounter.cpp" line="191"/>
         <source>Set counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/abstractcounter.cpp" line="190"/>
+        <location filename="../src/abstractcounter.cpp" line="192"/>
         <source>New value for counter &apos;%1&apos;:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -588,6 +588,11 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/dlg_settings.cpp" line="672"/>
+        <source>Last Change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/dlg_settings.cpp" line="676"/>
         <source>Download card pictures on the fly</source>
         <translation type="unfinished"></translation>
@@ -605,11 +610,6 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../src/dlg_settings.cpp" line="679"/>
         <source>Reset Download URLs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/dlg_settings.cpp" line="672"/>
-        <source>Last Updated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1176,7 +1176,7 @@ To remove your current avatar, confirm without choosing a new image.</source>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="113"/>
-        <source>Edit tokens</source>
+        <source>Edit custom tokens</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2658,11 +2658,6 @@ Local version is %1, remote version is %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="643"/>
-        <source>Edit &amp;tokens...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/window_main.cpp" line="645"/>
         <source>&amp;About Cockatrice</source>
         <translation type="unfinished"></translation>
@@ -2818,24 +2813,24 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1294"/>
-        <location filename="../src/window_main.cpp" line="1304"/>
-        <location filename="../src/window_main.cpp" line="1313"/>
+        <location filename="../src/window_main.cpp" line="1293"/>
+        <location filename="../src/window_main.cpp" line="1303"/>
+        <location filename="../src/window_main.cpp" line="1312"/>
         <source>Forgot Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1295"/>
+        <location filename="../src/window_main.cpp" line="1294"/>
         <source>Your password has been reset successfully, you now may  log in using the new credentials.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1305"/>
+        <location filename="../src/window_main.cpp" line="1304"/>
         <source>Failed to reset user account password, please contact the server operator to reset your password.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/window_main.cpp" line="1314"/>
+        <location filename="../src/window_main.cpp" line="1313"/>
         <source>Activation request received, please check your email for an activation token.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2851,6 +2846,11 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/window_main.cpp" line="642"/>
         <source>&amp;Manage sets...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/window_main.cpp" line="643"/>
+        <source>Edit custom &amp;tokens...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3761,7 +3761,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="652"/>
         <location filename="../src/player.cpp" line="659"/>
         <location filename="../src/player.cpp" line="672"/>
-        <location filename="../src/player.cpp" line="769"/>
+        <location filename="../src/player.cpp" line="770"/>
         <source>&amp;Graveyard</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3769,7 +3769,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="653"/>
         <location filename="../src/player.cpp" line="660"/>
         <location filename="../src/player.cpp" line="666"/>
-        <location filename="../src/player.cpp" line="770"/>
+        <location filename="../src/player.cpp" line="771"/>
         <source>&amp;Exile</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3782,7 +3782,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="657"/>
         <location filename="../src/player.cpp" line="663"/>
         <location filename="../src/player.cpp" line="669"/>
-        <location filename="../src/player.cpp" line="765"/>
+        <location filename="../src/player.cpp" line="766"/>
         <source>&amp;Top of library</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3802,7 +3802,7 @@ Cockatrice will now reload the card database.</source>
         <location filename="../src/player.cpp" line="665"/>
         <location filename="../src/player.cpp" line="671"/>
         <location filename="../src/player.cpp" line="694"/>
-        <location filename="../src/player.cpp" line="768"/>
+        <location filename="../src/player.cpp" line="769"/>
         <source>&amp;Hand</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3962,148 +3962,148 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="720"/>
+        <location filename="../src/player.cpp" line="721"/>
         <source>S&amp;ay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="712"/>
+        <location filename="../src/player.cpp" line="713"/>
         <source>C&amp;ard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="715"/>
+        <location filename="../src/player.cpp" line="716"/>
         <source>&amp;All players</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="723"/>
+        <location filename="../src/player.cpp" line="724"/>
         <source>&amp;Play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="724"/>
+        <location filename="../src/player.cpp" line="725"/>
         <source>&amp;Hide</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="725"/>
+        <location filename="../src/player.cpp" line="726"/>
         <source>Play &amp;Face Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="728"/>
+        <location filename="../src/player.cpp" line="729"/>
         <source>Toggle &amp;normal untapping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="733"/>
+        <location filename="../src/player.cpp" line="734"/>
         <source>&amp;Peek at card face</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="734"/>
+        <location filename="../src/player.cpp" line="735"/>
         <source>&amp;Clone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="735"/>
+        <location filename="../src/player.cpp" line="736"/>
         <source>Attac&amp;h to card...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="736"/>
+        <location filename="../src/player.cpp" line="737"/>
         <source>Unattac&amp;h</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="737"/>
+        <location filename="../src/player.cpp" line="738"/>
         <source>&amp;Draw arrow...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="738"/>
+        <location filename="../src/player.cpp" line="739"/>
         <source>&amp;Increase power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="739"/>
+        <location filename="../src/player.cpp" line="740"/>
         <source>&amp;Decrease power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="740"/>
+        <location filename="../src/player.cpp" line="741"/>
         <source>I&amp;ncrease toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="741"/>
+        <location filename="../src/player.cpp" line="742"/>
         <source>D&amp;ecrease toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="742"/>
+        <location filename="../src/player.cpp" line="743"/>
         <source>In&amp;crease power and toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="743"/>
+        <location filename="../src/player.cpp" line="744"/>
         <source>Dec&amp;rease power and toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="744"/>
+        <location filename="../src/player.cpp" line="745"/>
         <source>Increase power and decrease toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="745"/>
+        <location filename="../src/player.cpp" line="746"/>
         <source>Decrease power and increase toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="746"/>
+        <location filename="../src/player.cpp" line="747"/>
         <source>Set &amp;power and toughness...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="747"/>
+        <location filename="../src/player.cpp" line="748"/>
         <source>Reset p&amp;ower and toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="748"/>
+        <location filename="../src/player.cpp" line="749"/>
         <source>&amp;Set annotation...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="751"/>
+        <location filename="../src/player.cpp" line="752"/>
         <source>Red</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="752"/>
+        <location filename="../src/player.cpp" line="753"/>
         <source>Yellow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="753"/>
+        <location filename="../src/player.cpp" line="754"/>
         <source>Green</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="766"/>
+        <location filename="../src/player.cpp" line="767"/>
         <source>X cards from the top of library...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="767"/>
+        <location filename="../src/player.cpp" line="768"/>
         <source>&amp;Bottom of library in random order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="1188"/>
-        <location filename="../src/player.cpp" line="3241"/>
+        <location filename="../src/player.cpp" line="3242"/>
         <source>C&amp;reate another %1 token</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4113,128 +4113,128 @@ Cockatrice will now reload the card database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2671"/>
+        <location filename="../src/player.cpp" line="2672"/>
         <source>Change power/toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2671"/>
+        <location filename="../src/player.cpp" line="2672"/>
         <source>Change stats to:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3126"/>
+        <location filename="../src/player.cpp" line="3127"/>
         <source>Token: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2349"/>
+        <location filename="../src/player.cpp" line="2350"/>
         <source>Place card X cards from top of library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2350"/>
+        <location filename="../src/player.cpp" line="2351"/>
         <source>How many cards from the top of the deck should this card be placed:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3086"/>
+        <location filename="../src/player.cpp" line="3087"/>
         <source>View related cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3128"/>
+        <location filename="../src/player.cpp" line="3129"/>
         <source>Attach to </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="3142"/>
+        <location filename="../src/player.cpp" line="3143"/>
         <source>All tokens</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="935"/>
+        <location filename="../src/player.cpp" line="936"/>
         <source>View top cards of library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="727"/>
+        <location filename="../src/player.cpp" line="728"/>
         <source>&amp;Tap / Untap</source>
         <extracomment>Turn sideways or back again</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="730"/>
+        <location filename="../src/player.cpp" line="731"/>
         <source>T&amp;urn Over</source>
         <extracomment>Turn face up/face down</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="756"/>
+        <location filename="../src/player.cpp" line="757"/>
         <source>&amp;Add counter (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="759"/>
+        <location filename="../src/player.cpp" line="760"/>
         <source>&amp;Remove counter (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="762"/>
+        <location filename="../src/player.cpp" line="763"/>
         <source>&amp;Set counters (%1)...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="935"/>
+        <location filename="../src/player.cpp" line="936"/>
         <source>Number of cards:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1004"/>
+        <location filename="../src/player.cpp" line="1005"/>
         <source>Draw cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1004"/>
-        <location filename="../src/player.cpp" line="1053"/>
-        <location filename="../src/player.cpp" line="1079"/>
+        <location filename="../src/player.cpp" line="1005"/>
+        <location filename="../src/player.cpp" line="1054"/>
+        <location filename="../src/player.cpp" line="1080"/>
         <location filename="../src/player.cpp" line="1332"/>
-        <location filename="../src/player.cpp" line="2864"/>
+        <location filename="../src/player.cpp" line="2865"/>
         <source>Number:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1053"/>
+        <location filename="../src/player.cpp" line="1054"/>
         <source>Move top cards to grave</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1079"/>
+        <location filename="../src/player.cpp" line="1080"/>
         <source>Move top cards to exile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1158"/>
+        <location filename="../src/player.cpp" line="1159"/>
         <source>Roll die</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="1158"/>
+        <location filename="../src/player.cpp" line="1159"/>
         <source>Number of sides:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2777"/>
+        <location filename="../src/player.cpp" line="2778"/>
         <source>Set annotation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2777"/>
+        <location filename="../src/player.cpp" line="2778"/>
         <source>Please enter the new annotation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/player.cpp" line="2864"/>
+        <location filename="../src/player.cpp" line="2865"/>
         <source>Set counters</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4994,43 +4994,43 @@ Do you want to save the changes?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="757"/>
+        <location filename="../src/tab_deck_editor.cpp" line="760"/>
         <source>Load deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="778"/>
-        <location filename="../src/tab_deck_editor.cpp" line="804"/>
-        <location filename="../src/tab_deck_editor.cpp" line="826"/>
-        <location filename="../src/tab_deck_editor.cpp" line="887"/>
-        <location filename="../src/tab_deck_editor.cpp" line="899"/>
+        <location filename="../src/tab_deck_editor.cpp" line="781"/>
+        <location filename="../src/tab_deck_editor.cpp" line="807"/>
+        <location filename="../src/tab_deck_editor.cpp" line="829"/>
+        <location filename="../src/tab_deck_editor.cpp" line="890"/>
+        <location filename="../src/tab_deck_editor.cpp" line="902"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="778"/>
+        <location filename="../src/tab_deck_editor.cpp" line="781"/>
         <source>The deck could not be saved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="805"/>
-        <location filename="../src/tab_deck_editor.cpp" line="827"/>
+        <location filename="../src/tab_deck_editor.cpp" line="808"/>
+        <location filename="../src/tab_deck_editor.cpp" line="830"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="811"/>
+        <location filename="../src/tab_deck_editor.cpp" line="814"/>
         <source>Save deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="887"/>
+        <location filename="../src/tab_deck_editor.cpp" line="890"/>
         <source>There are no cards in your deck to be exported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/tab_deck_editor.cpp" line="899"/>
+        <location filename="../src/tab_deck_editor.cpp" line="902"/>
         <source>No deck was selected to be saved.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5866,83 +5866,83 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="98"/>
+        <location filename="../src/user_context_menu.cpp" line="100"/>
         <source>%1&apos;s games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="154"/>
-        <location filename="../src/user_context_menu.cpp" line="177"/>
-        <location filename="../src/user_context_menu.cpp" line="181"/>
+        <location filename="../src/user_context_menu.cpp" line="156"/>
+        <location filename="../src/user_context_menu.cpp" line="179"/>
+        <location filename="../src/user_context_menu.cpp" line="183"/>
         <source>Ban History</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="160"/>
+        <location filename="../src/user_context_menu.cpp" line="162"/>
         <source>Ban Time;Moderator;Ban Length;Ban Reason;Visible Reason</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="178"/>
+        <location filename="../src/user_context_menu.cpp" line="180"/>
         <source>User has never been banned.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="182"/>
+        <location filename="../src/user_context_menu.cpp" line="184"/>
         <source>Failed to collecting ban information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="192"/>
-        <location filename="../src/user_context_menu.cpp" line="213"/>
-        <location filename="../src/user_context_menu.cpp" line="217"/>
+        <location filename="../src/user_context_menu.cpp" line="194"/>
+        <location filename="../src/user_context_menu.cpp" line="215"/>
+        <location filename="../src/user_context_menu.cpp" line="219"/>
         <source>Warning History</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="197"/>
+        <location filename="../src/user_context_menu.cpp" line="199"/>
         <source>Warning Time;Moderator;User Name;Reason</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="214"/>
+        <location filename="../src/user_context_menu.cpp" line="216"/>
         <source>User has never been warned.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="218"/>
+        <location filename="../src/user_context_menu.cpp" line="220"/>
         <source>Failed to collecting warning information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="228"/>
-        <location filename="../src/user_context_menu.cpp" line="231"/>
+        <location filename="../src/user_context_menu.cpp" line="230"/>
+        <location filename="../src/user_context_menu.cpp" line="233"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="229"/>
+        <location filename="../src/user_context_menu.cpp" line="231"/>
         <source>Successfully promoted user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="231"/>
+        <location filename="../src/user_context_menu.cpp" line="233"/>
         <source>Successfully demoted user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="236"/>
         <location filename="../src/user_context_menu.cpp" line="238"/>
+        <location filename="../src/user_context_menu.cpp" line="240"/>
         <source>Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="236"/>
+        <location filename="../src/user_context_menu.cpp" line="238"/>
         <source>Failed to promote user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/user_context_menu.cpp" line="238"/>
+        <location filename="../src/user_context_menu.cpp" line="240"/>
         <source>Failed to demote user.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6471,7 +6471,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="182"/>
+        <location filename="../src/shortcutssettings.h" line="183"/>
         <source>Load deck (clipboard)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6481,7 +6481,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="186"/>
+        <location filename="../src/shortcutssettings.h" line="187"/>
         <source>New deck</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6491,7 +6491,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="187"/>
+        <location filename="../src/shortcutssettings.h" line="188"/>
         <source>Open custom pic folder</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6501,33 +6501,28 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="190"/>
+        <location filename="../src/shortcutssettings.h" line="191"/>
         <source>Print deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="194"/>
+        <location filename="../src/shortcutssettings.h" line="195"/>
         <source>Delete card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="175"/>
-        <source>Edit tokens</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/shortcutssettings.h" line="196"/>
-        <location filename="../src/shortcutssettings.h" line="476"/>
+        <location filename="../src/shortcutssettings.h" line="197"/>
+        <location filename="../src/shortcutssettings.h" line="477"/>
         <source>Reset layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="179"/>
+        <location filename="../src/shortcutssettings.h" line="180"/>
         <source>Add card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="198"/>
+        <location filename="../src/shortcutssettings.h" line="199"/>
         <source>Save deck</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6537,12 +6532,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="200"/>
+        <location filename="../src/shortcutssettings.h" line="201"/>
         <source>Save deck as</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="181"/>
+        <location filename="../src/shortcutssettings.h" line="182"/>
         <source>Load deck</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6577,87 +6572,87 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="201"/>
+        <location filename="../src/shortcutssettings.h" line="202"/>
         <source>Save deck (clipboard; annotated)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="204"/>
+        <location filename="../src/shortcutssettings.h" line="205"/>
         <source>Save deck (clipboard, raw)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="343"/>
+        <location filename="../src/shortcutssettings.h" line="344"/>
         <source>Untap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="345"/>
+        <location filename="../src/shortcutssettings.h" line="346"/>
         <source>Upkeep</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="347"/>
+        <location filename="../src/shortcutssettings.h" line="348"/>
         <source>Draw</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="349"/>
+        <location filename="../src/shortcutssettings.h" line="350"/>
         <source>Main 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="351"/>
+        <location filename="../src/shortcutssettings.h" line="352"/>
         <source>Start combat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="353"/>
+        <location filename="../src/shortcutssettings.h" line="354"/>
         <source>Attack</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="355"/>
+        <location filename="../src/shortcutssettings.h" line="356"/>
         <source>Block</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="357"/>
+        <location filename="../src/shortcutssettings.h" line="358"/>
         <source>Damage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="359"/>
+        <location filename="../src/shortcutssettings.h" line="360"/>
         <source>End combat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="361"/>
+        <location filename="../src/shortcutssettings.h" line="362"/>
         <source>Main 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="363"/>
+        <location filename="../src/shortcutssettings.h" line="364"/>
         <source>End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="364"/>
+        <location filename="../src/shortcutssettings.h" line="365"/>
         <source>Next phase</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="370"/>
+        <location filename="../src/shortcutssettings.h" line="371"/>
         <source>Next turn</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="474"/>
+        <location filename="../src/shortcutssettings.h" line="475"/>
         <source>Clear chat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="478"/>
+        <location filename="../src/shortcutssettings.h" line="479"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6672,7 +6667,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="429"/>
+        <location filename="../src/shortcutssettings.h" line="430"/>
         <source>Top cards of library</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6682,300 +6677,305 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="177"/>
+        <location filename="../src/shortcutssettings.h" line="174"/>
+        <source>Edit custom tokens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutssettings.h" line="178"/>
         <source>Export deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="213"/>
-        <location filename="../src/shortcutssettings.h" line="285"/>
+        <location filename="../src/shortcutssettings.h" line="214"/>
+        <location filename="../src/shortcutssettings.h" line="286"/>
         <source>Add green counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="216"/>
-        <location filename="../src/shortcutssettings.h" line="288"/>
+        <location filename="../src/shortcutssettings.h" line="217"/>
+        <location filename="../src/shortcutssettings.h" line="289"/>
         <source>Remove green counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="219"/>
-        <location filename="../src/shortcutssettings.h" line="291"/>
+        <location filename="../src/shortcutssettings.h" line="220"/>
+        <location filename="../src/shortcutssettings.h" line="292"/>
         <source>Set green counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="222"/>
+        <location filename="../src/shortcutssettings.h" line="223"/>
         <source>Add yellow counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="225"/>
+        <location filename="../src/shortcutssettings.h" line="226"/>
         <source>Remove yellow counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="228"/>
+        <location filename="../src/shortcutssettings.h" line="229"/>
         <source>Set yellow counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="231"/>
-        <location filename="../src/shortcutssettings.h" line="276"/>
+        <location filename="../src/shortcutssettings.h" line="232"/>
+        <location filename="../src/shortcutssettings.h" line="277"/>
         <source>Add red counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="234"/>
-        <location filename="../src/shortcutssettings.h" line="279"/>
+        <location filename="../src/shortcutssettings.h" line="235"/>
+        <location filename="../src/shortcutssettings.h" line="280"/>
         <source>Remove red counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="237"/>
-        <location filename="../src/shortcutssettings.h" line="282"/>
+        <location filename="../src/shortcutssettings.h" line="238"/>
+        <location filename="../src/shortcutssettings.h" line="283"/>
         <source>Set red counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="240"/>
+        <location filename="../src/shortcutssettings.h" line="241"/>
         <source>Add life counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="243"/>
+        <location filename="../src/shortcutssettings.h" line="244"/>
         <source>Remove life counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="246"/>
+        <location filename="../src/shortcutssettings.h" line="247"/>
         <source>Set life counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="249"/>
+        <location filename="../src/shortcutssettings.h" line="250"/>
         <source>Add white counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="252"/>
+        <location filename="../src/shortcutssettings.h" line="253"/>
         <source>Remove white counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="255"/>
+        <location filename="../src/shortcutssettings.h" line="256"/>
         <source>Set white counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="258"/>
+        <location filename="../src/shortcutssettings.h" line="259"/>
         <source>Add blue counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="261"/>
+        <location filename="../src/shortcutssettings.h" line="262"/>
         <source>Remove blue counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="264"/>
+        <location filename="../src/shortcutssettings.h" line="265"/>
         <source>Set blue counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="267"/>
+        <location filename="../src/shortcutssettings.h" line="268"/>
         <source>Add black counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="270"/>
+        <location filename="../src/shortcutssettings.h" line="271"/>
         <source>Remove black counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="273"/>
+        <location filename="../src/shortcutssettings.h" line="274"/>
         <source>Set black counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="294"/>
+        <location filename="../src/shortcutssettings.h" line="295"/>
         <source>Add X counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="297"/>
+        <location filename="../src/shortcutssettings.h" line="298"/>
         <source>Remove X counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="300"/>
+        <location filename="../src/shortcutssettings.h" line="301"/>
         <source>Set X counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="303"/>
+        <location filename="../src/shortcutssettings.h" line="304"/>
         <source>Add storm counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="306"/>
+        <location filename="../src/shortcutssettings.h" line="307"/>
         <source>Remove storm counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="309"/>
+        <location filename="../src/shortcutssettings.h" line="310"/>
         <source>Set storm counters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="312"/>
+        <location filename="../src/shortcutssettings.h" line="313"/>
         <source>Add power (+1/+0)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="315"/>
+        <location filename="../src/shortcutssettings.h" line="316"/>
         <source>Remove power (-1/-0)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="318"/>
+        <location filename="../src/shortcutssettings.h" line="319"/>
         <source>Move to power (+1/-1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="321"/>
+        <location filename="../src/shortcutssettings.h" line="322"/>
         <source>Add toughness (+0/+1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="324"/>
+        <location filename="../src/shortcutssettings.h" line="325"/>
         <source>Remove toughness (-0/-1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="327"/>
+        <location filename="../src/shortcutssettings.h" line="328"/>
         <source>Move to toughness (-1/+1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="330"/>
+        <location filename="../src/shortcutssettings.h" line="331"/>
         <source>Add power and toughness (+1/+1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="333"/>
+        <location filename="../src/shortcutssettings.h" line="334"/>
         <source>Remove power and toughness (-1/-1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="336"/>
+        <location filename="../src/shortcutssettings.h" line="337"/>
         <source>Set power and toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="339"/>
+        <location filename="../src/shortcutssettings.h" line="340"/>
         <source>Reset power and toughness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="367"/>
+        <location filename="../src/shortcutssettings.h" line="368"/>
         <source>Next phase action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="373"/>
+        <location filename="../src/shortcutssettings.h" line="374"/>
         <source>Tap / Untap Card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="376"/>
+        <location filename="../src/shortcutssettings.h" line="377"/>
         <source>Untap all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="380"/>
+        <location filename="../src/shortcutssettings.h" line="381"/>
         <source>Toggle untap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="382"/>
+        <location filename="../src/shortcutssettings.h" line="383"/>
         <source>Flip card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="384"/>
+        <location filename="../src/shortcutssettings.h" line="385"/>
         <source>Peek card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="386"/>
+        <location filename="../src/shortcutssettings.h" line="387"/>
         <source>Play card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="387"/>
+        <location filename="../src/shortcutssettings.h" line="388"/>
         <source>Attach card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="391"/>
+        <location filename="../src/shortcutssettings.h" line="392"/>
         <source>Unattach card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="392"/>
+        <location filename="../src/shortcutssettings.h" line="393"/>
         <source>Clone card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="395"/>
+        <location filename="../src/shortcutssettings.h" line="396"/>
         <source>Create token</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="398"/>
+        <location filename="../src/shortcutssettings.h" line="399"/>
         <source>Create all related tokens</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="401"/>
+        <location filename="../src/shortcutssettings.h" line="402"/>
         <source>Create another token</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="405"/>
+        <location filename="../src/shortcutssettings.h" line="406"/>
         <source>Set annotation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="406"/>
+        <location filename="../src/shortcutssettings.h" line="407"/>
         <source>Bottom library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="417"/>
+        <location filename="../src/shortcutssettings.h" line="418"/>
         <source>Top library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="411"/>
-        <location filename="../src/shortcutssettings.h" line="422"/>
+        <location filename="../src/shortcutssettings.h" line="412"/>
+        <location filename="../src/shortcutssettings.h" line="423"/>
         <source>Graveyard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="410"/>
-        <location filename="../src/shortcutssettings.h" line="426"/>
+        <location filename="../src/shortcutssettings.h" line="411"/>
+        <location filename="../src/shortcutssettings.h" line="427"/>
         <source>Exile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="415"/>
+        <location filename="../src/shortcutssettings.h" line="416"/>
         <source>Hand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="418"/>
+        <location filename="../src/shortcutssettings.h" line="419"/>
         <source>Play face down</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6985,17 +6985,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="424"/>
+        <location filename="../src/shortcutssettings.h" line="425"/>
         <source>Library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="428"/>
+        <location filename="../src/shortcutssettings.h" line="429"/>
         <source>Sideboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="433"/>
+        <location filename="../src/shortcutssettings.h" line="434"/>
         <source>Close recent view</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7005,22 +7005,22 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="435"/>
+        <location filename="../src/shortcutssettings.h" line="436"/>
         <source>Graveyard Once</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="436"/>
+        <location filename="../src/shortcutssettings.h" line="437"/>
         <source>Graveyard Multiple</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="440"/>
+        <location filename="../src/shortcutssettings.h" line="441"/>
         <source>Exile Once</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="442"/>
+        <location filename="../src/shortcutssettings.h" line="443"/>
         <source>Exile Multiple</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7030,12 +7030,12 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="210"/>
+        <location filename="../src/shortcutssettings.h" line="211"/>
         <source>Load remote deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="207"/>
+        <location filename="../src/shortcutssettings.h" line="208"/>
         <source>Load local deck</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7045,42 +7045,42 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="444"/>
+        <location filename="../src/shortcutssettings.h" line="445"/>
         <source>Draw arrow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="449"/>
+        <location filename="../src/shortcutssettings.h" line="450"/>
         <source>Leave game</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="445"/>
+        <location filename="../src/shortcutssettings.h" line="446"/>
         <source>Remove local arrows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="451"/>
+        <location filename="../src/shortcutssettings.h" line="452"/>
         <source>Concede</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="453"/>
+        <location filename="../src/shortcutssettings.h" line="454"/>
         <source>Roll dice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="470"/>
+        <location filename="../src/shortcutssettings.h" line="471"/>
         <source>Rotate view CW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="454"/>
+        <location filename="../src/shortcutssettings.h" line="455"/>
         <source>Shuffle library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="472"/>
+        <location filename="../src/shortcutssettings.h" line="473"/>
         <source>Rotate view CCW</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7095,27 +7095,27 @@ Please refrain from engaging in this activity or further actions may be taken ag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="458"/>
+        <location filename="../src/shortcutssettings.h" line="459"/>
         <source>Mulligan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="460"/>
+        <location filename="../src/shortcutssettings.h" line="461"/>
         <source>Draw card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="462"/>
+        <location filename="../src/shortcutssettings.h" line="463"/>
         <source>Draw cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="463"/>
+        <location filename="../src/shortcutssettings.h" line="464"/>
         <source>Undo draw</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/shortcutssettings.h" line="466"/>
+        <location filename="../src/shortcutssettings.h" line="467"/>
         <source>Always reveal top card</source>
         <translation type="unfinished"></translation>
     </message>
