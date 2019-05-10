@@ -38,8 +38,7 @@ matrix:
     cache:
       directories:
         - $CACHE/.ccache
-        - $CACHE/image
-    before_install: source .ci/travis-docker.sh --get --save
+    before_install: source .ci/travis-docker.sh --build
     script: RUN --server --debug
 
   - name: Ubuntu Bionic (Release)
@@ -50,34 +49,31 @@ matrix:
     cache:
       directories:
         - $CACHE/.ccache
-        - $CACHE/image
-    before_install: source .ci/travis-docker.sh --build --save
+    before_install: source .ci/travis-docker.sh --build
     script: RUN --server --package $NAME --release
 
-  #Fedora 29 (on docker)
-  - name: Fedora 29 (Debug)
+  #CentOs 7 (on docker)
+  - name: CentOs 7 (Debug)
     if: tag IS NOT present
     services: docker
     language: minimal
-    env: NAME=Fedora29 CACHE=$HOME/$NAME
+    env: NAME=CentOs7 CACHE=$HOME/$NAME
     cache:
       directories:
         - $CACHE/.ccache
-        - $CACHE/image
-    before_install: source .ci/travis-docker.sh --get --save
-    script: RUN --server --debug
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --3 --server --debug
 
-  - name: Fedora 29 (Release)
+  - name: CentOs 7 (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     services: docker
     language: minimal
-    env: NAME=Fedora29 CACHE=$HOME/$NAME
+    env: NAME=CentOs7 CACHE=$HOME/$NAME
     cache:
       directories:
         - $CACHE/.ccache
-        - $CACHE/image
-    before_install: source .ci/travis-docker.sh --build --save
-    script: RUN --server --package $NAME RPM --release
+    before_install: source .ci/travis-docker.sh --build
+    script: RUN --3 --server --package $NAME RPM --release
 
   #macOS
   - name: macOS (Debug)
