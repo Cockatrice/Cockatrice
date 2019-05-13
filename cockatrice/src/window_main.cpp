@@ -415,8 +415,8 @@ void MainWindow::loginError(Response::ResponseCode r,
         case Response::RespContextError:
             QMessageBox::critical(this, tr("Error"),
                                   tr("An internal error has occurred, please try closing and reopening your client and "
-                                     "try again. If the error persists try updating your client to the most recent "
-                                     "build and if need be contact your software provider."));
+                                     "trying again. If the error persists try updating your client to the most recent "
+                                     "build and if needed contact software's developers."));
             break;
         case Response::RespAccountNotActivated: {
             bool ok = false;
@@ -597,17 +597,17 @@ void MainWindow::setClientStatusTitle()
         case StatusRequestingForgotPassword:
             setWindowTitle(
                 appName + " - " +
-                tr("Requesting forgot password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
+                tr("Requesting forgotten password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
             break;
         case StatusSubmitForgotPasswordChallenge:
             setWindowTitle(
                 appName + " - " +
-                tr("Requesting forgot password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
+                tr("Requesting forgotten password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
             break;
         case StatusSubmitForgotPasswordReset:
             setWindowTitle(
                 appName + " - " +
-                tr("Requesting forgot password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
+                tr("Requesting forgotten password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
             break;
         default:
             setWindowTitle(appName);
@@ -1006,10 +1006,10 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("New sets found"));
     msgBox.setIcon(QMessageBox::Question);
-    msgBox.setText(tr("%1 new set(s) found in the card database\n"
-                      "Set code(s): %2\n"
-                      "Do you want to enable it/them?")
-                       .arg(numUnknownSets)
+    msgBox.setText(tr("%n new set(s) found in the card database\n"
+                      "Set code(s): %1\n"
+                      "Do you want to enable it/them?",
+                      "", numUnknownSets)
                        .arg(unknownSetsNames.join(", ")));
 
     QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);

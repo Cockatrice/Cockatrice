@@ -128,11 +128,13 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     labNotes->setText(
         "<b>" + tr("Deck Editor") + ":</b> " +
         tr("Only cards in enabled sets will appear in the deck editor card list") + "<br><br>" + "<b>" +
-        tr("Card Art") + ":</b> " + tr("Image priority is decided in the following order") + "<ol><li>" + tr("The") +
-        "<a href='https://github.com/Cockatrice/Cockatrice/wiki/"
-        "Custom-Cards-%26-Sets#to-add-custom-art-for-cards-the-easiest-way-is-to-use-the-custom-folder'> " +
-        tr("CUSTOM Folder") + "</a></li><li>" + tr("Enabled Sets (Top to Bottom)") + "</li><li>" +
-        tr("Disabled Sets (Top to Bottom)") + "</li></ol>");
+        tr("Card Art") + ":</b> " + tr("Image priority is decided in the following order") + "<ol><li>" +
+        tr("The %1 CUSTOM Folder")
+            .arg("<a "
+                 "href='https://github.com/Cockatrice/Cockatrice/wiki/"
+                 "Custom-Cards-%26-Sets#to-add-custom-art-for-cards-the-easiest-way-is-to-use-the-custom-folder'> ") +
+        "</a></li><li>" + tr("Enabled Sets (Top to Bottom)") + "</li><li>" + tr("Disabled Sets (Top to Bottom)") +
+        "</li></ol>");
 
     QGridLayout *hintsGrid = new QGridLayout;
     hintsGrid->addWidget(labNotes, 0, 0);

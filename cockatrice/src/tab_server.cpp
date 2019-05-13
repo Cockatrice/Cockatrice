@@ -206,12 +206,12 @@ void TabServer::joinRoomFinished(const Response &r,
         case Response::RespOk:
             break;
         case Response::RespNameNotFound:
-            QMessageBox::critical(this, tr("Error"), tr("Failed to join the room: it doesn't exists on the server."));
+            QMessageBox::critical(this, tr("Error"), tr("Failed to join the room: it doesn't exist on the server."));
             return;
         case Response::RespContextError:
             QMessageBox::critical(this, tr("Error"),
-                                  tr("The server thinks you are in the room but Cockatrice is unable to display it. "
-                                     "Try restarting Cockatrice."));
+                                  tr("The server thinks you are in the room but your client is unable to display it. "
+                                     "Try restarting your client."));
             return;
         case Response::RespUserLevelTooLow:
             QMessageBox::critical(this, tr("Error"), tr("You do not have the required permission to join this room."));
