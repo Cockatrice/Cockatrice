@@ -1291,7 +1291,7 @@ void MainWindow::forgotPasswordSuccess()
 {
     QMessageBox::information(
         this, tr("Forgot Password"),
-        tr("Your password has been reset successfully, you now may  log in using the new credentials."));
+        tr("Your password has been reset successfully, you can now log in using the new credentials."));
     settingsCache->servers().setFPHostName("");
     settingsCache->servers().setFPPort("");
     settingsCache->servers().setFPPlayerName("");
