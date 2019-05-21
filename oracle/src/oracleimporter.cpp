@@ -249,15 +249,32 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
                 setInfo.setProperty(xmlPropertyName, propertyValue);
         }
 
+        // skip alternatives
+        if (getStringPropertyFromMap(card, "isAlternative") == "true") {
+            continue;
+        }
+
+        // skip cards containing a star char in the collectors number
+        if (setInfo.getProperty("num").contains("★")) {
+            continue;
+        }
+
+        // skip prerelease foils
+        if (setInfo.getProperty("num").contains("s")) {
+            continue;
+        }
+
         // special handling properties
         colors = card.value("colors").toStringList().join("");
-        if (!colors.isEmpty())
+        if (!colors.isEmpty()) {
             properties.insert("colors", colors);
+        }
 
         // special handling properties
         colorIdentity = card.value("colorIdentity").toStringList().join("");
-        if (!colorIdentity.isEmpty())
+        if (!colorIdentity.isEmpty()) {
             properties.insert("coloridentity", colorIdentity);
+        }
 
         const auto &mainCardType = getMainCardType(card.value("types").toStringList());
         if (!mainCardType.isEmpty()) {
@@ -266,8 +283,9 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
 
         power = getStringPropertyFromMap(card, "power");
         toughness = getStringPropertyFromMap(card, "toughness");
-        if (!(power.isEmpty() && toughness.isEmpty()))
+        if (!(power.isEmpty() && toughness.isEmpty())) {
             properties.insert("pt", power + ptSeparator + toughness);
+        }
 
         additionalNames = card.value("names").toStringList();
 

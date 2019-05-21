@@ -6,7 +6,7 @@
 
 class QModelIndex;
 class CardDatabaseModel;
-class TokenDisplayModel;
+class TokenEditModel;
 class QLabel;
 class QComboBox;
 class QLineEdit;
@@ -27,7 +27,7 @@ private slots:
 private:
     CardInfoPtr currentCard;
     CardDatabaseModel *databaseModel;
-    TokenDisplayModel *cardDatabaseDisplayModel;
+    TokenEditModel *cardDatabaseDisplayModel;
     QStringList predefinedTokens;
     QLabel *nameLabel, *colorLabel, *ptLabel, *annotationLabel;
     QComboBox *colorEdit;

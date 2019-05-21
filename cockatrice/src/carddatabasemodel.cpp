@@ -349,6 +349,7 @@ const QString CardDatabaseDisplayModel::sanitizeCardName(const QString &dirtyNam
     }
     return QString::fromStdWString(toReturn);
 }
+
 TokenDisplayModel::TokenDisplayModel(QObject *parent) : CardDatabaseDisplayModel(parent)
 {
 }
@@ -360,6 +361,22 @@ bool TokenDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*so
 }
 
 int TokenDisplayModel::rowCount(const QModelIndex &parent) const
+{
+    // always load all tokens at start
+    return QSortFilterProxyModel::rowCount(parent);
+}
+
+TokenEditModel::TokenEditModel(QObject *parent) : CardDatabaseDisplayModel(parent)
+{
+}
+
+bool TokenEditModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
+{
+    CardInfoPtr info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
+    return info->getIsToken() && info->getSets().contains(CardDatabase::TOKENS_SETNAME) && rowMatchesCardName(info);
+}
+
+int TokenEditModel::rowCount(const QModelIndex &parent) const
 {
     // always load all tokens at start
     return QSortFilterProxyModel::rowCount(parent);

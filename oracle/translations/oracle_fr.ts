@@ -142,7 +142,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="482"/>
         <source>Do you want to try to download a fresh copy of the uncompressed file instead?</source>
-        <translation>Voulez vous essayer de télécharger une copie non compressée de fichier à la place ?</translation>
+        <translation>Voulez-vous essayer de télécharger une copie non-compressée du fichier à la place ?</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="504"/>
@@ -196,7 +196,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="737"/>
         <source>Restore default URL</source>
-        <translation>Restorer l&apos;URL par défaut</translation>
+        <translation>Restaurer l&apos;URL par défaut</translation>
     </message>
 </context>
 <context>
@@ -204,7 +204,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="771"/>
         <source>Tokens source selection</source>
-        <translation>sélection de la source des jetons</translation>
+        <translation>Sélection de la source des jetons</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="772"/>
@@ -219,7 +219,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="775"/>
         <source>Restore default URL</source>
-        <translation>Restorer l&apos;URL par défaut</translation>
+        <translation>Restaurer l&apos;URL par défaut</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="792"/>
@@ -251,7 +251,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="../src/oracleimporter.cpp" line="344"/>
+        <location filename="../src/oracleimporter.cpp" line="396"/>
         <source>Dummy set containing tokens</source>
         <translation>Fausse édition contenant les jetons.</translation>
     </message>
@@ -261,7 +261,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="91"/>
         <source>Oracle Importer</source>
-        <translation>Oracle Importeur</translation>
+        <translation>Importateur Oracle</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="92"/>
@@ -295,7 +295,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="546"/>
         <source>Save to the default path (recommended)</source>
-        <translation>Sauvergarder au chemin par défaut (recommendé)</translation>
+        <translation>Sauvegarder à l&apos;emplacement par défaut (recommandé)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="547"/>
@@ -320,18 +320,18 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="567"/>
         <source>XML; card database (*.xml)</source>
-        <translation>XML; base de donnée de carte (*.xml)</translation>
+        <translation>XML ; base de données de cartes (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="589"/>
         <source>Success</source>
-        <translation>Importation réussi</translation>
+        <translation>Importation réussie</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="590"/>
         <source>The card database has been saved successfully to
 %1</source>
-        <translation>La base de donnée de carte à été correctement sauvegardée dans
+        <translation>La base de données de cartes a été correctement sauvegardée dans
 %1</translation>
     </message>
     <message>
@@ -360,12 +360,12 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="900"/>
         <source>Save spoiler database</source>
-        <translation>Enregistrer la base de données des spoiler</translation>
+        <translation>Enregistrer la base de données des spoilers</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="901"/>
         <source>XML; card database (*.xml)</source>
-        <translation>XML; base de données de cartes (* .xml)</translation>
+        <translation>XML ; base de données de cartes (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="924"/>
@@ -388,12 +388,12 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="949"/>
         <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
-        <translation>Les jetons ont été importés. Pressez sur &quot;Sauvegarder&quot; pour sauver les jetons importés dans la base de données des jetons Cockatrice.</translation>
+        <translation>Les jetons ont été importés. Appuyez sur &quot;Sauvegarder&quot; pour sauvegarder les jetons importés dans la base de données des jetons Cockatrice.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="952"/>
         <source>Save to the default path (recommended)</source>
-        <translation>Sauvergarder au chemin par défaut (recommendé)</translation>
+        <translation>Sauvegarder à l&apos;emplacement par défaut (recommandé)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="959"/>
@@ -403,7 +403,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="960"/>
         <source>XML; token database (*.xml)</source>
-        <translation>XML; bases de données des jetons (*.xml)</translation>
+        <translation>XML ; bases de données des jetons (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="982"/>
@@ -414,7 +414,8 @@
         <location filename="../src/oraclewizard.cpp" line="983"/>
         <source>The token database has been saved successfully to
 %1</source>
-        <translation>La base de donnée de jetons a été correctement sauvegardée dans %1</translation>
+        <translation>La base de données de jetons a été correctement sauvegardée dans
+%1</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="985"/>
@@ -462,7 +463,7 @@
     <message>
         <location filename="../src/zip/unzip.cpp" line="1183"/>
         <source>Wrong password.</source>
-        <translation>Mauvais mot de passe.</translation>
+        <translation>Mot de passe erroné.</translation>
     </message>
     <message>
         <location filename="../src/zip/unzip.cpp" line="1184"/>

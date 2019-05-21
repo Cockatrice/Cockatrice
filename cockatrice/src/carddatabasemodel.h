@@ -140,4 +140,15 @@ protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 };
 
+class TokenEditModel : public CardDatabaseDisplayModel
+{
+    Q_OBJECT
+public:
+    explicit TokenEditModel(QObject *parent = nullptr);
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+
+protected:
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+};
+
 #endif
