@@ -180,7 +180,7 @@ private:
         {"TabDeckEditor/aManageSets", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Manage sets"),
                                                   parseSequenceString(""),
                                                   ShortcutGroup::Deck_Editor)},
-        {"TabDeckEditor/aEditTokens", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Edit tokens"),
+        {"TabDeckEditor/aEditTokens", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Edit custom tokens"),
                                                   parseSequenceString(""),
                                                   ShortcutGroup::Deck_Editor)},
         {"TabDeckEditor/aExportDeckDecklist", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Export deck"),
