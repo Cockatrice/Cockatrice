@@ -409,14 +409,14 @@ void MainWindow::loginError(Response::ResponseCode r,
         case Response::RespClientIdRequired:
             QMessageBox::critical(
                 this, tr("Error"),
-                tr("This server requires client ID's. Your client is either failing to generate an ID or you are "
+                tr("This server requires client IDs. Your client is either failing to generate an ID or you are "
                    "running a modified client.\nPlease close and reopen your client to try again."));
             break;
         case Response::RespContextError:
             QMessageBox::critical(this, tr("Error"),
                                   tr("An internal error has occurred, please try closing and reopening your client and "
                                      "trying again. If the error persists try updating your client to the most recent "
-                                     "build and if needed contact software's developers."));
+                                     "build and if needed contact the software developers."));
             break;
         case Response::RespAccountNotActivated: {
             bool ok = false;
