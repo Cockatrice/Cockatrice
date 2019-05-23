@@ -17,10 +17,6 @@ find_package(Qt5 COMPONENTS Network Widgets REQUIRED)
 set(dbconverter_QT_MODULES Qt5::Core Qt5::Network Qt5::Widgets)
 SET(QT_DONT_USE_QTGUI TRUE)
 
-# Include directories
-INCLUDE_DIRECTORIES(../cockatrice/src)
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-
 # Build servatrice binary and link it
 ADD_EXECUTABLE(dbconverter MACOSX_BUNDLE ${dbconverter_SOURCES} ${dbconverter_MOC_SRCS})
 
