@@ -640,7 +640,7 @@ void MainWindow::retranslateUi()
     aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
     aAddCustomSet->setText(tr("Add custom sets/cards"));
     aManageSets->setText(tr("&Manage sets..."));
-    aEditTokens->setText(tr("Edit &tokens..."));
+    aEditTokens->setText(tr("Edit custom &tokens..."));
 
     aAbout->setText(tr("&About Cockatrice"));
     aTips->setText(tr("&Tip of the Day"));

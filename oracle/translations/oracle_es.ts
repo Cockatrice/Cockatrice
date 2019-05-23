@@ -62,7 +62,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="270"/>
         <source>Sets JSON file (%1)</source>
-        <translation type="unfinished"/>
+        <translation>Agregando archivos JSON (%1)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="294"/>
@@ -112,12 +112,12 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="409"/>
         <source>Xz extraction failed.</source>
-        <translation type="unfinished"/>
+        <translation>Extracción de Xz fallida</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="417"/>
         <source>Sorry, this version of Oracle does not support xz compressed files.</source>
-        <translation type="unfinished"/>
+        <translation>Lo sentimos, esta versión de Oracle no soporta archivos comprimidos xz</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="436"/>
@@ -251,7 +251,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="../src/oracleimporter.cpp" line="344"/>
+        <location filename="../src/oracleimporter.cpp" line="396"/>
         <source>Dummy set containing tokens</source>
         <translation>Set dedicado para tokens</translation>
     </message>

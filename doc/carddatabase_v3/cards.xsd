@@ -70,7 +70,7 @@
             </xs:complexType>
         </xs:element>
       </xs:all>
-      <xs:attribute type="xs:integer" name="version"/>
+      <xs:attribute type="xs:integer" name="version" fixed="3"/>
     </xs:complexType>
   </xs:element>
 </xs:schema>

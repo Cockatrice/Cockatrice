@@ -46,7 +46,7 @@ void AbstractCardItem::cardInfoUpdated()
 {
     info = db->getCard(name);
 
-    if (!info) {
+    if (!info && !name.isEmpty()) {
         QVariantHash properties = QVariantHash();
 
         info = CardInfo::newInstance(name, "", true, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),

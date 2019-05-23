@@ -251,7 +251,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="../src/oracleimporter.cpp" line="344"/>
+        <location filename="../src/oracleimporter.cpp" line="396"/>
         <source>Dummy set containing tokens</source>
         <translation>包含衍生物的虚拟系列</translation>
     </message>
