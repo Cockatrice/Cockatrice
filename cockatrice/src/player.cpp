@@ -251,6 +251,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         handMenu->addSeparator();
         handMenu->addAction(aMulligan);
         handMenu->addSeparator();
+        handMenu->addAction(aViewHand);
         moveHandMenu = handMenu->addMenu(QString());
         moveHandMenu->addAction(aMoveHandToTopLibrary);
         moveHandMenu->addAction(aMoveHandToBottomLibrary);
@@ -269,7 +270,6 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         libraryMenu->addSeparator();
         libraryMenu->addAction(aViewLibrary);
         libraryMenu->addAction(aViewTopCards);
-        libraryMenu->addAction(aViewHand);
         libraryMenu->addSeparator();
         playerLists.append(mRevealLibrary = libraryMenu->addMenu(QString()));
         playerLists.append(mRevealTopCard = libraryMenu->addMenu(QString()));
@@ -676,7 +676,7 @@ void Player::retranslateUi()
         aMoveRfgToGrave->setText(tr("&Graveyard"));
 
         aViewLibrary->setText(tr("&View library"));
-        aViewLibrary->setText(tr("&View hand"));
+        aViewHand->setText(tr("&View hand"));
         aViewTopCards->setText(tr("View &top cards of library..."));
         mRevealLibrary->setTitle(tr("Reveal &library to..."));
         mRevealTopCard->setTitle(tr("Reveal t&op cards to..."));
@@ -844,7 +844,6 @@ void Player::setShortcutsActive()
 
     aViewSideboard->setShortcut(shortcuts.getSingleShortcut("Player/aViewSideboard"));
     aViewLibrary->setShortcut(shortcuts.getSingleShortcut("Player/aViewLibrary"));
-    aViewLibrary->setShortcut(shortcuts.getSingleShortcut("Player/aViewHand"));
     aViewTopCards->setShortcut(shortcuts.getSingleShortcut("Player/aViewTopCards"));
     aViewGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aViewGraveyard"));
     aDrawCard->setShortcut(shortcuts.getSingleShortcut("Player/aDrawCard"));
@@ -935,6 +934,11 @@ void Player::setDeck(const DeckLoader &_deck)
 void Player::actViewLibrary()
 {
     static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", -1);
+}
+
+void Player::actViewHand()
+{
+    static_cast<GameScene *>(scene())->toggleZoneView(this, "hand", -1);
 }
 
 void Player::actViewTopCards()
