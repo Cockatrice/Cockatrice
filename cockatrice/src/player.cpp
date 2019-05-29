@@ -192,6 +192,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
         aViewLibrary = new QAction(this);
         connect(aViewLibrary, SIGNAL(triggered()), this, SLOT(actViewLibrary()));
+        aViewHand = new QAction(this);
+        connect(aViewHand, SIGNAL(triggered()), this, SLOT(actViewHand()));
+
         aViewTopCards = new QAction(this);
         connect(aViewTopCards, SIGNAL(triggered()), this, SLOT(actViewTopCards()));
         aAlwaysRevealTopCard = new QAction(this);
@@ -266,6 +269,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         libraryMenu->addSeparator();
         libraryMenu->addAction(aViewLibrary);
         libraryMenu->addAction(aViewTopCards);
+        libraryMenu->addAction(aViewHand);
         libraryMenu->addSeparator();
         playerLists.append(mRevealLibrary = libraryMenu->addMenu(QString()));
         playerLists.append(mRevealTopCard = libraryMenu->addMenu(QString()));
@@ -672,6 +676,7 @@ void Player::retranslateUi()
         aMoveRfgToGrave->setText(tr("&Graveyard"));
 
         aViewLibrary->setText(tr("&View library"));
+        aViewLibrary->setText(tr("&View hand"));
         aViewTopCards->setText(tr("View &top cards of library..."));
         mRevealLibrary->setTitle(tr("Reveal &library to..."));
         mRevealTopCard->setTitle(tr("Reveal t&op cards to..."));
@@ -839,6 +844,7 @@ void Player::setShortcutsActive()
 
     aViewSideboard->setShortcut(shortcuts.getSingleShortcut("Player/aViewSideboard"));
     aViewLibrary->setShortcut(shortcuts.getSingleShortcut("Player/aViewLibrary"));
+    aViewLibrary->setShortcut(shortcuts.getSingleShortcut("Player/aViewHand"));
     aViewTopCards->setShortcut(shortcuts.getSingleShortcut("Player/aViewTopCards"));
     aViewGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aViewGraveyard"));
     aDrawCard->setShortcut(shortcuts.getSingleShortcut("Player/aDrawCard"));
@@ -864,6 +870,7 @@ void Player::setShortcutsInactive()
 
     aViewSideboard->setShortcut(QKeySequence());
     aViewLibrary->setShortcut(QKeySequence());
+    aViewHand->setShortcut(QKeySequence());
     aViewTopCards->setShortcut(QKeySequence());
     aViewGraveyard->setShortcut(QKeySequence());
     aDrawCard->setShortcut(QKeySequence());

@@ -213,7 +213,8 @@ private:
         *aAlwaysRevealTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardToGraveyard, *aMoveTopCardToExile,
         *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile, *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg,
         *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlayFaceDown,
-        *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aCardMenu, *aMoveBottomCardToGrave;
+        *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aCardMenu, *aMoveBottomCardToGrave,
+        *aViewHand;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
