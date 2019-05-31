@@ -414,9 +414,9 @@ void MainWindow::loginError(Response::ResponseCode r,
             break;
         case Response::RespContextError:
             QMessageBox::critical(this, tr("Error"),
-                                  tr("An internal error has occurred, please try closing and reopening your client and "
-                                     "trying again. If the error persists try updating your client to the most recent "
-                                     "build and if needed contact the software developers."));
+                                  tr("An internal error has occurred, please close and reopen Cockatrice before trying again.\n"
+                                     "If the error persists, ensure you are running the most recent version "
+                                     "of the software, and if needed contact the software developers."));
             break;
         case Response::RespAccountNotActivated: {
             bool ok = false;
