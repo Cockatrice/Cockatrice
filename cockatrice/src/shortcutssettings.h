@@ -419,6 +419,8 @@ private:
         {"Player/aMoveTopToPlayFaceDown", SK(QT_TRANSLATE_NOOP("shortcutsTab", "Play face down"),
                                              parseSequenceString("Ctrl+Shift+E"),
                                              ShortcutGroup::Move_selected)},
+        {"Player/aViewHand",
+         SK(QT_TRANSLATE_NOOP("shortcutsTab", "Hand"), parseSequenceString(""), ShortcutGroup::View)},
         {"Player/aViewGraveyard",
          SK(QT_TRANSLATE_NOOP("shortcutsTab", "Graveyard"), parseSequenceString("F4"), ShortcutGroup::View)},
         {"Player/aViewLibrary",
