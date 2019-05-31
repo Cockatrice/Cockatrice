@@ -255,6 +255,13 @@ if(WITH_ORACLE)
     SET(CPACK_INSTALL_CMAKE_PROJECTS "Oracle;Oracle;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
+# Compile dbconverter (default on)
+option(WITH_DBCONVERTER "build oracle" ON)
+if(WITH_DBCONVERTER)
+    add_subdirectory(dbconverter)
+    SET(CPACK_INSTALL_CMAKE_PROJECTS "Dbconverter;Dbconverter;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+endif()
+
 # Compile tests (default off)
 option(TEST "build tests" OFF)
 if(TEST)

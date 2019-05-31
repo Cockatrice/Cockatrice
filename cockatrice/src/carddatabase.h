@@ -437,7 +437,7 @@ public slots:
     LoadStatus loadCardDatabases();
     void addCard(CardInfoPtr card);
     void addSet(CardSetPtr set);
-private slots:
+protected slots:
     LoadStatus loadCardDatabase(const QString &path);
 signals:
     void cardDatabaseLoadingFailed();

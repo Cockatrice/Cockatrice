@@ -192,6 +192,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
         aViewLibrary = new QAction(this);
         connect(aViewLibrary, SIGNAL(triggered()), this, SLOT(actViewLibrary()));
+        aViewHand = new QAction(this);
+        connect(aViewHand, SIGNAL(triggered()), this, SLOT(actViewHand()));
+
         aViewTopCards = new QAction(this);
         connect(aViewTopCards, SIGNAL(triggered()), this, SLOT(actViewTopCards()));
         aAlwaysRevealTopCard = new QAction(this);
@@ -243,6 +246,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     if (local || judge) {
         handMenu = playerMenu->addMenu(QString());
+        handMenu->addAction(aViewHand);
         playerLists.append(mRevealHand = handMenu->addMenu(QString()));
         playerLists.append(mRevealRandomHandCard = handMenu->addMenu(QString()));
         handMenu->addSeparator();
@@ -672,6 +676,7 @@ void Player::retranslateUi()
         aMoveRfgToGrave->setText(tr("&Graveyard"));
 
         aViewLibrary->setText(tr("&View library"));
+        aViewHand->setText(tr("&View hand"));
         aViewTopCards->setText(tr("View &top cards of library..."));
         mRevealLibrary->setTitle(tr("Reveal &library to..."));
         mRevealTopCard->setTitle(tr("Reveal t&op cards to..."));
@@ -839,6 +844,7 @@ void Player::setShortcutsActive()
 
     aViewSideboard->setShortcut(shortcuts.getSingleShortcut("Player/aViewSideboard"));
     aViewLibrary->setShortcut(shortcuts.getSingleShortcut("Player/aViewLibrary"));
+    aViewHand->setShortcut(shortcuts.getSingleShortcut("Player/aViewHand"));
     aViewTopCards->setShortcut(shortcuts.getSingleShortcut("Player/aViewTopCards"));
     aViewGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aViewGraveyard"));
     aDrawCard->setShortcut(shortcuts.getSingleShortcut("Player/aDrawCard"));
@@ -864,6 +870,7 @@ void Player::setShortcutsInactive()
 
     aViewSideboard->setShortcut(QKeySequence());
     aViewLibrary->setShortcut(QKeySequence());
+    aViewHand->setShortcut(QKeySequence());
     aViewTopCards->setShortcut(QKeySequence());
     aViewGraveyard->setShortcut(QKeySequence());
     aDrawCard->setShortcut(QKeySequence());
@@ -928,6 +935,11 @@ void Player::setDeck(const DeckLoader &_deck)
 void Player::actViewLibrary()
 {
     static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", -1);
+}
+
+void Player::actViewHand()
+{
+    static_cast<GameScene *>(scene())->toggleZoneView(this, "hand", -1);
 }
 
 void Player::actViewTopCards()
