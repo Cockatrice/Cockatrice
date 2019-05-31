@@ -246,12 +246,12 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     if (local || judge) {
         handMenu = playerMenu->addMenu(QString());
+        handMenu->addAction(aViewHand);
         playerLists.append(mRevealHand = handMenu->addMenu(QString()));
         playerLists.append(mRevealRandomHandCard = handMenu->addMenu(QString()));
         handMenu->addSeparator();
         handMenu->addAction(aMulligan);
         handMenu->addSeparator();
-        handMenu->addAction(aViewHand);
         moveHandMenu = handMenu->addMenu(QString());
         moveHandMenu->addAction(aMoveHandToTopLibrary);
         moveHandMenu->addAction(aMoveHandToBottomLibrary);
