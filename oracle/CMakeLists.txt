@@ -187,7 +187,7 @@ IF(WIN32)
     # qt5 plugins: iconengines, platforms
 
     install(DIRECTORY "${QT_PLUGINS_DIR}/" DESTINATION ${plugin_dest_dir} COMPONENT Runtime
-        FILES_MATCHING REGEX "(iconengines|platforms)/.*[^d]\\.dll")
+        FILES_MATCHING REGEX "(iconengines|platforms|styles)/.*[^d]\\.dll")
 
     install(CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
