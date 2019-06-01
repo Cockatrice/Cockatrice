@@ -545,7 +545,7 @@ void SaveSetsPage::retranslateUi()
     setSubTitle(tr("The following sets has been imported. "
                    "Press \"Save\" to save the imported cards to the Cockatrice database."));
 
-    pathLabel->setText(tr("The card database will be saved at") + "<br/>" + settingsCache->getTokenDatabasePath());
+    pathLabel->setText(tr("The card database will be saved at") + "<br/>" + settingsCache->getCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 
     setButtonText(QWizard::NextButton, tr("&Save"));
@@ -890,7 +890,7 @@ void SaveSpoilersPage::retranslateUi()
     setSubTitle(tr("The spoilers file has been imported. "
                    "Press \"Save\" to save the imported spoilers to the Cockatrice card database."));
 
-    pathLabel->setText(tr("The spoiler database will be saved at") + "<br/>" + settingsCache->getTokenDatabasePath());
+    pathLabel->setText(tr("The spoiler database will be saved at") + "<br/>" + settingsCache->getSpoilerCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }
 
