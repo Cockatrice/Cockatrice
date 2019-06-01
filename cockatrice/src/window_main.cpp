@@ -30,6 +30,7 @@
 #include <QPixmapCache>
 #include <QSystemTrayIcon>
 #include <QThread>
+#include <QTimer>
 #include <QtConcurrent>
 #include <QtNetwork>
 
@@ -838,31 +839,53 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(cardDatabaseNewSetsFound(int, QStringList)));
     connect(db, SIGNAL(cardDatabaseAllNewSetsEnabled()), this, SLOT(cardDatabaseAllNewSetsEnabled()));
 
-    if (!settingsCache->getDownloadSpoilersStatus()) {
-        qDebug() << "Spoilers Disabled";
-        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
-    }
-
     tip = new DlgTipOfTheDay();
-    if (tip->successfulInit && settingsCache->getShowTipsOnStartup() && tip->newTipsAvailable) {
-        tip->show();
-    }
 
-    // Only run the check updater if the user wants it (defaults to on)
-    if (settingsCache->getNotifyAboutNewVersion()) {
-        auto versionUpdater = new MainUpdateHelper();
-        connect(versionUpdater, SIGNAL(newVersionDetected(QString)), this, SLOT(alertForcedOracleRun(QString)));
-        QtConcurrent::run(versionUpdater, &MainUpdateHelper::testForNewVersion);
+    // run startup check async
+    QTimer::singleShot(0, this, &MainWindow::startupConfigCheck);
+}
+
+void MainWindow::startupConfigCheck()
+{
+    if(settingsCache->getClientVersion() == CLIENT_INFO_NOT_SET) {
+        // no config found, 99% new clean install
+        qDebug() << "Startup: old client version empty, assuming first start after clean install";
+        alertForcedOracleRun(VERSION_STRING, false);
+    } else if (settingsCache->getClientVersion() != VERSION_STRING) {
+        // config found, from another (presumably older) version
+        qDebug() << "Startup: old client version" << settingsCache->getClientVersion() << "differs, assuming first start after update";
+        if (settingsCache->getNotifyAboutNewVersion()) {
+            alertForcedOracleRun(VERSION_STRING, true);
+        }
+    } else {
+        // previous config from this version found
+        qDebug() << "Startup: found config with current version";
+        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
+
+        // Run the tips dialog only on subsequent startups.
+        // On the first run after an install/update the startup is already crowded enough
+        if (tip->successfulInit && settingsCache->getShowTipsOnStartup() && tip->newTipsAvailable) {
+            tip->raise();
+            tip->show();
+        }
     }
 }
 
-void MainWindow::alertForcedOracleRun(const QString &newVersion)
+void MainWindow::alertForcedOracleRun(const QString &version, bool isUpdate)
 {
-    settingsCache->setClientVersion(newVersion);
-    QMessageBox::information(this, tr("New Version"),
+    settingsCache->setClientVersion(version);
+    if(isUpdate) {
+        QMessageBox::information(this, tr("New Version"),
                              tr("Congratulations on updating to Cockatrice %1!\n"
                                 "Oracle will now launch to update your card database.")
-                                 .arg(newVersion));
+                                 .arg(version));
+    } else {
+        QMessageBox::information(this, tr("Cockatrice installed"),
+                             tr("Congratulations on installing Cockatrice %1!\n"
+                                "Oracle will now launch to install the initial card database.")
+                                 .arg(version));
+    }
+
     actCheckCardUpdates();
     actCheckServerUpdates();
 }
@@ -1123,8 +1146,6 @@ void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = nullptr;
 
-    QMessageBox::information(this, tr("Information"),
-                             tr("Update completed successfully.\nCockatrice will now reload the card database."));
     QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
 }
 
@@ -1315,12 +1336,5 @@ void MainWindow::promptForgotPasswordReset()
     if (dlg.exec()) {
         client->submitForgotPasswordResetToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
                                                   dlg.getPlayerName(), dlg.getToken(), dlg.getPassword());
-    }
-}
-
-void MainUpdateHelper::testForNewVersion()
-{
-    if (settingsCache->getClientVersion() != VERSION_STRING) {
-        emit newVersionDetected(VERSION_STRING);
     }
 }

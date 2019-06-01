@@ -131,6 +131,7 @@ public:
 private:
     QTextEdit *messageLog;
     QCheckBox *defaultPathCheckBox;
+    QLabel *pathLabel;
 
 protected:
     void initializePage() override;
@@ -176,6 +177,7 @@ public:
 
 private:
     QCheckBox *defaultPathCheckBox;
+    QLabel *pathLabel;
 
 protected:
     bool validatePage() override;
@@ -216,6 +218,7 @@ public:
 
 private:
     QCheckBox *defaultPathCheckBox;
+    QLabel *pathLabel;
 
 protected:
     bool validatePage() override;

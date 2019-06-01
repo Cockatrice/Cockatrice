@@ -507,15 +507,17 @@ void LoadSetsPage::importFinished()
 
 SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
 {
+    pathLabel = new QLabel(this);
+
     defaultPathCheckBox = new QCheckBox(this);
-    defaultPathCheckBox->setChecked(true);
 
     messageLog = new QTextEdit(this);
     messageLog->setReadOnly(true);
 
     auto *layout = new QGridLayout(this);
-    layout->addWidget(defaultPathCheckBox, 0, 0);
-    layout->addWidget(messageLog, 1, 0);
+    layout->addWidget(pathLabel, 0, 0);
+    layout->addWidget(defaultPathCheckBox, 1, 0);
+    layout->addWidget(messageLog, 2, 0);
 
     setLayout(layout);
 }
@@ -543,7 +545,9 @@ void SaveSetsPage::retranslateUi()
     setSubTitle(tr("The following sets has been imported. "
                    "Press \"Save\" to save the imported cards to the Cockatrice database."));
 
-    defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
+    pathLabel->setText(tr("The card database will be saved at") + "<br/>" + settingsCache->getTokenDatabasePath());
+    defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
+
     setButtonText(QWizard::NextButton, tr("&Save"));
 }
 
@@ -569,9 +573,9 @@ bool SaveSetsPage::validatePage()
     do {
         QString fileName;
         if (defaultPathCheckBox->isChecked()) {
-            fileName = defaultPath;
-        } else {
             fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
+        } else {
+            fileName = defaultPath;
         }
 
         if (fileName.isEmpty()) {
@@ -586,14 +590,8 @@ bool SaveSetsPage::validatePage()
 
         if (wizard()->importer->saveToFile(fileName)) {
             ok = true;
-            QMessageBox::information(this, tr("Success"),
-                                     tr("The card database has been saved successfully to\n%1").arg(fileName));
         } else {
             QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
-            ;
-            if (defaultPathCheckBox->isChecked()) {
-                defaultPathCheckBox->setChecked(false);
-            }
         }
     } while (!ok);
 
@@ -875,11 +873,13 @@ void LoadTokensPage::actDownloadFinishedTokensFile()
 
 SaveSpoilersPage::SaveSpoilersPage(QWidget *parent) : OracleWizardPage(parent)
 {
+    pathLabel = new QLabel(this);
+
     defaultPathCheckBox = new QCheckBox(this);
-    defaultPathCheckBox->setChecked(true);
 
     auto *layout = new QGridLayout(this);
-    layout->addWidget(defaultPathCheckBox, 0, 0);
+    layout->addWidget(pathLabel, 0, 0);
+    layout->addWidget(defaultPathCheckBox, 1, 0);
 
     setLayout(layout);
 }
@@ -890,7 +890,8 @@ void SaveSpoilersPage::retranslateUi()
     setSubTitle(tr("The spoilers file has been imported. "
                    "Press \"Save\" to save the imported spoilers to the Cockatrice card database."));
 
-    defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
+    pathLabel->setText(tr("The spoiler database will be saved at") + "<br/>" + settingsCache->getTokenDatabasePath());
+    defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }
 
 bool SaveSpoilersPage::validatePage()
@@ -903,9 +904,9 @@ bool SaveSpoilersPage::validatePage()
     do {
         QString fileName;
         if (defaultPathCheckBox->isChecked()) {
-            fileName = defaultPath;
-        } else {
             fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
+        } else {
+            fileName = defaultPath;
         }
 
         if (fileName.isEmpty()) {
@@ -922,10 +923,6 @@ bool SaveSpoilersPage::validatePage()
             ok = true;
         } else {
             QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
-            ;
-            if (defaultPathCheckBox->isChecked()) {
-                defaultPathCheckBox->setChecked(false);
-            }
         }
     } while (!ok);
 
@@ -935,10 +932,12 @@ bool SaveSpoilersPage::validatePage()
 SaveTokensPage::SaveTokensPage(QWidget *parent) : OracleWizardPage(parent)
 {
     defaultPathCheckBox = new QCheckBox(this);
-    defaultPathCheckBox->setChecked(true);
+
+    pathLabel = new QLabel(this);
 
     auto *layout = new QGridLayout(this);
-    layout->addWidget(defaultPathCheckBox, 0, 0);
+    layout->addWidget(pathLabel, 0, 0);
+    layout->addWidget(defaultPathCheckBox, 1, 0);
 
     setLayout(layout);
 }
@@ -949,7 +948,8 @@ void SaveTokensPage::retranslateUi()
     setSubTitle(tr("The tokens has been imported. "
                    "Press \"Save\" to save the imported tokens to the Cockatrice tokens database."));
 
-    defaultPathCheckBox->setText(tr("Save to the default path (recommended)"));
+    pathLabel->setText(tr("The token database will be saved at") + "<br/>" + settingsCache->getTokenDatabasePath());
+    defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }
 
 bool SaveTokensPage::validatePage()
@@ -962,9 +962,9 @@ bool SaveTokensPage::validatePage()
     do {
         QString fileName;
         if (defaultPathCheckBox->isChecked()) {
-            fileName = defaultPath;
-        } else {
             fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
+        } else {
+            fileName = defaultPath;
         }
 
         if (fileName.isEmpty()) {
@@ -979,14 +979,8 @@ bool SaveTokensPage::validatePage()
 
         if (wizard()->saveTokensToFile(fileName)) {
             ok = true;
-            QMessageBox::information(this, tr("Success"),
-                                     tr("The token database has been saved successfully to\n%1").arg(fileName));
         } else {
             QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
-            ;
-            if (defaultPathCheckBox->isChecked()) {
-                defaultPathCheckBox->setChecked(false);
-            }
         }
     } while (!ok);
 

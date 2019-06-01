@@ -275,8 +275,8 @@ SettingsCache::SettingsCache()
     spectatorsCanTalk = settings->value("game/spectatorscantalk", false).toBool();
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
-    clientID = settings->value("personal/clientid", "notset").toString();
-    clientVersion = settings->value("personal/clientversion", "notset").toString();
+    clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
+    clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
 }
 

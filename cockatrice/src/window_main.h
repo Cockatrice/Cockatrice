@@ -102,7 +102,8 @@ private slots:
     void actManageSets();
     void actEditTokens();
 
-    void alertForcedOracleRun(const QString &);
+    void startupConfigCheck();
+    void alertForcedOracleRun(const QString &version, bool isUpdate);
 
 private:
     static const QString appName;
@@ -152,19 +153,6 @@ protected:
     void closeEvent(QCloseEvent *event) override;
     void changeEvent(QEvent *event) override;
     QString extractInvalidUsernameMessage(QString &in);
-};
-
-class MainUpdateHelper : public QObject
-{
-    Q_OBJECT
-
-signals:
-    void newVersionDetected(QString);
-
-public:
-    explicit MainUpdateHelper() = default;
-    ~MainUpdateHelper() override = default;
-    void testForNewVersion();
 };
 
 #endif
