@@ -199,8 +199,8 @@ void OutroPage::retranslateUi()
 {
     setTitle(tr("Finished"));
     setSubTitle(tr("The wizard has finished.") + "<br>" +
-				tr("You can now start using Cockatrice with the newly updated cards.") + "<br><br>" +
-				tr("If the card databases don't reload automatically, restart the Cockatrice client."));
+                tr("You can now start using Cockatrice with the newly updated cards.") + "<br><br>" +
+                tr("If the card databases don't reload automatically, restart the Cockatrice client."));
 }
 
 LoadSetsPage::LoadSetsPage(QWidget *parent) : OracleWizardPage(parent)
@@ -483,8 +483,7 @@ void LoadSetsPage::zipDownloadFailed(const QString &message)
 
     QMessageBox::StandardButton reply;
     reply = static_cast<QMessageBox::StandardButton>(QMessageBox::question(
-        this, tr("Error"),
-        message + "<br>" + tr("Do you want to download the uncompressed file instead?"),
+        this, tr("Error"), message + "<br>" + tr("Do you want to download the uncompressed file instead?"),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes));
 
     if (reply == QMessageBox::Yes) {
@@ -552,7 +551,8 @@ void SaveSetsPage::retranslateUi()
     setSubTitle(tr("The following sets have been found:"));
 
     saveLabel->setText(tr("Press \"Save\" to store the imported cards in the Cockatrice database."));
-    pathLabel->setText(tr("The card database will be saved at the following location:") + "<br>" + settingsCache->getCardDatabasePath());
+    pathLabel->setText(tr("The card database will be saved at the following location:") + "<br>" +
+                       settingsCache->getCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 
     setButtonText(QWizard::NextButton, tr("&Save"));
@@ -637,7 +637,8 @@ void LoadTokensPage::retranslateUi()
 
     urlLabel->setText(tr("Download URL:"));
     urlButton->setText(tr("Restore default URL"));
-    pathLabel->setText(tr("The token database will be saved at the following location:") + "<br>" + settingsCache->getTokenDatabasePath());
+    pathLabel->setText(tr("The token database will be saved at the following location:") + "<br>" +
+                       settingsCache->getTokenDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }
 
@@ -673,6 +674,7 @@ void LoadSpoilersPage::retranslateUi()
 
     urlLabel->setText(tr("Download URL:"));
     urlButton->setText(tr("Restore default URL"));
-    pathLabel->setText(tr("The spoiler database will be saved at the following location:") + "<br>" + settingsCache->getSpoilerCardDatabasePath());
+    pathLabel->setText(tr("The spoiler database will be saved at the following location:") + "<br>" +
+                       settingsCache->getSpoilerCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }
