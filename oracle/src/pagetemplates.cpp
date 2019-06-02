@@ -43,7 +43,7 @@ SimpleDownloadFilePage::SimpleDownloadFilePage(QWidget *parent) : OracleWizardPa
 
 void SimpleDownloadFilePage::initializePage()
 {
-    // get custom url from settings if any; otherway use default url
+    // get custom url from settings if any; otherwise use default url
     urlLineEdit->setText(wizard()->settings->value(getCustomUrlSettingsKey(), getDefaultUrl()).toString());
 
     progressLabel->hide();
