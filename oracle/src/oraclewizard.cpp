@@ -57,15 +57,17 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 
     importer = new OracleImporter(settingsCache->getDataPath(), this);
 
+    nam = new QNetworkAccessManager(this);
+
     if (!isSpoilersOnly) {
         addPage(new IntroPage);
         addPage(new LoadSetsPage);
         addPage(new SaveSetsPage);
         addPage(new LoadTokensPage);
-        addPage(new SaveTokensPage);
+        addPage(new OutroPage);
     } else {
         addPage(new LoadSpoilersPage);
-        addPage(new SaveSpoilersPage);
+        addPage(new OutroPage);
     }
 
     retranslateUi();
@@ -89,8 +91,6 @@ void OracleWizard::changeEvent(QEvent *event)
 void OracleWizard::retranslateUi()
 {
     setWindowTitle(tr("Oracle Importer"));
-    QWizard::setButtonText(QWizard::FinishButton, tr("Save"));
-
     for (int i = 0; i < pageIds().count(); i++) {
         dynamic_cast<OracleWizardPage *>(page(i))->retranslateUi();
     }
@@ -195,7 +195,14 @@ void IntroPage::retranslateUi()
     versionLabel->setText(tr("Version:") + QString(" %1").arg(VERSION_STRING));
 }
 
-LoadSetsPage::LoadSetsPage(QWidget *parent) : OracleWizardPage(parent), nam(nullptr)
+void OutroPage::retranslateUi()
+{
+    setTitle(tr("Finished"));
+    setSubTitle(tr("The wizard has finished.") + "<br/>" +
+                tr("You can now start using Cockatrice with the newly updated cards."));
+}
+
+LoadSetsPage::LoadSetsPage(QWidget *parent) : OracleWizardPage(parent)
 {
     urlRadioButton = new QRadioButton(this);
     fileRadioButton = new QRadioButton(this);
@@ -330,10 +337,7 @@ bool LoadSetsPage::validatePage()
 
 void LoadSetsPage::downloadSetsFile(QUrl url)
 {
-    if (!nam) {
-        nam = new QNetworkAccessManager(this);
-    }
-    QNetworkReply *reply = nam->get(QNetworkRequest(url));
+    QNetworkReply *reply = wizard()->nam->get(QNetworkRequest(url));
 
     connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSetsFile()));
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(actDownloadProgressSetsFile(qint64, qint64)));
@@ -600,392 +604,74 @@ bool SaveSetsPage::validatePage()
     return true;
 }
 
-LoadSpoilersPage::LoadSpoilersPage(QWidget *parent) : OracleWizardPage(parent), nam(nullptr)
+QString LoadTokensPage::getDefaultUrl()
 {
-    urlLabel = new QLabel(this);
-    urlLineEdit = new QLineEdit(this);
-
-    progressLabel = new QLabel(this);
-    progressBar = new QProgressBar(this);
-
-    urlButton = new QPushButton(this);
-    connect(urlButton, SIGNAL(clicked()), this, SLOT(actRestoreDefaultUrl()));
-
-    auto *layout = new QGridLayout(this);
-    layout->addWidget(urlLabel, 0, 0);
-    layout->addWidget(urlLineEdit, 0, 1);
-    layout->addWidget(urlButton, 1, 1, Qt::AlignRight);
-    layout->addWidget(progressLabel, 2, 0);
-    layout->addWidget(progressBar, 2, 1);
+    return TOKENS_URL;
 }
 
-void LoadSpoilersPage::actRestoreDefaultUrl()
+QString LoadTokensPage::getCustomUrlSettingsKey()
 {
-    urlLineEdit->setText(SPOILERS_URL);
+    return "tokensurl";
 }
 
-void LoadSpoilersPage::initializePage()
+QString LoadTokensPage::getDefaultSavePath()
 {
-    urlLineEdit->setText(wizard()->settings->value("spoilersurl", SPOILERS_URL).toString());
-
-    progressLabel->hide();
-    progressBar->hide();
+    return settingsCache->getTokenDatabasePath();
 }
 
-void LoadSpoilersPage::actDownloadProgressSpoilersFile(qint64 received, qint64 total)
+QString LoadTokensPage::getWindowTitle()
 {
-    if (total > 0) {
-        progressBar->setMaximum(static_cast<int>(total));
-        progressBar->setValue(static_cast<int>(received));
-    }
-
-    progressLabel->setText(tr("Downloading (%1MB)").arg((int)received / (1024 * 1024)));
+    return tr("Save token database");
 }
 
-void LoadSpoilersPage::actDownloadFinishedSpoilersFile()
+QString LoadTokensPage::getFileType()
 {
-    // Check for server reply
-    auto *reply = dynamic_cast<QNetworkReply *>(sender());
-    QNetworkReply::NetworkError errorCode = reply->error();
-
-    if (errorCode != QNetworkReply::NoError) {
-        QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
-
-        wizard()->enableButtons();
-        setEnabled(true);
-
-        reply->deleteLater();
-        return;
-    }
-
-    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if (statusCode == 301 || statusCode == 302) {
-        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
-        qDebug() << "following redirect url:" << redirectUrl.toString();
-        downloadSpoilersFile(redirectUrl);
-        reply->deleteLater();
-        return;
-    }
-
-    progressLabel->hide();
-    progressBar->hide();
-
-    // save spoiler.xml url, but only if the user customized it and download was successful
-    if (urlLineEdit->text() != QString(SPOILERS_URL)) {
-        wizard()->settings->setValue("spoilersurl", urlLineEdit->text());
-    } else {
-        wizard()->settings->remove("spoilersurl");
-    }
-
-    wizard()->setTokensData(reply->readAll());
-    reply->deleteLater();
-
-    wizard()->enableButtons();
-    setEnabled(true);
-    progressLabel->hide();
-    progressBar->hide();
-
-    wizard()->next();
-}
-
-void LoadSpoilersPage::downloadSpoilersFile(QUrl url)
-{
-    if (!nam) {
-        nam = new QNetworkAccessManager(this);
-    }
-    QNetworkReply *reply = nam->get(QNetworkRequest(url));
-
-    connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSpoilersFile()));
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this,
-            SLOT(actDownloadProgressSpoilersFile(qint64, qint64)));
-}
-
-bool LoadSpoilersPage::validatePage()
-{
-    // once the import is finished, we call next(); skip validation
-    if (wizard()->hasTokensData()) {
-        return true;
-    }
-
-    QUrl url = QUrl::fromUserInput(urlLineEdit->text());
-    if (!url.isValid()) {
-        QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
-        return false;
-    }
-
-    progressLabel->setText(tr("Downloading (0MB)"));
-    // show an infinite progressbar
-    progressBar->setMaximum(0);
-    progressBar->setMinimum(0);
-    progressBar->setValue(0);
-    progressLabel->show();
-    progressBar->show();
-
-    wizard()->disableButtons();
-    setEnabled(false);
-
-    downloadSpoilersFile(url);
-    return false;
-}
-
-void LoadSpoilersPage::retranslateUi()
-{
-    setTitle(tr("Spoilers source selection"));
-    setSubTitle(tr("Please specify a spoiler source."));
-
-    urlLabel->setText(tr("Download URL:"));
-    urlButton->setText(tr("Restore default URL"));
-}
-
-LoadTokensPage::LoadTokensPage(QWidget *parent) : OracleWizardPage(parent), nam(nullptr)
-{
-    urlLabel = new QLabel(this);
-    urlLineEdit = new QLineEdit(this);
-
-    progressLabel = new QLabel(this);
-    progressBar = new QProgressBar(this);
-
-    urlButton = new QPushButton(this);
-    connect(urlButton, SIGNAL(clicked()), this, SLOT(actRestoreDefaultUrl()));
-
-    auto *layout = new QGridLayout(this);
-    layout->addWidget(urlLabel, 0, 0);
-    layout->addWidget(urlLineEdit, 0, 1);
-    layout->addWidget(urlButton, 1, 1, Qt::AlignRight);
-    layout->addWidget(progressLabel, 2, 0);
-    layout->addWidget(progressBar, 2, 1);
-
-    setLayout(layout);
-}
-
-void LoadTokensPage::initializePage()
-{
-    urlLineEdit->setText(wizard()->settings->value("tokensurl", TOKENS_URL).toString());
-
-    progressLabel->hide();
-    progressBar->hide();
+    return tr("XML; token database (*.xml)");
 }
 
 void LoadTokensPage::retranslateUi()
 {
-    setTitle(tr("Tokens source selection"));
-    setSubTitle(tr("Please specify a source for the list of tokens."));
+    setTitle(tr("Tokens import"));
+    setSubTitle(tr("Please specify a token source."));
 
     urlLabel->setText(tr("Download URL:"));
     urlButton->setText(tr("Restore default URL"));
-}
-
-void LoadTokensPage::actRestoreDefaultUrl()
-{
-    urlLineEdit->setText(TOKENS_URL);
-}
-
-bool LoadTokensPage::validatePage()
-{
-    // once the import is finished, we call next(); skip validation
-    if (wizard()->hasTokensData()) {
-        return true;
-    }
-
-    QUrl url = QUrl::fromUserInput(urlLineEdit->text());
-    if (!url.isValid()) {
-        QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
-        return false;
-    }
-
-    progressLabel->setText(tr("Downloading (0MB)"));
-    // show an infinite progressbar
-    progressBar->setMaximum(0);
-    progressBar->setMinimum(0);
-    progressBar->setValue(0);
-    progressLabel->show();
-    progressBar->show();
-
-    wizard()->disableButtons();
-    setEnabled(false);
-
-    downloadTokensFile(url);
-    return false;
-}
-
-void LoadTokensPage::downloadTokensFile(QUrl url)
-{
-    if (!nam) {
-        nam = new QNetworkAccessManager(this);
-    }
-    QNetworkReply *reply = nam->get(QNetworkRequest(url));
-
-    connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedTokensFile()));
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(actDownloadProgressTokensFile(qint64, qint64)));
-}
-
-void LoadTokensPage::actDownloadProgressTokensFile(qint64 received, qint64 total)
-{
-    if (total > 0) {
-        progressBar->setMaximum(static_cast<int>(total));
-        progressBar->setValue(static_cast<int>(received));
-    }
-    progressLabel->setText(tr("Downloading (%1MB)").arg((int)received / (1024 * 1024)));
-}
-
-void LoadTokensPage::actDownloadFinishedTokensFile()
-{
-    // check for a reply
-    auto *reply = dynamic_cast<QNetworkReply *>(sender());
-    QNetworkReply::NetworkError errorCode = reply->error();
-    if (errorCode != QNetworkReply::NoError) {
-        QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
-
-        wizard()->enableButtons();
-        setEnabled(true);
-
-        reply->deleteLater();
-        return;
-    }
-
-    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if (statusCode == 301 || statusCode == 302) {
-        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
-        qDebug() << "following redirect url:" << redirectUrl.toString();
-        downloadTokensFile(redirectUrl);
-        reply->deleteLater();
-        return;
-    }
-
-    progressLabel->hide();
-    progressBar->hide();
-
-    // save tokens.xml url, but only if the user customized it and download was successfull
-    if (urlLineEdit->text() != QString(TOKENS_URL)) {
-        wizard()->settings->setValue("tokensurl", urlLineEdit->text());
-    } else {
-        wizard()->settings->remove("tokensurl");
-    }
-
-    wizard()->setTokensData(reply->readAll());
-    reply->deleteLater();
-
-    wizard()->enableButtons();
-    setEnabled(true);
-    progressLabel->hide();
-    progressBar->hide();
-
-    wizard()->next();
-}
-
-SaveSpoilersPage::SaveSpoilersPage(QWidget *parent) : OracleWizardPage(parent)
-{
-    pathLabel = new QLabel(this);
-
-    defaultPathCheckBox = new QCheckBox(this);
-
-    auto *layout = new QGridLayout(this);
-    layout->addWidget(pathLabel, 0, 0);
-    layout->addWidget(defaultPathCheckBox, 1, 0);
-
-    setLayout(layout);
-}
-
-void SaveSpoilersPage::retranslateUi()
-{
-    setTitle(tr("Spoilers imported"));
-    setSubTitle(tr("The spoilers file has been imported. "
-                   "Press \"Save\" to save the imported spoilers to the Cockatrice card database."));
-
-    pathLabel->setText(tr("The spoiler database will be saved at") + "<br/>" +
-                       settingsCache->getSpoilerCardDatabasePath());
-    defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
-}
-
-bool SaveSpoilersPage::validatePage()
-{
-    bool ok = false;
-    QString defaultPath = settingsCache->getSpoilerCardDatabasePath();
-    QString windowName = tr("Save spoiler database");
-    QString fileType = tr("XML; card database (*.xml)");
-
-    do {
-        QString fileName;
-        if (defaultPathCheckBox->isChecked()) {
-            fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
-        } else {
-            fileName = defaultPath;
-        }
-
-        if (fileName.isEmpty()) {
-            return false;
-        }
-
-        QFileInfo fi(fileName);
-        QDir fileDir(fi.path());
-        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
-            return false;
-        }
-
-        if (wizard()->saveTokensToFile(fileName)) {
-            ok = true;
-        } else {
-            QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
-        }
-    } while (!ok);
-
-    return true;
-}
-
-SaveTokensPage::SaveTokensPage(QWidget *parent) : OracleWizardPage(parent)
-{
-    defaultPathCheckBox = new QCheckBox(this);
-
-    pathLabel = new QLabel(this);
-
-    auto *layout = new QGridLayout(this);
-    layout->addWidget(pathLabel, 0, 0);
-    layout->addWidget(defaultPathCheckBox, 1, 0);
-
-    setLayout(layout);
-}
-
-void SaveTokensPage::retranslateUi()
-{
-    setTitle(tr("Tokens imported"));
-    setSubTitle(tr("The tokens has been imported. "
-                   "Press \"Save\" to save the imported tokens to the Cockatrice tokens database."));
-
     pathLabel->setText(tr("The token database will be saved at") + "<br/>" + settingsCache->getTokenDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }
 
-bool SaveTokensPage::validatePage()
+QString LoadSpoilersPage::getDefaultUrl()
 {
-    bool ok = false;
-    QString defaultPath = settingsCache->getTokenDatabasePath();
-    QString windowName = tr("Save token database");
-    QString fileType = tr("XML; token database (*.xml)");
+    return SPOILERS_URL;
+}
 
-    do {
-        QString fileName;
-        if (defaultPathCheckBox->isChecked()) {
-            fileName = QFileDialog::getSaveFileName(this, windowName, defaultPath, fileType);
-        } else {
-            fileName = defaultPath;
-        }
+QString LoadSpoilersPage::getCustomUrlSettingsKey()
+{
+    return "spoilersurl";
+}
 
-        if (fileName.isEmpty()) {
-            return false;
-        }
+QString LoadSpoilersPage::getDefaultSavePath()
+{
+    return settingsCache->getTokenDatabasePath();
+}
 
-        QFileInfo fi(fileName);
-        QDir fileDir(fi.path());
-        if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
-            return false;
-        }
+QString LoadSpoilersPage::getWindowTitle()
+{
+    return tr("Save spoiler database");
+}
 
-        if (wizard()->saveTokensToFile(fileName)) {
-            ok = true;
-        } else {
-            QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
-        }
-    } while (!ok);
+QString LoadSpoilersPage::getFileType()
+{
+    return tr("XML; spoiler database (*.xml)");
+}
 
-    return true;
+void LoadSpoilersPage::retranslateUi()
+{
+    setTitle(tr("Spoilers import"));
+    setSubTitle(tr("Please specify a spoiler source."));
+
+    urlLabel->setText(tr("Download URL:"));
+    urlButton->setText(tr("Restore default URL"));
+    pathLabel->setText(tr("The spoiler database will be saved at") + "<br/>" + settingsCache->getTokenDatabasePath());
+    defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }

@@ -19,6 +19,8 @@ class QVBoxLayout;
 class OracleImporter;
 class QSettings;
 
+#include "pagetemplates.h"
+
 class OracleWizard : public QWizard
 {
     Q_OBJECT
@@ -41,6 +43,7 @@ public:
 public:
     OracleImporter *importer;
     QSettings *settings;
+    QNetworkAccessManager *nam;
 
 private slots:
     void updateLanguage();
@@ -50,20 +53,6 @@ private:
 
 protected:
     void changeEvent(QEvent *event) override;
-};
-
-class OracleWizardPage : public QWizardPage
-{
-    Q_OBJECT
-public:
-    explicit OracleWizardPage(QWidget *parent = nullptr) : QWizardPage(parent){};
-    virtual void retranslateUi() = 0;
-
-protected:
-    inline OracleWizard *wizard()
-    {
-        return (OracleWizard *)QWizardPage::wizard();
-    };
 };
 
 class IntroPage : public OracleWizardPage
@@ -83,6 +72,16 @@ private:
 
 private slots:
     void languageBoxChanged(int index);
+};
+
+class OutroPage : public OracleWizardPage
+{
+    Q_OBJECT
+public:
+    explicit OutroPage(QWidget *parent = nullptr)
+    {
+    }
+    void retranslateUi() override;
 };
 
 class LoadSetsPage : public OracleWizardPage
@@ -108,7 +107,6 @@ private:
     QLabel *progressLabel;
     QProgressBar *progressBar;
 
-    QNetworkAccessManager *nam;
     QFutureWatcher<bool> watcher;
     QFuture<bool> future;
 
@@ -143,86 +141,34 @@ private slots:
     void updateTotalProgress(int cardsImported, int setIndex, const QString &setName);
 };
 
-class LoadSpoilersPage : public OracleWizardPage
+class LoadSpoilersPage : public SimpleDownloadFilePage
 {
     Q_OBJECT
 public:
-    explicit LoadSpoilersPage(QWidget *parent = nullptr);
+    explicit LoadSpoilersPage(QWidget *parent = nullptr){};
     void retranslateUi() override;
 
-private:
-    QLabel *urlLabel;
-    QLineEdit *urlLineEdit;
-    QPushButton *urlButton;
-    QLabel *progressLabel;
-    QProgressBar *progressBar;
-    QNetworkAccessManager *nam;
-
-private slots:
-    void actRestoreDefaultUrl();
-    void actDownloadProgressSpoilersFile(qint64 received, qint64 total);
-    void actDownloadFinishedSpoilersFile();
-
 protected:
-    void initializePage() override;
-    bool validatePage() override;
-    void downloadSpoilersFile(QUrl url);
+    QString getDefaultUrl() override;
+    QString getCustomUrlSettingsKey() override;
+    QString getDefaultSavePath() override;
+    QString getWindowTitle() override;
+    QString getFileType() override;
 };
 
-class SaveSpoilersPage : public OracleWizardPage
+class LoadTokensPage : public SimpleDownloadFilePage
 {
     Q_OBJECT
 public:
-    explicit SaveSpoilersPage(QWidget *parent = nullptr);
-    void retranslateUi() override;
-
-private:
-    QCheckBox *defaultPathCheckBox;
-    QLabel *pathLabel;
-
-protected:
-    bool validatePage() override;
-};
-
-class LoadTokensPage : public OracleWizardPage
-{
-    Q_OBJECT
-public:
-    explicit LoadTokensPage(QWidget *parent = nullptr);
+    explicit LoadTokensPage(QWidget *parent = nullptr){};
     void retranslateUi() override;
 
 protected:
-    void initializePage() override;
-    bool validatePage() override;
-    void downloadTokensFile(QUrl url);
-
-private:
-    QLabel *urlLabel;
-    QLineEdit *urlLineEdit;
-    QPushButton *urlButton;
-    QLabel *progressLabel;
-    QProgressBar *progressBar;
-    QNetworkAccessManager *nam;
-
-private slots:
-    void actRestoreDefaultUrl();
-    void actDownloadProgressTokensFile(qint64 received, qint64 total);
-    void actDownloadFinishedTokensFile();
-};
-
-class SaveTokensPage : public OracleWizardPage
-{
-    Q_OBJECT
-public:
-    explicit SaveTokensPage(QWidget *parent = nullptr);
-    void retranslateUi() override;
-
-private:
-    QCheckBox *defaultPathCheckBox;
-    QLabel *pathLabel;
-
-protected:
-    bool validatePage() override;
+    QString getDefaultUrl() override;
+    QString getCustomUrlSettingsKey() override;
+    QString getDefaultSavePath() override;
+    QString getWindowTitle() override;
+    QString getFileType() override;
 };
 
 #endif
