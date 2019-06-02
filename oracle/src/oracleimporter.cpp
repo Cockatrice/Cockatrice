@@ -295,7 +295,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         }
 
         // split cards are considered a single card, enqueue for later merging
-        if (layout == "split") {
+        if (layout == "split" || layout == "aftermath") {
             // get the position of this card part
             int index = additionalNames.indexOf(name);
             // construct full card name
