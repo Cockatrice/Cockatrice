@@ -847,13 +847,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
-    if(settingsCache->getClientVersion() == CLIENT_INFO_NOT_SET) {
+    if (settingsCache->getClientVersion() == CLIENT_INFO_NOT_SET) {
         // no config found, 99% new clean install
         qDebug() << "Startup: old client version empty, assuming first start after clean install";
         alertForcedOracleRun(VERSION_STRING, false);
     } else if (settingsCache->getClientVersion() != VERSION_STRING) {
         // config found, from another (presumably older) version
-        qDebug() << "Startup: old client version" << settingsCache->getClientVersion() << "differs, assuming first start after update";
+        qDebug() << "Startup: old client version" << settingsCache->getClientVersion()
+                 << "differs, assuming first start after update";
         if (settingsCache->getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
         }
@@ -874,16 +875,16 @@ void MainWindow::startupConfigCheck()
 void MainWindow::alertForcedOracleRun(const QString &version, bool isUpdate)
 {
     settingsCache->setClientVersion(version);
-    if(isUpdate) {
+    if (isUpdate) {
         QMessageBox::information(this, tr("New Version"),
-                             tr("Congratulations on updating to Cockatrice %1!\n"
-                                "Oracle will now launch to update your card database.")
-                                 .arg(version));
+                                 tr("Congratulations on updating to Cockatrice %1!\n"
+                                    "Oracle will now launch to update your card database.")
+                                     .arg(version));
     } else {
         QMessageBox::information(this, tr("Cockatrice installed"),
-                             tr("Congratulations on installing Cockatrice %1!\n"
-                                "Oracle will now launch to install the initial card database.")
-                                 .arg(version));
+                                 tr("Congratulations on installing Cockatrice %1!\n"
+                                    "Oracle will now launch to install the initial card database.")
+                                     .arg(version));
     }
 
     actCheckCardUpdates();

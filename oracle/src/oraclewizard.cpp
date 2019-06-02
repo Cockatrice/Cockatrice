@@ -890,7 +890,8 @@ void SaveSpoilersPage::retranslateUi()
     setSubTitle(tr("The spoilers file has been imported. "
                    "Press \"Save\" to save the imported spoilers to the Cockatrice card database."));
 
-    pathLabel->setText(tr("The spoiler database will be saved at") + "<br/>" + settingsCache->getSpoilerCardDatabasePath());
+    pathLabel->setText(tr("The spoiler database will be saved at") + "<br/>" +
+                       settingsCache->getSpoilerCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }
 
