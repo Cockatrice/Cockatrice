@@ -673,6 +673,6 @@ void LoadSpoilersPage::retranslateUi()
 
     urlLabel->setText(tr("Download URL:"));
     urlButton->setText(tr("Restore default URL"));
-    pathLabel->setText(tr("The spoiler database will be saved at the following location:") + "<br>" + settingsCache->getTokenDatabasePath());
+    pathLabel->setText(tr("The spoiler database will be saved at the following location:") + "<br>" + settingsCache->getSpoilerCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }
