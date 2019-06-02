@@ -134,7 +134,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
              "<a href ='https://github.com/Cockatrice/Cockatrice/wiki/Custom-Cards-%26-Sets#to-add-custom-art-for-"
                                                                           "cards-the-easiest-way-is-to-use-"
                                                                           "the-custom-folder'> (" +
-                         tr("How to use custom card art") + ")</a> + </li><li>" + tr("Enabled Sets (Top to Bottom)") +
+                         tr("How to use custom card art") + ")</a></li><li>" + tr("Enabled Sets (Top to Bottom)") +
                          "</li><li>" + tr("Disabled Sets (Top to Bottom)") + "</li></ol>");
 
     QGridLayout *hintsGrid = new QGridLayout;
