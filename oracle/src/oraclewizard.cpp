@@ -484,7 +484,7 @@ void LoadSetsPage::zipDownloadFailed(const QString &message)
     QMessageBox::StandardButton reply;
     reply = static_cast<QMessageBox::StandardButton>(QMessageBox::question(
         this, tr("Error"),
-        message + "<br>" + tr("Do you want to try to download a fresh copy of the uncompressed file instead?"),
+        message + "<br>" + tr("Do you want to download the uncompressed file instead?"),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes));
 
     if (reply == QMessageBox::Yes) {
