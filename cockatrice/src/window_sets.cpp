@@ -131,10 +131,10 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
              tr("Only cards in enabled sets will appear in the card list of the deck editor") + "<br><br>" + "<b>" +
              tr("Card Art") + ":</b> " + tr("Image priority is decided in the following order") + "<ol><li>" + "CUSTOM" +
              tr("Folder") +
-             "<a " href ='https://github.com/Cockatrice/Cockatrice/wiki/" "Custom-Cards-%26-Sets#to-add-custom-art-for-"
+             "<a href ='https://github.com/Cockatrice/Cockatrice/wiki/Custom-Cards-%26-Sets#to-add-custom-art-for-"
                                                                           "cards-the-easiest-way-is-to-use-"
                                                                           "the-custom-folder'> (" +
-                         tr("How to use custom card art") + ")</a> + + </li><li>" + tr("Enabled Sets (Top to Bottom)") +
+                         tr("How to use custom card art") + ")</a> + </li><li>" + tr("Enabled Sets (Top to Bottom)") +
                          "</li><li>" + tr("Disabled Sets (Top to Bottom)") + "</li></ol>");
 
     QGridLayout *hintsGrid = new QGridLayout;
