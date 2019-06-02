@@ -28,6 +28,7 @@ class SimpleDownloadFilePage : public OracleWizardPage
     Q_OBJECT
 public:
     explicit SimpleDownloadFilePage(QWidget *parent = nullptr);
+
 protected:
     void initializePage() override;
     bool validatePage() override;
