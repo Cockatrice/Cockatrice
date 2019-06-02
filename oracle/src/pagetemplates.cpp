@@ -10,8 +10,8 @@
 #include <QPushButton>
 #include <QtGui>
 
-#include "pagetemplates.h"
 #include "oraclewizard.h"
+#include "pagetemplates.h"
 
 SimpleDownloadFilePage::SimpleDownloadFilePage(QWidget *parent) : OracleWizardPage(parent)
 {
@@ -59,7 +59,7 @@ bool SimpleDownloadFilePage::validatePage()
 {
     // if data has already been downloaded, pass directly to the "save" step
     if (!downloadData.isEmpty()) {
-        if(saveToFile()) {
+        if (saveToFile()) {
             return true;
         } else {
             wizard()->enableButtons();
