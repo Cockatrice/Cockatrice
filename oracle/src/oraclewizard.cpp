@@ -523,8 +523,8 @@ SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
     auto *layout = new QGridLayout(this);
     layout->addWidget(messageLog, 0, 0);
     layout->addWidget(saveLabel, 1, 0);
-    layout->addWidget(pathLabel, 3, 0);
-    layout->addWidget(defaultPathCheckBox, 4, 0);
+    layout->addWidget(pathLabel, 2, 0);
+    layout->addWidget(defaultPathCheckBox, 3, 0);
 
     setLayout(layout);
 }
