@@ -508,6 +508,7 @@ void LoadSetsPage::importFinished()
 SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
 {
     pathLabel = new QLabel(this);
+    saveLabel = new QLabel(this);
 
     defaultPathCheckBox = new QCheckBox(this);
 
@@ -515,9 +516,10 @@ SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
     messageLog->setReadOnly(true);
 
     auto *layout = new QGridLayout(this);
-    layout->addWidget(pathLabel, 0, 0);
-    layout->addWidget(defaultPathCheckBox, 1, 0);
-    layout->addWidget(messageLog, 2, 0);
+    layout->addWidget(messageLog, 0, 0);
+    layout->addWidget(saveLabel, 1, 0);
+    layout->addWidget(pathLabel, 2, 0);
+    layout->addWidget(defaultPathCheckBox, 3, 0);
 
     setLayout(layout);
 }
@@ -542,9 +544,9 @@ void SaveSetsPage::initializePage()
 void SaveSetsPage::retranslateUi()
 {
     setTitle(tr("Sets imported"));
-    setSubTitle(tr("The following sets has been imported. "
-                   "Press \"Save\" to save the imported cards to the Cockatrice database."));
+    setSubTitle(tr("The following sets has been imported."));
 
+    saveLabel->setText(tr("Press \"Save\" to save the imported cards to the Cockatrice database."));
     pathLabel->setText(tr("The card database will be saved at") + "<br/>" + settingsCache->getCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 

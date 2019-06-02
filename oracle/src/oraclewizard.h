@@ -132,6 +132,7 @@ private:
     QTextEdit *messageLog;
     QCheckBox *defaultPathCheckBox;
     QLabel *pathLabel;
+    QLabel *saveLabel;
 
 protected:
     void initializePage() override;
