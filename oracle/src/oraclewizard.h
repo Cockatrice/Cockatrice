@@ -78,7 +78,7 @@ class OutroPage : public OracleWizardPage
 {
     Q_OBJECT
 public:
-    explicit OutroPage(QWidget *parent = nullptr)
+    explicit OutroPage(QWidget * = nullptr)
     {
     }
     void retranslateUi() override;
@@ -145,7 +145,7 @@ class LoadSpoilersPage : public SimpleDownloadFilePage
 {
     Q_OBJECT
 public:
-    explicit LoadSpoilersPage(QWidget *parent = nullptr){};
+    explicit LoadSpoilersPage(QWidget * = nullptr){};
     void retranslateUi() override;
 
 protected:
@@ -160,7 +160,7 @@ class LoadTokensPage : public SimpleDownloadFilePage
 {
     Q_OBJECT
 public:
-    explicit LoadTokensPage(QWidget *parent = nullptr){};
+    explicit LoadTokensPage(QWidget * = nullptr){};
     void retranslateUi() override;
 
 protected:
