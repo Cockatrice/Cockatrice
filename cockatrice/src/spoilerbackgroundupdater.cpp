@@ -24,9 +24,9 @@ SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(
     if (isSpoilerDownloadEnabled) {
         // Start the process of checking if we're in spoiler season
         // File exists means we're in spoiler season
-        // We will load the database before attempting to download spoilers, incase they fail
-        QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
         startSpoilerDownloadProcess(SPOILERS_STATUS_URL, false);
+    } else {
+        qDebug() << "Spoilers Disabled";
     }
 }
 

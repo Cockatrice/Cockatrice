@@ -214,7 +214,6 @@ void WndSets::actSave()
 {
     model->save(db);
     PictureLoader::clearPixmapCache();
-    QMessageBox::information(this, tr("Success"), tr("The sets database has been saved successfully."));
     close();
 }
 
