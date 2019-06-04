@@ -410,14 +410,14 @@ void MainWindow::loginError(Response::ResponseCode r,
         case Response::RespClientIdRequired:
             QMessageBox::critical(
                 this, tr("Error"),
-                tr("This server requires client ID's. Your client is either failing to generate an ID or you are "
+                tr("This server requires client IDs. Your client is either failing to generate an ID or you are "
                    "running a modified client.\nPlease close and reopen your client to try again."));
             break;
         case Response::RespContextError:
             QMessageBox::critical(this, tr("Error"),
-                                  tr("An internal error has occurred, please try closing and reopening your client and "
-                                     "try again. If the error persists try updating your client to the most recent "
-                                     "build and if need be contact your software provider."));
+                                  tr("An internal error has occurred, please close and reopen Cockatrice before trying "
+                                     "again.\nIf the error persists, ensure you are running the latest version of the "
+                                     "software and if needed contact the software developers."));
             break;
         case Response::RespAccountNotActivated: {
             bool ok = false;
@@ -598,17 +598,17 @@ void MainWindow::setClientStatusTitle()
         case StatusRequestingForgotPassword:
             setWindowTitle(
                 appName + " - " +
-                tr("Requesting forgot password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
+                tr("Requesting forgotten password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
             break;
         case StatusSubmitForgotPasswordChallenge:
             setWindowTitle(
                 appName + " - " +
-                tr("Requesting forgot password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
+                tr("Requesting forgotten password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
             break;
         case StatusSubmitForgotPasswordReset:
             setWindowTitle(
                 appName + " - " +
-                tr("Requesting forgot password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
+                tr("Requesting forgotten password to %1 as %2...").arg(client->peerName()).arg(client->getUserName()));
             break;
         default:
             setWindowTitle(appName);
@@ -1030,10 +1030,10 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("New sets found"));
     msgBox.setIcon(QMessageBox::Question);
-    msgBox.setText(tr("%1 new set(s) found in the card database\n"
-                      "Set code(s): %2\n"
-                      "Do you want to enable it/them?")
-                       .arg(numUnknownSets)
+    msgBox.setText(tr("%n new set(s) found in the card database\n"
+                      "Set code(s): %1\n"
+                      "Do you want to enable it/them?",
+                      "", numUnknownSets)
                        .arg(unknownSetsNames.join(", ")));
 
     QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
@@ -1313,7 +1313,7 @@ void MainWindow::forgotPasswordSuccess()
 {
     QMessageBox::information(
         this, tr("Forgot Password"),
-        tr("Your password has been reset successfully, you now may  log in using the new credentials."));
+        tr("Your password has been reset successfully, you can now log in using the new credentials."));
     settingsCache->servers().setFPHostName("");
     settingsCache->servers().setFPPort("");
     settingsCache->servers().setFPPlayerName("");

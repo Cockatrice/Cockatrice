@@ -181,7 +181,7 @@ void UserContextMenu::banUserHistory_processResponse(const Response &resp)
 
     } else
         QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Ban History"),
-                              tr("Failed to collecting ban information."));
+                              tr("Failed to collect ban information."));
 }
 
 void UserContextMenu::warnUserHistory_processResponse(const Response &resp)
@@ -217,7 +217,7 @@ void UserContextMenu::warnUserHistory_processResponse(const Response &resp)
 
     } else
         QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Warning History"),
-                              tr("Failed to collecting warning information."));
+                              tr("Failed to collect warning information."));
 }
 
 void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const CommandContainer &commandContainer)
