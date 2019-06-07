@@ -389,8 +389,6 @@ void OracleImporter::sortAndReduceColors(QString &colors)
 
 int OracleImporter::startImport()
 {
-    clear();
-
     int setCards = 0, setIndex = 0;
     // add an empty set for tokens
     CardSetPtr tokenSet = CardSet::newInstance(TOKENS_SETNAME, tr("Dummy set containing tokens"), "Tokens");
@@ -419,4 +417,10 @@ bool OracleImporter::saveToFile(const QString &fileName)
 {
     CockatriceXml4Parser parser;
     return parser.saveToFile(sets, cards, fileName);
+}
+
+void OracleImporter::clear()
+{
+    CardDatabase::clear();
+    allSets.clear();
 }
