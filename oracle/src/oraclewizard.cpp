@@ -530,6 +530,7 @@ SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
 
 void SaveSetsPage::cleanupPage()
 {
+    wizard()->importer->clear();
     disconnect(wizard()->importer, SIGNAL(setIndexChanged(int, int, const QString &)), nullptr, nullptr);
 }
 

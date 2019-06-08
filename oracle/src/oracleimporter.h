@@ -120,6 +120,7 @@ public:
     {
         return dataDir;
     }
+    void clear();
 
 protected:
     inline QString getStringPropertyFromMap(QVariantMap card, QString propertyName);
