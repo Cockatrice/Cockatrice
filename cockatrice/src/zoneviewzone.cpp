@@ -191,6 +191,7 @@ void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
     cards.insert(x, card);
     card->setParentItem(this);
     card->update();
+    reorganizeCards();
 }
 
 void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
