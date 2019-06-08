@@ -857,6 +857,8 @@ void MainWindow::startupConfigCheck()
                  << "differs, assuming first start after update";
         if (settingsCache->getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
+        } else {
+            QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
         }
     } else {
         // previous config from this version found
