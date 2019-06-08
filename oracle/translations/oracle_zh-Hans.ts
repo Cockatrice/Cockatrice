@@ -25,127 +25,127 @@
 <context>
     <name>LoadSetsPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="242"/>
+        <location filename="../src/oraclewizard.cpp" line="250"/>
         <source>Source selection</source>
         <translation>资源选择</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="243"/>
-        <source>Please specify a source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation>请选择系列和卡牌列表的来源。您可以输入下载链接或者使用电脑中已有的文件。</translation>
+        <location filename="../src/oraclewizard.cpp" line="251"/>
+        <source>Please specify a compatible source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="247"/>
+        <location filename="../src/oraclewizard.cpp" line="255"/>
         <source>Download URL:</source>
         <translation>下载链接：</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="248"/>
+        <location filename="../src/oraclewizard.cpp" line="256"/>
         <source>Local file:</source>
         <translation>本地文件：</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="249"/>
+        <location filename="../src/oraclewizard.cpp" line="257"/>
         <source>Restore default URL</source>
         <translation>恢复默认链接</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="250"/>
+        <location filename="../src/oraclewizard.cpp" line="258"/>
         <source>Choose file...</source>
         <translation>选择文件</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="260"/>
+        <location filename="../src/oraclewizard.cpp" line="268"/>
         <source>Load sets file</source>
         <translation>载入系列文件</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="270"/>
+        <location filename="../src/oraclewizard.cpp" line="278"/>
         <source>Sets JSON file (%1)</source>
         <translation>设置json文件（%1）</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="294"/>
-        <location filename="../src/oraclewizard.cpp" line="313"/>
-        <location filename="../src/oraclewizard.cpp" line="318"/>
-        <location filename="../src/oraclewizard.cpp" line="357"/>
-        <location filename="../src/oraclewizard.cpp" line="481"/>
-        <location filename="../src/oraclewizard.cpp" line="503"/>
+        <location filename="../src/oraclewizard.cpp" line="302"/>
+        <location filename="../src/oraclewizard.cpp" line="321"/>
+        <location filename="../src/oraclewizard.cpp" line="326"/>
+        <location filename="../src/oraclewizard.cpp" line="362"/>
+        <location filename="../src/oraclewizard.cpp" line="486"/>
+        <location filename="../src/oraclewizard.cpp" line="507"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="294"/>
+        <location filename="../src/oraclewizard.cpp" line="302"/>
         <source>The provided URL is not valid.</source>
         <translation>提供的链接无效。</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="298"/>
+        <location filename="../src/oraclewizard.cpp" line="306"/>
         <source>Downloading (0MB)</source>
         <translation>下载中(0MB)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="313"/>
+        <location filename="../src/oraclewizard.cpp" line="321"/>
         <source>Please choose a file.</source>
         <translation>请选择一个文件。</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="318"/>
+        <location filename="../src/oraclewizard.cpp" line="326"/>
         <source>Cannot open file &apos;%1&apos;.</source>
         <translation>无法打开文件&quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="348"/>
+        <location filename="../src/oraclewizard.cpp" line="353"/>
         <source>Downloading (%1MB)</source>
         <translation>下载中(%1MB)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="357"/>
+        <location filename="../src/oraclewizard.cpp" line="362"/>
         <source>Network error: %1.</source>
         <translation>网络错误：%1</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="395"/>
+        <location filename="../src/oraclewizard.cpp" line="400"/>
         <source>Parsing file</source>
         <translation>正在解析文件</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="409"/>
+        <location filename="../src/oraclewizard.cpp" line="414"/>
         <source>Xz extraction failed.</source>
         <translation>xz解压缩失败。</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="417"/>
+        <location filename="../src/oraclewizard.cpp" line="422"/>
         <source>Sorry, this version of Oracle does not support xz compressed files.</source>
         <translation>抱歉，当前版本的Oracle不支持xz压缩文件</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="436"/>
+        <location filename="../src/oraclewizard.cpp" line="441"/>
         <source>Failed to open Zip archive: %1.</source>
         <translation>未能打开压缩文件：%1。</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="441"/>
+        <location filename="../src/oraclewizard.cpp" line="446"/>
         <source>Zip extraction failed: the Zip archive doesn&apos;t contain exactly one file.</source>
         <translation>解压缩失败：该压缩文件不包含文件。</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="449"/>
+        <location filename="../src/oraclewizard.cpp" line="454"/>
         <source>Zip extraction failed: %1.</source>
         <translation>解压缩失败：%1。</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="458"/>
+        <location filename="../src/oraclewizard.cpp" line="463"/>
         <source>Sorry, this version of Oracle does not support zipped files.</source>
         <translation>抱歉，当前版本的Oracle不支持压缩文件。</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="482"/>
-        <source>Do you want to try to download a fresh copy of the uncompressed file instead?</source>
-        <translation>您是否想下载一个未压缩的文件？</translation>
+        <location filename="../src/oraclewizard.cpp" line="486"/>
+        <source>Do you want to download the uncompressed file instead?</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="504"/>
+        <location filename="../src/oraclewizard.cpp" line="508"/>
         <source>The file was retrieved successfully, but it does not contain any sets data.</source>
         <translation>文件恢复成功，但它不包含任何系列数据。</translation>
     </message>
@@ -153,99 +153,87 @@
 <context>
     <name>LoadSpoilersPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="642"/>
-        <source>Downloading (%1MB)</source>
-        <translation>下载中(%1MB)</translation>
+        <location filename="../src/oraclewizard.cpp" line="662"/>
+        <source>Save spoiler database</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="652"/>
-        <location filename="../src/oraclewizard.cpp" line="712"/>
-        <source>Error</source>
-        <translation>错误</translation>
+        <location filename="../src/oraclewizard.cpp" line="667"/>
+        <source>XML; spoiler database (*.xml)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="652"/>
-        <source>Network error: %1.</source>
-        <translation>网络错误：%1</translation>
+        <location filename="../src/oraclewizard.cpp" line="672"/>
+        <source>Spoilers import</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="712"/>
-        <source>The provided URL is not valid.</source>
-        <translation>提供的链接无效。</translation>
+        <location filename="../src/oraclewizard.cpp" line="673"/>
+        <source>Please specify a compatible source for spoiler data.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="716"/>
-        <source>Downloading (0MB)</source>
-        <translation>下载中(0MB)</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="733"/>
-        <source>Spoilers source selection</source>
-        <translation>选择spoiler资源文件</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="734"/>
-        <source>Please specify a spoiler source.</source>
-        <translation>请指定一个spoiler资源文件</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="736"/>
+        <location filename="../src/oraclewizard.cpp" line="675"/>
         <source>Download URL:</source>
         <translation>下载链接：</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="737"/>
+        <location filename="../src/oraclewizard.cpp" line="676"/>
         <source>Restore default URL</source>
         <translation>恢复默认链接</translation>
+    </message>
+    <message>
+        <location filename="../src/oraclewizard.cpp" line="677"/>
+        <source>The spoiler database will be saved at the following location:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/oraclewizard.cpp" line="679"/>
+        <source>Save to a custom path (not recommended)</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LoadTokensPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="771"/>
-        <source>Tokens source selection</source>
-        <translation>衍生物资源选择</translation>
+        <location filename="../src/oraclewizard.cpp" line="625"/>
+        <source>Save token database</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="772"/>
-        <source>Please specify a source for the list of tokens.</source>
-        <translation>请衍生物列表指定一个资源文件</translation>
+        <location filename="../src/oraclewizard.cpp" line="630"/>
+        <source>XML; token database (*.xml)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="774"/>
+        <location filename="../src/oraclewizard.cpp" line="635"/>
+        <source>Tokens import</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/oraclewizard.cpp" line="636"/>
+        <source>Please specify a compatible source for token data.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/oraclewizard.cpp" line="638"/>
         <source>Download URL:</source>
         <translation>下载链接：</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="775"/>
+        <location filename="../src/oraclewizard.cpp" line="639"/>
         <source>Restore default URL</source>
         <translation>恢复默认链接</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="792"/>
-        <location filename="../src/oraclewizard.cpp" line="837"/>
-        <source>Error</source>
-        <translation>错误</translation>
+        <location filename="../src/oraclewizard.cpp" line="640"/>
+        <source>The token database will be saved at the following location:</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="792"/>
-        <source>The provided URL is not valid.</source>
-        <translation>提供的链接无效。</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="796"/>
-        <source>Downloading (0MB)</source>
-        <translation>下载中(0MB)</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="828"/>
-        <source>Downloading (%1MB)</source>
-        <translation>下载中(%1MB)</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="837"/>
-        <source>Network error: %1.</source>
-        <translation>网络错误：%1</translation>
+        <location filename="../src/oraclewizard.cpp" line="642"/>
+        <source>Save to a custom path (not recommended)</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -259,173 +247,136 @@
 <context>
     <name>OracleWizard</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="91"/>
+        <location filename="../src/oraclewizard.cpp" line="93"/>
         <source>Oracle Importer</source>
         <translation>Oracle导入器</translation>
     </message>
+</context>
+<context>
+    <name>OutroPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="92"/>
-        <source>Save</source>
-        <translation>保存</translation>
+        <location filename="../src/oraclewizard.cpp" line="200"/>
+        <source>Finished</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/oraclewizard.cpp" line="201"/>
+        <source>The wizard has finished.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/oraclewizard.cpp" line="202"/>
+        <source>You can now start using Cockatrice with the newly updated cards.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/oraclewizard.cpp" line="203"/>
+        <source>If the card databases don&apos;t reload automatically, restart the Cockatrice client.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>SaveSetsPage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="536"/>
-        <location filename="../src/oraclewizard.cpp" line="592"/>
+        <location filename="../src/oraclewizard.cpp" line="544"/>
+        <location filename="../src/oraclewizard.cpp" line="601"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="536"/>
+        <location filename="../src/oraclewizard.cpp" line="544"/>
         <source>No set has been imported.</source>
         <translation>没有系列被导入。</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="542"/>
+        <location filename="../src/oraclewizard.cpp" line="550"/>
         <source>Sets imported</source>
         <translation>系列已导入</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="543"/>
-        <source>The following sets has been imported. Press &quot;Save&quot; to save the imported cards to the Cockatrice database.</source>
-        <translation>以下系列已导入。请点击“保存”按钮将卡牌保存到Cockatrice鸡蛇卡牌数据库。</translation>
+        <location filename="../src/oraclewizard.cpp" line="551"/>
+        <source>The following sets have been found:</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="546"/>
-        <source>Save to the default path (recommended)</source>
-        <translation>保存到默认路径(推荐)</translation>
+        <location filename="../src/oraclewizard.cpp" line="553"/>
+        <source>Press &quot;Save&quot; to store the imported cards in the Cockatrice database.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="547"/>
+        <location filename="../src/oraclewizard.cpp" line="554"/>
+        <source>The card database will be saved at the following location:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/oraclewizard.cpp" line="556"/>
+        <source>Save to a custom path (not recommended)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/oraclewizard.cpp" line="558"/>
         <source>&amp;Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="553"/>
+        <location filename="../src/oraclewizard.cpp" line="564"/>
         <source>Import finished: %1 cards.</source>
         <translation>导入成功：%1张卡牌。</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="556"/>
+        <location filename="../src/oraclewizard.cpp" line="567"/>
         <source>%1: %2 cards imported</source>
         <translation>%1：%2张卡牌被导入</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="566"/>
+        <location filename="../src/oraclewizard.cpp" line="577"/>
         <source>Save card database</source>
         <translation>保存卡牌数据库</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="567"/>
+        <location filename="../src/oraclewizard.cpp" line="578"/>
         <source>XML; card database (*.xml)</source>
         <translation>XML;卡牌数据库(*.xml)</translation>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="589"/>
-        <source>Success</source>
-        <translation>成功</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="590"/>
-        <source>The card database has been saved successfully to
-%1</source>
-        <translation>卡牌数据库已保存到
-%1</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="592"/>
+        <location filename="../src/oraclewizard.cpp" line="601"/>
         <source>The file could not be saved to %1</source>
         <translation>文件无法被保存到%1</translation>
     </message>
 </context>
 <context>
-    <name>SaveSpoilersPage</name>
+    <name>SimpleDownloadFilePage</name>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="889"/>
-        <source>Spoilers imported</source>
-        <translation>导入spoilers </translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="890"/>
-        <source>The spoilers file has been imported. Press &quot;Save&quot; to save the imported spoilers to the Cockatrice card database.</source>
-        <translation>spoilers文件已导入，请按保存按钮将导入的spoilers储存到鸡蛇卡牌数据库中。</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="893"/>
-        <source>Save to the default path (recommended)</source>
-        <translation>保存到默认路径(推荐)</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="900"/>
-        <source>Save spoiler database</source>
-        <translation>保存spoiler数据库</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="901"/>
-        <source>XML; card database (*.xml)</source>
-        <translation>XML;卡牌数据库(*.xml)</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="924"/>
+        <location filename="../src/pagetemplates.cpp" line="72"/>
+        <location filename="../src/pagetemplates.cpp" line="112"/>
+        <location filename="../src/pagetemplates.cpp" line="172"/>
         <source>Error</source>
-        <translation>错误</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/oraclewizard.cpp" line="924"/>
+        <location filename="../src/pagetemplates.cpp" line="72"/>
+        <source>The provided URL is not valid.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/pagetemplates.cpp" line="76"/>
+        <source>Downloading (0MB)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/pagetemplates.cpp" line="103"/>
+        <source>Downloading (%1MB)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/pagetemplates.cpp" line="112"/>
+        <source>Network error: %1.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/pagetemplates.cpp" line="172"/>
         <source>The file could not be saved to %1</source>
-        <translation>文件无法被保存到%1</translation>
-    </message>
-</context>
-<context>
-    <name>SaveTokensPage</name>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="948"/>
-        <source>Tokens imported</source>
-        <translation>衍生物已导入</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="949"/>
-        <source>The tokens has been imported. Press &quot;Save&quot; to save the imported tokens to the Cockatrice tokens database.</source>
-        <translation>衍生物已导入。请点击“保存”按钮将衍生物保存到Cockatrice鸡蛇衍生物数据库。</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="952"/>
-        <source>Save to the default path (recommended)</source>
-        <translation>保存到默认路径(推荐)</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="959"/>
-        <source>Save token database</source>
-        <translation>保存衍生物数据库</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="960"/>
-        <source>XML; token database (*.xml)</source>
-        <translation>XML; 衍生物数据库 (*.xml)</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="982"/>
-        <source>Success</source>
-        <translation>成功</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="983"/>
-        <source>The token database has been saved successfully to
-%1</source>
-        <translation>衍生物数据库已经保到
-%1</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="985"/>
-        <source>Error</source>
-        <translation>错误</translation>
-    </message>
-    <message>
-        <location filename="../src/oraclewizard.cpp" line="985"/>
-        <source>The file could not be saved to %1</source>
-        <translation>文件无法被保存到%1</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
