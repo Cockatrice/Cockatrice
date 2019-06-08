@@ -672,7 +672,7 @@ void DeckEditorSettingsPage::retranslateUi()
     lastUpdatedLabel.setText(tr("Last Change") + ": " + getLastUpdateTime());
     infoOnSpoilersLabel.setText(tr("Spoilers download automatically on launch") + "\n" +
                                 tr("Press the button to manually update without relaunching") + "\n\n" +
-                                tr("Do not close settings until manual update complete"));
+                                tr("Do not close settings until manual update is complete"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
     clearDownloadedPicsButton.setText(tr("Delete Downloaded Images"));
