@@ -56,33 +56,6 @@ matrix:
           "cockatrice_${NAME,,}"
           bash .ci/travis-compile.sh --server --package "$NAME" --release
 
-  #Fedora 29 (on docker)
-  - name: Fedora 29 (Debug)
-    if: tag IS NOT present
-    services: docker
-    env: NAME=Fedora29
-    cache:
-      directories:
-        - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --debug
-
-  - name: Fedora 29 (Release)
-    if: (branch = master AND NOT type = pull_request) OR tag IS present
-    services: docker
-    env: NAME=Fedora29
-    cache:
-      directories:
-        - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --package "$NAME" "RPM" --release
-
   #macOS
   - name: macOS (Debug)
     if: tag IS NOT present
