@@ -21,6 +21,14 @@ struct LogMoveCard
     int newX;
 };
 
+struct LogShuffle
+{
+    Player *player;
+    CardZone *zone;
+    int start;
+    int end;
+};
+
 class MessageLogWidget : public ChatView
 {
     Q_OBJECT
@@ -29,15 +37,16 @@ private:
     {
         MessageContext_None,
         MessageContext_MoveCard,
-        MessageContext_Mulligan
+        MessageContext_Mulligan,
+        MessageContext_ShuffleAfterMove,
     };
 
     int mulliganNumber;
     Player *mulliganPlayer;
     MessageContext currentContext;
     QList<LogMoveCard> moveCardQueue;
+    QList<LogShuffle> shuffleQueue;
     QMap<CardItem *, bool> moveCardTapped;
-    QList<QString> moveCardExtras;
     QString messagePrefix, messageSuffix;
 
     const QString tableConstant() const;
@@ -70,6 +79,7 @@ public slots:
     void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
     void logDestroyCard(Player *player, QString cardName);
     void logDoMoveCard(LogMoveCard &lmc);
+    void logDoShuffle(LogShuffle &ls);
     void logDrawCards(Player *player, int number);
     void logDumpZone(Player *player, CardZone *zone, int numberCards);
     void logFlipCard(Player *player, QString cardName, bool faceDown);

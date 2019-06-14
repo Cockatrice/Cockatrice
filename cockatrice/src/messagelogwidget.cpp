@@ -129,13 +129,19 @@ MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, boo
 void MessageLogWidget::containerProcessingDone()
 {
 
-    if (currentContext == MessageContext_MoveCard) {
+    if (currentContext == MessageContext_MoveCard || currentContext == MessageContext_ShuffleAfterMove) {
         for (auto &i : moveCardQueue) {
             logDoMoveCard(i);
         }
         moveCardQueue.clear();
         moveCardTapped.clear();
-        moveCardExtras.clear();
+
+        if(currentContext == MessageContext_ShuffleAfterMove) {
+            for (auto &i : shuffleQueue) {
+                logDoShuffle(i);
+            }
+            shuffleQueue.clear();
+        }
     } else if (currentContext == MessageContext_Mulligan) {
         logMulligan(mulliganPlayer, mulliganNumber);
         mulliganPlayer = nullptr;
@@ -333,9 +339,7 @@ void MessageLogWidget::logDoMoveCard(LogMoveCard &lmc)
     } else if (targetZone == handConstant()) {
         finalStr = tr("%1 moves %2%3 to their hand.");
     } else if (targetZone == deckConstant()) {
-        if (moveCardExtras.contains("shuffle_partial")) {
-            finalStr = tr("%1 puts %2%3 on bottom of their library randomly.");
-        } else if (lmc.newX == -1) {
+        if (lmc.newX == -1) {
             finalStr = tr("%1 puts %2%3 into their library.");
         } else if (lmc.newX == lmc.targetZone->getCards().size() - 1) {
             finalStr = tr("%1 puts %2%3 on bottom of their library.");
@@ -781,38 +785,46 @@ void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 
 void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int end)
 {
-    soundEngine->playSound("shuffle");
     if (currentContext == MessageContext_Mulligan) {
         return;
     }
 
-    if (currentContext == MessageContext_MoveCard && start == 0 && end == -1) {
-        moveCardExtras.append("shuffle_partial");
-        return;
+    LogShuffle attributes = {player, zone, start, end};
+
+    if (currentContext == MessageContext_MoveCard) {
+        currentContext = MessageContext_ShuffleAfterMove;
+        shuffleQueue.append(attributes);
+    } else {
+        logDoShuffle(attributes);
     }
+}
+
+void MessageLogWidget::logDoShuffle(LogShuffle &ls)
+{
+    soundEngine->playSound("shuffle");
 
     // start and end are indexes into the portion of the deck that was shuffled
     // with negitive numbers counging from the bottom up.
-    if (start == 0 && end == -1) {
+    if (ls.start == 0 && ls.end == -1) {
         appendHtmlServerMessage(tr("%1 shuffles %2.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg(zone->getTranslatedName(true, CaseShuffleZone)));
-    } else if (start < 0 && end == -1) {
+                                    .arg(sanitizeHtml(ls.player->getName()))
+                                    .arg(ls.zone->getTranslatedName(true, CaseShuffleZone)));
+    } else if (ls.start < 0 && ls.end == -1) {
         appendHtmlServerMessage(tr("%1 shuffles the bottom %3 cards of %2.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
-                                    .arg(-start));
-    } else if (start < 0 && end > 0) {
+                                    .arg(sanitizeHtml(ls.player->getName()))
+                                    .arg(ls.zone->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(-ls.start));
+    } else if (ls.start < 0 && ls.end > 0) {
         appendHtmlServerMessage(tr("%1 shuffles the top %3 cards of %2.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
-                                    .arg(end + 1));
+                                    .arg(sanitizeHtml(ls.player->getName()))
+                                    .arg(ls.zone->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(ls.end + 1));
     } else {
         appendHtmlServerMessage(tr("%1 shuffles cards %3 - %4 of %2.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
-                                    .arg(start)
-                                    .arg(end));
+                                    .arg(sanitizeHtml(ls.player->getName()))
+                                    .arg(ls.zone->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(ls.start)
+                                    .arg(ls.end));
     }
 }
 
