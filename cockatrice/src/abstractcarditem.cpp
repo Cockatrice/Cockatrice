@@ -52,7 +52,7 @@ void AbstractCardItem::cardInfoUpdated()
         info = CardInfo::newInstance(name, "", true, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
                                      CardInfoPerSetMap(), false, -1, false);
     }
-    if(info.data()) {
+    if (info.data()) {
         connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
     }
 
