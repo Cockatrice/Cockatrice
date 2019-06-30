@@ -96,6 +96,7 @@ matrix:
         - protobuf
         - qt
         - xz
+        update: true
     script: bash ./.ci/travis-compile.sh --server --install --debug
 
   - name: macOS (Release)
