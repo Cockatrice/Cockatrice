@@ -87,7 +87,7 @@ matrix:
   - name: macOS (Debug)
     if: tag IS NOT present
     os: osx
-    osx_image: xcode10.1
+    osx_image: xcode9.2
     cache: ccache
     addons:
       homebrew:
@@ -96,6 +96,7 @@ matrix:
         - protobuf
         - qt
         - xz
+        update: true
     script: bash ./.ci/travis-compile.sh --server --install --debug
 
   - name: macOS (Release)
