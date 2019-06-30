@@ -48,11 +48,11 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         // capitalize set type
         if (setType.length() > 0) {
             // basic grammar for words that aren't capitalized, like in "From the Vault"
-            const QStringList noCapitalize = {"the", "a", "an", "on", "to", "for"};
+            const QStringList noCapitalize = {"the", "a", "an", "on", "to", "for", "of", "in", "and", "with", "or"};
             QStringList words = setType.split("_");
             setType.clear();
             bool first = false;
-            for (auto& item : words) {
+            for (auto &item : words) {
                 if (first && noCapitalize.contains(item)) {
                     setType += item + QString(" ");
                 } else {
