@@ -31,6 +31,7 @@ AbstractCounter::AbstractCounter(Player *_player,
 
     if (player->getLocalOrJudge()) {
         menu = new QMenu(name);
+        menu->setTearOffEnabled(true);
         aSet = new QAction(this);
         connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
         menu->addAction(aSet);
