@@ -1012,8 +1012,8 @@ void Player::actMulligan()
     Command_Mulligan cmd;
     if (settingsCache->getLegacyMulligan() && zones.value("hand")->getCards().size() > 1) {
         cmd.set_number(zones.value("hand")->getCards().size() - 1);
-    }else{
-    cmd.set_number(settingsCache->getStartingHandSize());
+    } else {
+        cmd.set_number(settingsCache->getStartingHandSize());
     }
     sendGameCommand(cmd);
 }

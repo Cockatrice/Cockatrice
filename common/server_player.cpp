@@ -90,8 +90,8 @@ Server_Player::Server_Player(Server_Game *_game,
                              bool _judge,
                              Server_AbstractUserInterface *_userInterface)
     : ServerInfo_User_Container(_userInfo), game(_game), userInterface(_userInterface), deck(nullptr), pingTime(0),
-      playerId(_playerId), spectator(_spectator), judge(_judge), nextCardId(0), readyStart(false),
-      conceded(false), sideboardLocked(true)
+      playerId(_playerId), spectator(_spectator), judge(_judge), nextCardId(0), readyStart(false), conceded(false),
+      sideboardLocked(true)
 {
 }
 

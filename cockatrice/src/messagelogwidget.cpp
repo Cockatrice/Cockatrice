@@ -466,9 +466,12 @@ void MessageLogWidget::logMulligan(Player *player, int number)
         return;
     }
     if (number > 0) {
-        appendHtmlServerMessage(tr("%1 shuffles their deck and draws a new hand of %2 card(s).", "", number).arg(sanitizeHtml(player->getName())).arg(number));
+        appendHtmlServerMessage(tr("%1 shuffles their deck and draws a new hand of %2 card(s).", "", number)
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(number));
     } else {
-        appendHtmlServerMessage(tr("%1 shuffles their deck and draws a new hand.").arg(sanitizeHtml(player->getName())));
+        appendHtmlServerMessage(
+            tr("%1 shuffles their deck and draws a new hand.").arg(sanitizeHtml(player->getName())));
     }
 }
 
