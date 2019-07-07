@@ -90,7 +90,7 @@ Server_Player::Server_Player(Server_Game *_game,
                              bool _judge,
                              Server_AbstractUserInterface *_userInterface)
     : ServerInfo_User_Container(_userInfo), game(_game), userInterface(_userInterface), deck(nullptr), pingTime(0),
-      playerId(_playerId), spectator(_spectator), judge(_judge), initialCards(0), nextCardId(0), readyStart(false),
+      playerId(_playerId), spectator(_spectator), judge(_judge), nextCardId(0), readyStart(false),
       conceded(false), sideboardLocked(true)
 {
 }
@@ -165,8 +165,6 @@ void Server_Player::setupZones()
     addCounter(new Server_Counter(5, "g", makeColor(150, 255, 150), 20, 0));
     addCounter(new Server_Counter(6, "x", makeColor(255, 255, 255), 20, 0));
     addCounter(new Server_Counter(7, "storm", makeColor(255, 150, 30), 20, 0));
-
-    initialCards = 7;
 
     // ------------------------------------------------------------------
 
@@ -980,7 +978,7 @@ Server_Player::cmdShuffle(const Command_Shuffle &cmd, ResponseContainer & /*rc*/
 }
 
 Response::ResponseCode
-Server_Player::cmdMulligan(const Command_Mulligan & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
     if (spectator) {
         return Response::RespFunctionNotAllowed;
@@ -994,27 +992,24 @@ Server_Player::cmdMulligan(const Command_Mulligan & /*cmd*/, ResponseContainer &
     }
 
     Server_CardZone *hand = zones.value("hand");
-    int number = (hand->getCards().size() <= 1) ? initialCards : hand->getCards().size() - 1;
-
     Server_CardZone *deck = zones.value("deck");
-    while (!hand->getCards().isEmpty()) {
+    int number = cmd.number();
+
+    auto cardsToMove = QList<const CardToMove *>();
+    for (auto &card : hand->getCards()) {
         auto *cardToMove = new CardToMove;
-        cardToMove->set_card_id(hand->getCards().first()->getId());
-        moveCard(ges, hand, QList<const CardToMove *>() << cardToMove, deck, 0, 0, false);
-        delete cardToMove;
+        cardToMove->set_card_id(card->getId());
+        cardsToMove.append(cardToMove);
     }
+    moveCard(ges, hand, cardsToMove, deck, -1, 0, false);
 
     deck->shuffle();
     ges.enqueueGameEvent(Event_Shuffle(), playerId);
 
     drawCards(ges, number);
 
-    if (number == initialCards) {
-        number = -1;
-    }
-
     Context_Mulligan context;
-    context.set_number(static_cast<google::protobuf::uint32>(number));
+    context.set_number(static_cast<google::protobuf::uint32>(hand->getCards().size()));
     ges.setGameEventContext(context);
 
     return Response::RespOk;

@@ -1009,7 +1009,13 @@ void Player::actDrawCard()
 
 void Player::actMulligan()
 {
-    sendGameCommand(Command_Mulligan());
+    Command_Mulligan cmd;
+    if (settingsCache->getLegacyMulligan() && zones.value("hand")->getCards().size() > 1) {
+        cmd.set_number(zones.value("hand")->getCards().size() - 1);
+    }else{
+    cmd.set_number(settingsCache->getStartingHandSize());
+    }
+    sendGameCommand(cmd);
 }
 
 void Player::actDrawCards()

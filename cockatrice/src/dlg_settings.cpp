@@ -386,10 +386,27 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&specNotificationsEnabledCheckBox, 1, 0);
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 2, 0);
     generalGrid->addWidget(&playToStackCheckBox, 3, 0);
-    generalGrid->addWidget(&annotateTokensCheckBox, 4, 0);
+    generalGrid->addWidget(&annotateTokensCheckBox, 5, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
+
+    connect(&startingHandSizeEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setStartingHandSize(int)));
+    startingHandSizeEdit.setValue(settingsCache->getStartingHandSize());
+    startingHandSizeLabel.setBuddy(&startingHandSizeEdit);
+    startingHandSizeEdit.setMinimum(1);
+    startingHandSizeEdit.setMaximum(100);
+
+    legacyMulliganCheckBox.setChecked(settingsCache->getLegacyMulligan());
+    connect(&legacyMulliganCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setLegacyMulligan(int)));
+
+    auto *mulliganGrid = new QGridLayout;
+    mulliganGrid->addWidget(&startingHandSizeLabel, 0, 0, 1, 1);
+    mulliganGrid->addWidget(&startingHandSizeEdit, 0, 1, 1, 1);
+    mulliganGrid->addWidget(&legacyMulliganCheckBox, 1, 0, 1, 2);
+
+    mulliganGroupBox = new QGroupBox;
+    mulliganGroupBox->setLayout(mulliganGrid);
 
     tapAnimationCheckBox.setChecked(settingsCache->getTapAnimation());
     connect(&tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
@@ -402,6 +419,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(generalGroupBox);
+    mainLayout->addWidget(mulliganGroupBox);
     mainLayout->addWidget(animationGroupBox);
 
     setLayout(mainLayout);
@@ -420,6 +438,9 @@ void UserInterfaceSettingsPage::retranslateUi()
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
+    mulliganGroupBox->setTitle(tr("Mulligan settings"));
+    startingHandSizeLabel.setText(tr("Starting hand size used by the mulligan command"));
+    legacyMulliganCheckBox.setText(tr("&Mulligan follows the old pattern of drawing one card less (Paris mulligan)"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
 }

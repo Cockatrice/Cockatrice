@@ -111,8 +111,12 @@ private:
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox playToStackCheckBox;
     QCheckBox annotateTokensCheckBox;
+    QSpinBox startingHandSizeEdit;
+    QLabel startingHandSizeLabel;
+    QCheckBox legacyMulliganCheckBox;
     QCheckBox tapAnimationCheckBox;
     QGroupBox *generalGroupBox;
+    QGroupBox *mulliganGroupBox;
     QGroupBox *animationGroupBox;
 
 public:

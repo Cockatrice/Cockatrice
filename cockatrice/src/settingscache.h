@@ -78,6 +78,8 @@ private:
     bool spectatorNotificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
+    bool legacyMulligan;
+    int startingHandSize;
     bool annotateTokens;
     QByteArray tabGameSplitterSizes;
     bool displayCardNames;
@@ -231,6 +233,14 @@ public:
     bool getPlayToStack() const
     {
         return playToStack;
+    }
+    bool getLegacyMulligan() const
+    {
+        return legacyMulligan;
+    }
+    int getStartingHandSize() const
+    {
+        return startingHandSize;
     }
     bool getAnnotateTokens() const
     {
@@ -466,6 +476,8 @@ public slots:
     void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
+    void setLegacyMulligan(int _legacyMulligan);
+    void setStartingHandSize(int _startingHandSize);
     void setAnnotateTokens(int _annotateTokens);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setDisplayCardNames(int _displayCardNames);
