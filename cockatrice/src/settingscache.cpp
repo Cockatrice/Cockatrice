@@ -441,10 +441,9 @@ void SettingsCache::setPlayToStack(int _playToStack)
     settings->setValue("interface/playtostack", playToStack);
 }
 
-void SettingsCache::setLegacyMulligan(int _legacyMulligan)
+void SettingsCache::setLegacyMulligan(bool _legacyMulligan)
 {
-    legacyMulligan = static_cast<bool>(_legacyMulligan);
-    settings->setValue("interface/legacymulligan", legacyMulligan);
+    settings->setValue("interface/legacymulligan", _legacyMulligan);
 }
 
 void SettingsCache::setStartingHandSize(int _startingHandSize)

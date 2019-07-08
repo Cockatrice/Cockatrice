@@ -397,13 +397,15 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     startingHandSizeEdit.setMinimum(1);
     startingHandSizeEdit.setMaximum(100);
 
-    legacyMulliganCheckBox.setChecked(settingsCache->getLegacyMulligan());
-    connect(&legacyMulliganCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setLegacyMulligan(int)));
+    newMulliganRadioButton.setChecked(!settingsCache->getLegacyMulligan());
+    oldMulliganRadioButton.setChecked(settingsCache->getLegacyMulligan());
+    connect(&oldMulliganRadioButton, SIGNAL(toggled(bool)), settingsCache, SLOT(setLegacyMulligan(bool)));
 
     auto *mulliganGrid = new QGridLayout;
     mulliganGrid->addWidget(&startingHandSizeLabel, 0, 0, 1, 1);
     mulliganGrid->addWidget(&startingHandSizeEdit, 0, 1, 1, 1);
-    mulliganGrid->addWidget(&legacyMulliganCheckBox, 1, 0, 1, 2);
+    mulliganGrid->addWidget(&newMulliganRadioButton, 1, 0, 1, 2);
+    mulliganGrid->addWidget(&oldMulliganRadioButton, 1, 0, 2, 2);
 
     mulliganGroupBox = new QGroupBox;
     mulliganGroupBox->setLayout(mulliganGrid);
@@ -439,8 +441,9 @@ void UserInterfaceSettingsPage::retranslateUi()
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     mulliganGroupBox->setTitle(tr("Mulligan settings"));
-    startingHandSizeLabel.setText(tr("Starting hand size used by the mulligan command"));
-    legacyMulliganCheckBox.setText(tr("&Mulligan follows the old pattern of drawing one card less (Paris mulligan)"));
+    startingHandSizeLabel.setText(tr("Default starting hand size"));
+    newMulliganRadioButton.setText(tr("*NEW* London Mulligan (Draw starting hand size, put X cards to bottom)"));
+    oldMulliganRadioButton.setText(tr("Vancouver Mulligan (Draw one less card per redraw, scry 1)"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
 }

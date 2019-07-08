@@ -7,6 +7,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QSpinBox>
 
 class CardDatabase;
@@ -113,7 +114,8 @@ private:
     QCheckBox annotateTokensCheckBox;
     QSpinBox startingHandSizeEdit;
     QLabel startingHandSizeLabel;
-    QCheckBox legacyMulliganCheckBox;
+    QRadioButton newMulliganRadioButton;
+    QRadioButton oldMulliganRadioButton;
     QCheckBox tapAnimationCheckBox;
     QGroupBox *generalGroupBox;
     QGroupBox *mulliganGroupBox;

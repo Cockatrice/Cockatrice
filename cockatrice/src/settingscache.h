@@ -476,7 +476,7 @@ public slots:
     void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
-    void setLegacyMulligan(int _legacyMulligan);
+    void setLegacyMulligan(bool _legacyMulligan);
     void setStartingHandSize(int _startingHandSize);
     void setAnnotateTokens(int _annotateTokens);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
