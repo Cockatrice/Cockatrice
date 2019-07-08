@@ -88,7 +88,10 @@ matrix:
     if: tag IS NOT present
     os: osx
     osx_image: xcode10.1
-    cache: ccache
+    cache:
+      ccache
+      directories:
+      - $HOME/Library/Caches/Homebrew
     addons:
       homebrew:
         packages:
@@ -98,12 +101,18 @@ matrix:
         - xz
         update: true
     script: bash ./.ci/travis-compile.sh --server --install --debug
+    before_cache:
+    - brew cleanup
+
 
   - name: macOS (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode9.2
-    cache: ccache
+    cache:
+      ccache
+      directories:
+      - $HOME/Library/Caches/Homebrew
     addons:
       homebrew:
         packages:
@@ -113,6 +122,9 @@ matrix:
         - xz
         update: true
     script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
+    before_cache:
+    - brew cleanup
+
 
 # Builds for pull requests skip the deployment step altogether
 deploy:
