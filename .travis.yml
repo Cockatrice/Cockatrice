@@ -89,8 +89,8 @@ matrix:
     os: osx
     osx_image: xcode9.2
     cache:
-      ccache
-      directories:
+    - ccache
+    - directories:
       - $HOME/Library/Caches/Homebrew
     addons:
       homebrew:
@@ -110,8 +110,8 @@ matrix:
     os: osx
     osx_image: xcode9.2
     cache:
-      ccache
-      directories:
+    - ccache
+    - directories:
       - $HOME/Library/Caches/Homebrew
     addons:
       homebrew:
