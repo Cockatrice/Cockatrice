@@ -1017,9 +1017,9 @@ void Player::actMulligan()
                                       startSize, -handSize, deckSize);
     Command_Mulligan cmd;
     if (number < 1) {
-    if (handSize == 0) {
-        return;
-    }
+        if (handSize == 0) {
+            return;
+        }
         cmd.set_number(handSize + number);
     } else {
         cmd.set_number(number);
