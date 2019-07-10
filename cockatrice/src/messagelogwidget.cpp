@@ -128,20 +128,6 @@ MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, boo
 
 void MessageLogWidget::containerProcessingDone()
 {
-
-    if (currentContext == MessageContext_MoveCard) {
-        for (auto &i : moveCardQueue) {
-            logDoMoveCard(i);
-        }
-        moveCardQueue.clear();
-        moveCardTapped.clear();
-        moveCardExtras.clear();
-    } else if (currentContext == MessageContext_Mulligan) {
-        logMulligan(mulliganPlayer, mulliganNumber);
-        mulliganPlayer = nullptr;
-        mulliganNumber = 0;
-    }
-
     currentContext = MessageContext_None;
     messageSuffix = messagePrefix = QString();
 }
@@ -151,10 +137,7 @@ void MessageLogWidget::containerProcessingStarted(const GameEventContext &contex
     if (context.HasExtension(Context_MoveCard::ext)) {
         currentContext = MessageContext_MoveCard;
     } else if (context.HasExtension(Context_Mulligan::ext)) {
-        const Context_Mulligan &contextMulligan = context.GetExtension(Context_Mulligan::ext);
         currentContext = MessageContext_Mulligan;
-        mulliganPlayer = nullptr;
-        mulliganNumber = contextMulligan.number();
     }
 }
 
@@ -281,21 +264,30 @@ void MessageLogWidget::logDestroyCard(Player *player, QString cardName)
         tr("%1 destroys %2.").arg(sanitizeHtml(player->getName())).arg(cardLink(std::move(cardName))));
 }
 
-void MessageLogWidget::logDoMoveCard(LogMoveCard &lmc)
+void MessageLogWidget::logMoveCard(Player *player,
+                                   CardItem *card,
+                                   CardZone *startZone,
+                                   int oldX,
+                                   CardZone *targetZone,
+                                   int newX)
 {
-    QString startZone = lmc.startZone->getName();
-    QString targetZone = lmc.targetZone->getName();
-    bool ownerChanged = lmc.startZone->getPlayer() != lmc.targetZone->getPlayer();
-
-    // do not log if moved within the same zone
-    if ((startZone == tableConstant() && targetZone == tableConstant() && !ownerChanged) ||
-        (startZone == handConstant() && targetZone == handConstant()) ||
-        (startZone == exileConstant() && targetZone == exileConstant())) {
+    if (currentContext == MessageContext_Mulligan) {
         return;
     }
 
-    QString cardName = lmc.cardName;
-    QPair<QString, QString> nameFrom = getFromStr(lmc.startZone, cardName, lmc.oldX, ownerChanged);
+    QString startZoneName = startZone->getName();
+    QString targetZoneName = targetZone->getName();
+    bool ownerChanged = startZone->getPlayer() != targetZone->getPlayer();
+
+    // do not log if moved within the same zone
+    if ((startZoneName == tableConstant() && targetZoneName == tableConstant() && !ownerChanged) ||
+        (startZoneName == handConstant() && targetZoneName == handConstant()) ||
+        (startZoneName == exileConstant() && targetZoneName == exileConstant())) {
+        return;
+    }
+
+    QString cardName = card->getName();
+    QPair<QString, QString> nameFrom = getFromStr(startZone, cardName, oldX, ownerChanged);
     if (!nameFrom.first.isEmpty()) {
         cardName = nameFrom.first;
     }
@@ -309,64 +301,58 @@ void MessageLogWidget::logDoMoveCard(LogMoveCard &lmc)
         cardStr = cardLink(cardName);
     }
 
-    if (ownerChanged && (lmc.startZone->getPlayer() == lmc.player)) {
+    if (ownerChanged && (startZone->getPlayer() == player)) {
         appendHtmlServerMessage(tr("%1 gives %2 control over %3.")
-                                    .arg(sanitizeHtml(lmc.player->getName()))
-                                    .arg(sanitizeHtml(lmc.targetZone->getPlayer()->getName()))
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(sanitizeHtml(targetZone->getPlayer()->getName()))
                                     .arg(cardStr));
         return;
     }
 
     QString finalStr;
     bool usesNewX = false;
-    if (targetZone == tableConstant()) {
+    if (targetZoneName == tableConstant()) {
         soundEngine->playSound("play_card");
-        if (moveCardTapped.value(lmc.card)) {
-            finalStr = tr("%1 puts %2 into play tapped%3.");
-        } else {
-            finalStr = tr("%1 puts %2 into play%3.");
-        }
-    } else if (targetZone == graveyardConstant()) {
+        finalStr = tr("%1 puts %2 into play%3.");
+    } else if (targetZoneName == graveyardConstant()) {
         finalStr = tr("%1 puts %2%3 into their graveyard.");
-    } else if (targetZone == exileConstant()) {
+    } else if (targetZoneName == exileConstant()) {
         finalStr = tr("%1 exiles %2%3.");
-    } else if (targetZone == handConstant()) {
+    } else if (targetZoneName == handConstant()) {
         finalStr = tr("%1 moves %2%3 to their hand.");
-    } else if (targetZone == deckConstant()) {
-        if (moveCardExtras.contains("shuffle_partial")) {
-            finalStr = tr("%1 puts %2%3 on bottom of their library randomly.");
-        } else if (lmc.newX == -1) {
+    } else if (targetZoneName == deckConstant()) {
+        if (newX == -1) {
             finalStr = tr("%1 puts %2%3 into their library.");
-        } else if (lmc.newX == lmc.targetZone->getCards().size() - 1) {
+        } else if (newX == targetZone->getCards().size() - 1) {
             finalStr = tr("%1 puts %2%3 on bottom of their library.");
-        } else if (lmc.newX == 0) {
+        } else if (newX == 0) {
             finalStr = tr("%1 puts %2%3 on top of their library.");
         } else {
-            ++lmc.newX;
+            ++newX;
             usesNewX = true;
             finalStr = tr("%1 puts %2%3 into their library %4 cards from the top.");
         }
-    } else if (targetZone == sideboardConstant()) {
+    } else if (targetZoneName == sideboardConstant()) {
         finalStr = tr("%1 moves %2%3 to sideboard.");
-    } else if (targetZone == stackConstant()) {
+    } else if (targetZoneName == stackConstant()) {
         soundEngine->playSound("play_card");
         finalStr = tr("%1 plays %2%3.");
     }
 
     if (usesNewX) {
         appendHtmlServerMessage(
-            finalStr.arg(sanitizeHtml(lmc.player->getName())).arg(cardStr).arg(nameFrom.second).arg(lmc.newX));
+            finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(nameFrom.second).arg(newX));
     } else {
-        appendHtmlServerMessage(finalStr.arg(sanitizeHtml(lmc.player->getName())).arg(cardStr).arg(nameFrom.second));
+        appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(nameFrom.second));
     }
 }
 
 void MessageLogWidget::logDrawCards(Player *player, int number)
 {
+    soundEngine->playSound("draw_card");
     if (currentContext == MessageContext_Mulligan) {
-        mulliganPlayer = player;
+        logMulligan(player, number);
     } else {
-        soundEngine->playSound("draw_card");
         appendHtmlServerMessage(tr("%1 draws %2 card(s).", "", number)
                                     .arg(sanitizeHtml(player->getName()))
                                     .arg("<font class=\"blue\">" + QString::number(number) + "</font>"));
@@ -441,23 +427,6 @@ void MessageLogWidget::logLeaveSpectator(QString name, QString reason)
 void MessageLogWidget::logNotReadyStart(Player *player)
 {
     appendHtmlServerMessage(tr("%1 is not ready to start the game any more.").arg(sanitizeHtml(player->getName())));
-}
-
-void MessageLogWidget::logMoveCard(Player *player,
-                                   CardItem *card,
-                                   CardZone *startZone,
-                                   int oldX,
-                                   CardZone *targetZone,
-                                   int newX)
-{
-    LogMoveCard attributes = {player, card, card->getName(), startZone, oldX, targetZone, newX};
-    if (currentContext == MessageContext_MoveCard) {
-        moveCardQueue.append(attributes);
-    } else if (currentContext == MessageContext_Mulligan) {
-        mulliganPlayer = player;
-    } else {
-        logDoMoveCard(attributes);
-    }
 }
 
 void MessageLogWidget::logMulligan(Player *player, int number)
@@ -761,39 +730,34 @@ void MessageLogWidget::logSetSideboardLock(Player *player, bool locked)
 
 void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
 {
+    if (currentContext == MessageContext_MoveCard) {
+        return;
+    }
+
     if (tapped) {
         soundEngine->playSound("tap_card");
     } else {
         soundEngine->playSound("untap_card");
     }
 
-    if (currentContext == MessageContext_MoveCard) {
-        moveCardTapped.insert(card, tapped);
+    QString str;
+    if (!card) {
+        appendHtmlServerMessage((tapped ? tr("%1 taps their permanents.") : tr("%1 untaps their permanents."))
+                                    .arg(sanitizeHtml(player->getName())));
     } else {
-        QString str;
-        if (!card) {
-            appendHtmlServerMessage((tapped ? tr("%1 taps their permanents.") : tr("%1 untaps their permanents."))
-                                        .arg(sanitizeHtml(player->getName())));
-        } else {
-            appendHtmlServerMessage((tapped ? tr("%1 taps %2.") : tr("%1 untaps %2."))
-                                        .arg(sanitizeHtml(player->getName()))
-                                        .arg(cardLink(card->getName())));
-        }
+        appendHtmlServerMessage((tapped ? tr("%1 taps %2.") : tr("%1 untaps %2."))
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(cardLink(card->getName())));
     }
 }
 
 void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int end)
 {
-    soundEngine->playSound("shuffle");
     if (currentContext == MessageContext_Mulligan) {
         return;
     }
 
-    if (currentContext == MessageContext_MoveCard && start == 0 && end == -1) {
-        moveCardExtras.append("shuffle_partial");
-        return;
-    }
-
+    soundEngine->playSound("shuffle");
     // start and end are indexes into the portion of the deck that was shuffled
     // with negitive numbers counging from the bottom up.
     if (start == 0 && end == -1) {
@@ -866,6 +830,7 @@ void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optiona
 
 void MessageLogWidget::connectToPlayer(Player *player)
 {
+
     connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
     connect(player, &Player::logShuffle, this, &MessageLogWidget::logShuffle);
     connect(player, SIGNAL(logRollDie(Player *, int, int)), this, SLOT(logRollDie(Player *, int, int)));

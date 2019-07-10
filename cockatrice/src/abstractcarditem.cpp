@@ -52,7 +52,9 @@ void AbstractCardItem::cardInfoUpdated()
         info = CardInfo::newInstance(name, "", true, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
                                      CardInfoPerSetMap(), false, -1, false);
     }
-    connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
+    if (info.data()) {
+        connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
+    }
 
     cacheBgColor();
     update();
