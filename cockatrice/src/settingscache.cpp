@@ -228,7 +228,6 @@ SettingsCache::SettingsCache()
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     playToStack = settings->value("interface/playtostack", true).toBool();
-    legacyMulligan = settings->value("interface/playtostack", false).toBool();
     startingHandSize = settings->value("interface/startinghandsize", 7).toInt();
     annotateTokens = settings->value("interface/annotatetokens", false).toBool();
     tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
@@ -250,6 +249,8 @@ SettingsCache::SettingsCache()
 
     soundEnabled = settings->value("sound/enabled", false).toBool();
     soundThemeName = settings->value("sound/theme").toString();
+
+    mulliganName = settings->value("interface/mulligan_type").toString();
 
     maxFontSize = settings->value("game/maxfontsize", DEFAULT_FONT_SIZE).toInt();
 
@@ -441,11 +442,6 @@ void SettingsCache::setPlayToStack(int _playToStack)
     settings->setValue("interface/playtostack", playToStack);
 }
 
-void SettingsCache::setLegacyMulligan(bool _legacyMulligan)
-{
-    settings->setValue("interface/legacymulligan", _legacyMulligan);
-}
-
 void SettingsCache::setStartingHandSize(int _startingHandSize)
 {
     startingHandSize = _startingHandSize;
@@ -565,6 +561,12 @@ void SettingsCache::setSoundThemeName(const QString &_soundThemeName)
     soundThemeName = _soundThemeName;
     settings->setValue("sound/theme", soundThemeName);
     emit soundThemeChanged();
+}
+
+void SettingsCache::setMulliganOption(const QString &_mulliganName)
+{
+    mulliganName = _mulliganName;
+    settings->setValue("interface/mulligan_type", mulliganName);
 }
 
 void SettingsCache::setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers)

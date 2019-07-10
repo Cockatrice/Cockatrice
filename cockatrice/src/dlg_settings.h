@@ -105,6 +105,7 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage
     Q_OBJECT
 private slots:
     void setSpecNotificationEnabled(int);
+    void mulliganBoxChanged(int);
 
 private:
     QCheckBox notificationsEnabledCheckBox;
@@ -114,12 +115,13 @@ private:
     QCheckBox annotateTokensCheckBox;
     QSpinBox startingHandSizeEdit;
     QLabel startingHandSizeLabel;
-    QRadioButton newMulliganRadioButton;
-    QRadioButton oldMulliganRadioButton;
+    QComboBox mulliganComboBox;
+    QLabel mulliganComboBoxText;
     QCheckBox tapAnimationCheckBox;
     QGroupBox *generalGroupBox;
     QGroupBox *mulliganGroupBox;
     QGroupBox *animationGroupBox;
+    void updateMulliganText();
 
 public:
     UserInterfaceSettingsPage();

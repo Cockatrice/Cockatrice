@@ -78,7 +78,6 @@ private:
     bool spectatorNotificationsEnabled;
     bool doubleClickToPlay;
     bool playToStack;
-    bool legacyMulligan;
     int startingHandSize;
     bool annotateTokens;
     QByteArray tabGameSplitterSizes;
@@ -96,6 +95,7 @@ private:
     bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
     bool soundEnabled;
     QString soundThemeName;
+    QString mulliganName;
     bool ignoreUnregisteredUsers;
     bool ignoreUnregisteredUserMessages;
     QString picUrl;
@@ -234,10 +234,6 @@ public:
     {
         return playToStack;
     }
-    bool getLegacyMulligan() const
-    {
-        return legacyMulligan;
-    }
     int getStartingHandSize() const
     {
         return startingHandSize;
@@ -309,6 +305,14 @@ public:
     QString getSoundThemeName() const
     {
         return soundThemeName;
+    }
+    QString getMuliganName() const
+    {
+        return mulliganName;
+    }
+    bool isVancouverMulliganRule() const
+    {
+        return mulliganName == "Vancouver Mulligan";
     }
     bool getIgnoreUnregisteredUsers() const
     {
@@ -476,7 +480,6 @@ public slots:
     void setSpectatorNotificationsEnabled(int _spectatorNotificationsEnabled);
     void setDoubleClickToPlay(int _doubleClickToPlay);
     void setPlayToStack(int _playToStack);
-    void setLegacyMulligan(bool _legacyMulligan);
     void setStartingHandSize(int _startingHandSize);
     void setAnnotateTokens(int _annotateTokens);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
@@ -494,6 +497,7 @@ public slots:
     void setZoneViewPileView(int _zoneViewPileView);
     void setSoundEnabled(int _soundEnabled);
     void setSoundThemeName(const QString &_soundThemeName);
+    void setMulliganOption(const QString &_mulliganName);
     void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
     void setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages);
     void setPixmapCacheSize(const int _pixmapCacheSize);
