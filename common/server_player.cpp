@@ -995,14 +995,16 @@ Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc
     Server_CardZone *deck = zones.value("deck");
     int number = cmd.number();
 
-    auto cardsToMove = QList<const CardToMove *>();
-    for (auto &card : hand->getCards()) {
-        auto *cardToMove = new CardToMove;
-        cardToMove->set_card_id(card->getId());
-        cardsToMove.append(cardToMove);
+    if (!hand->getCards().isEmpty()) {
+        auto cardsToMove = QList<const CardToMove *>();
+        for (auto &card : hand->getCards()) {
+            auto *cardToMove = new CardToMove;
+            cardToMove->set_card_id(card->getId());
+            cardsToMove.append(cardToMove);
+        }
+        moveCard(ges, hand, cardsToMove, deck, -1, 0, false);
+        qDeleteAll(cardsToMove);
     }
-    moveCard(ges, hand, cardsToMove, deck, -1, 0, false);
-    qDeleteAll(cardsToMove);
 
     deck->shuffle();
     ges.enqueueGameEvent(Event_Shuffle(), playerId);
