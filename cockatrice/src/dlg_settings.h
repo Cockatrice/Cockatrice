@@ -7,7 +7,6 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
-#include <QRadioButton>
 #include <QSpinBox>
 
 class CardDatabase;
@@ -17,7 +16,6 @@ class QHBoxLayout;
 class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
-class QRadioButton;
 class QSlider;
 class QStackedWidget;
 class QTreeWidget;

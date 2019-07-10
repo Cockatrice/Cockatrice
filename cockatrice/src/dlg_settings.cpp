@@ -25,7 +25,6 @@
 #include <QListWidget>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QRadioButton>
 #include <QSlider>
 #include <QSpinBox>
 #include <QStackedWidget>

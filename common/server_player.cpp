@@ -1002,6 +1002,7 @@ Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc
         cardsToMove.append(cardToMove);
     }
     moveCard(ges, hand, cardsToMove, deck, -1, 0, false);
+    qDeleteAll(cardsToMove);
 
     deck->shuffle();
     ges.enqueueGameEvent(Event_Shuffle(), playerId);
