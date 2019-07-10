@@ -1015,11 +1015,11 @@ void Player::actMulligan()
     int number = QInputDialog::getInt(game, tr("Draw opening hand"),
                                       tr("Number:") + '\n' + tr("0 and lower are in comparison to current hand size"),
                                       startSize, -handSize, deckSize);
-    if (startSize == 0 && number == 0) {
-        return;
-    }
     Command_Mulligan cmd;
     if (number < 1) {
+    if (handSize == 0) {
+        return;
+    }
         cmd.set_number(handSize + number);
     } else {
         cmd.set_number(number);
