@@ -25,6 +25,7 @@
 #include <QListWidget>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QSlider>
 #include <QSpinBox>
 #include <QStackedWidget>
@@ -390,29 +391,6 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
 
-    connect(&startingHandSizeEdit, SIGNAL(valueChanged(int)), settingsCache, SLOT(setStartingHandSize(int)));
-    startingHandSizeEdit.setValue(settingsCache->getStartingHandSize());
-    startingHandSizeLabel.setBuddy(&startingHandSizeEdit);
-    startingHandSizeEdit.setMinimum(1);
-    startingHandSizeEdit.setMaximum(100);
-
-    // Mulligan choice setup
-    mulliganComboBox.addItem("London Mulligan");
-    mulliganComboBox.addItem("Vancouver Mulligan");
-    int starting_index = mulliganComboBox.findText(settingsCache->getMuliganName());
-    mulliganComboBox.setCurrentIndex(starting_index != -1 ? starting_index : 0);
-    updateMulliganText();
-    connect(&mulliganComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(mulliganBoxChanged(int)));
-
-    auto *mulliganGrid = new QGridLayout;
-    mulliganGrid->addWidget(&startingHandSizeLabel, 0, 0, 1, 1);
-    mulliganGrid->addWidget(&startingHandSizeEdit, 0, 1, 1, 1);
-    mulliganGrid->addWidget(&mulliganComboBox, 1, 0, 1, 1);
-    mulliganGrid->addWidget(&mulliganComboBoxText, 1, 1, 1, 1);
-
-    mulliganGroupBox = new QGroupBox;
-    mulliganGroupBox->setLayout(mulliganGrid);
-
     tapAnimationCheckBox.setChecked(settingsCache->getTapAnimation());
     connect(&tapAnimationCheckBox, SIGNAL(stateChanged(int)), settingsCache, SLOT(setTapAnimation(int)));
 
@@ -424,7 +402,6 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(generalGroupBox);
-    mainLayout->addWidget(mulliganGroupBox);
     mainLayout->addWidget(animationGroupBox);
 
     setLayout(mainLayout);
@@ -435,23 +412,6 @@ void UserInterfaceSettingsPage::setSpecNotificationEnabled(int i)
     specNotificationsEnabledCheckBox.setEnabled(i != 0);
 }
 
-void UserInterfaceSettingsPage::updateMulliganText()
-{
-    if (mulliganComboBox.currentText() == "London Mulligan") {
-        mulliganComboBoxText.setText(tr("Redraw hand with same number of cards."));
-    } else if (mulliganComboBox.currentText() == "Vancouver Mulligan") {
-        mulliganComboBoxText.setText(tr("Redraw hand with one fewer card."));
-    }
-}
-
-void UserInterfaceSettingsPage::mulliganBoxChanged(int index)
-{
-    if (index >= 0 && index < mulliganComboBox.count()) {
-        settingsCache->setMulliganOption(mulliganComboBox.currentText());
-        updateMulliganText();
-    }
-}
-
 void UserInterfaceSettingsPage::retranslateUi()
 {
     generalGroupBox->setTitle(tr("General interface settings"));
@@ -460,11 +420,8 @@ void UserInterfaceSettingsPage::retranslateUi()
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
-    mulliganGroupBox->setTitle(tr("Mulligan settings"));
-    startingHandSizeLabel.setText(tr("Default starting hand size"));
     animationGroupBox->setTitle(tr("Animation settings"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
-    updateMulliganText();
 }
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()

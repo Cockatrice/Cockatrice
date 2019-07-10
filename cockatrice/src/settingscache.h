@@ -95,7 +95,6 @@ private:
     bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
     bool soundEnabled;
     QString soundThemeName;
-    QString mulliganName;
     bool ignoreUnregisteredUsers;
     bool ignoreUnregisteredUserMessages;
     QString picUrl;
@@ -306,14 +305,6 @@ public:
     {
         return soundThemeName;
     }
-    QString getMuliganName() const
-    {
-        return mulliganName;
-    }
-    bool isVancouverMulliganRule() const
-    {
-        return mulliganName == "Vancouver Mulligan";
-    }
     bool getIgnoreUnregisteredUsers() const
     {
         return ignoreUnregisteredUsers;
@@ -497,7 +488,6 @@ public slots:
     void setZoneViewPileView(int _zoneViewPileView);
     void setSoundEnabled(int _soundEnabled);
     void setSoundThemeName(const QString &_soundThemeName);
-    void setMulliganOption(const QString &_mulliganName);
     void setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers);
     void setIgnoreUnregisteredUserMessages(int _ignoreUnregisteredUserMessages);
     void setPixmapCacheSize(const int _pixmapCacheSize);

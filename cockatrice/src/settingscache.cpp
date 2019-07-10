@@ -250,8 +250,6 @@ SettingsCache::SettingsCache()
     soundEnabled = settings->value("sound/enabled", false).toBool();
     soundThemeName = settings->value("sound/theme").toString();
 
-    mulliganName = settings->value("interface/mulligan_type").toString();
-
     maxFontSize = settings->value("game/maxfontsize", DEFAULT_FONT_SIZE).toInt();
 
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
@@ -561,12 +559,6 @@ void SettingsCache::setSoundThemeName(const QString &_soundThemeName)
     soundThemeName = _soundThemeName;
     settings->setValue("sound/theme", soundThemeName);
     emit soundThemeChanged();
-}
-
-void SettingsCache::setMulliganOption(const QString &_mulliganName)
-{
-    mulliganName = _mulliganName;
-    settings->setValue("interface/mulligan_type", mulliganName);
 }
 
 void SettingsCache::setIgnoreUnregisteredUsers(int _ignoreUnregisteredUsers)

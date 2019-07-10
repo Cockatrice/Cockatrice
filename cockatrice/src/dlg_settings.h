@@ -16,6 +16,7 @@ class QHBoxLayout;
 class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
+class QRadioButton;
 class QSlider;
 class QStackedWidget;
 class QTreeWidget;
@@ -103,7 +104,6 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage
     Q_OBJECT
 private slots:
     void setSpecNotificationEnabled(int);
-    void mulliganBoxChanged(int);
 
 private:
     QCheckBox notificationsEnabledCheckBox;
@@ -111,15 +111,9 @@ private:
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox playToStackCheckBox;
     QCheckBox annotateTokensCheckBox;
-    QSpinBox startingHandSizeEdit;
-    QLabel startingHandSizeLabel;
-    QComboBox mulliganComboBox;
-    QLabel mulliganComboBoxText;
     QCheckBox tapAnimationCheckBox;
     QGroupBox *generalGroupBox;
-    QGroupBox *mulliganGroupBox;
     QGroupBox *animationGroupBox;
-    void updateMulliganText();
 
 public:
     UserInterfaceSettingsPage();
