@@ -1009,13 +1009,25 @@ void Player::actDrawCard()
 
 void Player::actMulligan()
 {
+    int startSize = settingsCache->getStartingHandSize();
+    int handSize = zones.value("hand")->getCards().size();
+    int deckSize = zones.value("deck")->getCards().size() + handSize;
+    int number = QInputDialog::getInt(game, tr("Draw opening hand"),
+                                      tr("Number:") + '\n' + tr("0 and lower are in comparison to current hand size"),
+                                      startSize, -handSize, deckSize);
+    if (startSize == 0 && number == 0) {
+        return;
+    }
     Command_Mulligan cmd;
-    if (settingsCache->isVancouverMulliganRule() && zones.value("hand")->getCards().size() > 1) {
-        cmd.set_number(zones.value("hand")->getCards().size() - 1);
+    if (number < 1) {
+        cmd.set_number(handSize + number);
     } else {
-        cmd.set_number(settingsCache->getStartingHandSize());
+        cmd.set_number(number);
     }
     sendGameCommand(cmd);
+    if (startSize != number) {
+        settingsCache->setStartingHandSize(number);
+    }
 }
 
 void Player::actDrawCards()
