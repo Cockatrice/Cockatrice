@@ -30,6 +30,7 @@ ShortcutsSettings::ShortcutsSettings(const QString &settingsPath, QObject *paren
             if (isKeyAllowed(*it, stringSequence)) {
                 auto shortcut = getShortcut(*it);
                 shortcut.setSequence(parseSequenceString(stringSequence));
+                shortCuts.insert(*it, shortcut);
             } else {
                 invalidItems.insert(*it, stringSequence);
             }

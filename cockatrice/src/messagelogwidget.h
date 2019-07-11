@@ -10,17 +10,6 @@ class CardZone;
 class GameEventContext;
 class CardItem;
 
-struct LogMoveCard
-{
-    Player *player;
-    CardItem *card;
-    QString cardName;
-    CardZone *startZone;
-    int oldX;
-    CardZone *targetZone;
-    int newX;
-};
-
 class MessageLogWidget : public ChatView
 {
     Q_OBJECT
@@ -35,9 +24,6 @@ private:
     int mulliganNumber;
     Player *mulliganPlayer;
     MessageContext currentContext;
-    QList<LogMoveCard> moveCardQueue;
-    QMap<CardItem *, bool> moveCardTapped;
-    QList<QString> moveCardExtras;
     QString messagePrefix, messageSuffix;
 
     const QString tableConstant() const;
@@ -69,7 +55,6 @@ public slots:
     void logCreateToken(Player *player, QString cardName, QString pt);
     void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
     void logDestroyCard(Player *player, QString cardName);
-    void logDoMoveCard(LogMoveCard &lmc);
     void logDrawCards(Player *player, int number);
     void logDumpZone(Player *player, CardZone *zone, int numberCards);
     void logFlipCard(Player *player, QString cardName, bool faceDown);

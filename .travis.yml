@@ -6,6 +6,7 @@ git:
 
 matrix:
   include:
+
   #Ubuntu Xenial (Debug only)
   - name: Ubuntu Xenial (Debug)
     if: tag IS NOT present
@@ -29,6 +30,7 @@ matrix:
         - libqt5websockets5-dev
     script: bash ./.ci/travis-compile.sh --format --server --test --debug
 
+
   #Ubuntu Bionic (on docker)
   - name: Ubuntu Bionic (Debug)
     if: tag IS NOT present
@@ -36,7 +38,7 @@ matrix:
     env: NAME=UbuntuBionic
     cache:
       directories:
-        - $HOME/$NAME/
+      - $HOME/$NAME/
     before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
     script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
           --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
@@ -49,19 +51,23 @@ matrix:
     env: NAME=UbuntuBionic
     cache:
       directories:
-        - $HOME/$NAME/
+      - $HOME/$NAME/
     before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
     script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
           --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
           "cockatrice_${NAME,,}"
           bash .ci/travis-compile.sh --server --package "$NAME" --release
 
+
   #macOS
   - name: macOS (Debug)
     if: tag IS NOT present
     os: osx
-    osx_image: xcode10.1
-    cache: ccache
+    osx_image: xcode9.2
+    cache:
+    - ccache
+    - directories:
+      - $HOME/Library/Caches/Homebrew
     addons:
       homebrew:
         packages:
@@ -69,13 +75,19 @@ matrix:
         - protobuf
         - qt
         - xz
+        update: true
     script: bash ./.ci/travis-compile.sh --server --install --debug
+    before_cache:
+    - brew cleanup
 
   - name: macOS (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode9.2
-    cache: ccache
+    cache:
+    - ccache
+    - directories:
+      - $HOME/Library/Caches/Homebrew
     addons:
       homebrew:
         packages:
@@ -85,6 +97,9 @@ matrix:
         - xz
         update: true
     script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME" --release
+    before_cache:
+    - brew cleanup
+
 
 # Builds for pull requests skip the deployment step altogether
 deploy:

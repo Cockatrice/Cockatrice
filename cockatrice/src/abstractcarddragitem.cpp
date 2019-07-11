@@ -39,7 +39,6 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
 
 AbstractCardDragItem::~AbstractCardDragItem()
 {
-    qDebug("CardDragItem destructor");
     for (int i = 0; i < childDrags.size(); i++)
         delete childDrags[i];
 }

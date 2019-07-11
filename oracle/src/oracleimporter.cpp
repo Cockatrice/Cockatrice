@@ -47,7 +47,20 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         setType = map.value("type").toString();
         // capitalize set type
         if (setType.length() > 0) {
-            setType[0] = setType[0].toUpper();
+            // basic grammar for words that aren't capitalized, like in "From the Vault"
+            const QStringList noCapitalize = {"the", "a", "an", "on", "to", "for", "of", "in", "and", "with", "or"};
+            QStringList words = setType.split("_");
+            setType.clear();
+            bool first = false;
+            for (auto &item : words) {
+                if (first && noCapitalize.contains(item)) {
+                    setType += item + QString(" ");
+                } else {
+                    setType += item[0].toUpper() + item.mid(1, -1) + QString(" ");
+                    first = true;
+                }
+            }
+            setType = setType.trimmed();
         }
         if (!nonEnglishSets.contains(shortName)) {
             releaseDate = map.value("releaseDate").toDate();
