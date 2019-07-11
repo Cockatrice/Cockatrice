@@ -6,6 +6,7 @@ git:
 
 matrix:
   include:
+
   #Ubuntu Xenial (Debug only)
   - name: Ubuntu Xenial (Debug)
     if: tag IS NOT present
@@ -28,6 +29,7 @@ matrix:
         - libqt5sql5-mysql
         - libqt5websockets5-dev
     script: bash ./.ci/travis-compile.sh --format --server --test --debug
+
 
   #Ubuntu Bionic (on docker)
   - name: Ubuntu Bionic (Debug)
@@ -56,32 +58,6 @@ matrix:
           "cockatrice_${NAME,,}"
           bash .ci/travis-compile.sh --server --package "$NAME" --release
 
-  #Fedora 29 (on docker)
-  - name: Fedora 29 (Debug)
-    if: tag IS NOT present
-    services: docker
-    env: NAME=Fedora29
-    cache:
-      directories:
-      - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --debug
-
-  - name: Fedora 29 (Release)
-    if: (branch = master AND NOT type = pull_request) OR tag IS present
-    services: docker
-    env: NAME=Fedora29
-    cache:
-      directories:
-      - $HOME/$NAME/
-    before_install: docker build -t "cockatrice_${NAME,,}" .ci/$NAME && mkdir -p $HOME/$NAME/.ccache
-    script: docker run --mount "type=bind,source=$(pwd),target=/src" -w="/src"
-          --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
-          "cockatrice_${NAME,,}"
-          bash .ci/travis-compile.sh --server --package "$NAME" "RPM" --release
 
   #macOS
   - name: macOS (Debug)
@@ -103,7 +79,6 @@ matrix:
     script: bash ./.ci/travis-compile.sh --server --install --debug
     before_cache:
     - brew cleanup
-
 
   - name: macOS (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
