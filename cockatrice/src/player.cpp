@@ -1013,8 +1013,8 @@ void Player::actMulligan()
     int handSize = zones.value("hand")->getCards().size();
     int deckSize = zones.value("deck")->getCards().size() + handSize;
     bool ok;
-    int number = QInputDialog::getInt(game, tr("Draw opening hand"),
-                                      tr("Number:") + '\n' + tr("0 and lower are in comparison to current hand size"),
+    int number = QInputDialog::getInt(game, tr("Draw hand"),
+                                      tr("Number of cards:") + '\n' + tr("0 and lower are in comparison to current hand size"),
                                       startSize, -handSize, deckSize, 1, &ok);
     if (!ok) {
         return;
