@@ -1015,7 +1015,7 @@ void Player::actMulligan()
     bool ok;
     int number = QInputDialog::getInt(game, tr("Draw opening hand"),
                                       tr("Number:") + '\n' + tr("0 and lower are in comparison to current hand size"),
-                                      startSize, -handSize, deckSize, 1 & ok);
+                                      startSize, -handSize, deckSize, 1, &ok);
     if (!ok) {
         return;
     }
