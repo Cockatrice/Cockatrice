@@ -1012,9 +1012,13 @@ void Player::actMulligan()
     int startSize = settingsCache->getStartingHandSize();
     int handSize = zones.value("hand")->getCards().size();
     int deckSize = zones.value("deck")->getCards().size() + handSize;
+    bool ok;
     int number = QInputDialog::getInt(game, tr("Draw opening hand"),
                                       tr("Number:") + '\n' + tr("0 and lower are in comparison to current hand size"),
-                                      startSize, -handSize, deckSize);
+                                      startSize, -handSize, deckSize, 1 & ok);
+    if (!ok) {
+        return;
+    }
     Command_Mulligan cmd;
     if (number < 1) {
         if (handSize == 0) {
