@@ -243,9 +243,11 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     playerMenu = new QMenu(QString());
     table->setMenu(playerMenu);
+    playerMenu->setTearOffEnabled(true);
 
     if (local || judge) {
         handMenu = playerMenu->addMenu(QString());
+        handMenu->setTearOffEnabled(true);
         handMenu->addAction(aViewHand);
         playerLists.append(mRevealHand = handMenu->addMenu(QString()));
         playerLists.append(mRevealRandomHandCard = handMenu->addMenu(QString()));
@@ -253,6 +255,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         handMenu->addAction(aMulligan);
         handMenu->addSeparator();
         moveHandMenu = handMenu->addMenu(QString());
+        moveHandMenu->setTearOffEnabled(true);
         moveHandMenu->addAction(aMoveHandToTopLibrary);
         moveHandMenu->addAction(aMoveHandToBottomLibrary);
         moveHandMenu->addSeparator();
@@ -262,6 +265,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         hand->setMenu(handMenu);
 
         libraryMenu = playerMenu->addMenu(QString());
+        libraryMenu->setTearOffEnabled(true);
         libraryMenu->addAction(aDrawCard);
         libraryMenu->addAction(aDrawCards);
         libraryMenu->addAction(aUndoDraw);
@@ -292,6 +296,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     }
 
     graveMenu = playerMenu->addMenu(QString());
+    graveMenu->setTearOffEnabled(true);
     graveMenu->addAction(aViewGraveyard);
 
     if (local || judge) {
@@ -305,12 +310,14 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     grave->setMenu(graveMenu, aViewGraveyard);
 
     rfgMenu = playerMenu->addMenu(QString());
+    rfgMenu->setTearOffEnabled(true);
     rfgMenu->addAction(aViewRfg);
     rfg->setMenu(rfgMenu, aViewRfg);
 
     if (local || judge) {
         graveMenu->addSeparator();
         moveGraveMenu = graveMenu->addMenu(QString());
+        moveGraveMenu->setTearOffEnabled(true);
         moveGraveMenu->addAction(aMoveGraveToTopLibrary);
         moveGraveMenu->addAction(aMoveGraveToBottomLibrary);
         moveGraveMenu->addSeparator();
@@ -320,6 +327,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
         rfgMenu->addSeparator();
         moveRfgMenu = rfgMenu->addMenu(QString());
+        moveRfgMenu->setTearOffEnabled(true);
         moveRfgMenu->addAction(aMoveRfgToTopLibrary);
         moveRfgMenu->addAction(aMoveRfgToBottomLibrary);
         moveRfgMenu->addSeparator();
