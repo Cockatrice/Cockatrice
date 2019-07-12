@@ -35,4 +35,3 @@ EOM
       echo "Something went wrong in our formatting checks: clangify returned $err" >&2
       ;;
   esac
-fi
