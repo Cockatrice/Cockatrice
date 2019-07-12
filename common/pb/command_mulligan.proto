@@ -4,6 +4,6 @@ message Command_Mulligan {
     extend GameCommand {
         optional Command_Mulligan ext = 1004;
     }
+    optional uint32 number = 7;
 }
-
 

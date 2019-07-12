@@ -79,7 +79,6 @@ private:
     int playerId;
     bool spectator;
     bool judge;
-    int initialCards;
     int nextCardId;
     bool readyStart;
     bool conceded;
