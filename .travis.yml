@@ -36,7 +36,7 @@ matrix:
         - libqt5svg5-dev
         - libqt5sql5-mysql
         - libqt5websockets5-dev
-script: bash ./.ci/travis-compile.sh --format --server --test --debug
+    script: bash ./.ci/travis-compile.sh --format --server --test --debug
 
 
   #Ubuntu Bionic (on Docker)
