@@ -8,10 +8,9 @@ matrix:
   include:
 
   #Static Code Analysis
-  - name: Check code style (Linting)
+  - name: Check code style / Linting
     if: tag IS NOT present
     os: linux
-    dist: xenial
     group: stable
     script: bash ./.ci/travis-lint.sh
 
