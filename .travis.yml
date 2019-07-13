@@ -15,15 +15,6 @@ matrix:
     script: bash ./.ci/travis-lint.sh
 
 
-  #Ubuntu Xenial (Debug only)
-  - name: Ubuntu Xenial (--format argument test)
-    if: tag IS NOT present
-    os: linux
-    dist: xenial
-    group: stable
-    script: bash ./.ci/travis-compile.sh --format
-
-
   #Ubuntu Bionic (on Docker)
   - name: Ubuntu Bionic (Debug)
     if: tag IS NOT present
