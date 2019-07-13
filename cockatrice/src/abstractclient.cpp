@@ -22,7 +22,7 @@
 #include <google/protobuf/descriptor.h>
 
 AbstractClient::AbstractClient(QObject *parent) : QObject(parent), nextCmdId(0), status(StatusDisconnected)
-{
+  {
     qRegisterMetaType<QVariant>("QVariant");
     qRegisterMetaType<CommandContainer>("CommandContainer");
     qRegisterMetaType<Response>("Response");
