@@ -16,7 +16,7 @@ matrix:
 
 
   #Ubuntu Bionic (on Docker)
-  - name: Ubuntu Bionic (Debug)
+  - name: Ubuntu Bionic (Debug + Tests)
     if: tag IS NOT present
     services: docker
     env: NAME=UbuntuBionic
