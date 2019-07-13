@@ -54,7 +54,7 @@ done
 
 # Check formatting using clang-format
 if [[ $CHECK_FORMAT ]]; then
-  sh ./.ci/travis-lint.sh
+  bash ./.ci/travis-lint.sh
 fi
 
 set -e
