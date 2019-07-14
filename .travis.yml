@@ -28,6 +28,10 @@ matrix:
           --mount "type=bind,source=$HOME/$NAME/.ccache,target=/.ccache" -e "CCACHE_DIR=/.ccache"
           "cockatrice_${NAME,,}"
           bash .ci/travis-compile.sh --server --test --debug
+    before_cache:
+    - ccache --show-config
+    - ccache --show-stats
+    - ccache --zero-stats
 
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
