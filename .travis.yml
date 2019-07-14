@@ -29,6 +29,7 @@ matrix:
           "cockatrice_${NAME,,}"
           bash .ci/travis-compile.sh --server --test --debug
     before_cache:
+    #see https://ccache.dev/manual/latest.html
     - ccache --show-config
     - ccache --show-stats
     - ccache --zero-stats
