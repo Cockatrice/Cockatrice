@@ -851,6 +851,7 @@ void MainWindow::startupConfigCheck()
         // no config found, 99% new clean install
         qDebug() << "Startup: old client version empty, assuming first start after clean install";
         alertForcedOracleRun(VERSION_STRING, false);
+        settingsCache->setClientVersion(VERSION_STRING);
     } else if (settingsCache->getClientVersion() != VERSION_STRING) {
         // config found, from another (presumably older) version
         qDebug() << "Startup: old client version" << settingsCache->getClientVersion()
@@ -860,6 +861,7 @@ void MainWindow::startupConfigCheck()
         } else {
             QtConcurrent::run(db, &CardDatabase::loadCardDatabases);
         }
+        settingsCache->setClientVersion(VERSION_STRING);
     } else {
         // previous config from this version found
         qDebug() << "Startup: found config with current version";
@@ -876,7 +878,6 @@ void MainWindow::startupConfigCheck()
 
 void MainWindow::alertForcedOracleRun(const QString &version, bool isUpdate)
 {
-    settingsCache->setClientVersion(version);
     if (isUpdate) {
         QMessageBox::information(this, tr("New Version"),
                                  tr("Congratulations on updating to Cockatrice %1!\n"
