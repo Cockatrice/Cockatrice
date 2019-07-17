@@ -11,7 +11,7 @@
 // that way they will be sorted last by default
 // this will cause their art to not get priority over english cards
 // users will still be able to find these sets and prioritize them manually
-const QStringList nonEnglishSets = {"FBB", "PS11", "PSAL", "REN", "RIN"};
+const QStringList nonEnglishSets = {"4BB", "FBB", "PS11", "PSAL", "REN", "RIN"};
 
 class SetToDownload
 {
