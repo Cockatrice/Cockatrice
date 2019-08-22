@@ -58,6 +58,10 @@ public:
     {
         return zone;
     }
+    Player * getPlayer() const
+    {
+        return player;
+    }
     void retranslateUi();
 
 protected:
