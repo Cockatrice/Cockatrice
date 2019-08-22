@@ -46,8 +46,8 @@ void GameScene::addPlayer(Player *player)
 void GameScene::removePlayer(Player *player)
 {
     qDebug() << "GameScene::removePlayer name=" << player->getName();
-    for(ZoneViewWidget * zone : zoneViews) {
-        if(zone->getPlayer() == player) {
+    for (ZoneViewWidget *zone : zoneViews) {
+        if (zone->getPlayer() == player) {
             zone->close();
         }
     }

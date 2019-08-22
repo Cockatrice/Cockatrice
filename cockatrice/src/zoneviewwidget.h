@@ -58,7 +58,7 @@ public:
     {
         return zone;
     }
-    Player * getPlayer() const
+    Player *getPlayer() const
     {
         return player;
     }
