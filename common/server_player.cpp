@@ -82,6 +82,7 @@
 #include "pb/context_undo_draw.pb.h"
 
 #include <QDebug>
+#include <algorithm>
 
 Server_Player::Server_Player(Server_Game *_game,
                              int _playerId,
@@ -407,7 +408,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
     // 0 performs no sorting
     // 1 reverses the sorting
     MoveCardCompareFunctor cmp(0);
-    qSort(cardsToMove.begin(), cardsToMove.end(), cmp);
+    std::sort(cardsToMove.begin(), cardsToMove.end(), cmp);
 
     bool secondHalf = false;
     int xIndex = -1;

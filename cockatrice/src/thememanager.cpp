@@ -35,7 +35,7 @@ QStringMap &ThemeManager::getAvailableThemes()
     availableThemes.clear();
 
     // load themes from user profile dir
-    dir = settingsCache->getDataPath() + "/themes";
+    dir.setPath(settingsCache->getDataPath() + "/themes");
 
     foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))
@@ -43,14 +43,15 @@ QStringMap &ThemeManager::getAvailableThemes()
     }
 
     // load themes from cockatrice system dir
-    dir = qApp->applicationDirPath() +
+    dir.setPath(qApp->applicationDirPath() +
 #ifdef Q_OS_MAC
-          "/../Resources/themes";
+                "/../Resources/themes"
 #elif defined(Q_OS_WIN)
-          "/themes";
+                "/themes"
 #else // linux
-          "/../share/cockatrice/themes";
+                "/../share/cockatrice/themes"
 #endif
+    );
 
     foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))

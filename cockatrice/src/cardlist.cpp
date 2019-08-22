@@ -2,6 +2,8 @@
 #include "carddatabase.h"
 #include "carditem.h"
 
+#include <algorithm>
+
 CardList::CardList(bool _contentsKnown) : QList<CardItem *>(), contentsKnown(_contentsKnown)
 {
 }
@@ -56,5 +58,5 @@ public:
 void CardList::sort(int flags)
 {
     compareFunctor cf(flags);
-    qSort(begin(), end(), cf);
+    std::sort(begin(), end(), cf);
 }

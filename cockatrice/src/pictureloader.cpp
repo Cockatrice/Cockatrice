@@ -20,6 +20,7 @@
 #include <QSvgRenderer>
 #include <QThread>
 #include <QUrl>
+#include <algorithm>
 #include <utility>
 
 // never cache more than 300 cards at once for a single deck
@@ -36,7 +37,7 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card) : card(std::move(_card))
         if (sortedSets.empty()) {
             sortedSets << CardSet::newInstance("", "", "", QDate());
         }
-        qSort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
+        std::sort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
         // The first time called, nextSet will also populate the Urls for the first set.
         nextSet();
     }

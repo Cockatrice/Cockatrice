@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QMouseEvent>
+#include <algorithm>
 #include <math.h>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
@@ -283,7 +284,7 @@ void DeckViewCardContainer::rearrangeItems(const QList<QPair<int, int>> &rowsAnd
 
         QList<QString> cardTypeList = cardsByType.uniqueKeys();
         QList<DeckViewCard *> row = cardsByType.values(cardTypeList[i]);
-        qSort(row.begin(), row.end(), DeckViewCardContainer::sortCardsByName);
+        std::sort(row.begin(), row.end(), DeckViewCardContainer::sortCardsByName);
         for (int j = 0; j < row.size(); ++j) {
             DeckViewCard *card = row[j];
             card->setPos(x + (j % tempCols) * CARD_WIDTH, yUntilNow + (j / tempCols) * CARD_HEIGHT);

@@ -5,7 +5,12 @@
 #include "cardinfowidget.h"
 #include "carditem.h"
 #include "main.h"
+#include <QApplication>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
+#include <QScreen>
+#else
 #include <QDesktopWidget>
+#endif
 #include <QVBoxLayout>
 
 CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::WindowFlags flags)
@@ -27,8 +32,13 @@ CardInfoWidget::CardInfoWidget(const QString &cardName, QWidget *parent, Qt::Win
     setLayout(layout);
 
     setFrameStyle(QFrame::Panel | QFrame::Raised);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
+    int pixmapHeight = qApp->primaryScreen()->geometry().height() / 3;
+#else
     QDesktopWidget desktopWidget;
     int pixmapHeight = desktopWidget.screenGeometry().height() / 3;
+#endif
     int pixmapWidth = static_cast<int>(pixmapHeight / aspectRatio);
     pic->setFixedWidth(pixmapWidth);
     pic->setFixedHeight(pixmapHeight);

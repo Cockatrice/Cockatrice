@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QRegularExpression>
 #include <QTextStream>
+#include <algorithm>
 
 #if QT_VERSION < 0x050600
 // qHash on QRegularExpression was added in 5.6, FIX IT
@@ -316,7 +317,7 @@ QVector<QPair<int, int>> InnerDecklistNode::sort(Qt::SortOrder order)
 
     // Sort temporary list
     compareFunctor cmp(order);
-    qSort(tempList.begin(), tempList.end(), cmp);
+    std::sort(tempList.begin(), tempList.end(), cmp);
 
     // Map old indexes to new indexes and
     // copy temporary list to the current one

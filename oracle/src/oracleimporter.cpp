@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QtWidgets>
+#include <algorithm>
 #include <climits>
 
 #include "qt-json/json.h"
@@ -70,7 +71,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         newSetList.append(SetToDownload(shortName, longName, setCards, setType, releaseDate));
     }
 
-    qSort(newSetList);
+    std::sort(newSetList.begin(), newSetList.end());
 
     if (newSetList.isEmpty()) {
         return false;
@@ -337,8 +338,8 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         // get all parts for this specific card
         QList<SplitCardPart> splitCardParts = splitCards.values(nameSplit);
         // sort them by index (aka position)
-        qSort(splitCardParts.begin(), splitCardParts.end(),
-              [](const SplitCardPart &a, const SplitCardPart &b) -> bool { return a.getIndex() < b.getIndex(); });
+        std::sort(splitCardParts.begin(), splitCardParts.end(),
+                  [](const SplitCardPart &a, const SplitCardPart &b) -> bool { return a.getIndex() < b.getIndex(); });
 
         text = QString("");
         isToken = false;
