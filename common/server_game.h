@@ -68,6 +68,7 @@ private:
     int inactivityCounter;
     int startTimeOfThisGame, secondsElapsed;
     bool firstGameStarted;
+    bool turnOrderReversed;
     QDateTime startTime;
     QTimer *pingClock;
     QList<GameReplay *> replayList;
@@ -184,6 +185,10 @@ public:
     int getSecondsElapsed() const
     {
         return secondsElapsed;
+    }
+    bool reverseTurnOrder()
+    {
+        return turnOrderReversed = !turnOrderReversed;
     }
 
     void createGameJoinedEvent(Server_Player *player, ResponseContainer &rc, bool resuming);

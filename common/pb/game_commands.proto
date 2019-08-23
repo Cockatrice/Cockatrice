@@ -35,6 +35,7 @@ message GameCommand {
         CHANGE_ZONE_PROPERTIES = 1031;
         UNCONCEDE = 1032;
         JUDGE = 1033;
+        REVERSE_TURN = 1034;
     }
     extensions 100 to max;
 }

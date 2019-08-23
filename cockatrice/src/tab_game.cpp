@@ -47,6 +47,7 @@
 #include "pb/command_leave_game.pb.h"
 #include "pb/command_next_turn.pb.h"
 #include "pb/command_ready_start.pb.h"
+#include "pb/command_reverse_turn.pb.h"
 #include "pb/command_set_active_phase.pb.h"
 #include "pb/command_set_sideboard_lock.pb.h"
 #include "pb/command_set_sideboard_plan.pb.h"
@@ -62,6 +63,7 @@
 #include "pb/event_kicked.pb.h"
 #include "pb/event_leave.pb.h"
 #include "pb/event_player_properties_changed.pb.h"
+#include "pb/event_reverse_turn.pb.h"
 #include "pb/event_set_active_phase.pb.h"
 #include "pb/event_set_active_player.pb.h"
 #include "pb/game_event_container.pb.h"
@@ -214,6 +216,9 @@ void TabGame::refreshShortcuts()
     }
     if (aNextTurn) {
         aNextTurn->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aNextTurn"));
+    }
+    if (aReverseTurn) {
+        aReverseTurn->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aReverseTurn"));
     }
     if (aRemoveLocalArrows) {
         aRemoveLocalArrows->setShortcuts(settingsCache->shortcuts().getShortcut("Player/aRemoveLocalArrows"));
@@ -496,6 +501,9 @@ void TabGame::retranslateUi()
     if (aNextTurn) {
         aNextTurn->setText(tr("Next &turn"));
     }
+    if (aReverseTurn) {
+        aReverseTurn->setText(tr("Reverse turn order"));
+    }
     if (aRemoveLocalArrows) {
         aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
     }
@@ -716,6 +724,11 @@ void TabGame::actNextTurn()
     sendGameCommand(Command_NextTurn());
 }
 
+void TabGame::actReverseTurn()
+{
+    sendGameCommand(Command_ReverseTurn());
+}
+
 void TabGame::actRemoveLocalArrows()
 {
     QMapIterator<int, Player *> playerIterator(players);
@@ -846,6 +859,9 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont, Abstract
                     break;
                 case GameEvent::SET_ACTIVE_PHASE:
                     eventSetActivePhase(event.GetExtension(Event_SetActivePhase::ext), playerId, context);
+                    break;
+                case GameEvent::REVERSE_TURN:
+                    eventReverseTurn(event.GetExtension(Event_ReverseTurn::ext), playerId, context);
                     break;
 
                 default: {
@@ -1209,6 +1225,15 @@ void TabGame::eventKicked(const Event_Kicked & /*event*/, int /*eventPlayerId*/,
     emitUserEvent();
 }
 
+void TabGame::eventReverseTurn(const Event_ReverseTurn &event, int eventPlayerId, const GameEventContext & /*context*/)
+{
+    Player *player = players.value(eventPlayerId, 0);
+    if (!player)
+        return;
+
+    messageLog->logReverseTurn(player, event.reversed());
+}
+
 void TabGame::eventGameHostChanged(const Event_GameHostChanged & /*event*/,
                                    int eventPlayerId,
                                    const GameEventContext & /*context*/)
@@ -1367,6 +1392,8 @@ void TabGame::createMenuItems()
     connect(aNextPhaseAction, SIGNAL(triggered()), this, SLOT(actNextPhaseAction()));
     aNextTurn = new QAction(this);
     connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
+    aReverseTurn = new QAction(this);
+    connect(aReverseTurn, SIGNAL(triggered()), this, SLOT(actReverseTurn()));
     aRemoveLocalArrows = new QAction(this);
     connect(aRemoveLocalArrows, SIGNAL(triggered()), this, SLOT(actRemoveLocalArrows()));
     aRotateViewCW = new QAction(this);
@@ -1399,6 +1426,7 @@ void TabGame::createMenuItems()
     playersSeparator = gameMenu->addSeparator();
     gameMenu->addMenu(phasesMenu);
     gameMenu->addAction(aNextTurn);
+    gameMenu->addAction(aReverseTurn);
     gameMenu->addSeparator();
     gameMenu->addAction(aRemoveLocalArrows);
     gameMenu->addAction(aRotateViewCW);
@@ -1415,6 +1443,7 @@ void TabGame::createReplayMenuItems()
     aNextPhase = nullptr;
     aNextPhaseAction = nullptr;
     aNextTurn = nullptr;
+    aReverseTurn = nullptr;
     aRemoveLocalArrows = nullptr;
     aRotateViewCW = nullptr;
     aRotateViewCCW = nullptr;

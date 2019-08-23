@@ -45,6 +45,7 @@ class Event_SetActivePhase;
 class Event_Ping;
 class Event_GameSay;
 class Event_Kicked;
+class Event_ReverseTurn;
 class Player;
 class CardZone;
 class AbstractCardItem;
@@ -165,7 +166,7 @@ private:
     QMenu *gameMenu, *phasesMenu, *viewMenu, *cardInfoDockMenu, *messageLayoutDockMenu, *playerListDockMenu,
         *replayDockMenu;
     QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextPhaseAction, *aNextTurn,
-        *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
+        *aReverseTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aMessageLayoutDockVisible, *aMessageLayoutDockFloating,
         *aPlayerListDockVisible, *aPlayerListDockFloating, *aReplayDockVisible, *aReplayDockFloating;
     QList<QAction *> phaseActions;
@@ -193,6 +194,7 @@ private:
     void setActivePhase(int phase);
     void eventSetActivePhase(const Event_SetActivePhase &event, int eventPlayerId, const GameEventContext &context);
     void eventPing(const Event_Ping &event, int eventPlayerId, const GameEventContext &context);
+    void eventReverseTurn(const Event_ReverseTurn &event, int eventPlayerId, const GameEventContext & /*context*/);
     void emitUserEvent();
     void createMenuItems();
     void createReplayMenuItems();
@@ -236,6 +238,7 @@ private slots:
     void actNextPhase();
     void actNextPhaseAction();
     void actNextTurn();
+    void actReverseTurn();
 
     void addMentionTag(QString value);
     void linkCardToChat(QString cardName);
