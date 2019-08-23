@@ -1130,11 +1130,10 @@ void ShortcutSettingsPage::retranslateUi()
 
 DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 {
-    QRect rec =
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
-        qApp->primaryScreen()->availableGeometry();
+    QRect rec = qApp->primaryScreen()->availableGeometry();
 #else
-        QRect rec = QApplication::desktop()->availableGeometry();
+    QRect rec = QApplication::desktop()->availableGeometry();
 #endif
     this->setMinimumSize(rec.width() / 2, rec.height() - 100);
     this->setBaseSize(rec.width(), rec.height());
