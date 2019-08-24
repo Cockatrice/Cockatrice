@@ -1993,7 +1993,7 @@ Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_Chan
 }
 
 Response::ResponseCode
-Server_Player::cmdReverseTurn(const Command_ReverseTurn &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
     if (spectator) {
         return Response::RespFunctionNotAllowed;

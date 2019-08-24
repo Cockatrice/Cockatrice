@@ -229,7 +229,7 @@ public:
     cmdStopDumpZone(const Command_StopDumpZone &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode
-    cmdReverseTurn(const Command_ReverseTurn &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges);
+    cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges);
     Response::ResponseCode
     cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd, ResponseContainer &rc, GameEventStorage &ges);
 
