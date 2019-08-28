@@ -176,10 +176,10 @@ void PlayerListWidget::setActivePlayer(int playerId)
         QTreeWidgetItem *twi = i.value();
         if (i.key() == playerId) {
             twi->setBackground(4, QColor(150, 255, 150));
-            twi->setTextColor(4, QColor(0, 0, 0));
+            twi->setForeground(4, QColor(0, 0, 0));
         } else {
             twi->setBackground(4, palette().base().color());
-            twi->setTextColor(4, palette().text().color());
+            twi->setForeground(4, palette().text().color());
         }
     }
 }

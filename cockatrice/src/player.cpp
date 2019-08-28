@@ -26,7 +26,6 @@
 #include <QPainter>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
-#include <QSignalMapper>
 
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_change_zone_properties.pb.h"
@@ -3128,13 +3127,11 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
     cardMenu->addSeparator();
     auto viewRelatedCards = new QMenu(tr("View related cards"));
     cardMenu->addMenu(viewRelatedCards);
-    auto *signalMapper = new QSignalMapper(this);
     for (const CardRelation *relatedCard : relatedCards) {
-        QAction *viewCard = viewRelatedCards->addAction(relatedCard->getName());
-        connect(viewCard, SIGNAL(triggered()), signalMapper, SLOT(map()));
-        signalMapper->setMapping(viewCard, relatedCard->getName());
+        QString relatedCardName = relatedCard->getName();
+        QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
+        connect(viewCard, &QAction::triggered, game, [this, relatedCardName] { game->viewCardInfo(relatedCardName); });
     }
-    connect(signalMapper, SIGNAL(mapped(const QString &)), game, SLOT(viewCardInfo(const QString &)));
 }
 
 void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)

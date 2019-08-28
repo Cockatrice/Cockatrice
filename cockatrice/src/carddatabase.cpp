@@ -11,6 +11,7 @@
 #include <QDir>
 #include <QFile>
 #include <QMessageBox>
+#include <algorithm>
 #include <utility>
 
 const char *CardDatabase::TOKENS_SETNAME = "TK";
@@ -105,7 +106,7 @@ public:
 
 void SetList::sortByKey()
 {
-    qSort(begin(), end(), KeyCompareFunctor());
+    std::sort(begin(), end(), KeyCompareFunctor());
 }
 
 int SetList::getEnabledSetsNum()

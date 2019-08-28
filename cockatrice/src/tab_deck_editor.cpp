@@ -35,7 +35,6 @@
 #include <QProcessEnvironment>
 #include <QPushButton>
 #include <QRegularExpression>
-#include <QSignalMapper>
 #include <QSplitter>
 #include <QTextBrowser>
 #include <QTextEdit>
@@ -471,14 +470,12 @@ void TabDeckEditor::databaseCustomMenu(QPoint point)
     if (relatedCards.isEmpty()) {
         relatedMenu->setDisabled(true);
     } else {
-        auto *signalMapper = new QSignalMapper(this);
         for (const CardRelation *rel : relatedCards) {
-            QAction *relatedCard;
-            relatedCard = relatedMenu->addAction(rel->getName());
-            connect(relatedCard, SIGNAL(triggered()), signalMapper, SLOT(map()));
-            signalMapper->setMapping(relatedCard, rel->getName());
+            QString relatedCardName = rel->getName();
+            QAction *relatedCard = relatedMenu->addAction(relatedCardName);
+            connect(relatedCard, &QAction::triggered, cardInfo,
+                    [this, relatedCardName] { cardInfo->setCard(relatedCardName); });
         }
-        connect(signalMapper, SIGNAL(mapped(const QString &)), cardInfo, SLOT(setCard(const QString &)));
     }
     menu.exec(databaseView->mapToGlobal(point));
 }
@@ -820,7 +817,6 @@ bool TabDeckEditor::actSaveDeckAs()
     QFileDialog dialog(this, tr("Save deck"));
     dialog.setDirectory(settingsCache->getDeckPath());
     dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setConfirmOverwrite(true);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::fileNameFilters);
     dialog.selectFile(deckModel->getDeckList()->getName().trimmed() + ".cod");

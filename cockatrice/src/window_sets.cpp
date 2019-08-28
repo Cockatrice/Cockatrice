@@ -17,6 +17,8 @@
 #include <QToolBar>
 #include <QTreeView>
 
+#include <algorithm>
+
 #define SORT_RESET -1
 
 WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
@@ -338,7 +340,7 @@ void WndSets::actDisableSome()
 void WndSets::actUp()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    qSort(rows.begin(), rows.end(), qLess<QModelIndex>());
+    std::sort(rows.begin(), rows.end(), std::less<QModelIndex>());
     QSet<int> newRows;
 
     if (rows.empty())
@@ -360,7 +362,8 @@ void WndSets::actUp()
 void WndSets::actDown()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    qSort(rows.begin(), rows.end(), qGreater<QModelIndex>());
+    // QModelIndex only implements operator<, so we can't use std::greater
+    std::sort(rows.begin(), rows.end(), [](const QModelIndex &a, const QModelIndex &b) { return !(b < a); });
     QSet<int> newRows;
 
     if (rows.empty())
@@ -382,7 +385,7 @@ void WndSets::actDown()
 void WndSets::actTop()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    qSort(rows.begin(), rows.end(), qLess<QModelIndex>());
+    std::sort(rows.begin(), rows.end(), std::less<QModelIndex>());
     QSet<int> newRows;
     int newRow = 0;
 
@@ -407,7 +410,8 @@ void WndSets::actTop()
 void WndSets::actBottom()
 {
     QModelIndexList rows = view->selectionModel()->selectedRows();
-    qSort(rows.begin(), rows.end(), qGreater<QModelIndex>());
+    // QModelIndex only implements operator<, so we can't use std::greater
+    std::sort(rows.begin(), rows.end(), [](const QModelIndex &a, const QModelIndex &b) { return !(b < a); });
     QSet<int> newRows;
     int newRow = model->rowCount() - 1;
 

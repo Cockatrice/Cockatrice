@@ -102,7 +102,7 @@ QStringMap &SoundEngine::getAvailableThemes()
 
     // load themes from user profile dir
 
-    dir = settingsCache->getDataPath() + "/sounds";
+    dir.setPath(settingsCache->getDataPath() + "/sounds");
 
     foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))
@@ -110,14 +110,15 @@ QStringMap &SoundEngine::getAvailableThemes()
     }
 
     // load themes from cockatrice system dir
-    dir = qApp->applicationDirPath() +
+    dir.setPath(qApp->applicationDirPath() +
 #ifdef Q_OS_MAC
-          "/../Resources/sounds";
+                "/../Resources/sounds"
 #elif defined(Q_OS_WIN)
-          "/sounds";
+                "/sounds"
 #else // linux
-          "/../share/cockatrice/sounds";
+                "/../share/cockatrice/sounds"
 #endif
+    );
 
     foreach (QString themeName, dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))
