@@ -57,6 +57,7 @@ class Command_SetActivePhase;
 class Command_DumpZone;
 class Command_StopDumpZone;
 class Command_RevealCards;
+class Command_ReverseTurn;
 class Command_MoveCard;
 class Command_SetSideboardPlan;
 class Command_DeckSelect;
@@ -227,6 +228,8 @@ public:
     Response::ResponseCode
     cmdStopDumpZone(const Command_StopDumpZone &cmd, ResponseContainer &rc, GameEventStorage &ges);
     Response::ResponseCode cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    Response::ResponseCode
+    cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges);
     Response::ResponseCode
     cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd, ResponseContainer &rc, GameEventStorage &ges);
 

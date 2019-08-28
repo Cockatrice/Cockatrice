@@ -35,6 +35,7 @@
 #include "pb/command_next_turn.pb.h"
 #include "pb/command_ready_start.pb.h"
 #include "pb/command_reveal_cards.pb.h"
+#include "pb/command_reverse_turn.pb.h"
 #include "pb/command_roll_die.pb.h"
 #include "pb/command_set_active_phase.pb.h"
 #include "pb/command_set_card_attr.pb.h"
@@ -60,6 +61,7 @@
 #include "pb/event_move_card.pb.h"
 #include "pb/event_player_properties_changed.pb.h"
 #include "pb/event_reveal_cards.pb.h"
+#include "pb/event_reverse_turn.pb.h"
 #include "pb/event_roll_die.pb.h"
 #include "pb/event_set_card_attr.pb.h"
 #include "pb/event_set_card_counter.pb.h"
@@ -1991,6 +1993,30 @@ Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_Chan
 }
 
 Response::ResponseCode
+Server_Player::cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    if (spectator) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    if (!game->getGameStarted()) {
+        return Response::RespGameNotStarted;
+    }
+
+    if (conceded) {
+        return Response::RespContextError;
+    }
+
+    bool reversedTurn = game->reverseTurnOrder();
+
+    Event_ReverseTurn event;
+    event.set_reversed(reversedTurn);
+    ges.enqueueGameEvent(event, playerId);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode
 Server_Player::processGameCommand(const GameCommand &command, ResponseContainer &rc, GameEventStorage &ges)
 {
     switch ((GameCommand::GameCommandType)getPbExtension(command)) {
@@ -2096,7 +2122,9 @@ Server_Player::processGameCommand(const GameCommand &command, ResponseContainer 
         case GameCommand::JUDGE:
             return cmdJudge(command.GetExtension(Command_Judge::ext), rc, ges);
             break;
-
+        case GameCommand::REVERSE_TURN:
+            return cmdReverseTurn(command.GetExtension(Command_ReverseTurn::ext), rc, ges);
+            break;
         default:
             return Response::RespInvalidCommand;
     }

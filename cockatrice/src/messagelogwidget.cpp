@@ -530,6 +530,13 @@ void MessageLogWidget::logRevealCards(Player *player,
     }
 }
 
+void MessageLogWidget::logReverseTurn(Player *player, bool reversed)
+{
+    appendHtmlServerMessage(tr("%1 reversed turn order, now it's %2.")
+                                .arg(sanitizeHtml(player->getName()))
+                                .arg(reversed ? tr("reversed") : tr("normal")));
+}
+
 void MessageLogWidget::logRollDie(Player *player, int sides, int roll)
 {
     if (sides == 2) {

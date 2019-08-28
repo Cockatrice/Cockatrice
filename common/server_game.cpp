@@ -66,7 +66,8 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
       onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed),
       spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk),
       spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), startTimeOfThisGame(0),
-      secondsElapsed(0), firstGameStarted(false), startTime(QDateTime::currentDateTime()), gameMutex(QMutex::Recursive)
+      secondsElapsed(0), firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()),
+      gameMutex(QMutex::Recursive)
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
@@ -657,9 +658,17 @@ void Server_Game::nextTurn()
     if (activePlayer != -1)
         listPos = keys.indexOf(activePlayer);
     do {
-        ++listPos;
-        if (listPos == keys.size())
-            listPos = 0;
+        if (turnOrderReversed) {
+            --listPos;
+            if (listPos < 0) {
+                listPos = keys.size() - 1;
+            }
+        } else {
+            ++listPos;
+            if (listPos == keys.size()) {
+                listPos = 0;
+            }
+        }
     } while (players.value(keys[listPos])->getSpectator() || players.value(keys[listPos])->getConceded());
 
     setActivePlayer(keys[listPos]);
