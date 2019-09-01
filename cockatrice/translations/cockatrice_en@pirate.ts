@@ -12,12 +12,12 @@
     <message>
         <location filename="../src/abstractcounter.cpp" line="191"/>
         <source>Set counter</source>
-        <translation type="unfinished"/>
+        <translation>Set piece o&apos; eight</translation>
     </message>
     <message>
         <location filename="../src/abstractcounter.cpp" line="192"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation type="unfinished"/>
+        <translation>Freshly formed value for piece o&apos; eight &apos;%1&apos;:</translation>
     </message>
 </context>
 <context>

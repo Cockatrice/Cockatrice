@@ -196,7 +196,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/releasechannel.cpp" line="199"/>
         <source>Beta Releases</source>
-        <translation type="unfinished"/>
+        <translation>Betaversioner</translation>
     </message>
     <message>
         <location filename="../src/releasechannel.cpp" line="225"/>
@@ -244,7 +244,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/carddatabasemodel.cpp" line="78"/>
         <source>Color(s)</source>
-        <translation type="unfinished"/>
+        <translation>Färg(er)</translation>
     </message>
 </context>
 <context>
@@ -253,45 +253,45 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardfilter.cpp" line="7"/>
         <source>AND</source>
         <comment>Logical conjunction operator used in card filter</comment>
-        <translation type="unfinished"/>
+        <translation>OCH</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="9"/>
         <source>OR</source>
         <comment>Logical disjunction operator used in card filter</comment>
-        <translation type="unfinished"/>
+        <translation>ELLER</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="11"/>
         <source>AND NOT</source>
         <comment>Negated logical conjunction operator used in card filter</comment>
-        <translation type="unfinished"/>
+        <translation>OCH INTE</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="13"/>
         <source>OR NOT</source>
         <comment>Negated logical disjunction operator used in card filter</comment>
-        <translation type="unfinished"/>
+        <translation>ELLER INTE</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="23"/>
         <source>Name</source>
-        <translation type="unfinished"/>
+        <translation>Namn</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="25"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Typ</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="27"/>
         <source>Color</source>
-        <translation type="unfinished"/>
+        <translation>Färg</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="29"/>
         <source>Text</source>
-        <translation type="unfinished"/>
+        <translation>Text</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="31"/>
@@ -301,7 +301,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/cardfilter.cpp" line="33"/>
         <source>Mana Cost</source>
-        <translation type="unfinished"/>
+        <translation>Manakostnad</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="35"/>
@@ -311,12 +311,12 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/cardfilter.cpp" line="37"/>
         <source>Rarity</source>
-        <translation type="unfinished"/>
+        <translation>Raritet</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="39"/>
         <source>Power</source>
-        <translation type="unfinished"/>
+        <translation>Styrka</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="41"/>
@@ -326,12 +326,12 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/cardfilter.cpp" line="43"/>
         <source>Loyalty</source>
-        <translation type="unfinished"/>
+        <translation>Lojalitet</translation>
     </message>
     <message>
         <location filename="../src/cardfilter.cpp" line="45"/>
         <source>Format</source>
-        <translation type="unfinished"/>
+        <translation>Format</translation>
     </message>
 </context>
 <context>
@@ -357,7 +357,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/cardinfotext.cpp" line="52"/>
         <source>Related cards:</source>
-        <translation type="unfinished"/>
+        <translation>Relaterade kort:</translation>
     </message>
     <message>
         <location filename="../src/cardinfotext.cpp" line="69"/>
@@ -407,7 +407,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="63"/>
         <source>%1&apos;s library</source>
         <comment>look at zone</comment>
-        <translation>%1s lek</translation>
+        <translation>%1s bibliotek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="65"/>
@@ -419,7 +419,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="66"/>
         <source>of %1&apos;s library</source>
         <comment>top cards of zone</comment>
-        <translation>av %1s lek</translation>
+        <translation>av %1s %1s bibliotek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="68"/>
@@ -431,7 +431,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/cardzone.cpp" line="69"/>
         <source>%1&apos;s library</source>
         <comment>reveal zone</comment>
-        <translation>%1s lek</translation>
+        <translation>%1s %1s bibliotek</translation>
     </message>
     <message>
         <location filename="../src/cardzone.cpp" line="71"/>
@@ -533,7 +533,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_settings.cpp" line="558"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Fel</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="558"/>
@@ -543,7 +543,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_settings.cpp" line="565"/>
         <source>Add URL</source>
-        <translation type="unfinished"/>
+        <translation>Lägg till webbadress</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="565"/>
@@ -559,7 +559,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_settings.cpp" line="612"/>
         <source>Updating...</source>
-        <translation>Uppdatering ...</translation>
+        <translation>Uppdaterar ...</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="642"/>
@@ -574,7 +574,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_settings.cpp" line="669"/>
         <source>Spoilers</source>
-        <translation type="unfinished"/>
+        <translation>Spoilers</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="670"/>
@@ -589,27 +589,27 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_settings.cpp" line="672"/>
         <source>Last Change</source>
-        <translation type="unfinished"/>
+        <translation>Senaste ändring</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="676"/>
         <source>Download card pictures on the fly</source>
-        <translation type="unfinished"/>
+        <translation>Ladda enkelt ned bilder på kort</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="677"/>
         <source>How to add a custom URL</source>
-        <translation type="unfinished"/>
+        <translation>Hur man lägger till en valfri webbadress</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="678"/>
         <source>Delete Downloaded Images</source>
-        <translation type="unfinished"/>
+        <translation>Ta bort nedladdade bilder</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="679"/>
         <source>Reset Download URLs</source>
-        <translation type="unfinished"/>
+        <translation>Återställ nedladdnings-webbadresser</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="673"/>
@@ -659,12 +659,12 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/tab_game.cpp" line="139"/>
         <source>Load deck...</source>
-        <translation>Lastdäck ...</translation>
+        <translation>Ladda lek...</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="140"/>
         <source>Load remote deck...</source>
-        <translation>Ladda fjärrdäck ...</translation>
+        <translation>Ladda remote lek...</translation>
     </message>
     <message>
         <location filename="../src/tab_game.cpp" line="141"/>
@@ -747,7 +747,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_connect.cpp" line="61"/>
         <source>A&amp;uto connect</source>
-        <translation type="unfinished"/>
+        <translation>Anslut automatiskt</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="62"/>
@@ -788,7 +788,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_connect.cpp" line="115"/>
         <source>Server</source>
-        <translation type="unfinished"/>
+        <translation>Server</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="131"/>
@@ -798,7 +798,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_connect.cpp" line="268"/>
         <source>Server URL</source>
-        <translation type="unfinished"/>
+        <translation>Server webbadress</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="271"/>
@@ -808,12 +808,12 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_connect.cpp" line="276"/>
         <source>Unique Server Name</source>
-        <translation type="unfinished"/>
+        <translation>Unikt servernamn</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="300"/>
         <source>Connection Warning</source>
-        <translation>Anslutning Varning</translation>
+        <translation>Anslutningsvarning</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="300"/>
@@ -823,7 +823,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_connect.cpp" line="317"/>
         <source>Connect Warning</source>
-        <translation>Uppkopplingsvarning</translation>
+        <translation>Anslutningsvarning</translation>
     </message>
     <message>
         <location filename="../src/dlg_connect.cpp" line="317"/>
@@ -856,7 +856,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
     <message>
         <location filename="../src/dlg_creategame.cpp" line="41"/>
         <source>General</source>
-        <translation type="unfinished"/>
+        <translation>Allmän</translation>
     </message>
     <message>
         <location filename="../src/dlg_creategame.cpp" line="54"/>
@@ -1033,7 +1033,7 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <location filename="../src/dlg_edit_avatar.cpp" line="15"/>
         <location filename="../src/dlg_edit_avatar.cpp" line="54"/>
         <source>No image chosen.</source>
-        <translation>Ingen bild vald</translation>
+        <translation>Ingen bild vald.</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="20"/>
@@ -1045,7 +1045,7 @@ För att radera din nuvarande avatar, klicka &quot;bekräfta&quot; utan att väl
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="22"/>
         <source>Browse...</source>
-        <translation>Leta manuellt</translation>
+        <translation>Leta...</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_avatar.cpp" line="39"/>
@@ -1819,7 +1819,7 @@ Du kanske måste bygga från källan själv.</translation>
     <message>
         <location filename="../src/dlg_update.cpp" line="166"/>
         <source>Please check the download page manually and visit the wiki for instructions on compiling.</source>
-        <translation>Vänligen kontrollera nedladdningssidan manuellt och besök wiki för instruktioner om sammanställning.</translation>
+        <translation>Vänligen kontrollera nedladdningssidan manuellt och besök wikin för instruktioner om kompilering.</translation>
     </message>
     <message>
         <location filename="../src/dlg_update.cpp" line="202"/>
@@ -2099,7 +2099,7 @@ Du kanske måste bygga från källan själv.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="239"/>
         <source>Paths (editing disabled in portable mode)</source>
-        <translation>Banor (redigering inaktiverad i bärbart läge)</translation>
+        <translation>Sökvägar (redigering inaktiverad i bärbart läge)</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="241"/>
@@ -3044,7 +3044,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="347"/>
         <source>%1 puts %2%3 into their library %4 cards from the top.</source>
-        <translation type="unfinished"/>
+        <translation>%1 lägger %2%3 i sitt bibliotek %4 kort från toppen.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="350"/>
@@ -3075,12 +3075,12 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="431"/>
         <source>%1 has left the game (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1 har lämnat spelet (%2)</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="437"/>
         <source>%1 is not watching the game any more (%2).</source>
-        <translation type="unfinished"/>
+        <translation>%1 tittar inte längre på spelet (%2).</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="507"/>
@@ -3157,7 +3157,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="655"/>
         <source>%1&apos;s turn.</source>
-        <translation type="unfinished"/>
+        <translation>%1&apos;s tur</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="163"/>
@@ -4120,7 +4120,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="772"/>
         <source>X cards from the top of library...</source>
-        <translation type="unfinished"/>
+        <translation>X kort från toppen av biblioteket...</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="773"/>
@@ -4156,7 +4156,7 @@ Cockatrice will now reload the card database.</source>
     <message>
         <location filename="../src/player.cpp" line="2362"/>
         <source>Place card X cards from top of library</source>
-        <translation type="unfinished"/>
+        <translation>Lägg kort X kort från toppen av biblioteket</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2363"/>
@@ -5715,7 +5715,7 @@ The more information you put in, the more specific your results will be.</source
 This message might mean there is a new version of Cockatrice available or this server is running a custom or pre-release version.
 
 To update your client, go to Help -&gt; Check for Updates.</source>
-        <translation type="unfinished"/>
+        <translation>Servern har skickat dig ett meddelande som din klient inte förstår. Det här meddelandet kan betyda att det finns en ny version av Cockatrice tillgänglig eller så kör den här servern en användarinställd eller förhandsutgiven version. För att uppdatera din klient, gå till Hjälp -&gt; Leta efter uppdateringar.</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="611"/>
@@ -5725,7 +5725,7 @@ To update your client, go to Help -&gt; Check for Updates.</source>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="611"/>
         <source>You are about to be logged out due to inactivity.</source>
-        <translation type="unfinished"/>
+        <translation>Du kommer snart loggas ut på grund av inaktivitet.</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="615"/>
@@ -5740,7 +5740,7 @@ To update your client, go to Help -&gt; Check for Updates.</source>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="620"/>
         <source>Warned</source>
-        <translation type="unfinished"/>
+        <translation>Varnad</translation>
     </message>
     <message>
         <location filename="../src/tab_supervisor.cpp" line="621"/>
@@ -5760,7 +5760,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="../src/tab_userlists.h" line="56"/>
         <source>Account</source>
-        <translation type="unfinished"/>
+        <translation>Konto</translation>
     </message>
     <message>
         <location filename="../src/tab_userlists.cpp" line="62"/>

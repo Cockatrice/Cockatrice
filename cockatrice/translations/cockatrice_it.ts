@@ -3063,7 +3063,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="347"/>
         <source>%1 puts %2%3 into their library %4 cards from the top.</source>
-        <translation>%1 mette %2 %4a dalla cima nel suo grimorio%3.</translation>
+        <translation>%1 mette %2%3 nel suo grimorio %4 carte dalla cima.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="350"/>
@@ -3426,12 +3426,12 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="236"/>
         <source>%1 points from their %2 to %3&apos;s %4.</source>
-        <translation>%1 disegna una freccia dal suo %2 al %4 di %3.</translation>
+        <translation>%1 disegna una freccia dal suo %2 a %4 di %3.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="242"/>
         <source>%1 points from %2&apos;s %3 to their own %4.</source>
-        <translation>%1 disegna una freccia dal %3 di %2 al suo %4.</translation>
+        <translation>%1 disegna una freccia da %3 di %2 al suo %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="248"/>
@@ -3446,12 +3446,12 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="742"/>
         <source>%1 changes the PT of %2 from nothing to %4.</source>
-        <translation>%1 cambia la FC di %2 da vuota a %4.</translation>
+        <translation>%1 cambia F/C di %2 da vuota a %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="745"/>
         <source>%1 changes the PT of %2 from %3 to %4.</source>
-        <translation>%1 cambia la FC di %2 da %3 a %4.</translation>
+        <translation>%1 cambia F/C di %2 da %3 a %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="772"/>

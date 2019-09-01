@@ -6759,13 +6759,13 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
         <location filename="../src/shortcutssettings.h" line="234"/>
         <location filename="../src/shortcutssettings.h" line="306"/>
         <source>Add green counter</source>
-        <translation type="unfinished"/>
+        <translation>Groene teller toevoegen</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="237"/>
         <location filename="../src/shortcutssettings.h" line="309"/>
         <source>Remove green counter</source>
-        <translation type="unfinished"/>
+        <translation>Groene teller verwijderen</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="240"/>
@@ -6792,7 +6792,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
         <location filename="../src/shortcutssettings.h" line="252"/>
         <location filename="../src/shortcutssettings.h" line="297"/>
         <source>Add red counter</source>
-        <translation type="unfinished"/>
+        <translation>Rode teller toevoegen</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="255"/>
@@ -6804,7 +6804,7 @@ Gelieve af te zien van deelname aan deze activiteit of er kunnen verdere acties 
         <location filename="../src/shortcutssettings.h" line="258"/>
         <location filename="../src/shortcutssettings.h" line="303"/>
         <source>Set red counters</source>
-        <translation type="unfinished"/>
+        <translation>Rode tellers instellen</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="261"/>
