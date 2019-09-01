@@ -9,7 +9,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="192"/>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.</source>
-        <translation type="unfinished"/>
+        <translation>See võlur impordib Cockatrice’is kasutatava nimekirja komplektidest, kaartidest ja märgistustest.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="194"/>
@@ -19,7 +19,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="195"/>
         <source>Version:</source>
-        <translation type="unfinished"/>
+        <translation>Versioon:</translation>
     </message>
 </context>
 <context>
@@ -32,7 +32,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="251"/>
         <source>Please specify a compatible source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Palun täpsusta ühilduv allikas komplektide ja kaartide nimekirja jaoks. Võid täpsustada URL-i aadressi, mis laaditakse alla või kasutada olemasolevat faili oma arvutist.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="255"/>
@@ -62,7 +62,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="278"/>
         <source>Sets JSON file (%1)</source>
-        <translation type="unfinished"/>
+        <translation>Komplektide JSON fail (%1)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="302"/>
@@ -112,12 +112,12 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="414"/>
         <source>Xz extraction failed.</source>
-        <translation type="unfinished"/>
+        <translation>Xzi lahtipakkimine nurjus.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="422"/>
         <source>Sorry, this version of Oracle does not support xz compressed files.</source>
-        <translation type="unfinished"/>
+        <translation>Vabandame, aga antud Oracle’i versioon ei toeta xz kokkupakitud faile.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="441"/>
@@ -142,7 +142,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="486"/>
         <source>Do you want to download the uncompressed file instead?</source>
-        <translation type="unfinished"/>
+        <translation>Soovid alla laadida hoopis pakkimata faili?</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="508"/>
@@ -155,42 +155,42 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="662"/>
         <source>Save spoiler database</source>
-        <translation type="unfinished"/>
+        <translation>Salvesta spoileri andmebaas</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="667"/>
         <source>XML; spoiler database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; spoileri andmebaas (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="672"/>
         <source>Spoilers import</source>
-        <translation type="unfinished"/>
+        <translation>Spoilerite import</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="673"/>
         <source>Please specify a compatible source for spoiler data.</source>
-        <translation type="unfinished"/>
+        <translation>Täpsusta spoileri andmetega ühilduv allikas.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="675"/>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>Allalaadimise URL:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="676"/>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Taasta tavaURL</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="677"/>
         <source>The spoiler database will be saved at the following location:</source>
-        <translation type="unfinished"/>
+        <translation>Spoileri andmebaas salvestatakse järgmisesse asukohta:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="679"/>
         <source>Save to a custom path (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Salvesta enda määratud asukohta (pole soovitatav)</translation>
     </message>
 </context>
 <context>
@@ -198,22 +198,22 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="625"/>
         <source>Save token database</source>
-        <translation type="unfinished"/>
+        <translation>Salvesta märgistuste andmebaas</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="630"/>
         <source>XML; token database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; märgistuste andmebaas (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="635"/>
         <source>Tokens import</source>
-        <translation type="unfinished"/>
+        <translation>Märgistuste importimine</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="636"/>
         <source>Please specify a compatible source for token data.</source>
-        <translation type="unfinished"/>
+        <translation>Täpsusta märgistuste andmetega ühilduv allikas.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="638"/>
@@ -228,12 +228,12 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="640"/>
         <source>The token database will be saved at the following location:</source>
-        <translation type="unfinished"/>
+        <translation>Märgistuste andmebaas salvestatakse järgmisesse asukohta:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="642"/>
         <source>Save to a custom path (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Salvesta enda määratud asukohta (pole soovitatav)</translation>
     </message>
 </context>
 <context>
@@ -257,22 +257,22 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="200"/>
         <source>Finished</source>
-        <translation type="unfinished"/>
+        <translation>Valmis</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="201"/>
         <source>The wizard has finished.</source>
-        <translation type="unfinished"/>
+        <translation>Võlur on lõpetanud.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="202"/>
         <source>You can now start using Cockatrice with the newly updated cards.</source>
-        <translation type="unfinished"/>
+        <translation>Nüüd saad Cockatrice’i kasutada uhiuute kaartidega.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="203"/>
         <source>If the card databases don&apos;t reload automatically, restart the Cockatrice client.</source>
-        <translation type="unfinished"/>
+        <translation>Kui kaardi andmebaasid ei lae ise, taaskäivita Cockatrice’i klient.</translation>
     </message>
 </context>
 <context>
@@ -296,27 +296,27 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="551"/>
         <source>The following sets have been found:</source>
-        <translation type="unfinished"/>
+        <translation>Leiti järgmised komplektid:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="553"/>
         <source>Press &quot;Save&quot; to store the imported cards in the Cockatrice database.</source>
-        <translation type="unfinished"/>
+        <translation>Vajuta „Salvesta“, et salvestada imporditud kaardid Cockatrice’i andmebaasi.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="554"/>
         <source>The card database will be saved at the following location:</source>
-        <translation type="unfinished"/>
+        <translation>Kaardi andmebaas salvestatakse järgmisesse asukohta:</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="556"/>
         <source>Save to a custom path (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Salvesta enda määratud asukohta (pole soovitatav)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="558"/>
         <source>&amp;Save</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Salvesta</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="564"/>
@@ -351,32 +351,32 @@
         <location filename="../src/pagetemplates.cpp" line="112"/>
         <location filename="../src/pagetemplates.cpp" line="172"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Viga</translation>
     </message>
     <message>
         <location filename="../src/pagetemplates.cpp" line="72"/>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>Antud URL pole kehtiv.</translation>
     </message>
     <message>
         <location filename="../src/pagetemplates.cpp" line="76"/>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>Allalaadimine (0MB)</translation>
     </message>
     <message>
         <location filename="../src/pagetemplates.cpp" line="103"/>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>Allalaadimine (%1MB)</translation>
     </message>
     <message>
         <location filename="../src/pagetemplates.cpp" line="112"/>
         <source>Network error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Võrgu viga: %1.</translation>
     </message>
     <message>
         <location filename="../src/pagetemplates.cpp" line="172"/>
         <source>The file could not be saved to %1</source>
-        <translation type="unfinished"/>
+        <translation>Faili salvestamine asukohta %1 nurjus</translation>
     </message>
 </context>
 <context>
@@ -533,7 +533,7 @@
     <message>
         <location filename="../src/main.cpp" line="42"/>
         <source>Only run in spoiler mode</source>
-        <translation type="unfinished"/>
+        <translation>Käivita vaid spoileri režiimis</translation>
     </message>
 </context>
 </TS>

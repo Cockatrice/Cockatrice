@@ -257,7 +257,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="200"/>
         <source>Finished</source>
-        <translation type="unfinished"/>
+        <translation>Finalizado</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="201"/>
@@ -351,7 +351,7 @@
         <location filename="../src/pagetemplates.cpp" line="112"/>
         <location filename="../src/pagetemplates.cpp" line="172"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <location filename="../src/pagetemplates.cpp" line="72"/>

@@ -32,7 +32,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="251"/>
         <source>Please specify a compatible source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Veuillez spécifier une source compatible pour la liste d&apos;éditions et de cartes. Vous pouvez spécifier une URL qui sera utilisée pour télécharger un fichier ou utiliser un fichier existant sur votre ordinateur.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="255"/>
@@ -142,7 +142,7 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="486"/>
         <source>Do you want to download the uncompressed file instead?</source>
-        <translation type="unfinished"/>
+        <translation>Voulez-vous télécharger le fichier non compressé à la place ?</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="508"/>
@@ -155,22 +155,22 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="662"/>
         <source>Save spoiler database</source>
-        <translation type="unfinished"/>
+        <translation>Enregistrer la base de données des spoilers</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="667"/>
         <source>XML; spoiler database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML ; base de données des spoilers (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="672"/>
         <source>Spoilers import</source>
-        <translation type="unfinished"/>
+        <translation>Importation des spoilers</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="673"/>
         <source>Please specify a compatible source for spoiler data.</source>
-        <translation type="unfinished"/>
+        <translation>Veuillez spécifier une source compatible pour les spoilers.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="675"/>
@@ -185,12 +185,12 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="677"/>
         <source>The spoiler database will be saved at the following location:</source>
-        <translation type="unfinished"/>
+        <translation>La base de données des spoilers sera enregistrée à l&apos;emplacement suivant :</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="679"/>
         <source>Save to a custom path (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Sauvegarder à un emplacement personnalisé (non recommandé)</translation>
     </message>
 </context>
 <context>
@@ -198,22 +198,22 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="625"/>
         <source>Save token database</source>
-        <translation type="unfinished"/>
+        <translation>Enregistrer la base de données des jetons</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="630"/>
         <source>XML; token database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML ; base de données des jetons (*.xml)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="635"/>
         <source>Tokens import</source>
-        <translation type="unfinished"/>
+        <translation>Importation des jetons</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="636"/>
         <source>Please specify a compatible source for token data.</source>
-        <translation type="unfinished"/>
+        <translation>Veuillez spécifier une source compatible pour les jetons.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="638"/>
@@ -228,12 +228,12 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="640"/>
         <source>The token database will be saved at the following location:</source>
-        <translation type="unfinished"/>
+        <translation>La base de données des jetons sera enregistrée à l&apos;emplacement suivant :</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="642"/>
         <source>Save to a custom path (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Sauvegarder à un emplacement personnalisé (non recommandé)</translation>
     </message>
 </context>
 <context>
@@ -241,7 +241,7 @@
     <message>
         <location filename="../src/oracleimporter.cpp" line="396"/>
         <source>Dummy set containing tokens</source>
-        <translation>Fausse édition contenant les jetons.</translation>
+        <translation>Fausse édition contenant les jetons</translation>
     </message>
 </context>
 <context>
@@ -257,22 +257,22 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="200"/>
         <source>Finished</source>
-        <translation type="unfinished"/>
+        <translation>Terminé</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="201"/>
         <source>The wizard has finished.</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;assistant a terminé.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="202"/>
         <source>You can now start using Cockatrice with the newly updated cards.</source>
-        <translation type="unfinished"/>
+        <translation>Vous pouvez maintenant commencer à utiliser Cockatrice avec les cartes mises à jour.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="203"/>
         <source>If the card databases don&apos;t reload automatically, restart the Cockatrice client.</source>
-        <translation type="unfinished"/>
+        <translation>Si les bases de données de cartes ne rechargent pas automatiquement, redémarrez le client Cockatrice.</translation>
     </message>
 </context>
 <context>
@@ -296,22 +296,22 @@
     <message>
         <location filename="../src/oraclewizard.cpp" line="551"/>
         <source>The following sets have been found:</source>
-        <translation type="unfinished"/>
+        <translation>Les éditions suivantes ont été trouvées :</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="553"/>
         <source>Press &quot;Save&quot; to store the imported cards in the Cockatrice database.</source>
-        <translation type="unfinished"/>
+        <translation>Cliquez sur « Enregistrer » pour enregistrer les cartes importées dans la base de données de Cockatrice.</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="554"/>
         <source>The card database will be saved at the following location:</source>
-        <translation type="unfinished"/>
+        <translation>La base de données des cartes sera enregistrée à l&apos;emplacement suivant :</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="556"/>
         <source>Save to a custom path (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Sauvegarder à un emplacement personnalisé (non recommandé)</translation>
     </message>
     <message>
         <location filename="../src/oraclewizard.cpp" line="558"/>
@@ -351,32 +351,32 @@
         <location filename="../src/pagetemplates.cpp" line="112"/>
         <location filename="../src/pagetemplates.cpp" line="172"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur</translation>
     </message>
     <message>
         <location filename="../src/pagetemplates.cpp" line="72"/>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;URL fournie n&apos;est pas valide.</translation>
     </message>
     <message>
         <location filename="../src/pagetemplates.cpp" line="76"/>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>Téléchargement (0 Mo)</translation>
     </message>
     <message>
         <location filename="../src/pagetemplates.cpp" line="103"/>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>Téléchargement (%1 Mo)</translation>
     </message>
     <message>
         <location filename="../src/pagetemplates.cpp" line="112"/>
         <source>Network error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Erreur réseau : %1.</translation>
     </message>
     <message>
         <location filename="../src/pagetemplates.cpp" line="172"/>
         <source>The file could not be saved to %1</source>
-        <translation type="unfinished"/>
+        <translation>Le fichier n&apos;a pas pu être enregistré dans %1</translation>
     </message>
 </context>
 <context>

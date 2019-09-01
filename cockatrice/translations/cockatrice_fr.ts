@@ -17,7 +17,7 @@
     <message>
         <location filename="../src/abstractcounter.cpp" line="192"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation>Nouvelle valeur des marqueurs &quot;%1&quot; :</translation>
+        <translation>Nouvelle valeur des marqueurs « %1 » :</translation>
     </message>
 </context>
 <context>
@@ -589,7 +589,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="../src/dlg_settings.cpp" line="672"/>
         <source>Last Change</source>
-        <translation> Dernier changement</translation>
+        <translation>Dernier changement</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="676"/>
@@ -1194,7 +1194,7 @@ Pour enlever votre avatar actuel, confirmez sans choisir une nouvelle image.</tr
         <source>The chosen name conflicts with an existing card or token.
 Make sure to enable the &apos;Token&apos; set in the &quot;Manage sets&quot; dialog to display them correctly.</source>
         <translation>Le nom choisi est en conflit avec une carte ou un jeton existant.
-Assurez-vous d&apos;activer l&apos;édition &quot;Fausse édition contenant les jeton&quot; dans le menu &quot;Gérer les éditions&quot; afin de les afficher correctement.</translation>
+Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les jetons » dans le menu «  Gérer les éditions » afin de les afficher correctement.</translation>
     </message>
 </context>
 <context>
@@ -1230,7 +1230,7 @@ Assurez-vous d&apos;activer l&apos;édition &quot;Fausse édition contenant les 
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="19"/>
         <source>Show &apos;&amp;buddies only&apos; games</source>
-        <translation>Afficher les parties &quot;&amp;amis uniquement&quot;</translation>
+        <translation>N&apos;afficher que les parties « &amp;amis uniquement »</translation>
     </message>
     <message>
         <location filename="../src/dlg_filter_games.cpp" line="22"/>
@@ -1379,7 +1379,7 @@ Assurez-vous d&apos;activer l&apos;édition &quot;Fausse édition contenant les 
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="32"/>
         <source>Oops, looks like something has gone wrong. Please re-start the forgot password process by using the forgot password button on the connection screen.</source>
-        <translation type="unfinished"/>
+        <translation>Oups, il semble y avoir eu un problème. Veuillez recommencer la procédure de récupération du mot de passe à l&apos;aide du bouton « Mot de passe oublié » à l&apos;écran de connexion.</translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="37"/>
@@ -1641,12 +1641,12 @@ Voulez-vous changer l&apos;emplacement de votre base de données ?</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="1302"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation>Le chemin d&apos;accès pour le répertoire de votre deck est invalide. Souhaitez-vous redéfinir le chemin d&apos;accès ?</translation>
+        <translation>Le chemin d&apos;accès vers votre répertoire de decks est invalide. Voulez-vous redéfinir le chemin d&apos;accès ?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="1312"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
-        <translation>Le chemin d&apos;accès pour le répertoire de vos images est invalide. Souhaitez-vous redéfinir le chemin d&apos;accès ?</translation>
+        <translation>Le chemin d&apos;accès vers votre répertoire d&apos;illustrations de cartes est invalide. Voulez-vous redéfinir le chemin d&apos;accès ?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="1324"/>
@@ -2399,7 +2399,7 @@ Fermez cette session puis reconnectez vous.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="1316"/>
         <source>Your password has been reset successfully, you can now log in using the new credentials.</source>
-        <translation type="unfinished"/>
+        <translation>Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter en utilisant vos nouveaux identifiants.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="424"/>
@@ -2531,13 +2531,15 @@ Cela veut généralement dire que votre client n&apos;est plus à jour, et que l
         <location filename="../src/window_main.cpp" line="413"/>
         <source>This server requires client IDs. Your client is either failing to generate an ID or you are running a modified client.
 Please close and reopen your client to try again.</source>
-        <translation type="unfinished"/>
+        <translation>Ce serveur requiert un ID de client. Soit votre client a échoué lors de la génération d&apos;un ID, soit vous utilisez un client modifié.
+Veuillez fermer et rouvrir votre client pour réessayer.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="418"/>
         <source>An internal error has occurred, please close and reopen Cockatrice before trying again.
 If the error persists, ensure you are running the latest version of the software and if needed contact the software developers.</source>
-        <translation type="unfinished"/>
+        <translation>Une erreur interne est survenue. Veuillez fermer et rouvrir Cockatrice avant de réessayer.
+Si l&apos;erreur persiste, vérifiez que utilisez la dernière version du logiciel, ou contactez les développeurs si nécessaire.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="425"/>
@@ -2736,13 +2738,14 @@ Oracle va maintenant se lancer pour mettre à jour votre base de données de car
     <message>
         <location filename="../src/window_main.cpp" line="884"/>
         <source>Cockatrice installed</source>
-        <translation type="unfinished"/>
+        <translation>Installation de Cockatrice terminée</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="885"/>
         <source>Congratulations on installing Cockatrice %1!
 Oracle will now launch to install the initial card database.</source>
-        <translation type="unfinished"/>
+        <translation>Félicitations ! Vous venez d&apos;installer Cockatrice %1 !
+Oracle va maintenant se lancer pour installer la base de données de cartes initiale.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1008"/>
@@ -2755,8 +2758,8 @@ Oracle will now launch to install the initial card database.</source>
 Do you want to update your card database now?
 If unsure or first time user, choose &quot;Yes&quot;</source>
         <translation>Cockatrice n&apos;arrive pas à charger la base de de données de cartes.
-Souhaitez vous mettre à jour la base de données de cartes maintenant ?
-Si vous n’êtes pas sûr ou que vous êtes le premier joueur, choisissez &quot;Oui&quot;</translation>
+Voulez-vous la mettre à jour maintenant ?
+Si vous n’êtes pas sûr ou si c&apos;est la première fois que vous jouez, choisissez « Oui ».</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1014"/>
@@ -2877,7 +2880,7 @@ Si vous n’êtes pas sûr ou que vous êtes le premier joueur, choisissez &quot
         <location filename="../src/window_main.cpp" line="606"/>
         <location filename="../src/window_main.cpp" line="611"/>
         <source>Requesting forgotten password to %1 as %2...</source>
-        <translation type="unfinished"/>
+        <translation>Envoi de la requête de mot de passe oublié à %1 en tant que %2...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="643"/>
@@ -2894,16 +2897,20 @@ Si vous n’êtes pas sûr ou que vous êtes le premier joueur, choisissez &quot
         <source>%n new set(s) found in the card database
 Set code(s): %1
 Do you want to enable it/them?</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%n nouvelle(s) édition trouvée dans la base de données des cartes
+Code(s) d&apos;extension : %1
+En souhaitez-vous / l&apos;activation ?</numerusform><numerusform>%n nouvelle(s) édition(s) trouvée(s) dans la base de données des cartes
+Code(s) d&apos;édition(s) : %1
+Voulez-vous l&apos;(les) activer ?</numerusform></translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1061"/>
         <source>Hi! It seems like you're running this version of Cockatrice for the first time.
 All the sets in the card database have been enabled.
 Read more about changing the set order or disabling specific sets and consequent effects in the &quot;Manage Sets&quot; dialog.</source>
-        <translation>Salut ! On dirait que vous utilisez cette version de Cockatrice pour la première fois.
+        <translation>Salut ! On dirait que vous utilisez cette version de Cockatrice pour la première fois.
 Toutes les éditions de la base de données de cartes ont été activées.
-Pour plus d&apos;informations sur la modification de l&apos;ordre des éditions, la désactivation d&apos;éditions spécifiques, et leurs effets, consultez le menu &quot;Gérer les éditions...&quot;.</translation>
+Pour plus d&apos;informations sur la modification de l&apos;ordre des éditions, la désactivation d&apos;éditions spécifiques, et leurs effets, consultez le menu « Gérer les éditions… ».</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1181"/>
@@ -3656,27 +3663,27 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/game_specific_terms.h" line="29"/>
         <source>Card Type</source>
-        <translation type="unfinished"/>
+        <translation>Type de carte</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="31"/>
         <source>Converted Mana Cost</source>
-        <translation type="unfinished"/>
+        <translation>Coût converti de mana</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="37"/>
         <source>Main Card Type</source>
-        <translation type="unfinished"/>
+        <translation>Type de carte principal</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="39"/>
         <source>Mana Cost</source>
-        <translation type="unfinished"/>
+        <translation>Coût de mana</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="41"/>
         <source>P/T</source>
-        <translation type="unfinished"/>
+        <translation>F/E</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="43"/>
@@ -3786,7 +3793,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/player.cpp" line="655"/>
         <source>Player &quot;%1&quot;</source>
-        <translation>Joueur &quot;%1&quot;</translation>
+        <translation>Joueur « %1 »</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="656"/>
@@ -3850,7 +3857,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="../src/player.cpp" line="679"/>
         <source>&amp;View hand</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Voir main</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="680"/>
@@ -5146,7 +5153,7 @@ Veuillez entrer un nom:</translation>
         <location filename="../src/tab_deck_storage.cpp" line="331"/>
         <location filename="../src/tab_deck_storage.cpp" line="342"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
-        <translation>Êtes-vous sûr de vouloir supprimer &quot;%1&quot; ?</translation>
+        <translation>Êtes-vous sûr de vouloir supprimer « %1 » ?</translation>
     </message>
     <message>
         <location filename="../src/tab_deck_storage.cpp" line="281"/>
@@ -5599,7 +5606,7 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="../src/tab_replays.cpp" line="149"/>
         <source>Are you sure you want to delete &quot;%1&quot;?</source>
-        <translation>Êtes-vous sûr de vouloir supprimer &quot;%1&quot; ?</translation>
+        <translation>Êtes-vous sûr de vouloir supprimer « %1 » ?</translation>
     </message>
     <message>
         <location filename="../src/tab_replays.cpp" line="198"/>
@@ -5688,12 +5695,12 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="../src/tab_server.cpp" line="209"/>
         <source>Failed to join the room: it doesn&apos;t exist on the server.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de rejoindre le salon : il n&apos;existe pas sur le serveur.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="213"/>
         <source>The server thinks you are in the room but your client is unable to display it. Try restarting your client.</source>
-        <translation type="unfinished"/>
+        <translation>Le serveur considère que vous êtes dans le salon mais votre client est incapable de l&apos;afficher. Essayez en relançant votre client.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="217"/>
@@ -5938,12 +5945,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/user_context_menu.cpp" line="184"/>
         <source>Failed to collect ban information.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de collecter les informations de bannissement.</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="220"/>
         <source>Failed to collect warning information.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de collecter les informations d&apos;avertissements.</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="194"/>
@@ -6329,7 +6336,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/window_sets.cpp" line="129"/>
         <source>Only cards in enabled sets will appear in the card list of the deck editor</source>
-        <translation type="unfinished"/>
+        <translation>Seules les cartes des éditions activées apparaitront dans la liste de cartes de l&apos;éditeur de deck.</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="130"/>
@@ -6354,7 +6361,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/window_sets.cpp" line="134"/>
         <source>How to use custom card art</source>
-        <translation type="unfinished"/>
+        <translation>Comment utiliser une illustration personnalisée de carte</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="135"/>
@@ -6658,42 +6665,42 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/shortcutssettings.h" line="472"/>
         <source>Move to graveyard once</source>
-        <translation type="unfinished"/>
+        <translation>Mettre une carte dans le cimetière</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="475"/>
         <source>Move multiple to graveyard</source>
-        <translation type="unfinished"/>
+        <translation>Mettre des cartes dans le cimetière</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="478"/>
         <source>Move to exile once</source>
-        <translation type="unfinished"/>
+        <translation>Exiler une carte</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="481"/>
         <source>Move multiple to exile</source>
-        <translation type="unfinished"/>
+        <translation>Exiler des cartes</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="504"/>
         <source>Draw a card</source>
-        <translation type="unfinished"/>
+        <translation>Piocher une carte</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="507"/>
         <source>Draw multiple cards</source>
-        <translation type="unfinished"/>
+        <translation>Piocher des cartes</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="516"/>
         <source>Rotate view clockwise</source>
-        <translation type="unfinished"/>
+        <translation>Pivoter la vue dans le sens horaire</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="519"/>
         <source>Rotate view counterclockwise</source>
-        <translation type="unfinished"/>
+        <translation>Pivoter la vue dans le sens anti-horaire</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="522"/>
@@ -6728,7 +6735,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/shortcutssettings.h" line="160"/>
         <source>Start local game</source>
-        <translation type="unfinished"/>
+        <translation>Démarrer une partie locale</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="183"/>
@@ -6743,12 +6750,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/shortcutssettings.h" line="221"/>
         <source>Save deck to clipboard annotated</source>
-        <translation type="unfinished"/>
+        <translation>Copier le deck annoté</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="225"/>
         <source>Save deck to clipboard raw</source>
-        <translation type="unfinished"/>
+        <translation>Copier le deck brut</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="234"/>
@@ -7017,47 +7024,47 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../src/shortcutssettings.h" line="315"/>
         <source>Add colorless counter</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un marqueur incolore</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="318"/>
         <source>Remove colorless counter</source>
-        <translation type="unfinished"/>
+        <translation>Retirer un marqueur incolore</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="321"/>
         <source>Set colorless counter</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de marqueurs incolores</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="339"/>
         <source>Move toughness to power (+1/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Endurance vers force (+1/-1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="348"/>
         <source>Move power to toughness (-1/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Force vers endurance (-1/+1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="370"/>
         <source>First main phase</source>
-        <translation type="unfinished"/>
+        <translation>Première phase principale</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="385"/>
         <source>Second main phase</source>
-        <translation type="unfinished"/>
+        <translation>Seconde phase principale</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="408"/>
         <source>Turn card over</source>
-        <translation type="unfinished"/>
+        <translation>Retourner la carte</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="449"/>
         <source>Top of library</source>
-        <translation type="unfinished"/>
+        <translation>Dessus de la bibliothèque</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="460"/>

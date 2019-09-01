@@ -589,7 +589,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="../src/dlg_settings.cpp" line="672"/>
         <source>Last Change</source>
-        <translation type="unfinished"/>
+        <translation>Última Alteração</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="676"/>
@@ -1177,7 +1177,7 @@ Para remover o avatar atual, confirme sem escolher uma nova imagem.</translation
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="113"/>
         <source>Edit custom tokens</source>
-        <translation type="unfinished"/>
+        <translation>Editar fichas personalizadas</translation>
     </message>
     <message>
         <location filename="../src/dlg_edit_tokens.cpp" line="145"/>
@@ -1379,7 +1379,9 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="32"/>
         <source>Oops, looks like something has gone wrong. Please re-start the forgot password process by using the forgot password button on the connection screen.</source>
-        <translation type="unfinished"/>
+        <translation>Oops, parece que algo deu errado. 
+Por favor refaça o processo de Esqueci a Senha usando o 
+botão de Esqueci a Senha na tela de conexão. </translation>
     </message>
     <message>
         <location filename="../src/dlg_forgotpasswordreset.cpp" line="37"/>
@@ -2398,7 +2400,7 @@ Por favor, feche a sessão primeiro e logue novamente.</translation>
     <message>
         <location filename="../src/window_main.cpp" line="1316"/>
         <source>Your password has been reset successfully, you can now log in using the new credentials.</source>
-        <translation type="unfinished"/>
+        <translation>Sua senha foi alterada com sucesso, você pode se conectar usando suas novas credenciais </translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="424"/>
@@ -2530,13 +2532,15 @@ Isso geralmente significa que seu cliente está obsoleto, e o servidor enviou um
         <location filename="../src/window_main.cpp" line="413"/>
         <source>This server requires client IDs. Your client is either failing to generate an ID or you are running a modified client.
 Please close and reopen your client to try again.</source>
-        <translation type="unfinished"/>
+        <translation>Este servidor requer ID de cliente. Seu cliente ou não está conseguindo gerar um ID ou você está executando um cliente modificado.
+Por favor feche e abra seu cliente para tentar novamente. </translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="418"/>
         <source>An internal error has occurred, please close and reopen Cockatrice before trying again.
 If the error persists, ensure you are running the latest version of the software and if needed contact the software developers.</source>
-        <translation type="unfinished"/>
+        <translation>Ocorreu um erro interno, por favor, feche e reabra o Cockatrice antes de tentar novamente.
+Se o erro persistir, verifique se você está executando a versão mais recente do software e, se necessário, entre em contato com os desenvolvedores de software.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="425"/>
@@ -2735,13 +2739,14 @@ Oracle será inicializado agora para atualizar sua base de cartas</translation>
     <message>
         <location filename="../src/window_main.cpp" line="884"/>
         <source>Cockatrice installed</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice instalado</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="885"/>
         <source>Congratulations on installing Cockatrice %1!
 Oracle will now launch to install the initial card database.</source>
-        <translation type="unfinished"/>
+        <translation>Parabéns pela instalação do Cockatrice %1!
+O Oracle agora será iniciado para instalar o banco de dados inicial de cartas.</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="1008"/>
@@ -2876,7 +2881,7 @@ Se estiver em dúvida ou for um novo usuário selecione &quot;Sim&quot;</transla
         <location filename="../src/window_main.cpp" line="606"/>
         <location filename="../src/window_main.cpp" line="611"/>
         <source>Requesting forgotten password to %1 as %2...</source>
-        <translation type="unfinished"/>
+        <translation>Solicitando senha esquecida para %1 como %2...</translation>
     </message>
     <message>
         <location filename="../src/window_main.cpp" line="643"/>
@@ -2886,7 +2891,7 @@ Se estiver em dúvida ou for um novo usuário selecione &quot;Sim&quot;</transla
     <message>
         <location filename="../src/window_main.cpp" line="644"/>
         <source>Edit custom &amp;tokens...</source>
-        <translation type="unfinished"/>
+        <translation>Editar &amp;fichas personalizadas</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/window_main.cpp" line="1033"/>
@@ -3436,12 +3441,12 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="742"/>
         <source>%1 changes the PT of %2 from nothing to %4.</source>
-        <translation type="unfinished"/>
+        <translation>%1 alterar o PR de %2 de nada para %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="745"/>
         <source>%1 changes the PT of %2 from %3 to %4.</source>
-        <translation type="unfinished"/>
+        <translation>%1 alterar o P/R de %2 de %3 para %4.</translation>
     </message>
     <message>
         <location filename="../src/messagelogwidget.cpp" line="772"/>
@@ -3655,27 +3660,27 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/game_specific_terms.h" line="29"/>
         <source>Card Type</source>
-        <translation type="unfinished"/>
+        <translation>Tipo de Carta</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="31"/>
         <source>Converted Mana Cost</source>
-        <translation type="unfinished"/>
+        <translation>Custo de Mana Convertido</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="37"/>
         <source>Main Card Type</source>
-        <translation type="unfinished"/>
+        <translation>Tipo de Carta Principal</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="39"/>
         <source>Mana Cost</source>
-        <translation type="unfinished"/>
+        <translation>Custo de Mana</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="41"/>
         <source>P/T</source>
-        <translation type="unfinished"/>
+        <translation>P/R</translation>
     </message>
     <message>
         <location filename="../src/game_specific_terms.h" line="43"/>
@@ -3690,7 +3695,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/game_specific_terms.h" line="47"/>
         <source>Color Identity</source>
-        <translation type="unfinished"/>
+        <translation>Identidade de Cor</translation>
     </message>
 </context>
 <context>
@@ -3849,7 +3854,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="679"/>
         <source>&amp;View hand</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Ver mão</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="680"/>
@@ -4089,12 +4094,12 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="750"/>
         <source>Increase power and decrease toughness</source>
-        <translation type="unfinished"/>
+        <translation>Aumentar o poder e diminuir a resistência</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="751"/>
         <source>Decrease power and increase toughness</source>
-        <translation type="unfinished"/>
+        <translation>Diminuir o poder e aumentar a resistência</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="752"/>
@@ -4150,12 +4155,12 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/player.cpp" line="2684"/>
         <source>Change power/toughness</source>
-        <translation type="unfinished"/>
+        <translation>Mudar o poder/resistêcia</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="2684"/>
         <source>Change stats to:</source>
-        <translation type="unfinished"/>
+        <translation>Mudar estatísticas para:</translation>
     </message>
     <message>
         <location filename="../src/player.cpp" line="3139"/>
@@ -4538,12 +4543,13 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/sequenceEdit/sequenceedit.cpp" line="41"/>
         <source>Choose an action from the table</source>
-        <translation type="unfinished"/>
+        <translation> 
+Escolha uma ação da tabela</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/sequenceedit.cpp" line="47"/>
         <source>Hit the key/combination of keys you want to set for this action</source>
-        <translation type="unfinished"/>
+        <translation>Pressione a tecla/combinação de teclas que você deseja definir para esta ação</translation>
     </message>
     <message>
         <location filename="../src/sequenceEdit/sequenceedit.cpp" line="170"/>
@@ -4609,12 +4615,12 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="1110"/>
         <source>Clear all default shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Limpar todos os atalhos padrão</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="1111"/>
         <source>Do you really want to clear all shortcuts?</source>
-        <translation type="unfinished"/>
+        <translation>Você realmente quer limpar todos os atalhos?</translation>
     </message>
     <message>
         <location filename="../src/dlg_settings.cpp" line="1118"/>
@@ -4644,7 +4650,7 @@ O Cockatrice reiniciará imediatamente o banco de dados de cartas.</translation>
     <message>
         <location filename="../src/dlg_settings.cpp" line="1125"/>
         <source>How to set custom shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Como definir atalhos personalizados</translation>
     </message>
 </context>
 <context>
@@ -5688,12 +5694,12 @@ Quanto mais informação você inserir, mais específicos seus resultados serão
     <message>
         <location filename="../src/tab_server.cpp" line="209"/>
         <source>Failed to join the room: it doesn&apos;t exist on the server.</source>
-        <translation type="unfinished"/>
+        <translation>Falha ao entrar na sala: ela não existe no servidor.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="213"/>
         <source>The server thinks you are in the room but your client is unable to display it. Try restarting your client.</source>
-        <translation type="unfinished"/>
+        <translation>O servidor pensa que você está na sala, mas seu cliente não consegue exibi-lo. Tente reiniciar o seu cliente.</translation>
     </message>
     <message>
         <location filename="../src/tab_server.cpp" line="217"/>
@@ -5938,12 +5944,12 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/user_context_menu.cpp" line="184"/>
         <source>Failed to collect ban information.</source>
-        <translation type="unfinished"/>
+        <translation>Falha ao coletar informações de banidas.</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="220"/>
         <source>Failed to collect warning information.</source>
-        <translation type="unfinished"/>
+        <translation>Falha ao coletar informações de aviso.</translation>
     </message>
     <message>
         <location filename="../src/user_context_menu.cpp" line="194"/>
@@ -6329,7 +6335,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/window_sets.cpp" line="129"/>
         <source>Only cards in enabled sets will appear in the card list of the deck editor</source>
-        <translation type="unfinished"/>
+        <translation>Apenas cartas em conjuntos ativados aparecerão na lista de cartas do editor de deck</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="130"/>
@@ -6354,7 +6360,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/window_sets.cpp" line="134"/>
         <source>How to use custom card art</source>
-        <translation type="unfinished"/>
+        <translation>Como usar arte de carta personalizada</translation>
     </message>
     <message>
         <location filename="../src/window_sets.cpp" line="135"/>
@@ -6572,7 +6578,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="43"/>
         <source>Card counters</source>
-        <translation type="unfinished"/>
+        <translation>Marcadores de carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="47"/>
@@ -6587,12 +6593,12 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="63"/>
         <source>Chat room</source>
-        <translation type="unfinished"/>
+        <translation>Sala de chat</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="65"/>
         <source>Game window</source>
-        <translation type="unfinished"/>
+        <translation>Janela do jogo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="67"/>
@@ -6658,42 +6664,42 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="472"/>
         <source>Move to graveyard once</source>
-        <translation type="unfinished"/>
+        <translation>Mover para o cemitério uma vez</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="475"/>
         <source>Move multiple to graveyard</source>
-        <translation type="unfinished"/>
+        <translation>Mover várias para o cemitério</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="478"/>
         <source>Move to exile once</source>
-        <translation type="unfinished"/>
+        <translation>Mover para o exílio</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="481"/>
         <source>Move multiple to exile</source>
-        <translation type="unfinished"/>
+        <translation>Mover várias para o exílio</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="504"/>
         <source>Draw a card</source>
-        <translation type="unfinished"/>
+        <translation>Compre uma carta</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="507"/>
         <source>Draw multiple cards</source>
-        <translation type="unfinished"/>
+        <translation>Compre várias cartas</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="516"/>
         <source>Rotate view clockwise</source>
-        <translation type="unfinished"/>
+        <translation>Rodar a vista no sentido horário</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="519"/>
         <source>Rotate view counterclockwise</source>
-        <translation type="unfinished"/>
+        <translation>Rodar a vista no sentido anti-horário</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="522"/>
@@ -6728,12 +6734,12 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="160"/>
         <source>Start local game</source>
-        <translation type="unfinished"/>
+        <translation>Começar um jogo local</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="183"/>
         <source>Edit custom tokens</source>
-        <translation type="unfinished"/>
+        <translation>Editar fichas personalizadas</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="186"/>
@@ -6743,12 +6749,13 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="221"/>
         <source>Save deck to clipboard annotated</source>
-        <translation type="unfinished"/>
+        <translation> 
+Salvar o deck na área de transferência com anotações</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="225"/>
         <source>Save deck to clipboard raw</source>
-        <translation type="unfinished"/>
+        <translation>Salvar o deck para a área de transferência sem anotações</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="234"/>
@@ -6771,150 +6778,150 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="243"/>
         <source>Add yellow counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicione um marcador amarelo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="246"/>
         <source>Remove yellow counter</source>
-        <translation type="unfinished"/>
+        <translation>Remova um marcador amarelo</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="249"/>
         <source>Set yellow counters</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores amarelos</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="252"/>
         <location filename="../src/shortcutssettings.h" line="297"/>
         <source>Add red counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador vermelho</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="255"/>
         <location filename="../src/shortcutssettings.h" line="300"/>
         <source>Remove red counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador vermelho</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="258"/>
         <location filename="../src/shortcutssettings.h" line="303"/>
         <source>Set red counters</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores vermelhos</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="261"/>
         <source>Add life counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador de vida</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="264"/>
         <source>Remove life counter</source>
-        <translation type="unfinished"/>
+        <translation>remover marcador de vida</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="267"/>
         <source>Set life counters</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores de vida</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="270"/>
         <source>Add white counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador branco</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="273"/>
         <source>Remove white counter</source>
-        <translation type="unfinished"/>
+        <translation>remover marcador branco</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="276"/>
         <source>Set white counters</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores brancos</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="279"/>
         <source>Add blue counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador azul</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="282"/>
         <source>Remove blue counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador azul</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="285"/>
         <source>Set blue counters</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores azuis</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="288"/>
         <source>Add black counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador preto</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="291"/>
         <source>Remove black counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador preto</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="294"/>
         <source>Set black counters</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores pretos</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="324"/>
         <source>Add storm counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador de rajada</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="327"/>
         <source>Remove storm counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador de rajada</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="330"/>
         <source>Set storm counters</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores de rajada</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="333"/>
         <source>Add power (+1/+0)</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar poder (+1/+0)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="336"/>
         <source>Remove power (-1/-0)</source>
-        <translation type="unfinished"/>
+        <translation>Remover poder (-1/-0)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="342"/>
         <source>Add toughness (+0/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar resistência (+0/+1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="345"/>
         <source>Remove toughness (-0/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Remover resistência (-0/-1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="351"/>
         <source>Add power and toughness (+1/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar poder e resistência (+1/+1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="354"/>
         <source>Remove power and toughness (-1/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Remover poder e resistência (-1/-1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="357"/>
         <source>Set power and toughness</source>
-        <translation type="unfinished"/>
+        <translation>Definir poder e resistência</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="360"/>
         <source>Reset power and toughness</source>
-        <translation type="unfinished"/>
+        <translation>Redefinir poder e resistência</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="393"/>
@@ -7017,47 +7024,47 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="315"/>
         <source>Add colorless counter</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar marcador incolor</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="318"/>
         <source>Remove colorless counter</source>
-        <translation type="unfinished"/>
+        <translation>Remover marcador incolor</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="321"/>
         <source>Set colorless counter</source>
-        <translation type="unfinished"/>
+        <translation>Definir marcadores incolores</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="339"/>
         <source>Move toughness to power (+1/-1)</source>
-        <translation type="unfinished"/>
+        <translation>Mover resistência para o poder (+1/-1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="348"/>
         <source>Move power to toughness (-1/+1)</source>
-        <translation type="unfinished"/>
+        <translation>Mover poder para a resistência (-1/+1)</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="370"/>
         <source>First main phase</source>
-        <translation type="unfinished"/>
+        <translation>Primeira fase principal</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="385"/>
         <source>Second main phase</source>
-        <translation type="unfinished"/>
+        <translation>Segunda fase principal</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="408"/>
         <source>Turn card over</source>
-        <translation type="unfinished"/>
+        <translation>Virar o card</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="449"/>
         <source>Top of library</source>
-        <translation type="unfinished"/>
+        <translation>Topo do grimório</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="460"/>
@@ -7137,7 +7144,7 @@ Por favor evite tais ações ou outras medidas poderão ser tomadas contra você
     <message>
         <location filename="../src/shortcutssettings.h" line="45"/>
         <source>Player counters</source>
-        <translation type="unfinished"/>
+        <translation>Marcadores de jogadores</translation>
     </message>
     <message>
         <location filename="../src/shortcutssettings.h" line="501"/>
