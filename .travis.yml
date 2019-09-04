@@ -44,7 +44,7 @@ matrix:
 
 
   #macOS Sierra
-  - name: macOS (Debug)
+  - name: macOS Sierra (Debug)
     if: tag IS NOT present
     os: osx
     osx_image: xcode9.2
@@ -64,11 +64,11 @@ matrix:
     before_cache:
     - brew cleanup
 
-  - name: macOS (Release)
+  - name: macOS Sierra (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode9.2
-    env: NAME=Sierra
+    env: OSX_VERSION=10.12
     cache:
     - ccache
     - directories:
@@ -81,12 +81,12 @@ matrix:
         - qt
         - xz
         update: true
-    script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME-$NAME" --release
+    script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME-$OSX_VERSION" --release
     before_cache:
     - brew cleanup
 
   #macOS Mojave
-  - name: macOS (Debug)
+  - name: macOS Mojave (Debug)
     if: tag IS NOT present
     os: osx
     osx_image: xcode11
@@ -106,11 +106,11 @@ matrix:
     before_cache:
     - brew cleanup
 
-  - name: macOS (Release)
+  - name: macOS Mojave (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode11
-    env: NAME=Mojave
+    env: OSX_VERSION=10.14
     cache:
     - ccache
     - directories:
@@ -123,7 +123,7 @@ matrix:
         - qt
         - xz
         #update: true
-    script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME-$NAME" --release
+    script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME-$OSX_VERSION" --release
     before_cache:
     - brew cleanup
 
