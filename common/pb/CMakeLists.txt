@@ -176,6 +176,7 @@ if(${Protobuf_VERSION} VERSION_LESS "3.1.0")
     # remove unused parameter and misleading indentation warnings when compiling to avoid errors
     set(CMAKE_CXX_FLAGS_DEBUG
         "${CMAKE_CXX_FLAGS_DEBUG} -Wno-unused-parameter -Wno-misleading-indentation")
-    message(WARNING "Outdated protobuf version found (${Protobuf_VERSION} < 3.1.0), "
-        "disabled warnings to avoid compilation errors.")
+    message(WARNING "Older protobuf version found (${Protobuf_VERSION} < 3.1.0), "
+        "disabled the warnings 'unused-parameter' and 'misleading-indentation' for protobuf generated code "
+        "to avoid compilation errors.")
 endif()
