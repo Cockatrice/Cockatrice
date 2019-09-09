@@ -178,7 +178,7 @@ QString GeneralSettingsPage::languageName(const QString &qmFile)
 
 void GeneralSettingsPage::deckPathButtonClicked()
 {
-    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
+    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), deckPathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -188,7 +188,7 @@ void GeneralSettingsPage::deckPathButtonClicked()
 
 void GeneralSettingsPage::replaysPathButtonClicked()
 {
-    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
+    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), replaysPathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -198,7 +198,7 @@ void GeneralSettingsPage::replaysPathButtonClicked()
 
 void GeneralSettingsPage::picsPathButtonClicked()
 {
-    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"));
+    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), picsPathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -208,7 +208,7 @@ void GeneralSettingsPage::picsPathButtonClicked()
 
 void GeneralSettingsPage::cardDatabasePathButtonClicked()
 {
-    QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
+    QString path = QFileDialog::getOpenFileName(this, tr("Choose path"), cardDatabasePathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -218,7 +218,7 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
 
 void GeneralSettingsPage::tokenDatabasePathButtonClicked()
 {
-    QString path = QFileDialog::getOpenFileName(this, tr("Choose path"));
+    QString path = QFileDialog::getOpenFileName(this, tr("Choose path"), tokenDatabasePathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -640,7 +640,7 @@ QString DeckEditorSettingsPage::getLastUpdateTime()
 
 void DeckEditorSettingsPage::spoilerPathButtonClicked()
 {
-    QString lsPath = QFileDialog::getExistingDirectory(this, tr("Choose path"));
+    QString lsPath = QFileDialog::getExistingDirectory(this, tr("Choose path"), mpSpoilerSavePathLineEdit->text());
     if (lsPath.isEmpty()) {
         return;
     }
