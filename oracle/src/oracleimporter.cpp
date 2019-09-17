@@ -87,8 +87,7 @@ QString OracleImporter::getMainCardType(const QStringList &typeList)
             return type;
         }
     }
-    if(typeList.isEmpty())
-    {
+    if (typeList.isEmpty()) {
         return {};
     } else {
         return typeList.first();
