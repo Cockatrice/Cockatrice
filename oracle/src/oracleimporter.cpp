@@ -87,7 +87,12 @@ QString OracleImporter::getMainCardType(const QStringList &typeList)
             return type;
         }
     }
-    return typeList.first();
+    if(typeList.isEmpty())
+    {
+        return {};
+    } else {
+        return typeList.first();
+    }
 }
 
 CardInfoPtr OracleImporter::addCard(QString name,
@@ -291,7 +296,9 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         }
 
         const auto &mainCardType = getMainCardType(card.value("types").toStringList());
-        if (!mainCardType.isEmpty()) {
+        if (mainCardType.isEmpty()) {
+            qDebug() << "warning: no mainCardType for card:" << name;
+        } else {
             properties.insert("maintype", mainCardType);
         }
 
