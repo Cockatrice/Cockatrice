@@ -82,16 +82,17 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
 
 QString OracleImporter::getMainCardType(const QStringList &typeList)
 {
+    if (typeList.isEmpty()) {
+        return {};
+    }
+
     for (const auto &type : mainCardTypes) {
         if (typeList.contains(type)) {
             return type;
         }
     }
-    if (typeList.isEmpty()) {
-        return {};
-    } else {
-        return typeList.first();
-    }
+
+    return typeList.first();
 }
 
 CardInfoPtr OracleImporter::addCard(QString name,
