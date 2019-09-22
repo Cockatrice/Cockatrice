@@ -41,6 +41,10 @@ while [[ "$@" ]]; do
       BUILDTYPE="Release"
       shift
       ;;
+    '--zip')
+      MAKE_ZIP=1
+      shift
+      ;;
     *)
       if [[ $1 == -* ]]; then
         echo "unrecognized option: $1"
@@ -108,6 +112,13 @@ if [[ $MAKE_PACKAGE ]]; then
       echo "could not find package" >&2
       exit 1
     fi
-    mv "$path/$file" "$path/${file%.*}-$PACKAGE_NAME.${file##*.}"
+    new_name="$path/${file%.*}-$PACKAGE_NAME."
+    if [[ $MAKE_ZIP ]]; then
+      zip "${new_name}zip" "$path/$file"
+      mv "$path/$file" "$path/_$file"
+    else
+      extension="${file##*.}"
+      mv "$path/$file" "$new_name$extension"
+    fi
   fi
 fi
