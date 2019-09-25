@@ -28,12 +28,13 @@ private:
     QString pt;
     bool destroyOnZoneChange;
     bool doesntUntap;
+    bool counterPermanency;
     QPoint gridPoint;
     CardDragItem *dragItem;
     CardItem *attachedTo;
     QList<CardItem *> attachedCards;
 
-    QMenu *cardMenu, *ptMenu, *moveMenu;
+    QMenu *cardMenu, *ptMenu, *moveMenu, *counterMenu;
 
     void prepareDelete();
 public slots:
@@ -95,6 +96,14 @@ public:
         return counters;
     }
     void setCounter(int _id, int _value);
+    bool getCounterPermanency() const
+    {
+        return counterPermanency;
+    }
+    void setCounterPermanency(bool _counterPermanency)
+    {
+        counterPermanency = _counterPermanency;
+    }
     QString getAnnotation() const
     {
         return annotation;
@@ -149,6 +158,10 @@ public:
     QMenu *getMoveMenu() const
     {
         return moveMenu;
+    }
+    QMenu *getCounterMenu() const
+    {
+        return counterMenu;
     }
 
     bool animationEvent();

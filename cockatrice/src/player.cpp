@@ -403,6 +403,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     aDoesntUntap = new QAction(this);
     aDoesntUntap->setData(cmDoesntUntap);
     connect(aDoesntUntap, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
+    aCounterPermanency = new QAction(this);
+    aCounterPermanency->setData(cmCounterPermanency);
+    connect(aCounterPermanency, SIGNAL(triggered()), this, SLOT(cardMenuAction()));
     aAttach = new QAction(this);
     connect(aAttach, SIGNAL(triggered()), this, SLOT(actAttach()));
     aUnattach = new QAction(this);
@@ -759,6 +762,7 @@ void Player::retranslateUi()
     aSetPT->setText(tr("Set &power and toughness..."));
     aResetPT->setText(tr("Reset p&ower and toughness"));
     aSetAnnotation->setText(tr("&Set annotation..."));
+    aCounterPermanency->setText(tr("Toggle counter &permanency"));
 
     QStringList counterColors;
     counterColors.append(tr("Red"));
@@ -813,6 +817,7 @@ void Player::setShortcutsActive()
     aSetPT->setShortcuts(shortcuts.getShortcut("Player/aSetPT"));
     aResetPT->setShortcuts(shortcuts.getShortcut("Player/aResetPT"));
     aSetAnnotation->setShortcuts(shortcuts.getShortcut("Player/aSetAnnotation"));
+    aCounterPermanency->setShortcuts(shortcuts.getShortcut("Player/aCounterPermanency"));
     aMoveToTopLibrary->setShortcuts(shortcuts.getShortcut("Player/aMoveToTopLibrary"));
     aMoveToBottomLibrary->setShortcuts(shortcuts.getShortcut("Player/aMoveToBottomLibrary"));
     aMoveToHand->setShortcuts(shortcuts.getShortcut("Player/aMoveToHand"));
@@ -1500,6 +1505,11 @@ void Player::setCardAttrHelper(const GameEventContext &context,
         case AttrPT: {
             emit logSetPT(this, card, avalue);
             card->setPT(avalue);
+            break;
+        }
+        case AttrCounterPermanency: {
+            bool value = (avalue == "1");
+            card->setCounterPermanency(value);
             break;
         }
     }
@@ -2445,7 +2455,7 @@ void Player::cardMenuAction()
     }
 
     QList<const ::google::protobuf::Message *> commandList;
-    if (a->data().toInt() <= (int)cmClone) {
+    if (a->data().toInt() <= (int)cmClone) { // FIX ME
         for (const auto &card : cardList) {
             switch (static_cast<CardMenuActionType>(a->data().toInt())) {
                 // Leaving both for compatibility with server
@@ -2501,6 +2511,15 @@ void Player::cardMenuAction()
                     cmd->set_destroy_on_zone_change(true);
                     cmd->set_x(-1);
                     cmd->set_y(card->getGridPoint().y());
+                    commandList.append(cmd);
+                    break;
+                }
+                case cmCounterPermanency: {
+                    auto *cmd = new Command_SetCardAttr;
+                    cmd->set_zone(card->getZone()->getName().toStdString());
+                    cmd->set_card_id(card->getId());
+                    cmd->set_attribute(AttrCounterPermanency);
+                    cmd->set_attr_value(card->getCounterPermanency() ? "0" : "1");
                     commandList.append(cmd);
                     break;
                 }
@@ -2975,6 +2994,7 @@ void Player::updateCardMenu(const CardItem *card)
     QMenu *cardMenu = card->getCardMenu();
     QMenu *ptMenu = card->getPTMenu();
     QMenu *moveMenu = card->getMoveMenu();
+    QMenu *counterMenu = card->getCounterMenu();
 
     cardMenu->clear();
 
@@ -3005,6 +3025,18 @@ void Player::updateCardMenu(const CardItem *card)
             moveMenu->addAction(aMoveToGraveyard);
             moveMenu->addSeparator();
             moveMenu->addAction(aMoveToExile);
+        }
+
+        if (counterMenu->isEmpty()) {
+            counterMenu->addAction(aCounterPermanency);
+            for (int i = 0; i < aAddCounter.size(); ++i) {
+                counterMenu->addSeparator();
+                counterMenu->addAction(aAddCounter[i]);
+                if (card->getCounters().contains(i)) {
+                    counterMenu->addAction(aRemoveCounter[i]);
+                }
+                counterMenu->addAction(aSetCounter[i]);
+            }
         }
 
         if (card->getZone()) {
@@ -3049,15 +3081,7 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
-
-                for (int i = 0; i < aAddCounter.size(); ++i) {
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aAddCounter[i]);
-                    if (card->getCounters().contains(i)) {
-                        cardMenu->addAction(aRemoveCounter[i]);
-                    }
-                    cardMenu->addAction(aSetCounter[i]);
-                }
+                cardMenu->addMenu(counterMenu);
                 cardMenu->addSeparator();
             } else if (card->getZone()->getName() == "stack") {
                 // Card is on the stack
@@ -3065,6 +3089,7 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
                 cardMenu->addMenu(moveMenu);
+                cardMenu->addMenu(counterMenu);
 
                 addRelatedCardView(card, cardMenu);
                 addRelatedCardActions(card, cardMenu);

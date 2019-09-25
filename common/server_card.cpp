@@ -24,7 +24,8 @@
 
 Server_Card::Server_Card(QString _name, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)
     : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), tapped(false), attacking(false),
-      facedown(false), color(), ptString(), annotation(), destroyOnZoneChange(false), doesntUntap(false), parentCard(0)
+      facedown(false), color(), ptString(), annotation(), destroyOnZoneChange(false), doesntUntap(false),
+      counterPermanency(false), parentCard(nullptr)
 {
 }
 
@@ -74,6 +75,9 @@ QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue
             break;
         case AttrDoesntUntap:
             setDoesntUntap(avalue == "1");
+            break;
+        case AttrCounterPermanency:
+            setCounterPermanency(avalue == "1");
             break;
     }
     return avalue;

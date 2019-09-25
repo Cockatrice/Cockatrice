@@ -45,6 +45,7 @@ private:
     QString annotation;
     bool destroyOnZoneChange;
     bool doesntUntap;
+    bool counterPermanency;
 
     Server_Card *parentCard;
     QList<Server_Card *> attachedCards;
@@ -172,6 +173,10 @@ public:
     void setDoesntUntap(bool _doesntUntap)
     {
         doesntUntap = _doesntUntap;
+    }
+    void setCounterPermanency(bool _counterPermanency)
+    {
+        counterPermanency = _counterPermanency;
     }
     void setParentCard(Server_Card *_parentCard);
     void addAttachedCard(Server_Card *card)

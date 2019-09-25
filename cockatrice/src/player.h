@@ -220,7 +220,7 @@ private:
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
         *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
         *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile,
-        *aMoveToXfromTopOfLibrary;
+        *aMoveToXfromTopOfLibrary, *aCounterPermanency;
 
     bool shortcutsActive;
     int defaultNumberTopCards;
@@ -301,6 +301,7 @@ public:
         cmTap,
         cmUntap,
         cmDoesntUntap,
+        cmCounterPermanency,
         cmFlip,
         cmPeek,
         cmClone,

@@ -17,14 +17,15 @@
 #include <QPainter>
 
 CardItem::CardItem(Player *_owner, const QString &_name, int _cardid, bool _revealedCard, QGraphicsItem *parent)
-    : AbstractCardItem(_name, _owner, _cardid, parent), zone(0), revealedCard(_revealedCard), attacking(false),
-      destroyOnZoneChange(false), doesntUntap(false), dragItem(0), attachedTo(0)
+    : AbstractCardItem(_name, _owner, _cardid, parent), zone(nullptr), revealedCard(_revealedCard), attacking(false),
+      destroyOnZoneChange(false), doesntUntap(false), counterPermanency(false), dragItem(nullptr), attachedTo(nullptr)
 {
     owner->addCard(this);
 
     cardMenu = new QMenu;
     ptMenu = new QMenu;
     moveMenu = new QMenu;
+    counterMenu = new QMenu;
 
     retranslateUi();
     emit updateCardMenu(this);
@@ -40,6 +41,7 @@ CardItem::~CardItem()
     delete cardMenu;
     delete ptMenu;
     delete moveMenu;
+    delete counterMenu;
 
     deleteDragItem();
 }
@@ -81,6 +83,7 @@ void CardItem::retranslateUi()
 {
     moveMenu->setTitle(tr("&Move to"));
     ptMenu->setTitle(tr("&Power / toughness"));
+    counterMenu->setTitle(tr("&Counters"));
 }
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -216,7 +219,9 @@ void CardItem::resetState()
 {
     attacking = false;
     facedown = false;
-    counters.clear();
+    if (!counterPermanency) {
+        counters.clear();
+    }
     pt.clear();
     annotation.clear();
     attachedTo = 0;

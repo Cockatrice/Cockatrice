@@ -7,4 +7,5 @@ enum CardAttribute {
     AttrPT = 5;
     AttrAnnotation = 6;
     AttrDoesntUntap = 7;
+    AttrCounterPermanency = 8;
 }
