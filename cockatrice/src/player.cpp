@@ -1169,7 +1169,7 @@ void Player::actMoveTopCardToPlay()
     cardToMove->set_card_id(0);
     cmd.set_target_player_id(getId());
     cmd.set_target_zone("stack");
-    cmd.set_x(0);
+    cmd.set_x(-1);
     cmd.set_y(0);
 
     sendGameCommand(cmd);
