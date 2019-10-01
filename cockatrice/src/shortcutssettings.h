@@ -449,6 +449,7 @@ private:
         {"Player/aMoveToTopLibrary", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Top of library"),
                                                  parseSequenceString(""),
                                                  ShortcutGroup::Move_selected)},
+        {"Player/aMoveTopToPlay", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Play on stack"), parseSequenceString("Ctrl+Y"), ShortcutGroup::Move_selected)},
         {"Player/aMoveTopToPlayFaceDown", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Play face down"),
                                                       parseSequenceString("Ctrl+Shift+E"),
                                                       ShortcutGroup::Move_selected)},
