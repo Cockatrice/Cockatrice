@@ -196,6 +196,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
         aViewTopCards = new QAction(this);
         connect(aViewTopCards, SIGNAL(triggered()), this, SLOT(actViewTopCards()));
+        aAlwaysViewTopCard = new QAction(this);
+        aAlwaysViewTopCard->setCheckable(true);
+        connect(aAlwaysViewTopCard, SIGNAL(triggered()), this, SLOT(actAlwaysViewTopCard()));
         aAlwaysRevealTopCard = new QAction(this);
         aAlwaysRevealTopCard->setCheckable(true);
         connect(aAlwaysRevealTopCard, SIGNAL(triggered()), this, SLOT(actAlwaysRevealTopCard()));
@@ -276,6 +279,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         libraryMenu->addSeparator();
         playerLists.append(mRevealLibrary = libraryMenu->addMenu(QString()));
         playerLists.append(mRevealTopCard = libraryMenu->addMenu(QString()));
+        libraryMenu->addAction(aAlwaysViewTopCard);
         libraryMenu->addAction(aAlwaysRevealTopCard);
         libraryMenu->addSeparator();
         libraryMenu->addAction(aMoveTopToPlayFaceDown);
@@ -683,10 +687,11 @@ void Player::retranslateUi()
         aMoveRfgToGrave->setText(tr("&Graveyard"));
 
         aViewLibrary->setText(tr("&View library"));
-        aViewHand->setText(tr("&View hand"));
+        aViewHand->setText(tr("View &hand"));
         aViewTopCards->setText(tr("View &top cards of library..."));
         mRevealLibrary->setTitle(tr("Reveal &library to..."));
         mRevealTopCard->setTitle(tr("Reveal t&op cards to..."));
+        aAlwaysViewTopCard->setText(tr("Al&ways look at top card"));
         aAlwaysRevealTopCard->setText(tr("&Always reveal top card"));
         aOpenDeckInDeckEditor->setText(tr("O&pen deck in deck editor"));
         aViewSideboard->setText(tr("&View sideboard"));
@@ -863,6 +868,7 @@ void Player::setShortcutsActive()
     aRollDie->setShortcut(shortcuts.getSingleShortcut("Player/aRollDie"));
     aCreateToken->setShortcut(shortcuts.getSingleShortcut("Player/aCreateToken"));
     aCreateAnotherToken->setShortcut(shortcuts.getSingleShortcut("Player/aCreateAnotherToken"));
+    aAlwaysViewTopCard->setShortcut(shortcuts.getSingleShortcut("Player/aAlwaysViewTopCard"));
     aAlwaysRevealTopCard->setShortcut(shortcuts.getSingleShortcut("Player/aAlwaysRevealTopCard"));
     aMoveTopToPlayFaceDown->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopToPlayFaceDown"));
     aMoveTopCardToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToGraveyard"));
@@ -889,6 +895,7 @@ void Player::setShortcutsInactive()
     aRollDie->setShortcut(QKeySequence());
     aCreateToken->setShortcut(QKeySequence());
     aCreateAnotherToken->setShortcut(QKeySequence());
+    aAlwaysViewTopCard->setShortcut(QKeySequence());
     aAlwaysRevealTopCard->setShortcut(QKeySequence());
     aMoveTopToPlayFaceDown->setShortcut(QKeySequence());
     aMoveTopCardToGraveyard->setShortcut(QKeySequence());
@@ -967,6 +974,14 @@ void Player::actAlwaysRevealTopCard()
     cmd.set_always_reveal_top_card(aAlwaysRevealTopCard->isChecked());
 
     sendGameCommand(cmd);
+}
+
+void Player::actAlwaysViewTopCard()
+{
+    CardZone *zone = zones.value("deck");
+    if (zone) {
+        zone->setAlwaysRevealTopCard(aAlwaysRevealTopCard->isChecked());
+    }
 }
 
 void Player::actOpenDeckInDeckEditor()
@@ -3232,6 +3247,7 @@ void Player::setGameStarted()
 {
     if (local) {
         aAlwaysRevealTopCard->setChecked(false);
+        aAlwaysViewTopCard->setChecked(false);
     }
     setConceded(false);
 }
