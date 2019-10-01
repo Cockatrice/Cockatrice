@@ -1,6 +1,8 @@
 #ifndef COUNTER_H
 #define COUNTER_H
 
+#include "tearoffmenu.h"
+
 #include <QGraphicsItem>
 #include <QInputDialog>
 
@@ -28,7 +30,7 @@ protected:
 
 private:
     QAction *aSet, *aDec, *aInc;
-    QMenu *menu;
+    TearOffMenu *menu;
     bool dialogSemaphore, deleteAfterDialog;
     bool shownInCounterArea;
     bool shortcutActive;
