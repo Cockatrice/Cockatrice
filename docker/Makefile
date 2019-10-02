@@ -3,7 +3,7 @@ VERSION = latest
 
 .PHONY: build build-nocache tag-latest push push-latest release git-tag-version
 
-build: generator.jar
+build:
 	docker build -t $(NAME):$(VERSION) --rm .
 
 build-nocache:

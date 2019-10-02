@@ -1,8 +1,7 @@
 FROM ubuntu:18.04
-MAINTAINER Alfredo Foltran <alfoltran@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update \
+RUN apt-get update -y --no-install-recommends \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
@@ -21,6 +20,8 @@ RUN apt-get update \
         libqt5websockets5 \
         libqt5widgets5 \
     && dpkg -i ./Cockatrice-Faerie_Tales-2.7.2-UbuntuBionic.deb \
-    && apt-get install -f
+    && apt-get install -f \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 CMD cockatrice
