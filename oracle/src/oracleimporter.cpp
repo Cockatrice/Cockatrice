@@ -82,11 +82,16 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
 
 QString OracleImporter::getMainCardType(const QStringList &typeList)
 {
+    if (typeList.isEmpty()) {
+        return {};
+    }
+
     for (const auto &type : mainCardTypes) {
         if (typeList.contains(type)) {
             return type;
         }
     }
+
     return typeList.first();
 }
 
@@ -291,7 +296,9 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         }
 
         const auto &mainCardType = getMainCardType(card.value("types").toStringList());
-        if (!mainCardType.isEmpty()) {
+        if (mainCardType.isEmpty()) {
+            qDebug() << "warning: no mainCardType for card:" << name;
+        } else {
             properties.insert("maintype", mainCardType);
         }
 
