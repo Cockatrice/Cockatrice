@@ -101,18 +101,22 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 {
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
-    if (parentGame->getIsLocalGame())
-        loadRemoteButton->setEnabled(false);
     readyStartButton = new ToggleButton;
     readyStartButton->setEnabled(false);
     sideboardLockButton = new ToggleButton;
     sideboardLockButton->setEnabled(false);
 
     connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
-    connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
     connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
     connect(sideboardLockButton, SIGNAL(clicked()), this, SLOT(sideboardLockButtonClicked()));
     connect(sideboardLockButton, SIGNAL(stateChanged()), this, SLOT(updateSideboardLockButtonText()));
+
+    if (parentGame->getIsLocalGame()) {
+        loadRemoteButton->setEnabled(false);
+    }
+    else {
+    connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
+    }
 
     auto *buttonHBox = new QHBoxLayout;
     buttonHBox->addWidget(loadLocalButton);
@@ -140,7 +144,7 @@ void DeckViewContainer::retranslateUi()
 {
     loadLocalButton->setText(tr("Load deck..."));
     loadRemoteButton->setText(tr("Load remote deck..."));
-    readyStartButton->setText(tr("Ready to s&tart"));
+    readyStartButton->setText(tr("Ready to start"));
     updateSideboardLockButtonText();
 }
 
@@ -154,16 +158,19 @@ void DeckViewContainer::setButtonsVisible(bool _visible)
 
 void DeckViewContainer::updateSideboardLockButtonText()
 {
-    if (sideboardLockButton->getState())
-        sideboardLockButton->setText(tr("S&ideboard unlocked"));
-    else
-        sideboardLockButton->setText(tr("S&ideboard locked"));
+    if (sideboardLockButton->getState()) {
+        sideboardLockButton->setText(tr("Sideboard unlocked"));
+    } else {
+        sideboardLockButton->setText(tr("Sideboard locked"));
+    }
 }
 
 void DeckViewContainer::refreshShortcuts()
 {
     loadLocalButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/loadLocalButton"));
     loadRemoteButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/loadRemoteButton"));
+    readyStartButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/readyStartButton"));
+    sideboardLockButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/sideboardLockButton"));
 }
 
 void TabGame::refreshShortcuts()
