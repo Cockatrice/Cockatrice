@@ -12,6 +12,7 @@ public:
     ServerInfo_User_Container(ServerInfo_User *_userInfo = 0);
     ServerInfo_User_Container(const ServerInfo_User &_userInfo);
     ServerInfo_User_Container(const ServerInfo_User_Container &other);
+    ServerInfo_User_Container &operator=(const ServerInfo_User_Container &other) = default;
     virtual ~ServerInfo_User_Container();
     ServerInfo_User *getUserInfo() const
     {

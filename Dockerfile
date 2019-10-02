@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y\
   git\
   libprotobuf-dev\
   libqt5sql5-mysql\
+  libmysqlclient-dev\
   libqt5websockets5-dev\
   protobuf-compiler\
   qt5-default\
@@ -18,7 +19,7 @@ COPY . /home/servatrice/code/
 WORKDIR /home/servatrice/code
 
 WORKDIR build
-RUN cmake .. -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0 &&\
+RUN cmake .. -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0 -DWITH_DBCONVERTER=0 &&\
   make &&\
   make install
 
@@ -26,4 +27,5 @@ WORKDIR /home/servatrice
 
 EXPOSE 4747
 
-CMD [ "servatrice", "--log-to-console" ]
+ENTRYPOINT [ "servatrice", "--log-to-console" ]
+
