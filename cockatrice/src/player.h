@@ -5,6 +5,7 @@
 #include "carddatabase.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"
+#include "tearoffmenu.h"
 #include <QInputDialog>
 #include <QMap>
 #include <QPoint>
@@ -203,9 +204,9 @@ private slots:
 
 private:
     TabGame *game;
-    QMenu *playerMenu, *handMenu, *moveHandMenu, *graveMenu, *moveGraveMenu, *rfgMenu, *moveRfgMenu, *libraryMenu,
-        *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mRevealTopCard, *mRevealHand,
+    QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mRevealTopCard, *mRevealHand,
         *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
+    TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *rfgMenu, *playerMenu;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,

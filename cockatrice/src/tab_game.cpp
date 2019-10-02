@@ -1408,8 +1408,7 @@ void TabGame::createMenuItems()
     connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
     aCloseReplay = nullptr;
 
-    phasesMenu = new QMenu(this);
-    phasesMenu->setTearOffEnabled(true);
+    phasesMenu = new TearOffMenu(this);
 
     for (int i = 0; i < phasesToolbar->phaseCount(); ++i) {
         QAction *temp = new QAction(QString(), this);

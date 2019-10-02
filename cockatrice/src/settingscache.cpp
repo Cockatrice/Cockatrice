@@ -231,6 +231,9 @@ SettingsCache::SettingsCache()
     startingHandSize = settings->value("interface/startinghandsize", 7).toInt();
     annotateTokens = settings->value("interface/annotatetokens", false).toBool();
     tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
+    knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
+    useTearOffMenus = settings->value("interface/usetearoffmenus", true).toBool();
+
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
@@ -278,12 +281,18 @@ SettingsCache::SettingsCache()
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
-    knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
 }
 
-void SettingsCache::setKnownMissingFeatures(QString _knownMissingFeatures)
+void SettingsCache::setUseTearOffMenus(bool _useTearOffMenus)
 {
-    knownMissingFeatures = std::move(_knownMissingFeatures);
+    useTearOffMenus = _useTearOffMenus;
+    settings->setValue("interface/usetearoffmenus", useTearOffMenus);
+    emit useTearOffMenusChanged(useTearOffMenus);
+}
+
+void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
+{
+    knownMissingFeatures = _knownMissingFeatures;
     settings->setValue("interface/knownmissingfeatures", knownMissingFeatures);
 }
 
@@ -592,15 +601,15 @@ void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
     emit pixmapCacheSizeChanged(pixmapCacheSize);
 }
 
-void SettingsCache::setClientID(QString _clientID)
+void SettingsCache::setClientID(const QString &_clientID)
 {
-    clientID = std::move(_clientID);
+    clientID = _clientID;
     settings->setValue("personal/clientid", clientID);
 }
 
-void SettingsCache::setClientVersion(QString _clientVersion)
+void SettingsCache::setClientVersion(const QString &_clientVersion)
 {
-    clientVersion = std::move(_clientVersion);
+    clientVersion = _clientVersion;
     settings->setValue("personal/clientversion", clientVersion);
 }
 

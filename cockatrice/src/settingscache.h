@@ -50,6 +50,7 @@ signals:
     void chatMentionCompleterChanged();
     void downloadSpoilerTimeIndexChanged();
     void downloadSpoilerStatusChanged();
+    void useTearOffMenusChanged(bool state);
 
 private:
     QSettings *settings;
@@ -102,6 +103,7 @@ private:
     QString clientID;
     QString clientVersion;
     QString knownMissingFeatures;
+    bool useTearOffMenus;
     int pixmapCacheSize;
     bool scaleCards;
     bool showMessagePopups;
@@ -398,9 +400,10 @@ public:
     {
         return maxFontSize;
     }
-    void setClientID(QString clientID);
-    void setClientVersion(QString clientVersion);
-    void setKnownMissingFeatures(QString _knownMissingFeatures);
+    void setClientID(const QString &clientID);
+    void setClientVersion(const QString &clientVersion);
+    void setKnownMissingFeatures(const QString &_knownMissingFeatures);
+    void setUseTearOffMenus(bool _useTearOffMenus);
     QString getClientID()
     {
         return clientID;
@@ -412,6 +415,10 @@ public:
     QString getKnownMissingFeatures()
     {
         return knownMissingFeatures;
+    }
+    bool getUseTearOffMenus()
+    {
+        return useTearOffMenus;
     }
     ShortcutsSettings &shortcuts() const
     {

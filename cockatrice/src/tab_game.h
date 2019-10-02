@@ -4,6 +4,7 @@
 #include "pb/event_leave.pb.h"
 #include "pb/serverinfo_game.pb.h"
 #include "tab.h"
+#include "tearoffmenu.h"
 #include <QCompleter>
 #include <QMap>
 #include <QPushButton>
@@ -163,8 +164,8 @@ private:
         *replayControlWidget;
     QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
     QAction *playersSeparator;
-    QMenu *gameMenu, *phasesMenu, *viewMenu, *cardInfoDockMenu, *messageLayoutDockMenu, *playerListDockMenu,
-        *replayDockMenu;
+    QMenu *gameMenu, *viewMenu, *cardInfoDockMenu, *messageLayoutDockMenu, *playerListDockMenu, *replayDockMenu;
+    TearOffMenu *phasesMenu;
     QAction *aGameInfo, *aConcede, *aLeaveGame, *aCloseReplay, *aNextPhase, *aNextPhaseAction, *aNextTurn,
         *aReverseTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aMessageLayoutDockVisible, *aMessageLayoutDockFloating,
