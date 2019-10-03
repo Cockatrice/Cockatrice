@@ -81,7 +81,7 @@ matrix:
         - qt
         - xz
         update: true
-    script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME-$OSX_VERSION" --release
+    script: bash ./.ci/travis-compile.sh --server --package "macos$OSX_VERSION" --release
     before_cache:
     - brew cleanup
 
@@ -123,7 +123,7 @@ matrix:
         - qt
         - xz
         #update: true
-    script: bash ./.ci/travis-compile.sh --server --package "$TRAVIS_OS_NAME-$OSX_VERSION" --release --zip
+    script: bash ./.ci/travis-compile.sh --server --package "macos$OSX_VERSION" --release --zip
     before_cache:
     - brew cleanup
 
