@@ -184,6 +184,12 @@ CardInfoPtr OracleImporter::addCard(QString name,
         // reset the side property, since the card has no back image
         properties.insert("side", "front");
     }
+  
+    // Adventure cards
+    if (layout == "adventure") {
+        // both parts of an adventure are on the front side
+        properties.insert("side", "front");
+    }
 
     // insert the card and its properties
     QList<CardRelation *> reverseRelatedCards;
