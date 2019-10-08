@@ -47,7 +47,7 @@ matrix:
   - name: macOS (Debug)
     if: tag IS NOT present
     os: osx
-    osx_image: xcode9.2
+    osx_image: xcode10.1
     cache:
     - ccache
     - directories:
@@ -67,7 +67,7 @@ matrix:
   - name: macOS (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
-    osx_image: xcode9.2
+    osx_image: xcode10.1
     cache:
     - ccache
     - directories:
