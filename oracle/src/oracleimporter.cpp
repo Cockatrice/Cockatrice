@@ -378,7 +378,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
                         if (prop == "colors") {
                             properties.insert(prop, originalPropertyValue + thisCardPropertyValue);
                         } else if (prop == "maintype" && layout == "adventure") {
-                            properties.insert(prop, "Creature");
+                            properties.insert(prop, originalPropertyValue);
                         } else {
                             properties.insert(prop,
                                               originalPropertyValue + splitCardPropSeparator + thisCardPropertyValue);
