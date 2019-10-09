@@ -316,7 +316,7 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
         }
 
         // split cards are considered a single card, enqueue for later merging
-        if (layout == "split" || layout == "aftermath") {
+        if (layout == "split" || layout == "aftermath" || layout == "adventure") {
             // get the position of this card part
             int index = additionalNames.indexOf(name);
             // construct full card name
@@ -370,12 +370,15 @@ int OracleImporter::importCardsFromSet(CardSetPtr currentSet, const QList<QVaria
                 setInfo = tmp.getSetInfo();
             } else {
                 const QVariantHash &props = tmp.getProperties();
+                layout = properties.value("layout").toString();
                 for (const QString &prop : props.keys()) {
                     QString originalPropertyValue = properties.value(prop).toString();
                     QString thisCardPropertyValue = props.value(prop).toString();
                     if (originalPropertyValue != thisCardPropertyValue) {
                         if (prop == "colors") {
                             properties.insert(prop, originalPropertyValue + thisCardPropertyValue);
+                        } else if (prop == "maintype" && layout == "adventure") {
+                            properties.insert(prop, originalPropertyValue);
                         } else {
                             properties.insert(prop,
                                               originalPropertyValue + splitCardPropSeparator + thisCardPropertyValue);
