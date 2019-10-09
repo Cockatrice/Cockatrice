@@ -43,8 +43,8 @@ matrix:
           bash .ci/travis-compile.sh --server --package "$NAME" --release
 
 
-  #macOS Sierra
-  - name: macOS Sierra (Debug)
+  #macOS High Sierra
+  - name: macOS High Sierra (Debug)
     if: tag IS NOT present
     os: osx
     osx_image: xcode10.1
@@ -59,12 +59,12 @@ matrix:
         - protobuf
         - qt
         - xz
-        update: true
+        #update: true
     script: bash ./.ci/travis-compile.sh --server --install --debug
     before_cache:
     - brew cleanup
 
-  - name: macOS Sierra (Release)
+  - name: macOS High Sierra (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode10.1
@@ -122,7 +122,7 @@ matrix:
         - protobuf
         - qt
         - xz
-        #update: true
+        update: true
     script: bash ./.ci/travis-compile.sh --server --package "macos$OSX_VERSION" --release --zip
     before_cache:
     - brew cleanup
