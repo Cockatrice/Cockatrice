@@ -113,9 +113,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 
     if (parentGame->getIsLocalGame()) {
         loadRemoteButton->setEnabled(false);
-    }
-    else {
-    connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
+    } else {
+        connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
     }
 
     auto *buttonHBox = new QHBoxLayout;
@@ -170,7 +169,8 @@ void DeckViewContainer::refreshShortcuts()
     loadLocalButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/loadLocalButton"));
     loadRemoteButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/loadRemoteButton"));
     readyStartButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/readyStartButton"));
-    sideboardLockButton->setShortcut(settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/sideboardLockButton"));
+    sideboardLockButton->setShortcut(
+        settingsCache->shortcuts().getSingleShortcut("DeckViewContainer/sideboardLockButton"));
 }
 
 void TabGame::refreshShortcuts()
