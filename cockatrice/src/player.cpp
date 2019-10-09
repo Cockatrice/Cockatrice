@@ -224,6 +224,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aShuffle, SIGNAL(triggered()), this, SLOT(actShuffle()));
         aMulligan = new QAction(this);
         connect(aMulligan, SIGNAL(triggered()), this, SLOT(actMulligan()));
+        aMoveTopToPlay = new QAction(this);
+        connect(aMoveTopToPlay, SIGNAL(triggered()), this, SLOT(actMoveTopCardToPlay()));
         aMoveTopToPlayFaceDown = new QAction(this);
         connect(aMoveTopToPlayFaceDown, SIGNAL(triggered()), this, SLOT(actMoveTopCardToPlayFaceDown()));
         aMoveTopCardToGraveyard = new QAction(this);
@@ -274,6 +276,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         playerLists.append(mRevealTopCard = libraryMenu->addMenu(QString()));
         libraryMenu->addAction(aAlwaysRevealTopCard);
         libraryMenu->addSeparator();
+        libraryMenu->addAction(aMoveTopToPlay);
         libraryMenu->addAction(aMoveTopToPlayFaceDown);
         libraryMenu->addAction(aMoveTopCardToBottom);
         libraryMenu->addAction(aMoveBottomCardToGrave);
@@ -687,6 +690,7 @@ void Player::retranslateUi()
         aUndoDraw->setText(tr("&Undo last draw"));
         aMulligan->setText(tr("Take &mulligan"));
         aShuffle->setText(tr("&Shuffle"));
+        aMoveTopToPlay->setText(tr("Play top card"));
         aMoveTopToPlayFaceDown->setText(tr("Play top card &face down"));
         aMoveTopCardToGraveyard->setText(tr("Move top card to grave&yard"));
         aMoveTopCardToExile->setText(tr("Move top card to e&xile"));
@@ -856,6 +860,7 @@ void Player::setShortcutsActive()
     aCreateToken->setShortcut(shortcuts.getSingleShortcut("Player/aCreateToken"));
     aCreateAnotherToken->setShortcut(shortcuts.getSingleShortcut("Player/aCreateAnotherToken"));
     aAlwaysRevealTopCard->setShortcut(shortcuts.getSingleShortcut("Player/aAlwaysRevealTopCard"));
+    aMoveTopToPlay->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopToPlay"));
     aMoveTopToPlayFaceDown->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopToPlayFaceDown"));
     aMoveTopCardToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToGraveyard"));
     aMoveTopCardsToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToGraveyard"));
@@ -882,6 +887,7 @@ void Player::setShortcutsInactive()
     aCreateToken->setShortcut(QKeySequence());
     aCreateAnotherToken->setShortcut(QKeySequence());
     aAlwaysRevealTopCard->setShortcut(QKeySequence());
+    aMoveTopToPlay->setShortcut(QKeySequence());
     aMoveTopToPlayFaceDown->setShortcut(QKeySequence());
     aMoveTopCardToGraveyard->setShortcut(QKeySequence());
     aMoveTopCardsToGraveyard->setShortcut(QKeySequence());
@@ -1141,6 +1147,20 @@ void Player::actMoveTopCardToBottom()
     cmd.mutable_cards_to_move()->add_card()->set_card_id(0);
     cmd.set_target_player_id(getId());
     cmd.set_target_zone("deck");
+    cmd.set_x(-1);
+    cmd.set_y(0);
+
+    sendGameCommand(cmd);
+}
+
+void Player::actMoveTopCardToPlay()
+{
+    Command_MoveCard cmd;
+    cmd.set_start_zone("deck");
+    CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
+    cardToMove->set_card_id(0);
+    cmd.set_target_player_id(getId());
+    cmd.set_target_zone("stack");
     cmd.set_x(-1);
     cmd.set_y(0);
 
