@@ -43,8 +43,8 @@ matrix:
           bash .ci/travis-compile.sh --server --package "$NAME" --release
 
 
-  #macOS
-  - name: macOS (Debug)
+  #macOS High Sierra
+  - name: macOS High Sierra (Debug)
     if: tag IS NOT present
     os: osx
     osx_image: xcode10.1
@@ -64,10 +64,11 @@ matrix:
     before_cache:
     - brew cleanup
 
-  - name: macOS (Release)
+  - name: macOS High Sierra (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
     os: osx
     osx_image: xcode10.1
+    env: OSX_VERSION=10.13
     cache:
     - ccache
     - directories:
@@ -80,7 +81,49 @@ matrix:
         - qt
         - xz
         update: true
-    script: bash ./.ci/travis-compile.sh --server --package "macos" --release
+    script: bash ./.ci/travis-compile.sh --server --package "macos$OSX_VERSION" --release
+    before_cache:
+    - brew cleanup
+
+  #macOS Mojave
+  - name: macOS Mojave (Debug)
+    if: tag IS NOT present
+    os: osx
+    osx_image: xcode11.1
+    cache:
+    - ccache
+    - directories:
+      - $HOME/Library/Caches/Homebrew
+    addons:
+      homebrew:
+        packages:
+        - ccache
+        - protobuf
+        - qt
+        - xz
+        update: true
+    script: bash ./.ci/travis-compile.sh --server --install --debug
+    before_cache:
+    - brew cleanup
+
+  - name: macOS Mojave (Release)
+    if: (branch = master AND NOT type = pull_request) OR tag IS present
+    os: osx
+    osx_image: xcode11.1
+    env: OSX_VERSION=10.14
+    cache:
+    - ccache
+    - directories:
+      - $HOME/Library/Caches/Homebrew
+    addons:
+      homebrew:
+        packages:
+        - ccache
+        - protobuf
+        - qt
+        - xz
+        update: true
+    script: bash ./.ci/travis-compile.sh --server --package "macos$OSX_VERSION" --release --zip
     before_cache:
     - brew cleanup
 
@@ -135,4 +178,5 @@ notifications:
 # Announcements of build image updates: https://docs.travis-ci.com/user/build-environment-updates/
 # For precise versions of preinstalled tools on the VM, check “Build system information” in the build log!
 # Official validator for ".travis.yml" config file: https://yaml.travis-ci.org
+# Official Travis CI Build Config Explorer: https://config.travis-ci.com/explore
 # Travis CI config documentation: https://docs.travis-ci.com/user/customizing-the-build
