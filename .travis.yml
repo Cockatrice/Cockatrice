@@ -135,7 +135,6 @@ deploy:
   - provider: releases
     token:
       secure: mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU=
-    skip_cleanup: true
     name: "Cockatrice $TRAVIS_TAG"
     release_notes: "Beta release of Cockatrice"
     file_glob: true
@@ -152,7 +151,6 @@ deploy:
   - provider: releases
     token:
       secure: mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU=
-    skip_cleanup: true
     file_glob: true
     file: "build/Cockatrice-*"
     overwrite: true
