@@ -21,7 +21,7 @@ var WebClient = {
     port: "",
     user: "",
     pass: "",
-    debug: false,
+    debug: true,
     autojoinrooms: false,
     keepalive: 5000
   },
