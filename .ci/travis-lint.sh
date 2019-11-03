@@ -12,7 +12,7 @@ case $err in
 
 ***********************************************************
 ***                                                     ***
-***   Your code does NOT comply with our style guide!   ***
+***   Your code does not comply with our style guide.   ***
 ***                                                     ***
 ***  Please correct it or run the "clangify.sh" script. ***
 ***  Then commit and push those changes to this branch. ***
