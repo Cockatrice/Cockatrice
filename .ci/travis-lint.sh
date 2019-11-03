@@ -53,10 +53,11 @@ ${diff%%
 
 Exiting...
 EOM
-      exit 2
+      exit 0
       ;;
 
     *)
       echo "Something went wrong in our formatting checks: clangify returned $err" >&2
+      exit 2
       ;;
   esac
