@@ -12,13 +12,13 @@ case $err in
 
 ***********************************************************
 ***                                                     ***
-***    Your code does NOT comply with our styleguide!   ***
+***   Your code does NOT comply with our style guide!   ***
 ***                                                     ***
 ***  Please correct it or run the "clangify.sh" script. ***
 ***  Then commit and push those changes to this branch. ***
 ***   Check our CONTRIBUTING.md file for more details.  ***
 ***                                                     ***
-***                     Thank you ♥                     ***
+***                    Thank you ❤️                     ***
 ***                                                     ***
 ***********************************************************
 
@@ -40,7 +40,7 @@ EOM
 
 ***********************************************************
 ***                                                     ***
-***       Your code complies with our styleguide!       ***
+***       Your code complies with our style guide!      ***
 ***                                                     ***
 ***                      Awesome 👍                     ***
 ***                                                     ***
