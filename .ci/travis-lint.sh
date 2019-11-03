@@ -59,7 +59,5 @@ EOM
     *)
       echo "Something went wrong in our formatting checks: clangify returned $err" >&2
       echo ""
-      echo "Exiting..."
-      exit 2
       ;;
   esac
