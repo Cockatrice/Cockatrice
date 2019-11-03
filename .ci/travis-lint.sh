@@ -35,6 +35,7 @@ Exiting...
 EOM
       exit 2
       ;;
+
     0)
       cat <<EOM
 
@@ -50,8 +51,10 @@ Used clang-format version:
 ${diff%%
 *}
 
+Exiting...
 EOM
-;;
+      exit 2
+      ;;
 
     *)
       echo "Something went wrong in our formatting checks: clangify returned $err" >&2
