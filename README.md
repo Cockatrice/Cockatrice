@@ -88,8 +88,8 @@ Dependencies: *(for minimum requirements search our [CMake file](https://github.
 - [CMake](https://www.cmake.org/)
 
 Oracle can optionally use zlib and xz to load compressed files:
-- [zlib](https://www.zlib.net/)
 - [xz](https://tukaani.org/xz/)
+- [zlib](https://www.zlib.net/)
 
 To compile:
 
