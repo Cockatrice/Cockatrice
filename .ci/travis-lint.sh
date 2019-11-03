@@ -2,8 +2,11 @@
 
 # Check formatting using clang-format
 echo "Checking your code using clang-format..."
+echo ""
+
 diff="$(./clangify.sh --diff --cf-version)"
 err=$?
+
 case $err in
   1)
     cat <<EOM
@@ -33,7 +36,7 @@ EOM
       exit 2
       ;;
     0)
-          cat <<EOM
+      cat <<EOM
 
 ***********************************************************
 ***                                                     ***
@@ -43,8 +46,13 @@ EOM
 ***                                                     ***
 ***********************************************************
 
+Used clang-format version:
+${diff%%
+*}
+
 EOM
 ;;
+
     *)
       echo "Something went wrong in our formatting checks: clangify returned $err" >&2
       ;;
