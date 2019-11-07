@@ -8,7 +8,7 @@
    <a href="#get-involved-">Get Involved</a> <b>|</b>
    <a href="#community-resources">Community</a> <b>|</b>
    <a href="#translations-">Translations</a> <b>|</b>
-   <a href="#build--">Build</a> <b>|</b>
+   <a href="#build---">Build</a> <b>|</b>
    <a href="#run">Run</a> <b>|</b>
    <a href="#license-">License</a>
 </p>
@@ -88,8 +88,8 @@ Dependencies: *(for minimum requirements search our [CMake file](https://github.
 - [CMake](https://www.cmake.org/)
 
 Oracle can optionally use zlib and xz to load compressed files:
-- [zlib](https://www.zlib.net/)
 - [xz](https://tukaani.org/xz/)
+- [zlib](https://www.zlib.net/)
 
 To compile:
 

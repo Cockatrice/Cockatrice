@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `active` tinyint(1) NOT NULL,
   `token` binary(16),
   `clientid` varchar(15) NOT NULL,
-  `privlevel` enum('NONE','VIP','DONATOR') NOT NULL,
+  `privlevel` enum("NONE","VIP","DONATOR") NOT NULL,
   `privlevelStartDate` datetime NOT NULL,
   `privlevelEndDate` datetime NOT NULL,
   `passwordLastChangedDate` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
