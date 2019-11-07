@@ -3,11 +3,12 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from "react-router-dom";
 
+import { store } from 'store';
+
 import './AppShell.css';
 import Routes from './AppShellRoutes';
 import Header from './Header/Header';
 
-import store from '../store/store';
 
 const AppShell = () => {
   return (

@@ -1,49 +1,38 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
+
+import { ServerService } from 'common/services/data';
+import { RouteEnum } from 'common/types';
+import {
+	Selectors,
+	ServerConnectParams,
+	ServerStateStatus
+} from 'store/server';
 
 import './Header.css';
 import logo from './logo.png';
-import RouteEnum from '../../common/types/RouteEnum';
-import WebClient from '../../common/services/WebClient/WebClient';
 
 class Header extends Component<HeaderProps, HeaderState> {
-	constructor(props: HeaderProps) {
+	constructor(props) {
 		super(props);
 
-		this.state = {
-			status: WebClient.getStatusEnumLabel(WebClient.StatusEnum.DISCONNECTED)
-		};
 		this.connect = this.connect.bind(this);
-		this.handleStatusCallback = this.handleStatusCallback.bind(this);
+	}
+
+	componentWillMount() {
+		console.log(this);
 	}
 
 	connect() {
-		WebClient.getInstance().connect({
-			host: 'chickatrice.net',
+		const options: ServerConnectParams = {
+			host: 'server.cockatrice.us',
 			port: '4748',
 			user: '',
 			pass: '',
-	        statusCallback: this.handleStatusCallback,
-	        connectionClosedCallback: (id, desc) => console.log(`connectionClosedCallback [${id}] : `, desc),
-	        serverMessageCallback: (message) => console.log(`serverMessageCallback : `, message),
-	        serverIdentificationCallback: (data) => console.log(`serverIdentificationCallback : `, data),
-	        serverShutdownCallback: (data) => console.log(`serverShutdownCallback : `, data),
-	        notifyUserCallback: (data) => console.log(`notifyUserCallback : `, data),
-	        userInfoCallback: (data) => console.log(`userInfoCallback : `, data),
-	        listRoomsCallback: (rooms) => console.log(`listRoomsCallback : `, rooms),
-	        errorCallback: (id, desc) => console.log(`errorCallback [${id}] : `, desc),
-	        joinRoomCallback: (room) => console.log(`joinRoomCallback : `, room),
-	        roomMessageCallback: (roomId, message) => console.log(`roomMessageCallback [${roomId}] : `, message),
-	        roomJoinCallback: (roomId, message) => console.log(`roomJoinCallback [${roomId}] : `, message),
-	        roomLeaveCallback: (roomId, message) => console.log(`roomLeaveCallback [${roomId}] : `, message),
-	        roomListGamesCallback: (roomId, message) => console.log(`roomListGamesCallback [${roomId}] : `, message)
-		});
-	}
+		};
 
-	handleStatusCallback(id, desc) {
-		this.setState({
-			status: desc
-		});
+		ServerService.connectServer(options);
 	}
 
 	render() {
@@ -55,7 +44,7 @@ class Header extends Component<HeaderProps, HeaderState> {
 				<div className="Header-content">
 					<div className="Header-connect">
 						<button onClick={this.connect}>Connect</button>
-						{<span className="Header-connect__status">{this.state.status}</span>}
+						{<span className="Header-connect__status">{this.props.status.description}</span>}
 					</div>
 					{/*<div className="Header-serverDetails">
 						<div>Server: server.cockatrice.us</div>
@@ -87,10 +76,16 @@ class Header extends Component<HeaderProps, HeaderState> {
 	}
 }
 
-export interface HeaderProps {}
-
 export interface HeaderState {
-	status: number
+	status: ServerStateStatus;
 }
 
-export default Header;
+export interface HeaderProps extends HeaderState {
+
+}
+
+const mapStateToProps = state => ({
+	status: Selectors.getStatus(state)
+});
+
+export default connect(mapStateToProps)(Header);

@@ -5,5 +5,3 @@ export enum RouteEnum {
   GAME = "/game",
   MAIN = "/main",
 }
-
-export default RouteEnum;
