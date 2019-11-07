@@ -1794,7 +1794,7 @@ void WebsocketServerSocketInterface::binaryMessageReceived(const QByteArray &mes
 }
 
 // TODO make this configurable?
-bool isPasswordLongEnough(const int passwordLength) const
+bool AbstractServerSocketInterface::isPasswordLongEnough(const int passwordLength)
 {
     return passwordLength < 6;
 }
