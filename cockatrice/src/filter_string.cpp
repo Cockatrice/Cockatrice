@@ -28,7 +28,7 @@ ToughnessQuery <- [Tt] 'ou' 'ghness'? ws? NumericExpression
 RarityQuery <- [rR] ':' RegexString
 
 FormatQuery <- 'f' ':' Format / Legality ':' Format
-Format <- [Mm] 'odern'? / [Ss] 'tandard'? / [Vv] 'intage'? / [Ll] 'egacy'? / [Cc] 'ommander'?
+Format <- [Mm] 'odern'? / [Ss] 'tandard'? / [Vv] 'intage'? / [Ll] 'egacy'? / [Cc] 'ommander'? / [Pp] 'ioneer'?
 Legality <- [Ll] 'egal'? / [Bb] 'anned'? / [Rr] 'estricted'
 
 
@@ -68,7 +68,7 @@ static void setupParserRules()
     search["Start"] = passthru;
     search["QueryPartList"] = [](const peg::SemanticValues &sv) -> Filter {
         return [=](CardData x) {
-            for (unsigned int i = 0; i < sv.size(); ++i) {
+            for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
                 if (!sv[i].get<Filter>()(x))
                     return false;
             }
@@ -77,7 +77,7 @@ static void setupParserRules()
     };
     search["ComplexQueryPart"] = [](const peg::SemanticValues &sv) -> Filter {
         return [=](CardData x) {
-            for (unsigned int i = 0; i < sv.size(); ++i) {
+            for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
                 if (sv[i].get<Filter>()(x))
                     return true;
             }
@@ -149,6 +149,8 @@ static void setupParserRules()
                 return "legacy";
             case 'c':
                 return "commander";
+            case 'p':
+                return "pioneer";
             default:
                 return "";
         }
@@ -195,7 +197,7 @@ static void setupParserRules()
     };
     search["CompactStringSet"] = search["StringList"] = [](const peg::SemanticValues &sv) -> QStringList {
         QStringList result;
-        for (unsigned int i = 0; i < sv.size(); ++i) {
+        for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
             result.append(sv[i].get<QString>());
         }
         return result;
@@ -245,7 +247,7 @@ static void setupParserRules()
 
     search["ColorQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         QString parts;
-        for (unsigned int i = 0; i < sv.size(); ++i) {
+        for (int i = 0; i < static_cast<int>(sv.size()); ++i) {
             parts += sv[i].get<char>();
         }
         bool idenity = sv.tokens[0].first[0] != 'i';

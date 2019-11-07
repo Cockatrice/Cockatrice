@@ -1,10 +1,11 @@
+os: linux
 language: cpp
 compiler: gcc
 
 git:
   depth: 15
 
-matrix:
+jobs:
   include:
 
   #Static Code Analysis
@@ -18,6 +19,7 @@ matrix:
   #Ubuntu Bionic (on Docker)
   - name: Ubuntu Bionic (Debug + Tests)
     if: tag IS NOT present
+    os: linux
     services: docker
     env: NAME=UbuntuBionic
     cache:
@@ -31,6 +33,7 @@ matrix:
 
   - name: Ubuntu Bionic (Release)
     if: (branch = master AND NOT type = pull_request) OR tag IS present
+    os: linux
     services: docker
     env: NAME=UbuntuBionic
     cache:
@@ -132,11 +135,10 @@ matrix:
 deploy:
 # Deploy configuration for "beta" releases
   - provider: releases
-    api_key:
+    token:
       secure: mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU=
-    skip_cleanup: true
     name: "Cockatrice $TRAVIS_TAG"
-    body: "Beta release of Cockatrice"
+    release_notes: "Beta release of Cockatrice"
     file_glob: true
     file: "build/Cockatrice-*"
     overwrite: true
@@ -149,9 +151,8 @@ deploy:
 
 # Deploy configuration for "stable" releases
   - provider: releases
-    api_key:
+    token:
       secure: mLMF41q7xgOR1sjczsilEy7HQis2PkZCzhfOGbn/8FoOQnmmPOZjrsdhn06ZSl3SFsbfCLuClDYXAbFscQmdgjcGN5AmHV+JYfW650QEuQa/f4/lQFsVRtEqUA1O3FQ0OuRxdpCfJubZBdFVH8SbZ93GLC5zXJbkWQNq+xCX1fU=
-    skip_cleanup: true
     file_glob: true
     file: "build/Cockatrice-*"
     overwrite: true
