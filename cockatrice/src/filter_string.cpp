@@ -68,7 +68,7 @@ static void setupParserRules()
     search["Start"] = passthru;
     search["QueryPartList"] = [](const peg::SemanticValues &sv) -> Filter {
         return [=](CardData x) {
-            for (int i = 0; i < sv.size(); ++i) {
+            for (unsigned int i = 0; i < sv.size(); ++i) {
                 if (!sv[i].get<Filter>()(x))
                     return false;
             }
@@ -77,7 +77,7 @@ static void setupParserRules()
     };
     search["ComplexQueryPart"] = [](const peg::SemanticValues &sv) -> Filter {
         return [=](CardData x) {
-            for (int i = 0; i < sv.size(); ++i) {
+            for (unsigned int i = 0; i < sv.size(); ++i) {
                 if (sv[i].get<Filter>()(x))
                     return true;
             }
@@ -195,7 +195,7 @@ static void setupParserRules()
     };
     search["CompactStringSet"] = search["StringList"] = [](const peg::SemanticValues &sv) -> QStringList {
         QStringList result;
-        for (int i = 0; i < sv.size(); ++i) {
+        for (unsigned int i = 0; i < sv.size(); ++i) {
             result.append(sv[i].get<QString>());
         }
         return result;
@@ -245,7 +245,7 @@ static void setupParserRules()
 
     search["ColorQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         QString parts;
-        for (int i = 0; i < sv.size(); ++i) {
+        for (unsigned int i = 0; i < sv.size(); ++i) {
             parts += sv[i].get<char>();
         }
         bool idenity = sv.tokens[0].first[0] != 'i';

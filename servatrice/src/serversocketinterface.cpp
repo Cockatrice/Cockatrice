@@ -1077,8 +1077,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     QString country = QString::fromStdString(cmd.country());
     QString password = QString::fromStdString(cmd.password());
 
-    // TODO make this configurable?
-    if (password.length() < 6) {
+    if (!isPasswordLongEnough(password.length())) {
         if (servatrice->getEnableRegistrationAudit())
             sqlInterface->addAuditRecord(QString::fromStdString(cmd.user_name()).simplified(), this->getAddress(),
                                          QString::fromStdString(cmd.clientid()).simplified(), "REGISTER_ACCOUNT",
@@ -1223,8 +1222,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
     QString oldPassword = QString::fromStdString(cmd.old_password());
     QString newPassword = QString::fromStdString(cmd.new_password());
 
-    // TODO make this configurable?
-    if (newPassword.length() < 6)
+    if (!isPasswordLongEnough(newPassword.length()))
         return Response::RespPasswordTooShort;
 
     QString userName = QString::fromStdString(userInfo->name());
@@ -1793,4 +1791,10 @@ void WebsocketServerSocketInterface::binaryMessageReceived(const QByteArray &mes
     }
 
     processCommandContainer(newCommandContainer);
+}
+
+// TODO make this configurable?
+bool isPasswordLongEnough(const int passwordLength) const
+{
+    return passwordLength < 6;
 }
