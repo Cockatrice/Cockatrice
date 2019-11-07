@@ -1,6 +1,6 @@
 ---
 name: "Bug Report"
-about: Report a problem encountered while using this style
+about: Report an issue encountered while using Cockatrice
 title: ''
 labels: 'Defect - Basic'
 assignees: ''
