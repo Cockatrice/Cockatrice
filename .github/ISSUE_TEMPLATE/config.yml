@@ -1,14 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Community Discord Server
+  - name: Community Discord Server (Login support requests go here!)
     url: https://discord.gg/V6ckZEs
     about: Need help with using the client? Want to find some games? Try the Discord server!
-  - name: Server-Specific Help: Rooster Ranges
-    url: TODO
-    about: You can ask for help with the Rooster Ranges server here.
-  - name: Server-Specific Help: Chickatrice
-    url: TODO
-    about: You can ask for help with the Chickatrice server here.
-  - name: Server-Specific Help: Tetrarch
-    url: mailto:skw@tetrarch.co
-    about: You can ask for help with the Tetrarch server here.
