@@ -8,7 +8,6 @@ export interface ServerConnectParams {
 export interface ServerState {
 	info: ServerStateInfo;
 	status: ServerStateStatus;
-	rooms: ServerStateRooms;
 	user: ServerStateUser;
 }
 
@@ -23,24 +22,6 @@ export interface ServerStateInfo {
 	version: string;
 }
 
-export interface ServerStateRooms {
-	[roomId: string]: any;
-}
-
-export interface ServerStateRoom {
-	autoJoin: boolean
-	description: string;
-	gameCount: number;
-	gameList: any[];
-	gametypeList: any[];
-	name: string;
-	permissionlevel: ServerStateRoomAccessLevel;
-	playerCount: number;
-	privilegelevel: ServerStateRoomAccessLevel;
-	roomId: number;
-	userList: any[];
-}
-
 export interface ServerStateUser {
 	accountageSecs: number;
 	avatarBmp: Uint8Array;
@@ -49,10 +30,6 @@ export interface ServerStateUser {
 	name: string;
 	privlevel: ServerStateUserAccessLevel;
 	userLevel: ServerStateUserPrivLevel;
-}
-
-export enum ServerStateRoomAccessLevel {
-	"none"
 }
 
 export enum ServerStateUserAccessLevel {

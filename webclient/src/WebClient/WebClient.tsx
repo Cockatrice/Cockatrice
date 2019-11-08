@@ -6,7 +6,7 @@ import { StatusEnum } from 'types';
 import * as roomEvents from './roomEvents';
 import * as sessionEvents from './sessionEvents';
   
-import { ServerService } from './services';
+import { RoomsService, ServerService } from './services';
 import { SessionCommands } from './commands';
 
 const roomEventKeys = Object.keys(roomEvents);
@@ -17,6 +17,7 @@ interface ApplicationCommands {
 }
 
 interface ApplicationServices {
+  rooms: RoomsService;
   server: ServerService;
 }
 
@@ -52,13 +53,18 @@ export class WebClient {
       }
     });
 
+    // This sucks. I can't seem to get out of this
+    // circular dependency trap, so this is my current best.
     this.commands = {
       session: new SessionCommands(this),
     };
 
     this.services = {
+      rooms: new RoomsService(this),
       server: new ServerService(this),
     };
+
+    console.log(this);
   }
 
   public updateStatus(status, description) {

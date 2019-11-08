@@ -34,14 +34,6 @@ export class ServerService {
     Dispatch.updateInfo(name, version);
   }
 
-  updateRooms(rooms) {
-    Dispatch.updateRooms(rooms);
-  }
-
-  updateRoom(room) {
-    Dispatch.updateRoom(room);
-  }
-
   updateStatus(state, description) {
     Dispatch.updateStatus(state, description);
 

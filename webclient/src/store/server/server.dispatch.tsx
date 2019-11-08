@@ -8,20 +8,11 @@ export const Dispatch = {
   connectionClosed: reason => {
     store.dispatch(Actions.connectionClosed(reason));
   },
-  joinRoom: roomId => {
-    store.dispatch(Actions.joinRoom(roomId));
-  },
   updateInfo: (name, version) => {
     store.dispatch(Actions.updateInfo({
       name,
       version
     }));
-  },
-  updateRooms: rooms => {
-    store.dispatch(Actions.updateRooms(rooms));
-  },
-  updateRoom: room => {
-    store.dispatch(Actions.updateRoom(room));
   },
   updateStatus: (state, description) => {
     store.dispatch(Actions.updateStatus({

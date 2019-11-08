@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 import { StatusEnum, getStatusEnumLabel } from 'types';
 
 import { ServerState } from './server.interfaces'
@@ -15,7 +13,6 @@ const initialState: ServerState = {
 		name: null,
 		version: null
 	},
-	rooms: [],
 	user: null
 };
 
@@ -29,11 +26,6 @@ export const serverReducer = (state = initialState, action: any) => {
 					...state.status
 				}
 			}
-		}
-		case Types.JOIN_ROOM: {
-			return {
-				...state
-			};
 		}
 		case Types.SERVER_MESSAGE: {
 			const { message } = action;
@@ -52,30 +44,6 @@ export const serverReducer = (state = initialState, action: any) => {
 				...state,
 				info: { ...info, name, version }
 			}
-		}
-		case Types.UPDATE_ROOMS: {
-			const rooms = {
-				...state.rooms
-			};
-
-			_.each(action.rooms, (room) => {
-				const existing = rooms[room.roomId] || {};
-
-				rooms[room.roomId] = {
-					...existing,
-					...room
-				};
-			});
-
-			return { ...state, rooms };
-		}
-		case Types.UPDATE_ROOM: {
-			return {
-				...state,
-				room: {
-					...action.room
-				}
-			};
 		}
 		case Types.UPDATE_STATUS: {
 			const { status } = action;

@@ -5,7 +5,12 @@ import * as _ from 'lodash';
 
 // import { ServerService } from 'common/services/data';
 import webClient, { WebClient } from 'WebClient/WebClient';
-import { Selectors } from 'store/server';
+import {
+  Selectors as RoomsSelectors,
+} from 'store/rooms';
+import {
+  Selectors as ServerSelectors,
+} from 'store/server';
 
 import './Server.css';
 
@@ -71,8 +76,8 @@ export interface ServerProps {
 }
 
 const mapStateToProps = state => ({
-  message: Selectors.getMessage(state),
-  rooms: Selectors.getRooms(state)
+  message: ServerSelectors.getMessage(state),
+  rooms: RoomsSelectors.getRooms(state)
 });
 
 export default connect(mapStateToProps)(Server);
