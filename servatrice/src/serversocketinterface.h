@@ -122,7 +122,7 @@ private:
     bool addAdminFlagToUser(const QString &user, int flag);
     bool removeAdminFlagFromUser(const QString &user, int flag);
 
-    bool isPasswordLongEnough(const int passwordLength) const;
+    bool isPasswordLongEnough(const int passwordLength);
 
 public:
     AbstractServerSocketInterface(Servatrice *_server,
