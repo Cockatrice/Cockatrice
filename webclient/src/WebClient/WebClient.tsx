@@ -1,28 +1,48 @@
 import protobuf from 'protobufjs';
 import $ from 'jquery';
 
-import { StatusEnum } from 'common/types';
-import { ServerService } from 'common/services/data';
-  
-import * as sessionEvents from './sessionEvents';
+import { StatusEnum } from 'types';
+
 import * as roomEvents from './roomEvents';
+import * as sessionEvents from './sessionEvents';
+  
+import { ServerService } from './services';
+import { SessionCommands } from './commands';
 
-class WebClient {
-  private static instance: WebClient;
+const roomEventKeys = Object.keys(roomEvents);
+const sessionEventKeys = Object.keys(sessionEvents);
 
-  public static getInstance() {
-    if (this.instance) {
-      return this.instance;
-    }
+interface ApplicationCommands {
+  session: SessionCommands;
+}
 
-    this.instance = new WebClient();
-    return this.instance;
-  }
+interface ApplicationServices {
+  server: ServerService;
+}
 
+export class WebClient {
+  private socket: WebSocket;
+  private status: StatusEnum = StatusEnum.DISCONNECTED;
+  private keepalivecb;
+  private lastPingPending = false;
+  private cmdId = 0;
+  private pendingCommands = {};
+
+  public commands: ApplicationCommands;
+  public services: ApplicationServices;
+
+  public protocolVersion = 14;
   public pb;
 
-  private roomEventKeys;
-  private sessionEventKeys;
+  public options: any = {
+    host: '',
+    port: '',
+    user: '',
+    pass: '',
+    debug: false,
+    autojoinrooms: true,
+    keepalive: 5000
+  };
 
   constructor() {
     this.pb = new protobuf.Root();
@@ -32,26 +52,19 @@ class WebClient {
       }
     });
 
-    this.roomEventKeys = Object.keys(roomEvents);
-    this.sessionEventKeys = Object.keys(sessionEvents);
+    this.commands = {
+      session: new SessionCommands(this),
+    };
+
+    this.services = {
+      server: new ServerService(this),
+    };
   }
 
-  public protocolVersion = 14;
-  public options: any = {
-    host: '',
-    port: '',
-    user: '',
-    pass: '',
-    debug: false,
-    autojoinrooms: false,
-    keepalive: 5000
-  };
-  private status = StatusEnum.DISCONNECTED;
-  private socket: WebSocket;
-  private keepalivecb;
-  private lastPingPending = false;
-  private cmdId = 0;
-  private pendingCommands = {};
+  public updateStatus(status, description) {
+    this.status = status;
+    this.services.server.updateStatus(status, description);
+  }
 
   public resetConnectionvars() {
     this.cmdId = 0;
@@ -72,21 +85,33 @@ class WebClient {
     }
   }
 
-  public sendRoomCommand(roomId, roomCmd, callback) {
-    var cmd = this.pb.CommandContainer.create({
+  public sendRoomCommand(roomId, roomCmd, callback?) {
+    const cmd = this.pb.CommandContainer.create({
       "roomId" : roomId,
       "roomCommand" : [ roomCmd ]
     });
 
-    this.sendCommand(cmd, callback);
+    this.sendCommand(cmd, raw => {
+      this.debug(() => console.log(raw));
+      
+      if (callback) {
+        callback(raw);
+      }
+    });
   }
 
-  public sendSessionCommand(ses, callback) {
-    var cmd = this.pb.CommandContainer.create({
+  public sendSessionCommand(ses, callback?) {
+    const cmd = this.pb.CommandContainer.create({
       "sessionCommand" : [ ses ]
     });
 
-    this.sendCommand(cmd, callback);
+    this.sendCommand(cmd, raw => {
+      this.debug(() => console.log(raw));
+      
+      if (callback) {
+        callback(raw);
+      }
+    });
   }
 
   public startPingLoop() {
@@ -95,11 +120,11 @@ class WebClient {
       if (this.lastPingPending) {
         this.disconnect();
 
-        ServerService.updateStatus(StatusEnum.DISCONNECTED, 'Connection timeout');
+        this.updateStatus(StatusEnum.DISCONNECTED, 'Connection timeout');
       }
 
       // stop the ping loop if we're disconnected
-      if (ServerService.getStatus().state !== StatusEnum.LOGGEDIN) {
+      if (this.status !== StatusEnum.LOGGEDIN) {
         clearInterval(this.keepalivecb);
         this.keepalivecb = null;
         return;
@@ -108,8 +133,8 @@ class WebClient {
       // send a ping
       this.lastPingPending = true;
 
-      var ping = this.pb.Command_Ping.create();
-      var command = this.pb.SessionCommand.create({
+      const ping = this.pb.Command_Ping.create();
+      const command = this.pb.SessionCommand.create({
         ".Command_Ping.ext" : ping
       });
 
@@ -117,15 +142,28 @@ class WebClient {
     }, this.options.keepalive);
   }
 
-  public connect(options, { onopen, onclose, onerror }) {
+  public connect(options) {
     $.extend(this.options, options || {});
 
     this.socket = new WebSocket('ws://' + this.options.host + ':' + this.options.port);
     this.socket.binaryType = "arraybuffer"; // We are talking binary
 
-    this.socket.onopen = onopen;
-    this.socket.onclose = onclose;
-    this.socket.onerror = onerror;
+    this.socket.onopen = () => {
+      this.updateStatus(StatusEnum.CONNECTED, 'Connected');
+    };
+
+    this.socket.onclose = () => {
+      // @TODO determine if these connectionClosed hooks are desired
+      // this.services.server.connectionClosed('Connection Closed');
+      this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Closed');
+    };
+
+    this.socket.onerror = () => {
+      // @TODO determine if these connectionClosed hooks are desired
+      // this.services.server.connectionClosed('Connection Failed');
+      this.updateStatus(StatusEnum.DISCONNECTED, 'Connection Failed');
+    };
+
 
     this.socket.onmessage = (event) => {
       const msg = this.decodeServerMessage(event);
@@ -136,10 +174,10 @@ class WebClient {
             this.processServerResponse(msg.response);
             break;
           case this.pb.ServerMessage.MessageType.ROOM_EVENT:
-            this.processRoomEvent(msg.roomEvent);
+            this.processRoomEvent(msg.roomEvent, msg);
             break;
           case this.pb.ServerMessage.MessageType.SESSION_EVENT:
-            this.processSessionEvent(msg.sessionEvent);
+            this.processSessionEvent(msg.sessionEvent, msg);
             break;
           case this.pb.ServerMessage.MessageType.GAME_EVENT_CONTAINER:
             // TODO
@@ -175,9 +213,9 @@ class WebClient {
       console.log("Processing failed:", err);
 
       this.debug(() => {
-        var str = "";
+        let str = "";
 
-        for (var i = 0; i < uint8msg.length; i++) {
+        for (let i = 0; i < uint8msg.length; i++) {
           str += String.fromCharCode(uint8msg[i]);
         }
 
@@ -189,7 +227,7 @@ class WebClient {
   }
 
   private processServerResponse(response) {
-    var cmdId = response.cmdId;
+    const cmdId = response.cmdId;
 
     if (!this.pendingCommands.hasOwnProperty(cmdId)) {
       return;
@@ -199,22 +237,22 @@ class WebClient {
     delete this.pendingCommands[cmdId];
   }
 
-  private processRoomEvent(raw) {
-    this.processEvent(raw, roomEvents, this.roomEventKeys);
+  private processRoomEvent(response, raw) {
+    this.processEvent(response, roomEvents, roomEventKeys, raw);
   }
 
-  private processSessionEvent(raw) {
-    this.processEvent(raw, sessionEvents, this.sessionEventKeys);
+  private processSessionEvent(response, raw) {
+    this.processEvent(response, sessionEvents, sessionEventKeys, raw);
   }
 
-  private processEvent(raw, events, keys) {
+  private processEvent(response, events, keys, raw) {
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       const event = events[key];
-      const payload = raw[event.id];
+      const payload = response[event.id];
 
       if (payload) {
-        events[key].action(payload);
+        events[key].action(payload, this, raw);
         return;
       }
     }
@@ -249,4 +287,5 @@ class WebClient {
   ];
 }
 
-export default WebClient;
+const webClient = new WebClient();
+export default webClient;

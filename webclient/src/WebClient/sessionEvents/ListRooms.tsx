@@ -1,8 +1,16 @@
+import * as _ from 'lodash';
+
 export const ListRooms = {
   id: '.Event_ListRooms.ext',
-  action: (payload) => {
-    // @TODO dispatch action with rooms
-    // @Maybe include autojoin from poc
-    console.info('Event_ListRooms', payload);
+  action: ({ roomList }, webClient) => {
+    webClient.services.server.updateRooms(roomList);
+  	
+    if (webClient.options.autojoinrooms) {
+	    _.each(roomList, ({ autoJoin, roomId }) => {
+	    	if (autoJoin) {
+		    	webClient.services.server.joinRoom(roomId);
+	    	}
+	    });
+    }
   }
 };

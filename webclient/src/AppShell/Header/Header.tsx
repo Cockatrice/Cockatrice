@@ -2,26 +2,25 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
 
-import { ServerService } from 'common/services/data';
-import { RouteEnum } from 'common/types';
 import {
 	Selectors,
 	ServerConnectParams,
-	ServerStateStatus
+	ServerStateUser
 } from 'store/server';
+import webClient, { WebClient } from 'WebClient/WebClient';
+
+import { RouteEnum } from '../common/types';
 
 import './Header.css';
 import logo from './logo.png';
 
-class Header extends Component<HeaderProps, HeaderState> {
+class Header extends Component<HeaderProps> {
+	webClient: WebClient = webClient;
+
 	constructor(props) {
 		super(props);
 
 		this.connect = this.connect.bind(this);
-	}
-
-	componentWillMount() {
-		console.log(this);
 	}
 
 	connect() {
@@ -32,60 +31,70 @@ class Header extends Component<HeaderProps, HeaderState> {
 			pass: '',
 		};
 
-		ServerService.connectServer(options);
+		this.webClient.services.server.connectServer(options);
 	}
 
 	render() {
+		let template;
+
+		if (this.props.user) {
+			template = (<Navigation user={this.props.user} />);
+		} else {
+			template = (<SignIn connect={this.connect} />);
+		}
+
 		return (
 			<header className="Header">
-				<Link to={RouteEnum.MAIN}>
+				<Link to={RouteEnum.SERVER}>
 					<img src={logo} className="Header__logo" alt="logo" />
 				</Link>
 				<div className="Header-content">
-					<div className="Header-connect">
-						<button onClick={this.connect}>Connect</button>
-						{<span className="Header-connect__status">{this.props.status.description}</span>}
-					</div>
-					{/*<div className="Header-serverDetails">
-						<div>Server: server.cockatrice.us</div>
-						<div>Room: Magic - Welcome to Rooster Ranges</div>
-					</div>*/}
-					<nav className="Header-nav">
-						<ul className="Header-nav__items">
-							<li className="Header-nav__item">
-								<Link to={RouteEnum.DECKS}>
-									Decks
-								</Link>
-							</li>
-							<strong>|</strong>
-							<li className="Header-nav__item">
-								<Link to={RouteEnum.ACCOUNT}>
-									<div className="Header-account">
-										<span className="Header-account__name">
-											Seavor
-										</span>
-										<span className="Header-account__indicator"></span>
-									</div>
-								</Link>
-							</li>
-						</ul>
-					</nav>
+					{template}
 				</div>
 			</header>
 		)
 	}
 }
 
-export interface HeaderState {
-	status: ServerStateStatus;
+function Navigation(props) {
+	return (
+		<nav className="Header-nav">
+			<ul className="Header-nav__items">
+				<li className="Header-nav__item">
+					<Link to={RouteEnum.DECKS}>
+						Decks
+					</Link>
+				</li>
+				<strong>|</strong>
+				<Link to={RouteEnum.ACCOUNT}>
+					<div className="Header-account">
+						<span className="Header-account__name">
+							{props.user.name}
+						</span>
+						<span className="Header-account__indicator"></span>
+					</div>
+				</Link>
+			</ul>
+		</nav>
+	);
 }
 
-export interface HeaderProps extends HeaderState {
+function SignIn(props) {
+	return (
+		<div className="Header-connect">
+			<button onClick={props.connect}>Connect</button>
+		</div>
+	);
+}
 
+export interface HeaderProps {
+	description: string;
+	user: ServerStateUser;
 }
 
 const mapStateToProps = state => ({
-	status: Selectors.getStatus(state)
+	description: Selectors.getDescription(state),
+	user: Selectors.getUser(state)
 });
 
 export default connect(mapStateToProps)(Header);

@@ -8,12 +8,12 @@ export enum StatusEnum {
 };
 
 export enum StatusEnumLabel {
-  'Disconnected',
-  'Connecting',
-  'Connected',
-  'Loggingin',
-  'Loggedin',
-  'Disconnecting'
+  'Disconnected' = 0,
+  'Connecting' = 1,
+  'Connected' = 2,
+  'Loggingin' = 3,
+  'Loggedin' = 4,
+  'Disconnecting' = 99
 };
 
 export const getStatusEnumLabel = (statusEnum: number) => {

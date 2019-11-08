@@ -1,10 +1,11 @@
 {
   "name": "webclient",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@types/jest": "24.0.20",
     "@types/jquery": "^3.3.31",
+    "@types/lodash": "^4.14.145",
     "@types/node": "12.11.7",
     "@types/prop-types": "^15.7.3",
     "@types/protobufjs": "^6.0.0",
@@ -14,6 +15,7 @@
     "@types/react-router-dom": "^5.1.0",
     "@types/redux": "^3.6.0",
     "jquery": "^3.4.1",
+    "lodash": "^4.17.15",
     "prop-types": "^15.7.2",
     "protobufjs": "^6.8.8",
     "react": "^16.11.0",

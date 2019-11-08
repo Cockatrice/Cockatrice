@@ -1,23 +1,23 @@
   import React from 'react';
 import { Redirect, Route, Switch } from "react-router-dom";
 
-import { RouteEnum } from '../common/types';
+import { RouteEnum } from './common/types';
 
 import Account from './Account/Account';
-import Connect from './Connect/Connect';
 import Decks from './Decks/Decks';
 import Game from './Game/Game';
-import MainRoom from './MainRoom/MainRoom';
+import Server from './Server/Server';
 
 const Routes = () => (
-  <div>
+  <div className="AppShell-routes overflow-scroll">
   	<Switch>
-      <Route path={RouteEnum.ACCOUNT} render={() => <Account />} />
-      <Route path={RouteEnum.CONNECT} render={() => <Connect />} />
-      <Route path={RouteEnum.DECKS} render={() => <Decks />} />
+      <Route path={RouteEnum.SERVER} render={() => <Server />} />
+      {/*<Route path={RouteEnum.ROOM} render={() => <Room />} />*/}
       <Route path={RouteEnum.GAME} render={() => <Game />} />
-      <Route path={RouteEnum.MAIN} render={() => <MainRoom />} />
-      <Redirect from="/" to={RouteEnum.MAIN} />
+      <Route path={RouteEnum.DECKS} render={() => <Decks />} />
+      {/*<Route path={RouteEnum.DECK} render={() => <Deck />} />*/}
+      <Route path={RouteEnum.ACCOUNT} render={() => <Account />} />
+      <Redirect from="/" to={RouteEnum.SERVER} />
     </Switch>
   </div>
 );

@@ -1,12 +1,8 @@
-import { ServerService } from 'common/services/data';
-import { StatusEnum } from 'common/types';
-
-import WebClient from '../WebClient';
+import { StatusEnum } from 'types';
 
 export const ConnectionClosed = {
   id: '.Event_ConnectionClosed.ext',
-  action: ({ reason }) => {
-    const webClient = WebClient.getInstance();
+  action: ({ reason }, webClient) => {
     let message = '';
 
     switch(reason) {
@@ -18,6 +14,9 @@ export const ConnectionClosed = {
         break;
       case webClient.pb.Event_ConnectionClosed.CloseReason.BANNED:
         message = 'You are banned';
+        break;
+      case webClient.pb.Event_ConnectionClosed.CloseReason.DEMOTED:
+        message = 'You were demoted';
         break;
       case webClient.pb.Event_ConnectionClosed.CloseReason.SERVER_SHUTDOWN:
         message = 'Scheduled server shutdown';
@@ -34,6 +33,7 @@ export const ConnectionClosed = {
         break;
     }
 
-    ServerService.updateStatus(StatusEnum.DISCONNECTED, message);
+    // @TODO: This of a better place for this response data
+    webClient.services.server.updateStatus(StatusEnum.DISCONNECTED, message);
   }
 };
