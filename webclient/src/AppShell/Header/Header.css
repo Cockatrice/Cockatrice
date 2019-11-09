@@ -55,8 +55,8 @@
 
 .Header-account__indicator {
 	display: inline-block;
-	height: 14px;
-	width: 14px;
+	height: 16px;
+	width: 16px;
 	background: red;
 	border: 2px solid;
 	border-radius: 50%;

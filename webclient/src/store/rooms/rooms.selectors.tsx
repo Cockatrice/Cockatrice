@@ -10,4 +10,6 @@ export const Selectors = {
 	getRoom: ({ rooms }: State, id: number) =>
 		_.find(rooms.rooms, ({roomId}) => roomId === id),
 	getActive: ({ rooms }: State) => rooms.active,
+	getActiveRoom: (state: State) => Selectors.getRoom(state, Selectors.getActive(state))
 }
+

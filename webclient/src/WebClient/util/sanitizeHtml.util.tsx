@@ -5,7 +5,7 @@ export function sanitizeHtml(msg) {
   const whitelist = {
     tags: "br,a,img,center,b,font",
     attrs: ["href","color"],
-    href: ["http://",/*"https://",*/"ftp://","//"]
+    href: ["http://","https://","ftp://","//"]
   };
 
   // remove all tags, attributes, and href protocols except some
