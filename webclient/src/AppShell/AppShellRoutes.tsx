@@ -6,13 +6,14 @@ import { RouteEnum } from './common/types';
 import Account from './Account/Account';
 import Decks from './Decks/Decks';
 import Game from './Game/Game';
+import Room from './Room/Room';
 import Server from './Server/Server';
 
 const Routes = () => (
   <div className="AppShell-routes overflow-scroll">
   	<Switch>
       <Route path={RouteEnum.SERVER} render={() => <Server />} />
-      {/*<Route path={RouteEnum.ROOM} render={() => <Room />} />*/}
+      {<Route path={`${RouteEnum.ROOM}/:roomId`} render={() => <Room />} />}
       <Route path={RouteEnum.GAME} render={() => <Game />} />
       <Route path={RouteEnum.DECKS} render={() => <Decks />} />
       {/*<Route path={RouteEnum.DECK} render={() => <Deck />} />*/}

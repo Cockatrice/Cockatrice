@@ -14,5 +14,11 @@ export const Actions = {
 	leaveRoom: roomId => ({
 		type: Types.LEAVE_ROOM,
 		roomId
+	}),
+
+	addMessage: (roomId, message) => ({
+		type: Types.ADD_MESSAGE,
+		roomId,
+		message
 	})
 }

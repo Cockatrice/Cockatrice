@@ -25,7 +25,7 @@ class ConnectForm extends Component<InjectedFormProps> {
 					<label className="connectForm-item__label" htmlFor="pass">Password</label>	
 					<Field className="connectForm-item__field" name="pass" component="input" type="password" />
 				</div>
-				<button className="connectForm-submit" type="submit">Submit</button>
+				<button className="connectForm-submit" type="submit">Connect</button>
 			</form>
 		);
 	}
@@ -35,4 +35,11 @@ const propsMap = {
 	form: 'connect'
 };
 
-export default connect()(reduxForm(propsMap)(ConnectForm));
+const mapStateToProps = () => ({
+	initialValues: {
+		host: 'server.cockatrice.us',
+		port: '4748'
+	}
+});
+
+export default connect(mapStateToProps)(reduxForm(propsMap)(ConnectForm));

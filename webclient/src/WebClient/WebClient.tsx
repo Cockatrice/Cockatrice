@@ -3,10 +3,10 @@ import $ from 'jquery';
 
 import { StatusEnum } from 'types';
 
-import * as roomEvents from './roomEvents';
-import * as sessionEvents from './sessionEvents';
+import * as roomEvents from './events/RoomEvents';
+import * as sessionEvents from './events/SessionEvents';
   
-import { RoomsService, ServerService } from './services';
+import { RoomService, ServerService } from './services';
 import { SessionCommands } from './commands';
 
 const roomEventKeys = Object.keys(roomEvents);
@@ -17,7 +17,7 @@ interface ApplicationCommands {
 }
 
 interface ApplicationServices {
-  rooms: RoomsService;
+  rooms: RoomService;
   server: ServerService;
 }
 
@@ -60,7 +60,7 @@ export class WebClient {
     };
 
     this.services = {
-      rooms: new RoomsService(this),
+      rooms: new RoomService(this),
       server: new ServerService(this),
     };
 
@@ -174,6 +174,8 @@ export class WebClient {
     this.socket.onmessage = (event) => {
       const msg = this.decodeServerMessage(event);
 
+      console.log('Message: ', msg);
+
       if (msg) {
         switch (msg.messageType) {
           case this.pb.ServerMessage.MessageType.RESPONSE:
@@ -216,7 +218,7 @@ export class WebClient {
 
       return msg;
     } catch (err) {
-      console.log("Processing failed:", err);
+      console.error("Processing failed:", err);
 
       this.debug(() => {
         let str = "";

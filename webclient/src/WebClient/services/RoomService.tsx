@@ -2,7 +2,7 @@ import { Dispatch } from 'store/rooms';
 
 import { WebClient } from '../WebClient';
 
-export class RoomsService {
+export class RoomService {
   webClient: WebClient;
 
   constructor(webClient) {
@@ -15,5 +15,9 @@ export class RoomsService {
 
   joinRoom(roomId) {
     Dispatch.joinRoom(roomId);
+  }
+
+  addMessage(roomId, message) {
+    Dispatch.addMessage(roomId, message);
   }
 }

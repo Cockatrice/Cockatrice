@@ -1,5 +1,5 @@
 import { StatusEnum } from 'types';
-import { guid } from '../util';
+import { guid } from '../../util';
 
 const defaultLoginConfig = {
   "clientver" : "webclient-1.0 (2019-10-31)",
@@ -54,7 +54,7 @@ export const ServerIdentification = {
     function handleCommandResponse(raw) {
       const resp = raw[".Response_Login.ext"];
 
-      webClient.debug(() => console.log('.Response_Login.ext', resp));
+      webClient.debug(() =>  console.log('.Response_Login.ext', resp));
 
       switch(raw.responseCode) {
         case webClient.pb.Response.ResponseCode.RespOk:
@@ -70,6 +70,7 @@ export const ServerIdentification = {
           break;
 
         case webClient.pb.Response.ResponseCode.RespWrongPassword:
+        case webClient.pb.Response.ResponseCode.RespUsernameInvalid:
           webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: incorrect username or password');
           break;
 
@@ -79,10 +80,6 @@ export const ServerIdentification = {
 
         case webClient.pb.Response.ResponseCode.RespUserIsBanned:
           webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: banned user');
-          break;
-
-        case webClient.pb.Response.ResponseCode.RespUsernameInvalid:
-          webClient.updateStatus(StatusEnum.DISCONNECTING, 'Login failed: invalid username');
           break;
 
         case webClient.pb.Response.ResponseCode.RespRegistrationRequired:

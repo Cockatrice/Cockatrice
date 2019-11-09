@@ -1,16 +1,23 @@
 export interface RoomsState {
 	rooms: RoomsStateRooms;
-	joined: {
-		[roomId: number]: true;
-	};
+	joined: JoinedRooms;
+	messages: RoomsStateMessages;
 	active: number;
 }
 
 export interface RoomsStateRooms {
-	[id: number]: any;
+	[roomId: number]: Room;
 }
 
-export interface RoomsStateRoom {
+export interface JoinedRooms {
+	[roomId: number]: boolean;
+}
+
+export interface RoomsStateMessages {
+	[roomId: number]: Message[];
+}
+
+export interface Room {
 	autoJoin: boolean
 	description: string;
 	gameCount: number;
@@ -22,6 +29,13 @@ export interface RoomsStateRoom {
 	privilegelevel: RoomsStateRoomAccessLevel;
 	roomId: number;
 	userList: any[];
+	order: number;
+}
+
+export interface Message {
+	message: string;
+	messageType: number;
+	timeOf?: number;
 }
 
 export enum RoomsStateRoomAccessLevel {

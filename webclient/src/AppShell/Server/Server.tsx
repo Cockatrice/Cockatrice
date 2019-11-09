@@ -3,10 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import { Selectors as RoomsSelectors } from 'store/rooms';
-import {
-  Selectors as ServerSelectors,
-  ServerConnectParams
-} from 'store/server';
+import { Selectors as ServerSelectors } from 'store/server';
 
 import { AuthenticationService } from 'AppShell/common/services';
 

@@ -12,5 +12,9 @@ export const Dispatch = {
 
   leaveRoom: roomId => {
     store.dispatch(Actions.leaveRoom(roomId));
+  },
+
+  addMessage: (roomId, message) => {
+    store.dispatch(Actions.addMessage(roomId, message));
   }
 }
