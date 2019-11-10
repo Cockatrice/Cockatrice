@@ -16,7 +16,7 @@ class SayMessage extends Component<InjectedFormProps> {
 						type="text"
 					/>
 				</div>
-				<button className="sayMessage-submit" type="submit">>>></button>
+				<button className="sayMessage-submit" type="submit">>></button>
 			</form>
 		);
 	}

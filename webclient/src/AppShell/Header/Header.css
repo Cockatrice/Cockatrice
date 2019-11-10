@@ -11,10 +11,9 @@
 
 .Header-content {
 	display: flex;
-	justify-content: flex-end;
 	align-items: center;
-    width: 100%;
-    padding: 5px;
+  width: 100%;
+  padding: 5px;
 	background: #159741;
 	color: white;
 }
@@ -29,13 +28,16 @@
 }
 
 .Header-nav {
+	width: 100%;
 	display: flex;
-    align-items: center;
+  align-items: center;
 	margin-right: 10px;
 }
 
 .Header-nav__items {
+	width: 100%;
 	display: flex;
+	justify-content: flex-end;
 }
 
 .Header-nav__item {

@@ -1,15 +1,33 @@
 .room-view {
 	height: 100%;
   display: flex;
-  flex-direction: column;
 }
 
-.room-view__messages {
-	height: 100%;
-}
-
-.room-view__sayMessage {
+.room-view__main {
 	width: 100%;
-	max-width: 400px;
-	margin: 20px auto 20px;
+}
+
+.room-view__main-games {
+	height: 50%;
+	border-bottom: 1px solid;
+}
+
+.room-view__main-messages {
+	height: 50%;
+  display: flex;
+  flex-direction: column;
+	
+}
+
+.room-view__main-messages__sayMessage {
+	width: 100%;
+	max-width: 600px;
+	margin: 10px auto;
+}
+
+.room-view__sidebar {
+	width: 25%;
+	max-width: 300px;
+	flex-shrink: 0;
+	border-left: 1px solid;
 }

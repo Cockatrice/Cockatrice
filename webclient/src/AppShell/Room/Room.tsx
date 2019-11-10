@@ -34,12 +34,26 @@ class Room extends Component<any> {
 
 		return (
 			<div className="room-view">
-				<div className="room-view__messages overflow-scroll">
-					<Messages messages={messages} />
+				<div className="room-view__main">
+					<div className="room-view__main-games">
+						<div className="room-view__main-games__content overflow-scroll">
+							GAMES PANEL
+						</div>						
+					</div>
+					<div className="room-view__main-messages">
+						<div className="room-view__main-messages__content overflow-scroll">
+							<Messages messages={messages} />
+						</div>
+						<div className="room-view__main-messages__sayMessage">
+							<SayMessage onSubmit={this.handleSubmit} />
+						</div>
+					</div>
 				</div>
-				<div className="room-view__sayMessage">
-					<SayMessage onSubmit={this.handleSubmit} />
+				<div className="room-view__sidebar">
+					USERS PANEL
 				</div>
+
+
 			</div>
 		);
 	}

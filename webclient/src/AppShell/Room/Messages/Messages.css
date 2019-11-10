@@ -1,10 +1,11 @@
 .messages {
 	width: 100%;
-	padding: 0 20px;
+	padding: 0 10px;
 	font-size: 12px;
+	line-height: 1.3;
 }
 
 .message {
-	padding: 10px 0 5px;
+	padding: 5px 0 2px;
 	border-bottom: 1px dashed;
 }
