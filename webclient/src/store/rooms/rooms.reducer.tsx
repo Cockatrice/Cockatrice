@@ -110,23 +110,29 @@ export const roomsReducer = (state = initialState, action: any) => {
 			const { roomId, games } = action;
 			const room = state.rooms[roomId];
 
+			// Create map of games with update objects
 			const toUpdate = games.reduce((map, game) => {
 				map[game.gameId] = game;
 				return map;
 			}, {});
 
 			const gameUpdates = room.gameList
+				// filter out closed games and remove from update map
 				.filter(game => {
 					const gameUpdate = toUpdate[game.gameId];
-					return !gameUpdate || !gameUpdate.closed;
+					const closedGame = gameUpdate && gameUpdate.closed;
+
+					if (closedGame) {
+						delete toUpdate[game.gameId];
+					}
+
+					return !closedGame;
 				})
 				.map(game => {
 					const gameUpdate = toUpdate[game.gameId];
 
 					if (gameUpdate) {
-						if (!gameUpdate.creatorInfo) {
-							delete gameUpdate.gameTypes;
-						}
+						delete toUpdate[game.gameId];
 
 						return {
 							...game,
@@ -136,6 +142,11 @@ export const roomsReducer = (state = initialState, action: any) => {
 
 					return game;
 				});
+
+			// Push new games to end of list
+			if (_.size(toUpdate)) {
+				_.each(toUpdate, game => gameUpdates.push(game));
+			}
 
 			return {
 				...state,

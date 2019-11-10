@@ -62,8 +62,6 @@ class Room extends Component<any> {
 			this.hidePasswordProtectedGame(game) &&
 			this.hideBuddiesOnlyGame(game)
 		));
-		
-		console.log(games);
 
 		return (
 			<div className="room-view">
