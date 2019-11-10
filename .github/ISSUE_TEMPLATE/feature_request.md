@@ -1,8 +1,8 @@
 ---
-name: "Feature Request"
+name: "💡 Feature Request"
 about: Request a new feature
 title: ''
-labels: ''
+labels: 'Feature Request'
 assignees: ''
 
 ---
