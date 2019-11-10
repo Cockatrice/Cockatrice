@@ -1,6 +1,7 @@
 export const ListGames = {
   id: '.Event_ListGames.ext',
-  action: (payload) => {
-    // console.info('Event_ListGames', payload);
+  action: ({ gameList }, webClient, { roomEvent }) => {
+  	const { roomId } = roomEvent;
+  	webClient.services.rooms.updateGames(roomId, gameList)
   }
 };

@@ -9,12 +9,17 @@ export class RoomService {
     this.webClient = webClient;
   }
 
+  joinRoom(roomInfo) {
+    const { roomId } = roomInfo;
+    Dispatch.joinRoom(roomInfo);
+  }
+
   updateRooms(rooms) {
     Dispatch.updateRooms(rooms);
   }
 
-  joinRoom(roomId) {
-    Dispatch.joinRoom(roomId);
+  updateGames(roomId, gameList) {
+    Dispatch.updateGames(roomId, gameList);
   }
 
   addMessage(roomId, message) {

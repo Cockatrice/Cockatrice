@@ -6,9 +6,9 @@ export const Actions = {
 		rooms
 	}),
 
-	joinRoom: roomId => ({
+	joinRoom: roomInfo => ({
 		type: Types.JOIN_ROOM,
-		roomId
+		roomInfo
 	}),
 
 	leaveRoom: roomId => ({
@@ -20,5 +20,11 @@ export const Actions = {
 		type: Types.ADD_MESSAGE,
 		roomId,
 		message
+	}),
+
+	updateGames: (roomId, games) => ({
+		type: Types.UPDATE_GAMES,
+		roomId,
+		games
 	})
 }

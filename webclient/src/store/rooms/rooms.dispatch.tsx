@@ -6,8 +6,9 @@ export const Dispatch = {
     store.dispatch(Actions.updateRooms(rooms));
   },
 
-  joinRoom: roomId => {
-    store.dispatch(Actions.joinRoom(roomId));
+  joinRoom: roomInfo => {
+    console.log(roomInfo);
+    store.dispatch(Actions.joinRoom(roomInfo));
   },
 
   leaveRoom: roomId => {
@@ -16,5 +17,9 @@ export const Dispatch = {
 
   addMessage: (roomId, message) => {
     store.dispatch(Actions.addMessage(roomId, message));
+  },
+
+  updateGames: (roomId, games) => {
+    store.dispatch(Actions.updateGames(roomId, games));
   }
 }

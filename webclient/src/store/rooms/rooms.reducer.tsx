@@ -19,11 +19,17 @@ export const roomsReducer = (state = initialState, action: any) => {
 
 			// Server does not send everything everytime
 			_.each(action.rooms, (room, order) => {
-				const existing = rooms[room.roomId] || {};
+				const { roomId } = room;
+				const existing = rooms[roomId] || {};
+				
+				const update = { ...room };
+				delete update.gameList;
+				delete update.gametypeList;
+				delete update.userList;
 
-				rooms[room.roomId] = {
+				rooms[roomId] = {
 					...existing,
-					...room,
+					...update,
 					order
 				};
 			});
@@ -31,11 +37,18 @@ export const roomsReducer = (state = initialState, action: any) => {
 			return { ...state, rooms };
 		}
 		case Types.JOIN_ROOM: {
-			const { roomId } = action;
-			const { joined } = state;
+			const { roomInfo } = action;
+			const { roomId } = roomInfo;
+
+			const { joined, rooms } = state;
 
 			return {
 				...state,
+
+				rooms: {
+					...rooms,
+					[roomId]: roomInfo
+				},
 
 				joined: {
 					...joined,
@@ -90,6 +103,45 @@ export const roomsReducer = (state = initialState, action: any) => {
 					[roomId]: [
 						...roomMessages
 					]
+				}
+			}
+		}
+		case Types.UPDATE_GAMES: {
+			const { roomId, games } = action;
+			const room = state.rooms[roomId];
+
+			const toUpdate = games.reduce((map, game) => {
+				map[game.gameId] = game;
+				return map;
+			}, {});
+
+			const gameUpdates = room.gameList.map(game => {
+				const gameUpdate = toUpdate[game.gameId];
+
+				if (gameUpdate) {
+					if (!gameUpdate.creatorInfo) {
+						delete gameUpdate.gameTypes;
+					}
+
+					return {
+						...game,
+						...gameUpdate
+					};
+				}
+
+				return game;
+			});
+
+			return {
+				...state,
+				rooms: {
+					...state.rooms,
+					[roomId]: {
+						...room,
+						gameList: [
+							...gameUpdates
+						]
+					}
 				}
 			}
 		}

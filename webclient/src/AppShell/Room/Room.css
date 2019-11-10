@@ -16,7 +16,12 @@
 	height: 50%;
   display: flex;
   flex-direction: column;
-	
+}
+
+
+.room-view__main-games__content,
+.room-view__main-messages__content {
+	height: 100%;
 }
 
 .room-view__main-messages__sayMessage {
