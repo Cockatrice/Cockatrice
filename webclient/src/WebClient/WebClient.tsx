@@ -6,19 +6,20 @@ import { StatusEnum } from 'types';
 import * as roomEvents from './events/RoomEvents';
 import * as sessionEvents from './events/SessionEvents';
   
-import { RoomService, ServerService } from './services';
-import { SessionCommands } from './commands';
+import { RoomService, SessionService } from './services';
+import { RoomCommands, SessionCommands } from './commands';
 
 const roomEventKeys = Object.keys(roomEvents);
 const sessionEventKeys = Object.keys(sessionEvents);
 
 interface ApplicationCommands {
+  room: RoomCommands;
   session: SessionCommands;
 }
 
 interface ApplicationServices {
   rooms: RoomService;
-  server: ServerService;
+  server: SessionService;
 }
 
 export class WebClient {
@@ -56,12 +57,13 @@ export class WebClient {
     // This sucks. I can't seem to get out of this
     // circular dependency trap, so this is my current best.
     this.commands = {
+      room: new RoomCommands(this),
       session: new SessionCommands(this),
     };
 
     this.services = {
       rooms: new RoomService(this),
-      server: new ServerService(this),
+      server: new SessionService(this),
     };
 
     console.log(this);
@@ -106,9 +108,9 @@ export class WebClient {
     });
   }
 
-  public sendSessionCommand(ses, callback?) {
+  public sendSessionCommand(sesCmd, callback?) {
     const cmd = this.pb.CommandContainer.create({
-      "sessionCommand" : [ ses ]
+      "sessionCommand" : [ sesCmd ]
     });
 
     this.sendCommand(cmd, raw => {
@@ -173,8 +175,6 @@ export class WebClient {
 
     this.socket.onmessage = (event) => {
       const msg = this.decodeServerMessage(event);
-
-      console.log('Message: ', msg);
 
       if (msg) {
         switch (msg.messageType) {

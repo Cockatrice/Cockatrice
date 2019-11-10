@@ -4,7 +4,7 @@ import { StatusEnum } from 'types';
 import { sanitizeHtml } from '../util';
 import { WebClient } from '../WebClient';
 
-export class ServerService {
+export class SessionService {
   webClient: WebClient;
 
   constructor(webClient) {

@@ -5,6 +5,9 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 
 import { RoomsStateMessages, RoomsStateRooms, Selectors } from 'store/rooms';
 
+import { RoomsService } from 'AppShell/common/services';
+import SayMessage from 'AppShell/common/components/SayMessage/SayMessage';
+
 import Messages from './Messages/Messages';
 
 import './Room.css';
@@ -12,13 +15,31 @@ import './Room.css';
 // @TODO figure out how to properly type this component
 // Component<RouteComponentProps<???, ???, ???>>
 class Room extends Component<any> {
+	constructor(props) {
+		super(props);
+
+		this.handleSubmit = this.handleSubmit.bind(this);
+	}
+
+	handleSubmit({ message }) {
+		if (message) {
+			const { roomId } = this.props.match.params;
+			RoomsService.roomSay(roomId, message);
+		}
+	}
+
 	render() {
 		const { roomId } = this.props.match.params;
 		const messages = this.props.messages[roomId];
 
 		return (
-			<div>
-				<Messages messages={messages} />
+			<div className="room-view">
+				<div className="room-view__messages overflow-scroll">
+					<Messages messages={messages} />
+				</div>
+				<div className="room-view__sayMessage">
+					<SayMessage onSubmit={this.handleSubmit} />
+				</div>
 			</div>
 		);
 	}

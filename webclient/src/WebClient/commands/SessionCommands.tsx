@@ -8,9 +8,9 @@ export class SessionCommands {
   }
 
   fetchRooms() {
-    var CmdListRooms = this.webClient.pb.Command_ListRooms.create();
+    const CmdListRooms = this.webClient.pb.Command_ListRooms.create();
 
-    var sc = this.webClient.pb.SessionCommand.create({
+    const sc = this.webClient.pb.SessionCommand.create({
       ".Command_ListRooms.ext" : CmdListRooms
     });
 
@@ -18,11 +18,11 @@ export class SessionCommands {
   }
 
   joinRoom(roomId: string) {
-    var CmdJoinRoom = this.webClient.pb.Command_JoinRoom.create({
+    const CmdJoinRoom = this.webClient.pb.Command_JoinRoom.create({
       "roomId" : roomId
     });
 
-    var sc = this.webClient.pb.SessionCommand.create({
+    const sc = this.webClient.pb.SessionCommand.create({
       ".Command_JoinRoom.ext" : CmdJoinRoom
     });
 

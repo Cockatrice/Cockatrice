@@ -18,6 +18,12 @@ export class RoomService {
   }
 
   addMessage(roomId, message) {
+    const { name } = message;
+
+    if (name) {
+      message.message = `${name}: ${message.message}`;
+    }
+
     Dispatch.addMessage(roomId, message);
   }
 }
