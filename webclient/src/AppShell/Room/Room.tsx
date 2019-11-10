@@ -44,17 +44,17 @@ class Room extends Component<any> {
 		const { roomId } = this.props.match.params;
 		const room = this.props.rooms[roomId];
 
-		const games = room.gameList;
 		const messages = this.props.messages[roomId];
-
-		console.log(room);
+		const games = room.gameList.filter(({ started, maxPlayers, playerCount }) => (
+			!started && playerCount < maxPlayers
+		));
 
 		return (
 			<div className="room-view">
 				<div className="room-view__main">
 					<div className="room-view__main-games">
 						<div className="room-view__main-games__content overflow-scroll">
-							<Games games={games.filter(game => !game.started)} gameTypesMap={this.gametypeMap} />
+							<Games games={games} gameTypesMap={this.gametypeMap} />
 						</div>						
 					</div>
 					<div className="room-view__main-messages">

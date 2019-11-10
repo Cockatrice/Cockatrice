@@ -20,6 +20,7 @@ export const Dispatch = {
   },
 
   updateGames: (roomId, games) => {
+    console.log('update', games);
     store.dispatch(Actions.updateGames(roomId, games));
   }
 }

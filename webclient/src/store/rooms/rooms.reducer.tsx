@@ -115,22 +115,27 @@ export const roomsReducer = (state = initialState, action: any) => {
 				return map;
 			}, {});
 
-			const gameUpdates = room.gameList.map(game => {
-				const gameUpdate = toUpdate[game.gameId];
+			const gameUpdates = room.gameList
+				.filter(game => {
+					const gameUpdate = toUpdate[game.gameId];
+					return !gameUpdate || !gameUpdate.closed;
+				})
+				.map(game => {
+					const gameUpdate = toUpdate[game.gameId];
 
-				if (gameUpdate) {
-					if (!gameUpdate.creatorInfo) {
-						delete gameUpdate.gameTypes;
+					if (gameUpdate) {
+						if (!gameUpdate.creatorInfo) {
+							delete gameUpdate.gameTypes;
+						}
+
+						return {
+							...game,
+							...gameUpdate
+						};
 					}
 
-					return {
-						...game,
-						...gameUpdate
-					};
-				}
-
-				return game;
-			});
+					return game;
+				});
 
 			return {
 				...state,
