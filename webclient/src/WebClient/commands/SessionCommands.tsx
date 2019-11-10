@@ -35,7 +35,6 @@ export class SessionCommands {
         case this.webClient.pb.Response.ResponseCode.RespOk:
           const { roomInfo } = raw['.Response_JoinRoom.ext'];
 
-          // @TODO join room to store
           this.webClient.services.rooms.joinRoom(roomInfo);
           this.webClient.debug(() => console.log('Join Room: ', roomInfo.name));
           return;

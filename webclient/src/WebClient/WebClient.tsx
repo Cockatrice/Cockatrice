@@ -72,6 +72,7 @@ export class WebClient {
   public updateStatus(status, description) {
     this.status = status;
     this.services.server.updateStatus(status, description);
+    console.log(`Status: [${status}]: ${description}`);
   }
 
   public resetConnectionvars() {

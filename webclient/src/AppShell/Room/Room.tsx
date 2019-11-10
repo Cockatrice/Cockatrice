@@ -8,6 +8,8 @@ import { RoomsStateMessages, RoomsStateRooms, Selectors } from 'store/rooms';
 import { RoomsService } from 'AppShell/common/services';
 import SayMessage from 'AppShell/common/components/SayMessage/SayMessage';
 
+import ScrollToBottomOnChanges from '../common/components/ScrollToBottomOnChanges/ScrollToBottomOnChanges';
+
 import Games from './Games/Games';
 import Messages from './Messages/Messages';
 
@@ -27,7 +29,7 @@ class Room extends Component<any> {
 			map[type.gameTypeId] = type.description;
 			return map;
 		})
-		
+
 		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
@@ -71,7 +73,9 @@ class Room extends Component<any> {
 					</div>
 					<div className="room-view__main-messages">
 						<div className="room-view__main-messages__content overflow-scroll">
-							<Messages messages={messages} />
+							<ScrollToBottomOnChanges changes={messages.length} content={(
+								<Messages messages={messages} />
+							)} />
 						</div>
 						<div className="room-view__main-messages__sayMessage">
 							<SayMessage onSubmit={this.handleSubmit} />
