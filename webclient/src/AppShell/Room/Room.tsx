@@ -21,16 +21,14 @@ class Room extends Component<any> {
 	constructor(props) {
 		super(props);
 
-		this.handleSubmit = this.handleSubmit.bind(this);
-	}
-
-	componentDidMount() {
 		const { roomId } = this.props.match.params;
 
 		this.gametypeMap = this.props.rooms[roomId].gametypeList.reduce((map, type) => {
 			map[type.gameTypeId] = type.description;
 			return map;
 		})
+		
+		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
 	handleSubmit({ message }) {
