@@ -1,8 +1,8 @@
 ---
-name: "Bug Report"
+name: "🐛 Bug Report"
 about: Report an issue encountered while using Cockatrice
 title: ''
-labels: 'Defect - Basic'
+labels: 'Bug'
 assignees: ''
 
 ---
