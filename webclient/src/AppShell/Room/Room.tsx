@@ -40,14 +40,30 @@ class Room extends Component<any> {
 		}
 	}
 
+	hideUnavailableGame({ started, maxPlayers, playerCount }) {
+		return !started && playerCount < maxPlayers;
+	}
+
+	hidePasswordProtectedGame({ withPassword }) {
+		return !withPassword;
+	}
+
+	hideBuddiesOnlyGame({ onlyBuddies }) {
+		return !onlyBuddies;
+	}
+
 	render() {
 		const { roomId } = this.props.match.params;
 		const room = this.props.rooms[roomId];
 
 		const messages = this.props.messages[roomId];
-		const games = room.gameList.filter(({ started, maxPlayers, playerCount }) => (
-			!started && playerCount < maxPlayers
+		const games = room.gameList.filter(game => (
+			this.hideUnavailableGame(game) &&
+			this.hidePasswordProtectedGame(game) &&
+			this.hideBuddiesOnlyGame(game)
 		));
+		
+		console.log(games);
 
 		return (
 			<div className="room-view">
