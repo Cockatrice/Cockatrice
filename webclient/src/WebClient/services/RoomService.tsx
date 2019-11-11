@@ -10,7 +10,6 @@ export class RoomService {
   }
 
   joinRoom(roomInfo) {
-    const { roomId } = roomInfo;
     Dispatch.joinRoom(roomInfo);
   }
 

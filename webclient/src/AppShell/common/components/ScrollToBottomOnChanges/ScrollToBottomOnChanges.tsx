@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const ScrollToBottomOnChanges = ({ content, changes }) => {
   const messagesEndRef = useRef(null);

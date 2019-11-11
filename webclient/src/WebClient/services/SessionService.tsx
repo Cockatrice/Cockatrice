@@ -45,6 +45,14 @@ export class SessionService {
     Dispatch.updateUsers(users);
   }
 
+  userJoined(user) {
+    Dispatch.userJoined(user);
+  }
+
+  userLeft(userId) {
+    Dispatch.userLeft(userId);
+  }
+
   serverMessage(message) {
     Dispatch.serverMessage(sanitizeHtml(message));
   }

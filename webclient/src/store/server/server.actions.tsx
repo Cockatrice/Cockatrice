@@ -27,5 +27,13 @@ export const Actions = {
   updateUsers: users => ({
     type: Types.UPDATE_USERS,
     users
+  }),
+  userJoined: user => ({
+    type: Types.USER_JOINED,
+    user
+  }),
+  userLeft: name => ({
+    type: Types.USER_LEFT,
+    name
   })
 }

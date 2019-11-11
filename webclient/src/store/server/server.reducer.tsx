@@ -73,6 +73,24 @@ export const serverReducer = (state = initialState, action: any) => {
         users
       };
     }
+    case Types.USER_JOINED: {
+      return {
+        ...state,
+        users: [
+          ...state.users,
+          { ...action.user }
+        ]
+      };
+    }
+    case Types.USER_LEFT: {
+      const { name } = action;
+      const users = state.users.filter(user => user.name !== name);
+
+      return {
+        ...state,
+        users
+      };
+    }
     default:
       return state;
   }

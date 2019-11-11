@@ -19,11 +19,11 @@ class ConnectForm extends Component<InjectedFormProps> {
         </div>
         <div className="connectForm-item">
           <label className="connectForm-item__label" htmlFor="user">User</label>  
-          <Field className="connectForm-item__field" name="user" component="input" type="text" />
+          <Field className="connectForm-item__field" name="user" component="input" type="text" autoComplete="username" />
         </div>
         <div className="connectForm-item">
           <label className="connectForm-item__label" htmlFor="pass">Password</label>  
-          <Field className="connectForm-item__field" name="pass" component="input" type="password" />
+          <Field className="connectForm-item__field" name="pass" component="input" type="password" autoComplete="current-password" />
         </div>
         <button className="connectForm-submit" type="submit">Connect</button>
       </form>

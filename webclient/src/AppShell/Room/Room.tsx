@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { withRouter, RouteComponentProps } from "react-router-dom";
+import { withRouter /*, RouteComponentProps */ } from "react-router-dom";
 
 import { RoomsStateMessages, RoomsStateRooms, Selectors } from 'store/rooms';
 

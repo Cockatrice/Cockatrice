@@ -26,6 +26,12 @@ export const Dispatch = {
   updateUsers: users => {
     store.dispatch(Actions.updateUsers(users));
   },
+  userJoined: user => {
+    store.dispatch(Actions.userJoined(user));
+  },
+  userLeft: name => {
+    store.dispatch(Actions.userLeft(name));
+  },
   serverMessage: message => {
     store.dispatch(Actions.serverMessage(message));
   }

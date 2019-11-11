@@ -5,5 +5,7 @@ export const Types = {
   UPDATE_INFO: "[Server] Update Info",
   UPDATE_STATUS: "[Server] Update Status",
   UPDATE_USER: "[Server] Update User",
-  UPDATE_USERS: "[Server] Update Users"
+  UPDATE_USERS: "[Server] Update Users",
+  USER_JOINED: "[Server] User Joined",
+  USER_LEFT: "[Server] User Left"
 };
