@@ -2,7 +2,7 @@
 
 # Check formatting using clang-format
 echo "Checking your code using clang-format..."
-diff="$(./clangify.sh --diff --cf-version)"
+diff="$(./clangify.sh --color-diff --cf-version)"
 err=$?
 case $err in
   1)
