@@ -1793,8 +1793,7 @@ void WebsocketServerSocketInterface::binaryMessageReceived(const QByteArray &mes
     processCommandContainer(newCommandContainer);
 }
 
-// TODO make this configurable?
 bool AbstractServerSocketInterface::isPasswordLongEnough(const int passwordLength)
 {
-    return passwordLength < 6;
+    return passwordLength < servatrice->getMinPasswordLength();
 }
