@@ -8,6 +8,7 @@
 #include "pb/serverinfo_user.pb.h"
 #include "player.h"
 #include "soundengine.h"
+#include "phase.h"
 
 const QString MessageLogWidget::tableConstant() const
 {
@@ -561,8 +562,18 @@ void MessageLogWidget::logSay(Player *player, QString message)
 
 void MessageLogWidget::logSetActivePhase(int phase)
 {
-    QString phaseName;
-    QString color;
+    Phase phaseT(phase);
+    QString phaseName = phaseT.getName();
+    QString color = phaseT.getColor();
+
+    if( phaseT.getName() != "Unknown Phase" ){
+        soundEngine->playSound(phaseT.getSoundFileName());
+    }
+
+    appendHtml("<font color=\"" + color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
+               QString("%1").arg(tr(phaseName.toStdString().c_str())) + "</b></font>");
+
+/*
     switch (phase) { // TODO: define phases
         case 0:
             phaseName = tr("Untap");
@@ -626,6 +637,7 @@ void MessageLogWidget::logSetActivePhase(int phase)
     }
     appendHtml("<font color=\"" + color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
                QString("%1").arg(phaseName) + "</b></font>");
+    */
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
